@@ -4,6 +4,7 @@
 #include<QDebug>
 #include<QMessageBox>
 #include<QtNetwork>
+#include<QDesktopServices>
 
 login::login(QWidget *parent) :
     QDialog(parent),
@@ -14,6 +15,7 @@ login::login(QWidget *parent) :
     ui->setupUi(this);
     // Initialize user token
     ezpi_user_token.clear();
+
 }
 
 login::~login() {
@@ -27,19 +29,11 @@ void login::on_buttonBox_accepted() {
 
 void login::on_pushButton_login_clicked() {
 
-#if 1
-
     if((ui->lineEdit_user_name->text().length() < 1) || ui->lineEdit_password->text().length() < 1) {
 
         QMessageBox::warning(this, "Invalid credentials!", "The credentials entered is invalid!");
 
     } else {
-
-//        memcpy(ezpi_user_name, ui->lineEdit_user_name->text().toLatin1(), ui->lineEdit_user_name->text().length());
-//        ezpi_user_name[ui->lineEdit_user_name->text().length()] = 0;
-
-//        memcpy(ezpi_user_pass, ui->lineEdit_password->text().toLatin1(), ui->lineEdit_password->text().length());
-//        ezpi_user_name[ui->lineEdit_password->text().length()] = 0;
 
         ezpi_user_name = ui->lineEdit_user_name->text();
         ezpi_user_pass = ui->lineEdit_password->text();
@@ -73,35 +67,6 @@ void login::on_pushButton_login_clicked() {
 
         manager->post(request, data);
     }
-
-#else
-        QUrl url("https://api-cloud.ezlo.com/v1/request");
-        QNetworkRequest request(url);
-
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-        QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-
-        connect(manager, SIGNAL(finished(QNetworkReply*)),
-                this, SLOT(replyFinished(QNetworkReply*)));
-
-        QJsonObject obj_param;
-        obj_param["user_id"] = "ezlopitest001";
-        obj_param["user_password"] = "ezlopitest001!2";
-
-        QJsonObject obj_main;
-        obj_main["call"] = "login_with_id_and_password";
-        obj_main["params"] = obj_param;
-
-        QJsonDocument doc(obj_main);
-
-        QByteArray data = doc.toJson(QJsonDocument::Compact);
-
-        // FIXME for debug
-        qDebug() << "Sync" << QString::fromUtf8(data.data(), data.size());
-
-        manager->post(request, data);
-#endif
 }
 
 void login::on_pushButton_cancle_clicked() {
@@ -113,8 +78,6 @@ void login::replyFinished(QNetworkReply *rep) {
     QByteArray response_bytes = rep->readAll();
 
 //    qDebug() << response_bytes;
-
-#if 1
 
         QJsonParseError jerror;
 
@@ -153,5 +116,5 @@ void login::replyFinished(QNetworkReply *rep) {
               qDebug() << "Incomplete and unknown status !";
               QMessageBox::information(this, "Login Failed !", "Failed login to ezlo cloud!");
           }
-#endif
 }
+

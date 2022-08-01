@@ -107,15 +107,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->comboBox_uart_list,SIGNAL(currentIndexChanged(const QString&)),
             this,SLOT(on_comboBox_uart_list_currentIndexChanged(const QString&)));
 
-
     // Timer initialization
     ezpi_timer_ask_info.callOnTimeout(this, &MainWindow::ezpi_message_info_no_firmware_detected);
-
-//    qDebug() << QUuid::createUuidV3(QUuid{}, uuid).toString().toLocal8Bit();
-//    qDebug() << QString::fromStdString(QUuid(uuid).toRfc4122().toStdString());
-
-//    QUuid::createUuidV3()
-//    QUuid myQTUUID = QUuid::createUuid();
 
 }
 
@@ -179,32 +172,6 @@ void MainWindow::pars(uchar *buf, int len) {
         break;
     }
     case SET_CONFIG:{
-        /*
-        if(cou_dev){
-            for(int i=0; cou_dev; i++){
-                QByteArray buf1;
-                buf1.append(0x95);
-                buf1.append(sizeof(device_t) + 2);
-                if(i == 0){
-                    buf1.append(FIRST_DEV);
-                }
-                else{
-                    buf1.append(SET_DEV);
-                }
-                unsigned char buf_d[sizeof(device_t)];
-                memcpy(buf_d,(void*)&device[i],sizeof(device_t));
-                for(unsigned int j = 0; j<sizeof(device_t); j++){
-                    buf1.append(buf_d[j]);
-                }
-                ezpi_serial_port.write(buf1,3 + sizeof(device_t));
-            }
-            QByteArray buf1;
-            buf1.append(0x95);
-            buf1.append(2);
-            buf1.append(END_DEV);
-            ezpi_serial_port.write(buf1,3);
-        }
-        */
 
             QMessageBox::information(this,"Info","Send to ESP OK!");
             break;
@@ -797,28 +764,10 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     qDebug() << "Current dir : " << QDir::currentPath();
     ui->textBrowser_console_log->append("Current dir: " + QDir::currentPath());
 
-
-//    QString command = "";
-//    for(auto args : arguments) {
-//        command += args + " ";
-//    }
     qDebug() << "Arguments : " << argument_string;
 
-//    ezpi_process_write_flash->setArguments(arguments);
-//    ezpi_process_write_flash->arguments();
     ezpi_process_write_flash->setNativeArguments(argument_string);
     ezpi_process_write_flash->start();
-#if 0
-    qDebug() << command;
-
-    QString fl1 = " -p " + ser_port + " -b 460800 --before default_reset --after hard_reset --chip esp32  write_flash --flash_mode dio --flash_size detect --flash_freq 40m 0x1000 " +
-            path_files + "/bootloader.bin 0x8000 " + path_files + "/partition-table.bin 0x10000 " + path_files + "/esp_configs.bin 0x2E0000 " + path_files + "/ld.bin";
-    QString comm = fl + /* ui->comboBox_uart_list->currentText() + */ fl1;
-    qDebug() << comm;
-    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(comm + "\n");
-
-    ezpi_process_write_flash->start(comm);
-#endif
 }
 
 void MainWindow::on_pushButton_clear_uart_direct_log_clicked() {
@@ -990,20 +939,6 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
     connect(ezpi_process_erase_flash, &QProcess::readyReadStandardOutput, this, &MainWindow::ezpi_log_erase_flash);
     connect(ezpi_process_erase_flash, &QProcess::readyReadStandardError, this, &MainWindow::ezpi_log_erase_flash);
 
-//    QString dir;
-//    QString path_files = QDir::currentPath();
-
-//    dir = path_files + "/esptool.exe ";
-
-//    qDebug() << dir;
-//    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(dir + "\n");
-
-//    path_files = QFileInfo(dir).absoluteDir().absolutePath();
-//    qDebug() << path_files;
-//    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(path_files + "\n");
-
-//    QString fl = dir;
-
     ezpi_serial_port.close();
     ui->pushButton_connect_uart->setEnabled(false);
 
@@ -1123,9 +1058,8 @@ void MainWindow::on_actionRegister_triggered() {
     if(flag_login == true) {
 
         if(QDateTime::currentSecsSinceEpoch() < login_expires) {
-//            ui->textBrowser_console_log->append("Login Success !");
-//            if(flag_login) qDebug() << "Login Success !";
-            qDebug() << "Token: " << user_token;
+
+//            qDebug() << "Token: " << user_token;
 
             QJsonObject jobj_get_uuid_root;
             QJsonObject jobj_param;
@@ -1170,7 +1104,7 @@ void MainWindow::on_actionRegister_triggered() {
 }
 
 void MainWindow::success_prov_dat(QNetworkReply *d) {
-#if 1
+
     qDebug() << "Added new device";
     ui->textBrowser_console_log->append("Added new device!");
     QByteArray response_bytes = d->readAll();
@@ -1200,16 +1134,10 @@ void MainWindow::success_prov_dat(QNetworkReply *d) {
         QJsonObject jobj_data = jobj_main["data"].toObject();
         QString uuid = jobj_data["uuid"].toString();
 
-        // Get prov lists :
-   //     {"call":"self_provision_get","params":{"uuid":"131d03bf-28ae-4e72-b63b-47a18e1af2f5"}}
-       #endif
-
-   //     user_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6eyJ1dWlkIjoiOWZjMTg2ZTAtZjYxMS0xMWVjLWE5ZjctMDdhYjAxODFiNTA0IiwiZXhwaXJlc190cyI6MTY1NjQxODAwOSwiZ2VuZXJhdGVkX3RzIjoxNjU2MzMxNjA5LCJ0eXBlIjoidXNlciJ9LCJsb2NhdGlvbiI6eyJpZCI6NTAyMDU5MiwidXVpZCI6IjUzOWQzZmEwLWYyY2ItMTFlYy04ZjgwLTNmZDVhM2JhYjcxNyJ9LCJvZW0iOnsiaWQiOjF9LCJ1c2VyIjp7ImlkIjo1MDIwOTQyLCJ1dWlkIjoiNTM4ODdmMjAtZjJjYi0xMWVjLWFhMTktNDdlZjVlOWVhOTMxIn0sImxlZ2FjeSI6eyJhY2NvdW50Ijp7ImlkIjo1MDIwNTkyfX0sImlhdCI6MTY1NjMzMTYxMCwiZXhwIjoxNjU2NDE4MDA4fQ.GODCEgk2pr4ZxC-vtSiobCjqG3DvFY16ic1ityRzi9Y";
         QJsonObject jobj_get_prov_json;
         QJsonObject jobj_param;
 
         jobj_param["uuid"] = uuid;
-   //     jobj_param["uuid"] = "7a3424be-d62c-4305-9184-72c95057e9f9";
         jobj_get_prov_json["params"] = jobj_param;
         jobj_get_prov_json["call"] = QString("self_provision_get");
 
@@ -1289,7 +1217,6 @@ void MainWindow::success_get_prov_jsons(QNetworkReply *d) {
 
         ui->textBrowser_console_log->append( QString::fromStdString("provision_server: ") + jobj_prov_data_prov_data["provision_server"].toString());
         ui->textBrowser_console_log->append( QString::fromStdString("cloud_server: ") + jobj_prov_data_prov_data["cloud_server"].toString());
-//        ui->textBrowser_console_log->append( QString::fromStdString("provision_token: ") + jobj_prov_data_prov_data["provision_token"].toString());
         ui->textBrowser_console_log->append( QString::fromStdString("default_wifi_ssid: ") + jobj_prov_data_prov_data["default_wifi_ssid"].toString());
         ui->textBrowser_console_log->append( QString::fromStdString("default_wifi_password: ") + jobj_prov_data_prov_data["default_wifi_password"].toString());
         ui->textBrowser_console_log->append( QString::fromStdString("controller_uuid: ") + jobj_prov_data_data["controller_uuid"].toString());

@@ -31,9 +31,7 @@ public:
     QWidget *layoutWidget;
     QHBoxLayout *horizontalLayout_3;
     QSpacerItem *horizontalSpacer_4;
-    QLabel *label_reset_password;
-    QSpacerItem *horizontalSpacer_3;
-    QLabel *label_sign_in;
+    QLabel *label_need_help_login;
     QLineEdit *lineEdit_password;
     QPushButton *pushButton_cancle;
     QPushButton *pushButton_login;
@@ -65,19 +63,11 @@ public:
 
         horizontalLayout_3->addItem(horizontalSpacer_4);
 
-        label_reset_password = new QLabel(layoutWidget);
-        label_reset_password->setObjectName(QString::fromUtf8("label_reset_password"));
+        label_need_help_login = new QLabel(layoutWidget);
+        label_need_help_login->setObjectName(QString::fromUtf8("label_need_help_login"));
+        label_need_help_login->setOpenExternalLinks(true);
 
-        horizontalLayout_3->addWidget(label_reset_password);
-
-        horizontalSpacer_3 = new QSpacerItem(38, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_3->addItem(horizontalSpacer_3);
-
-        label_sign_in = new QLabel(layoutWidget);
-        label_sign_in->setObjectName(QString::fromUtf8("label_sign_in"));
-
-        horizontalLayout_3->addWidget(label_sign_in);
+        horizontalLayout_3->addWidget(label_need_help_login);
 
         lineEdit_password = new QLineEdit(login);
         lineEdit_password->setObjectName(QString::fromUtf8("lineEdit_password"));
@@ -89,6 +79,8 @@ public:
         pushButton_login = new QPushButton(login);
         pushButton_login->setObjectName(QString::fromUtf8("pushButton_login"));
         pushButton_login->setGeometry(QRect(250, 180, 80, 23));
+#if QT_CONFIG(shortcut)
+#endif // QT_CONFIG(shortcut)
 
         retranslateUi(login);
 
@@ -103,8 +95,10 @@ public:
         label_enter_ezlo_credentials->setText(QCoreApplication::translate("login", "Enter ezlo user name and password to continue.", nullptr));
         lineEdit_user_name->setText(QString());
         lineEdit_user_name->setPlaceholderText(QCoreApplication::translate("login", "user name or email", nullptr));
-        label_reset_password->setText(QCoreApplication::translate("login", "Reset Password", nullptr));
-        label_sign_in->setText(QCoreApplication::translate("login", "Register", nullptr));
+#if QT_CONFIG(tooltip)
+        label_need_help_login->setToolTip(QCoreApplication::translate("login", "Click for help from getvera login page.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_need_help_login->setText(QCoreApplication::translate("login", "<a href=\"https://home.getvera.com/users/login/\">Need Help in login ?</a>", nullptr));
         lineEdit_password->setPlaceholderText(QCoreApplication::translate("login", "Enter password", nullptr));
         pushButton_cancle->setText(QCoreApplication::translate("login", "Cancle", nullptr));
         pushButton_login->setText(QCoreApplication::translate("login", "Login", nullptr));

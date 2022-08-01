@@ -92,29 +92,18 @@
      </spacer>
     </item>
     <item>
-     <widget class="QLabel" name="label_reset_password">
+     <widget class="QLabel" name="label_need_help_login">
+      <property name="toolTip">
+       <string>Click for help from getvera login page.</string>
+      </property>
       <property name="text">
-       <string>Reset Password</string>
+       <string>&lt;a href=&quot;https://home.getvera.com/users/login/&quot;&gt;Need Help in login ?&lt;/a&gt;</string>
       </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="horizontalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+      <property name="openExternalLinks">
+       <bool>true</bool>
       </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>38</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_sign_in">
-      <property name="text">
-       <string>Register</string>
+      <property name="buddy">
+       <cstring></cstring>
       </property>
      </widget>
     </item>

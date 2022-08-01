@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ezlogic"
-#define MyAppVersion "beta build-02"
+#define MyAppVersion "1.0.1.02"
 #define MyAppPublisher "Ezlo Innovation"
 #define MyAppURL "https://www.ezlopi.com/"
 #define MyAppExeName "ezlogic.exe"
@@ -22,8 +22,8 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=E:\Projects\nds\ezlopi\dashboard_qt\installer
-OutputBaseFilename=ezlogic_win_installer_build_02
+OutputDir=E:\Projects\nds\Ezlo_Pi\dashboard_qt\installer
+OutputBaseFilename=ezlogic_win_installer_10102
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -36,27 +36,111 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
+[CustomMessages]
+InstallingVC2019redist = Installing Visual Studio Redistributable 2019
+
 [Files]
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\D3Dcompiler_47.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\libEGL.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\libGLESv2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\opengl32sw.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\Qt5Core.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\Qt5Gui.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\Qt5Network.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\Qt5SerialPort.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\Qt5Svg.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\Qt5Widgets.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\bearer\*"; DestDir: "{app}\bearer"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\esptool\*"; DestDir: "{app}\esptool"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\ezpibins\*"; DestDir: "{app}\ezpibins"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\iconengines\*"; DestDir: "{app}\iconengines"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\imageformats\*"; DestDir: "{app}\imageformats"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\styles\*"; DestDir: "{app}\styles"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_15_2_MSVC2019_64bit-Release\release\translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\D3Dcompiler_47.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\libEGL.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\libGLESv2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\opengl32sw.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\Qt5Core.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\Qt5Gui.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\Qt5Network.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\Qt5SerialPort.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\Qt5Svg.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\Qt5Widgets.dll"; DestDir: "{app}"; Flags: ignoreversion
+
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-console-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-datetime-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-debug-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-errorhandling-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-file-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-file-l1-2-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-file-l2-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-handle-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-heap-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-interlocked-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-libraryloader-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-localization-l1-2-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-memory-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-namedpipe-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-processenvironment-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-processthreads-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-processthreads-l1-1-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-profile-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-rtlsupport-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-string-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-synch-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-synch-l1-2-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-sysinfo-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-timezone-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-core-util-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-conio-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-convert-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-environment-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-filesystem-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-heap-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-locale-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-math-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-multibyte-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-private-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-process-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-runtime-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-stdio-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-string-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-time-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\api-ms-win-crt-utility-l1-1-0.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\concrt140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\ucrtbase.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\libcrypto-1_1-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\libssl-1_1-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\bearer\*"; DestDir: "{app}\bearer"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\esptool\*"; DestDir: "{app}\esptool"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\ezpibins\*"; DestDir: "{app}\ezpibins"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\iconengines\*"; DestDir: "{app}\iconengines"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\imageformats\*"; DestDir: "{app}\imageformats"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\styles\*"; DestDir: "{app}\styles"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; VC++ redistributable runtime. Extracted by VC2017RedistNeedsInstall(), if needed.
+Source: "E:\Projects\nds\Ezlo_Pi\dashboard_qt\release\depends\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+
+[Run]
+Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "{cm:InstallingVC2019redist}"; \
+Parameters: "/quiet"; Check: VC201522RedistNeedsInstall ; Flags: waituntilterminated
+
+
+[Code]
+function VC201522RedistNeedsInstall: Boolean;
+var 
+  Version: String;
+begin
+  if RegQueryStringValue(HKEY_LOCAL_MACHINE,
+       'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64', 'Version', Version) then
+  begin
+    // Is the installed version at least 14.32 ? 
+    Log('VC Redist Version check : found ' + Version);
+    Result := (CompareStr(Version, 'v14.32.31332.00')<0);
+  end
+  else 
+  begin
+    // Not even an old version installed
+    Result := True;
+  end;
+  if (Result) then
+  begin
+    ExtractTemporaryFile('VC_redist.x64.exe');
+  end;
+end;
+
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

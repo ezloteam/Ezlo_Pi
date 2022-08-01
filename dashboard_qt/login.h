@@ -31,7 +31,7 @@ private slots:
 
     void on_pushButton_cancle_clicked();
 
-    void replyFinished(QNetworkReply *) ;
+    void replyFinished(QNetworkReply *);
 
 private:
     Ui::login *ui;

@@ -21,6 +21,8 @@ HEADERS  += mainwindow.h \
     ezuuid.h \
     login.h
 
+#CONFIG += console
+
 FORMS    += mainwindow.ui \
     login.ui
 

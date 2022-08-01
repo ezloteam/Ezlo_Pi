@@ -156,7 +156,7 @@ public:
         scrollArea_device_type->setWidget(scrollAreaWidgetContents_add_device);
         scrollArea_set_wifi_cred = new QScrollArea(centralWidget);
         scrollArea_set_wifi_cred->setObjectName(QString::fromUtf8("scrollArea_set_wifi_cred"));
-        scrollArea_set_wifi_cred->setGeometry(QRect(200, 150, 251, 211));
+        scrollArea_set_wifi_cred->setGeometry(QRect(130, 150, 251, 211));
         scrollArea_set_wifi_cred->setWidgetResizable(true);
         scrollAreaWidgetContents_set_wifi = new QWidget();
         scrollAreaWidgetContents_set_wifi->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_set_wifi"));
@@ -185,7 +185,7 @@ public:
         scrollArea_set_wifi_cred->setWidget(scrollAreaWidgetContents_set_wifi);
         scrollArea_gpio_config = new QScrollArea(centralWidget);
         scrollArea_gpio_config->setObjectName(QString::fromUtf8("scrollArea_gpio_config"));
-        scrollArea_gpio_config->setGeometry(QRect(170, 110, 281, 361));
+        scrollArea_gpio_config->setGeometry(QRect(220, 110, 281, 361));
         scrollArea_gpio_config->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
