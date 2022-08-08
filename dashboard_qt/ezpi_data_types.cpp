@@ -1,0 +1,88 @@
+
+#include "ezpi_data_types.h"
+
+EzPi::EzPi():
+    _ezpi_board_type(EZPI_BOARD_TYPE_ESP32_GENERIC)
+{
+
+}
+
+EzPi::~EzPi() {
+
+}
+
+void EzPi::EZPI_SET_BOARD_TYPE(ezpi_board_type board_type) {
+
+    _ezpi_board_type = board_type;
+    switch(_ezpi_board_type) {
+    case EZPI_BOARD_TYPE_ESP32_GENERIC:
+        ezpi_gpio_pool.resize(EZPI_ESP32_GENERIC_PINOUT_COUNT);
+        break;
+    case EZPI_BOARD_TYPE_ESP32_C3:
+        break;
+    case EZPI_BOARD_TYPE_ESP32_S3:
+        break;
+    default:
+        break;
+    }
+}
+
+void EzPi::EZPI_INIT_BOARD(void) {
+
+    ezlogic_output_devices.resize(EZPI_MAX_DEV_DIO);
+    ezlogic_input_devices.resize(EZPI_MAX_DEV_DIP);
+    ezlogic_i2c_devices.resize(EZPI_MAX_DEV_I2C);
+    ezlogic_spi_devices.resize(EZPI_MAX_DEV_SPI);
+
+    switch (_ezpi_board_type) {
+        case EZPI_BOARD_TYPE_ESP32_GENERIC:
+            // Reference [unofficial]
+            // https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+            ezpi_gpio_pool.at(0) = (EZPI_UINT8)EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(1) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(2) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(3) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(4) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(5) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(6) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(7) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(8) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(9) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(10) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(11) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(12) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(13) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(14) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(15) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(16) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(17) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(18) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(19) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(20) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(21) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(22) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(23) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(24) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(25) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(26) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(27) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(28) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(29) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(30) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(31) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(32) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(33) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(34) = EZPI_DEV_TYPE_INPUT_ONLY;
+            ezpi_gpio_pool.at(35) = EZPI_DEV_TYPE_INPUT_ONLY;
+            ezpi_gpio_pool.at(36) = EZPI_DEV_TYPE_INPUT_ONLY;
+            ezpi_gpio_pool.at(37) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(38) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(39) = EZPI_DEV_TYPE_INPUT_ONLY;
+            break;
+        case EZPI_BOARD_TYPE_ESP32_C3:
+            break;
+        default:
+            break;
+    }
+}
+

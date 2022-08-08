@@ -26,17 +26,6 @@
 #include "ezuuid.h"
 #include<iostream>
 
-enum commands {
-    GET_CONFIG = 0xa0,
-    SET_CONFIG,
-    SET_VOL,
-    SET_WiFi,
-    FIRST_DEV,
-    SET_DEV,
-    GET_DEV,
-    END_DEV
-} ;
-
 device_t device[EZPI_MAX_DEVICES];
 int cou_dev = 0;
 
@@ -62,14 +51,24 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(810, 628);
     ui->setupUi(this);
 
+    EzloPi = new EzPi();
+    EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_GENERIC);
+    EzloPi->EZPI_INIT_BOARD();
+
     ezpi_form_login = new login(this);
+    ezpi_form_WiFi = new Dialog_WiFi(this);
+    ezpi_form_devadd = new Dialog_devadd(this);
+    ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
+    ezpi_form_config_digital_ip = new Dialog_config_input(this);
+    ezpi_form_config_onewire = new Dialog_config_onewire(this);
+    ezpi_form_config_i2c = new Dialog_config_i2c(this);
+    ezpi_form_config_spi = new Dialog_config_spi(this);
 
-//    QTimer::singleShot(1000, this, [=]() {
-//        ezpi_form_login->setModal(true);
-//        ezpi_form_login->show();
-//    });
+    connect(ezpi_form_devadd, SIGNAL(ezpi_send_dev_type_selected(EZPI_UINT8)), this, SLOT(ezpi_receive_dev_type_selected(EZPI_UINT8)));
 
-     user_token.clear();
+
+
+    user_token.clear();
 
     // Hide pop-up widgets
     ui->scrollArea_gpio_config->setVisible(false);
@@ -373,7 +372,6 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
 
         ui->tableWidget_device_table->clearContents();
         ui->tableWidget_device_table->setEnabled(false);
-
     }
 }
 
@@ -383,8 +381,9 @@ void MainWindow::on_pushButton_add_device_clicked() {
         QMessageBox::information(this,"Device full","Devices reaches top limit, no more devices can be added");
         return;
     }
-    ui->comboBox_device_type->setCurrentIndex(0);
-    ui->scrollArea_device_type->setVisible(true);
+
+    ezpi_form_devadd->setModal(true);
+    ezpi_form_devadd->show();
 }
 
 void MainWindow::on_pushButton_gpio_cancel_clicked() {
@@ -775,9 +774,7 @@ void MainWindow::on_pushButton_clear_uart_direct_log_clicked() {
 }
 
 void MainWindow::on_pushButton_set_wifi_clicked() {
-    ui->lineEdit_set_wifi_ssid->setText("");
-    ui->lineEdit_set_wifi_pass->setText("");
-    ui->scrollArea_set_wifi_cred->setVisible(true);
+    ezpi_form_WiFi->show();
 }
 
 void MainWindow::on_pushButton_set_wifi_cancel_clicked() {
@@ -806,63 +803,6 @@ void MainWindow::on_pushButton_set_wifi_apply_clicked() {
 
 void MainWindow::on_pushButton_select_device_type_apply_clicked() {
 
-    QString str;
-
-    ui->scrollArea_device_type->setVisible(false);
-
-    if(ui->comboBox_device_type->currentIndex() >= DEV_TYPE_TAMPER) {
-        QMessageBox::information(this,"Unsupported","Not yet supported");
-        return;
-    }
-
-    ui->comboBox_gpio_out_select_pin->clear();
-
-    for(int i = 0; i < EZPI_MAX_GPIOS; i++) {
-        if(gpio_m[i] == DEV_NONE) {
-            ui->comboBox_gpio_out_select_pin->addItem(str.asprintf("%d",i));
-        }
-    }
-
-    int gp_i = ui->comboBox_gpio_out_select_pin->currentText().toInt();
-
-    ui->comboBox_gpio_in_select_pin->clear();
-
-    for(int i = 0; i < EZPI_MAX_GPIOS; i++) {
-        if(gpio_m[i] == DEV_NONE) {
-            if(i!=gp_i) {
-                ui->comboBox_gpio_in_select_pin->addItem(str.asprintf("%d",i));
-            }
-        }
-    }
-
-    ui->groupBox_gpio_our_default_bool->setEnabled(true);
-    ui->lineEdit_gpio_device_name->setText(ui->comboBox_device_type->currentText());
-    ui->comboBox_gpio_out_select_pin->setEnabled(true);
-    ui->groupBox_gpio_our_default_shunt_res->setEnabled(true);
-    ui->groupBox_gpio_our_default_bool->setEnabled(true);
-
-    if(ui->comboBox_device_type->currentIndex() == DEV_TYPE_LED) {
-
-        ui->checkBox_gpio_led_button_enable->setChecked(false);
-
-    } else {
-
-        ui->checkBox_gpio_led_button_enable->setChecked(true);
-
-        if(ui->comboBox_device_type->currentIndex() == DEV_TYPE_TAMPER) {
-
-            ui->comboBox_gpio_out_select_pin->clear();
-            ui->comboBox_gpio_out_select_pin->setEnabled(false);
-            ui->groupBox_gpio_our_default_shunt_res->setEnabled(false);
-            ui->groupBox_gpio_our_default_bool->setEnabled(false);
-        }
-    }
-
-    ui->radioButton_gpio_out_default_pull_up->setChecked(true);
-    ui->radioButton_gpio_out_default_low->setChecked(true);
-
-
-    ui->scrollArea_gpio_config->setVisible(true);
 }
 
 void MainWindow::on_pushButton_select_device_type_cancel_clicked() {
@@ -1344,5 +1284,76 @@ void MainWindow::success_get_prov_jsons(QNetworkReply *d) {
 void MainWindow::on_actionLogin_triggered() {
     ezpi_form_login->setModal(true);
     ezpi_form_login->show();
+}
+
+void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
+    qDebug() << "Device type Index: " << dev_type_index;
+
+
+    switch(dev_type_index) {
+        case EZPI_DEV_TYPE_DIGITAL_OP: {
+            ezpi_form_configdev_digitalio->show();
+            break;
+        }
+        case EZPI_DEV_TYPE_DIGITAL_IP: {
+            ezpi_form_config_digital_ip->show();
+            break;
+        }
+        case EZPI_DEV_TYPE_ANALOG_IP: {
+           QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
+           break;
+        }
+        case EZPI_DEV_TYPE_ANALOG_OP: {
+            QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
+            break;
+        }
+        case EZPI_DEV_TYPE_PWM: {
+            QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
+            break;
+        }
+        case EZPI_DEV_TYPE_UART: {
+            QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
+            break;
+        }
+        case EZPI_DEV_TYPE_ONE_WIRE: {
+            ezpi_form_config_onewire->show();
+            break;
+        }
+        case EZPI_DEV_TYPE_I2C: {
+            ezpi_form_config_i2c->show();
+            break;
+        }
+        case EZPI_DEV_TYPE_SPI: {
+            ezpi_form_config_spi->show();
+            break;
+        }
+
+        default: {
+            QMessageBox::information(this, "Unknown", "Unknown type.");
+        }
+    }
+}
+
+
+void MainWindow::on_comboBox_esp32_board_type_currentIndexChanged(int index) {
+    EZPI_UINT8 board_index = index + 1;
+    switch(board_index) {
+        case EZPI_BOARD_TYPE_NONE:
+            break;
+        case EZPI_BOARD_TYPE_ESP32_GENERIC:
+            EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_GENERIC);
+            qDebug() << "New Selected board : ESP32 Generic.";
+            break;
+        case EZPI_BOARD_TYPE_ESP32_C3:
+            EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_C3);
+            qDebug() << "New Selected board : ESP32 C3.";
+            break;
+         case EZPI_BOARD_TYPE_ESP32_S3:
+            EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_S3);
+            qDebug() << "New Selected board : ESP32 S3.";
+            break;
+        default:
+            break;
+    }
 }
 

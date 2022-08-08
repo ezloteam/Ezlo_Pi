@@ -8,73 +8,16 @@
 #include <QProcess>
 
 #include<login.h>
-
-enum ezpi_devices {
-    DEV_NONE = 0,
-    DEV_USER
-};
-
-enum ezpi_dev_type {
-    DEV_TYPE_LED,
-    DEV_TYPE_SWITCH,
-    DEV_TYPE_PLUG,
-    DEV_TYPE_TAMPER,
-    DEV_TYPE_ONE_WIRE,
-    DEV_TYPE_I2C,
-    DEV_TYPE_PWM,
-    DEV_TYPE_ADC,
-    DEV_TYPE_FREQ,
-    DEV_TYPE_TOTAL
-};
-
-#define     SIZE_DEVICE_ID      8
-#define     SIZE_DEVICE_FNAME   16
-#define     SIZE_ROOM_ID        8
-#define     SIZE_ID_I           8
-#define     SIZE_UART_NAME      20
+#include<dialog_wifi.h>
+#include<dialog_devadd.h>
+#include<dialog_configdev_digitalio.h>
+#include<dialog_config_input.h>
+#include<dialog_config_onewire.h>
+#include<dialog_config_i2c.h>
+#include<dialog_config_spi.h>
 
 
-#define     MAX_DEVICES         10
-#define     MAX_GPIOS           28
-
-#define     EZPI_ID             1655702685UL        // Random Ezpi ID
-#define     EZPI_DEFAULT_BAUD   115200UL
-#define     EZPI_MAX_DEVICES    10
-#define     EZPI_MAX_GPIOS      28
-
-
-#define     MAX_DEV             EZPI_MAX_DEVICES
-
-#define     SIZE_EZPI_OFFSET_CONN_ID_0                          0X0000
-#define     SIZE_EZPI_OFFSET_CONN_ID_1                          0X7000
-#define     SIZE_EZPI_OFFSET_HUB_ID_0                           0XE000
-#define     SIZE_EZPI_OFFSET_HUB_ID_1                           0XF000
-
-struct device_t {
-    char dev_id[SIZE_DEVICE_ID];
-    unsigned char dev_type;
-    char Name[SIZE_DEVICE_FNAME];
-    char roomId[SIZE_ROOM_ID];
-    char id_i[SIZE_ID_I];           // Item ID
-    bool input_vol;
-    bool out_vol;
-    unsigned char input_gpio;
-    unsigned char out_gpio;
-    bool is_input;
-    bool checkBox_gpio_in_logic_type;       // Input Inv
-    bool checkBox_gpio_out_logic_type;      // Out put Inv
-    bool is_meter;
-};
-
-typedef union conv_u16_array {
-    uint8_t data_bytes[sizeof(uint16_t)];
-    uint16_t data;
-} conv_u16_array_t;
-
-typedef union conv_u64_array {
-    uint8_t data_bytes[sizeof(uint64_t)];
-    uint64_t data;
-} conv_64_array_t;
+#include "ezpi_data_types.h"
 
 namespace Ui {
 class MainWindow;
@@ -89,11 +32,15 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_serRX1();
 
+    // Custom slots
     void ezpi_log_write_flash();
-
     void ezpi_log_erase_flash();
+    void ezpi_check_firmware();
+    void ezpi_message_info_no_firmware_detected();
+    void ezpi_receive_dev_type_selected(EZPI_UINT8);
+
+    void on_serRX1();
 
     void on_pushButton_connect_uart_clicked();
 
@@ -135,9 +82,6 @@ private slots:
 
     void on_comboBox_uart_list_currentIndexChanged();
 
-    void ezpi_check_firmware();
-    void ezpi_message_info_no_firmware_detected();
-
     void on_actionExit_triggered();
 
     void on_actionEnable_Log_triggered();
@@ -150,6 +94,8 @@ private slots:
     void success_get_prov_jsons(QNetworkReply *d);
 
     void on_actionLogin_triggered();
+
+    void on_comboBox_esp32_board_type_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
@@ -175,11 +121,20 @@ private:
 
     void pars(uchar *buf, int len);
 
-    login * ezpi_form_login;
-
     QString user_token;
 
     bool ezpi_flag_registered;
+
+    login * ezpi_form_login;
+    Dialog_WiFi * ezpi_form_WiFi;
+    Dialog_devadd * ezpi_form_devadd;
+    Dialog_config_input * ezpi_form_config_digital_ip;
+    Dialog_configdev_digitalio * ezpi_form_configdev_digitalio;
+    Dialog_config_onewire * ezpi_form_config_onewire;
+    Dialog_config_i2c * ezpi_form_config_i2c;
+    Dialog_config_spi * ezpi_form_config_spi;
+
+    EzPi * EzloPi;
 
 };
 

@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -35,6 +36,7 @@ public:
     QLineEdit *lineEdit_password;
     QPushButton *pushButton_cancle;
     QPushButton *pushButton_login;
+    QCheckBox *checkBox_show_password;
 
     void setupUi(QDialog *login)
     {
@@ -43,19 +45,19 @@ public:
         login->resize(346, 225);
         label_user_name = new QLabel(login);
         label_user_name->setObjectName(QString::fromUtf8("label_user_name"));
-        label_user_name->setGeometry(QRect(32, 47, 66, 16));
+        label_user_name->setGeometry(QRect(32, 47, 71, 16));
         label_password = new QLabel(login);
         label_password->setObjectName(QString::fromUtf8("label_password"));
-        label_password->setGeometry(QRect(32, 80, 57, 16));
+        label_password->setGeometry(QRect(32, 80, 71, 16));
         label_enter_ezlo_credentials = new QLabel(login);
         label_enter_ezlo_credentials->setObjectName(QString::fromUtf8("label_enter_ezlo_credentials"));
-        label_enter_ezlo_credentials->setGeometry(QRect(31, 20, 291, 16));
+        label_enter_ezlo_credentials->setGeometry(QRect(10, 20, 321, 16));
         lineEdit_user_name = new QLineEdit(login);
         lineEdit_user_name->setObjectName(QString::fromUtf8("lineEdit_user_name"));
         lineEdit_user_name->setGeometry(QRect(110, 47, 201, 23));
         layoutWidget = new QWidget(login);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(80, 120, 232, 22));
+        layoutWidget->setGeometry(QRect(80, 140, 232, 22));
         horizontalLayout_3 = new QHBoxLayout(layoutWidget);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
@@ -75,10 +77,13 @@ public:
         lineEdit_password->setEchoMode(QLineEdit::Password);
         pushButton_cancle = new QPushButton(login);
         pushButton_cancle->setObjectName(QString::fromUtf8("pushButton_cancle"));
-        pushButton_cancle->setGeometry(QRect(150, 180, 80, 23));
+        pushButton_cancle->setGeometry(QRect(150, 180, 80, 31));
         pushButton_login = new QPushButton(login);
         pushButton_login->setObjectName(QString::fromUtf8("pushButton_login"));
-        pushButton_login->setGeometry(QRect(250, 180, 80, 23));
+        pushButton_login->setGeometry(QRect(250, 180, 80, 31));
+        checkBox_show_password = new QCheckBox(login);
+        checkBox_show_password->setObjectName(QString::fromUtf8("checkBox_show_password"));
+        checkBox_show_password->setGeometry(QRect(110, 110, 161, 24));
 #if QT_CONFIG(shortcut)
 #endif // QT_CONFIG(shortcut)
 
@@ -102,6 +107,7 @@ public:
         lineEdit_password->setPlaceholderText(QCoreApplication::translate("login", "Enter password", nullptr));
         pushButton_cancle->setText(QCoreApplication::translate("login", "Cancle", nullptr));
         pushButton_login->setText(QCoreApplication::translate("login", "Login", nullptr));
+        checkBox_show_password->setText(QCoreApplication::translate("login", "Show password", nullptr));
     } // retranslateUi
 
 };

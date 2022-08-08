@@ -118,3 +118,14 @@ void login::replyFinished(QNetworkReply *rep) {
           }
 }
 
+
+void login::on_checkBox_show_password_stateChanged(int arg1) {
+    if(arg1 == Qt::Unchecked) {
+        ui->lineEdit_password->setEchoMode(QLineEdit::EchoMode::Password);
+    } else if(arg1 == Qt::Checked) {
+        ui->lineEdit_password->setEchoMode(QLineEdit::EchoMode::Normal);
+    } else {
+        // Do nothing
+    }
+}
+

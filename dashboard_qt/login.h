@@ -33,6 +33,8 @@ private slots:
 
     void replyFinished(QNetworkReply *);
 
+    void on_checkBox_show_password_stateChanged(int arg1);
+
 private:
     Ui::login *ui;
     QString ezpi_user_name;

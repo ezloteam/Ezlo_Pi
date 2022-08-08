@@ -664,7 +664,7 @@
     <property name="geometry">
      <rect>
       <x>637</x>
-      <y>200</y>
+      <y>270</y>
       <width>151</width>
       <height>121</height>
      </rect>
@@ -703,7 +703,7 @@
     <property name="geometry">
      <rect>
       <x>639</x>
-      <y>60</y>
+      <y>130</y>
       <width>149</width>
       <height>129</height>
      </rect>
@@ -738,6 +738,44 @@
      </property>
     </widget>
    </widget>
+   <widget class="QComboBox" name="comboBox_esp32_board_type">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>90</y>
+      <width>131</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>ESP32 Generic</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>ESP32C3</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>ESP32S3</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="label_board_select">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>65</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Board Select</string>
+    </property>
+   </widget>
    <zorder>layoutWidget</zorder>
    <zorder>splitter</zorder>
    <zorder>scrollArea_device_type</zorder>
@@ -745,6 +783,8 @@
    <zorder>scrollArea_gpio_config</zorder>
    <zorder>groupBox_device_config</zorder>
    <zorder>groupBox</zorder>
+   <zorder>comboBox_esp32_board_type</zorder>
+   <zorder>label_board_select</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

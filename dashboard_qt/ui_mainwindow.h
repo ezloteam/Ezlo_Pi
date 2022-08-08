@@ -101,6 +101,8 @@ public:
     QGroupBox *groupBox;
     QPushButton *pushButton_add_device;
     QPushButton *pushButton_remove_device;
+    QComboBox *comboBox_esp32_board_type;
+    QLabel *label_board_select;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuHelp;
@@ -329,7 +331,7 @@ public:
         splitter->addWidget(textBrowser_console_log);
         groupBox_device_config = new QGroupBox(centralWidget);
         groupBox_device_config->setObjectName(QString::fromUtf8("groupBox_device_config"));
-        groupBox_device_config->setGeometry(QRect(637, 200, 151, 121));
+        groupBox_device_config->setGeometry(QRect(637, 270, 151, 121));
         pushButton_get_ezpi_config = new QPushButton(groupBox_device_config);
         pushButton_get_ezpi_config->setObjectName(QString::fromUtf8("pushButton_get_ezpi_config"));
         pushButton_get_ezpi_config->setGeometry(QRect(20, 30, 111, 31));
@@ -338,13 +340,22 @@ public:
         pushButton_set_ezpi_config->setGeometry(QRect(20, 70, 111, 31));
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(639, 60, 149, 129));
+        groupBox->setGeometry(QRect(639, 130, 149, 129));
         pushButton_add_device = new QPushButton(groupBox);
         pushButton_add_device->setObjectName(QString::fromUtf8("pushButton_add_device"));
         pushButton_add_device->setGeometry(QRect(20, 30, 111, 31));
         pushButton_remove_device = new QPushButton(groupBox);
         pushButton_remove_device->setObjectName(QString::fromUtf8("pushButton_remove_device"));
         pushButton_remove_device->setGeometry(QRect(20, 80, 111, 31));
+        comboBox_esp32_board_type = new QComboBox(centralWidget);
+        comboBox_esp32_board_type->addItem(QString());
+        comboBox_esp32_board_type->addItem(QString());
+        comboBox_esp32_board_type->addItem(QString());
+        comboBox_esp32_board_type->setObjectName(QString::fromUtf8("comboBox_esp32_board_type"));
+        comboBox_esp32_board_type->setGeometry(QRect(650, 90, 131, 26));
+        label_board_select = new QLabel(centralWidget);
+        label_board_select->setObjectName(QString::fromUtf8("label_board_select"));
+        label_board_select->setGeometry(QRect(650, 65, 111, 20));
         MainWindow->setCentralWidget(centralWidget);
         layoutWidget->raise();
         splitter->raise();
@@ -353,6 +364,8 @@ public:
         scrollArea_gpio_config->raise();
         groupBox_device_config->raise();
         groupBox->raise();
+        comboBox_esp32_board_type->raise();
+        label_board_select->raise();
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 810, 26));
@@ -459,6 +472,11 @@ public:
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "Device", nullptr));
         pushButton_add_device->setText(QCoreApplication::translate("MainWindow", "Add Device", nullptr));
         pushButton_remove_device->setText(QCoreApplication::translate("MainWindow", "Remove Device", nullptr));
+        comboBox_esp32_board_type->setItemText(0, QCoreApplication::translate("MainWindow", "ESP32 Generic", nullptr));
+        comboBox_esp32_board_type->setItemText(1, QCoreApplication::translate("MainWindow", "ESP32C3", nullptr));
+        comboBox_esp32_board_type->setItemText(2, QCoreApplication::translate("MainWindow", "ESP32S3", nullptr));
+
+        label_board_select->setText(QCoreApplication::translate("MainWindow", "Board Select", nullptr));
         menuFile->setTitle(QCoreApplication::translate("MainWindow", "File", nullptr));
         menuHelp->setTitle(QCoreApplication::translate("MainWindow", "Help", nullptr));
         menuView->setTitle(QCoreApplication::translate("MainWindow", "View", nullptr));
