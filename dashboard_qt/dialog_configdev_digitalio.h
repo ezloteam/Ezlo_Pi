@@ -2,7 +2,8 @@
 #define DIALOG_CONFIGDEV_DIGITALIO_H
 
 #include <QDialog>
-
+#include<QMessageBox>
+#include <QDebug>
 #include "ezpi_data_types.h"
 
 namespace Ui {

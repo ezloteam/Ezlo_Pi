@@ -522,6 +522,9 @@ debug\moc_mainwindow.cpp: mainwindow.h \
 		ezpi_data_types.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDataStream \
 		dialog_configdev_digitalio.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
 		dialog_config_input.h \
 		dialog_config_onewire.h \
 		dialog_config_i2c.h \
@@ -744,6 +747,11 @@ debug\moc_dialog_config_input.cpp: dialog_config_input.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\qfiledevice.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qvector2d.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtouchdevice.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
+		ezpi_data_types.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDataStream \
 		debug\moc_predefs.h \
 		C:\Qt\5.15.2\msvc2019_64\bin\moc.exe
 	C:\Qt\5.15.2\msvc2019_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include E:/Projects/nds/Ezlo_Pi/dashboard_qt/debug/moc_predefs.h -IC:/Qt/5.15.2/msvc2019_64/mkspecs/win32-msvc -IE:/Projects/nds/Ezlo_Pi/dashboard_qt -IC:/Qt/5.15.2/msvc2019_64/include -IC:/Qt/5.15.2/msvc2019_64/include/QtWidgets -IC:/Qt/5.15.2/msvc2019_64/include/QtGui -IC:/Qt/5.15.2/msvc2019_64/include/QtANGLE -IC:/Qt/5.15.2/msvc2019_64/include/QtSerialPort -IC:/Qt/5.15.2/msvc2019_64/include/QtNetwork -IC:/Qt/5.15.2/msvc2019_64/include/QtCore -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.32.31326\ATLMFC\include" -I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.32.31326\include" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\shared" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\um" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\winrt" -I"C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\cppwinrt" dialog_config_input.h -o debug\moc_dialog_config_input.cpp
@@ -1071,6 +1079,9 @@ debug\moc_dialog_configdev_digitalio.cpp: dialog_configdev_digitalio.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\qfiledevice.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qvector2d.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtouchdevice.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
 		ezpi_data_types.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDataStream \
 		debug\moc_predefs.h \
@@ -1963,6 +1974,9 @@ debug\main.obj: main.cpp mainwindow.h \
 		ezpi_data_types.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDataStream \
 		dialog_configdev_digitalio.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
 		dialog_config_input.h \
 		dialog_config_onewire.h \
 		dialog_config_i2c.h \
@@ -2185,6 +2199,11 @@ debug\dialog_config_input.obj: dialog_config_input.cpp dialog_config_input.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\qfiledevice.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qvector2d.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtouchdevice.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
+		ezpi_data_types.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDataStream \
 		ui_dialog_config_input.h
 
 debug\dialog_config_onewire.obj: dialog_config_onewire.cpp dialog_config_onewire.h \
@@ -2506,8 +2525,14 @@ debug\dialog_configdev_digitalio.obj: dialog_configdev_digitalio.cpp dialog_conf
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\qfiledevice.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qvector2d.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtouchdevice.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
 		ezpi_data_types.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDataStream \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qicon.h \
 		ui_dialog_configdev_digitalio.h
 
 debug\dialog_devadd.obj: dialog_devadd.cpp dialog_devadd.h \
@@ -3399,14 +3424,14 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		ezpi_data_types.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDataStream \
 		dialog_configdev_digitalio.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
 		dialog_config_input.h \
 		dialog_config_onewire.h \
 		dialog_config_i2c.h \
 		dialog_config_spi.h \
 		ui_mainwindow.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QDebug \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMessageBox \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmessagebox.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QJsonArray \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QJsonDocument \
 		C:\Qt\5.15.2\msvc2019_64\include\QtCore\QJsonObject \

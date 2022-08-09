@@ -2,8 +2,6 @@
 #include "qpushbutton.h"
 #include "ui_dialog_configdev_digitalio.h"
 
-#include<QMessageBox>
-
 
 void Dialog_configdev_digitalio::ezpi_ensure_no_same_pins() {
 
@@ -38,6 +36,7 @@ Dialog_configdev_digitalio::Dialog_configdev_digitalio(QWidget *parent, EzPi * E
     for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
         if((gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED) || (gpio_pool[i] == EZPI_DEV_TYPE_OUTPUT_ONLY))
             ui->comboBox_output_gpio->addItem(QString::number(i));
+//        qDebug() << "Gpio Pin: " << QString::number(i) << "value: " << QString::number(gpio_pool[i]);
     }
 }
 
@@ -47,7 +46,58 @@ Dialog_configdev_digitalio::~Dialog_configdev_digitalio() {
 
 void Dialog_configdev_digitalio::on_buttonBox_accepted() {
 
+    ezlogic_device_digital_op_t digital_op_user_data;
 
+     digital_op_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
+     digital_op_user_data.dev_name = ui->lineEdit_device_name->text();
+     digital_op_user_data.id_room = 0; // TBD
+     digital_op_user_data.id_item = ui->comboBox_output_subtype->currentIndex() + 1;
+
+     ezpi_high_low digital_op_default_value = (ezpi_high_low)ui->comboBox_default_value_output->currentIndex();
+     digital_op_default_value ? digital_op_user_data.val_op = true : digital_op_user_data.val_op = false;
+
+     digital_op_user_data.gpio_out = ui->comboBox_output_gpio->currentText().toInt();
+
+     if(ui->radioButton_output_pullup->isChecked()) digital_op_user_data.pullup_op = true;
+     else                                           digital_op_user_data.pullup_op = false;
+
+     if(ui->checkBox_invert_output->checkState() == Qt::Checked)    digital_op_user_data.op_inv = true;
+     else                                                           digital_op_user_data.op_inv = false;
+
+     // Update GPIO assignments with selected GPIO Output
+     ezloPi_digital_io->EZPI_SET_GPIO_POOL(digital_op_user_data.gpio_out, EZPI_DEV_TYPE_DIGITAL_OP);
+
+     if(ui->checkBox_enable_pushbutton->checkState() == Qt::Checked) {
+
+         digital_op_user_data.is_ip = true;
+
+         ezpi_high_low digital_ip_default_value = (ezpi_high_low)ui->comboBox_default_value_input->currentIndex();
+         digital_ip_default_value ? digital_op_user_data.val_ip = true : digital_op_user_data.val_ip = false;
+         digital_op_user_data.gpio_in = ui->comboBox_input_gpio->currentText().toInt();
+
+         if(ui->radioButton_input_pullup->isChecked()) digital_op_user_data.pullup_ip = true;
+         else                                           digital_op_user_data.pullup_ip = false;
+
+         if(ui->checkBox_invert_input->checkState() == Qt::Checked)    digital_op_user_data.ip_inv = true;
+         else                                                           digital_op_user_data.ip_inv = false;
+
+         // Update GPIO assignments with selected GPIO Input
+         ezloPi_digital_io->EZPI_SET_GPIO_POOL(digital_op_user_data.gpio_in, EZPI_DEV_TYPE_DIGITAL_IP);
+
+     } else {
+          digital_op_user_data.is_ip = false;
+     }
+
+     // Adding device to the device vector
+     if(ezloPi_digital_io->EZPI_ADD_OUTPUT_DEVICE(digital_op_user_data) == EZPI_SUCCESS) {
+        QMessageBox::information(this, "Success", "Successfully added a output device.");
+     } else if(ezloPi_digital_io->EZPI_ADD_OUTPUT_DEVICE(digital_op_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {
+        QMessageBox::information(this, "Error", "Error : Reached maximum output device limit.");
+     } else {
+         // Do nothing
+     }
+
+     // TODO : add device on the table on the UI
 }
 
 

@@ -58,14 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ezpi_form_login = new login(this);
     ezpi_form_WiFi = new Dialog_WiFi(this);
     ezpi_form_devadd = new Dialog_devadd(this);
-    ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
-    ezpi_form_config_digital_ip = new Dialog_config_input(this);
-    ezpi_form_config_onewire = new Dialog_config_onewire(this);
-    ezpi_form_config_i2c = new Dialog_config_i2c(this);
-    ezpi_form_config_spi = new Dialog_config_spi(this);
 
     connect(ezpi_form_devadd, SIGNAL(ezpi_send_dev_type_selected(EZPI_UINT8)), this, SLOT(ezpi_receive_dev_type_selected(EZPI_UINT8)));
-
 
 
     user_token.clear();
@@ -1286,17 +1280,22 @@ void MainWindow::on_actionLogin_triggered() {
     ezpi_form_login->show();
 }
 
+
 void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
     qDebug() << "Device type Index: " << dev_type_index;
 
 
     switch(dev_type_index) {
         case EZPI_DEV_TYPE_DIGITAL_OP: {
+            ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
             ezpi_form_configdev_digitalio->show();
+            ezpi_form_configdev_digitalio->setModal(true);
             break;
         }
         case EZPI_DEV_TYPE_DIGITAL_IP: {
+            ezpi_form_config_digital_ip = new Dialog_config_input(this, EzloPi);
             ezpi_form_config_digital_ip->show();
+            ezpi_form_config_digital_ip->setModal(true);
             break;
         }
         case EZPI_DEV_TYPE_ANALOG_IP: {
@@ -1316,15 +1315,21 @@ void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_ONE_WIRE: {
+            ezpi_form_config_onewire = new Dialog_config_onewire(this);
             ezpi_form_config_onewire->show();
+            ezpi_form_config_onewire->setModal(true);
             break;
         }
         case EZPI_DEV_TYPE_I2C: {
+            ezpi_form_config_i2c = new Dialog_config_i2c(this);
             ezpi_form_config_i2c->show();
+            ezpi_form_config_i2c->setModal(true);
             break;
         }
         case EZPI_DEV_TYPE_SPI: {
+            ezpi_form_config_spi = new Dialog_config_spi(this);
             ezpi_form_config_spi->show();
+            ezpi_form_config_spi->setModal(true);
             break;
         }
 

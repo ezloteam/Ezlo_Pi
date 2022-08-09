@@ -45,6 +45,15 @@ typedef QString EZPI_STRING;
 #define     SIZE_EZPI_OFFSET_HUB_ID_0                           0XE000
 #define     SIZE_EZPI_OFFSET_HUB_ID_1                           0XF000
 
+enum ezpi_high_low {
+    EZPI_LOW,
+    EZPI_HIGH
+};
+
+enum ezpi_error_codes_configurator {
+    EZPI_SUCCESS,
+    EZPI_ERROR_REACHED_MAX_DEV
+};
 
 enum ezpi_dev_type {
     EZPI_DEV_TYPE_RESTRICTED,
@@ -112,6 +121,8 @@ typedef struct ezlogic_device_digital_op {
     EZPI_UINT8 gpio_out;
     EZPI_BOOL is_ip;
     EZPI_BOOL ip_inv;
+    EZPI_BOOL pullup_ip;
+    EZPI_BOOL pullup_op;
     EZPI_BOOL op_inv;
 } ezlogic_device_digital_op_t;
 
@@ -201,10 +212,12 @@ public:
     ~EzPi();
     void EZPI_INIT_BOARD(void);
     void EZPI_SET_BOARD_TYPE(ezpi_board_type board_type);
+    ezpi_error_codes_configurator EZPI_ADD_OUTPUT_DEVICE(ezlogic_device_digital_op_t d);
+    ezpi_error_codes_configurator EZPI_ADD_INPUT_DEVICE(ezlogic_device_digital_ip_t d);
 
     ezpi_board_type EZPI_GET_BOARD_TYPE(void) {return _ezpi_board_type;}
-    void EZPI_SET_GPIO_POOL(EZPI_UINT8 index, ezpi_dev_type d) { ezpi_gpio_pool.at(index) = d;}
     std::vector<EZPI_UINT8> EZPI_GET_GPIO_POOL(void) {return ezpi_gpio_pool;}
+    void EZPI_SET_GPIO_POOL(EZPI_UINT8 index, ezpi_dev_type d) { ezpi_gpio_pool.at(index) = d;}
     ezpi_dev_type EZPI_GET_GPIO_POOL(EZPI_UINT8 index) {return (ezpi_dev_type)ezpi_gpio_pool[index];}
 
 };

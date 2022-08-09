@@ -29,10 +29,10 @@ void EzPi::EZPI_SET_BOARD_TYPE(ezpi_board_type board_type) {
 
 void EzPi::EZPI_INIT_BOARD(void) {
 
-    ezlogic_output_devices.resize(EZPI_MAX_DEV_DIO);
-    ezlogic_input_devices.resize(EZPI_MAX_DEV_DIP);
-    ezlogic_i2c_devices.resize(EZPI_MAX_DEV_I2C);
-    ezlogic_spi_devices.resize(EZPI_MAX_DEV_SPI);
+//    ezlogic_output_devices.resize(EZPI_MAX_DEV_DIO);
+//    ezlogic_input_devices.resize(EZPI_MAX_DEV_DIP);
+//    ezlogic_i2c_devices.resize(EZPI_MAX_DEV_I2C);
+//    ezlogic_spi_devices.resize(EZPI_MAX_DEV_SPI);
 
     switch (_ezpi_board_type) {
         case EZPI_BOARD_TYPE_ESP32_GENERIC:
@@ -86,3 +86,15 @@ void EzPi::EZPI_INIT_BOARD(void) {
     }
 }
 
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_OUTPUT_DEVICE(ezlogic_device_digital_op_t d) {
+    if(ezlogic_output_devices.size() >= EZPI_MAX_DEV_DIO) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezlogic_output_devices.push_back(d);
+    return EZPI_SUCCESS;
+}
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_INPUT_DEVICE(ezlogic_device_digital_ip_t d) {
+    if(ezlogic_input_devices.size() >= EZPI_MAX_DEV_DIP) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezlogic_input_devices.push_back(d);
+    return EZPI_SUCCESS;
+}
