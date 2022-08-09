@@ -98,3 +98,21 @@ ezpi_error_codes_configurator EzPi::EZPI_ADD_INPUT_DEVICE(ezlogic_device_digital
     ezlogic_input_devices.push_back(d);
     return EZPI_SUCCESS;
 }
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_ONEWIRE_DEVICE(ezlogic_device_one_wire_t d) {
+    if(ezlogic_onewire_devices.size() >= EZPI_MAX_DEV_ONEWIRE) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezlogic_onewire_devices.push_back(d);
+    return EZPI_SUCCESS;
+}
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_I2C_DEVICE(ezlogic_device_I2C_t d) {
+    if(ezlogic_i2c_devices.size() >= EZPI_MAX_DEV_I2C) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezlogic_i2c_devices.push_back(d);
+    return EZPI_SUCCESS;
+}
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_SPI_DEVICE(ezlogic_device_SPI_t d) {
+    if(ezlogic_spi_devices.size() >= EZPI_MAX_DEV_SPI) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezlogic_spi_devices.push_back(d);
+    return EZPI_SUCCESS;
+}

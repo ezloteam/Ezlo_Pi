@@ -50,9 +50,9 @@ void Dialog_config_input::on_buttonBox_accepted() {
 
     // Adding device to the device vector
     if(ezloPi_digital_ip->EZPI_ADD_INPUT_DEVICE(digital_ip_user_data) == EZPI_SUCCESS) {
-       QMessageBox::information(this, "Success", "Successfully added a output device.");
+       QMessageBox::information(this, "Success", "Successfully added a input device.");
     } else if(ezloPi_digital_ip->EZPI_ADD_INPUT_DEVICE(digital_ip_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {
-       QMessageBox::information(this, "Error", "Error : Reached maximum output device limit.");
+       QMessageBox::information(this, "Error", "Error : Reached maximum input device limit.");
     } else {
         // Do nothing
     }

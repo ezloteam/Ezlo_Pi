@@ -375,7 +375,7 @@ void MainWindow::on_pushButton_add_device_clicked() {
         QMessageBox::information(this,"Device full","Devices reaches top limit, no more devices can be added");
         return;
     }
-
+    ezpi_form_devadd->setFixedSize(250, 120);
     ezpi_form_devadd->setModal(true);
     ezpi_form_devadd->show();
 }
@@ -768,6 +768,8 @@ void MainWindow::on_pushButton_clear_uart_direct_log_clicked() {
 }
 
 void MainWindow::on_pushButton_set_wifi_clicked() {
+    ezpi_form_WiFi->setFixedSize(315, 165);
+    ezpi_form_WiFi->setModal(true);
     ezpi_form_WiFi->show();
 }
 
@@ -1276,6 +1278,7 @@ void MainWindow::success_get_prov_jsons(QNetworkReply *d) {
 }
 
 void MainWindow::on_actionLogin_triggered() {
+//    ezpi_form_login->setFixedSize()
     ezpi_form_login->setModal(true);
     ezpi_form_login->show();
 }
@@ -1288,14 +1291,16 @@ void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
     switch(dev_type_index) {
         case EZPI_DEV_TYPE_DIGITAL_OP: {
             ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
-            ezpi_form_configdev_digitalio->show();
+            ezpi_form_configdev_digitalio->setFixedSize(275, 380);
             ezpi_form_configdev_digitalio->setModal(true);
+            ezpi_form_configdev_digitalio->show();
             break;
         }
         case EZPI_DEV_TYPE_DIGITAL_IP: {
             ezpi_form_config_digital_ip = new Dialog_config_input(this, EzloPi);
-            ezpi_form_config_digital_ip->show();
+            ezpi_form_config_digital_ip->setFixedSize(180, 310);
             ezpi_form_config_digital_ip->setModal(true);
+            ezpi_form_config_digital_ip->show();
             break;
         }
         case EZPI_DEV_TYPE_ANALOG_IP: {
@@ -1315,21 +1320,27 @@ void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_ONE_WIRE: {
-            ezpi_form_config_onewire = new Dialog_config_onewire(this);
-            ezpi_form_config_onewire->show();
+            ezpi_form_config_onewire = new Dialog_config_onewire(this, EzloPi);
+            ezpi_form_config_onewire->setFixedSize(335, 230);
             ezpi_form_config_onewire->setModal(true);
+            ezpi_form_config_onewire->show();
             break;
         }
         case EZPI_DEV_TYPE_I2C: {
-            ezpi_form_config_i2c = new Dialog_config_i2c(this);
-            ezpi_form_config_i2c->show();
+            ezpi_form_config_i2c = new Dialog_config_i2c(this, EzloPi);
+//            ezpi_form_config_i2c->setFixedHeight(true);
+//            ezpi_form_config_i2c->setFixedWidth(true);
+            ezpi_form_config_i2c->setFixedSize(325, 240);
             ezpi_form_config_i2c->setModal(true);
+            ezpi_form_config_i2c->show();
             break;
         }
         case EZPI_DEV_TYPE_SPI: {
-            ezpi_form_config_spi = new Dialog_config_spi(this);
-            ezpi_form_config_spi->show();
+            ezpi_form_config_spi = new Dialog_config_spi(this, EzloPi);
+            ezpi_form_config_spi->setFixedHeight(296);
+            ezpi_form_config_spi->setFixedWidth(190);
             ezpi_form_config_spi->setModal(true);
+            ezpi_form_config_spi->show();
             break;
         }
 

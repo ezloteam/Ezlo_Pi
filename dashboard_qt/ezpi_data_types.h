@@ -31,10 +31,11 @@ typedef QString EZPI_STRING;
 
 #define     EZPI_MAX_DEVICES    10
 
-#define     EZPI_MAX_DEV_DIO    10
-#define     EZPI_MAX_DEV_DIP    10
-#define     EZPI_MAX_DEV_I2C    5
-#define     EZPI_MAX_DEV_SPI    3
+#define     EZPI_MAX_DEV_DIO        10
+#define     EZPI_MAX_DEV_DIP        10
+#define     EZPI_MAX_DEV_ONEWIRE    5
+#define     EZPI_MAX_DEV_I2C        5
+#define     EZPI_MAX_DEV_SPI        3
 
 #define     MAX_DEV             EZPI_MAX_DEVICES
 
@@ -143,6 +144,7 @@ typedef struct ezlogic_device_one_wire {
     EZPI_UINT16 id_room;
     EZPI_UINT16 id_item;
     EZPI_BOOL val_ip;
+    EZPI_BOOL pull_up;
     EZPI_UINT8 gpio;
 } ezlogic_device_one_wire_t;
 
@@ -204,6 +206,7 @@ private:
     std::vector <EZPI_UINT8> ezpi_gpio_pool;
     std::vector <ezlogic_device_digital_op_t> ezlogic_output_devices;
     std::vector <ezlogic_device_digital_ip_t> ezlogic_input_devices;
+    std::vector <ezlogic_device_one_wire_t> ezlogic_onewire_devices;
     std::vector <ezlogic_device_I2C_t> ezlogic_i2c_devices;
     std::vector <ezlogic_device_SPI_t> ezlogic_spi_devices;
 
@@ -214,6 +217,9 @@ public:
     void EZPI_SET_BOARD_TYPE(ezpi_board_type board_type);
     ezpi_error_codes_configurator EZPI_ADD_OUTPUT_DEVICE(ezlogic_device_digital_op_t d);
     ezpi_error_codes_configurator EZPI_ADD_INPUT_DEVICE(ezlogic_device_digital_ip_t d);
+    ezpi_error_codes_configurator EZPI_ADD_ONEWIRE_DEVICE(ezlogic_device_one_wire_t d);
+    ezpi_error_codes_configurator EZPI_ADD_I2C_DEVICE(ezlogic_device_I2C_t d);
+    ezpi_error_codes_configurator EZPI_ADD_SPI_DEVICE(ezlogic_device_SPI_t d);
 
     ezpi_board_type EZPI_GET_BOARD_TYPE(void) {return _ezpi_board_type;}
     std::vector<EZPI_UINT8> EZPI_GET_GPIO_POOL(void) {return ezpi_gpio_pool;}
