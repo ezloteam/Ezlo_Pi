@@ -103,6 +103,15 @@ enum commands {
     END_DEV
 };
 
+enum ezpi_cmd {
+    CMD_ACTION_NONE,
+    CMD_ACTION_GET_INFO,
+    CMD_ACTION_SET_WIFI,
+    CMD_ACTION_SET_CONFIG,
+    CMD_ACTION_GET_CONFIG,
+    CMD_ACTION_TOTAL
+};
+
 enum ezpi_board_type {
     EZPI_BOARD_TYPE_NONE,
     EZPI_BOARD_TYPE_ESP32_GENERIC,
@@ -231,6 +240,12 @@ public:
     ezpi_error_codes_configurator EZPI_ADD_I2C_DEVICE(ezlogic_device_I2C_t d);
     ezpi_error_codes_configurator EZPI_ADD_SPI_DEVICE(ezlogic_device_SPI_t d);
 
+    void EZPI_DELETE_OUTPUT_DEVICE(void) { ezlogic_output_devices.pop_back(); }
+    void EZPI_DELETE_INPUT_DEVICE() { ezlogic_input_devices.pop_back(); }
+    void EZPI_DELETE_ONEWIRE_DEVICE() { ezlogic_onewire_devices.pop_back(); }
+    void EZPI_DELETE_I2C_DEVICE() { ezlogic_i2c_devices.pop_back(); }
+    void EZPI_DELETE_SPI_DEVICE() { ezlogic_spi_devices.pop_back(); }
+
     ezpi_board_type EZPI_GET_BOARD_TYPE(void) {return _ezpi_board_type;}
     std::vector<EZPI_UINT8> EZPI_GET_GPIO_POOL(void) {return ezpi_gpio_pool;}
     void EZPI_SET_GPIO_POOL(EZPI_UINT8 index, ezpi_dev_type d) { ezpi_gpio_pool.at(index) = d;}
@@ -241,6 +256,15 @@ public:
     std::vector <ezlogic_device_one_wire_t> EZPI_GET_ONEWIRE_DEVICES() { return ezlogic_onewire_devices; }
     std::vector <ezlogic_device_I2C_t> EZPI_GET_I2C_DEVICES() { return ezlogic_i2c_devices; }
     std::vector <ezlogic_device_SPI_t> EZPI_GET_SPI_DEVICES() { return ezlogic_spi_devices; }
+
+    EZPI_UINT8 EZPI_GET_DEVICE_COUNT(void) {
+        return (ezlogic_output_devices.size() + \
+                ezlogic_input_devices.size() + \
+                ezlogic_onewire_devices.size() + \
+                ezlogic_i2c_devices.size() + \
+                ezlogic_spi_devices.size());
+    }
+
 
     EZPI_STRING EZPI_GET_DEV_TYPE(ezpi_dev_type d) {return ezlogic_device_types_str->at(d);}
     EZPI_STRING EZPI_GET_ITEM_TYPE(ezpi_item_type i) {return ezlogic_item_types_str->at(i);}

@@ -23,6 +23,12 @@
 #include <QFileDialog>
 #include <QUuid>
 
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
+
 #include "ezuuid.h"
 #include<iostream>
 
@@ -517,58 +523,33 @@ void MainWindow::on_pushButton_gpio_apply_clicked() {
 
 void MainWindow::on_pushButton_remove_device_clicked() {
 
-    int row = ui->tableWidget_device_table->currentRow();
-    if(row<0)
-        return;
 
-    QTableWidgetItem *gtwi1 = ui->tableWidget_device_table->item(row,0);
-    QString str = gtwi1->text();
-    qDebug() << "DELETE " << str;
-    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("DELETE " + str + "\n");
-    QString str1,str2;
-    int nom,nom1;
-    for (int i=0;i<cou_dev;i++) {
-        str1 = "";
-        nom = 0;
-        nom1 = 0;
-        if(device[i].out_gpio != 0) {
-            str1=str2.asprintf("%d",device[i].out_gpio);
-            nom = device[i].out_gpio;
-        }
+//    QTableWidgetItem ezlogic_table_selected_item = ui->tableWidget_device_table->selectedItems();
+    QList<QTableWidgetItem*> ezlogic_table_selected_item = ui->tableWidget_device_table->selectedItems();
+    EZPI_UINT8 ezlogic_table_selected_row = ezlogic_table_selected_item[0]->row();
+    qDebug() << "Selected row: " << ezlogic_table_selected_row;
+    ui->tableWidget_device_table->removeRow(ezlogic_table_selected_row);
 
-        if (device[i].input_gpio != 0) {
-            nom1 = device[i].input_gpio;
-            if(device[i].out_gpio != 0) {
-                str1=str1 + " / ";
-            }
-            str1=str1 + str2.asprintf("%d",device[i].input_gpio);
-        }
-        qDebug() << "str"  << str << " str1 " << str1;
-        if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("str"  + str + " str1 " + str1 + "\n");
-        if(str.toLatin1() == str1.toLatin1()) {
-            if (nom)
-                gpio_m[nom] = 0;
-            if (nom1)
-                gpio_m[nom1] = 0;
-            ui->tableWidget_device_table->removeRow(row);
-            nom = cou_dev - i - 1;
-            cou_dev--;
+    switch(ezlogic_table_row_device_map.at(ezlogic_table_selected_row)) {
 
-            if (nom>0)  memcpy(&device[i],&device[i+1],nom*sizeof(device_t));
-
-            device[cou_dev].Name[0] = 0;
-            device[cou_dev].out_gpio = 0;
-            device[cou_dev].input_gpio = 0;
-            device[cou_dev].is_meter = false;
-            for (int j=0;j<cou_dev;j++) {
-                qDebug() << "DEV" << j << " INPUT " << device[j].input_gpio << " OUT " << device[j].out_gpio;
-            }
-            return;
-        }
+        case EZPI_DEV_TYPE_DIGITAL_OP:
+            EzloPi->EZPI_DELETE_OUTPUT_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_DIGITAL_IP:
+            EzloPi->EZPI_DELETE_INPUT_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_ONE_WIRE:
+            EzloPi->EZPI_DELETE_ONEWIRE_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_I2C:
+            EzloPi->EZPI_DELETE_I2C_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_SPI:
+            EzloPi->EZPI_DELETE_SPI_DEVICE();
+            break;
+        default:
+            break;
     }
-//    int nom = str.toInt();
-//    gpio_m[nom] = 0;
-//    ui->tableWidget_device_table->removeRow(row);
 }
 
 void MainWindow::on_pushButton_get_ezpi_config_clicked() {
@@ -589,49 +570,107 @@ void MainWindow::on_pushButton_get_ezpi_config_clicked() {
 
 void MainWindow::on_pushButton_set_ezpi_config_clicked() {
 
-    uchar buf[60];
+    QJsonObject object_root_set_device;
+    QJsonDocument document_root_set_device;
+    QJsonArray array_device_detail;
 
-    buf[0]=0x95;
-    buf[1]=30;
-    buf[2]=0xa1;
-    memcpy(&buf[3],gpio_m,28);
-    ezpi_serial_port.write((const char*)buf,31);
+    std::vector <ezlogic_device_digital_op_t> device_digital_op = EzloPi->EZPI_GET_OUTPUT_DEVICES();
+    std::vector <ezlogic_device_digital_ip_t> device_digital_ip = EzloPi->EZPI_GET_INPUT_DEVICES();
+    std::vector <ezlogic_device_one_wire_t> device_onewire = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
+    std::vector <ezlogic_device_I2C_t> device_i2c = EzloPi->EZPI_GET_I2C_DEVICES();
+    std::vector <ezlogic_device_SPI_t> device_spi = EzloPi->EZPI_GET_SPI_DEVICES();
 
-    qDebug() << "Sent from QT" << buf;
-    for (int j=0;j<28;j++) {
-        QString str;
-        str = str.asprintf("%d",j);
-        gpio_m[j] = buf[2+j];
-        qDebug() << "gpio_m[" << j<< "] = " << gpio_m[j];
+    object_root_set_device.insert("cmd", CMD_ACTION_SET_CONFIG);
+    object_root_set_device.insert("dev_total", EzloPi->EZPI_GET_DEVICE_COUNT());
+
+    for(EZPI_UINT8 i = 0; i < device_digital_op.size(); i++) {
+
+        QJsonObject object_device_digital_output;
+
+        object_device_digital_output.insert("dev_type", device_digital_op[i].dev_type);
+        object_device_digital_output.insert("dev_name", device_digital_op[i].dev_name);
+        object_device_digital_output.insert("id_room", device_digital_op[i].id_room);
+        object_device_digital_output.insert("id_item", device_digital_op[i].id_item);
+        object_device_digital_output.insert("val_ip", device_digital_op[i].val_ip);
+        object_device_digital_output.insert("val_op", device_digital_op[i].val_op);
+        object_device_digital_output.insert("gpio_in", device_digital_op[i].gpio_in);
+        object_device_digital_output.insert("gpio_out", device_digital_op[i].gpio_out);
+        object_device_digital_output.insert("is_ip", device_digital_op[i].is_ip);
+        object_device_digital_output.insert("pullup_ip", device_digital_op[i].pullup_ip);
+        object_device_digital_output.insert("pullup_op", device_digital_op[i].pullup_op);
+        object_device_digital_output.insert("ip_inv", device_digital_op[i].ip_inv);
+        object_device_digital_output.insert("op_inv", device_digital_op[i].op_inv);
+
+        array_device_detail.push_back(object_device_digital_output);
     }
 
-    if(!device[0].Name[0])
-        return;
-    buf[1] = sizeof(device_t) + 2;
 
-    connect(&ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::on_serRX1);
+    for(EZPI_UINT8 i = 0; i < device_digital_ip.size(); i++) {
+        QJsonObject object_device_digital_input;
 
-//    memcpy(&buf[3],&device[0],sizeof(device_t));
-//    ezpi_serial_port.write((const char*)buf,sizeof(device_t) + 3);
-    for (int i=0;i<MAX_DEV;i++) {
+        object_device_digital_input.insert("dev_type", device_digital_ip[i].dev_type);
+        object_device_digital_input.insert("dev_name", device_digital_ip[i].dev_name);
+        object_device_digital_input.insert("id_room", device_digital_ip[i].id_room);
+        object_device_digital_input.insert("id_item", device_digital_ip[i].id_item);
+        object_device_digital_input.insert("val_ip", device_digital_ip[i].val_ip);
+        object_device_digital_input.insert("gpio", device_digital_ip[i].gpio);
+        object_device_digital_input.insert("pull_up", device_digital_ip[i].pull_up);
+        object_device_digital_input.insert("logic_inv", device_digital_ip[i].logic_inv);
 
-        if(!device[i].Name[0]) {
-            buf[1] = 2;
-            buf[2] = END_DEV;
-            ezpi_serial_port.write((const char*)buf,3);
-            return;
-        }
-
-        if(i == 0)
-            buf[2] = FIRST_DEV;
-        else
-            buf[2] = SET_DEV;
-
-        memcpy(&buf[3],&device[i],sizeof(device_t));
-        ezpi_serial_port.write((const char*)buf,sizeof(device_t) + 3);
-        qDebug() << "Sending from QT: " << buf;
-//        if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Sending from QT: " + QString::fromWCharArray(buf) + "\n");
+        array_device_detail.push_back(object_device_digital_input);
     }
+
+    for(EZPI_UINT8 i = 0; i < device_onewire.size(); i++) {
+        QJsonObject object_device_onewire;
+
+        object_device_onewire.insert("dev_type", device_onewire[i].dev_type);
+        object_device_onewire.insert("dev_name", device_onewire[i].dev_name);
+        object_device_onewire.insert("id_room", device_onewire[i].id_room);
+        object_device_onewire.insert("id_item", device_onewire[i].id_item);
+        object_device_onewire.insert("val_ip", device_onewire[i].val_ip);
+        object_device_onewire.insert("pull_up", device_onewire[i].pull_up);
+        object_device_onewire.insert("gpio", device_onewire[i].gpio);
+
+        array_device_detail.push_back(object_device_onewire);
+    }
+
+    for(EZPI_UINT8 i = 0; i < device_i2c.size(); i++) {
+        QJsonObject object_device_i2c;
+
+        object_device_i2c.insert("dev_name", device_i2c[i].dev_name);
+        object_device_i2c.insert("id_room", device_i2c[i].id_room);
+        object_device_i2c.insert("id_item", device_i2c[i].id_item);
+        object_device_i2c.insert("gpio_sda", device_i2c[i].gpio_sda);
+        object_device_i2c.insert("gpio_scl", device_i2c[i].gpio_scl);
+        object_device_i2c.insert("pullup_scl", device_i2c[i].pullup_scl);
+        object_device_i2c.insert("pullup_sda", device_i2c[i].pullup_sda);
+        object_device_i2c.insert("slave_addr", device_i2c[i].slave_addr);
+
+        array_device_detail.push_back(object_device_i2c);
+    }
+
+    for(EZPI_UINT8 i = 0; i < device_spi.size(); i++) {
+        QJsonObject object_device_spi;
+
+        object_device_spi.insert("dev_type", device_spi[i].dev_type);
+        object_device_spi.insert("dev_name", device_spi[i].dev_name);
+        object_device_spi.insert("id_room", device_spi[i].id_room);
+        object_device_spi.insert("id_item", device_spi[i].id_item);
+        object_device_spi.insert("gpio_miso", device_spi[i].gpio_miso);
+        object_device_spi.insert("gpio_mosi", device_spi[i].gpio_mosi);
+        object_device_spi.insert("gpio_sck", device_spi[i].gpio_sck);
+        object_device_spi.insert("gpio_cs", device_spi[i].gpio_cs);
+
+        array_device_detail.push_back(object_device_spi);
+    }
+
+    object_root_set_device.insert("dev_detail", array_device_detail);
+    document_root_set_device.setObject(object_root_set_device);
+
+
+    QByteArray dev_data =  document_root_set_device.toJson(QJsonDocument::Compact);
+    qDebug() << QString::fromLatin1(dev_data);
+
 }
 
 void MainWindow::ezpi_log_write_flash() {
@@ -695,19 +734,6 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
 
     connect(ezpi_process_write_flash, &QProcess::readyReadStandardOutput, this, &MainWindow::ezpi_log_write_flash);
     connect(ezpi_process_write_flash, &QProcess::readyReadStandardError, this, &MainWindow::ezpi_log_write_flash);
-
-//    QString dir;
-//    QString path_files = QDir::currentPath();
-
-//    dir = path_files + "/esptool.exe";
-
-//    path_files = QFileInfo(dir).absoluteDir().absolutePath();
-//    qDebug() << path_files;
-//    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(path_files + "\n");
-
-//    QString fl = dir;
-
-//    dir = path_files + "/bootloader.bin";
 
     #ifdef __linux__
             QString ser_port = "/dev/" + ezpi_serial_port_info.portName();
@@ -1394,7 +1420,7 @@ void MainWindow::ezpi_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezlogic_device_digital_op_t> output_devices = EzloPi->EZPI_GET_OUTPUT_DEVICES();
             EZPI_UINT8 output_devices_total = output_devices.size();
             ezlogic_device_digital_op_t output_device = output_devices[output_devices_total - 1];
-
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_DIGITAL_OP);
             ezlogic_table_adddev_digital_op(output_device);
             break;
         }
@@ -1403,7 +1429,7 @@ void MainWindow::ezpi_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezlogic_device_digital_ip_t> input_devices = EzloPi->EZPI_GET_INPUT_DEVICES();
             EZPI_UINT8 input_devices_total = input_devices.size();
             ezlogic_device_digital_ip_t input_device = input_devices[input_devices_total - 1];
-
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_DIGITAL_IP);
             ezlogic_table_adddev_digital_ip(input_device);
             break;
         }
@@ -1411,7 +1437,7 @@ void MainWindow::ezpi_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezlogic_device_one_wire_t> onewire_devices = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
             EZPI_UINT8 onewire_devices_total = onewire_devices.size();
             ezlogic_device_one_wire_t onewire_device = onewire_devices[onewire_devices_total - 1];
-
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_ONE_WIRE);
             ezlogic_table_adddev_onewire(onewire_device);
             break;
         }
@@ -1419,7 +1445,7 @@ void MainWindow::ezpi_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezlogic_device_I2C_t> i2c_devices = EzloPi->EZPI_GET_I2C_DEVICES();
             EZPI_UINT8 i2c_devices_total = i2c_devices.size();
             ezlogic_device_I2C_t i2c_device = i2c_devices[i2c_devices_total - 1];
-
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_I2C);
             ezlogic_table_adddev_i2c(i2c_device);
             break;
         }
@@ -1427,7 +1453,7 @@ void MainWindow::ezpi_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezlogic_device_SPI_t> spi_devices = EzloPi->EZPI_GET_SPI_DEVICES();
             EZPI_UINT8 spi_devices_total = spi_devices.size();
             ezlogic_device_SPI_t spi_device = spi_devices[spi_devices_total - 1];
-
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_I2C);
             ezlogic_table_adddev_spi(spi_device);
             break;
         }

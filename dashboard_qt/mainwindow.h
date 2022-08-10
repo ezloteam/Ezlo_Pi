@@ -151,6 +151,8 @@ private:
     void ezlogic_table_adddev_i2c(ezlogic_device_I2C_t);
     void ezlogic_table_adddev_spi(ezlogic_device_SPI_t);
 
+    std::vector<ezpi_dev_type> ezlogic_table_row_device_map;
+
 
 };
 
