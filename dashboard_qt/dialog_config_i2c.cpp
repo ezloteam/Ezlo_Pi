@@ -38,6 +38,8 @@ Dialog_config_i2c::Dialog_config_i2c(QWidget *parent, EzPi * EzloPi) :
             }
     }
 
+    ui->lineEdit_device_name->setText(ezloPi_i2c->EZPI_GET_DEV_TYPE(EZPI_DEV_TYPE_I2C) + \
+                                      " " + QString::number(ezloPi_i2c->EZPI_GET_I2C_DEVICES().size() + 1));
     ezpi_ensure_no_same_pins();
 
 
@@ -65,7 +67,7 @@ void Dialog_config_i2c::on_buttonBox_accepted() {
     i2c_user_data.dev_name = ui->lineEdit_device_name->text();
     i2c_user_data.id_room = 0; //TBD
 
-    i2c_user_data.id_item = ui->comboBox_i2c_subtype->currentIndex() + EZPI_ITEM_TYPE_MPU6050;
+    i2c_user_data.id_item = (ezpi_item_type)(ui->comboBox_i2c_subtype->currentIndex() + EZPI_ITEM_TYPE_MPU6050);
 
     i2c_user_data.gpio_sda = ui->comboBox_i2c_gpio_sda->currentText().toInt();
     i2c_user_data.gpio_scl = ui->comboBox_i2c_gpio_scl->currentText().toInt();

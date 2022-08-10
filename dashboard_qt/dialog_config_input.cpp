@@ -18,7 +18,7 @@ Dialog_config_input::Dialog_config_input(QWidget *parent, EzPi * EzloPi) :
     }
 
     ui->lineEdit_device_name->setText(ezloPi_digital_ip->EZPI_GET_DEV_TYPE(EZPI_DEV_TYPE_DIGITAL_IP) + \
-                                      " " + QString::number(ezloPi_digital_ip->EZPI_GET_OUTPUT_DEVICES().size() + 1));
+                                      " " + QString::number(ezloPi_digital_ip->EZPI_GET_INPUT_DEVICES().size() + 1));
 
 }
 

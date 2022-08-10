@@ -44,6 +44,9 @@ Dialog_config_spi::Dialog_config_spi(QWidget *parent, EzPi * EzloPi) :
 
     ezpi_ensure_no_same_pins();
 
+    ui->lineEdit_device_name->setText(ezloPi_spi->EZPI_GET_DEV_TYPE(EZPI_DEV_TYPE_SPI) + \
+                                      " " + QString::number(ezloPi_spi->EZPI_GET_SPI_DEVICES().size() + 1));
+
 }
 
 Dialog_config_spi::~Dialog_config_spi()
@@ -68,9 +71,9 @@ void Dialog_config_spi::on_buttonBox_config_spi_accepted() {
     ezlogic_device_SPI_t spi_user_data;
 
     spi_user_data.dev_type = EZPI_DEV_TYPE_SPI;
-    spi_user_data.dev_name = ui->label_device_name->text();
+    spi_user_data.dev_name = ui->lineEdit_device_name->text();
     spi_user_data.id_room = 0; // TBD
-    spi_user_data.id_item = ui->comboBox_spi_device_subtype->currentIndex() + EZPI_ITEM_TYPE_BMP280_SPI;
+    spi_user_data.id_item = (ezpi_item_type)(ui->comboBox_spi_device_subtype->currentIndex() + EZPI_ITEM_TYPE_BMP280_SPI);
     spi_user_data.gpio_miso = ui->comboBox_miso->currentText().toInt();
     spi_user_data.gpio_mosi = ui->comboBox_mosi->currentText().toInt();
     spi_user_data.gpio_sck = ui->comboBox_sck->currentText().toInt();

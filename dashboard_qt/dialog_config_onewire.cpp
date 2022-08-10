@@ -15,8 +15,10 @@ Dialog_config_onewire::Dialog_config_onewire(QWidget *parent, EzPi * EzloPi) :
     for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
         if(gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED)
             ui->comboBox_onewire_gpio->addItem(QString::number(i));
-//        qDebug() << "Gpio Pin: " << QString::number(i) << "value: " << QString::number(gpio_pool[i]);
     }
+
+    ui->lineEdit_device_name->setText(ezloPi_one_wire->EZPI_GET_DEV_TYPE(EZPI_DEV_TYPE_ONE_WIRE) + \
+                                      " " + QString::number(ezloPi_one_wire->EZPI_GET_ONEWIRE_DEVICES().size() + 1));
 }
 
 Dialog_config_onewire::~Dialog_config_onewire() {
