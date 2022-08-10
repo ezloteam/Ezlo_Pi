@@ -553,19 +553,138 @@ void MainWindow::on_pushButton_remove_device_clicked() {
 }
 
 void MainWindow::on_pushButton_get_ezpi_config_clicked() {
-    QByteArray buf;
 
-    buf.append(0x95);
-    buf.append(2);
-    buf.append(0xa0);
-    ezpi_serial_port.setBaudRate(460800);
-    ezpi_serial_port.write(buf, 3);
-    qDebug() << "Send" << buf;
+    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
 
-    ezpi_serial_port.flush();
+    QJsonParseError jsonError;
+    QJsonDocument doc_get_config = QJsonDocument::fromJson(test_json.toUtf8(), &jsonError);
 
-    connect(&ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::on_serRX1);
+    if (jsonError.error != QJsonParseError::NoError){
+        qDebug() << jsonError.errorString();
+        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+        return;
+    }
 
+    QJsonObject obj_data_root_get_config = doc_get_config.object();
+    QVariantMap json_map_root_get_config = obj_data_root_get_config.toVariantMap();
+
+    if(json_map_root_get_config["cmd"].toUInt() != CMD_ACTION_GET_CONFIG) {
+        return;
+    }
+
+    QVariantList list_get_config_device_detail = json_map_root_get_config["dev_detail"].toList();
+
+    ezlogic_device_digital_op_t device_digital_op;
+    ezlogic_device_digital_ip_t device_digital_ip;
+    ezlogic_device_one_wire_t device_onewire;
+    ezlogic_device_I2C_t device_i2c;
+    ezlogic_device_SPI_t device_spi;
+
+    EZPI_UINT8 dev_count_get_config = 0;
+
+    // Clear table contents
+    ui->tableWidget_device_table->clear();
+
+    // Clear internal device storage
+    EzloPi->EZPI_CLEAR_OUTPUT_DEVICES();
+    EzloPi->EZPI_CLEAR_INPUT_DEVICES();
+    EzloPi->EZPI_CLEAR_ONEWIRE_DEVICES();
+    EzloPi->EZPI_CLEAR_I2C_DEVICES();
+    EzloPi->EZPI_CLEAR_SPI_DEVICES();
+
+
+    for(EZPI_UINT8 i = 0; i < list_get_config_device_detail.size(); i++) {
+
+        dev_count_get_config++;
+
+        QVariantMap get_config_device = list_get_config_device_detail[i].toMap();
+
+        switch(get_config_device["dev_type"].toUInt()) {
+            case EZPI_DEV_TYPE_DIGITAL_OP:
+                device_digital_op.dev_name = get_config_device["dev_name"].toString();
+                device_digital_op.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_digital_op.id_room = get_config_device["id_room"].toUInt();
+                device_digital_op.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_digital_op.val_ip = get_config_device["val_ip"].toBool();
+                device_digital_op.val_op = get_config_device["val_op"].toBool();
+                device_digital_op.gpio_in = get_config_device["gpio_in"].toUInt();
+                device_digital_op.gpio_out = get_config_device["gpio_out"].toUInt();
+                device_digital_op.is_ip = get_config_device["is_ip"].toBool();
+                device_digital_op.ip_inv = get_config_device["ip_inv"].toBool();
+                device_digital_op.pullup_ip = get_config_device["pullup_ip"].toBool();
+                device_digital_op.pullup_op = get_config_device["pullup_op"].toBool();
+                device_digital_op.op_inv = get_config_device["op_inv"].toBool();
+
+                EzloPi->EZPI_ADD_OUTPUT_DEVICE(device_digital_op);
+
+                ezlogic_table_adddev_digital_op(device_digital_op);
+
+                break;
+            case EZPI_DEV_TYPE_DIGITAL_IP:
+                device_digital_ip.dev_name = get_config_device["dev_name"].toString();
+                device_digital_ip.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_digital_ip.id_room = get_config_device["id_room"].toUInt();
+                device_digital_ip.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_digital_ip.val_ip = get_config_device["val_ip"].toBool();
+                device_digital_ip.gpio = get_config_device["gpio"].toUInt();
+                device_digital_ip.pull_up = get_config_device["pull_up"].toBool();
+                device_digital_ip.logic_inv = get_config_device["logic_inv"].toBool();
+
+                EzloPi->EZPI_ADD_INPUT_DEVICE(device_digital_ip);
+
+                ezlogic_table_adddev_digital_ip(device_digital_ip);
+                break;
+
+            case EZPI_DEV_TYPE_ONE_WIRE:
+                device_onewire.dev_name = get_config_device["dev_name"].toString();
+                device_onewire.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_onewire.id_room = get_config_device["id_room"].toUInt();
+                device_onewire.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_onewire.val_ip = get_config_device["val_ip"].toBool();
+                device_onewire.pull_up = get_config_device["pull_up"].toBool();
+                device_onewire.gpio = get_config_device["gpio"].toUInt();
+
+                EzloPi->EZPI_ADD_ONEWIRE_DEVICE(device_onewire);
+
+                ezlogic_table_adddev_onewire(device_onewire);
+                break;
+
+            case EZPI_DEV_TYPE_I2C:
+                device_i2c.dev_name = get_config_device["dev_name"].toString();
+                device_i2c.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_i2c.id_room = get_config_device["id_room"].toUInt();
+                device_i2c.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_i2c.gpio_sda = get_config_device["gpio_sda"].toUInt();
+                device_i2c.gpio_scl = get_config_device["gpio_scl"].toUInt();
+                device_i2c.pullup_scl = get_config_device["pullup_scl"].toBool();
+                device_i2c.pullup_sda = get_config_device["pullup_sda"].toBool();
+                device_i2c.slave_addr = get_config_device["slave_addr"].toUInt();
+
+                EzloPi->EZPI_ADD_I2C_DEVICE(device_i2c);
+
+                ezlogic_table_adddev_i2c(device_i2c);
+                break;
+
+            case EZPI_DEV_TYPE_SPI:
+                device_spi.dev_name = get_config_device["dev_name"].toString();
+                device_spi.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_spi.id_room = get_config_device["id_room"].toUInt();
+                device_spi.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_spi.gpio_miso = get_config_device["gpio_miso"].toUInt();
+                device_spi.gpio_mosi = (ezpi_dev_type)get_config_device["gpio_mosi"].toUInt();
+                device_spi.gpio_sck = get_config_device["gpio_sck"].toUInt();
+                device_spi.gpio_cs = (ezpi_item_type)get_config_device["gpio_cs"].toUInt();
+
+                EzloPi->EZPI_ADD_SPI_DEVICE(device_spi);
+
+                ezlogic_table_adddev_spi(device_spi);
+                break;
+            default:
+                break;
+        }
+    }
+
+    if(dev_count_get_config < 1) QMessageBox::information(this, "No device!", "Device configurations not found1");
 }
 
 void MainWindow::on_pushButton_set_ezpi_config_clicked() {

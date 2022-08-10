@@ -241,10 +241,16 @@ public:
     ezpi_error_codes_configurator EZPI_ADD_SPI_DEVICE(ezlogic_device_SPI_t d);
 
     void EZPI_DELETE_OUTPUT_DEVICE(void) { ezlogic_output_devices.pop_back(); }
-    void EZPI_DELETE_INPUT_DEVICE() { ezlogic_input_devices.pop_back(); }
-    void EZPI_DELETE_ONEWIRE_DEVICE() { ezlogic_onewire_devices.pop_back(); }
-    void EZPI_DELETE_I2C_DEVICE() { ezlogic_i2c_devices.pop_back(); }
-    void EZPI_DELETE_SPI_DEVICE() { ezlogic_spi_devices.pop_back(); }
+    void EZPI_DELETE_INPUT_DEVICE(void) { ezlogic_input_devices.pop_back(); }
+    void EZPI_DELETE_ONEWIRE_DEVICE(void) { ezlogic_onewire_devices.pop_back(); }
+    void EZPI_DELETE_I2C_DEVICE(void) { ezlogic_i2c_devices.pop_back(); }
+    void EZPI_DELETE_SPI_DEVICE(void) { ezlogic_spi_devices.pop_back(); }
+
+    void EZPI_CLEAR_OUTPUT_DEVICES(void) { ezlogic_output_devices.clear(); }
+    void EZPI_CLEAR_INPUT_DEVICES(void) { ezlogic_input_devices.clear(); }
+    void EZPI_CLEAR_ONEWIRE_DEVICES(void) { ezlogic_onewire_devices.clear(); }
+    void EZPI_CLEAR_I2C_DEVICES(void) { ezlogic_i2c_devices.clear(); }
+    void EZPI_CLEAR_SPI_DEVICES(void) { ezlogic_spi_devices.clear(); }
 
     ezpi_board_type EZPI_GET_BOARD_TYPE(void) {return _ezpi_board_type;}
     std::vector<EZPI_UINT8> EZPI_GET_GPIO_POOL(void) {return ezpi_gpio_pool;}
