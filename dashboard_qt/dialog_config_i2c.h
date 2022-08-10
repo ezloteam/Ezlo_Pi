@@ -30,6 +30,8 @@ private:
 
     Ui::Dialog_config_i2c *ui;
     EzPi * ezloPi_i2c;
+signals:
+    void ezpi_signal_dev_i2c_added(ezpi_dev_type);
 };
 
 #endif // DIALOG_CONFIG_I2C_H

@@ -85,13 +85,13 @@ void Dialog_config_spi::on_buttonBox_config_spi_accepted() {
     // Adding device to the device vector
     if(ezloPi_spi->EZPI_ADD_SPI_DEVICE(spi_user_data) == EZPI_SUCCESS) {
        QMessageBox::information(this, "Success", "Successfully added an SPI device.");
+       // Trigger signal to add device in the table
+       emit ezpi_signal_dev_spi_added(EZPI_DEV_TYPE_SPI);
     } else if(ezloPi_spi->EZPI_ADD_SPI_DEVICE(spi_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {
        QMessageBox::information(this, "Error", "Error : Reached maximum SPI device limit.");
     } else {
         // Do nothing
     }
-
-    // TODO : add device on the table on the UI
 }
 
 

@@ -311,8 +311,8 @@ public:
         splitter->setGeometry(QRect(10, 60, 611, 471));
         splitter->setOrientation(Qt::Vertical);
         tableWidget_device_table = new QTableWidget(splitter);
-        if (tableWidget_device_table->columnCount() < 5)
-            tableWidget_device_table->setColumnCount(5);
+        if (tableWidget_device_table->columnCount() < 4)
+            tableWidget_device_table->setColumnCount(4);
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
         tableWidget_device_table->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
@@ -321,8 +321,6 @@ public:
         tableWidget_device_table->setHorizontalHeaderItem(2, __qtablewidgetitem2);
         QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
         tableWidget_device_table->setHorizontalHeaderItem(3, __qtablewidgetitem3);
-        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
-        tableWidget_device_table->setHorizontalHeaderItem(4, __qtablewidgetitem4);
         tableWidget_device_table->setObjectName(QString::fromUtf8("tableWidget_device_table"));
         tableWidget_device_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
         splitter->addWidget(tableWidget_device_table);
@@ -456,15 +454,13 @@ public:
         pushButton_flash_ezpi_bins->setText(QCoreApplication::translate("MainWindow", "Flash Firmware", nullptr));
         pushButton_clear_uart_direct_log->setText(QCoreApplication::translate("MainWindow", "Clear Logs", nullptr));
         QTableWidgetItem *___qtablewidgetitem = tableWidget_device_table->horizontalHeaderItem(0);
-        ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "GPIO", nullptr));
+        ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "Device Name", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = tableWidget_device_table->horizontalHeaderItem(1);
         ___qtablewidgetitem1->setText(QCoreApplication::translate("MainWindow", "Type", nullptr));
         QTableWidgetItem *___qtablewidgetitem2 = tableWidget_device_table->horizontalHeaderItem(2);
-        ___qtablewidgetitem2->setText(QCoreApplication::translate("MainWindow", "Resistor", nullptr));
+        ___qtablewidgetitem2->setText(QCoreApplication::translate("MainWindow", "Sub type", nullptr));
         QTableWidgetItem *___qtablewidgetitem3 = tableWidget_device_table->horizontalHeaderItem(3);
-        ___qtablewidgetitem3->setText(QCoreApplication::translate("MainWindow", "Def Vol", nullptr));
-        QTableWidgetItem *___qtablewidgetitem4 = tableWidget_device_table->horizontalHeaderItem(4);
-        ___qtablewidgetitem4->setText(QCoreApplication::translate("MainWindow", "Type", nullptr));
+        ___qtablewidgetitem3->setText(QCoreApplication::translate("MainWindow", "GPIOs", nullptr));
         textBrowser_console_log->setPlaceholderText(QCoreApplication::translate("MainWindow", "log console", nullptr));
         groupBox_device_config->setTitle(QCoreApplication::translate("MainWindow", "Configure", nullptr));
         pushButton_get_ezpi_config->setText(QCoreApplication::translate("MainWindow", "Get config", nullptr));

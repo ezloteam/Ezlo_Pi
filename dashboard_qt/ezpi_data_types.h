@@ -112,10 +112,10 @@ enum ezpi_board_type {
 };
 
 typedef struct ezlogic_device_digital_op {
-    EZPI_UINT8 dev_type;
+    ezpi_dev_type dev_type;
     EZPI_STRING dev_name;
     EZPI_UINT16 id_room;
-    EZPI_UINT16 id_item;
+    ezpi_item_type id_item;
     EZPI_BOOL val_ip;
     EZPI_BOOL val_op;
     EZPI_UINT8 gpio_in;
@@ -128,10 +128,10 @@ typedef struct ezlogic_device_digital_op {
 } ezlogic_device_digital_op_t;
 
 typedef struct ezlogic_device_digital_ip {
-    EZPI_UINT8 dev_type;
+    ezpi_dev_type dev_type;
     EZPI_STRING dev_name;
     EZPI_UINT16 id_room;
-    EZPI_UINT16 id_item;
+    ezpi_item_type id_item;
     EZPI_BOOL val_ip;
     EZPI_UINT8 gpio;
     EZPI_BOOL pull_up;
@@ -139,20 +139,20 @@ typedef struct ezlogic_device_digital_ip {
 } ezlogic_device_digital_ip_t;
 
 typedef struct ezlogic_device_one_wire {
-    EZPI_UINT8 dev_type;
+    ezpi_dev_type dev_type;
     EZPI_STRING dev_name;
     EZPI_UINT16 id_room;
-    EZPI_UINT16 id_item;
+    ezpi_item_type id_item;
     EZPI_BOOL val_ip;
     EZPI_BOOL pull_up;
     EZPI_UINT8 gpio;
 } ezlogic_device_one_wire_t;
 
 typedef struct ezlogic_device_I2C {
-    EZPI_UINT8 dev_type;
+    ezpi_dev_type dev_type;
     EZPI_STRING dev_name;
     EZPI_UINT16 id_room;
-    EZPI_UINT16 id_item;
+    ezpi_item_type id_item;
     EZPI_UINT8 gpio_sda;
     EZPI_UINT8 gpio_scl;
     EZPI_BOOL pullup_scl;
@@ -161,10 +161,10 @@ typedef struct ezlogic_device_I2C {
 } ezlogic_device_I2C_t;
 
 typedef struct ezlogic_device_SPI {
-    EZPI_UINT8 dev_type;
+    ezpi_dev_type dev_type;
     EZPI_STRING dev_name;
     EZPI_UINT16 id_room;
-    EZPI_UINT16 id_item;
+    ezpi_item_type id_item;
     EZPI_UINT8 gpio_miso;
     EZPI_UINT8 gpio_mosi;
     EZPI_UINT8 gpio_sck;
@@ -210,6 +210,16 @@ private:
     std::vector <ezlogic_device_I2C_t> ezlogic_i2c_devices;
     std::vector <ezlogic_device_SPI_t> ezlogic_spi_devices;
 
+    EZPI_UINT8 ezlogic_output_devices_n;
+    EZPI_UINT8 ezlogic_input_devices_n;
+    EZPI_UINT8 ezlogic_onewire_devices_n;
+    EZPI_UINT8 ezlogic_i2c_devices_n;
+    EZPI_UINT8 ezlogic_spi_devices_n;
+
+
+    QStringList * ezlogic_device_types_str;
+    QStringList * ezlogic_item_types_str;
+
 public:
     EzPi();
     ~EzPi();
@@ -225,6 +235,15 @@ public:
     std::vector<EZPI_UINT8> EZPI_GET_GPIO_POOL(void) {return ezpi_gpio_pool;}
     void EZPI_SET_GPIO_POOL(EZPI_UINT8 index, ezpi_dev_type d) { ezpi_gpio_pool.at(index) = d;}
     ezpi_dev_type EZPI_GET_GPIO_POOL(EZPI_UINT8 index) {return (ezpi_dev_type)ezpi_gpio_pool[index];}
+
+    std::vector <ezlogic_device_digital_op_t> EZPI_GET_OUTPUT_DEVICES() { return ezlogic_output_devices; }
+    std::vector <ezlogic_device_digital_ip_t> EZPI_GET_INPUT_DEVICES() { return ezlogic_input_devices; }
+    std::vector <ezlogic_device_one_wire_t> EZPI_GET_ONEWIRE_DEVICES() { return ezlogic_onewire_devices; }
+    std::vector <ezlogic_device_I2C_t> EZPI_GET_I2C_DEVICES() { return ezlogic_i2c_devices; }
+    std::vector <ezlogic_device_SPI_t> EZPI_GET_SPI_DEVICES() { return ezlogic_spi_devices; }
+
+    EZPI_STRING EZPI_GET_DEV_TYPE(ezpi_dev_type d) {return ezlogic_device_types_str->at(d);}
+    EZPI_STRING EZPI_GET_ITEM_TYPE(ezpi_item_type i) {return ezlogic_item_types_str->at(i);}
 
 };
 

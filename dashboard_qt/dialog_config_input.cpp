@@ -15,8 +15,10 @@ Dialog_config_input::Dialog_config_input(QWidget *parent, EzPi * EzloPi) :
     for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
         if((gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED) || (gpio_pool[i] == EZPI_DEV_TYPE_INPUT_ONLY))
             ui->comboBox_input_gpio->addItem(QString::number(i));
-//        qDebug() << "Gpio Pin: " << QString::number(i) << "value: " << QString::number(gpio_pool[i]);
     }
+
+    ui->lineEdit_device_name->setText(ezloPi_digital_ip->EZPI_GET_DEV_TYPE(EZPI_DEV_TYPE_DIGITAL_IP) + \
+                                      " " + QString::number(ezloPi_digital_ip->EZPI_GET_OUTPUT_DEVICES().size() + 1));
 
 }
 
@@ -51,13 +53,12 @@ void Dialog_config_input::on_buttonBox_accepted() {
     // Adding device to the device vector
     if(ezloPi_digital_ip->EZPI_ADD_INPUT_DEVICE(digital_ip_user_data) == EZPI_SUCCESS) {
        QMessageBox::information(this, "Success", "Successfully added a input device.");
+       // Trigger signal to add device in the table
+       emit ezpi_signal_dev_ip_added(EZPI_DEV_TYPE_DIGITAL_IP);
     } else if(ezloPi_digital_ip->EZPI_ADD_INPUT_DEVICE(digital_ip_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {
        QMessageBox::information(this, "Error", "Error : Reached maximum input device limit.");
     } else {
         // Do nothing
     }
-
-    // TODO : add device on the table on the UI
-
 }
 

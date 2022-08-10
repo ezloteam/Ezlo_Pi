@@ -44,13 +44,12 @@ void Dialog_config_onewire::on_buttonBox_accepted() {
     // Adding device to the device vector
     if(ezloPi_one_wire->EZPI_ADD_ONEWIRE_DEVICE(onewire_user_data) == EZPI_SUCCESS) {
        QMessageBox::information(this, "Success", "Successfully added a one wire device.");
+       // Trigger signal to add device in the table
+       emit ezpi_signal_dev_onewire_added(EZPI_DEV_TYPE_ONE_WIRE);
     } else if(ezloPi_one_wire->EZPI_ADD_ONEWIRE_DEVICE(onewire_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {
        QMessageBox::information(this, "Error", "Error : Reached maximum one wire device limit.");
     } else {
         // Do nothing
     }
-
-    // TODO : add device on the table on the UI
-
 }
 

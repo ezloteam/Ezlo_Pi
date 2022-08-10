@@ -34,6 +34,8 @@ private:
 
     Ui::Dialog_config_spi *ui;
     EzPi * ezloPi_spi;
+signals:
+    void ezpi_signal_dev_spi_added(ezpi_dev_type);
 };
 
 #endif // DIALOG_CONFIG_SPI_H

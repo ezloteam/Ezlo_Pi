@@ -1278,26 +1278,36 @@ void MainWindow::success_get_prov_jsons(QNetworkReply *d) {
 }
 
 void MainWindow::on_actionLogin_triggered() {
-//    ezpi_form_login->setFixedSize()
+    ezpi_form_login->setFixedSize(350, 225);
     ezpi_form_login->setModal(true);
     ezpi_form_login->show();
 }
 
 
 void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
+
     qDebug() << "Device type Index: " << dev_type_index;
 
+    ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
+    ezpi_form_config_digital_ip = new Dialog_config_input(this, EzloPi);
+    ezpi_form_config_onewire = new Dialog_config_onewire(this, EzloPi);
+    ezpi_form_config_i2c = new Dialog_config_i2c(this, EzloPi);
+    ezpi_form_config_spi = new Dialog_config_spi(this, EzloPi);
+
+    connect(ezpi_form_configdev_digitalio, SIGNAL(ezpi_signal_dev_op_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_digital_ip, SIGNAL(ezpi_signal_dev_ip_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_onewire, SIGNAL(ezpi_signal_dev_onewire_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_i2c, SIGNAL(ezpi_signal_dev_i2c_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_spi, SIGNAL(ezpi_signal_dev_spi_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
 
     switch(dev_type_index) {
-        case EZPI_DEV_TYPE_DIGITAL_OP: {
-            ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
+        case EZPI_DEV_TYPE_DIGITAL_OP: {            
             ezpi_form_configdev_digitalio->setFixedSize(275, 380);
             ezpi_form_configdev_digitalio->setModal(true);
             ezpi_form_configdev_digitalio->show();
             break;
         }
-        case EZPI_DEV_TYPE_DIGITAL_IP: {
-            ezpi_form_config_digital_ip = new Dialog_config_input(this, EzloPi);
+        case EZPI_DEV_TYPE_DIGITAL_IP: {            
             ezpi_form_config_digital_ip->setFixedSize(180, 310);
             ezpi_form_config_digital_ip->setModal(true);
             ezpi_form_config_digital_ip->show();
@@ -1319,24 +1329,19 @@ void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
             break;
         }
-        case EZPI_DEV_TYPE_ONE_WIRE: {
-            ezpi_form_config_onewire = new Dialog_config_onewire(this, EzloPi);
+        case EZPI_DEV_TYPE_ONE_WIRE: {            
             ezpi_form_config_onewire->setFixedSize(335, 230);
             ezpi_form_config_onewire->setModal(true);
             ezpi_form_config_onewire->show();
             break;
         }
         case EZPI_DEV_TYPE_I2C: {
-            ezpi_form_config_i2c = new Dialog_config_i2c(this, EzloPi);
-//            ezpi_form_config_i2c->setFixedHeight(true);
-//            ezpi_form_config_i2c->setFixedWidth(true);
             ezpi_form_config_i2c->setFixedSize(325, 240);
             ezpi_form_config_i2c->setModal(true);
             ezpi_form_config_i2c->show();
             break;
         }
         case EZPI_DEV_TYPE_SPI: {
-            ezpi_form_config_spi = new Dialog_config_spi(this, EzloPi);
             ezpi_form_config_spi->setFixedHeight(296);
             ezpi_form_config_spi->setFixedWidth(190);
             ezpi_form_config_spi->setModal(true);
@@ -1373,3 +1378,77 @@ void MainWindow::on_comboBox_esp32_board_type_currentIndexChanged(int index) {
     }
 }
 
+void MainWindow::ezpi_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
+
+    std::vector <ezlogic_device_digital_ip_t> input_devices;
+    std::vector <ezlogic_device_one_wire_t> onewire_devices;
+    std::vector <ezlogic_device_I2C_t> i2c_devices;
+    std::vector <ezlogic_device_SPI_t> spi_devices;
+
+    qDebug() << "Added device type: " << QString::number(ezpi_added_dev_type);
+
+//    QTableWidgetItem * table_item_ezpi_devices;
+//    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+//    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    switch(ezpi_added_dev_type) {
+        case EZPI_DEV_TYPE_DIGITAL_OP: {
+
+            std::vector <ezlogic_device_digital_op_t> output_devices = EzloPi->EZPI_GET_OUTPUT_DEVICES();
+            EZPI_UINT8 output_devices_total = output_devices.size();
+            ezlogic_device_digital_op_t output_device = output_devices[output_devices_total - 1];
+
+            ezlogic_table_adddev_digital_op(output_device);
+
+            break;
+        }
+        case EZPI_DEV_TYPE_DIGITAL_IP: {
+            break;
+        }
+        case EZPI_DEV_TYPE_ONE_WIRE: {
+            break;
+        }
+        case EZPI_DEV_TYPE_I2C: {
+            break;
+        }
+        case EZPI_DEV_TYPE_SPI: {
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void MainWindow::ezlogic_table_adddev_digital_op(ezlogic_device_digital_op_t output_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(output_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(output_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(output_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+
+    EZPI_STRING GPIOs;
+    GPIOs = QString::number(output_device.gpio_out);
+    if(output_device.is_ip) {
+        GPIOs += ", " + QString::number(output_device.gpio_in);
+    }
+    table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+}
+void MainWindow::ezlogic_table_adddev_digital_ip(ezlogic_device_digital_ip_t) {
+
+}
+void MainWindow::ezlogic_table_adddev_onewire(ezlogic_device_one_wire_t) {
+
+}
+void MainWindow::ezlogic_table_adddev_i2c(ezlogic_device_I2C_t) {
+
+}
+void MainWindow::ezlogic_table_adddev_spi(ezlogic_device_SPI_t) {
+
+}

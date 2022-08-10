@@ -19,6 +19,14 @@
 
 #include "ezpi_data_types.h"
 
+enum ezlogic_table_column {
+    EZLOZIC_TABLE_COLUMN_DEV_NAME,
+    EZLOZIC_TABLE_COLUMN_DEV_TYPE,
+    EZLOZIC_TABLE_COLUMN_ITEM_TYPE,
+    EZLOZIC_TABLE_COLUMN_GPIOS,
+    EZLOZIC_TABLE_COLUMN_TOTAL
+};
+
 namespace Ui {
 class MainWindow;
 }
@@ -39,6 +47,7 @@ private slots:
     void ezpi_check_firmware();
     void ezpi_message_info_no_firmware_detected();
     void ezpi_receive_dev_type_selected(EZPI_UINT8);
+    void ezpi_receive_added_dev(ezpi_dev_type);
 
     void on_serRX1();
 
@@ -135,6 +144,13 @@ private:
     Dialog_config_spi * ezpi_form_config_spi;
 
     EzPi * EzloPi;
+
+    void ezlogic_table_adddev_digital_op(ezlogic_device_digital_op_t);
+    void ezlogic_table_adddev_digital_ip(ezlogic_device_digital_ip_t);
+    void ezlogic_table_adddev_onewire(ezlogic_device_one_wire_t);
+    void ezlogic_table_adddev_i2c(ezlogic_device_I2C_t);
+    void ezlogic_table_adddev_spi(ezlogic_device_SPI_t);
+
 
 };
 

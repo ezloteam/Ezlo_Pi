@@ -630,7 +630,7 @@
      </property>
      <column>
       <property name="text">
-       <string>GPIO</string>
+       <string>Device Name</string>
       </property>
      </column>
      <column>
@@ -640,17 +640,12 @@
      </column>
      <column>
       <property name="text">
-       <string>Resistor</string>
+       <string>Sub type</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Def Vol</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Type</string>
+       <string>GPIOs</string>
       </property>
      </column>
     </widget>

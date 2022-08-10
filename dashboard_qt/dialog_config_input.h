@@ -26,6 +26,9 @@ private slots:
 private:
     Ui::Dialog_config_input *ui;
     EzPi * ezloPi_digital_ip;
+
+signals:
+    void ezpi_signal_dev_ip_added(ezpi_dev_type);
 };
 
 #endif // DIALOG_CONFIG_INPUT_H

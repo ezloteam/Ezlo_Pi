@@ -32,6 +32,9 @@ private:
     Ui::Dialog_configdev_digitalio *ui;
     EzPi * ezloPi_digital_io;
     void ezpi_ensure_no_same_pins();
+
+signals:
+    void ezpi_signal_dev_op_added(ezpi_dev_type);
 };
 
 #endif // DIALOG_CONFIGDEV_DIGITALIO_H

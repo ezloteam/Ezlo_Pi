@@ -36,8 +36,10 @@ Dialog_configdev_digitalio::Dialog_configdev_digitalio(QWidget *parent, EzPi * E
     for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
         if((gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED) || (gpio_pool[i] == EZPI_DEV_TYPE_OUTPUT_ONLY))
             ui->comboBox_output_gpio->addItem(QString::number(i));
-//        qDebug() << "Gpio Pin: " << QString::number(i) << "value: " << QString::number(gpio_pool[i]);
     }
+
+    ui->lineEdit_device_name->setText(ezloPi_digital_io->EZPI_GET_DEV_TYPE(EZPI_DEV_TYPE_DIGITAL_OP) + \
+                                      " " + QString::number(ezloPi_digital_io->EZPI_GET_OUTPUT_DEVICES().size() + 1));
 }
 
 Dialog_configdev_digitalio::~Dialog_configdev_digitalio() {
@@ -51,7 +53,7 @@ void Dialog_configdev_digitalio::on_buttonBox_accepted() {
      digital_op_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
      digital_op_user_data.dev_name = ui->lineEdit_device_name->text();
      digital_op_user_data.id_room = 0; // TBD
-     digital_op_user_data.id_item = ui->comboBox_output_subtype->currentIndex() + 1;
+     digital_op_user_data.id_item = (ezpi_item_type)(ui->comboBox_output_subtype->currentIndex() + 1);
 
      ezpi_high_low digital_op_default_value = (ezpi_high_low)ui->comboBox_default_value_output->currentIndex();
      digital_op_default_value ? digital_op_user_data.val_op = true : digital_op_user_data.val_op = false;
@@ -90,14 +92,14 @@ void Dialog_configdev_digitalio::on_buttonBox_accepted() {
 
      // Adding device to the device vector
      if(ezloPi_digital_io->EZPI_ADD_OUTPUT_DEVICE(digital_op_user_data) == EZPI_SUCCESS) {
-        QMessageBox::information(this, "Success", "Successfully added a output device.");
+        QMessageBox::information(this, "Success", "Successfully added an output device.");
+        // Trigger signal to add device in the table
+        emit ezpi_signal_dev_op_added(EZPI_DEV_TYPE_DIGITAL_OP);
      } else if(ezloPi_digital_io->EZPI_ADD_OUTPUT_DEVICE(digital_op_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {
         QMessageBox::information(this, "Error", "Error : Reached maximum output device limit.");
      } else {
          // Do nothing
      }
-
-     // TODO : add device on the table on the UI
 }
 
 

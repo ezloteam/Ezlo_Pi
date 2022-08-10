@@ -23,6 +23,8 @@ private slots:
 private:
     Ui::Dialog_config_onewire *ui;
     EzPi * ezloPi_one_wire;
+signals:
+    void ezpi_signal_dev_onewire_added(ezpi_dev_type);
 };
 
 #endif // DIALOG_CONFIG_ONEWIRE_H
