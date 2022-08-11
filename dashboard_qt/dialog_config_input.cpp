@@ -10,7 +10,7 @@ Dialog_config_input::Dialog_config_input(QWidget *parent, EzPi * EzloPi) :
     ezloPi_digital_ip = EzloPi;
 
     std::vector<EZPI_UINT8> gpio_pool = ezloPi_digital_ip->EZPI_GET_GPIO_POOL();
-    EZPI_UINT8 gpio_pool_count = gpio_pool.size();
+    EZPI_UINT8 gpio_pool_count = (EZPI_UINT8)gpio_pool.size();
 
     for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
         if((gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED) || (gpio_pool[i] == EZPI_DEV_TYPE_INPUT_ONLY))

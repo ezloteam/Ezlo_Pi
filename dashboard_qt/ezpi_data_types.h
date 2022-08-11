@@ -288,7 +288,7 @@ public:
     std::vector <ezlogic_device_SPI_t> EZPI_GET_SPI_DEVICES() { return ezlogic_spi_devices; }
 
     EZPI_UINT8 EZPI_GET_DEVICE_COUNT(void) {
-        return (ezlogic_output_devices.size() + \
+        return (EZPI_UINT8)(ezlogic_output_devices.size() + \
                 ezlogic_input_devices.size() + \
                 ezlogic_onewire_devices.size() + \
                 ezlogic_i2c_devices.size() + \

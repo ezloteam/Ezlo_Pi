@@ -31,7 +31,7 @@ Dialog_configdev_digitalio::Dialog_configdev_digitalio(QWidget *parent, EzPi * E
     ui->checkBox_invert_input->setEnabled(false);
 
     std::vector<EZPI_UINT8> gpio_pool = ezloPi_digital_io->EZPI_GET_GPIO_POOL();
-    EZPI_UINT8 gpio_pool_count = gpio_pool.size();
+    EZPI_UINT8 gpio_pool_count = (EZPI_UINT8)gpio_pool.size();
 
     for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
         if((gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED) || (gpio_pool[i] == EZPI_DEV_TYPE_OUTPUT_ONLY))
@@ -113,7 +113,7 @@ void Dialog_configdev_digitalio::on_checkBox_enable_pushbutton_stateChanged(int 
         ui->checkBox_invert_input->setEnabled(true);
 
         std::vector<EZPI_UINT8> gpio_pool = ezloPi_digital_io->EZPI_GET_GPIO_POOL();
-        EZPI_UINT8 gpio_pool_count = gpio_pool.size();
+        EZPI_UINT8 gpio_pool_count = (EZPI_UINT8)gpio_pool.size();
 
         for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
             if((gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED) || (gpio_pool[i] == EZPI_DEV_TYPE_INPUT_ONLY)) {

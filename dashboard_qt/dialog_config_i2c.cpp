@@ -24,7 +24,7 @@ Dialog_config_i2c::Dialog_config_i2c(QWidget *parent, EzPi * EzloPi) :
     ezloPi_i2c = EzloPi;
 
     std::vector<EZPI_UINT8> gpio_pool = ezloPi_i2c->EZPI_GET_GPIO_POOL();
-    EZPI_UINT8 gpio_pool_count = gpio_pool.size();
+    EZPI_UINT8 gpio_pool_count = (EZPI_UINT8)gpio_pool.size();
 
     for(EZPI_UINT8 i = 0; i < gpio_pool_count; i++) {
         if((gpio_pool[i] == EZPI_DEV_TYPE_UNCONFIGURED) || (gpio_pool[i] == EZPI_DEV_TYPE_I2C))

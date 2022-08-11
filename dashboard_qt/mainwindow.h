@@ -49,15 +49,9 @@ private slots:
     void ezpi_receive_dev_type_selected(EZPI_UINT8);
     void ezpi_receive_added_dev(ezpi_dev_type);
 
-    void on_serRX1();
-
     void on_pushButton_connect_uart_clicked();
 
     void on_pushButton_add_device_clicked();
-
-    void on_pushButton_gpio_cancel_clicked();
-
-    void on_pushButton_gpio_apply_clicked();
 
     void on_pushButton_remove_device_clicked();
 
@@ -71,19 +65,7 @@ private slots:
 
     void on_pushButton_set_wifi_clicked();
 
-    void on_pushButton_set_wifi_cancel_clicked();
-
-    void on_pushButton_set_wifi_apply_clicked();
-
     void on_pushButton_select_device_type_apply_clicked();
-
-    void on_pushButton_select_device_type_cancel_clicked();
-
-    void on_comboBox_gpio_out_select_pin_currentTextChanged(const QString &arg1);
-
-    void on_comboBox_gpio_in_select_pin_currentTextChanged(const QString &arg1);
-
-    void on_checkBox_gpio_led_button_enable_stateChanged();
 
     void on_pushButton_erase_flash_clicked();
 
