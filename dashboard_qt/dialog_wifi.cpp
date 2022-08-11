@@ -3,6 +3,7 @@
 #include "dialog_wifi.h"
 #include "qjsondocument.h"
 #include "qjsonobject.h"
+#include "qthread.h"
 #include "ui_dialog_wifi.h"
 #include "ezpi_data_types.h"
 
@@ -54,7 +55,7 @@ void Dialog_WiFi::on_buttonBox_accepted() {
 
         if (ezpi_serial_wifi->waitForBytesWritten()) {
             // read response
-            if (ezpi_serial_wifi->waitForReadyRead()) {
+            if (ezpi_serial_wifi->waitForReadyRead(5000)) {
                 QByteArray responseData = ezpi_serial_wifi->readAll();
                 while (ezpi_serial_wifi->waitForReadyRead(10))
                     responseData += ezpi_serial_wifi->readAll();
@@ -62,7 +63,11 @@ void Dialog_WiFi::on_buttonBox_accepted() {
                 const EZPI_STRING response = QString::fromUtf8(responseData);
                 qDebug() << "Response : " << response;
                 process_response(response);
+            } else {
+                QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
             }
+        } else {
+
         }
     }
 }
@@ -92,10 +97,10 @@ void Dialog_WiFi::process_response(QString data_response_set_wifi) {
             if(json_map_root_set_wifi_response["status_connect"].toUInt() >= 1) {
                 QMessageBox::information(this, "Success!", "WiFi connection successful.");
             } else {
-                QMessageBox::warning(this, "Error!", "WiFi connection failed.");
+                QMessageBox::warning(this, "Connection failed!", "WiFi connection failed.");
             }
         } else {
-            QMessageBox::warning(this, "Error!", "WiFi connection failed.");
+            QMessageBox::warning(this, "Connection failed!", "WiFi connection failed.");
         }
     } else {
         QMessageBox::warning(this, "Error!", "Unknown command received, WiFi: unknown status!");

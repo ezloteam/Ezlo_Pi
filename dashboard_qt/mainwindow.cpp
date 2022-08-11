@@ -119,29 +119,53 @@ MainWindow::~MainWindow() {
 
 EZPI_BOOL MainWindow::ezpi_check_firmware() {
 
-    QString test_json = "{\"cmd\":1,\"status\":1,\"v_sw\":3625,\"v_type\":1,\"build\":17,\"v_idf\":8456,\"uptime\":4856,\"build_date\":1657623331,\"boot_count\":15,\"boot_reason\":2,\"mac\":1577079727,\"uuid\":\"65261d76-e584-4d35-aff1-d84bd043\",\"serial\":100004032,\"ssid\":\"ssid\",\"dev_type\":1,\"dev_flash\":64256,\"dev_free_flash\":300,\"dev_name\":\"My Device\"}";
+//    QString test_json = "{\"cmd\":1,\"status\":1,\"v_sw\":3625,\"v_type\":1,\"build\":17,\"v_idf\":8456,\"uptime\":4856,\"build_date\":1657623331,\"boot_count\":15,\"boot_reason\":2,\"mac\":1577079727,\"uuid\":\"65261d76-e584-4d35-aff1-d84bd043\",\"serial\":100004032,\"ssid\":\"ssid\",\"dev_type\":1,\"dev_flash\":64256,\"dev_free_flash\":300,\"dev_name\":\"My Device\"}";
 
-    QString json_send_get_info = "{\"cmd\":1}";
+    const char * json_send_get_info = "{\"cmd\":1}";
+
+    QString response_data;
+
+    ezpi_serial_port->write(json_send_get_info);
+
+    if (ezpi_serial_port->waitForBytesWritten()) {
+        // read response
+        if (ezpi_serial_port->waitForReadyRead(5000)) {
+            QByteArray responseData = ezpi_serial_port->readAll();
+            while (ezpi_serial_port->waitForReadyRead(10))
+                responseData += ezpi_serial_port->readAll();
+
+            const EZPI_STRING response = QString::fromUtf8(responseData);
+            qDebug() << "Response : " << response;
+            response_data = response;
+        } else {
+//            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
+        }
+    } else {
+
+    }
 
     ezlogic_info_t get_info_fmw_info;
     EZPI_BOOL ezpi_fimware_present = false;
 
     QJsonParseError jsonError;
-    QJsonDocument doc_get_info = QJsonDocument::fromJson(test_json.toUtf8(), &jsonError);
+    QJsonDocument doc_get_info = QJsonDocument::fromJson(response_data.toUtf8(), &jsonError);
 
+#if 0
     if (jsonError.error != QJsonParseError::NoError){
-//        qDebug() << jsonError.errorString();
-//        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
-//        return;
+        qDebug() << jsonError.errorString();
+        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+        return;
     }
+#endif
 
     QJsonObject obj_data_root_get_info = doc_get_info.object();
     QVariantMap json_map_root_get_info = obj_data_root_get_info.toVariantMap();
 
+#if 0
     if(json_map_root_get_info["cmd"].toUInt() != CMD_ACTION_GET_INFO) {
-//        return;
+        return;
     }
-
+#endif
     if(json_map_root_get_info["status"].toUInt() == 1) {
 
         get_info_fmw_info.v_sw = json_map_root_get_info["v_sw"].toUInt();
@@ -158,20 +182,6 @@ EZPI_BOOL MainWindow::ezpi_check_firmware() {
     }
 
     return ezpi_fimware_present;
-
-
-#if 0
-    QByteArray ezpi_byte_array_write_to_serial;
-
-    quint64 bytes_wrote = ezpi_serial_port->write("$GET_CONFIG\n");
-    if(bytes_wrote > 0) {
-        qDebug() << bytes_wrote << " bytes written!";
-//        if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(" bytes written!");
-        ezpi_timer_ask_info.start(5000);
-    }
-
-    connect(&ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::on_serRX1);
-#endif
 }
 
 
@@ -379,7 +389,28 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
                 if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + " serial port is open.");
 
                 // Check firmware
-                ezpi_check_firmware();
+                if(ezpi_check_firmware()) {
+                    ui->pushButton_set_wifi->setEnabled(true);
+                    ui->pushButton_add_device->setEnabled(true);
+
+                    ui->pushButton_get_ezpi_config->setEnabled(true);
+                    ui->pushButton_set_ezpi_config->setEnabled(true);
+
+                    ui->pushButton_erase_flash->setEnabled(true);
+                    ui->pushButton_flash_ezpi_bins->setEnabled(true);
+
+                    ui->pushButton_remove_device->setEnabled(true);
+
+                    ui->pushButton_clear_uart_direct_log->setEnabled(true);
+
+                    ui->tableWidget_device_table->setEnabled(true);
+
+                    ezpi_timer_ask_info.stop();
+
+                } else {
+                    ezpi_timer_ask_info.start(5000);
+                }
+
             } else {
                 qDebug() << "Failed opeaning serial port: " << ui->comboBox_uart_list->currentText();
                 if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Failed opeaning serial port: " + ui->comboBox_uart_list->currentText());
@@ -599,10 +630,33 @@ void MainWindow::on_pushButton_remove_device_clicked() {
 
 void MainWindow::on_pushButton_get_ezpi_config_clicked() {
 
-    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
+//    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
+
+    QString response_data;
+
+    const char * json_send_get_config = "{\"cmd\":4}";
+
+    ezpi_serial_port->write(json_send_get_config);
+
+    if (ezpi_serial_port->waitForBytesWritten()) {
+        // read response
+        if (ezpi_serial_port->waitForReadyRead(5000)) {
+            QByteArray responseData = ezpi_serial_port->readAll();
+            while (ezpi_serial_port->waitForReadyRead(10))
+                responseData += ezpi_serial_port->readAll();
+
+            const EZPI_STRING response = QString::fromUtf8(responseData);
+            qDebug() << "Response : " << response;
+            response_data = response;
+        } else {
+            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
+        }
+    } else {
+
+    }
 
     QJsonParseError jsonError;
-    QJsonDocument doc_get_config = QJsonDocument::fromJson(test_json.toUtf8(), &jsonError);
+    QJsonDocument doc_get_config = QJsonDocument::fromJson(response_data.toUtf8(), &jsonError);
 
     if (jsonError.error != QJsonParseError::NoError){
         qDebug() << jsonError.errorString();
@@ -831,10 +885,55 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
     object_root_set_device.insert("dev_detail", array_device_detail);
     document_root_set_device.setObject(object_root_set_device);
 
-
     QByteArray dev_data =  document_root_set_device.toJson(QJsonDocument::Compact);
     qDebug() << QString::fromLatin1(dev_data);
 
+    const  char * data_action_set_config = dev_data.constData();
+    QString response_data;
+
+    ezpi_serial_port->write(data_action_set_config);
+
+    if (ezpi_serial_port->waitForBytesWritten()) {
+        // read response
+        if (ezpi_serial_port->waitForReadyRead(5000)) {
+            QByteArray responseData = ezpi_serial_port->readAll();
+            while (ezpi_serial_port->waitForReadyRead(10))
+                responseData += ezpi_serial_port->readAll();
+
+            const EZPI_STRING response = QString::fromUtf8(responseData);
+            qDebug() << "Response : " << response;
+
+            QJsonParseError jsonError;
+            QJsonDocument doc_set_config_response = QJsonDocument::fromJson(response.toUtf8(), &jsonError);
+
+        #if 0
+            if (jsonError.error != QJsonParseError::NoError){
+                qDebug() << jsonError.errorString();
+                QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+                return;
+            }
+        #endif
+
+            QJsonObject obj_root_set_config_response = doc_set_config_response.object();
+            QVariantMap json_map_root_set_config_response = obj_root_set_config_response.toVariantMap();
+
+            qDebug() << "cmd: " << QString::number(json_map_root_set_config_response["cmd"].toUInt());
+            qDebug() << "status_write: " << QString::number(json_map_root_set_config_response["status_write"].toUInt());
+
+            if(json_map_root_set_config_response["cmd"].toUInt() == CMD_ACTION_SET_CONFIG) {
+                if(json_map_root_set_config_response["status_write"].toUInt() == 1) {
+                    QMessageBox::information(this, "Success", "Writing configuration to ESP32 is successful!");
+                } else {
+                    QMessageBox::warning(this, "Failed!", "Failed writing configuration to ESP device!");
+                }
+            } else {
+                QMessageBox::warning(this, "Error!", "Unknown command received, writing configuration to ESP device: unknown status!");
+            }
+
+        } else {
+            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
+        }
+    }
 }
 
 void MainWindow::ezpi_log_write_flash() {
