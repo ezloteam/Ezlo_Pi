@@ -44,7 +44,7 @@ private slots:
     // Custom slots
     void ezpi_log_write_flash();
     void ezpi_log_erase_flash();
-    void ezpi_check_firmware();
+    EZPI_BOOL ezpi_check_firmware();
     void ezpi_message_info_no_firmware_detected();
     void ezpi_receive_dev_type_selected(EZPI_UINT8);
     void ezpi_receive_added_dev(ezpi_dev_type);
@@ -111,8 +111,11 @@ private:
 
     // Variables for port management
     std::vector<QSerialPortInfo> ezpi_serial_ports_info_list;
+
     QSerialPortInfo ezpi_serial_port_info;
-    QSerialPort ezpi_serial_port;
+
+    QSerialPort * ezpi_serial_port;
+
     bool ezpi_flag_serial_port_open;
 
     // Timers

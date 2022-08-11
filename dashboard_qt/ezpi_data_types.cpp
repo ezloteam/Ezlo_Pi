@@ -42,6 +42,8 @@ EzPi::EzPi():
     ezlogic_item_types_str->append("LNA219");
     ezlogic_item_types_str->append("DHT11");
 
+     ezlogic_firmware_info = new ezlogic_info_t;
+
 }
 
 EzPi::~EzPi() {

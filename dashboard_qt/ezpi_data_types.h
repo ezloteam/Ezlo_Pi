@@ -120,6 +120,28 @@ enum ezpi_board_type {
     EZPI_BOARD_TYPE_TOTAL
 };
 
+typedef struct ezlogic_info {
+    EZPI_UINT32 v_sw;
+    EZPI_UINT8 v_type;
+    EZPI_UINT16 build;
+    EZPI_UINT32 v_idf;
+    EZPI_UINT32 uptime;
+    EZPI_UINT32 build_date;
+
+    // To be implemented
+//    "boot_count": 15,
+//    "boot_reason": 2,
+//    "mac": 1577079727,
+//    "uuid": "65261d76-e584-4d35-aff1-d84bd043",
+//    "serial": 100004032,
+//    "ssid": "ssid",
+//    "dev_type": 1,
+//    "dev_flash": 64256,
+//    "dev_free_flash": 300,
+//    "dev_name": "My Device"
+
+} ezlogic_info_t;
+
 typedef struct ezlogic_device_digital_op {
     ezpi_dev_type dev_type;
     EZPI_STRING dev_name;
@@ -229,6 +251,8 @@ private:
     QStringList * ezlogic_device_types_str;
     QStringList * ezlogic_item_types_str;
 
+    ezlogic_info_t * ezlogic_firmware_info;
+
 public:
     EzPi();
     ~EzPi();
@@ -274,6 +298,8 @@ public:
 
     EZPI_STRING EZPI_GET_DEV_TYPE(ezpi_dev_type d) {return ezlogic_device_types_str->at(d);}
     EZPI_STRING EZPI_GET_ITEM_TYPE(ezpi_item_type i) {return ezlogic_item_types_str->at(i);}
+
+    void EZPI_SET_FMW_INFO(ezlogic_info_t ezlogic_fmw_info) { ezlogic_firmware_info = &ezlogic_fmw_info; }
 
 };
 

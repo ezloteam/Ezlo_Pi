@@ -57,16 +57,17 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(810, 628);
     ui->setupUi(this);
 
+    ezpi_serial_port = new QSerialPort;
+
     EzloPi = new EzPi();
     EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_GENERIC);
     EzloPi->EZPI_INIT_BOARD();
 
     ezpi_form_login = new login(this);
-    ezpi_form_WiFi = new Dialog_WiFi(this);
+    ezpi_form_WiFi = new Dialog_WiFi(this, ezpi_serial_port);
     ezpi_form_devadd = new Dialog_devadd(this);
 
     connect(ezpi_form_devadd, SIGNAL(ezpi_send_dev_type_selected(EZPI_UINT8)), this, SLOT(ezpi_receive_dev_type_selected(EZPI_UINT8)));
-
 
     user_token.clear();
 
@@ -84,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_remove_device->setEnabled(false);
 
     // Set WiFi
-    ui->pushButton_set_wifi->setEnabled(false);
+//    ui->pushButton_set_wifi->setEnabled(false);
 
     // Get and set configs
     ui->pushButton_get_ezpi_config->setEnabled(false);
@@ -112,15 +113,57 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 MainWindow::~MainWindow() {
-    ezpi_serial_port.close();
+    ezpi_serial_port->close();
     delete ui;    
 }
 
-void MainWindow::ezpi_check_firmware() {
+EZPI_BOOL MainWindow::ezpi_check_firmware() {
 
+    QString test_json = "{\"cmd\":1,\"status\":1,\"v_sw\":3625,\"v_type\":1,\"build\":17,\"v_idf\":8456,\"uptime\":4856,\"build_date\":1657623331,\"boot_count\":15,\"boot_reason\":2,\"mac\":1577079727,\"uuid\":\"65261d76-e584-4d35-aff1-d84bd043\",\"serial\":100004032,\"ssid\":\"ssid\",\"dev_type\":1,\"dev_flash\":64256,\"dev_free_flash\":300,\"dev_name\":\"My Device\"}";
+
+    QString json_send_get_info = "{\"cmd\":1}";
+
+    ezlogic_info_t get_info_fmw_info;
+    EZPI_BOOL ezpi_fimware_present = false;
+
+    QJsonParseError jsonError;
+    QJsonDocument doc_get_info = QJsonDocument::fromJson(test_json.toUtf8(), &jsonError);
+
+    if (jsonError.error != QJsonParseError::NoError){
+//        qDebug() << jsonError.errorString();
+//        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+//        return;
+    }
+
+    QJsonObject obj_data_root_get_info = doc_get_info.object();
+    QVariantMap json_map_root_get_info = obj_data_root_get_info.toVariantMap();
+
+    if(json_map_root_get_info["cmd"].toUInt() != CMD_ACTION_GET_INFO) {
+//        return;
+    }
+
+    if(json_map_root_get_info["status"].toUInt() == 1) {
+
+        get_info_fmw_info.v_sw = json_map_root_get_info["v_sw"].toUInt();
+        get_info_fmw_info.v_type = json_map_root_get_info["v_type"].toUInt();
+        get_info_fmw_info.build = json_map_root_get_info["build"].toUInt();
+        get_info_fmw_info.v_idf = json_map_root_get_info["v_idf"].toUInt();
+        get_info_fmw_info.uptime = json_map_root_get_info["uptime"].toUInt();
+        get_info_fmw_info.build_date = json_map_root_get_info["build_date"].toUInt();
+
+        EzloPi->EZPI_SET_FMW_INFO(get_info_fmw_info);
+
+        if(get_info_fmw_info.v_sw > 1)    ezpi_fimware_present = true;
+        else ezpi_fimware_present = false;
+    }
+
+    return ezpi_fimware_present;
+
+
+#if 0
     QByteArray ezpi_byte_array_write_to_serial;
 
-    quint64 bytes_wrote = ezpi_serial_port.write("$GET_CONFIG\n");
+    quint64 bytes_wrote = ezpi_serial_port->write("$GET_CONFIG\n");
     if(bytes_wrote > 0) {
         qDebug() << bytes_wrote << " bytes written!";
 //        if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(" bytes written!");
@@ -128,7 +171,7 @@ void MainWindow::ezpi_check_firmware() {
     }
 
     connect(&ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::on_serRX1);
-
+#endif
 }
 
 
@@ -239,7 +282,7 @@ void MainWindow::on_serRX1() {
     static int cou = 0;
     static int len_d = 0;
     static uchar buf[256];
-    QByteArray dat=ezpi_serial_port.readAll();
+    QByteArray dat=ezpi_serial_port->readAll();
     if(!dat.length())
     {
         return;
@@ -312,12 +355,14 @@ void MainWindow::on_serRX1() {
 
 void MainWindow::on_pushButton_connect_uart_clicked() {
 
-    ezpi_serial_port.setPort(ezpi_serial_port_info);
-    ezpi_serial_port.setBaudRate(460800);
+    ezpi_serial_port->setPort(ezpi_serial_port_info);
+//    ezpi_serial_port->setBaudRate(460800);
+    ezpi_serial_port->setBaudRate(115200);
+
     if(ezpi_flag_serial_port_open == false) {
         if(!ezpi_serial_port_info.isBusy()) {
 
-            if(ezpi_serial_port.open(QIODevice::ReadWrite)) {
+            if(ezpi_serial_port->open(QIODevice::ReadWrite)) {
 //                if(1) {
                 ezpi_flag_serial_port_open = true;
                 is_start = false;
@@ -344,7 +389,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
             if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
         }
     } else {
-        ezpi_serial_port.close();
+        ezpi_serial_port->close();
         ezpi_flag_serial_port_open = false;
 
         ui->pushButton_connect_uart->setText("Open");
@@ -357,7 +402,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
         if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + " serial port is close.");
 
         // Deactivate all the buttons
-        ui->pushButton_set_wifi->setEnabled(false);
+//        ui->pushButton_set_wifi->setEnabled(false);
         ui->pushButton_add_device->setEnabled(false);
 
         ui->pushButton_get_ezpi_config->setEnabled(false);
@@ -809,11 +854,11 @@ void MainWindow::ezpi_log_write_flash() {
 
     if(str_StandardOutput.contains("error") || str_StandardError.contains("error")) {
         ezpi_message_box_failed_erase.information(this, "Failed flashing the device!", "Flashing ezlopi firmware to the device was not successful, close the app, disconnect device, reconnect and try again!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     } else if(str_StandardError.contains("Hard resetting") || str_StandardOutput.contains("Hard resetting")) {
         ezpi_message_box_failed_erase.information(this, "Success flashing the device!", "Flashing ezlopi firmware to the device was successful! You can now gracefully disconnect the device and move further!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     }
 }
@@ -835,11 +880,11 @@ void MainWindow::ezpi_log_erase_flash() {
 
     if(str_StandardOutput.contains("error") || str_StandardError.contains("error")) {
         ezpi_message_box_failed_erase.information(this, "Failed erasing the device!", "Erasing the flas of the device was not successful, close the app, disconnect device, reconnect and try again!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     } else if(str_StandardOutput.contains("Hard resetting") || str_StandardError.contains("Hard resetting")) {
         ezpi_message_box_failed_erase.information(this, "Success erasing the device!", "Erasing the device was successful! You can now proceed forward flashing the ezlopi firmware!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     }
 }
@@ -862,7 +907,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
 
     #endif
 
-    ezpi_serial_port.close();
+    ezpi_serial_port->close();
     ui->pushButton_connect_uart->setEnabled(false);
 
     ezpi_process_write_flash->setProgram("esptool/esptool.exe");
@@ -932,7 +977,7 @@ void MainWindow::on_pushButton_set_wifi_apply_clicked() {
     buf[0]=0x95;
     buf[1]=98;
     buf[2]=SET_WiFi & 0xff;
-    ezpi_serial_port.write((const char*)buf,99);
+    ezpi_serial_port->write((const char*)buf,99);
 
     ui->textBrowser_console_log->append(QString::fromLocal8Bit(QByteArray::fromRawData((const char*)buf, 99)));
     QString str1;
@@ -1020,7 +1065,7 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
     connect(ezpi_process_erase_flash, &QProcess::readyReadStandardOutput, this, &MainWindow::ezpi_log_erase_flash);
     connect(ezpi_process_erase_flash, &QProcess::readyReadStandardError, this, &MainWindow::ezpi_log_erase_flash);
 
-    ezpi_serial_port.close();
+    ezpi_serial_port->close();
     ui->pushButton_connect_uart->setEnabled(false);
 
 
