@@ -190,7 +190,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
     ezpi_serial_port->setBaudRate(115200);
 
     if(ezpi_flag_serial_port_open == false) {
-        if(!ezpi_serial_port_info.isBusy()) {
+//        if(!ezpi_serial_port_info.isBusy()) {
 
             if(ezpi_serial_port->open(QIODevice::ReadWrite)) {
 //                if(1) {
@@ -234,10 +234,10 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
                 qDebug() << "Failed opeaning serial port: " << ui->comboBox_uart_list->currentText();
                 if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Failed opeaning serial port: " + ui->comboBox_uart_list->currentText());
             }
-        } else {
-            qDebug() << ezpi_serial_port_info.portName() <<  ": port is busy !";
-            if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
-        }
+//        } else {
+//            qDebug() << ezpi_serial_port_info.portName() <<  ": port is busy !";
+//            if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
+//        }
     } else {
         ezpi_serial_port->close();
         ezpi_flag_serial_port_open = false;
@@ -732,7 +732,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
 
     qDebug() << "Arguments : " << argument_string;
 
-    ezpi_process_write_flash->setNativeArguments(argument_string);
+    ezpi_process_write_flash->setArguments(arguments);
     ezpi_process_write_flash->start();
 }
 
@@ -1092,11 +1092,11 @@ void MainWindow::success_get_prov_jsons(QNetworkReply *d) {
         ld_binary_array.append('\0');
         ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x44, jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi"));
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi").toLocal8Bit());
         ld_binary_array.append('\0');
         ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x104, jobj_prov_data_prov_data["id"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown"));
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
 
         ser_ver.data = 0;
         // For Connection-ID-0

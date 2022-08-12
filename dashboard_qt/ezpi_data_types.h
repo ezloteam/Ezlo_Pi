@@ -2,6 +2,8 @@
 #define EZPI_DATA_TYPES_H
 
 #include<QDataStream>
+#include <QString>
+#include <QStringList>
 
 typedef qint8 EZPI_INT8;
 typedef quint8 EZPI_UINT8;
