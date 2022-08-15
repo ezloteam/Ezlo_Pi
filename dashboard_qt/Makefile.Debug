@@ -3760,9 +3760,6 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qdesktopwidget.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qguiapplication.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qinputmethod.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QCheckBox \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qcheckbox.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qabstractbutton.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QComboBox \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qcombobox.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qabstractitemdelegate.h \
@@ -3788,22 +3785,13 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qabstractscrollarea.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QLabel \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qlabel.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QLineEdit \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qlineedit.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtextcursor.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtextformat.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qpen.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtextoption.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMenu \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmenu.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QMenuBar \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qmenubar.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QPushButton \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qpushbutton.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QRadioButton \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qradiobutton.h \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QScrollArea \
-		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qscrollarea.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qabstractbutton.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QSplitter \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qsplitter.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QStatusBar \
@@ -3815,6 +3803,10 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qtextbrowser.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qtextedit.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtextoption.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtextcursor.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qtextformat.h \
+		C:\Qt\5.15.2\msvc2019_64\include\QtGui\qpen.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QToolBar \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\qtoolbar.h \
 		C:\Qt\5.15.2\msvc2019_64\include\QtWidgets\QWidget \

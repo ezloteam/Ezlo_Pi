@@ -193,7 +193,6 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
         if(!ezpi_serial_port_info.isBusy()) {
 
             if(ezpi_serial_port->open(QIODevice::ReadWrite)) {
-//                if(1) {
                 ezpi_flag_serial_port_open = true;
 
                 //Modify UI elements:
@@ -283,8 +282,6 @@ void MainWindow::on_pushButton_add_device_clicked() {
 
 void MainWindow::on_pushButton_remove_device_clicked() {
 
-
-//    QTableWidgetItem ezlogic_table_selected_item = ui->tableWidget_device_table->selectedItems();
     QList<QTableWidgetItem*> ezlogic_table_selected_item = ui->tableWidget_device_table->selectedItems();
     EZPI_UINT8 ezlogic_table_selected_row = ezlogic_table_selected_item[0]->row();
     qDebug() << "Selected row: " << ezlogic_table_selected_row;
@@ -314,7 +311,16 @@ void MainWindow::on_pushButton_remove_device_clicked() {
 
 void MainWindow::on_pushButton_get_ezpi_config_clicked() {
 
-//    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
+#if 0
+    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,"
+                        "\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,"
+                        "\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1"
+                        "\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip"
+                        "\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up"
+                        "\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room"
+                        "\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,"
+                        "\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
+#endif
 
     QString response_data;
 
@@ -366,7 +372,7 @@ void MainWindow::on_pushButton_get_ezpi_config_clicked() {
     EZPI_UINT8 dev_count_get_config = 0;
 
     // Clear table contents
-    ui->tableWidget_device_table->clear();
+    ui->tableWidget_device_table->clearContents();
 
     // Clear internal device storage
     EzloPi->EZPI_CLEAR_OUTPUT_DEVICES();
@@ -374,7 +380,6 @@ void MainWindow::on_pushButton_get_ezpi_config_clicked() {
     EzloPi->EZPI_CLEAR_ONEWIRE_DEVICES();
     EzloPi->EZPI_CLEAR_I2C_DEVICES();
     EzloPi->EZPI_CLEAR_SPI_DEVICES();
-
 
     for(EZPI_UINT8 i = 0; i < list_get_config_device_detail.size(); i++) {
 
@@ -613,7 +618,6 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
             } else {
                 QMessageBox::warning(this, "Error!", "Unknown command received, writing configuration to ESP device: unknown status!");
             }
-
         } else {
             QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
         }

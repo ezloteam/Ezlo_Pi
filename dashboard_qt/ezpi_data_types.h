@@ -202,22 +202,6 @@ typedef struct ezlogic_device_SPI {
     EZPI_UINT8 gpio_cs;
 } ezlogic_device_SPI_t;
 
-struct device_t {
-    char dev_id[SIZE_DEVICE_ID];
-    unsigned char dev_type;
-    char Name[SIZE_DEVICE_FNAME];
-    char roomId[SIZE_ROOM_ID];
-    char id_i[SIZE_ID_I];           // Item ID
-    bool input_vol;
-    bool out_vol;
-    unsigned char input_gpio;
-    unsigned char out_gpio;
-    bool is_input;
-    bool checkBox_gpio_in_logic_type;       // Input Inv
-    bool checkBox_gpio_out_logic_type;      // Out put Inv
-    bool is_meter;
-};
-
 typedef union conv_u16_array {
     uint8_t data_bytes[sizeof(uint16_t)];
     uint16_t data;
