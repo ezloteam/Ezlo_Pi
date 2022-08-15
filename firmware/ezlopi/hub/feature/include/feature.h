@@ -1,22 +1,18 @@
 #ifndef __HUB_FEATURE_H__
 #define __HUB_FEATURE_H__
 
-#include <string>
+#include <string.h>
+#include "frozen.h"
 
-using namespace std;
-
-class feature
+#ifdef __cplusplus
+extern "C"
 {
-protected:
-    feature() {}
-    static feature *feature_;
+#endif
 
-public:
-    static feature *get_instance(void);
-    feature(feature &other) = delete;
-    void operator=(const feature &) = delete;
+    char *feature_list(const char *payload, uint32_t len, struct json_token *method);
 
-    static string list(const char *payload, uint32_t len, struct json_token *method);
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HUB_FEATURE_H__

@@ -1,22 +1,18 @@
 #ifndef __HUB_GATEWAYS_H__
 #define __HUB_GATEWAYS_H__
 
-#include <string>
+#include <string.h>
+#include "frozen.h"
 
-using namespace std;
-
-class gateways
+#ifdef __cplusplus
+extern "C"
 {
-protected:
-    gateways() {}
-    static gateways *gateways_;
+#endif
 
-public:
-    static gateways *get_instance(void);
-    gateways(gateways &other) = delete;
-    void operator=(const gateways &) = delete;
+    char *gateways_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 
-    static string list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HUB_GATEWAYS_H__

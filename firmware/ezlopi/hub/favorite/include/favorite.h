@@ -1,22 +1,18 @@
 #ifndef __HUB_FAVORITE_LIST_H__
 #define __HUB_FAVORITE_LIST_H__
 
-#include <string>
+#include <string.h>
+#include "frozen.h"
 
-using namespace std;
-
-class favorite
+#ifdef __cplusplus
+extern "C"
 {
-protected:
-    favorite() {}
-    static favorite *favorite_;
+#endif
 
-public:
-    static favorite *get_instance(void);
-    favorite(favorite &other) = delete;
-    void operator=(const favorite &) = delete;
+    char *favorite_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 
-    static string list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HUB_FAVORITE_LIST_H__

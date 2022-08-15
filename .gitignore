@@ -1,4 +1,11 @@
-<<<<<<< HEAD
+**/deprecated
+firmware/ezlopi_v2/build/*
+firmware/ezlopi_v2/v*/*
+firmware/ezlopi/build/*
+firmware/ezlopi/v*/*
+firmware/GPIO_CFG/v*/*
+**/*.zip
+**/*.bin
 build*/
 bin/*
 docs/doxygen/*
@@ -6,7 +13,6 @@ build-esp_gpio_config-Desktop-Debug/*
 firmware/GPIO_CFG/build/*
 firmware/GPIO_CFG/cmake-build-debug/*
 firmware/bootloader/subproject/*
-=======
 firmware/GPIO_CFG/build/
 firmware/GPIO_CFG/.vscode/
 **/build/
@@ -365,4 +371,3 @@ firmware/GPIO_CFG/.vscode/
 
 # JetBrains Rider
 **/*.sln.iml
->>>>>>> 1778cc7f796d7f02696fce23007ca1a91f26ea40

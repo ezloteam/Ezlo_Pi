@@ -40,7 +40,7 @@ enum commands {
 device_t device[EZPI_MAX_DEVICES];
 int cou_dev = 0;
 
-uchar gpio_m[EZPI_MAX_GPIOS] = {0xff,0xff,0xff,0xff,0xff,0,0xff,0xff,0xff,0xff,0xff,0xff,0,0,0,0,0xff,0,0,0,0,0,0,0,0xff,0,0,0};
+uchar gpio_m[EZPI_MAX_GPIOS] ={0xff,0xff,0x00,0xff,0xff,0,0xff,0xff,0xff,0xff,0xff,0xff,0,0,0,0,0xff,0,0,0,0,0,0,0,0xff,0,0,0};
 
 bool is_start = false;
 bool is_pars = false;
@@ -282,18 +282,18 @@ void MainWindow::on_serRX1() {
 
     QString str,str1;
     str1.asprintf("%s",(char*)dat.data());
-    str.asprintf("%s",str1.toStdString().c_str());    
-#if 1
+    str.asprintf("%s",str1.toStdString().c_str());
     qDebug() << str1;
     if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(str1);
+
+
 
     if(ezpi_flag_enable_log){
         ui->textBrowser_console_log->append(dat.data());
         qDebug() << dat;
     }
-#endif
 
-    if(!is_start) {
+    if(!is_start){
         qDebug() << dat;
 
         if(dat.at(0) == '$') {
@@ -636,14 +636,7 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
     buf[2]=0xa1;
     memcpy(&buf[3],gpio_m,28);
     ezpi_serial_port.write((const char*)buf,31);
-
-    qDebug() << "Sent from QT" << buf;
-    for (int j=0;j<28;j++) {
-        QString str;
-        str = str.asprintf("%d",j);
-        gpio_m[j] = buf[2+j];
-        qDebug() << "gpio_m[" << j<< "] = " << gpio_m[j];
-    }
+    qDebug() << "Send" << buf;
 
     if(!device[0].Name[0])
         return;
@@ -789,9 +782,8 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
                                 "--flash_freq 40m " + \
                                 "0x1000 ezpibins/bootloader.bin " + \
                                 "0x8000 ezpibins/partition-table.bin " + \
-                                "0xD000 ezpibins/ota_data_initial.bin " + \
                                 "0x10000 ezpibins/esp_configs.bin " + \
-                                "0x3B0000 ezpibins/ld.bin";
+                                "0x2E0000 ezpibins/ld.bin";
 
 
     qDebug() << "Current dir : " << QDir::currentPath();
@@ -846,11 +838,10 @@ void MainWindow::on_pushButton_set_wifi_apply_clicked() {
     buf[1]=98;
     buf[2]=SET_WiFi & 0xff;
     ezpi_serial_port.write((const char*)buf,99);
-
-    ui->textBrowser_console_log->append(QString::fromLocal8Bit(QByteArray::fromRawData((const char*)buf, 99)));
     QString str1;
     str1 = str1.asprintf("%s",buf);
-    qDebug() << "Send" << str1;
+    qDebug() << "Send[SSID]: " << &str1[3];
+    qDebug() << "Send[PASS]: " << &str1[35];
     if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Send" + str1 + "\n");
     ui->scrollArea_set_wifi_cred->setVisible(false);
 }

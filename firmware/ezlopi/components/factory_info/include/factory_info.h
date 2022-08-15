@@ -1,11 +1,16 @@
 #ifndef __FACTORY_INFO_H__
 #define __FACTORY_INFO_H__
 
-#include <string>
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+// #include <string>
 #include "esp_partition.h"
 #include "frozen.h"
 
-using namespace std;
+#define ENABLE_FACTORY_INFO_ENCRYPTION 0
 
 // #define FACTORY_INFO_PARTITION_NAME "factory_id"
 #define FACTORY_INFO_PARTITION_NAME "id"
@@ -61,69 +66,31 @@ using namespace std;
 #define SSL_PRIVATE_KEY_OFFSET 0x3000
 #define SSL_SHARED_KEY_OFFSET 0x4000
 
-class factory_info
-{
-private:
-    const esp_partition_t *partition_ctx = NULL;
-    void set_default_if_not_found(void);
-    char *read_string_from_partition(int offset, int length);
-    int write_string_to_flash(int offset, int size, struct json_token *token);
+    typedef struct s_factory_info
+    {
+        short h_version;
+        unsigned long long id;
+        char *name;
+        char *controller_uuid;
+        char *zwave_region;
+        char *default_wifi_ssid;
+        char *default_wifi_password;
+        char *device_mac;
 
-protected:
-    factory_info() {}
-    static factory_info *factory_info_;
+        char *cloud_server;
+        char *provisioning_server;
+        char *provisioning_token;
+        char *ca_certificate;
+        char *ssl_private_key;
+        char *ssl_shared_key;
+        char *ssl_public_key;
+    } s_factory_info_t;
 
-public:
-    unsigned long long id = 0ULL;
-    char *name = NULL;
-    short h_version = 0;
-    char *controller_uuid = NULL;
-    char *zwave_region = NULL;
-    char *default_wifi_ssid = NULL;
-    char *default_wifi_password = NULL;
-    char *cloud_server = NULL;
-    char *provisioning_server = NULL;
-    char *provisioning_token = NULL;
-    char *ca_certificate = NULL;
-    char *ssl_private_key = NULL;
-    char *ssl_shared_key = NULL;
-    char *ssl_public_key = NULL;
+    s_factory_info_t *factory_info_init(void);
+    s_factory_info_t *factory_info_get_info(void);
 
-    unsigned long long get_id(void);
-    char *get_uuid(void);
-    char *get_zwave_region(void);
-    char *get_default_wifi_ssid(void);
-    char *get_default_wifi_password(void);
-    char *get_name(void);
-
-    char *get_provisioning_server(void);
-    char *get_provisioning_token(void);
-    char *get_cloud_server(void);
-    char *get_ca_certificate(void);
-    char *get_ssl_private_key(void);
-    char *get_ssl_shared_key(void);
-
-    int set_id(char *payload, int len);
-    int set_uuid(char *payload, int len);
-    int set_zwave_region(char *payload, int len);
-    int set_default_wifi_ssid(char *payload, int len);
-    int set_default_wifi_password(char *payload, int len);
-    int set_name(char *payload, int len);
-
-    int set_provisioning_server(char *payload, int len);
-    int set_provisioning_token(char *payload, int len);
-    int set_cloud_server(char *payload, int len);
-    int set_ca_certificate(char *payload, int len);
-    int set_ssl_private_key(char *payload, int len);
-    int set_ssl_shared_key(char *payload, int len);
-
-    static string update_factory_info(char *payload, int len);
-
-    int init(void);
-    static factory_info *get_instance(void);
-
-    factory_info(factory_info &other) = delete;
-    void operator=(const factory_info &) = delete;
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __FACTORY_INFO_H__

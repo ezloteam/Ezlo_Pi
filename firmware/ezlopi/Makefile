@@ -1,4 +1,4 @@
-PROJECT_NAME := ezpi_3
+PROJECT_NAME := ezlopi
 
 COMPONENT_ADD_INCLUDEDIRS := components/include
 

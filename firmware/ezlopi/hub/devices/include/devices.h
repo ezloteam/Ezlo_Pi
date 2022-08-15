@@ -1,23 +1,20 @@
 #ifndef __HUB_DEVICE_LIST_H__
 #define __HUB_DEVICE_LIST_H__
 
-#include <string>
+#include <string.h>
+#include "frozen.h"
 
-using namespace std;
-
-class devices
+#ifdef __cplusplus
+extern "C"
 {
-protected:
-    devices() {}
-    static devices *devices_;
+#endif
 
-public:
-    static devices *get_instance(void);
-    devices(devices &other) = delete;
-    void operator=(const devices &) = delete;
+    char *devices_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    char *devices_settings_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    char *devices_name_set(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 
-    static string list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-    static string settings_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HUB_DEVICE_LIST_H__
