@@ -1,4 +1,4 @@
-file(GLOB_RECURSE src_files "src/*.cpp")
+file(GLOB_RECURSE src_files "src/*.c*")
 idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "include"
     REQUIRES frozen
@@ -7,4 +7,5 @@ idf_component_register(SRCS "${src_files}"
     devices_common
     freertos
     websocket_client
+    wss
 )

@@ -1,4 +1,4 @@
-file(GLOB_RECURSE websocket_src "src/*.c*")
+file(GLOB_RECURSE websocket_src "src/*.c")
 
 idf_component_register(SRCS "${websocket_src}"
     INCLUDE_DIRS "include"

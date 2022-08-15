@@ -28,7 +28,7 @@ enum ezpi_dev_type {
 };
 
 #define     SIZE_DEVICE_ID      8
-#define     SIZE_DEVICE_FNAME   16
+#define     SIZE_DEVICE_FNAME   20
 #define     SIZE_ROOM_ID        8
 #define     SIZE_ID_I           8
 #define     SIZE_UART_NAME      20
@@ -55,14 +55,14 @@ struct device_t {
     unsigned char dev_type;
     char Name[SIZE_DEVICE_FNAME];
     char roomId[SIZE_ROOM_ID];
-    char id_i[SIZE_ID_I];           // Item ID
+    char id_i[SIZE_ID_I];
     bool input_vol;
     bool out_vol;
     unsigned char input_gpio;
     unsigned char out_gpio;
     bool is_input;
-    bool checkBox_gpio_in_logic_type;       // Input Inv
-    bool checkBox_gpio_out_logic_type;      // Out put Inv
+    bool checkBox_gpio_in_logic_type;
+    bool checkBox_gpio_out_logic_type;
     bool is_meter;
 };
 

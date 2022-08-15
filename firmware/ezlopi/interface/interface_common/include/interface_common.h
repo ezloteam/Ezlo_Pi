@@ -1,33 +1,27 @@
 #ifndef __INTERFACE_COMMON_H__
 #define __INTERFACE_COMMON_H__
 
-#include <iostream>
-
 #include "driver/gpio.h"
 
-class interface_common
+#ifdef __cplusplus
+extern "C"
 {
-private:
-public:
-    void init(void);
-    static interface_common *get_instance(void);
+#endif
 
-    uint8_t get_config(int idx);
-    void set_config(uint8_t val, int idx);
+    void interface_common_init(void);
 
-    void gpio_config_sets(uint32_t n);
-    uint32_t gpio_state_get(uint32_t pin);
-    uint32_t get_gpio_isr_event(uint32_t wait_ms);
-    void gpio_state_set(uint32_t pin, uint32_t state);
-    void inst_input_button(gpio_num_t gpioPin, gpio_pull_mode_t pull);
-    void inst_out_button(gpio_num_t gpioPin, uint8_t state, gpio_pull_mode_t pull);
+    uint8_t interface_common_get_config(int idx);
+    void interface_common_set_config(uint8_t val, int idx);
 
-    interface_common(interface_common &other) = delete;
-    void operator=(const interface_common &) = delete;
+    void interface_common_gpio_config_sets(uint32_t n);
+    uint32_t interface_common_gpio_state_get(uint32_t pin);
+    uint32_t interface_common_get_gpio_isr_event(uint32_t wait_ms);
+    void interface_common_gpio_state_set(uint32_t pin, uint32_t state);
+    void interface_common_inst_input_button(gpio_num_t gpioPin, gpio_pull_mode_t pull);
+    void interface_common_inst_out_button(gpio_num_t gpioPin, uint8_t state, gpio_pull_mode_t pull);
 
-protected:
-    interface_common() {}
-    static interface_common *interface_common_;
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __INTERFACE_COMMON_H__

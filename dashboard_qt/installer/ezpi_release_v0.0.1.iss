@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ezlogic"
-#define MyAppVersion "beta build-02"
+#define MyAppVersion "beta"
 #define MyAppPublisher "Ezlo Innovation"
 #define MyAppURL "https://www.ezlopi.com/"
 #define MyAppExeName "ezlogic.exe"
@@ -23,7 +23,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=E:\Projects\nds\ezlopi\dashboard_qt\installer
-OutputBaseFilename=ezlogic_win_installer_build_02
+OutputBaseFilename=ezlogic_win_installer
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -61,4 +61,7 @@ Source: "E:\Projects\nds\ezlopi\dashboard_qt\build-esp_gpio_config-Desktop_Qt_5_
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Run]
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 

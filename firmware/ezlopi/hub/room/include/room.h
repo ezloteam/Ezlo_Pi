@@ -1,23 +1,15 @@
 #ifndef __HUB_ROOM_H__
 #define __HUB_ROOM_H__
-#include <string>
-#include <cstring>
+#include <string.h>
 #include "frozen.h"
-
-using namespace std;
-
-class room
+#ifdef __cplusplus
+extern "C"
 {
-protected:
-    room() {}
-    static room *room_;
+#endif
+    char *room_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 
-public:
-    static room *get_instance(void);
-    room(room &other) = delete;
-    void operator=(const room &) = delete;
-
-    static string list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HUB_ROOM_H__
