@@ -83,6 +83,10 @@ int websocket_client::send(std::string &_str)
     {
         ret = esp_websocket_client_send_text(client, _str.c_str(), _str.length(), portMAX_DELAY);
     }
+    else
+    {
+        TRACE_E("ERROR: websocket client is not connected!");
+    }
     return ret;
 }
 
@@ -92,6 +96,10 @@ int websocket_client::send(char *c_str)
     if (esp_websocket_client_is_connected(client))
     {
         ret = esp_websocket_client_send_text(client, c_str, strlen(c_str), portMAX_DELAY);
+    }
+    else
+    {
+        TRACE_E("ERROR: websocket is not connected!");
     }
     return ret;
 }
@@ -104,11 +112,12 @@ esp_websocket_client_handle_t websocket_client::websocket_app_start(string &uri,
             .upcall = upcall,
         };
 
-        factory_info *factory = factory_info::get_instance();
+        // factory_info *factory = factory_info::get_instance();
+        s_factory_info_t *factory = factory_info_get_info();
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri.c_str(),
-            .task_stack = 10 * 1024,
+            .task_stack = 8 * 1024,
             .cert_pem = factory->ca_certificate,
             .client_cert = factory->ssl_shared_key,
             .client_key = factory->ssl_private_key,

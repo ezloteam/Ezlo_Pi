@@ -1,12 +1,9 @@
-#include <string>
-#include <cstring>
+#include <string.h>
 
 #include "modes.h"
 #include "debug.h"
 #include "frozen.h"
 #include "devices_common.h"
-
-using namespace std;
 
 const char *modes_1_start = "{\"method\":\"hub.modes.get\",\"msg_id\":%d,\"api\":\"1.0\",\"error\":null,\"id\":\"%.*s\",\"result\":{\"current\":\"%s\",\"switchTo\":\"\",\"timeIsLeftToSwitch\":0,\"switchToDelay\":0,\"alarmDelay\":0,\"modes\":[";
 const char *modes_1_modes_start = "{\"_id\":\"%s\",\"name\":\"%s\",\"description\":\"%s\"";
@@ -19,40 +16,26 @@ const char *modes_1_protect = "\"protect\":[\"%s\"";
 const char *modes_1_item_end = "]";
 const char *modes_1_end = "]},\"sender\":%.*s}";
 
-modes *modes::modes_ = nullptr;
-
-modes *modes::get_instance(void)
+char *modes_get(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
-    if (nullptr == modes_)
+    uint32_t buf_len = 2014;
+    char *send_buf = (char *)malloc(buf_len);
+
+    if (send_buf)
     {
-        modes_ = new modes();
+
+        struct json_token msg_id = JSON_INVALID_TOKEN;
+        json_scanf(payload, len, "{id: %T}", &msg_id);
+
+        struct json_token sender = JSON_INVALID_TOKEN;
+        int sender_status = json_scanf(payload, len, "{sender: %T}", &sender);
+
+        snprintf(send_buf, buf_len, modes_1_start, msg_count, msg_id.len, msg_id.ptr, "");
+        int len_b = strlen(send_buf);
+        snprintf(&send_buf[len_b], buf_len - len_b, modes_1_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
+
+        TRACE_B(">>>>>>>>>>> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
     }
 
-    return modes_;
-}
-
-string modes::get(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
-{
-    string ret = "";
-    char send_buf[2048] = {'\0'};
-    devices_common *devices_ctx = devices_common::get_instance();
-    s_device_properties_t *devices = devices_ctx->device_list();
-
-    struct json_token msg_id = JSON_INVALID_TOKEN;
-    json_scanf(payload, len, "{id: %T}", &msg_id);
-
-    struct json_token sender = JSON_INVALID_TOKEN;
-    int sender_status = json_scanf(payload, len, "{sender: %T}", &sender);
-
-    snprintf(send_buf, sizeof(send_buf), modes_1_start, msg_count, msg_id.len, msg_id.ptr, "");
-    int len_b = strlen(send_buf);
-    snprintf(&send_buf[len_b], sizeof(send_buf) - len_b, modes_1_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-    len_b = strlen(send_buf);
-    send_buf[len_b] = 0;
-
-    ret = send_buf;
-
-    TRACE_B(">>>>>>>>>>> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, ret.length(), ret.c_str());
-
-    return ret;
+    return send_buf;
 }

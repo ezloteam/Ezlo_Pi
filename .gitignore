@@ -1,3 +1,11 @@
+**/deprecated
+firmware/ezlopi_v2/build/*
+firmware/ezlopi_v2/v*/*
+firmware/ezlopi/build/*
+firmware/ezlopi/v*/*
+firmware/GPIO_CFG/v*/*
+**/*.zip
+**/*.bin
 build*/
 bin/*
 dlls/*
@@ -6,7 +14,6 @@ build-esp_gpio_config-Desktop-Debug/*
 firmware/GPIO_CFG/build/*
 firmware/GPIO_CFG/cmake-build-debug/*
 firmware/bootloader/subproject/*
-firmware/GPIO_CFG/.vscode/
 **/build/
 **/cmake-build-debug/
 **/.vscode
@@ -362,5 +369,3 @@ firmware/GPIO_CFG/.vscode/
 **/*.msm
 **/*.msp
 
-# JetBrains Rider
-**/*.sln.iml

@@ -1,5 +1,5 @@
 # file( GLOB_RECURSE provisioning_src "*.c*" "actions/*.c*" )
-file(GLOB_RECURSE provisioning_src "*.c*" "actions/*.c*")
+file(GLOB_RECURSE provisioning_src "*.c*")
 idf_component_register(SRCS "${provisioning_src}"
     INCLUDE_DIRS "."
     REQUIRES
@@ -8,6 +8,7 @@ idf_component_register(SRCS "${provisioning_src}"
     esp_http_client
     common_components
     esp-tls
+    wss
     websocket_client
     esp_hw_support
     factory_info
@@ -25,4 +26,6 @@ idf_component_register(SRCS "${provisioning_src}"
     items
     room
     settings
+    network
+    wss
 )

@@ -1,22 +1,18 @@
 #ifndef __HUB_SCENES_LIST_H__
 #define __HUB_SCENES_LIST_H__
 
-#include <string>
+#include <string.h>
+#include "frozen.h"
 
-using namespace std;
-
-class scenes
+#ifdef __cplusplus
+extern "C"
 {
-protected:
-    scenes() {}
-    static scenes *scenes_;
+#endif
 
-public:
-    static scenes *get_instance(void);
-    scenes(scenes &other) = delete;
-    void operator=(const scenes &) = delete;
+    char *scenes_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 
-    static string list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HUB_SCENES_LIST_H__

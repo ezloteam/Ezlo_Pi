@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+
 # message(STATUS "current dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/update_device_list.sh"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/xyz.txt"
@@ -42,5 +43,4 @@ set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS}) # add the list of directories 'SUBDI
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENTS_DIRS}\r\n")
 
 # # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
-
-project(ezpi_3)
+project(ezpi_2)
