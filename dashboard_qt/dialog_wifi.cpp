@@ -3,21 +3,29 @@
 #include "dialog_wifi.h"
 #include "qjsondocument.h"
 #include "qjsonobject.h"
-#include "qthread.h"
 #include "ui_dialog_wifi.h"
-#include "ezpi_data_types.h"
 
 Dialog_WiFi::Dialog_WiFi(QWidget *parent, QSerialPort * ezpi_serial_port) :
     QDialog(parent),
-    ui(new Ui::Dialog_WiFi)
-{
+    ui(new Ui::Dialog_WiFi)  
+{    
     ui->setupUi(this);
+
+    read_data_serial = new QByteArray;
+    data_action_set_wifi_char_array = new QByteArray;
+
+//    QString read_data_serial;
     ezpi_serial_wifi = ezpi_serial_port;
+    connect(ezpi_serial_wifi, &QSerialPort::readyRead, this, &Dialog_WiFi::serialConnector);
+
+    ezpi_wif_rx_timer.callOnTimeout(this, &Dialog_WiFi::ezpi_wifi_accumulate_serial_msg);
 }
 
 Dialog_WiFi::~Dialog_WiFi()
 {
     delete ui;
+    delete read_data_serial;
+    delete data_action_set_wifi_char_array;
 }
 
 void Dialog_WiFi::on_checkBox_view_password_stateChanged(int arg1) {
@@ -48,11 +56,20 @@ void Dialog_WiFi::on_buttonBox_accepted() {
         obj_action_set_wifi["pass"] = ezpi_wifi_pass;
 
         QJsonDocument doc_action_set_wifi(obj_action_set_wifi);
-        QByteArray data_action_set_wifi = doc_action_set_wifi.toJson(QJsonDocument::Compact);
-        const char * data_action_set_wifi_char_array = data_action_set_wifi.constData();
+        *data_action_set_wifi_char_array = doc_action_set_wifi.toJson(QJsonDocument::Compact);
+        ezpi_wifi_serial_transfer(*data_action_set_wifi_char_array);
+
+#if 0
+        read_data_serial = new QByteArray;
 
         ezpi_serial_wifi->write(data_action_set_wifi_char_array);
+        ezpi_serial_wifi->flush();
+        if(ezpi_serial_wifi->waitForBytesWritten()) {
+            ezpi_wif_rx_timer.start(EZPI_SERIAL_READ_TIMEOUT);
+        }
+#endif
 
+#if 0
         if (ezpi_serial_wifi->waitForBytesWritten()) {
             // read response
             if (ezpi_serial_wifi->waitForReadyRead(5000)) {
@@ -69,6 +86,7 @@ void Dialog_WiFi::on_buttonBox_accepted() {
         } else {
 
         }
+#endif
     }
 }
 
@@ -76,7 +94,7 @@ void Dialog_WiFi::process_response(QString data_response_set_wifi) {
 
     QString response_data = data_response_set_wifi;
 
-    qDebug() << response_data;
+//    qDebug() << response_data;
 
     QJsonParseError jsonError;
     QJsonDocument doc_set_wifi_response = QJsonDocument::fromJson(response_data.toUtf8(), &jsonError);
@@ -104,5 +122,30 @@ void Dialog_WiFi::process_response(QString data_response_set_wifi) {
         }
     } else {
         QMessageBox::warning(this, "Error!", "Unknown command received, WiFi: unknown status!");
+    }
+}
+
+void Dialog_WiFi::serialConnector(void) {
+    *read_data_serial += ezpi_serial_wifi->readAll();
+}
+
+void Dialog_WiFi::ezpi_wifi_accumulate_serial_msg(void) {
+    ezpi_wif_rx_timer.stop();
+    process_response(EZPI_STRING::fromLocal8Bit(*read_data_serial));
+#if 0
+    if(read_data_serial->length() > 0) {
+        qDebug() << "Serial read WiFi : " << QString::fromLocal8Bit(*read_data_serial);
+        process_response(EZPI_STRING::fromLocal8Bit(*read_data_serial));
+    } else {
+        ezpi_wifi_serial_transfer(*data_action_set_wifi_char_array);
+    }
+#endif
+}
+
+void Dialog_WiFi::ezpi_wifi_serial_transfer(QByteArray d) {
+    ezpi_serial_wifi->write(d.constData());
+    ezpi_serial_wifi->flush();
+    if(ezpi_serial_wifi->waitForBytesWritten()) {
+        ezpi_wif_rx_timer.start(EZPI_SERIAL_READ_TIMEOUT);
     }
 }

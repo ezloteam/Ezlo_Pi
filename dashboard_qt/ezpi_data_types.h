@@ -46,6 +46,8 @@ typedef QString EZPI_STRING;
 #define     SIZE_EZPI_OFFSET_HUB_ID_0                           0XE000
 #define     SIZE_EZPI_OFFSET_HUB_ID_1                           0XF000
 
+#define     EZPI_SERIAL_READ_TIMEOUT                            2000
+
 enum ezpi_high_low {
     EZPI_LOW,
     EZPI_HIGH

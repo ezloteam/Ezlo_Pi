@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ezpi_form_devadd = new Dialog_devadd(this);
 
     connect(ezpi_form_devadd, SIGNAL(ezpi_send_dev_type_selected(EZPI_UINT8)), this, SLOT(ezpi_receive_dev_type_selected(EZPI_UINT8)));
+    connect(ezpi_form_WiFi, SIGNAL(ezpi_signal_serial_rx_wifi(ezpi_cmd)), this, SLOT(ezpi_serial_receive));
 
     user_token.clear();
 
@@ -69,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_remove_device->setEnabled(false);
 
     // Set WiFi
-    ui->pushButton_set_wifi->setEnabled(false);
+//    ui->pushButton_set_wifi->setEnabled(false);
 
     // Get and set configs
     ui->pushButton_get_ezpi_config->setEnabled(false);
@@ -103,7 +104,12 @@ MainWindow::~MainWindow() {
 
 EZPI_BOOL MainWindow::ezpi_check_firmware() {
 
-//    QString test_json = "{\"cmd\":1,\"status\":1,\"v_sw\":3625,\"v_type\":1,\"build\":17,\"v_idf\":8456,\"uptime\":4856,\"build_date\":1657623331,\"boot_count\":15,\"boot_reason\":2,\"mac\":1577079727,\"uuid\":\"65261d76-e584-4d35-aff1-d84bd043\",\"serial\":100004032,\"ssid\":\"ssid\",\"dev_type\":1,\"dev_flash\":64256,\"dev_free_flash\":300,\"dev_name\":\"My Device\"}";
+#if 0
+    QString test_json = "{\"cmd\":1,\"status\":1,\"v_sw\":3625,\"v_type\":1,\"build\":17,\"v_idf\":8456,\"uptime"
+                        "\":4856,\"build_date\":1657623331,\"boot_count\":15,\"boot_reason\":2,\"mac\":1577079727,"
+                        "\"uuid\":\"65261d76-e584-4d35-aff1-d84bd043\",\"serial\":100004032,\"ssid\":\"ssid\",\"dev_type\":1,"
+                        "\"dev_flash\":64256,\"dev_free_flash\":300,\"dev_name\":\"My Device\"}";
+#endif
 
     const char * json_send_get_info = "{\"cmd\":1}";
 
@@ -208,7 +214,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
 
                 // Check firmware
                 if(ezpi_check_firmware()) {
-                    ui->pushButton_set_wifi->setEnabled(true);
+//                    ui->pushButton_set_wifi->setEnabled(true);
                     ui->pushButton_add_device->setEnabled(true);
 
                     ui->pushButton_get_ezpi_config->setEnabled(true);
@@ -1184,7 +1190,7 @@ void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
     connect(ezpi_form_config_digital_ip, SIGNAL(ezpi_signal_dev_ip_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
     connect(ezpi_form_config_onewire, SIGNAL(ezpi_signal_dev_onewire_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
     connect(ezpi_form_config_i2c, SIGNAL(ezpi_signal_dev_i2c_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
-    connect(ezpi_form_config_spi, SIGNAL(ezpi_signal_dev_spi_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_spi, SIGNAL(ezpi_signal_dev_spi_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));     
 
     switch(dev_type_index) {
         case EZPI_DEV_TYPE_DIGITAL_OP: {            
@@ -1412,4 +1418,9 @@ void MainWindow::ezlogic_table_adddev_spi(ezlogic_device_SPI_t spi_device) {
             ", CS: " + QString::number(spi_device.gpio_cs);
     table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
     ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+}
+
+void MainWindow::ezpi_serial_receive(void) {
+    QByteArray serial_rx =  ezpi_serial_port->readAll();
+    qDebug() << "Serial Rx : " << QString::fromLocal8Bit(serial_rx);
 }

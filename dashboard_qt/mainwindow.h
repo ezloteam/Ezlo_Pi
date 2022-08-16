@@ -49,6 +49,8 @@ private slots:
     void ezpi_receive_dev_type_selected(EZPI_UINT8);
     void ezpi_receive_added_dev(ezpi_dev_type);
 
+    void ezpi_serial_receive(void);
+
     void on_pushButton_connect_uart_clicked();
 
     void on_pushButton_add_device_clicked();
