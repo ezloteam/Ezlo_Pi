@@ -64,11 +64,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::ezpi_serial_receive);
 
     connect(ezpi_form_WiFi, SIGNAL(ezpi_signal_serial_rx_wifi(ezpi_cmd)), this, SLOT(ezpi_serial_receive_wif(ezpi_cmd)));
-//    ezpi_signal_serial_rx_wifi(CMD_ACTION_SET_WIFI);
-
-//    connect(ezpi_serial_port, &QSerialPort::readyRead, this, [=]() {
-//        qDebug() << "Serial RX : " << QString::fromLocal8Bit(ezpi_serial_port->readAll());
-//    });
 
     user_token.clear();
 
@@ -131,32 +126,6 @@ EZPI_BOOL MainWindow::ezpi_check_firmware() {
 
     ezpi_cmd_state = CMD_ACTION_GET_INFO;
     ezpi_serial_transfer(json_send_get_info.toUtf8());
-
-#if 0
-    ezpi_serial_port->write(json_send_get_info);
-
-    if (ezpi_serial_port->waitForBytesWritten()) {
-    QString response_data;
-
-    ezpi_serial_port->write(json_send_get_info);
-
-    if (ezpi_serial_port->waitForBytesWritten()) {
-        // read response
-        if (ezpi_serial_port->waitForReadyRead(5000)) {
-            QByteArray responseData = ezpi_serial_port->readAll();
-            while (ezpi_serial_port->waitForReadyRead(10))
-                responseData += ezpi_serial_port->readAll();
-
-            const EZPI_STRING response = QString::fromUtf8(responseData);
-            qDebug() << "Response : " << response;
-            response_data = response;
-        } else {
-//            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
-        }
-    } else {
-
-    }
-#endif
 
     return ezpi_fimware_present;
 }
@@ -443,11 +412,16 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
     object_root_set_device.insert("dev_detail", array_device_detail);
     document_root_set_device.setObject(object_root_set_device);
 
-    QByteArray dev_data =  document_root_set_device.toJson(QJsonDocument::Compact);
+//    QByteArray dev_data =  document_root_set_device.toJson(QJsonDocument::Compact);
+    ezpi_cmd_state = CMD_ACTION_SET_CONFIG;
+    ezpi_serial_transfer(document_root_set_device.toJson(QJsonDocument::Compact));
+
+#if 0
     qDebug() << QString::fromLatin1(dev_data);
 
     const  char * data_action_set_config = dev_data.constData();
     QString response_data;
+
 
     ezpi_serial_port->write(data_action_set_config);
 
@@ -491,6 +465,8 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
             QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
         }
     }
+#endif
+
 }
 
 void MainWindow::ezpi_log_write_flash() {
@@ -1285,13 +1261,13 @@ void MainWindow::ezlogic_table_adddev_spi(ezlogic_device_SPI_t spi_device) {
 
 void MainWindow::ezpi_serial_receive(void) {
     *ezpi_read_data_serial += ezpi_serial_port->readAll();
-    qDebug() << "Serial read raw : " << QString::fromLocal8Bit(*ezpi_read_data_serial);
-//    qDebug() << "Serial read: " << QString::fromLocal8Bit(*read_data_serial);
+//    qDebug() << "Serial read on ready : " << QString::fromLocal8Bit(*ezpi_read_data_serial);
 }
 
 void MainWindow::ezpi_serial_process(void) {
     ezpi_timer_serial_complete.stop();
-//    qDebug() << "ezpi_read_data_serial: " << QString::fromLocal8Bit(*ezpi_read_data_serial);
+    qDebug() << "Data RX: " << QString::fromLocal8Bit(*ezpi_read_data_serial);
+    ui->textBrowser_console_log->append("Data RX: " + QString::fromLocal8Bit(*ezpi_read_data_serial));
     switch (ezpi_cmd_state) {
         case CMD_ACTION_SET_WIFI:
             ezpi_action_set_wifi(*ezpi_read_data_serial);
@@ -1301,12 +1277,14 @@ void MainWindow::ezpi_serial_process(void) {
             ezpi_action_check_info(*ezpi_read_data_serial);
             break;
         case CMD_ACTION_SET_CONFIG:
-            ezpi_action_get_config_process(*ezpi_read_data_serial);
+            ezpi_action_set_config_process(*ezpi_read_data_serial);
             break;
         case CMD_ACTION_GET_CONFIG:
+            ezpi_action_get_config_process(*ezpi_read_data_serial);
             break;
         default:
-        qDebug() << "Unknown CMD !";
+            qDebug() << "Unknown CMD from UI !";
+            ui->textBrowser_console_log->append("Unknown CMD from UI !");
             break;
     }
 }
@@ -1316,9 +1294,6 @@ void MainWindow::ezpi_serial_transfer(QByteArray d) {
     ezpi_serial_port->write(d.constData());
     ezpi_read_data_serial->clear();
     ezpi_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT);
-//    if(ezpi_serial_port->waitForBytesWritten()) {
-        ezpi_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT);
-//    }
 }
 
 void MainWindow::ezpi_action_check_info(QByteArray serial_read) {
@@ -1501,8 +1476,6 @@ void MainWindow::ezpi_action_set_wifi(QByteArray wifi_response) {
 
     QString response_data = QString::fromLocal8Bit(wifi_response);
 
-//    qDebug() << response_data;
-
     QJsonParseError jsonError;
     QJsonDocument doc_set_wifi_response = QJsonDocument::fromJson(response_data.toUtf8(), &jsonError);
 
@@ -1529,5 +1502,34 @@ void MainWindow::ezpi_action_set_wifi(QByteArray wifi_response) {
         }
     } else {
         QMessageBox::warning(this, "Error!", "Unknown command received, WiFi: unknown status!");
+    }
+}
+
+void MainWindow::ezpi_action_set_config_process(QByteArray serial_read) {
+    QJsonParseError jsonError;
+    QJsonDocument doc_set_config_response = QJsonDocument::fromJson(serial_read, &jsonError);
+
+#if 0
+    if (jsonError.error != QJsonParseError::NoError){
+        qDebug() << jsonError.errorString();
+        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+        return;
+    }
+#endif
+
+    QJsonObject obj_root_set_config_response = doc_set_config_response.object();
+    QVariantMap json_map_root_set_config_response = obj_root_set_config_response.toVariantMap();
+
+//    qDebug() << "cmd: " << QString::number(json_map_root_set_config_response["cmd"].toUInt());
+//    qDebug() << "status_write: " << QString::number(json_map_root_set_config_response["status_write"].toUInt());
+
+    if(json_map_root_set_config_response["cmd"].toUInt() == CMD_ACTION_SET_CONFIG) {
+        if(json_map_root_set_config_response["status_write"].toUInt() == 1) {
+            QMessageBox::information(this, "Success", "Writing configuration to ESP32 is successful!");
+        } else {
+            QMessageBox::warning(this, "Failed!", "Failed writing configuration to ESP device!");
+        }
+    } else {
+        QMessageBox::warning(this, "Error!", "Unknown command received, writing configuration to ESP device: unknown status!");
     }
 }

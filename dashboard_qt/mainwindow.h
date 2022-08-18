@@ -145,6 +145,7 @@ private:
     void ezpi_serial_process(void);
 
     void ezpi_action_check_info(QByteArray);
+    void ezpi_action_set_config_process(QByteArray);
     void ezpi_action_get_config_process(QByteArray);
     void ezpi_action_set_wifi(QByteArray);
 
