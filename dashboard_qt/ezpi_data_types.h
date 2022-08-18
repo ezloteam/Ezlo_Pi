@@ -11,6 +11,7 @@ typedef qint32 EZPI_INT32;
 typedef quint32 EZPI_UINT32;
 typedef qint64 EZPI_INT64;
 typedef quint64 EZPI_UINT64;
+
 typedef bool EZPI_BOOL;
 
 typedef QString EZPI_STRING;
@@ -31,11 +32,12 @@ typedef QString EZPI_STRING;
 
 #define     EZPI_MAX_DEVICES    10
 
-#define     EZPI_MAX_DEV_DIO        10
-#define     EZPI_MAX_DEV_DIP        10
-#define     EZPI_MAX_DEV_ONEWIRE    5
-#define     EZPI_MAX_DEV_I2C        5
-#define     EZPI_MAX_DEV_SPI        3
+#define     EZPI_MAX_DEV_DIO        5
+#define     EZPI_MAX_DEV_DIP        5
+#define     EZPI_MAX_DEV_AIP        5
+#define     EZPI_MAX_DEV_ONEWIRE    3
+#define     EZPI_MAX_DEV_I2C        3
+#define     EZPI_MAX_DEV_SPI        1
 
 #define     MAX_DEV             EZPI_MAX_DEVICES
 
@@ -46,7 +48,8 @@ typedef QString EZPI_STRING;
 #define     SIZE_EZPI_OFFSET_HUB_ID_0                           0XE000
 #define     SIZE_EZPI_OFFSET_HUB_ID_1                           0XF000
 
-#define     EZPI_SERIAL_READ_TIMEOUT                            5000
+#define     EZPI_SERIAL_READ_TIMEOUT                            3000
+#define     EZPI_FIRMWARE_CHECK_TIMEOUT                         4000
 
 enum ezpi_high_low {
     EZPI_LOW,
@@ -91,6 +94,8 @@ enum ezpi_item_type {
     EZPI_ITEM_TYPE_BMP280_SPI,
     EZPI_ITEM_TYPE_LNA219,
     EZPI_ITEM_TYPE_DHT11,
+    EZPI_ITEM_TYPE_DHT22,
+    EZPI_ITEM_TYPE_POT_GENERIC,
     EZPI_ITEM_TYPE_TOTAL
 };
 
@@ -120,6 +125,14 @@ enum ezpi_board_type {
     EZPI_BOARD_TYPE_ESP32_C3,
     EZPI_BOARD_TYPE_ESP32_S3,
     EZPI_BOARD_TYPE_TOTAL
+};
+
+enum ezpi_adc_resln {
+    EZPI_ADC_RESLN_NONE,
+    EZPI_ADC_RESLN_8_BIT,
+    EZPI_ADC_RESLN_10_BIT,
+    EZPI_ADC_RESLN_12_BIT,
+    EZPI_ADC_RESLN_TOTAL,
 };
 
 typedef struct ezlogic_info {
@@ -170,6 +183,15 @@ typedef struct ezlogic_device_digital_ip {
     EZPI_BOOL pull_up;
     EZPI_BOOL logic_inv;
 } ezlogic_device_digital_ip_t;
+
+typedef struct ezlogic_device_analog_ip {
+    ezpi_dev_type dev_type;
+    EZPI_STRING dev_name;
+    EZPI_UINT16 id_room;
+    ezpi_item_type id_item;
+    EZPI_UINT8 gpio;
+    ezpi_adc_resln resln_bit;
+} ezlogic_device_analog_ip_t;
 
 typedef struct ezlogic_device_one_wire {
     ezpi_dev_type dev_type;
@@ -223,16 +245,10 @@ private:
     std::vector <EZPI_UINT8> ezpi_gpio_pool;
     std::vector <ezlogic_device_digital_op_t> ezlogic_output_devices;
     std::vector <ezlogic_device_digital_ip_t> ezlogic_input_devices;
+    std::vector <ezlogic_device_analog_ip_t> ezlogic_analog_input_devices;
     std::vector <ezlogic_device_one_wire_t> ezlogic_onewire_devices;
     std::vector <ezlogic_device_I2C_t> ezlogic_i2c_devices;
     std::vector <ezlogic_device_SPI_t> ezlogic_spi_devices;
-
-    EZPI_UINT8 ezlogic_output_devices_n;
-    EZPI_UINT8 ezlogic_input_devices_n;
-    EZPI_UINT8 ezlogic_onewire_devices_n;
-    EZPI_UINT8 ezlogic_i2c_devices_n;
-    EZPI_UINT8 ezlogic_spi_devices_n;
-
 
     QStringList * ezlogic_device_types_str;
     QStringList * ezlogic_item_types_str;
@@ -246,18 +262,21 @@ public:
     void EZPI_SET_BOARD_TYPE(ezpi_board_type board_type);
     ezpi_error_codes_configurator EZPI_ADD_OUTPUT_DEVICE(ezlogic_device_digital_op_t d);
     ezpi_error_codes_configurator EZPI_ADD_INPUT_DEVICE(ezlogic_device_digital_ip_t d);
+    ezpi_error_codes_configurator EZPI_ADD_AINPUT_DEVICE(ezlogic_device_analog_ip_t d);
     ezpi_error_codes_configurator EZPI_ADD_ONEWIRE_DEVICE(ezlogic_device_one_wire_t d);
     ezpi_error_codes_configurator EZPI_ADD_I2C_DEVICE(ezlogic_device_I2C_t d);
     ezpi_error_codes_configurator EZPI_ADD_SPI_DEVICE(ezlogic_device_SPI_t d);
 
     void EZPI_DELETE_OUTPUT_DEVICE(void) { ezlogic_output_devices.pop_back(); }
     void EZPI_DELETE_INPUT_DEVICE(void) { ezlogic_input_devices.pop_back(); }
+    void EZPI_DELETE_AINPUT_DEVICE(void) { ezlogic_analog_input_devices.pop_back(); }
     void EZPI_DELETE_ONEWIRE_DEVICE(void) { ezlogic_onewire_devices.pop_back(); }
     void EZPI_DELETE_I2C_DEVICE(void) { ezlogic_i2c_devices.pop_back(); }
     void EZPI_DELETE_SPI_DEVICE(void) { ezlogic_spi_devices.pop_back(); }
 
     void EZPI_CLEAR_OUTPUT_DEVICES(void) { ezlogic_output_devices.clear(); }
     void EZPI_CLEAR_INPUT_DEVICES(void) { ezlogic_input_devices.clear(); }
+    void EZPI_CLEAR_AINPUT_DEVICES(void) { ezlogic_analog_input_devices.clear(); }
     void EZPI_CLEAR_ONEWIRE_DEVICES(void) { ezlogic_onewire_devices.clear(); }
     void EZPI_CLEAR_I2C_DEVICES(void) { ezlogic_i2c_devices.clear(); }
     void EZPI_CLEAR_SPI_DEVICES(void) { ezlogic_spi_devices.clear(); }
@@ -269,6 +288,7 @@ public:
 
     std::vector <ezlogic_device_digital_op_t> EZPI_GET_OUTPUT_DEVICES() { return ezlogic_output_devices; }
     std::vector <ezlogic_device_digital_ip_t> EZPI_GET_INPUT_DEVICES() { return ezlogic_input_devices; }
+    std::vector <ezlogic_device_analog_ip_t> EZPI_GET_AINPUT_DEVICES() { return ezlogic_analog_input_devices; }
     std::vector <ezlogic_device_one_wire_t> EZPI_GET_ONEWIRE_DEVICES() { return ezlogic_onewire_devices; }
     std::vector <ezlogic_device_I2C_t> EZPI_GET_I2C_DEVICES() { return ezlogic_i2c_devices; }
     std::vector <ezlogic_device_SPI_t> EZPI_GET_SPI_DEVICES() { return ezlogic_spi_devices; }
@@ -276,6 +296,7 @@ public:
     EZPI_UINT8 EZPI_GET_DEVICE_COUNT(void) {
         return (EZPI_UINT8)(ezlogic_output_devices.size() + \
                 ezlogic_input_devices.size() + \
+                ezlogic_analog_input_devices.size() + \
                 ezlogic_onewire_devices.size() + \
                 ezlogic_i2c_devices.size() + \
                 ezlogic_spi_devices.size());
