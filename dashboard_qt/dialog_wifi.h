@@ -32,6 +32,8 @@ private:
 
     QByteArray * data_action_set_wifi_char_array;
 
+    EzPi * ezpi_set_wif;
+
     void ezpi_wifi_accumulate_serial_msg();
     void ezpi_wifi_serial_transfer(QByteArray);
 

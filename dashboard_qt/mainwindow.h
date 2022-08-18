@@ -49,7 +49,7 @@ private slots:
     void ezpi_receive_dev_type_selected(EZPI_UINT8);
     void ezpi_receive_added_dev(ezpi_dev_type);
 
-    void ezpi_serial_receive(void);
+//    void ezpi_serial_receive(void);
 
     void on_pushButton_connect_uart_clicked();
 
@@ -90,6 +90,8 @@ private slots:
 
     void on_comboBox_esp32_board_type_currentIndexChanged(int index);
 
+    void ezpi_serial_receive_wif(ezpi_cmd);
+
 private:
     Ui::MainWindow *ui;
 
@@ -104,6 +106,7 @@ private:
 
     // Timers
     QTimer ezpi_timer_ask_info;
+    QTimer ezpi_timer_serial_complete;
 
     // flags
     bool ezpi_flag_is_ezlopi;
@@ -138,8 +141,23 @@ private:
     void ezlogic_table_adddev_i2c(ezlogic_device_I2C_t);
     void ezlogic_table_adddev_spi(ezlogic_device_SPI_t);
 
+    void ezpi_serial_transfer(QByteArray d);
+    void ezpi_serial_process(void);
+
+    void ezpi_action_check_info(QByteArray);
+    void ezpi_action_get_config_process(QByteArray);
+    void ezpi_action_set_wifi(QByteArray);
+
     std::vector<ezpi_dev_type> ezlogic_table_row_device_map;
 
+    QByteArray * ezpi_read_data_serial;
+//    QByteArray * read_data_serial;
+
+    ezpi_cmd ezpi_cmd_state;
+
+    EZPI_BOOL ezpi_fimware_present;
+public slots:
+    void ezpi_serial_receive(void);
 
 };
 
