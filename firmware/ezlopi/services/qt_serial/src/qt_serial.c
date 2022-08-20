@@ -82,7 +82,7 @@ void JSON_Analyze(const cJSON * const root) {
 	}
 }
 
-void UART_INIT()(void) {
+void UART_INIT(void) {
     const uart_config_t uart_config = {
         .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
