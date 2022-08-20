@@ -22,6 +22,8 @@
 #include "switch_service.h"
 #include "gatt_server.h"
 #include "dht.h"
+#include "MPU6050.h"
+
 #include "wss.h"
 
 static void blinky(void *pv);
