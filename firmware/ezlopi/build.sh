@@ -78,22 +78,31 @@ wait_for_key() {
     done
 }
 
+copy_binaries() {
+    cp $1/ezlopi.bin $2/0x10000.bin
+    cp $1/bootloader/bootloader.bin $2/0x1000.bin
+    cp $1/partition_table/partition-table.bin $2/0x8000.bin
+    cp $1/ota_data_initial.bin $2/0xd000.bin
+}
+
 create_release() {
     release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}"
     mkdir $release_bins
-    cp build/ezpi_3.bin $release_bins/firmware.bin
-    cp build/bootloader/bootloader.bin $release_bins/
-    cp build/partition_table/partition-table.bin $release_bins/
-    cp build/ota_data_initial.bin $release_bins/
+    copy_binaries build $release_bins
+    # cp build/ezlopi.bin $release_bins/10000.bin
+    # cp build/bootloader/bootloader.bin $release_bins/
+    # cp build/partition_table/partition-table.bin $release_bins/
+    # cp build/ota_data_initial.bin $release_bins/
 }
 
 create_test_release() {
     release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}_${V_BUILD}"
     mkdir $release_bins
-    cp build/ezpi_3.bin $release_bins/firmware.bin
-    cp build/bootloader/bootloader.bin $release_bins/
-    cp build/partition_table/partition-table.bin $release_bins/
-    cp build/ota_data_initial.bin $release_bins/
+    copy_binaries build $release_bins
+    # cp build/ezlopi.bin $release_bins/0x10000.bin
+    # cp build/bootloader/bootloader.bin $release_bins/0x1000.bin
+    # cp build/partition_table/partition-table.bin $release_bins/0x8000.bin
+    # cp build/ota_data_initial.bin $release_bins/0xd000.bin
 }
 
 release_note() {

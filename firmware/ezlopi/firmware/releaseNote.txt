@@ -32,3 +32,9 @@ v1_0_6
 v1_0_6_96  Date: Mon 25 Jul 2022 04:52:49 PM +0545
 	test release
 
+v1_0_6_98  Date: Mon 22 Aug 2022 01:33:03 PM +0545
+	test build failed
+
+v1_0_6_99  Date: Mon 22 Aug 2022 01:45:11 PM +0545
+	test release for web-UI team
+

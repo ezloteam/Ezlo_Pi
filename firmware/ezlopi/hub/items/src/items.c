@@ -6,7 +6,7 @@
 #include "devices_common.h"
 #include "interface_common.h"
 #include "dht.h"
-#include "MPU6050.h"
+#include "mpu6050.h"
 
 #define TEST 0
 
@@ -271,11 +271,11 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
                     val = accel_z_value_read();
                     snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\",\"syncNotification\":false", val);
                     break;
-                
+
                 default:
                     break;
                 }
-                
+
                 break;
             }
             case LED:

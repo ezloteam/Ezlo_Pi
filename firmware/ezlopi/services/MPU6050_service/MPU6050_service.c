@@ -1,7 +1,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "debug.h"
-#include "MPU6050.h"
+#include "mpu6050.h"
 #include "string.h"
 #include "items.h"
 #include "wss.h"
@@ -19,7 +19,6 @@ static uint8_t SCL = 23;
 static void mpu_service_process(void *pv);
 uint32_t web_provisioning_get_message_count(void);
 
-
 void mpu_service_init(uint8_t scl_pin, uint8_t sda_pin, uint32_t dev_idx)
 {
     SDA = sda_pin;
@@ -31,7 +30,7 @@ static void mpu_service_process(void *pv)
 {
     while (1)
     {
-        ESP_ERROR_CHECK(MPU6050_i2c_master_init(SDA,SCL));
+        ESP_ERROR_CHECK(MPU6050_i2c_master_init(SDA, SCL));
         ESP_ERROR_CHECK(mpu6050_wake());
         MPU_TASK();
 
