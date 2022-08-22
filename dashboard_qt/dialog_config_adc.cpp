@@ -27,7 +27,7 @@ Dialog_config_adc::~Dialog_config_adc()
 
 void Dialog_config_adc::on_buttonBox_accepted() {
 
-    ezlogic_device_analog_ip_t adc_user_data;
+    ezpi_device_analog_ip_t adc_user_data;
 
     adc_user_data.dev_type = EZPI_DEV_TYPE_ANALOG_IP;
     adc_user_data.dev_name = ui->lineEdit_device_name->text();

@@ -68,7 +68,7 @@ void Dialog_config_spi::ezpi_ensure_no_same_pins() {
 }
 
 void Dialog_config_spi::on_buttonBox_config_spi_accepted() {
-    ezlogic_device_SPI_t spi_user_data;
+    ezpi_device_SPI_t spi_user_data;
 
     spi_user_data.dev_type = EZPI_DEV_TYPE_SPI;
     spi_user_data.dev_name = ui->lineEdit_device_name->text();

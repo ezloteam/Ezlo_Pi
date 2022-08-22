@@ -311,7 +311,7 @@
   </action>
   <action name="actionClear_Table">
    <property name="text">
-    <string>Clear Table</string>
+    <string>Clear Table and data</string>
    </property>
   </action>
  </widget>

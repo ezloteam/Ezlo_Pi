@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QProcess>
 
-#include<login.h>
+#include<dialog_login.h>
 #include<dialog_wifi.h>
 #include<dialog_devadd.h>
 #include<dialog_configdev_digitalio.h>
@@ -17,8 +17,8 @@
 #include<dialog_config_i2c.h>
 #include<dialog_config_spi.h>
 
-
-#include "ezpi_data_types.h"
+// Ezlo Pi Specefic header
+#include "ezlopi.h"
 
 enum ezlogic_table_column {
     EZLOZIC_TABLE_COLUMN_DEV_NAME,
@@ -57,15 +57,15 @@ private slots:
     void on_pushButton_set_ezpi_config_clicked();
 
     // Custom slots
-    void ezpi_log_write_flash();
-    void ezpi_log_erase_flash();
-    EZPI_BOOL ezpi_check_firmware();
-    void ezpi_message_info_no_firmware_detected();
-    void ezpi_receive_dev_type_selected(EZPI_UINT8);
-    void ezpi_receive_added_dev(ezpi_dev_type);
-    void ezpi_serial_receive_wif(ezpi_cmd);
-    void ezpi_success_prov_dat(QNetworkReply *d);
-    void ezpi_success_get_prov_jsons(QNetworkReply *d);
+    void ezlogic_log_write_flash();
+    void ezlogic_log_erase_flash();
+    EZPI_BOOL ezlogic_check_firmware();
+    void ezlogic_message_info_no_firmware_detected();
+    void ezlogic_receive_dev_type_selected(EZPI_UINT8);
+    void ezlogic_receive_added_dev(ezpi_dev_type);
+    void ezlogic_serial_receive_wif(ezpi_cmd);
+    void ezlogic_success_prov_dat(QNetworkReply *d);
+    void ezlogic_success_get_prov_jsons(QNetworkReply *d);
 
     // UI Actions
     void on_actionEnable_Log_triggered();
@@ -73,84 +73,87 @@ private slots:
     void on_actionLogin_triggered();
     void on_actionAbout_EzloPi_triggered();
     void on_actionExit_triggered();
-
     void on_actionClear_Table_triggered();
 
 private:
 
     Ui::MainWindow *ui;
 
-    login * ezpi_form_login;
-    Dialog_WiFi * ezpi_form_WiFi;
-    Dialog_devadd * ezpi_form_devadd;
-    Dialog_config_input * ezpi_form_config_digital_ip;
-    Dialog_config_adc * ezpi_form_config_analog_ip;
-    Dialog_configdev_digitalio * ezpi_form_configdev_digitalio;
-    Dialog_config_onewire * ezpi_form_config_onewire;
-    Dialog_config_i2c * ezpi_form_config_i2c;
-    Dialog_config_spi * ezpi_form_config_spi;
+    login * ezlogic_form_login;
+    Dialog_WiFi * ezlogic_form_WiFi;
+    Dialog_devadd * ezlogic_form_devadd;
+    Dialog_config_input * ezlogic_form_config_digital_ip;
+    Dialog_config_adc * ezlogic_form_config_analog_ip;
+    Dialog_configdev_digitalio * ezlogic_form_configdev_digitalio;
+    Dialog_config_onewire * ezlogic_form_config_onewire;
+    Dialog_config_i2c * ezlogic_form_config_i2c;
+    Dialog_config_spi * ezlogic_form_config_spi;
 
     // EzloPi object
     EzPi * EzloPi;
 
     // Variables for port management
-    std::vector<QSerialPortInfo> ezpi_serial_ports_info_list;
-    QSerialPortInfo ezpi_serial_port_info;
-    QSerialPort * ezpi_serial_port;
+    std::vector<QSerialPortInfo> ezlogic_serial_ports_info_list;
+    QSerialPortInfo ezlogic_serial_port_info;
+    QSerialPort * ezlogic_serial_port;
 
-    bool ezpi_flag_serial_port_open;
+    EZPI_BOOL ezlogic_flag_serial_port_open;
 
     // Timers
-    QTimer ezpi_timer_ask_info;
-    QTimer ezpi_timer_serial_complete;
+    QTimer ezlogic_timer_ask_info;
+    QTimer ezlogic_timer_serial_complete;
 
     // flags
-    bool ezpi_flag_is_ezlopi;
+    EZPI_BOOL ezlogic_flag_is_ezlopi;
 
     // External flasher program process handlers
-    QProcess * ezpi_process_erase_flash;
-    QProcess * ezpi_process_write_flash;
+    QProcess * ezlogic_process_erase_flash;
+    QProcess * ezlogic_process_write_flash;
 
     // Total number of device counter
-    uint8_t ezpi_device_counter;
+    uint8_t ezlogic_device_counter;
 
     // Console log flag
-    bool ezpi_flag_enable_log;
+    EZPI_BOOL ezlogic_flag_enable_log;
 
     // Provisioning task global variables
-    QString user_token;
-    bool ezpi_flag_registered;    
+    QString ezlogic_prov_data_user_token;
+    bool ezlogic_flag_registered;
 
     // EzloPi interfacing device storage for UI
     std::vector<ezpi_dev_type> ezlogic_table_row_device_map;
 
     // Serial data storage
-    QByteArray * ezpi_read_data_serial;
+    QByteArray * ezlogic_read_data_serial;
 
     // Command type at the time of UI interactivity
-    ezpi_cmd ezpi_cmd_state;
+    ezpi_cmd ezlogic_cmd_state;
 
     // Flag if the connected device is EzloPi or not
-    EZPI_BOOL ezpi_fimware_present;
+    EZPI_BOOL ezlogic_flag_fimware_present;
+
+    QLabel *ezlogic_status = nullptr;
 
     // Private methods
-    void ezlogic_table_adddev_digital_op(ezlogic_device_digital_op_t);
-    void ezlogic_table_adddev_digital_ip(ezlogic_device_digital_ip_t);
-    void ezlogic_table_adddev_analog_ip(ezlogic_device_analog_ip_t);
-    void ezlogic_table_adddev_onewire(ezlogic_device_one_wire_t);
-    void ezlogic_table_adddev_i2c(ezlogic_device_I2C_t);
-    void ezlogic_table_adddev_spi(ezlogic_device_SPI_t);
+    void ezlogic_table_adddev_digital_op(ezpi_device_digital_op_t);
+    void ezlogic_table_adddev_digital_ip(ezpi_device_digital_ip_t);
+    void ezlogic_table_adddev_analog_ip(ezpi_device_analog_ip_t);
+    void ezlogic_table_adddev_onewire(ezpi_device_one_wire_t);
+    void ezlogic_table_adddev_i2c(ezpi_device_I2C_t);
+    void ezlogic_table_adddev_spi(ezpi_device_SPI_t);
 
-    void ezpi_action_set_wifi(QByteArray);
-    void ezpi_action_check_info(QByteArray);
-    void ezpi_action_set_config_process(QByteArray);
-    void ezpi_action_get_config_process(QByteArray);
+    void ezlogic_action_set_wifi(QByteArray);
+    void ezlogic_action_check_info(QByteArray);
+    void ezlogic_action_set_config_process(QByteArray);
+    void ezlogic_action_get_config_process(QByteArray);
 
-    void ezpi_serial_transfer(QByteArray d);
-    void ezpi_serial_process(void);
+    void ezlogic_serial_transfer(QByteArray d);
+    void ezlogic_serial_process(void);
+    void ezlogic_clear_table_data(void);
+    void ezpi_show_status_message(const QString&);
 
 public slots:
-    void ezpi_serial_receive(void);
+    void ezlogic_serial_receive(void);
 
 };
 

@@ -29,7 +29,7 @@ Dialog_config_input::~Dialog_config_input() {
 
 void Dialog_config_input::on_buttonBox_accepted() {
 
-    ezlogic_device_digital_ip_t digital_ip_user_data;
+    ezpi_device_digital_ip_t digital_ip_user_data;
 
     digital_ip_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_IP;
     digital_ip_user_data.dev_name = ui->lineEdit_device_name->text();

@@ -1,45 +1,45 @@
 
-#include "ezpi_data_types.h"
+#include "ezlopi.h"
 
 EzPi::EzPi():
     _ezpi_board_type(EZPI_BOARD_TYPE_ESP32_GENERIC)
 {
 
-    ezlogic_device_types_str = new QStringList;
-    ezlogic_item_types_str = new QStringList;
+    ezpi_device_types_str = new QStringList;
+    ezpi_item_types_str = new QStringList;
 
-    ezlogic_device_types_str->append("Restricted");
-    ezlogic_device_types_str->append("Digital Out");
-    ezlogic_device_types_str->append("Digital In");
-    ezlogic_device_types_str->append("Analog In");
-    ezlogic_device_types_str->append("Analog Out");
-    ezlogic_device_types_str->append("PWM");
-    ezlogic_device_types_str->append("UART");
-    ezlogic_device_types_str->append("Onewire");
-    ezlogic_device_types_str->append("I2C");
-    ezlogic_device_types_str->append("SPI");
+    ezpi_device_types_str->append("Restricted");
+    ezpi_device_types_str->append("Digital Out");
+    ezpi_device_types_str->append("Digital In");
+    ezpi_device_types_str->append("Analog In");
+    ezpi_device_types_str->append("Analog Out");
+    ezpi_device_types_str->append("PWM");
+    ezpi_device_types_str->append("UART");
+    ezpi_device_types_str->append("Onewire");
+    ezpi_device_types_str->append("I2C");
+    ezpi_device_types_str->append("SPI");
 
 
-    ezlogic_item_types_str->append("None");
-    ezlogic_item_types_str->append("LED");
-    ezlogic_item_types_str->append("Relay");
-    ezlogic_item_types_str->append("Plug");
-    ezlogic_item_types_str->append("Button");
-    ezlogic_item_types_str->append("MPU6050");
-    ezlogic_item_types_str->append("ADXL345");
-    ezlogic_item_types_str->append("GY271");
-    ezlogic_item_types_str->append("MCP4725");
-    ezlogic_item_types_str->append("GY530");
-    ezlogic_item_types_str->append("DS1307");
-    ezlogic_item_types_str->append("MAX30100");
-    ezlogic_item_types_str->append("BMP280 I2C");
-    ezlogic_item_types_str->append("BMP280 SPI");
-    ezlogic_item_types_str->append("LNA219");
-    ezlogic_item_types_str->append("DHT11");
-    ezlogic_item_types_str->append("DHT22");
-    ezlogic_item_types_str->append("POT");
+    ezpi_item_types_str->append("None");
+    ezpi_item_types_str->append("LED");
+    ezpi_item_types_str->append("Relay");
+    ezpi_item_types_str->append("Plug");
+    ezpi_item_types_str->append("Button");
+    ezpi_item_types_str->append("MPU6050");
+    ezpi_item_types_str->append("ADXL345");
+    ezpi_item_types_str->append("GY271");
+    ezpi_item_types_str->append("MCP4725");
+    ezpi_item_types_str->append("GY530");
+    ezpi_item_types_str->append("DS1307");
+    ezpi_item_types_str->append("MAX30100");
+    ezpi_item_types_str->append("BMP280 I2C");
+    ezpi_item_types_str->append("BMP280 SPI");
+    ezpi_item_types_str->append("LNA219");
+    ezpi_item_types_str->append("DHT11");
+    ezpi_item_types_str->append("DHT22");
+    ezpi_item_types_str->append("POT");
 
-     ezlogic_firmware_info = new ezlogic_info_t;
+     ezpi_firmware_info = new ezpi_info_t;
 
 }
 
@@ -118,38 +118,38 @@ void EzPi::EZPI_INIT_BOARD(void) {
 }
 
 
-ezpi_error_codes_configurator EzPi::EZPI_ADD_OUTPUT_DEVICE(ezlogic_device_digital_op_t d) {
-    if(ezlogic_output_devices.size() >= EZPI_MAX_DEV_DIO) return EZPI_ERROR_REACHED_MAX_DEV;
-    ezlogic_output_devices.push_back(d);
+ezpi_error_codes_configurator EzPi::EZPI_ADD_OUTPUT_DEVICE(ezpi_device_digital_op_t d) {
+    if(ezpi_output_devices.size() >= EZPI_MAX_DEV_DIO) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezpi_output_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
-ezpi_error_codes_configurator EzPi::EZPI_ADD_INPUT_DEVICE(ezlogic_device_digital_ip_t d) {
-    if(ezlogic_input_devices.size() >= EZPI_MAX_DEV_DIP) return EZPI_ERROR_REACHED_MAX_DEV;
-    ezlogic_input_devices.push_back(d);
+ezpi_error_codes_configurator EzPi::EZPI_ADD_INPUT_DEVICE(ezpi_device_digital_ip_t d) {
+    if(ezpi_input_devices.size() >= EZPI_MAX_DEV_DIP) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezpi_input_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
-ezpi_error_codes_configurator EzPi::EZPI_ADD_AINPUT_DEVICE(ezlogic_device_analog_ip_t d) {
-    if(ezlogic_analog_input_devices.size() >= EZPI_MAX_DEV_AIP) return EZPI_ERROR_REACHED_MAX_DEV;
-    ezlogic_analog_input_devices.push_back(d);
+ezpi_error_codes_configurator EzPi::EZPI_ADD_AINPUT_DEVICE(ezpi_device_analog_ip_t d) {
+    if(ezpi_analog_input_devices.size() >= EZPI_MAX_DEV_AIP) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezpi_analog_input_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
-ezpi_error_codes_configurator EzPi::EZPI_ADD_ONEWIRE_DEVICE(ezlogic_device_one_wire_t d) {
-    if(ezlogic_onewire_devices.size() >= EZPI_MAX_DEV_ONEWIRE) return EZPI_ERROR_REACHED_MAX_DEV;
-    ezlogic_onewire_devices.push_back(d);
+ezpi_error_codes_configurator EzPi::EZPI_ADD_ONEWIRE_DEVICE(ezpi_device_one_wire_t d) {
+    if(ezpi_onewire_devices.size() >= EZPI_MAX_DEV_ONEWIRE) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezpi_onewire_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
-ezpi_error_codes_configurator EzPi::EZPI_ADD_I2C_DEVICE(ezlogic_device_I2C_t d) {
-    if(ezlogic_i2c_devices.size() >= EZPI_MAX_DEV_I2C) return EZPI_ERROR_REACHED_MAX_DEV;
-    ezlogic_i2c_devices.push_back(d);
+ezpi_error_codes_configurator EzPi::EZPI_ADD_I2C_DEVICE(ezpi_device_I2C_t d) {
+    if(ezpi_i2c_devices.size() >= EZPI_MAX_DEV_I2C) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezpi_i2c_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
-ezpi_error_codes_configurator EzPi::EZPI_ADD_SPI_DEVICE(ezlogic_device_SPI_t d) {
-    if(ezlogic_spi_devices.size() >= EZPI_MAX_DEV_SPI) return EZPI_ERROR_REACHED_MAX_DEV;
-    ezlogic_spi_devices.push_back(d);
+ezpi_error_codes_configurator EzPi::EZPI_ADD_SPI_DEVICE(ezpi_device_SPI_t d) {
+    if(ezpi_spi_devices.size() >= EZPI_MAX_DEV_SPI) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezpi_spi_devices.push_back(d);
     return EZPI_SUCCESS;
 }

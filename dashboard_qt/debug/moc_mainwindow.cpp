@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[37];
-    char stringdata0[954];
+    char stringdata0[984];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -47,28 +47,28 @@ QT_MOC_LITERAL(11, 329, 32), // "on_pushButton_add_device_clicked"
 QT_MOC_LITERAL(12, 362, 35), // "on_pushButton_remove_device_c..."
 QT_MOC_LITERAL(13, 398, 37), // "on_pushButton_get_ezpi_config..."
 QT_MOC_LITERAL(14, 436, 37), // "on_pushButton_set_ezpi_config..."
-QT_MOC_LITERAL(15, 474, 20), // "ezpi_log_write_flash"
-QT_MOC_LITERAL(16, 495, 20), // "ezpi_log_erase_flash"
-QT_MOC_LITERAL(17, 516, 19), // "ezpi_check_firmware"
-QT_MOC_LITERAL(18, 536, 9), // "EZPI_BOOL"
-QT_MOC_LITERAL(19, 546, 38), // "ezpi_message_info_no_firmware..."
-QT_MOC_LITERAL(20, 585, 30), // "ezpi_receive_dev_type_selected"
-QT_MOC_LITERAL(21, 616, 10), // "EZPI_UINT8"
-QT_MOC_LITERAL(22, 627, 22), // "ezpi_receive_added_dev"
-QT_MOC_LITERAL(23, 650, 13), // "ezpi_dev_type"
-QT_MOC_LITERAL(24, 664, 23), // "ezpi_serial_receive_wif"
-QT_MOC_LITERAL(25, 688, 8), // "ezpi_cmd"
-QT_MOC_LITERAL(26, 697, 21), // "ezpi_success_prov_dat"
-QT_MOC_LITERAL(27, 719, 14), // "QNetworkReply*"
-QT_MOC_LITERAL(28, 734, 1), // "d"
-QT_MOC_LITERAL(29, 736, 27), // "ezpi_success_get_prov_jsons"
-QT_MOC_LITERAL(30, 764, 29), // "on_actionEnable_Log_triggered"
-QT_MOC_LITERAL(31, 794, 27), // "on_actionRegister_triggered"
-QT_MOC_LITERAL(32, 822, 24), // "on_actionLogin_triggered"
-QT_MOC_LITERAL(33, 847, 31), // "on_actionAbout_EzloPi_triggered"
-QT_MOC_LITERAL(34, 879, 23), // "on_actionExit_triggered"
-QT_MOC_LITERAL(35, 903, 30), // "on_actionClear_Table_triggered"
-QT_MOC_LITERAL(36, 934, 19) // "ezpi_serial_receive"
+QT_MOC_LITERAL(15, 474, 23), // "ezlogic_log_write_flash"
+QT_MOC_LITERAL(16, 498, 23), // "ezlogic_log_erase_flash"
+QT_MOC_LITERAL(17, 522, 22), // "ezlogic_check_firmware"
+QT_MOC_LITERAL(18, 545, 9), // "EZPI_BOOL"
+QT_MOC_LITERAL(19, 555, 41), // "ezlogic_message_info_no_firmw..."
+QT_MOC_LITERAL(20, 597, 33), // "ezlogic_receive_dev_type_sele..."
+QT_MOC_LITERAL(21, 631, 10), // "EZPI_UINT8"
+QT_MOC_LITERAL(22, 642, 25), // "ezlogic_receive_added_dev"
+QT_MOC_LITERAL(23, 668, 13), // "ezpi_dev_type"
+QT_MOC_LITERAL(24, 682, 26), // "ezlogic_serial_receive_wif"
+QT_MOC_LITERAL(25, 709, 8), // "ezpi_cmd"
+QT_MOC_LITERAL(26, 718, 24), // "ezlogic_success_prov_dat"
+QT_MOC_LITERAL(27, 743, 14), // "QNetworkReply*"
+QT_MOC_LITERAL(28, 758, 1), // "d"
+QT_MOC_LITERAL(29, 760, 30), // "ezlogic_success_get_prov_jsons"
+QT_MOC_LITERAL(30, 791, 29), // "on_actionEnable_Log_triggered"
+QT_MOC_LITERAL(31, 821, 27), // "on_actionRegister_triggered"
+QT_MOC_LITERAL(32, 849, 24), // "on_actionLogin_triggered"
+QT_MOC_LITERAL(33, 874, 31), // "on_actionAbout_EzloPi_triggered"
+QT_MOC_LITERAL(34, 906, 23), // "on_actionExit_triggered"
+QT_MOC_LITERAL(35, 930, 30), // "on_actionClear_Table_triggered"
+QT_MOC_LITERAL(36, 961, 22) // "ezlogic_serial_receive"
 
     },
     "MainWindow\0on_pushButton_scan_uart_ports_clicked\0"
@@ -83,21 +83,21 @@ QT_MOC_LITERAL(36, 934, 19) // "ezpi_serial_receive"
     "on_pushButton_remove_device_clicked\0"
     "on_pushButton_get_ezpi_config_clicked\0"
     "on_pushButton_set_ezpi_config_clicked\0"
-    "ezpi_log_write_flash\0ezpi_log_erase_flash\0"
-    "ezpi_check_firmware\0EZPI_BOOL\0"
-    "ezpi_message_info_no_firmware_detected\0"
-    "ezpi_receive_dev_type_selected\0"
-    "EZPI_UINT8\0ezpi_receive_added_dev\0"
-    "ezpi_dev_type\0ezpi_serial_receive_wif\0"
-    "ezpi_cmd\0ezpi_success_prov_dat\0"
-    "QNetworkReply*\0d\0ezpi_success_get_prov_jsons\0"
+    "ezlogic_log_write_flash\0ezlogic_log_erase_flash\0"
+    "ezlogic_check_firmware\0EZPI_BOOL\0"
+    "ezlogic_message_info_no_firmware_detected\0"
+    "ezlogic_receive_dev_type_selected\0"
+    "EZPI_UINT8\0ezlogic_receive_added_dev\0"
+    "ezpi_dev_type\0ezlogic_serial_receive_wif\0"
+    "ezpi_cmd\0ezlogic_success_prov_dat\0"
+    "QNetworkReply*\0d\0ezlogic_success_get_prov_jsons\0"
     "on_actionEnable_Log_triggered\0"
     "on_actionRegister_triggered\0"
     "on_actionLogin_triggered\0"
     "on_actionAbout_EzloPi_triggered\0"
     "on_actionExit_triggered\0"
     "on_actionClear_Table_triggered\0"
-    "ezpi_serial_receive"
+    "ezlogic_serial_receive"
 };
 #undef QT_MOC_LITERAL
 
@@ -195,23 +195,23 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 9: _t->on_pushButton_remove_device_clicked(); break;
         case 10: _t->on_pushButton_get_ezpi_config_clicked(); break;
         case 11: _t->on_pushButton_set_ezpi_config_clicked(); break;
-        case 12: _t->ezpi_log_write_flash(); break;
-        case 13: _t->ezpi_log_erase_flash(); break;
-        case 14: { EZPI_BOOL _r = _t->ezpi_check_firmware();
+        case 12: _t->ezlogic_log_write_flash(); break;
+        case 13: _t->ezlogic_log_erase_flash(); break;
+        case 14: { EZPI_BOOL _r = _t->ezlogic_check_firmware();
             if (_a[0]) *reinterpret_cast< EZPI_BOOL*>(_a[0]) = std::move(_r); }  break;
-        case 15: _t->ezpi_message_info_no_firmware_detected(); break;
-        case 16: _t->ezpi_receive_dev_type_selected((*reinterpret_cast< EZPI_UINT8(*)>(_a[1]))); break;
-        case 17: _t->ezpi_receive_added_dev((*reinterpret_cast< ezpi_dev_type(*)>(_a[1]))); break;
-        case 18: _t->ezpi_serial_receive_wif((*reinterpret_cast< ezpi_cmd(*)>(_a[1]))); break;
-        case 19: _t->ezpi_success_prov_dat((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
-        case 20: _t->ezpi_success_get_prov_jsons((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
+        case 15: _t->ezlogic_message_info_no_firmware_detected(); break;
+        case 16: _t->ezlogic_receive_dev_type_selected((*reinterpret_cast< EZPI_UINT8(*)>(_a[1]))); break;
+        case 17: _t->ezlogic_receive_added_dev((*reinterpret_cast< ezpi_dev_type(*)>(_a[1]))); break;
+        case 18: _t->ezlogic_serial_receive_wif((*reinterpret_cast< ezpi_cmd(*)>(_a[1]))); break;
+        case 19: _t->ezlogic_success_prov_dat((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
+        case 20: _t->ezlogic_success_get_prov_jsons((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
         case 21: _t->on_actionEnable_Log_triggered(); break;
         case 22: _t->on_actionRegister_triggered(); break;
         case 23: _t->on_actionLogin_triggered(); break;
         case 24: _t->on_actionAbout_EzloPi_triggered(); break;
         case 25: _t->on_actionExit_triggered(); break;
         case 26: _t->on_actionClear_Table_triggered(); break;
-        case 27: _t->ezpi_serial_receive(); break;
+        case 27: _t->ezlogic_serial_receive(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {

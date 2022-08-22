@@ -2,7 +2,7 @@
 #define DIALOG_DEVADD_H
 
 #include <QDialog>
-#include <ezpi_data_types.h>
+#include <ezlopi.h>
 
 namespace Ui {
 class Dialog_devadd;

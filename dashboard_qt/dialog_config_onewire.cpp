@@ -26,7 +26,7 @@ Dialog_config_onewire::~Dialog_config_onewire() {
 }
 
 void Dialog_config_onewire::on_buttonBox_accepted() {
-    ezlogic_device_one_wire_t onewire_user_data;
+    ezpi_device_one_wire_t onewire_user_data;
     onewire_user_data.dev_type = EZPI_DEV_TYPE_ONE_WIRE;
     onewire_user_data.dev_name = ui->lineEdit_device_name->text();
     onewire_user_data.id_room = 0; //TBD

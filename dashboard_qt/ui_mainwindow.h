@@ -228,7 +228,7 @@ public:
 #endif // QT_CONFIG(shortcut)
         actionRegister->setText(QCoreApplication::translate("MainWindow", "Register", nullptr));
         actionLogin->setText(QCoreApplication::translate("MainWindow", "Login", nullptr));
-        actionClear_Table->setText(QCoreApplication::translate("MainWindow", "Clear Table", nullptr));
+        actionClear_Table->setText(QCoreApplication::translate("MainWindow", "Clear Table and data", nullptr));
         pushButton_scan_uart_ports->setText(QCoreApplication::translate("MainWindow", "Scan", nullptr));
         pushButton_connect_uart->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
         pushButton_set_wifi->setText(QCoreApplication::translate("MainWindow", "Configure WiFi", nullptr));

@@ -48,7 +48,7 @@ Dialog_configdev_digitalio::~Dialog_configdev_digitalio() {
 
 void Dialog_configdev_digitalio::on_buttonBox_accepted() {
 
-    ezlogic_device_digital_op_t digital_op_user_data;
+    ezpi_device_digital_op_t digital_op_user_data;
 
      digital_op_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
      digital_op_user_data.dev_name = ui->lineEdit_device_name->text();

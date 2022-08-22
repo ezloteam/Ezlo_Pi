@@ -61,7 +61,7 @@ void Dialog_config_i2c::on_comboBox_i2c_gpio_scl_currentIndexChanged(int index) 
 
 
 void Dialog_config_i2c::on_buttonBox_accepted() {
-    ezlogic_device_I2C_t i2c_user_data;
+    ezpi_device_I2C_t i2c_user_data;
 
     i2c_user_data.dev_type = EZPI_DEV_TYPE_I2C;
     i2c_user_data.dev_name = ui->lineEdit_device_name->text();
