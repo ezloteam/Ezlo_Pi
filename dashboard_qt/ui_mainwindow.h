@@ -10,6 +10,7 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
@@ -38,6 +39,7 @@ public:
     QAction *actionEnable_Log;
     QAction *actionRegister;
     QAction *actionLogin;
+    QAction *actionClear_Table;
     QWidget *centralWidget;
     QWidget *layoutWidget;
     QHBoxLayout *horizontalLayout;
@@ -71,6 +73,9 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(810, 628);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        MainWindow->setWindowIcon(icon);
         actionExit = new QAction(MainWindow);
         actionExit->setObjectName(QString::fromUtf8("actionExit"));
         actionAbout_EzloPi = new QAction(MainWindow);
@@ -81,6 +86,8 @@ public:
         actionRegister->setObjectName(QString::fromUtf8("actionRegister"));
         actionLogin = new QAction(MainWindow);
         actionLogin->setObjectName(QString::fromUtf8("actionLogin"));
+        actionClear_Table = new QAction(MainWindow);
+        actionClear_Table->setObjectName(QString::fromUtf8("actionClear_Table"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         layoutWidget = new QWidget(centralWidget);
@@ -200,6 +207,7 @@ public:
         menuFile->addAction(actionExit);
         menuHelp->addAction(actionAbout_EzloPi);
         menuView->addAction(actionEnable_Log);
+        menuView->addAction(actionClear_Table);
 
         retranslateUi(MainWindow);
 
@@ -220,6 +228,7 @@ public:
 #endif // QT_CONFIG(shortcut)
         actionRegister->setText(QCoreApplication::translate("MainWindow", "Register", nullptr));
         actionLogin->setText(QCoreApplication::translate("MainWindow", "Login", nullptr));
+        actionClear_Table->setText(QCoreApplication::translate("MainWindow", "Clear Table", nullptr));
         pushButton_scan_uart_ports->setText(QCoreApplication::translate("MainWindow", "Scan", nullptr));
         pushButton_connect_uart->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
         pushButton_set_wifi->setText(QCoreApplication::translate("MainWindow", "Configure WiFi", nullptr));

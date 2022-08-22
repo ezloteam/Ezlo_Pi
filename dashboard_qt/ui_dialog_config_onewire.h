@@ -10,6 +10,7 @@
 #define UI_DIALOG_CONFIG_ONEWIRE_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -44,6 +45,9 @@ public:
         if (Dialog_config_onewire->objectName().isEmpty())
             Dialog_config_onewire->setObjectName(QString::fromUtf8("Dialog_config_onewire"));
         Dialog_config_onewire->resize(331, 229);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_config_onewire->setWindowIcon(icon);
         buttonBox = new QDialogButtonBox(Dialog_config_onewire);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(-33, 180, 341, 32));

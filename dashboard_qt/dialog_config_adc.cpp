@@ -1,13 +1,12 @@
-#include "dialog_adc.h"
-#include "ui_dialog_adc.h"
+#include "dialog_config_adc.h"
+#include "ui_dialog_config_adc.h"
 
-Dialog_adc::Dialog_adc(QWidget *parent, EzPi * EzloPi) :
+Dialog_config_adc::Dialog_config_adc(QWidget *parent, EzPi * EzloPi) :
     QDialog(parent),
-    ui(new Ui::Dialog_adc)
+    ui(new Ui::Dialog_config_adc)
 {
     ui->setupUi(this);
     ezloPi_adc = EzloPi;
-
 
     std::vector<EZPI_UINT8> gpio_pool = ezloPi_adc->EZPI_GET_GPIO_POOL();
     EZPI_UINT8 gpio_pool_count = (EZPI_UINT8)gpio_pool.size();
@@ -21,12 +20,12 @@ Dialog_adc::Dialog_adc(QWidget *parent, EzPi * EzloPi) :
                                       " " + QString::number(ezloPi_adc->EZPI_GET_AINPUT_DEVICES().size() + 1));
 }
 
-Dialog_adc::~Dialog_adc()
+Dialog_config_adc::~Dialog_config_adc()
 {
     delete ui;
 }
 
-void Dialog_adc::on_buttonBox_accepted() {
+void Dialog_config_adc::on_buttonBox_accepted() {
 
     ezlogic_device_analog_ip_t adc_user_data;
 

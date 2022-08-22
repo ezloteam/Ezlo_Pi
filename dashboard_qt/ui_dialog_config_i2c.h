@@ -10,6 +10,7 @@
 #define UI_DIALOG_CONFIG_I2C_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -43,6 +44,9 @@ public:
         if (Dialog_config_i2c->objectName().isEmpty())
             Dialog_config_i2c->setObjectName(QString::fromUtf8("Dialog_config_i2c"));
         Dialog_config_i2c->resize(322, 240);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_config_i2c->setWindowIcon(icon);
         buttonBox = new QDialogButtonBox(Dialog_config_i2c);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(110, 200, 201, 32));

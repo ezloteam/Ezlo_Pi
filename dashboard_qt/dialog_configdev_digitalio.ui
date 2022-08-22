@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Configure Digital Output</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="ezlopi.qrc">
+    <normaloff>:/res/icon.png</normaloff>:/res/icon.png</iconset>
+  </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
@@ -332,7 +336,9 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="ezlopi.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

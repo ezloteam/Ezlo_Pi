@@ -10,6 +10,7 @@
 #define UI_DIALOG_CONFIG_INPUT_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -42,6 +43,9 @@ public:
         if (Dialog_config_input->objectName().isEmpty())
             Dialog_config_input->setObjectName(QString::fromUtf8("Dialog_config_input"));
         Dialog_config_input->resize(177, 309);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_config_input->setWindowIcon(icon);
         buttonBox = new QDialogButtonBox(Dialog_config_input);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(14, 259, 141, 32));

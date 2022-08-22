@@ -14,7 +14,7 @@ TEMPLATE = app
 QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:"level='requireAdministrator'"
 
 SOURCES += main.cpp\
-        dialog_adc.cpp \
+        dialog_config_adc.cpp \
         dialog_config_i2c.cpp \
         dialog_config_input.cpp \
         dialog_config_onewire.cpp \
@@ -27,7 +27,7 @@ SOURCES += main.cpp\
         mainwindow.cpp
 
 HEADERS  += mainwindow.h \
-    dialog_adc.h \
+    dialog_config_adc.h \
     dialog_config_i2c.h \
     dialog_config_input.h \
     dialog_config_onewire.h \
@@ -43,7 +43,7 @@ HEADERS  += mainwindow.h \
 #CONFIG += console
 
 FORMS    += mainwindow.ui \
-    dialog_adc.ui \
+    dialog_config_adc.ui \
     dialog_config_i2c.ui \
     dialog_config_input.ui \
     dialog_config_onewire.ui \
@@ -53,12 +53,14 @@ FORMS    += mainwindow.ui \
     dialog_wifi.ui \
     login.ui
 
-DISTFILES +=
+DISTFILES += \
+    C:/Users/lomas/Downloads/EZLO_ICON.png
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES +=
+RESOURCES += \
+    ezlopi.qrc
 

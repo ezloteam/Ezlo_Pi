@@ -12,7 +12,7 @@
 #include<dialog_devadd.h>
 #include<dialog_configdev_digitalio.h>
 #include<dialog_config_input.h>
-#include<dialog_adc.h>
+#include<dialog_config_adc.h>
 #include<dialog_config_onewire.h>
 #include<dialog_config_i2c.h>
 #include<dialog_config_spi.h>
@@ -74,6 +74,8 @@ private slots:
     void on_actionAbout_EzloPi_triggered();
     void on_actionExit_triggered();
 
+    void on_actionClear_Table_triggered();
+
 private:
 
     Ui::MainWindow *ui;
@@ -82,7 +84,7 @@ private:
     Dialog_WiFi * ezpi_form_WiFi;
     Dialog_devadd * ezpi_form_devadd;
     Dialog_config_input * ezpi_form_config_digital_ip;
-    Dialog_adc * ezpi_form_config_analog_ip;
+    Dialog_config_adc * ezpi_form_config_analog_ip;
     Dialog_configdev_digitalio * ezpi_form_configdev_digitalio;
     Dialog_config_onewire * ezpi_form_config_onewire;
     Dialog_config_i2c * ezpi_form_config_i2c;

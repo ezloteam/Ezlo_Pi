@@ -10,6 +10,7 @@
 #define UI_DIALOG_CONFIGDEV_DIGITALIO_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -53,6 +54,9 @@ public:
         if (Dialog_configdev_digitalio->objectName().isEmpty())
             Dialog_configdev_digitalio->setObjectName(QString::fromUtf8("Dialog_configdev_digitalio"));
         Dialog_configdev_digitalio->resize(274, 337);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_configdev_digitalio->setWindowIcon(icon);
         buttonBox = new QDialogButtonBox(Dialog_configdev_digitalio);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(72, 299, 191, 32));

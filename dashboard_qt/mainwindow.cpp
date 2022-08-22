@@ -105,7 +105,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ezpi_read_data_serial = new QByteArray;
 
-
 }
 
 MainWindow::~MainWindow() {
@@ -156,7 +155,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
                     ezpi_timer_ask_info.stop();
 
                 } else {
-                    ezpi_timer_ask_info.start(5000);
+                    ezpi_timer_ask_info.start(EZPI_FIRMWARE_CHECK_TIMEOUT);
                 }
 
             } else {
@@ -414,28 +413,6 @@ void MainWindow::on_pushButton_get_ezpi_config_clicked() {
     ezpi_cmd_state = CMD_ACTION_GET_CONFIG;
     ezpi_serial_transfer(json_send_get_config.toLocal8Bit());
 
-#if 0
-
-    ezpi_serial_port->write(json_send_get_config);
-
-    if (ezpi_serial_port->waitForBytesWritten()) {
-        // read response
-        if (ezpi_serial_port->waitForReadyRead(5000)) {
-            QByteArray responseData = ezpi_serial_port->readAll();
-            while (ezpi_serial_port->waitForReadyRead(10))
-                responseData += ezpi_serial_port->readAll();
-
-            const EZPI_STRING response = QString::fromUtf8(responseData);
-            qDebug() << "Response : " << response;
-            response_data = response;
-        } else {
-            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
-        }
-    } else {
-
-    }
-#endif
-
 }
 
 void MainWindow::on_pushButton_set_ezpi_config_clicked() {
@@ -474,7 +451,6 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
 
         array_device_detail.push_back(object_device_digital_output);
     }
-
 
     for(EZPI_UINT8 i = 0; i < device_digital_ip.size(); i++) {
         QJsonObject object_device_digital_input;
@@ -596,13 +572,11 @@ void MainWindow::ezpi_log_erase_flash() {
     QMessageBox ezpi_message_box_failed_erase;
     QByteArray byteArray = ezpi_process_erase_flash->readAllStandardOutput();
     QString str_StandardOutput = QString::fromLocal8Bit(byteArray);
-//    qDebug() << str_StandardOutput;
 
     ui->textBrowser_console_log->append(str_StandardOutput);
 
     byteArray = ezpi_process_erase_flash->readAllStandardError();
     QString str_StandardError = QString::fromLocal8Bit(byteArray);
-//    qDebug() << str_StandardError;
 
     ui->textBrowser_console_log->append(str_StandardError);
 
@@ -654,7 +628,7 @@ void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
 
     ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
     ezpi_form_config_digital_ip = new Dialog_config_input(this, EzloPi);
-    ezpi_form_config_analog_ip = new Dialog_adc(this, EzloPi);
+    ezpi_form_config_analog_ip = new Dialog_config_adc(this, EzloPi);
     ezpi_form_config_onewire = new Dialog_config_onewire(this, EzloPi);
     ezpi_form_config_i2c = new Dialog_config_i2c(this, EzloPi);
     ezpi_form_config_spi = new Dialog_config_spi(this, EzloPi);
@@ -810,7 +784,6 @@ void MainWindow::on_pushButton_scan_uart_ports_clicked() {
 
     if(ports.availablePorts().size() <= 0) {
         messageBoxNoUart.information(this, "No device found!", "We did not find any device connected, please check your connection and try again.");
-//         qDebug() << "No device found";
     } else {
         qDebug() << "Available UART Ports";
         if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Available UART Ports:\n");
@@ -1143,10 +1116,20 @@ void MainWindow::on_actionRegister_triggered() {
     }
 }
 
+void MainWindow::on_actionClear_Table_triggered() {
+    ui->tableWidget_device_table->clearContents();
+}
+
 void MainWindow::on_actionAbout_EzloPi_triggered() {
-
-    QMessageBox::about(this, "EzloPi", "EzloPi V0.0.1");
-
+    QMessageBox::about(this, "EzloPi V1.2.0", \
+                       "EzloPi is an open-source project contributed by Ezlo Innovation"
+                       "to extend the capabilities of ESP32/ESP32-C3 chipset-based devices "
+                       "and platforms. It provides unparalleled capabilities to configure and "
+                       "control your ESP-based devices and bring any of your automation ideas to life."
+                       "\nEzloPi Version 1.2.0\n"
+                       "Web: https://www.ezlopi.com/\n"
+                       "Project: https://github.com/ezloteam/Ezlo_Pi\n"
+                       "Licence: EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT");
 }
 
 void MainWindow::on_actionExit_triggered() {
@@ -1174,6 +1157,7 @@ void MainWindow::ezlogic_table_adddev_digital_op(ezlogic_device_digital_op_t out
     table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
     ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
 }
+
 void MainWindow::ezlogic_table_adddev_digital_ip(ezlogic_device_digital_ip_t input_device) {
 
     QTableWidgetItem * table_item_ezpi_devices;
@@ -1310,7 +1294,7 @@ void MainWindow::ezpi_action_check_info(QByteArray serial_read) {
     QJsonParseError jsonError;
     QJsonDocument doc_get_info = QJsonDocument::fromJson(serial_read, &jsonError);
 
-#if 1
+#if 0
     if (jsonError.error != QJsonParseError::NoError){
         qDebug() << jsonError.errorString();
         QMessageBox::warning(this, "Error!", "Incorrect data format received!");
@@ -1537,9 +1521,6 @@ void MainWindow::ezpi_action_set_config_process(QByteArray serial_read) {
     QJsonObject obj_root_set_config_response = doc_set_config_response.object();
     QVariantMap json_map_root_set_config_response = obj_root_set_config_response.toVariantMap();
 
-//    qDebug() << "cmd: " << QString::number(json_map_root_set_config_response["cmd"].toUInt());
-//    qDebug() << "status_write: " << QString::number(json_map_root_set_config_response["status_write"].toUInt());
-
     if(json_map_root_set_config_response["cmd"].toUInt() == CMD_ACTION_SET_CONFIG) {
         if(json_map_root_set_config_response["status_write"].toUInt() == 1) {
             QMessageBox::information(this, "Success", "Writing configuration to ESP32 is successful!");
@@ -1550,3 +1531,5 @@ void MainWindow::ezpi_action_set_config_process(QByteArray serial_read) {
         QMessageBox::warning(this, "Error!", "Unknown command received, writing configuration to ESP device: unknown status!");
     }
 }
+
+

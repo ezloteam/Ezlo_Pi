@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog_adc</class>
- <widget class="QDialog" name="Dialog_adc">
+ <class>Dialog_config_adc</class>
+ <widget class="QDialog" name="Dialog_config_adc">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -12,6 +12,10 @@
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="ezlopi.qrc">
+    <normaloff>:/res/icon.png</normaloff>:/res/icon.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -145,12 +149,14 @@
    </item>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="ezlopi.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog_adc</receiver>
+   <receiver>Dialog_config_adc</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -166,7 +172,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog_adc</receiver>
+   <receiver>Dialog_config_adc</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

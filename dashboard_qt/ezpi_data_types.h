@@ -79,7 +79,8 @@ enum ezpi_dev_type {
 };
 
 enum ezpi_item_type {
-    EZPI_ITEM_TYPE_LED = 1,
+    EZPI_ITEM_TYPE_NONE,
+    EZPI_ITEM_TYPE_LED,
     EZPI_ITEM_TYPE_RELAY,
     EZPI_ITEM_TYPE_PLUG,
     EZPI_ITEM_TYPE_BUTTON,
