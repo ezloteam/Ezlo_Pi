@@ -6,6 +6,7 @@
 #include "devices_common.h"
 #include "interface_common.h"
 #include "dht.h"
+#include "MPU6050.h"
 
 #define TEST 0
 
@@ -247,6 +248,34 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
                 // snprintf(dev_value, sizeof(dev_value), "\"%.02f\",\"scale\":\"celsius\"", dht11_service_get_temperature());
                 float val = dht11_service_get_temperature();
                 snprintf(dev_value, sizeof(dev_value), "%.02f,\"valueFormatted\":\"%.02f\",\"scale\":\"celsius\",\"syncNotification\":false", val, val);
+                break;
+            }
+            case MPU6050:
+            {
+                static int count = 0;
+                switch (count)
+                {
+                    uint16_t val;
+                case 0:
+                    count++;
+                    val = accel_x_value_read();
+                    snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\",\"syncNotification\":false", val);
+                    break;
+                case 1:
+                    count++;
+                    val = accel_y_value_read();
+                    snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\",\"syncNotification\":false", val);
+                    break;
+                case 2:
+                    count = 0;
+                    val = accel_z_value_read();
+                    snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\",\"syncNotification\":false", val);
+                    break;
+                
+                default:
+                    break;
+                }
+                
                 break;
             }
             case LED:

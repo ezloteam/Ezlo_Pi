@@ -19,6 +19,7 @@ extern "C"
         SWITCH,
         PLUG,
         TAMPER,
+        MPU6050 = 5,
     } e_device_type_t;
 
     typedef struct s_device_properties
