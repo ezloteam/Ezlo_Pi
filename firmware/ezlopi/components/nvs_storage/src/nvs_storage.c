@@ -109,4 +109,6 @@ void nvs_storage_read_wifi(char *wifi_info, uint32_t len)
 
 void nvs_storage_deinit(void)
 {
+    nvs_close(nvs_storage_handle);
+    nvs_storage_handle = 0;
 }

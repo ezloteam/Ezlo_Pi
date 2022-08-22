@@ -5,6 +5,7 @@
 #include "string.h"
 #include "items.h"
 #include "wss.h"
+#include "driver/i2c.h"
 
 static uint16_t accel_x;
 static uint16_t accel_y;
@@ -23,6 +24,7 @@ void mpu_service_init(uint8_t scl_pin, uint8_t sda_pin, uint32_t dev_idx)
 {
     SDA = sda_pin;
     SCL = scl_pin;
+    i2c_master_init(I2C_NUM_0, sda_pin, scl_pin, 100000);
     xTaskCreatePinnedToCore(mpu_service_process, "mpu6050-service", 3072, NULL, 3, NULL, 1);
 }
 
@@ -30,7 +32,7 @@ static void mpu_service_process(void *pv)
 {
     while (1)
     {
-        ESP_ERROR_CHECK(MPU6050_i2c_master_init(SDA, SCL));
+        // ESP_ERROR_CHECK(MPU6050_i2c_master_init(SDA, SCL));
         ESP_ERROR_CHECK(mpu6050_wake());
         MPU_TASK();
 

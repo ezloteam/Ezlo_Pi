@@ -220,8 +220,7 @@ void QT_GET_INFO()
     cJSON_Minify(my_json_string);
     cJSON_Delete(get_info); // free Json string
 
-    const int len = strlen(my_json_string);
-    const int txBytes = uart_write_bytes(UART_NUM_0, my_json_string, len); // Send the data over uart
+    qt_serial_respond_to_qt(strlen(my_json_string), my_json_string);
 
     cJSON_free(my_json_string);
 }
@@ -321,7 +320,7 @@ void QT_READ_DATA(void)
         cJSON_Delete(root); // free Json string
 
         const int len = strlen(my_json_string);
-        const int txBytes = uart_write_bytes(UART_NUM_0, my_json_string, len); // Send the data over uart
+        const int txBytes = qt_serial_respond_to_qt(len, my_json_string); // Send the data over uart
 
         cJSON_free(my_json_string);
 
@@ -332,22 +331,14 @@ void QT_READ_DATA(void)
 int qt_serial_respond_to_qt(int len, uint8_t *data)
 {
     int ret = 0;
+    ret = uart_write_bytes(UART_NUM_0, data, len);
+    ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
 
     return ret;
 }
 
 void qt_serial_init(void)
 {
-    esp_err_t err = nvs_flash_init();
-    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        // NVS partition was truncated and needs to be erased
-        // Retry nvs_flash_init
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        err = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(err);
-
     UART_INIT();
     xTaskCreate(rx_task, "uart_rx_task", 1024 * 2, NULL, configMAX_PRIORITIES, NULL);
 }

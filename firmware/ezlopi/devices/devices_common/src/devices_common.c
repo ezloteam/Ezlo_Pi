@@ -41,6 +41,11 @@ int devices_common_get_device_by_item_id(const char *item_id)
     return 0xFFFF;
 }
 
+void devices_init_from_json(void)
+{
+    
+}
+
 void devices_common_init_devices(void)
 {
     esp_err_t err;
