@@ -971,11 +971,11 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
         ld_binary_array.append('\0');
         ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x44, jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi"));
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi").toLocal8Bit());
         ld_binary_array.append('\0');
         ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x104, jobj_prov_data_prov_data["id"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown"));
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
 
         ser_ver.data = 0;
         // For Connection-ID-0
@@ -1016,7 +1016,6 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
     } else {
         QMessageBox::information(this, "Registration failed!", "Failed adding new device into the cloud platform, try again closing and reopeaning the app!");
     }
-
 }
 
 // ACTION list 
@@ -1248,8 +1247,17 @@ void MainWindow::ezlogic_serial_process(void) {
     ezlogic_timer_serial_complete.stop();
 
     qDebug() << "Data RX: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
-
     ui->textBrowser_console_log->append("Data RX: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
+
+    if( (ezlogic_read_data_serial->at(0) == '\200') &&
+        (ezlogic_read_data_serial->at(1) == '\r') &&
+        (ezlogic_read_data_serial->at(2) == '\n')) {
+        ezlogic_read_data_serial->remove(0, 3);
+    } else {
+        return;
+    }
+
+    ui->textBrowser_console_log->append("Json Data: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
     switch (ezlogic_cmd_state) {
         case CMD_ACTION_SET_WIFI:
             ezlogic_action_set_wifi(*ezlogic_read_data_serial);
