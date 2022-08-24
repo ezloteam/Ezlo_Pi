@@ -61,6 +61,8 @@ public:
     QPushButton *pushButton_remove_device;
     QComboBox *comboBox_esp32_board_type;
     QLabel *label_board_select;
+    QLabel *label_registered_devices;
+    QComboBox *comboBox_registered_devices;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuHelp;
@@ -156,7 +158,7 @@ public:
         splitter->addWidget(textBrowser_console_log);
         groupBox_device_config = new QGroupBox(centralWidget);
         groupBox_device_config->setObjectName(QString::fromUtf8("groupBox_device_config"));
-        groupBox_device_config->setGeometry(QRect(637, 270, 151, 121));
+        groupBox_device_config->setGeometry(QRect(637, 330, 151, 121));
         pushButton_get_ezpi_config = new QPushButton(groupBox_device_config);
         pushButton_get_ezpi_config->setObjectName(QString::fromUtf8("pushButton_get_ezpi_config"));
         pushButton_get_ezpi_config->setGeometry(QRect(20, 30, 111, 31));
@@ -165,7 +167,7 @@ public:
         pushButton_set_ezpi_config->setGeometry(QRect(20, 70, 111, 31));
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(639, 130, 149, 129));
+        groupBox->setGeometry(QRect(639, 190, 149, 129));
         pushButton_add_device = new QPushButton(groupBox);
         pushButton_add_device->setObjectName(QString::fromUtf8("pushButton_add_device"));
         pushButton_add_device->setGeometry(QRect(20, 30, 111, 31));
@@ -177,10 +179,16 @@ public:
         comboBox_esp32_board_type->addItem(QString());
         comboBox_esp32_board_type->addItem(QString());
         comboBox_esp32_board_type->setObjectName(QString::fromUtf8("comboBox_esp32_board_type"));
-        comboBox_esp32_board_type->setGeometry(QRect(650, 90, 131, 26));
+        comboBox_esp32_board_type->setGeometry(QRect(650, 150, 131, 26));
         label_board_select = new QLabel(centralWidget);
         label_board_select->setObjectName(QString::fromUtf8("label_board_select"));
-        label_board_select->setGeometry(QRect(650, 65, 111, 20));
+        label_board_select->setGeometry(QRect(650, 125, 111, 20));
+        label_registered_devices = new QLabel(centralWidget);
+        label_registered_devices->setObjectName(QString::fromUtf8("label_registered_devices"));
+        label_registered_devices->setGeometry(QRect(650, 65, 131, 20));
+        comboBox_registered_devices = new QComboBox(centralWidget);
+        comboBox_registered_devices->setObjectName(QString::fromUtf8("comboBox_registered_devices"));
+        comboBox_registered_devices->setGeometry(QRect(650, 90, 131, 26));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -255,6 +263,7 @@ public:
         comboBox_esp32_board_type->setItemText(2, QCoreApplication::translate("MainWindow", "ESP32S3", nullptr));
 
         label_board_select->setText(QCoreApplication::translate("MainWindow", "Board Select", nullptr));
+        label_registered_devices->setText(QCoreApplication::translate("MainWindow", "Registered devices", nullptr));
         menuFile->setTitle(QCoreApplication::translate("MainWindow", "File", nullptr));
         menuHelp->setTitle(QCoreApplication::translate("MainWindow", "Help", nullptr));
         menuView->setTitle(QCoreApplication::translate("MainWindow", "View", nullptr));

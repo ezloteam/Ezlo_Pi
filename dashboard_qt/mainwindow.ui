@@ -122,7 +122,7 @@
     <property name="geometry">
      <rect>
       <x>637</x>
-      <y>270</y>
+      <y>330</y>
       <width>151</width>
       <height>121</height>
      </rect>
@@ -161,7 +161,7 @@
     <property name="geometry">
      <rect>
       <x>639</x>
-      <y>130</y>
+      <y>190</y>
       <width>149</width>
       <height>129</height>
      </rect>
@@ -200,7 +200,7 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>90</y>
+      <y>150</y>
       <width>131</width>
       <height>26</height>
      </rect>
@@ -225,13 +225,36 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>65</y>
+      <y>125</y>
       <width>111</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
      <string>Board Select</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_registered_devices">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>65</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Registered devices</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_registered_devices">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>90</y>
+      <width>131</width>
+      <height>26</height>
+     </rect>
     </property>
    </widget>
   </widget>

@@ -93,6 +93,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Register
     ui->actionRegister->setEnabled(false);
 
+    // Registered deviecs list
+    ui->comboBox_registered_devices->setEnabled(false);
+
     ui->comboBox_esp32_board_type->setEnabled(false);
 
     connect(ui->comboBox_uart_list,SIGNAL(currentIndexChanged(const QString&)),
@@ -104,10 +107,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ezlogic_read_data_serial = new QByteArray;
 
+    // scan and list registered devices
+    ezpi_update_dev_list();
+
     ui->statusBar->addWidget(ezlogic_status);
 
     ezpi_show_status_message("EzloPi V1.2.0, Build 0");
-
 }
 
 MainWindow::~MainWindow() {
@@ -185,6 +190,8 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
 
         ui->tableWidget_device_table->clearContents();
         ui->tableWidget_device_table->setEnabled(false);
+
+        ui->comboBox_registered_devices->setEnabled(false);
     }
 }
 void MainWindow::on_comboBox_uart_list_currentIndexChanged() {
@@ -267,41 +274,34 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     QStringList arguments;
     arguments.append("-p");
     arguments.append(ser_port);
+    arguments.append("--chip esp32");
     arguments.append("-b 460800");
-//    arguments.append("--before default_reset");
-//    arguments.append("--after hard_reset");
-//    arguments.append("--chip esp32");
-//    arguments.append("--flash_mode dio");
-//    arguments.append("--flash_size detect");
-    arguments.append("write_flash");
-//    arguments.append("write_flash");
-//    arguments.append("--flash_freq 40m");
+    arguments.append("--before default_reset");
+    arguments.append("--after hard_reset");
+    arguments.append("write_flash -z");
+    arguments.append("--flash_mode dio");
+    arguments.append("--flash_size detect");
+    arguments.append("--flash_freq 40m");
     arguments.append("0x1000 ezpibins/bootloader.bin");
     arguments.append("0x8000 ezpibins/partition-table.bin");
     arguments.append("0x10000 ezpibins/esp_configs.bin");
-    arguments.append("0x2E0000 ezpibins/ld.bin");
+    arguments.append("0xD000 ezpibins/ota_data_initial.bin");
 
-    QString argument_string = "-p " + ser_port + " -b 460800 " + \
-                                " --before default_reset " + \
-                                "--after hard_reset " + \
-                                "--chip esp32 " + \
-                                "write_flash " + \
-                                "--flash_mode dio " + \
-                                "--flash_size detect " + \
-                                "--flash_freq 40m " + \
-                                "0x1000 ezpibins/bootloader.bin " + \
-                                "0x8000 ezpibins/partition-table.bin " + \
-                                "0xD000 ezpibins/ota_data_initial.bin " + \
-                                "0x10000 ezpibins/esp_configs.bin " + \
-                                "0x3B0000 ezpibins/ld.bin";
+    QString ezpi_selected_registered_device = ui->comboBox_registered_devices->currentText();
+//    QString message_user_flash = "You are now about to flash the firmware "
+//                                 "for the device, which is regisrered with the serial: ";
+//    message_user_flash += ezpi_selected_registered_device;
+//    message_user_flash += " in ezlo cloud.";
 
+    QMessageBox::information(this, "Flashing info!", "You are now about to flash the firmware "
+                                                      "for the device, which is regisrered with the serial: " +
+                                                      ezpi_selected_registered_device +
+                                                      " in ezlo cloud.");
 
-    qDebug() << "Current dir : " << QDir::currentPath();
-    ui->textBrowser_console_log->append("Current dir: " + QDir::currentPath());
+    ezpi_selected_registered_device += ".bin";
+    arguments.append("0x3B0000 devs/"+ ezpi_selected_registered_device);
 
-    qDebug() << "Arguments : " << argument_string;
-
-    ezlogic_process_write_flash->setNativeArguments(argument_string);
+    ezlogic_process_write_flash->setArguments(arguments);
     ezlogic_process_write_flash->start();
 }
 
@@ -491,6 +491,7 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
     for(EZPI_UINT8 i = 0; i < device_i2c.size(); i++) {
         QJsonObject object_device_i2c;
 
+        object_device_i2c.insert("dev_type", device_i2c[i].dev_type);
         object_device_i2c.insert("dev_name", device_i2c[i].dev_name);
         object_device_i2c.insert("id_room", device_i2c[i].id_room);
         object_device_i2c.insert("id_item", device_i2c[i].id_item);
@@ -998,20 +999,33 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
         ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
         ld_binary_array.append('\0');
 
-
-        if(!QFile::remove("ezpibins/ld.bin")) {
+#if 0
+        if(!QFile::remove("devs/ld.bin")) {
             qDebug() << "Failed deleting old file and create new ld.bin file.";
             ui->textBrowser_console_log->append("Failed deleting old file and create new ld.bin file.");
             return;
         }
+#endif
+
         qDebug() << "Current dir: " << QDir::currentPath();
-        QFile out("ezpibins/ld.bin");
+        QString ld_file_name = "devs/" + jobj_prov_data_prov_data["id"].toString();
+        QFile out(ld_file_name);
         out.open(QIODevice::WriteOnly);
         out.write(ld_binary_array);
         out.close();
 
         QMessageBox::information(this, "Registration complete!", "Adding new device has been successful.\n Please note the ID from console below.\n" \
                                                                  "now flash the firmware!");
+
+        // scan and list registered devices
+        ui->comboBox_registered_devices->clear();
+        QDir directory("devs");
+        QStringList registered_devices = directory.entryList(QStringList() << "*.bin",QDir::Files);
+        foreach(QString filename, registered_devices) {
+            qDebug() << "Registered devices: " << filename.remove(".bin");
+            ui->comboBox_registered_devices->addItem(filename.remove(".bin"));
+        }
+
         ezlogic_flag_registered = true;
     } else {
         QMessageBox::information(this, "Registration failed!", "Failed adding new device into the cloud platform, try again closing and reopeaning the app!");
@@ -1246,16 +1260,65 @@ void MainWindow::ezlogic_serial_process(void) {
 
     ezlogic_timer_serial_complete.stop();
 
-    qDebug() << "Data RX: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
-    ui->textBrowser_console_log->append("Data RX: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
+    int idx = 0;
+    int rx_size = ezlogic_read_data_serial->count();
+    int found_start_bytes = 0;
 
-    if( (ezlogic_read_data_serial->at(0) == '\200') &&
-        (ezlogic_read_data_serial->at(1) == '\r') &&
-        (ezlogic_read_data_serial->at(2) == '\n')) {
-        ezlogic_read_data_serial->remove(0, 3);
-    } else {
+    while (idx != (rx_size - 8)) {
+        if( (ezlogic_read_data_serial->at(idx) == '\200') &&
+            (ezlogic_read_data_serial->at(idx+1) == '\r') &&
+            (ezlogic_read_data_serial->at(idx+2) == '\n') &&
+            (ezlogic_read_data_serial->at(idx+3) == '{') )
+        {
+            found_start_bytes = 1;
+            ezlogic_read_data_serial->remove(0, idx+3);
+            break;
+        }
+
+        idx++;
+    }
+
+    idx = 0;
+    rx_size = ezlogic_read_data_serial->count();
+    int opening_count = 0;
+    int closing_count = 0;
+
+    while (idx != rx_size) {
+        if ('{' == ezlogic_read_data_serial->at(idx))
+        {
+            opening_count++;
+        }
+
+        if ('}' == ezlogic_read_data_serial->at(idx))
+        {
+            closing_count++;
+        }
+
+        if ( opening_count == closing_count)
+        {
+            ezlogic_read_data_serial->remove(idx+1, rx_size-idx-1);
+            break;
+        }
+        idx++;
+    }
+
+    qDebug().noquote() << "Json data: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
+
+    if( 0 == found_start_bytes ) {
+//        qDebug() << "Data RX: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
         return;
     }
+
+//    qDebug() << "Data RX: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
+//    ui->textBrowser_console_log->append("Data RX: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
+
+//    if( (ezlogic_read_data_serial->at(0) == '\200') &&
+//        (ezlogic_read_data_serial->at(1) == '\r') &&
+//        (ezlogic_read_data_serial->at(2) == '\n')) {
+//        ezlogic_read_data_serial->remove(0, 3);
+//    } else {
+//        return;
+//    }
 
     ui->textBrowser_console_log->append("Json Data: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
     switch (ezlogic_cmd_state) {
@@ -1279,6 +1342,8 @@ void MainWindow::ezlogic_serial_process(void) {
                 ui->pushButton_clear_uart_direct_log->setEnabled(true);
 
                 ui->tableWidget_device_table->setEnabled(true);
+
+                ui->comboBox_registered_devices->setEnabled(true);
 
                 ezlogic_timer_ask_info.stop();
             }
@@ -1374,7 +1439,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
 
     // Clear table contents
 //    ui->tableWidget_device_table->clearContents();
-    on_actionClear_Table_triggered();
+    ezlogic_clear_table_data();
 
     // Clear internal device storage
     EzloPi->EZPI_CLEAR_OUTPUT_DEVICES();
@@ -1557,4 +1622,17 @@ void MainWindow::ezlogic_action_set_config_process(QByteArray serial_read) {
 
 void MainWindow::ezpi_show_status_message(const QString &message) {
     ezlogic_status->setText(message);
+}
+
+void MainWindow::ezpi_update_dev_list(void) {
+    QDir directory("devs");
+    QStringList registered_devices = directory.entryList(QStringList() << "*.bin",QDir::Files);
+    if (registered_devices.size() == 0) {
+        ui->comboBox_registered_devices->setEnabled(false);
+    }
+
+    foreach(QString filename, registered_devices) {
+        qDebug() << "Registered devices: " << filename.remove(".bin");
+        ui->comboBox_registered_devices->addItem(filename.remove(".bin"));
+    }
 }

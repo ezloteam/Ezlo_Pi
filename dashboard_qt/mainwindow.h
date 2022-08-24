@@ -151,6 +151,7 @@ private:
     void ezlogic_serial_process(void);
     void ezlogic_clear_table_data(void);
     void ezpi_show_status_message(const QString&);
+    void ezpi_update_dev_list(void);
 
 public slots:
     void ezlogic_serial_receive(void);

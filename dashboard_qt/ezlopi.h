@@ -98,17 +98,6 @@ enum ezpi_item_type {
     EZPI_ITEM_TYPE_TOTAL
 };
 
-enum commands {
-    GET_CONFIG = 0xa0,
-    SET_CONFIG,
-    SET_VOL,
-    SET_WiFi,
-    FIRST_DEV,
-    SET_DEV,
-    GET_DEV,
-    END_DEV
-};
-
 enum ezpi_cmd {
     CMD_ACTION_NONE,
     CMD_ACTION_GET_INFO,

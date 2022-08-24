@@ -44,7 +44,7 @@ void Dialog_config_adc::on_buttonBox_accepted() {
 
     // Adding device to the device vector
     if(ezloPi_adc->EZPI_ADD_AINPUT_DEVICE(adc_user_data) == EZPI_SUCCESS) {
-       QMessageBox::information(this, "Success", "Successfully added an ADC device.");
+//       QMessageBox::information(this, "Success", "Successfully added an ADC device.");
        // Trigger signal to add device in the table
        emit ezpi_signal_dev_adc_added(EZPI_DEV_TYPE_ANALOG_IP);
     } else if(ezloPi_adc->EZPI_ADD_AINPUT_DEVICE(adc_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {
