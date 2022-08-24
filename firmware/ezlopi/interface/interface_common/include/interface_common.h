@@ -20,6 +20,8 @@ extern "C"
     void interface_common_inst_input_button(gpio_num_t gpioPin, gpio_pull_mode_t pull);
     void interface_common_inst_out_button(gpio_num_t gpioPin, uint8_t state, gpio_pull_mode_t pull);
 
+    uint32_t interface_get_message_count_in_queue(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -79,36 +79,37 @@ void app_main(void)
     wifi_connect_from_nvs();
 
     xTaskCreate(main_task, "main task", 20 * 1024, NULL, 2, NULL);
-    xTaskCreate(blinky, "blinky", 2048, NULL, 1, NULL);
+    // xTaskCreate(blinky, "blinky", 2048, NULL, 1, NULL);
 }
 
 static void blinky(void *pv)
 {
-    // gpio_config_t io_conf = {
-    //     .pin_bit_mask = (1ULL << GPIO_NUM_2),
-    //     .mode = GPIO_MODE_OUTPUT,
-    //     .pull_up_en = GPIO_PULLUP_DISABLE,
-    //     .pull_down_en = GPIO_PULLDOWN_DISABLE,
-    //     .intr_type = GPIO_INTR_DISABLE,
-    // };
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL << GPIO_NUM_2),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
 
-    // uint32_t state = 0;
+    uint32_t state = 0;
     // uint32_t count = 0;
-    // gpio_config(&io_conf);
+    gpio_config(&io_conf);
     // gpio_pad_select_gpio(dht22_pin);
 
     while (1)
     {
-        // gpio_set_level(GPIO_NUM_2, state);
-        vTaskDelay(5000 / portTICK_RATE_MS);
-        // state ^= 1;
+        state ^= 1;
+        gpio_set_level(GPIO_NUM_2, state);
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
 
         // if (count++ > 20)
         {
-            TRACE_D("-----------------------------------------");
-            TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
-            TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
-            TRACE_D("-----------------------------------------");
+            // TRACE_D("-----------------------------------------");
+            // TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
+            // TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
+            // TRACE_D("-----------------------------------------");
         }
 
         // float humidity, temperature;

@@ -11,6 +11,9 @@ extern "C"
     void nvs_storage_init(void);
     void nvs_storaget_deinit(void);
 
+    int nvs_storage_write_config_data_str(char *data);
+    int nvs_storage_read_config_data_str(char **data);
+
     void nvs_storage_read_wifi(char *wifi_info, uint32_t len);
     void nvs_storage_write_wifi(const char *wifi_info, uint32_t len);
 

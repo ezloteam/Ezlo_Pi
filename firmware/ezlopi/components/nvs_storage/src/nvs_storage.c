@@ -8,6 +8,8 @@
 #include "interface_common.h"
 
 static nvs_handle_t nvs_storage_handle;
+static const char *storage_name = "storage";
+static const char *config_nvs_name = "confi_data";
 
 void nvs_storage_init(void)
 {
@@ -20,7 +22,7 @@ void nvs_storage_init(void)
         err = nvs_flash_init();
     }
 
-    err = nvs_open("storage", NVS_READWRITE, &nvs_storage_handle);
+    err = nvs_open(storage_name, NVS_READWRITE, &nvs_storage_handle);
     if (ESP_OK != err)
     {
         TRACE_E("NVS Open Error!");
@@ -30,6 +32,78 @@ void nvs_storage_init(void)
     {
         TRACE_D("NVS Open success");
     }
+}
+
+int nvs_storage_write_config_data_str(char *data)
+{
+    int ret = 0;
+
+    esp_err_t err;
+    nvs_handle_t config_nvs_handle;
+
+    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+    TRACE_W("nvs_open - error: %s", esp_err_to_name(err));
+
+    if (ESP_OK == err)
+    {
+        err = nvs_set_str(config_nvs_handle, config_nvs_name, data);
+        TRACE_W("nvs_set_str - error: %s", esp_err_to_name(err));
+
+        if (ESP_OK == err)
+        {
+            err = nvs_commit(config_nvs_handle);
+            TRACE_W("nvs_commit - error: %s", esp_err_to_name(err));
+
+            if (ESP_OK == err)
+            {
+                ret = 1;
+            }
+        }
+
+        nvs_close(config_nvs_handle);
+    }
+
+    return ret;
+}
+
+int nvs_storage_read_config_data_str(char **data)
+{
+    int ret = 0;
+    esp_err_t err = ESP_OK;
+
+    nvs_handle_t config_nvs_handle;
+    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+
+    if (ESP_OK == err)
+    {
+        size_t buf_len_needed;
+        err = nvs_get_str(config_nvs_handle, config_nvs_name, NULL, &buf_len_needed);
+
+        if (buf_len_needed && (ESP_OK == err))
+        {
+            *data = malloc(buf_len_needed + 1);
+
+            if (*data)
+            {
+                err = nvs_get_str(config_nvs_handle, config_nvs_name, *data, &buf_len_needed);
+                TRACE_W("nvs_get_str(data) error: %s", esp_err_to_name(err));
+
+                if (ESP_OK == err)
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    free(*data);
+                    *data = NULL;
+                }
+            }
+        }
+
+        nvs_close(config_nvs_handle);
+    }
+
+    return ret;
 }
 
 void nvs_storage_write_device_config(void *buffer, uint32_t len)

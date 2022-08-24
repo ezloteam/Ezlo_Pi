@@ -2,6 +2,7 @@
 #include "driver/i2c.h"
 
 #include "mpu6050.h"
+#include "i2c_master_interface.h"
 
 #define I2C_MASTER_SCL_IO 22        /*!< gpio number for I2C master clock */
 #define I2C_MASTER_SDA_IO 23        /*!< gpio number for I2C master data  */
@@ -57,15 +58,8 @@ uint16_t gyro_z;
 
 esp_err_t MPU6050_i2c_master_init(uint8_t SDA, uint8_t SCL)
 {
-    i2c_config_t conf;
-    conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = SDA;
-    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = SCL;
-    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
-    i2c_param_config(I2C_NUM_0, &conf);
-    return i2c_driver_install(I2C_NUM_0, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+    i2c_master_interface_init(I2C_NUM_0, SDA, SCL, 100000);
+    return ESP_OK;
 }
 
 esp_err_t mpu6050_wake(void)

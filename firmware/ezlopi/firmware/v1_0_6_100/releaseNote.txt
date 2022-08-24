@@ -41,6 +41,3 @@ v1_0_6_99  Date: Mon 22 Aug 2022 01:45:11 PM +0545
 v1_0_6_100  Date: Tue 23 Aug 2022 02:15:47 PM +0545
 	Testing on QT after handling memory leaks and mallocs
 
-v1_0_6_101  Date: Wed 24 Aug 2022 08:39:48 PM +0545
-	Integration of Json based QT, MPU6050, fixing Qt_serial and memory leaks, added malloc handles, etc.
-
