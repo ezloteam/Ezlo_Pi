@@ -88,6 +88,7 @@ public:
         checkBox_invert_output->setGeometry(QRect(187, 133, 141, 24));
         comboBox_onewire_subtype = new QComboBox(Dialog_config_onewire);
         comboBox_onewire_subtype->addItem(QString());
+        comboBox_onewire_subtype->addItem(QString());
         comboBox_onewire_subtype->setObjectName(QString::fromUtf8("comboBox_onewire_subtype"));
         comboBox_onewire_subtype->setGeometry(QRect(20, 80, 141, 26));
         label_device_subtype = new QLabel(Dialog_config_onewire);
@@ -116,6 +117,7 @@ public:
         radioButton_pulldown->setText(QCoreApplication::translate("Dialog_config_onewire", "PULL-DOWN", nullptr));
         checkBox_invert_output->setText(QCoreApplication::translate("Dialog_config_onewire", "INVERT OUTPUT", nullptr));
         comboBox_onewire_subtype->setItemText(0, QCoreApplication::translate("Dialog_config_onewire", "DHT11", nullptr));
+        comboBox_onewire_subtype->setItemText(1, QCoreApplication::translate("Dialog_config_onewire", "DHT22", nullptr));
 
         label_device_subtype->setText(QCoreApplication::translate("Dialog_config_onewire", "Device Subtype", nullptr));
     } // retranslateUi

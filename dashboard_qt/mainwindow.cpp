@@ -274,18 +274,29 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     QStringList arguments;
     arguments.append("-p");
     arguments.append(ser_port);
-    arguments.append("--chip esp32");
+    arguments.append("--chip");
+    arguments.append("esp32");
     arguments.append("-b 460800");
-    arguments.append("--before default_reset");
-    arguments.append("--after hard_reset");
-    arguments.append("write_flash -z");
-    arguments.append("--flash_mode dio");
-    arguments.append("--flash_size detect");
-    arguments.append("--flash_freq 40m");
-    arguments.append("0x1000 ezpibins/bootloader.bin");
-    arguments.append("0x8000 ezpibins/partition-table.bin");
-    arguments.append("0x10000 ezpibins/esp_configs.bin");
-    arguments.append("0xD000 ezpibins/ota_data_initial.bin");
+    arguments.append("--before");
+    arguments.append("default_reset");
+    arguments.append("--after");
+    arguments.append("hard_reset");
+    arguments.append("write_flash");
+    arguments.append("-z");
+    arguments.append("--flash_mode");
+    arguments.append("dio");
+    arguments.append("--flash_size");
+    arguments.append("detect");
+    arguments.append("--flash_freq");
+    arguments.append("40m");
+    arguments.append("0x1000");
+    arguments.append("ezpibins/0x1000.bin");
+    arguments.append("0x8000");
+    arguments.append("ezpibins/0x8000.bin");
+    arguments.append("0x10000");
+    arguments.append("ezpibins/0x10000.bin");
+    arguments.append("0xD000");
+    arguments.append("ezpibins/0xd000.bin");
 
     QString ezpi_selected_registered_device = ui->comboBox_registered_devices->currentText();
 //    QString message_user_flash = "You are now about to flash the firmware "
@@ -299,7 +310,8 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
                                                       " in ezlo cloud.");
 
     ezpi_selected_registered_device += ".bin";
-    arguments.append("0x3B0000 devs/"+ ezpi_selected_registered_device);
+    arguments.append("0x3B0000");
+    arguments.append("devs/"+ ezpi_selected_registered_device);
 
     ezlogic_process_write_flash->setArguments(arguments);
     ezlogic_process_write_flash->start();
@@ -821,7 +833,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
     if(jerror.error != QJsonParseError::NoError) {
 
         qDebug() << "Message failed parcing json";
-        ui->textBrowser_console_log->append("Error: Failed parcing json");
+        if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append("Error: Failed parcing json");
         return;
     }
 
@@ -832,7 +844,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
 
     if( (status == 1) && (complete == 1) ) {
 
-        ui->textBrowser_console_log->append("Success: New device has been registered, you can login and find the device added.");
+        if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append("Success: New device has been registered, you can login and find the device added.");
 
         QJsonObject jobj_data = jobj_main["data"].toObject();
         QString uuid = jobj_data["uuid"].toString();
@@ -859,7 +871,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
         QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
         connect(manager, SIGNAL(finished(QNetworkReply*)),
-                this, SLOT(success_get_prov_jsons(QNetworkReply*)));
+                this, SLOT(ezlogic_success_get_prov_jsons(QNetworkReply*)));
 
         // FIXME for debug
         qDebug() << "Sync" << QString::fromUtf8(get_prov_json.data(), get_prov_json.size());
@@ -1006,9 +1018,12 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
             return;
         }
 #endif
-
+//        ld_binary_array = "abc";
         qDebug() << "Current dir: " << QDir::currentPath();
-        QString ld_file_name = "devs/" + jobj_prov_data_prov_data["id"].toString();
+        QString ld_file_name =  "devs/";
+        ld_file_name += QString::number(jobj_prov_data_prov_data["id"].toInt());
+        ld_file_name += ".bin";
+        qDebug() << "File name: " << ld_file_name;
         QFile out(ld_file_name);
         out.open(QIODevice::WriteOnly);
         out.write(ld_binary_array);
@@ -1070,7 +1085,7 @@ void MainWindow::on_actionRegister_triggered() {
 
         if((uint64_t)QDateTime::currentSecsSinceEpoch() < login_expires) {
 
-//            qDebug() << "Token: " << user_token;
+            qDebug() << "Token: " << ezlogic_prov_data_user_token;
 
             QJsonObject jobj_get_uuid_root;
             QJsonObject jobj_param;
@@ -1096,7 +1111,7 @@ void MainWindow::on_actionRegister_triggered() {
             QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
             connect(manager, SIGNAL(finished(QNetworkReply*)),
-                    this, SLOT(success_prov_dat(QNetworkReply*)));
+                    this, SLOT(ezlogic_success_prov_dat(QNetworkReply*)));
 
             // FIXME for debug
             qDebug() << "Sync" << QString::fromUtf8(getUUID_JSON.data(), getUUID_JSON.size());
@@ -1120,8 +1135,8 @@ void MainWindow::on_actionClear_Table_triggered() {
 
 void MainWindow::on_actionAbout_EzloPi_triggered() {
     QMessageBox::about(this, "EzloPi V1.2.0", \
-                       "EzloPi is an open-source project contributed by Ezlo Innovation"
-                       "to extend the capabilities of ESP32/ESP32-C3 chipset-based devices "
+                       "EzloPi is an open-source project contributed by Ezlo Innovation "
+                       "to extend the capabilities of ESP32 chipset-based devices "
                        "and platforms. It provides unparalleled capabilities to configure and "
                        "control your ESP-based devices and bring any of your automation ideas to life."
                        "\nEzloPi Version 1.2.0\n"
@@ -1252,13 +1267,29 @@ void MainWindow::ezlogic_table_adddev_spi(ezpi_device_SPI_t spi_device) {
 }
 
 void MainWindow::ezlogic_serial_receive(void) {
-    *ezlogic_read_data_serial += ezlogic_serial_port->readAll();
+    QByteArray serial_read_temp =  ezlogic_serial_port->readAll();
+    *ezlogic_read_data_serial += serial_read_temp;
 //    qDebug() << "Serial read on ready : " << QString::fromLocal8Bit(*ezpi_read_data_serial);
+    QDateTime date = QDateTime::currentDateTime();
+    QString formattedTime = date.toString("dd.MM.yyyy hh:mm:ss");
+//    QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
+
+//    qDebug() << "Date:"+formattedTime;
+    if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(formattedTime + ": " + QString::fromLocal8Bit(serial_read_temp));
+    serial_read_temp.clear();
 }
 
 void MainWindow::ezlogic_serial_process(void) {
 
     ezlogic_timer_serial_complete.stop();
+
+//    QDateTime date = QDateTime::currentDateTime();
+//    QString formattedTime = date.toString("dd.MM.yyyy hh:mm:ss");
+////    QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
+
+//    qDebug() << "Date:"+formattedTime;
+
+//    if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(formattedTime + ": " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
 
     int idx = 0;
     int rx_size = ezlogic_read_data_serial->count();
@@ -1375,7 +1406,7 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
     QJsonParseError jsonError;
     QJsonDocument doc_get_info = QJsonDocument::fromJson(serial_read, &jsonError);
 
-#if 0
+#if 1
     if (jsonError.error != QJsonParseError::NoError){
         qDebug() << jsonError.errorString();
         QMessageBox::warning(this, "Error!", "Incorrect data format received!");
@@ -1410,7 +1441,7 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
 void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
 
     QJsonParseError jsonError;
-    QJsonDocument doc_get_config = QJsonDocument::fromJson(serial_read, &jsonError);
+    QJsonDocument doc_get_config = QJsonDocument::fromJson(QString::fromLocal8Bit(serial_read).toUtf8(), &jsonError);
 
     if (jsonError.error != QJsonParseError::NoError){
         qDebug() << jsonError.errorString();

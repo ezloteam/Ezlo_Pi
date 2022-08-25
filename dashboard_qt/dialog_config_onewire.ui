@@ -184,6 +184,11 @@
      <string>DHT11</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>DHT22</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_device_subtype">
    <property name="geometry">

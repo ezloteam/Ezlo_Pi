@@ -40,7 +40,7 @@ HEADERS  += mainwindow.h \
     ezuuid.h \
     res_strings.h
 
-#CONFIG += console
+CONFIG += console
 
 FORMS    += mainwindow.ui \
     dialog_config_adc.ui \
