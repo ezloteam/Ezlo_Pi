@@ -50,6 +50,3 @@ v1_0_6_102  Date: Thu 25 Aug 2022 03:57:38 PM +0545
 v1_0_1_104  Date: Thu 25 Aug 2022 04:33:34 PM +0545
 	added factory info in qt-info response
 
-v1_1_1_105  Date: Thu 25 Aug 2022 04:36:13 PM +0545
-	Increased minor version
-

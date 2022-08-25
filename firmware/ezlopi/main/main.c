@@ -10,7 +10,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "wifi.h"
+#include "wifi_interface.h"
 #include "http.h"
 #include "debug.h"
 #include "frozen.h"

@@ -6,7 +6,7 @@
 #include "factory_info.h"
 #include "debug.h"
 
-static s_factory_info_t factory_info;
+static s_factory_info_t *factory_info = NULL;
 static const esp_partition_t *partition_ctx = NULL;
 
 static unsigned long long factory_info_get_id(void);
@@ -63,62 +63,61 @@ static const char *default_ssl_shared_key = "-----BEGIN CERTIFICATE-----\r\nMIIC
 
 s_factory_info_t *factory_info_get_info(void)
 {
-    return &factory_info;
+    if (NULL == factory_info)
+    {
+        factory_info_init();
+    }
+
+    return factory_info;
 }
 
 s_factory_info_t *factory_info_init(void)
 {
-    memset(&factory_info, 0, sizeof(s_factory_info_t));
-    partition_ctx = esp_partition_find_first((esp_partition_type_t)FACTORY_INFO_PARTITION_TYPE, FACTORY_INFO_PARTITION_SUBTYPE, (const char *)FACTORY_INFO_PARTITION_NAME);
-
-    if (partition_ctx != NULL)
+    factory_info = malloc(sizeof(s_factory_info_t));
+    if (NULL != factory_info)
     {
-        TRACE_I("Partition found '%s' at offset '0x%x' with size '0x%x'",
-                partition_ctx->label, partition_ctx->address, partition_ctx->size);
+        memset(factory_info, 0, sizeof(s_factory_info_t));
+        partition_ctx = esp_partition_find_first((esp_partition_type_t)FACTORY_INFO_PARTITION_TYPE, FACTORY_INFO_PARTITION_SUBTYPE, (const char *)FACTORY_INFO_PARTITION_NAME);
 
-        factory_info.id = factory_info_get_id();
-        factory_info.controller_uuid = factory_info_get_uuid();
-        factory_info.zwave_region = factory_info_get_zwave_region();
-        factory_info.default_wifi_ssid = factory_info_get_default_wifi_ssid();
-        factory_info.default_wifi_password = factory_info_get_default_wifi_password();
-        factory_info.name = factory_info_get_name();
-        factory_info.cloud_server = factory_info_get_cloud_server();
-        factory_info.provisioning_server = factory_info_get_provisioning_server();
-        factory_info.provisioning_token = factory_info_get_provisioning_token();
-        factory_info.ca_certificate = factory_info_get_ca_certificate();
-        factory_info.ssl_private_key = factory_info_get_ssl_private_key();
-        factory_info.ssl_shared_key = factory_info_get_ssl_shared_key();
+        if (partition_ctx != NULL)
+        {
+            TRACE_I("Partition found '%s' at offset '0x%x' with size '0x%x'",
+                    partition_ctx->label, partition_ctx->address, partition_ctx->size);
+
+            factory_info->id = factory_info_get_id();
+            factory_info->controller_uuid = factory_info_get_uuid();
+            factory_info->zwave_region = factory_info_get_zwave_region();
+            factory_info->default_wifi_ssid = factory_info_get_default_wifi_ssid();
+            factory_info->default_wifi_password = factory_info_get_default_wifi_password();
+            factory_info->name = factory_info_get_name();
+            factory_info->cloud_server = factory_info_get_cloud_server();
+            factory_info->provisioning_server = factory_info_get_provisioning_server();
+            factory_info->provisioning_token = factory_info_get_provisioning_token();
+            factory_info->ca_certificate = factory_info_get_ca_certificate();
+            factory_info->ssl_private_key = factory_info_get_ssl_private_key();
+            factory_info->ssl_shared_key = factory_info_get_ssl_shared_key();
+        }
+        else
+        {
+            TRACE_E("Partition \"id\" not found!!");
+        }
+
+        factory_info_set_default();
+
+        TRACE_D("id [off: %d, len: %d]: %llu", ID_OFFSET, sizeof(long long), factory_info->id);
+
+        PRINT_FACTORY_INFO("controller_uuid", UUID_OFFSET, factory_info->controller_uuid);
+        PRINT_FACTORY_INFO("zwave_region", ZWAVE_REGION_OFFSET, factory_info->zwave_region);
+        PRINT_FACTORY_INFO("name", PRODUCT_NAME_OFFSET, factory_info->name);
+        PRINT_FACTORY_INFO("cloud_server", CLOUD_SERVER_OFFSET, factory_info->cloud_server);
+        PRINT_FACTORY_INFO("provisioning_server", PROVISIONING_SERVER_OFFSET, factory_info->provisioning_server);
+        PRINT_FACTORY_INFO("provisioning_token", PROVISIONING_TOKEN_OFFSET, factory_info->provisioning_token);
+        PRINT_FACTORY_INFO("ca_certificate", CA_CERTIFICATE_OFFSET, factory_info->ca_certificate);
+        PRINT_FACTORY_INFO("ssl_private_key", SSL_PRIVATE_KEY_OFFSET, factory_info->ssl_private_key);
+        PRINT_FACTORY_INFO("ssl_shared_key", SSL_SHARED_KEY_OFFSET, factory_info->ssl_shared_key);
     }
-    else
-    {
-        TRACE_E("Partition \"id\" not found!!");
-    }
 
-    factory_info_set_default();
-
-    TRACE_D("id [off: %d, len: %d]: %llu", ID_OFFSET, sizeof(long long), factory_info.id);
-
-    PRINT_FACTORY_INFO("controller_uuid", UUID_OFFSET, factory_info.controller_uuid);
-    PRINT_FACTORY_INFO("zwave_region", ZWAVE_REGION_OFFSET, factory_info.zwave_region);
-    PRINT_FACTORY_INFO("name", PRODUCT_NAME_OFFSET, factory_info.name);
-    PRINT_FACTORY_INFO("cloud_server", CLOUD_SERVER_OFFSET, factory_info.cloud_server);
-    PRINT_FACTORY_INFO("provisioning_server", PROVISIONING_SERVER_OFFSET, factory_info.provisioning_server);
-    PRINT_FACTORY_INFO("provisioning_token", PROVISIONING_TOKEN_OFFSET, factory_info.provisioning_token);
-    PRINT_FACTORY_INFO("ca_certificate", CA_CERTIFICATE_OFFSET, factory_info.ca_certificate);
-    PRINT_FACTORY_INFO("ssl_private_key", SSL_PRIVATE_KEY_OFFSET, factory_info.ssl_private_key);
-    PRINT_FACTORY_INFO("ssl_shared_key", SSL_SHARED_KEY_OFFSET, factory_info.ssl_shared_key);
-
-    // TRACE_D("controller_uuid [off: %d, len: %d]: \n%s", UUID_OFFSET, strlen(factory_info.controller_uuid), factory_info.controller_uuid);
-    // TRACE_D("zwave_region [off: %d, len: %d]: \n%s", ZWAVE_REGION_OFFSET, strlen(factory_info.zwave_region), factory_info.zwave_region);
-    // TRACE_D("name [off: %d, len: %d]: \n%s", PRODUCT_NAME_OFFSET, strlen(factory_info.name), factory_info.name);
-    // TRACE_D("cloud_server [off: %d, len: %d]: \n%s", CLOUD_SERVER_OFFSET, strlen(factory_info.cloud_server), factory_info.cloud_server);
-    // TRACE_D("provisioning_server [off: %d, len: %d]: \n%s", PROVISIONING_SERVER_OFFSET, strlen(factory_info.provisioning_server), factory_info.provisioning_server);
-    // TRACE_D("provisioning_token [off: %d, len: %d]: \n%s", PROVISIONING_TOKEN_OFFSET, strlen(factory_info.provisioning_token), factory_info.provisioning_token);
-    // TRACE_D("ca_certificate [off: %d, len: %d]: \n%s", CA_CERTIFICATE_OFFSET, strlen(factory_info.ca_certificate), factory_info.ca_certificate);
-    // TRACE_D("ssl_private_key [off: %d, len: %d]: \n%s", SSL_PRIVATE_KEY_OFFSET, strlen(factory_info.ssl_private_key), factory_info.ssl_private_key);
-    // TRACE_D("ssl_shared_key [off: %d, len: %d]: \n%s", SSL_SHARED_KEY_OFFSET, strlen(factory_info.ssl_shared_key), factory_info.ssl_shared_key);
-
-    return &factory_info;
+    return factory_info;
 }
 
 static unsigned long long factory_info_get_id(void)
@@ -234,28 +233,28 @@ static char *factory_info_get_ssl_shared_key(void)
 
 static void factory_info_set_default(void)
 {
-    if (((NULL == factory_info.provisioning_server) || ('\0' == factory_info.provisioning_server[0])) ||
-        ((NULL == factory_info.provisioning_token) || ('\0' == factory_info.provisioning_token[0])) ||
-        ((NULL == factory_info.cloud_server) || ('\0' == factory_info.cloud_server[0])) ||
-        ((NULL == factory_info.ca_certificate) || (NULL == strstr(factory_info.ca_certificate, "-----BEGIN CERTIFICATE-----"))) ||
-        ((NULL == factory_info.ssl_private_key) || (NULL == strstr(factory_info.ssl_private_key, "-----BEGIN PRIVATE KEY-----"))) ||
-        ((NULL == factory_info.ssl_shared_key) || (NULL == strstr(factory_info.ssl_shared_key, "-----BEGIN CERTIFICATE-----"))))
+    if (((NULL == factory_info->provisioning_server) || ('\0' == factory_info->provisioning_server[0])) ||
+        ((NULL == factory_info->provisioning_token) || ('\0' == factory_info->provisioning_token[0])) ||
+        ((NULL == factory_info->cloud_server) || ('\0' == factory_info->cloud_server[0])) ||
+        ((NULL == factory_info->ca_certificate) || (NULL == strstr(factory_info->ca_certificate, "-----BEGIN CERTIFICATE-----"))) ||
+        ((NULL == factory_info->ssl_private_key) || (NULL == strstr(factory_info->ssl_private_key, "-----BEGIN PRIVATE KEY-----"))) ||
+        ((NULL == factory_info->ssl_shared_key) || (NULL == strstr(factory_info->ssl_shared_key, "-----BEGIN CERTIFICATE-----"))))
     {
         TRACE_W("ID-Info incomplete. Setting up default ID-Info!");
 
-        factory_info.id = 100004005ULL;
-        free_and_assign_new(factory_info.controller_uuid, default_uuid);
-        free_and_assign_new(factory_info.zwave_region, default_zwave_region);
-        free_and_assign_new(factory_info.default_wifi_ssid, default_wifi_ssid_1);
-        free_and_assign_new(factory_info.default_wifi_password, default_wifi_password_1);
-        free_and_assign_new(factory_info.name, default_name);
-        free_and_assign_new(factory_info.provisioning_server, default_provisioning_server);
-        free_and_assign_new(factory_info.provisioning_token, default_provisioning_token);
-        free_and_assign_new(factory_info.cloud_server, default_cloud_server);
-        free_and_assign_new(factory_info.ca_certificate, default_ca_certificate);
-        free_and_assign_new(factory_info.ssl_private_key, default_ssl_private_key);
-        free_and_assign_new(factory_info.ssl_shared_key, default_ssl_shared_key);
-        free_and_assign_new(factory_info.ssl_public_key, NULL);
+        factory_info->id = 100004005ULL;
+        free_and_assign_new(factory_info->controller_uuid, default_uuid);
+        free_and_assign_new(factory_info->zwave_region, default_zwave_region);
+        free_and_assign_new(factory_info->default_wifi_ssid, default_wifi_ssid_1);
+        free_and_assign_new(factory_info->default_wifi_password, default_wifi_password_1);
+        free_and_assign_new(factory_info->name, default_name);
+        free_and_assign_new(factory_info->provisioning_server, default_provisioning_server);
+        free_and_assign_new(factory_info->provisioning_token, default_provisioning_token);
+        free_and_assign_new(factory_info->cloud_server, default_cloud_server);
+        free_and_assign_new(factory_info->ca_certificate, default_ca_certificate);
+        free_and_assign_new(factory_info->ssl_private_key, default_ssl_private_key);
+        free_and_assign_new(factory_info->ssl_shared_key, default_ssl_shared_key);
+        free_and_assign_new(factory_info->ssl_public_key, NULL);
     }
     else
     {

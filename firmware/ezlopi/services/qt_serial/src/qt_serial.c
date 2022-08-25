@@ -20,6 +20,9 @@
 #include "debug.h"
 #include "nvs_storage.h"
 #include "qt_serial.h"
+#include "wifi_interface.h"
+#include "factory_info.h"
+#include "version.h"
 
 static const int RX_BUF_SIZE = 3096;
 
@@ -207,29 +210,34 @@ void QT_GET_INFO()
 
     if (get_info)
     {
+        char wifi_info[64];
         esp_chip_info_t chip_info;
         esp_chip_info(&chip_info);
+        s_factory_info_t *factory = factory_info_get_info();
+        nvs_storage_read_wifi(wifi_info, 64);
 
-        cJSON_AddNumberToObject(get_info, "cmd", 1);
-        cJSON_AddNumberToObject(get_info, "status", 1);
-        cJSON_AddNumberToObject(get_info, "v_sw", 3625);
-        cJSON_AddNumberToObject(get_info, "v_type", 1);
-        cJSON_AddNumberToObject(get_info, "build", 17);
-        cJSON_AddNumberToObject(get_info, "v_idf", 8456);
-        cJSON_AddNumberToObject(get_info, "uptime", 1234);
-        cJSON_AddNumberToObject(get_info, "build_date", 1657623331);
-        cJSON_AddNumberToObject(get_info, "boot_count", 15);
-        cJSON_AddNumberToObject(get_info, "boot_reason", 2);
-        cJSON_AddNumberToObject(get_info, "mac", 45647894);
-        cJSON_AddStringToObject(get_info, "uuid", "65261d76-e584-4d35-aff1-d84bd043");
-        cJSON_AddNumberToObject(get_info, "serial", 10004032);
-        cJSON_AddStringToObject(get_info, "ssid", "ssid");
+        if (factory)
+        {
+            cJSON_AddNumberToObject(get_info, "cmd", 1);
+            cJSON_AddNumberToObject(get_info, "status", 1);
+            cJSON_AddNumberToObject(get_info, "v_sw", (MAJOR << 16) | (MINOR << 8) | BATCH);
+            cJSON_AddNumberToObject(get_info, "v_type", 1);
+            cJSON_AddNumberToObject(get_info, "build", BUILD);
+            cJSON_AddNumberToObject(get_info, "v_idf", (4 << 16) | (4 << 8) | 1);
+            cJSON_AddNumberToObject(get_info, "uptime", 1234);
+            cJSON_AddNumberToObject(get_info, "build_date", 1657623331);
+            cJSON_AddNumberToObject(get_info, "boot_count", 15);
+            cJSON_AddNumberToObject(get_info, "boot_reason", 2);
+            cJSON_AddNumberToObject(get_info, "mac", 45647894);
+            cJSON_AddStringToObject(get_info, "uuid", factory->controller_uuid);
+            cJSON_AddNumberToObject(get_info, "serial", factory->id);
+            cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
 
-        cJSON_AddNumberToObject(get_info, "dev_type", 1);
-        cJSON_AddNumberToObject(get_info, "dev_flash", 64256);
-        cJSON_AddNumberToObject(get_info, "dev_free_flash", 300);
-        cJSON_AddNumberToObject(get_info, "mac", 45647894);
-        cJSON_AddStringToObject(get_info, "dev_name", "My Device");
+            cJSON_AddNumberToObject(get_info, "dev_type", 1);
+            cJSON_AddNumberToObject(get_info, "dev_flash", 64256);
+            cJSON_AddNumberToObject(get_info, "dev_free_flash", 300);
+            cJSON_AddStringToObject(get_info, "dev_name", factory->name);
+        }
 
         char *my_json_string = cJSON_Print(get_info);
         cJSON_Delete(get_info); // free Json object
@@ -255,11 +263,17 @@ void QT_SET_WIFI(const char *data)
         }
         if (cJSON_GetObjectItem(root, "pass"))
         {
-            char *pass = cJSON_GetObjectItem(root, "pass")->valuestring;
             char *ssid = cJSON_GetObjectItem(root, "ssid")->valuestring;
+            char *pass = cJSON_GetObjectItem(root, "pass")->valuestring;
 
-            uint8_t status_connect = 1; // WIFI_CONNET;
-            QT_RESPONE(2, 1, status_connect);
+            if (ssid && pass && (strlen(pass) >= 8))
+            {
+                set_new_wifi_flag();
+                wifi_connect((const char *)ssid, (const char *)pass);
+            }
+
+            // uint8_t status_connect = 1; // WIFI_CONNET;
+            // QT_RESPONE(2, 1, status_connect);
         }
 
         cJSON_Delete(root); // free Json string

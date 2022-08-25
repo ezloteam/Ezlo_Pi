@@ -13,7 +13,7 @@ idf_component_register(SRCS "${provisioning_src}"
     esp_hw_support
     factory_info
     devices_common
-    wifi
+    wifi_interface
     data
     devices
     scenes
