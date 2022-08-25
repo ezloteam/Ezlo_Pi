@@ -32,16 +32,17 @@ static void main_task(void *pv)
     char url[128];
     s_factory_info_t *factory = factory_info_get_info();
 
-    snprintf(url, 128, "%s/getserver?json=true", factory->cloud_server);
-    TRACE_D("Calling Cloud Server api: %s\r\n", url);
-
     while (1)
     {
         char *ws_endpoint = NULL;
         struct json_token wss_uri_tok = JSON_INVALID_TOKEN;
 
         wait_for_wifi_to_connect();
+
+        snprintf(url, 128, "%s/getserver?json=true", factory->cloud_server);
+        TRACE_D("Calling Cloud Server api: %s\r\n", url);
         ws_endpoint = http_get_request(url, factory->ssl_private_key, factory->ssl_shared_key, factory->ca_certificate);
+
         if (ws_endpoint)
         {
             TRACE_D("ws_endpoint: %s\r\n", ws_endpoint);

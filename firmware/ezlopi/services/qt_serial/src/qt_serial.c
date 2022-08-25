@@ -214,14 +214,15 @@ void QT_GET_INFO()
         esp_chip_info_t chip_info;
         esp_chip_info(&chip_info);
         s_factory_info_t *factory = factory_info_get_info();
-        nvs_storage_read_wifi(wifi_info, 64);
+        memset(wifi_info, 0, sizeof(wifi_info));
+        nvs_storage_read_wifi(wifi_info, sizeof(wifi_info));
 
         if (factory)
         {
             cJSON_AddNumberToObject(get_info, "cmd", 1);
             cJSON_AddNumberToObject(get_info, "status", 1);
             cJSON_AddNumberToObject(get_info, "v_sw", (MAJOR << 16) | (MINOR << 8) | BATCH);
-            cJSON_AddNumberToObject(get_info, "v_type", 1);
+            cJSON_AddNumberToObject(get_info, "v_type", 4000);
             cJSON_AddNumberToObject(get_info, "build", BUILD);
             cJSON_AddNumberToObject(get_info, "v_idf", (4 << 16) | (4 << 8) | 1);
             cJSON_AddNumberToObject(get_info, "uptime", 1234);

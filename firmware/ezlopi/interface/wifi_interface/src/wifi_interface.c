@@ -224,5 +224,5 @@ void wifi_connect(const char *ssid, const char *pass)
 
 void wait_for_wifi_to_connect(void)
 {
-    xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+    xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 }

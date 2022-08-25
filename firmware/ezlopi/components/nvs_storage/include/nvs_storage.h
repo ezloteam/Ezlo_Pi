@@ -8,6 +8,8 @@ extern "C"
 {
 #endif
 
+#define NVS_WIFI_MAGIC      0x5647ABCD
+
     void nvs_storage_init(void);
     void nvs_storaget_deinit(void);
 
