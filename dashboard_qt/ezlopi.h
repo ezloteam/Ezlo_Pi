@@ -46,8 +46,8 @@ typedef QString EZPI_STRING;
 #define     SIZE_EZPI_OFFSET_HUB_ID_0                           0XE000
 #define     SIZE_EZPI_OFFSET_HUB_ID_1                           0XF000
 
-#define     EZPI_SERIAL_READ_TIMEOUT                            3000
-#define     EZPI_FIRMWARE_CHECK_TIMEOUT                         4000
+#define     EZPI_SERIAL_READ_TIMEOUT                            4000
+#define     EZPI_FIRMWARE_CHECK_TIMEOUT                         5000
 
 enum ezpi_high_low {
     EZPI_LOW,
@@ -99,7 +99,7 @@ enum ezpi_item_type {
 };
 
 enum ezpi_cmd {
-    CMD_ACTION_NONE,
+    CMD_ACTION_RESET,
     CMD_ACTION_GET_INFO,
     CMD_ACTION_SET_WIFI,
     CMD_ACTION_SET_CONFIG,
@@ -121,6 +121,13 @@ enum ezpi_adc_resln {
     EZPI_ADC_RESLN_10_BIT,
     EZPI_ADC_RESLN_12_BIT,
     EZPI_ADC_RESLN_TOTAL,
+};
+
+enum ezpi_log_level {
+    EZPI_LOG_NONE,
+    EZPI_LOG_INFO,
+    EZPI_LOG_DEBUG,
+    EZPI_LOG_TOTAL
 };
 
 typedef struct ezpi_info {

@@ -245,7 +245,6 @@ Makefile: esp_gpio_config.pro C:\Qt\5.15.2\msvc2019_64\mkspecs\win32-msvc\qmake.
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\resolve_config.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\exclusive_builds_post.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\default_post.prf \
-		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\win32\console.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\qtquickcompiler.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\precompile_header.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\warn_on.prf \
@@ -257,6 +256,7 @@ Makefile: esp_gpio_config.pro C:\Qt\5.15.2\msvc2019_64\mkspecs\win32-msvc\qmake.
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\uic.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\qmake_use.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\file_copies.prf \
+		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\win32\windows.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\testcase_targets.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\exceptions.prf \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\yacc.prf \
@@ -267,13 +267,15 @@ Makefile: esp_gpio_config.pro C:\Qt\5.15.2\msvc2019_64\mkspecs\win32-msvc\qmake.
 		C:\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPort.prl \
 		C:\Qt\5.15.2\msvc2019_64\lib\Qt5Network.prl \
 		C:\Qt\5.15.2\msvc2019_64\lib\Qt5Core.prl \
+		C:\Qt\5.15.2\msvc2019_64\lib\qtmain.prl \
 		C:\Qt\5.15.2\msvc2019_64\mkspecs\features\build_pass.prf \
 		ezlopi.qrc \
 		C:\Qt\5.15.2\msvc2019_64\lib\Qt5Widgetsd.prl \
 		C:\Qt\5.15.2\msvc2019_64\lib\Qt5Guid.prl \
 		C:\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPortd.prl \
 		C:\Qt\5.15.2\msvc2019_64\lib\Qt5Networkd.prl \
-		C:\Qt\5.15.2\msvc2019_64\lib\Qt5Cored.prl
+		C:\Qt\5.15.2\msvc2019_64\lib\Qt5Cored.prl \
+		C:\Qt\5.15.2\msvc2019_64\lib\qtmaind.prl
 	$(QMAKE) -o Makefile esp_gpio_config.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\spec_pre.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\common\angle.conf:
@@ -436,7 +438,6 @@ C:\Qt\5.15.2\msvc2019_64\mkspecs\features\win32\default_pre.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\resolve_config.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\exclusive_builds_post.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\default_post.prf:
-C:\Qt\5.15.2\msvc2019_64\mkspecs\features\win32\console.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\qtquickcompiler.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\precompile_header.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\warn_on.prf:
@@ -448,6 +449,7 @@ C:\Qt\5.15.2\msvc2019_64\mkspecs\features\win32\opengl.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\uic.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\qmake_use.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\file_copies.prf:
+C:\Qt\5.15.2\msvc2019_64\mkspecs\features\win32\windows.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\testcase_targets.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\exceptions.prf:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\yacc.prf:
@@ -458,6 +460,7 @@ C:\Qt\5.15.2\msvc2019_64\lib\Qt5Gui.prl:
 C:\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPort.prl:
 C:\Qt\5.15.2\msvc2019_64\lib\Qt5Network.prl:
 C:\Qt\5.15.2\msvc2019_64\lib\Qt5Core.prl:
+C:\Qt\5.15.2\msvc2019_64\lib\qtmain.prl:
 C:\Qt\5.15.2\msvc2019_64\mkspecs\features\build_pass.prf:
 ezlopi.qrc:
 C:\Qt\5.15.2\msvc2019_64\lib\Qt5Widgetsd.prl:
@@ -465,6 +468,7 @@ C:\Qt\5.15.2\msvc2019_64\lib\Qt5Guid.prl:
 C:\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPortd.prl:
 C:\Qt\5.15.2\msvc2019_64\lib\Qt5Networkd.prl:
 C:\Qt\5.15.2\msvc2019_64\lib\Qt5Cored.prl:
+C:\Qt\5.15.2\msvc2019_64\lib\qtmaind.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile esp_gpio_config.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
 

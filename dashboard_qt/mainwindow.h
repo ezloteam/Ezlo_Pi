@@ -55,6 +55,7 @@ private slots:
     void on_pushButton_remove_device_clicked();
     void on_pushButton_get_ezpi_config_clicked();
     void on_pushButton_set_ezpi_config_clicked();
+    void on_pushButton_device_restart_clicked();
 
     // Custom slots
     void ezlogic_log_write_flash();
@@ -68,12 +69,14 @@ private slots:
     void ezlogic_success_get_prov_jsons(QNetworkReply *d);
 
     // UI Actions
-    void on_actionEnable_Log_triggered();
     void on_actionRegister_triggered();
     void on_actionLogin_triggered();
     void on_actionAbout_EzloPi_triggered();
     void on_actionExit_triggered();
     void on_actionClear_Table_triggered();
+    void on_actionDisable_triggered();
+    void on_actionInfo_triggered();
+    void on_actionDebug_triggered();
 
 private:
 
@@ -114,7 +117,7 @@ private:
     uint8_t ezlogic_device_counter;
 
     // Console log flag
-    EZPI_BOOL ezlogic_flag_enable_log;
+//    EZPI_BOOL ezlogic_flag_enable_log;
 
     // Provisioning task global variables
     QString ezlogic_prov_data_user_token;
@@ -134,6 +137,8 @@ private:
 
     QLabel *ezlogic_status = nullptr;
 
+    ezpi_log_level ezlogic_log_level;
+
     // Private methods
     void ezlogic_table_adddev_digital_op(ezpi_device_digital_op_t);
     void ezlogic_table_adddev_digital_ip(ezpi_device_digital_ip_t);
@@ -142,6 +147,7 @@ private:
     void ezlogic_table_adddev_i2c(ezpi_device_I2C_t);
     void ezlogic_table_adddev_spi(ezpi_device_SPI_t);
 
+    void ezlogic_action_restart(QByteArray);
     void ezlogic_action_set_wifi(QByteArray);
     void ezlogic_action_check_info(QByteArray);
     void ezlogic_action_set_config_process(QByteArray);

@@ -23,7 +23,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>726</width>
+      <width>781</width>
       <height>31</height>
      </rect>
     </property>
@@ -122,9 +122,9 @@
     <property name="geometry">
      <rect>
       <x>637</x>
-      <y>330</y>
+      <y>425</y>
       <width>151</width>
-      <height>121</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="title">
@@ -134,20 +134,20 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>30</y>
+       <y>24</y>
        <width>111</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>Get config</string>
+      <string>Get Config</string>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton_set_ezpi_config">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>70</y>
+       <y>64</y>
        <width>111</width>
        <height>31</height>
       </rect>
@@ -161,9 +161,9 @@
     <property name="geometry">
      <rect>
       <x>639</x>
-      <y>190</y>
+      <y>300</y>
       <width>149</width>
-      <height>129</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="title">
@@ -173,7 +173,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>30</y>
+       <y>25</y>
        <width>111</width>
        <height>31</height>
       </rect>
@@ -186,7 +186,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
+       <y>68</y>
        <width>111</width>
        <height>31</height>
       </rect>
@@ -200,7 +200,7 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>150</y>
+      <y>254</y>
       <width>131</width>
       <height>26</height>
      </rect>
@@ -225,7 +225,7 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>125</y>
+      <y>229</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -238,7 +238,7 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>65</y>
+      <y>169</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -251,12 +251,60 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>90</y>
+      <y>194</y>
       <width>131</width>
       <height>26</height>
      </rect>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_reset">
+    <property name="geometry">
+     <rect>
+      <x>641</x>
+      <y>53</y>
+      <width>141</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Reset</string>
+    </property>
+    <widget class="QPushButton" name="pushButton_device_restart">
+     <property name="geometry">
+      <rect>
+       <x>19</x>
+       <y>23</y>
+       <width>111</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Restart</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_device_factory_reset">
+     <property name="geometry">
+      <rect>
+       <x>17</x>
+       <y>65</y>
+       <width>121</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Factory Restore</string>
+     </property>
+    </widget>
+   </widget>
+   <zorder>groupBox_reset</zorder>
+   <zorder>layoutWidget</zorder>
+   <zorder>splitter</zorder>
+   <zorder>groupBox_device_config</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>comboBox_esp32_board_type</zorder>
+   <zorder>label_board_select</zorder>
+   <zorder>label_registered_devices</zorder>
+   <zorder>comboBox_registered_devices</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -285,7 +333,15 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionEnable_Log"/>
+    <widget class="QMenu" name="menuConsole_Log_mode">
+     <property name="title">
+      <string>Console Log mode</string>
+     </property>
+     <addaction name="actionDisable"/>
+     <addaction name="actionInfo"/>
+     <addaction name="actionDebug"/>
+    </widget>
+    <addaction name="menuConsole_Log_mode"/>
     <addaction name="actionClear_Table"/>
    </widget>
    <addaction name="menuFile"/>
@@ -311,17 +367,6 @@
     <string>About EzloPi</string>
    </property>
   </action>
-  <action name="actionEnable_Log">
-   <property name="text">
-    <string>Disable Log</string>
-   </property>
-   <property name="statusTip">
-    <string>Check to enable log to the log console.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+L</string>
-   </property>
-  </action>
   <action name="actionRegister">
    <property name="text">
     <string>Register</string>
@@ -335,6 +380,33 @@
   <action name="actionClear_Table">
    <property name="text">
     <string>Clear Table and data</string>
+   </property>
+  </action>
+  <action name="actionDisable">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Disable</string>
+   </property>
+  </action>
+  <action name="actionInfo">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Info</string>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Debug</string>
    </property>
   </action>
  </widget>

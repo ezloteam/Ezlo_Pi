@@ -40,7 +40,7 @@ HEADERS  += mainwindow.h \
     ezuuid.h \
     res_strings.h
 
-CONFIG += console
+#CONFIG += console
 
 FORMS    += mainwindow.ui \
     dialog_config_adc.ui \
@@ -53,8 +53,6 @@ FORMS    += mainwindow.ui \
     dialog_login.ui \
     dialog_wifi.ui
 
-DISTFILES += \
-    C:/Users/lomas/Downloads/EZLO_ICON.png
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

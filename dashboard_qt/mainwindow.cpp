@@ -35,9 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ezlogic_flag_serial_port_open(false),
     ezlogic_flag_is_ezlopi(false),
     ezlogic_device_counter(0),
-    ezlogic_flag_enable_log(true),
     ezlogic_flag_registered(false),
-    ezlogic_flag_fimware_present(false)
+    ezlogic_flag_fimware_present(false),
+    ezlogic_log_level(EZPI_LOG_INFO)
 {
     // Create and Init UI
     ui = new Ui::MainWindow;
@@ -97,6 +97,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox_registered_devices->setEnabled(false);
 
     ui->comboBox_esp32_board_type->setEnabled(false);
+    ui->pushButton_device_restart->setEnabled(false);
+    ui->pushButton_device_factory_reset->setEnabled(false);
 
     connect(ui->comboBox_uart_list,SIGNAL(currentIndexChanged(const QString&)),
             this,SLOT(on_comboBox_uart_list_currentIndexChanged(const QString&)));
@@ -137,11 +139,11 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
                 ui->pushButton_scan_uart_ports->setDisabled(true);
                 ui->comboBox_uart_list->setDisabled(true);
 
-                ui->actionRegister->setEnabled(true);
+                ui->actionRegister->setEnabled(true);                
 
                 // Display message on console
                 qDebug() << ezlogic_serial_port_info.portName() << " serial port is open.";
-                if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + " serial port is open.");
+                if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + " serial port is open.");
 
                 // Check firmware
                 ezlogic_check_firmware(); // Send get info json
@@ -152,11 +154,11 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
 
             } else {
                 qDebug() << "Failed opeaning serial port: " << ui->comboBox_uart_list->currentText();
-                if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append("Failed opeaning serial port: " + ui->comboBox_uart_list->currentText());
+                if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append("Failed opeaning serial port: " + ui->comboBox_uart_list->currentText());
             }
         } else {
             qDebug() << ezlogic_serial_port_info.portName() <<  ": port is busy !";
-            if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
+            if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
         }
     } else {
         ezlogic_serial_port->close();
@@ -170,7 +172,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
         ui->actionRegister->setEnabled(false);
 
         qDebug() << ezlogic_serial_port_info.portName() << " serial port is close.";
-        if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + " serial port is close.");
+        if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + " serial port is close.");
 
         ezpi_show_status_message("Disconnected to " + ezlogic_serial_port_info.portName());
 
@@ -192,6 +194,8 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
         ui->tableWidget_device_table->setEnabled(false);
 
         ui->comboBox_registered_devices->setEnabled(false);
+
+        ui->pushButton_device_restart->setEnabled(false);
     }
 }
 void MainWindow::on_comboBox_uart_list_currentIndexChanged() {
@@ -202,7 +206,7 @@ void MainWindow::on_comboBox_uart_list_currentIndexChanged() {
         }
     }
     qDebug() << "New selected port: " << ezlogic_serial_port_info.portName();
-    if(ezlogic_flag_enable_log) {
+    if(ezlogic_log_level == EZPI_LOG_INFO) {
         ui->textBrowser_console_log->append("New selected port: " + ezlogic_serial_port_info.portName() + "\n");
     }
 }
@@ -538,6 +542,14 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
     ezlogic_serial_transfer(document_root_set_device.toJson(QJsonDocument::Compact));
 }
 
+void MainWindow::on_pushButton_device_restart_clicked() {
+    ezlogic_cmd_state = CMD_ACTION_RESET;
+    QString ezlogic_reset_command = "{\"cmd\":0}";
+    ezlogic_serial_transfer(ezlogic_reset_command.toUtf8());
+    QMessageBox::warning(this, "Device ready to restart", "Connected hardware device will now restart!");
+}
+
+
 // Custom Slots
 void MainWindow::ezlogic_log_write_flash() {
 
@@ -616,8 +628,10 @@ void MainWindow::ezlogic_message_info_no_firmware_detected() {
     ui->pushButton_flash_ezpi_bins->setEnabled(true);
     ui->pushButton_clear_uart_direct_log->setEnabled(true);
 
-    ui->tableWidget_device_table->clearContents();
+    ezlogic_clear_table_data();
     ui->tableWidget_device_table->setEnabled(false);
+
+    ui->comboBox_registered_devices->setEnabled(true);
 }
 
 void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
@@ -801,11 +815,11 @@ void MainWindow::on_pushButton_scan_uart_ports_clicked() {
         messageBoxNoUart.information(this, "No device found!", "We did not find any device connected, please check your connection and try again.");
     } else {
         qDebug() << "Available UART Ports";
-        if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append("Available UART Ports:\n");
+        if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append("Available UART Ports:\n");
 
         foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
             qDebug().noquote() << info.portName() << info.description() << info.manufacturer();
-            if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(info.portName() + " " + info.description() + " " + info.manufacturer() + "\n");
+            if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(info.portName() + " " + info.description() + " " + info.manufacturer() + "\n");
 
             if(info.description() != "") {
                 ui->comboBox_uart_list->addItem(info.portName());
@@ -833,7 +847,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
     if(jerror.error != QJsonParseError::NoError) {
 
         qDebug() << "Message failed parcing json";
-        if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append("Error: Failed parcing json");
+        if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append("Error: Failed parcing json");
         return;
     }
 
@@ -844,7 +858,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
 
     if( (status == 1) && (complete == 1) ) {
 
-        if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append("Success: New device has been registered, you can login and find the device added.");
+        if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append("Success: New device has been registered, you can login and find the device added.");
 
         QJsonObject jobj_data = jobj_main["data"].toObject();
         QString uuid = jobj_data["uuid"].toString();
@@ -1018,7 +1032,6 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
             return;
         }
 #endif
-//        ld_binary_array = "abc";
         qDebug() << "Current dir: " << QDir::currentPath();
         QString ld_file_name =  "devs/";
         ld_file_name += QString::number(jobj_prov_data_prov_data["id"].toInt());
@@ -1052,22 +1065,6 @@ void MainWindow::on_actionLogin_triggered() {
     ezlogic_form_login->setFixedSize(350, 225);
     ezlogic_form_login->setModal(true);
     ezlogic_form_login->show();
-}
-
-void MainWindow::on_actionEnable_Log_triggered()
-{
-    if(ezlogic_flag_enable_log == true) {
-        qDebug() << "Disabled log \r\n";
-        ui->textBrowser_console_log->append("Disabled log \n");
-        ui->actionEnable_Log->setText("Enable Log");
-
-        ezlogic_flag_enable_log = false;
-    } else {
-        qDebug() << "Enabled log \r\n";
-        ui->textBrowser_console_log->append("Enabled log \n");
-        ui->actionEnable_Log->setText("Disable Log");
-        ezlogic_flag_enable_log = true;
-    }
 }
 
 void MainWindow::on_actionRegister_triggered() {
@@ -1131,6 +1128,32 @@ void MainWindow::on_actionRegister_triggered() {
 
 void MainWindow::on_actionClear_Table_triggered() {
     ezlogic_clear_table_data();
+}
+
+void MainWindow::on_actionDisable_triggered() {
+    ezlogic_log_level = EZPI_LOG_NONE;
+    ui->actionDisable->setChecked(true);
+    ui->actionInfo->setChecked(false);
+    ui->actionDebug->setChecked(false);
+    ui->textBrowser_console_log->append("Disabled log \n");
+}
+
+
+void MainWindow::on_actionInfo_triggered() {
+    ezlogic_log_level = EZPI_LOG_INFO;
+    ui->actionDisable->setChecked(false);
+    ui->actionInfo->setChecked(true);
+    ui->actionDebug->setChecked(false);
+    ui->textBrowser_console_log->append("Enabled log : Info only \n");
+}
+
+
+void MainWindow::on_actionDebug_triggered() {
+    ezlogic_log_level = EZPI_LOG_DEBUG;
+    ui->actionDisable->setChecked(false);
+    ui->actionInfo->setChecked(false);
+    ui->actionDebug->setChecked(true);
+    ui->textBrowser_console_log->append("Enabled log : debug only \n");
 }
 
 void MainWindow::on_actionAbout_EzloPi_triggered() {
@@ -1275,7 +1298,8 @@ void MainWindow::ezlogic_serial_receive(void) {
 //    QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
 
 //    qDebug() << "Date:"+formattedTime;
-    if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(formattedTime + ": " + QString::fromLocal8Bit(serial_read_temp));
+    if(ezlogic_log_level == EZPI_LOG_DEBUG) ui->textBrowser_console_log->append(formattedTime + ": " + QString::fromLocal8Bit(serial_read_temp));
+    qDebug() << formattedTime + ": " + QString::fromLocal8Bit(serial_read_temp);
     serial_read_temp.clear();
 }
 
@@ -1336,23 +1360,15 @@ void MainWindow::ezlogic_serial_process(void) {
     qDebug().noquote() << "Json data: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
 
     if( 0 == found_start_bytes ) {
-//        qDebug() << "Data RX: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
         return;
     }
 
-//    qDebug() << "Data RX: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
-//    ui->textBrowser_console_log->append("Data RX: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
-
-//    if( (ezlogic_read_data_serial->at(0) == '\200') &&
-//        (ezlogic_read_data_serial->at(1) == '\r') &&
-//        (ezlogic_read_data_serial->at(2) == '\n')) {
-//        ezlogic_read_data_serial->remove(0, 3);
-//    } else {
-//        return;
-//    }
 
     ui->textBrowser_console_log->append("Json Data: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
     switch (ezlogic_cmd_state) {
+        case CMD_ACTION_RESET:
+            ezlogic_action_restart(*ezlogic_read_data_serial);
+            break;
         case CMD_ACTION_SET_WIFI:
             ezlogic_action_set_wifi(*ezlogic_read_data_serial);
             break;
@@ -1375,6 +1391,8 @@ void MainWindow::ezlogic_serial_process(void) {
                 ui->tableWidget_device_table->setEnabled(true);
 
                 ui->comboBox_registered_devices->setEnabled(true);
+
+                ui->pushButton_device_restart->setEnabled(true);
 
                 ezlogic_timer_ask_info.stop();
             }
@@ -1417,8 +1435,9 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
     QJsonObject obj_data_root_get_info = doc_get_info.object();
     QVariantMap json_map_root_get_info = obj_data_root_get_info.toVariantMap();
 
-#if 0
+#if 1
     if(json_map_root_get_info["cmd"].toUInt() != CMD_ACTION_GET_INFO) {
+        QMessageBox::warning(this, "Error!", "Invalid command received!");
         return;
     }
 #endif
@@ -1651,6 +1670,34 @@ void MainWindow::ezlogic_action_set_config_process(QByteArray serial_read) {
     }
 }
 
+void MainWindow::ezlogic_action_restart(QByteArray reset_response) {
+
+
+    QJsonParseError jsonError;
+    QJsonDocument doc_reset_response = QJsonDocument::fromJson(reset_response, &jsonError);
+
+#if 1
+    if (jsonError.error != QJsonParseError::NoError){
+        qDebug() << jsonError.errorString();
+        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+        return;
+    }
+#endif
+
+    QJsonObject obj_root_reset_response = doc_reset_response.object();
+    QVariantMap json_map_root_reset_response = obj_root_reset_response.toVariantMap();
+
+    if(json_map_root_reset_response["cmd"].toUInt() == CMD_ACTION_RESET) {
+        if(json_map_root_reset_response["status"].toUInt() == 1) {
+            QMessageBox::warning(this, "Device ready to restart", "Connected hardware device will now restart!");
+        } else {
+            QMessageBox::warning(this, "Restart failed!", "Restart attempt failed!");
+        }
+    } else {
+        QMessageBox::warning(this, "Error!", "Unknown command received, Restart: unknown status!");
+    }
+}
+
 void MainWindow::ezpi_show_status_message(const QString &message) {
     ezlogic_status->setText(message);
 }
@@ -1667,3 +1714,4 @@ void MainWindow::ezpi_update_dev_list(void) {
         ui->comboBox_registered_devices->addItem(filename.remove(".bin"));
     }
 }
+
