@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 
     void __dump(const char *file_name, uint32_t line, void *_buff, uint32_t ofs, uint32_t cnt);
 
