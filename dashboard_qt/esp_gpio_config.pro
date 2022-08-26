@@ -39,6 +39,8 @@ HEADERS  += mainwindow.h \
     res_strings.h
 
 #CONFIG += console
+CONFIG += qt
+QT += gui
 
 FORMS    += mainwindow.ui \
     dialog_config_i2c.ui \

@@ -7,7 +7,6 @@
 #include <QSerialPortInfo>
 
 #include <QDebug>
-#include "string.h"
 
 #include <QTimer>
 #include <QMessageBox>
@@ -23,18 +22,14 @@
 #include <QFileDialog>
 #include <QUuid>
 
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
+
 #include "ezuuid.h"
 #include<iostream>
-
-device_t device[EZPI_MAX_DEVICES];
-int cou_dev = 0;
-
-uchar gpio_m[EZPI_MAX_GPIOS] = {0xff,0xff,0xff,0xff,0xff,0,0xff,0xff,0xff,0xff,0xff,0xff,0,0,0,0,0xff,0,0,0,0,0,0,0,0xff,0,0,0};
-
-bool is_start = false;
-bool is_pars = false;
-bool is_work = false;
-bool is_func = false;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -51,29 +46,19 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(810, 628);
     ui->setupUi(this);
 
+    ezpi_serial_port = new QSerialPort;
+
     EzloPi = new EzPi();
     EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_GENERIC);
     EzloPi->EZPI_INIT_BOARD();
 
     ezpi_form_login = new login(this);
-    ezpi_form_WiFi = new Dialog_WiFi(this);
+    ezpi_form_WiFi = new Dialog_WiFi(this, ezpi_serial_port);
     ezpi_form_devadd = new Dialog_devadd(this);
-    ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
-    ezpi_form_config_digital_ip = new Dialog_config_input(this);
-    ezpi_form_config_onewire = new Dialog_config_onewire(this);
-    ezpi_form_config_i2c = new Dialog_config_i2c(this);
-    ezpi_form_config_spi = new Dialog_config_spi(this);
 
     connect(ezpi_form_devadd, SIGNAL(ezpi_send_dev_type_selected(EZPI_UINT8)), this, SLOT(ezpi_receive_dev_type_selected(EZPI_UINT8)));
 
-
-
     user_token.clear();
-
-    // Hide pop-up widgets
-    ui->scrollArea_gpio_config->setVisible(false);
-    ui->scrollArea_set_wifi_cred->setVisible(false);
-    ui->scrollArea_device_type->setVisible(false);
 
     // Deactive buttons
     // Open the selected serial port
@@ -112,23 +97,75 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 MainWindow::~MainWindow() {
-    ezpi_serial_port.close();
+    ezpi_serial_port->close();
     delete ui;    
 }
 
-void MainWindow::ezpi_check_firmware() {
+EZPI_BOOL MainWindow::ezpi_check_firmware() {
 
-    QByteArray ezpi_byte_array_write_to_serial;
+//    QString test_json = "{\"cmd\":1,\"status\":1,\"v_sw\":3625,\"v_type\":1,\"build\":17,\"v_idf\":8456,\"uptime\":4856,\"build_date\":1657623331,\"boot_count\":15,\"boot_reason\":2,\"mac\":1577079727,\"uuid\":\"65261d76-e584-4d35-aff1-d84bd043\",\"serial\":100004032,\"ssid\":\"ssid\",\"dev_type\":1,\"dev_flash\":64256,\"dev_free_flash\":300,\"dev_name\":\"My Device\"}";
 
-    quint64 bytes_wrote = ezpi_serial_port.write("$GET_CONFIG\n");
-    if(bytes_wrote > 0) {
-        qDebug() << bytes_wrote << " bytes written!";
-//        if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(" bytes written!");
-        ezpi_timer_ask_info.start(5000);
+    const char * json_send_get_info = "{\"cmd\":1}";
+
+    QString response_data;
+
+    ezpi_serial_port->write(json_send_get_info);
+
+    if (ezpi_serial_port->waitForBytesWritten()) {
+        // read response
+        if (ezpi_serial_port->waitForReadyRead(5000)) {
+            QByteArray responseData = ezpi_serial_port->readAll();
+            while (ezpi_serial_port->waitForReadyRead(10))
+                responseData += ezpi_serial_port->readAll();
+
+            const EZPI_STRING response = QString::fromUtf8(responseData);
+            qDebug() << "Response : " << response;
+            response_data = response;
+        } else {
+//            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
+        }
+    } else {
+
     }
 
-    connect(&ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::on_serRX1);
+    ezlogic_info_t get_info_fmw_info;
+    EZPI_BOOL ezpi_fimware_present = false;
 
+    QJsonParseError jsonError;
+    QJsonDocument doc_get_info = QJsonDocument::fromJson(response_data.toUtf8(), &jsonError);
+
+#if 0
+    if (jsonError.error != QJsonParseError::NoError){
+        qDebug() << jsonError.errorString();
+        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+        return;
+    }
+#endif
+
+    QJsonObject obj_data_root_get_info = doc_get_info.object();
+    QVariantMap json_map_root_get_info = obj_data_root_get_info.toVariantMap();
+
+#if 0
+    if(json_map_root_get_info["cmd"].toUInt() != CMD_ACTION_GET_INFO) {
+        return;
+    }
+#endif
+    if(json_map_root_get_info["status"].toUInt() == 1) {
+
+        get_info_fmw_info.v_sw = json_map_root_get_info["v_sw"].toUInt();
+        get_info_fmw_info.v_type = json_map_root_get_info["v_type"].toUInt();
+        get_info_fmw_info.build = json_map_root_get_info["build"].toUInt();
+        get_info_fmw_info.v_idf = json_map_root_get_info["v_idf"].toUInt();
+        get_info_fmw_info.uptime = json_map_root_get_info["uptime"].toUInt();
+        get_info_fmw_info.build_date = json_map_root_get_info["build_date"].toUInt();
+
+        EzloPi->EZPI_SET_FMW_INFO(get_info_fmw_info);
+
+        if(get_info_fmw_info.v_sw > 1)    ezpi_fimware_present = true;
+        else ezpi_fimware_present = false;
+    }
+
+    return ezpi_fimware_present;
 }
 
 
@@ -146,181 +183,18 @@ void MainWindow::ezpi_message_info_no_firmware_detected() {
     ui->tableWidget_device_table->setEnabled(false);
 }
 
-
-void MainWindow::pars(uchar *buf, int len) {
-
-    switch (buf[1]){
-
-    case GET_CONFIG:
-    {
-        int row = ui->tableWidget_device_table->rowCount();
-        if(row>0){
-            for (int n=0;n<row;n++){
-                ui->tableWidget_device_table->removeRow(0);
-            }
-        }
-        cou_dev = 0;
-        for (int j=0;j<28;j++)
-        {
-            QString str;
-            str = str.asprintf("%d",j);
-            gpio_m[j] = buf[2+j];
-            qDebug() << "gpio_m[" << j<< "] = " << gpio_m[j];
-        }
-        qDebug() << "copy buf ";
-        break;
-    }
-    case SET_CONFIG:{
-
-            QMessageBox::information(this,"Info","Send to ESP OK!");
-            break;
-    }
-    case FIRST_DEV:
-    case SET_DEV:
-    {
-        if(buf[1] == FIRST_DEV)
-        {
-            cou_dev = 0;
-        }
-        memcpy((void*)&device[cou_dev],&buf[2],len-2);
-
-        int row = ui->tableWidget_device_table->rowCount();
-        ui->tableWidget_device_table->setRowCount(row+1);
-        QString str,str1,str2;
-        int nom = device[cou_dev].out_gpio;
-        int nom1 = device[cou_dev].input_gpio;
-        if (nom)
-        {
-            str = str.asprintf("%d", nom);
-            str1 = "OUT";
-        }
-        if(nom1)
-        {
-            if (nom){
-                str = str + " / ";
-                str1 = str1 + " / ";
-            }
-
-            str = str + str2.asprintf("%d",nom1);
-            str1 = str1 + "IN";
-        }
-        QTableWidgetItem *gtwi = new QTableWidgetItem(str);
-        ui->tableWidget_device_table->setItem(row,0,gtwi);
-        gtwi = new QTableWidgetItem(str1);
-        ui->tableWidget_device_table->setItem(row,1,gtwi);
-        str1 = str1.asprintf("%d",device[cou_dev].out_vol);
-        gtwi = new QTableWidgetItem(str1);
-        ui->tableWidget_device_table->setItem(row,3,gtwi);
-        ui->comboBox_device_type->setCurrentIndex(device[cou_dev].dev_type);
-        gtwi = new QTableWidgetItem(ui->comboBox_device_type->currentText());
-        ui->tableWidget_device_table->setItem(row,4,gtwi);
-        cou_dev++;
-        device[cou_dev].Name[0] = 0;
-        device[cou_dev].is_meter = false;
-        break;
-    }
-    case SET_VOL:{
-        QString str;
-        str = str.asprintf("Pin %d STATE - %d", buf[2],buf[3]);
-        QMessageBox::information(this, "Info", str);
-    }
-    case SET_WiFi:{
-        if (buf[2]){
-            QMessageBox::information(this,"Info","WiFi set successfully !");
-        }else{
-            QMessageBox::information(this,"Info","WiFi set Error !");
-        }
-        break;
-    }
-    }
-}
-
-void MainWindow::on_serRX1() {
-    static int cou = 0;
-    static int len_d = 0;
-    static uchar buf[256];
-    QByteArray dat=ezpi_serial_port.readAll();
-    if(!dat.length())
-    {
-        return;
-    }
-    qDebug() << "Read " << dat.length() << " bytes";
-
-    QString str,str1;
-    str1.asprintf("%s",(char*)dat.data());
-    str.asprintf("%s",str1.toStdString().c_str());    
-#if 1
-    qDebug() << str1;
-    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(str1);
-
-    if(ezpi_flag_enable_log){
-        ui->textBrowser_console_log->append(dat.data());
-        qDebug() << dat;
-    }
-#endif
-
-    if(!is_start) {
-        qDebug() << dat;
-
-        if(dat.at(0) == '$') {
-
-            is_start = true;
-
-            ui->pushButton_set_wifi->setEnabled(true);
-            ui->pushButton_add_device->setEnabled(true);
-
-            ui->pushButton_get_ezpi_config->setEnabled(true);
-            ui->pushButton_set_ezpi_config->setEnabled(true);
-
-            ui->pushButton_erase_flash->setEnabled(true);
-            ui->pushButton_flash_ezpi_bins->setEnabled(true);
-
-            ui->pushButton_remove_device->setEnabled(true);
-
-            ui->pushButton_clear_uart_direct_log->setEnabled(true);
-
-            ui->tableWidget_device_table->setEnabled(true);
-
-            ezpi_timer_ask_info.stop();
-        }
-    } else {
-        for(int i = 0; i<dat.length();i++){
-            if(!is_pars){
-                if((uchar)dat.at(i) == 0xc5){
-                    is_pars = true;
-                    qDebug() << "is_pars = true";
-                    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("is_pars = true");
-                    cou = 0;
-                }
-            }else{
-                buf[cou] = dat.at(i);
-                if(cou == 0)
-                {
-                    len_d = buf[cou];
-                }
-                cou++;
-                if (cou == len_d)
-                {
-                    pars(buf,cou);
-                    is_pars = false;
-                    cou = 0;
-                }
-            }
-        }
-    }
-}
-
 void MainWindow::on_pushButton_connect_uart_clicked() {
 
-    ezpi_serial_port.setPort(ezpi_serial_port_info);
-    ezpi_serial_port.setBaudRate(460800);
-    if(ezpi_flag_serial_port_open == false) {
-        if(!ezpi_serial_port_info.isBusy()) {
+    ezpi_serial_port->setPort(ezpi_serial_port_info);
+//    ezpi_serial_port->setBaudRate(460800);
+    ezpi_serial_port->setBaudRate(115200);
 
-            if(ezpi_serial_port.open(QIODevice::ReadWrite)) {
+    if(ezpi_flag_serial_port_open == false) {
+//        if(!ezpi_serial_port_info.isBusy()) {
+
+            if(ezpi_serial_port->open(QIODevice::ReadWrite)) {
 //                if(1) {
                 ezpi_flag_serial_port_open = true;
-                is_start = false;
 
                 //Modify UI elements:
                 ui->pushButton_connect_uart->setText("Close");
@@ -334,17 +208,38 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
                 if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + " serial port is open.");
 
                 // Check firmware
-                ezpi_check_firmware();
+                if(ezpi_check_firmware()) {
+                    ui->pushButton_set_wifi->setEnabled(true);
+                    ui->pushButton_add_device->setEnabled(true);
+
+                    ui->pushButton_get_ezpi_config->setEnabled(true);
+                    ui->pushButton_set_ezpi_config->setEnabled(true);
+
+                    ui->pushButton_erase_flash->setEnabled(true);
+                    ui->pushButton_flash_ezpi_bins->setEnabled(true);
+
+                    ui->pushButton_remove_device->setEnabled(true);
+
+                    ui->pushButton_clear_uart_direct_log->setEnabled(true);
+
+                    ui->tableWidget_device_table->setEnabled(true);
+
+                    ezpi_timer_ask_info.stop();
+
+                } else {
+                    ezpi_timer_ask_info.start(5000);
+                }
+
             } else {
                 qDebug() << "Failed opeaning serial port: " << ui->comboBox_uart_list->currentText();
                 if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Failed opeaning serial port: " + ui->comboBox_uart_list->currentText());
             }
-        } else {
-            qDebug() << ezpi_serial_port_info.portName() <<  ": port is busy !";
-            if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
-        }
+//        } else {
+//            qDebug() << ezpi_serial_port_info.portName() <<  ": port is busy !";
+//            if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(ezpi_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
+//        }
     } else {
-        ezpi_serial_port.close();
+        ezpi_serial_port->close();
         ezpi_flag_serial_port_open = false;
 
         ui->pushButton_connect_uart->setText("Open");
@@ -381,262 +276,347 @@ void MainWindow::on_pushButton_add_device_clicked() {
         QMessageBox::information(this,"Device full","Devices reaches top limit, no more devices can be added");
         return;
     }
-
+    ezpi_form_devadd->setFixedSize(250, 120);
     ezpi_form_devadd->setModal(true);
     ezpi_form_devadd->show();
 }
 
-void MainWindow::on_pushButton_gpio_cancel_clicked() {
-    ui->scrollArea_gpio_config->setVisible(false);
-    is_func = false;
-}
-
-void MainWindow::on_pushButton_gpio_apply_clicked() {
-
-    QString str, str1;
-
-    if(!is_func) {
-        memcpy(device[cou_dev].Name ,ui->lineEdit_gpio_device_name->text().toLatin1(),ui->lineEdit_gpio_device_name->text().length());
-        device[cou_dev].Name[ui->lineEdit_gpio_device_name->text().length()] = 0;
-        device[cou_dev].is_meter = false;
-
-        if(ui->comboBox_gpio_out_select_pin->isEnabled()) {
-            str = ui->comboBox_gpio_out_select_pin->currentText();
-            str1 = "OUT";
-        }
-
-        if(ui->comboBox_gpio_in_select_pin->isEnabled()) {
-            if (str1 != "") {
-                str = str + " / ";
-            }
-            str = str + ui->comboBox_gpio_in_select_pin->currentText();
-            if (str1 != "")
-                str1 = str1 + " / ";
-            str1 = str1 + "IN";
-        }
-
-        QTableWidgetItem *gtwi = new QTableWidgetItem(str);
-        int row = ui->tableWidget_device_table->rowCount();
-        ui->tableWidget_device_table->setRowCount(row+1);
-        int nom = ui->comboBox_gpio_in_select_pin->currentText().toInt();
-
-        ui->tableWidget_device_table->setItem(row,0,gtwi);
-        ui->scrollArea_gpio_config->setVisible(false);
-
-        QTableWidgetItem *gtwi1 = new QTableWidgetItem(str1);
-        ui->tableWidget_device_table->setItem(row,1,gtwi1);
-
-
-        if(ui->comboBox_gpio_in_select_pin->isEnabled()) {
-
-            gpio_m[nom] = 1;
-            device[cou_dev].is_input = true;
-            device[cou_dev].input_gpio = nom;
-            device[cou_dev].input_vol = (ui->radioButton_gpio_in_default_pull_up->isChecked() ? 0:1);
-            device[cou_dev].checkBox_gpio_in_logic_type = ui->checkBox_gpio_in_logic_type->isChecked();
-
-            if(ui->radioButton_gpio_in_default_pull_up->isChecked()) {
-                gtwi = new QTableWidgetItem("PU ");
-            } else {
-                gtwi = new QTableWidgetItem("PD ");
-                gpio_m[nom] += 4;
-            }
-            ui->tableWidget_device_table->setItem(row,2,gtwi);
-
-            gpio_m[nom] += ui->comboBox_device_type->currentIndex()*16;
-
-        } else {
-            device[cou_dev].input_gpio = 0;
-        }
-
-        if(ui->comboBox_gpio_out_select_pin->isEnabled()) {
-            str = ui->comboBox_gpio_out_select_pin->currentText();
-            int nom = str.toInt();
-            gpio_m[nom] = 2;
-
-            device[cou_dev].out_gpio = nom;
-            device[cou_dev].out_vol = (ui->radioButton_gpio_out_default_low->isChecked() ? 0:1);
-            device[cou_dev].checkBox_gpio_out_logic_type = ui->checkBox_gpio_out_logic_type->isChecked();
-
-            if(ui->radioButton_gpio_out_default_pull_up->isChecked()){
-                // gtwi = new QTableWidgetItem("PULL-UP");
-            } else {
-               // gtwi = new QTableWidgetItem("PULL-DOWN");
-                gpio_m[nom] += 4;
-            }
-
-            if(ui->radioButton_gpio_out_default_low->isChecked()) {
-                gtwi = new QTableWidgetItem("   0  ");
-            } else {
-                gtwi = new QTableWidgetItem("   1  ");
-                gpio_m[nom] += 8;
-            }
-            ui->tableWidget_device_table->setItem(row,3,gtwi);
-            gpio_m[nom] += ui->comboBox_device_type->currentIndex()*16;
-
-        } else {
-            device[cou_dev].out_gpio = 0;
-        }
-
-        gtwi = new QTableWidgetItem(ui->comboBox_device_type->currentText());
-        ui->tableWidget_device_table->setItem(row,4,gtwi);
-        device[cou_dev].dev_type = ui->comboBox_device_type->currentIndex();
-        QString str_u = QUuid::createUuid().toString();
-        str_u.remove(QRegularExpression("{|}|-")); // if you want only hex numbers
-        qDebug() << str_u;
-        for(int u=0;u<8;u++)
-            device[cou_dev].dev_id[u]=str_u.at(u).toLatin1();
-        device[cou_dev].dev_id[7] = 0;
-        for(int u=8;u<16;u++)
-            device[cou_dev].id_i[u-8]=str_u.at(u).toLatin1();
-        device[cou_dev].id_i[7] = 0;
-        device[cou_dev].roomId[0] = 0;
-        qDebug() << "dev_id" << device[cou_dev].dev_id;
-        qDebug() << "id_i" << device[cou_dev].id_i;
-        cou_dev ++;
-        device[cou_dev].Name[0] = 0;
-        qDebug() << "Devise struc size" << sizeof(device_t);
-    } else {
-        int nom = ui->comboBox_gpio_in_select_pin->currentText().toInt();
-        gpio_m[nom] = 1;
-        if(ui->radioButton_gpio_in_default_pull_up->isChecked()) {
-        } else {
-            gpio_m[nom] += 4;
-        }
-        gpio_m[nom] += 0xF0;
-        nom = ui->comboBox_gpio_out_select_pin->currentText().toInt();
-        gpio_m[nom] = 2;
-        if(ui->radioButton_gpio_out_default_pull_up->isChecked()) {
-        } else {
-            gpio_m[nom] += 4;
-        }
-
-        if(ui->radioButton_gpio_out_default_low->isChecked()) {
-        } else {
-            gpio_m[nom] += 8;
-        }
-        gpio_m[nom] += 0xF0;
-        ui->scrollArea_gpio_config->setVisible(false);
-        is_func = false;
-    }
-}
-
 void MainWindow::on_pushButton_remove_device_clicked() {
 
-    int row = ui->tableWidget_device_table->currentRow();
-    if(row<0)
-        return;
 
-    QTableWidgetItem *gtwi1 = ui->tableWidget_device_table->item(row,0);
-    QString str = gtwi1->text();
-    qDebug() << "DELETE " << str;
-    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("DELETE " + str + "\n");
-    QString str1,str2;
-    int nom,nom1;
-    for (int i=0;i<cou_dev;i++) {
-        str1 = "";
-        nom = 0;
-        nom1 = 0;
-        if(device[i].out_gpio != 0) {
-            str1=str2.asprintf("%d",device[i].out_gpio);
-            nom = device[i].out_gpio;
-        }
+//    QTableWidgetItem ezlogic_table_selected_item = ui->tableWidget_device_table->selectedItems();
+    QList<QTableWidgetItem*> ezlogic_table_selected_item = ui->tableWidget_device_table->selectedItems();
+    EZPI_UINT8 ezlogic_table_selected_row = ezlogic_table_selected_item[0]->row();
+    qDebug() << "Selected row: " << ezlogic_table_selected_row;
+    ui->tableWidget_device_table->removeRow(ezlogic_table_selected_row);
 
-        if (device[i].input_gpio != 0) {
-            nom1 = device[i].input_gpio;
-            if(device[i].out_gpio != 0) {
-                str1=str1 + " / ";
-            }
-            str1=str1 + str2.asprintf("%d",device[i].input_gpio);
-        }
-        qDebug() << "str"  << str << " str1 " << str1;
-        if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("str"  + str + " str1 " + str1 + "\n");
-        if(str.toLatin1() == str1.toLatin1()) {
-            if (nom)
-                gpio_m[nom] = 0;
-            if (nom1)
-                gpio_m[nom1] = 0;
-            ui->tableWidget_device_table->removeRow(row);
-            nom = cou_dev - i - 1;
-            cou_dev--;
+    switch(ezlogic_table_row_device_map.at(ezlogic_table_selected_row)) {
 
-            if (nom>0)  memcpy(&device[i],&device[i+1],nom*sizeof(device_t));
-
-            device[cou_dev].Name[0] = 0;
-            device[cou_dev].out_gpio = 0;
-            device[cou_dev].input_gpio = 0;
-            device[cou_dev].is_meter = false;
-            for (int j=0;j<cou_dev;j++) {
-                qDebug() << "DEV" << j << " INPUT " << device[j].input_gpio << " OUT " << device[j].out_gpio;
-            }
-            return;
-        }
+        case EZPI_DEV_TYPE_DIGITAL_OP:
+            EzloPi->EZPI_DELETE_OUTPUT_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_DIGITAL_IP:
+            EzloPi->EZPI_DELETE_INPUT_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_ONE_WIRE:
+            EzloPi->EZPI_DELETE_ONEWIRE_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_I2C:
+            EzloPi->EZPI_DELETE_I2C_DEVICE();
+            break;
+        case EZPI_DEV_TYPE_SPI:
+            EzloPi->EZPI_DELETE_SPI_DEVICE();
+            break;
+        default:
+            break;
     }
-//    int nom = str.toInt();
-//    gpio_m[nom] = 0;
-//    ui->tableWidget_device_table->removeRow(row);
 }
 
 void MainWindow::on_pushButton_get_ezpi_config_clicked() {
-    QByteArray buf;
 
-    buf.append(0x95);
-    buf.append(2);
-    buf.append(0xa0);
-    ezpi_serial_port.setBaudRate(460800);
-    ezpi_serial_port.write(buf, 3);
-    qDebug() << "Send" << buf;
+//    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
 
-    ezpi_serial_port.flush();
+    QString response_data;
 
-    connect(&ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::on_serRX1);
+    const char * json_send_get_config = "{\"cmd\":4}";
 
+    ezpi_serial_port->write(json_send_get_config);
+
+    if (ezpi_serial_port->waitForBytesWritten()) {
+        // read response
+        if (ezpi_serial_port->waitForReadyRead(5000)) {
+            QByteArray responseData = ezpi_serial_port->readAll();
+            while (ezpi_serial_port->waitForReadyRead(10))
+                responseData += ezpi_serial_port->readAll();
+
+            const EZPI_STRING response = QString::fromUtf8(responseData);
+            qDebug() << "Response : " << response;
+            response_data = response;
+        } else {
+            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
+        }
+    } else {
+
+    }
+
+    QJsonParseError jsonError;
+    QJsonDocument doc_get_config = QJsonDocument::fromJson(response_data.toUtf8(), &jsonError);
+
+    if (jsonError.error != QJsonParseError::NoError){
+        qDebug() << jsonError.errorString();
+        QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+        return;
+    }
+
+    QJsonObject obj_data_root_get_config = doc_get_config.object();
+    QVariantMap json_map_root_get_config = obj_data_root_get_config.toVariantMap();
+
+    if(json_map_root_get_config["cmd"].toUInt() != CMD_ACTION_GET_CONFIG) {
+        return;
+    }
+
+    QVariantList list_get_config_device_detail = json_map_root_get_config["dev_detail"].toList();
+
+    ezlogic_device_digital_op_t device_digital_op;
+    ezlogic_device_digital_ip_t device_digital_ip;
+    ezlogic_device_one_wire_t device_onewire;
+    ezlogic_device_I2C_t device_i2c;
+    ezlogic_device_SPI_t device_spi;
+
+    EZPI_UINT8 dev_count_get_config = 0;
+
+    // Clear table contents
+    ui->tableWidget_device_table->clear();
+
+    // Clear internal device storage
+    EzloPi->EZPI_CLEAR_OUTPUT_DEVICES();
+    EzloPi->EZPI_CLEAR_INPUT_DEVICES();
+    EzloPi->EZPI_CLEAR_ONEWIRE_DEVICES();
+    EzloPi->EZPI_CLEAR_I2C_DEVICES();
+    EzloPi->EZPI_CLEAR_SPI_DEVICES();
+
+
+    for(EZPI_UINT8 i = 0; i < list_get_config_device_detail.size(); i++) {
+
+        dev_count_get_config++;
+
+        QVariantMap get_config_device = list_get_config_device_detail[i].toMap();
+
+        switch(get_config_device["dev_type"].toUInt()) {
+            case EZPI_DEV_TYPE_DIGITAL_OP:
+                device_digital_op.dev_name = get_config_device["dev_name"].toString();
+                device_digital_op.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_digital_op.id_room = get_config_device["id_room"].toUInt();
+                device_digital_op.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_digital_op.val_ip = get_config_device["val_ip"].toBool();
+                device_digital_op.val_op = get_config_device["val_op"].toBool();
+                device_digital_op.gpio_in = get_config_device["gpio_in"].toUInt();
+                device_digital_op.gpio_out = get_config_device["gpio_out"].toUInt();
+                device_digital_op.is_ip = get_config_device["is_ip"].toBool();
+                device_digital_op.ip_inv = get_config_device["ip_inv"].toBool();
+                device_digital_op.pullup_ip = get_config_device["pullup_ip"].toBool();
+                device_digital_op.pullup_op = get_config_device["pullup_op"].toBool();
+                device_digital_op.op_inv = get_config_device["op_inv"].toBool();
+
+                EzloPi->EZPI_ADD_OUTPUT_DEVICE(device_digital_op);
+
+                ezlogic_table_adddev_digital_op(device_digital_op);
+
+                break;
+            case EZPI_DEV_TYPE_DIGITAL_IP:
+                device_digital_ip.dev_name = get_config_device["dev_name"].toString();
+                device_digital_ip.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_digital_ip.id_room = get_config_device["id_room"].toUInt();
+                device_digital_ip.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_digital_ip.val_ip = get_config_device["val_ip"].toBool();
+                device_digital_ip.gpio = get_config_device["gpio"].toUInt();
+                device_digital_ip.pull_up = get_config_device["pull_up"].toBool();
+                device_digital_ip.logic_inv = get_config_device["logic_inv"].toBool();
+
+                EzloPi->EZPI_ADD_INPUT_DEVICE(device_digital_ip);
+
+                ezlogic_table_adddev_digital_ip(device_digital_ip);
+                break;
+
+            case EZPI_DEV_TYPE_ONE_WIRE:
+                device_onewire.dev_name = get_config_device["dev_name"].toString();
+                device_onewire.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_onewire.id_room = get_config_device["id_room"].toUInt();
+                device_onewire.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_onewire.val_ip = get_config_device["val_ip"].toBool();
+                device_onewire.pull_up = get_config_device["pull_up"].toBool();
+                device_onewire.gpio = get_config_device["gpio"].toUInt();
+
+                EzloPi->EZPI_ADD_ONEWIRE_DEVICE(device_onewire);
+
+                ezlogic_table_adddev_onewire(device_onewire);
+                break;
+
+            case EZPI_DEV_TYPE_I2C:
+                device_i2c.dev_name = get_config_device["dev_name"].toString();
+                device_i2c.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_i2c.id_room = get_config_device["id_room"].toUInt();
+                device_i2c.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_i2c.gpio_sda = get_config_device["gpio_sda"].toUInt();
+                device_i2c.gpio_scl = get_config_device["gpio_scl"].toUInt();
+                device_i2c.pullup_scl = get_config_device["pullup_scl"].toBool();
+                device_i2c.pullup_sda = get_config_device["pullup_sda"].toBool();
+                device_i2c.slave_addr = get_config_device["slave_addr"].toUInt();
+
+                EzloPi->EZPI_ADD_I2C_DEVICE(device_i2c);
+
+                ezlogic_table_adddev_i2c(device_i2c);
+                break;
+
+            case EZPI_DEV_TYPE_SPI:
+                device_spi.dev_name = get_config_device["dev_name"].toString();
+                device_spi.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_spi.id_room = get_config_device["id_room"].toUInt();
+                device_spi.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_spi.gpio_miso = get_config_device["gpio_miso"].toUInt();
+                device_spi.gpio_mosi = (ezpi_dev_type)get_config_device["gpio_mosi"].toUInt();
+                device_spi.gpio_sck = get_config_device["gpio_sck"].toUInt();
+                device_spi.gpio_cs = (ezpi_item_type)get_config_device["gpio_cs"].toUInt();
+
+                EzloPi->EZPI_ADD_SPI_DEVICE(device_spi);
+
+                ezlogic_table_adddev_spi(device_spi);
+                break;
+            default:
+                break;
+        }
+    }
+
+    if(dev_count_get_config < 1) QMessageBox::information(this, "No device!", "Device configurations not found1");
 }
 
 void MainWindow::on_pushButton_set_ezpi_config_clicked() {
 
-    uchar buf[60];
+    QJsonObject object_root_set_device;
+    QJsonDocument document_root_set_device;
+    QJsonArray array_device_detail;
 
-    buf[0]=0x95;
-    buf[1]=30;
-    buf[2]=0xa1;
-    memcpy(&buf[3],gpio_m,28);
-    ezpi_serial_port.write((const char*)buf,31);
+    std::vector <ezlogic_device_digital_op_t> device_digital_op = EzloPi->EZPI_GET_OUTPUT_DEVICES();
+    std::vector <ezlogic_device_digital_ip_t> device_digital_ip = EzloPi->EZPI_GET_INPUT_DEVICES();
+    std::vector <ezlogic_device_one_wire_t> device_onewire = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
+    std::vector <ezlogic_device_I2C_t> device_i2c = EzloPi->EZPI_GET_I2C_DEVICES();
+    std::vector <ezlogic_device_SPI_t> device_spi = EzloPi->EZPI_GET_SPI_DEVICES();
 
-    qDebug() << "Sent from QT" << buf;
-    for (int j=0;j<28;j++) {
-        QString str;
-        str = str.asprintf("%d",j);
-        gpio_m[j] = buf[2+j];
-        qDebug() << "gpio_m[" << j<< "] = " << gpio_m[j];
+    object_root_set_device.insert("cmd", CMD_ACTION_SET_CONFIG);
+    object_root_set_device.insert("dev_total", EzloPi->EZPI_GET_DEVICE_COUNT());
+
+    for(EZPI_UINT8 i = 0; i < device_digital_op.size(); i++) {
+
+        QJsonObject object_device_digital_output;
+
+        object_device_digital_output.insert("dev_type", device_digital_op[i].dev_type);
+        object_device_digital_output.insert("dev_name", device_digital_op[i].dev_name);
+        object_device_digital_output.insert("id_room", device_digital_op[i].id_room);
+        object_device_digital_output.insert("id_item", device_digital_op[i].id_item);
+        object_device_digital_output.insert("val_ip", device_digital_op[i].val_ip);
+        object_device_digital_output.insert("val_op", device_digital_op[i].val_op);
+        object_device_digital_output.insert("gpio_in", device_digital_op[i].gpio_in);
+        object_device_digital_output.insert("gpio_out", device_digital_op[i].gpio_out);
+        object_device_digital_output.insert("is_ip", device_digital_op[i].is_ip);
+        object_device_digital_output.insert("pullup_ip", device_digital_op[i].pullup_ip);
+        object_device_digital_output.insert("pullup_op", device_digital_op[i].pullup_op);
+        object_device_digital_output.insert("ip_inv", device_digital_op[i].ip_inv);
+        object_device_digital_output.insert("op_inv", device_digital_op[i].op_inv);
+
+        array_device_detail.push_back(object_device_digital_output);
     }
 
-    if(!device[0].Name[0])
-        return;
-    buf[1] = sizeof(device_t) + 2;
 
-    connect(&ezpi_serial_port, &QSerialPort::readyRead, this, &MainWindow::on_serRX1);
+    for(EZPI_UINT8 i = 0; i < device_digital_ip.size(); i++) {
+        QJsonObject object_device_digital_input;
 
-//    memcpy(&buf[3],&device[0],sizeof(device_t));
-//    ezpi_serial_port.write((const char*)buf,sizeof(device_t) + 3);
-    for (int i=0;i<MAX_DEV;i++) {
+        object_device_digital_input.insert("dev_type", device_digital_ip[i].dev_type);
+        object_device_digital_input.insert("dev_name", device_digital_ip[i].dev_name);
+        object_device_digital_input.insert("id_room", device_digital_ip[i].id_room);
+        object_device_digital_input.insert("id_item", device_digital_ip[i].id_item);
+        object_device_digital_input.insert("val_ip", device_digital_ip[i].val_ip);
+        object_device_digital_input.insert("gpio", device_digital_ip[i].gpio);
+        object_device_digital_input.insert("pull_up", device_digital_ip[i].pull_up);
+        object_device_digital_input.insert("logic_inv", device_digital_ip[i].logic_inv);
 
-        if(!device[i].Name[0]) {
-            buf[1] = 2;
-            buf[2] = END_DEV;
-            ezpi_serial_port.write((const char*)buf,3);
-            return;
+        array_device_detail.push_back(object_device_digital_input);
+    }
+
+    for(EZPI_UINT8 i = 0; i < device_onewire.size(); i++) {
+        QJsonObject object_device_onewire;
+
+        object_device_onewire.insert("dev_type", device_onewire[i].dev_type);
+        object_device_onewire.insert("dev_name", device_onewire[i].dev_name);
+        object_device_onewire.insert("id_room", device_onewire[i].id_room);
+        object_device_onewire.insert("id_item", device_onewire[i].id_item);
+        object_device_onewire.insert("val_ip", device_onewire[i].val_ip);
+        object_device_onewire.insert("pull_up", device_onewire[i].pull_up);
+        object_device_onewire.insert("gpio", device_onewire[i].gpio);
+
+        array_device_detail.push_back(object_device_onewire);
+    }
+
+    for(EZPI_UINT8 i = 0; i < device_i2c.size(); i++) {
+        QJsonObject object_device_i2c;
+
+        object_device_i2c.insert("dev_name", device_i2c[i].dev_name);
+        object_device_i2c.insert("id_room", device_i2c[i].id_room);
+        object_device_i2c.insert("id_item", device_i2c[i].id_item);
+        object_device_i2c.insert("gpio_sda", device_i2c[i].gpio_sda);
+        object_device_i2c.insert("gpio_scl", device_i2c[i].gpio_scl);
+        object_device_i2c.insert("pullup_scl", device_i2c[i].pullup_scl);
+        object_device_i2c.insert("pullup_sda", device_i2c[i].pullup_sda);
+        object_device_i2c.insert("slave_addr", device_i2c[i].slave_addr);
+
+        array_device_detail.push_back(object_device_i2c);
+    }
+
+    for(EZPI_UINT8 i = 0; i < device_spi.size(); i++) {
+        QJsonObject object_device_spi;
+
+        object_device_spi.insert("dev_type", device_spi[i].dev_type);
+        object_device_spi.insert("dev_name", device_spi[i].dev_name);
+        object_device_spi.insert("id_room", device_spi[i].id_room);
+        object_device_spi.insert("id_item", device_spi[i].id_item);
+        object_device_spi.insert("gpio_miso", device_spi[i].gpio_miso);
+        object_device_spi.insert("gpio_mosi", device_spi[i].gpio_mosi);
+        object_device_spi.insert("gpio_sck", device_spi[i].gpio_sck);
+        object_device_spi.insert("gpio_cs", device_spi[i].gpio_cs);
+
+        array_device_detail.push_back(object_device_spi);
+    }
+
+    object_root_set_device.insert("dev_detail", array_device_detail);
+    document_root_set_device.setObject(object_root_set_device);
+
+    QByteArray dev_data =  document_root_set_device.toJson(QJsonDocument::Compact);
+    qDebug() << QString::fromLatin1(dev_data);
+
+    const  char * data_action_set_config = dev_data.constData();
+    QString response_data;
+
+    ezpi_serial_port->write(data_action_set_config);
+
+    if (ezpi_serial_port->waitForBytesWritten()) {
+        // read response
+        if (ezpi_serial_port->waitForReadyRead(5000)) {
+            QByteArray responseData = ezpi_serial_port->readAll();
+            while (ezpi_serial_port->waitForReadyRead(10))
+                responseData += ezpi_serial_port->readAll();
+
+            const EZPI_STRING response = QString::fromUtf8(responseData);
+            qDebug() << "Response : " << response;
+
+            QJsonParseError jsonError;
+            QJsonDocument doc_set_config_response = QJsonDocument::fromJson(response.toUtf8(), &jsonError);
+
+        #if 0
+            if (jsonError.error != QJsonParseError::NoError){
+                qDebug() << jsonError.errorString();
+                QMessageBox::warning(this, "Error!", "Incorrect data format received!");
+                return;
+            }
+        #endif
+
+            QJsonObject obj_root_set_config_response = doc_set_config_response.object();
+            QVariantMap json_map_root_set_config_response = obj_root_set_config_response.toVariantMap();
+
+            qDebug() << "cmd: " << QString::number(json_map_root_set_config_response["cmd"].toUInt());
+            qDebug() << "status_write: " << QString::number(json_map_root_set_config_response["status_write"].toUInt());
+
+            if(json_map_root_set_config_response["cmd"].toUInt() == CMD_ACTION_SET_CONFIG) {
+                if(json_map_root_set_config_response["status_write"].toUInt() == 1) {
+                    QMessageBox::information(this, "Success", "Writing configuration to ESP32 is successful!");
+                } else {
+                    QMessageBox::warning(this, "Failed!", "Failed writing configuration to ESP device!");
+                }
+            } else {
+                QMessageBox::warning(this, "Error!", "Unknown command received, writing configuration to ESP device: unknown status!");
+            }
+
+        } else {
+            QMessageBox::warning(this, "Request time out!", "No response from the device !\n Connection status unknown !");
         }
-
-        if(i == 0)
-            buf[2] = FIRST_DEV;
-        else
-            buf[2] = SET_DEV;
-
-        memcpy(&buf[3],&device[i],sizeof(device_t));
-        ezpi_serial_port.write((const char*)buf,sizeof(device_t) + 3);
-        qDebug() << "Sending from QT: " << buf;
-//        if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Sending from QT: " + QString::fromWCharArray(buf) + "\n");
     }
 }
 
@@ -657,11 +637,11 @@ void MainWindow::ezpi_log_write_flash() {
 
     if(str_StandardOutput.contains("error") || str_StandardError.contains("error")) {
         ezpi_message_box_failed_erase.information(this, "Failed flashing the device!", "Flashing ezlopi firmware to the device was not successful, close the app, disconnect device, reconnect and try again!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     } else if(str_StandardError.contains("Hard resetting") || str_StandardOutput.contains("Hard resetting")) {
         ezpi_message_box_failed_erase.information(this, "Success flashing the device!", "Flashing ezlopi firmware to the device was successful! You can now gracefully disconnect the device and move further!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     }
 }
@@ -683,11 +663,11 @@ void MainWindow::ezpi_log_erase_flash() {
 
     if(str_StandardOutput.contains("error") || str_StandardError.contains("error")) {
         ezpi_message_box_failed_erase.information(this, "Failed erasing the device!", "Erasing the flas of the device was not successful, close the app, disconnect device, reconnect and try again!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     } else if(str_StandardOutput.contains("Hard resetting") || str_StandardError.contains("Hard resetting")) {
         ezpi_message_box_failed_erase.information(this, "Success erasing the device!", "Erasing the device was successful! You can now proceed forward flashing the ezlopi firmware!");
-        ezpi_serial_port.open(QIODevice::ReadWrite);
+        ezpi_serial_port->open(QIODevice::ReadWrite);
         ui->pushButton_connect_uart->setEnabled(true);
     }
 }
@@ -702,19 +682,6 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     connect(ezpi_process_write_flash, &QProcess::readyReadStandardOutput, this, &MainWindow::ezpi_log_write_flash);
     connect(ezpi_process_write_flash, &QProcess::readyReadStandardError, this, &MainWindow::ezpi_log_write_flash);
 
-//    QString dir;
-//    QString path_files = QDir::currentPath();
-
-//    dir = path_files + "/esptool.exe";
-
-//    path_files = QFileInfo(dir).absoluteDir().absolutePath();
-//    qDebug() << path_files;
-//    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append(path_files + "\n");
-
-//    QString fl = dir;
-
-//    dir = path_files + "/bootloader.bin";
-
     #ifdef __linux__
             QString ser_port = "/dev/" + ezpi_serial_port_info.portName();
     #elif _WIN32
@@ -723,7 +690,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
 
     #endif
 
-    ezpi_serial_port.close();
+    ezpi_serial_port->close();
     ui->pushButton_connect_uart->setEnabled(false);
 
     ezpi_process_write_flash->setProgram("esptool/esptool.exe");
@@ -765,7 +732,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
 
     qDebug() << "Arguments : " << argument_string;
 
-    ezpi_process_write_flash->setNativeArguments(argument_string);
+    ezpi_process_write_flash->setArguments(arguments);
     ezpi_process_write_flash->start();
 }
 
@@ -774,102 +741,13 @@ void MainWindow::on_pushButton_clear_uart_direct_log_clicked() {
 }
 
 void MainWindow::on_pushButton_set_wifi_clicked() {
+    ezpi_form_WiFi->setFixedSize(315, 165);
+    ezpi_form_WiFi->setModal(true);
     ezpi_form_WiFi->show();
-}
-
-void MainWindow::on_pushButton_set_wifi_cancel_clicked() {
-    ui->scrollArea_set_wifi_cred->setVisible(false);
-}
-
-void MainWindow::on_pushButton_set_wifi_apply_clicked() {
-    uchar buf[100] = {0};
-
-    memcpy(buf+3,ui->lineEdit_set_wifi_ssid->text().toStdString().c_str(),ui->lineEdit_set_wifi_ssid->text().length());
-    buf[3+ui->lineEdit_set_wifi_ssid->text().length()] = 0;
-    memcpy(buf+35, ui->lineEdit_set_wifi_pass->text().toStdString().c_str(),ui->lineEdit_set_wifi_pass->text().length());
-    buf[35+ui->lineEdit_set_wifi_pass->text().length()] = 0;
-    buf[0]=0x95;
-    buf[1]=98;
-    buf[2]=SET_WiFi & 0xff;
-    ezpi_serial_port.write((const char*)buf,99);
-
-    ui->textBrowser_console_log->append(QString::fromLocal8Bit(QByteArray::fromRawData((const char*)buf, 99)));
-    QString str1;
-    str1 = str1.asprintf("%s",buf);
-    qDebug() << "Send" << str1;
-    if(ezpi_flag_enable_log) ui->textBrowser_console_log->append("Send" + str1 + "\n");
-    ui->scrollArea_set_wifi_cred->setVisible(false);
 }
 
 void MainWindow::on_pushButton_select_device_type_apply_clicked() {
 
-}
-
-void MainWindow::on_pushButton_select_device_type_cancel_clicked() {
-    ui->scrollArea_device_type->setVisible(false);
-}
-
-void MainWindow::on_comboBox_gpio_out_select_pin_currentTextChanged(const QString &arg1) {
-    if (is_work)
-        return;
-    is_work = true;
-    QString str,str2;
-    str2 = ui->comboBox_gpio_in_select_pin->currentText();
-    int gp_i = ui->comboBox_gpio_out_select_pin->currentText().toInt();
-    ui->comboBox_gpio_in_select_pin->clear();
-    for(int i=0;i<27;i++) {
-        if(gpio_m[i] == 0) {
-            if(i!=gp_i) {
-                ui->comboBox_gpio_in_select_pin->addItem(str.asprintf("%d",i));
-            }
-        }
-    }
-    if(arg1!=str2) {
-        ui->comboBox_gpio_in_select_pin->setCurrentText(str2);
-    }
-    is_work = false;
-}
-
-void MainWindow::on_comboBox_gpio_in_select_pin_currentTextChanged(const QString &arg1) {
-    if (is_work)
-        return;
-    is_work = true;
-    QString str,str2;
-    str2 = ui->comboBox_gpio_out_select_pin->currentText();
-    int gp_i = ui->comboBox_gpio_in_select_pin->currentText().toInt();
-    ui->comboBox_gpio_out_select_pin->clear();
-    for(int i=0;i<27;i++) {
-        if(gpio_m[i] == 0) {
-            if(i!=gp_i) {
-                ui->comboBox_gpio_out_select_pin->addItem(str.asprintf("%d",i));
-            }
-        }
-    }
-
-    if(arg1!=str2) {
-        ui->comboBox_gpio_out_select_pin->setCurrentText(str2);
-    }
-    is_work = false;
-}
-
-void MainWindow::on_checkBox_gpio_led_button_enable_stateChanged() {
-
-    if (ui->checkBox_gpio_led_button_enable->isChecked()) {
-
-        ui->comboBox_gpio_in_select_pin->setEnabled(true);
-        ui->groupBox_gpio_in_default_shunt_res->setEnabled(true);
-        ui->groupBox_gpio_in_default_bool->setEnabled(true);
-        ui->radioButton_gpio_in_default_pull_up->setChecked(true);
-        ui->radioButton_gpio_in_default_low->setChecked(true);
-        ui->checkBox_gpio_in_logic_type->setEnabled(true);
-
-    } else {
-
-        ui->comboBox_gpio_in_select_pin->setEnabled(false);
-        ui->groupBox_gpio_in_default_shunt_res->setEnabled(false);
-        ui->groupBox_gpio_in_default_bool->setEnabled(false);
-        ui->checkBox_gpio_in_logic_type->setEnabled(false);
-    }
 }
 
 void MainWindow::on_pushButton_erase_flash_clicked() {
@@ -879,7 +757,7 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
     connect(ezpi_process_erase_flash, &QProcess::readyReadStandardOutput, this, &MainWindow::ezpi_log_erase_flash);
     connect(ezpi_process_erase_flash, &QProcess::readyReadStandardError, this, &MainWindow::ezpi_log_erase_flash);
 
-    ezpi_serial_port.close();
+    ezpi_serial_port->close();
     ui->pushButton_connect_uart->setEnabled(false);
 
 
@@ -997,7 +875,7 @@ void MainWindow::on_actionRegister_triggered() {
 
     if(flag_login == true) {
 
-        if(QDateTime::currentSecsSinceEpoch() < login_expires) {
+        if((uint64_t)QDateTime::currentSecsSinceEpoch() < login_expires) {
 
 //            qDebug() << "Token: " << user_token;
 
@@ -1214,11 +1092,11 @@ void MainWindow::success_get_prov_jsons(QNetworkReply *d) {
         ld_binary_array.append('\0');
         ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x44, jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi"));
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi").toLocal8Bit());
         ld_binary_array.append('\0');
         ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x104, jobj_prov_data_prov_data["id"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown"));
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
 
         ser_ver.data = 0;
         // For Connection-ID-0
@@ -1282,20 +1160,38 @@ void MainWindow::success_get_prov_jsons(QNetworkReply *d) {
 }
 
 void MainWindow::on_actionLogin_triggered() {
+    ezpi_form_login->setFixedSize(350, 225);
     ezpi_form_login->setModal(true);
     ezpi_form_login->show();
 }
 
+
 void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
+
     qDebug() << "Device type Index: " << dev_type_index;
 
+    ezpi_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
+    ezpi_form_config_digital_ip = new Dialog_config_input(this, EzloPi);
+    ezpi_form_config_onewire = new Dialog_config_onewire(this, EzloPi);
+    ezpi_form_config_i2c = new Dialog_config_i2c(this, EzloPi);
+    ezpi_form_config_spi = new Dialog_config_spi(this, EzloPi);
+
+    connect(ezpi_form_configdev_digitalio, SIGNAL(ezpi_signal_dev_op_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_digital_ip, SIGNAL(ezpi_signal_dev_ip_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_onewire, SIGNAL(ezpi_signal_dev_onewire_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_i2c, SIGNAL(ezpi_signal_dev_i2c_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
+    connect(ezpi_form_config_spi, SIGNAL(ezpi_signal_dev_spi_added(ezpi_dev_type)), this, SLOT(ezpi_receive_added_dev(ezpi_dev_type)));
 
     switch(dev_type_index) {
-        case EZPI_DEV_TYPE_DIGITAL_OP: {
+        case EZPI_DEV_TYPE_DIGITAL_OP: {            
+            ezpi_form_configdev_digitalio->setFixedSize(275, 380);
+            ezpi_form_configdev_digitalio->setModal(true);
             ezpi_form_configdev_digitalio->show();
             break;
         }
-        case EZPI_DEV_TYPE_DIGITAL_IP: {
+        case EZPI_DEV_TYPE_DIGITAL_IP: {            
+            ezpi_form_config_digital_ip->setFixedSize(180, 310);
+            ezpi_form_config_digital_ip->setModal(true);
             ezpi_form_config_digital_ip->show();
             break;
         }
@@ -1315,15 +1211,22 @@ void MainWindow::ezpi_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
             break;
         }
-        case EZPI_DEV_TYPE_ONE_WIRE: {
+        case EZPI_DEV_TYPE_ONE_WIRE: {            
+            ezpi_form_config_onewire->setFixedSize(335, 230);
+            ezpi_form_config_onewire->setModal(true);
             ezpi_form_config_onewire->show();
             break;
         }
         case EZPI_DEV_TYPE_I2C: {
+            ezpi_form_config_i2c->setFixedSize(325, 240);
+            ezpi_form_config_i2c->setModal(true);
             ezpi_form_config_i2c->show();
             break;
         }
         case EZPI_DEV_TYPE_SPI: {
+            ezpi_form_config_spi->setFixedHeight(296);
+            ezpi_form_config_spi->setFixedWidth(190);
+            ezpi_form_config_spi->setModal(true);
             ezpi_form_config_spi->show();
             break;
         }
@@ -1357,6 +1260,7 @@ void MainWindow::on_comboBox_esp32_board_type_currentIndexChanged(int index) {
     }
 }
 
+<<<<<<< HEAD
 =======
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -2771,3 +2675,154 @@ void MainWindow::on_actionLogin_triggered() {
 }
 
 >>>>>>> master
+=======
+void MainWindow::ezpi_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
+
+    std::vector <ezlogic_device_digital_ip_t> input_devices;
+    std::vector <ezlogic_device_one_wire_t> onewire_devices;
+    std::vector <ezlogic_device_I2C_t> i2c_devices;
+    std::vector <ezlogic_device_SPI_t> spi_devices;
+
+    qDebug() << "Added device type: " << QString::number(ezpi_added_dev_type);
+
+
+    switch(ezpi_added_dev_type) {
+        case EZPI_DEV_TYPE_DIGITAL_OP: {
+
+            std::vector <ezlogic_device_digital_op_t> output_devices = EzloPi->EZPI_GET_OUTPUT_DEVICES();
+            EZPI_UINT8 output_devices_total = (EZPI_UINT8)output_devices.size();
+            ezlogic_device_digital_op_t output_device = output_devices[output_devices_total - 1];
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_DIGITAL_OP);
+            ezlogic_table_adddev_digital_op(output_device);
+            break;
+        }
+        case EZPI_DEV_TYPE_DIGITAL_IP: {
+
+            std::vector <ezlogic_device_digital_ip_t> input_devices = EzloPi->EZPI_GET_INPUT_DEVICES();
+            EZPI_UINT8 input_devices_total = (EZPI_UINT8)input_devices.size();
+            ezlogic_device_digital_ip_t input_device = input_devices[input_devices_total - 1];
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_DIGITAL_IP);
+            ezlogic_table_adddev_digital_ip(input_device);
+            break;
+        }
+        case EZPI_DEV_TYPE_ONE_WIRE: {
+            std::vector <ezlogic_device_one_wire_t> onewire_devices = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
+            EZPI_UINT8 onewire_devices_total = (EZPI_UINT8)onewire_devices.size();
+            ezlogic_device_one_wire_t onewire_device = onewire_devices[onewire_devices_total - 1];
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_ONE_WIRE);
+            ezlogic_table_adddev_onewire(onewire_device);
+            break;
+        }
+        case EZPI_DEV_TYPE_I2C: {
+            std::vector <ezlogic_device_I2C_t> i2c_devices = EzloPi->EZPI_GET_I2C_DEVICES();
+            EZPI_UINT8 i2c_devices_total = (EZPI_UINT8)i2c_devices.size();
+            ezlogic_device_I2C_t i2c_device = i2c_devices[i2c_devices_total - 1];
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_I2C);
+            ezlogic_table_adddev_i2c(i2c_device);
+            break;
+        }
+        case EZPI_DEV_TYPE_SPI: {
+            std::vector <ezlogic_device_SPI_t> spi_devices = EzloPi->EZPI_GET_SPI_DEVICES();
+            EZPI_UINT8 spi_devices_total = (EZPI_UINT8)spi_devices.size();
+            ezlogic_device_SPI_t spi_device = spi_devices[spi_devices_total - 1];
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_I2C);
+            ezlogic_table_adddev_spi(spi_device);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void MainWindow::ezlogic_table_adddev_digital_op(ezlogic_device_digital_op_t output_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(output_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(output_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(output_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+
+    EZPI_STRING GPIOs;
+    GPIOs = QString::number(output_device.gpio_out);
+    if(output_device.is_ip) {
+        GPIOs += ", " + QString::number(output_device.gpio_in);
+    }
+    table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+}
+void MainWindow::ezlogic_table_adddev_digital_ip(ezlogic_device_digital_ip_t input_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(input_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(input_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(input_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(QString::number(input_device.gpio));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+
+}
+void MainWindow::ezlogic_table_adddev_onewire(ezlogic_device_one_wire_t onewire_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(onewire_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(onewire_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(onewire_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(QString::number(onewire_device.gpio));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+
+}
+void MainWindow::ezlogic_table_adddev_i2c(ezlogic_device_I2C_t i2c_device) {
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(i2c_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(i2c_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(i2c_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+
+    EZPI_STRING GPIOs;
+    GPIOs = "SDA: " + QString::number(i2c_device.gpio_sda) + ", SCL: " + QString::number(i2c_device.gpio_scl);
+    table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+}
+void MainWindow::ezlogic_table_adddev_spi(ezlogic_device_SPI_t spi_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(spi_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(spi_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(spi_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+
+    EZPI_STRING GPIOs;
+    GPIOs = "MOSI: " + QString::number(spi_device.gpio_mosi) + \
+            ", MISO: " + QString::number(spi_device.gpio_miso) + \
+            ", SCK: " + QString::number(spi_device.gpio_sck) + \
+            ", CS: " + QString::number(spi_device.gpio_cs);
+    table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+}
+>>>>>>> f6c32fde5bdeef2288103eab5cae6bd3a5bf4b03

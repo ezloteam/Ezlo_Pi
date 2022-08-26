@@ -20,6 +20,14 @@
 
 #include "ezpi_data_types.h"
 
+enum ezlogic_table_column {
+    EZLOZIC_TABLE_COLUMN_DEV_NAME,
+    EZLOZIC_TABLE_COLUMN_DEV_TYPE,
+    EZLOZIC_TABLE_COLUMN_ITEM_TYPE,
+    EZLOZIC_TABLE_COLUMN_GPIOS,
+    EZLOZIC_TABLE_COLUMN_TOTAL
+};
+
 namespace Ui {
 class MainWindow;
 }
@@ -37,19 +45,14 @@ private slots:
     // Custom slots
     void ezpi_log_write_flash();
     void ezpi_log_erase_flash();
-    void ezpi_check_firmware();
+    EZPI_BOOL ezpi_check_firmware();
     void ezpi_message_info_no_firmware_detected();
     void ezpi_receive_dev_type_selected(EZPI_UINT8);
-
-    void on_serRX1();
+    void ezpi_receive_added_dev(ezpi_dev_type);
 
     void on_pushButton_connect_uart_clicked();
 
     void on_pushButton_add_device_clicked();
-
-    void on_pushButton_gpio_cancel_clicked();
-
-    void on_pushButton_gpio_apply_clicked();
 
     void on_pushButton_remove_device_clicked();
 
@@ -63,19 +66,7 @@ private slots:
 
     void on_pushButton_set_wifi_clicked();
 
-    void on_pushButton_set_wifi_cancel_clicked();
-
-    void on_pushButton_set_wifi_apply_clicked();
-
     void on_pushButton_select_device_type_apply_clicked();
-
-    void on_pushButton_select_device_type_cancel_clicked();
-
-    void on_comboBox_gpio_out_select_pin_currentTextChanged(const QString &arg1);
-
-    void on_comboBox_gpio_in_select_pin_currentTextChanged(const QString &arg1);
-
-    void on_checkBox_gpio_led_button_enable_stateChanged();
 
     void on_pushButton_erase_flash_clicked();
 
@@ -103,8 +94,11 @@ private:
 
     // Variables for port management
     std::vector<QSerialPortInfo> ezpi_serial_ports_info_list;
+
     QSerialPortInfo ezpi_serial_port_info;
-    QSerialPort ezpi_serial_port;
+
+    QSerialPort * ezpi_serial_port;
+
     bool ezpi_flag_serial_port_open;
 
     // Timers
@@ -136,6 +130,15 @@ private:
     Dialog_config_spi * ezpi_form_config_spi;
 
     EzPi * EzloPi;
+
+    void ezlogic_table_adddev_digital_op(ezlogic_device_digital_op_t);
+    void ezlogic_table_adddev_digital_ip(ezlogic_device_digital_ip_t);
+    void ezlogic_table_adddev_onewire(ezlogic_device_one_wire_t);
+    void ezlogic_table_adddev_i2c(ezlogic_device_I2C_t);
+    void ezlogic_table_adddev_spi(ezlogic_device_SPI_t);
+
+    std::vector<ezpi_dev_type> ezlogic_table_row_device_map;
+
 
 };
 

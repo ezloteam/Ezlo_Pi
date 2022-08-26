@@ -1,5 +1,5 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'dialog_config_onewire.h'
+** Meta object code from reading C++ file 'dialog_devadd.h'
 **
 ** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
@@ -7,11 +7,11 @@
 *****************************************************************************/
 
 #include <memory>
-#include "../dialog_config_onewire.h"
+#include "../dialog_devadd.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'dialog_config_onewire.h' doesn't include <QObject>."
+#error "The header file 'dialog_devadd.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
 #error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -21,31 +21,30 @@
 QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-struct qt_meta_stringdata_Dialog_config_onewire_t {
+struct qt_meta_stringdata_Dialog_devadd_t {
     QByteArrayData data[5];
-    char stringdata0[89];
+    char stringdata0[76];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_Dialog_config_onewire_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_Dialog_devadd_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
-static const qt_meta_stringdata_Dialog_config_onewire_t qt_meta_stringdata_Dialog_config_onewire = {
+static const qt_meta_stringdata_Dialog_devadd_t qt_meta_stringdata_Dialog_devadd = {
     {
-QT_MOC_LITERAL(0, 0, 21), // "Dialog_config_onewire"
-QT_MOC_LITERAL(1, 22, 29), // "ezpi_signal_dev_onewire_added"
-QT_MOC_LITERAL(2, 52, 0), // ""
-QT_MOC_LITERAL(3, 53, 13), // "ezpi_dev_type"
-QT_MOC_LITERAL(4, 67, 21) // "on_buttonBox_accepted"
+QT_MOC_LITERAL(0, 0, 13), // "Dialog_devadd"
+QT_MOC_LITERAL(1, 14, 27), // "ezpi_send_dev_type_selected"
+QT_MOC_LITERAL(2, 42, 0), // ""
+QT_MOC_LITERAL(3, 43, 10), // "EZPI_UINT8"
+QT_MOC_LITERAL(4, 54, 21) // "on_buttonBox_accepted"
 
     },
-    "Dialog_config_onewire\0"
-    "ezpi_signal_dev_onewire_added\0\0"
-    "ezpi_dev_type\0on_buttonBox_accepted"
+    "Dialog_devadd\0ezpi_send_dev_type_selected\0"
+    "\0EZPI_UINT8\0on_buttonBox_accepted"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_Dialog_config_onewire[] = {
+static const uint qt_meta_data_Dialog_devadd[] = {
 
  // content:
        8,       // revision
@@ -73,21 +72,21 @@ static const uint qt_meta_data_Dialog_config_onewire[] = {
        0        // eod
 };
 
-void Dialog_config_onewire::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void Dialog_devadd::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        auto *_t = static_cast<Dialog_config_onewire *>(_o);
+        auto *_t = static_cast<Dialog_devadd *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->ezpi_signal_dev_onewire_added((*reinterpret_cast< ezpi_dev_type(*)>(_a[1]))); break;
+        case 0: _t->ezpi_send_dev_type_selected((*reinterpret_cast< EZPI_UINT8(*)>(_a[1]))); break;
         case 1: _t->on_buttonBox_accepted(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (Dialog_config_onewire::*)(ezpi_dev_type );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dialog_config_onewire::ezpi_signal_dev_onewire_added)) {
+            using _t = void (Dialog_devadd::*)(EZPI_UINT8 );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dialog_devadd::ezpi_send_dev_type_selected)) {
                 *result = 0;
                 return;
             }
@@ -95,30 +94,30 @@ void Dialog_config_onewire::qt_static_metacall(QObject *_o, QMetaObject::Call _c
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject Dialog_config_onewire::staticMetaObject = { {
+QT_INIT_METAOBJECT const QMetaObject Dialog_devadd::staticMetaObject = { {
     QMetaObject::SuperData::link<QDialog::staticMetaObject>(),
-    qt_meta_stringdata_Dialog_config_onewire.data,
-    qt_meta_data_Dialog_config_onewire,
+    qt_meta_stringdata_Dialog_devadd.data,
+    qt_meta_data_Dialog_devadd,
     qt_static_metacall,
     nullptr,
     nullptr
 } };
 
 
-const QMetaObject *Dialog_config_onewire::metaObject() const
+const QMetaObject *Dialog_devadd::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *Dialog_config_onewire::qt_metacast(const char *_clname)
+void *Dialog_devadd::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_Dialog_config_onewire.stringdata0))
+    if (!strcmp(_clname, qt_meta_stringdata_Dialog_devadd.stringdata0))
         return static_cast<void*>(this);
     return QDialog::qt_metacast(_clname);
 }
 
-int Dialog_config_onewire::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int Dialog_devadd::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QDialog::qt_metacall(_c, _id, _a);
     if (_id < 0)
@@ -136,7 +135,7 @@ int Dialog_config_onewire::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void Dialog_config_onewire::ezpi_signal_dev_onewire_added(ezpi_dev_type _t1)
+void Dialog_devadd::ezpi_send_dev_type_selected(EZPI_UINT8 _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

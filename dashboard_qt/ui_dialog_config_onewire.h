@@ -29,65 +29,66 @@ public:
     QLabel *label_device_name;
     QLineEdit *lineEdit_device_name;
     QLabel *label_default_value_output;
-    QComboBox *comboBox_default_value;
+    QComboBox *comboBox_default_value_gpio;
     QLabel *label_GPIO;
     QGroupBox *groupBox_resistor;
     QRadioButton *radioButton_pullup;
     QRadioButton *radioButton_pulldown;
-    QComboBox *comboBox_output_gpio;
+    QComboBox *comboBox_onewire_gpio;
     QCheckBox *checkBox_invert_output;
-    QComboBox *comboBox_output_gpio_2;
-    QLabel *label_GPIO_2;
+    QComboBox *comboBox_onewire_subtype;
+    QLabel *label_device_subtype;
 
     void setupUi(QDialog *Dialog_config_onewire)
     {
         if (Dialog_config_onewire->objectName().isEmpty())
             Dialog_config_onewire->setObjectName(QString::fromUtf8("Dialog_config_onewire"));
-        Dialog_config_onewire->resize(360, 282);
+        Dialog_config_onewire->resize(331, 229);
         buttonBox = new QDialogButtonBox(Dialog_config_onewire);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        buttonBox->setGeometry(QRect(10, 230, 341, 32));
+        buttonBox->setGeometry(QRect(-33, 180, 341, 32));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
         label_device_name = new QLabel(Dialog_config_onewire);
         label_device_name->setObjectName(QString::fromUtf8("label_device_name"));
-        label_device_name->setGeometry(QRect(34, 33, 121, 20));
+        label_device_name->setGeometry(QRect(19, 10, 121, 20));
         lineEdit_device_name = new QLineEdit(Dialog_config_onewire);
         lineEdit_device_name->setObjectName(QString::fromUtf8("lineEdit_device_name"));
-        lineEdit_device_name->setGeometry(QRect(30, 60, 151, 26));
+        lineEdit_device_name->setGeometry(QRect(17, 30, 151, 26));
         label_default_value_output = new QLabel(Dialog_config_onewire);
         label_default_value_output->setObjectName(QString::fromUtf8("label_default_value_output"));
-        label_default_value_output->setGeometry(QRect(25, 152, 121, 20));
-        comboBox_default_value = new QComboBox(Dialog_config_onewire);
-        comboBox_default_value->addItem(QString());
-        comboBox_default_value->addItem(QString());
-        comboBox_default_value->setObjectName(QString::fromUtf8("comboBox_default_value"));
-        comboBox_default_value->setGeometry(QRect(25, 180, 111, 26));
+        label_default_value_output->setGeometry(QRect(20, 110, 141, 20));
+        comboBox_default_value_gpio = new QComboBox(Dialog_config_onewire);
+        comboBox_default_value_gpio->addItem(QString());
+        comboBox_default_value_gpio->addItem(QString());
+        comboBox_default_value_gpio->setObjectName(QString::fromUtf8("comboBox_default_value_gpio"));
+        comboBox_default_value_gpio->setGeometry(QRect(20, 130, 111, 26));
         label_GPIO = new QLabel(Dialog_config_onewire);
         label_GPIO->setObjectName(QString::fromUtf8("label_GPIO"));
-        label_GPIO->setGeometry(QRect(210, 156, 121, 20));
+        label_GPIO->setGeometry(QRect(190, 18, 121, 20));
         groupBox_resistor = new QGroupBox(Dialog_config_onewire);
         groupBox_resistor->setObjectName(QString::fromUtf8("groupBox_resistor"));
-        groupBox_resistor->setGeometry(QRect(210, 30, 121, 91));
+        groupBox_resistor->setGeometry(QRect(187, 71, 131, 61));
         radioButton_pullup = new QRadioButton(groupBox_resistor);
         radioButton_pullup->setObjectName(QString::fromUtf8("radioButton_pullup"));
-        radioButton_pullup->setGeometry(QRect(20, 20, 110, 24));
+        radioButton_pullup->setGeometry(QRect(6, 16, 110, 24));
+        radioButton_pullup->setChecked(true);
         radioButton_pulldown = new QRadioButton(groupBox_resistor);
         radioButton_pulldown->setObjectName(QString::fromUtf8("radioButton_pulldown"));
-        radioButton_pulldown->setGeometry(QRect(20, 51, 110, 24));
-        comboBox_output_gpio = new QComboBox(Dialog_config_onewire);
-        comboBox_output_gpio->setObjectName(QString::fromUtf8("comboBox_output_gpio"));
-        comboBox_output_gpio->setGeometry(QRect(209, 177, 121, 26));
+        radioButton_pulldown->setGeometry(QRect(7, 37, 110, 24));
+        comboBox_onewire_gpio = new QComboBox(Dialog_config_onewire);
+        comboBox_onewire_gpio->setObjectName(QString::fromUtf8("comboBox_onewire_gpio"));
+        comboBox_onewire_gpio->setGeometry(QRect(190, 38, 121, 26));
         checkBox_invert_output = new QCheckBox(Dialog_config_onewire);
         checkBox_invert_output->setObjectName(QString::fromUtf8("checkBox_invert_output"));
-        checkBox_invert_output->setGeometry(QRect(210, 130, 141, 24));
-        comboBox_output_gpio_2 = new QComboBox(Dialog_config_onewire);
-        comboBox_output_gpio_2->addItem(QString());
-        comboBox_output_gpio_2->setObjectName(QString::fromUtf8("comboBox_output_gpio_2"));
-        comboBox_output_gpio_2->setGeometry(QRect(25, 118, 141, 26));
-        label_GPIO_2 = new QLabel(Dialog_config_onewire);
-        label_GPIO_2->setObjectName(QString::fromUtf8("label_GPIO_2"));
-        label_GPIO_2->setGeometry(QRect(30, 90, 121, 20));
+        checkBox_invert_output->setGeometry(QRect(187, 133, 141, 24));
+        comboBox_onewire_subtype = new QComboBox(Dialog_config_onewire);
+        comboBox_onewire_subtype->addItem(QString());
+        comboBox_onewire_subtype->setObjectName(QString::fromUtf8("comboBox_onewire_subtype"));
+        comboBox_onewire_subtype->setGeometry(QRect(20, 80, 141, 26));
+        label_device_subtype = new QLabel(Dialog_config_onewire);
+        label_device_subtype->setObjectName(QString::fromUtf8("label_device_subtype"));
+        label_device_subtype->setGeometry(QRect(20, 60, 121, 20));
 
         retranslateUi(Dialog_config_onewire);
         QObject::connect(buttonBox, SIGNAL(accepted()), Dialog_config_onewire, SLOT(accept()));
@@ -100,18 +101,19 @@ public:
     {
         Dialog_config_onewire->setWindowTitle(QCoreApplication::translate("Dialog_config_onewire", "Dialog", nullptr));
         label_device_name->setText(QCoreApplication::translate("Dialog_config_onewire", "Device Name", nullptr));
-        label_default_value_output->setText(QCoreApplication::translate("Dialog_config_onewire", "Default Value", nullptr));
-        comboBox_default_value->setItemText(0, QCoreApplication::translate("Dialog_config_onewire", "HIGH", nullptr));
-        comboBox_default_value->setItemText(1, QCoreApplication::translate("Dialog_config_onewire", "LOW", nullptr));
+        lineEdit_device_name->setPlaceholderText(QCoreApplication::translate("Dialog_config_onewire", "Device friendly name.", nullptr));
+        label_default_value_output->setText(QCoreApplication::translate("Dialog_config_onewire", "Default GPIO Value", nullptr));
+        comboBox_default_value_gpio->setItemText(0, QCoreApplication::translate("Dialog_config_onewire", "LOW", nullptr));
+        comboBox_default_value_gpio->setItemText(1, QCoreApplication::translate("Dialog_config_onewire", "HIGH", nullptr));
 
-        label_GPIO->setText(QCoreApplication::translate("Dialog_config_onewire", "GPIO", nullptr));
-        groupBox_resistor->setTitle(QCoreApplication::translate("Dialog_config_onewire", "Resistor", nullptr));
+        label_GPIO->setText(QCoreApplication::translate("Dialog_config_onewire", "GPIO Interface", nullptr));
+        groupBox_resistor->setTitle(QCoreApplication::translate("Dialog_config_onewire", "Resistor on GPIO", nullptr));
         radioButton_pullup->setText(QCoreApplication::translate("Dialog_config_onewire", "PULL-UP", nullptr));
         radioButton_pulldown->setText(QCoreApplication::translate("Dialog_config_onewire", "PULL-DOWN", nullptr));
         checkBox_invert_output->setText(QCoreApplication::translate("Dialog_config_onewire", "INVERT OUTPUT", nullptr));
-        comboBox_output_gpio_2->setItemText(0, QCoreApplication::translate("Dialog_config_onewire", "DHT11", nullptr));
+        comboBox_onewire_subtype->setItemText(0, QCoreApplication::translate("Dialog_config_onewire", "DHT11", nullptr));
 
-        label_GPIO_2->setText(QCoreApplication::translate("Dialog_config_onewire", "Device Subtype", nullptr));
+        label_device_subtype->setText(QCoreApplication::translate("Dialog_config_onewire", "Device Subtype", nullptr));
     } // retranslateUi
 
 };
