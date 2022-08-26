@@ -9,6 +9,7 @@
 uint32_t device_count = 0;
 static s_device_properties_t devices[MAX_DEV];
 extern void dht11_service_init(uint32_t dht_pin, uint32_t dev_idx);
+extern void mpu_service_init(uint8_t scl_pin, uint8_t sda_pin, uint32_t dev_idx);
 
 const char *devices_common_get_device_type_id(void)
 {
@@ -100,6 +101,18 @@ void devices_common_init_devices(void)
 
                         break;
                     }
+                    case MPU6050:
+                        
+                        snprintf(devices[i].category, sizeof(devices[i].category), "level_sensor");
+                        //devices[i].subcategory[0] = '\0';
+                        snprintf(devices[i].subcategory, sizeof(devices[i].subcategory), "navigation");
+                        snprintf(devices[i].item_name, sizeof(devices[i].item_name), "acceleration_x_axis");
+                        snprintf(devices[i].devicType, sizeof(devices[i].devicType), "sensor");
+                        snprintf(devices[i].value_type, sizeof(devices[i].value_type), "value");
+                        devices[i].has_getter = true;
+                        devices[i].has_setter = false;
+
+                        mpu_service_init(22,23,i);
                     default:
                         break;
                     }
