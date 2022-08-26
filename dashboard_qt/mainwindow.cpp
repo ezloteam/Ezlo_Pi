@@ -235,7 +235,7 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
 
     #endif
 
-    ezlogic_process_erase_flash->setProgram("esptool/esptool.exe");
+    ezlogic_process_erase_flash->setProgram("esptool.exe");
     QStringList arguments;
     arguments.append("-p");
     arguments.append(ser_port);
@@ -273,7 +273,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     ui->tableWidget_device_table->clearContents();
     ui->pushButton_connect_uart->setEnabled(false);
 
-    ezlogic_process_write_flash->setProgram("esptool/esptool.exe");
+    ezlogic_process_write_flash->setProgram("esptool.exe");
 
     QStringList arguments;
     arguments.append("-p");
@@ -1689,7 +1689,7 @@ void MainWindow::ezlogic_action_restart(QByteArray reset_response) {
 
     if(json_map_root_reset_response["cmd"].toUInt() == CMD_ACTION_RESET) {
         if(json_map_root_reset_response["status"].toUInt() == 1) {
-            QMessageBox::warning(this, "Device ready to restart", "Connected hardware device will now restart!");
+            QMessageBox::information(this, "Success!", "Successfully issued restart command !");
         } else {
             QMessageBox::warning(this, "Restart failed!", "Restart attempt failed!");
         }

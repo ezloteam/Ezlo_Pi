@@ -64,3 +64,6 @@ Icon*
 ################
 *.m~
 *.mat
+
+installer/*
+release/*
