@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "driver/i2c.h"
 
 #include "mpu6050.h"
@@ -45,16 +46,16 @@
 #define MPU6050_SLAVE_ADDR 0x68
 #define who_am_i 0x75
 
-uint8_t buffer[14];
-size_t data_len = 12;
-SemaphoreHandle_t print_mux = NULL;
-uint16_t pbuffer[7];
-uint16_t accel_x;
-uint16_t accel_y;
-uint16_t accel_z;
-uint16_t gyro_x;
-uint16_t gyro_y;
-uint16_t gyro_z;
+static uint8_t buffer[14];
+static size_t data_len = 12;
+static SemaphoreHandle_t print_mux = NULL;
+static uint16_t pbuffer[7];
+static uint16_t accel_x = 0;
+static uint16_t accel_y = 0;
+static uint16_t accel_z = 0;
+static uint16_t gyro_x = 0;
+static uint16_t gyro_y = 0;
+static uint16_t gyro_z = 0;
 
 esp_err_t MPU6050_i2c_master_init(uint8_t SDA, uint8_t SCL)
 {
@@ -132,6 +133,8 @@ void MPU6050_disp_buff(uint8_t *buf, int len)
 {
     int i;
 
+    memset(pbuffer, 0, sizeof(pbuffer));
+
     pbuffer[0] = (int)((buf[0] << 8) | buf[1]);
     pbuffer[1] = (int)((buf[2] << 8) | buf[3]);
     pbuffer[2] = (int)((buf[4] << 8) | buf[5]);
@@ -156,6 +159,7 @@ void MPU6050_disp_buff(uint8_t *buf, int len)
 void MPU_TASK()
 {
     int ret;
+    memset(buffer, 0, sizeof(buffer));
     ret = i2c_master_sensor_test(14, &buffer[0], 0);
     if (ret == ESP_ERR_TIMEOUT)
     {

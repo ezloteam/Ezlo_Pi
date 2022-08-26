@@ -56,7 +56,7 @@ void interface_common_init_v2(void)
                     device_list[idx].out_gpio, device_list[idx].output_pullup,
                     device_list[idx].out_vol, device_list[idx].out_inv);
 
-            uint8_t state = (device_list[idx].out_inv ? device_list[idx].out_vol : (device_list[idx].out_vol ? 0 : 1));
+            uint8_t state = (device_list[idx].out_inv ? (device_list[idx].out_vol ? 0 : 1) : device_list[idx].out_vol);
             gpio_reset_pin((gpio_num_t)device_list[idx].out_gpio);
             interface_common_inst_out_button((gpio_num_t)device_list[idx].out_gpio, state, device_list[idx].output_pullup);
         }

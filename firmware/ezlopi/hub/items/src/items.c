@@ -208,15 +208,8 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
             uint32_t state = value.len ? (strncmp(value.ptr, "true", 4) ? false : true) : false;
             TRACE_D("Current state: %d", state);
 
-            if (dev_list[device_idx].out_inv)
-            {
-                state = state ? 0 : 1;
-                interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
-            }
-            else
-            {
-                interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
-            }
+            state = dev_list[device_idx].out_inv ? (state ? 0 : 1) : state;
+            interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
         }
 
         TRACE_B(">> WS Tx - '%.*s' [%d]\r\n%s", method->len, method->ptr, strlen(send_buf), send_buf);
