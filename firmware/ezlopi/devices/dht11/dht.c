@@ -98,15 +98,15 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
             return ESP_ERR_INVALID_ARG; \
     } while (0)
 
-#define CHECK_LOGE(x, msg, ...)                \
-    do                                         \
-    {                                          \
-        if (x != ESP_OK)                       \
-        {                                      \
-            PORT_EXIT_CRITICAL();              \
-            ESP_LOGE(TAG, msg, ##__VA_ARGS__); \
-            return x;                          \
-        }                                      \
+#define CHECK_LOGE(x, msg, ...)          \
+    do                                   \
+    {                                    \
+        if (x != ESP_OK)                 \
+        {                                \
+            PORT_EXIT_CRITICAL();        \
+            TRACE_E(msg, ##__VA_ARGS__); \
+            return x;                    \
+        }                                \
     } while (0)
 
 /**
@@ -181,7 +181,7 @@ static inline esp_err_t dht_fetch_data(dht_sensor_type_t sensor_type, gpio_num_t
         data[b] |= (high_duration > low_duration) << (7 - m);
     }
 
-        // TRACE_D("low bit time: %d, high bit time: %d", low_duration, high_duration);
+    // TRACE_D("low bit time: %d, high bit time: %d", low_duration, high_duration);
 
     return ESP_OK;
 }
@@ -238,7 +238,7 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
 
     if (data[4] != ((data[0] + data[1] + data[2] + data[3]) & 0xFF))
     {
-        ESP_LOGE(TAG, "Checksum failed, invalid data received from sensor");
+        TRACE_E("Checksum failed, invalid data received from sensor");
         return ESP_ERR_INVALID_CRC;
     }
 
@@ -247,7 +247,7 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     if (temperature)
         *temperature = dht_convert_data(sensor_type, data[2], data[3]);
 
-    ESP_LOGD(TAG, "Sensor data: humidity=%d, temp=%d", *humidity, *temperature);
+    TRACE_D("Sensor data: humidity=%d, temp=%d", *humidity, *temperature);
 
     return ESP_OK;
 }

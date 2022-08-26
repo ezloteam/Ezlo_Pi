@@ -27,7 +27,7 @@ void dht11_service_init(uint8_t dht_pin, uint32_t dev_idx)
 {
     dht_sensor_pin = dht_pin;
     device_index = dev_idx;
-    xTaskCreatePinnedToCore(dht11_service_process, "dht11-service", 3072, NULL, 3, NULL, 1);
+    // xTaskCreatePinnedToCore(dht11_service_process, "dht11-service", 3072, NULL, 3, NULL, 1);
 }
 
 static void dht11_service_process(void *pv)
@@ -47,6 +47,6 @@ static void dht11_service_process(void *pv)
             ret = NULL;
         }
 
-        vTaskDelay(5000 / portTICK_RATE_MS);
+        vTaskDelay(60000 / portTICK_RATE_MS);
     }
 }

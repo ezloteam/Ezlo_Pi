@@ -22,7 +22,7 @@
 // #include "esp_netif_lwip_internal.h"
 
 #include "debug.h"
-#include "wifi.h"
+#include "wifi_interface.h"
 #include "factory_info.h"
 #include "nvs_storage.h"
 // #include "qt_serial.h"
@@ -34,7 +34,7 @@
 */
 #define EXAMPLE_ESP_WIFI_SSID "nepaldigisys"
 #define EXAMPLE_ESP_WIFI_PASS "NDS_0ffice"
-#define EXAMPLE_ESP_MAXIMUM_RETRY INT32_MAX
+#define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
@@ -61,15 +61,8 @@ esp_netif_ip_info_t *wifi_get_ip_infos(void)
 
 static void alert_qt_wifi_fail(void)
 {
-    // qt_serial *qt_ctx = qt_serial::get_instance();
-
-    uint8_t buf[10];
-    buf[0] = 0xC5;
-    buf[1] = 3;
-    buf[2] = 0xa3; // SET_WiFi;
-    buf[3] = 0;
-
-    qt_serial_respond_to_qt(4, buf);
+    char *qt_resp = "{\"cmd\":2,\"status_write\":0,\"status_connect\":0}";
+    qt_serial_respond_to_qt(strlen(qt_resp), (uint8_t *)qt_resp);
 }
 
 // extern "C" void set_new_wifi_flag_c(void);
@@ -115,17 +108,19 @@ static void alert_qt_wifi_got_ip(void)
 {
     // qt_serial *qt_ctx = qt_serial::get_instance();
 
-    uint8_t buf[4];
-    buf[0] = 0xC5;
-    buf[1] = 3;
-    buf[2] = 0xa3; // SET_WiFi;
-    buf[3] = 1;
-    qt_serial_respond_to_qt(4, buf);
-
     if (new_wifi)
     {
         new_wifi = 0;
         nvs_storage_write_wifi(wifi_ssid_pass, sizeof(wifi_ssid_pass));
+
+        char *qt_resp = "{\"cmd\":2,\"status_write\":1,\"status_connect\":1}";
+        qt_serial_respond_to_qt(strlen(qt_resp), (uint8_t *)qt_resp);
+    }
+    else
+    {
+
+        char *qt_resp = "{\"cmd\":2,\"status_connect\":1}";
+        qt_serial_respond_to_qt(strlen(qt_resp), (uint8_t *)qt_resp);
     }
 }
 
@@ -148,6 +143,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         {
             xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
             alert_qt_wifi_fail();
+            s_retry_num = 0;
         }
         TRACE_I("connect to the AP fail");
     }
@@ -228,5 +224,5 @@ void wifi_connect(const char *ssid, const char *pass)
 
 void wait_for_wifi_to_connect(void)
 {
-    xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+    xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 }
