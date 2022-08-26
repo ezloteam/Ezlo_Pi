@@ -6,7 +6,7 @@
 #include "devices_common.h"
 
 const char *favorite_1_start = "{\"method\":\"hub.favorite.list\",\"msg_id\":%d,\"api\":\"1.0\",\"error\":null,\"id\":\"%.*s\",\"result\":{\"favorites\":{\"devices\":[";
-const char *favorite_1_devs = "{\"_id\":\"d%.*s\"}";
+const char *favorite_1_devs = "{\"_id\":\"%.*s\"}";
 const char *favorite_1_end = "]}},\"sender\":%.*s}";
 
 char *favorite_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)

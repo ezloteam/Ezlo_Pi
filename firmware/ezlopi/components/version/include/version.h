@@ -5,10 +5,10 @@ extern "C"
 {
 #endif
 #define MAJOR 1
-#define MINOR 0
-#define BATCH 6
-#define BUILD 96
-#define VERSION_STR "v1.0.6.96"
+#define MINOR 1
+#define BATCH 2
+#define BUILD 111
+#define VERSION_STR "v1.1.2.111"
 #ifdef __cplusplus
 }
 #endif

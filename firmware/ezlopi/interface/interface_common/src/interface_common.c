@@ -8,6 +8,7 @@
 #include "debug.h"
 #include "nvs_storage.h"
 #include "interface_common.h"
+#include "devices_common.h"
 
 #define USE_RTOS_QUEUE 1
 #if (1 == USE_RTOS_QUEUE)
@@ -21,6 +22,47 @@ static uint8_t gpio_state[28] = {0}; // value of pin
 static uint8_t gpio_conf[28] = {0xff, 0xff, 0x00, 0xff, 0xff, 0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0xff, 0, 0, 0, 0, 0, 0, 0, 0xff, 0, 0, 0};
 // static uint8_t gpio_conf[28] = {0xff, 0xff, 0xff, 0xff, 0xff, 0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0xff, 0, 0, 0, 0, 0, 0, 0, 0xff, 0, 0, 0};
 
+void interface_common_init_v2(void)
+{
+    s_device_properties_t *device_list = devices_common_device_list();
+
+    for (int idx = 0; idx < MAX_DEV; idx++)
+    {
+        if (device_list[idx].input_gpio)
+        {
+            gpio_reset_pin(device_list[idx].input_gpio);
+
+            if (EZPI_DEV_TYPE_ONE_WIRE == device_list[idx].dev_type)
+            {
+                TRACE_B("Onewire gpio - Num: %d, pullup: %d, Val: %d, Inv: %d",
+                        device_list[idx].input_gpio, device_list[idx].input_pullup,
+                        device_list[idx].input_vol, device_list[idx].input_inv);
+
+                gpio_pad_select_gpio(device_list[idx].input_gpio);
+            }
+            else
+            {
+                TRACE_B("Input gpio - Num: %d, pullup: %d, Val: %d, Inv: %d",
+                        device_list[idx].input_gpio, device_list[idx].input_pullup,
+                        device_list[idx].input_vol, device_list[idx].input_inv);
+
+                interface_common_inst_input_button((gpio_num_t)device_list[idx].input_gpio, device_list[idx].input_pullup);
+            }
+        }
+
+        if (device_list[idx].out_gpio)
+        {
+            TRACE_B("Output gpio - Num: %d, pullup: %d, Val: %d, Inv: %d",
+                    device_list[idx].out_gpio, device_list[idx].output_pullup,
+                    device_list[idx].out_vol, device_list[idx].out_inv);
+
+            uint8_t state = (device_list[idx].out_inv ? device_list[idx].out_vol : (device_list[idx].out_vol ? 0 : 1));
+            gpio_reset_pin((gpio_num_t)device_list[idx].out_gpio);
+            interface_common_inst_out_button((gpio_num_t)device_list[idx].out_gpio, state, device_list[idx].output_pullup);
+        }
+    }
+}
+
 void interface_common_init(void)
 {
 #if (1 == USE_RTOS_QUEUE)
@@ -29,6 +71,9 @@ void interface_common_init(void)
     gpio_smphr = xSemaphoreCreateBinary();
 #endif
 
+    interface_common_init_v2();
+
+#if 0
     uint8_t gpio_conf_read[28];
     memset(gpio_conf_read, 0, sizeof(gpio_conf_read));
 
@@ -49,6 +94,15 @@ void interface_common_init(void)
     }
 
     interface_common_gpio_config_sets(0xff);
+#endif
+}
+
+uint32_t interface_get_message_count_in_queue(void)
+{
+    if (gpio_evt_queue)
+        return uxQueueMessagesWaiting(gpio_evt_queue);
+    else
+        return 0;
 }
 
 uint32_t interface_common_get_gpio_isr_event(uint32_t wait_ms)
@@ -120,10 +174,10 @@ void interface_common_inst_input_button(gpio_num_t gpioPin, gpio_pull_mode_t pul
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << gpioPin),
         .mode = GPIO_MODE_INPUT,
-        .pull_up_en = (pull == GPIO_PULLUP_ONLY) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE,
-        .pull_down_en = (pull == GPIO_PULLUP_ONLY) ? GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE,
+        .pull_up_en = (pull == 1) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE,
+        .pull_down_en = (pull == 1) ? GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE,
         // .intr_type = GPIO_INTR_ANYEDGE,
-        .intr_type = (pull == GPIO_PULLUP_ONLY) ? GPIO_INTR_POSEDGE : GPIO_INTR_NEGEDGE,
+        .intr_type = (pull == 1) ? GPIO_INTR_POSEDGE : GPIO_INTR_NEGEDGE,
     };
 
     gpio_config(&io_conf);
@@ -199,7 +253,7 @@ void interface_common_gpio_state_set(uint32_t pin, uint32_t state)
 uint32_t interface_common_gpio_state_get(uint32_t pin)
 {
     uint32_t ret = 0;
-    if ((pin < sizeof(gpio_conf)) && (0xff != gpio_conf[pin]) && (0x01 & gpio_conf[pin]))
+    if ((pin < sizeof(gpio_conf)) && (0xff != gpio_conf[pin]) && (0x01 & gpio_conf[pin]) && (0x00 != gpio_conf[pin]))
     {
         gpio_state[pin] = (uint8_t)gpio_get_level((gpio_num_t)pin) & 0xff;
     }

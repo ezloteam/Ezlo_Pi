@@ -6,4 +6,5 @@ idf_component_register(SRCS "${src_files}"
     debug
     devices_common
     interface_common
-    items)
+    items
+    mpu6050)
