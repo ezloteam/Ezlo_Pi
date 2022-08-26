@@ -150,21 +150,39 @@ int sendData(const char *logName, const char *data)
             switch (cmd_temp)
             {
             case 1:
+            {
                 QT_GET_INFO();
                 break;
+            }
             case 2:
+            {
                 QT_SET_WIFI(data);
                 break;
+            }
             case 3:
+            {
                 QT_SET_DATA(data);
                 break;
+            }
             case 4:
+            {
                 QT_READ_DATA();
                 break;
+            }
+            case 0:
+            {
+                const static char *reboot_response = "{\"cmd\":0,\"status\":1}";
+                qt_serial_respond_to_qt(strlen(reboot_response), reboot_response);
+                vTaskDelay(20);
+                esp_restart();
+                break;
+            }
 
             default:
+            {
                 TRACE_E("InValid command");
                 break;
+            }
             }
         }
 

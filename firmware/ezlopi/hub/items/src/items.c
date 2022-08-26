@@ -52,25 +52,57 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
         {
             for (int i = 0; i < MAX_DEV; i++)
             {
-                uint32_t current_state = interface_common_gpio_state_get(devices[i].out_gpio);
 
                 char dev_value[40];
                 switch (devices[i].dev_type)
                 {
-                case TAMPER:
+                // case TAMPER:
+                case EZPI_DEV_TYPE_ONE_WIRE:
                 {
                     snprintf(dev_value, sizeof(dev_value), "%.02f,\"scale\":\"celsius\"", dht11_service_get_temperature());
                     break;
                 }
-                case LED:
-                case SWITCH:
-                case PLUG:
+                case EZPI_DEV_TYPE_I2C:
                 {
+                    static int count = 0;
+                    switch (count)
+                    {
+                        uint16_t val;
+                    case 0:
+                        count++;
+                        val = accel_x_value_read();
+                        snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\"", val);
+                        break;
+                    case 1:
+                        count++;
+                        val = accel_y_value_read();
+                        snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\"", val);
+                        break;
+                    case 2:
+                        count = 0;
+                        val = accel_z_value_read();
+                        snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\"", val);
+                        break;
+
+                    default:
+                        break;
+                    }
+
+                    break;
+                }
+                // case LED:
+                // case SWITCH:
+                // case PLUG:
+                case EZPI_DEV_TYPE_DIGITAL_OP:
+                case EZPI_DEV_TYPE_DIGITAL_IP:
+                {
+                    uint32_t current_state = interface_common_gpio_state_get(devices[i].out_gpio);
                     snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
                     break;
                 }
                 default:
                 {
+                    snprintf(dev_value, sizeof(dev_value), "0");
                     break;
                 }
                 }
@@ -238,7 +270,6 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
         if (device_idx < MAX_DEV)
         {
             s_device_properties_t *dev_list = devices_common_device_list();
-            uint32_t current_state = interface_common_gpio_state_get(dev_list[device_idx].out_gpio);
 
             char dev_value[100];
             memset(dev_value, 0, sizeof(dev_value));
@@ -281,15 +312,19 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
 
                 break;
             }
-            case LED:
-            case SWITCH:
-            case PLUG:
+            // case LED:
+            // case SWITCH:
+            // case PLUG:
+            case EZPI_DEV_TYPE_DIGITAL_OP:
+            case EZPI_DEV_TYPE_DIGITAL_IP:
             {
+                uint32_t current_state = interface_common_gpio_state_get(dev_list[device_idx].out_gpio);
                 snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
                 break;
             }
             default:
             {
+                snprintf(dev_value, sizeof(dev_value), "0");
                 break;
             }
             }

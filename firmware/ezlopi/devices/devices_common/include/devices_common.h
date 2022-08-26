@@ -13,6 +13,7 @@ extern "C"
 #define MAX_DEV 10
 #define DEVICE_TYPE_ID "ezlopi" // manufacturer deviceTypeId
 
+#if 0
     typedef enum e_device_type
     {
         LED = 0,
@@ -21,6 +22,7 @@ extern "C"
         TAMPER,
         MPU6050 = 5,
     } e_device_type_t;
+#endif
 
     typedef enum e_dev_type
     {

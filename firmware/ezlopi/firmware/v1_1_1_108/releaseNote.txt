@@ -62,12 +62,3 @@ v1_1_1_107  Date: Fri 26 Aug 2022 01:04:57 AM +0545
 v1_1_1_108  Date: Fri 26 Aug 2022 12:56:35 PM +0545
 	added esp-restart from QT with command 'cmd = 0',
 
-v1_1_1_109  Date: Fri 26 Aug 2022 04:06:45 PM +0545
-	fixed 'hub.items.list' response
-
-v1_1_1_110  Date: Fri 26 Aug 2022 04:07:52 PM +0545
-	bug fix: hub.items.list
-
-v1_1_2_111  Date: Fri 26 Aug 2022 04:09:30 PM +0545
-	updated batch number
-

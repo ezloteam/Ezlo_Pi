@@ -253,7 +253,7 @@ void interface_common_gpio_state_set(uint32_t pin, uint32_t state)
 uint32_t interface_common_gpio_state_get(uint32_t pin)
 {
     uint32_t ret = 0;
-    if ((pin < sizeof(gpio_conf)) && (0xff != gpio_conf[pin]) && (0x01 & gpio_conf[pin]))
+    if ((pin < sizeof(gpio_conf)) && (0xff != gpio_conf[pin]) && (0x01 & gpio_conf[pin]) && (0x00 != gpio_conf[pin]))
     {
         gpio_state[pin] = (uint8_t)gpio_get_level((gpio_num_t)pin) & 0xff;
     }

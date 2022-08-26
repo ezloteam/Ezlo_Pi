@@ -6,9 +6,9 @@ extern "C"
 #endif
 #define MAJOR 1
 #define MINOR 1
-#define BATCH 1
-#define BUILD 107
-#define VERSION_STR "v1.1.1.107"
+#define BATCH 2
+#define BUILD 111
+#define VERSION_STR "v1.1.2.111"
 #ifdef __cplusplus
 }
 #endif

@@ -14,7 +14,7 @@ fi
 
 V_MAJOR=1 # Major changes such as protocols, in-compatible APIs, Probably not compatible with prior version
 V_MINOR=1 # Minor changes, Are always compatible with prior versions, eg. feature additions, 
-V_BATCH=0 # Patch changes are like bug-fixes, security addition, and are strickly backward compatible
+V_BATCH=2 # Patch changes are like bug-fixes, security addition, and are strickly backward compatible
 V_BUILD=0 # Build count, Incremental, Increases by 1 on each build call
 
 S_MAJOR="MAJOR"
@@ -139,33 +139,38 @@ build_note() {
 }
 
 idf.py build
-get_version_variables
+retVal=$?
+if [ $retVal -ne 1 ]; then
+    get_version_variables
+    V_BUILD=$((V_BUILD+1))
 
-V_BUILD=$((V_BUILD+1))
 
+    if [[ 0 == release ]];then
+        wait_for_key
+    fi
 
-if [[ 0 == release ]];then
-    wait_for_key
-fi
-
-if [ $release == 1 ];then # Releasing the firmware for deployment
-    V_BATCH=$((V_BATCH+1))
-    version_update
-    create_release
-    release_note
-    release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}"
-    zip -r $release_bins.zip $release_bins
-    echo -e "Release "$release_bins".zip successfully created."
-elif [ 2 == $release ];then # creating test-release: Only for testing
-    version_update add_build_version
-    create_test_release
-    test_release_note
-    release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}_${V_BUILD}"
-    zip -r $release_bins.zip $release_bins
-    echo -e "Test release "$release_bins".zip successfully created."
-else # Build note only,
-    version_update
-    build_note
+    if [ $release == 1 ];then # Releasing the firmware for deployment
+        V_BATCH=$((V_BATCH+1))
+        version_update
+        idf.py build
+        create_release
+        release_note
+        release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}"
+        zip -r $release_bins.zip $release_bins
+        echo -e "Release "$release_bins".zip successfully created."
+    elif [ 2 == $release ];then # creating test-release: Only for testing
+        version_update add_build_version
+        idf.py build
+        create_test_release
+        test_release_note
+        release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}_${V_BUILD}"
+        zip -r $release_bins.zip $release_bins
+        echo -e "Test release "$release_bins".zip successfully created."
+    else # Build note only,
+        version_update
+        idf.py build
+        build_note
+    fi
 fi
 
 echo "MAJOR: $V_MAJOR"
