@@ -10,29 +10,6 @@
 #include "debug.h"
 #include "factory_info.h"
 
-static const char *private_key =
-    "-----BEGIN PRIVATE KEY-----\r\n"
-    "MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQg/2cQ79U/nLXvov+J4Kpi\r\n"
-    "lO4qO88X0HbRmHhvRNKMiJ+hRANCAATYtFGFMTEqaO18wxhqnBBJy1ckbgDAaBGV\r\n"
-    "SVBju06op4irOXNv7xcnjPqBryAvk862yDnwsUsIwEjtKVZC11sU\r\n"
-    "-----END PRIVATE KEY-----";
-
-static const char *root_ca_certificate =
-
-    "-----BEGIN CERTIFICATE-----\r\n"
-    "MIICDDCCAbKgAwIBAgIDAy6fMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\r\n"
-    "MBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\r\n"
-    "BklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExURCBDQTEh\r\n"
-    "MB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTIxMTIwMjA4MTEw\r\n"
-    "MVoYDzIyOTUwOTE2MDgxMTAxWjCBjDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCk5l\r\n"
-    "dyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xEzARBgNVBAoMCmNvbnRyb2xsZXIx\r\n"
-    "LTArBgNVBAsMJDYzNTFjNzUwLTUzNDctMTFlYy1iMmQ2LThmMjYwZjUyODdmYTES\r\n"
-    "MBAGA1UEAwwJMTAwMDA0MDA1MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE2LRRhTEx\r\n"
-    "KmjtfMMYapwQSctXJG4AwGgRlUlQY7tOqKeIqzlzb+8XJ4z6ga8gL5POtsg58LFL\r\n"
-    "CMBI7SlWQtdbFDAKBggqhkjOPQQDAgNIADBFAiEApGxLFOsnD7rbUmvY2sJvmlKp\r\n"
-    "Ixl5rgMrOQH6uKoQxa0CIFfN69EKILiT6R7HnEw76DZwkSwdmX/xpkjvN2bXJiuA\r\n"
-    "-----END CERTIFICATE-----";
-
 static bool is_wss = false;
 static char wss_buffer[4096];
 static char wss_url[64];
@@ -194,6 +171,12 @@ static void wss_recv_func(void)
 static void wss_receive_task(void *pvParameters)
 {
     int ret, flags, len;
+    s_factory_info_t *factory = factory_info_get_info();
+
+    if (NULL == factory)
+    {
+        vTaskDelete(NULL);
+    }
 
     mbedtls_ssl_init(&ssl);
     mbedtls_pk_init(&p_key);
@@ -214,7 +197,7 @@ static void wss_receive_task(void *pvParameters)
 
     TRACE_I("Loading the CA root certificate...");
 
-    ret = mbedtls_x509_crt_parse(&cacert, (uint8_t *)root_ca_certificate, strlen(root_ca_certificate) + 1);
+    ret = mbedtls_x509_crt_parse(&cacert, (uint8_t *)factory->ssl_shared_key, strlen(factory->ssl_shared_key) + 1);
 
     if (ret < 0)
     {
@@ -222,7 +205,7 @@ static void wss_receive_task(void *pvParameters)
         abort();
     }
 
-    ret = mbedtls_pk_parse_key(&p_key, (uint8_t *)private_key, strlen(private_key) + 1, NULL, 0);
+    ret = mbedtls_pk_parse_key(&p_key, (uint8_t *)factory->ssl_private_key, strlen(factory->ssl_private_key) + 1, NULL, 0);
 
     TRACE_I("Setting hostname for TLS session...");
 

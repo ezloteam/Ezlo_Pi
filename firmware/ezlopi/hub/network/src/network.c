@@ -2,7 +2,7 @@
 #include "esp_wifi.h"
 #include "esp_netif_types.h"
 #include "network.h"
-#include "wifi.h"
+#include "wifi_interface.h"
 #include "debug.h"
 #include "frozen.h"
 

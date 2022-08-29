@@ -6,6 +6,7 @@
 #include "devices_common.h"
 #include "interface_common.h"
 #include "dht.h"
+#include "mpu6050.h"
 
 #define TEST 0
 
@@ -13,8 +14,8 @@ extern float dht11_service_get_temperature(void);
 static void parse_item_id(char *data, uint32_t len, char *item_id);
 
 static const char *items_list_start = "{\"method\":\"hub.items.list\",\"msg_id\":%d,\"result\":{\"items\":[";
-static const char *items_list_item = "{\"_id\":\"a%.*s\","
-                                     "\"deviceId\":\"d%.*s\","
+static const char *items_list_item = "{\"_id\":\"%.*s\","
+                                     "\"deviceId\":\"%.*s\","
                                      "\"deviceName\":\"%.*s\","
                                      "\"deviceArmed\":true,"
                                      "\"hasGetter\":%s,"
@@ -51,25 +52,57 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
         {
             for (int i = 0; i < MAX_DEV; i++)
             {
-                uint32_t current_state = interface_common_gpio_state_get(devices[i].out_gpio);
 
                 char dev_value[40];
                 switch (devices[i].dev_type)
                 {
-                case TAMPER:
+                // case TAMPER:
+                case EZPI_DEV_TYPE_ONE_WIRE:
                 {
                     snprintf(dev_value, sizeof(dev_value), "%.02f,\"scale\":\"celsius\"", dht11_service_get_temperature());
                     break;
                 }
-                case LED:
-                case SWITCH:
-                case PLUG:
+                case EZPI_DEV_TYPE_I2C:
                 {
+                    static int count = 0;
+                    switch (count)
+                    {
+                        uint16_t val;
+                    case 0:
+                        count++;
+                        val = accel_x_value_read();
+                        snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\"", val);
+                        break;
+                    case 1:
+                        count++;
+                        val = accel_y_value_read();
+                        snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\"", val);
+                        break;
+                    case 2:
+                        count = 0;
+                        val = accel_z_value_read();
+                        snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\"", val);
+                        break;
+
+                    default:
+                        break;
+                    }
+
+                    break;
+                }
+                // case LED:
+                // case SWITCH:
+                // case PLUG:
+                case EZPI_DEV_TYPE_DIGITAL_OP:
+                case EZPI_DEV_TYPE_DIGITAL_IP:
+                {
+                    uint32_t current_state = interface_common_gpio_state_get(devices[i].out_gpio);
                     snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
                     break;
                 }
                 default:
                 {
+                    snprintf(dev_value, sizeof(dev_value), "0");
                     break;
                 }
                 }
@@ -167,7 +200,7 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
         char item_id[20] = {'\0', '\0'};
         parse_item_id((char *)params.ptr, params.len, item_id);
 
-        int device_idx = devices_common_get_device_by_item_id(&item_id[1]);
+        int device_idx = devices_common_get_device_by_item_id(item_id);
 
         if (device_idx < MAX_DEV)
         {
@@ -175,15 +208,8 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
             uint32_t state = value.len ? (strncmp(value.ptr, "true", 4) ? false : true) : false;
             TRACE_D("Current state: %d", state);
 
-            if (dev_list[device_idx].out_inv)
-            {
-                state = state ? 0 : 1;
-                interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
-            }
-            else
-            {
-                interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
-            }
+            state = dev_list[device_idx].out_inv ? (state ? 0 : 1) : state;
+            interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
         }
 
         TRACE_B(">> WS Tx - '%.*s' [%d]\r\n%s", method->len, method->ptr, strlen(send_buf), send_buf);
@@ -220,14 +246,14 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
             TRACE_W("value: %.*s", value.len, value.ptr);
 
             parse_item_id((char *)params.ptr, params.len, item_id);
-            device_idx = devices_common_get_device_by_item_id(&item_id[1]);
+            device_idx = devices_common_get_device_by_item_id(item_id);
         }
         else
         {
             device_idx = device_index;
         }
 
-        static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\"hub.item.updated\",\"result\":{\"_id\":\"a%.*s\",\"deviceId\":\"d%.*s\","
+        static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\"hub.item.updated\",\"result\":{\"_id\":\"%.*s\",\"deviceId\":\"%.*s\","
                                          "\"deviceName\":\"%.*s\",\"deviceCategory\":\"%.*s\",\"deviceSubcategory\":\"%.*s\",\"roomName\":\"%.*s\","
                                          "\"serviceNotification\":false,\"userNotification\":false,\"notifications\":null,\"name\":\"%.*s\",\"valueType\":\"%s\","
                                          "\"value\":%s}}";
@@ -237,27 +263,61 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
         if (device_idx < MAX_DEV)
         {
             s_device_properties_t *dev_list = devices_common_device_list();
-            uint32_t current_state = interface_common_gpio_state_get(dev_list[device_idx].out_gpio);
 
             char dev_value[100];
+            memset(dev_value, 0, sizeof(dev_value));
+
             switch (dev_list[device_idx].dev_type)
             {
-            case TAMPER:
+#warning "need to replace with id_item
+            case EZPI_DEV_TYPE_ONE_WIRE:
             {
                 // snprintf(dev_value, sizeof(dev_value), "\"%.02f\",\"scale\":\"celsius\"", dht11_service_get_temperature());
                 float val = dht11_service_get_temperature();
                 snprintf(dev_value, sizeof(dev_value), "%.02f,\"valueFormatted\":\"%.02f\",\"scale\":\"celsius\",\"syncNotification\":false", val, val);
                 break;
             }
-            case LED:
-            case SWITCH:
-            case PLUG:
+            case EZPI_DEV_TYPE_I2C:
             {
+                static int count = 0;
+                switch (count)
+                {
+                    uint16_t val;
+                case 0:
+                    count++;
+                    val = accel_x_value_read();
+                    snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\",\"syncNotification\":false", val);
+                    break;
+                case 1:
+                    count++;
+                    val = accel_y_value_read();
+                    snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\",\"syncNotification\":false", val);
+                    break;
+                case 2:
+                    count = 0;
+                    val = accel_z_value_read();
+                    snprintf(dev_value, sizeof(dev_value), "%d,\"scale\":\"meter_per_second_square\",\"syncNotification\":false", val);
+                    break;
+
+                default:
+                    break;
+                }
+
+                break;
+            }
+            // case LED:
+            // case SWITCH:
+            // case PLUG:
+            case EZPI_DEV_TYPE_DIGITAL_OP:
+            case EZPI_DEV_TYPE_DIGITAL_IP:
+            {
+                uint32_t current_state = interface_common_gpio_state_get(dev_list[device_idx].out_gpio);
                 snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
                 break;
             }
             default:
             {
+                snprintf(dev_value, sizeof(dev_value), "0");
                 break;
             }
             }

@@ -32,6 +32,7 @@ static void __gpio_intr_proces(void *pv)
     while (1)
     {
         const uint32_t event_gpio_n = interface_common_get_gpio_isr_event(UINT32_MAX);
+        // TRACE_B("Queue size: %d", interface_get_message_count_in_queue());
         TRACE_D("Got gpio event -> GPIO num: %d", event_gpio_n);
         TickType_t tick_now = xTaskGetTickCount();
 

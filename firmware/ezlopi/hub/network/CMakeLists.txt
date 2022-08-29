@@ -6,4 +6,4 @@ idf_component_register(SRCS "${src_files}"
     debug
     devices_common
     esp_netif
-    wifi)
+    wifi_interface)

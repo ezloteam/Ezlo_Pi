@@ -10,7 +10,7 @@
 
 const char *devices_1_start = "{\"method\":\"hub.devices.list\",\"msg_id\":%d,\"id\":\"%.*s\",\"result\":{\"devices\":[";
 const char *devices_1_devs =
-    "{\"_id\":\"d%.*s\","        // 588b7eb528b12d03be86f36f
+    "{\"_id\":\"%.*s\","        // 588b7eb528b12d03be86f36f
     "\"deviceTypeId\":\"%.*s\"," // plughub
     "\"parentDeviceId\":\"\","
     "\"category\":\"%.*s\","    // switch -> Category -> https://api.ezlo.com/devices/categories/index.html
