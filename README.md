@@ -10,7 +10,7 @@ Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 
 ## supported features
 * __GPIO__
-* __Analaog Input__
+* __Analog Input__
 * __Digital Input__
 * __I2C__
 * __One Wire__
