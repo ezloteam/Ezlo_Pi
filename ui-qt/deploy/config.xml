@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<Installer>
+    <Name>EzloPi</Name>
+    <Version>1.2.0-0</Version>
+    <Title>EzloPi</Title>
+    <Publisher>Ezlo Inc</Publisher>
+    <ProductUrl>https://www.ezlopi.com</ProductUrl>
+    <StartMenuDir>EzloPi</StartMenuDir>
+    <TargetDir>@RootDir@Program Files\Ezlo</TargetDir>
+    <AllowSpaceInPath>true</AllowSpaceInPath>
+</Installer>
