@@ -1,7 +1,7 @@
 
 [![N|Ezlo-Pi](https://www.ezlopi.com/wp-content/uploads/2022/07/Logo.svg)](https://www.ezlopi.com/)
 
-[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network) [![GitHub stars](https://img.shields.io/github/stars/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/stargazers) [![GitHub license](https://img.shields.io/github/license/ezloteam/Ezlo_Pi/)](https://github.com/ezloteam/Ezlo_Pi/blob/887e05dc07885874b0ce221bdb22af61b99ac0da/LICENCE.md)
+[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network) [![GitHub stars](https://img.shields.io/github/stars/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/stargazers) [![License](https://img.shields.io/github/license/ezloteam/Ezlo_Pi/)](https://github.com/ezloteam/Ezlo_Pi/blob/master/LICENCE.txt)
 
 # ezlopi
 EzloPi is an open-source project contributed by Ezlo Innovation to extend the capabilities of ESP32 chipset-based devices and platforms. It provides unparalleled capabilities to configure and control your ESP-based devices and bring any of your automation ideas to life.
@@ -23,7 +23,7 @@ Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 # 1. Getting started
 EzloPi has a windows based configurator application to configure the ESP32 for any of the feature mentioned above at supported features. The desktop application can be used to configure the ESP32 device for interfacing Relay, and analog input, digital input, an I2C based sensor etc in no time. After the device has been configured using the desktop app, anyone can use our cloud and mobile app serviece to get control of device from anywhere in real-time.
 
-![EzloPi Desktop UI](https://github.com/ezloteam/Ezlo_Pi/ezlopi_screenshot.png)
+![EzloPi Desktop UI](https://github.com/ezloteam/Ezlo_Pi/blob/master/ezlopi_screenshot.png)
 
 # 2. Customizing and building EzloPi firmware in your local setup
 It is required to have [ESP-IDF](https://www.espressif.com/en/products/sdks/esp-idf) installed in your machine.
