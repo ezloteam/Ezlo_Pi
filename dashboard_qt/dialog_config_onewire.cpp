@@ -26,11 +26,12 @@ Dialog_config_onewire::~Dialog_config_onewire() {
 }
 
 void Dialog_config_onewire::on_buttonBox_accepted() {
-    ezlogic_device_one_wire_t onewire_user_data;
+    ezpi_device_one_wire_t onewire_user_data;
     onewire_user_data.dev_type = EZPI_DEV_TYPE_ONE_WIRE;
     onewire_user_data.dev_name = ui->lineEdit_device_name->text();
     onewire_user_data.id_room = 0; //TBD
-    onewire_user_data.id_item = EZPI_ITEM_TYPE_DHT11;
+
+    onewire_user_data.id_item = (ezpi_item_type)(EZPI_ITEM_TYPE_DHT11 + ui->comboBox_onewire_subtype->currentIndex());
 
     ezpi_high_low digital_io_default_value = (ezpi_high_low)ui->comboBox_default_value_gpio->currentIndex();
     digital_io_default_value ? onewire_user_data.val_ip = true : onewire_user_data.val_ip = false;
@@ -45,7 +46,7 @@ void Dialog_config_onewire::on_buttonBox_accepted() {
 
     // Adding device to the device vector
     if(ezloPi_one_wire->EZPI_ADD_ONEWIRE_DEVICE(onewire_user_data) == EZPI_SUCCESS) {
-       QMessageBox::information(this, "Success", "Successfully added a one wire device.");
+//       QMessageBox::information(this, "Success", "Successfully added a one wire device.");
        // Trigger signal to add device in the table
        emit ezpi_signal_dev_onewire_added(EZPI_DEV_TYPE_ONE_WIRE);
     } else if(ezloPi_one_wire->EZPI_ADD_ONEWIRE_DEVICE(onewire_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {

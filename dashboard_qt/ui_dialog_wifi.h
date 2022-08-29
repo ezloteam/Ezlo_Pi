@@ -10,6 +10,7 @@
 #define UI_DIALOG_WIFI_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
@@ -34,6 +35,9 @@ public:
         if (Dialog_WiFi->objectName().isEmpty())
             Dialog_WiFi->setObjectName(QString::fromUtf8("Dialog_WiFi"));
         Dialog_WiFi->resize(314, 162);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_WiFi->setWindowIcon(icon);
         buttonBox = new QDialogButtonBox(Dialog_WiFi);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(0, 120, 301, 32));

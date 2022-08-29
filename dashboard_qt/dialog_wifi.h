@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QSerialPort>
+#include <QTimer>
+#include "ezlopi.h"
 
 namespace Ui {
 class Dialog_WiFi;
@@ -19,11 +21,16 @@ public:
 private slots:
     void on_checkBox_view_password_stateChanged(int arg1);
     void on_buttonBox_accepted();
-    void process_response(QString data_response_set_wifi);
 
 private:
     Ui::Dialog_WiFi *ui;
     QSerialPort * ezpi_serial_wifi;
+    QByteArray * data_action_set_wifi_char_array;
+
+    void ezpi_wifi_serial_transfer(QByteArray);
+
+signals:
+    void ezpi_signal_serial_rx_wifi(ezpi_cmd);
 
 };
 

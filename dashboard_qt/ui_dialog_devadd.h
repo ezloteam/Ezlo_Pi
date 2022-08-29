@@ -10,6 +10,7 @@
 #define UI_DIALOG_DEVADD_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
@@ -28,6 +29,9 @@ public:
         if (Dialog_devadd->objectName().isEmpty())
             Dialog_devadd->setObjectName(QString::fromUtf8("Dialog_devadd"));
         Dialog_devadd->resize(247, 120);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_devadd->setWindowIcon(icon);
         buttonBox = new QDialogButtonBox(Dialog_devadd);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(30, 70, 191, 32));

@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QMessageBox>
-#include "ezpi_data_types.h"
+#include "ezlopi.h"
 
 namespace Ui {
 class Dialog_config_onewire;

@@ -1,6 +1,6 @@
 #include "dialog_devadd.h"
 #include "ui_dialog_devadd.h"
-#include "ezpi_data_types.h"
+#include "ezlopi.h"
 
 #include <QDebug>
 

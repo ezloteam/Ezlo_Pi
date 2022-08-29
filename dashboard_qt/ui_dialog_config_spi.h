@@ -10,6 +10,7 @@
 #define UI_DIALOG_CONFIG_SPI_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
@@ -41,6 +42,9 @@ public:
         if (Dialog_config_spi->objectName().isEmpty())
             Dialog_config_spi->setObjectName(QString::fromUtf8("Dialog_config_spi"));
         Dialog_config_spi->resize(198, 296);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_config_spi->setWindowIcon(icon);
         buttonBox_config_spi = new QDialogButtonBox(Dialog_config_spi);
         buttonBox_config_spi->setObjectName(QString::fromUtf8("buttonBox_config_spi"));
         buttonBox_config_spi->setGeometry(QRect(10, 249, 171, 32));

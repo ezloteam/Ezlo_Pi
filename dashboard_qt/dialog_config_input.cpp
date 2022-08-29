@@ -29,7 +29,7 @@ Dialog_config_input::~Dialog_config_input() {
 
 void Dialog_config_input::on_buttonBox_accepted() {
 
-    ezlogic_device_digital_ip_t digital_ip_user_data;
+    ezpi_device_digital_ip_t digital_ip_user_data;
 
     digital_ip_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_IP;
     digital_ip_user_data.dev_name = ui->lineEdit_device_name->text();
@@ -52,7 +52,7 @@ void Dialog_config_input::on_buttonBox_accepted() {
 
     // Adding device to the device vector
     if(ezloPi_digital_ip->EZPI_ADD_INPUT_DEVICE(digital_ip_user_data) == EZPI_SUCCESS) {
-       QMessageBox::information(this, "Success", "Successfully added a input device.");
+//       QMessageBox::information(this, "Success", "Successfully added a input device.");
        // Trigger signal to add device in the table
        emit ezpi_signal_dev_ip_added(EZPI_DEV_TYPE_DIGITAL_IP);
     } else if(ezloPi_digital_ip->EZPI_ADD_INPUT_DEVICE(digital_ip_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {

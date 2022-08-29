@@ -61,7 +61,7 @@ void Dialog_config_i2c::on_comboBox_i2c_gpio_scl_currentIndexChanged(int index) 
 
 
 void Dialog_config_i2c::on_buttonBox_accepted() {
-    ezlogic_device_I2C_t i2c_user_data;
+    ezpi_device_I2C_t i2c_user_data;
 
     i2c_user_data.dev_type = EZPI_DEV_TYPE_I2C;
     i2c_user_data.dev_name = ui->lineEdit_device_name->text();
@@ -86,7 +86,7 @@ void Dialog_config_i2c::on_buttonBox_accepted() {
 
     // Adding device to the device vector
     if(ezloPi_i2c->EZPI_ADD_I2C_DEVICE(i2c_user_data) == EZPI_SUCCESS) {
-       QMessageBox::information(this, "Success", "Successfully added an I2C device.");
+//       QMessageBox::information(this, "Success", "Successfully added an I2C device.");
        // Trigger signal to add device in the table
        emit ezpi_signal_dev_i2c_added(EZPI_DEV_TYPE_I2C);
     } else if(ezloPi_i2c->EZPI_ADD_I2C_DEVICE(i2c_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {

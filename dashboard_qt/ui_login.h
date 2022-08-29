@@ -10,6 +10,7 @@
 #define UI_LOGIN_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
@@ -43,6 +44,9 @@ public:
         if (login->objectName().isEmpty())
             login->setObjectName(QString::fromUtf8("login"));
         login->resize(346, 225);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        login->setWindowIcon(icon);
         label_user_name = new QLabel(login);
         label_user_name->setObjectName(QString::fromUtf8("label_user_name"));
         label_user_name->setGeometry(QRect(32, 47, 71, 16));

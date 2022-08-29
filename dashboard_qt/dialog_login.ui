@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Login to Ezlo Cloud</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="ezlopi.qrc">
+    <normaloff>:/res/icon.png</normaloff>:/res/icon.png</iconset>
+  </property>
   <widget class="QLabel" name="label_user_name">
    <property name="geometry">
     <rect>
@@ -165,6 +169,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="ezlopi.qrc"/>
+ </resources>
  <connections/>
 </ui>

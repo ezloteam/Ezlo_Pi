@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="ezlopi.qrc">
+    <normaloff>:/res/icon.png</normaloff>:/res/icon.png</iconset>
+  </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
@@ -180,6 +184,11 @@
      <string>DHT11</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>DHT22</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_device_subtype">
    <property name="geometry">
@@ -195,7 +204,9 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="ezlopi.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

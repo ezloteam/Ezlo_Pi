@@ -1,5 +1,5 @@
-#ifndef LOGIN_H
-#define LOGIN_H
+#ifndef DIALOG_LOGIN_H
+#define DIALOG_LOGIN_H
 
 #include <QDialog>
 #include<QtNetwork>
@@ -45,4 +45,4 @@ private:
     uint64_t ezpi_token_expiry_time;
 };
 
-#endif // LOGIN_H
+#endif // DIALOG_LOGIN_H

@@ -48,7 +48,7 @@ Dialog_configdev_digitalio::~Dialog_configdev_digitalio() {
 
 void Dialog_configdev_digitalio::on_buttonBox_accepted() {
 
-    ezlogic_device_digital_op_t digital_op_user_data;
+    ezpi_device_digital_op_t digital_op_user_data;
 
      digital_op_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
      digital_op_user_data.dev_name = ui->lineEdit_device_name->text();
@@ -92,7 +92,7 @@ void Dialog_configdev_digitalio::on_buttonBox_accepted() {
 
      // Adding device to the device vector
      if(ezloPi_digital_io->EZPI_ADD_OUTPUT_DEVICE(digital_op_user_data) == EZPI_SUCCESS) {
-        QMessageBox::information(this, "Success", "Successfully added an output device.");
+//        QMessageBox::information(this, "Success", "Successfully added an output device.");
         // Trigger signal to add device in the table
         emit ezpi_signal_dev_op_added(EZPI_DEV_TYPE_DIGITAL_OP);
      } else if(ezloPi_digital_io->EZPI_ADD_OUTPUT_DEVICE(digital_op_user_data) == EZPI_ERROR_REACHED_MAX_DEV) {

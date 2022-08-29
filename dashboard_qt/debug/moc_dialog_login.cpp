@@ -1,5 +1,5 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'login.h'
+** Meta object code from reading C++ file 'dialog_login.h'
 **
 ** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
@@ -7,11 +7,11 @@
 *****************************************************************************/
 
 #include <memory>
-#include "../login.h"
+#include "../dialog_login.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'login.h' doesn't include <QObject>."
+#error "The header file 'dialog_login.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
 #error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."

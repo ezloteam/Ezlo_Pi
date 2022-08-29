@@ -10,6 +10,7 @@
 #define UI_DIALOG_CONFIG_ONEWIRE_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -44,6 +45,9 @@ public:
         if (Dialog_config_onewire->objectName().isEmpty())
             Dialog_config_onewire->setObjectName(QString::fromUtf8("Dialog_config_onewire"));
         Dialog_config_onewire->resize(331, 229);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Dialog_config_onewire->setWindowIcon(icon);
         buttonBox = new QDialogButtonBox(Dialog_config_onewire);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(-33, 180, 341, 32));
@@ -84,6 +88,7 @@ public:
         checkBox_invert_output->setGeometry(QRect(187, 133, 141, 24));
         comboBox_onewire_subtype = new QComboBox(Dialog_config_onewire);
         comboBox_onewire_subtype->addItem(QString());
+        comboBox_onewire_subtype->addItem(QString());
         comboBox_onewire_subtype->setObjectName(QString::fromUtf8("comboBox_onewire_subtype"));
         comboBox_onewire_subtype->setGeometry(QRect(20, 80, 141, 26));
         label_device_subtype = new QLabel(Dialog_config_onewire);
@@ -112,6 +117,7 @@ public:
         radioButton_pulldown->setText(QCoreApplication::translate("Dialog_config_onewire", "PULL-DOWN", nullptr));
         checkBox_invert_output->setText(QCoreApplication::translate("Dialog_config_onewire", "INVERT OUTPUT", nullptr));
         comboBox_onewire_subtype->setItemText(0, QCoreApplication::translate("Dialog_config_onewire", "DHT11", nullptr));
+        comboBox_onewire_subtype->setItemText(1, QCoreApplication::translate("Dialog_config_onewire", "DHT22", nullptr));
 
         label_device_subtype->setText(QCoreApplication::translate("Dialog_config_onewire", "Device Subtype", nullptr));
     } // retranslateUi
