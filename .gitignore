@@ -369,3 +369,13 @@ firmware/bootloader/subproject/*
 **/*.msm
 **/*.msp
 
+<<<<<<< HEAD
+=======
+# JetBrains Rider
+**/*.sln.iml
+
+# QT UI
+dashboard_qt/devs/*
+dashboard_qt/release/devs/
+dashboard_qt/ezpibins/*
+>>>>>>> qt

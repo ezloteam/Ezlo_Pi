@@ -1,167 +1,71 @@
 
 [![N|Ezlo-Pi](https://www.ezlopi.com/wp-content/uploads/2022/07/Logo.svg)](https://www.ezlopi.com/)
 
-[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network) [![GitHub stars](https://img.shields.io/github/stars/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/stargazers) [![GitHub license](https://img.shields.io/github/license/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi) [![Twitter](https://img.shields.io/twitter/url?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fezloteam%2FEzlo_Pi)
+[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network) [![GitHub stars](https://img.shields.io/github/stars/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/stargazers) [![License](https://img.shields.io/github/license/ezloteam/Ezlo_Pi/)](https://github.com/ezloteam/Ezlo_Pi/blob/master/LICENCE.txt)
 
+# ezlopi
+EzloPi is an open-source project contributed by Ezlo Innovation to extend the capabilities of ESP32 chipset-based devices and platforms. It provides unparalleled capabilities to configure and control your ESP-based devices and bring any of your automation ideas to life.
 
-## _Steps to setup working environment for Ezlo-Pi_
+Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 
-[Ezlo-Pi: Master](https://github.com/ezloteam/Ezlo_Pi/tree/master)
+## supported features
+* __GPIO__
+* __Analog Input__
+* __Digital Input__
+* __I2C__
+* __One Wire__
 
-  
+# 1. Getting started
+EzloPi has a windows based configurator application to configure the ESP32 for any of the feature mentioned above at supported features. The desktop application can be used to configure the ESP32 device for interfacing Relay, and analog input, digital input, an I2C based sensor etc in no time. After the device has been configured using the desktop app, anyone can use our cloud and mobile app serviece to get control of device from anywhere in real-time.
 
-# 1. Setting esp-idf in Linux
+![EzloPi Desktop UI](https://github.com/ezloteam/Ezlo_Pi/blob/master/ezlopi_screenshot.png)
 
-#### 1. Clone esp-idf reposository
+# 2. Customizing and building EzloPi firmware in your local setup
+It is required to have [ESP-IDF](https://www.espressif.com/en/products/sdks/esp-idf) installed in your machine.
+Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/get-started/index.html). IDF version in this project : 4.4.1.
 
-```bash
-
-git clone -b v4.4.1 --recursive https://github.com/espressif/esp-idf.git
-cd esp-idf
-```
-
-#### 2. Install esp-idf
-
-```bash
-./install.sh
-```
-
-#### 3. export esp-idf
-
-```bash
-. ./export.sh
-```
-
-#### OR
-
-- Follow the instructions: https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-setup.html
-
-# 2. Setting esp-idf in Windows
-
-**Follow this instructions: https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/windows-setup.html**
-
-**OR**
-
-#### 1. Download esp-idf installer (version: v4.4.1)
-[https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-offline-4.4.1.exe?](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-offline-4.4.1.exe?  "https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-offline-4.4.1.exe?")
-
-#### 2. Install _"esp-idf-tools-setup-offline-4.4.1.exe"_
-
-# 3. Settings up Ezlo-Pi source code
-
-#### 1. Getting Ezlo-Pi repository from github
-
+#### 1. Clone Ezlo-Pi repository from github
 Open terminal or bash-shell and run the below commands
-
 ```bash
-
 git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
-
 cd ezlopi/firmware/ezlopi
-
 ```
-
 #### 2. Build
-
 using ```idf.py```
-
 ```bash
-
 idf.py build
-
 ```
-
 Using custom command
-
 ###### a. To generate test release firmware:
-
 Generates .bin files in firmware/[version] folder. The below command also increases the build number.
-
 ```bash
-
 ./build.sh test
-
 ```
-
 ###### b. To only build:
-
 Does not generate any .bin files in firmware/[version] folder. This command will only increase the build number in version.
-
 ```bash
-
 ./build.sh build
-
 ```
-
-###### c. Generate release firmware:
-
+###### c. Build for release firmware:
 Generates .bin files in firmware/[version] folder. The below command also creates the .bin files in firmware/[version] folder
-
 ```bash
-
 ./build.sh release
-
 ```
-
 #### 3. flash the firmware
-
 using usb port and baudrate
-
 ```bash
-
-idf.py flash
-
+idf.py -p <COM Port Name> -b <baud> flash
+```
+Monitor
+```bash
+idf.py -p <COM Port Name> monitor
 ```
 
-using specific port and baudrate
+# 3. Customizing Desktop app:
+The desktop application has been build under QT V 5.15. QT creator with necessary compiler should be set in your local machine. 
+The installer script is under _deploy_ directory.
 
-Linux:
-
-```bash
-
-idf.py -p /dev/ttyUSB0 -b 921600 flash
-
-```
-
-Windows:
-
-```bash
-
-idf.py -p COM9 -b 921600 flash
-
-```
-
-#### 4. Monitor on console
-
-using usb port and baudrate
-
-```bash
-
-idf.py monitor
-
-```
-
-using specific port:
-
-Linux:
-
-```bash
-
-idf.py -p /dev/ttyUSB0 monitor
-
-```
-
-Windows:
-
-```bash
-
-idf.py -p COM9 monitor
-
-```
-
-## 4: Flashing firmware using QT-App
-
-## 5: Working with examples
+# 4. Working with examples
 
 [Fllow from the examples](https://www.ezlopi.com/examples/)
 1. [EzloPi AC Lamp setup with Relay interfacing​](https://www.ezlopi.com/examples/relay-circuitry-and-lamp-circuit-setup/)
