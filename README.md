@@ -10,15 +10,10 @@ Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 
 ## supported features
 * __GPIO__
-* __Analaog Input__
+* __Analog Input__
 * __Digital Input__
 * __I2C__
 * __One Wire__
-
-## _Steps to setup working environment for Ezlo-Pi_
-
-[Ezlo-Pi: Master](https://github.com/ezloteam/Ezlo_Pi/)
-
 
 # 1. Getting started
 EzloPi has a windows based configurator application to configure the ESP32 for any of the feature mentioned above at supported features. The desktop application can be used to configure the ESP32 device for interfacing Relay, and analog input, digital input, an I2C based sensor etc in no time. After the device has been configured using the desktop app, anyone can use our cloud and mobile app serviece to get control of device from anywhere in real-time.
@@ -66,11 +61,11 @@ Monitor
 idf.py -p <COM Port Name> monitor
 ```
 
-# 3: Customizing Desktop app:
+# 3. Customizing Desktop app:
 The desktop application has been build under QT V 5.15. QT creator with necessary compiler should be set in your local machine. 
 The installer script is under _deploy_ directory.
 
-# 4: Working with examples
+# 4. Working with examples
 
 [Fllow from the examples](https://www.ezlopi.com/examples/)
 1. [EzloPi AC Lamp setup with Relay interfacing​](https://www.ezlopi.com/examples/relay-circuitry-and-lamp-circuit-setup/)
