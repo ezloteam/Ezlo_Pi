@@ -28,7 +28,7 @@ void interface_common_init_v2(void)
 
     for (int idx = 0; idx < MAX_DEV; idx++)
     {
-        if (device_list[idx].input_gpio)
+        if ((device_list[idx].input_gpio >= 0) && (device_list[idx].input_gpio < GPIO_NUM_MAX))
         {
             gpio_reset_pin(device_list[idx].input_gpio);
 
@@ -50,7 +50,7 @@ void interface_common_init_v2(void)
             }
         }
 
-        if (device_list[idx].out_gpio)
+        if ((device_list[idx].out_gpio >= 0) && (device_list[idx].out_gpio < GPIO_NUM_MAX))
         {
             TRACE_B("Output gpio - Num: %d, pullup: %d, Val: %d, Inv: %d",
                     device_list[idx].out_gpio, device_list[idx].output_pullup,
