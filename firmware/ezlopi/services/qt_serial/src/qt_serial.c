@@ -23,12 +23,20 @@
 #include "wifi_interface.h"
 #include "factory_info.h"
 #include "version.h"
+#include "sdkconfig.h"
 
 static const int RX_BUF_SIZE = 3096;
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
 #define TXD_PIN (GPIO_NUM_1)
 #define RXD_PIN (GPIO_NUM_3)
-#define STORAGE_NAMESPACE "storage"
+#elif defined(CONFIG_IDF_TARGET_ESP32S2)
+#elif defined(CONFIG_IDF_TARGET_ESP32C3)
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+#define TXD_PIN (GPIO_NUM_43)
+#define RXD_PIN (GPIO_NUM_44)
+#endif
+
 // cJson Types
 
 void QT_GET_INFO();
@@ -332,33 +340,6 @@ void QT_RESPONE(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
 
 void QT_SET_DATA(const char *data)
 {
-#if 0
-    nvs_handle_t confi_data;
-    esp_err_t err;
-    err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &confi_data);
-    if (err != ESP_OK)
-    {
-        QT_RESPONE(3, 0, 5);
-        return;
-    }
-
-    err = nvs_set_str(confi_data, "confi_data", data);
-    if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
-    {
-        QT_RESPONE(3, 0, 5);
-        return;
-    }
-
-    err = nvs_commit(confi_data);
-    if (err != ESP_OK)
-    {
-        QT_RESPONE(3, 0, 5);
-        return;
-    }
-    nvs_close(confi_data);
-    QT_RESPONE(3, 1, 5);
-#endif
-
     uint8_t ret = nvs_storage_write_config_data_str(data);
     if (ret)
     {

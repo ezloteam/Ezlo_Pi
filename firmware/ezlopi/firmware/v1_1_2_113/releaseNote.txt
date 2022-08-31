@@ -77,6 +77,3 @@ v1_1_2_112  Date: Fri 26 Aug 2022 06:59:05 PM +0545
 v1_1_2_113  Date: Mon 29 Aug 2022 04:58:28 PM +0545
 	tstest realase for esp32s3
 
-v1_1_2_114  Date: Tue 30 Aug 2022 01:33:02 PM +0545
-	Fixed UART pin for esp32s3, generating release for esp32s3
-

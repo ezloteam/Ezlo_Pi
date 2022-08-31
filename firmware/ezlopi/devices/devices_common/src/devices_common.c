@@ -8,7 +8,7 @@
 #include "debug.h"
 
 static uint32_t device_count = 0;
-static s_device_properties_t devices[MAX_DEV];
+static s_device_properties_t g_devices[MAX_DEV];
 
 #define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
     {                                                         \
@@ -30,13 +30,15 @@ static s_device_properties_t devices[MAX_DEV];
 
 extern void mpu_service_init(uint8_t scl_pin, uint8_t sda_pin, uint32_t dev_idx);
 extern void dht11_service_init(uint32_t dht_pin, uint32_t dev_idx);
-static void add_device_to_list(cJSON *devices, uint32_t dev_idx);
+static void add_device_to_list(cJSON *j_devices, uint32_t dev_idx);
+static void reset_device_list_gpio_pins(void);
 
 void devices_common_init_devices(void)
 {
     char *nvs_json_conf = NULL;
     nvs_storage_read_config_data_str(&nvs_json_conf);
-    memset(devices, 0, sizeof(s_device_properties_t) * MAX_DEV);
+    memset(g_devices, 0, sizeof(s_device_properties_t) * MAX_DEV);
+    reset_device_list_gpio_pins();
 
     if (nvs_json_conf)
     {
@@ -81,6 +83,15 @@ void devices_common_init_devices(void)
     }
 }
 
+static void reset_device_list_gpio_pins(void)
+{
+    for (int idx = 0; idx < MAX_DEV; idx++)
+    {
+        g_devices[idx].input_gpio = 0xff;
+        g_devices[idx].out_gpio = 0xff;
+    }
+}
+
 static void add_item_digital_out(cJSON *o_device, uint32_t dev_idx)
 {
     char *dev_name = NULL;
@@ -100,41 +111,39 @@ static void add_item_digital_out(cJSON *o_device, uint32_t dev_idx)
     CJSON_GET_VALUE_INT(o_device, "val_ip", val_ip);
     CJSON_GET_VALUE_INT(o_device, "val_op", val_op);
 
-    memset(&devices[dev_idx], 0, sizeof(s_device_properties_t));
-
     if (dev_name)
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "%s", dev_name);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "%s", dev_name);
     }
     else
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
     }
 
-    devices[dev_idx].dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
-    snprintf(devices[dev_idx].device_id, sizeof(devices[dev_idx].device_id), "de100%.3d", dev_idx);
-    snprintf(devices[dev_idx].item_id, sizeof(devices[dev_idx].item_id), "ab100%.3d", dev_idx);
-    snprintf(devices[dev_idx].roomId, sizeof(devices[dev_idx].roomId), "abcd%d", id_room);
-    snprintf(devices[dev_idx].roomName, sizeof(devices[dev_idx].roomName), "room-%d", id_room);
+    g_devices[dev_idx].dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
+    snprintf(g_devices[dev_idx].device_id, sizeof(g_devices[dev_idx].device_id), "de100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].item_id, sizeof(g_devices[dev_idx].item_id), "ab100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].roomId, sizeof(g_devices[dev_idx].roomId), "abcd%d", id_room);
+    snprintf(g_devices[dev_idx].roomName, sizeof(g_devices[dev_idx].roomName), "room-%d", id_room);
 
-    snprintf(devices[dev_idx].category, sizeof(devices[dev_idx].category), "switch");
-    snprintf(devices[dev_idx].subcategory, sizeof(devices[dev_idx].subcategory), "in_wall");
-    snprintf(devices[dev_idx].item_name, sizeof(devices[dev_idx].item_name), "switch"); // defined here: https://api.ezlo.com/devices/items/index.html
-    snprintf(devices[dev_idx].devicType, sizeof(devices[dev_idx].devicType), "switch.inwall");
-    snprintf(devices[dev_idx].value_type, sizeof(devices[dev_idx].value_type), "bool");
+    snprintf(g_devices[dev_idx].category, sizeof(g_devices[dev_idx].category), "switch");
+    snprintf(g_devices[dev_idx].subcategory, sizeof(g_devices[dev_idx].subcategory), "in_wall");
+    snprintf(g_devices[dev_idx].item_name, sizeof(g_devices[dev_idx].item_name), "switch"); // defined here: https://api.ezlo.com/devices/items/index.html
+    snprintf(g_devices[dev_idx].devicType, sizeof(g_devices[dev_idx].devicType), "switch.inwall");
+    snprintf(g_devices[dev_idx].value_type, sizeof(g_devices[dev_idx].value_type), "bool");
 
-    devices[dev_idx].input_gpio = gpio_in;
-    devices[dev_idx].input_inv = ip_inv;
-    devices[dev_idx].input_vol = val_ip;
-    devices[dev_idx].is_input = is_ip;
-    devices[dev_idx].is_meter = 0;
-    devices[dev_idx].out_gpio = gpio_out;
-    devices[dev_idx].out_inv = op_inv;
-    devices[dev_idx].out_vol = val_op;
-    devices[dev_idx].input_pullup = pullup_ip;
-    devices[dev_idx].output_pullup = pullup_op;
-    devices[dev_idx].has_getter = true;
-    devices[dev_idx].has_setter = true;
+    g_devices[dev_idx].input_gpio = gpio_in;
+    g_devices[dev_idx].input_inv = ip_inv;
+    g_devices[dev_idx].input_vol = val_ip;
+    g_devices[dev_idx].is_input = is_ip;
+    g_devices[dev_idx].is_meter = 0;
+    g_devices[dev_idx].out_gpio = gpio_out;
+    g_devices[dev_idx].out_inv = op_inv;
+    g_devices[dev_idx].out_vol = val_op;
+    g_devices[dev_idx].input_pullup = pullup_ip;
+    g_devices[dev_idx].output_pullup = pullup_op;
+    g_devices[dev_idx].has_getter = true;
+    g_devices[dev_idx].has_setter = true;
 }
 
 static void add_item_digital_in(cJSON *o_device, uint32_t dev_idx)
@@ -152,33 +161,33 @@ static void add_item_digital_in(cJSON *o_device, uint32_t dev_idx)
 
     if (dev_name)
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "%s", dev_name);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "%s", dev_name);
     }
     else
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
     }
 
-    devices[dev_idx].dev_type = EZPI_DEV_TYPE_DIGITAL_IP;
-    snprintf(devices[dev_idx].device_id, sizeof(devices[dev_idx].device_id), "de100%.3d", dev_idx);
-    snprintf(devices[dev_idx].item_id, sizeof(devices[dev_idx].item_id), "ab100%.3d", dev_idx);
-    snprintf(devices[dev_idx].roomId, sizeof(devices[dev_idx].roomId), "abcd%d", id_room);
-    snprintf(devices[dev_idx].roomName, sizeof(devices[dev_idx].roomName), "room-%d", id_room);
+    g_devices[dev_idx].dev_type = EZPI_DEV_TYPE_DIGITAL_IP;
+    snprintf(g_devices[dev_idx].device_id, sizeof(g_devices[dev_idx].device_id), "de100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].item_id, sizeof(g_devices[dev_idx].item_id), "ab100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].roomId, sizeof(g_devices[dev_idx].roomId), "abcd%d", id_room);
+    snprintf(g_devices[dev_idx].roomName, sizeof(g_devices[dev_idx].roomName), "room-%d", id_room);
 
-    snprintf(devices[dev_idx].category, sizeof(devices[dev_idx].category), "switch");
-    snprintf(devices[dev_idx].subcategory, sizeof(devices[dev_idx].subcategory), "in_wall");
-    snprintf(devices[dev_idx].item_name, sizeof(devices[dev_idx].item_name), "switch"); // defined here: https://api.ezlo.com/devices/items/index.html
-    snprintf(devices[dev_idx].devicType, sizeof(devices[dev_idx].devicType), "switch.inwall");
-    snprintf(devices[dev_idx].value_type, sizeof(devices[dev_idx].value_type), "bool");
+    snprintf(g_devices[dev_idx].category, sizeof(g_devices[dev_idx].category), "switch");
+    snprintf(g_devices[dev_idx].subcategory, sizeof(g_devices[dev_idx].subcategory), "in_wall");
+    snprintf(g_devices[dev_idx].item_name, sizeof(g_devices[dev_idx].item_name), "switch"); // defined here: https://api.ezlo.com/devices/items/index.html
+    snprintf(g_devices[dev_idx].devicType, sizeof(g_devices[dev_idx].devicType), "switch.inwall");
+    snprintf(g_devices[dev_idx].value_type, sizeof(g_devices[dev_idx].value_type), "bool");
 
-    devices[dev_idx].input_gpio = gpio_in;
-    devices[dev_idx].input_inv = ip_inv;
-    devices[dev_idx].input_vol = val_ip;
-    devices[dev_idx].is_input = true;
-    devices[dev_idx].is_meter = 0;
-    devices[dev_idx].input_pullup = pullup_ip;
-    devices[dev_idx].has_getter = true;
-    devices[dev_idx].has_setter = false;
+    g_devices[dev_idx].input_gpio = gpio_in;
+    g_devices[dev_idx].input_inv = ip_inv;
+    g_devices[dev_idx].input_vol = val_ip;
+    g_devices[dev_idx].is_input = true;
+    g_devices[dev_idx].is_meter = 0;
+    g_devices[dev_idx].input_pullup = pullup_ip;
+    g_devices[dev_idx].has_getter = true;
+    g_devices[dev_idx].has_setter = false;
 }
 
 static void add_item_analogue_in(cJSON *o_device, uint32_t dev_idx)
@@ -213,32 +222,32 @@ static void add_item_onewire(cJSON *o_device, uint32_t dev_idx)
     CJSON_GET_VALUE_INT(o_device, "pull_up", pullup);
     CJSON_GET_VALUE_INT(o_device, "val_ip", val_ip);
 
-    memset(&devices[dev_idx], 0, sizeof(s_device_properties_t));
+    memset(&g_devices[dev_idx], 0, sizeof(s_device_properties_t));
 
-    devices[dev_idx].dev_type = EZPI_DEV_TYPE_ONE_WIRE;
+    g_devices[dev_idx].dev_type = EZPI_DEV_TYPE_ONE_WIRE;
 
     if (dev_name)
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "%s", dev_name);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "%s", dev_name);
     }
     else
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
     }
 
-    snprintf(devices[dev_idx].device_id, sizeof(devices[dev_idx].device_id), "de100%.3d", dev_idx);
-    snprintf(devices[dev_idx].item_id, sizeof(devices[dev_idx].item_id), "ab100%.3d", dev_idx);
-    snprintf(devices[dev_idx].roomId, sizeof(devices[dev_idx].roomId), "abcd%d", id_room);
-    snprintf(devices[dev_idx].roomName, sizeof(devices[dev_idx].roomName), "room-%d", id_room);
+    snprintf(g_devices[dev_idx].device_id, sizeof(g_devices[dev_idx].device_id), "de100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].item_id, sizeof(g_devices[dev_idx].item_id), "ab100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].roomId, sizeof(g_devices[dev_idx].roomId), "abcd%d", id_room);
+    snprintf(g_devices[dev_idx].roomName, sizeof(g_devices[dev_idx].roomName), "room-%d", id_room);
 
-    snprintf(devices[dev_idx].category, sizeof(devices[dev_idx].category), "temperature");
-    devices[dev_idx].subcategory[0] = '\0';
-    snprintf(devices[dev_idx].item_name, sizeof(devices[dev_idx].item_name), "temp"); // defined here: https://api.ezlo.com/devices/items/index.html
-    snprintf(devices[dev_idx].devicType, sizeof(devices[dev_idx].devicType), "sensor");
-    snprintf(devices[dev_idx].value_type, sizeof(devices[dev_idx].value_type), "temperature");
+    snprintf(g_devices[dev_idx].category, sizeof(g_devices[dev_idx].category), "temperature");
+    g_devices[dev_idx].subcategory[0] = '\0';
+    snprintf(g_devices[dev_idx].item_name, sizeof(g_devices[dev_idx].item_name), "temp"); // defined here: https://api.ezlo.com/devices/items/index.html
+    snprintf(g_devices[dev_idx].devicType, sizeof(g_devices[dev_idx].devicType), "sensor");
+    snprintf(g_devices[dev_idx].value_type, sizeof(g_devices[dev_idx].value_type), "temperature");
 
-    devices[dev_idx].has_getter = true;
-    devices[dev_idx].has_setter = false;
+    g_devices[dev_idx].has_getter = true;
+    g_devices[dev_idx].has_setter = false;
 
     dht11_service_init(gpio, dev_idx);
 }
@@ -263,32 +272,32 @@ static void add_item_i2c(cJSON *o_device, uint32_t dev_idx)
     CJSON_GET_VALUE_INT(o_device, "pullup_sda", pullup_sda);
     CJSON_GET_VALUE_INT(o_device, "slave_addr", slave_addr);
 
-    memset(&devices[dev_idx], 0, sizeof(s_device_properties_t));
+    memset(&g_devices[dev_idx], 0, sizeof(s_device_properties_t));
 
-    devices[dev_idx].dev_type = EZPI_DEV_TYPE_I2C;
+    g_devices[dev_idx].dev_type = EZPI_DEV_TYPE_I2C;
 
     if (dev_name)
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "%s", dev_name);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "%s", dev_name);
     }
     else
     {
-        snprintf(devices[dev_idx].name, sizeof(devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "dev-%d:digital_out", dev_idx);
     }
 
-    snprintf(devices[dev_idx].device_id, sizeof(devices[dev_idx].device_id), "de100%.3d", dev_idx);
-    snprintf(devices[dev_idx].item_id, sizeof(devices[dev_idx].item_id), "ab100%.3d", dev_idx);
-    snprintf(devices[dev_idx].roomId, sizeof(devices[dev_idx].roomId), "abcd%.3d", dev_idx);
-    snprintf(devices[dev_idx].roomName, sizeof(devices[dev_idx].roomName), "room-%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].device_id, sizeof(g_devices[dev_idx].device_id), "de100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].item_id, sizeof(g_devices[dev_idx].item_id), "ab100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].roomId, sizeof(g_devices[dev_idx].roomId), "abcd%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].roomName, sizeof(g_devices[dev_idx].roomName), "room-%.3d", dev_idx);
 
-    snprintf(devices[dev_idx].category, sizeof(devices[dev_idx].category), "level_sensor");
-    // devices[dev_idx].subcategory[0] = '\0';
-    snprintf(devices[dev_idx].subcategory, sizeof(devices[dev_idx].subcategory), "navigation");
-    snprintf(devices[dev_idx].item_name, sizeof(devices[dev_idx].item_name), "acceleration_x_axis");
-    snprintf(devices[dev_idx].devicType, sizeof(devices[dev_idx].devicType), "sensor");
-    snprintf(devices[dev_idx].value_type, sizeof(devices[dev_idx].value_type), "value");
-    devices[dev_idx].has_getter = true;
-    devices[dev_idx].has_setter = false;
+    snprintf(g_devices[dev_idx].category, sizeof(g_devices[dev_idx].category), "level_sensor");
+    // g_devices[dev_idx].subcategory[0] = '\0';
+    snprintf(g_devices[dev_idx].subcategory, sizeof(g_devices[dev_idx].subcategory), "navigation");
+    snprintf(g_devices[dev_idx].item_name, sizeof(g_devices[dev_idx].item_name), "acceleration_x_axis");
+    snprintf(g_devices[dev_idx].devicType, sizeof(g_devices[dev_idx].devicType), "sensor");
+    snprintf(g_devices[dev_idx].value_type, sizeof(g_devices[dev_idx].value_type), "value");
+    g_devices[dev_idx].has_getter = true;
+    g_devices[dev_idx].has_setter = false;
 
     mpu_service_init(gpio_scl, gpio_sda, dev_idx);
 }
@@ -301,6 +310,8 @@ static void add_device_to_list(cJSON *o_device, uint32_t dev_idx)
 {
     int id_item, id_room, dev_type = 0, gpio_out, gpio_in = 0;
     CJSON_GET_VALUE_INT(o_device, "dev_type", dev_type);
+    TRACE_D("--------------dev_type: %u---------------", dev_type);
+    TRACE_D("-----------------------------------------", dev_type);
 
     switch ((e_dev_type_t)dev_type)
     {
@@ -363,6 +374,30 @@ static void add_device_to_list(cJSON *o_device, uint32_t dev_idx)
         TRACE_W("Un-recognized device type");
     }
     }
+
+    TRACE_D("device_id: %s", g_devices[dev_idx].device_id);
+    TRACE_D("name: %s", g_devices[dev_idx].name);
+    TRACE_D("roomId: %s", g_devices[dev_idx].roomId);
+    TRACE_D("roomName: %s", g_devices[dev_idx].roomName);
+    TRACE_D("item_id: %s", g_devices[dev_idx].item_id);
+    TRACE_D("item_name: %s", g_devices[dev_idx].item_name);
+    TRACE_D("input_vol: %u", g_devices[dev_idx].input_vol);
+    TRACE_D("out_vol: %u", g_devices[dev_idx].out_vol);
+    TRACE_D("input_gpio: %u", g_devices[dev_idx].input_gpio);
+    TRACE_D("out_gpio: %u", g_devices[dev_idx].out_gpio);
+    TRACE_D("input_pullup: %u", g_devices[dev_idx].input_pullup);
+    TRACE_D("output_pullup: %u", g_devices[dev_idx].output_pullup);
+    TRACE_D("is_input: %u", g_devices[dev_idx].is_input);
+    TRACE_D("input_inv: %u", g_devices[dev_idx].input_inv);
+    TRACE_D("out_inv: %u", g_devices[dev_idx].out_inv);
+    TRACE_D("is_meter: %u", g_devices[dev_idx].is_meter);
+    TRACE_D("category: %s", g_devices[dev_idx].category);
+    TRACE_D("subcategory: %s", g_devices[dev_idx].subcategory);
+    TRACE_D("devicType: %s", g_devices[dev_idx].devicType);
+    TRACE_D("value_type: %s", g_devices[dev_idx].value_type);
+    TRACE_D("has_getter: %u", g_devices[dev_idx].has_getter);
+    TRACE_D("has_setter: %u", g_devices[dev_idx].has_setter);
+    TRACE_D("-----------------------------------------", dev_type);
 }
 
 const char *devices_common_get_device_type_id(void)
@@ -372,17 +407,17 @@ const char *devices_common_get_device_type_id(void)
 
 s_device_properties_t *devices_common_device_list(void)
 {
-    return devices;
+    return g_devices;
 }
 
 int devices_common_get_device_by_item_id(const char *item_id)
 {
     for (int idx = 0; idx < MAX_DEV; idx++)
     {
-        if (devices[idx].name[0] && item_id[0])
+        if (g_devices[idx].name[0] && item_id[0])
         {
-            TRACE_D("Checking: %.*s | %s", sizeof(devices[idx].item_id), devices[idx].item_id, item_id);
-            if (0 == strncmp(devices[idx].item_id, item_id, sizeof(devices[idx].item_id)))
+            TRACE_D("Checking: %.*s | %s", sizeof(g_devices[idx].item_id), g_devices[idx].item_id, item_id);
+            if (0 == strncmp(g_devices[idx].item_id, item_id, sizeof(g_devices[idx].item_id)))
             {
                 return idx;
             }
@@ -396,4 +431,3 @@ int devices_common_get_device_by_item_id(const char *item_id)
 
     return 0xFFFF;
 }
-
