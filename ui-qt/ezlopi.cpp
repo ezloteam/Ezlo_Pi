@@ -1,9 +1,7 @@
 
 #include "ezlopi.h"
 
-EzPi::EzPi():
-    _ezpi_board_type(EZPI_BOARD_TYPE_ESP32_GENERIC)
-{
+EzPi::EzPi() {
 
     ezpi_device_types_str = new QStringList;
     ezpi_item_types_str = new QStringList;
@@ -54,9 +52,10 @@ void EzPi::EZPI_SET_BOARD_TYPE(ezpi_board_type board_type) {
     case EZPI_BOARD_TYPE_ESP32_GENERIC:
         ezpi_gpio_pool.resize(EZPI_ESP32_GENERIC_PINOUT_COUNT);
         break;
-    case EZPI_BOARD_TYPE_ESP32_C3:
-        break;
     case EZPI_BOARD_TYPE_ESP32_S3:
+        ezpi_gpio_pool.resize(EZPI_ESP32_S3_PINOUT_COUNT);
+        break;
+    case EZPI_BOARD_TYPE_ESP32_C3:
         break;
     default:
         break;
@@ -110,7 +109,58 @@ void EzPi::EZPI_INIT_BOARD(void) {
             ezpi_gpio_pool.at(38) = EZPI_DEV_TYPE_RESTRICTED;
             ezpi_gpio_pool.at(39) = EZPI_DEV_TYPE_INPUT_ONLY;
             break;
-        case EZPI_BOARD_TYPE_ESP32_C3:
+        case EZPI_BOARD_TYPE_ESP32_S3:
+            // Reference
+            // https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-reference/peripherals/gpio.html
+            ezpi_gpio_pool.at(0) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(1) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(2) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(3) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(4) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(5) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(6) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(7) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(8) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(9) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(10) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(11) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(12) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(13) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(14) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(15) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(16) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(17) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(18) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(19) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(20) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(21) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(22) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(23) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(24) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(25) = EZPI_DEV_TYPE_RESTRICTED;
+            ezpi_gpio_pool.at(26) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(27) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(28) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(29) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(30) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(31) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(32) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(33) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(34) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(35) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(36) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(37) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(38) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(39) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(40) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(41) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(42) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(43) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(44) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(45) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(46) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(47) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(48) = EZPI_DEV_TYPE_UNCONFIGURED;
             break;
         default:
             break;

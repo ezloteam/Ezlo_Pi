@@ -1,6 +1,6 @@
 #include <windows.h>
 
-IDI_ICON1	ICON	DISCARDABLE	"E:\\Projects\\nds\\Ezlo_Pi\\dashboard_qt\\res\\icon.ico"
+IDI_ICON1	ICON	DISCARDABLE	"E:\\Projects\\nds\\Ezlo_Pi\\ui-qt\\res\\icon.ico"
 
 VS_VERSION_INFO VERSIONINFO
 	FILEVERSION 0,0,0,0

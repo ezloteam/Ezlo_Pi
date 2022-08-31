@@ -49,8 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ezlogic_serial_port->setBaudRate(115200);
 
     EzloPi = new EzPi();
-    EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_GENERIC);
-    EzloPi->EZPI_INIT_BOARD();
 
     ezlogic_form_login = new login(this);
     ezlogic_form_WiFi = new Dialog_WiFi(this, ezlogic_serial_port);
@@ -115,6 +113,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusBar->addWidget(ezlogic_status);
 
     ezpi_show_status_message("EzloPi V1.2.0, Build 0");
+    EZPI_UINT8 ezlogic_selected_board = ui->comboBox_esp32_board_type->currentIndex() + 1;
+    EzloPi->EZPI_SET_BOARD_TYPE((ezpi_board_type)ezlogic_selected_board);
+    EzloPi->EZPI_INIT_BOARD();
 }
 
 MainWindow::~MainWindow() {
@@ -196,6 +197,8 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
         ui->comboBox_registered_devices->setEnabled(false);
 
         ui->pushButton_device_restart->setEnabled(false);
+
+        ui->comboBox_esp32_board_type->setEnabled(false);
     }
 }
 void MainWindow::on_comboBox_uart_list_currentIndexChanged() {
@@ -273,34 +276,77 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     ui->tableWidget_device_table->clearContents();
     ui->pushButton_connect_uart->setEnabled(false);
 
-    ezlogic_process_write_flash->setProgram("esptool.exe");
+    ezlogic_process_write_flash->setProgram("esptool.exe");       
+
 
     QStringList arguments;
+
     arguments.append("-p");
     arguments.append(ser_port);
     arguments.append("--chip");
-    arguments.append("esp32");
-    arguments.append("-b 460800");
-    arguments.append("--before");
-    arguments.append("default_reset");
-    arguments.append("--after");
-    arguments.append("hard_reset");
-    arguments.append("write_flash");
-    arguments.append("-z");
-    arguments.append("--flash_mode");
-    arguments.append("dio");
-    arguments.append("--flash_size");
-    arguments.append("detect");
-    arguments.append("--flash_freq");
-    arguments.append("40m");
-    arguments.append("0x1000");
-    arguments.append("ezpibins/0x1000.bin");
-    arguments.append("0x8000");
-    arguments.append("ezpibins/0x8000.bin");
-    arguments.append("0x10000");
-    arguments.append("ezpibins/0x10000.bin");
-    arguments.append("0xD000");
-    arguments.append("ezpibins/0xd000.bin");
+
+    switch(EzloPi->EZPI_GET_BOARD_TYPE()) {
+
+        case EZPI_BOARD_TYPE_NONE: {
+            break;
+        }
+
+        case EZPI_BOARD_TYPE_ESP32_GENERIC: {
+            arguments.append("esp32");
+            arguments.append("-b 460800");
+            arguments.append("--before");
+            arguments.append("default_reset");
+            arguments.append("--after");
+            arguments.append("hard_reset");
+            arguments.append("write_flash");
+            arguments.append("-z");
+            arguments.append("--flash_mode");
+            arguments.append("dio");
+            arguments.append("--flash_size");
+            arguments.append("detect");
+            arguments.append("--flash_freq");
+            arguments.append("40m");
+            arguments.append("0x1000");
+            arguments.append("ezpibins/esp32/0x1000.bin");
+            arguments.append("0x8000");
+            arguments.append("ezpibins/esp32/0x8000.bin");
+            arguments.append("0x10000");
+            arguments.append("ezpibins/esp32/0x10000.bin");
+            arguments.append("0xD000");
+            arguments.append("ezpibins/esp32/0xd000.bin");
+            break;
+        }
+
+        case EZPI_BOARD_TYPE_ESP32_S3: {
+            arguments.append("esp32s3");
+            arguments.append("-b 460800");
+            arguments.append("--before");
+            arguments.append("default_reset");
+            arguments.append("--after");
+            arguments.append("hard_reset");
+            arguments.append("write_flash");
+            arguments.append("-z");
+            arguments.append("--flash_mode");
+            arguments.append("dio");
+            arguments.append("--flash_size");
+            arguments.append("detect");
+            arguments.append("--flash_freq");
+            arguments.append("40m");
+            arguments.append("0x0");
+            arguments.append("ezpibins/esp32s3/bootloader.bin");
+            arguments.append("0x8000");
+            arguments.append("ezpibins/esp32s3/partition-table.bin");
+            arguments.append("0x10000");
+            arguments.append("ezpibins/esp32s3/ezlopi.bin");
+            arguments.append("0xD000");
+            arguments.append("ezpibins/esp32s3/ota_data_initial.bin");
+            break;
+        }
+
+        default: {
+            break;
+        }
+    }
 
     QString ezpi_selected_registered_device = ui->comboBox_registered_devices->currentText();
 //    QString message_user_flash = "You are now about to flash the firmware "
@@ -332,15 +378,24 @@ void MainWindow::on_comboBox_esp32_board_type_currentIndexChanged(int index) {
             break;
         case EZPI_BOARD_TYPE_ESP32_GENERIC:
             EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_GENERIC);
+            EzloPi->EZPI_INIT_BOARD();
+            ezlogic_clear_table_data();
+            ui->textBrowser_console_log->append("Warning : Data for previously selected device has been deleted.");
             qDebug() << "New Selected board : ESP32 Generic.";
-            break;
-        case EZPI_BOARD_TYPE_ESP32_C3:
-            EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_C3);
-            qDebug() << "New Selected board : ESP32 C3.";
             break;
          case EZPI_BOARD_TYPE_ESP32_S3:
             EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_S3);
+            EzloPi->EZPI_INIT_BOARD();
+            ezlogic_clear_table_data();
+            ui->textBrowser_console_log->append("Warning : Data for previously selected device has been deleted.");
             qDebug() << "New Selected board : ESP32 S3.";
+            break;
+        case EZPI_BOARD_TYPE_ESP32_C3:
+            EzloPi->EZPI_SET_BOARD_TYPE(EZPI_BOARD_TYPE_ESP32_C3);
+            EzloPi->EZPI_INIT_BOARD();
+            ezlogic_clear_table_data();
+            ui->textBrowser_console_log->append("Warning : Data for previously selected device has been deleted.");
+            qDebug() << "New Selected board : ESP32 C3.";
             break;
         default:
             break;
@@ -390,7 +445,7 @@ void MainWindow::on_pushButton_remove_device_clicked() {
 
     if(last_row == 1) {
         ui->pushButton_remove_device->setEnabled(false);
-        ui->pushButton_set_ezpi_config->setEnabled(false);
+//        ui->pushButton_set_ezpi_config->setEnabled(false);
     }
 }
 
@@ -627,6 +682,7 @@ void MainWindow::ezlogic_message_info_no_firmware_detected() {
     ui->pushButton_erase_flash->setEnabled(true);
     ui->pushButton_flash_ezpi_bins->setEnabled(true);
     ui->pushButton_clear_uart_direct_log->setEnabled(true);
+    ui->comboBox_esp32_board_type->setEnabled(true);
 
     ezlogic_clear_table_data();
     ui->tableWidget_device_table->setEnabled(false);
@@ -714,7 +770,7 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
     qDebug() << "Added device type: " << QString::number(ezpi_added_dev_type);
 
     ui->pushButton_remove_device->setEnabled(true);
-    ui->pushButton_set_ezpi_config->setEnabled(true);
+//    ui->pushButton_set_ezpi_config->setEnabled(true);
 
     switch(ezpi_added_dev_type) {
         case EZPI_DEV_TYPE_DIGITAL_OP: {
@@ -787,7 +843,7 @@ void MainWindow::ezlogic_clear_table_data(void) {
     }
 
     ui->pushButton_remove_device->setEnabled(false);
-    ui->pushButton_set_ezpi_config->setEnabled(false);
+//    ui->pushButton_set_ezpi_config->setEnabled(false);
 
     // Clear data
     EzloPi->EZPI_CLEAR_OUTPUT_DEVICES();
@@ -1307,16 +1363,15 @@ void MainWindow::ezlogic_serial_process(void) {
 
     ezlogic_timer_serial_complete.stop();
 
-//    QDateTime date = QDateTime::currentDateTime();
-//    QString formattedTime = date.toString("dd.MM.yyyy hh:mm:ss");
-////    QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
-
-//    qDebug() << "Date:"+formattedTime;
-
-//    if(ezlogic_flag_enable_log) ui->textBrowser_console_log->append(formattedTime + ": " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
-
-    int idx = 0;
     int rx_size = ezlogic_read_data_serial->count();
+
+    if(rx_size == 0) {
+        ezlogic_flag_fimware_present = false;
+        QMessageBox::warning(this, "Timeout!", "Serial receive timeout!");
+        return;
+    }
+
+    int idx = 0;    
     int found_start_bytes = 0;
 
     while (idx != (rx_size - 8)) {
@@ -1379,7 +1434,7 @@ void MainWindow::ezlogic_serial_process(void) {
                 ui->pushButton_add_device->setEnabled(true);
 
                 ui->pushButton_get_ezpi_config->setEnabled(true);
-                ui->pushButton_set_ezpi_config->setEnabled(false);
+                ui->pushButton_set_ezpi_config->setEnabled(true);
 
                 ui->pushButton_erase_flash->setEnabled(true);
                 ui->pushButton_flash_ezpi_bins->setEnabled(true);
@@ -1393,6 +1448,8 @@ void MainWindow::ezlogic_serial_process(void) {
                 ui->comboBox_registered_devices->setEnabled(true);
 
                 ui->pushButton_device_restart->setEnabled(true);
+
+                ui->comboBox_esp32_board_type->setEnabled(true);
 
                 ezlogic_timer_ask_info.stop();
             }
@@ -1607,7 +1664,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
         QMessageBox::information(this, "No device!", "Device configurations not found !");
     } else {
         ui->pushButton_remove_device->setEnabled(true);
-        ui->pushButton_set_ezpi_config->setEnabled(true);
+//        ui->pushButton_set_ezpi_config->setEnabled(true);
     }
 }
 

@@ -42,6 +42,7 @@ typedef QString EZPI_STRING;
 #define     MAX_DEV             EZPI_MAX_DEVICES
 
 #define     EZPI_ESP32_GENERIC_PINOUT_COUNT                     40
+#define     EZPI_ESP32_S3_PINOUT_COUNT                          49
 
 #define     SIZE_EZPI_OFFSET_CONN_ID_0                          0X0000
 #define     SIZE_EZPI_OFFSET_CONN_ID_1                          0X7000
@@ -112,8 +113,8 @@ enum ezpi_cmd {
 enum ezpi_board_type {
     EZPI_BOARD_TYPE_NONE,
     EZPI_BOARD_TYPE_ESP32_GENERIC,
-    EZPI_BOARD_TYPE_ESP32_C3,
     EZPI_BOARD_TYPE_ESP32_S3,
+    EZPI_BOARD_TYPE_ESP32_C3,
     EZPI_BOARD_TYPE_TOTAL
 };
 
@@ -257,6 +258,8 @@ public:
     ~EzPi();
     void EZPI_INIT_BOARD(void);
     void EZPI_SET_BOARD_TYPE(ezpi_board_type board_type);
+    ezpi_board_type EZPI_GET_BOARD_TYPE(void) {return _ezpi_board_type;}
+
     ezpi_error_codes_configurator EZPI_ADD_OUTPUT_DEVICE(ezpi_device_digital_op_t d);
     ezpi_error_codes_configurator EZPI_ADD_INPUT_DEVICE(ezpi_device_digital_ip_t d);
     ezpi_error_codes_configurator EZPI_ADD_AINPUT_DEVICE(ezpi_device_analog_ip_t d);
@@ -278,7 +281,6 @@ public:
     void EZPI_CLEAR_I2C_DEVICES(void) { ezpi_i2c_devices.clear(); }
     void EZPI_CLEAR_SPI_DEVICES(void) { ezpi_spi_devices.clear(); }
 
-    ezpi_board_type EZPI_GET_BOARD_TYPE(void) {return _ezpi_board_type;}
     std::vector<EZPI_UINT8> EZPI_GET_GPIO_POOL(void) {return ezpi_gpio_pool;}
     void EZPI_SET_GPIO_POOL(EZPI_UINT8 index, ezpi_dev_type d) { ezpi_gpio_pool.at(index) = d;}
     ezpi_dev_type EZPI_GET_GPIO_POOL(EZPI_UINT8 index) {return (ezpi_dev_type)ezpi_gpio_pool[index];}
