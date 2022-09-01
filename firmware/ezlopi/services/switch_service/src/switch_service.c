@@ -40,7 +40,7 @@ static void __gpio_intr_proces(void *pv)
             (event_gpio_n < NUMBER_OF_GPIO) &&
             ((tick_now - gpio_intr_tick_arr[event_gpio_n]) > switch_debounce_time)) // debounce time is 100 miliseconds
         {
-            // uint32_t _state = interface_common_gpio_state_get(device_list[event_gpio_n].out_gpio);
+            // uint32_t _state = interface_common_gpio_get_output_state(device_list[event_gpio_n].out_gpio);
 
             TRACE_B("debounce time: %u", tick_now - gpio_intr_tick_arr[event_gpio_n]);
             gpio_intr_tick_arr[event_gpio_n] = tick_now;
@@ -49,10 +49,11 @@ static void __gpio_intr_proces(void *pv)
             {
                 if (event_gpio_n == device_list[idx].input_gpio)
                 {
-                    uint32_t new_state = interface_common_gpio_state_get(device_list[idx].out_gpio) ? 0 : 1;
+                    uint32_t new_state = interface_common_gpio_get_output_state(device_list[idx].out_gpio) ? 0 : 1;
                     TRACE_B("Setting pin: %d -> %d", device_list[idx].out_gpio, new_state)
                     interface_common_gpio_state_set(device_list[idx].out_gpio, new_state);
                     char *j_response = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), idx);
+
                     if (j_response)
                     {
                         wss_client_send(j_response, strlen(j_response));

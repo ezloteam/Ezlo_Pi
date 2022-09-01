@@ -96,7 +96,7 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
                 case EZPI_DEV_TYPE_DIGITAL_OP:
                 case EZPI_DEV_TYPE_DIGITAL_IP:
                 {
-                    uint32_t current_state = interface_common_gpio_state_get(devices[i].out_gpio);
+                    uint32_t current_state = interface_common_gpio_get_output_state(devices[i].out_gpio);
                     snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
                     break;
                 }
@@ -206,9 +206,11 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
         {
             s_device_properties_t *dev_list = devices_common_device_list();
             uint32_t state = value.len ? (strncmp(value.ptr, "true", 4) ? false : true) : false;
-            TRACE_D("Current state: %d", state);
+            TRACE_D("Requested state: %d", state);
 
-            state = dev_list[device_idx].out_inv ? (state ? 0 : 1) : state;
+            state = dev_list[device_idx].out_inv ? ~state : state;
+            TRACE_D("Adjusted state: %d", state);
+
             interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
         }
 
@@ -305,13 +307,10 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
 
                 break;
             }
-            // case LED:
-            // case SWITCH:
-            // case PLUG:
             case EZPI_DEV_TYPE_DIGITAL_OP:
             case EZPI_DEV_TYPE_DIGITAL_IP:
             {
-                uint32_t current_state = interface_common_gpio_state_get(dev_list[device_idx].out_gpio);
+                uint32_t current_state = interface_common_gpio_get_output_state(dev_list[device_idx].out_gpio);
                 snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
                 break;
             }

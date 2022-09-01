@@ -311,7 +311,6 @@ static void add_device_to_list(cJSON *o_device, uint32_t dev_idx)
     int id_item, id_room, dev_type = 0, gpio_out, gpio_in = 0;
     CJSON_GET_VALUE_INT(o_device, "dev_type", dev_type);
     TRACE_D("--------------dev_type: %u---------------", dev_type);
-    TRACE_D("-----------------------------------------", dev_type);
 
     switch ((e_dev_type_t)dev_type)
     {
@@ -397,7 +396,7 @@ static void add_device_to_list(cJSON *o_device, uint32_t dev_idx)
     TRACE_D("value_type: %s", g_devices[dev_idx].value_type);
     TRACE_D("has_getter: %u", g_devices[dev_idx].has_getter);
     TRACE_D("has_setter: %u", g_devices[dev_idx].has_setter);
-    TRACE_D("-----------------------------------------", dev_type);
+    TRACE_D("-----------------------------------------");
 }
 
 const char *devices_common_get_device_type_id(void)
