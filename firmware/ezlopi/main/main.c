@@ -5,6 +5,7 @@
 #include "nvs_flash.h"
 #include "mbedtls/config.h"
 #include "driver/gpio.h"
+#include "driver/adc.h"
 #include "nvs_storage.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
@@ -23,6 +24,7 @@
 #include "gatt_server.h"
 #include "dht.h"
 #include "mpu6050.h"
+
 
 #include "wss.h"
 
@@ -93,6 +95,8 @@ static void blinky(void *pv)
         .intr_type = GPIO_INTR_DISABLE,
     };
 
+    adc1_config_width(ADC_WIDTH_BIT_12);
+
     uint32_t state = 0;
     // uint32_t count = 0;
     gpio_config(&io_conf);
@@ -102,8 +106,10 @@ static void blinky(void *pv)
     {
         state ^= 1;
         gpio_set_level(GPIO_NUM_2, state);
+        int hall_sensor_value = hall_sensor_read();
+        printf("Hall Sensor value: %d\r\n", hall_sensor_value);
 
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(200 / portTICK_RATE_MS);
 
         // if (count++ > 20)
         {

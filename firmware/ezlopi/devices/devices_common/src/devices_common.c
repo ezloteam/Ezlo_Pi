@@ -30,6 +30,8 @@ static s_device_properties_t g_devices[MAX_DEV];
 
 extern void mpu_service_init(uint8_t scl_pin, uint8_t sda_pin, uint32_t dev_idx);
 extern void dht11_service_init(uint32_t dht_pin, uint32_t dev_idx);
+extern void hall_sensor_service_init(uint32_t dev_idx);
+
 static void add_device_to_list(cJSON *j_devices, uint32_t dev_idx);
 static void reset_device_list_gpio_pins(void);
 
@@ -206,6 +208,44 @@ static void add_item_uart(cJSON *o_device, uint32_t dev_idx)
 {
 }
 
+static void add_other(cJSON *o_device, uint32_t dev_idx)
+{
+    char *dev_name = NULL;
+    int id_item = 0;
+    int id_room = 0;
+
+    CJSON_GET_VALUE_STRING(o_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_INT(o_device, "id_item", id_item);
+    CJSON_GET_VALUE_INT(o_device, "id_room", id_room);
+    
+    memset(&g_devices[dev_idx], 0, sizeof(s_device_properties_t));
+    g_devices[dev_idx].dev_type = EZPI_DEV_TYPE_OTHER;
+
+    if (dev_name)
+    {
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "%s", dev_name);
+    }
+    else
+    {
+        snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "dev-%d:other", dev_idx);
+    }
+
+    snprintf(g_devices[dev_idx].device_id, sizeof(g_devices[dev_idx].device_id), "de100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].item_id, sizeof(g_devices[dev_idx].item_id), "ab100%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].roomId, sizeof(g_devices[dev_idx].roomId), "abcd%.3d", dev_idx);
+    snprintf(g_devices[dev_idx].roomName, sizeof(g_devices[dev_idx].roomName), "room-%.3d", dev_idx);
+
+    snprintf(g_devices[dev_idx].category, sizeof(g_devices[dev_idx].category), "security_sensor");
+    snprintf(g_devices[dev_idx].subcategory, sizeof(g_devices[dev_idx].subcategory), "door");
+    snprintf(g_devices[dev_idx].item_name, sizeof(g_devices[dev_idx].item_name), "dw_state");
+    snprintf(g_devices[dev_idx].devicType, sizeof(g_devices[dev_idx].devicType), "doorlock");
+    snprintf(g_devices[dev_idx].value_type, sizeof(g_devices[dev_idx].value_type), "token");
+    g_devices[dev_idx].has_getter = true;
+    g_devices[dev_idx].has_setter = false;
+    
+    hall_sensor_service_init(dev_idx);
+}
+
 static void add_item_onewire(cJSON *o_device, uint32_t dev_idx)
 {
     char *dev_name = NULL;
@@ -366,6 +406,12 @@ static void add_device_to_list(cJSON *o_device, uint32_t dev_idx)
     {
         TRACE_D("device type: EZPI_DEV_TYPE_SPI");
         add_item_spi(o_device, dev_idx);
+        break;
+    }
+    case EZPI_DEV_TYPE_OTHER:
+    {
+        TRACE_D("device type: EZPI_DEV_TYPE_OTHER");
+        add_other(o_device, dev_idx);
         break;
     }
     default:
