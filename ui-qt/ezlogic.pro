@@ -18,6 +18,7 @@ SOURCES += main.cpp\
         dialog_config_i2c.cpp \
         dialog_config_input.cpp \
         dialog_config_onewire.cpp \
+        dialog_config_other.cpp \
         dialog_config_spi.cpp \
         dialog_configdev_digitalio.cpp \
         dialog_devadd.cpp \
@@ -31,6 +32,7 @@ HEADERS  += mainwindow.h \
     dialog_config_i2c.h \
     dialog_config_input.h \
     dialog_config_onewire.h \
+    dialog_config_other.h \
     dialog_config_spi.h \
     dialog_configdev_digitalio.h \
     dialog_devadd.h \
@@ -49,6 +51,7 @@ FORMS    += mainwindow.ui \
     dialog_config_i2c.ui \
     dialog_config_input.ui \
     dialog_config_onewire.ui \
+    dialog_config_other.ui \
     dialog_config_spi.ui \
     dialog_configdev_digitalio.ui \
     dialog_devadd.ui \

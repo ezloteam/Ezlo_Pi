@@ -16,6 +16,7 @@
 #include<dialog_config_onewire.h>
 #include<dialog_config_i2c.h>
 #include<dialog_config_spi.h>
+#include<dialog_config_other.h>
 
 // Ezlo Pi Specefic header
 #include "ezlopi.h"
@@ -91,6 +92,7 @@ private:
     Dialog_config_onewire * ezlogic_form_config_onewire;
     Dialog_config_i2c * ezlogic_form_config_i2c;
     Dialog_config_spi * ezlogic_form_config_spi;
+    Dialog_config_other * ezlogic_form_config_other;
 
     // EzloPi object
     EzPi * EzloPi;
@@ -146,6 +148,7 @@ private:
     void ezlogic_table_adddev_onewire(ezpi_device_one_wire_t);
     void ezlogic_table_adddev_i2c(ezpi_device_I2C_t);
     void ezlogic_table_adddev_spi(ezpi_device_SPI_t);
+    void ezlogic_table_adddev_other(ezpi_device_other_t);
 
     void ezlogic_action_restart(QByteArray);
     void ezlogic_action_set_wifi(QByteArray);

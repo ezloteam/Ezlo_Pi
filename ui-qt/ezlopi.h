@@ -38,6 +38,7 @@ typedef QString EZPI_STRING;
 #define     EZPI_MAX_DEV_ONEWIRE    3
 #define     EZPI_MAX_DEV_I2C        3
 #define     EZPI_MAX_DEV_SPI        1
+#define     EZPI_MAX_DEV_OTHER      3
 
 #define     MAX_DEV             EZPI_MAX_DEVICES
 
@@ -73,7 +74,8 @@ enum ezpi_dev_type {
     EZPI_DEV_TYPE_UART,
     EZPI_DEV_TYPE_ONE_WIRE,
     EZPI_DEV_TYPE_I2C,
-    EZPI_DEV_TYPE_SPI,    
+    EZPI_DEV_TYPE_SPI,
+    EZPI_DEV_TYPE_OTHER,
     EZPI_DEV_TYPE_TOTAL,
     EZPI_DEV_TYPE_INPUT_ONLY = 253,
     EZPI_DEV_TYPE_OUTPUT_ONLY,
@@ -99,6 +101,7 @@ enum ezpi_item_type {
     EZPI_ITEM_TYPE_DHT11,
     EZPI_ITEM_TYPE_DHT22,
     EZPI_ITEM_TYPE_POT_GENERIC,
+    EZPI_ITEM_TYPE_DOOR_SENSOR,
     EZPI_ITEM_TYPE_TOTAL
 };
 
@@ -225,6 +228,20 @@ typedef struct ezpi_device_SPI {
     EZPI_UINT8 gpio_cs;
 } ezpi_device_SPI_t;
 
+
+typedef struct ezpi_device_other {
+    ezpi_dev_type dev_type;
+    EZPI_STRING dev_name;
+    EZPI_UINT16 id_room;
+    ezpi_item_type id_item;
+    EZPI_BOOL en_gpio1;
+    EZPI_UINT8 gpio1;
+    EZPI_BOOL en_gpio2;
+    EZPI_UINT8 gpio2;
+    EZPI_BOOL en_gpio3;
+    EZPI_UINT8 gpio3;
+} ezpi_device_other_t;
+
 typedef union conv_u16_array {
     uint8_t data_bytes[sizeof(uint16_t)];
     uint16_t data;
@@ -248,6 +265,7 @@ private:
     std::vector <ezpi_device_one_wire_t> ezpi_onewire_devices;
     std::vector <ezpi_device_I2C_t> ezpi_i2c_devices;
     std::vector <ezpi_device_SPI_t> ezpi_spi_devices;
+    std::vector <ezpi_device_other_t> ezpi_other_devices;
 
     QStringList * ezpi_device_types_str;
     QStringList * ezpi_item_types_str;
@@ -267,6 +285,7 @@ public:
     ezpi_error_codes_configurator EZPI_ADD_ONEWIRE_DEVICE(ezpi_device_one_wire_t d);
     ezpi_error_codes_configurator EZPI_ADD_I2C_DEVICE(ezpi_device_I2C_t d);
     ezpi_error_codes_configurator EZPI_ADD_SPI_DEVICE(ezpi_device_SPI_t d);
+    ezpi_error_codes_configurator EZPI_ADD_OTHER_DEVICE(ezpi_device_other_t d);
 
     void EZPI_DELETE_OUTPUT_DEVICE(void) { ezpi_output_devices.pop_back(); }
     void EZPI_DELETE_INPUT_DEVICE(void) { ezpi_input_devices.pop_back(); }
@@ -274,6 +293,7 @@ public:
     void EZPI_DELETE_ONEWIRE_DEVICE(void) { ezpi_onewire_devices.pop_back(); }
     void EZPI_DELETE_I2C_DEVICE(void) { ezpi_i2c_devices.pop_back(); }
     void EZPI_DELETE_SPI_DEVICE(void) { ezpi_spi_devices.pop_back(); }
+    void EZPI_DELETE_OTHER_DEVICE(void) { ezpi_other_devices.pop_back(); }
 
     void EZPI_CLEAR_OUTPUT_DEVICES(void) { ezpi_output_devices.clear(); }
     void EZPI_CLEAR_INPUT_DEVICES(void) { ezpi_input_devices.clear(); }
@@ -281,6 +301,7 @@ public:
     void EZPI_CLEAR_ONEWIRE_DEVICES(void) { ezpi_onewire_devices.clear(); }
     void EZPI_CLEAR_I2C_DEVICES(void) { ezpi_i2c_devices.clear(); }
     void EZPI_CLEAR_SPI_DEVICES(void) { ezpi_spi_devices.clear(); }
+    void EZPI_CLEAR_OTHER_DEVICES(void) { ezpi_other_devices.clear(); }
 
     std::vector<EZPI_UINT8> EZPI_GET_GPIO_POOL(void) {return ezpi_gpio_pool;}
     void EZPI_SET_GPIO_POOL(EZPI_UINT8 index, ezpi_dev_type d) { ezpi_gpio_pool.at(index) = d;}
@@ -292,6 +313,7 @@ public:
     std::vector <ezpi_device_one_wire_t> EZPI_GET_ONEWIRE_DEVICES() { return ezpi_onewire_devices; }
     std::vector <ezpi_device_I2C_t> EZPI_GET_I2C_DEVICES() { return ezpi_i2c_devices; }
     std::vector <ezpi_device_SPI_t> EZPI_GET_SPI_DEVICES() { return ezpi_spi_devices; }
+    std::vector <ezpi_device_other_t> EZPI_GET_OTHER_DEVICES() { return ezpi_other_devices; }
 
     EZPI_UINT8 EZPI_GET_DEVICE_COUNT(void) {
         return (EZPI_UINT8)(ezpi_output_devices.size() + \
@@ -299,7 +321,8 @@ public:
                 ezpi_analog_input_devices.size() + \
                 ezpi_onewire_devices.size() + \
                 ezpi_i2c_devices.size() + \
-                ezpi_spi_devices.size());
+                ezpi_spi_devices.size() + \
+                ezpi_other_devices.size());
     }
 
 

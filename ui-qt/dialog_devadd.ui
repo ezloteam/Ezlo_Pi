@@ -87,6 +87,11 @@
      <string>SPI</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>Other</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources>

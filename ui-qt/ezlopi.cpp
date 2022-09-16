@@ -16,6 +16,7 @@ EzPi::EzPi() {
     ezpi_device_types_str->append("Onewire");
     ezpi_device_types_str->append("I2C");
     ezpi_device_types_str->append("SPI");
+    ezpi_device_types_str->append("Other");
 
 
     ezpi_item_types_str->append("None");
@@ -36,6 +37,7 @@ EzPi::EzPi() {
     ezpi_item_types_str->append("DHT11");
     ezpi_item_types_str->append("DHT22");
     ezpi_item_types_str->append("POT");
+    ezpi_item_types_str->append("Door Sensor");
 
      ezpi_firmware_info = new ezpi_info_t;
 
@@ -54,8 +56,6 @@ void EzPi::EZPI_SET_BOARD_TYPE(ezpi_board_type board_type) {
         break;
     case EZPI_BOARD_TYPE_ESP32_S3:
         ezpi_gpio_pool.resize(EZPI_ESP32_S3_PINOUT_COUNT);
-        break;
-    case EZPI_BOARD_TYPE_ESP32_C3:
         break;
     default:
         break;
@@ -201,5 +201,11 @@ ezpi_error_codes_configurator EzPi::EZPI_ADD_I2C_DEVICE(ezpi_device_I2C_t d) {
 ezpi_error_codes_configurator EzPi::EZPI_ADD_SPI_DEVICE(ezpi_device_SPI_t d) {
     if(ezpi_spi_devices.size() >= EZPI_MAX_DEV_SPI) return EZPI_ERROR_REACHED_MAX_DEV;
     ezpi_spi_devices.push_back(d);
+    return EZPI_SUCCESS;
+}
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_OTHER_DEVICE(ezpi_device_other_t d) {
+    if(ezpi_other_devices.size() >= EZPI_MAX_DEV_OTHER) return EZPI_ERROR_REACHED_MAX_DEV;
+    ezpi_other_devices.push_back(d);
     return EZPI_SUCCESS;
 }

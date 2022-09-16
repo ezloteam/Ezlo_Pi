@@ -112,7 +112,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->statusBar->addWidget(ezlogic_status);
 
-    ezpi_show_status_message("EzloPi V1.2.0, Build 0");
+    ezpi_show_status_message("EzloPi V1.2.0, Build 2");
+    // Build 0 : Release
+    // Build 1 : S3 Support
+    // Build 2 : Other device support
     EZPI_UINT8 ezlogic_selected_board = ui->comboBox_esp32_board_type->currentIndex() + 1;
     EzloPi->EZPI_SET_BOARD_TYPE((ezpi_board_type)ezlogic_selected_board);
     EzloPi->EZPI_INIT_BOARD();
@@ -439,13 +442,15 @@ void MainWindow::on_pushButton_remove_device_clicked() {
         case EZPI_DEV_TYPE_SPI:
             EzloPi->EZPI_DELETE_SPI_DEVICE();
             break;
+    case EZPI_DEV_TYPE_OTHER:
+        EzloPi->EZPI_DELETE_OTHER_DEVICE();
+        break;
         default:
             break;
     }
 
     if(last_row == 1) {
         ui->pushButton_remove_device->setEnabled(false);
-//        ui->pushButton_set_ezpi_config->setEnabled(false);
     }
 }
 
@@ -483,6 +488,7 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
     std::vector <ezpi_device_one_wire_t> device_onewire = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
     std::vector <ezpi_device_I2C_t> device_i2c = EzloPi->EZPI_GET_I2C_DEVICES();
     std::vector <ezpi_device_SPI_t> device_spi = EzloPi->EZPI_GET_SPI_DEVICES();
+    std::vector <ezpi_device_other_t> device_other = EzloPi->EZPI_GET_OTHER_DEVICES();
 
     object_root_set_device.insert("cmd", CMD_ACTION_SET_CONFIG);
     object_root_set_device.insert("dev_total", EzloPi->EZPI_GET_DEVICE_COUNT());
@@ -590,9 +596,29 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
         array_device_detail.push_back(object_device_spi);
     }
 
+
+    for(EZPI_UINT8 i = 0; i < device_other.size(); i++) {
+        QJsonObject object_device_other;
+
+        object_device_other.insert("dev_type", device_other[i].dev_type);
+        object_device_other.insert("dev_name", device_other[i].dev_name);
+        object_device_other.insert("id_room", device_other[i].id_room);
+        object_device_other.insert("id_item", device_other[i].id_item);
+        object_device_other.insert("en_gpio1", device_other[i].en_gpio1);
+        object_device_other.insert("gpio1", device_other[i].gpio1);
+        object_device_other.insert("en_gpio2", device_other[i].en_gpio2);
+        object_device_other.insert("gpio2", device_other[i].gpio2);
+        object_device_other.insert("en_gpio3", device_other[i].en_gpio3);
+        object_device_other.insert("gpio3", device_other[i].gpio3);
+
+        array_device_detail.push_back(object_device_other);
+    }
+
     object_root_set_device.insert("dev_detail", array_device_detail);
     document_root_set_device.setObject(object_root_set_device);
-
+    QString json_string = document_root_set_device.toJson(QJsonDocument::Indented);
+    ui->textBrowser_console_log->append(json_string);
+    qDebug() << json_string;
     ezlogic_cmd_state = CMD_ACTION_SET_CONFIG;
     ezlogic_serial_transfer(document_root_set_device.toJson(QJsonDocument::Compact));
 }
@@ -700,6 +726,7 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
     ezlogic_form_config_onewire = new Dialog_config_onewire(this, EzloPi);
     ezlogic_form_config_i2c = new Dialog_config_i2c(this, EzloPi);
     ezlogic_form_config_spi = new Dialog_config_spi(this, EzloPi);
+    ezlogic_form_config_other = new Dialog_config_other(this, EzloPi);
 
     connect(ezlogic_form_configdev_digitalio, SIGNAL(ezpi_signal_dev_op_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_digital_ip, SIGNAL(ezpi_signal_dev_ip_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
@@ -707,6 +734,7 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
     connect(ezlogic_form_config_onewire, SIGNAL(ezpi_signal_dev_onewire_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_i2c, SIGNAL(ezpi_signal_dev_i2c_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_spi, SIGNAL(ezpi_signal_dev_spi_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
+    connect(ezlogic_form_config_other, SIGNAL(ezpi_signal_dev_other_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
 
     switch(dev_type_index) {
         case EZPI_DEV_TYPE_DIGITAL_OP: {
@@ -756,6 +784,13 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             ezlogic_form_config_spi->setFixedWidth(190);
             ezlogic_form_config_spi->setModal(true);
             ezlogic_form_config_spi->show();
+            break;
+        }
+        case EZPI_DEV_TYPE_OTHER: {
+            ezlogic_form_config_other->setFixedHeight(270);
+            ezlogic_form_config_other->setFixedWidth(185);
+            ezlogic_form_config_other->setModal(true);
+            ezlogic_form_config_other->show();
             break;
         }
 
@@ -822,8 +857,16 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_SPI_t> spi_devices = EzloPi->EZPI_GET_SPI_DEVICES();
             EZPI_UINT8 spi_devices_total = (EZPI_UINT8)spi_devices.size();
             ezpi_device_SPI_t spi_device = spi_devices[spi_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_I2C);
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_SPI);
             ezlogic_table_adddev_spi(spi_device);
+            break;
+        }
+        case EZPI_DEV_TYPE_OTHER: {
+            std::vector <ezpi_device_other_t> other_devices = EzloPi->EZPI_GET_OTHER_DEVICES();
+            EZPI_UINT8 other_devices_total = (EZPI_UINT8)other_devices.size();
+            ezpi_device_other_t other_device = other_devices[other_devices_total - 1];
+            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_OTHER);
+            ezlogic_table_adddev_other(other_device);
             break;
         }
         default:
@@ -1345,6 +1388,30 @@ void MainWindow::ezlogic_table_adddev_spi(ezpi_device_SPI_t spi_device) {
     ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_SPI);
 }
 
+void MainWindow::ezlogic_table_adddev_other(ezpi_device_other_t other_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(other_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(other_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(other_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+
+
+    EZPI_STRING GPIOs = "";
+    if(other_device.en_gpio1) GPIOs += "GPIO1: " + QString::number(other_device.gpio1);
+    if(other_device.en_gpio2) GPIOs += " GPIO2: " + QString::number(other_device.gpio2);
+    if(other_device.en_gpio3) GPIOs += " GPIO3: " + QString::number(other_device.gpio3);
+    table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+    ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_OTHER);
+
+}
+
 void MainWindow::ezlogic_serial_receive(void) {
     QByteArray serial_read_temp =  ezlogic_serial_port->readAll();
     *ezlogic_read_data_serial += serial_read_temp;
@@ -1541,6 +1608,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
     ezpi_device_one_wire_t device_onewire;
     ezpi_device_I2C_t device_i2c;
     ezpi_device_SPI_t device_spi;
+    ezpi_device_other_t device_other;
 
     EZPI_UINT8 dev_count_get_config = 0;
 
@@ -1555,6 +1623,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
     EzloPi->EZPI_CLEAR_ONEWIRE_DEVICES();
     EzloPi->EZPI_CLEAR_I2C_DEVICES();
     EzloPi->EZPI_CLEAR_SPI_DEVICES();
+    EzloPi->EZPI_CLEAR_OTHER_DEVICES();
 
     for(EZPI_UINT8 i = 0; i < list_get_config_device_detail.size(); i++) {
 
@@ -1654,6 +1723,23 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
                 EzloPi->EZPI_ADD_SPI_DEVICE(device_spi);
 
                 ezlogic_table_adddev_spi(device_spi);
+                break;
+
+            case EZPI_DEV_TYPE_OTHER:
+                device_other.dev_name = get_config_device["dev_name"].toString();
+                device_other.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_other.id_room = get_config_device["id_room"].toUInt();
+                device_other.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_other.en_gpio1 = get_config_device["en_gpio1"].toBool();
+                device_other.gpio1 = get_config_device["gpio1"].toUInt();
+                device_other.en_gpio2 = get_config_device["en_gpio2"].toBool();
+                device_other.gpio2 = get_config_device["gpio2"].toUInt();
+                device_other.en_gpio3 = get_config_device["en_gpio3"].toBool();
+                device_other.gpio3 = get_config_device["gpio3"].toUInt();
+
+                EzloPi->EZPI_ADD_OTHER_DEVICE(device_other);
+
+                ezlogic_table_adddev_other(device_other);
                 break;
             default:
                 break;
