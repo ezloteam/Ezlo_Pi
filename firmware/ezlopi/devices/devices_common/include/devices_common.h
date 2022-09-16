@@ -36,10 +36,11 @@ extern "C"
         EZPI_DEV_TYPE_ONE_WIRE,
         EZPI_DEV_TYPE_I2C,
         EZPI_DEV_TYPE_SPI,
+        EZPI_DEV_TYPE_OTHER,
         EZPI_DEV_TYPE_TOTAL,
         EZPI_DEV_TYPE_INPUT_ONLY = 253,
         EZPI_DEV_TYPE_OUTPUT_ONLY,
-        EZPI_DEV_TYPE_UNCONFIGURED
+        EZPI_DEV_TYPE_UNCONFIGURED                                                      
     } e_dev_type_t;
 
     typedef enum e_item_type
@@ -62,6 +63,7 @@ extern "C"
         EZPI_ITEM_TYPE_DHT11,
         EZPI_ITEM_TYPE_DHT22,
         EZPI_ITEM_TYPE_POT_GENERIC,
+        EZPI_ITEM_TYPE_DOOR_SENSOR,
         EZPI_ITEM_TYPE_TOTAL
     } e_item_type_t;
 
