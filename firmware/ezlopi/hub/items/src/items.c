@@ -90,14 +90,18 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
 
                     break;
                 }
-                // case LED:
-                // case SWITCH:
-                // case PLUG:
                 case EZPI_DEV_TYPE_DIGITAL_OP:
                 case EZPI_DEV_TYPE_DIGITAL_IP:
                 {
                     uint32_t current_state = interface_common_gpio_get_output_state(devices[i].out_gpio);
                     snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
+                    break;
+                }
+                case EZPI_DEV_TYPE_OTHER:
+                {
+                    extern int hall_sensor_value_get(void);
+                    int current_state = hall_sensor_value_get();
+                    snprintf(dev_value, sizeof(dev_value), "%s", (current_state > 60 || current_state < 10) ? "\"dw_is_closed\"" : "\"dw_is_opened\"");
                     break;
                 }
                 default:
@@ -312,6 +316,13 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
             {
                 uint32_t current_state = interface_common_gpio_get_output_state(dev_list[device_idx].out_gpio);
                 snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
+                break;
+            }
+            case EZPI_DEV_TYPE_OTHER:
+            {
+                extern int hall_sensor_value_get(void);
+                int current_state = hall_sensor_value_get();
+                snprintf(dev_value, sizeof(dev_value), "%s", (current_state > 60 || current_state < 10) ? "\"dw_is_closed\"" : "\"dw_is_opened\"");
                 break;
             }
             default:

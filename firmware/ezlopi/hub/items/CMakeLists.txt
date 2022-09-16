@@ -7,4 +7,4 @@ idf_component_register(SRCS "${src_files}"
     devices_common
     interface_common
     items
-    mpu6050)
+    mpu6050 sensor_service)
