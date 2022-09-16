@@ -130,7 +130,8 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
     ezlogic_serial_port->setPort(ezlogic_serial_port_info);
 
     if(ezlogic_flag_serial_port_open == false) {
-        if(!ezlogic_serial_port_info.isBusy()) {
+//        if(!ezlogic_serial_port_info.isBusy())
+        {
 
             if(ezlogic_serial_port->open(QIODevice::ReadWrite)) {
                 ezlogic_flag_serial_port_open = true;
@@ -833,7 +834,7 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
 
 void MainWindow::ezlogic_serial_receive_wif(ezpi_cmd cmd) {
     ezlogic_cmd_state = cmd;
-    ezlogic_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT_WIFI);
+    ezlogic_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT);
 }
 
 void MainWindow::ezlogic_clear_table_data(void) {

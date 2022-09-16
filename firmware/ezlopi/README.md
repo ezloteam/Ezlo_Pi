@@ -1,169 +1,88 @@
+# Wi-Fi Scan Example
 
-[![N|Ezlo-Pi](https://www.ezlopi.com/wp-content/uploads/2022/07/Logo.svg)](https://www.ezlopi.com/)
+(See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network) [![GitHub stars](https://img.shields.io/github/stars/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/stargazers) [![GitHub license](https://img.shields.io/github/license/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/blob/master/LICENCE.txt) [![Twitter](https://img.shields.io/twitter/url?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fezloteam%2FEzlo_Pi)
+This example shows how to scan for available set of APs.
 
+## How to use example
 
-## _Steps to setup working environment for Ezlo-Pi_
+Before project configuration and build, be sure to set the correct chip target using `idf.py set-target <chip_name>`.
 
-[Ezlo-Pi: Master](https://github.com/ezloteam/Ezlo_Pi/tree/master)
+### Hardware Required
 
-  
+* A development board with ESP32/ESP32-S2/ESP32-C3 SoC (e.g., ESP32-DevKitC, ESP-WROVER-KIT, etc.).
+* A USB cable for Power supply and programming.
 
-# 1. Setting esp-idf in Linux
+### Configure the project
 
-#### 1. Clone esp-idf reposository
+Open the project configuration menu (`idf.py menuconfig`). 
 
-```bash
+In the `Example Configuration` menu:
 
-git clone -b v4.4.1 --recursive https://github.com/espressif/esp-idf.git
-cd esp-idf
-```
+* Set the Example configuration.
+    * Use `Max size of scan list` to set the maximum nunber of access points in the list.
 
-#### 2. Install esp-idf
+### Build and Flash
 
-```bash
-./install.sh
-```
+Build the project and flash it to the board, then run the monitor tool to view the serial output:
 
-#### 3. export esp-idf
+Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 
-```bash
-. ./export.sh
-```
+(To exit the serial monitor, type ``Ctrl-]``.)
 
-#### OR
+See the Getting Started Guide for all the steps to configure and use the ESP-IDF to build projects.
 
-- Follow the instructions: https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-setup.html
+* [ESP-IDF Getting Started Guide on ESP32](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html)
+* [ESP-IDF Getting Started Guide on ESP32-S2](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/get-started/index.html)
+* [ESP-IDF Getting Started Guide on ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/get-started/index.html)
 
-# 2. Setting esp-idf in Windows
+## Example Output
 
-**Follow this instructions: https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/windows-setup.html**
-
-**OR**
-
-#### 1. Download esp-idf installer (version: v4.4.1)
-[https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-offline-4.4.1.exe?](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-offline-4.4.1.exe?  "https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-offline-4.4.1.exe?")
-
-#### 2. Install _"esp-idf-tools-setup-offline-4.4.1.exe"_
-
-# 3. Settings up Ezlo-Pi source code
-
-#### 1. Getting Ezlo-Pi repository from github
-
-Open terminal or bash-shell and run the below commands
-
-```bash
-
-git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
-
-cd ezlopi/firmware/ezlopi
+As you run the example, you will see the following log:
 
 ```
+I (443) wifi:wifi firmware version: 6bff005
+I (443) wifi:wifi certification version: v7.0
+I (443) wifi:config NVS flash: enabled
+I (443) wifi:config nano formating: disabled
+I (453) wifi:Init data frame dynamic rx buffer num: 32
+I (453) wifi:Init management frame dynamic rx buffer num: 32
+I (463) wifi:Init management short buffer num: 32
+I (463) wifi:Init dynamic tx buffer num: 32
+I (473) wifi:Init static tx FG buffer num: 2
+I (473) wifi:Init static rx buffer size: 1600
+I (473) wifi:Init static rx buffer num: 10
+I (483) wifi:Init dynamic rx buffer num: 32
+I (483) wifi_init: rx ba win: 6
+I (493) wifi_init: tcpip mbox: 32
+I (493) wifi_init: udp mbox: 6
+I (493) wifi_init: tcp mbox: 6
+I (503) wifi_init: tcp tx win: 5744
+I (503) wifi_init: tcp rx win: 5744
+I (513) wifi_init: tcp mss: 1440
+I (513) wifi_init: WiFi IRAM OP enabled
+I (513) wifi_init: WiFi RX IRAM OP enabled
+I (533) phy_init: phy_version 300,6e46ba7,Jan 25 2021
+I (683) wifi:set rx active PTI: 0, rx ack PTI: 0, and default PTI: 0
+I (683) wifi:mode : sta (7c:df:a1:40:23:84)
+I (683) wifi:enable tsf
+I (2783) scan: Total APs scanned = 17
+I (2783) scan: SSID 		IoTNetwork
+I (2783) scan: RSSI 		-50
+I (2783) scan: Authmode 	WIFI_AUTH_WPA2_PSK
+I (2783) scan: Pairwise Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2793) scan: Group Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2793) scan: Channel 		5
 
-#### 2. Build
-
-using ```idf.py```
-
-```bash
-
-idf.py build
-
+I (2883) scan: SSID 		TP-Link_6872
+I (2883) scan: RSSI 		-70
+I (2883) scan: Authmode 	WIFI_AUTH_WPA_WPA2_PSK
+I (2893) scan: Pairwise Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2893) scan: Group Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2903) scan: Channel 		11
+...
 ```
 
-Using custom command
+## Troubleshooting
 
-###### a. To generate test release firmware:
-
-Generates .bin files in firmware/[version] folder. The below command also increases the build number.
-
-```bash
-
-./build.sh test
-
-```
-
-###### b. To only build:
-
-Does not generate any .bin files in firmware/[version] folder. This command will only increase the build number in version.
-
-```bash
-
-./build.sh build
-
-```
-
-###### c. Generate release firmware:
-
-Generates .bin files in firmware/[version] folder. The below command also creates the .bin files in firmware/[version] folder
-
-```bash
-
-./build.sh release
-
-```
-
-#### 3. flash the firmware
-
-using usb port and baudrate
-
-```bash
-
-idf.py flash
-
-```
-
-using specific port and baudrate
-
-Linux:
-
-```bash
-
-idf.py -p /dev/ttyUSB0 -b 921600 flash
-
-```
-
-Windows:
-
-```bash
-
-idf.py -p COM9 -b 921600 flash
-
-```
-
-#### 4. Monitor on console
-
-using usb port and baudrate
-
-```bash
-
-idf.py monitor
-
-```
-
-using specific port:
-
-Linux:
-
-```bash
-
-idf.py -p /dev/ttyUSB0 monitor
-
-```
-
-Windows:
-
-```bash
-
-idf.py -p COM9 monitor
-
-```
-
-## 4: Flashing firmware using QT-App
-
-## 5: Working with examples
-
-[Fllow from the examples](https://www.ezlopi.com/examples/)
-1. [EzloPi AC Lamp setup with Relay interfacing​](https://www.ezlopi.com/examples/relay-circuitry-and-lamp-circuit-setup/)
-2. [EzloPi AC lamp setup with relay and a momentary switch](https://www.ezlopi.com/examples/ezlopi-ac-lamp-setup-with-relay-and-a-momentary-switch/)
-3. [EzloPi I2C MPU6050 Example](https://www.ezlopi.com/examples/ezlopi-i2c-mpu6050-example/)
+For any technical queries, please open an [issue](https://github.com/espressif/esp-idf/issues) on GitHub. We will get back to you soon.

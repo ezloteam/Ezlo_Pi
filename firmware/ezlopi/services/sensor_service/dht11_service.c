@@ -37,6 +37,7 @@ static void dht11_service_process(void *pv)
         dht_read_float_data(DHT_TYPE_AM2301, dht_sensor_pin, &humidity, &temperature);
         TRACE_B("temperature: %f", temperature);
         TRACE_B("humidity: %f", humidity);
+        
         char *ret = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), device_index);
 
         if (ret)
