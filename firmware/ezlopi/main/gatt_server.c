@@ -11,10 +11,13 @@
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
+#include "esp_netif_types.h"
+#include "esp_netif.h"
 
 #include "sdkconfig.h"
 #include "gatt_server.h"
 #include "factory_info.h"
+#include "wifi_interface.h"
 #include "debug.h"
 
 static RTC_DATA_ATTR char __SSID[32];
@@ -404,24 +407,55 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     }
     case ESP_GATTS_READ_EVT:
     {
-#warning "Need to fix data transfer for 'character-description'"
         TRACE_I("GATT_READ_EVT, conn_id %d, trans_id %d, handle %d", param->read.conn_id, param->read.trans_id, param->read.handle);
         esp_gatt_rsp_t rsp;
         memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
         rsp.attr_value.handle = param->read.handle;
         char *wifi_creds = get_current_wifi_creds_c();
-        char tmp_buffer[100];
-        snprintf(tmp_buffer, 200, "{\"SSID\":\"%.*s\",\"PSD\":\"%.*s\"}", 32, &wifi_creds[0], 64, &wifi_creds[32]);
 
-        if (0 != strlen(tmp_buffer) && strlen(tmp_buffer) > param->read.offset)
+        char *rsp_buffer = NULL;
+        esp_netif_ip_info_t *ip_info = wifi_get_ip_infos();
+        cJSON *root = cJSON_CreateObject();
+
+        if (root)
         {
-            strncpy((char *)rsp.attr_value.value, (char *)(tmp_buffer + param->read.offset), ESP_GATT_MAX_ATTR_LEN);
+            cJSON_AddStringToObject(root, "SSID", wifi_creds);
+            cJSON_AddStringToObject(root, "PSD", &wifi_creds[32]);
+
+            if (got_ip_c())
+            {
+                char tmp_buffer[512];
+                cJSON_AddStringToObject(root, "IP4", (NULL != esp_ip4addr_ntoa(&ip_info->ip, tmp_buffer, sizeof(tmp_buffer))) ? tmp_buffer : "");
+                cJSON_AddStringToObject(root, "GW", (NULL != esp_ip4addr_ntoa(&ip_info->gw, tmp_buffer, sizeof(tmp_buffer))) ? tmp_buffer : "");
+                cJSON_AddStringToObject(root, "NETMASK", (NULL != esp_ip4addr_ntoa(&ip_info->netmask, tmp_buffer, sizeof(tmp_buffer))) ? tmp_buffer : "");
+            }
+            else
+            {
+                cJSON_AddStringToObject(root, "IP4", "");
+                cJSON_AddStringToObject(root, "GW", "");
+                cJSON_AddStringToObject(root, "NETMASK", "");
+            }
+
+            rsp_buffer = cJSON_Print(root);
+            cJSON_Delete(root); // free Json object
+        }
+
+        if ((NULL != rsp_buffer) && (strlen(rsp_buffer) > param->read.offset))
+        {
+            cJSON_Minify(rsp_buffer);
+            strncpy((char *)rsp.attr_value.value, (char *)(rsp_buffer + param->read.offset), ESP_GATT_MAX_ATTR_LEN);
             rsp.attr_value.len = strlen((const char *)rsp.attr_value.value);
         }
         else
         {
             rsp.attr_value.len = 1;
             rsp.attr_value.value[0] = 0; // Read 0 if the device not provisioned yet.
+        }
+
+        if (rsp_buffer)
+        {
+            cJSON_free(rsp_buffer);
+            rsp_buffer = NULL;
         }
 
         esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id,
