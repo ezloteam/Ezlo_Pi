@@ -32,17 +32,20 @@ void dht11_service_init(uint8_t dht_pin, uint32_t dev_idx)
 
 static void dht11_service_process(void *pv)
 {
+    char value_buf[128];
     while (1)
     {
         dht_read_float_data(DHT_TYPE_AM2301, dht_sensor_pin, &humidity, &temperature);
         TRACE_B("temperature: %f", temperature);
         TRACE_B("humidity: %f", humidity);
-        
-        char *ret = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), device_index);
+
+        memset(value_buf, 0, sizeof(value_buf));
+        snprintf(value_buf, sizeof(value_buf), "%.02f,\"valueFormatted\":\"%.02f\",\"scale\":\"celsius\",\"syncNotification\":false", temperature, temperature);
+        char *ret = items_update_from_sensor(device_index, value_buf);
 
         if (ret)
         {
-            // TRACE_W(">> DHT-service TX(ret): %s", ret);
+            TRACE_B(">> WS Tx - 'hub.item.updated' [%d]\r\n%s", strlen(ret), ret);
             wss_client_send(ret, strlen(ret));
             vPortFree(ret);
             ret = NULL;

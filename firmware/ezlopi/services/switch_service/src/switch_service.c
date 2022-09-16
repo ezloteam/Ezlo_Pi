@@ -58,12 +58,11 @@ static void __gpio_intr_proces(void *pv)
                     snprintf(value_buf, sizeof(value_buf), "%s", new_state ? "true" : "false");
 
                     char *j_response = items_update_from_sensor(idx, value_buf);
-                    // char *j_response = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), idx);
-
+ 
                     if (j_response)
                     {
-                        wss_client_send(j_response, strlen(j_response));
                         TRACE_B(">> WS Tx - 'hub.item.updated' [%d]\r\n%s", strlen(j_response), j_response);
+                        wss_client_send(j_response, strlen(j_response));
                         free(j_response);
                         j_response = NULL;
                     }

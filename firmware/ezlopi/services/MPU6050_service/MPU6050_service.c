@@ -70,8 +70,6 @@ static void mpu_service_process(void *pv)
 
         char *ret = items_update_from_sensor(device_index, value_buf);
 
-        // char *ret = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), device_index);
-
         if (ret)
         {
             // TRACE_W(">> DHT-service TX(ret): %s", ret);
