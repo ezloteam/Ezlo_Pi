@@ -29,7 +29,7 @@ MACRO(SUBDIRLIST result curdir)
     SET(${result} ${dirlist}) # copy the components of 'dirlist' into 'result'(return variable)
 ENDMACRO()
 
-set(external_components_list services devices protocols interface hub) # list of external components
+set(external_components_list services devices protocols interface hub sensors library ezlopi) # list of external components
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'
 set(ALL_COMPONENTS "") # clearing 'ALL_COMPONENTS' variable

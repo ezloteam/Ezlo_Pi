@@ -1,41 +1,36 @@
 #include "string.h"
 #include "stdint.h"
 #include "time.h"
-
+#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 
+#include "ezlopi_actions.h"
 
-typedef struct s_sensors_schedule {
-    struct s_sensors_schedule * next_sensor;
-    void (*sample_func)(void);
-    time_t interval_ms;
-    time_t next_sample_time;
-    void (*initiator_func)(void);
+static QueueHandle_t event_queue = NULL;
 
-} s_sensors_schedule_t;
+static void event_process(void *pv);
 
-static s_sensors_schedule_t * sensor_schedule_head = NULL;
-
-static void sensor_schedular(void *pv);
-
-void add_sensor_to_schedule(void(*sample_func)(void))
+void sensor_service(void)
 {
-    if (sensor_schedule_head) {
-
-    } else {
-        
-    }
+    event_queue = xQueueCreate(20, sizeof(e_ezlopi_actions_t));
+    xTaskCreate(event_process, "event_process", 4 * 1024, NULL, 4, NULL);
 }
 
-void sensor_service(void){
-    xTaskCreate(sensor_schedular, "sensor schedualr", 4*1024, NULL, 4, NULL);
-}
-
-static void sensor_schedular(void *pv)
+static void event_process(void *pv)
 {
     while (1)
     {
-        /* code */
+        e_ezlopi_actions_t action = EZLOPI_ACTION_NONE;
+        if (pdTRUE == xQueueReceive(event_queue, &action, UINT32_MAX / portTICK_PERIOD_MS))
+        {
+            s_sensors_schedule_t *sensor = sensor_schedule_head;
+            while (sensor)
+            {
+                sensor->sensor_call(action, NULL);
+                sensor = sensor->next;
+            }
+        }
     }
 }
