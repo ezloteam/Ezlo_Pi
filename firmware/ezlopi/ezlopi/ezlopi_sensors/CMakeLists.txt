@@ -4,4 +4,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES debug ezlopi_actions)
+    REQUIRES debug ezlopi_actions sensor_bme280)

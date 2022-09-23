@@ -7,6 +7,7 @@
 #include "freertos/queue.h"
 
 #include "ezlopi_actions.h"
+#include "ezlopi_sensors.h"
 
 static QueueHandle_t event_queue = NULL;
 
@@ -25,11 +26,12 @@ static void event_process(void *pv)
         e_ezlopi_actions_t action = EZLOPI_ACTION_NONE;
         if (pdTRUE == xQueueReceive(event_queue, &action, UINT32_MAX / portTICK_PERIOD_MS))
         {
-            s_sensors_schedule_t *sensor = sensor_schedule_head;
-            while (sensor)
+            s_sensors_list_t *current_sensor = ezlopi_sensor_get_head();
+
+            while (current_sensor)
             {
-                sensor->sensor_call(action, NULL);
-                sensor = sensor->next;
+                current_sensor->call(action, NULL);
+                current_sensor = current_sensor->next;
             }
         }
     }
