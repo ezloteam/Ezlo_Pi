@@ -24,7 +24,7 @@
 #include "gatt_server.h"
 #include "dht.h"
 #include "mpu6050.h"
-
+#include "ezlopi_timer.h"
 
 #include "wss.h"
 
@@ -67,6 +67,51 @@ static void main_task(void *pv)
     vTaskDelete(NULL);
 }
 
+void inline print_timer_counter(uint64_t counter_value)
+{
+    printf("Counter: 0x%08x%08x\r\n", (uint32_t)(counter_value >> 32),
+           (uint32_t)(counter_value));
+    printf("Time   : %.8f s\r\n", (double)counter_value / EZLOPI_TIMER_SCALE);
+}
+
+void ezlopi_timer_task(void *args)
+{
+    s_timer_queue = xQueueCreate(10, sizeof(ezlopi_timer_event_t));
+
+    ESP_LOGE("EZLOPI_TIMER", "The timer frequency is: %d", TIMER_BASE_CLK);
+    ezlopi_tg_timer_init(EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0, true, 1);
+
+    while (1)
+    {
+        ezlopi_timer_event_t evt;
+        xQueueReceive(s_timer_queue, &evt, portMAX_DELAY);
+
+        /* Print information that the timer reported an event */
+        if (evt.info.auto_reload)
+        {
+            printf("Timer Group with auto reload\n");
+        }
+        else
+        {
+            printf("Timer Group without auto reload\n");
+        }
+        printf("Group[%d], timer[%d] alarm event\n", evt.info.timer_group, evt.info.timer_idx);
+
+        /* Print the timer values passed by event */
+        printf("------- EVENT TIME --------\n");
+        print_timer_counter(evt.timer_counter_value);
+
+        /* Print the timer values as visible by this task */
+        printf("-------- TASK TIME --------\n");
+        uint64_t task_counter_value;
+        timer_get_counter_value(evt.info.timer_group, evt.info.timer_idx, &task_counter_value);
+        print_timer_counter(task_counter_value);
+
+        printf("-------- NOTIFY ENUM --------\n");
+        ESP_LOGE("EZLOPI_TIMER", "The notify enum val is: %d", evt.info.notify);
+    }
+}
+
 void app_main(void)
 {
     gpio_install_isr_service(0);
@@ -81,9 +126,13 @@ void app_main(void)
     wifi_initialize();
     wifi_connect_from_nvs();
 
+    ESP_LOGE("EZLOPI_TIMER", "Initializing timer...");
+    xTaskCreate(ezlopi_timer_task, "ezlopi_timer_task", 3072, NULL, 0, NULL);
+
     xTaskCreate(main_task, "main task", 20 * 1024, NULL, 2, NULL);
     // xTaskCreate(blinky, "blinky", 2048, NULL, 1, NULL);
 }
+
 
 static void blinky(void *pv)
 {
@@ -101,7 +150,7 @@ static void blinky(void *pv)
     // uint32_t count = 0;
     gpio_config(&io_conf);
     // gpio_pad_select_gpio(dht22_pin);
-
+    
     while (1)
     {
         state ^= 1;
