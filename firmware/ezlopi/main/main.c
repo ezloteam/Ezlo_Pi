@@ -79,7 +79,10 @@ void ezlopi_timer_task(void *args)
     s_timer_queue = xQueueCreate(10, sizeof(ezlopi_timer_event_t));
 
     ESP_LOGE("EZLOPI_TIMER", "The timer frequency is: %d", TIMER_BASE_CLK);
-    ezlopi_tg_timer_init(EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0, true, 1);
+    ezlopi_tg_timer_init(EZLOPI_ACTIONS_NOTIFY_50_MS);
+    ezlopi_tg_timer_init(EZLOPI_ACTIONS_NOTIFY_100_MS);
+    ezlopi_tg_timer_init(EZLOPI_ACTIONS_NOTIFY_200_MS);
+    ezlopi_tg_timer_init(EZLOPI_ACTIONS_NOTIFY_500_MS);
 
     while (1)
     {
