@@ -59,15 +59,15 @@ int sensor_bme280(e_ezlopi_actions_t action, void *arg)
 
     switch (action)
     {
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        break;
+    }
     case EZLOPI_ACTION_GET_VALUE:
     {
         break;
     }
     case EZLOPI_ACTION_SET_VALUE:
-    {
-        break;
-    }
-    case EZLOPI_ACTION_INITIALIZE:
     {
         break;
     }
