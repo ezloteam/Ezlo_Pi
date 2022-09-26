@@ -2,7 +2,7 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_sensors.h"
 
-static char *sensor_bme280_data_format_ezlo(void)
+static char *sensor_bme280_ezlopi_update_data(void)
 {
     char *ret = NULL;
 
@@ -19,7 +19,7 @@ static int sensor_bme280_init(void)
 static int sensor_bme280_get_value(void)
 {
     int ret = 0;
-    sensor_bme280_data_format_ezlo();
+    sensor_bme280_ezlopi_update_data();
     return ret;
 }
 
@@ -35,21 +35,21 @@ static int sensor_bme280_notify_30_seconds(void)
     int ret = 0;
 
     static int seconds_counter;
-    seconds_counter = (seconds_counter % 30) ? seconds_counter++ : 0;
+    seconds_counter = (seconds_counter % 30) ? seconds_counter : 0;
 
     if (0 == seconds_counter)
     {
         seconds_counter = 0;
 
         /* Send the value to cloud using web-socket */
-        char *data = sensor_bme280_data_format_ezlo();
+        char *data = sensor_bme280_ezlopi_update_data();
         if (data)
         {
-                }
+            /* Send to ezlo cloud */
+        }
     }
 
     seconds_counter++;
-
     return ret;
 }
 

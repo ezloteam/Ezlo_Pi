@@ -11,6 +11,24 @@
 
 static QueueHandle_t event_queue = NULL;
 
+int sensor_service_add_event_to_queue(e_ezlopi_actions_t action, int from_isr)
+{
+    int ret = 0;
+    if (NULL != event_queue)
+    {
+        if (from_isr)
+        {
+            ret = (pdTRUE == xQueueSendFromISR(event_queue, &action, pdFALSE)) ? 1 : 0;
+        }
+        else
+        {
+            ret = (pdTRUE == xQueueSend(event_queue, &action, 50)) ? 1 : 0;
+        }
+    }
+
+    return ret;
+}
+
 static void event_process(void *pv);
 
 void sensor_service(void)
