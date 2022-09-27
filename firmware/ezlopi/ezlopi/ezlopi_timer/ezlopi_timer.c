@@ -95,52 +95,59 @@ void ezlopi_tg_timer_init(ezlopi_action_notify_t ezlopi_action)
     {
     case EZLOPI_ACTIONS_NOTIFY_50_MS:
     {
-        if (!notify_50_ms_state)
+        if (notify_50_ms_state)
         {
-            ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_50_MS assigned to timer group 0, index 0");
-            timer_info->notify = EZLOPI_ACTIONS_NOTIFY_50_MS;
-            initiator(EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0, 0.05, &notify_50_ms_state);
+            ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized already!! continuing...");
         }
-        ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized!! continuing...");
+        ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_50_MS assigned to timer group 0, index 0");
+        timer_info->notify = EZLOPI_ACTIONS_NOTIFY_50_MS;
+        initiator(EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0, 0.05, &notify_50_ms_state);
+        ESP_LOGE(EZLOPI_TIMER_TAG, "The group %d, timer %d timer initialized!!", EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0);
         break;
     }
     case EZLOPI_ACTIONS_NOTIFY_100_MS:
     {
-        if (!notify_100_ms_state)
+        if (notify_100_ms_state)
         {
-            ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_100_MS assigned to timer group 0, index 1");
-            timer_info->notify = EZLOPI_ACTIONS_NOTIFY_100_MS;
-            initiator(EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_1, 0.1, &notify_100_ms_state);
+            ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized already!! continuing...");
+            goto ret;
         }
-        ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized!! continuing...");
+        ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_100_MS assigned to timer group 0, index 1");
+        timer_info->notify = EZLOPI_ACTIONS_NOTIFY_100_MS;
+        initiator(EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_1, 0.1, &notify_100_ms_state);
+        ESP_LOGE(EZLOPI_TIMER_TAG, "The group %d, timer %d initialized!!", EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_1);
         break;
     }
     case EZLOPI_ACTIONS_NOTIFY_200_MS:
     {
-        if (!notify_200_ms_state)
+        if (notify_200_ms_state)
         {
-            ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_200_MS assigned to timer group 1, index 0");
-            timer_info->notify = EZLOPI_ACTIONS_NOTIFY_200_MS;
-            initiator(EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_0, 0.2, &notify_200_ms_state);
+            ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized already!! continuing...");
+            goto ret;
         }
-        ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized!! continuing...");
+        ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_200_MS assigned to timer group 1, index 0");
+        timer_info->notify = EZLOPI_ACTIONS_NOTIFY_200_MS;
+        initiator(EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_0, 0.2, &notify_200_ms_state);
+        ESP_LOGE(EZLOPI_TIMER_TAG, "The group %d, timer %d timer initialized!!", EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_0);
         break;
     }
     case EZLOPI_ACTIONS_NOTIFY_500_MS:
     {
-        if (!notify_500_ms_state)
+        if (notify_500_ms_state)
         {
-            ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_500_MS assigned to timer group 1, index 1");
-            timer_info->notify = EZLOPI_ACTIONS_NOTIFY_500_MS;
-            initiator(EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_1, 0.5, &notify_500_ms_state);
+            ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized already!! continuing...");
+            goto ret;
         }
-        ESP_LOGE(EZLOPI_TIMER_TAG, "The timer was initialized!! continuing...");
+        ESP_LOGI(EZLOPI_TIMER_TAG, "EZLOPI_ACTIONS_NOTIFY_500_MS assigned to timer group 1, index 1");
+        timer_info->notify = EZLOPI_ACTIONS_NOTIFY_500_MS;
+        initiator(EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_1, 0.5, &notify_500_ms_state);
+        ESP_LOGE(EZLOPI_TIMER_TAG, "The group %d, timer %d timer initialized!!", EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_1);
         break;
     }
     default:
     {
         ESP_LOGE(EZLOPI_TIMER_TAG, "Invalid action provided!!, %d", ezlopi_action);
-        return;
+        goto ret;
         break;
     }
     }
@@ -167,4 +174,8 @@ void ezlopi_tg_timer_init(ezlopi_action_notify_t ezlopi_action)
     timer_isr_callback_add(timer_group, timer_idx, timer_group_isr_callback, timer_info, 0);
 
     timer_start(timer_group, timer_idx);
+
+    ret: 
+        return;
+
 }
