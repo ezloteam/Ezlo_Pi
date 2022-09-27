@@ -6,37 +6,15 @@
  * @brief defining the type of sensor call function
  *
  */
-typedef int (*f_sensor_call_t)(e_ezlopi_actions_t, void *arg);
+// int sensor_bme280(e_ezlopi_actions_t action, void *arg);
+typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, void *arg);
 
 /**
- * @brief
+ * @brief Provides the list of available sensors
  *
+ * @return f_sensor_call_t*
  */
-typedef int (*f_sensor_list_t)(e_ezlopi_actions_t, void *arg);
-
-/**
- * @brief linked list structure defined to hold the registered sensors
- *
- */
-typedef struct s_sensors_list
-{
-    struct s_sensors_list *next;
-    f_sensor_call_t call;
-} s_sensors_list_t;
-
-/**
- * @brief 'sensor_service_add_to_list' adds the sensor to the list
- *
- * @param sensor_call main function for the particular function
- */
-void sensor_service_add_to_list(f_sensor_call_t call_func);
-
-/**
- * @brief 'ezlopi_sensor_get_head' fetch the head of the registered-sensor list
- *
- * @return s_sensors_list_t* return the head of the registered-sensor list
- */
-s_sensors_list_t *ezlopi_sensor_get_head(void);
+const f_sensor_call_t *ezlopi_sensor_get_list(void);
 
 #if 0
 /**

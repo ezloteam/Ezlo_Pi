@@ -36,7 +36,7 @@
 
 /******************************************************************************/
 /*!                         Own header files                                  */
-#include "bme280.h"
+#include "../bme280.h"
 
 /******************************************************************************/
 /*!                               Structures                                  */
@@ -133,7 +133,7 @@ int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev);
 /*!
  * @brief This function starts execution of the program.
  */
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     struct bme280_dev dev;
 
