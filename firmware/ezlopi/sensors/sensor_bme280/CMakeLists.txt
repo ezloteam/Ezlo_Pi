@@ -1,7 +1,8 @@
 # set(config_src "config.cpp")
 
-file(GLOB_RECURSE config_src "*.c")
+# file(GLOB_RECURSE config_src "sensor_bme280.c")
+set(config_src "sensor_bme280.c")
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "sensor_bme280.c"
     INCLUDE_DIRS "."
-    REQUIRES  common_components debug sensor_service)
+    REQUIRES debug ezlopi_actions sensor_service)

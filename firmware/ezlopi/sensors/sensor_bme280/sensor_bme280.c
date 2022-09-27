@@ -23,7 +23,7 @@ static int sensor_bme280_get_value(void)
     return ret;
 }
 
-static int sensor_bme280_set_value(void)
+static int sensor_bme280_set_value(void *arg)
 {
     int ret = 0;
 
@@ -53,34 +53,51 @@ static int sensor_bme280_notify_30_seconds(void)
     return ret;
 }
 
-int sensor_bme280(e_ezlopi_actions_t action, void *arg)
-{
-    int ret = 0;
+int sensor_bme280(e_ezlopi_actions_t action, void *arg) { return 0; }
 
-    switch (action)
-    {
-    case EZLOPI_ACTION_INITIALIZE:
-    {
-        break;
-    }
-    case EZLOPI_ACTION_GET_VALUE:
-    {
-        break;
-    }
-    case EZLOPI_ACTION_SET_VALUE:
-    {
-        break;
-    }
-    case EZLOPI_ACTION_NOTIFY_1000_MS:
-    {
-        ret = sensor_bme280_notify_30_seconds();
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
+// int sensor_bme280(e_ezlopi_actions_t action, void *arg)
+// {
+//     int ret = 0;
 
-    return ret;
-}
+//     switch (action)
+//     {
+//     case EZLOPI_ACTION_INITIALIZE:
+//     {
+//         ret = sensor_bme280_init();
+//         break;
+//     }
+//     case EZLOPI_ACTION_GET_VALUE:
+//     {
+//         ret = sensor_bme280_get_value();
+//         break;
+//     }
+//     case EZLOPI_ACTION_SET_VALUE:
+//     {
+//         ret = sensor_bme280_set_value(arg);
+//         break;
+//     }
+//     case EZLOPI_ACTION_NOTIFY_1000_MS:
+//     {
+//         ret = sensor_bme280_notify_30_seconds();
+//         break;
+//     }
+//     case EZLOPI_ACTION_HUB_GET_DEVICE:
+//     {
+//         break;
+//     }
+//     case EZLOPI_ACTION_HUB_GET_ITEM:
+//     {
+//         break;
+//     }
+//     case EZLOPI_ACTION_HUB_UPDATE:
+//     {
+//         break;
+//     }
+//     default:
+//     {
+//         break;
+//     }
+//     }
+
+//     return ret;
+// }
