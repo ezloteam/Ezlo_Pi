@@ -7,6 +7,7 @@
 
 // int _sensor_bme280(e_ezlopi_actions_t action, void *arg);
 int sensor_bme280(e_ezlopi_actions_t action, void *arg);
+// int sensor_bme280(e_ezlopi_actions_t action, void *arg) { return 0; }
 
 // int sensor_bme280(e_ezlopi_actions_t action, void *arg)
 // {

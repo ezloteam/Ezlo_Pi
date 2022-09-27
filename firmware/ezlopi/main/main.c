@@ -11,11 +11,20 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "sensor_service.h"
+// #include "sensor_bme280.h"
 
 static void blinky(void *pv);
+// static int (*sensor_list[])(e_ezlopi_actions_t action, void *arg) = {
+//     // #ifdef SENSOR_0010_BME280
+//     // &sensor_bme280,
+//     sensor_bme280,
+//     // #endif
+//     NULL, // Do not remove 'NULL' from list, because the element of the list is compared with NULL for termination of loop
+// };
 
 void app_main(void)
 {
+    // sensor_list[0](0, NULL);
     sensor_service();
     xTaskCreate(blinky, "blinky", 2048, NULL, 1, NULL);
 }

@@ -1,6 +1,5 @@
 #include "sensor_bme280.h"
 #include "ezlopi_actions.h"
-#include "ezlopi_sensors.h"
 
 static char *sensor_bme280_ezlopi_update_data(void)
 {

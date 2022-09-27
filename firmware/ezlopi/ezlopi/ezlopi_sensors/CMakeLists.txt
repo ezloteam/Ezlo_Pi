@@ -1,7 +1,17 @@
-# set(config_src "config.cpp")
+# set(srcs    "main.cpp"
+# "example.cpp"
+# )
 
-file(GLOB_RECURSE config_src "*.c")
+file(GLOB_RECURSE SOURCES "./*.c*")
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS ${SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES debug ezlopi_actions sensor_service sensor_bme280)
+    REQUIRES sensor_service sensor_bme280)
+
+# file( GLOB_RECURSE SOURCES "./*.cpp" )
+
+# idf_component_register( SRCS ${SOURCES}
+# INCLUDE_DIRS "")
+# REQUIRES common app_update soc
+# wifi_service2
+# time_service)

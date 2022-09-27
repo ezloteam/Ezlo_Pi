@@ -29,7 +29,7 @@ MACRO(SUBDIRLIST result curdir)
     SET(${result} ${dirlist}) # copy the components of 'dirlist' into 'result'(return variable)
 ENDMACRO()
 
-set(external_components_list devices protocols interface hub sensors ezlopi services) # list of external components
+set(external_components_list sensors devices protocols interface hub ezlopi services) # list of external components
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'
 set(ALL_COMPONENTS "") # clearing 'ALL_COMPONENTS' variable
@@ -47,6 +47,6 @@ LIST(APPEND ALL_COMPONENTS library)
 set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS}) # add the list of directories 'SUBDIRS' to 'EXTRA_COMPONENT_DIRS'(ESP32 VARIABLES), links the external components
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENTS_DIRS}\r\n")
 
-# # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
+## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
 
 project(Ezlo_Pi_v2x)
