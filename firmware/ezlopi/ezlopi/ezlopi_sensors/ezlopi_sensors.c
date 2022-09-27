@@ -17,3 +17,8 @@ const f_sensor_call_t *ezlopi_sensor_get_list(void)
 {
     return sensor_list;
 }
+
+
+
+
+

@@ -2,6 +2,7 @@
 #define __SENSOR_BME280_H__
 
 #include "ezlopi_actions.h"
+#include "bme280.h"
 
 #define SENSOR_0010_BME280
 

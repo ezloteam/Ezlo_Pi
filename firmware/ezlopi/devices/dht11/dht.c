@@ -96,7 +96,7 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     {                                   \
         if (!(VAL))                     \
             return ESP_ERR_INVALID_ARG; \
-    } while (0)
+    } while (0) 
 
 #define CHECK_LOGE(x, msg, ...)          \
     do                                   \

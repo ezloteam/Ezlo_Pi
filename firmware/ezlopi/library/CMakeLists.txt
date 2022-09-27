@@ -7,3 +7,5 @@ list(REMOVE_ITEM config_src "examples/*")
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES esp_common esp-tls esp_http_client common_components debug)
+
+
