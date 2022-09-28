@@ -35,7 +35,7 @@ int sensor_service_add_event_to_queue(s_ezlo_event_t *event, int from_isr)
 
 static void event_process(void *pv);
 
-void sensor_service(void)
+void sensor_service_init(void)
 {
     event_queue = xQueueCreate(20, sizeof(s_ezlo_event_t *));
     xTaskCreate(event_process, "event_process", 4 * 1024, NULL, 4, NULL);

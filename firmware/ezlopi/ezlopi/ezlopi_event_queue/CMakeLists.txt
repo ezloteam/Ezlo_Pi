@@ -2,6 +2,6 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "hall_sensor.c" "${config_src}"
+idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES frozen)
+    REQUIRES debug ezlopi_actions)

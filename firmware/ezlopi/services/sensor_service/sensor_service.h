@@ -16,7 +16,7 @@ typedef struct s_ezlo_event
  * @brief
  *
  */
-void sensor_service(void);
+void sensor_service_init(void);
 
 /**
  * @brief

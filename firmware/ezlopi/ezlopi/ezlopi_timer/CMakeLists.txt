@@ -1,4 +1,5 @@
 
 
 idf_component_register(SRCS "ezlopi_timer.c" 
-                        INCLUDE_DIRS ".")
+                        INCLUDE_DIRS "."
+                        REQUIRES debug sensor_service)

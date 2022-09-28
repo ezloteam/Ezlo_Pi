@@ -29,7 +29,7 @@ static void hall_sensor_process(void *pv)
     char value_buff[128];
 
     while (1) {
-        hall_sensor_value = hall_sensor_read();
+        hall_sensor_value = hall_sensor_read();  /*!< ADC1 channel 3 is GPIO39 */ /*!< ADC1 channel 0 is GPIO36 */
         printf("Value: %d\r\n", hall_sensor_value);
 
         memset(value_buff, 0, sizeof(value_buff));
