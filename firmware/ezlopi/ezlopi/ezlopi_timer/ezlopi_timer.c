@@ -35,7 +35,7 @@
  *******************************************************************************/
 #include "ezlopi_timer.h"
 #include "debug.h"
-#include "sensor_service.h"
+#include "ezlopi_event_queue.h"
 
 typedef struct s_ezlopi_timer
 {
@@ -43,6 +43,7 @@ typedef struct s_ezlopi_timer
     int group;
     int index;
     int alarm_value;
+    e_ezlopi_actions_t event_type;
 } s_ezlopi_timer_t;
 
 /*******************************************************************************
@@ -73,44 +74,55 @@ const static int timer_group_index_pair[MAX_TIMER][2] = {
 static bool IRAM_ATTR timer_group_isr_callback(void *args)
 {
     BaseType_t high_task_awoken = pdFALSE;
-    s_ezlopi_timer_t *timer_conf = (s_ezlopi_timer_t *)args;
+    s_ezlopi_timer_t *_timer_conf = (s_ezlopi_timer_t *)args;
 
-    uint64_t timer_counter_value = timer_group_get_counter_value_in_isr(timer_conf->group, timer_conf->index);
+    uint64_t timer_counter_value = timer_group_get_counter_value_in_isr(_timer_conf->group, _timer_conf->index);
 
-    if (!timer_conf->internal.auto_reload)
+    if (!_timer_conf->internal.auto_reload)
     {
-        timer_counter_value += timer_conf->alarm_value * EZLOPI_TIMER_SCALE;
-        timer_group_set_alarm_value_in_isr(timer_conf->group, timer_conf->index, timer_counter_value);
+        timer_counter_value += _timer_conf->alarm_value * EZLOPI_TIMER_SCALE;
+        timer_group_set_alarm_value_in_isr(_timer_conf->group, _timer_conf->index, timer_counter_value);
+    }
+
+    s_ezlo_event_t *event_data = malloc(sizeof(s_ezlo_event_t));
+    if (event_data)
+    {
+        event_data->action = _timer_conf->event_type;
+        event_data->arg = NULL;
+        if (0 == ezlopi_event_queue_send(&event_data, true))
+        {
+            free(event_data);
+        }
     }
 
     return high_task_awoken == pdTRUE; // return whether we need to yield at the end of ISR
 }
 
-static void ezlopi_timer_init_timer_event(int timer_num, int time_ms);
-static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, int group, int index, int alarm_ms);
 static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t *timer_conf);
+static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_actions_t event_type);
+static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_actions_t event_type, int group, int index, int alarm_ms);
 
 void ezlopi_timer_start_50ms(void)
 {
-    ezlopi_timer_init_timer_event(1, 50);
+    ezlopi_timer_init_timer_event(0, 50, EZLOPI_ACTION_NOTIFY_50_MS);
 }
 
 void ezlopi_timer_start_100ms(void)
 {
-    ezlopi_timer_init_timer_event(2, 100);
+    ezlopi_timer_init_timer_event(1, 100, EZLOPI_ACTION_NOTIFY_100_MS);
 }
 
 void ezlopi_timer_start_200ms(void)
 {
-    ezlopi_timer_init_timer_event(3, 200);
+    ezlopi_timer_init_timer_event(2, 200, EZLOPI_ACTION_NOTIFY_200_MS);
 }
 
 void ezlopi_timer_start_500ms(void)
 {
-    ezlopi_timer_init_timer_event(4, 500);
+    ezlopi_timer_init_timer_event(3, 500, EZLOPI_ACTION_NOTIFY_500_MS);
 }
 
-static void ezlopi_timer_init_timer_event(int timer_num, int time_ms)
+static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_actions_t event_type)
 {
     if (timer_num < MAX_TIMER)
     {
@@ -118,7 +130,7 @@ static void ezlopi_timer_init_timer_event(int timer_num, int time_ms)
 
         if (timer_config)
         {
-            ezlopi_timer_setup_struct(timer_config, timer_group_index_pair[timer_num][0], timer_group_index_pair[timer_num][1], time_ms);
+            ezlopi_timer_setup_struct(timer_config, event_type, timer_group_index_pair[timer_num][0], timer_group_index_pair[timer_num][1], time_ms);
             ezlopi_timer_alarm_enable(timer_config);
         }
     }
@@ -128,9 +140,10 @@ static void ezlopi_timer_init_timer_event(int timer_num, int time_ms)
     }
 }
 
-static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, int group, int index, int alarm_ms)
+static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_actions_t event_type, int group, int index, int alarm_ms)
 {
-    timer_config->alarm_value = (alarm_ms * EZLOPI_TIMER_SCALE / 1000);
+    timer_config->event_type = event_type;
+    timer_config->alarm_value = (alarm_ms * (EZLOPI_TIMER_SCALE / 1000));
     timer_config->group = group;
     timer_config->index = index;
     timer_config->internal.alarm_en = TIMER_ALARM_EN,

@@ -13,7 +13,8 @@ static void hall_sensor_process(void *pv);
 static uint32_t device_index = 0;
 static int hall_sensor_value = 0;
 
-int hall_sensor_value_get(void){
+int hall_sensor_value_get(void)
+{
     return hall_sensor_value;
 }
 
@@ -28,14 +29,15 @@ static void hall_sensor_process(void *pv)
     adc1_config_width(ADC_WIDTH_BIT_12);
     char value_buff[128];
 
-    while (1) {
-        hall_sensor_value = hall_sensor_read();  /*!< ADC1 channel 3 is GPIO39 */ /*!< ADC1 channel 0 is GPIO36 */
+    while (1)
+    {
+        // hall_sensor_value = hall_sensor_read();  /*!< ADC1 channel 3 is GPIO39 */ /*!< ADC1 channel 0 is GPIO36 */
         printf("Value: %d\r\n", hall_sensor_value);
 
         memset(value_buff, 0, sizeof(value_buff));
         snprintf(value_buff, sizeof(value_buff), "%s", (hall_sensor_value > 65 || hall_sensor_value < 15) ? "\"dw_is_closed\"" : "\"dw_is_opened\"");
-        char * ret = items_update_from_sensor(device_index, value_buff);
-        
+        char *ret = items_update_from_sensor(device_index, value_buff);
+
         if (ret)
         {
             TRACE_B(">> WS Tx - 'hub.item.updated' [%d]\r\n%s", strlen(ret), ret);
@@ -44,6 +46,6 @@ static void hall_sensor_process(void *pv)
             ret = NULL;
         }
 
-        vTaskDelay(2000/portTICK_RATE_MS);
+        vTaskDelay(2000 / portTICK_RATE_MS);
     }
 }

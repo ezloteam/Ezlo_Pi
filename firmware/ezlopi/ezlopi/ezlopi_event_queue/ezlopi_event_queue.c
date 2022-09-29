@@ -6,42 +6,61 @@ static QueueHandle_t generic_queue = NULL;
 
 void ezlopi_event_queue_init(void)
 {
-    generic_queue = xQueueCreate(20, sizeof(s_ezlo_event_t));
+    if (NULL == generic_queue)
+    {
+        generic_queue = xQueueCreate(20, sizeof(s_ezlo_event_t *));
+    }
 }
 
-int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
+int ezlopi_event_queue_send(s_ezlo_event_t **event_data, int from_isr)
 {
     int ret = 0;
 
-    if (xQueueIsQueueFullFromISR(generic_queue))
+    if (generic_queue)
     {
-        s_ezlo_event_t *tmp_evt_data = NULL;
-        xQueueReceive(generic_queue, tmp_evt_data, 0);
-        if (tmp_evt_data)
+        if (xQueueIsQueueFullFromISR(generic_queue))
         {
-            if (tmp_evt_data->arg)
+            s_ezlo_event_t *tmp_evt_data = NULL;
+            if (from_isr)
             {
-                free(tmp_evt_data->arg);
+                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                xQueueReceiveFromISR(generic_queue, tmp_evt_data, &xHigherPriorityTaskWoken);
             }
-            free(tmp_evt_data);
+            else
+            {
+                xQueueReceive(generic_queue, tmp_evt_data, 0);
+            }
+
+            if (tmp_evt_data)
+            {
+                if (tmp_evt_data->arg)
+                {
+                    free(tmp_evt_data->arg);
+                }
+                free(tmp_evt_data);
+            }
+        }
+
+        if (from_isr)
+        {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            ret = xQueueSendFromISR(generic_queue, event_data, &xHigherPriorityTaskWoken);
+        }
+        else
+        {
+            ret = xQueueSend(generic_queue, event_data, 0);
         }
     }
 
-    if (from_isr)
-    {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        xQueueSendFromISR(generic_queue, event_data, &xHigherPriorityTaskWoken);
-    }
-    else
-    {
-        xQueueSend(generic_queue, event_data, 0);
-    }
     return ret;
 }
 
 int ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms)
 {
     int ret = 0;
-    ret = (pdTRUE == xQueueReceive(generic_queue, *event_data, (time_out_ms / portTICK_RATE_MS)) ? 1 : 0);
+    if (generic_queue)
+    {
+        ret = xQueueReceive(generic_queue, event_data, (time_out_ms / portTICK_RATE_MS));
+    }
     return ret;
 }

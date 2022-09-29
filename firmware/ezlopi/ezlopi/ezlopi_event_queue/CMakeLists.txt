@@ -2,6 +2,6 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_event_queue.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES debug ezlopi_actions)

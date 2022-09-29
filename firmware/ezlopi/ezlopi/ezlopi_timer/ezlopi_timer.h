@@ -37,7 +37,6 @@
  *                          Include Files
  *******************************************************************************/
 
-#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -58,6 +57,9 @@
 #define EZLOPI_TIMER_DIVIDER (1000)                                //  Hardware timer clock divider
 #define EZLOPI_TIMER_SCALE (TIMER_BASE_CLK / EZLOPI_TIMER_DIVIDER) // convert counter value to seconds
 
-
+void ezlopi_timer_start_50ms(void);
+void ezlopi_timer_start_100ms(void);
+void ezlopi_timer_start_200ms(void);
+void ezlopi_timer_start_500ms(void);
 
 #endif // EZLOPI_TIMER_H

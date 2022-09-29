@@ -13,6 +13,7 @@
 
 #include "sensor_service.h"
 #include "ezlopi_timer.h"
+#include "ezlopi_event_queue.h"
 
 static void blinky(void *pv);
 // static int (*sensor_list[])(e_ezlopi_actions_t action, void *arg) = {
@@ -32,7 +33,9 @@ void inline print_timer_counter(uint64_t counter_value)
 
 void app_main(void)
 {
+    ezlopi_event_queue_init();
     sensor_service_init();
+    ezlopi_timer_start_500ms();
     xTaskCreate(blinky, "blinky", 2048, NULL, 1, NULL);
 }
 
@@ -55,10 +58,11 @@ static void blinky(void *pv)
     {
         state ^= 1;
         gpio_set_level(GPIO_NUM_2, state);
-        int hall_sensor_value = hall_sensor_read();
+        // int hall_sensor_value = hall_sensor_read();
+        int hall_sensor_value = 0;
         printf("Hall Sensor value: %d\r\n", hall_sensor_value);
 
-        vTaskDelay(200 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_RATE_MS);
 
         // if (count++ > 20)
         {
@@ -68,14 +72,18 @@ static void blinky(void *pv)
             // TRACE_D("-----------------------------------------");
         }
 
-        s_ezlo_event_t *event = malloc(sizeof(s_ezlo_event_t));
-        if (event)
-        {
-            if (0 == sensor_service_add_event_to_queue(event, 0))
-            {
-                free(event);
-            }
-        }
+        // s_ezlo_event_t *event = malloc(sizeof(s_ezlo_event_t));
+        // if (event)
+        // {
+        //     event->action = EZLOPI_ACTION_GET_VALUE;
+        //     event->arg = NULL;
+
+        //     if (0 == ezlopi_event_queue_send(&event, 0))
+        //     {
+        //         printf("Error: failed to send to the queue!\n");
+        //         // free(event);
+        //     }
+        // }
 
         // float humidity, temperature;
         // dht_read_float_data(DHT_TYPE_AM2301, dht22_pin, &humidity, &temperature);
