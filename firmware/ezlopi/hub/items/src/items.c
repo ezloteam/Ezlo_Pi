@@ -392,3 +392,4 @@ static void parse_item_id(char *data, uint32_t len, char *item_id)
         TRACE_E("item_id not found!");
     }
 }
+    
