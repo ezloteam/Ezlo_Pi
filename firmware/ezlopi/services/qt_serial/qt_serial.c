@@ -39,97 +39,13 @@ static const int RX_BUF_SIZE = 3096;
 
 // cJson Types
 
-void QT_GET_INFO();
-void QT_SET_WIFI(const char *data);
-void QT_RESPONE(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
-void QT_SET_DATA(const char *data);
-void QT_READ_DATA(void);
+static void qt_get_info();
+static void qt_set_wifi(const char *data);
+static void qt_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
+static void qt_set_data(const char *data);
+static void qt_read_data(void);
 
-#if 0
-char *JSON_Types(int type)
-{
-    if (type == cJSON_Invalid)
-        return ("cJSON_Invalid");
-    if (type == cJSON_False)
-        return ("cJSON_False");
-    if (type == cJSON_True)
-        return ("cJSON_True");
-    if (type == cJSON_NULL)
-        return ("cJSON_NULL");
-    if (type == cJSON_Number)
-        return ("cJSON_Number");
-    if (type == cJSON_String)
-        return ("cJSON_String");
-    if (type == cJSON_Array)
-        return ("cJSON_Array");
-    if (type == cJSON_Object)
-        return ("cJSON_Object");
-    if (type == cJSON_Raw)
-        return ("cJSON_Raw");
-    return NULL;
-}
-
-void JSON_Analyze(const cJSON *const root)
-{
-    ////TRACE_I( "root->type=%s", JSON_Types(root->type));
-    cJSON *current_element = NULL;
-    ////TRACE_I( "roo->child=%p", root->child);
-    ////TRACE_I( "roo->next =%p", root->next);
-    cJSON_ArrayForEach(current_element, root)
-    {
-        ////TRACE_I( "type=%s", JSON_Types(current_element->type));
-        ////TRACE_I( "current_element->string=%p", current_element->string);
-        if (current_element->string)
-        {
-            const char *string = current_element->string;
-            // TRACE_I( "[%s]", string);
-        }
-        if (cJSON_IsInvalid(current_element))
-        {
-            // TRACE_I( "Invalid");
-        }
-        else if (cJSON_IsFalse(current_element))
-        {
-            // TRACE_I( "False");
-        }
-        else if (cJSON_IsTrue(current_element))
-        {
-            // TRACE_I( "True");
-        }
-        else if (cJSON_IsNull(current_element))
-        {
-            // TRACE_I( "Null");
-        }
-        else if (cJSON_IsNumber(current_element))
-        {
-            int valueint = current_element->valueint;
-            double valuedouble = current_element->valuedouble;
-            // TRACE_I( "int=%d double=%f", valueint, valuedouble);
-        }
-        else if (cJSON_IsString(current_element))
-        {
-            const char *valuestring = current_element->valuestring;
-            // TRACE_I( "%s", valuestring);
-        }
-        else if (cJSON_IsArray(current_element))
-        {
-            ////TRACE_I( "Array");
-            JSON_Analyze(current_element);
-        }
-        else if (cJSON_IsObject(current_element))
-        {
-            ////TRACE_I( "Object");
-            JSON_Analyze(current_element);
-        }
-        else if (cJSON_IsRaw(current_element))
-        {
-            // TRACE_I( "Raw(Not support)");
-        }
-    }
-}
-#endif
-
-void UART_INIT(void)
+static void serial_init(void)
 {
     const uart_config_t uart_config = {
         .baud_rate = 115200,
@@ -145,7 +61,7 @@ void UART_INIT(void)
     uart_set_pin(UART_NUM_0, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
 
-int sendData(const char *logName, const char *data)
+static int sendData(const char *logName, const char *data)
 {
     cJSON *root = cJSON_Parse(data);
 
@@ -159,7 +75,7 @@ int sendData(const char *logName, const char *data)
             {
             case 1:
             {
-                QT_GET_INFO();
+                qt_get_info();
                 break;
             }
             case 2:
@@ -169,7 +85,7 @@ int sendData(const char *logName, const char *data)
             }
             case 3:
             {
-                QT_SET_DATA(data);
+                qt_set_data(data);
                 break;
             }
             case 4:
@@ -230,7 +146,7 @@ static void rx_task(void *arg)
 
 //---------------------------------QT-Funtions
 
-void QT_GET_INFO()
+static void qt_get_info()
 {
     cJSON *get_info = cJSON_CreateObject();
 
@@ -278,7 +194,7 @@ void QT_GET_INFO()
     }
 }
 
-void QT_SET_WIFI(const char *data)
+static void qt_set_wifi(const char *data)
 {
     cJSON *root = cJSON_Parse(data);
 
@@ -300,14 +216,14 @@ void QT_SET_WIFI(const char *data)
             }
 
             // uint8_t status_connect = 1; // WIFI_CONNET;
-            // QT_RESPONE(2, 1, status_connect);
+            // qt_response(2, 1, status_connect);
         }
 
         cJSON_Delete(root); // free Json string
     }
 }
 
-void QT_RESPONE(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
+static void qt_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
 {
     cJSON *response = NULL;
     response = cJSON_CreateObject();
@@ -338,7 +254,7 @@ void QT_RESPONE(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
     }
 }
 
-void QT_SET_DATA(const char *data)
+static void qt_set_data(const char *data)
 {
     uint8_t ret = nvs_storage_write_config_data_str(data);
     if (ret)
@@ -351,7 +267,7 @@ void QT_SET_DATA(const char *data)
     return;
 }
 
-void QT_READ_DATA(void)
+static void qt_read_data(void)
 {
     char *buf = NULL;
     nvs_storage_read_config_data_str(&buf);
@@ -395,6 +311,6 @@ int qt_serial_respond_to_qt(int len, uint8_t *data)
 
 void qt_serial_init(void)
 {
-    UART_INIT();
+    serial_init();
     xTaskCreate(rx_task, "uart_rx_task", 1024 * 10, NULL, configMAX_PRIORITIES, NULL);
 }

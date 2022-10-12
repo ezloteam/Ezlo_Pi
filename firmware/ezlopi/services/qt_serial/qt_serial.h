@@ -10,18 +10,6 @@ extern "C"
 {
 #endif
 
-    typedef enum s_command
-    {
-        GET_CONFIG = 0xa0,
-        SET_CONFIG,
-        SET_VOL,
-        SET_WiFi,
-        FIRST_DEV,
-        SET_DEV,
-        GET_DEV,
-        END_DEV,
-    } s_command_t;
-
     void qt_serial_init(void);
     int qt_serial_respond_to_qt(int len, uint8_t *data);
     //--------------- Changes
