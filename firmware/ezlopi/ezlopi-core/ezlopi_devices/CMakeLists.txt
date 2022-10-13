@@ -2,6 +2,6 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_devices.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES esp_common esp-tls esp_http_client common_components debug)
+    REQUIRES debug ezlopi_hal)
