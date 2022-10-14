@@ -4,4 +4,4 @@ file(GLOB_RECURSE config_src "src/*.c*")
 
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "include"
-    REQUIRES nvs_flash interface_common debug)
+    REQUIRES nvs_flash  debug)

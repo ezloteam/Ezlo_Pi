@@ -7,8 +7,7 @@
 #include "interface_common.h"
 #include "dht.h"
 #include "mpu6050.h"
-
-#define TEST 0
+#include "web_provisioning.h"
 
 extern float dht11_service_get_temperature(void);
 static void parse_item_id(char *data, uint32_t len, char *item_id);
@@ -44,19 +43,15 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
 
         struct json_token sender = JSON_INVALID_TOKEN;
         int snd_state = json_scanf(payload, len, "{sender: %T}", &sender);
-
-#if (0 == TEST)
         snprintf(send_buf, buf_len, items_list_start, msg_count);
 
         if (devices[0].name[0])
         {
             for (int i = 0; i < MAX_DEV; i++)
             {
-
                 char dev_value[40];
                 switch (devices[i].dev_type)
                 {
-                // case TAMPER:
                 case EZPI_DEV_TYPE_ONE_WIRE:
                 {
                     snprintf(dev_value, sizeof(dev_value), "%.02f,\"scale\":\"celsius\"", dht11_service_get_temperature());
@@ -90,14 +85,18 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
 
                     break;
                 }
-                // case LED:
-                // case SWITCH:
-                // case PLUG:
                 case EZPI_DEV_TYPE_DIGITAL_OP:
                 case EZPI_DEV_TYPE_DIGITAL_IP:
                 {
                     uint32_t current_state = interface_common_gpio_get_output_state(devices[i].out_gpio);
                     snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
+                    break;
+                }
+                case EZPI_DEV_TYPE_OTHER:
+                {
+                    extern int hall_sensor_value_get(void);
+                    int current_state = hall_sensor_value_get();
+                    snprintf(dev_value, sizeof(dev_value), "%s", (current_state > 60 || current_state < 10) ? "\"dw_is_closed\"" : "\"dw_is_opened\"");
                     break;
                 }
                 default:
@@ -140,30 +139,6 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
         len_b = strlen(send_buf);
         snprintf(&send_buf[len_b], buf_len - len_b, items_list_end, msg_id.len, msg_id.ptr,
                  snd_state ? sender.len : 2, snd_state ? sender.ptr : "{}");
-#endif
-
-#if (TEST == 1)
-        static const char *test =
-            "{\"method\":\"hub.items.list\","
-            "\"msg_id\":3364512107,"
-            "\"result\":{\"items\":[{\"_id\":\"142F6C69\","
-            "\"deviceId\":\"588b7eb528b12d03be86f36f\","
-            "\"deviceName\": \"SWITCH1\","
-            "\"deviceArmed\":true,"
-            "\"hasGetter\":true,"
-            "\"hasSetter\":true,"
-            "\"name\":\"switch\","
-            "\"show\":true,"
-            "\"valueType\":\"bool\","
-            "\"value\":false, \"valueFormatted\":\"false\","
-            "\"status\":\"synced\"}]},"
-            "\"error\":null,"
-            "\"id\":\"%.*s\",\"sender\":%.*s}";
-
-        ret = "";
-        snprintf(send_buf, buf_len, test, msg_id.len, msg_id.ptr, snd_state ? sender.len : 2, snd_state ? sender.ptr : "{}");
-#endif
-
         TRACE_B(">> WS Tx - '%.*s' [%d]\r\n%s", method->len, method->ptr, strlen(send_buf), send_buf);
     }
 
@@ -225,6 +200,43 @@ char *items_update(const char *payload, uint32_t len, struct json_token *method,
     return items_update_with_device_index(payload, len, method, msg_count, UINT32_MAX);
 }
 
+char *items_update_from_sensor(int device_index, char * updated_value)
+{
+    uint32_t buf_len = 1024;
+    char * send_buf = malloc(buf_len);
+
+    if (send_buf)
+    {
+        if (device_index < MAX_DEV)
+        {
+
+            static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\"hub.item.updated\",\"result\":{\"_id\":\"%.*s\",\"deviceId\":\"%.*s\","
+                                            "\"deviceName\":\"%.*s\",\"deviceCategory\":\"%.*s\",\"deviceSubcategory\":\"%.*s\",\"roomName\":\"%.*s\","
+                                            "\"serviceNotification\":false,\"userNotification\":false,\"notifications\":null,\"name\":\"%.*s\",\"valueType\":\"%s\","
+                                            "\"value\":%s}}";
+
+            s_device_properties_t *dev_list = devices_common_device_list();
+
+            snprintf(send_buf, buf_len, update_frmt, web_provisioning_get_message_count(),
+                sizeof(dev_list[device_index].item_id), dev_list[device_index].item_id,
+                sizeof(dev_list[device_index].device_id), dev_list[device_index].device_id,
+                sizeof(dev_list[device_index].name), dev_list[device_index].name,
+                sizeof(dev_list[device_index].category), dev_list[device_index].category,
+                sizeof(dev_list[device_index].subcategory), dev_list[device_index].subcategory,
+                sizeof(dev_list[device_index].roomName), dev_list[device_index].roomName,
+                sizeof(dev_list[device_index].item_name), dev_list[device_index].item_name,
+                dev_list[device_index].value_type, updated_value);
+        }
+        else
+        {
+            TRACE_E("Item not found in device list!");
+            strcpy(send_buf, "{\"id\":\"_ID_\",\"error\":{\"code\":-32600,\"data\":\"rpc.params.empty._id\",\"description\":\"Missing item_id\"},\"result\":{}}");
+        }
+    }
+
+    return send_buf;
+}
+
 char *items_update_with_device_index(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count, int device_index)
 {
     uint32_t buf_len = 1024;
@@ -271,7 +283,7 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
 
             switch (dev_list[device_idx].dev_type)
             {
-#warning "need to replace with id_item
+#warning "need to replace with id_item"
             case EZPI_DEV_TYPE_ONE_WIRE:
             {
                 // snprintf(dev_value, sizeof(dev_value), "\"%.02f\",\"scale\":\"celsius\"", dht11_service_get_temperature());
@@ -312,6 +324,13 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
             {
                 uint32_t current_state = interface_common_gpio_get_output_state(dev_list[device_idx].out_gpio);
                 snprintf(dev_value, sizeof(dev_value), "%s", current_state ? "true" : "false");
+                break;
+            }
+            case EZPI_DEV_TYPE_OTHER:
+            {
+                extern int hall_sensor_value_get(void);
+                int current_state = hall_sensor_value_get();
+                snprintf(dev_value, sizeof(dev_value), "%s", (current_state > 60 || current_state < 10) ? "\"dw_is_closed\"" : "\"dw_is_opened\"");
                 break;
             }
             default:

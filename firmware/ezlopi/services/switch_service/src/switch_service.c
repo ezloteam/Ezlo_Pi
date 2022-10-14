@@ -27,6 +27,7 @@ void switch_service_init(void)
 
 static void __gpio_intr_proces(void *pv)
 {
+    char value_buf[128];
     s_device_properties_t *device_list = devices_common_device_list();
 
     while (1)
@@ -50,13 +51,19 @@ static void __gpio_intr_proces(void *pv)
                 if (event_gpio_n == device_list[idx].input_gpio)
                 {
                     uint32_t new_state = interface_common_gpio_get_output_state(device_list[idx].out_gpio) ? 0 : 1;
-                    TRACE_B("Setting pin: %d -> %d", device_list[idx].out_gpio, new_state)
+                    TRACE_B("Setting pin: %d -> %d", device_list[idx].out_gpio, new_state);
                     interface_common_gpio_state_set(device_list[idx].out_gpio, new_state);
-                    char *j_response = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), idx);
+
+                    memset(value_buf, 0, sizeof(value_buf));
+                    snprintf(value_buf, sizeof(value_buf), "%s", new_state ? "true" : "false");
+
+                    char *j_response = items_update_from_sensor(idx, value_buf);
+                    // char *j_response = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), idx);
 
                     if (j_response)
                     {
                         wss_client_send(j_response, strlen(j_response));
+                        TRACE_B(">> WS Tx - 'hub.item.updated' [%d]\r\n%s", strlen(j_response), j_response);
                         free(j_response);
                         j_response = NULL;
                     }
