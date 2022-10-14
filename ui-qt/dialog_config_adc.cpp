@@ -37,7 +37,7 @@ void Dialog_config_adc::on_buttonBox_accepted() {
 
     adc_user_data.gpio = ui->comboBox_adc_gpio->currentText().toInt();
 
-    adc_user_data.resln_bit = (ezpi_adc_resln)(ui->comboBox_ADC_subtype->currentIndex() + 1);
+    adc_user_data.resln_bit = (ezpi_adc_resln)(ui->comboBox_adc_resolution->currentIndex() + 1);
 
     // Adding device to the device vector
     if(ezloPi_adc->EZPI_ADD_AINPUT_DEVICE(adc_user_data) == EZPI_SUCCESS) {

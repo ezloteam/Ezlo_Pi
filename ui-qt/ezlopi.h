@@ -51,6 +51,7 @@ typedef QString EZPI_STRING;
 #define     SIZE_EZPI_OFFSET_HUB_ID_1                           0XF000
 
 #define     EZPI_SERIAL_READ_TIMEOUT                            4000
+#define     EZPI_SERIAL_READ_TIMEOUT_WIFI                       6000
 #define     EZPI_FIRMWARE_CHECK_TIMEOUT                         5000
 
 enum ezpi_high_low {
