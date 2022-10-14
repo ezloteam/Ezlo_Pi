@@ -19,8 +19,8 @@ void ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
         {
             i2c_config_t i2c_config = {
                 .mode = I2C_MODE_MASTER,
-                .sda_io_num = i2c_master_conf->sda_pin,
-                .scl_io_num = i2c_master_conf->scl_pin,
+                .sda_io_num = i2c_master_conf->sda,
+                .scl_io_num = i2c_master_conf->scl,
                 .sda_pullup_en = GPIO_PULLUP_ENABLE,
                 .scl_pullup_en = GPIO_PULLUP_ENABLE,
                 .master.clk_speed = i2c_master_conf->clock_speed,
