@@ -287,13 +287,13 @@ public:
     ezpi_error_codes_configurator EZPI_ADD_SPI_DEVICE(ezpi_device_SPI_t d);
     ezpi_error_codes_configurator EZPI_ADD_OTHER_DEVICE(ezpi_device_other_t d);
 
-    void EZPI_DELETE_OUTPUT_DEVICE(void) { ezpi_output_devices.pop_back(); }
-    void EZPI_DELETE_INPUT_DEVICE(void) { ezpi_input_devices.pop_back(); }
-    void EZPI_DELETE_AINPUT_DEVICE(void) { ezpi_analog_input_devices.pop_back(); }
-    void EZPI_DELETE_ONEWIRE_DEVICE(void) { ezpi_onewire_devices.pop_back(); }
-    void EZPI_DELETE_I2C_DEVICE(void) { ezpi_i2c_devices.pop_back(); }
-    void EZPI_DELETE_SPI_DEVICE(void) { ezpi_spi_devices.pop_back(); }
-    void EZPI_DELETE_OTHER_DEVICE(void) { ezpi_other_devices.pop_back(); }
+    void EZPI_DELETE_OUTPUT_DEVICE(void);
+    void EZPI_DELETE_INPUT_DEVICE(void);
+    void EZPI_DELETE_AINPUT_DEVICE(void);
+    void EZPI_DELETE_ONEWIRE_DEVICE(void);
+    void EZPI_DELETE_I2C_DEVICE(void);
+    void EZPI_DELETE_SPI_DEVICE(void);
+    void EZPI_DELETE_OTHER_DEVICE(void);
 
     void EZPI_CLEAR_OUTPUT_DEVICES(void) { ezpi_output_devices.clear(); }
     void EZPI_CLEAR_INPUT_DEVICES(void) { ezpi_input_devices.clear(); }

@@ -170,42 +170,110 @@ void EzPi::EZPI_INIT_BOARD(void) {
 
 ezpi_error_codes_configurator EzPi::EZPI_ADD_OUTPUT_DEVICE(ezpi_device_digital_op_t d) {
     if(ezpi_output_devices.size() >= EZPI_MAX_DEV_DIO) return EZPI_ERROR_REACHED_MAX_DEV;
+
+    if(d.is_ip) EZPI_SET_GPIO_POOL(d.gpio_in, EZPI_DEV_TYPE_DIGITAL_IP);
+
+    EZPI_SET_GPIO_POOL(d.gpio_out, EZPI_DEV_TYPE_DIGITAL_IP);
+
     ezpi_output_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
 ezpi_error_codes_configurator EzPi::EZPI_ADD_INPUT_DEVICE(ezpi_device_digital_ip_t d) {
     if(ezpi_input_devices.size() >= EZPI_MAX_DEV_DIP) return EZPI_ERROR_REACHED_MAX_DEV;
+    EZPI_SET_GPIO_POOL(d.gpio, EZPI_DEV_TYPE_DIGITAL_IP);
     ezpi_input_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
 ezpi_error_codes_configurator EzPi::EZPI_ADD_AINPUT_DEVICE(ezpi_device_analog_ip_t d) {
     if(ezpi_analog_input_devices.size() >= EZPI_MAX_DEV_AIP) return EZPI_ERROR_REACHED_MAX_DEV;
+    EZPI_SET_GPIO_POOL(d.gpio, EZPI_DEV_TYPE_ANALOG_IP);
     ezpi_analog_input_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
 ezpi_error_codes_configurator EzPi::EZPI_ADD_ONEWIRE_DEVICE(ezpi_device_one_wire_t d) {
     if(ezpi_onewire_devices.size() >= EZPI_MAX_DEV_ONEWIRE) return EZPI_ERROR_REACHED_MAX_DEV;
+    EZPI_SET_GPIO_POOL(d.gpio, EZPI_DEV_TYPE_ONE_WIRE);
     ezpi_onewire_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
 ezpi_error_codes_configurator EzPi::EZPI_ADD_I2C_DEVICE(ezpi_device_I2C_t d) {
     if(ezpi_i2c_devices.size() >= EZPI_MAX_DEV_I2C) return EZPI_ERROR_REACHED_MAX_DEV;
+    EZPI_SET_GPIO_POOL(d.gpio_sda, EZPI_DEV_TYPE_I2C);
+    EZPI_SET_GPIO_POOL(d.gpio_scl, EZPI_DEV_TYPE_I2C);
     ezpi_i2c_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
 ezpi_error_codes_configurator EzPi::EZPI_ADD_SPI_DEVICE(ezpi_device_SPI_t d) {
     if(ezpi_spi_devices.size() >= EZPI_MAX_DEV_SPI) return EZPI_ERROR_REACHED_MAX_DEV;
+    EZPI_SET_GPIO_POOL(d.gpio_miso, EZPI_DEV_TYPE_SPI);
+    EZPI_SET_GPIO_POOL(d.gpio_mosi, EZPI_DEV_TYPE_SPI);
+    EZPI_SET_GPIO_POOL(d.gpio_sck, EZPI_DEV_TYPE_SPI);
+    EZPI_SET_GPIO_POOL(d.gpio_cs, EZPI_DEV_TYPE_DIGITAL_OP);
     ezpi_spi_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
 ezpi_error_codes_configurator EzPi::EZPI_ADD_OTHER_DEVICE(ezpi_device_other_t d) {
     if(ezpi_other_devices.size() >= EZPI_MAX_DEV_OTHER) return EZPI_ERROR_REACHED_MAX_DEV;
+    if(d.en_gpio1) EZPI_SET_GPIO_POOL(d.gpio1, EZPI_DEV_TYPE_DIGITAL_OP);
+    if(d.en_gpio2) EZPI_SET_GPIO_POOL(d.gpio2, EZPI_DEV_TYPE_DIGITAL_OP);
+    if(d.en_gpio3) EZPI_SET_GPIO_POOL(d.gpio3, EZPI_DEV_TYPE_DIGITAL_OP);
     ezpi_other_devices.push_back(d);
     return EZPI_SUCCESS;
+}
+
+
+void EzPi::EZPI_DELETE_OUTPUT_DEVICE(void) {
+    ezpi_device_digital_op_t d = ezpi_output_devices.back();
+    if(d.is_ip) ezpi_gpio_pool[d.gpio_in] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_gpio_pool[d.gpio_out] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_output_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_INPUT_DEVICE(void) {
+
+    ezpi_device_digital_ip_t d = ezpi_input_devices.back();
+    ezpi_gpio_pool[d.gpio] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_input_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_AINPUT_DEVICE(void) {
+    ezpi_device_analog_ip_t d = ezpi_analog_input_devices.back();
+    ezpi_gpio_pool[d.gpio] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_analog_input_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_ONEWIRE_DEVICE(void) {
+    ezpi_device_one_wire_t d = ezpi_onewire_devices.back();
+    ezpi_gpio_pool[d.gpio] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_onewire_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_I2C_DEVICE(void) {
+    ezpi_device_I2C_t d = ezpi_i2c_devices.back();
+    ezpi_gpio_pool[d.gpio_scl] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_gpio_pool[d.gpio_sda] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_i2c_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_SPI_DEVICE(void) {
+    ezpi_device_SPI_t d = ezpi_spi_devices.back();
+    ezpi_gpio_pool[d.gpio_miso] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_gpio_pool[d.gpio_mosi] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_gpio_pool[d.gpio_sck] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_gpio_pool[d.gpio_cs] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_spi_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_OTHER_DEVICE(void) {
+    ezpi_device_other_t d = ezpi_other_devices.back();
+    if(d.en_gpio1) ezpi_gpio_pool[d.gpio1] = EZPI_DEV_TYPE_UNCONFIGURED;
+    if(d.en_gpio2) ezpi_gpio_pool[d.gpio2] = EZPI_DEV_TYPE_UNCONFIGURED;
+    if(d.en_gpio3) ezpi_gpio_pool[d.gpio3] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_other_devices.pop_back();
 }

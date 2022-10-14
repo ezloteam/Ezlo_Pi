@@ -47,9 +47,6 @@ void Dialog_config_input::on_buttonBox_accepted() {
     if(ui->checkBox_invert_input->checkState() == Qt::Checked)    digital_ip_user_data.logic_inv = true;
     else                                                           digital_ip_user_data.logic_inv = false;
 
-    // Update GPIO assignments with selected GPIO Input
-    ezloPi_digital_ip->EZPI_SET_GPIO_POOL(digital_ip_user_data.gpio, EZPI_DEV_TYPE_DIGITAL_IP);
-
     // Adding device to the device vector
     if(ezloPi_digital_ip->EZPI_ADD_INPUT_DEVICE(digital_ip_user_data) == EZPI_SUCCESS) {
 //       QMessageBox::information(this, "Success", "Successfully added a input device.");

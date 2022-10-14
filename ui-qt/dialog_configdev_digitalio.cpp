@@ -84,7 +84,7 @@ void Dialog_configdev_digitalio::on_buttonBox_accepted() {
          else                                                           digital_op_user_data.ip_inv = false;
 
          // Update GPIO assignments with selected GPIO Input
-         ezloPi_digital_io->EZPI_SET_GPIO_POOL(digital_op_user_data.gpio_in, EZPI_DEV_TYPE_DIGITAL_IP);
+//         ezloPi_digital_io->EZPI_SET_GPIO_POOL(digital_op_user_data.gpio_in, EZPI_DEV_TYPE_DIGITAL_IP);
 
      } else {
           digital_op_user_data.is_ip = false;

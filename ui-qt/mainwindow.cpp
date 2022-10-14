@@ -426,24 +426,31 @@ void MainWindow::on_pushButton_remove_device_clicked() {
 
         case EZPI_DEV_TYPE_DIGITAL_OP:
             EzloPi->EZPI_DELETE_OUTPUT_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
             break;
         case EZPI_DEV_TYPE_DIGITAL_IP:
             EzloPi->EZPI_DELETE_INPUT_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
             break;
         case EZPI_DEV_TYPE_ANALOG_IP:
             EzloPi->EZPI_DELETE_AINPUT_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
             break;
         case EZPI_DEV_TYPE_ONE_WIRE:
             EzloPi->EZPI_DELETE_ONEWIRE_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
             break;
         case EZPI_DEV_TYPE_I2C:
             EzloPi->EZPI_DELETE_I2C_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
             break;
         case EZPI_DEV_TYPE_SPI:
             EzloPi->EZPI_DELETE_SPI_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
             break;
     case EZPI_DEV_TYPE_OTHER:
         EzloPi->EZPI_DELETE_OTHER_DEVICE();
+        ezlogic_table_row_device_map.pop_back();
         break;
         default:
             break;
@@ -813,7 +820,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_digital_op_t> output_devices = EzloPi->EZPI_GET_OUTPUT_DEVICES();
             EZPI_UINT8 output_devices_total = (EZPI_UINT8)output_devices.size();
             ezpi_device_digital_op_t output_device = output_devices[output_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_DIGITAL_OP);
             ezlogic_table_adddev_digital_op(output_device);
             break;
         }
@@ -822,7 +828,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_digital_ip_t> input_devices = EzloPi->EZPI_GET_INPUT_DEVICES();
             EZPI_UINT8 input_devices_total = (EZPI_UINT8)input_devices.size();
             ezpi_device_digital_ip_t input_device = input_devices[input_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_DIGITAL_IP);
             ezlogic_table_adddev_digital_ip(input_device);
             break;
         }
@@ -832,7 +837,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_analog_ip_t> adc_devices = EzloPi->EZPI_GET_AINPUT_DEVICES();
             EZPI_UINT8 adc_devices_total = (EZPI_UINT8)adc_devices.size();
             ezpi_device_analog_ip_t adc_device = adc_devices[adc_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_ANALOG_IP);
             ezlogic_table_adddev_analog_ip(adc_device);
             break;
         }
@@ -841,7 +845,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_one_wire_t> onewire_devices = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
             EZPI_UINT8 onewire_devices_total = (EZPI_UINT8)onewire_devices.size();
             ezpi_device_one_wire_t onewire_device = onewire_devices[onewire_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_ONE_WIRE);
             ezlogic_table_adddev_onewire(onewire_device);
             break;
         }
@@ -849,7 +852,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_I2C_t> i2c_devices = EzloPi->EZPI_GET_I2C_DEVICES();
             EZPI_UINT8 i2c_devices_total = (EZPI_UINT8)i2c_devices.size();
             ezpi_device_I2C_t i2c_device = i2c_devices[i2c_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_I2C);
             ezlogic_table_adddev_i2c(i2c_device);
             break;
         }
@@ -857,7 +859,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_SPI_t> spi_devices = EzloPi->EZPI_GET_SPI_DEVICES();
             EZPI_UINT8 spi_devices_total = (EZPI_UINT8)spi_devices.size();
             ezpi_device_SPI_t spi_device = spi_devices[spi_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_SPI);
             ezlogic_table_adddev_spi(spi_device);
             break;
         }
@@ -865,7 +866,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             std::vector <ezpi_device_other_t> other_devices = EzloPi->EZPI_GET_OTHER_DEVICES();
             EZPI_UINT8 other_devices_total = (EZPI_UINT8)other_devices.size();
             ezpi_device_other_t other_device = other_devices[other_devices_total - 1];
-            ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_OTHER);
             ezlogic_table_adddev_other(other_device);
             break;
         }
@@ -1256,12 +1256,13 @@ void MainWindow::on_actionDebug_triggered() {
 }
 
 void MainWindow::on_actionAbout_EzloPi_triggered() {
-    QMessageBox::about(this, "EzloPi V1.2.0", \
+    QMessageBox::about(this, "EzloPi V1.2.2", \
                        "EzloPi is an open-source project contributed by Ezlo Innovation "
                        "to extend the capabilities of ESP32 chipset-based devices "
                        "and platforms. It provides unparalleled capabilities to configure and "
                        "control your ESP-based devices and bring any of your automation ideas to life."
-                       "\nEzloPi Version 1.2.0\n"
+                       "\nEzloPi Version 1.2.2\n"
+                       "Build type: Development"
                        "Web: https://www.ezlopi.com/\n"
                        "Project: https://github.com/ezloteam/Ezlo_Pi\n"
                        "Licence: EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT");

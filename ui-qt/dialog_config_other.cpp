@@ -68,9 +68,6 @@ void Dialog_config_other::on_buttonBox_accepted() {
 
     other_user_data.en_gpio3 = ui->checkBox_gpio3->isChecked();
     other_user_data.gpio3 = ui->comboBox_gpio3->currentText().toInt();
-    if(other_user_data.en_gpio3) {
-        ezloPi_other->EZPI_SET_GPIO_POOL(other_user_data.gpio3, EZPI_DEV_TYPE_OTHER);
-    }
 
     // Adding device to the device vector
     if(ezloPi_other->EZPI_ADD_OTHER_DEVICE(other_user_data) == EZPI_SUCCESS) {
