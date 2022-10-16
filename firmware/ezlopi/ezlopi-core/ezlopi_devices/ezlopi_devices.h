@@ -13,10 +13,10 @@ typedef struct e_ezlopi_devices
     union comm
     {
         s_ezlopi_uart_t uart;
-        s_ezlopi_i2c_master_t i2c;
-        s_ezlopi_spi_master_t spi;
-        s_ezlopi_onewire_t onewire;
-        s_ezlopi_gpio_t gpio;
+        s_ezlopi_i2c_master_t i2c_master;
+        s_ezlopi_spi_master_t spi_master;
+        s_ezlopi_onewire_t onewire_master;
+        s_ezlopi_gpios_t gpio;
     };
 
     // cloud information

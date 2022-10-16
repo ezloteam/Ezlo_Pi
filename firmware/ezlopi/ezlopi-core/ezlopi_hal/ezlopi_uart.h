@@ -3,6 +3,7 @@
 
 typedef struct s_ezlopi_uart
 {
+    bool enable;
     uint32_t tx;
     uint32_t rx;
     uint32_t channel;

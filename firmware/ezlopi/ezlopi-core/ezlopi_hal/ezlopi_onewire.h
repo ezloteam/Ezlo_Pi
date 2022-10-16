@@ -5,6 +5,7 @@
 
 typedef struct s_ezlopi_onewire
 {
+    bool enable;
     uint32_t onewire_pin;
 } s_ezlopi_onewire_t;
 
