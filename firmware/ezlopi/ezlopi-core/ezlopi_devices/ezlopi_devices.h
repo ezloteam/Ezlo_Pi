@@ -7,8 +7,20 @@
 #include "ezlopi_spi_master.h"
 #include "ezlopi_onewire.h"
 
+typedef enum e_ezlopi_device_interface_type
+{
+    EZLOPI_DEVICE_INTERFACE_NONE,
+    EZLOPI_DEVICE_INTERFACE_UART,
+    EZLOPI_DEVICE_INTERFACE_I2C_MASTER,
+    EZLOPI_DEVICE_INTERFACE_SPI_MASTER,
+    EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER,
+    EZLOPI_DEVICE_INTERFACE_GPIO,
+    EZLOPI_DEVICE_INTERFACE_MAX
+} e_ezlopi_device_interface_type_t;
+
 typedef struct e_ezlopi_devices
 {
+    e_ezlopi_device_interface_type_t interface;
     // hardware interface
     union comm
     {
@@ -17,7 +29,7 @@ typedef struct e_ezlopi_devices
         s_ezlopi_spi_master_t spi_master;
         s_ezlopi_onewire_t onewire_master;
         s_ezlopi_gpios_t gpio;
-    };
+    } comm;
 
     // cloud information
     char name[20]; // device name

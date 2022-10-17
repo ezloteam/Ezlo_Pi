@@ -1,6 +1,9 @@
 #ifndef __EZLOPI_UART_H__
 #define __EZLOPI_UART_H__
 
+#include "stdbool.h"
+#include "stdint.h"
+
 typedef struct s_ezlopi_uart
 {
     bool enable;
