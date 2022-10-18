@@ -23,7 +23,7 @@
 #include "esp_websocket_client.h"
 #include "protocol_examples_common.h"
 
-#include "factory_info.h"
+#include "ezlopi_factory_info.h"
 #include "websocket_client.h"
 #include "debug.h"
 
@@ -112,8 +112,8 @@ esp_websocket_client_handle_t websocket_client::websocket_app_start(string &uri,
             .upcall = upcall,
         };
 
-        // factory_info *factory = factory_info::get_instance();
-        s_factory_info_t *factory = factory_info_get_info();
+        // ezlopi_factory_info *factory = ezlopi_factory_info::get_instance();
+        s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri.c_str(),

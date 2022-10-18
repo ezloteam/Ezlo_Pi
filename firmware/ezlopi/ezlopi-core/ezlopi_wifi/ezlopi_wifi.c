@@ -22,10 +22,10 @@
 // #include "esp_netif_lwip_internal.h"
 
 #include "debug.h"
-#include "wifi_interface.h"
-#include "factory_info.h"
-#include "nvs_storage.h"
-// #include "qt_serial.h"
+#include "ezlopi_wifi.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_nvs.h"
+#include "qt_serial.h"
 
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -52,9 +52,7 @@ static int s_retry_num = 0;
 static char wifi_ssid_pass[64];
 static int station_got_ip = 0;
 
-int qt_serial_respond_to_qt(int len, uint8_t *data);
-
-esp_netif_ip_info_t *wifi_get_ip_infos(void)
+esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void)
 {
     return &my_ip;
 }
@@ -62,34 +60,15 @@ esp_netif_ip_info_t *wifi_get_ip_infos(void)
 static void alert_qt_wifi_fail(void)
 {
     char *qt_resp = "{\"cmd\":2,\"status_write\":0,\"status_connect\":0}";
-    qt_serial_respond_to_qt(strlen(qt_resp), (uint8_t *)qt_resp);
+    qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
 }
 
-// extern "C" void set_new_wifi_flag_c(void);
-void set_new_wifi_flag_c(void)
-{
-    new_wifi = 1;
-}
-
-// extern "C" char *get_current_wifi_creds_c(void);
-char *get_current_wifi_creds_c(void)
-{
-    return wifi_ssid_pass;
-}
-
-// extern "C" int got_ip_c(void);
-int got_ip_c(void)
+int ezlopi_wifi_got_ip(void)
 {
     return station_got_ip;
 }
 
-// extern "C" void wifi_connect_c(const char *ssid, const char *pass);
-void wifi_connect_c(const char *ssid, const char *pass)
-{
-    wifi_connect(ssid, pass);
-}
-
-void set_new_wifi_flag(void)
+void ezlopi_wifi_set_new_wifi_flag(void)
 {
     new_wifi = 1;
 }
@@ -98,7 +77,7 @@ static void set_wifi_station_host_name(void)
 {
     static char station_host_name[32];
     // factory_info *factory = factory_info::get_instance();
-    s_factory_info_t *factory = factory_info_get_info();
+    s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
     snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", factory->id);
     esp_err_t err = tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, station_host_name);
     TRACE_W("'tcpip_adapter_set_hostname' ERROR: %s", esp_err_to_name(err));
@@ -111,16 +90,16 @@ static void alert_qt_wifi_got_ip(void)
     if (new_wifi)
     {
         new_wifi = 0;
-        nvs_storage_write_wifi(wifi_ssid_pass, sizeof(wifi_ssid_pass));
+        ezlopi_nvs_write_wifi(wifi_ssid_pass, sizeof(wifi_ssid_pass));
 
         char *qt_resp = "{\"cmd\":2,\"status_write\":1,\"status_connect\":1}";
-        qt_serial_respond_to_qt(strlen(qt_resp), (uint8_t *)qt_resp);
+        qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
     }
     else
     {
 
         char *qt_resp = "{\"cmd\":2,\"status_connect\":1}";
-        qt_serial_respond_to_qt(strlen(qt_resp), (uint8_t *)qt_resp);
+        qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
     }
 }
 
@@ -163,7 +142,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
     }
 }
 
-void wifi_initialize(void)
+void ezlopi_wifi_initialize(void)
 {
     s_wifi_event_group = xEventGroupCreate();
 
@@ -184,21 +163,21 @@ void wifi_initialize(void)
         IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL, &instance_got_ip));
 }
 
-void wifi_connect_from_nvs(void)
+void ezlopi_wifi_connect_from_nvs(void)
 {
     char wifi_info[64];
     memset(wifi_info, 0, sizeof(wifi_info));
-    nvs_storage_read_wifi(wifi_info, sizeof(wifi_info));
+    ezlopi_nvs_read_wifi(wifi_info, sizeof(wifi_info));
 
     if (wifi_info[0] == 0)
     {
         strcpy(wifi_info, "krishna home_wlink");
         strcpy(&wifi_info[32], "coldWinter");
     }
-    wifi_connect(&wifi_info[0], &wifi_info[32]);
+    ezlopi_wifi_connect(&wifi_info[0], &wifi_info[32]);
 }
 
-void wifi_connect(const char *ssid, const char *pass)
+void ezlopi_wifi_connect(const char *ssid, const char *pass)
 {
     strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
     strncpy((char *)&wifi_ssid_pass[32], pass, 32);
@@ -222,7 +201,7 @@ void wifi_connect(const char *ssid, const char *pass)
     set_wifi_station_host_name();
 }
 
-void wait_for_wifi_to_connect(void)
+void ezlopi_wait_for_wifi_to_connect(void)
 {
     xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 }

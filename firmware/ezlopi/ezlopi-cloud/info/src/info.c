@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "sdkconfig.h"
-#include "factory_info.h"
+#include "ezlopi_factory_info.h"
 #include "info.h"
 #include "debug.h"
 #include "frozen.h"
@@ -36,7 +36,7 @@ char *info_get(const char *payload, uint32_t len, struct json_token *method, uin
     {
         memset(send_buf, 0, buf_len);
         // factory_info *factory = factory_info::get_instance();
-        s_factory_info_t *factory = factory_info_get_info();
+        s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
 
         struct json_token msg_id = JSON_INVALID_TOKEN;
         json_scanf(payload, len, "{id: %T}", &msg_id);

@@ -4,7 +4,7 @@
 #include "cJSON.h"
 
 #include "devices_common.h"
-#include "nvs_storage.h"
+#include "ezlopi_nvs.h"
 #include "debug.h"
 
 static uint32_t device_count = 0;
@@ -38,7 +38,7 @@ static void reset_device_list_gpio_pins(void);
 void devices_common_init_devices(void)
 {
     char *nvs_json_conf = NULL;
-    nvs_storage_read_config_data_str(&nvs_json_conf);
+    ezlopi_nvs_read_config_data_str(&nvs_json_conf);
     memset(g_devices, 0, sizeof(s_device_properties_t) * MAX_DEV);
     reset_device_list_gpio_pins();
 
@@ -217,7 +217,7 @@ static void add_other(cJSON *o_device, uint32_t dev_idx)
     CJSON_GET_VALUE_STRING(o_device, "dev_name", dev_name);
     CJSON_GET_VALUE_INT(o_device, "id_item", id_item);
     CJSON_GET_VALUE_INT(o_device, "id_room", id_room);
-    
+
     memset(&g_devices[dev_idx], 0, sizeof(s_device_properties_t));
     g_devices[dev_idx].dev_type = EZPI_DEV_TYPE_OTHER;
 
@@ -242,7 +242,7 @@ static void add_other(cJSON *o_device, uint32_t dev_idx)
     snprintf(g_devices[dev_idx].value_type, sizeof(g_devices[dev_idx].value_type), "token");
     g_devices[dev_idx].has_getter = true;
     g_devices[dev_idx].has_setter = false;
-    
+
     hall_sensor_service_init(dev_idx);
 }
 

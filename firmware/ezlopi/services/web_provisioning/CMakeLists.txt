@@ -11,9 +11,9 @@ idf_component_register(SRCS "${provisioning_src}"
     wss
     websocket_client
     esp_hw_support
-    factory_info
+    ezlopi_factory_info
     devices_common
-    wifi_interface
+    ezlopi_wifi
     data
     devices
     scenes

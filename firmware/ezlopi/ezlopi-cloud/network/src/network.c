@@ -2,7 +2,7 @@
 #include "esp_wifi.h"
 #include "esp_netif_types.h"
 #include "network.h"
-#include "wifi_interface.h"
+#include "ezlopi_wifi.h"
 #include "debug.h"
 #include "frozen.h"
 
@@ -21,7 +21,7 @@ char *network_get(const char *data, uint32_t len, struct json_token *method_tok,
     {
         char mac_str[20];
         uint8_t mac_addr[6];
-        esp_netif_ip_info_t *ip_info = wifi_get_ip_infos();
+        esp_netif_ip_info_t *ip_info = ezlopi_wifi_get_ip_infos();
 
         esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
         snprintf(mac_str, sizeof(mac_str), "%02x:%02x:%02x:%02x:%02x:%02x",

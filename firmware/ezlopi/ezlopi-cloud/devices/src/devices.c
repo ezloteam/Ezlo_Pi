@@ -4,7 +4,7 @@
 #include "debug.h"
 #include "frozen.h"
 #include "devices_common.h"
-#include "factory_info.h"
+#include "ezlopi_factory_info.h"
 
 #define TEST 0
 

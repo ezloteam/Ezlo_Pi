@@ -21,6 +21,14 @@ void sensor_service_init(void)
 static void event_process(void *pv)
 {
     const f_sensor_call_t *sensor_list = ezlopi_sensor_get_list();
+
+    int idx = 0;
+    while (NULL != sensor_list[idx])
+    {
+        sensor_list[idx](EZLOPI_ACTION_INITIALIZE, NULL);
+        idx++;
+    }
+
     int old_tick = xTaskGetTickCount();
 
     while (1)
@@ -33,9 +41,9 @@ static void event_process(void *pv)
 
             if (event)
             {
-                int idx = 0;
                 printf("action received: %s\n", ezlopi_actions_to_string(event->action));
 
+                idx = 0;
                 while (NULL != sensor_list[idx])
                 {
                     sensor_list[idx](event->action, event->arg);

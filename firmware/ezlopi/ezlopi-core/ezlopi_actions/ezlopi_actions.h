@@ -11,5 +11,4 @@ typedef enum e_ezlopi_actions
 
 char *ezlopi_actions_to_string(e_ezlopi_actions_t action);
 
-#endif // 
-
+#endif //

@@ -4,14 +4,14 @@
 #include "freertos/task.h"
 
 #include "debug.h"
-#include "nvs_storage.h"
+#include "ezlopi_nvs.h"
 // #include "interface_common.h"
 
-static nvs_handle_t nvs_storage_handle;
+static nvs_handle_t ezlopi_nvs_handle;
 static const char *storage_name = "storage";
 static const char *config_nvs_name = "confi_data";
 
-void nvs_storage_init(void)
+void ezlopi_nvs_init(void)
 {
     esp_err_t err = nvs_flash_init();
 
@@ -22,7 +22,7 @@ void nvs_storage_init(void)
         err = nvs_flash_init();
     }
 
-    err = nvs_open(storage_name, NVS_READWRITE, &nvs_storage_handle);
+    err = nvs_open(storage_name, NVS_READWRITE, &ezlopi_nvs_handle);
     if (ESP_OK != err)
     {
         TRACE_E("NVS Open Error!");
@@ -34,7 +34,7 @@ void nvs_storage_init(void)
     }
 }
 
-int nvs_storage_write_config_data_str(char *data)
+int ezlopi_nvs_write_config_data_str(char *data)
 {
     int ret = 0;
 
@@ -66,7 +66,7 @@ int nvs_storage_write_config_data_str(char *data)
     return ret;
 }
 
-int nvs_storage_read_config_data_str(char **data)
+int ezlopi_nvs_read_config_data_str(char **data)
 {
     int ret = 0;
     esp_err_t err = ESP_OK;
@@ -106,37 +106,37 @@ int nvs_storage_read_config_data_str(char **data)
     return ret;
 }
 
-void nvs_storage_write_device_config(void *buffer, uint32_t len)
+void ezlopi_nvs_write_device_config(void *buffer, uint32_t len)
 {
-    esp_err_t err = nvs_set_blob(nvs_storage_handle, "devices_sw", buffer, len);
+    esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, "devices_sw", buffer, len);
     TRACE_D("'device_config' Error nvs_set_blob: %s", esp_err_to_name(err));
-    err = nvs_commit(nvs_storage_handle);
+    err = nvs_commit(ezlopi_nvs_handle);
     TRACE_D("'device_config' Error nvs_commit: %s", esp_err_to_name(err));
 }
 
-void nvs_storage_write_gpio_config(uint8_t *gpio_conf, uint32_t len)
+void ezlopi_nvs_write_gpio_config(uint8_t *gpio_conf, uint32_t len)
 {
-    esp_err_t err = nvs_set_blob(nvs_storage_handle, "gpio_cfg", gpio_conf, len);
+    esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, "gpio_cfg", gpio_conf, len);
     TRACE_D("'gpio_config' Error nvs_set_blob: %s", esp_err_to_name(err));
-    err = nvs_commit(nvs_storage_handle);
+    err = nvs_commit(ezlopi_nvs_handle);
     TRACE_D("'gpio_config' Error nvs_commit: %s", esp_err_to_name(err));
 }
 
-void nvs_storage_write_wifi(const char *wifi_info, uint32_t len)
+void ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len)
 {
-    esp_err_t err = nvs_set_blob(nvs_storage_handle, "wifi_info", wifi_info, len);
+    esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, "wifi_info", wifi_info, len);
     TRACE_D("'write_wifi' Error nvs_set_blob: %s", esp_err_to_name(err));
-    err = nvs_commit(nvs_storage_handle);
+    err = nvs_commit(ezlopi_nvs_handle);
     TRACE_D("'write_wifi' Error nvs_commit: %s", esp_err_to_name(err));
 }
 
-esp_err_t nvs_storage_read_device_config(void *buffer, uint32_t len)
+esp_err_t ezlopi_nvs_read_device_config(void *buffer, uint32_t len)
 {
     size_t required_size = 0;
-    esp_err_t err = nvs_get_blob(nvs_storage_handle, "devices_sw", NULL, &required_size);
+    esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, "devices_sw", NULL, &required_size);
     if (len >= required_size)
     {
-        err = nvs_get_blob(nvs_storage_handle, "devices_sw", buffer, &required_size);
+        err = nvs_get_blob(ezlopi_nvs_handle, "devices_sw", buffer, &required_size);
         TRACE_D("'Device Config' Error nvs_get_blob: %s", esp_err_to_name(err));
     }
     else
@@ -146,13 +146,13 @@ esp_err_t nvs_storage_read_device_config(void *buffer, uint32_t len)
     return err;
 }
 
-esp_err_t nvs_storage_read_gpio_config(uint8_t *gpio_conf, uint32_t len)
+esp_err_t ezlopi_nvs_read_gpio_config(uint8_t *gpio_conf, uint32_t len)
 {
     size_t req_len;
-    esp_err_t err = nvs_get_blob(nvs_storage_handle, "gpio_cfg", NULL, &req_len);
+    esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, "gpio_cfg", NULL, &req_len);
     if (len >= req_len)
     {
-        err = nvs_get_blob(nvs_storage_handle, "gpio_cfg", gpio_conf, &req_len);
+        err = nvs_get_blob(ezlopi_nvs_handle, "gpio_cfg", gpio_conf, &req_len);
         TRACE_D("'gpio_cfg': Error nvs_get_blob: %s", esp_err_to_name(err));
     }
     else
@@ -162,13 +162,13 @@ esp_err_t nvs_storage_read_gpio_config(uint8_t *gpio_conf, uint32_t len)
     return err;
 }
 
-void nvs_storage_read_wifi(char *wifi_info, uint32_t len)
+void ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
 {
     size_t required_size;
-    esp_err_t err = nvs_get_blob(nvs_storage_handle, "wifi_info", NULL, &required_size);
+    esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, "wifi_info", NULL, &required_size);
     if (len >= required_size)
     {
-        err = nvs_get_blob(nvs_storage_handle, "wifi_info", wifi_info, &required_size);
+        err = nvs_get_blob(ezlopi_nvs_handle, "wifi_info", wifi_info, &required_size);
         TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
         if (ESP_OK == err)
         {
@@ -181,8 +181,8 @@ void nvs_storage_read_wifi(char *wifi_info, uint32_t len)
     }
 }
 
-void nvs_storage_deinit(void)
+void ezlopi_nvs_deinit(void)
 {
-    nvs_close(nvs_storage_handle);
-    nvs_storage_handle = 0;
+    nvs_close(ezlopi_nvs_handle);
+    ezlopi_nvs_handle = 0;
 }

@@ -8,7 +8,7 @@
 
 #include "frozen.h"
 #include "debug.h"
-#include "factory_info.h"
+#include "ezlopi_factory_info.h"
 
 static bool is_wss = false;
 static char wss_buffer[4096];
@@ -71,7 +71,7 @@ void wss_client_init(struct json_token *a_uri, wss_upcall_t wss_rx_upcall_functi
     }
 
     snprintf(wss_url, sizeof(wss_url), "%.*s", a_uri->len - 6, a_uri->ptr + 6);
-    snprintf(request, sizeof(request), request_format, wss_url, wss_url, factory_info_get_info()->id);
+    snprintf(request, sizeof(request), request_format, wss_url, wss_url, ezlopi_factory_info_get_info()->id);
     TRACE_D("request_format: %s", request);
 
     xTaskCreate(wss_receive_task, "wss_receive_task", 6 * 1024, NULL, 5, NULL);
@@ -171,7 +171,7 @@ static void wss_recv_func(void)
 static void wss_receive_task(void *pvParameters)
 {
     int ret, flags, len;
-    s_factory_info_t *factory = factory_info_get_info();
+    s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
 
     if (NULL == factory)
     {

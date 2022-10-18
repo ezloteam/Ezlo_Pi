@@ -6,7 +6,7 @@
 #include "freertos/semphr.h"
 
 #include "debug.h"
-#include "nvs_storage.h"
+#include "ezlopi_nvs.h"
 #include "interface_common.h"
 #include "devices_common.h"
 

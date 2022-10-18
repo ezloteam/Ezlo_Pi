@@ -14,7 +14,7 @@
 
 // #include "sdkconfig.h"
 // #include "gatt_server.h"
-// #include "factory_info.h"
+// #include "ezlopi_factory_info.h"
 // #include "debug.h"
 
 // static RTC_DATA_ATTR char __SSID[32];
@@ -29,9 +29,6 @@
 // static esp_gatt_char_prop_t b_property = 0;
 
 // /// Declare the static function
-// int got_ip_c(void);
-// void set_new_wifi_flag_c(void);
-// char *get_current_wifi_creds_c(void);
 // void wifi_connect_c(const char *ssid, const char *pass);
 // static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 // static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
@@ -335,7 +332,7 @@
 //             snprintf(__SSID, sizeof(__SSID), "%s", cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring);
 //             snprintf(__PWD, sizeof(__PWD), "%s", cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring);
 //             cJSON_Delete(root);
-//             set_new_wifi_flag_c();
+//             set_new_wifi_flag();
 //             wifi_connect_c(__SSID, __PWD);
 //         }
 //     }
@@ -409,7 +406,7 @@
 //         esp_gatt_rsp_t rsp;
 //         memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
 //         rsp.attr_value.handle = param->read.handle;
-//         char *wifi_creds = get_current_wifi_creds_c();
+//         char *wifi_creds = get_current_wifi_creds();
 //         char tmp_buffer[100];
 //         snprintf(tmp_buffer, 200, "{\"SSID\":\"%.*s\",\"PSD\":\"%.*s\"}", 32, &wifi_creds[0], 64, &wifi_creds[32]);
 
@@ -614,7 +611,7 @@
 //         memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
 //         rsp.attr_value.handle = param->read.handle;
 //         rsp.attr_value.len = 1;
-//         if (got_ip_c())
+//         if (ezlopi_wifi_got_ip())
 //         {
 //             rsp.attr_value.value[0] = 1;
 //         }
@@ -763,7 +760,7 @@
 // static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 // void GATT_SERVER_MAIN(void)
 // {
-//     s_factory_info_t *factory = factory_info_get_info();
+//     s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
 //     snprintf(TEST_DEVICE_NAME, sizeof(TEST_DEVICE_NAME), "EzloPi-%llu", factory->id);
 
 //     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));

@@ -66,7 +66,7 @@ extern "C"
 #define SSL_PRIVATE_KEY_OFFSET 0x3000
 #define SSL_SHARED_KEY_OFFSET 0x4000
 
-    typedef struct s_factory_info
+    typedef struct s_ezlopi_factory_info
     {
         short h_version;
         unsigned long long id;
@@ -84,10 +84,10 @@ extern "C"
         char *ssl_private_key;
         char *ssl_shared_key;
         char *ssl_public_key;
-    } s_factory_info_t;
+    } s_ezlopi_factory_info_t;
 
-    s_factory_info_t *factory_info_init(void);
-    s_factory_info_t *factory_info_get_info(void);
+    s_ezlopi_factory_info_t *ezlopi_factory_info_init();
+    s_ezlopi_factory_info_t *ezlopi_factory_info_get_info(void);
 
 #ifdef __cplusplus
 }

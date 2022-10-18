@@ -18,10 +18,10 @@
 #include "driver/gpio.h"
 #include "cJSON.h"
 #include "debug.h"
-#include "nvs_storage.h"
+#include "ezlopi_nvs.h"
 #include "qt_serial.h"
-#include "wifi_interface.h"
-#include "factory_info.h"
+#include "ezlopi_wifi.h"
+#include "ezlopi_factory_info.h"
 #include "version.h"
 #include "sdkconfig.h"
 
@@ -39,11 +39,22 @@ static const int RX_BUF_SIZE = 3096;
 
 // cJson Types
 
-static void qt_get_info();
-static void qt_set_wifi(const char *data);
-static void qt_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
-static void qt_set_data(const char *data);
-static void qt_read_data(void);
+static void qt_serial_get_info();
+static void qt_serial_set_wifi(const char *data);
+static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
+static void qt_serial_save_config(const char *data);
+static void qt_serial_read_data(void);
+
+int qt_serial_tx_data(int len, uint8_t *data)
+{
+    int ret = 0;
+    char start_bytes[] = {0x80, '\r', '\n'};
+    ret += uart_write_bytes(UART_NUM_0, start_bytes, sizeof(start_bytes));
+    ret = uart_write_bytes(UART_NUM_0, data, len);
+    // ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
+
+    return ret;
+}
 
 static void serial_init(void)
 {
@@ -61,7 +72,7 @@ static void serial_init(void)
     uart_set_pin(UART_NUM_0, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
 
-static int sendData(const char *logName, const char *data)
+static int qt_serial_parse_rx_data(const char *data)
 {
     cJSON *root = cJSON_Parse(data);
 
@@ -75,28 +86,28 @@ static int sendData(const char *logName, const char *data)
             {
             case 1:
             {
-                qt_get_info();
+                qt_serial_get_info();
                 break;
             }
             case 2:
             {
-                QT_SET_WIFI(data);
+                qt_serial_set_wifi(data);
                 break;
             }
             case 3:
             {
-                qt_set_data(data);
+                qt_serial_save_config(data);
                 break;
             }
             case 4:
             {
-                QT_READ_DATA();
+                qt_serial_read_data();
                 break;
             }
             case 0:
             {
                 const static char *reboot_response = "{\"cmd\":0,\"status\":1}";
-                qt_serial_respond_to_qt(strlen(reboot_response), reboot_response);
+                qt_serial_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
                 vTaskDelay(20);
                 esp_restart();
                 break;
@@ -115,14 +126,7 @@ static int sendData(const char *logName, const char *data)
     return 1;
 }
 
-static void tx_task(const char *data)
-{
-    static const char *TX_TASK_TAG = "TX_TASK";
-    esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
-    sendData(TX_TASK_TAG, data);
-}
-
-static void rx_task(void *arg)
+static void qt_serial_rx_task(void *arg)
 {
     static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
@@ -136,7 +140,7 @@ static void rx_task(void *arg)
         {
             data[rxBytes] = 0;
             TRACE_I("%s", data);
-            tx_task((const char *)data);
+            qt_serial_parse_rx_data((const char *)data);
         }
     }
 
@@ -144,9 +148,7 @@ static void rx_task(void *arg)
     vTaskDelete(NULL);
 }
 
-//---------------------------------QT-Funtions
-
-static void qt_get_info()
+static void qt_serial_get_info()
 {
     cJSON *get_info = cJSON_CreateObject();
 
@@ -155,9 +157,9 @@ static void qt_get_info()
         char wifi_info[64];
         esp_chip_info_t chip_info;
         esp_chip_info(&chip_info);
-        s_factory_info_t *factory = factory_info_get_info();
+        s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
         memset(wifi_info, 0, sizeof(wifi_info));
-        nvs_storage_read_wifi(wifi_info, sizeof(wifi_info));
+        ezlopi_nvs_read_wifi(wifi_info, sizeof(wifi_info));
 
         if (factory)
         {
@@ -188,13 +190,13 @@ static void qt_get_info()
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-            qt_serial_respond_to_qt(strlen(my_json_string), (uint8_t *)my_json_string);
+            qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
             cJSON_free(my_json_string);
         }
     }
 }
 
-static void qt_set_wifi(const char *data)
+static void qt_serial_set_wifi(const char *data)
 {
     cJSON *root = cJSON_Parse(data);
 
@@ -211,19 +213,16 @@ static void qt_set_wifi(const char *data)
 
             if (ssid && pass && (strlen(pass) >= 8))
             {
-                set_new_wifi_flag();
-                wifi_connect((const char *)ssid, (const char *)pass);
+                ezlopi_wifi_set_new_wifi_flag();
+                ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
             }
-
-            // uint8_t status_connect = 1; // WIFI_CONNET;
-            // qt_response(2, 1, status_connect);
         }
 
         cJSON_Delete(root); // free Json string
     }
 }
 
-static void qt_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
+static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
 {
     cJSON *response = NULL;
     response = cJSON_CreateObject();
@@ -245,7 +244,7 @@ static void qt_response(uint8_t cmd, uint8_t status_write, uint8_t status_connec
         {
             cJSON_Minify(my_json_string);
 
-            qt_serial_respond_to_qt(strlen(my_json_string), (uint8_t *)my_json_string);
+            qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
             // const int len = strlen(my_json_string);
             // const int txBytes = uart_write_bytes(UART_NUM_0, my_json_string, len); // Send the data over uart
 
@@ -254,23 +253,23 @@ static void qt_response(uint8_t cmd, uint8_t status_write, uint8_t status_connec
     }
 }
 
-static void qt_set_data(const char *data)
+static void qt_serial_save_config(const char *data)
 {
-    uint8_t ret = nvs_storage_write_config_data_str(data);
+    uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
     if (ret)
     {
         TRACE_B("Successfully wrote config data..");
     }
 
-    QT_RESPONE(3, ret, 5);
+    qt_serial_response(3, ret, 5);
 
     return;
 }
 
-static void qt_read_data(void)
+static void qt_serial_read_data(void)
 {
     char *buf = NULL;
-    nvs_storage_read_config_data_str(&buf);
+    ezlopi_nvs_read_config_data_str(&buf);
 
     if (buf)
     {
@@ -290,7 +289,7 @@ static void qt_read_data(void)
                 cJSON_Delete(root); // free Json string
 
                 const int len = strlen(my_json_string);
-                const int txBytes = qt_serial_respond_to_qt(len, (uint8_t *)my_json_string); // Send the data over uart
+                const int txBytes = qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
 
                 cJSON_free(my_json_string);
             }
@@ -298,19 +297,8 @@ static void qt_read_data(void)
     }
 }
 
-int qt_serial_respond_to_qt(int len, uint8_t *data)
-{
-    int ret = 0;
-    char start_bytes[] = {0x80, '\r', '\n'};
-    ret += uart_write_bytes(UART_NUM_0, start_bytes, sizeof(start_bytes));
-    ret = uart_write_bytes(UART_NUM_0, data, len);
-    // ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
-
-    return ret;
-}
-
 void qt_serial_init(void)
 {
     serial_init();
-    xTaskCreate(rx_task, "uart_rx_task", 1024 * 10, NULL, configMAX_PRIORITIES, NULL);
+    xTaskCreate(qt_serial_rx_task, "qt_serial_rx_task", 1024 * 10, NULL, configMAX_PRIORITIES, NULL);
 }
