@@ -7,7 +7,7 @@
 #include "lwip/apps/sntp.h"
 
 #include "frozen.h"
-#include "debug.h"
+#include "trace.h"
 #include "ezlopi_factory_info.h"
 
 static bool is_wss = false;

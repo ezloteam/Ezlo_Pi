@@ -6,6 +6,7 @@
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
 #include "ezlopi_onewire.h"
+#include "ezlopi_cloud.h"
 
 typedef enum e_ezlopi_device_interface_type
 {
@@ -22,21 +23,9 @@ typedef enum e_ezlopi_device_interface_type
     EZLOPI_DEVICE_INTERFACE_MAX
 } e_ezlopi_device_interface_type_t;
 
-typedef enum e_ezlopi_item_type
-{
-    EZLOPI_ITEM_NONE = 0,
-    EZLOPI_ITEM_LED = 1,
-    EZLOPI_ITEM_RELAY = 2,
-    EZLOPI_ITEM_PLUG = 3,
-    EZLOPI_ITEM_SPK = 4, // SPK -> [S: Switch][P: Push Buttom][K: Key]
-    EZLOPI_ITEM_MPU6050 =5,
-    EZLOPI_ITEM_ADXL345 = 6,
-    EZLOPI_ITEM_
-} e_ezlopi_item_type_t;
-
 typedef struct e_ezlopi_devices
 {
-    e_ezlopi_device_interface_type_t interface;
+    e_ezlopi_device_interface_type_t interface_type;
     // hardware interface
     union
     {
@@ -45,26 +34,12 @@ typedef struct e_ezlopi_devices
         s_ezlopi_spi_master_t spi_master;
         s_ezlopi_onewire_t onewire_master;
         s_ezlopi_gpios_t gpio;
-    } comm;
+    } interface;
 
-    // cloud information
-    char name[20]; // device name
-    char device_id[9];
-
-    char room_id[9];
-    char room_name[20];
-
-    char item_id[9];
-    char item_name[20];
-
-    char *category;
-    char *subcategory;
-    char *device_type;
-    char *value_type;
-
-    bool has_getter;
-    bool has_setter;
+    s_ezlopi_cloud_info_t ezlopi_cloud;
 
 } e_ezlopi_devices_t;
+
+void ezlopi_device_init(void);
 
 #endif // __EZLOPI_DEVICE_H__

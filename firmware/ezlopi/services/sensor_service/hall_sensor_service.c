@@ -3,7 +3,7 @@
 
 #include "driver/adc.h"
 
-#include "debug.h"
+#include "trace.h"
 #include "items.h"
 #include "devices.h"
 #include "web_provisioning.h"

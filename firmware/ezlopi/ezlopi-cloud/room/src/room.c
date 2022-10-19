@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "room.h"
-#include "debug.h"
+#include "trace.h"
 #include "frozen.h"
 #include "devices_common.h"
 

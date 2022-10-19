@@ -4,7 +4,7 @@
 #include "esp_wifi_types.h"
 #include "esp_idf_version.h"
 
-#include "debug.h"
+#include "trace.h"
 #include "frozen.h"
 #include "web_provisioning.h"
 #include "wss.h"

@@ -22,7 +22,7 @@ idf_component_register(SRCS "${provisioning_src}"
     gateways
     info
     modes
-    debug
+    trace
     items
     room
     settings

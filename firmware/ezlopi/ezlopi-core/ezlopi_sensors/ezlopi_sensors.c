@@ -1,18 +1,15 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_sensors.h"
-
 #include "sensor_bme280.h"
 
-/*Sensors include here*/
-
-static const f_sensor_call_t sensor_list[] = {
-#ifdef SENSOR_0010_BME280
-    sensor_bme280,
+static const s_ezlopi_sensor_t sensor_list[] = {
+#ifdef EZLOPI_SENSOR_0018_BME280
+    {EZLOPI_SENSOR_0018_BME280, sensor_bme280},
 #endif
-    NULL, // Do not remove 'NULL' from list, because the element of the list is compared with NULL for termination of loop
+    {EZLOPI_SENSOR_NONE, NULL}, // Do not remove 'NULL' from list, because the element of the list is compared with NULL for termination of loop
 };
 
-const f_sensor_call_t *ezlopi_sensor_get_list(void)
+const s_ezlopi_sensor_t *ezlopi_sensor_get_list(void)
 {
     return sensor_list;
 }

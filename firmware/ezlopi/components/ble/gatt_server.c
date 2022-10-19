@@ -15,7 +15,7 @@
 // #include "sdkconfig.h"
 // #include "gatt_server.h"
 // #include "ezlopi_factory_info.h"
-// #include "debug.h"
+// #include "trace.h"
 
 // static RTC_DATA_ATTR char __SSID[32];
 // static RTC_DATA_ATTR char __PWD[32];

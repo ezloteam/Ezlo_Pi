@@ -26,7 +26,7 @@
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
 
-#include "debug.h"
+#include "trace.h"
 
 #ifdef CONFIG_EXAMPLE_CONNECT_IPV6
 #define MAX_IP6_ADDRS_PER_NETIF (5)

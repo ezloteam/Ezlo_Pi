@@ -6,7 +6,7 @@
 #include "wss.h"
 // #include "websocket_client.h"
 #include "registeration.h"
-#include "debug.h"
+#include "trace.h"
 
 static volatile uint32_t is_registered = 0;
 static void registeration_process(void *pv);

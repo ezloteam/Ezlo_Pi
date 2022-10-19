@@ -3,7 +3,7 @@
 #include "esp_netif_types.h"
 #include "network.h"
 #include "ezlopi_wifi.h"
-#include "debug.h"
+#include "trace.h"
 #include "frozen.h"
 
 static const char *network_1_start = "{\"error\":null,\"msg_id\":%d,\"id\":\"%.*s\",\"method\":\"hub.network.get\",\"result\":{\"interfaces\":[";

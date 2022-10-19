@@ -9,7 +9,7 @@
 #include "web_provisioning.h"
 #include "devices_common.h"
 #include "items.h"
-#include "debug.h"
+#include "trace.h"
 #include "freertos/portmacro.h"
 #include "wss.h"
 
@@ -58,7 +58,7 @@ static void __gpio_intr_proces(void *pv)
                     snprintf(value_buf, sizeof(value_buf), "%s", new_state ? "true" : "false");
 
                     char *j_response = items_update_from_sensor(idx, value_buf);
- 
+
                     if (j_response)
                     {
                         TRACE_B(">> WS Tx - 'hub.item.updated' [%d]\r\n%s", strlen(j_response), j_response);

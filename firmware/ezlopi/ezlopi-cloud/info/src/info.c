@@ -3,7 +3,7 @@
 #include "sdkconfig.h"
 #include "ezlopi_factory_info.h"
 #include "info.h"
-#include "debug.h"
+#include "trace.h"
 #include "frozen.h"
 #include "devices_common.h"
 #include "version.h"

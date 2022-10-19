@@ -6,20 +6,14 @@
 #include "bme280/bme280_defs.h"
 #include "driver/i2c.h"
 
-#define SENSOR_BME280_TAG "SENSOR BME280 TAG"
-
-#define SENSOR_0010_BME280
 #define CHIP_ID 0x76
 #define ACK_CHECK_EN 0x1
 
 /**
  *
  * @brief Structure that contains identifier details used in example
- *
  * @public uint8_t dev_addr: This variable stores device address
  * @public int8_t fd: This variable stores file descriptor
- *
- *
  */
 typedef struct
 {

@@ -3,4 +3,4 @@ file(GLOB_RECURSE src_files "src/*.c*")
 
 idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "include"
-    REQUIRES driver freertos ezlopi_nvs debug devices_common)
+    REQUIRES driver freertos ezlopi_nvs trace devices_common)

@@ -3,7 +3,7 @@
 #include "esp_system.h"
 #include "esp_partition.h"
 
-#include "debug.h"
+#include "trace.h"
 #include "ezlopi_factory_info.h"
 
 static s_ezlopi_factory_info_t *factory_info = NULL;

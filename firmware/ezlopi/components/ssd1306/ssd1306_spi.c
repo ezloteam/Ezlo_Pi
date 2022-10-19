@@ -8,7 +8,7 @@
 #include "esp_log.h"
 
 #include "ssd1306.h"
-#include "debug.h"
+#include "trace.h"
 
 #define TAG "SSD1306"
 

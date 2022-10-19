@@ -25,7 +25,7 @@
 
 #include "ezlopi_factory_info.h"
 #include "websocket_client.h"
-#include "debug.h"
+#include "trace.h"
 
 using namespace std;
 

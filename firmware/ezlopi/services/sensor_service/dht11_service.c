@@ -1,6 +1,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "debug.h"
+#include "trace.h"
 #include "dht.h"
 #include "string.h"
 #include "items.h"

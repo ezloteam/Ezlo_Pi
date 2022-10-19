@@ -3,7 +3,7 @@
 #include "esp_http_client.h"
 
 #include "http.h"
-#include "debug.h"
+#include "trace.h"
 
 static void http_free_rx_data(s_rx_data_t *rx_data);
 static esp_err_t http_event_handler(esp_http_client_event_t *evt);

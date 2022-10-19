@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "items.h"
-#include "debug.h"
+#include "trace.h"
 #include "frozen.h"
 #include "devices_common.h"
 #include "interface_common.h"
@@ -200,10 +200,10 @@ char *items_update(const char *payload, uint32_t len, struct json_token *method,
     return items_update_with_device_index(payload, len, method, msg_count, UINT32_MAX);
 }
 
-char *items_update_from_sensor(int device_index, char * updated_value)
+char *items_update_from_sensor(int device_index, char *updated_value)
 {
     uint32_t buf_len = 1024;
-    char * send_buf = malloc(buf_len);
+    char *send_buf = malloc(buf_len);
 
     if (send_buf)
     {
@@ -211,21 +211,21 @@ char *items_update_from_sensor(int device_index, char * updated_value)
         {
 
             static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\"hub.item.updated\",\"result\":{\"_id\":\"%.*s\",\"deviceId\":\"%.*s\","
-                                            "\"deviceName\":\"%.*s\",\"deviceCategory\":\"%.*s\",\"deviceSubcategory\":\"%.*s\",\"roomName\":\"%.*s\","
-                                            "\"serviceNotification\":false,\"userNotification\":false,\"notifications\":null,\"name\":\"%.*s\",\"valueType\":\"%s\","
-                                            "\"value\":%s}}";
+                                             "\"deviceName\":\"%.*s\",\"deviceCategory\":\"%.*s\",\"deviceSubcategory\":\"%.*s\",\"roomName\":\"%.*s\","
+                                             "\"serviceNotification\":false,\"userNotification\":false,\"notifications\":null,\"name\":\"%.*s\",\"valueType\":\"%s\","
+                                             "\"value\":%s}}";
 
             s_device_properties_t *dev_list = devices_common_device_list();
 
             snprintf(send_buf, buf_len, update_frmt, web_provisioning_get_message_count(),
-                sizeof(dev_list[device_index].item_id), dev_list[device_index].item_id,
-                sizeof(dev_list[device_index].device_id), dev_list[device_index].device_id,
-                sizeof(dev_list[device_index].name), dev_list[device_index].name,
-                sizeof(dev_list[device_index].category), dev_list[device_index].category,
-                sizeof(dev_list[device_index].subcategory), dev_list[device_index].subcategory,
-                sizeof(dev_list[device_index].roomName), dev_list[device_index].roomName,
-                sizeof(dev_list[device_index].item_name), dev_list[device_index].item_name,
-                dev_list[device_index].value_type, updated_value);
+                     sizeof(dev_list[device_index].item_id), dev_list[device_index].item_id,
+                     sizeof(dev_list[device_index].device_id), dev_list[device_index].device_id,
+                     sizeof(dev_list[device_index].name), dev_list[device_index].name,
+                     sizeof(dev_list[device_index].category), dev_list[device_index].category,
+                     sizeof(dev_list[device_index].subcategory), dev_list[device_index].subcategory,
+                     sizeof(dev_list[device_index].roomName), dev_list[device_index].roomName,
+                     sizeof(dev_list[device_index].item_name), dev_list[device_index].item_name,
+                     dev_list[device_index].value_type, updated_value);
         }
         else
         {
@@ -392,4 +392,3 @@ static void parse_item_id(char *data, uint32_t len, char *item_id)
         TRACE_E("item_id not found!");
     }
 }
-    

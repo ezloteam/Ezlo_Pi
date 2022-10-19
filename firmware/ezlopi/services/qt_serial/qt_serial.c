@@ -17,7 +17,7 @@
 #include "nvs.h"
 #include "driver/gpio.h"
 #include "cJSON.h"
-#include "debug.h"
+#include "trace.h"
 #include "ezlopi_nvs.h"
 #include "qt_serial.h"
 #include "ezlopi_wifi.h"

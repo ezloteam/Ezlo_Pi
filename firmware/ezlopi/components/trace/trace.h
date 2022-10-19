@@ -1,5 +1,5 @@
-#ifndef __DEBUG_H__
-#define __DEBUG_H__
+#ifndef __TRACE_H__
+#define __TRACE_H__
 
 #include "sdkconfig.h"
 #include "esp_log.h"
@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-#define ENABLE_DEBUG 1
+#define ENABLE_TRACE 1
 
     void __dump(const char *file_name, uint32_t line, void *_buff, uint32_t ofs, uint32_t cnt);
 
@@ -32,7 +32,7 @@ extern "C"
         printf("\x1B[0m\r\n");                          \
     }
 
-#if (1 == ENABLE_DEBUG)
+#if (1 == ENABLE_TRACE)
 
 #define TRACE_E trace_err
 #define TRACE_W trace_war
@@ -56,16 +56,16 @@ extern "C"
 class trace
 {
 private:
-    int debug_level = 0;
+    int trace_level = 0;
     void trace();
 
 public:
-    void set_debug(int level);
+    void set_trace(int level);
 
     void error();
     void warning();
     void info();
-    void debug();
+    void trace();
 
     void red();
     void green();
@@ -79,4 +79,4 @@ public:
 }
 #endif
 
-#endif // __DEBUG_H__
+#endif // __TRACE_H__

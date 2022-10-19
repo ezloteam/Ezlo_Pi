@@ -5,7 +5,7 @@
 
 #include "devices_common.h"
 #include "ezlopi_nvs.h"
-#include "debug.h"
+#include "trace.h"
 
 static uint32_t device_count = 0;
 static s_device_properties_t g_devices[MAX_DEV];

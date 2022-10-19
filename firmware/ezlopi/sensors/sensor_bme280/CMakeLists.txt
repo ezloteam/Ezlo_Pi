@@ -5,4 +5,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "sensor_bme280.c"
     INCLUDE_DIRS "."
-    REQUIRES debug ezlopi_actions sensor_service ezlopi_timer library)
+    REQUIRES trace ezlopi_actions sensor_service ezlopi_timer library)

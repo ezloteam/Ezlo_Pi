@@ -1,11 +1,12 @@
+#include <string.h>
 
 #include "sensor_bme280.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_sensors.h"
 #include "ezlopi_timer.h"
 #include "items.h"
-#include <string.h>
 #include "frozen.h"
+#include "trace.h"
 
 bme280_identifier_t identifier = {
     .dev_addr = 0x76,
@@ -36,22 +37,22 @@ static int8_t sensor_bme280_get_value(char *sensor_data)
     int data_len = 100;
     if (ret != BME280_OK)
     {
-        ESP_LOGE(SENSOR_BME280_TAG, "Failed to set sensor mode (code %+d).", ret);
+        TRACE_E("Failed to set sensor mode (code %+d).", ret);
     }
     else
     {
-        ESP_LOGI(SENSOR_BME280_TAG, "Sensor mode set successfully!!");
+        TRACE_I("Sensor mode set successfully!!");
     }
 
     sensor_bme280_data_t data;
     ret = bme280_get_sensor_data(BME280_ALL, &data, &device);
     if (ret != BME280_OK)
     {
-        ESP_LOGE(SENSOR_BME280_TAG, "Failed to get sensor data (code %+d).", ret);
+        TRACE_E("Failed to get sensor data (code %+d).", ret);
     }
     else
     {
-        ESP_LOGI(SENSOR_BME280_TAG, "Sensor mode obtained successfully!!");
+        TRACE_I("Sensor mode obtained successfully!!");
     }
 
     float temp = data.temperature;
@@ -60,7 +61,7 @@ static int8_t sensor_bme280_get_value(char *sensor_data)
 
     snprintf(sensor_data, data_len, "\"Temperature: %0.2lf deg C, Pressure: %0.2lf hPa, Humidity: %0.2lf%%\"", temp, press, hum);
 
-    // ESP_LOGI(SENSOR_BME280_TAG, "Data len=> %d, Temperature: %0.2lf deg C, Pressure: %0.2lf hPa, Humidity: %0.2lf%%\n", sizeof(data), temp, press, hum);
+    // TRACE_I("Data len=> %d, Temperature: %0.2lf deg C, Pressure: %0.2lf hPa, Humidity: %0.2lf%%\n", sizeof(data), temp, press, hum);
 
     return ret;
 }
@@ -78,7 +79,7 @@ static int sensor_bme280_ezlopi_update_data(void)
     char *send_buf = malloc(1024);
     sensor_bme280_get_value(data);
     send_buf = items_update_from_sensor(0, data);
-    ESP_LOGI(SENSOR_BME280_TAG, "The send_buf is: %s, the size is: %d", send_buf, strlen(send_buf));
+    TRACE_I("The send_buf is: %s, the size is: %d", send_buf, strlen(send_buf));
     free(data);
     free(send_buf);
     return 0;
@@ -120,21 +121,21 @@ static int sensor_bme280_init()
     ret = bme280_init(&device);
     if (ret != BME280_OK)
     {
-        ESP_LOGE(SENSOR_BME280_TAG, "Failed to initialize bme280 (code %+d).", ret);
+        TRACE_E("Failed to initialize bme280 (code %+d).", ret);
     }
     else
     {
-        ESP_LOGI(SENSOR_BME280_TAG, "Sensor bme280 was successfully initialized.");
+        TRACE_I("Sensor bme280 was successfully initialized.");
     }
 
     ret = bme280_set_sensor_settings(sampling_settting, &device);
     if (ret != BME280_OK)
     {
-        ESP_LOGE(SENSOR_BME280_TAG, "Failed to set sensor settings (code %+d).", ret);
+        TRACE_E("Failed to set sensor settings (code %+d).", ret);
     }
     else
     {
-        ESP_LOGI(SENSOR_BME280_TAG, "Sensor setting was successfully set.");
+        TRACE_I("Sensor setting was successfully set.");
     }
     return ret;
 }
@@ -152,27 +153,27 @@ int sensor_bme280(e_ezlopi_actions_t action, void *arg)
     {
     case EZLOPI_ACTION_INITIALIZE:
     {
-        ESP_LOGI(SENSOR_BME280_TAG, "EZLOPI_ACTION_INITIALIZE event.");
+        TRACE_I("EZLOPI_ACTION_INITIALIZE event.");
         sensor_bme280_init();
         break;
     }
     case EZLOPI_ACTION_GET_VALUE:
     {
-        ESP_LOGI(SENSOR_BME280_TAG, "EZLOPI_ACTION_GET_VALUE event.");
+        TRACE_I("EZLOPI_ACTION_GET_VALUE event.");
         char *data = (char *)malloc(100);
         sensor_bme280_get_value(data);
-        ESP_LOGI(SENSOR_BME280_TAG, "The string is: %s", data);
+        TRACE_I("The string is: %s", data);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_500_MS:
     {
-        ESP_LOGI(SENSOR_BME280_TAG, "EZLOPI_ACTION_NOTIFY_500_MS");
+        TRACE_I("EZLOPI_ACTION_NOTIFY_500_MS");
         sensor_bme280_notify_30_seconds();
         break;
     }
     default:
     {
-        ESP_LOGE(SENSOR_BME280_TAG, "Unknown defaule bm280 action found!");
+        TRACE_E("Unknown defaule bm280 action found!");
         break;
     }
     }

@@ -43,7 +43,7 @@
 #include <freertos/FreeRTOS.h>
 #include <string.h>
 #include <esp_log.h>
-#include "debug.h"
+#include "trace.h"
 // #include <esp_idf_lib_helpers.h>
 
 // DHT timer precision in microseconds
@@ -96,7 +96,7 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     {                                   \
         if (!(VAL))                     \
             return ESP_ERR_INVALID_ARG; \
-    } while (0) 
+    } while (0)
 
 #define CHECK_LOGE(x, msg, ...)          \
     do                                   \

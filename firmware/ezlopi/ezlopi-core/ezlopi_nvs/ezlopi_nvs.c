@@ -3,7 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "debug.h"
+#include "trace.h"
 #include "ezlopi_nvs.h"
 // #include "interface_common.h"
 

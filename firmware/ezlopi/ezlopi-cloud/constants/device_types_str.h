@@ -1,6 +1,7 @@
 #ifndef __EZLOPI_DEVICE_TYPES_STR_H__
 #define __EZLOPI_DEVICE_TYPES_STR_H__
 
+/// @brief https://api.ezlo.com/devices/devices/index.html
 const static char *dev_type_device = "device";
 const static char *dev_type_sensor = "sensor";
 const static char *dev_type_sensor_motion = "sensor.motion";

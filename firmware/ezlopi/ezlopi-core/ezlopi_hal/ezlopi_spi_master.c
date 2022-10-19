@@ -4,7 +4,7 @@
 #include "driver/spi_master.h"
 
 #include "ezlopi_spi_master.h"
-#include "debug.h"
+#include "trace.h"
 
 typedef enum e_spi_state
 {

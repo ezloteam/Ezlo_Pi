@@ -1,6 +1,7 @@
 #ifndef __EZLOPI_DEVICES_STR_H__
 #define __EZLOPI_DEVICES_STR_H__
 
+/// @brief  https://api.ezlo.com/devices/devices/index.html
 const static char *device_alarm = "alarm";
 const static char *device_alarms = "alarms";
 const static char *device_device = "device";

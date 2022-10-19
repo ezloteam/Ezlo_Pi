@@ -1,24 +1,21 @@
 #include <stdio.h>
-
 #include "nvs.h"
 #include "nvs_flash.h"
-#include "mbedtls/config.h"
-#include "driver/gpio.h"
-#include "driver/adc.h"
 #include "esp_system.h"
+#include "driver/adc.h"
+#include "driver/i2c.h"
+#include "driver/gpio.h"
+#include "mbedtls/config.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "sensor_service.h"
 #include "ezlopi_timer.h"
+#include "sensor_service.h"
 #include "ezlopi_event_queue.h"
 
-#include "driver/i2c.h"
-#include "ezlopi_i2c_master.h"
-#include "ezlopi_nvs.h"
-#include "ezlopi_wifi.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi.h"
 #include "qt_serial.h"
+#include "trace.h"
 
 static void blinky(void *pv);
 
@@ -26,17 +23,11 @@ extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 
 void app_main(void)
 {
-    ezlopi_factory_info_init();
-    ezlopi_nvs_init();
-    ezlopi_wifi_initialize();
-    ezlopi_wifi_connect_from_nvs();
-    ezlopi_event_queue_init();
-
     qt_serial_init();
-
-    sensor_service_init();
-    ezlopi_timer_start_500ms();
-    sensor_bme280(EZLOPI_ACTION_INITIALIZE, NULL);
+    ezlopi_init();
+    // sensor_service_init();
+    // ezlopi_timer_start_500ms();
+    // sensor_bme280(EZLOPI_ACTION_INITIALIZE, NULL);
 
     xTaskCreate(blinky, "blinky", 2048, NULL, 1, NULL);
 }

@@ -14,7 +14,7 @@
 // #include "esp_log.h"
 // #include "freertos/FreeRTOS.h"
 // #include "gatt_client.h"
-// #include "debug.h"
+// #include "trace.h"
 
 // #define GATTC_TAG "GATTC_TAG"
 

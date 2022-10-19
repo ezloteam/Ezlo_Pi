@@ -21,7 +21,7 @@
 #include "esp_netif_types.h"
 // #include "esp_netif_lwip_internal.h"
 
-#include "debug.h"
+#include "trace.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"

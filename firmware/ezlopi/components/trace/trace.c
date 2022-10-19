@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "trace.h"
 
 #include <stdio.h>
 #include <string.h>

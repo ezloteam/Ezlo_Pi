@@ -1,6 +1,7 @@
 #ifndef __EZLOPI_SUBCATEGORY_H__
 #define __EZLOPI_SUBCATEGORY_H__
 
+/// @brief https://api.ezlo.com/devices/categories/index.html
 const static char *subcategory_not_defined = "";
 const static char *subcategory_dimmable_bulb = "dimmable_bulb";
 const static char *subcategory_dimmable_plugged = "dimmable_plugged";

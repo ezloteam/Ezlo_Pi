@@ -3,7 +3,7 @@ idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "include"
     REQUIRES frozen
     ezlopi_factory_info
-    debug
+    trace
     devices_common
     interface_common
     items

@@ -34,7 +34,7 @@
  *                          Include Files
  *******************************************************************************/
 #include "ezlopi_timer.h"
-#include "debug.h"
+#include "trace.h"
 #include "ezlopi_event_queue.h"
 
 typedef struct s_ezlopi_timer

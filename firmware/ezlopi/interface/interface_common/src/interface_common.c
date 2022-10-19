@@ -5,7 +5,7 @@
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
 
-#include "debug.h"
+#include "trace.h"
 #include "ezlopi_nvs.h"
 #include "interface_common.h"
 #include "devices_common.h"
