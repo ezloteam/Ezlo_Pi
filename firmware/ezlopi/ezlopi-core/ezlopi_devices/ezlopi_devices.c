@@ -3,9 +3,23 @@
 #include "trace.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_devices.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_sensors.h"
 
 static void ezlopi_device_map_devices(cJSON *cjson_device);
 static void ezlopi_device_parse_json(char *config_string);
+
+#if 0
+static void add_item_digital_out(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_digital_in(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_analogue_in(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_analogue_out(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_pwm(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_uart(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_other(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_onewire(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_i2c(cJSON *cjson_device, uint32_t dev_idx);
+static void add_item_spi(cJSON *cjson_device, uint32_t dev_idx);
 
 #define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
     {                                                         \
@@ -24,6 +38,21 @@ static void ezlopi_device_parse_json(char *config_string);
             item_val = o_item->valuestring;                   \
         }                                                     \
     }
+
+#define ASSIGN_DEVICE_NAME()                                                                                                                            \
+    {                                                                                                                                                   \
+        char *device_name = NULL;                                                                                                                       \
+        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);                                                                                  \
+        if ((NULL != device_name) && ('\0' != device_name[0]))                                                                                          \
+        {                                                                                                                                               \
+            snprintf(device->ezlopi_cloud.device_name, sizeof(device->ezlopi_cloud.device_name), "%s", device_name);                                    \
+        }                                                                                                                                               \
+        else                                                                                                                                            \
+        {                                                                                                                                               \
+            snprintf(device->ezlopi_cloud.device_name, sizeof(device->ezlopi_cloud.device_name), "dev-%d:digital_out", device->ezlopi_cloud.device_id); \
+        }                                                                                                                                               \
+    }
+#endif
 
 void ezlopi_device_init(void)
 {
@@ -88,59 +117,39 @@ static void ezlopi_device_map_devices(cJSON *cjson_device)
     }
 }
 
-static void ezlopi_device_parse_json(char *config_string)
+#if 0
+static void add_item_digital_out(cJSON *cjson_device, uint32_t dev_idx)
 {
-    cJSON *cjson_config = cJSON_Parse(config_string);
+    s_ezlopi_devices_t *device = malloc(sizeof(s_ezlopi_devices_t));
 
-    if (cjson_config)
+    if (device)
     {
-        cJSON *cjson_device_list = cJSON_GetObjectItem(cjson_config, "dev_detail");
-        if (cjson_device_list)
-        {
-            int dev_idx = 0;
-            cJSON *cjson_device = NULL;
+        int tmp_var = 0;
+        device->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
 
-            TRACE_B("---------------------------------------------");
-            while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, dev_idx)))
-            {
-                TRACE_B("Device-%d - %d:", dev_idx, (uint32_t)cjson_device);
+        device->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
+        CJSON_GET_VALUE_INT(cjson_device, "id_room", device->ezlopi_cloud.room_id);
+        CJSON_GET_VALUE_INT(cjson_device, "id_item", device->ezlopi_cloud.item_id);
+        ASSIGN_DEVICE_NAME()
+        device->ezlopi_cloud.has_getter = true;
+        device->ezlopi_cloud.has_setter = true;
 
-                cJSON *o_dev_name = NULL;
-                if (NULL != (o_dev_name = cJSON_GetObjectItem(cjson_device, "dev_name")))
-                {
-                    TRACE_D("dev_name: %s", o_dev_name->valuestring);
-                }
+        CJSON_GET_VALUE_INT(cjson_device, "is_ip", device->interface.gpio.gpio_in.enable);
+        CJSON_GET_VALUE_INT(cjson_device, "gpio_in", device->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "ip_inv", device->interface.gpio.gpio_in.invert);
+        CJSON_GET_VALUE_INT(cjson_device, "val_ip", device->interface.gpio.gpio_in.value);
+        CJSON_GET_VALUE_INT(cjson_device, "pullup_ip", tmp_var);
+        device->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
 
-                ezlopi_device_map_devices(cjson_device);
-
-                dev_idx++;
-                TRACE_B("---------------------------------------------");
-            }
-        }
-
-        cJSON_Delete(cjson_config);
+        device->interface.gpio.gpio_out.enable = true;
+        CJSON_GET_VALUE_INT(cjson_device, "gpio_out", device->interface.gpio.gpio_out.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "op_inv", device->interface.gpio.gpio_out.invert);
+        CJSON_GET_VALUE_INT(cjson_device, "val_op", device->interface.gpio.gpio_out.value);
+        CJSON_GET_VALUE_INT(cjson_device, "pullup_op", tmp_var);
+        device->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     }
-}
 
-static void add_item_digital_out(cJSON *o_device, uint32_t dev_idx)
-{
-    char *dev_name = NULL;
-    int id_room = 0, gpio_in = 0, gpio_out = 0, id_item = 0, ip_inv = 0;
-    int is_ip = 0, op_inv = 0, pullup_ip = 0, pullup_op = 0, val_ip = 0, val_op = 0;
-
-    CJSON_GET_VALUE_STRING(o_device, "dev_name", dev_name);
-    CJSON_GET_VALUE_INT(o_device, "id_room", id_room);
-    CJSON_GET_VALUE_INT(o_device, "gpio_in", gpio_in);
-    CJSON_GET_VALUE_INT(o_device, "gpio_out", gpio_out);
-    CJSON_GET_VALUE_INT(o_device, "id_item", id_item);
-    CJSON_GET_VALUE_INT(o_device, "ip_inv", ip_inv);
-    CJSON_GET_VALUE_INT(o_device, "is_ip", is_ip);
-    CJSON_GET_VALUE_INT(o_device, "op_inv", op_inv);
-    CJSON_GET_VALUE_INT(o_device, "pullup_ip", pullup_ip);
-    CJSON_GET_VALUE_INT(o_device, "pullup_op", pullup_op);
-    CJSON_GET_VALUE_INT(o_device, "val_ip", val_ip);
-    CJSON_GET_VALUE_INT(o_device, "val_op", val_op);
-
+#if 0
     if (dev_name)
     {
         snprintf(g_devices[dev_idx].name, sizeof(g_devices[dev_idx].name), "%s", dev_name);
@@ -174,20 +183,21 @@ static void add_item_digital_out(cJSON *o_device, uint32_t dev_idx)
     g_devices[dev_idx].output_pullup = pullup_op;
     g_devices[dev_idx].has_getter = true;
     g_devices[dev_idx].has_setter = true;
+#endif
 }
 
-static void add_item_digital_in(cJSON *o_device, uint32_t dev_idx)
+static void add_item_digital_in(cJSON *cjson_device, uint32_t dev_idx)
 {
     char *dev_name = NULL;
     int id_room = 0, gpio_in = 0, id_item = 0, ip_inv = 0, pullup_ip = 0, val_ip = 0;
 
-    CJSON_GET_VALUE_STRING(o_device, "dev_name", dev_name);
-    CJSON_GET_VALUE_INT(o_device, "id_room", id_room);
-    CJSON_GET_VALUE_INT(o_device, "gpio", gpio_in);
-    CJSON_GET_VALUE_INT(o_device, "id_item", id_item);
-    CJSON_GET_VALUE_INT(o_device, "logic_inv", ip_inv);
-    CJSON_GET_VALUE_INT(o_device, "pull_up", pullup_ip);
-    CJSON_GET_VALUE_INT(o_device, "val_ip", val_ip);
+    CJSON_GET_VALUE_STRING(cjson_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_INT(cjson_device, "id_room", id_room);
+    CJSON_GET_VALUE_INT(cjson_device, "gpio", gpio_in);
+    CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+    CJSON_GET_VALUE_INT(cjson_device, "logic_inv", ip_inv);
+    CJSON_GET_VALUE_INT(cjson_device, "pull_up", pullup_ip);
+    CJSON_GET_VALUE_INT(cjson_device, "val_ip", val_ip);
 
     if (dev_name)
     {
@@ -220,31 +230,31 @@ static void add_item_digital_in(cJSON *o_device, uint32_t dev_idx)
     g_devices[dev_idx].has_setter = false;
 }
 
-static void add_item_analogue_in(cJSON *o_device, uint32_t dev_idx)
+static void add_item_analogue_in(cJSON *cjson_device, uint32_t dev_idx)
 {
 }
 
-static void add_item_analogue_out(cJSON *o_device, uint32_t dev_idx)
+static void add_item_analogue_out(cJSON *cjson_device, uint32_t dev_idx)
 {
 }
 
-static void add_item_pwm(cJSON *o_device, uint32_t dev_idx)
+static void add_item_pwm(cJSON *cjson_device, uint32_t dev_idx)
 {
 }
 
-static void add_item_uart(cJSON *o_device, uint32_t dev_idx)
+static void add_item_uart(cJSON *cjson_device, uint32_t dev_idx)
 {
 }
 
-static void add_other(cJSON *o_device, uint32_t dev_idx)
+static void add_item_other(cJSON *cjson_device, uint32_t dev_idx)
 {
     char *dev_name = NULL;
     int id_item = 0;
     int id_room = 0;
 
-    CJSON_GET_VALUE_STRING(o_device, "dev_name", dev_name);
-    CJSON_GET_VALUE_INT(o_device, "id_item", id_item);
-    CJSON_GET_VALUE_INT(o_device, "id_room", id_room);
+    CJSON_GET_VALUE_STRING(cjson_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+    CJSON_GET_VALUE_INT(cjson_device, "id_room", id_room);
 
     memset(&g_devices[dev_idx], 0, sizeof(s_device_properties_t));
     g_devices[dev_idx].dev_type = EZPI_DEV_TYPE_OTHER;
@@ -274,7 +284,7 @@ static void add_other(cJSON *o_device, uint32_t dev_idx)
     hall_sensor_service_init(dev_idx);
 }
 
-static void add_item_onewire(cJSON *o_device, uint32_t dev_idx)
+static void add_item_onewire(cJSON *cjson_device, uint32_t dev_idx)
 {
     char *dev_name = NULL;
     int gpio = 0;
@@ -283,12 +293,12 @@ static void add_item_onewire(cJSON *o_device, uint32_t dev_idx)
     int pullup = 0;
     int val_ip = 0;
 
-    CJSON_GET_VALUE_STRING(o_device, "dev_name", dev_name);
-    CJSON_GET_VALUE_INT(o_device, "gpio", gpio);
-    CJSON_GET_VALUE_INT(o_device, "id_item", id_item);
-    CJSON_GET_VALUE_INT(o_device, "id_room", id_room);
-    CJSON_GET_VALUE_INT(o_device, "pull_up", pullup);
-    CJSON_GET_VALUE_INT(o_device, "val_ip", val_ip);
+    CJSON_GET_VALUE_STRING(cjson_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_INT(cjson_device, "gpio", gpio);
+    CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+    CJSON_GET_VALUE_INT(cjson_device, "id_room", id_room);
+    CJSON_GET_VALUE_INT(cjson_device, "pull_up", pullup);
+    CJSON_GET_VALUE_INT(cjson_device, "val_ip", val_ip);
 
     memset(&g_devices[dev_idx], 0, sizeof(s_device_properties_t));
 
@@ -320,7 +330,7 @@ static void add_item_onewire(cJSON *o_device, uint32_t dev_idx)
     dht11_service_init(gpio, dev_idx);
 }
 
-static void add_item_i2c(cJSON *o_device, uint32_t dev_idx)
+static void add_item_i2c(cJSON *cjson_device, uint32_t dev_idx)
 {
     char *dev_name = NULL;
     int id_item = 0;
@@ -331,14 +341,14 @@ static void add_item_i2c(cJSON *o_device, uint32_t dev_idx)
     int pullup_sda = 0;
     int slave_addr = 0;
 
-    CJSON_GET_VALUE_STRING(o_device, "dev_name", dev_name);
-    CJSON_GET_VALUE_INT(o_device, "id_item", id_item);
-    CJSON_GET_VALUE_INT(o_device, "id_room", id_room);
-    CJSON_GET_VALUE_INT(o_device, "gpio_scl", gpio_scl);
-    CJSON_GET_VALUE_INT(o_device, "gpio_sda", gpio_sda);
-    CJSON_GET_VALUE_INT(o_device, "pullup_scl", pullup_scl);
-    CJSON_GET_VALUE_INT(o_device, "pullup_sda", pullup_sda);
-    CJSON_GET_VALUE_INT(o_device, "slave_addr", slave_addr);
+    CJSON_GET_VALUE_STRING(cjson_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+    CJSON_GET_VALUE_INT(cjson_device, "id_room", id_room);
+    CJSON_GET_VALUE_INT(cjson_device, "gpio_scl", gpio_scl);
+    CJSON_GET_VALUE_INT(cjson_device, "gpio_sda", gpio_sda);
+    CJSON_GET_VALUE_INT(cjson_device, "pullup_scl", pullup_scl);
+    CJSON_GET_VALUE_INT(cjson_device, "pullup_sda", pullup_sda);
+    CJSON_GET_VALUE_INT(cjson_device, "slave_addr", slave_addr);
 
     memset(&g_devices[dev_idx], 0, sizeof(s_device_properties_t));
 
@@ -370,6 +380,79 @@ static void add_item_i2c(cJSON *o_device, uint32_t dev_idx)
     mpu_service_init(gpio_scl, gpio_sda, dev_idx);
 }
 
-static void add_item_spi(cJSON *o_device, uint32_t dev_idx)
+static void add_item_spi(cJSON *cjson_device, uint32_t dev_idx)
 {
+}
+#endif
+
+static void ezlopi_device_parse_json(char *config_string)
+{
+    cJSON *cjson_config = cJSON_Parse(config_string);
+
+    if (cjson_config)
+    {
+        cJSON *cjson_device_list = cJSON_GetObjectItem(cjson_config, "dev_detail");
+        if (cjson_device_list)
+        {
+            int config_dev_idx = 0;
+            cJSON *cjson_device = NULL;
+
+            TRACE_B("---------------------------------------------");
+            while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
+            {
+                TRACE_B("Device-%d - %d:", config_dev_idx, (uint32_t)cjson_device);
+
+                char *device_name = NULL;
+                CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+
+                if (NULL != device_name)
+                {
+                    TRACE_D("device name: %s", device_name);
+                }
+
+                int id_item = 0;
+                CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+
+                if (0 != id_item)
+                {
+                    const s_ezlopi_sensor_t *sensor_list = ezlopi_sensor_get_list();
+
+                    int dev_idx = 0;
+                    while (NULL != sensor_list[dev_idx].func)
+                    {
+                        sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, (void *)cjson_device);
+                        dev_idx++;
+                    }
+                }
+
+                // ezlopi_device_map_devices(cjson_device);
+
+                config_dev_idx++;
+                TRACE_B("---------------------------------------------");
+            }
+        }
+
+        cJSON_Delete(cjson_config);
+    }
+}
+
+uint16_t ezlopi_device_generate_device_id(void)
+{
+    static uint16_t device_id;
+    device_id = (0 == device_id) ? 0xd001 : device_id + 1;
+    return device_id;
+}
+
+uint16_t ezlopi_device_generate_item_id(void)
+{
+    static uint16_t item_id;
+    item_id = (0 == item_id) ? 0x1001 : item_id + 1;
+    return item_id;
+}
+
+uint16_t ezlopi_device_generate_room_id(void)
+{
+    static uint16_t room_id;
+    room_id = (0 == room_id) ? 0x4001 : room_id + 1;
+    return room_id;
 }

@@ -8,7 +8,7 @@
 
 #include "sensor_service.h"
 #include "ezlopi_actions.h"
-#include "ezlopi_sensors.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_event_queue.h"
 
 static void event_process(void *pv);
@@ -20,12 +20,12 @@ void sensor_service_init(void)
 
 static void event_process(void *pv)
 {
-    const f_sensor_call_t *sensor_list = ezlopi_sensor_get_list();
+    const s_ezlopi_sensor_t *sensor_list = ezlopi_sensor_get_list();
 
     int idx = 0;
-    while (NULL != sensor_list[idx])
+    while (NULL != sensor_list[idx].func)
     {
-        sensor_list[idx](EZLOPI_ACTION_INITIALIZE, NULL);
+        sensor_list[idx].func(EZLOPI_ACTION_INITIALIZE, NULL);
         idx++;
     }
 
@@ -44,9 +44,9 @@ static void event_process(void *pv)
                 printf("action received: %s\n", ezlopi_actions_to_string(event->action));
 
                 idx = 0;
-                while (NULL != sensor_list[idx])
+                while (NULL != sensor_list[idx].func)
                 {
-                    sensor_list[idx](event->action, event->arg);
+                    sensor_list[idx].func(event->action, event->arg);
                     idx++;
                 }
             }

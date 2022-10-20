@@ -7,7 +7,7 @@
 typedef struct s_ezlopi_cloud_info
 {
     // cloud information
-    char device_name[20]; // device name, 'name' field in 'hub.devices.list'
+    char device_name[32]; // device name, 'name' field in 'hub.devices.list'
     uint16_t device_id;   //
     char *category;       // ezlopi-cloud/constants/category_str.h
     char *subcategory;    // ezlopi-cloud/constants/subcategory_str.h
@@ -16,7 +16,7 @@ typedef struct s_ezlopi_cloud_info
     bool battery_powered;
     bool reachable;
     uint16_t room_id;   //
-    char room_name[20]; //
+    char room_name[32]; //
 
     uint16_t item_id; //
     char *item_name;  // https://api.ezlo.com/devices/items/index.html

@@ -78,10 +78,10 @@ static int sensor_bme280_ezlopi_update_data(void)
     char *data = (char *)malloc(65);
     char *send_buf = malloc(1024);
     sensor_bme280_get_value(data);
-    send_buf = items_update_from_sensor(0, data);
-    TRACE_I("The send_buf is: %s, the size is: %d", send_buf, strlen(send_buf));
+    // send_buf = items_update_from_sensor(0, data);
+    // TRACE_I("The send_buf is: %s, the size is: %d", send_buf, strlen(send_buf));
     free(data);
-    free(send_buf);
+    // free(send_buf);
     return 0;
 }
 
@@ -173,7 +173,7 @@ int sensor_bme280(e_ezlopi_actions_t action, void *arg)
     }
     default:
     {
-        TRACE_E("Unknown defaule bm280 action found!");
+        TRACE_E("Action not implemented found!");
         break;
     }
     }

@@ -26,7 +26,7 @@ typedef enum e_ezlopi_gpio_logic_invert
 typedef struct s_ezlopi_gpio
 {
     bool enable;
-    e_ezlopi_gpio_num_t gpio;
+    e_ezlopi_gpio_num_t gpio_num;
     e_ezlopi_gpio_mode_t mode;
     e_ezlopi_gpio_value_t value;
     e_ezlopi_gpio_pull_mode_t pull;
