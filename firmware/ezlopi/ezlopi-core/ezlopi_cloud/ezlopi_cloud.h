@@ -13,8 +13,8 @@ typedef struct s_ezlopi_cloud_info
     char *subcategory;    // ezlopi-cloud/constants/subcategory_str.h
     char *device_type;    // ezlopi-cloud/constants/device_types_str.h
     char *value_type;     // ezlopi-cloud/constants/values_str.h
-    bool battery_powered;
     bool reachable;
+    bool battery_powered;
     uint16_t room_id;   //
     char room_name[32]; //
 

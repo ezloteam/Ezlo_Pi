@@ -1,5 +1,5 @@
-file(GLOB_RECURSE config_src "src/*.c*")
+file(GLOB_RECURSE config_src "*.c*")
 
 idf_component_register(SRCS "${config_src}"
-    INCLUDE_DIRS "include"
+    INCLUDE_DIRS "."
     REQUIRES frozen mbedtls trace ezlopi_factory_info)

@@ -2,11 +2,11 @@
 
 #include "esp_http_client.h"
 
-#include "http.h"
+#include "ezlopi_http.h"
 #include "trace.h"
 
-static void http_free_rx_data(s_rx_data_t *rx_data);
-static esp_err_t http_event_handler(esp_http_client_event_t *evt);
+static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
+static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 
 #define TAG __FILE__
 
@@ -19,7 +19,7 @@ static esp_err_t http_event_handler(esp_http_client_event_t *evt);
         }                     \
     }
 
-char *http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
+char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
 {
     char *ret = NULL;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
@@ -33,7 +33,7 @@ char *http_get_request(char *cloud_url, char *private_key, char *shared_key, cha
             .cert_pem = ca_certificate,
             .client_cert_pem = shared_key,
             .client_key_pem = private_key,
-            .event_handler = http_event_handler,
+            .event_handler = ezlopi_http_event_handler,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data),
         };
@@ -73,7 +73,7 @@ char *http_get_request(char *cloud_url, char *private_key, char *shared_key, cha
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
             }
 
-            http_free_rx_data(my_data);
+            ezlopi_http_free_rx_data(my_data);
             esp_http_client_cleanup(client);
         }
     }
@@ -81,7 +81,7 @@ char *http_get_request(char *cloud_url, char *private_key, char *shared_key, cha
     return ret;
 }
 
-static esp_err_t http_event_handler(esp_http_client_event_t *evt)
+static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt)
 {
     switch (evt->event_id)
     {
@@ -171,13 +171,13 @@ static esp_err_t http_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
-static void http_free_rx_data(s_rx_data_t *rx_data)
+static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data)
 {
     if (rx_data)
     {
         if (rx_data->next)
         {
-            http_free_rx_data(rx_data->next);
+            ezlopi_http_free_rx_data(rx_data->next);
         }
 
         if (rx_data->ptr)

@@ -13,9 +13,10 @@
 #include "sensor_service.h"
 #include "ezlopi_event_queue.h"
 
+#include "trace.h"
 #include "ezlopi.h"
 #include "qt_serial.h"
-#include "trace.h"
+#include "web_provisioning.h"
 
 static void blinky(void *pv);
 
@@ -25,6 +26,7 @@ void app_main(void)
 {
     qt_serial_init();
     ezlopi_init();
+    web_provisioning_init();
     // sensor_service_init();
     // ezlopi_timer_start_500ms();
     // sensor_bme280(EZLOPI_ACTION_INITIALIZE, NULL);

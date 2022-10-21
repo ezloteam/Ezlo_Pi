@@ -3,7 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "wss.h"
+#include "ezlopi_wss.h"
 // #include "websocket_client.h"
 #include "registeration.h"
 #include "trace.h"

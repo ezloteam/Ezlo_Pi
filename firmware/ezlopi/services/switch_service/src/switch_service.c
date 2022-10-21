@@ -11,7 +11,7 @@
 #include "items.h"
 #include "trace.h"
 #include "freertos/portmacro.h"
-#include "wss.h"
+#include "ezlopi_wss.h"
 
 #define NUMBER_OF_GPIO 28
 static const uint32_t switch_debounce_time = 1000;

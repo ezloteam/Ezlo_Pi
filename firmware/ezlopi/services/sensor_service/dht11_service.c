@@ -4,7 +4,7 @@
 #include "dht.h"
 #include "string.h"
 #include "items.h"
-#include "wss.h"
+#include "ezlopi_wss.h"
 
 static float humidity = 0.0f;
 static float temperature = 0.0f;

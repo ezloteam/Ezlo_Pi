@@ -10,6 +10,10 @@
 #include "cJSON.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_cloud_category_str.h"
+#include "ezlopi_cloud_subcategory_str.h"
+#include "ezlopi_item_name_str.h"
+#include "ezlopi_cloud_device_types_str.h"
+#include "ezlopi_cloud_value_type_str.h"
 
 static int digital_io_init();
 static int8_t digital_io_get_value(char *sensor_data);
@@ -75,21 +79,31 @@ static int digital_io_prepare(void *arg)
     if (device)
     {
         int tmp_var = 0;
+        memset(device, 0, sizeof(s_ezlopi_devices_t));
         device->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
 
         ASSIGN_DEVICE_NAME();
-        device->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-        device->ezlopi_cloud.category = 
-            CJSON_GET_VALUE_INT(cjson_device, "id_room", device->ezlopi_cloud.room_id);
-        CJSON_GET_VALUE_INT(cjson_device, "id_item", device->ezlopi_cloud.item_id);
+        device->ezlopi_cloud.category = category_switch;
+        device->ezlopi_cloud.subcategory = subcategory_in_wall;
+        device->ezlopi_cloud.item_name = ezlopi_item_name_switch;
+        device->ezlopi_cloud.device_type = dev_type_switch_inwall;
+        device->ezlopi_cloud.value_type = value_type_bool;
         device->ezlopi_cloud.has_getter = true;
         device->ezlopi_cloud.has_setter = true;
+        device->ezlopi_cloud.reachable = false;
+        device->ezlopi_cloud.battery_powered = false;
+        device->ezlopi_cloud.show = true;
+        device->ezlopi_cloud.room_name[0] = '\0';
+        device->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
+        CJSON_GET_VALUE_INT(cjson_device, "id_room", device->ezlopi_cloud.room_id);
+        CJSON_GET_VALUE_INT(cjson_device, "id_item", device->ezlopi_cloud.item_id);
 
         CJSON_GET_VALUE_INT(cjson_device, "is_ip", device->interface.gpio.gpio_in.enable);
         CJSON_GET_VALUE_INT(cjson_device, "gpio_in", device->interface.gpio.gpio_in.gpio_num);
         CJSON_GET_VALUE_INT(cjson_device, "ip_inv", device->interface.gpio.gpio_in.invert);
         CJSON_GET_VALUE_INT(cjson_device, "val_ip", device->interface.gpio.gpio_in.value);
         CJSON_GET_VALUE_INT(cjson_device, "pullup_ip", tmp_var);
+        device->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
         device->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
 
         device->interface.gpio.gpio_out.enable = true;
@@ -97,8 +111,11 @@ static int digital_io_prepare(void *arg)
         CJSON_GET_VALUE_INT(cjson_device, "op_inv", device->interface.gpio.gpio_out.invert);
         CJSON_GET_VALUE_INT(cjson_device, "val_op", device->interface.gpio.gpio_out.value);
         CJSON_GET_VALUE_INT(cjson_device, "pullup_op", tmp_var);
+        device->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
         device->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     }
+
+    ezlopi_device_print_properties(device);
 
     return ret;
 }

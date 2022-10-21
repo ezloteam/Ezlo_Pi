@@ -4,7 +4,7 @@
 #include "mpu6050.h"
 #include "string.h"
 #include "items.h"
-#include "wss.h"
+#include "ezlopi_wss.h"
 #include "driver/i2c.h"
 #include "i2c_master_interface.h"
 

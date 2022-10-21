@@ -2,7 +2,7 @@
 // Created by samogon on 11.02.20.
 //
 
-#include "wss.h"
+#include "ezlopi_wss.h"
 #include "time.h"
 #include "lwip/apps/sntp.h"
 
@@ -57,24 +57,28 @@ bool wss_client_is_connected(void)
     return is_wss;
 }
 
-void wss_client_init(struct json_token *a_uri, wss_upcall_t wss_rx_upcall_function)
+void ezlopi_client_init(char *a_uri, wss_upcall_t wss_rx_upcall_function)
 {
-    wss_upcall_function = wss_rx_upcall_function;
-
-    snprintf(wss_buffer, sizeof(wss_buffer), "%.*s", a_uri->len, a_uri->ptr);
-    char *port_start = strrchr(wss_buffer, ':');
-
-    if (port_start)
+    if (a_uri)
     {
-        snprintf(wss_port, sizeof(wss_port), "%d", atoi(port_start + 1));
-        a_uri->len = port_start - wss_buffer;
+        wss_upcall_function = wss_rx_upcall_function;
+
+        snprintf(wss_buffer, sizeof(wss_buffer), "%s", a_uri);
+        char *port_start = strrchr(wss_buffer, ':');
+        uint32_t tmp_var = 0;
+
+        if (port_start)
+        {
+            snprintf(wss_port, sizeof(wss_port), "%d", atoi(port_start + 1));
+            tmp_var = port_start - wss_buffer;
+        }
+
+        snprintf(wss_url, sizeof(wss_url), "%.*s", tmp_var - 6, a_uri + 6);
+        snprintf(request, sizeof(request), request_format, wss_url, wss_url, ezlopi_factory_info_get_info()->id);
+        TRACE_D("request_format: %s", request);
+
+        xTaskCreate(wss_receive_task, "wss_receive_task", 6 * 1024, NULL, 5, NULL);
     }
-
-    snprintf(wss_url, sizeof(wss_url), "%.*s", a_uri->len - 6, a_uri->ptr + 6);
-    snprintf(request, sizeof(request), request_format, wss_url, wss_url, ezlopi_factory_info_get_info()->id);
-    TRACE_D("request_format: %s", request);
-
-    xTaskCreate(wss_receive_task, "wss_receive_task", 6 * 1024, NULL, 5, NULL);
 }
 
 static void wss_recv_func(void)

@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef __WSS_H__
-#define __WSS_H__
+#ifndef __EZLOPI_WSS_H__
+#define __EZLOPI_WSS_H__
 
 #include <stdio.h>
 #include "string.h"
@@ -58,7 +58,7 @@ extern "C"
 
     typedef void (*wss_upcall_t)(const char *payload, uint32_t len);
 
-    void wss_client_init(struct json_token *uri, wss_upcall_t wss_upcall);
+    void ezlopi_client_init(char *uri, wss_upcall_t wss_upcall);
     int wss_client_send(char *buf_s, size_t len);
     bool wss_client_is_connected(void);
 
@@ -66,4 +66,4 @@ extern "C"
 }
 #endif /* __cplusplus */
 
-#endif // __WSS_H__
+#endif // __EZLOPI_WSS_H__

@@ -7,7 +7,7 @@
 #include "items.h"
 #include "devices.h"
 #include "web_provisioning.h"
-#include "wss.h"
+#include "ezlopi_wss.h"
 
 static void hall_sensor_process(void *pv);
 static uint32_t device_index = 0;

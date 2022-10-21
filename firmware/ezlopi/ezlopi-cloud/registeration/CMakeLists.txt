@@ -7,5 +7,5 @@ idf_component_register(SRCS "${src_files}"
     devices_common
     freertos
     websocket_client
-    wss
+    ezlopi_wss
 )

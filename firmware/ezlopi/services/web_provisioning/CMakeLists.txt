@@ -8,7 +8,7 @@ idf_component_register(SRCS "${provisioning_src}"
     esp_http_client
     common_components
     esp-tls
-    wss
+    ezlopi_wss
     websocket_client
     esp_hw_support
     ezlopi_factory_info
@@ -27,5 +27,6 @@ idf_component_register(SRCS "${provisioning_src}"
     room
     settings
     network
-    wss
+    ezlopi_wss
+    ezlopi_http
 )
