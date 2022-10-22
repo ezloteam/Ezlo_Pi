@@ -26,18 +26,20 @@
         }                                                     \
     }
 
-#define ASSIGN_DEVICE_NAME()                                                                                                                            \
-    {                                                                                                                                                   \
-        char *device_name = NULL;                                                                                                                       \
-        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);                                                                                  \
-        if ((NULL != device_name) && ('\0' != device_name[0]))                                                                                          \
-        {                                                                                                                                               \
-            snprintf(device->ezlopi_cloud.device_name, sizeof(device->ezlopi_cloud.device_name), "%s", device_name);                                    \
-        }                                                                                                                                               \
-        else                                                                                                                                            \
-        {                                                                                                                                               \
-            snprintf(device->ezlopi_cloud.device_name, sizeof(device->ezlopi_cloud.device_name), "dev-%d:digital_out", device->ezlopi_cloud.device_id); \
-        }                                                                                                                                               \
+#define ASSIGN_DEVICE_NAME(digital_io_device_properties, device_name)                             \
+    {                                                                                             \
+        if ((NULL != device_name) && ('\0' != device_name[0]))                                    \
+        {                                                                                         \
+            snprintf(digital_io_device_properties->ezlopi_cloud.device_name,                      \
+                     sizeof(digital_io_device_properties->ezlopi_cloud.device_name),              \
+                     "%s", device_name);                                                          \
+        }                                                                                         \
+        else                                                                                      \
+        {                                                                                         \
+            snprintf(digital_io_device_properties->ezlopi_cloud.device_name,                      \
+                     sizeof(digital_io_device_properties->ezlopi_cloud.device_name),              \
+                     "dev-%d:digital_out", digital_io_device_properties->ezlopi_cloud.device_id); \
+        }                                                                                         \
     }
 
 typedef enum e_ezlopi_device_interface_type
@@ -55,9 +57,10 @@ typedef enum e_ezlopi_device_interface_type
     EZLOPI_DEVICE_INTERFACE_MAX
 } e_ezlopi_device_interface_type_t;
 
-typedef struct s_ezlopi_devices
+typedef struct s_ezlopi_device_properties
 {
     e_ezlopi_device_interface_type_t interface_type;
+    uint16_t device_subtype; // id_item : from qt-app or ezlogic app
     // hardware interface
     union
     {
@@ -70,13 +73,13 @@ typedef struct s_ezlopi_devices
 
     s_ezlopi_cloud_info_t ezlopi_cloud;
 
-} s_ezlopi_devices_t;
+} s_ezlopi_device_properties_t;
 
 void ezlopi_device_init(void);
 uint16_t ezlopi_device_generate_device_id(void);
 uint16_t ezlopi_device_generate_item_id(void);
 uint16_t ezlopi_device_generate_room_id(void);
 
-void ezlopi_device_print_properties(s_ezlopi_devices_t *device);
+void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
 
 #endif // __EZLOPI_DEVICE_H__

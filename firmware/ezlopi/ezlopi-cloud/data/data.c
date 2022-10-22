@@ -1,9 +1,10 @@
 #include <string.h>
 
+#include "cJSON.h"
 #include "data.h"
 #include "trace.h"
 #include "frozen.h"
-#include "devices_common.h"
+#include "ezlopi_devices_list.h"
 
 static const char *data_list_start = "{\"method\":\"hub.data.list\",\"msg_id\":%d,\"api\":\"1.0\",\"error\":null,\"id\":\"%.*s\",\"result\":{\"settings\":{";
 static const char *data_list_cont = "\"first_start\":{\"value\": 0}";
@@ -16,38 +17,30 @@ char *data_list(const char *data, uint32_t len, struct json_token *method, uint3
 
     if (send_buf)
     {
-        s_device_properties_t *devices = devices_common_device_list();
-
+        int sender_status = 0;
         struct json_token msg_id = JSON_INVALID_TOKEN;
-        json_scanf(data, len, "{id: %T}", &msg_id);
-
         struct json_token sender = JSON_INVALID_TOKEN;
-        int sender_status = json_scanf(data, len, "{sender: %T}", &sender);
+        s_ezlopi_device_t *devices_list = ezlopi_devices_list_get_list();
 
-        snprintf(send_buf, buf_len, data_list_start, msg_count, msg_id.len, msg_id.ptr);
-
-        if (devices[0].name[0])
+        if (devices_list)
         {
-            for (int i = 0; i < MAX_DEV; i++)
-            {
-                int len_b = strlen(send_buf);
-                snprintf(&send_buf[len_b], buf_len - len_b, "%s", data_list_cont); //, devices[i].device_id, devices[i].name);
-                if (i < MAX_DEV - 1)
-                {
-                    if (devices[i + 1].name[0])
-                    {
-#warning "WARNING: Remove break from here!"
-                        break;
+            json_scanf(data, len, "{id: %T}", &msg_id);
+            sender_status = json_scanf(data, len, "{sender: %T}", &sender);
 
-                        len_b = strlen(send_buf);
-                        send_buf[len_b] = ',';
-                        send_buf[len_b + 1] = 0;
-                    }
-                    else
-                    {
-                        break;
-                    }
+            snprintf(send_buf, buf_len, data_list_start, msg_count, msg_id.len, msg_id.ptr);
+
+            int device_idx = 0;
+            while (NULL != devices_list[device_idx].func)
+            {
+                if (true == devices_list[device_idx].is_configured)
+                {
+                    int len_b = strlen(send_buf);
+                    snprintf(&send_buf[len_b], buf_len - len_b, "%s", data_list_cont); //, devices[i].device_id, devices[i].name);
+#warning "WARNING: Remove break from here!"
+                    break;
                 }
+
+                device_idx++;
             }
         }
 
@@ -56,4 +49,16 @@ char *data_list(const char *data, uint32_t len, struct json_token *method, uint3
     }
 
     return send_buf;
+}
+
+static cJSON *ezlopi_cloud_data_create_device_list(void)
+{
+    cJSON *cjson_device_list = cJSON_CreateObject();
+
+    if (cjson_device_list)
+    {
+        cJSON_AddNumberToObject(cjson_device_list, "ids", 1234);
+    }
+
+    return cjson_device_list;
 }

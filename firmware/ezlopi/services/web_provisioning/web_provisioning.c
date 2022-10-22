@@ -76,8 +76,7 @@ void web_provisioning_send_to_nma_websocket(char *data)
 {
     if (data)
     {
-        // ws_client.send(data);
-        // TRACE_D("WSS-SENDING: %s", data);
+        TRACE_D("WSS-SENDING: %s", data);
         wss_client_send(data, strlen(data));
         message_counter++;
     }

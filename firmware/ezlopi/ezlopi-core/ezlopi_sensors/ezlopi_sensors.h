@@ -16,14 +16,14 @@
 // {
 //     uint16_t id;
 //     f_sensor_call_t func;
-// } s_ezlopi_sensor_t;
+// } s_ezlopi_device_t;
 
 // /**
 //  * @brief Provides the list of available sensors
 //  *
 //  * @return f_sensor_call_t*
 //  */
-// const s_ezlopi_sensor_t *ezlopi_sensor_get_list(void);
+// const s_ezlopi_device_t *ezlopi_sensor_get_list(void);
 
 // #if 0
 // /**

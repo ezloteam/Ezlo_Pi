@@ -20,7 +20,7 @@ void sensor_service_init(void)
 
 static void event_process(void *pv)
 {
-    const s_ezlopi_sensor_t *sensor_list = ezlopi_sensor_get_list();
+    const s_ezlopi_device_t *sensor_list = ezlopi_devices_list_get_list();
 
     int idx = 0;
     while (NULL != sensor_list[idx].func)
