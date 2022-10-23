@@ -111,7 +111,7 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                printf("'hub.items.list' response:\r\n%s\r\n", cjson_response);
+                printf("'hub.items.list' response:\r\n%s\r\n", string_response);
                 cJSON_Minify(string_response);
             }
 
