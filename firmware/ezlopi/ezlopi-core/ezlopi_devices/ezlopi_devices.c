@@ -8,7 +8,7 @@
 
 // typedef
 
-static void ezlopi_device_map_devices(cJSON *cjson_device);
+// static void ezlopi_device_map_devices(cJSON *cjson_device);
 static void ezlopi_device_parse_json(char *config_string);
 
 void ezlopi_device_init(void)
@@ -72,6 +72,7 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
     }
 }
 
+#if 0
 static void ezlopi_device_map_devices(cJSON *cjson_device)
 {
     e_ezlopi_device_interface_type_t device_type = EZLOPI_DEVICE_INTERFACE_NONE;
@@ -121,6 +122,7 @@ static void ezlopi_device_map_devices(cJSON *cjson_device)
     }
     }
 }
+#endif
 
 static void ezlopi_device_parse_json(char *config_string)
 {
@@ -157,7 +159,10 @@ static void ezlopi_device_parse_json(char *config_string)
                     int dev_idx = 0;
                     while (NULL != sensor_list[dev_idx].func)
                     {
-                        sensor_list[dev_idx].properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, (void *)cjson_device);
+                        if (id_item == sensor_list[dev_idx].id)
+                        {
+                            sensor_list[dev_idx].properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, (void *)cjson_device);
+                        }
                         dev_idx++;
                     }
                 }

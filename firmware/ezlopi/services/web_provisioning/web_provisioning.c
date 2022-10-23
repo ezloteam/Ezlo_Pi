@@ -10,14 +10,14 @@
 // #include "web_provisioning.h"
 // #include "wss.h"
 #include "data.h"
-// #include "devices.h"
+#include "devices.h"
 // #include "scenes.h"
 #include "registeration.h"
 // #include "favorite.h"
 // #include "gateways.h"
 // #include "info.h"
 // #include "modes.h"
-// #include "items.h"
+#include "items.h"
 // #include "room.h"
 // #include "settings.h"
 // #include "network.h"
@@ -45,9 +45,9 @@ s_method_list_t method_list[] = {
     /** Getter functions **/
     {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
     // {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
-    // {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
+    {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
     // {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
-    // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
+    {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
     // {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
     // {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
     // {.method_name = "hub.info.get", .method = info_get, .updater = NULL},

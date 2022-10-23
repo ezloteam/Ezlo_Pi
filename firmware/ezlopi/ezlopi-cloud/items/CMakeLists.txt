@@ -1,10 +1,4 @@
-file(GLOB_RECURSE src_files "src/*.c")
+file(GLOB_RECURSE src_files "*.c")
 idf_component_register(SRCS "${src_files}"
-    INCLUDE_DIRS "include"
-    REQUIRES frozen
-    ezlopi_factory_info
-    trace
-    devices_common
-    interface_common
-    items
-    mpu6050 sensor_service)
+    INCLUDE_DIRS "."
+    REQUIRES frozen ezlopi_factory_info trace devices_common interface_common items mpu6050 sensor_service)

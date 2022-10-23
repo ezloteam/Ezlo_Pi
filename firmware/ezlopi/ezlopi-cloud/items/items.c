@@ -9,6 +9,11 @@
 #include "mpu6050.h"
 #include "web_provisioning.h"
 
+#include "cJSON.h"
+#include "ezlopi_cloud_keywords.h"
+#include "ezlopi_cloud_methods_str.h"
+#include "ezlopi_devices_list.h"
+
 extern float dht11_service_get_temperature(void);
 static void parse_item_id(char *data, uint32_t len, char *item_id);
 
@@ -27,6 +32,99 @@ static const char *items_list_item = "{\"_id\":\"%.*s\","
                                      "\"status\":\"synced\"}";
 static const char *items_list_end = "]},\"error\":null,\"id\":\"%.*s\",\"sender\":%.*s}";
 
+char *items_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+{
+    char *string_response = NULL;
+
+    cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
+    if (cjson_request)
+    {
+        cJSON *id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
+        cJSON *sender = cJSON_GetObjectItem(cjson_request, ezlopi_sender_str);
+
+        cJSON *cjson_response = cJSON_CreateObject();
+        if (cjson_response)
+        {
+            cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_items_list);
+            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
+            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_id_str, id);
+            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_sender_str, sender);
+            cJSON_AddNullToObject(cjson_response, "error");
+
+            cJSON *cjson_result = cJSON_CreateObject();
+            if (cjson_result)
+            {
+                cJSON *cjson_items_array = cJSON_CreateArray();
+                if (cjson_items_array)
+                {
+
+                    s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
+                    if (ezlopi_device_list)
+                    {
+                        int dev_idx = 0;
+                        while (EZLOPI_SENSOR_NONE != ezlopi_device_list[dev_idx].id)
+                        {
+                            if (NULL != ezlopi_device_list[dev_idx].properties)
+                            {
+                                cJSON *cjson_properties = cJSON_CreateObject();
+                                if (cjson_properties)
+                                {
+                                    char tmp_string[64];
+                                    snprintf(tmp_string, sizeof(tmp_string), "%d", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.item_id);
+                                    cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
+                                    snprintf(tmp_string, sizeof(tmp_string), "%d", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_id);
+                                    cJSON_AddStringToObject(cjson_properties, "deviceId", ezlopi_ezlopi_str);
+                                    cJSON_AddStringToObject(cjson_properties, "deviceName", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_name);
+                                    cJSON_AddTrueToObject(cjson_properties, "deviceArmed");
+                                    cJSON_AddBoolToObject(cjson_properties, "hasGetter", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.has_getter);
+                                    cJSON_AddBoolToObject(cjson_properties, "hasSetter", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.has_setter);
+                                    cJSON_AddStringToObject(cjson_properties, "name", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.item_name);
+                                    cJSON_AddTrueToObject(cjson_properties, "show");
+                                    cJSON_AddStringToObject(cjson_properties, "valueType", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.value_type);
+                                    cJSON_AddStringToObject(cjson_properties, "valueType", (char *)ezlopi_device_list[dev_idx].func(EZLOPI_ACTION_GET_EZLOPI_VALUE, NULL));
+                                    cJSON_AddStringToObject(cjson_properties, "valueFormatted", "true");
+                                    cJSON_AddStringToObject(cjson_properties, "status", "synced");
+
+                                    if (!cJSON_AddItemToArray(cjson_items_array, cjson_properties))
+                                    {
+                                        cJSON_Delete(cjson_properties);
+                                    }
+                                }
+                            }
+
+                            dev_idx++;
+                        }
+                    }
+
+                    if (!cJSON_AddItemToObjectCS(cjson_result, "items", cjson_items_array))
+                    {
+                        cJSON_Delete(cjson_items_array);
+                    }
+                }
+
+                if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result))
+                {
+                    cJSON_Delete(cjson_result);
+                }
+            }
+
+            string_response = cJSON_Print(cjson_response);
+            if (string_response)
+            {
+                printf("'hub.items.list' response:\r\n%s\r\n", cjson_response);
+                cJSON_Minify(string_response);
+            }
+
+            cJSON_Delete(cjson_response);
+        }
+
+        cJSON_Delete(cjson_request);
+    }
+
+    return string_response;
+}
+
+#if 0
 char *items_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     uint32_t buf_len = 4096;
@@ -392,3 +490,4 @@ static void parse_item_id(char *data, uint32_t len, char *item_id)
         TRACE_E("item_id not found!");
     }
 }
+#endif

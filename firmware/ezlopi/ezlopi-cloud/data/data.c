@@ -32,7 +32,7 @@ char *data_list(const char *data, uint32_t len, struct json_token *method, uint3
             int device_idx = 0;
             while (NULL != devices_list[device_idx].func)
             {
-                if (true == devices_list[device_idx].is_configured)
+                if (NULL != devices_list[device_idx].properties)
                 {
                     int len_b = strlen(send_buf);
                     snprintf(&send_buf[len_b], buf_len - len_b, "%s", data_list_cont); //, devices[i].device_id, devices[i].name);
@@ -52,6 +52,18 @@ char *data_list(const char *data, uint32_t len, struct json_token *method, uint3
 }
 
 static cJSON *ezlopi_cloud_data_create_device_list(void)
+{
+    cJSON *cjson_device_list = cJSON_CreateObject();
+
+    if (cjson_device_list)
+    {
+        cJSON_AddNumberToObject(cjson_device_list, "ids", 1234);
+    }
+
+    return cjson_device_list;
+}
+
+static cJSON *ezlopi_cloud_data_create_settings_list(void)
 {
     cJSON *cjson_device_list = cJSON_CreateObject();
 

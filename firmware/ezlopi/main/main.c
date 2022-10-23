@@ -45,6 +45,7 @@ static void blinky(void *pv)
     };
 
     uint32_t state = 0;
+    uint32_t count = 0;
 
     adc1_config_width(ADC_WIDTH_BIT_12);
     gpio_config(&io_conf);
@@ -54,18 +55,18 @@ static void blinky(void *pv)
         state ^= 1;
         gpio_set_level(GPIO_NUM_2, state);
         // int hall_sensor_value = hall_sensor_read();
-        int hall_sensor_value = 0;
-        printf("Hall Sensor value: %d\r\n", hall_sensor_value);
+        // int hall_sensor_value = 0;
+        // printf("Hall Sensor value: %d\r\n", hall_sensor_value);
 
         vTaskDelay(1000 / portTICK_RATE_MS);
 
-        // if (count++ > 20)
-        // {
-        //     TRACE_D("-----------------------------------------");
-        //     TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
-        //     TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
-        //     TRACE_D("-----------------------------------------");
-        // }
+        if (count++ > 50)
+        {
+            TRACE_D("-----------------------------------------");
+            TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
+            TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
+            TRACE_D("-----------------------------------------");
+        }
 
         // s_ezlo_event_t *event = malloc(sizeof(s_ezlo_event_t));
         // if (event)

@@ -22,7 +22,7 @@ typedef struct s_ezlopi_device
 {
     uint16_t id;
     f_sensor_call_t func;
-    bool is_configured;
+    // bool is_configured;
     s_ezlopi_device_properties_t *properties;
 } s_ezlopi_device_t;
 

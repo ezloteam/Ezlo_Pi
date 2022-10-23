@@ -61,6 +61,11 @@ int digital_io(e_ezlopi_actions_t action, void *arg)
         ret = digital_io_prepare(arg);
         break;
     }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        const static char *mock_value = "true";
+        ret = (int)mock_value;
+    }
     default:
     {
         TRACE_E("Unknown defaule bm280 action found!");
