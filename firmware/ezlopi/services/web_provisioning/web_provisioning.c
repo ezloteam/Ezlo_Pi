@@ -11,16 +11,17 @@
 // #include "wss.h"
 #include "data.h"
 #include "devices.h"
-// #include "scenes.h"
+#include "scenes.h"
 #include "registeration.h"
-// #include "favorite.h"
-// #include "gateways.h"
-// #include "info.h"
-// #include "modes.h"
+#include "favorite.h"
+#include "gateways.h"
+#include "info.h"
+#include "modes.h"
 #include "items.h"
-// #include "room.h"
+#include "room.h"
+#include "feature.h"
 // #include "settings.h"
-// #include "network.h"
+#include "network.h"
 
 #include "ezlopi_factory_info.h"
 #include "ezlopi_wifi.h"
@@ -44,15 +45,15 @@ typedef struct s_method_list
 s_method_list_t method_list[] = {
     /** Getter functions **/
     {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
-    // {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
+    {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
     {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
-    // {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
+    {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
     {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
-    // {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
-    // {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
-    // {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
-    // {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
-    // {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
+    {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
+    {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
+    {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
+    {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
+    {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
     // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
     // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
     // {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
@@ -64,7 +65,7 @@ s_method_list_t method_list[] = {
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
     // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL},      // documentation missing
+    {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 
 uint32_t web_provisioning_get_message_count(void)
@@ -72,11 +73,11 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
-void web_provisioning_send_to_nma_websocket(char *data)
+static void web_provisioning_send_to_nma_websocket(char *data)
 {
     if (data)
     {
-        TRACE_D("WSS-SENDING: %s", data);
+        // TRACE_D("WSS-SENDING: %s", data);
         wss_client_send(data, strlen(data));
         message_counter++;
     }
@@ -145,11 +146,31 @@ static void __message_upcall(const char *payload, uint32_t len)
                 if (NULL != method_list[idx].method)
                 {
                     j_response = method_list[idx].method(payload, len, &method_tok, message_counter);
+                    if (j_response)
+                    {
+                        web_provisioning_send_to_nma_websocket(j_response);
+                        free(j_response);
+                        j_response = NULL;
+                    }
+                    else
+                    {
+                        TRACE_E("Error - j_response: %d", (uint32_t)j_response);
+                    }
                 }
 
                 if (NULL != method_list[idx].updater)
                 {
                     j_response = method_list[idx].updater(payload, len, &method_tok, message_counter);
+                    if (j_response)
+                    {
+                        web_provisioning_send_to_nma_websocket(j_response);
+                        free(j_response);
+                        j_response = NULL;
+                    }
+                    else
+                    {
+                        TRACE_E("Error - j_response: %d", (uint32_t)j_response);
+                    }
                 }
 
                 rpc_method_found = 1;
@@ -160,17 +181,16 @@ static void __message_upcall(const char *payload, uint32_t len)
         if (0 == rpc_method_found)
         {
             j_response = __rpc_method_notfound(payload, len, &method_tok, message_counter);
-        }
-
-        if (j_response)
-        {
-            wss_client_send(j_response, strlen(j_response));
-            free(j_response);
-            j_response = NULL;
-        }
-        else
-        {
-            TRACE_E("Error - j_response: %d", (uint32_t)j_response);
+            if (j_response)
+            {
+                web_provisioning_send_to_nma_websocket(j_response);
+                free(j_response);
+                j_response = NULL;
+            }
+            else
+            {
+                TRACE_E("Error - j_response: %d", (uint32_t)j_response);
+            }
         }
     }
     else

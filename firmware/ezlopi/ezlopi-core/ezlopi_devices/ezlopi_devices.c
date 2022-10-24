@@ -178,23 +178,27 @@ static void ezlopi_device_parse_json(char *config_string)
     }
 }
 
-uint16_t ezlopi_device_generate_device_id(void)
+static uint32_t device_id = 0;
+static uint32_t item_id = 0;
+static uint32_t room_id = 0;
+
+uint32_t ezlopi_device_generate_device_id(void)
 {
-    static uint16_t device_id;
-    device_id = (0 == device_id) ? 0xd001 : device_id + 1;
+    device_id = (0 == device_id) ? 0x30000001 : device_id + 1;
+    printf("device_id: %u\r\n", device_id);
     return device_id;
 }
 
-uint16_t ezlopi_device_generate_item_id(void)
+uint32_t ezlopi_device_generate_item_id(void)
 {
-    static uint16_t item_id;
-    item_id = (0 == item_id) ? 0x1001 : item_id + 1;
+    item_id = (0 == item_id) ? 0x20000001 : item_id + 1;
+    printf("item_id: %u\r\n", item_id);
     return item_id;
 }
 
-uint16_t ezlopi_device_generate_room_id(void)
+uint32_t ezlopi_device_generate_room_id(void)
 {
-    static uint16_t room_id;
-    room_id = (0 == room_id) ? 0x4001 : room_id + 1;
+    room_id = (0 == room_id) ? 0x10000001 : room_id + 1;
+    printf("room_id: %u\r\n", room_id);
     return room_id;
 }

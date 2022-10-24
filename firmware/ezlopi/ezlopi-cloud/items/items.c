@@ -70,10 +70,10 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
                                 if (cjson_properties)
                                 {
                                     char tmp_string[64];
-                                    snprintf(tmp_string, sizeof(tmp_string), "%d", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.item_id);
+                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.item_id);
                                     cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
-                                    snprintf(tmp_string, sizeof(tmp_string), "%d", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_id);
-                                    cJSON_AddStringToObject(cjson_properties, "deviceId", ezlopi_ezlopi_str);
+                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_id);
+                                    cJSON_AddStringToObject(cjson_properties, "deviceId", tmp_string);
                                     cJSON_AddStringToObject(cjson_properties, "deviceName", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_name);
                                     cJSON_AddTrueToObject(cjson_properties, "deviceArmed");
                                     cJSON_AddBoolToObject(cjson_properties, "hasGetter", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.has_getter);
@@ -81,8 +81,23 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
                                     cJSON_AddStringToObject(cjson_properties, "name", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.item_name);
                                     cJSON_AddTrueToObject(cjson_properties, "show");
                                     cJSON_AddStringToObject(cjson_properties, "valueType", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.value_type);
-                                    cJSON_AddStringToObject(cjson_properties, "valueType", (char *)ezlopi_device_list[dev_idx].func(EZLOPI_ACTION_GET_EZLOPI_VALUE, NULL));
-                                    cJSON_AddStringToObject(cjson_properties, "valueFormatted", "true");
+
+#if 0
+                                    switch (ezlopi_device_list[dev_idx].properties->ezlopi_cloud.value_type)
+                                    {
+                                        case :
+                                        {
+
+                                        }
+                                        default:
+                                        {
+                                            
+                                        }
+                                    }
+#endif
+
+                                    cJSON_AddStringToObject(cjson_properties, "value", (char *)ezlopi_device_list[dev_idx].func(EZLOPI_ACTION_GET_EZLOPI_VALUE, NULL));
+                                    cJSON_AddStringToObject(cjson_properties, "valueFormatted", "false");
                                     cJSON_AddStringToObject(cjson_properties, "status", "synced");
 
                                     if (!cJSON_AddItemToArray(cjson_items_array, cjson_properties))

@@ -14,7 +14,6 @@
 char *devices_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     char *string_response = NULL;
-
     cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
 
     if (cjson_request)
@@ -49,7 +48,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                 if (cjson_properties)
                                 {
                                     char tmp_string[64];
-                                    snprintf(tmp_string, sizeof(tmp_string), "%d", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_id);
+                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_id);
                                     cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
                                     cJSON_AddStringToObject(cjson_properties, "deviceTypeId", ezlopi_ezlopi_str);
                                     cJSON_AddStringToObject(cjson_properties, "parentDeviceId", "");
@@ -62,7 +61,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                     cJSON_AddBoolToObject(cjson_properties, "persistent", true);
                                     cJSON_AddBoolToObject(cjson_properties, "serviceNotification", false);
                                     cJSON_AddBoolToObject(cjson_properties, "armed", false);
-                                    snprintf(tmp_string, sizeof(tmp_string), "%d", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.room_id);
+                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.room_id);
                                     cJSON_AddStringToObject(cjson_properties, "roomId", tmp_string);
                                     cJSON_AddStringToObject(cjson_properties, "security", "");
                                     cJSON_AddBoolToObject(cjson_properties, "ready", true);
@@ -95,6 +94,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
+                printf("'%s' response:\r\n%s\r\n", method_hub_devices_list, string_response);
                 cJSON_Minify(string_response);
             }
 

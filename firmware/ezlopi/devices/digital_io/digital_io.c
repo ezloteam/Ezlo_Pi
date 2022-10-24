@@ -102,13 +102,15 @@ static int digital_io_prepare(void *arg)
             digital_io_device_properties->ezlopi_cloud.value_type = value_type_bool;
             digital_io_device_properties->ezlopi_cloud.has_getter = true;
             digital_io_device_properties->ezlopi_cloud.has_setter = true;
-            digital_io_device_properties->ezlopi_cloud.reachable = false;
+            digital_io_device_properties->ezlopi_cloud.reachable = true;
             digital_io_device_properties->ezlopi_cloud.battery_powered = false;
             digital_io_device_properties->ezlopi_cloud.show = true;
             digital_io_device_properties->ezlopi_cloud.room_name[0] = '\0';
             digital_io_device_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-            CJSON_GET_VALUE_INT(cjson_device, "id_room", digital_io_device_properties->ezlopi_cloud.room_id);
-            CJSON_GET_VALUE_INT(cjson_device, "id_item", digital_io_device_properties->ezlopi_cloud.item_id);
+            digital_io_device_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
+            digital_io_device_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+            // CJSON_GET_VALUE_INT(cjson_device, "id_room", digital_io_device_properties->ezlopi_cloud.room_id);
+            // CJSON_GET_VALUE_INT(cjson_device, "id_item", digital_io_device_properties->ezlopi_cloud.item_id);
 
             CJSON_GET_VALUE_INT(cjson_device, "is_ip", digital_io_device_properties->interface.gpio.gpio_in.enable);
             CJSON_GET_VALUE_INT(cjson_device, "gpio_in", digital_io_device_properties->interface.gpio.gpio_in.gpio_num);

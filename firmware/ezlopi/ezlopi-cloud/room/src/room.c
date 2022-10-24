@@ -4,11 +4,83 @@
 #include "trace.h"
 #include "frozen.h"
 #include "devices_common.h"
+#include "cJSON.h"
+#include "ezlopi_cloud_methods_str.h"
+#include "ezlopi_cloud_keywords.h"
+#include "ezlopi_devices_list.h"
 
-static const char *room_list_start = "{\"method\":\"hub.room.list\",\"msg_id\":%d,\"error\":null,\"id\":\"%.*s\",\"result\":[";
-static const char *room_list_room = "{\"_id\":\"b%.*s\", \"name\":\"%.*s\"}";
-static const char *room_list_end = "],\"sender\":%.*s}";
+char *room_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+{
+    char *string_response = NULL;
+    cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
 
+    if (cjson_request)
+    {
+        cJSON *id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
+        cJSON *sender = cJSON_GetObjectItem(cjson_request, ezlopi_sender_str);
+
+        cJSON *cjson_response = cJSON_CreateObject();
+        if (cjson_response)
+        {
+            cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_room_list);
+            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
+            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_id_str, id);
+            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_sender_str, sender);
+            cJSON_AddNullToObject(cjson_response, "error");
+
+            cJSON *cjson_result_array = cJSON_CreateArray();
+            if (cjson_result_array)
+            {
+                s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
+                if (ezlopi_device_list)
+                {
+                    int dev_idx = 0;
+                    while (EZLOPI_SENSOR_NONE != ezlopi_device_list[dev_idx].id)
+                    {
+                        if (NULL != ezlopi_device_list[dev_idx].properties)
+                        {
+                            cJSON *cjson_room_info = cJSON_CreateObject();
+                            if (cjson_room_info)
+                            {
+                                char tmp_string[64];
+                                snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.room_id);
+                                cJSON_AddStringToObject(cjson_room_info, "_id", tmp_string);
+                                cJSON_AddStringToObject(cjson_room_info, "name", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.room_name);
+
+                                if (!cJSON_AddItemToArray(cjson_result_array, cjson_room_info))
+                                {
+                                    cJSON_Delete(cjson_room_info);
+                                }
+                            }
+                        }
+
+                        dev_idx++;
+                    }
+                }
+
+                if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result_array))
+                {
+                    cJSON_Delete(cjson_result_array);
+                }
+            }
+
+            string_response = cJSON_Print(cjson_response);
+            if (string_response)
+            {
+                printf("'%s' response:\r\n%s\r\n", method_hub_room_list, string_response);
+                cJSON_Minify(string_response);
+            }
+
+            cJSON_Delete(cjson_response);
+        }
+
+        cJSON_Delete(cjson_request);
+    }
+
+    return string_response;
+}
+
+#if 0
 char *room_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     uint32_t buf_len = 2048;
@@ -57,3 +129,4 @@ char *room_list(const char *payload, uint32_t len, struct json_token *method, ui
 
     return send_buf;
 }
+#endif

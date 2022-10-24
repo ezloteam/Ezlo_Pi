@@ -76,9 +76,9 @@ typedef struct s_ezlopi_device_properties
 } s_ezlopi_device_properties_t;
 
 void ezlopi_device_init(void);
-uint16_t ezlopi_device_generate_device_id(void);
-uint16_t ezlopi_device_generate_item_id(void);
-uint16_t ezlopi_device_generate_room_id(void);
+uint32_t ezlopi_device_generate_device_id(void);
+uint32_t ezlopi_device_generate_item_id(void);
+uint32_t ezlopi_device_generate_room_id(void);
 
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
 

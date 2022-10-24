@@ -6,45 +6,102 @@
 #include "trace.h"
 #include "frozen.h"
 
-static const char *network_1_start = "{\"error\":null,\"msg_id\":%d,\"id\":\"%.*s\",\"method\":\"hub.network.get\",\"result\":{\"interfaces\":[";
-static const char *network_1_net = "{\"_id\":\"wifi\",\"enabled\":\"auto\",\"hwaddr\":\"%s\",\"internetAvailable\":true,"
-                                   "\"ipv4\":{\"gateway\":\"" IPSTR "\",\"ip\":\"" IPSTR "\",\"mask\":\"" IPSTR "\",\"mode\":\"dhcp\"},"
-                                   "\"network\":\"wan\",\"status\":\"up\",\"type\":\"wifi\"}";
-static const char *network_1_end = "]},\"sender\":%.*s}";
+#include "cJSON.h"
+#include "ezlopi_cloud_methods_str.h"
+#include "ezlopi_cloud_keywords.h"
 
-char *network_get(const char *data, uint32_t len, struct json_token *method_tok, uint32_t msg_count)
+#define MAC_ADDR_EXPANDED(mac) mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
+
+char *network_get(const char *payload, uint32_t len, struct json_token *method_tok, uint32_t msg_count)
 {
-    uint32_t buf_len = 2048;
-    char *send_buf = (char *)malloc(buf_len);
+    char *string_response = NULL;
+    cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
 
-    if (send_buf)
+    if (cjson_request)
     {
-        char mac_str[20];
-        uint8_t mac_addr[6];
-        esp_netif_ip_info_t *ip_info = ezlopi_wifi_get_ip_infos();
+        cJSON *id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
+        cJSON *sender = cJSON_GetObjectItem(cjson_request, ezlopi_sender_str);
 
-        esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
-        snprintf(mac_str, sizeof(mac_str), "%02x:%02x:%02x:%02x:%02x:%02x",
-                 mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+        cJSON *cjson_response = cJSON_CreateObject();
+        if (cjson_response)
+        {
+            cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_network_get);
+            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
+            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_id_str, id);
+            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_sender_str, sender);
+            cJSON_AddNullToObject(cjson_response, "error");
 
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        json_scanf(data, len, "{id: %T}", &msg_id);
+            cJSON *cjson_result = cJSON_CreateObject();
+            if (cjson_result)
+            {
+                cJSON *interfaces_array = cJSON_CreateArray();
+                if (interfaces_array)
+                {
+                    cJSON *wifi_properties = cJSON_CreateObject();
+                    if (wifi_properties)
+                    {
+                        char tmp_string[64];
+                        cJSON_AddStringToObject(wifi_properties, "_id", "wifi");
+                        cJSON_AddStringToObject(wifi_properties, "enabled", "auto");
 
-        struct json_token sender = JSON_INVALID_TOKEN;
-        int sender_state = json_scanf(data, len, "{sender: %T}", &sender);
+                        uint8_t mac_addr[6];
+                        esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
+                        snprintf(tmp_string, sizeof(tmp_string), "%02x:%02x:%02x:%02x:%02x:%02x", MAC_ADDR_EXPANDED(mac_addr));
+                        cJSON_AddStringToObject(wifi_properties, "hwaddr", tmp_string);
+                        cJSON_AddBoolToObject(wifi_properties, "internetAvailable", true);
+                        cJSON_AddStringToObject(wifi_properties, "network", "wan");
+                        cJSON_AddStringToObject(wifi_properties, "status", "up");
+                        cJSON_AddStringToObject(wifi_properties, "type", "wifi");
 
-        memset(send_buf, 0, buf_len);
+                        cJSON *wifi_ipv4 = cJSON_CreateObject();
+                        if (wifi_ipv4)
+                        {
+                            esp_netif_ip_info_t *ip_info = ezlopi_wifi_get_ip_infos();
+                            snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->gw));
+                            cJSON_AddStringToObject(wifi_ipv4, "ip", tmp_string);
+                            snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->ip));
+                            cJSON_AddStringToObject(wifi_ipv4, "mask", tmp_string);
+                            snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->netmask));
+                            cJSON_AddStringToObject(wifi_ipv4, "gateway", tmp_string);
+                            cJSON_AddStringToObject(wifi_ipv4, "mode", "dhcp");
 
-        snprintf(send_buf, buf_len, network_1_start, msg_count, msg_id.len, msg_id.ptr);
-        snprintf(send_buf + strlen(send_buf), buf_len - strlen(send_buf), network_1_net, mac_str,
-                 IP2STR(&ip_info->gw),       // ip4addr_ntoa((const ip4_addr_t *)&ip_info->gw.addr),
-                 IP2STR(&ip_info->ip),       // ip4addr_ntoa((const ip4_addr_t *)&ip_info->ip.addr),
-                 IP2STR(&ip_info->netmask)); // ip4addr_ntoa((const ip4_addr_t *)&ip_info->netmask.addr));
+                            if (!cJSON_AddItemToObjectCS(wifi_properties, "ipv4", wifi_ipv4))
+                            {
+                                cJSON_Delete(wifi_ipv4);
+                                wifi_ipv4 = NULL;
+                            }
+                        }
 
-        snprintf(send_buf + strlen(send_buf), buf_len - strlen(send_buf), network_1_end, sender_state ? sender.len : 2, sender_state ? sender.ptr : "{}");
+                        if (!cJSON_AddItemToArray(interfaces_array, wifi_properties))
+                        {
+                            cJSON_Delete(wifi_properties);
+                        }
+                    }
 
-        TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method_tok->len, method_tok->ptr, strlen(send_buf), send_buf);
+                    if (!cJSON_AddItemToObjectCS(cjson_result, "interfaces", interfaces_array))
+                    {
+                        cJSON_Delete(interfaces_array);
+                    }
+                }
+
+                if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result))
+                {
+                    cJSON_Delete(cjson_result);
+                }
+            }
+
+            string_response = cJSON_Print(cjson_response);
+            if (string_response)
+            {
+                printf("'%s' response:\r\n%s\r\n", method_hub_network_get, string_response);
+                cJSON_Minify(string_response);
+            }
+
+            cJSON_Delete(cjson_response);
+        }
+
+        cJSON_Delete(cjson_request);
     }
 
-    return send_buf;
+    return string_response;
 }
