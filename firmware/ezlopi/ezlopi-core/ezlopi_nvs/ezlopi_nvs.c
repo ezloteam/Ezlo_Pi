@@ -118,7 +118,7 @@ void ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
 {
     size_t required_size;
     esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, "wifi_info", NULL, &required_size);
-    if (len >= required_size)
+    if ((ESP_OK == err) && (len >= required_size))
     {
         err = nvs_get_blob(ezlopi_nvs_handle, "wifi_info", wifi_info, &required_size);
         TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
@@ -129,7 +129,7 @@ void ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
     }
     else
     {
-        TRACE_E("'wifi config' read-lenght error!");
+        TRACE_E("'wifi config' read-lenght error!, Required: %d | %d, Error: %s", required_size, len, esp_err_to_name(err));
     }
 }
 

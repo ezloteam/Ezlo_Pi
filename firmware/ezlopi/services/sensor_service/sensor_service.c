@@ -25,7 +25,7 @@ static void event_process(void *pv)
     int idx = 0;
     while (NULL != sensor_list[idx].func)
     {
-        sensor_list[idx].func(EZLOPI_ACTION_INITIALIZE, NULL);
+        sensor_list[idx].func(EZLOPI_ACTION_INITIALIZE, sensor_list[idx].properties, NULL);
         idx++;
     }
 
@@ -46,7 +46,7 @@ static void event_process(void *pv)
                 idx = 0;
                 while (NULL != sensor_list[idx].func)
                 {
-                    sensor_list[idx].func(event->action, event->arg);
+                    sensor_list[idx].func(event->action, sensor_list[idx].properties, event->arg);
                     idx++;
                 }
             }

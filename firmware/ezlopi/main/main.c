@@ -17,6 +17,7 @@
 #include "ezlopi.h"
 #include "qt_serial.h"
 #include "web_provisioning.h"
+#include "gatt_server.h"
 
 static void blinky(void *pv);
 
@@ -27,6 +28,7 @@ void app_main(void)
     qt_serial_init();
     ezlopi_init();
     web_provisioning_init();
+    GATT_SERVER_MAIN();
     // sensor_service_init();
     // ezlopi_timer_start_500ms();
     // sensor_bme280(EZLOPI_ACTION_INITIALIZE, NULL);
@@ -60,12 +62,13 @@ static void blinky(void *pv)
 
         vTaskDelay(1000 / portTICK_RATE_MS);
 
-        if (count++ > 50)
+        if (count++ > 10)
         {
             TRACE_D("-----------------------------------------");
             TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
             TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
             TRACE_D("-----------------------------------------");
+            count = 0;
         }
 
         // s_ezlo_event_t *event = malloc(sizeof(s_ezlo_event_t));

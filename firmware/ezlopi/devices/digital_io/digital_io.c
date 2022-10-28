@@ -19,8 +19,10 @@ static int digital_io_init();
 static int8_t digital_io_get_value(char *sensor_data);
 static int digital_io_notify_30_seconds(void);
 static int digital_io_prepare(void *arg);
+static int digital_io_get_ezlopi_value(s_ezlopi_device_properties_t *properties, void *arg);
+static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg);
 
-static s_ezlopi_device_properties_t *digital_io_device_properties = NULL;
+// static s_ezlopi_device_properties_t *digital_io_device_properties = NULL;
 
 /**
  * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
@@ -29,7 +31,7 @@ static s_ezlopi_device_properties_t *digital_io_device_properties = NULL;
  * @param arg Other arguments if needed
  * @return int
  */
-int digital_io(e_ezlopi_actions_t action, void *arg)
+int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
 
@@ -44,9 +46,13 @@ int digital_io(e_ezlopi_actions_t action, void *arg)
     case EZLOPI_ACTION_GET_VALUE:
     {
         TRACE_I("EZLOPI_ACTION_GET_VALUE event.");
-        char *data = (char *)malloc(100);
-        ret = digital_io_get_value(data);
-        TRACE_I("The string is: %s", data);
+        ret = digital_io_get_value(NULL);
+        break;
+    }
+    case EZLOPI_ACTION_SET_VALUE:
+    {
+        TRACE_I("EZLOPI_ACTION_SET_VALUE event.");
+        ret = digital_io_set_value(properties, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_500_MS:
@@ -63,8 +69,7 @@ int digital_io(e_ezlopi_actions_t action, void *arg)
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        const static char *mock_value = "true";
-        ret = (int)mock_value;
+        ret = digital_io_get_ezlopi_value(properties, arg);
     }
     default:
     {
@@ -76,11 +81,25 @@ int digital_io(e_ezlopi_actions_t action, void *arg)
     return ret;
 }
 
+static int digital_io_get_ezlopi_value(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        ret = 1;
+    }
+
+    return ret;
+}
+
 // Must type cast the 'digital_io_device_properties' to 'int' and return
 static int digital_io_prepare(void *arg)
 {
     int ret;
     cJSON *cjson_device = (cJSON *)arg;
+    s_ezlopi_device_properties_t *digital_io_device_properties = NULL;
 
     if ((NULL == digital_io_device_properties) && (NULL != cjson_device))
     {
@@ -130,8 +149,6 @@ static int digital_io_prepare(void *arg)
         }
     }
 
-    ezlopi_device_print_properties(digital_io_device_properties);
-
     return ((int)digital_io_device_properties);
 }
 
@@ -141,9 +158,20 @@ static int8_t digital_io_get_value(char *sensor_data)
     return ret;
 }
 
-static int digital_io_set_value(void *arg)
+static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
+    cJSON *cjson_params = (cJSON *)arg;
+
+    int value = 0;
+    CJSON_GET_VALUE_INT(cjson_params, "value", value);
+
+    TRACE_I("item_name: %s", properties->ezlopi_cloud.item_name);
+    TRACE_I("gpio_num: %d", properties->interface.gpio.gpio_out.gpio_num);
+    TRACE_I("item_id: %d", properties->ezlopi_cloud.item_id);
+    TRACE_I("prev value: %d", properties->interface.gpio.gpio_out.value);
+    TRACE_I("cur value: %d", value);
+    properties->interface.gpio.gpio_out.value = value;
 
     return ret;
 }

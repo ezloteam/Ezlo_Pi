@@ -66,7 +66,8 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                     cJSON_AddStringToObject(cjson_properties, "security", "");
                                     cJSON_AddBoolToObject(cjson_properties, "ready", true);
                                     cJSON_AddStringToObject(cjson_properties, "status", "synced");
-                                    cJSON_AddStringToObject(cjson_properties, "info", "{}");
+                                    // cJSON_AddStringToObject(cjson_properties, "info", "{}");
+                                    cJSON_AddObjectToObject(cjson_properties, "info");
 
                                     if (!cJSON_AddItemToArray(cjson_devices_array, cjson_properties))
                                     {

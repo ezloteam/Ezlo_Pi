@@ -60,13 +60,14 @@ s_ezlopi_device_t *ezlopi_devices_list_get_list(void)
 static l_ezlopi_configured_devices_t *device_list = NULL;
 static l_ezlopi_configured_devices_t *ezlopi_device_list_create(s_ezlopi_device_t *device);
 
-l_ezlopi_configured_devices_t *ezlopi_sensor_get_configured_items(void)
+l_ezlopi_configured_devices_t *ezlopi_devices_get_configured_items(void)
 {
     return device_list;
 }
 
-void ezlopi_devices_list_add(s_ezlopi_device_t *device)
+int ezlopi_devices_list_add(s_ezlopi_device_t *device)
 {
+    int ret = 0;
     if (device_list)
     {
         l_ezlopi_configured_devices_t *current_dev = device_list;
@@ -76,11 +77,17 @@ void ezlopi_devices_list_add(s_ezlopi_device_t *device)
             current_dev = current_dev->next;
         }
         current_dev->next = ezlopi_device_list_create(device);
+        if (current_dev->next)
+            ret = 1;
     }
     else
     {
         device_list = ezlopi_device_list_create(device);
+        if (device_list)
+            ret = 1;
     }
+
+    return ret;
 }
 
 static l_ezlopi_configured_devices_t *ezlopi_device_list_create(s_ezlopi_device_t *device)

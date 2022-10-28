@@ -171,8 +171,9 @@ void ezlopi_wifi_connect_from_nvs(void)
 
     if (wifi_info[0] == 0)
     {
-        strcpy(wifi_info, "krishna home_wlink");
-        strcpy(&wifi_info[32], "coldWinter");
+        strcpy(wifi_info, "Asialinks travels & tours");
+        strcpy(&wifi_info[32], "Tours       ");
+        ezlopi_wifi_set_new_wifi_flag();
     }
     ezlopi_wifi_connect(&wifi_info[0], &wifi_info[32]);
 }

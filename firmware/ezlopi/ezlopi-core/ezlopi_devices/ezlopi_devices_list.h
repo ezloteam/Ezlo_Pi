@@ -17,18 +17,18 @@
  *
  */
 // int sensor_bme280(e_ezlopi_actions_t action, void *arg);
-typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, void *arg);
+typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg);
 typedef struct s_ezlopi_device
 {
-    uint16_t id;
+    uint32_t id;
     f_sensor_call_t func;
-    // bool is_configured;
     s_ezlopi_device_properties_t *properties;
 } s_ezlopi_device_t;
 
 typedef struct l_ezlopi_configured_devices
 {
     struct l_ezlopi_configured_devices *next;
+    s_ezlopi_device_properties_t *properties;
     s_ezlopi_device_t *device;
 } l_ezlopi_configured_devices_t;
 
@@ -39,8 +39,9 @@ typedef struct l_ezlopi_configured_devices
  */
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void);
 
-void ezlopi_devices_list_add(s_ezlopi_device_t *device);
-l_ezlopi_configured_devices_t *ezlopi_sensor_get_configured_items(void);
+// void ezlopi_devices_list_add(s_ezlopi_device_t *device);
+int ezlopi_devices_list_add(s_ezlopi_device_t *device);
+l_ezlopi_configured_devices_t *ezlopi_devices_get_configured_items(void);
 
 #if 0
 /**

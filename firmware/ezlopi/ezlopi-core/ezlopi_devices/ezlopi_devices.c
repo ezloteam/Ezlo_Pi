@@ -28,6 +28,7 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
 {
     if (device)
     {
+        TRACE_B("***************************************************************************************************");
         TRACE_D("device->ezlopi_cloud.device_name: %.*s", sizeof(device->ezlopi_cloud.device_name), device->ezlopi_cloud.device_name);
         TRACE_D("device->ezlopi_cloud.category: %s", device->ezlopi_cloud.category ? device->ezlopi_cloud.category : "");
         TRACE_D("device->ezlopi_cloud.subcategory: %s", device->ezlopi_cloud.subcategory ? device->ezlopi_cloud.subcategory : "");
@@ -44,31 +45,34 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         TRACE_D("device->ezlopi_cloud.room_id: %d", device->ezlopi_cloud.room_id);
         TRACE_D("device->ezlopi_cloud.item_id: %d", device->ezlopi_cloud.item_id);
 
-        TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_in.gpio_num: %d", device->interface.gpio.gpio_in.gpio_num);
-        TRACE_D("device->interface.gpio.gpio_in.invert: %s", device->interface.gpio.gpio_in.invert ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_in.value: %d", device->interface.gpio.gpio_in.value);
-        TRACE_D("device->interface.gpio.gpio_in.pull: %d", device->interface.gpio.gpio_in.pull);
-        TRACE_D("device->interface.gpio.gpio_in.interrupt: %d", device->interface.gpio.gpio_in.interrupt);
+        switch (device->interface_type)
+        {
+        case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
+        case EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT:
+        {
+            TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
+            TRACE_D("device->interface.gpio.gpio_in.gpio_num: %d", device->interface.gpio.gpio_in.gpio_num);
+            TRACE_D("device->interface.gpio.gpio_in.invert: %s", device->interface.gpio.gpio_in.invert ? "true" : "false");
+            TRACE_D("device->interface.gpio.gpio_in.value: %d", device->interface.gpio.gpio_in.value);
+            TRACE_D("device->interface.gpio.gpio_in.pull: %d", device->interface.gpio.gpio_in.pull);
+            TRACE_D("device->interface.gpio.gpio_in.interrupt: %d", device->interface.gpio.gpio_in.interrupt);
 
-        TRACE_D("device->interface.gpio.gpio_out.enable: %s", device->interface.gpio.gpio_out.enable ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_out.gpio_num: %d", device->interface.gpio.gpio_out.gpio_num);
-        TRACE_D("device->interface.gpio.gpio_out.invert: %s", device->interface.gpio.gpio_out.invert ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_out.value: %d", device->interface.gpio.gpio_out.value);
-        TRACE_D("device->interface.gpio.gpio_out.pull: %d", device->interface.gpio.gpio_out.pull);
-        TRACE_D("device->interface.gpio.gpio_in.interrupt: %d", device->interface.gpio.gpio_in.interrupt);
-
-        TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
-        TRACE_D("device->interface.gpio.gpio_in.enable: %s", device->interface.gpio.gpio_in.enable ? "true" : "false");
-        TRACE_D("device->ezlopi_cloud.subcategory: %s", device->ezlopi_cloud.subcategory ? device->ezlopi_cloud.subcategory : "");
-        TRACE_D("device->ezlopi_cloud.subcategory: %s", device->ezlopi_cloud.subcategory ? device->ezlopi_cloud.subcategory : "");
-        TRACE_D("device->ezlopi_cloud.subcategory: %s", device->ezlopi_cloud.subcategory ? device->ezlopi_cloud.subcategory : "");
-        TRACE_D("device->ezlopi_cloud.subcategory: %s", device->ezlopi_cloud.subcategory ? device->ezlopi_cloud.subcategory : "");
-        TRACE_D("device->ezlopi_cloud.subcategory: %s", device->ezlopi_cloud.subcategory ? device->ezlopi_cloud.subcategory : "");
+            TRACE_D("device->interface.gpio.gpio_out.enable: %s", device->interface.gpio.gpio_out.enable ? "true" : "false");
+            TRACE_D("device->interface.gpio.gpio_out.gpio_num: %d", device->interface.gpio.gpio_out.gpio_num);
+            TRACE_D("device->interface.gpio.gpio_out.invert: %s", device->interface.gpio.gpio_out.invert ? "true" : "false");
+            TRACE_D("device->interface.gpio.gpio_out.value: %d", device->interface.gpio.gpio_out.value);
+            TRACE_D("device->interface.gpio.gpio_out.pull: %d", device->interface.gpio.gpio_out.pull);
+            TRACE_D("device->interface.gpio.gpio_in.interrupt: %d", device->interface.gpio.gpio_in.interrupt);
+            TRACE_B("###################################################################################################");
+            break;
+        }
+        case EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT:
+        case EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT:
+        default:
+        {
+            break;
+        }
+        }
     }
 }
 
@@ -161,13 +165,36 @@ static void ezlopi_device_parse_json(char *config_string)
                     {
                         if (id_item == sensor_list[dev_idx].id)
                         {
-                            sensor_list[dev_idx].properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, (void *)cjson_device);
+                            sensor_list[dev_idx].properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)cjson_device);
+                            TRACE_B("sensor_list[%d].properties: %d", dev_idx, (int)sensor_list[dev_idx].properties);
+
+                            if (sensor_list[dev_idx].properties)
+                            {
+                                if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx]))
+                                {
+                                    // free(sensor_list[dev_idx].properties);
+                                    // sensor_list[dev_idx].properties = NULL;
+                                }
+
+                                // ezlopi_device_print_properties(sensor_list[dev_idx].properties);
+                            }
                         }
+
                         dev_idx++;
                     }
-                }
 
-                // ezlopi_device_map_devices(cjson_device);
+                    l_ezlopi_configured_devices_t *current_head = ezlopi_devices_get_configured_items();
+                    if (current_head)
+                    {
+                        TRACE_D("Print properties here:");
+                        ezlopi_device_print_properties(current_head->device->properties);
+
+                        while (NULL != current_head->next)
+                        {
+                            ezlopi_device_print_properties(current_head->next->device->properties);
+                        }
+                    }
+                }
 
                 config_dev_idx++;
                 TRACE_B("---------------------------------------------");
