@@ -147,11 +147,7 @@ static void ezlopi_device_parse_json(char *config_string)
 
                 char *device_name = NULL;
                 CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-
-                if (NULL != device_name)
-                {
-                    TRACE_D("device name: %s", device_name);
-                }
+                TRACE_D("device name: %s", device_name ? device_name : "");
 
                 int id_item = 0;
                 CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
@@ -165,34 +161,26 @@ static void ezlopi_device_parse_json(char *config_string)
                     {
                         if (id_item == sensor_list[dev_idx].id)
                         {
-                            sensor_list[dev_idx].properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)cjson_device);
-                            TRACE_B("sensor_list[%d].properties: %d", dev_idx, (int)sensor_list[dev_idx].properties);
+                            s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)cjson_device);
+                            TRACE_B("%d-properties: %d", dev_idx, (int)properties);
 
-                            if (sensor_list[dev_idx].properties)
+                            if (properties)
                             {
-                                if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx]))
+                                if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx], properties))
                                 {
-                                    // free(sensor_list[dev_idx].properties);
-                                    // sensor_list[dev_idx].properties = NULL;
+                                    free(properties);
                                 }
-
-                                // ezlopi_device_print_properties(sensor_list[dev_idx].properties);
                             }
                         }
 
                         dev_idx++;
                     }
 
-                    l_ezlopi_configured_devices_t *current_head = ezlopi_devices_get_configured_items();
-                    if (current_head)
+                    l_ezlopi_configured_devices_t *current_head = ezlopi_devices_list_get_configured_items();
+                    while (NULL != current_head)
                     {
-                        TRACE_D("Print properties here:");
-                        ezlopi_device_print_properties(current_head->device->properties);
-
-                        while (NULL != current_head->next)
-                        {
-                            ezlopi_device_print_properties(current_head->next->device->properties);
-                        }
+                        ezlopi_device_print_properties(current_head->properties);
+                        current_head = current_head->next;
                     }
                 }
 

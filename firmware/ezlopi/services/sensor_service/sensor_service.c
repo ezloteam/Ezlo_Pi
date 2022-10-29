@@ -20,13 +20,11 @@ void sensor_service_init(void)
 
 static void event_process(void *pv)
 {
-    const s_ezlopi_device_t *sensor_list = ezlopi_devices_list_get_list();
-
-    int idx = 0;
-    while (NULL != sensor_list[idx].func)
+    l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
+    while (NULL != registered_device)
     {
-        sensor_list[idx].func(EZLOPI_ACTION_INITIALIZE, sensor_list[idx].properties, NULL);
-        idx++;
+        registered_device->device->func(EZLOPI_ACTION_INITIALIZE, registered_device->properties, NULL);
+        registered_device = registered_device->next;
     }
 
     int old_tick = xTaskGetTickCount();
@@ -43,11 +41,11 @@ static void event_process(void *pv)
             {
                 printf("action received: %s\n", ezlopi_actions_to_string(event->action));
 
-                idx = 0;
-                while (NULL != sensor_list[idx].func)
+                registered_device = ezlopi_devices_list_get_configured_items();
+                while (NULL != registered_device)
                 {
-                    sensor_list[idx].func(event->action, sensor_list[idx].properties, event->arg);
-                    idx++;
+                    registered_device->device->func(event->action, registered_device->properties, event->arg);
+                    registered_device = registered_device->next;
                 }
             }
             else

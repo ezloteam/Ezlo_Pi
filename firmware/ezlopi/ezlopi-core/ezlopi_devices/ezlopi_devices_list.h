@@ -22,7 +22,7 @@ typedef struct s_ezlopi_device
 {
     uint32_t id;
     f_sensor_call_t func;
-    s_ezlopi_device_properties_t *properties;
+    // s_ezlopi_device_properties_t *properties;
 } s_ezlopi_device_t;
 
 typedef struct l_ezlopi_configured_devices
@@ -40,8 +40,9 @@ typedef struct l_ezlopi_configured_devices
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void);
 
 // void ezlopi_devices_list_add(s_ezlopi_device_t *device);
-int ezlopi_devices_list_add(s_ezlopi_device_t *device);
-l_ezlopi_configured_devices_t *ezlopi_devices_get_configured_items(void);
+// int ezlopi_devices_list_add(s_ezlopi_device_t *device);
+int ezlopi_devices_list_add(s_ezlopi_device_t *device, s_ezlopi_device_properties_t *properties);
+l_ezlopi_configured_devices_t *ezlopi_devices_list_get_configured_items(void);
 
 #if 0
 /**

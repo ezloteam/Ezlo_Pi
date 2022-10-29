@@ -4,6 +4,7 @@
 /*****************************************************************************************
  *                                     Methods                                           *
  *****************************************************************************************/
+const static char *method_hub_item_updated = "hub.item.updated";
 const static char *method_add_device = "addDevice";
 const static char *method_add_all_devices = "addAllDevices";
 const static char *method_cloud_firmware_info_get = "cloud.firmware.info.get";

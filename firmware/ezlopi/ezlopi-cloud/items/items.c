@@ -46,44 +46,47 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
                 if (cjson_items_array)
                 {
 
-                    s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
-                    if (ezlopi_device_list)
+                    // s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
+                    // if (ezlopi_device_list)
+                    // {
+                    //     int dev_idx = 0;
+                    l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
+                    while (NULL != registered_device)
                     {
-                        int dev_idx = 0;
-                        while (EZLOPI_SENSOR_NONE != ezlopi_device_list[dev_idx].id)
+                        if (NULL != registered_device->properties)
                         {
-                            if (NULL != ezlopi_device_list[dev_idx].properties)
+                            cJSON *cjson_properties = cJSON_CreateObject();
+                            if (cjson_properties)
                             {
-                                cJSON *cjson_properties = cJSON_CreateObject();
-                                if (cjson_properties)
+                                char tmp_string[64];
+                                snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.item_id);
+                                cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
+                                snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.device_id);
+                                cJSON_AddStringToObject(cjson_properties, "deviceId", tmp_string);
+                                cJSON_AddStringToObject(cjson_properties, "deviceName", registered_device->properties->ezlopi_cloud.device_name);
+                                cJSON_AddTrueToObject(cjson_properties, "deviceArmed");
+                                cJSON_AddBoolToObject(cjson_properties, "hasGetter", registered_device->properties->ezlopi_cloud.has_getter);
+                                cJSON_AddBoolToObject(cjson_properties, "hasSetter", registered_device->properties->ezlopi_cloud.has_setter);
+                                cJSON_AddStringToObject(cjson_properties, "name", registered_device->properties->ezlopi_cloud.item_name);
+                                cJSON_AddTrueToObject(cjson_properties, "show");
+                                cJSON_AddStringToObject(cjson_properties, "valueType", registered_device->properties->ezlopi_cloud.value_type);
+
+                                registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_properties);
+                                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "false");
+                                cJSON_AddStringToObject(cjson_properties, "status", "synced");
+
+                                if (!cJSON_AddItemToArray(cjson_items_array, cjson_properties))
                                 {
-                                    char tmp_string[64];
-                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.item_id);
-                                    cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
-                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_id);
-                                    cJSON_AddStringToObject(cjson_properties, "deviceId", tmp_string);
-                                    cJSON_AddStringToObject(cjson_properties, "deviceName", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.device_name);
-                                    cJSON_AddTrueToObject(cjson_properties, "deviceArmed");
-                                    cJSON_AddBoolToObject(cjson_properties, "hasGetter", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.has_getter);
-                                    cJSON_AddBoolToObject(cjson_properties, "hasSetter", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.has_setter);
-                                    cJSON_AddStringToObject(cjson_properties, "name", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.item_name);
-                                    cJSON_AddTrueToObject(cjson_properties, "show");
-                                    cJSON_AddStringToObject(cjson_properties, "valueType", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.value_type);
-
-                                    ezlopi_device_list[dev_idx].func(EZLOPI_ACTION_GET_EZLOPI_VALUE, ezlopi_device_list[dev_idx].properties, cjson_properties);
-                                    cJSON_AddStringToObject(cjson_properties, "valueFormatted", "false");
-                                    cJSON_AddStringToObject(cjson_properties, "status", "synced");
-
-                                    if (!cJSON_AddItemToArray(cjson_items_array, cjson_properties))
-                                    {
-                                        cJSON_Delete(cjson_properties);
-                                    }
+                                    cJSON_Delete(cjson_properties);
                                 }
                             }
-
-                            dev_idx++;
                         }
+
+                        registered_device = registered_device->next;
+
+                        // dev_idx++;
                     }
+                    // }
 
                     if (!cJSON_AddItemToObjectCS(cjson_result, "items", cjson_items_array))
                     {
@@ -133,21 +136,22 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
             int item_id = strtol(item_id_str, NULL, 16);
             TRACE_I("item_id: %d | %X", item_id, item_id);
 
-            s_ezlopi_device_t *device_list = ezlopi_devices_list_get_list();
-            if (device_list)
+            // s_ezlopi_device_t *device_list = ezlopi_devices_list_get_list();
+            // if (device_list)
+            // {
+            //     int idx = 0;
+            l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
+            while (NULL != registered_device)
             {
-                int idx = 0;
-                while (device_list[idx].func)
+                if (registered_device->properties)
                 {
-                    if (device_list[idx].properties)
+                    if (item_id == registered_device->properties->ezlopi_cloud.item_id)
                     {
-                        if (item_id == device_list[idx].properties->ezlopi_cloud.item_id)
-                        {
-                            device_list[idx].func(EZLOPI_ACTION_SET_VALUE, device_list[idx].properties, cjson_params);
-                        }
+                        registered_device->device->func(EZLOPI_ACTION_SET_VALUE, registered_device->properties, cjson_params);
                     }
-                    idx++;
                 }
+
+                registered_device = registered_device->next;
             }
         }
 
@@ -179,12 +183,9 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
 char *items_update(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     char *string_response = NULL;
-    TRACE_I("1");
-
     cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
     if (cjson_request)
     {
-        TRACE_I("2");
         cJSON *cjson_id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
         cJSON *cjson_sender = cJSON_GetObjectItem(cjson_request, "sender");
         cJSON *cjson_params = cJSON_GetObjectItem(cjson_request, "params");
@@ -193,69 +194,57 @@ char *items_update(const char *payload, uint32_t len, struct json_token *method,
 
         if (cjson_params)
         {
-
-            TRACE_I("3");
             CJSON_GET_VALUE_STRING(cjson_params, ezlopi__id_str, item_id_str);
             int item_id = strtol(item_id_str, NULL, 16);
             TRACE_I("item_id: %d | %X", item_id, item_id);
+            l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
 
-            s_ezlopi_device_t *device_list = ezlopi_devices_list_get_list();
-            if (device_list)
+            while (NULL != registered_device)
             {
-                TRACE_I("4");
-                int idx = 0;
-                while (device_list[idx].func)
+                if (NULL != registered_device->properties)
                 {
-                    TRACE_I("5");
-                    if (device_list[idx].properties)
+                    if (item_id == registered_device->properties->ezlopi_cloud.item_id)
                     {
-                        TRACE_I("6");
-                        if (item_id == device_list[idx].properties->ezlopi_cloud.item_id)
+                        cJSON *cjson_response = cJSON_CreateObject();
+                        if (cjson_response)
                         {
-                            TRACE_I("7");
-                            cJSON *cjson_response = cJSON_CreateObject();
-                            if (cjson_response)
+                            cJSON_AddStringToObject(cjson_response, "msg_subclass", method_hub_item_updated);
+                            cJSON_AddNumberToObject(cjson_response, "msg_id", msg_count);
+                            cJSON_AddStringToObject(cjson_response, "id", "ui_broadcast");
+                            cJSON *cjson_result = cJSON_AddObjectToObject(cjson_response, "result");
+                            if (cjson_result)
                             {
-                                cJSON_AddStringToObject(cjson_response, "msg_subclass", "hub.item.updated");
-                                cJSON_AddNumberToObject(cjson_response, "msg_id", msg_count);
-                                cJSON_AddStringToObject(cjson_response, "id", "ui_broadcast");
-                                // cJSON_AddNullToObject(cjson_response, "error");
-                                cJSON *cjson_result = cJSON_AddObjectToObject(cjson_response, "result");
-                                if (cjson_result)
-                                {
-                                    TRACE_I("8");
-                                    cJSON_AddStringToObject(cjson_result, "_id", item_id_str);
-                                    char tmp_string[64];
-                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", device_list[idx].properties->ezlopi_cloud.device_id);
-                                    cJSON_AddStringToObject(cjson_result, "deviceId", tmp_string);
-                                    cJSON_AddStringToObject(cjson_result, "deviceName", device_list[idx].properties->ezlopi_cloud.device_name);
-                                    cJSON_AddStringToObject(cjson_result, "deviceCategory", device_list[idx].properties->ezlopi_cloud.category);
-                                    cJSON_AddStringToObject(cjson_result, "deviceSubcategory", device_list[idx].properties->ezlopi_cloud.subcategory);
-                                    cJSON_AddStringToObject(cjson_result, "roomName", device_list[idx].properties->ezlopi_cloud.room_name);
-                                    cJSON_AddFalseToObject(cjson_result, "serviceNotification");
-                                    cJSON_AddFalseToObject(cjson_result, "userNotification");
-                                    cJSON_AddNullToObject(cjson_result, "notifications");
-                                    cJSON_AddStringToObject(cjson_result, "name", device_list[idx].properties->ezlopi_cloud.item_name);
-                                    device_list[idx].func(EZLOPI_ACTION_GET_EZLOPI_VALUE, device_list[idx].properties, cjson_result);
-                                    cJSON_AddStringToObject(cjson_result, "valueType", device_list[idx].properties->ezlopi_cloud.value_type);
-                                }
-
-                                string_response = cJSON_Print(cjson_response);
-                                if (string_response)
-                                {
-                                    TRACE_I("9");
-                                    TRACE_B("'hub.items.update' response: %s", string_response);
-                                    cJSON_Minify(string_response);
-                                }
-
-                                cJSON_Delete(cjson_response);
+                                cJSON_AddStringToObject(cjson_result, "_id", item_id_str);
+                                char tmp_string[64];
+                                snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.device_id);
+                                cJSON_AddStringToObject(cjson_result, "deviceId", tmp_string);
+                                cJSON_AddStringToObject(cjson_result, "deviceName", registered_device->properties->ezlopi_cloud.device_name);
+                                cJSON_AddStringToObject(cjson_result, "deviceCategory", registered_device->properties->ezlopi_cloud.category);
+                                cJSON_AddStringToObject(cjson_result, "deviceSubcategory", registered_device->properties->ezlopi_cloud.subcategory);
+                                cJSON_AddStringToObject(cjson_result, "roomName", registered_device->properties->ezlopi_cloud.room_name);
+                                cJSON_AddFalseToObject(cjson_result, "serviceNotification");
+                                cJSON_AddFalseToObject(cjson_result, "userNotification");
+                                cJSON_AddNullToObject(cjson_result, "notifications");
+                                cJSON_AddStringToObject(cjson_result, "name", registered_device->properties->ezlopi_cloud.item_name);
+                                registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_result);
+                                cJSON_AddStringToObject(cjson_result, "valueType", registered_device->properties->ezlopi_cloud.value_type);
                             }
 
-                            break;
+                            string_response = cJSON_Print(cjson_response);
+                            if (string_response)
+                            {
+                                TRACE_B("'hub.items.update' response: %s", string_response);
+                                cJSON_Minify(string_response);
+                            }
+
+                            cJSON_Delete(cjson_response);
                         }
+
+                        break;
                     }
-                    idx++;
                 }
+
+                registered_device = registered_device->next;
             }
         }
 
@@ -266,55 +255,6 @@ char *items_update(const char *payload, uint32_t len, struct json_token *method,
 }
 
 #if 0
-char *items_set_value_old(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
-{
-    uint32_t buf_len = 400;
-    char *send_buf = (char *)malloc(buf_len);
-
-    if (send_buf)
-    {
-        memset(send_buf, 0, buf_len);
-
-        int sender_found = 0;
-        // bool value = false;
-        struct json_token value = JSON_INVALID_TOKEN;
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        struct json_token sender = JSON_INVALID_TOKEN;
-        struct json_token params = JSON_INVALID_TOKEN;
-
-        json_scanf(payload, len, "{id:%T}", &msg_id);
-        json_scanf(payload, len, "{params:%T}", &params);
-        json_scanf(params.ptr, params.len, "{value:%T}", &value);
-        sender_found = json_scanf(payload, len, "{sender:%T}", &sender);
-
-        snprintf(send_buf, buf_len, response, msg_count,
-                 method->len, method->ptr,
-                 msg_id.len, msg_id.ptr,
-                 sender_found ? sender.len : 2, sender_found ? sender.ptr : "{}");
-
-        char item_id[20] = {'\0', '\0'};
-        parse_item_id((char *)params.ptr, params.len, item_id);
-
-        int device_idx = devices_common_get_device_by_item_id(item_id);
-
-        if (device_idx < MAX_DEV)
-        {
-            s_device_properties_t *dev_list = devices_common_device_list();
-            uint32_t state = value.len ? (strncmp(value.ptr, "true", 4) ? false : true) : false;
-            TRACE_D("Requested state: %d", state);
-
-            state = dev_list[device_idx].out_inv ? ~state : state;
-            TRACE_D("Adjusted state: %d", state);
-
-            interface_common_gpio_state_set(dev_list[device_idx].out_gpio, state);
-        }
-
-        TRACE_B(">> WS Tx - '%.*s' [%d]\r\n%s", method->len, method->ptr, strlen(send_buf), send_buf);
-    }
-
-    return send_buf;
-}
-
 char *items_update(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     return items_update_with_device_index(payload, len, method, msg_count, UINT32_MAX);
@@ -330,7 +270,7 @@ char *items_update_from_sensor(int device_index, char *updated_value)
         if (device_index < MAX_DEV)
         {
 
-            static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\"hub.item.updated\",\"result\":{\"_id\":\"%.*s\",\"deviceId\":\"%.*s\","
+            static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\method_hub_item_updated",\"result\":{\"_id\":\"%.*s\",\"deviceId\":\"%.*s\","
                                              "\"deviceName\":\"%.*s\",\"deviceCategory\":\"%.*s\",\"deviceSubcategory\":\"%.*s\",\"roomName\":\"%.*s\","
                                              "\"serviceNotification\":false,\"userNotification\":false,\"notifications\":null,\"name\":\"%.*s\",\"valueType\":\"%s\","
                                              "\"value\":%s}}";
@@ -387,7 +327,7 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
             device_idx = device_index;
         }
 
-        static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\"hub.item.updated\",\"result\":{\"_id\":\"%.*s\",\"deviceId\":\"%.*s\","
+        static const char *update_frmt = "{\"id\":\"ui_broadcast\",\"msg_id\":\"%d\",\"msg_subclass\":\method_hub_item_updated",\"result\":{\"_id\":\"%.*s\",\"deviceId\":\"%.*s\","
                                          "\"deviceName\":\"%.*s\",\"deviceCategory\":\"%.*s\",\"deviceSubcategory\":\"%.*s\",\"roomName\":\"%.*s\","
                                          "\"serviceNotification\":false,\"userNotification\":false,\"notifications\":null,\"name\":\"%.*s\",\"valueType\":\"%s\","
                                          "\"value\":%s}}";
@@ -485,7 +425,7 @@ char *items_update_with_device_index(const char *payload, uint32_t len, struct j
             }
         }
 
-        TRACE_B(">> WS Tx - 'hub.item.updated' [%d]\r\n%s", strlen(send_buf), send_buf);
+        TRACE_B(">> WS Tx - method_hub_item_updated [%d]\r\n%s", strlen(send_buf), send_buf);
     }
 
     return send_buf;

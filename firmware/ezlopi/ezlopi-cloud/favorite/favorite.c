@@ -42,32 +42,34 @@ char *favorite_list(const char *payload, uint32_t len, struct json_token *method
                     cJSON *cjson_devices_array = cJSON_CreateArray();
                     if (cjson_devices_array)
                     {
-                        s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
-                        if (ezlopi_device_list)
+                        // s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
+                        l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
+                        // if (ezlopi_device_list)
+                        // {
+                        //     int dev_idx = 0;
+                        while (NULL != registered_devices)
                         {
-                            int dev_idx = 0;
-                            while (EZLOPI_SENSOR_NONE != ezlopi_device_list[dev_idx].id)
+                            if (NULL != registered_devices->properties)
                             {
-                                if (NULL != ezlopi_device_list[dev_idx].properties)
+                                cJSON *cjson_room_info = cJSON_CreateObject();
+                                if (cjson_room_info)
                                 {
-                                    cJSON *cjson_room_info = cJSON_CreateObject();
-                                    if (cjson_room_info)
-                                    {
-                                        char tmp_string[64];
-                                        snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.room_id);
-                                        cJSON_AddStringToObject(cjson_room_info, "_id", tmp_string);
-                                        cJSON_AddStringToObject(cjson_room_info, "name", ezlopi_device_list[dev_idx].properties->ezlopi_cloud.room_name);
+                                    char tmp_string[64];
+                                    snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_devices->properties->ezlopi_cloud.room_id);
+                                    cJSON_AddStringToObject(cjson_room_info, "_id", tmp_string);
+                                    cJSON_AddStringToObject(cjson_room_info, "name", registered_devices->properties->ezlopi_cloud.room_name);
 
-                                        if (!cJSON_AddItemToArray(cjson_devices_array, cjson_room_info))
-                                        {
-                                            cJSON_Delete(cjson_room_info);
-                                        }
+                                    if (!cJSON_AddItemToArray(cjson_devices_array, cjson_room_info))
+                                    {
+                                        cJSON_Delete(cjson_room_info);
                                     }
                                 }
-
-                                dev_idx++;
                             }
+
+                            registered_devices = registered_devices->next;
+                            // dev_idx++;
                         }
+                        // }
 
                         if (!cJSON_AddItemToObjectCS(cjson_favorites, "devices", cjson_devices_array))
                         {
