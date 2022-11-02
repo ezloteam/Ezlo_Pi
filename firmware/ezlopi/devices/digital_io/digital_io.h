@@ -4,6 +4,7 @@
 #include "ezlopi_actions.h"
 #include "driver/gpio.h"
 
-int digital_io(e_ezlopi_actions_t action, void *arg);
+// int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg);
+int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg);
 
 #endif // __DIGITAL_IO_H__

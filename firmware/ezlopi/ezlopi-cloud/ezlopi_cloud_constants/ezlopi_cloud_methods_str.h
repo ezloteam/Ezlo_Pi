@@ -4,6 +4,7 @@
 /*****************************************************************************************
  *                                     Methods                                           *
  *****************************************************************************************/
+const static char *msg_sub_class_method_hub_item_updated = "method_hub_item_updated";
 const static char *method_hub_item_updated = "hub.item.updated";
 const static char *method_add_device = "addDevice";
 const static char *method_add_all_devices = "addAllDevices";

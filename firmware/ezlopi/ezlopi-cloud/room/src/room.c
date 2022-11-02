@@ -3,7 +3,6 @@
 #include "room.h"
 #include "trace.h"
 #include "frozen.h"
-#include "devices_common.h"
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
@@ -31,10 +30,6 @@ char *room_list(const char *payload, uint32_t len, struct json_token *method, ui
             cJSON *cjson_result_array = cJSON_CreateArray();
             if (cjson_result_array)
             {
-                // s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
-                // if (ezlopi_device_list)
-                // {
-                // int dev_idx = 0;
                 l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
                 while (NULL != registered_device)
                 {
@@ -56,9 +51,7 @@ char *room_list(const char *payload, uint32_t len, struct json_token *method, ui
                     }
 
                     registered_device = registered_device->next;
-                    // dev_idx++;
                 }
-                // }
 
                 if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result_array))
                 {
@@ -69,7 +62,7 @@ char *room_list(const char *payload, uint32_t len, struct json_token *method, ui
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                printf("'%s' response:\r\n%s\r\n", method_hub_room_list, string_response);
+                TRACE_B("'%s' response:\r\n%s\r\n", method_hub_room_list, string_response);
                 cJSON_Minify(string_response);
             }
 

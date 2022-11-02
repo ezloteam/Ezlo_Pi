@@ -5,7 +5,7 @@
 #include "string.h"
 #include "esp_err.h"
 #include "esp_log.h"
-#include "esp_tls.h"
+// #include "esp_tls.h"
 #include "esp_event.h"
 #include "esp_http_client.h"
 #include "protocol_examples_common.h"

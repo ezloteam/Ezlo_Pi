@@ -10,7 +10,7 @@
 #include "freertos/task.h"
 
 #include "ezlopi_timer.h"
-#include "sensor_service.h"
+// #include "sensor_service.h"
 #include "ezlopi_event_queue.h"
 
 #include "trace.h"
@@ -58,7 +58,7 @@ static void blinky(void *pv)
         gpio_set_level(GPIO_NUM_2, state);
         // int hall_sensor_value = hall_sensor_read();
         // int hall_sensor_value = 0;
-        // printf("Hall Sensor value: %d\r\n", hall_sensor_value);
+        // TRACE_D("Hall Sensor value: %d\r\n", hall_sensor_value);
 
         vTaskDelay(1000 / portTICK_RATE_MS);
 
@@ -79,13 +79,13 @@ static void blinky(void *pv)
 
         //     if (0 == ezlopi_event_queue_send(&event, 0))
         //     {
-        //         printf("Error: failed to send to the queue!\n");
+        //         TRACE_E("Error: failed to send to the queue!\n");
         //         // free(event);
         //     }
         // }
 
         // float humidity, temperature;
         // dht_read_float_data(DHT_TYPE_AM2301, dht22_pin, &humidity, &temperature);
-        // printf(">>>>>> SN-002 real data -> Humidity: %.02f, Temperature: %.02f <<<<<<\n", humidity, temperature);
+        // TRACE_B(">>>>>> SN-002 real data -> Humidity: %.02f, Temperature: %.02f <<<<<<\n", humidity, temperature);
     }
 }

@@ -3,7 +3,6 @@
 #include "scenes.h"
 #include "trace.h"
 #include "frozen.h"
-#include "devices_common.h"
 
 static const char *json_scenes_list = "{\"method\":\"%.*s\",\"msg_id\":%d,\"result\":{\"scenes\":[]},\"error\":null,\"id\":\"%.*s\",\"sender\":%.*s}";
 

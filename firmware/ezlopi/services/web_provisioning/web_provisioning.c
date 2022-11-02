@@ -73,14 +73,17 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
-static void web_provisioning_send_to_nma_websocket(char *data)
+int web_provisioning_send_to_nma_websocket(char *data)
 {
+    int ret = 0;
     if (data)
     {
         // TRACE_D("WSS-SENDING: %s", data);
-        wss_client_send(data, strlen(data));
+        ret = wss_client_send(data, strlen(data));
         message_counter++;
     }
+
+    return ret;
 }
 
 void web_provisioning_init(void)

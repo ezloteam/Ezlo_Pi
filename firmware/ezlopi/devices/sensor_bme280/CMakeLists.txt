@@ -5,4 +5,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES trace ezlopi_actions sensor_service ezlopi_timer library items)
+    REQUIRES trace ezlopi_actions ezlopi_timer library items)

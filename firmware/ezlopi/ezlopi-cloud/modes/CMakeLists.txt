@@ -3,5 +3,4 @@ idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES frozen
     ezlopi_factory_info
-    trace
-    devices_common)
+    trace)

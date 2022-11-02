@@ -2,7 +2,7 @@
 
 #include "sensor_bme280.h"
 #include "ezlopi_actions.h"
-#include "ezlopi_sensors.h"
+// #include "ezlopi_sensors.h"
 #include "ezlopi_timer.h"
 #include "items.h"
 #include "frozen.h"

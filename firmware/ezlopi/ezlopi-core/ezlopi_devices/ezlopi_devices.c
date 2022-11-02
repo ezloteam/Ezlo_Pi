@@ -4,7 +4,9 @@
 #include "ezlopi_nvs.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_sensors.h"
+#include "items.h"
+#include "web_provisioning.h"
+// #include "ezlopi_sensors.h"
 
 // typedef
 
@@ -200,20 +202,20 @@ static uint32_t room_id = 0;
 uint32_t ezlopi_device_generate_device_id(void)
 {
     device_id = (0 == device_id) ? 0x30000001 : device_id + 1;
-    printf("device_id: %u\r\n", device_id);
+    TRACE_D("device_id: %u\r\n", device_id);
     return device_id;
 }
 
 uint32_t ezlopi_device_generate_item_id(void)
 {
     item_id = (0 == item_id) ? 0x20000001 : item_id + 1;
-    printf("item_id: %u\r\n", item_id);
+    TRACE_D("item_id: %u\r\n", item_id);
     return item_id;
 }
 
 uint32_t ezlopi_device_generate_room_id(void)
 {
     room_id = (0 == room_id) ? 0x10000001 : room_id + 1;
-    printf("room_id: %u\r\n", room_id);
+    TRACE_D("room_id: %u\r\n", room_id);
     return room_id;
 }

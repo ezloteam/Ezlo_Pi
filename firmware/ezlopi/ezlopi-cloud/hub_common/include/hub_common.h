@@ -25,7 +25,6 @@ const char *hub_feature_status_set = "hub.feature.status.set";
 const char *hub_features_list = "hub.features.list";
 
 const char *hub_data_list = "hub.data.list";
-const char *hub_room_list = "hub.room.list";
 const char *hub_scenes_list = "hub.scenes.list";
 const char *hub_favorite_list = "hub.favorite.list";
 const char *hub_gateways_list = "hub.gateways.list";

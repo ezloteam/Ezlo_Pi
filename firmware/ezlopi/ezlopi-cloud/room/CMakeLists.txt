@@ -4,7 +4,9 @@ idf_component_register(SRCS "${src_files}"
     REQUIRES frozen
     ezlopi_factory_info
     trace
-    devices_common
     freertos
     websocket_client
+    json
+    ezlopi_cloud_constants
+    ezlopi_devices
 )

@@ -5,7 +5,6 @@
 #include "info.h"
 #include "trace.h"
 #include "frozen.h"
-#include "devices_common.h"
 #include "version.h"
 
 #include "cJSON.h"
@@ -118,7 +117,7 @@ char *info_get(const char *payload, uint32_t len, struct json_token *method_tok,
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                printf("'%s' response:\r\n%s\r\n", method_hub_info_get, string_response);
+                TRACE_B("'%s' response:\r\n%s\r\n", method_hub_info_get, string_response);
                 cJSON_Minify(string_response);
             }
 

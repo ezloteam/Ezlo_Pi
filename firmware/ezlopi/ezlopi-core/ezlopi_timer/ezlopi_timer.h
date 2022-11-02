@@ -58,8 +58,8 @@
 #define EZLOPI_TIMER_SCALE (TIMER_BASE_CLK / EZLOPI_TIMER_DIVIDER) // convert counter value to seconds
 
 void ezlopi_timer_start_50ms(void);
-void ezlopi_timer_start_100ms(void);
-void ezlopi_timer_start_200ms(void);
-void ezlopi_timer_start_500ms(void);
+// void ezlopi_timer_start_200ms(void);
+// void ezlopi_timer_start_500ms(void);
+// void ezlopi_timer_start_1000ms(void);
 
 #endif // EZLOPI_TIMER_H

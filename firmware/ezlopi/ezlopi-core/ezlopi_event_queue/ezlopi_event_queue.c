@@ -16,7 +16,7 @@ int ezlopi_event_queue_send(s_ezlo_event_t **event_data, int from_isr)
 {
     int ret = 0;
 
-    if (generic_queue)
+    if (NULL != generic_queue)
     {
         if (xQueueIsQueueFullFromISR(generic_queue))
         {

@@ -3,7 +3,6 @@
 #include "feature.h"
 #include "trace.h"
 #include "frozen.h"
-#include "devices_common.h"
 
 const char *feature_1_start = "{\"method\":\"hub.features.list\",\"api\":\"1.0\",\"error\":null,\"id\":\"%.*s\",\"result\":{\"feature\":{\"devices\":[";
 const char *feature_1_list = "{\"_id\":\"%s\"}";

@@ -3,7 +3,6 @@
 #include "gateways.h"
 #include "trace.h"
 #include "frozen.h"
-#include "devices_common.h"
 
 static const char *gateways_1_start = "{\"method\":\"hub.gateways.list\",\"msg_id\":%d,\"api\":\"1.0\",\"error\":null,\"id\":\"%.*s\",\"result\":{\"gateways\":[";
 // static const char *gateways_1_list =

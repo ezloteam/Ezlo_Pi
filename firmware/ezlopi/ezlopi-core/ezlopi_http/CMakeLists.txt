@@ -4,4 +4,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES sensor_service trace)
+    REQUIRES trace esp_http_client common_components esp-tls)

@@ -4,6 +4,7 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_event_queue.h"
 #include "ezlopi_nvs.h"
+#include "ezlopi_timer.h"
 
 void ezlopi_init(void)
 {
@@ -17,4 +18,6 @@ void ezlopi_init(void)
     ezlopi_wifi_initialize();
     ezlopi_wifi_connect_from_nvs();
     ezlopi_event_queue_init();
+
+    ezlopi_timer_start_50ms();
 }

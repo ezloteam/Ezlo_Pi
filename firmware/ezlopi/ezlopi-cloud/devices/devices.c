@@ -3,7 +3,6 @@
 #include "devices.h"
 #include "trace.h"
 #include "frozen.h"
-#include "devices_common.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_devices_list.h"
@@ -102,7 +101,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                printf("'%s' response:\r\n%s\r\n", method_hub_devices_list, string_response);
+                TRACE_B("'%s' response:\r\n%s\r\n", method_hub_devices_list, string_response);
                 cJSON_Minify(string_response);
             }
 

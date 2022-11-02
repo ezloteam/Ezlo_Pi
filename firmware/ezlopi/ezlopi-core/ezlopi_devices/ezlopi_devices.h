@@ -59,8 +59,8 @@ typedef enum e_ezlopi_device_interface_type
 
 typedef struct s_ezlopi_device_properties
 {
+    // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
     e_ezlopi_device_interface_type_t interface_type;
-    uint16_t device_subtype; // id_item : from qt-app or ezlogic app
     // hardware interface
     union
     {
