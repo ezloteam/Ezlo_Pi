@@ -40,6 +40,8 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
+
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

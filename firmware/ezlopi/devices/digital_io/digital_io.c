@@ -81,7 +81,7 @@ static int digital_io_get_value_cjson(s_ezlopi_device_properties_t *properties, 
 // Must type cast the 'digital_io_device_properties' to 'int' and return
 static int digital_io_prepare(void *arg)
 {
-    cJSON *cjson_device = (cJSON *)arg;
+    cJSON *cjson_device = (cJSON *)arg; //
     s_ezlopi_device_properties_t *digital_io_device_properties = NULL;
 
     if ((NULL == digital_io_device_properties) && (NULL != cjson_device))
