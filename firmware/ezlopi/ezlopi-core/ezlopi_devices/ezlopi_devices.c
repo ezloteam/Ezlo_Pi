@@ -6,11 +6,11 @@
 #include "ezlopi_devices_list.h"
 #include "items.h"
 #include "web_provisioning.h"
-// #include "ezlopi_sensors.h"
 
-// typedef
+static uint32_t device_id = 0;
+static uint32_t item_id = 0;
+static uint32_t room_id = 0;
 
-// static void ezlopi_device_map_devices(cJSON *cjson_device);
 static void ezlopi_device_parse_json(char *config_string);
 
 void ezlopi_device_init(void)
@@ -78,58 +78,6 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
     }
 }
 
-#if 0
-static void ezlopi_device_map_devices(cJSON *cjson_device)
-{
-    e_ezlopi_device_interface_type_t device_type = EZLOPI_DEVICE_INTERFACE_NONE;
-    CJSON_GET_VALUE_INT(cjson_device, "dev_type", device_type);
-
-    switch (device_type)
-    {
-    case EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_PWM:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_UART:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_I2C_MASTER:
-    {
-        break;
-    }
-    case EZLOPI_DEVICE_INTERFACE_SPI_MASTER:
-    {
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
-}
-#endif
-
 static void ezlopi_device_parse_json(char *config_string)
 {
     cJSON *cjson_config = cJSON_Parse(config_string);
@@ -194,10 +142,6 @@ static void ezlopi_device_parse_json(char *config_string)
         cJSON_Delete(cjson_config);
     }
 }
-
-static uint32_t device_id = 0;
-static uint32_t item_id = 0;
-static uint32_t room_id = 0;
 
 uint32_t ezlopi_device_generate_device_id(void)
 {

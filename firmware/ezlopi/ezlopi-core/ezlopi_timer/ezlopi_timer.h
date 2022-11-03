@@ -36,7 +36,7 @@
 /*******************************************************************************
  *                          Include Files
  *******************************************************************************/
-
+#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -54,8 +54,15 @@
 #define EZLOPI_TIMER_IDX_0 TIMER_0
 #define EZLOPI_TIMER_IDX_1 TIMER_1
 
-#define EZLOPI_TIMER_DIVIDER (1000)                                //  Hardware timer clock divider
+#define EZLOPI_TIMER_DIVIDER (1000) //  Hardware timer clock divider
+
+#ifdef CONFIG_IDF_TARGET_ESP32S3
+#define EZLOPI_TIMER_SCALE (TIMER_BASE_CLK / (2 * EZLOPI_TIMER_DIVIDER)) // convert counter value to seconds
+#endif
+
+#ifdef CONFIG_IDF_TARGET_ESP32
 #define EZLOPI_TIMER_SCALE (TIMER_BASE_CLK / EZLOPI_TIMER_DIVIDER) // convert counter value to seconds
+#endif
 
 void ezlopi_timer_start_50ms(void);
 // void ezlopi_timer_start_200ms(void);

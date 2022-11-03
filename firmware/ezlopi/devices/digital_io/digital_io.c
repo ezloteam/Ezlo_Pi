@@ -3,7 +3,6 @@
 
 #include "sensor_bme280.h"
 #include "ezlopi_actions.h"
-// #include "ezlopi_sensors.h"
 #include "ezlopi_timer.h"
 #include "items.h"
 #include "frozen.h"
@@ -52,14 +51,13 @@ int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properti
         ret = digital_io_get_value_cjson(properties, arg);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_500_MS:
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
         ret = ezlopi_device_value_updated_from_device(properties);
         break;
     }
     default:
     {
-        TRACE_E("Unknown default 'digital_io' action found!");
         break;
     }
     }

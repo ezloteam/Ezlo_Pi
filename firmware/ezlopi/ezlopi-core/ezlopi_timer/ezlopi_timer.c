@@ -103,24 +103,24 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
         static int count;
         send_event_to_queue(EZLOPI_ACTION_NOTIFY_50_MS);
 
-        if (count % 2) // 100 ms
+        if (0 == (count % 2)) // 100 ms
         {
             send_event_to_queue(EZLOPI_ACTION_NOTIFY_100_MS);
         }
 
-        if (count % 4) // 200 ms
+        if (0 == (count % 4)) // 200 ms
         {
             send_event_to_queue(EZLOPI_ACTION_NOTIFY_200_MS);
         }
 
-        if (count % 10) // 500 ms
+        if (0 == (count % 10)) // 500 ms
         {
             send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
         }
 
-        if (count % 20) // 500 ms
+        if (0 == (count % 20)) // 1000 ms
         {
-            send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
+            send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
         }
 
         count++;

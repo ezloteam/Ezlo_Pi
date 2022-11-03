@@ -357,7 +357,12 @@ static void wss_receive_task(void *pvParameters)
         static int request_count;
         TRACE_I("Completed %d requests", ++request_count);
 
-        for (int countdown = 10; countdown >= 0; countdown--)
+        if (request_count > 6)
+        {
+            esp_restart();
+        }
+
+        for (int countdown = 5; countdown >= 0; countdown--)
         {
             TRACE_I("%d...", countdown);
             vTaskDelay(1000 / portTICK_PERIOD_MS);

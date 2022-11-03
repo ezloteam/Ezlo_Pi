@@ -12,6 +12,7 @@ static const char *data_list_start = "{\"method\":\"hub.data.list\",\"msg_id\":%
 static const char *data_list_cont = "\"first_start\":{\"value\": 0}";
 static const char *data_list_end = "}},\"sender\":%.*s}";
 
+#if 0
 char *data_list_v2(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     char *string_response = NULL;
@@ -39,9 +40,6 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
                 {
 
                     l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
-                    // s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
-                    // if (ezlopi_device_list)
-                    // {
                     int dev_idx = 0;
                     while (NULL != registered_devices)
                     {
@@ -108,6 +106,72 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
 
     return string_response;
 }
+#endif
+
+char *data_list(const char *data, uint32_t len, struct json_token *method, uint32_t msg_count)
+{
+    uint32_t buf_len = 4096;
+    char *send_buf = (char *)malloc(buf_len);
+
+    if (send_buf)
+    {
+        int sender_status = 0;
+        struct json_token msg_id = JSON_INVALID_TOKEN;
+        struct json_token sender = JSON_INVALID_TOKEN;
+
+        // s_ezlopi_device_t *devices_list = ezlopi_devices_list_get_list();
+        // if (devices_list)
+        // {
+        json_scanf(data, len, "{id: %T}", &msg_id);
+        sender_status = json_scanf(data, len, "{sender: %T}", &sender);
+
+        snprintf(send_buf, buf_len, data_list_start, msg_count, msg_id.len, msg_id.ptr);
+        l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
+
+        while (NULL != registered_devices)
+        {
+            if (NULL != registered_devices->properties)
+            {
+                int len_b = strlen(send_buf);
+                snprintf(&send_buf[len_b], buf_len - len_b, "%s", data_list_cont); //, devices[i].device_id, devices[i].name);
+#warning "WARNING: Remove break from here!"
+                break;
+            }
+
+            registered_devices = registered_devices->next;
+        }
+
+        snprintf(&send_buf[strlen(send_buf)], buf_len - strlen(send_buf), data_list_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
+        TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
+    }
+
+    return send_buf;
+}
+
+#if 0
+static cJSON *ezlopi_cloud_data_create_device_list(void)
+{
+    cJSON *cjson_device_list = cJSON_CreateObject();
+
+    if (cjson_device_list)
+    {
+        cJSON_AddNumberToObject(cjson_device_list, "ids", 1234);
+    }
+
+    return cjson_device_list;
+}
+
+static cJSON *ezlopi_cloud_data_create_settings_list(void)
+{
+    cJSON *cjson_device_list = cJSON_CreateObject();
+
+    if (cjson_device_list)
+    {
+        cJSON_AddNumberToObject(cjson_device_list, "ids", 1234);
+    }
+
+    return cjson_device_list;
+}
 
 static cJSON *ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t *ezlopi_device)
 {
@@ -142,67 +206,4 @@ static cJSON *ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t *ezl
 
     return cjson_settings;
 }
-
-char *data_list(const char *data, uint32_t len, struct json_token *method, uint32_t msg_count)
-{
-    uint32_t buf_len = 4096;
-    char *send_buf = (char *)malloc(buf_len);
-
-    if (send_buf)
-    {
-        int sender_status = 0;
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        struct json_token sender = JSON_INVALID_TOKEN;
-
-        // s_ezlopi_device_t *devices_list = ezlopi_devices_list_get_list();
-        // if (devices_list)
-        // {
-        json_scanf(data, len, "{id: %T}", &msg_id);
-        sender_status = json_scanf(data, len, "{sender: %T}", &sender);
-
-        snprintf(send_buf, buf_len, data_list_start, msg_count, msg_id.len, msg_id.ptr);
-        l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
-        int device_idx = 0;
-        while (NULL != registered_devices)
-        {
-            if (NULL != registered_devices->properties)
-            {
-                int len_b = strlen(send_buf);
-                snprintf(&send_buf[len_b], buf_len - len_b, "%s", data_list_cont); //, devices[i].device_id, devices[i].name);
-#warning "WARNING: Remove break from here!"
-                break;
-            }
-
-            registered_devices = registered_devices->next;
-        }
-
-        snprintf(&send_buf[strlen(send_buf)], buf_len - strlen(send_buf), data_list_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-        TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
-    }
-
-    return send_buf;
-}
-
-static cJSON *ezlopi_cloud_data_create_device_list(void)
-{
-    cJSON *cjson_device_list = cJSON_CreateObject();
-
-    if (cjson_device_list)
-    {
-        cJSON_AddNumberToObject(cjson_device_list, "ids", 1234);
-    }
-
-    return cjson_device_list;
-}
-
-static cJSON *ezlopi_cloud_data_create_settings_list(void)
-{
-    cJSON *cjson_device_list = cJSON_CreateObject();
-
-    if (cjson_device_list)
-    {
-        cJSON_AddNumberToObject(cjson_device_list, "ids", 1234);
-    }
-
-    return cjson_device_list;
-}
+#endif

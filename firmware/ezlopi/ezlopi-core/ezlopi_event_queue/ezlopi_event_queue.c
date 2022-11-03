@@ -1,6 +1,7 @@
 #include "ezlopi_event_queue.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+#include "trace.h"
 
 static QueueHandle_t generic_queue = NULL;
 
@@ -18,17 +19,17 @@ int ezlopi_event_queue_send(s_ezlo_event_t **event_data, int from_isr)
 
     if (NULL != generic_queue)
     {
-        if (xQueueIsQueueFullFromISR(generic_queue))
+        if (xQueueIsQueueFullFromISR(generic_queue)) // 'FromISR' or not
         {
             s_ezlo_event_t *tmp_evt_data = NULL;
             if (from_isr)
             {
                 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-                xQueueReceiveFromISR(generic_queue, tmp_evt_data, &xHigherPriorityTaskWoken);
+                xQueueReceiveFromISR(generic_queue, &tmp_evt_data, &xHigherPriorityTaskWoken);
             }
             else
             {
-                xQueueReceive(generic_queue, tmp_evt_data, 0);
+                xQueueReceive(generic_queue, &tmp_evt_data, 0);
             }
 
             if (tmp_evt_data)
