@@ -77,7 +77,7 @@ void login::replyFinished(QNetworkReply *rep) {
 
     QByteArray response_bytes = rep->readAll();
 
-//    qDebug() << response_bytes;
+    qDebug().noquote() << response_bytes;
 
         QJsonParseError jerror;
 

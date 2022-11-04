@@ -33,12 +33,6 @@ void Dialog_config_onewire::on_buttonBox_accepted() {
 
     onewire_user_data.id_item = (ezpi_item_type)(EZPI_ITEM_TYPE_DHT11 + ui->comboBox_onewire_subtype->currentIndex());
 
-    ezpi_high_low digital_io_default_value = (ezpi_high_low)ui->comboBox_default_value_gpio->currentIndex();
-    digital_io_default_value ? onewire_user_data.val_ip = true : onewire_user_data.val_ip = false;
-
-    if(ui->radioButton_pullup->isChecked()) onewire_user_data.pull_up = true;
-    else                                    onewire_user_data.pull_up = false;
-
     onewire_user_data.gpio = ui->comboBox_onewire_gpio->currentText().toInt();
 
     // Adding device to the device vector

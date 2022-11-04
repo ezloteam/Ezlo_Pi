@@ -88,6 +88,7 @@ void Dialog_configdev_digitalio::on_buttonBox_accepted() {
 
      } else {
           digital_op_user_data.is_ip = false;
+          digital_op_user_data.gpio_in = 0;
      }
 
      // Adding device to the device vector

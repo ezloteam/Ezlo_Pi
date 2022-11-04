@@ -200,8 +200,6 @@ typedef struct ezpi_device_one_wire {
     EZPI_STRING dev_name;
     EZPI_UINT16 id_room;
     ezpi_item_type id_item;
-    EZPI_BOOL val_ip;
-    EZPI_BOOL pull_up;
     EZPI_UINT8 gpio;
 } ezpi_device_one_wire_t;
 
