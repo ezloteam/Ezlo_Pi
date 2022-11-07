@@ -101,7 +101,6 @@ static void ezlopi_device_parse_json(char *config_string)
 
                 int id_item = 0;
                 CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
-
                 if (0 != id_item)
                 {
                     s_ezlopi_device_t *sensor_list = ezlopi_devices_list_get_list();

@@ -49,7 +49,6 @@ Dialog_configdev_digitalio::~Dialog_configdev_digitalio() {
 void Dialog_configdev_digitalio::on_buttonBox_accepted() {
 
         ezpi_device_digital_op_t digital_op_user_data;
-        memset(&digital_op_user_data, 0, sizeof(ezpi_device_digital_op_t));
      digital_op_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
      digital_op_user_data.dev_name = ui->lineEdit_device_name->text();
      digital_op_user_data.id_room = 0; // TBD
