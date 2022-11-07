@@ -177,7 +177,6 @@ static int digital_io_ezlopi_update_data(void)
 static int digital_io_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-
     if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
     {
         const gpio_config_t io_conf = {
@@ -193,9 +192,9 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
                                 : GPIO_PULLDOWN_DISABLE,
             .intr_type = GPIO_INTR_DISABLE,
         };
-
+        
         gpio_config(&io_conf);
-        gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, properties->interface.gpio.gpio_out.value);
+        esp_err_t error = gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, properties->interface.gpio.gpio_out.value);
     }
 
     if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
@@ -217,6 +216,7 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
         gpio_config(&io_conf);
         properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
     }
+    
 
     return ret;
 }

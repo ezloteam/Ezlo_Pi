@@ -2,16 +2,9 @@
 #include "ezlopi_devices_list.h"
 #include "sensor_bme280.h"
 #include "digital_io.h"
+#include "sensor_pir.h"
 
 static s_ezlopi_device_t device_array[] = {
-#ifdef EZLOPI_SENSOR_0018_BME280
-    {
-        .id = EZLOPI_SENSOR_0018_BME280,
-        .func = sensor_bme280,
-        // .is_configured = false,
-        // .properties = NULL,
-    },
-#endif
 
 #ifdef EZLOPI_SENSOR_0001_LED
     {
@@ -38,6 +31,23 @@ static s_ezlopi_device_t device_array[] = {
         // .is_configured = false,
         // .properties = NULL,
     },
+#endif
+
+#ifdef EZLOPI_SENSOR_0012_BME280_I2C
+    {
+        .id = EZLOPI_SENSOR_0012_BME280_I2C,
+        .func = sensor_bme280,
+        // .is_configured = false,
+        // .properties = NULL,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_019_PIR
+    {
+        .id = EZLOPI_SENSOR_019_PIR,
+        .func = ezlopi_pir_begin,
+    },
+
 #endif
 
     /**
@@ -106,3 +116,8 @@ static l_ezlopi_configured_devices_t *ezlopi_device_list_create(s_ezlopi_device_
     }
     return device_list_element;
 }
+
+
+
+
+

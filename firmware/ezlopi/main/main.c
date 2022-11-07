@@ -18,26 +18,32 @@
 #include "qt_serial.h"
 #include "web_provisioning.h"
 #include "gatt_server.h"
+#include "sensor_pir.h"
+
+#define EZLOPI_PIR_PIN_NUM GPIO_NUM_2
 
 static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
+
+
 
 void app_main(void)
 {
     qt_serial_init();
     ezlopi_init();
     web_provisioning_init();
-    GATT_SERVER_MAIN();
-    sensor_service_init();
+    // GATT_SERVER_MAIN();
+    // sensor_service_init();
+    ezlopi_pir_begin(EZLOPI_ACTION_PREPARE, NULL, NULL);
 
-    xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+    // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
 static void blinky(void *pv)
 {
     gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_2),
+        .pin_bit_mask = (1ULL << GPIO_NUM_4),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
