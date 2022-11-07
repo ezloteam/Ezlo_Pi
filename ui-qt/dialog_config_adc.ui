@@ -123,7 +123,7 @@
     <string>Device sub type</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="comboBox_adc_resolution">
    <property name="geometry">
     <rect>
      <x>10</x>
