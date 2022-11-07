@@ -12,7 +12,7 @@
 #include "data.h"
 #include "devices.h"
 #include "scenes.h"
-#include "registeration.h"
+#include "registration.h"
 #include "favorite.h"
 #include "gateways.h"
 #include "info.h"
@@ -56,7 +56,7 @@ s_method_list_t method_list[] = {
     {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
     // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
     // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
-    // {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
+    {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
 
     // // /** Setter functions **/
     {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
@@ -118,7 +118,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
                 {
                     TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                     ezlopi_client_init(cjson_uri->valuestring, __message_upcall);
-                    registeration_init();
+                    registration_init();
                     break;
                 }
             }

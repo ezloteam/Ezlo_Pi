@@ -8,8 +8,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0018_BME280,
         .func = sensor_bme280,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 #endif
 
@@ -17,8 +15,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0001_LED,
         .func = digital_io,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 #endif
 
@@ -26,8 +22,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0002_RELAY,
         .func = digital_io,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 #endif
 
@@ -35,8 +29,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0003_PLUG,
         .func = digital_io,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 #endif
 
@@ -49,8 +41,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_NONE,
         .func = NULL,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 };
 

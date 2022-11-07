@@ -1,10 +1,9 @@
-#include "cJSON.h"
+#include <cJSON.h>
 
+#include "items.h"
 #include "trace.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_devices.h"
-#include "ezlopi_devices_list.h"
-#include "items.h"
 #include "web_provisioning.h"
 
 static uint32_t device_id = 0;
@@ -93,14 +92,15 @@ static void ezlopi_device_parse_json(char *config_string)
             TRACE_B("---------------------------------------------");
             while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
             {
-                TRACE_B("Device-%d - %d:", config_dev_idx, (uint32_t)cjson_device);
+                TRACE_B("Device-%d:", config_dev_idx);
 
-                char *device_name = NULL;
-                CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-                TRACE_D("device name: %s", device_name ? device_name : "");
+                // char *device_name = NULL;
+                // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+                // TRACE_D("device name: %s", device_name ? device_name : "");
 
                 int id_item = 0;
                 CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+                TRACE_B("id_item: %d", id_item);
 
                 if (0 != id_item)
                 {
@@ -111,16 +111,17 @@ static void ezlopi_device_parse_json(char *config_string)
                     {
                         if (id_item == sensor_list[dev_idx].id)
                         {
-                            s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)cjson_device);
-                            TRACE_B("%d-properties: %d", dev_idx, (int)properties);
+                            s_ezlopi_prep_arg_t device_prep_arg = {.device = &sensor_list[dev_idx], .cjson_device = cjson_device};
+                            sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg);
+                            // s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg);
 
-                            if (properties)
-                            {
-                                if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx], properties))
-                                {
-                                    free(properties);
-                                }
-                            }
+                            // if (properties)
+                            // {
+                            //     if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx], properties))
+                            //     {
+                            //         free(properties);
+                            //     }
+                            // }
                         }
 
                         dev_idx++;
@@ -146,20 +147,20 @@ static void ezlopi_device_parse_json(char *config_string)
 uint32_t ezlopi_device_generate_device_id(void)
 {
     device_id = (0 == device_id) ? 0x30000001 : device_id + 1;
-    TRACE_D("device_id: %u\r\n", device_id);
+    // TRACE_D("device_id: %u\r\n", device_id);
     return device_id;
 }
 
 uint32_t ezlopi_device_generate_item_id(void)
 {
     item_id = (0 == item_id) ? 0x20000001 : item_id + 1;
-    TRACE_D("item_id: %u\r\n", item_id);
+    // TRACE_D("item_id: %u\r\n", item_id);
     return item_id;
 }
 
 uint32_t ezlopi_device_generate_room_id(void)
 {
     room_id = (0 == room_id) ? 0x10000001 : room_id + 1;
-    TRACE_D("room_id: %u\r\n", room_id);
+    // TRACE_D("room_id: %u\r\n", room_id);
     return room_id;
 }

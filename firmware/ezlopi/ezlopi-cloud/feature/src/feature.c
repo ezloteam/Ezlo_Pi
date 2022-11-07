@@ -23,7 +23,7 @@ char *feature_list(const char *payload, uint32_t len, struct json_token *method)
         uint32_t len_b = strlen(send_buf);
         snprintf(&send_buf[len_b], buf_len - len_b, "%s", feature_1_end);
 
-        TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
+        // TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
     }
 
     return send_buf;

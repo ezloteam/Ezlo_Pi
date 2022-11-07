@@ -93,7 +93,7 @@ char *network_get(const char *payload, uint32_t len, struct json_token *method_t
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                TRACE_B("'%s' response:\r\n%s", method_hub_network_get, string_response);
+                // TRACE_B("'%s' response:\r\n%s", method_hub_network_get, string_response);
                 cJSON_Minify(string_response);
             }
 

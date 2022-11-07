@@ -276,7 +276,7 @@ char *ezlopi_cloud_items_updated_from_devices(l_ezlopi_configured_devices_t *reg
                 string_response = cJSON_Print(cjson_response);
                 if (string_response)
                 {
-                    TRACE_B("'%s' response: \r\n%s", msg_sub_class_method_hub_item_updated, string_response);
+                    // TRACE_B("'%s' response: \r\n%s", msg_sub_class_method_hub_item_updated, string_response);
                     cJSON_Minify(string_response);
                 }
 
