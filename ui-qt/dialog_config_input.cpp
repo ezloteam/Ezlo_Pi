@@ -34,7 +34,12 @@ void Dialog_config_input::on_buttonBox_accepted() {
     digital_ip_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_IP;
     digital_ip_user_data.dev_name = ui->lineEdit_device_name->text();
     digital_ip_user_data.id_room = 0; // TBD
-    digital_ip_user_data.id_item = EZPI_ITEM_TYPE_BUTTON;
+
+    if(ui->comboBox_input_subtype->currentIndex() == 0) {
+         digital_ip_user_data.id_item = (ezpi_item_type)EZPI_ITEM_TYPE_BUTTON;
+    } else if(ui->comboBox_input_subtype->currentIndex() == 1) {
+         digital_ip_user_data.id_item = (ezpi_item_type)EZPI_ITEM_TYPE_PIR_SENSOR;
+    }
 
     ezpi_high_low digital_ip_default_value = (ezpi_high_low)ui->comboBox_default_value_input->currentIndex();
     digital_ip_default_value ? digital_ip_user_data.val_ip = true : digital_ip_user_data.val_ip = false;

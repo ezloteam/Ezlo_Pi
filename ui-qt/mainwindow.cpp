@@ -750,7 +750,7 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_DIGITAL_IP: {
-            ezlogic_form_config_digital_ip->setFixedSize(180, 310);
+            ezlogic_form_config_digital_ip->setFixedSize(290, 260);
             ezlogic_form_config_digital_ip->setModal(true);
             ezlogic_form_config_digital_ip->show();
             break;

@@ -38,6 +38,7 @@ EzPi::EzPi() {
     ezpi_item_types_str->append("DHT22");
     ezpi_item_types_str->append("POT");
     ezpi_item_types_str->append("Door Sensor");
+    ezpi_item_types_str->append("PIR Sensor");
 
      ezpi_firmware_info = new ezpi_info_t;
 
