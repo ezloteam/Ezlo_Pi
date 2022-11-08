@@ -32,3 +32,5 @@ const static char *dev_type_meter_flow = "meter.flow";
 const static char *dev_type_camera = "camera";
 
 #endif // __EZLOPI_DEVICE_TYPES_STR_H__
+
+

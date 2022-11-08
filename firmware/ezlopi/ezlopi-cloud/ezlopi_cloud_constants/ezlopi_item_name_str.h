@@ -118,7 +118,7 @@
 // const static char *ezlopi_item_name_moisture = "moisture";
 const static char *ezlopi_item_name_motion = "motion";
 // const static char *ezlopi_item_name_power = "power";
-// const static char *ezlopi_item_name_pressure = "pressure";
+const static char *ezlopi_item_name_pressure = "pressure";
 // const static char *ezlopi_item_name_rgbcolor = "rgbcolor";
 // const static char *ezlopi_item_name_rgbcolor_down = "rgbcolor_down";
 // const static char *ezlopi_item_name_rgbcolor_stop = "rgbcolor_stop";

@@ -18,36 +18,36 @@ int ezlopi_pir_begin(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *pr
 
     switch (action)
     {
-    case EZLOPI_ACTION_PREPARE:
-    {
-        TRACE_I("EZLOPI_ACTION_PREPARE");
-        ret = sensor_pir_prepare(arg);
-        break;
-    }
-    case EZLOPI_ACTION_INITIALIZE:
-    {
-        TRACE_I("EZLOPI_ACTION_INITIALIZE event.");
-        ret = sensor_pir_init(properties);
-        break;
-    }
-    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-    {
-        ret = sensor_pir_get_value_cjson(properties, arg);
-        break;
-    }
-    case EZLOPI_ACTION_NOTIFY_1000_MS:
-    {
-        // TRACE_I("EZLOPI_ACTION_NOTIFY_100_MS");
-        // sensor_pir_get_value(properties);
-        ezlopi_device_value_updated_from_device(properties);
-        ret = 0;
-        break;
-    }
-    default:
-    {
-        TRACE_I("Default action encountered.(action : %s)", ezlopi_actions_to_string(action));
-        break;
-    }
+        case EZLOPI_ACTION_PREPARE:
+        {
+            TRACE_I("EZLOPI_ACTION_PREPARE");
+            ret = sensor_pir_prepare(arg);
+            break;
+        }
+        case EZLOPI_ACTION_INITIALIZE:
+        {
+            TRACE_I("EZLOPI_ACTION_INITIALIZE event.");
+            ret = sensor_pir_init(properties);
+            break;
+        }
+        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+        {
+            ret = sensor_pir_get_value_cjson(properties, arg);
+            break;
+        }
+        case EZLOPI_ACTION_NOTIFY_1000_MS:
+        {
+            // TRACE_I("EZLOPI_ACTION_NOTIFY_100_MS");
+            // sensor_pir_get_value(properties);
+            ezlopi_device_value_updated_from_device(properties);
+            ret = 0;
+            break;
+        }
+        default:
+        {
+            TRACE_I("Default action encountered.(action : %s)", ezlopi_actions_to_string(action));
+            break;
+        }
     }
 
     return ret;
