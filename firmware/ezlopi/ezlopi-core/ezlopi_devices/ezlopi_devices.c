@@ -104,6 +104,7 @@ static void ezlopi_device_parse_json(char *config_string)
                 if (0 != id_item)
                 {
                     s_ezlopi_device_t *sensor_list = ezlopi_devices_list_get_list();
+                    TRACE_E("Here");
 
                     int dev_idx = 0;
                     while (NULL != sensor_list[dev_idx].func)

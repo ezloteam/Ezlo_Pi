@@ -49,7 +49,7 @@ static int sensor_bme280_init();
  * @param arg Other arguments if needed
  * @return int
  */
-int sensor_bme280(e_ezlopi_actions_t action, void *arg)
+int sensor_bme280(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg)
 {
     switch (action)
     {
@@ -62,7 +62,7 @@ int sensor_bme280(e_ezlopi_actions_t action, void *arg)
         case EZLOPI_ACTION_INITIALIZE:
         {
             TRACE_I("EZLOPI_ACTION_INITIALIZE event.");
-            sensor_bme280_init();
+            sensor_bme280_init(properties);
             break;
         }
         case EZLOPI_ACTION_GET_VALUE:
@@ -117,16 +117,16 @@ static int sensor_ble280_prepare(void* arg)
         {
             int tmp_var = 0;
             memset(sensor_ble280_properties, 0, sizeof(s_ezlopi_device_properties_t));
-            sensor_ble280_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT;
+            sensor_ble280_properties->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
 
             char *device_name = NULL;
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
             ASSIGN_DEVICE_NAME(sensor_ble280_properties, device_name);
-            sensor_ble280_properties->ezlopi_cloud.category = category_not_defined;
+            sensor_ble280_properties->ezlopi_cloud.category = category_temperature;
             sensor_ble280_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-            sensor_ble280_properties->ezlopi_cloud.item_name = ezlopi_item_name_pressure;
-            sensor_ble280_properties->ezlopi_cloud.device_type = "";
-            sensor_ble280_properties->ezlopi_cloud.value_type = value_type_bool;
+            sensor_ble280_properties->ezlopi_cloud.item_name = ezlopi_item_name_target_temperature;
+            sensor_ble280_properties->ezlopi_cloud.device_type = dev_type_sensor;
+            sensor_ble280_properties->ezlopi_cloud.value_type = value_type_float;
             sensor_ble280_properties->ezlopi_cloud.has_getter = true;
             sensor_ble280_properties->ezlopi_cloud.has_setter = false;
             sensor_ble280_properties->ezlopi_cloud.reachable = true;
@@ -139,13 +139,12 @@ static int sensor_ble280_prepare(void* arg)
             // CJSON_GET_VALUE_INT(cjson_device, "id_room", sensor_ble280_properties->ezlopi_cloud.room_id);
             // CJSON_GET_VALUE_INT(cjson_device, "id_item", sensor_ble280_properties->ezlopi_cloud.item_id);
 
-            CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_ble280_properties->interface.gpio.gpio_in.gpio_num);
-            CJSON_GET_VALUE_INT(cjson_device, "ip_inv", sensor_ble280_properties->interface.gpio.gpio_in.invert);
-            CJSON_GET_VALUE_INT(cjson_device, "val_ip", sensor_ble280_properties->interface.gpio.gpio_in.value);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_scl", sensor_ble280_properties->interface.i2c_master.scl);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_sda", sensor_ble280_properties->interface.i2c_master.sda);
 
-            sensor_ble280_properties->interface.gpio.gpio_in.enable = true;
-            sensor_ble280_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
-            sensor_ble280_properties->interface.gpio.gpio_in.pull = GPIO_PULLUP_ONLY;            
+            sensor_ble280_properties->interface.i2c_master.enable = true;
+            sensor_ble280_properties->interface.i2c_master.clock_speed = 100000;
+            sensor_ble280_properties->interface.i2c_master.channel = EZLOPI_I2C_0;
         }
     }
 
@@ -239,10 +238,11 @@ static int sensor_bme280_notify_30_seconds(void)
  *
  * @return returns 0 for successful initialization.
  */
-static int sensor_bme280_init()
+static int sensor_bme280_init(s_ezlopi_device_properties_t* properties)
 {
     int ret = 0;
-
+    ezlopi_i2c_master_init(&properties->interface.i2c_master);
+    TRACE_I("I2C master init successfully.");
     uint8_t sampling_settting = BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL;
 
     ret = bme280_init(&device);
