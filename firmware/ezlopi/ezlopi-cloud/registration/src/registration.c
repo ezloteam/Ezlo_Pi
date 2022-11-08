@@ -5,27 +5,27 @@
 
 #include "ezlopi_wss.h"
 // #include "websocket_client.h"
-#include "registeration.h"
+#include "registration.h"
 #include "trace.h"
 
 static volatile uint32_t is_registered = 0;
-static void registeration_process(void *pv);
+static void registration_process(void *pv);
 
-void registeration_init(void)
+void registration_init(void)
 {
     is_registered = 0;
-    xTaskCreate(registeration_process, "registeration_process", 2 * 2048, NULL, 2, NULL);
+    xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
 }
 
 char *registered(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     char *ret = NULL;
-    TRACE_I("Device registeration successful.");
+    TRACE_I("Device registration successful.");
     is_registered = 1;
     return ret;
 }
 
-static void registeration_process(void *pv)
+static void registration_process(void *pv)
 {
     char mac_str[18];
     uint8_t mac_addr[6];
@@ -49,10 +49,10 @@ static void registeration_process(void *pv)
 
     while (0 == is_registered)
     {
-        /*Send registeration packet in some interval*/
+        /*Send registration packet in some interval*/
         wss_client_send(reg_str, strlen(reg_str));
         // ws_client->send(reg_str);
-        TRACE_I(">>>> WSS-Tx: 'register':\r\n%s", reg_str);
+        // TRACE_I(">>>> WSS-Tx: 'register':\r\n%s", reg_str);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 

@@ -121,6 +121,7 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
         if (0 == (count % 20)) // 1000 ms
         {
             send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
+            count = 0;
         }
 
         count++;

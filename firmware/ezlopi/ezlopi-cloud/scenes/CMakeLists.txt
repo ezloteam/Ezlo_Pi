@@ -1,4 +1,4 @@
 file(GLOB_RECURSE src_files "*.c*")
-idf_component_register(SRCS "scenes.cpp" "${src_files}"
+idf_component_register(SRCS "scenes.c" "${src_files}"
     INCLUDE_DIRS "."
-    REQUIRES frozen ezlopi_factory_info trace)
+    REQUIRES frozen ezlopi_factory_info trace)lopi_factory_info trace)

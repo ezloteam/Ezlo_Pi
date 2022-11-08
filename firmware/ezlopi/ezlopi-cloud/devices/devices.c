@@ -35,7 +35,6 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                 cJSON *cjson_devices_array = cJSON_CreateArray();
                 if (cjson_devices_array)
                 {
-                    s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
                     l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
 
                     while (NULL != registered_devices)
@@ -64,7 +63,6 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                 cJSON_AddStringToObject(cjson_properties, "security", "");
                                 cJSON_AddBoolToObject(cjson_properties, "ready", true);
                                 cJSON_AddStringToObject(cjson_properties, "status", "synced");
-                                // cJSON_AddStringToObject(cjson_properties, "info", "{}");
                                 cJSON_AddObjectToObject(cjson_properties, "info");
 
                                 if (!cJSON_AddItemToArray(cjson_devices_array, cjson_properties))
@@ -74,10 +72,8 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                             }
                         }
 
-                        // dev_idx++;
                         registered_devices = registered_devices->next;
                     }
-                    // }
 
                     if (!cJSON_AddItemToObjectCS(cjson_result, "devices", cjson_devices_array))
                     {
@@ -94,7 +90,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                TRACE_B("'%s' response:\r\n%s", method_hub_devices_list, string_response);
+                // TRACE_B("'%s' response:\r\n%s", method_hub_devices_list, string_response);
                 cJSON_Minify(string_response);
             }
 

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <cJSON.h>
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
 
@@ -32,6 +33,12 @@ typedef struct l_ezlopi_configured_devices
     s_ezlopi_device_properties_t *properties;
     s_ezlopi_device_t *device;
 } l_ezlopi_configured_devices_t;
+
+typedef struct s_ezlopi_prep_arg
+{
+    cJSON *cjson_device;
+    s_ezlopi_device_t *device;
+} s_ezlopi_prep_arg_t;
 
 /**
  * @brief Provides the list of available sensors

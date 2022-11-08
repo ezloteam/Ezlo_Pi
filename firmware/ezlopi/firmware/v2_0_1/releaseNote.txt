@@ -7,9 +7,3 @@ v2_0_1
 
 
 
-v2_0_2
-	Release Date: Thu Nov  3 03:25:54 PM +0545 2022
-	128: Release for esp32 for testing purpose
-
-
-

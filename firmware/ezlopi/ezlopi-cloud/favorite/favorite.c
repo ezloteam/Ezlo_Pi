@@ -41,11 +41,7 @@ char *favorite_list(const char *payload, uint32_t len, struct json_token *method
                     cJSON *cjson_devices_array = cJSON_CreateArray();
                     if (cjson_devices_array)
                     {
-                        // s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
                         l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
-                        // if (ezlopi_device_list)
-                        // {
-                        //     int dev_idx = 0;
                         while (NULL != registered_devices)
                         {
                             if (NULL != registered_devices->properties)
@@ -66,9 +62,7 @@ char *favorite_list(const char *payload, uint32_t len, struct json_token *method
                             }
 
                             registered_devices = registered_devices->next;
-                            // dev_idx++;
                         }
-                        // }
 
                         if (!cJSON_AddItemToObjectCS(cjson_favorites, "devices", cjson_devices_array))
                         {
@@ -91,7 +85,7 @@ char *favorite_list(const char *payload, uint32_t len, struct json_token *method
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                TRACE_B("'%s' response:\r\n%s", method_hub_favorite_list, string_response);
+                // TRACE_B("'%s' response:\r\n%s", method_hub_favorite_list, string_response);
                 cJSON_Minify(string_response);
             }
 

@@ -21,28 +21,21 @@ void sensor_service_init(void)
 
 static void event_process(void *pv)
 {
-    l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
-    while (NULL != registered_device)
-    {
-        registered_device->device->func(EZLOPI_ACTION_INITIALIZE, registered_device->properties, NULL);
-        registered_device = registered_device->next;
-    }
-
-    // int old_tick = xTaskGetTickCount();
+    TickType_t old_tick = xTaskGetTickCount();
 
     while (1)
     {
         s_ezlo_event_t *event = NULL; //  = {.action = EZLOPI_ACTION_NONE, .arg = NULL};
         if (pdTRUE == ezlopi_event_queue_receive(&event, UINT32_MAX / portTICK_PERIOD_MS))
         {
-            // TRACE_D("Tick expired: %d\n", xTaskGetTickCount() - old_tick);
-            // old_tick = xTaskGetTickCount();
+            TRACE_D("Tick expired: %d\n", xTaskGetTickCount() - old_tick);
+            old_tick = xTaskGetTickCount();
 
             if (event)
             {
-                // TRACE_D("action received: %s\n", ezlopi_actions_to_string(event->action));
+                TRACE_D("action received: %s\n", ezlopi_actions_to_string(event->action));
 
-                registered_device = ezlopi_devices_list_get_configured_items();
+                l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
                 while (NULL != registered_device)
                 {
                     registered_device->device->func(event->action, registered_device->properties, event->arg);

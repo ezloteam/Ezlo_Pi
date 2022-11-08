@@ -21,7 +21,7 @@ char *scenes_list(const char *payload, uint32_t len, struct json_token *method, 
 
         snprintf(send_buf, buf_len, json_scenes_list, method->len, method->ptr, msg_count, msg_id.len, msg_id.ptr, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
 
-        TRACE_B(">> WS Tx - '%.*s' [%d]\r\n%s", method->len, method->ptr, strlen(send_buf), send_buf);
+        // TRACE_B(">> WS Tx - '%.*s' [%d]\r\n%s", method->len, method->ptr, strlen(send_buf), send_buf);
     }
     return send_buf;
 }
