@@ -47,7 +47,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                 char tmp_string[64];
                                 snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_devices->properties->ezlopi_cloud.device_id);
                                 cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
-                                cJSON_AddStringToObject(cjson_properties, "deviceTypeId", ezlopi_ezlopi_str);
+                                cJSON_AddStringToObject(cjson_properties, "deviceTypeId", "ezlopi");
                                 cJSON_AddStringToObject(cjson_properties, "parentDeviceId", "");
                                 cJSON_AddStringToObject(cjson_properties, "category", registered_devices->properties->ezlopi_cloud.category);
                                 cJSON_AddStringToObject(cjson_properties, "subcategory", registered_devices->properties->ezlopi_cloud.subcategory);
@@ -90,7 +90,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                // TRACE_B("'%s' response:\r\n%s", method_hub_devices_list, string_response);
+                TRACE_B("'%s' response:\r\n%s", method_hub_devices_list, string_response);
                 cJSON_Minify(string_response);
             }
 

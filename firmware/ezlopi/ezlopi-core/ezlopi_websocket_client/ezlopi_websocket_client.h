@@ -1,7 +1,6 @@
 #ifndef __WEBSOCKET_CLIENT_H__
 #define __WEBSOCKET_CLIENT_H__
 
-#include <string>
 #include "esp_wifi.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
@@ -10,16 +9,21 @@
 #include "protocol_examples_common.h"
 #include "sdkconfig.h"
 
+#include "cJSON.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "freertos/event_groups.h"
-// #include "memory_map.h"
 
 #include "esp_websocket_client.h"
 #include "esp_event.h"
-// #include "certificates.h"
 
+int ezlopi_websocket_client_send(char *data, uint32_t len);
+esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*upcall)(const char *, uint32_t));
+bool ezlopi_websocket_client_is_connected(void);
+void ezlopi_websocket_client_kill(void);
+
+#if 0
 class websocket_client
 {
 private:
@@ -52,5 +56,6 @@ public:
      */
     void websocket_client_kill(void);
 };
+#endif
 
 #endif // __WEBSOCKET_CLIENT_H__

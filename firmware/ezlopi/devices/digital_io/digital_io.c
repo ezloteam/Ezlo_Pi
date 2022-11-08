@@ -49,7 +49,7 @@ int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properti
         ret = digital_io_get_value_cjson(properties, arg);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    case EZLOPI_ACTION_NOTIFY_50_MS:
     {
         ret = ezlopi_device_value_updated_from_device(properties);
         break;
@@ -99,52 +99,6 @@ static int digital_io_prepare(void *arg)
                 ret = 1;
             }
         }
-#if 0
-        digital_io_device_properties = malloc(sizeof(s_ezlopi_device_properties_t));
-
-        if (digital_io_device_properties)
-        {
-            int tmp_var = 0;
-            memset(digital_io_device_properties, 0, sizeof(s_ezlopi_device_properties_t));
-            digital_io_device_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
-
-            char *device_name = NULL;
-            CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-            ASSIGN_DEVICE_NAME(digital_io_device_properties, device_name);
-            digital_io_device_properties->ezlopi_cloud.category = category_switch;
-            digital_io_device_properties->ezlopi_cloud.subcategory = subcategory_in_wall;
-            digital_io_device_properties->ezlopi_cloud.item_name = ezlopi_item_name_switch;
-            digital_io_device_properties->ezlopi_cloud.device_type = dev_type_switch_inwall;
-            digital_io_device_properties->ezlopi_cloud.value_type = value_type_bool;
-            digital_io_device_properties->ezlopi_cloud.has_getter = true;
-            digital_io_device_properties->ezlopi_cloud.has_setter = true;
-            digital_io_device_properties->ezlopi_cloud.reachable = true;
-            digital_io_device_properties->ezlopi_cloud.battery_powered = false;
-            digital_io_device_properties->ezlopi_cloud.show = true;
-            digital_io_device_properties->ezlopi_cloud.room_name[0] = '\0';
-            digital_io_device_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-            digital_io_device_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-            digital_io_device_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
-            // CJSON_GET_VALUE_INT(cjson_device, "id_room", digital_io_device_properties->ezlopi_cloud.room_id);
-            // CJSON_GET_VALUE_INT(cjson_device, "id_item", digital_io_device_properties->ezlopi_cloud.item_id);
-
-            CJSON_GET_VALUE_INT(cjson_device, "is_ip", digital_io_device_properties->interface.gpio.gpio_in.enable);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_in", digital_io_device_properties->interface.gpio.gpio_in.gpio_num);
-            CJSON_GET_VALUE_INT(cjson_device, "ip_inv", digital_io_device_properties->interface.gpio.gpio_in.invert);
-            CJSON_GET_VALUE_INT(cjson_device, "val_ip", digital_io_device_properties->interface.gpio.gpio_in.value);
-            CJSON_GET_VALUE_INT(cjson_device, "pullup_ip", tmp_var);
-            digital_io_device_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
-            digital_io_device_properties->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
-
-            digital_io_device_properties->interface.gpio.gpio_out.enable = true;
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_out", digital_io_device_properties->interface.gpio.gpio_out.gpio_num);
-            CJSON_GET_VALUE_INT(cjson_device, "op_inv", digital_io_device_properties->interface.gpio.gpio_out.invert);
-            CJSON_GET_VALUE_INT(cjson_device, "val_op", digital_io_device_properties->interface.gpio.gpio_out.value);
-            CJSON_GET_VALUE_INT(cjson_device, "pullup_op", tmp_var);
-            digital_io_device_properties->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
-            digital_io_device_properties->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
-        }
-#endif
     }
 
     return ret;

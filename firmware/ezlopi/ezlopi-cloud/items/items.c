@@ -116,7 +116,7 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
         cJSON *cjson_id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
         cJSON *cjson_sender = cJSON_GetObjectItem(cjson_request, "sender");
         cJSON *cjson_params = cJSON_GetObjectItem(cjson_request, "params");
-        cJSON *cjson_methods = cJSON_GetObjectItem(cjson_request, "method");
+        // cJSON *cjson_methods = cJSON_GetObjectItem(cjson_request, "method");
 
         if (cjson_params)
         {
@@ -171,10 +171,10 @@ char *items_update(const char *payload, uint32_t len, struct json_token *method,
     cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
     if (cjson_request)
     {
-        cJSON *cjson_id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
-        cJSON *cjson_sender = cJSON_GetObjectItem(cjson_request, "sender");
+        // cJSON *cjson_id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
+        // cJSON *cjson_sender = cJSON_GetObjectItem(cjson_request, "sender");
         cJSON *cjson_params = cJSON_GetObjectItem(cjson_request, "params");
-        cJSON *cjson_method = cJSON_GetObjectItem(cjson_request, "method");
+        // cJSON *cjson_method = cJSON_GetObjectItem(cjson_request, "method");
         char *item_id_str = 0;
 
         if (cjson_params)
@@ -276,7 +276,7 @@ char *ezlopi_cloud_items_updated_from_devices(l_ezlopi_configured_devices_t *reg
                 string_response = cJSON_Print(cjson_response);
                 if (string_response)
                 {
-                    // TRACE_B("'%s' response: \r\n%s", msg_sub_class_method_hub_item_updated, string_response);
+                    TRACE_B("'%s' response: \r\n%s", msg_sub_class_method_hub_item_updated, string_response);
                     cJSON_Minify(string_response);
                 }
 

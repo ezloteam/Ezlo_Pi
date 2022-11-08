@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include "frozen.h"
 #include "settings.h"
+#include "trace.h"
 
 char *settings_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
@@ -24,6 +25,8 @@ char *settings_list(const char *payload, uint32_t len, struct json_token *method
                  method->len, method->ptr,
                  msg_count,
                  sender.len ? sender.len : 2, sender.len ? sender.ptr : "{}");
+
+        TRACE_B("%s", send_buf);
     }
 
     return send_buf;

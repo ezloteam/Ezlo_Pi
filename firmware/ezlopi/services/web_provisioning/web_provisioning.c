@@ -6,9 +6,6 @@
 #include "esp_idf_version.h"
 
 #include "trace.h"
-// #include "frozen.h"
-// #include "web_provisioning.h"
-// #include "wss.h"
 #include "data.h"
 #include "devices.h"
 #include "scenes.h"
@@ -20,13 +17,12 @@
 #include "items.h"
 #include "room.h"
 #include "feature.h"
-// #include "settings.h"
 #include "network.h"
+#include "ezlopi_websocket_client.h"
 
 #include "ezlopi_factory_info.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_http.h"
-#include "ezlopi_wss.h"
 
 static uint32_t message_counter = 0;
 
@@ -79,7 +75,8 @@ int web_provisioning_send_to_nma_websocket(char *data)
     if (data)
     {
         // TRACE_D("WSS-SENDING: %s", data);
-        ret = wss_client_send(data, strlen(data));
+        ezlopi_websocket_client_send(data, strlen(data));
+        // ret = wss_client_send(data, strlen(data));
         message_counter++;
     }
 
@@ -117,7 +114,8 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
                 if (cjson_uri)
                 {
                     TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                    ezlopi_client_init(cjson_uri->valuestring, __message_upcall);
+                    ezlopi_websocket_client_init(cjson_uri, __message_upcall);
+                    // ezlopi_client_init(cjson_uri->valuestring, __message_upcall);
                     registration_init();
                     break;
                 }

@@ -1,7 +1,8 @@
 #ifndef __EZLOPI_CLOUD_KEYWORDS_H__
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 
-const static char *ezlopi_ezlopi_str = "ezlopi";
+#include "stdio.h"
+// const static char *ezlopi_ezlopi_str = "ezlopi";
 
 const static char *ezlopi_id_str = "id";
 const static char *ezlopi_ids_str = "ids";

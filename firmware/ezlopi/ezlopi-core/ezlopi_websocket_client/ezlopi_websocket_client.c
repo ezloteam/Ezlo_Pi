@@ -19,15 +19,14 @@
 #include "freertos/event_groups.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "cJSON.h"
 
 #include "esp_websocket_client.h"
 #include "protocol_examples_common.h"
 
 #include "ezlopi_factory_info.h"
-#include "websocket_client.h"
+#include "ezlopi_websocket_client.h"
 #include "trace.h"
-
-using namespace std;
 
 typedef struct s_ws_event_arg
 {
@@ -47,8 +46,6 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     case WEBSOCKET_EVENT_CONNECTED:
     {
         TRACE_I("WEBSOCKET_EVENT_CONNECTED");
-        // static const string send_hello = "Hello from client!";
-        // esp_websocket_client_send_text(event_arg->client, send_hello.c_str(), send_hello.length(), portMAX_DELAY);
         break;
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
@@ -58,14 +55,10 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DATA:
     {
-        if (data->data_ptr && data->data_len)
+        if ((NULL != data->data_ptr) && (data->data_len > 0) && (NULL != event_arg) && (NULL != event_arg->upcall))
         {
             event_arg->upcall(data->data_ptr, data->data_len);
         }
-        // TRACE_I("WEBSOCKET_EVENT_DATA");
-        // TRACE_I("Received opcode=%d", data->op_code);
-        // TRACE_W("Received=%.*s", data->data_len, (char *)data->data_ptr);
-        // TRACE_W("Total payload length=%d, data_len=%d, current payload offset=%d\r\n", data->payload_len, data->data_len, data->payload_offset);
         break;
     }
     case WEBSOCKET_EVENT_ERROR:
@@ -73,8 +66,80 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
         TRACE_I("WEBSOCKET_EVENT_ERROR");
         break;
     }
+    default:
+    {
+        TRACE_W("Websocket event type not-implemented! value: %u", event_id);
+        break;
+    }
     }
 }
+
+int ezlopi_websocket_client_send(char *data, uint32_t len)
+{
+    int ret = 0;
+
+    if ((NULL != data) && (len > 0))
+    {
+        if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
+        {
+            ret = esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
+        }
+    }
+
+    return ret;
+}
+
+esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*upcall)(const char *, uint32_t))
+{
+    if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != upcall))
+    {
+        static s_ws_event_arg_t event_arg;
+        event_arg.client = client;
+        event_arg.upcall = upcall;
+
+        s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+
+        esp_websocket_client_config_t websocket_cfg = {
+            .uri = uri->valuestring,
+            .task_stack = 8 * 1024,
+            .cert_pem = factory->ca_certificate,
+            .client_cert = factory->ssl_shared_key,
+            .client_key = factory->ssl_private_key,
+            .pingpong_timeout_sec = 20,
+            .keep_alive_enable = 1,
+            .ping_interval_sec = 10,
+        };
+
+        TRACE_I("Connecting to %s...", websocket_cfg.uri);
+
+        client = esp_websocket_client_init(&websocket_cfg);
+        esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
+        esp_websocket_client_start(client);
+        // event_arg.client = client;
+    }
+    else
+    {
+        TRACE_I("Client already active!");
+    }
+
+    return client;
+}
+
+bool ezlopi_websocket_client_is_connected(void)
+{
+    return esp_websocket_client_is_connected(client);
+}
+
+void ezlopi_websocket_client_kill(void)
+{
+    esp_websocket_client_stop(client);
+    TRACE_I("Websocket Stopped");
+    esp_websocket_client_destroy(client);
+    client = NULL;
+}
+
+#if 0
+using namespace std;
 
 int websocket_client::send(std::string &_str)
 {
@@ -153,3 +218,4 @@ void websocket_client::websocket_client_kill(void)
     esp_websocket_client_destroy(client);
     client = NULL;
 }
+#endif

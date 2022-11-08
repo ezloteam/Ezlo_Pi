@@ -3,10 +3,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "ezlopi_wss.h"
-// #include "websocket_client.h"
-#include "registration.h"
 #include "trace.h"
+#include "registration.h"
+#include "ezlopi_websocket_client.h"
 
 static volatile uint32_t is_registered = 0;
 static void registration_process(void *pv);
@@ -30,7 +29,6 @@ static void registration_process(void *pv)
     char mac_str[18];
     uint8_t mac_addr[6];
     char reg_str[300] = "";
-    // websocket_client *ws_client = (websocket_client *)pv;
 
     esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
     snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
@@ -42,17 +40,14 @@ static void registration_process(void *pv)
              "\"hubType\":\"32.1\",\"mac_address\":\"%s\"}}",
              esp_random(), "a2:97:1e:74:0b:52");
 
-    while (false == wss_client_is_connected())
+    while (false == ezlopi_websocket_client_is_connected())
     {
         vTaskDelay(200 / portTICK_RATE_MS);
     }
 
     while (0 == is_registered)
     {
-        /*Send registration packet in some interval*/
-        wss_client_send(reg_str, strlen(reg_str));
-        // ws_client->send(reg_str);
-        // TRACE_I(">>>> WSS-Tx: 'register':\r\n%s", reg_str);
+        ezlopi_websocket_client_send(reg_str, strlen(reg_str));
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
