@@ -75,7 +75,7 @@ static void send_event_to_queue(e_ezlopi_actions_t action)
     {
         event_data->arg = NULL;
         event_data->action = action;
-        if (0 == ezlopi_event_queue_send(&event_data, true))
+        if (0 == ezlopi_event_queue_send(event_data, true))
         {
             free(event_data);
         }

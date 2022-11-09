@@ -26,7 +26,7 @@ const static char *category_temperature = "temperature";
 // const static char *category_alarm_panel = "alarm_panel";
 // const static char *category_alarm_partition = "alarm_partition";
 // const static char *category_siren = "siren";
-// const static char *category_weather = "weather";
+const static char *category_weather = "weather";
 // const static char *category_philips_controller = "philips_controller";
 // const static char *category_appliance = "appliance";
 // const static char *category_uv_sensor = "uv_sensor";
@@ -39,5 +39,6 @@ const static char *category_temperature = "temperature";
 // const static char *category_state_sensor = "state_sensor";
 // const static char *category_level_sensor = "level_sensor";
 // const static char *category_clock = "clock";
+const static char *category_pressure = "pressure";
 
 #endif // __EZLOPI_CATEGORY_H__

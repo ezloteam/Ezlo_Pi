@@ -72,22 +72,5 @@ static void blinky(void *pv)
             TRACE_D("-----------------------------------------");
             count = 0;
         }
-
-        // s_ezlo_event_t *event = malloc(sizeof(s_ezlo_event_t));
-        // if (event)
-        // {
-        //     event->action = EZLOPI_ACTION_GET_VALUE;
-        //     event->arg = NULL;
-
-        //     if (0 == ezlopi_event_queue_send(&event, 0))
-        //     {
-        //         TRACE_E("Error: failed to send to the queue!\n");
-        //         // free(event);
-        //     }
-        // }
-
-        // float humidity, temperature;
-        // dht_read_float_data(DHT_TYPE_AM2301, dht22_pin, &humidity, &temperature);
-        // TRACE_B(">>>>>> SN-002 real data -> Humidity: %.02f, Temperature: %.02f <<<<<<\n", humidity, temperature);
     }
 }

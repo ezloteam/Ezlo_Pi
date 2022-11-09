@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
+#include<math.h>
 
 
 bme280_identifier_t identifier = {
@@ -44,7 +45,7 @@ typedef enum device_feature device_feature_t;
 
 static int add_multiple_device_features(device_feature_t feature, void *arg);
 static int prepare_sensor(void *arg);
-static int sensor_bme280_prepare(const char* category, const char *sub_category, const char *item_name, void* arg);
+static int sensor_bme280_prepare(const char* category, const char *sub_category, const char *item_name, const char *value_type, void* arg);
 static int8_t sensor_bme280_get_value(sensor_bme280_data_t *data);
 static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t* properties, void* args);
 static int sensor_bme280_init();
@@ -120,7 +121,7 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_pro
     {
         if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_bme_device_properties))
         {
-            free(sensor_bme_device_properties);
+            ret = 0;
         }
         else
         {
@@ -145,21 +146,21 @@ static int add_multiple_device_features(device_feature_t feature, void *arg)
             case TEMPERATURE_FEATURE:
             {
                 TRACE_I("Adding temperature feature.");
-                sensor_bme_device_properties = sensor_bme280_prepare(category_temperature, subcategory_not_defined, ezlopi_item_name_target_temperature, cjson_device);
+                sensor_bme_device_properties = sensor_bme280_prepare(category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, cjson_device);
                 add_device_to_list(prep_arg, sensor_bme_device_properties);
                 break;
             }
             case HUMIDITY_FEATURE:
             {
                 TRACE_I("Adding humidity feature.");
-                sensor_bme_device_properties = sensor_bme280_prepare(category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, cjson_device);
+                sensor_bme_device_properties = sensor_bme280_prepare(category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, cjson_device);
                 add_device_to_list(prep_arg, sensor_bme_device_properties);
                 break;
             }
             case PRESSURE_FEATURE:
             {
                 TRACE_I("Adding pressure feature.");
-                sensor_bme_device_properties = sensor_bme280_prepare(category_not_defined, subcategory_not_defined, ezlopi_item_name_pressure, cjson_device);
+                sensor_bme_device_properties = sensor_bme280_prepare(category_pressure, subcategory_not_defined, ezlopi_item_name_pressure, value_type_pressure, cjson_device);
                 add_device_to_list(prep_arg, sensor_bme_device_properties);
                 break;
             }
@@ -171,20 +172,20 @@ static int add_multiple_device_features(device_feature_t feature, void *arg)
         }
         
     }
+    free(sensor_bme_device_properties);
     return ret;
-
 }
 
 static int prepare_sensor(void *arg)
 {
     int ret = 0;
-    // add_multiple_device_features(TEMPERATURE_FEATURE, arg);
+    add_multiple_device_features(TEMPERATURE_FEATURE, arg);
     add_multiple_device_features(HUMIDITY_FEATURE, arg);
-    // add_multiple_device_features(PRESSURE_FEATURE, arg);
+    add_multiple_device_features(PRESSURE_FEATURE, arg);
     return ret;
 }
 
-static int sensor_bme280_prepare(const char* category, const char *sub_category, const char *item_name, void* arg)
+static int sensor_bme280_prepare(const char* category, const char *sub_category, const char *item_name, const char *value_type, void* arg)
 {
      cJSON* cjson_device = (cJSON*)arg;
     s_ezlopi_device_properties_t* sensor_ble280_properties = NULL;
@@ -204,7 +205,7 @@ static int sensor_bme280_prepare(const char* category, const char *sub_category,
             sensor_ble280_properties->ezlopi_cloud.subcategory = sub_category;
             sensor_ble280_properties->ezlopi_cloud.item_name = item_name;
             sensor_ble280_properties->ezlopi_cloud.device_type = dev_type_sensor;
-            sensor_ble280_properties->ezlopi_cloud.value_type = value_type_float;
+            sensor_ble280_properties->ezlopi_cloud.value_type = value_type;
             sensor_ble280_properties->ezlopi_cloud.has_getter = true;
             sensor_ble280_properties->ezlopi_cloud.has_setter = false;
             sensor_ble280_properties->ezlopi_cloud.reachable = true;
@@ -256,6 +257,7 @@ static int8_t sensor_bme280_get_value(sensor_bme280_data_t *data)
     else
     {
         TRACE_I("Sensor mode obtained successfully!!");
+        data->pressure = 0.01 * data->pressure;
     }
     return data;
 }
@@ -305,18 +307,24 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t* propertie
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        if(0 == strcmp("temperature", cJSON_GetStringValue(cJSON_GetObjectItem(cjson_propertise, "deviceCategory"))))
+        if (category_temperature == properties->ezlopi_cloud.category)
         {
                 TRACE_E("Temperature is: %f", data->temperature);
                 cJSON_AddNumberToObject(cjson_propertise, "value", data->temperature);
                 cJSON_AddStringToObject(cjson_propertise, "scale", "celsius");
         }
-        else if(0 == strcmp("humidity", cJSON_GetStringValue(cJSON_GetObjectItem(cjson_propertise, "deviceCategory"))))
+        if (category_humidity == properties->ezlopi_cloud.category)
         {
                 TRACE_E("Humidity is: %f", data->humidity);
                 cJSON_AddNumberToObject(cjson_propertise, "value", data->humidity);
-                cJSON_AddStringToObject(cjson_propertise, "scale", "%");
-        }                 
+                cJSON_AddStringToObject(cjson_propertise, "scale", "percent");
+        }
+        if(category_pressure == properties->ezlopi_cloud.category)
+        {
+            TRACE_E("Pressure is: %f", data->pressure);
+            cJSON_AddNumberToObject(cjson_propertise, "value", data->pressure);
+            cJSON_AddStringToObject(cjson_propertise, "scale", "kilo_pascal");
+        }                
         
         ret = 1;
     }

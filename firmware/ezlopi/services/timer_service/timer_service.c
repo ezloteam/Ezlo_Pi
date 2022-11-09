@@ -28,12 +28,13 @@ static void event_process(void *pv)
         s_ezlo_event_t *event = NULL; //  = {.action = EZLOPI_ACTION_NONE, .arg = NULL};
         if (pdTRUE == ezlopi_event_queue_receive(&event, UINT32_MAX / portTICK_PERIOD_MS))
         {
-            TRACE_D("Tick expired: %d\n", xTaskGetTickCount() - old_tick);
+            // TRACE_D("Tick expired: %d\n", xTaskGetTickCount() - old_tick);
             old_tick = xTaskGetTickCount();
 
-            if (event)
+            if (NULL != event)
             {
-                TRACE_D("action received: %s\n", ezlopi_actions_to_string(event->action));
+                TRACE_B("free heap: %u", esp_get_free_heap_size());
+                // TRACE_D("action received: %s\n", ezlopi_actions_to_string(event->action));
 
                 l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
                 while (NULL != registered_device)
@@ -41,10 +42,9 @@ static void event_process(void *pv)
                     registered_device->device->func(event->action, registered_device->properties, event->arg);
                     registered_device = registered_device->next;
                 }
-            }
-            else
-            {
+
                 free(event);
+                event = NULL;
             }
         }
     }

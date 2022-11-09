@@ -1,7 +1,6 @@
 #include <string.h>
-
-#include "room.h"
 #include "trace.h"
+#include "room.h"
 #include "frozen.h"
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"
