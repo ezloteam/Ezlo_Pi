@@ -19,6 +19,7 @@ static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *
 static s_ezlopi_device_properties_t *digital_io_prepare_item(cJSON *cjson_device);
 static void digital_io_write_gpio_value(s_ezlopi_device_properties_t *properties);
 static uint32_t digital_io_read_gpio_value(s_ezlopi_device_properties_t *properties);
+extern void digital_io_isr_service_init(s_ezlopi_device_properties_t *properties);
 
 int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg)
 {
@@ -49,7 +50,7 @@ int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properti
         ret = digital_io_get_value_cjson(properties, arg);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_50_MS:
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
         ret = ezlopi_device_value_updated_from_device(properties);
         break;
@@ -76,7 +77,33 @@ static int digital_io_get_value_cjson(s_ezlopi_device_properties_t *properties, 
     return ret;
 }
 
-// Must type cast the 'digital_io_device_properties' to 'int' and return
+static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    cJSON *cjson_params = (cJSON *)arg;
+
+    if (NULL != cjson_params)
+    {
+        int value = 0;
+        CJSON_GET_VALUE_INT(cjson_params, "value", value);
+
+        TRACE_I("item_name: %s", properties->ezlopi_cloud.item_name);
+        TRACE_I("gpio_num: %d", properties->interface.gpio.gpio_out.gpio_num);
+        TRACE_I("item_id: %d", properties->ezlopi_cloud.item_id);
+        TRACE_I("prev value: %d", properties->interface.gpio.gpio_out.value);
+        TRACE_I("cur value: %d", value);
+
+        if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
+        {
+            value = (0 == properties->interface.gpio.gpio_out.invert) ? value : ((EZLOPI_GPIO_LOW == value) ? EZLOPI_GPIO_HIGH : EZLOPI_GPIO_LOW);
+            gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, value);
+            properties->interface.gpio.gpio_out.value = value;
+        }
+    }
+
+    return ret;
+}
+
 static int digital_io_prepare(void *arg)
 {
     int ret = 0;
@@ -102,45 +129,6 @@ static int digital_io_prepare(void *arg)
     }
 
     return ret;
-}
-
-static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg)
-{
-    int ret = 0;
-    cJSON *cjson_params = (cJSON *)arg;
-
-    if (NULL != cjson_params)
-    {
-        int value = 0;
-        CJSON_GET_VALUE_INT(cjson_params, "value", value);
-
-        TRACE_I("item_name: %s", properties->ezlopi_cloud.item_name);
-        TRACE_I("gpio_num: %d", properties->interface.gpio.gpio_out.gpio_num);
-        TRACE_I("item_id: %d", properties->ezlopi_cloud.item_id);
-        TRACE_I("prev value: %d", properties->interface.gpio.gpio_out.value);
-        TRACE_I("cur value: %d", value);
-
-        if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
-        {
-            gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, value);
-            properties->interface.gpio.gpio_out.value = value;
-        }
-    }
-
-    return ret;
-}
-
-static int digital_io_ezlopi_update_data(void)
-{
-    int ret = 0;
-    // char *data = (char *)malloc(65);
-    // char *send_buf = malloc(1024);
-    // digital_io_get_value(data);
-    // send_buf = items_update_from_sensor(0, data);
-    // TRACE_I("The send_buf is: %s, the size is: %d", send_buf, strlen(send_buf));
-    // free(data);
-    // free(send_buf);
-    return 0;
 }
 
 static int digital_io_init(s_ezlopi_device_properties_t *properties)
@@ -179,11 +167,13 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
                              (properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
                                 ? GPIO_PULLDOWN_ENABLE
                                 : GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_DISABLE,
+            .intr_type = (GPIO_PULLUP_ONLY == properties->interface.gpio.gpio_in.pull)
+                             ? GPIO_INTR_POSEDGE
+                             : GPIO_INTR_NEGEDGE,
         };
 
         gpio_config(&io_conf);
-        properties->interface.gpio.gpio_in.value = digital_io_read_gpio_value(properties);
+        digital_io_isr_service_init(properties);
     }
     
 

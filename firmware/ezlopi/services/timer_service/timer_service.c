@@ -33,7 +33,7 @@ static void event_process(void *pv)
 
             if (NULL != event)
             {
-                TRACE_B("free heap: %u", esp_get_free_heap_size());
+                // TRACE_B("free heap: %u", esp_get_free_heap_size());
                 // TRACE_D("action received: %s\n", ezlopi_actions_to_string(event->action));
 
                 l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
