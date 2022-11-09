@@ -81,7 +81,7 @@ static int digital_io_prepare(void *arg)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
-    cJSON *cjson_device = (cJSON *)prep_arg->cjson_device;
+    cJSON *cjson_device = prep_arg->cjson_device;
 
     s_ezlopi_device_properties_t *digital_io_device_properties = NULL;
 

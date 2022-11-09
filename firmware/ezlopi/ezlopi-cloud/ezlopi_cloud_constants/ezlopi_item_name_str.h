@@ -111,7 +111,7 @@
 // const static char *ezlopi_item_name_gas_meter_pulse = "gas_meter_pulse";
 // const static char *ezlopi_item_name_heating_meter_energy = "heating_meter_energy";
 // const static char *ezlopi_item_name_cooling_meter_energy = "cooling_meter_energy";
-// const static char *ezlopi_item_name_humidity = "humidity";
+const static char *ezlopi_item_name_humidity = "humidity";
 // const static char *ezlopi_item_name_loudness = "loudness";
 // const static char *ezlopi_item_name_lux = "lux";
 // const static char *ezlopi_item_name_meter_reset = "meter_reset";

@@ -62,7 +62,7 @@ char *room_list(const char *payload, uint32_t len, struct json_token *method, ui
             string_response = cJSON_Print(cjson_response);
             if (string_response)
             {
-                // TRACE_B("'%s' response:\r\n%s", method_hub_room_list, string_response);
+                TRACE_B("'%s' response:\r\n%s", method_hub_room_list, string_response);
                 cJSON_Minify(string_response);
             }
 

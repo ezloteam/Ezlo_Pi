@@ -6,6 +6,7 @@
 #include "ezlopi_nvs.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_devices_list.h"
+#include "trace.h"
 
 static void ezlopi_initialize_devices(void);
 
@@ -17,6 +18,7 @@ void ezlopi_init(void)
 
     // Init devices
     ezlopi_device_init();
+    ezlopi_initialize_devices();
 
     ezlopi_wifi_initialize();
     ezlopi_wifi_connect_from_nvs();

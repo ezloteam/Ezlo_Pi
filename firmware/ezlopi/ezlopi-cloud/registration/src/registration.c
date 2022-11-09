@@ -52,7 +52,7 @@ static void registration_process(void *pv)
         /*Send registration packet in some interval*/
         wss_client_send(reg_str, strlen(reg_str));
         // ws_client->send(reg_str);
-        // TRACE_I(">>>> WSS-Tx: 'register':\r\n%s", reg_str);
+        TRACE_I(">>>> WSS-Tx: 'register':\r\n%s", reg_str);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 

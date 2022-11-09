@@ -48,7 +48,7 @@ char *gateways_list(const char *payload, uint32_t len, struct json_token *method
         len_b = strlen(send_buf);
         send_buf[len_b] = 0;
 
-        // TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
+        TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
     }
 
     return send_buf;

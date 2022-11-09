@@ -33,7 +33,7 @@ char *modes_get(const char *payload, uint32_t len, struct json_token *method, ui
         int len_b = strlen(send_buf);
         snprintf(&send_buf[len_b], buf_len - len_b, modes_1_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
 
-        // TRACE_B(">>>>>>>>>>> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
+        TRACE_B(">>>>>>>>>>> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
     }
 
     return send_buf;
