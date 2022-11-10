@@ -29,7 +29,8 @@ void digital_io_isr_service_init(s_ezlopi_device_properties_t *properties)
     static bool service_started;
 
     if (false == service_started)
-    {
+    {   
+        gpio_install_isr_service(0);
         gpio_evt_queue = xQueueCreate(20, sizeof(s_ezlopi_device_properties_t *));
         xTaskCreate(digital_io_isr_service, "digital-io-isr-service", 2048, NULL, 3, NULL);
         service_started = true;
@@ -75,6 +76,7 @@ static void digital_io_isr_service(void *pv)
     {
         s_event_arg_t *event_arg = NULL;
         xQueueReceive(gpio_evt_queue, &event_arg, portMAX_DELAY);
+        TRACE_E("Interrupt encountered!!");
 
         if (NULL != event_arg)
         {
@@ -88,3 +90,5 @@ static void digital_io_isr_service(void *pv)
         }
     }
 }
+
+

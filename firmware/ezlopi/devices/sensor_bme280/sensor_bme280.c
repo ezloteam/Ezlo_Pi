@@ -121,7 +121,7 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_pro
     {
         if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_bme_device_properties))
         {
-            ret = 0;
+            free(sensor_bme_device_properties);
         }
         else
         {
@@ -160,7 +160,7 @@ static int add_multiple_device_features(device_feature_t feature, void *arg)
             case PRESSURE_FEATURE:
             {
                 TRACE_I("Adding pressure feature.");
-                sensor_bme_device_properties = sensor_bme280_prepare(category_pressure, subcategory_not_defined, ezlopi_item_name_pressure, value_type_pressure, cjson_device);
+                sensor_bme_device_properties = sensor_bme280_prepare(category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, cjson_device);
                 add_device_to_list(prep_arg, sensor_bme_device_properties);
                 break;
             }
@@ -172,7 +172,7 @@ static int add_multiple_device_features(device_feature_t feature, void *arg)
         }
         
     }
-    free(sensor_bme_device_properties);
+    
     return ret;
 }
 
@@ -319,7 +319,7 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t* propertie
                 cJSON_AddNumberToObject(cjson_propertise, "value", data->humidity);
                 cJSON_AddStringToObject(cjson_propertise, "scale", "percent");
         }
-        if(category_pressure == properties->ezlopi_cloud.category)
+        if(category_not_defined == properties->ezlopi_cloud.category)
         {
             TRACE_E("Pressure is: %f", data->pressure);
             cJSON_AddNumberToObject(cjson_propertise, "value", data->pressure);

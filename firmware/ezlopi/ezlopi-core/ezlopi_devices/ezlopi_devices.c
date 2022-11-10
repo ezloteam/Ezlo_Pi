@@ -42,10 +42,9 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         TRACE_D("device->ezlopi_cloud.battery_powered: %s", device->ezlopi_cloud.battery_powered ? "true" : "false");
         TRACE_D("device->ezlopi_cloud.show: %s", device->ezlopi_cloud.show ? "true" : "false");
         TRACE_D("device->ezlopi_cloud.room_name: %s", device->ezlopi_cloud.room_name ? device->ezlopi_cloud.room_name : "");
-        TRACE_D("device->ezlopi_cloud.device_id: %d", device->ezlopi_cloud.device_id);
-        TRACE_D("device->ezlopi_cloud.room_id: %d", device->ezlopi_cloud.room_id);
-        TRACE_D("device->ezlopi_cloud.item_id: %d", device->ezlopi_cloud.item_id);
-
+        TRACE_D("device->ezlopi_cloud.device_id: 0x%08x", device->ezlopi_cloud.device_id);
+        TRACE_D("device->ezlopi_cloud.room_id: 0x%08x", device->ezlopi_cloud.room_id);
+        TRACE_D("device->ezlopi_cloud.item_id: 0x%08x", device->ezlopi_cloud.item_id);
         switch (device->interface_type)
         {
         case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
