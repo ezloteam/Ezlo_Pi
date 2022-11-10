@@ -36,24 +36,24 @@ void app_main(void)
 
 static void blinky(void *pv)
 {
-    gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_2),
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
+    // gpio_config_t io_conf = {
+    //     .pin_bit_mask = (1ULL << GPIO_NUM_2),
+    //     .mode = GPIO_MODE_OUTPUT,
+    //     .pull_up_en = GPIO_PULLUP_DISABLE,
+    //     .pull_down_en = GPIO_PULLDOWN_DISABLE,
+    //     .intr_type = GPIO_INTR_DISABLE,
+    // };
 
-    uint32_t state = 0;
+    // uint32_t state = 0;
     uint32_t count = 0;
 
-    adc1_config_width(ADC_WIDTH_BIT_12);
-    gpio_config(&io_conf);
+    // adc1_config_width(ADC_WIDTH_BIT_12);
+    // gpio_config(&io_conf);
 
     while (1)
     {
-        state ^= 1;
-        gpio_set_level(GPIO_NUM_2, state);
+        // state ^= 1;
+        // gpio_set_level(GPIO_NUM_2, state);
         // int hall_sensor_value = hall_sensor_read();
         // int hall_sensor_value = 0;
         // TRACE_D("Hall Sensor value: %d\r\n", hall_sensor_value);

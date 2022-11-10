@@ -12,7 +12,7 @@ static uint32_t room_id = 0;
 
 static void ezlopi_device_parse_json(char *config_string);
 
-void ezlopi_device_init(void)
+void ezlopi_device_prepare(void)
 {
     char *config_string = NULL;
     ezlopi_nvs_read_config_data_str(&config_string);
@@ -113,15 +113,6 @@ static void ezlopi_device_parse_json(char *config_string)
                         {
                             s_ezlopi_prep_arg_t device_prep_arg = {.device = &sensor_list[dev_idx], .cjson_device = cjson_device};
                             sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg);
-                            // s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg);
-
-                            // if (properties)
-                            // {
-                            //     if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx], properties))
-                            //     {
-                            //         free(properties);
-                            //     }
-                            // }
                         }
 
                         dev_idx++;
