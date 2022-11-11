@@ -18,6 +18,7 @@
 #include "qt_serial.h"
 #include "web_provisioning.h"
 #include "gatt_server.h"
+#include "gpio_isr_service.h"
 
 static void blinky(void *pv);
 
@@ -30,6 +31,7 @@ void app_main(void)
     web_provisioning_init();
     GATT_SERVER_MAIN();
     sensor_service_init();
+    gpio_isr_service_init();
 
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
