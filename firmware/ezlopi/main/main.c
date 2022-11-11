@@ -18,7 +18,7 @@
 #include "qt_serial.h"
 #include "web_provisioning.h"
 #include "gatt_server.h"
-#include "sensor_pir.h"
+#include "sensor_door.h"
 
 #define EZLOPI_PIR_PIN_NUM GPIO_NUM_2
 
@@ -26,18 +26,33 @@ static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 
+void door_task(void *args)
+{
+    int value = 0;
+    while(1)
+    {
+        
+        value = get_door_sensor_value();
+        TRACE_I("The value obtained from hall sensor is: %d", value);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
 
+}
 
 void app_main(void)
 {
     qt_serial_init();
-    ezlopi_init();
-    web_provisioning_init();
-    // GATT_SERVER_MAIN();
-    // sensor_service_init();
-    ezlopi_pir_begin(EZLOPI_ACTION_PREPARE, NULL, NULL);
+//     ezlopi_init();
+//     web_provisioning_init();
+//     // GATT_SERVER_MAIN();
+//     // sensor_service_init();
+//     ezlopi_pir_begin(EZLOPI_ACTION_PREPARE, NULL, NULL);
 
     // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+
+    setup_door_sensor();
+    xTaskCreate(door_task, "door_task", 2*2048, NULL, 1, NULL);
+
 }
 
 static void blinky(void *pv)
