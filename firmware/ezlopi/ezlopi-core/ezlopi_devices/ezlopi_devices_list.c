@@ -36,9 +36,9 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_019_PIR
+#ifdef EZLOPI_SENSOR_0019_PIR
     {
-        .id = EZLOPI_SENSOR_019_PIR,
+        .id = EZLOPI_SENSOR_0019_PIR,
         .func = ezlopi_pir_begin,
     },
 

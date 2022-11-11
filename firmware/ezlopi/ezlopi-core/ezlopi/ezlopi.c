@@ -17,8 +17,7 @@ void ezlopi_init(void)
     ezlopi_factory_info_init();
 
     // Init devices
-    ezlopi_device_init();
-    ezlopi_initialize_devices();
+    ezlopi_device_prepare();
 
     ezlopi_wifi_initialize();
     ezlopi_wifi_connect_from_nvs();

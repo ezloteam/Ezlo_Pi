@@ -1,6 +1,7 @@
 
 
 #include "sensor_pir.h"
+#include "isr_service.h"
 
 
 static int sensor_pir_prepare(void* arg);
@@ -132,6 +133,8 @@ static int sensor_pir_init(s_ezlopi_device_properties_t* properties)
                 TRACE_I("PIR sensor initialize successfully.");
                 properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
             }
+
+            isr_service_init(properties, ezlopi_device_value_updated_from_device);
         }
         
         return ret;
