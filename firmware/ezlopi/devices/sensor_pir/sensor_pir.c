@@ -9,7 +9,7 @@ static int sensor_pir_get_value_cjson(s_ezlopi_device_properties_t *properties, 
 static int sensor_pir_get_value(s_ezlopi_device_properties_t *properties);
 // static int ezlopi_device_value_updated_from_device(s_ezlopi_device_properties_t* properties);
 
-int ezlopi_pir_begin(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg)
+int sensor_pir(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
 

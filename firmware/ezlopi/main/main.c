@@ -11,6 +11,7 @@
 
 #include "ezlopi_timer.h"
 #include "timer_service.h"
+#include "gpio_isr_service.h"
 #include "ezlopi_event_queue.h"
 
 #include "trace.h"
@@ -35,6 +36,7 @@ void app_main(void)
     gpio_isr_service_init();
 
     // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+
 }
 
 static void blinky(void *pv)

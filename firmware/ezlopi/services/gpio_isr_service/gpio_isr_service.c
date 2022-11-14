@@ -13,10 +13,13 @@
 static QueueHandle_t gpio_evt_queue = NULL;
 static const uint32_t switch_debounce_time = 1000;
 
+
+
 typedef struct s_event_arg
 {
     TickType_t time;
     s_ezlopi_device_properties_t *properties;
+    f_interrupt_upcall_t __upcall;
 } s_event_arg_t;
 
 static void IRAM_ATTR __gpio_isr_handler(void *arg);
@@ -37,7 +40,8 @@ void gpio_isr_service_init(void)
 
 }
 
-void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, void (*__upcall)(s_ezlopi_device_properties_t *properties))
+
+void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_interrupt_upcall_t __upcall)
 {
     s_event_arg_t *event_arg = malloc(sizeof(s_event_arg_t));
 
@@ -45,6 +49,7 @@ void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, void (*
     {
         event_arg->time = 0;
         event_arg->properties = properties;
+        event_arg->__upcall = __upcall;
         gpio_intr_enable(properties->interface.gpio.gpio_in.gpio_num);
         gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void *)event_arg);
     }
@@ -77,10 +82,7 @@ static void digital_io_isr_service(void *pv)
 
             if ((tick_now - event_arg->time) > (switch_debounce_time / portTICK_RATE_MS))
             {
-                TRACE_I("****** ISR-event:: pin: %u", event_arg->properties->interface.gpio.gpio_in.gpio_num);
-                event_arg->properties->interface.gpio.gpio_out.value = (EZLOPI_GPIO_LOW == event_arg->properties->interface.gpio.gpio_out.value) ? EZLOPI_GPIO_HIGH : EZLOPI_GPIO_LOW;
-                gpio_set_level(event_arg->properties->interface.gpio.gpio_out.gpio_num, event_arg->properties->interface.gpio.gpio_out.value);
-                ezlopi_device_value_updated_from_device(event_arg->properties);
+                event_arg->__upcall(event_arg->properties);
                 event_arg->time = tick_now;
             }
         }

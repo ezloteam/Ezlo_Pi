@@ -3,6 +3,7 @@
 #include "sensor_bme280.h"
 #include "digital_io.h"
 #include "sensor_pir.h"
+#include "sensor_door.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -36,10 +37,17 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0018_DOOR
+    {
+        .id = EZLOPI_SENSOR_0018_DOOR,
+        .func = setup_door_sensor,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0019_PIR
     {
         .id = EZLOPI_SENSOR_0019_PIR,
-        .func = ezlopi_pir_begin,
+        .func = sensor_pir,
     },
 
 #endif
@@ -108,8 +116,3 @@ static l_ezlopi_configured_devices_t *ezlopi_device_list_create(s_ezlopi_device_
     }
     return device_list_element;
 }
-
-
-
-
-

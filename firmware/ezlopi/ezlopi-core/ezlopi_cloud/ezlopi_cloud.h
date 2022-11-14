@@ -12,14 +12,14 @@ typedef struct s_ezlopi_cloud_info
     const char *category;    // ezlopi-cloud/constants/category_str.h
     const char *subcategory; // ezlopi-cloud/constants/subcategory_str.h
     const char *device_type; // ezlopi-cloud/constants/device_types_str.h
-    const char *value_type;  // ezlopi-cloud/constants/values_str.h        
+    const char *value_type;  // ezlopi-cloud/constants/values_str.h
     bool reachable;
     bool battery_powered;
     uint32_t room_id;   //
     char room_name[32]; //
 
-    uint32_t item_id; //
-    char *item_name;  // https://api.ezlo.com/devices/items/index.html
+    uint32_t item_id;      //
+    const char *item_name; // https://api.ezlo.com/devices/items/index.html
 
     bool has_getter; //
     bool has_setter;
