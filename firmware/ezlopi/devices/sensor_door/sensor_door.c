@@ -130,7 +130,7 @@ static int get_door_sensor_value(s_ezlopi_device_properties_t* properties, void 
     int ret = 0;
     int sensor_data = hall_sensor_read();
     TRACE_E("Reading value from the door sensor.");
-    char* door_is = ((sensor_data >= 70) || (sensor_data <= 20)) ? "dw_is_closed" : "dw_is_opened";
+    char* door_is = ((sensor_data >= 60) || (sensor_data <= 20)) ? "dw_is_closed" : "dw_is_opened";
     // TRACE_I("The door is %s", door_is);
     cJSON *cjson_propertise = (cJSON *)args;
     if(cjson_propertise)
