@@ -6,10 +6,11 @@
 
 
 #include "driver/adc.h"
-#include "ezlopi.h"
+#include "ezlopi_actions.h"
+#include "ezlopi_devices.h"
 
 
-int setup_door_sensor(e_ezlopi_actions_t action, void *args);
+int setup_door_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args);
 
 
 #endif // _SENSOR_DOOR_H_

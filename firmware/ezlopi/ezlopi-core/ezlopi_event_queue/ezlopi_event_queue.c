@@ -13,7 +13,7 @@ void ezlopi_event_queue_init(void)
     }
 }
 
-int ezlopi_event_queue_send(s_ezlo_event_t **event_data, int from_isr)
+int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr)
 {
     int ret = 0;
 
@@ -45,11 +45,11 @@ int ezlopi_event_queue_send(s_ezlo_event_t **event_data, int from_isr)
         if (from_isr)
         {
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            ret = xQueueSendFromISR(generic_queue, event_data, &xHigherPriorityTaskWoken);
+            ret = xQueueSendFromISR(generic_queue, &event_data, &xHigherPriorityTaskWoken);
         }
         else
         {
-            ret = xQueueSend(generic_queue, event_data, 0);
+            ret = xQueueSend(generic_queue, &event_data, 0);
         }
     }
 

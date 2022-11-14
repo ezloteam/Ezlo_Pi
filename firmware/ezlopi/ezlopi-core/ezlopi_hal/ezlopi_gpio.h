@@ -32,7 +32,6 @@ typedef struct s_ezlopi_gpio
     e_ezlopi_gpio_pull_mode_t pull;
     e_ezlopi_gpio_logic_invert_t invert;
     e_ezlopi_gpio_interrupt_t interrupt;
-
 } s_ezlopi_gpio_t;
 
 typedef struct s_ezlopi_gpios

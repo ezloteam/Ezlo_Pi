@@ -119,9 +119,6 @@ char *data_list(const char *data, uint32_t len, struct json_token *method, uint3
         struct json_token msg_id = JSON_INVALID_TOKEN;
         struct json_token sender = JSON_INVALID_TOKEN;
 
-        // s_ezlopi_device_t *devices_list = ezlopi_devices_list_get_list();
-        // if (devices_list)
-        // {
         json_scanf(data, len, "{id: %T}", &msg_id);
         sender_status = json_scanf(data, len, "{sender: %T}", &sender);
 

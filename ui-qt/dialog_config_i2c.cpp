@@ -80,10 +80,6 @@ void Dialog_config_i2c::on_buttonBox_accepted() {
 
     i2c_user_data.slave_addr = ui->spinBox_i2c_slave_address->value();
 
-    // Update GPIO assignments with selected GPIO used for I2C
-    ezloPi_i2c->EZPI_SET_GPIO_POOL(i2c_user_data.gpio_sda, EZPI_DEV_TYPE_I2C);
-    ezloPi_i2c->EZPI_SET_GPIO_POOL(i2c_user_data.gpio_scl, EZPI_DEV_TYPE_I2C);
-
     // Adding device to the device vector
     if(ezloPi_i2c->EZPI_ADD_I2C_DEVICE(i2c_user_data) == EZPI_SUCCESS) {
 //       QMessageBox::information(this, "Success", "Successfully added an I2C device.");

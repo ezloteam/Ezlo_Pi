@@ -1,10 +1,9 @@
-#include "cJSON.h"
+#include <cJSON.h>
 
+#include "items.h"
 #include "trace.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_devices.h"
-#include "ezlopi_devices_list.h"
-#include "items.h"
 #include "web_provisioning.h"
 
 static uint32_t device_id = 0;
@@ -43,10 +42,9 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         TRACE_D("device->ezlopi_cloud.battery_powered: %s", device->ezlopi_cloud.battery_powered ? "true" : "false");
         TRACE_D("device->ezlopi_cloud.show: %s", device->ezlopi_cloud.show ? "true" : "false");
         TRACE_D("device->ezlopi_cloud.room_name: %s", device->ezlopi_cloud.room_name ? device->ezlopi_cloud.room_name : "");
-        TRACE_D("device->ezlopi_cloud.device_id: %d", device->ezlopi_cloud.device_id);
-        TRACE_D("device->ezlopi_cloud.room_id: %d", device->ezlopi_cloud.room_id);
-        TRACE_D("device->ezlopi_cloud.item_id: %d", device->ezlopi_cloud.item_id);
-
+        TRACE_D("device->ezlopi_cloud.device_id: 0x%08x", device->ezlopi_cloud.device_id);
+        TRACE_D("device->ezlopi_cloud.room_id: 0x%08x", device->ezlopi_cloud.room_id);
+        TRACE_D("device->ezlopi_cloud.item_id: 0x%08x", device->ezlopi_cloud.item_id);
         switch (device->interface_type)
         {
         case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
@@ -70,8 +68,19 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         }
         case EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT:
         case EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT:
+        case EZLOPI_DEVICE_INTERFACE_I2C_MASTER:
+        {
+            TRACE_D("device->interface.i2c_master.enable: %s", device->interface.i2c_master.enable ? "true" : "false");
+            TRACE_D("device->interface.i2c_master.channel: %d", device->interface.i2c_master.channel);
+            TRACE_D("device->interface.i2c_master.clock_speed: %d", device->interface.i2c_master.clock_speed);
+            TRACE_D("device->interface.i2c_master.scl: %d", device->interface.i2c_master.scl);
+            TRACE_D("device->interface.i2c_master.sda: %d", device->interface.i2c_master.sda);
+            TRACE_B("###################################################################################################");
+            break;
+        }
         default:
         {
+            TRACE_E("Default interface type: %d", device->interface_type);
             break;
         }
         }
@@ -93,34 +102,37 @@ static void ezlopi_device_parse_json(char *config_string)
             TRACE_B("---------------------------------------------");
             while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
             {
-                TRACE_B("Device-%d - %d:", config_dev_idx, (uint32_t)cjson_device);
+                TRACE_B("Device-%d:", config_dev_idx);
 
-                char *device_name = NULL;
-                CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-                TRACE_D("device name: %s", device_name ? device_name : "");
+                // char *device_name = NULL;
+                // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+                // TRACE_D("device name: %s", device_name ? device_name : "");
 
                 int id_item = 0;
                 CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+                TRACE_B("id_item: %d", id_item);
 
                 if (0 != id_item)
                 {
                     s_ezlopi_device_t *sensor_list = ezlopi_devices_list_get_list();
-
                     int dev_idx = 0;
                     while (NULL != sensor_list[dev_idx].func)
                     {
+                        
                         if (id_item == sensor_list[dev_idx].id)
                         {
-                            s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)cjson_device);
-                            TRACE_B("%d-properties: %d", dev_idx, (int)properties);
+                            
+                            s_ezlopi_prep_arg_t device_prep_arg = {.device = &sensor_list[dev_idx], .cjson_device = cjson_device};
+                            sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg);
+                            // s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg);
 
-                            if (properties)
-                            {
-                                if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx], properties))
-                                {
-                                    free(properties);
-                                }
-                            }
+                            // if (properties)
+                            // {
+                            //     if (0 == ezlopi_devices_list_add(&sensor_list[dev_idx], properties))
+                            //     {
+                            //         free(properties);
+                            //     }
+                            // }
                         }
 
                         dev_idx++;
@@ -146,20 +158,20 @@ static void ezlopi_device_parse_json(char *config_string)
 uint32_t ezlopi_device_generate_device_id(void)
 {
     device_id = (0 == device_id) ? 0x30000001 : device_id + 1;
-    TRACE_D("device_id: %u\r\n", device_id);
+    // TRACE_D("device_id: %u\r\n", device_id);
     return device_id;
 }
 
 uint32_t ezlopi_device_generate_item_id(void)
 {
     item_id = (0 == item_id) ? 0x20000001 : item_id + 1;
-    TRACE_D("item_id: %u\r\n", item_id);
+    // TRACE_D("item_id: %u\r\n", item_id);
     return item_id;
 }
 
 uint32_t ezlopi_device_generate_room_id(void)
 {
     room_id = (0 == room_id) ? 0x10000001 : room_id + 1;
-    TRACE_D("room_id: %u\r\n", room_id);
+    // TRACE_D("room_id: %u\r\n", room_id);
     return room_id;
 }

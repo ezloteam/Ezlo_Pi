@@ -2,6 +2,7 @@
 #define __EZLOPI_CATEGORY_H__
 
 /// @brief https://api.ezlo.com/devices/categories/index.html
+const static char *category_not_defined = "";
 const static char *category_interface = "interface";
 const static char *category_dimmable_light = "dimmable_light";
 const static char *category_switch = "switch";
@@ -16,8 +17,8 @@ const static char *category_security_sensor = "security_sensor";
 // const static char *category_serial_port = "serial_port";
 // const static char *category_scene_controller = "scene_controller";
 // const static char *category_av = "av";
-// const static char *category_humidity = "humidity";
-// const static char *category_temperature = "temperature";
+const static char *category_humidity = "humidity";
+const static char *category_temperature = "temperature";
 // const static char *category_light_sensor = "light_sensor";
 // const static char *category_zwave_int = "zwave_int";
 // const static char *category_insteon_int = "insteon_int";
@@ -25,7 +26,7 @@ const static char *category_security_sensor = "security_sensor";
 // const static char *category_alarm_panel = "alarm_panel";
 // const static char *category_alarm_partition = "alarm_partition";
 // const static char *category_siren = "siren";
-// const static char *category_weather = "weather";
+const static char *category_weather = "weather";
 // const static char *category_philips_controller = "philips_controller";
 // const static char *category_appliance = "appliance";
 // const static char *category_uv_sensor = "uv_sensor";

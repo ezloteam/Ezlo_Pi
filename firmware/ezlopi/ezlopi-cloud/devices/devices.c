@@ -35,7 +35,6 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                 cJSON *cjson_devices_array = cJSON_CreateArray();
                 if (cjson_devices_array)
                 {
-                    s_ezlopi_device_t *ezlopi_device_list = ezlopi_devices_list_get_list();
                     l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
 
                     while (NULL != registered_devices)
@@ -48,7 +47,7 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                 char tmp_string[64];
                                 snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_devices->properties->ezlopi_cloud.device_id);
                                 cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
-                                cJSON_AddStringToObject(cjson_properties, "deviceTypeId", ezlopi_ezlopi_str);
+                                cJSON_AddStringToObject(cjson_properties, "deviceTypeId", "ezlopi");
                                 cJSON_AddStringToObject(cjson_properties, "parentDeviceId", "");
                                 cJSON_AddStringToObject(cjson_properties, "category", registered_devices->properties->ezlopi_cloud.category);
                                 cJSON_AddStringToObject(cjson_properties, "subcategory", registered_devices->properties->ezlopi_cloud.subcategory);
@@ -64,7 +63,6 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                 cJSON_AddStringToObject(cjson_properties, "security", "");
                                 cJSON_AddBoolToObject(cjson_properties, "ready", true);
                                 cJSON_AddStringToObject(cjson_properties, "status", "synced");
-                                // cJSON_AddStringToObject(cjson_properties, "info", "{}");
                                 cJSON_AddObjectToObject(cjson_properties, "info");
 
                                 if (!cJSON_AddItemToArray(cjson_devices_array, cjson_properties))
@@ -74,10 +72,8 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                             }
                         }
 
-                        // dev_idx++;
                         registered_devices = registered_devices->next;
                     }
-                    // }
 
                     if (!cJSON_AddItemToObjectCS(cjson_result, "devices", cjson_devices_array))
                     {

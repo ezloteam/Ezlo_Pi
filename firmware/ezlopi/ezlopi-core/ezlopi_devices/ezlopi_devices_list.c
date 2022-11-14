@@ -3,6 +3,7 @@
 #include "sensor_bme280.h"
 #include "digital_io.h"
 #include "sensor_pir.h"
+#include "sensor_door.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -10,8 +11,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0001_LED,
         .func = digital_io,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 #endif
 
@@ -19,8 +18,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0002_RELAY,
         .func = digital_io,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 #endif
 
@@ -28,8 +25,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0003_PLUG,
         .func = digital_io,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 #endif
 
@@ -39,6 +34,13 @@ static s_ezlopi_device_t device_array[] = {
         .func = sensor_bme280,
         // .is_configured = false,
         // .properties = NULL,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0018_DOOR
+    {
+        .id = EZLOPI_SENSOR_0018_DOOR,
+        .func = setup_door_sensor,
     },
 #endif
 
@@ -57,8 +59,6 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_NONE,
         .func = NULL,
-        // .is_configured = false,
-        // .properties = NULL,
     },
 };
 

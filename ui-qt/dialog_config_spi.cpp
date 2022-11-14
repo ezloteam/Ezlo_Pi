@@ -80,10 +80,10 @@ void Dialog_config_spi::on_buttonBox_config_spi_accepted() {
     spi_user_data.gpio_cs = ui->comboBox_cs->currentText().toInt();
 
     // Update GPIO assignments with selected GPIO used for SPI
-    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_miso, EZPI_DEV_TYPE_SPI);
-    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_mosi, EZPI_DEV_TYPE_SPI);
-    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_sck, EZPI_DEV_TYPE_SPI);
-    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_cs, EZPI_DEV_TYPE_SPI);
+//    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_miso, EZPI_DEV_TYPE_SPI);
+//    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_mosi, EZPI_DEV_TYPE_SPI);
+//    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_sck, EZPI_DEV_TYPE_SPI);
+//    ezloPi_spi->EZPI_SET_GPIO_POOL(spi_user_data.gpio_cs, EZPI_DEV_TYPE_SPI);
 
     // Adding device to the device vector
     if(ezloPi_spi->EZPI_ADD_SPI_DEVICE(spi_user_data) == EZPI_SUCCESS) {

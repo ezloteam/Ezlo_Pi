@@ -75,7 +75,7 @@ static void send_event_to_queue(e_ezlopi_actions_t action)
     {
         event_data->arg = NULL;
         event_data->action = action;
-        if (0 == ezlopi_event_queue_send(&event_data, true))
+        if (0 == ezlopi_event_queue_send(event_data, true))
         {
             free(event_data);
         }
@@ -101,26 +101,27 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
     if (EZLOPI_ACTION_NOTIFY_50_MS == _timer_conf->event_type)
     {
         static int count;
-        send_event_to_queue(EZLOPI_ACTION_NOTIFY_50_MS);
+        // send_event_to_queue(EZLOPI_ACTION_NOTIFY_50_MS);
 
-        if (0 == (count % 2)) // 100 ms
-        {
-            send_event_to_queue(EZLOPI_ACTION_NOTIFY_100_MS);
-        }
+        // if (0 == (count % 2)) // 100 ms
+        // {
+        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_100_MS);
+        // }
 
-        if (0 == (count % 4)) // 200 ms
-        {
-            send_event_to_queue(EZLOPI_ACTION_NOTIFY_200_MS);
-        }
+        // if (0 == (count % 4)) // 200 ms
+        // {
+        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_200_MS);
+        // }
 
-        if (0 == (count % 10)) // 500 ms
-        {
-            send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
-        }
+        // if (0 == (count % 10)) // 500 ms
+        // {
+        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
+        // }
 
         if (0 == (count % 20)) // 1000 ms
         {
             send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
+            count = 0;
         }
 
         count++;

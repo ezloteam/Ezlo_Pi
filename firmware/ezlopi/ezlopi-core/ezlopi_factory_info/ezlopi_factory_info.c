@@ -148,7 +148,7 @@ static char *ezlopi_factory_info_get_uuid(void)
 
             if (u_buf)
             {
-                if (ESP_OK == esp_partition_read(partition_ctx, HUB_INFO_0_SIZE + UUID_OFFSET, u_buf, UUID_LENGTH))
+                if (ESP_OK == esp_partition_read(partition_ctx, HUB_INFO_0_OFFSET + UUID_OFFSET, u_buf, UUID_LENGTH))
                 {
                     if (uuid_string)
                     {
