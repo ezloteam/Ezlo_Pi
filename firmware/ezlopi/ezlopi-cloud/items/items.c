@@ -250,7 +250,7 @@ char *ezlopi_cloud_items_updated_from_devices(l_ezlopi_configured_devices_t *reg
             cJSON *cjson_response = cJSON_CreateObject();
             if (cjson_response)
             {
-                cJSON_AddStringToObject(cjson_response, "msg_subclass", msg_sub_class_method_hub_item_updated);
+                cJSON_AddStringToObject(cjson_response, "msg_subclass", method_hub_item_updated);
                 cJSON_AddNumberToObject(cjson_response, "msg_id", web_provisioning_get_message_count());
                 cJSON_AddStringToObject(cjson_response, "id", "ui_broadcast");
                 cJSON *cjson_result = cJSON_AddObjectToObject(cjson_response, "result");

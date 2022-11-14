@@ -101,22 +101,22 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
     if (EZLOPI_ACTION_NOTIFY_50_MS == _timer_conf->event_type)
     {
         static int count;
-        // send_event_to_queue(EZLOPI_ACTION_NOTIFY_50_MS);
+        send_event_to_queue(EZLOPI_ACTION_NOTIFY_50_MS);
 
-        // if (0 == (count % 2)) // 100 ms
-        // {
-        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_100_MS);
-        // }
+        if (0 == (count % 2)) // 100 ms
+        {
+            send_event_to_queue(EZLOPI_ACTION_NOTIFY_100_MS);
+        }
 
-        // if (0 == (count % 4)) // 200 ms
-        // {
-        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_200_MS);
-        // }
+        if (0 == (count % 4)) // 200 ms
+        {
+            send_event_to_queue(EZLOPI_ACTION_NOTIFY_200_MS);
+        }
 
-        // if (0 == (count % 10)) // 500 ms
-        // {
-        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
-        // }
+        if (0 == (count % 10)) // 500 ms
+        {
+            send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
+        }
 
         if (0 == (count % 20)) // 1000 ms
         {

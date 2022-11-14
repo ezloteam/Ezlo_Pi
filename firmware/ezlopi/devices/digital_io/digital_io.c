@@ -8,6 +8,8 @@
 #include "ezlopi_timer.h"
 #include "items.h"
 
+#include "gpio_isr_service.h"
+#include "ezlopi_gpio.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
@@ -50,11 +52,11 @@ int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properti
         ret = digital_io_get_value_cjson(properties, arg);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_1000_MS:
-    {
-        ret = ezlopi_device_value_updated_from_device(properties);
-        break;
-    }
+    // case EZLOPI_ACTION_NOTIFY_1000_MS:
+    // {
+    //     ret = ezlopi_device_value_updated_from_device(properties);
+    //     break;
+    // }
     default:
     {
         break;
@@ -156,9 +158,10 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
 
     if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
     {
+        // TRACE_W("Setting up gpio_in");
         const gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
-            .mode = GPIO_MODE_OUTPUT,
+            .mode = GPIO_MODE_INPUT,
             .pull_up_en = ((properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
                            (properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
                               ? GPIO_PULLUP_ENABLE
@@ -173,7 +176,9 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
         };
 
         gpio_config(&io_conf);
-        digital_io_isr_service_init(properties);
+        extern void gpio_isr_service_register(s_ezlopi_device_properties_t * properties, void (*__upcall)(s_ezlopi_device_properties_t * properties));
+        gpio_isr_service_register(properties, NULL);
+        // digital_io_isr_service_init(properties);
     }
     
 

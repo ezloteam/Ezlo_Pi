@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
+#include "gpio_isr_service.h"
 
 static int sensor_door_init(s_ezlopi_device_properties_t *properties);
 static int get_door_sensor_value(s_ezlopi_device_properties_t* properties, void *args);
@@ -43,7 +44,7 @@ int setup_door_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
             get_door_sensor_value(properties, args);
             break;
         }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
+        case EZLOPI_ACTION_NOTIFY_200_MS:
         {
             TRACE_I("%s", ezlopi_actions_to_string(action));
             ezlopi_device_value_updated_from_device(properties);
@@ -59,6 +60,7 @@ int setup_door_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
     return ret;
 
 }
+
 
 static int sensor_door_prepare(void *args)
 {
@@ -129,7 +131,7 @@ static int get_door_sensor_value(s_ezlopi_device_properties_t* properties, void 
     int sensor_data = hall_sensor_read();
     TRACE_E("Reading value from the door sensor.");
     char* door_is = ((sensor_data >= 70) || (sensor_data <= 20)) ? "dw_is_closed" : "dw_is_opened";
-    TRACE_I("The door is %s", door_is);
+    // TRACE_I("The door is %s", door_is);
     cJSON *cjson_propertise = (cJSON *)args;
     if(cjson_propertise)
     {

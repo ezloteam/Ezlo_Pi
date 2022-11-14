@@ -3,6 +3,7 @@
 
 #include "stdio.h"
 #include "driver/gpio.h"
+// #include "ezlopi_devices.h"
 
 typedef gpio_num_t e_ezlopi_gpio_num_t;
 typedef gpio_mode_t e_ezlopi_gpio_mode_t;
@@ -39,5 +40,7 @@ typedef struct s_ezlopi_gpios
     s_ezlopi_gpio_t gpio_in;
     s_ezlopi_gpio_t gpio_out;
 } s_ezlopi_gpios_t;
+
+// int ezlopi_gpio_init(s_ezlopi_device_properties_t *properties);
 
 #endif // __EZLOPI_GPIO_H__
