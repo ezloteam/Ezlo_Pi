@@ -8,6 +8,7 @@
 #include "ezlopi_timer.h"
 #include "items.h"
 
+#include "gpio_isr_service.h"
 #include "ezlopi_gpio.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
@@ -175,7 +176,9 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
         };
 
         gpio_config(&io_conf);
-        digital_io_isr_service_init(properties);
+        extern void gpio_isr_service_register(s_ezlopi_device_properties_t * properties, void (*__upcall)(s_ezlopi_device_properties_t * properties));
+        gpio_isr_service_register(properties, NULL);
+        // digital_io_isr_service_init(properties);
     }
     
 

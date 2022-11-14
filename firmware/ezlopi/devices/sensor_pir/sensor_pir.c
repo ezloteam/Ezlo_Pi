@@ -1,14 +1,14 @@
 
 
 #include "sensor_pir.h"
-#include "isr_service.h"
+#include "gpio_isr_service.h"
 
 
 static int sensor_pir_prepare(void* arg);
 static int sensor_pir_init(s_ezlopi_device_properties_t* properties);
 static int sensor_pir_get_value_cjson(s_ezlopi_device_properties_t* properties, void* args);
 static int sensor_pir_get_value(s_ezlopi_device_properties_t* properties);
-// static int ezlopi_device_value_updated_from_device(s_ezlopi_device_properties_t* properties);
+static void sensor_pir_value_updated_from_device(s_ezlopi_device_properties_t* properties);
 
 
 
@@ -36,14 +36,14 @@ int ezlopi_pir_begin(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *pr
             ret = sensor_pir_get_value_cjson(properties, arg);
             break;
         }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
-        {
-            // TRACE_I("EZLOPI_ACTION_NOTIFY_100_MS");
-            // sensor_pir_get_value(properties);
-            ezlopi_device_value_updated_from_device(properties);
-            ret = 0;
-            break;
-        }
+        // case EZLOPI_ACTION_NOTIFY_1000_MS:
+        // {
+        //     // TRACE_I("EZLOPI_ACTION_NOTIFY_100_MS");
+        //     // sensor_pir_get_value(properties);
+        //     ezlopi_device_value_updated_from_device(properties);
+        //     ret = 0;
+        //     break;
+        // }
         default:
         {
             TRACE_I("Default action encountered.(action : %s)", ezlopi_actions_to_string(action));
@@ -74,9 +74,11 @@ static int sensor_pir_prepare(void* arg)
             int tmp_var = 0;
             memset(sensor_pir_properties, 0, sizeof(s_ezlopi_device_properties_t));
             sensor_pir_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT;
-
             char *device_name = NULL;
+            char * cjson_device_str = cJSON_Print(cjson_device);
+            TRACE_B("cjson str: %s", cjson_device_str);
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+            TRACE_E("cjson_device: %p, device_name: %p", cjson_device, device_name);
             ASSIGN_DEVICE_NAME(sensor_pir_properties, device_name);
             sensor_pir_properties->ezlopi_cloud.category = category_security_sensor;
             sensor_pir_properties->ezlopi_cloud.subcategory = subcategory_motion;
@@ -134,10 +136,15 @@ static int sensor_pir_init(s_ezlopi_device_properties_t* properties)
                 properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
             }
 
-            isr_service_init(properties, ezlopi_device_value_updated_from_device);
+            gpio_isr_service_register(properties, ezlopi_device_value_updated_from_device);
         }
         
         return ret;
+}
+
+static void sensor_pir_value_updated_from_device(s_ezlopi_device_properties_t* properties)
+{
+    ezlopi_device_value_updated_from_device(properties);
 }
 
 static int sensor_pir_get_value_cjson(s_ezlopi_device_properties_t* properties, void* args)
