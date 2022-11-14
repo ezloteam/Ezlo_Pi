@@ -11,7 +11,8 @@
 #define EZLOPI_SENSOR_0001_LED 1
 #define EZLOPI_SENSOR_0002_RELAY 2
 #define EZLOPI_SENSOR_0003_PLUG 3
-#define EZLOPI_SENSOR_0018_BME280 18
+#define EZLOPI_SENSOR_0012_BME280_I2C 12
+#define EZLOPI_SENSOR_0019_PIR 19
 
 /**
  * @brief defining the type of sensor call function

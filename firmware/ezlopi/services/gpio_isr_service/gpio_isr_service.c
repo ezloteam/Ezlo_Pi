@@ -8,7 +8,7 @@
 
 #include "trace.h"
 #include "gpio_isr_service.h"
-#include "ezlopi_devices_list.h"
+#include "ezlopi_device_value_updated.h"
 
 static QueueHandle_t gpio_evt_queue = NULL;
 static const uint32_t switch_debounce_time = 1000;
@@ -21,14 +21,20 @@ typedef struct s_event_arg
 
 static void IRAM_ATTR __gpio_isr_handler(void *arg);
 static void digital_io_isr_service(void *pv);
-static void digital_io_isr_setup_isr(s_ezlopi_device_properties_t *properties);
 
 void gpio_isr_service_init(void)
 {
-    TRACE_I("Started gpio-isr service");
-    gpio_install_isr_service(0);
-    gpio_evt_queue = xQueueCreate(20, sizeof(s_ezlopi_device_properties_t *));
-    xTaskCreate(digital_io_isr_service, "digital-io-isr-service", 2 * 2048, NULL, 3, NULL);
+    static bool service_started;
+
+    if (false == service_started)
+    {
+        TRACE_I("Started gpio-isr service");
+        gpio_install_isr_service(0);
+        gpio_evt_queue = xQueueCreate(20, sizeof(s_ezlopi_device_properties_t *));
+        xTaskCreate(digital_io_isr_service, "digital-io-isr-service", 2 * 2048, NULL, 3, NULL);
+        service_started = true;
+    }
+
 }
 
 void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, void (*__upcall)(s_ezlopi_device_properties_t *properties))
@@ -57,16 +63,13 @@ static void IRAM_ATTR __gpio_isr_handler(void *arg)
     }
 }
 
-static void digital_io_isr_setup_isr(s_ezlopi_device_properties_t *properties)
-{
-}
-
 static void digital_io_isr_service(void *pv)
 {
     while (1)
     {
         s_event_arg_t *event_arg = NULL;
         xQueueReceive(gpio_evt_queue, &event_arg, portMAX_DELAY);
+        TRACE_E("Interrupt encountered!!");
 
         if (NULL != event_arg)
         {
@@ -77,7 +80,7 @@ static void digital_io_isr_service(void *pv)
                 TRACE_I("****** ISR-event:: pin: %u", event_arg->properties->interface.gpio.gpio_in.gpio_num);
                 event_arg->properties->interface.gpio.gpio_out.value = (EZLOPI_GPIO_LOW == event_arg->properties->interface.gpio.gpio_out.value) ? EZLOPI_GPIO_HIGH : EZLOPI_GPIO_LOW;
                 gpio_set_level(event_arg->properties->interface.gpio.gpio_out.gpio_num, event_arg->properties->interface.gpio.gpio_out.value);
-                // ezlopi_device_value_updated_from_device(event_arg->properties);
+                ezlopi_device_value_updated_from_device(event_arg->properties);
                 event_arg->time = tick_now;
             }
         }

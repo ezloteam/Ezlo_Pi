@@ -52,11 +52,6 @@ int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properti
         ret = digital_io_get_value_cjson(properties, arg);
         break;
     }
-    // case EZLOPI_ACTION_NOTIFY_1000_MS:
-    // {
-    //     ret = ezlopi_device_value_updated_from_device(properties);
-    //     break;
-    // }
     default:
     {
         break;
@@ -110,7 +105,7 @@ static int digital_io_prepare(void *arg)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
-    cJSON *cjson_device = (cJSON *)prep_arg->cjson_device;
+    cJSON *cjson_device = prep_arg->cjson_device;
 
     s_ezlopi_device_properties_t *digital_io_device_properties = NULL;
 
@@ -151,7 +146,7 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
                                 : GPIO_PULLDOWN_DISABLE,
             .intr_type = GPIO_INTR_DISABLE,
         };
-
+        
         gpio_config(&io_conf);
         digital_io_write_gpio_value(properties);
     }
@@ -180,6 +175,7 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
         gpio_isr_service_register(properties, NULL);
         // digital_io_isr_service_init(properties);
     }
+    
 
     return ret;
 }

@@ -6,7 +6,7 @@ file(GLOB_RECURSE SOURCES "./*.c*")
 
 idf_component_register(SRCS ${SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES bt json ezlopi_factory_info ezlopi_wifi ezlopi_nvs)
+    REQUIRES json ezlopi_factory_info ezlopi_wifi ezlopi_nvs bt)
 
 # file( GLOB_RECURSE SOURCES "./*.cpp" )
 

@@ -73,7 +73,7 @@
 // const static char *ezlopi_item_name_battery_charging_state = "battery_charging_state";
 // const static char *ezlopi_item_name_battery_backup = "battery_backup";
 // const static char *ezlopi_item_name_angle_position = "angle_position";
-// const static char *ezlopi_item_name_atmospheric_pressure = "atmospheric_pressure";
+const static char *ezlopi_item_name_atmospheric_pressure = "atmospheric_pressure";
 // const static char *ezlopi_item_name_barometric_pressure = "barometric_pressure";
 // const static char *ezlopi_item_name_barrier = "barrier";
 // const static char *ezlopi_item_name_barrier_state = "barrier_state";
@@ -111,12 +111,12 @@
 // const static char *ezlopi_item_name_gas_meter_pulse = "gas_meter_pulse";
 // const static char *ezlopi_item_name_heating_meter_energy = "heating_meter_energy";
 // const static char *ezlopi_item_name_cooling_meter_energy = "cooling_meter_energy";
-// const static char *ezlopi_item_name_humidity = "humidity";
+const static char *ezlopi_item_name_humidity = "humidity";
 // const static char *ezlopi_item_name_loudness = "loudness";
 // const static char *ezlopi_item_name_lux = "lux";
 // const static char *ezlopi_item_name_meter_reset = "meter_reset";
 // const static char *ezlopi_item_name_moisture = "moisture";
-// const static char *ezlopi_item_name_motion = "motion";
+const static char *ezlopi_item_name_motion = "motion";
 // const static char *ezlopi_item_name_power = "power";
 // const static char *ezlopi_item_name_pressure = "pressure";
 // const static char *ezlopi_item_name_rgbcolor = "rgbcolor";
@@ -133,7 +133,7 @@
 // const static char *ezlopi_item_name_soil_temperature = "soil_temperature";
 // const static char *ezlopi_item_name_solar_radiation = "solar_radiation";
 const static char *ezlopi_item_name_switch = "switch";
-// const static char *ezlopi_item_name_temp = "temp";
+const static char *ezlopi_item_name_temp = "temp";
 // const static char *ezlopi_item_name_thermostat_fan_mode = "thermostat_fan_mode";
 // const static char *ezlopi_item_name_thermostat_fan_state = "thermostat_fan_state";
 // const static char *ezlopi_item_name_thermostat_mode = "thermostat_mode";

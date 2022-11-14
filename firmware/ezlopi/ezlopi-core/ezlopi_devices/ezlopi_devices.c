@@ -42,10 +42,9 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         TRACE_D("device->ezlopi_cloud.battery_powered: %s", device->ezlopi_cloud.battery_powered ? "true" : "false");
         TRACE_D("device->ezlopi_cloud.show: %s", device->ezlopi_cloud.show ? "true" : "false");
         TRACE_D("device->ezlopi_cloud.room_name: %s", device->ezlopi_cloud.room_name ? device->ezlopi_cloud.room_name : "");
-        TRACE_D("device->ezlopi_cloud.device_id: %d", device->ezlopi_cloud.device_id);
-        TRACE_D("device->ezlopi_cloud.room_id: %d", device->ezlopi_cloud.room_id);
-        TRACE_D("device->ezlopi_cloud.item_id: %d", device->ezlopi_cloud.item_id);
-
+        TRACE_D("device->ezlopi_cloud.device_id: 0x%08x", device->ezlopi_cloud.device_id);
+        TRACE_D("device->ezlopi_cloud.room_id: 0x%08x", device->ezlopi_cloud.room_id);
+        TRACE_D("device->ezlopi_cloud.item_id: 0x%08x", device->ezlopi_cloud.item_id);
         switch (device->interface_type)
         {
         case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
@@ -69,8 +68,19 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         }
         case EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT:
         case EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT:
+        case EZLOPI_DEVICE_INTERFACE_I2C_MASTER:
+        {
+            TRACE_D("device->interface.i2c_master.enable: %s", device->interface.i2c_master.enable ? "true" : "false");
+            TRACE_D("device->interface.i2c_master.channel: %d", device->interface.i2c_master.channel);
+            TRACE_D("device->interface.i2c_master.clock_speed: %d", device->interface.i2c_master.clock_speed);
+            TRACE_D("device->interface.i2c_master.scl: %d", device->interface.i2c_master.scl);
+            TRACE_D("device->interface.i2c_master.sda: %d", device->interface.i2c_master.sda);
+            TRACE_B("###################################################################################################");
+            break;
+        }
         default:
         {
+            TRACE_E("Default interface type: %d", device->interface_type);
             break;
         }
         }
@@ -105,7 +115,6 @@ static void ezlopi_device_parse_json(char *config_string)
                 if (0 != id_item)
                 {
                     s_ezlopi_device_t *sensor_list = ezlopi_devices_list_get_list();
-
                     int dev_idx = 0;
                     while (NULL != sensor_list[dev_idx].func)
                     {

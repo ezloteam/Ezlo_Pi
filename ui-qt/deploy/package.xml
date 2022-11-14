@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
     <DisplayName>Ezlopi Desktop Configurator</DisplayName>
-    <Description>This is going to install EzloPi Desktop configurator in your machine.</Description>
-    <Version>1.2.0-0</Version>
-    <ReleaseDate>2022-08-26</ReleaseDate>
+    <Description>This is going to install EzloPi Desktop V1.2.3 configurator in your machine.</Description>
+    <Version>1.2.3-0</Version>
+    <ReleaseDate>2022-11-03</ReleaseDate>
     <Default>true</Default>   
     <Name>com.ezlo.ezlopi</Name> 
     <ForcedInstallation>true</ForcedInstallation>
