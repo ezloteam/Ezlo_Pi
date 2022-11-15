@@ -14,8 +14,11 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
-#include<math.h>
+#include <math.h>
 
+static void user_delay_us(uint32_t period, void *intf_ptr);
+static int8_t user_i2c_read(uint8_t reg_addr, uint8_t *data, uint32_t len, void *intf_ptr);
+static int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void *intf_ptr);
 
 bme280_identifier_t identifier = {
     .dev_addr = 0x76,
@@ -35,22 +38,22 @@ static sensor_bme280_dev_t device = {
     .intf_ptr = &identifier,
 };
 
-enum device_feature{
+enum device_feature
+{
     TEMPERATURE_FEATURE = 0,
     HUMIDITY_FEATURE = 1,
-    PRESSURE_FEATURE = 2 
+    PRESSURE_FEATURE = 2
 };
 
 typedef enum device_feature device_feature_t;
 
 static int add_multiple_device_features(device_feature_t feature, void *arg);
 static int prepare_sensor(void *arg);
-static int sensor_bme280_prepare(const char* category, const char *sub_category, const char *item_name, const char *value_type, void* arg);
+static int sensor_bme280_prepare(const char *category, const char *sub_category, const char *item_name, const char *value_type, void *arg);
 static int8_t sensor_bme280_get_value(sensor_bme280_data_t *data);
-static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t* properties, void* args);
+static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static int sensor_bme280_init();
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_bme_device_properties);
-
 
 /**
  * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
@@ -63,52 +66,46 @@ int sensor_bme280(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *prope
 {
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            prepare_sensor(arg);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            TRACE_I("EZLOPI_ACTION_INITIALIZE event.");
-            sensor_bme280_init(properties);
-            break;
-        }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            TRACE_I("EZLOPI_ACTION_GET_EZLOPI_VALUE event.");
-            sensor_bme280_get_value_cjson(properties, arg);
-            break;
-        }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
-        {
-            TRACE_I("EZLOPI_ACTION_NOTIFY_1000_MS");
-            ezlopi_device_value_updated_from_device(properties);
-            break;
-        }
-        default:
-        {
-            TRACE_E("Default action found!, (action: %s)", ezlopi_actions_to_string(action));
-            break;
-        }
+    case EZLOPI_ACTION_PREPARE:
+    {
+        prepare_sensor(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        sensor_bme280_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        sensor_bme280_get_value_cjson(properties, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        ezlopi_device_value_updated_from_device(properties);
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
     return 0;
 }
 
-int8_t user_i2c_read(uint8_t register_addr, uint8_t *data, uint32_t len, void *intf_ptr)
+static int8_t user_i2c_read(uint8_t register_addr, uint8_t *data, uint32_t len, void *intf_ptr)
 {
     i2c_master_write_read_device(I2C_NUM_0, CHIP_ID, &register_addr, 1, data, len, 1000 / portTICK_RATE_MS);
     return 0;
 }
 
-void user_delay_us(uint32_t period, void *intf_ptr)
+static void user_delay_us(uint32_t period, void *intf_ptr)
 {
     vTaskDelay(period / portTICK_PERIOD_MS);
-    return;
 }
 
-int8_t user_i2c_write(uint8_t register_addr, const uint8_t *data, uint32_t len, void *intf_ptr)
+static int8_t user_i2c_write(uint8_t register_addr, const uint8_t *data, uint32_t len, void *intf_ptr)
 {
     i2c_master_write_read_device(I2C_NUM_0, CHIP_ID, &register_addr, 1, data, len, 1000 / portTICK_RATE_MS);
     return 0;
@@ -143,36 +140,35 @@ static int add_multiple_device_features(device_feature_t feature, void *arg)
     {
         switch (feature)
         {
-            case TEMPERATURE_FEATURE:
-            {
-                TRACE_I("Adding temperature feature.");
-                sensor_bme_device_properties = sensor_bme280_prepare(category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, cjson_device);
-                add_device_to_list(prep_arg, sensor_bme_device_properties);
-                break;
-            }
-            case HUMIDITY_FEATURE:
-            {
-                TRACE_I("Adding humidity feature.");
-                sensor_bme_device_properties = sensor_bme280_prepare(category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, cjson_device);
-                add_device_to_list(prep_arg, sensor_bme_device_properties);
-                break;
-            }
-            case PRESSURE_FEATURE:
-            {
-                TRACE_I("Adding pressure feature.");
-                sensor_bme_device_properties = sensor_bme280_prepare(category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, cjson_device);
-                add_device_to_list(prep_arg, sensor_bme_device_properties);
-                break;
-            }
-            default:
-            {
-                TRACE_B("Unknown BME280 feature.");
-                break;
-            }
+        case TEMPERATURE_FEATURE:
+        {
+            TRACE_I("Adding temperature feature.");
+            sensor_bme_device_properties = sensor_bme280_prepare(category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, cjson_device);
+            add_device_to_list(prep_arg, sensor_bme_device_properties);
+            break;
         }
-        
+        case HUMIDITY_FEATURE:
+        {
+            TRACE_I("Adding humidity feature.");
+            sensor_bme_device_properties = sensor_bme280_prepare(category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, cjson_device);
+            add_device_to_list(prep_arg, sensor_bme_device_properties);
+            break;
+        }
+        case PRESSURE_FEATURE:
+        {
+            TRACE_I("Adding pressure feature.");
+            sensor_bme_device_properties = sensor_bme280_prepare(category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, cjson_device);
+            add_device_to_list(prep_arg, sensor_bme_device_properties);
+            break;
+        }
+        default:
+        {
+            TRACE_B("Unknown BME280 feature.");
+            break;
+        }
+        }
     }
-    
+
     return ret;
 }
 
@@ -185,11 +181,11 @@ static int prepare_sensor(void *arg)
     return ret;
 }
 
-static int sensor_bme280_prepare(const char* category, const char *sub_category, const char *item_name, const char *value_type, void* arg)
+static int sensor_bme280_prepare(const char *category, const char *sub_category, const char *item_name, const char *value_type, void *arg)
 {
-     cJSON* cjson_device = (cJSON*)arg;
-    s_ezlopi_device_properties_t* sensor_ble280_properties = NULL;
-    if((NULL == sensor_ble280_properties) && (NULL != cjson_device))
+    cJSON *cjson_device = (cJSON *)arg;
+    s_ezlopi_device_properties_t *sensor_ble280_properties = NULL;
+    if ((NULL == sensor_ble280_properties) && (NULL != cjson_device))
     {
         sensor_ble280_properties = malloc(sizeof(s_ezlopi_device_properties_t));
         if (sensor_ble280_properties)
@@ -215,8 +211,6 @@ static int sensor_bme280_prepare(const char* category, const char *sub_category,
             sensor_ble280_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
             sensor_ble280_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
             sensor_ble280_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
-            // CJSON_GET_VALUE_INT(cjson_device, "id_room", sensor_ble280_properties->ezlopi_cloud.room_id);
-            // CJSON_GET_VALUE_INT(cjson_device, "id_item", sensor_ble280_properties->ezlopi_cloud.item_id);
 
             CJSON_GET_VALUE_INT(cjson_device, "gpio_scl", sensor_ble280_properties->interface.i2c_master.scl);
             CJSON_GET_VALUE_INT(cjson_device, "gpio_sda", sensor_ble280_properties->interface.i2c_master.sda);
@@ -227,8 +221,7 @@ static int sensor_bme280_prepare(const char* category, const char *sub_category,
         }
     }
 
-    return ((int)sensor_ble280_properties); 
-    
+    return ((int)sensor_ble280_properties);
 }
 
 /**
@@ -262,13 +255,12 @@ static int8_t sensor_bme280_get_value(sensor_bme280_data_t *data)
     return data;
 }
 
-
 /**
  * @brief Static function to initialize the bme280 sensor.
  *
  * @return returns 0 for successful initialization.
  */
-static int sensor_bme280_init(s_ezlopi_device_properties_t* properties)
+static int sensor_bme280_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
     ezlopi_i2c_master_init(&properties->interface.i2c_master);
@@ -297,11 +289,10 @@ static int sensor_bme280_init(s_ezlopi_device_properties_t* properties)
     return ret;
 }
 
-
-static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t* properties, void* args)
+static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-    sensor_bme280_data_t *data = (sensor_bme280_data_t*)malloc(sizeof(sensor_bme280_data_t));
+    sensor_bme280_data_t *data = (sensor_bme280_data_t *)malloc(sizeof(sensor_bme280_data_t));
     memset(data, 0, sizeof(sensor_bme280_data_t));
     sensor_bme280_get_value(data);
     cJSON *cjson_propertise = (cJSON *)args;
@@ -309,26 +300,26 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t* propertie
     {
         if (category_temperature == properties->ezlopi_cloud.category)
         {
-                TRACE_E("Temperature is: %f", data->temperature);
-                cJSON_AddNumberToObject(cjson_propertise, "value", data->temperature);
-                cJSON_AddStringToObject(cjson_propertise, "scale", "celsius");
+            TRACE_E("Temperature is: %f", data->temperature);
+            cJSON_AddNumberToObject(cjson_propertise, "value", data->temperature);
+            cJSON_AddStringToObject(cjson_propertise, "scale", "celsius");
         }
         if (category_humidity == properties->ezlopi_cloud.category)
         {
-                TRACE_E("Humidity is: %f", data->humidity);
-                cJSON_AddNumberToObject(cjson_propertise, "value", data->humidity);
-                cJSON_AddStringToObject(cjson_propertise, "scale", "percent");
+            TRACE_E("Humidity is: %f", data->humidity);
+            cJSON_AddNumberToObject(cjson_propertise, "value", data->humidity);
+            cJSON_AddStringToObject(cjson_propertise, "scale", "percent");
         }
-        if(category_not_defined == properties->ezlopi_cloud.category)
+        if (category_not_defined == properties->ezlopi_cloud.category)
         {
             TRACE_E("Pressure is: %f", data->pressure);
             cJSON_AddNumberToObject(cjson_propertise, "value", data->pressure);
             cJSON_AddStringToObject(cjson_propertise, "scale", "kilo_pascal");
-        }                
-        
+        }
+
         ret = 1;
     }
-    
+
     free(data);
     return ret;
 }

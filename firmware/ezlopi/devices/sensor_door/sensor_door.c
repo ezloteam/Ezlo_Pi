@@ -20,38 +20,33 @@ static int get_door_sensor_value(s_ezlopi_device_properties_t *properties, void 
 static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args);
 static int sensor_door_prepare(void *args);
 
-int setup_door_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args)
+int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        TRACE_I("%s", ezlopi_actions_to_string(action));
         sensor_door_prepare(args);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        TRACE_I("%s", ezlopi_actions_to_string(action));
         sensor_door_init(properties);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        TRACE_I("EZLOPI_ACTION_GET_EZLOPI_VALUE event.");
         get_door_sensor_value(properties, args);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_200_MS:
     {
-        TRACE_I("%s", ezlopi_actions_to_string(action));
         ezlopi_device_value_updated_from_device(properties);
         break;
     }
     default:
     {
-        TRACE_E("Default action encountered.(action: %s)", ezlopi_actions_to_string(action));
         break;
     }
     }

@@ -40,7 +40,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0018_DOOR
     {
         .id = EZLOPI_SENSOR_0018_DOOR,
-        .func = setup_door_sensor,
+        .func = door_hall_sensor,
     },
 #endif
 
