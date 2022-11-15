@@ -28,11 +28,12 @@ extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 void app_main(void)
 {
     qt_serial_init();
+    gpio_isr_service_init();
     ezlopi_init();
     web_provisioning_init();
     GATT_SERVER_MAIN();
     sensor_service_init();
-    gpio_isr_service_init();
+    
 
     // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }

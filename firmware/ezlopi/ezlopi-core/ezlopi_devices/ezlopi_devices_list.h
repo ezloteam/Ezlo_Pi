@@ -38,7 +38,7 @@ typedef struct s_ezlopi_prep_arg
 {
     cJSON *cjson_device;
     s_ezlopi_device_t *device;
-} s_ezlopi_prep_arg_t;
+}  s_ezlopi_prep_arg_t;
 
 /**
  * @brief Provides the list of available sensors

@@ -22,7 +22,6 @@ typedef struct s_event_arg
 
 static void IRAM_ATTR __gpio_isr_handler(void *arg);
 static void digital_io_isr_service(void *pv);
-static void digital_io_isr_setup_isr(s_ezlopi_device_properties_t *properties);
 
 void gpio_isr_service_init(void)
 {
@@ -34,6 +33,7 @@ void gpio_isr_service_init(void)
 
 void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_interrupt_upcall_t __upcall)
 {
+    TRACE_I("Registering GPIO ISR");
     s_event_arg_t *event_arg = malloc(sizeof(s_event_arg_t));
 
     if (event_arg)
@@ -42,7 +42,14 @@ void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_inter
         event_arg->properties = properties;
         event_arg->__upcall = __upcall;
         gpio_intr_enable(properties->interface.gpio.gpio_in.gpio_num);
-        gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void *)event_arg);
+        if(gpio_isr_handler_add(properties->interface.gpio.gpio_in.gpio_num, __gpio_isr_handler, (void *)event_arg))
+        {
+            TRACE_E("Error while adding GPIO ISR handler.");
+        }
+        else 
+        {
+            TRACE_I("Successfully added GPIO ISR handler.");
+        }
     }
     else
     {
@@ -59,12 +66,11 @@ static void IRAM_ATTR __gpio_isr_handler(void *arg)
     }
 }
 
-static void digital_io_isr_setup_isr(s_ezlopi_device_properties_t *properties)
-{
-}
+
 
 static void digital_io_isr_service(void *pv)
 {
+    
     while (1)
     {
         s_event_arg_t *event_arg = NULL;
