@@ -121,7 +121,7 @@ static void ezlopi_device_parse_json(char *config_string)
                         if (id_item == sensor_list[dev_idx].id)
                         {
                             s_ezlopi_prep_arg_t device_prep_arg = {.device = &sensor_list[dev_idx], .cjson_device = cjson_device};
-                            sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg);
+                            sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
                         }
 
                         dev_idx++;

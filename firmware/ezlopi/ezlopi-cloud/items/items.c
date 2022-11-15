@@ -63,7 +63,7 @@ char *items_list(const char *payload, uint32_t len, struct json_token *method, u
                                 cJSON_AddTrueToObject(cjson_properties, "show");
                                 cJSON_AddStringToObject(cjson_properties, "valueType", registered_device->properties->ezlopi_cloud.value_type);
 
-                                registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_properties);
+                                registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_properties, registered_device->user_arg);
                                 cJSON_AddStringToObject(cjson_properties, "valueFormatted", "false");
                                 cJSON_AddStringToObject(cjson_properties, "status", "synced");
 
@@ -132,7 +132,7 @@ char *items_set_value(const char *payload, uint32_t len, struct json_token *meth
                 {
                     if (item_id == registered_device->properties->ezlopi_cloud.item_id)
                     {
-                        registered_device->device->func(EZLOPI_ACTION_SET_VALUE, registered_device->properties, cjson_params);
+                        registered_device->device->func(EZLOPI_ACTION_SET_VALUE, registered_device->properties, cjson_params, registered_device->user_arg);
                     }
                 }
 
@@ -211,7 +211,7 @@ char *items_update(const char *payload, uint32_t len, struct json_token *method,
                                 cJSON_AddFalseToObject(cjson_result, "userNotification");
                                 cJSON_AddNullToObject(cjson_result, "notifications");
                                 cJSON_AddStringToObject(cjson_result, "name", registered_device->properties->ezlopi_cloud.item_name);
-                                registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_result);
+                                registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_result, registered_device->user_arg);
                                 cJSON_AddStringToObject(cjson_result, "valueType", registered_device->properties->ezlopi_cloud.value_type);
                             }
 
@@ -269,7 +269,7 @@ char *ezlopi_cloud_items_updated_from_devices(l_ezlopi_configured_devices_t *reg
                     cJSON_AddFalseToObject(cjson_result, "userNotification");
                     cJSON_AddNullToObject(cjson_result, "notifications");
                     cJSON_AddStringToObject(cjson_result, "name", registered_device->properties->ezlopi_cloud.item_name);
-                    registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_result);
+                    registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_result, registered_device->user_arg);
                     cJSON_AddStringToObject(cjson_result, "valueType", registered_device->properties->ezlopi_cloud.value_type);
                 }
 

@@ -20,7 +20,7 @@ static int get_door_sensor_value(s_ezlopi_device_properties_t *properties, void 
 static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args);
 static int sensor_door_prepare(void *args);
 
-int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args)
+int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -68,7 +68,7 @@ static int sensor_door_prepare(void *args)
         sensor_door_device_properties = sensor_door_prepare_properties(cjson_device);
         if (sensor_door_device_properties)
         {
-            if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_door_device_properties))
+            if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_door_device_properties, NULL))
             {
                 free(sensor_door_device_properties);
             }

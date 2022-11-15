@@ -72,6 +72,7 @@ typedef struct s_ezlopi_device_properties
     } interface;
 
     s_ezlopi_cloud_info_t ezlopi_cloud;
+    void *user_arg;
 
 } s_ezlopi_device_properties_t;
 
