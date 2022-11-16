@@ -103,7 +103,7 @@ static void alert_qt_wifi_got_ip(void)
     }
 }
 
-static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+static void __event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
     {
@@ -124,7 +124,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
             alert_qt_wifi_fail();
             s_retry_num = 0;
         }
-        TRACE_I("connect to the AP fail");
+        TRACE_W("connect to the AP fail");
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
@@ -158,9 +158,9 @@ void ezlopi_wifi_initialize(void)
     esp_event_handler_instance_t instance_got_ip;
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL, &instance_any_id));
+        WIFI_EVENT, ESP_EVENT_ANY_ID, &__event_handler, NULL, &instance_any_id));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL, &instance_got_ip));
+        IP_EVENT, IP_EVENT_STA_GOT_IP, &__event_handler, NULL, &instance_got_ip));
 }
 
 void ezlopi_wifi_connect_from_nvs(void)
@@ -171,15 +171,18 @@ void ezlopi_wifi_connect_from_nvs(void)
 
     if (wifi_info[0] == 0)
     {
-        strcpy(wifi_info, "Asialinks travels & tours");
-        strcpy(&wifi_info[32], "Tours       ");
+        strcpy(wifi_info, "ezlopitest");
+        strcpy(&wifi_info[32], "ezlopitest");
         ezlopi_wifi_set_new_wifi_flag();
     }
-    ezlopi_wifi_connect(&wifi_info[0], &wifi_info[32]);
+
+    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_info[0], &wifi_info[32]);
+    TRACE_E("wifi_error: %u", wifi_error);
 }
 
-void ezlopi_wifi_connect(const char *ssid, const char *pass)
+esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 {
+    esp_err_t err = ESP_OK;
     strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
     strncpy((char *)&wifi_ssid_pass[32], pass, 32);
 
@@ -197,9 +200,10 @@ void ezlopi_wifi_connect(const char *ssid, const char *pass)
 
     esp_wifi_stop();
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+    err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
     ESP_ERROR_CHECK(esp_wifi_start());
     set_wifi_station_host_name();
+    return err;
 }
 
 void ezlopi_wait_for_wifi_to_connect(void)

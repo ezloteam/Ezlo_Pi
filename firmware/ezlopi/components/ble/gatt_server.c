@@ -338,7 +338,7 @@ void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_bl
             snprintf(__PWD, sizeof(__PWD), "%s", cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring);
             cJSON_Delete(root);
             ezlopi_wifi_set_new_wifi_flag();
-            ezlopi_wifi_connect(__SSID, __PWD);
+            esp_err_t wifi_error = ezlopi_wifi_connect(__SSID, __PWD);
             // wifi_connect_c(__SSID, __PWD);
         }
     }
