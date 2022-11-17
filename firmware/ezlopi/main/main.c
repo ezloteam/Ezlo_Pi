@@ -18,13 +18,12 @@
 #include "ezlopi.h"
 #include "qt_serial.h"
 #include "web_provisioning.h"
-#include "gatt_server.h"
+#include "ezlopi_ble_gatt_server.h"
 #include "gpio_isr_service.h"
 
 static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
-
 
 void app_main(void)
 {
@@ -36,7 +35,6 @@ void app_main(void)
     sensor_service_init();
 
     // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
-
 }
 
 static void blinky(void *pv)

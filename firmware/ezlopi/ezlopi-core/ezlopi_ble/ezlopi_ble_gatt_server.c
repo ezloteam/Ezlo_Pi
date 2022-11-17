@@ -13,14 +13,12 @@
 #include "esp_gatt_common_api.h"
 
 #include "sdkconfig.h"
-#include "gatt_server.h"
+#include "trace.h"
+#include "ezlopi_ble_gatt_server.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_factory_info.h"
-#include "trace.h"
 
-static RTC_DATA_ATTR char __SSID[32];
-static RTC_DATA_ATTR char __PWD[32];
 static char TEST_DEVICE_NAME[32];
 
 #define GATTS_DEMO_CHAR_VAL_LEN_MAX 0x40
@@ -31,7 +29,10 @@ static esp_gatt_char_prop_t a_property = 0;
 static esp_gatt_char_prop_t b_property = 0;
 
 /// Declare the static function
-void wifi_connect_c(const char *ssid, const char *pass);
+static void ezlopi_ble_start_secure_gatt_server(void);
+static esp_err_t ezlopi_ble_getts_parse_and_connect_wifi(uint8_t *data, uint32_t len);
+static void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
+static void gatts_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 
@@ -95,7 +96,7 @@ static uint8_t adv_service_uuid128[32] = {
 };
 
 // The length of adv data must be less than 31 bytes
-// static uint8_t test_manufacturer[TEST_MANUFACTURER_DATA_LEN] =  {0x12, 0x23, 0x45, 0x56};
+static uint8_t test_manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
 // adv data
 static esp_ble_adv_data_t adv_data = {
     .set_scan_rsp = false,
@@ -120,8 +121,8 @@ static esp_ble_adv_data_t scan_rsp_data = {
     //.min_interval = 0x0006,
     //.max_interval = 0x0010,
     .appearance = 0x00,
-    .manufacturer_len = 0,       // TEST_MANUFACTURER_DATA_LEN,
-    .p_manufacturer_data = NULL, //&test_manufacturer[0],
+    .manufacturer_len = sizeof(test_manufacturer), // TEST_MANUFACTURER_DATA_LEN,
+    .p_manufacturer_data = test_manufacturer,      //&test_manufacturer[0],
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = sizeof(adv_service_uuid128),
@@ -142,22 +143,6 @@ static esp_ble_adv_params_t adv_params = {
     .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
 };
 
-typedef struct gatts_profile_inst
-{
-    esp_gatts_cb_t gatts_cb;
-    uint16_t gatts_if;
-    uint16_t app_id;
-    uint16_t conn_id;
-    uint16_t service_handle;
-    esp_gatt_srvc_id_t service_id;
-    uint16_t char_handle;
-    esp_bt_uuid_t char_uuid;
-    esp_gatt_perm_t perm;
-    esp_gatt_char_prop_t property;
-    uint16_t descr_handle;
-    esp_bt_uuid_t descr_uuid;
-} gatts_profile_inst_t;
-
 /* One gatt-based profile one app_id and one gatts_if, this array will store the gatts_if returned by ESP_GATTS_REG_EVT */
 static gatts_profile_inst_t gl_profile_tab[PROFILE_NUM] = {
     [PROFILE_A_APP_ID] = {
@@ -170,17 +155,7 @@ static gatts_profile_inst_t gl_profile_tab[PROFILE_NUM] = {
     },
 };
 
-typedef struct
-{
-    uint8_t *prepare_buf;
-    int prepare_len;
-} prepare_type_env_t;
-
 static prepare_type_env_t a_prepare_write_env;
-// static prepare_type_env_t b_prepare_write_env;
-
-void gatts_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
-void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
 
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
@@ -261,11 +236,20 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
 void gatts_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param)
 {
     esp_gatt_status_t status = ESP_GATT_OK;
+    TRACE_D("param->write.is_prep: %d", param->write.is_prep);
     TRACE_D("param->write.need_rsp: %d", param->write.need_rsp);
+    TRACE_D("param->write.len: %d", param->write.len);
+    TRACE_D("param->write.offset: %d", param->write.offset);
+    TRACE_D("param->write.handle: %d", param->write.handle);
+    TRACE_D("param->write.conn_id: %d", param->write.conn_id);
+    TRACE_D("param->write.bda:");
+    dump(param->write.bda, 0, 6);
+    TRACE_D("param->write.data:");
+    dump(param->write.value, 0, param->write.len);
 
     if (param->write.need_rsp)
     {
-        TRACE_D("param->write.is_prep: %d", param->write.is_prep);
+        // TRACE_D("param->write.is_prep: %d", param->write.is_prep);
         if (param->write.is_prep)
         {
             TRACE_D("prepare_write_env->prepare_buf: %s", prepare_write_env->prepare_buf ? "Not NULL" : "NULL");
@@ -324,34 +308,47 @@ void gatts_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_w
     }
 }
 
-void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param)
+static esp_err_t ezlopi_ble_getts_parse_and_connect_wifi(uint8_t *data, uint32_t len)
 {
-    if (param->exec_write.exec_write_flag == ESP_GATT_PREP_WRITE_EXEC)
-    {
-        TRACE_I("Prep data[%d]: %s", prepare_write_env->prepare_len, (char *)prepare_write_env->prepare_buf);
+    esp_err_t err = ESP_OK;
 
-        cJSON *root = cJSON_Parse((const char *)prepare_write_env->prepare_buf);
-        TRACE_W("root: %d", (uint32_t)root);
+    if ((NULL != data) && (len > 0))
+    {
+        cJSON *root = cJSON_Parse((const char *)data);
         if (root)
         {
-            snprintf(__SSID, sizeof(__SSID), "%s", cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring);
-            snprintf(__PWD, sizeof(__PWD), "%s", cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring);
+            char *ssid = cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring;
+            char *password = cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring;
+            esp_err_t wifi_error = ezlopi_wifi_connect(ssid, password);
             cJSON_Delete(root);
-            ezlopi_wifi_set_new_wifi_flag();
-            esp_err_t wifi_error = ezlopi_wifi_connect(__SSID, __PWD);
-            // wifi_connect_c(__SSID, __PWD);
         }
+        else
+        {
+            err = ESP_ERR_NVS_INVALID_STATE;
+        }
+    }
+
+    return err;
+}
+
+void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param)
+{
+    if (ESP_GATT_PREP_WRITE_EXEC == param->exec_write.exec_write_flag)
+    {
+        TRACE_I("Prep data[%d]: %s", prepare_write_env->prepare_len, (char *)prepare_write_env->prepare_buf);
+        ezlopi_ble_getts_parse_and_connect_wifi(prepare_write_env->prepare_buf, prepare_write_env->prepare_len);
     }
     else
     {
         TRACE_I("ESP_GATT_PREP_WRITE_CANCEL");
     }
 
-    if (prepare_write_env->prepare_buf)
+    if (NULL != prepare_write_env->prepare_buf)
     {
         free(prepare_write_env->prepare_buf);
         prepare_write_env->prepare_buf = NULL;
     }
+
     prepare_write_env->prepare_len = 0;
 }
 
@@ -439,10 +436,11 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     case ESP_GATTS_WRITE_EVT:
     {
         TRACE_I("GATT_WRITE_EVT, conn_id %d, trans_id %d, handle %d", param->write.conn_id, param->write.trans_id, param->write.handle);
-        if (!param->write.is_prep)
+        if (0 == param->write.is_prep) // Data received in single packet
         {
             TRACE_I("GATT_WRITE_EVT, value len %d, value :", param->write.len);
             dump(param->write.value, 0, param->write.len);
+
             if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2)
             {
                 uint16_t descr_value = param->write.value[1] << 8 | param->write.value[0];
@@ -462,10 +460,11 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                     dump(param->write.value, 0, param->write.len);
                 }
             }
+
+            ezlopi_ble_getts_parse_and_connect_wifi(param->write.value, param->write.len);
         }
 
         gatts_write_event_env(gatts_if, &a_prepare_write_env, param);
-        // gatts_exec_wifi_connect_event(&a_prepare_write_env, param);
         break;
     }
     case ESP_GATTS_EXEC_WRITE_EVT:
@@ -773,7 +772,7 @@ static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 void GATT_SERVER_MAIN(void)
 {
     s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-    snprintf(TEST_DEVICE_NAME, sizeof(TEST_DEVICE_NAME), "EzloPi-%llu", factory->id);
+    snprintf(TEST_DEVICE_NAME, sizeof(TEST_DEVICE_NAME), "ezlopi_%llu", factory->id);
 
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     CHECK_PRINT_ERROR(esp_bt_controller_init(&bt_cfg), "initialize controller failed");
@@ -785,4 +784,38 @@ void GATT_SERVER_MAIN(void)
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_A_APP_ID), "gatts app register error");
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_B_APP_ID), "gatts app register error");
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
+    ezlopi_ble_start_secure_gatt_server();
+}
+
+static void ezlopi_ble_start_secure_gatt_server(void)
+{
+    /* set the security iocap & auth_req & key size & init key response key parameters to the stack*/
+    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND; // bonding with peer device after authentication
+    esp_ble_io_cap_t iocap = ESP_IO_CAP_OUT;                    // set the IO capability to No output No input
+    uint8_t key_size = 16;                                      // the key size should be 7~16 bytes
+    uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
+    uint8_t rsp_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
+    // set static passkey
+    uint32_t passkey = 123456;
+    uint8_t auth_option = ESP_BLE_ONLY_ACCEPT_SPECIFIED_AUTH_DISABLE;
+    uint8_t oob_support = ESP_BLE_OOB_ENABLE; // ESP_BLE_OOB_DISABLE;
+    esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_MAX_KEY_SIZE, &key_size, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, &auth_option, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, &oob_support, sizeof(uint8_t));
+    /* If your BLE device acts as a Slave, the init_key means you hope which types of key of the master should distribute to you,
+    and the response key means which key you can distribute to the master;
+    If your BLE device acts as a master, the response key means you hope which types of key of the slave should distribute to you,
+    and the init key means which key you can distribute to the slave. */
+    esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t));
+
+    /* Just show how to clear all the bonded devices
+     * Delay 30s, clear all the bonded devices
+     *
+     * vTaskDelay(30000 / portTICK_PERIOD_MS);
+     * remove_all_bonded_devices();
+     */
 }

@@ -165,44 +165,52 @@ void ezlopi_wifi_initialize(void)
 
 void ezlopi_wifi_connect_from_nvs(void)
 {
-    char wifi_info[64];
-    memset(wifi_info, 0, sizeof(wifi_info));
-    ezlopi_nvs_read_wifi(wifi_info, sizeof(wifi_info));
+    memset(wifi_ssid_pass, 0, sizeof(wifi_ssid_pass));
+    ezlopi_nvs_read_wifi(wifi_ssid_pass, sizeof(wifi_ssid_pass));
 
-    if (wifi_info[0] == 0)
+    if (wifi_ssid_pass[0] == 0)
     {
-        strcpy(wifi_info, "ezlopitest");
-        strcpy(&wifi_info[32], "ezlopitest");
+        strcpy(&wifi_ssid_pass[00], "ezlopitest");
+        strcpy(&wifi_ssid_pass[32], "ezlopitest");
         ezlopi_wifi_set_new_wifi_flag();
     }
 
-    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_info[0], &wifi_info[32]);
+    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass[0], &wifi_ssid_pass[32]);
     TRACE_E("wifi_error: %u", wifi_error);
 }
 
 esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 {
     esp_err_t err = ESP_OK;
-    strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
-    strncpy((char *)&wifi_ssid_pass[32], pass, 32);
 
-    TRACE_D("SSID: %s, Password: %s\r\n", ssid, pass);
+    if ((NULL != ssid) && (NULL != pass))
+    {
+        if ((0 != strncmp(ssid, &wifi_ssid_pass[0], 32)) || ((0 != strncmp(pass, &wifi_ssid_pass[32], 32))))
+        {
+            ezlopi_wifi_set_new_wifi_flag();
+            strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
+            strncpy((char *)&wifi_ssid_pass[32], pass, 32);
+        }
 
-    wifi_config_t wifi_config = {
-        .sta = {
-            .pmf_cfg = {.capable = true, .required = false},
-        },
-    };
+        TRACE_D("SSID: %s, Password: %s\r\n", ssid, pass);
 
-    strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
-    strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
-    wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+        wifi_config_t wifi_config = {
+            .sta = {
+                .pmf_cfg = {.capable = true, .required = false},
+            },
+        };
 
-    esp_wifi_stop();
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-    ESP_ERROR_CHECK(esp_wifi_start());
-    set_wifi_station_host_name();
+        strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
+        strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
+        wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+
+        esp_wifi_stop();
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+        err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+        ESP_ERROR_CHECK(esp_wifi_start());
+        set_wifi_station_host_name();
+    }
+
     return err;
 }
 
