@@ -258,10 +258,10 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
 
     QString command = "";
     for(auto args : arguments) {
-        command += args;
+        command += " " + args;
     }
 
-    qDebug() << command;
+    qDebug() << "Erase flash command arguments: " << command;
 
     ezlogic_process_erase_flash->setArguments(arguments);
     ezlogic_process_erase_flash->start();
