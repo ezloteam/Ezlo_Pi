@@ -235,14 +235,22 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
 
 
     #ifdef __linux__
-            QString ser_port = "/dev/" + ezpi_serial_port_info.portName();
+            QString ser_port = "/dev/" + ezlogic_serial_port_info.portName();
     #elif _WIN32
         QString ser_port = ezlogic_serial_port_info.portName();
     #else
 
     #endif
 
-    ezlogic_process_erase_flash->setProgram("esptool.exe");
+
+    #ifdef __linux__
+        ezlogic_process_erase_flash->setProgram("esptool");
+    #elif _WIN32
+        ezlogic_process_erase_flash->setProgram("esptool.exe");
+    #else
+
+    #endif
+
     QStringList arguments;
     arguments.append("-p");
     arguments.append(ser_port);
@@ -269,7 +277,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     connect(ezlogic_process_write_flash, &QProcess::readyReadStandardError, this, &MainWindow::ezlogic_log_write_flash);
 
     #ifdef __linux__
-            QString ser_port = "/dev/" + ezpi_serial_port_info.portName();
+            QString ser_port = "/dev/" + ezlogic_serial_port_info.portName();
     #elif _WIN32
         QString ser_port = ezlogic_serial_port_info.portName();
     #else
@@ -280,8 +288,14 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     ui->tableWidget_device_table->clearContents();
     ui->pushButton_connect_uart->setEnabled(false);
 
-    ezlogic_process_write_flash->setProgram("esptool.exe");       
 
+    #ifdef __linux__
+        ezlogic_process_write_flash->setProgram("esptool");
+    #elif _WIN32
+        ezlogic_process_write_flash->setProgram("esptool.exe");
+    #else
+
+    #endif
 
     QStringList arguments;
 

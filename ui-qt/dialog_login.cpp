@@ -1,5 +1,5 @@
 #include "dialog_login.h"
-#include "ui_login.h"
+#include "ui_dialog_login.h"
 
 #include<QDebug>
 #include<QMessageBox>
