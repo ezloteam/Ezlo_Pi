@@ -19,22 +19,22 @@ static uint32_t device_index = 0xFF;
 static void mpu_service_process(void *pv);
 uint32_t web_provisioning_get_message_count(void);
 
-void i2c_master_interface_init(int i2c_num, int sda, int scl, uint32_t clock_speed)
-{
-    // if (0 == i2c_port_status[i2c_num])
-    // {
-    i2c_config_t i2c_config = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = sda,
-        .scl_io_num = scl,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = clock_speed};
-    i2c_param_config(I2C_NUM_0, &i2c_config);
-    i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
-    // i2c_port_status[i2c_num] = 1;
-    // }
-}
+// void i2c_master_interface_init(int i2c_num, int sda, int scl, uint32_t clock_speed)
+// {
+//     // if (0 == i2c_port_status[i2c_num])
+//     // {
+//     i2c_config_t i2c_config = {
+//         .mode = I2C_MODE_MASTER,
+//         .sda_io_num = sda,
+//         .scl_io_num = scl,
+//         .sda_pullup_en = GPIO_PULLUP_ENABLE,
+//         .scl_pullup_en = GPIO_PULLUP_ENABLE,
+//         .master.clk_speed = clock_speed};
+//     i2c_param_config(I2C_NUM_0, &i2c_config);
+//     i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
+//     // i2c_port_status[i2c_num] = 1;
+//     // }
+// }
 
 void mpu_service_init(uint8_t scl_pin, uint8_t sda_pin, uint32_t dev_idx)
 {
@@ -45,6 +45,7 @@ void mpu_service_init(uint8_t scl_pin, uint8_t sda_pin, uint32_t dev_idx)
 
 static void mpu_service_process(void *pv)
 {
+    char value_buf[128];
     while (1)
     {
         // ESP_ERROR_CHECK(MPU6050_i2c_master_init(SDA, SCL));
@@ -52,7 +53,24 @@ static void mpu_service_process(void *pv)
         mpu6050_wake();
         MPU_TASK();
 
-        char *ret = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), device_index);
+        uint16_t x_val = accel_x_value_read();
+        uint16_t y_val = accel_y_value_read();
+        uint16_t z_val = accel_z_value_read();
+
+        static const char * scale_str = "\"scale\":\"meter_per_second_square\",\"syncNotification\":false";
+
+        memset(value_buf, 0, sizeof(value_buf));
+        snprintf(value_buf, sizeof(value_buf), "%d,%s", x_val, scale_str);
+        
+        memset(value_buf, 0, sizeof(value_buf));
+        snprintf(value_buf, sizeof(value_buf), "%d,%s", y_val, scale_str);
+
+        memset(value_buf, 0, sizeof(value_buf));
+        snprintf(value_buf, sizeof(value_buf), "%d,%s", z_val, scale_str);
+
+        char *ret = items_update_from_sensor(device_index, value_buf);
+
+        // char *ret = items_update_with_device_index(NULL, 0, NULL, web_provisioning_get_message_count(), device_index);
 
         if (ret)
         {

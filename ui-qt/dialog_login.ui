@@ -139,7 +139,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Cancle</string>
+    <string>Cancel</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_login">

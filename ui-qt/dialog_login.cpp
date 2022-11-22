@@ -1,5 +1,5 @@
 #include "dialog_login.h"
-#include "ui_login.h"
+#include "ui_dialog_login.h"
 
 #include<QDebug>
 #include<QMessageBox>
@@ -77,7 +77,7 @@ void login::replyFinished(QNetworkReply *rep) {
 
     QByteArray response_bytes = rep->readAll();
 
-//    qDebug() << response_bytes;
+    qDebug().noquote() << response_bytes;
 
         QJsonParseError jerror;
 

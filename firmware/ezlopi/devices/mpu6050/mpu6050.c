@@ -49,7 +49,6 @@
 static uint8_t buffer[14];
 static size_t data_len = 12;
 static SemaphoreHandle_t print_mux = NULL;
-static uint16_t pbuffer[7];
 static uint16_t accel_x = 0;
 static uint16_t accel_y = 0;
 static uint16_t accel_z = 0;
@@ -133,27 +132,18 @@ void MPU6050_disp_buff(uint8_t *buf, int len)
 {
     int i;
 
+    static uint16_t pbuffer[7];
     memset(pbuffer, 0, sizeof(pbuffer));
 
-    pbuffer[0] = (int)((buf[0] << 8) | buf[1]);
-    pbuffer[1] = (int)((buf[2] << 8) | buf[3]);
-    pbuffer[2] = (int)((buf[4] << 8) | buf[5]);
-    pbuffer[3] = (int)((buf[6] << 8) | buf[7]);
-    pbuffer[4] = (int)((buf[8] << 8) | buf[9]);
-    pbuffer[5] = (int)((buf[10] << 8) | buf[11]);
-    pbuffer[6] = (int)((buf[12] << 8) | buf[13]);
-    accel_x = pbuffer[0];
-    accel_y = pbuffer[1];
-    accel_z = pbuffer[2];
-    gyro_x = pbuffer[3];
-    gyro_y = pbuffer[4];
-    gyro_z = pbuffer[5];
+    accel_x = (uint16_t)((buf[0] << 8) | buf[1]);
+    accel_y = (uint16_t)((buf[2] << 8) | buf[3]);
+    accel_z = (uint16_t)((buf[4] << 8) | buf[5]);
+    gyro_x = (uint16_t)((buf[6] << 8) | buf[7]);
+    gyro_y = (uint16_t)((buf[8] << 8) | buf[9]);
+    gyro_z = (uint16_t)((buf[10] << 8) | buf[11]);
 
-    for (i = 0; i < 7; i++)
-    {
-        printf("%d ", pbuffer[i]);
-    }
-    printf("\n");
+    printf("a_x: %d, a_y: %d, a_z: %d\r\n", accel_x, accel_y, accel_z);
+    printf("g_x: %d, g_y: %d, g_z: %d\r\n", gyro_x, gyro_y, gyro_z);
 }
 
 void MPU_TASK()
