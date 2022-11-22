@@ -133,7 +133,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
     ezlogic_serial_port->setPort(ezlogic_serial_port_info);
 
     if(ezlogic_flag_serial_port_open == false) {
-//        if(!ezlogic_serial_port_info.isBusy())
+        if(!ezlogic_serial_port_info.isBusy())
         {
 
             if(ezlogic_serial_port->open(QIODevice::ReadWrite)) {
