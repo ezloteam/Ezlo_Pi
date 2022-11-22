@@ -50,7 +50,7 @@ static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
 
-#define PROFILE_NUM 2
+#define PROFILE_NUM 1
 #define PROFILE_A_APP_ID 0
 #define PROFILE_B_APP_ID 1
 
@@ -163,6 +163,7 @@ static prepare_type_env_t a_prepare_write_env;
 
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
+    TRACE_W("GAP EVENT: %d", event);
     switch (event)
     {
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
@@ -264,7 +265,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
         TRACE_I("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
-        dump(param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
+        dump("", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
         TRACE_I("------------------------------------");
         break;
     }
@@ -338,9 +339,9 @@ void gatts_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_w
     TRACE_D("param->write.handle: %d", param->write.handle);
     TRACE_D("param->write.conn_id: %d", param->write.conn_id);
     TRACE_D("param->write.bda:");
-    dump(param->write.bda, 0, 6);
+    dump("", param->write.bda, 0, 6);
     TRACE_D("param->write.data:");
-    dump(param->write.value, 0, param->write.len);
+    dump("", param->write.value, 0, param->write.len);
 
     if (param->write.need_rsp)
     {
@@ -449,7 +450,7 @@ void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_bl
 
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_I("BLE-GATT event: %d", event);
+    TRACE_W("A - BLE-GATT event: %d", event);
 
     switch (event)
     {
@@ -509,9 +510,10 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 
         // char *wifi_creds = ezlopi_nvs_get_current_wifi_creds();
         char wifi_creds[64];
+        memset(wifi_creds, 0, sizeof(wifi_creds));
         ezlopi_nvs_read_wifi(wifi_creds, 64);
-        char tmp_buffer[100];
-        snprintf(tmp_buffer, 200, "{\"SSID\":\"%.*s\",\"PSD\":\"%.*s\"}", 32, &wifi_creds[0], 64, &wifi_creds[32]);
+        char tmp_buffer[200];
+        snprintf(tmp_buffer, sizeof(tmp_buffer), "{\"SSID\":\"%.*s\",\"PSD\":\"%.*s\"}", 32, &wifi_creds[0], 64, &wifi_creds[32]);
 
         if (0 != strlen(tmp_buffer) && strlen(tmp_buffer) > param->read.offset)
         {
@@ -534,7 +536,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         if (0 == param->write.is_prep) // Data received in single packet
         {
             TRACE_I("GATT_WRITE_EVT, value len %d, value :", param->write.len);
-            dump(param->write.value, 0, param->write.len);
+            dump("", param->write.value, 0, param->write.len);
 
             if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2)
             {
@@ -552,7 +554,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 else
                 {
                     TRACE_E("unknown descr value");
-                    dump(param->write.value, 0, param->write.len);
+                    dump("", param->write.value, 0, param->write.len);
                 }
             }
 
@@ -653,6 +655,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     }
     case ESP_GATTS_CONNECT_EVT:
     {
+#if 0 // for insecure communication
         esp_ble_conn_update_params_t conn_params = {0};
         memcpy(conn_params.bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
         /* For the IOS system, please reference the apple official documents about the ble connection parameters restrictions. */
@@ -667,6 +670,10 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         gl_profile_tab[PROFILE_A_APP_ID].conn_id = param->connect.conn_id;
         // start sent the update connection parameters to the peer device.
         esp_ble_gap_update_conn_params(&conn_params);
+#endif
+        TRACE_I("ESP_GATTS_CONNECT_EVT");
+        /* start security connect with peer device when receive the connect event sent by the master */
+        esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM);
         break;
     }
     case ESP_GATTS_DISCONNECT_EVT:
@@ -680,7 +687,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         TRACE_I("ESP_GATTS_CONF_EVT, status %d attr_handle %d", param->conf.status, param->conf.handle);
         if (param->conf.status != ESP_GATT_OK)
         {
-            dump(param->conf.value, 0, param->conf.len);
+            dump("", param->conf.value, 0, param->conf.len);
         }
         break;
     }
@@ -697,6 +704,8 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 
 static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
+    TRACE_W("B - BLE-GATT event: %d", event);
+
     switch (event)
     {
     case ESP_GATTS_REG_EVT:
@@ -792,11 +801,18 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     }
     case ESP_GATTS_CONNECT_EVT:
     {
+#if 0
         TRACE_I("CONNECT_EVT, conn_id %d, remote %02x:%02x:%02x:%02x:%02x:%02x:",
                 param->connect.conn_id,
                 param->connect.remote_bda[0], param->connect.remote_bda[1], param->connect.remote_bda[2],
                 param->connect.remote_bda[3], param->connect.remote_bda[4], param->connect.remote_bda[5]);
         gl_profile_tab[PROFILE_B_APP_ID].conn_id = param->connect.conn_id;
+#endif
+
+        TRACE_I("ESP_GATTS_CONNECT_EVT");
+        /* start security connect with peer device when receive the connect event sent by the master */
+        esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM);
+
         break;
     }
     case ESP_GATTS_CONF_EVT:
@@ -804,7 +820,7 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         TRACE_I("ESP_GATTS_CONF_EVT status %d attr_handle %d", param->conf.status, param->conf.handle);
         if (param->conf.status != ESP_GATT_OK)
         {
-            dump(param->conf.value, 0, param->conf.len);
+            dump("", param->conf.value, 0, param->conf.len);
         }
         break;
     }
@@ -830,7 +846,7 @@ static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_
         }
         else
         {
-            TRACE_I("Reg app failed, app_id %04x, status %d", param->reg.app_id, param->reg.status);
+            TRACE_W("Reg app failed, app_id %04x, status %d", param->reg.app_id, param->reg.status);
             return;
         }
     }
@@ -885,9 +901,9 @@ void GATT_SERVER_MAIN(void)
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
     /* set the security iocap & auth_req & key size & init key response key parameters to the stack*/
-    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND; // bonding with peer device after authentication
-    esp_ble_io_cap_t iocap = ESP_IO_CAP_OUT;                    // set the IO capability to No output No input
-    uint8_t key_size = 16;                                      // the key size should be 7~16 bytes
+    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_BOND_MITM; // bonding with peer device after authentication
+    esp_ble_io_cap_t iocap = ESP_IO_CAP_OUT;                 // set the IO capability to No output No input
+    uint8_t key_size = 16;                                   // the key size should be 7~16 bytes
     uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
     uint8_t rsp_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
     // set static passkey
@@ -934,7 +950,7 @@ static void show_bonded_devices(void)
     TRACE_I("Bonded devices list : %d\n", dev_num);
     for (int i = 0; i < dev_num; i++)
     {
-        dump((void *)dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
+        dump("", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
     }
 
     free(dev_list);

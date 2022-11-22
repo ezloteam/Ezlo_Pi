@@ -44,13 +44,13 @@ static void put_idump(uint8_t *buff, uint32_t ofs, uint32_t cnt)
     }
 }
 
-void __dump(const char *file_name, uint32_t line, void *_buff, uint32_t ofs, uint32_t cnt)
+void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt)
 {
     unsigned char *buff = _buff;
     int lines = cnt >> 4;
     int l;
 
-    printf("%s (%d): Total Size: %d\r\n", file_name, line, cnt);
+    printf("%s (%d):: %s: Total Size: %d\r\n", file_name, line, buffer_name, cnt);
 
     for (l = 0; l < lines; l++)
     {

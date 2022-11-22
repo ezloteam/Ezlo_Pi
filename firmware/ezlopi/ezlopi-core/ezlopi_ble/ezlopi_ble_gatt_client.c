@@ -99,7 +99,7 @@
 //         gl_profile_tab[PROFILE_A_APP_ID].conn_id = p_data->connect.conn_id;
 //         memcpy(gl_profile_tab[PROFILE_A_APP_ID].remote_bda, p_data->connect.remote_bda, sizeof(esp_bd_addr_t));
 //         TRACE_I("REMOTE BDA:");
-//         dump(gl_profile_tab[PROFILE_A_APP_ID].remote_bda, 0, sizeof(esp_bd_addr_t));
+//         dump("gl_profile_tab[PROFILE_A_APP_ID].remote_bda", gl_profile_tab[PROFILE_A_APP_ID].remote_bda, 0, sizeof(esp_bd_addr_t));
 //         esp_err_t mtu_ret = esp_ble_gattc_send_mtu_req(gattc_if, p_data->connect.conn_id);
 //         if (mtu_ret)
 //         {
@@ -294,7 +294,7 @@
 //         {
 //             TRACE_I("ESP_GATTC_NOTIFY_EVT, receive indicate value:");
 //         }
-//         dump(p_data->notify.value, 0, p_data->notify.value_len);
+//         dump("p_data->notify.value", p_data->notify.value, 0, p_data->notify.value_len);
 //         break;
 //     case ESP_GATTC_WRITE_DESCR_EVT:
 //         if (p_data->write.status != ESP_GATT_OK)
@@ -321,7 +321,7 @@
 //         esp_bd_addr_t bda;
 //         memcpy(bda, p_data->srvc_chg.remote_bda, sizeof(esp_bd_addr_t));
 //         TRACE_I("ESP_GATTC_SRVC_CHG_EVT, bd_addr:");
-//         dump(bda, 0, sizeof(esp_bd_addr_t));
+//         dump("bda", bda, 0, sizeof(esp_bd_addr_t));
 //         break;
 //     }
 //     case ESP_GATTC_WRITE_CHAR_EVT:
@@ -371,7 +371,7 @@
 //         switch (scan_result->scan_rst.search_evt)
 //         {
 //         case ESP_GAP_SEARCH_INQ_RES_EVT:
-//             dump(scan_result->scan_rst.bda, 0, 6);
+//             dump("scan_result->scan_rst.bda", scan_result->scan_rst.bda, 0, 6);
 //             TRACE_I("searched Adv Data Len %d, Scan Response Len %d", scan_result->scan_rst.adv_data_len, scan_result->scan_rst.scan_rsp_len);
 //             adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
 //                                                 ESP_BLE_AD_TYPE_NAME_CMPL, &adv_name_len);
@@ -382,12 +382,12 @@
 //             if (scan_result->scan_rst.adv_data_len > 0)
 //             {
 //                 TRACE_I("adv data:");
-//                 dump(&scan_result->scan_rst.ble_adv[0], 0, scan_result->scan_rst.adv_data_len);
+//                 dump("scan_result->scan_rst.ble_adv", &scan_result->scan_rst.ble_adv[0], 0, scan_result->scan_rst.adv_data_len);
 //             }
 //             if (scan_result->scan_rst.scan_rsp_len > 0)
 //             {
 //                 TRACE_I("scan resp:");
-//                 dump(&scan_result->scan_rst.ble_adv[scan_result->scan_rst.adv_data_len], 0, scan_result->scan_rst.scan_rsp_len);
+//                 dump("scan_result->scan_rst.ble_adv[scan_result->scan_rst.adv_data_len]", &scan_result->scan_rst.ble_adv[scan_result->scan_rst.adv_data_len], 0, scan_result->scan_rst.scan_rsp_len);
 //             }
 // #endif
 //             TRACE_I("\n");

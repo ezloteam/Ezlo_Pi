@@ -216,5 +216,8 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 
 void ezlopi_wait_for_wifi_to_connect(void)
 {
-    xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+    if (NULL != s_wifi_event_group)
+    {
+        xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+    }
 }
