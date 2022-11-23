@@ -26,6 +26,7 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"
 #include "qt_serial.h"
+#include "ezlopi_wifi_err_reason.h"
 
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -111,6 +112,10 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
+        // event_data; //
+        wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
+        TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
+
         station_got_ip = 0;
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
         {
@@ -144,6 +149,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
 
 void ezlopi_wifi_initialize(void)
 {
+    memset(&my_ip, 0, sizeof(my_ip));
     s_wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_netif_init());

@@ -6,6 +6,7 @@
 #include "esp_bt.h"
 #include "cJSON.h"
 
+#include "lwip/ip_addr.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
 #include "esp_bt_defs.h"
@@ -26,7 +27,6 @@ static char TEST_DEVICE_NAME[32];
 static uint8_t char1_str[] = {0x11, 0x22, 0x33};
 
 static esp_gatt_char_prop_t a_property = 0;
-static esp_gatt_char_prop_t b_property = 0;
 
 /// Declare the static function
 
@@ -50,7 +50,7 @@ static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
 
-#define PROFILE_NUM 1
+#define PROFILE_NUM 2
 #define PROFILE_A_APP_ID 0
 #define PROFILE_B_APP_ID 1
 
@@ -166,7 +166,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
     TRACE_W("GAP EVENT: %d", event);
     switch (event)
     {
-    case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
+    case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT: // 0
     {
         adv_config_done &= (~ADV_CONFIG_FLAG);
         if (adv_config_done == 0)
@@ -175,7 +175,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         }
         break;
     }
-    case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT:
+    case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT: // 1
     {
         adv_config_done &= (~SCAN_RSP_CONFIG_FLAG);
         if (adv_config_done == 0)
@@ -184,7 +184,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         }
         break;
     }
-    case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
+    case ESP_GAP_BLE_ADV_START_COMPLETE_EVT: // 6
     {
         // advertising start complete event to indicate advertising start successfully or failed
         if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS)
@@ -197,70 +197,70 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         }
         break;
     }
-    case ESP_GAP_BLE_PASSKEY_REQ_EVT:
+    case ESP_GAP_BLE_PASSKEY_REQ_EVT: // 12
     {
         TRACE_I("ESP_GAP_BLE_PASSKEY_REQ_EVT");
         break;
     }
-    case ESP_GAP_BLE_OOB_REQ_EVT:
+    case ESP_GAP_BLE_OOB_REQ_EVT: // 13
     {
         TRACE_I("ESP_GAP_BLE_OOB_REQ_EVT");
         uint8_t tk[16] = {1};
         esp_ble_oob_req_reply(param->ble_security.ble_req.bd_addr, tk, sizeof(tk));
         break;
     }
-    case ESP_GAP_BLE_LOCAL_IR_EVT:
+    case ESP_GAP_BLE_LOCAL_IR_EVT: // 14
     {
         TRACE_I("ESP_GAP_BLE_LOCAL_IR_EVT");
         break;
     }
-    case ESP_GAP_BLE_LOCAL_ER_EVT:
+    case ESP_GAP_BLE_LOCAL_ER_EVT: // 15
     {
         TRACE_I("ESP_GAP_BLE_LOCAL_ER_EVT");
         break;
     }
-    case ESP_GAP_BLE_NC_REQ_EVT:
+    case ESP_GAP_BLE_NC_REQ_EVT: // 16
     {
         esp_ble_confirm_reply(param->ble_security.ble_req.bd_addr, true);
         TRACE_I("ESP_GAP_BLE_NC_REQ_EVT, the passkey Notify number: %d", param->ble_security.key_notif.passkey);
         break;
     }
-    case ESP_GAP_BLE_SEC_REQ_EVT:
+    case ESP_GAP_BLE_SEC_REQ_EVT: // 10
     {
         esp_ble_gap_security_rsp(param->ble_security.ble_req.bd_addr, true);
         break;
     }
-    case ESP_GAP_BLE_PASSKEY_NOTIF_EVT:
+    case ESP_GAP_BLE_PASSKEY_NOTIF_EVT: // 11
     {
         TRACE_I("The passkey Notify number:%06d", param->ble_security.key_notif.passkey);
         break;
     }
-    case ESP_GAP_BLE_KEY_EVT:
+    case ESP_GAP_BLE_KEY_EVT: // 9
     {
         TRACE_I("key type = %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
         break;
     }
-    case ESP_GAP_BLE_AUTH_CMPL_EVT:
+    case ESP_GAP_BLE_AUTH_CMPL_EVT: // 8
     {
         esp_bd_addr_t bd_addr;
         memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
-        TRACE_I("remote BD_ADDR: %08x%04x",
-                (bd_addr[0] << 24) + (bd_addr[1] << 16) + (bd_addr[2] << 8) + bd_addr[3],
-                (bd_addr[4] << 8) + bd_addr[5]);
+        dump("remote BD_ADDR", bd_addr, 0, 6);
         TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
-        TRACE_I("pair status = %s", param->ble_security.auth_cmpl.success ? "success" : "fail");
         if (!param->ble_security.auth_cmpl.success)
         {
+            TRACE_W("pair status = fail");
             TRACE_W("fail reason = 0x%x", param->ble_security.auth_cmpl.fail_reason);
+            esp_ble_gap_disconnect(bd_addr);
         }
         else
         {
+            TRACE_I("pair status = success");
             TRACE_I("auth mode =  %s", esp_auth_req_to_str(param->ble_security.auth_cmpl.auth_mode));
         }
         show_bonded_devices();
         break;
     }
-    case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT:
+    case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: // 23
     {
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
@@ -269,7 +269,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         TRACE_I("------------------------------------");
         break;
     }
-    case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT:
+    case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
         if (param->local_privacy_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {
@@ -299,7 +299,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
 
         break;
     }
-    case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
+    case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT: // 17
     {
         if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {
@@ -311,7 +311,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         }
         break;
     }
-    case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
+    case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT: // 20
     {
         TRACE_I("update connection params status = %d, min_int = %d, max_int = %d,conn_int = %d,latency = %d, timeout = %d",
                 param->update_conn_params.status,
@@ -338,10 +338,8 @@ void gatts_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_w
     TRACE_D("param->write.offset: %d", param->write.offset);
     TRACE_D("param->write.handle: %d", param->write.handle);
     TRACE_D("param->write.conn_id: %d", param->write.conn_id);
-    TRACE_D("param->write.bda:");
-    dump("", param->write.bda, 0, 6);
-    TRACE_D("param->write.data:");
-    dump("", param->write.value, 0, param->write.len);
+    dump("param->write.bda", param->write.bda, 0, 6);
+    dump("param->write.data:", param->write.value, 0, param->write.len);
 
     if (param->write.need_rsp)
     {
@@ -508,26 +506,48 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
         rsp.attr_value.handle = param->read.handle;
 
-        // char *wifi_creds = ezlopi_nvs_get_current_wifi_creds();
         char wifi_creds[64];
         memset(wifi_creds, 0, sizeof(wifi_creds));
-        ezlopi_nvs_read_wifi(wifi_creds, 64);
-        char tmp_buffer[200];
-        snprintf(tmp_buffer, sizeof(tmp_buffer), "{\"SSID\":\"%.*s\",\"PSD\":\"%.*s\"}", 32, &wifi_creds[0], 64, &wifi_creds[32]);
+        ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
 
-        if (0 != strlen(tmp_buffer) && strlen(tmp_buffer) > param->read.offset)
+        cJSON *cjson_wifi_info = cJSON_CreateObject();
+        if (cjson_wifi_info)
         {
-            strncpy((char *)rsp.attr_value.value, (char *)(tmp_buffer + param->read.offset), ESP_GATT_MAX_ATTR_LEN);
-            rsp.attr_value.len = strlen((const char *)rsp.attr_value.value);
-        }
-        else
-        {
-            rsp.attr_value.len = 1;
-            rsp.attr_value.value[0] = 0; // Read 0 if the device not provisioned yet.
+            if (strlen(wifi_creds) >= 32)
+            {
+                wifi_creds[31] = '\0';
+            }
+            cJSON_AddStringToObject(cjson_wifi_info, "SSID", &wifi_creds[0]);
+            cJSON_AddStringToObject(cjson_wifi_info, "PSD", "********");
+
+            esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
+            cJSON_AddStringToObject(cjson_wifi_info, "ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
+            cJSON_AddStringToObject(cjson_wifi_info, "gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
+            cJSON_AddStringToObject(cjson_wifi_info, "netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
+
+            char *json_str_wifi_info = cJSON_Print(cjson_wifi_info);
+            if (json_str_wifi_info)
+            {
+                cJSON_Minify(json_str_wifi_info);
+                if (0 != strlen(json_str_wifi_info) && strlen(json_str_wifi_info) > param->read.offset)
+                {
+                    strncpy((char *)rsp.attr_value.value, json_str_wifi_info + param->read.offset, ESP_GATT_MAX_ATTR_LEN);
+                    rsp.attr_value.len = strlen((const char *)rsp.attr_value.value);
+                }
+                else
+                {
+                    rsp.attr_value.len = 1;
+                    rsp.attr_value.value[0] = 0; // Read 0 if the device not provisioned yet.
+                }
+
+                dump("rsp.attr_value.value", rsp.attr_value.value, 0, rsp.attr_value.len);
+                esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
+                free(json_str_wifi_info);
+            }
+
+            cJSON_Delete(cjson_wifi_info);
         }
 
-        esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id,
-                                    ESP_GATT_OK, &rsp);
         break;
     }
     case ESP_GATTS_WRITE_EVT:
@@ -535,8 +555,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         TRACE_I("GATT_WRITE_EVT, conn_id %d, trans_id %d, handle %d", param->write.conn_id, param->write.trans_id, param->write.handle);
         if (0 == param->write.is_prep) // Data received in single packet
         {
-            TRACE_I("GATT_WRITE_EVT, value len %d, value :", param->write.len);
-            dump("", param->write.value, 0, param->write.len);
+            dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
 
             if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2)
             {
@@ -554,7 +573,6 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 else
                 {
                     TRACE_E("unknown descr value");
-                    dump("", param->write.value, 0, param->write.len);
                 }
             }
 
@@ -588,11 +606,9 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         gl_profile_tab[PROFILE_A_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_TEST_A;
 
         esp_ble_gatts_start_service(gl_profile_tab[PROFILE_A_APP_ID].service_handle);
-        a_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
+        esp_gatt_char_prop_t a_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
         esp_err_t add_char_ret = esp_ble_gatts_add_char(gl_profile_tab[PROFILE_A_APP_ID].service_handle, &gl_profile_tab[PROFILE_A_APP_ID].char_uuid,
-                                                        ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
-                                                        a_property,
-                                                        &gatts_demo_char1_val, NULL);
+                                                        ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, a_property, &gatts_demo_char1_val, NULL);
         if (add_char_ret)
         {
             TRACE_E("add char failed, error code =%x", add_char_ret);
@@ -687,7 +703,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         TRACE_I("ESP_GATTS_CONF_EVT, status %d attr_handle %d", param->conf.status, param->conf.handle);
         if (param->conf.status != ESP_GATT_OK)
         {
-            dump("", param->conf.value, 0, param->conf.len);
+            dump("param->conf.value", param->conf.value, 0, param->conf.len);
         }
         break;
     }
@@ -708,7 +724,7 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 
     switch (event)
     {
-    case ESP_GATTS_REG_EVT:
+    case ESP_GATTS_REG_EVT: // 0
     {
         TRACE_I("REGISTER_APP_EVT, status %d, app_id %d", param->reg.status, param->reg.app_id);
         gl_profile_tab[PROFILE_B_APP_ID].service_id.is_primary = true;
@@ -719,7 +735,7 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         esp_ble_gatts_create_service(gatts_if, &gl_profile_tab[PROFILE_B_APP_ID].service_id, GATTS_NUM_HANDLE_TEST_B);
         break;
     }
-    case ESP_GATTS_READ_EVT:
+    case ESP_GATTS_READ_EVT: // 1
     {
         TRACE_I("GATT_READ_EVT, conn_id %d, trans_id %d, handle %d", param->read.conn_id, param->read.trans_id, param->read.handle);
         esp_gatt_rsp_t rsp;
@@ -737,12 +753,12 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
         break;
     }
-    case ESP_GATTS_MTU_EVT:
+    case ESP_GATTS_MTU_EVT: // 4
     {
         TRACE_I("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
         break;
     }
-    case ESP_GATTS_CREATE_EVT:
+    case ESP_GATTS_CREATE_EVT: // 7
     {
         TRACE_I("CREATE_SERVICE_EVT, status %d,  service_handle %d", param->create.status, param->create.service_handle);
         gl_profile_tab[PROFILE_B_APP_ID].service_handle = param->create.service_handle;
@@ -750,22 +766,31 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         gl_profile_tab[PROFILE_B_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_TEST_B;
 
         esp_ble_gatts_start_service(gl_profile_tab[PROFILE_B_APP_ID].service_handle);
-        b_property = ESP_GATT_CHAR_PROP_BIT_READ;
-        esp_err_t add_char_ret = esp_ble_gatts_add_char(gl_profile_tab[PROFILE_B_APP_ID].service_handle, &gl_profile_tab[PROFILE_B_APP_ID].char_uuid,
-                                                        ESP_GATT_PERM_READ,
-                                                        b_property,
-                                                        NULL, NULL);
-        if (add_char_ret)
+
         {
-            TRACE_E("add char failed, error code =%x", add_char_ret);
+            esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = GATTS_CHAR_UUID_TEST_B, .len = ESP_UUID_LEN_16};
+            esp_err_t add_char_ret = esp_ble_gatts_add_char(param->create.service_handle, &tmp_uuid, ESP_GATT_PERM_READ, ESP_GATT_CHAR_PROP_BIT_READ, NULL, NULL);
+            if (add_char_ret)
+            {
+                TRACE_E("WIFI_STATUS char failed, error code =%x", add_char_ret);
+            }
+        }
+
+        {
+            esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = GATTS_CHAR_UUID_ERR_B, .len = ESP_UUID_LEN_16};
+            esp_err_t add_char_ret = esp_ble_gatts_add_char(param->create.service_handle, &tmp_uuid, ESP_GATT_PERM_READ, ESP_GATT_CHAR_PROP_BIT_READ, NULL, NULL);
+            if (add_char_ret)
+            {
+                TRACE_E("WIFI_ERROR char failed, error code =%x", add_char_ret);
+            }
         }
         break;
     }
-    case ESP_GATTS_ADD_INCL_SRVC_EVT:
+    case ESP_GATTS_ADD_INCL_SRVC_EVT: // 8
     {
         break;
     }
-    case ESP_GATTS_ADD_CHAR_EVT:
+    case ESP_GATTS_ADD_CHAR_EVT: // 9
     {
         TRACE_I("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
@@ -773,33 +798,37 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         gl_profile_tab[PROFILE_B_APP_ID].char_handle = param->add_char.attr_handle;
         gl_profile_tab[PROFILE_B_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
         gl_profile_tab[PROFILE_B_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
-        esp_ble_gatts_add_char_descr(gl_profile_tab[PROFILE_B_APP_ID].service_handle, &gl_profile_tab[PROFILE_B_APP_ID].descr_uuid,
-                                     ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
-                                     NULL, NULL);
+
+        esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG, .len = ESP_UUID_LEN_16};
+        esp_ble_gatts_add_char_descr(param->add_char.service_handle, &tmp_uuid, (ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE), NULL, NULL);
+
+        // esp_ble_gatts_add_char_descr(param->add_char.service_handle, &gl_profile_tab[PROFILE_B_APP_ID].descr_uuid,
+        //                              ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
+        //                              NULL, NULL);
         break;
     }
-    case ESP_GATTS_ADD_CHAR_DESCR_EVT:
+    case ESP_GATTS_ADD_CHAR_DESCR_EVT: // 10
     {
         gl_profile_tab[PROFILE_B_APP_ID].descr_handle = param->add_char_descr.attr_handle;
         TRACE_I("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
                 param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
         break;
     }
-    case ESP_GATTS_DELETE_EVT:
+    case ESP_GATTS_DELETE_EVT: // 11
     {
         break;
     }
-    case ESP_GATTS_START_EVT:
+    case ESP_GATTS_START_EVT: // 12
     {
         TRACE_I("SERVICE_START_EVT, status %d, service_handle %d",
                 param->start.status, param->start.service_handle);
         break;
     }
-    case ESP_GATTS_STOP_EVT:
+    case ESP_GATTS_STOP_EVT: // 13
     {
         break;
     }
-    case ESP_GATTS_CONNECT_EVT:
+    case ESP_GATTS_CONNECT_EVT: // 14
     {
 #if 0
         TRACE_I("CONNECT_EVT, conn_id %d, remote %02x:%02x:%02x:%02x:%02x:%02x:",
@@ -815,21 +844,21 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 
         break;
     }
-    case ESP_GATTS_CONF_EVT:
+    case ESP_GATTS_CONF_EVT: // 5
     {
         TRACE_I("ESP_GATTS_CONF_EVT status %d attr_handle %d", param->conf.status, param->conf.handle);
         if (param->conf.status != ESP_GATT_OK)
         {
-            dump("", param->conf.value, 0, param->conf.len);
+            dump("param->conf.value", param->conf.value, 0, param->conf.len);
         }
         break;
     }
-    case ESP_GATTS_DISCONNECT_EVT:
-    case ESP_GATTS_OPEN_EVT:
-    case ESP_GATTS_CANCEL_OPEN_EVT:
-    case ESP_GATTS_CLOSE_EVT:
-    case ESP_GATTS_LISTEN_EVT:
-    case ESP_GATTS_CONGEST_EVT:
+    case ESP_GATTS_DISCONNECT_EVT:  // 15
+    case ESP_GATTS_OPEN_EVT:        // 16
+    case ESP_GATTS_CANCEL_OPEN_EVT: // 17
+    case ESP_GATTS_CLOSE_EVT:       // 18
+    case ESP_GATTS_LISTEN_EVT:      // 19
+    case ESP_GATTS_CONGEST_EVT:     // 20
     default:
         break;
     }
@@ -883,7 +912,7 @@ static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 void GATT_SERVER_MAIN(void)
 {
     s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-    snprintf(TEST_DEVICE_NAME, sizeof(TEST_DEVICE_NAME), "ezlopi_%llu", factory->id);
+    snprintf(TEST_DEVICE_NAME, sizeof(TEST_DEVICE_NAME), "ezlopi_test_%llu", factory->id);
 
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     CHECK_PRINT_ERROR(esp_bt_controller_init(&bt_cfg), "initialize controller failed");
@@ -950,7 +979,7 @@ static void show_bonded_devices(void)
     TRACE_I("Bonded devices list : %d\n", dev_num);
     for (int i = 0; i < dev_num; i++)
     {
-        dump("", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
+        dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
     }
 
     free(dev_list);
