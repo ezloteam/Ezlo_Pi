@@ -52,6 +52,13 @@ static uint32_t new_wifi = 0;
 static int s_retry_num = 0;
 static char wifi_ssid_pass[64];
 static int station_got_ip = 0;
+static const char *const wifi_no_error_str = "NO_ERROR";
+static const char *last_disconnect_reason = wifi_no_error_str;
+
+const char *ezlopi_wifi_get_last_disconnect_reason(void)
+{
+    return last_disconnect_reason;
+}
 
 esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void)
 {
@@ -115,6 +122,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         // event_data; //
         wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
         TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
+        last_disconnect_reason = ezlopi_wifi_err_reason_str(disconnected->reason);
 
         station_got_ip = 0;
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
@@ -133,6 +141,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
+        last_disconnect_reason = wifi_no_error_str;
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         TRACE_I("got - ip:      " IPSTR, IP2STR(&event->ip_info.ip));
         TRACE_I("      netmask: " IPSTR, IP2STR(&event->ip_info.netmask));

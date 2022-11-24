@@ -15,6 +15,7 @@ extern "C"
     void ezlopi_wifi_connect_from_nvs(void);
     void ezlopi_wait_for_wifi_to_connect(void);
     esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void);
+    const char *ezlopi_wifi_get_last_disconnect_reason(void);
 
 #ifdef __cplusplus
 }

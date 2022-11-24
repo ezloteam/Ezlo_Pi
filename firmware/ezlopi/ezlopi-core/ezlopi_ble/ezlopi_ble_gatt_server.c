@@ -37,8 +37,9 @@ static void ezlopi_ble_start_secure_gatt_server(void);
 static esp_err_t ezlopi_ble_getts_parse_and_connect_wifi(uint8_t *data, uint32_t len);
 static void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
 static void gatts_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
-static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
-static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
+static void __gatts_profile_wifi_info_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
+static void __gatts_profile_wifi_status_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
+static void __gatts_profile_wifi_error_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 
 static esp_attr_value_t gatts_demo_char1_val = {
     .attr_max_len = GATTS_DEMO_CHAR_VAL_LEN_MAX,
@@ -50,9 +51,10 @@ static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
 
-#define PROFILE_NUM 2
-#define PROFILE_A_APP_ID 0
-#define PROFILE_B_APP_ID 1
+#define PROFILE_NUM 3
+#define PROFILE_WIFI_INFO_APP_ID 0
+#define PROFILE_WIFI_STATUS_APP_ID 1
+#define PROFILE_WIFI_ERROR_APP_ID 2
 
 #ifdef CONFIG_SET_RAW_ADV_DATA
 static uint8_t raw_adv_data[] = {
@@ -61,43 +63,10 @@ static uint8_t raw_scan_rsp_data[] = {
     0x0f, 0x09, 0x45, 0x53, 0x50, 0x5f, 0x47, 0x41, 0x54, 0x54, 0x53, 0x5f, 0x44, 0x45, 0x4d, 0x4f};
 #else
 
-static uint8_t adv_service_uuid128[32] = {
-    /* LSB <--------------------------------------------------------------------------------> MSB */
-    // first uuid, 16bit, [12],[13] is the value
-    0xfb,
-    0x34,
-    0x9b,
-    0x5f,
-    0x80,
-    0x00,
-    0x00,
-    0x80,
-    0x00,
-    0x10,
-    0x00,
-    0x00,
-    0xEE,
-    0x00,
-    0x00,
-    0x00,
-    // second uuid, 32bit, [12], [13], [14], [15] is the value
-    0xfb,
-    0x34,
-    0x9b,
-    0x5f,
-    0x80,
-    0x00,
-    0x00,
-    0x80,
-    0x00,
-    0x10,
-    0x00,
-    0x00,
-    0xFF,
-    0x00,
-    0x00,
-    0x00,
-};
+/*                                       LSB <-----------------------------------------------------------------------------------> MSB */
+static uint8_t adv_service_uuid128[] = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xEE, 0x00, 0x00, 0x00,  // first uuid, 16bit, [12],[13] is the value
+                                        0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00,  // second uuid, 32bit, [12], [13], [14], [15] is the value
+                                        0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xF1, 0x00, 0x00, 0x00}; // third uuid, 32bit, [12], [13], [14], [15] is the value
 
 // The length of adv data must be less than 31 bytes
 static uint8_t test_manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
@@ -149,13 +118,17 @@ static esp_ble_adv_params_t adv_params = {
 
 /* One gatt-based profile one app_id and one gatts_if, this array will store the gatts_if returned by ESP_GATTS_REG_EVT */
 static gatts_profile_inst_t gl_profile_tab[PROFILE_NUM] = {
-    [PROFILE_A_APP_ID] = {
-        .gatts_cb = gatts_profile_a_event_handler,
+    [PROFILE_WIFI_INFO_APP_ID] = {
+        .gatts_cb = __gatts_profile_wifi_info_event_handler,
         .gatts_if = ESP_GATT_IF_NONE, /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
     },
-    [PROFILE_B_APP_ID] = {
-        .gatts_cb = gatts_profile_b_event_handler, /* This demo does not implement, similar as profile A */
-        .gatts_if = ESP_GATT_IF_NONE,              /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
+    [PROFILE_WIFI_STATUS_APP_ID] = {
+        .gatts_cb = __gatts_profile_wifi_status_event_handler, /* This demo does not implement, similar as profile A */
+        .gatts_if = ESP_GATT_IF_NONE,                          /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
+    },
+    [PROFILE_WIFI_ERROR_APP_ID] = {
+        .gatts_cb = __gatts_profile_wifi_error_event_handler, /* This demo does not implement, similar as profile A */
+        .gatts_if = ESP_GATT_IF_NONE,                         /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
     },
 };
 
@@ -446,19 +419,19 @@ void gatts_exec_wifi_connect_event(prepare_type_env_t *prepare_write_env, esp_bl
     prepare_write_env->prepare_len = 0;
 }
 
-static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
+static void __gatts_profile_wifi_info_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_W("A - BLE-GATT event: %d", event);
+    TRACE_W("WIFI_INFO - BLE-GATT event: %d", event);
 
     switch (event)
     {
     case ESP_GATTS_REG_EVT:
     {
         TRACE_I("REGISTER_APP_EVT, status %d, app_id %d", param->reg.status, param->reg.app_id);
-        gl_profile_tab[PROFILE_A_APP_ID].service_id.is_primary = true;
-        gl_profile_tab[PROFILE_A_APP_ID].service_id.id.inst_id = 0x00;
-        gl_profile_tab[PROFILE_A_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_A_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_TEST_A;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_id.is_primary = true;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_id.id.inst_id = 0x00;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_WIFI_INFO;
 
         esp_err_t set_dev_name_ret = esp_ble_gap_set_device_name(TEST_DEVICE_NAME);
         if (set_dev_name_ret)
@@ -495,7 +468,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         adv_config_done |= SCAN_RSP_CONFIG_FLAG;
 
 #endif
-        esp_ble_gatts_create_service(gatts_if, &gl_profile_tab[PROFILE_A_APP_ID].service_id, GATTS_NUM_HANDLE_TEST_A);
+        esp_ble_gatts_create_service(gatts_if, &gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_id, GATTS_NUM_HANDLE_WIFI_INFO);
         break;
     }
     case ESP_GATTS_READ_EVT:
@@ -557,7 +530,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         {
             dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
 
-            if (gl_profile_tab[PROFILE_A_APP_ID].descr_handle == param->write.handle && param->write.len == 2)
+            if (gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].descr_handle == param->write.handle && param->write.len == 2)
             {
                 uint16_t descr_value = param->write.value[1] << 8 | param->write.value[0];
                 if (descr_value == 0x0001)
@@ -594,29 +567,21 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         TRACE_I("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
         break;
     }
-    case ESP_GATTS_UNREG_EVT:
-    {
-        break;
-    }
     case ESP_GATTS_CREATE_EVT:
     {
         TRACE_I("CREATE_SERVICE_EVT, status %d,  service_handle %d", param->create.status, param->create.service_handle);
-        gl_profile_tab[PROFILE_A_APP_ID].service_handle = param->create.service_handle;
-        gl_profile_tab[PROFILE_A_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_A_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_TEST_A;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_handle = param->create.service_handle;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_WIFI_INFO;
 
-        esp_ble_gatts_start_service(gl_profile_tab[PROFILE_A_APP_ID].service_handle);
+        esp_ble_gatts_start_service(gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_handle);
         esp_gatt_char_prop_t a_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-        esp_err_t add_char_ret = esp_ble_gatts_add_char(gl_profile_tab[PROFILE_A_APP_ID].service_handle, &gl_profile_tab[PROFILE_A_APP_ID].char_uuid,
+        esp_err_t add_char_ret = esp_ble_gatts_add_char(gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_handle, &gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].char_uuid,
                                                         ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, a_property, &gatts_demo_char1_val, NULL);
         if (add_char_ret)
         {
             TRACE_E("add char failed, error code =%x", add_char_ret);
         }
-        break;
-    }
-    case ESP_GATTS_ADD_INCL_SRVC_EVT:
-    {
         break;
     }
     case ESP_GATTS_ADD_CHAR_EVT:
@@ -626,9 +591,9 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
 
         TRACE_I("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
-        gl_profile_tab[PROFILE_A_APP_ID].char_handle = param->add_char.attr_handle;
-        gl_profile_tab[PROFILE_A_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_A_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].char_handle = param->add_char.attr_handle;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
         esp_err_t get_attr_ret = esp_ble_gatts_get_attr_value(param->add_char.attr_handle, &length, &prf_char);
         if (get_attr_ret == ESP_FAIL)
         {
@@ -640,7 +605,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         {
             TRACE_I("prf_char[%x] =%x", i, prf_char[i]);
         }
-        esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(gl_profile_tab[PROFILE_A_APP_ID].service_handle, &gl_profile_tab[PROFILE_A_APP_ID].descr_uuid,
+        esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].service_handle, &gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].descr_uuid,
                                                                ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, NULL, NULL);
         if (add_descr_ret)
         {
@@ -650,13 +615,9 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     }
     case ESP_GATTS_ADD_CHAR_DESCR_EVT:
     {
-        gl_profile_tab[PROFILE_A_APP_ID].descr_handle = param->add_char_descr.attr_handle;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].descr_handle = param->add_char_descr.attr_handle;
         TRACE_I("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
                 param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
-        break;
-    }
-    case ESP_GATTS_DELETE_EVT:
-    {
         break;
     }
     case ESP_GATTS_START_EVT:
@@ -665,10 +626,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 param->start.status, param->start.service_handle);
         break;
     }
-    case ESP_GATTS_STOP_EVT:
-    {
-        break;
-    }
+
     case ESP_GATTS_CONNECT_EVT:
     {
 #if 0 // for insecure communication
@@ -683,7 +641,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 param->connect.conn_id,
                 param->connect.remote_bda[0], param->connect.remote_bda[1], param->connect.remote_bda[2],
                 param->connect.remote_bda[3], param->connect.remote_bda[4], param->connect.remote_bda[5]);
-        gl_profile_tab[PROFILE_A_APP_ID].conn_id = param->connect.conn_id;
+        gl_profile_tab[PROFILE_WIFI_INFO_APP_ID].conn_id = param->connect.conn_id;
         // start sent the update connection parameters to the peer device.
         esp_ble_gap_update_conn_params(&conn_params);
 #endif
@@ -707,6 +665,10 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         }
         break;
     }
+    case ESP_GATTS_STOP_EVT:
+    case ESP_GATTS_DELETE_EVT:
+    case ESP_GATTS_ADD_INCL_SRVC_EVT:
+    case ESP_GATTS_UNREG_EVT:
     case ESP_GATTS_OPEN_EVT:
     case ESP_GATTS_CANCEL_OPEN_EVT:
     case ESP_GATTS_CLOSE_EVT:
@@ -718,21 +680,21 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     }
 }
 
-static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
+static void __gatts_profile_wifi_status_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_W("B - BLE-GATT event: %d", event);
+    TRACE_W("WIFI_STATUS - BLE-GATT event: %d", event);
 
     switch (event)
     {
     case ESP_GATTS_REG_EVT: // 0
     {
         TRACE_I("REGISTER_APP_EVT, status %d, app_id %d", param->reg.status, param->reg.app_id);
-        gl_profile_tab[PROFILE_B_APP_ID].service_id.is_primary = true;
-        gl_profile_tab[PROFILE_B_APP_ID].service_id.id.inst_id = 0x00;
-        gl_profile_tab[PROFILE_B_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_B_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_TEST_B;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].service_id.is_primary = true;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].service_id.id.inst_id = 0x00;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_WIFI_STATUS;
 
-        esp_ble_gatts_create_service(gatts_if, &gl_profile_tab[PROFILE_B_APP_ID].service_id, GATTS_NUM_HANDLE_TEST_B);
+        esp_ble_gatts_create_service(gatts_if, &gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].service_id, GATTS_NUM_HANDLE_WIFI_STATUS);
         break;
     }
     case ESP_GATTS_READ_EVT: // 1
@@ -761,33 +723,20 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     case ESP_GATTS_CREATE_EVT: // 7
     {
         TRACE_I("CREATE_SERVICE_EVT, status %d,  service_handle %d", param->create.status, param->create.service_handle);
-        gl_profile_tab[PROFILE_B_APP_ID].service_handle = param->create.service_handle;
-        gl_profile_tab[PROFILE_B_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_B_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_TEST_B;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].service_handle = param->create.service_handle;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_WIFI_STATUS;
 
-        esp_ble_gatts_start_service(gl_profile_tab[PROFILE_B_APP_ID].service_handle);
+        esp_ble_gatts_start_service(gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].service_handle);
 
         {
-            esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = GATTS_CHAR_UUID_TEST_B, .len = ESP_UUID_LEN_16};
+            esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = GATTS_CHAR_UUID_WIFI_STATUS, .len = ESP_UUID_LEN_16};
             esp_err_t add_char_ret = esp_ble_gatts_add_char(param->create.service_handle, &tmp_uuid, ESP_GATT_PERM_READ, ESP_GATT_CHAR_PROP_BIT_READ, NULL, NULL);
             if (add_char_ret)
             {
                 TRACE_E("WIFI_STATUS char failed, error code =%x", add_char_ret);
             }
         }
-
-        {
-            esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = GATTS_CHAR_UUID_ERR_B, .len = ESP_UUID_LEN_16};
-            esp_err_t add_char_ret = esp_ble_gatts_add_char(param->create.service_handle, &tmp_uuid, ESP_GATT_PERM_READ, ESP_GATT_CHAR_PROP_BIT_READ, NULL, NULL);
-            if (add_char_ret)
-            {
-                TRACE_E("WIFI_ERROR char failed, error code =%x", add_char_ret);
-            }
-        }
-        break;
-    }
-    case ESP_GATTS_ADD_INCL_SRVC_EVT: // 8
-    {
         break;
     }
     case ESP_GATTS_ADD_CHAR_EVT: // 9
@@ -795,37 +744,26 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         TRACE_I("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
 
-        gl_profile_tab[PROFILE_B_APP_ID].char_handle = param->add_char.attr_handle;
-        gl_profile_tab[PROFILE_B_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_B_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].char_handle = param->add_char.attr_handle;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
 
         esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG, .len = ESP_UUID_LEN_16};
         esp_ble_gatts_add_char_descr(param->add_char.service_handle, &tmp_uuid, (ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE), NULL, NULL);
 
-        // esp_ble_gatts_add_char_descr(param->add_char.service_handle, &gl_profile_tab[PROFILE_B_APP_ID].descr_uuid,
-        //                              ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
-        //                              NULL, NULL);
         break;
     }
     case ESP_GATTS_ADD_CHAR_DESCR_EVT: // 10
     {
-        gl_profile_tab[PROFILE_B_APP_ID].descr_handle = param->add_char_descr.attr_handle;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].descr_handle = param->add_char_descr.attr_handle;
         TRACE_I("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
                 param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
-        break;
-    }
-    case ESP_GATTS_DELETE_EVT: // 11
-    {
         break;
     }
     case ESP_GATTS_START_EVT: // 12
     {
         TRACE_I("SERVICE_START_EVT, status %d, service_handle %d",
                 param->start.status, param->start.service_handle);
-        break;
-    }
-    case ESP_GATTS_STOP_EVT: // 13
-    {
         break;
     }
     case ESP_GATTS_CONNECT_EVT: // 14
@@ -835,7 +773,7 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 param->connect.conn_id,
                 param->connect.remote_bda[0], param->connect.remote_bda[1], param->connect.remote_bda[2],
                 param->connect.remote_bda[3], param->connect.remote_bda[4], param->connect.remote_bda[5]);
-        gl_profile_tab[PROFILE_B_APP_ID].conn_id = param->connect.conn_id;
+        gl_profile_tab[PROFILE_WIFI_STATUS_APP_ID].conn_id = param->connect.conn_id;
 #endif
 
         TRACE_I("ESP_GATTS_CONNECT_EVT");
@@ -853,12 +791,134 @@ static void gatts_profile_b_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         }
         break;
     }
-    case ESP_GATTS_DISCONNECT_EVT:  // 15
-    case ESP_GATTS_OPEN_EVT:        // 16
-    case ESP_GATTS_CANCEL_OPEN_EVT: // 17
-    case ESP_GATTS_CLOSE_EVT:       // 18
-    case ESP_GATTS_LISTEN_EVT:      // 19
-    case ESP_GATTS_CONGEST_EVT:     // 20
+    case ESP_GATTS_ADD_INCL_SRVC_EVT: // 8
+    case ESP_GATTS_STOP_EVT:          // 13
+    case ESP_GATTS_DELETE_EVT:        // 11
+    case ESP_GATTS_DISCONNECT_EVT:    // 15
+    case ESP_GATTS_OPEN_EVT:          // 16
+    case ESP_GATTS_CANCEL_OPEN_EVT:   // 17
+    case ESP_GATTS_CLOSE_EVT:         // 18
+    case ESP_GATTS_LISTEN_EVT:        // 19
+    case ESP_GATTS_CONGEST_EVT:       // 20
+    default:
+        break;
+    }
+}
+
+static void __gatts_profile_wifi_error_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
+{
+    TRACE_W("WIFI_ERROR - BLE-GATT event: %d", event);
+
+    switch (event)
+    {
+    case ESP_GATTS_REG_EVT: // 0
+    {
+        TRACE_I("REGISTER_APP_EVT, status %d, app_id %d", param->reg.status, param->reg.app_id);
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].service_id.is_primary = true;
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].service_id.id.inst_id = 0x00;
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_WIFI_ERROR;
+
+        esp_ble_gatts_create_service(gatts_if, &gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].service_id, GATTS_NUM_HANDLE_WIFI_ERROR);
+        break;
+    }
+    case ESP_GATTS_READ_EVT: // 1
+    {
+        TRACE_I("GATT_READ_EVT, conn_id %d, trans_id %d, handle %d", param->read.conn_id, param->read.trans_id, param->read.handle);
+        esp_gatt_rsp_t rsp;
+        memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
+        rsp.attr_value.handle = param->read.handle;
+        rsp.attr_value.len = 1;
+        if (ezlopi_wifi_got_ip())
+        {
+            rsp.attr_value.value[0] = 1;
+        }
+        else
+        {
+            rsp.attr_value.value[0] = 0;
+        }
+        rsp.attr_value.len = strlen(ezlopi_wifi_get_last_disconnect_reason());
+        snprintf((char *)rsp.attr_value.value, ESP_GATT_MAX_ATTR_LEN, "%s", ezlopi_wifi_get_last_disconnect_reason());
+        esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
+        break;
+    }
+    case ESP_GATTS_MTU_EVT: // 4
+    {
+        TRACE_I("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
+        break;
+    }
+    case ESP_GATTS_CREATE_EVT: // 7
+    {
+        TRACE_I("CREATE_SERVICE_EVT, status %d,  service_handle %d", param->create.status, param->create.service_handle);
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].service_handle = param->create.service_handle;
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_WIFI_ERROR;
+
+        esp_ble_gatts_start_service(gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].service_handle);
+
+        {
+            esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = GATTS_CHAR_UUID_WIFI_ERROR, .len = ESP_UUID_LEN_16};
+            esp_err_t add_char_ret = esp_ble_gatts_add_char(param->create.service_handle, &tmp_uuid, ESP_GATT_PERM_READ, ESP_GATT_CHAR_PROP_BIT_READ, NULL, NULL);
+            if (add_char_ret)
+            {
+                TRACE_E("WIFI_STATUS char failed, error code =%x", add_char_ret);
+            }
+        }
+        break;
+    }
+    case ESP_GATTS_ADD_CHAR_EVT: // 9
+    {
+        TRACE_I("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
+                param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
+
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].char_handle = param->add_char.attr_handle;
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
+
+        esp_bt_uuid_t tmp_uuid = {.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG, .len = ESP_UUID_LEN_16};
+        esp_ble_gatts_add_char_descr(param->add_char.service_handle, &tmp_uuid, (ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE), NULL, NULL);
+
+        break;
+    }
+    case ESP_GATTS_ADD_CHAR_DESCR_EVT: // 10
+    {
+        gl_profile_tab[PROFILE_WIFI_ERROR_APP_ID].descr_handle = param->add_char_descr.attr_handle;
+        TRACE_I("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
+                param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
+        break;
+    }
+    case ESP_GATTS_START_EVT: // 12
+    {
+        TRACE_I("SERVICE_START_EVT, status %d, service_handle %d",
+                param->start.status, param->start.service_handle);
+        break;
+    }
+    case ESP_GATTS_CONNECT_EVT: // 14
+    {
+        TRACE_I("ESP_GATTS_CONNECT_EVT");
+        /* start security connect with peer device when receive the connect event sent by the master */
+        esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM);
+
+        break;
+    }
+    case ESP_GATTS_CONF_EVT: // 5
+    {
+        TRACE_I("ESP_GATTS_CONF_EVT status %d attr_handle %d", param->conf.status, param->conf.handle);
+        if (param->conf.status != ESP_GATT_OK)
+        {
+            dump("param->conf.value", param->conf.value, 0, param->conf.len);
+        }
+        break;
+    }
+    case ESP_GATTS_ADD_INCL_SRVC_EVT: // 8
+    case ESP_GATTS_DELETE_EVT:        // 11
+    case ESP_GATTS_STOP_EVT:          // 13
+    case ESP_GATTS_DISCONNECT_EVT:    // 15
+    case ESP_GATTS_OPEN_EVT:          // 16
+    case ESP_GATTS_CANCEL_OPEN_EVT:   // 17
+    case ESP_GATTS_CLOSE_EVT:         // 18
+    case ESP_GATTS_LISTEN_EVT:        // 19
+    case ESP_GATTS_CONGEST_EVT:       // 20
     default:
         break;
     }
@@ -921,51 +981,32 @@ void GATT_SERVER_MAIN(void)
     CHECK_PRINT_ERROR(esp_bluedroid_enable(), "enable bluetooth failed");
     CHECK_PRINT_ERROR(esp_ble_gatts_register_callback(gatts_event_handler), "gatts register error, error code");
     CHECK_PRINT_ERROR(esp_ble_gap_register_callback(gap_event_handler), "gap register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_A_APP_ID), "gatts app register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_B_APP_ID), "gatts app register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_INFO_APP_ID), "gatts app register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_STATUS_APP_ID), "gatts app register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_ERROR_APP_ID), "gatts app register error");
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
     ezlopi_ble_start_secure_gatt_server();
 }
 
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
-    /* set the security iocap & auth_req & key size & init key response key parameters to the stack*/
-    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_BOND_MITM; // bonding with peer device after authentication
-    esp_ble_io_cap_t iocap = ESP_IO_CAP_OUT;                 // set the IO capability to No output No input
-    uint8_t key_size = 16;                                   // the key size should be 7~16 bytes
-    uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
-    uint8_t rsp_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
-    // set static passkey
     uint32_t passkey = 123456;
+    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_BOND_MITM;
+    esp_ble_io_cap_t iocap = ESP_IO_CAP_OUT;
+    uint8_t key_size = 16;
     uint8_t auth_option = ESP_BLE_ONLY_ACCEPT_SPECIFIED_AUTH_DISABLE;
     uint8_t oob_support = ESP_BLE_OOB_DISABLE;
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t)),
-                      "failed -set - ESP_BLE_SM_SET_STATIC_PASSKEY");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_IOCAP_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_MAX_KEY_SIZE, &key_size, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_MAX_KEY_SIZE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, &auth_option, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, &oob_support, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_OOB_SUPPORT");
-    /* If your BLE device acts as a Slave, the init_key means you hope which types of key of the master should distribute to you,
-    and the response key means which key you can distribute to the master;
-    If your BLE device acts as a master, the response key means you hope which types of key of the slave should distribute to you,
-    and the init key means which key you can distribute to the slave. */
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_SET_INIT_KEY");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_SET_RSP_KEY");
+    uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
+    uint8_t rsp_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
 
-    /* Just show how to clear all the bonded devices
-     * Delay 30s, clear all the bonded devices
-     *
-     * vTaskDelay(30000 / portTICK_PERIOD_MS);
-     * remove_all_bonded_devices();
-     */
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t)), "failed -set - ESP_BLE_SM_SET_STATIC_PASSKEY");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_IOCAP_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_MAX_KEY_SIZE, &key_size, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_MAX_KEY_SIZE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, &auth_option, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, &oob_support, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_OOB_SUPPORT");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_SET_INIT_KEY");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
 
 static void show_bonded_devices(void)
