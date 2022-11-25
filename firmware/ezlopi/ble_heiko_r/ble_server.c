@@ -90,30 +90,7 @@ static esp_ble_adv_data_t ble_adv_data = {
 };
 
 /* Parameters defining how the pushbutton advertises the data defined above */
-static esp_ble_adv_params_t ble_adv_params = {
-	.adv_int_min = BLE_ADV_MIN_INTERVAL,
-	.adv_int_max = BLE_ADV_MAX_INTERVAL,
-	.adv_type = ADV_TYPE_IND,
-	.own_addr_type = BLE_ADDR_TYPE_PUBLIC,
-	.channel_map = ADV_CHNL_ALL,
-	.adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
-};
-
-/* This function initialises the GAP data.
- * ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT is sent to gap_event_handler() below
- * afterwards.
- */
-void gaps_init()
-{
-	esp_err_t ret;
-
-	char device_name[BLE_DEVICE_NAME_LEN];
-	sprintf(device_name, BLE_DEVICE_NAME, *gatts_char[GATTS_BUTTON_NUMBER_CHAR_POS].char_val->attr_value); // copy configured button number into the device name
-	esp_ble_gap_set_device_name(device_name);
-
-	ret = esp_ble_gap_config_adv_data(&ble_adv_data);
-	ESP_LOGI(GATTS_TAG, "esp_ble_gap_config_adv_data %d", ret);
-}
+static esp_ble_adv_params_t ble_adv_params = BLE_DEFAULT_ADV_PARAMS;
 
 /* In server (config) mode, this function is called whenever the ESP32
  * bluetooth stack generates a GAP event.
