@@ -19,10 +19,16 @@
 #include "web_provisioning.h"
 #include "gatt_server.h"
 #include "gpio_isr_service.h"
+#include "ezlopi_uart.h"
 
 static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
+
+static void upcall(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
+{
+    TRACE_I("Buffer data is %s", buffer);
+}
 
 
 void app_main(void)
@@ -33,7 +39,6 @@ void app_main(void)
     web_provisioning_init();
     GATT_SERVER_MAIN();
     sensor_service_init();
-    
 
     // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }

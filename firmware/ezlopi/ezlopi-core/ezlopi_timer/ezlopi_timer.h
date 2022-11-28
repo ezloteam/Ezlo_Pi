@@ -61,7 +61,7 @@
 #endif
 
 #ifdef CONFIG_IDF_TARGET_ESP32
-#define EZLOPI_TIMER_SCALE (XTAL_CLK_FREQ / EZLOPI_TIMER_DIVIDER) // convert counter value to seconds
+#define EZLOPI_TIMER_SCALE (APB_CLK_FREQ / EZLOPI_TIMER_DIVIDER) // convert counter value to seconds
 #endif
 
 void ezlopi_timer_start_50ms(void);
