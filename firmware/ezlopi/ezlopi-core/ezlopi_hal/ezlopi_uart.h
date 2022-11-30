@@ -15,12 +15,7 @@
 #endif
 #define EZLOPI_UART_CHANNEL_MAX UART_NUM_MAX
 
-#define EZLOPI_UART_OK                  (ESP_OK)
-#define EZLOPI_UART_INVALID_CHANNEL     1
-#define EZLOPI_UART_CHANNEL_BUSY        2
-
 typedef int ezlo_uart_channel_t;
-
 
 typedef struct s_ezlopi_uart
 {
@@ -34,6 +29,8 @@ typedef struct s_ezlopi_uart
 
 typedef struct s_ezlopi_uart_object *s_ezlopi_uart_object_handle_t;
 typedef void (*__upcall)(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
+
+
 s_ezlopi_uart_object_handle_t ezlopi_uart_init(ezlo_uart_channel_t channel, uint32_t baudrate, uint32_t tx, uint32_t rx, __upcall upcall);
 void ezlopi_uart_deinit(s_ezlopi_uart_object_handle_t uart_object_handle);
 

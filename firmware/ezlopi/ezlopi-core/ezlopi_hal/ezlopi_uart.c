@@ -88,6 +88,7 @@ static void ezlopi_uart_channel_task(void* args)
 {
     uart_event_t event;
     uint8_t *buffer = (uint8_t*)malloc(256);
+    // s_ezlopi_uart_object_t *ezlopi_uart_object = (s_ezlopi_uart_object_t*)args;
     s_ezlopi_uart_object_handle_t ezlopi_uart_object = (s_ezlopi_uart_object_handle_t)args;
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     while (1)
