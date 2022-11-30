@@ -45,9 +45,9 @@
 /* GAP advertising configuration, determines how the teacher's button will
  * advertise itself via BLE in configuration mode.
  */
-#define BLE_DEVICE_NAME_LEN 23					   // Length of the device name below. Count 2 bytes for the button number and add one for the (invisible) \0 at the end of the string
+#define BLE_DEVICE_NAME_LEN 32 // Length of the device name below. Count 2 bytes for the button number and add one for the (invisible) \0 at the end of the string
 // #define BLE_DEVICE_NAME "EG Teacher's Button %02u" // Base name used as device name for BLE advertising; %02u will be replaced by the configured button number
-#define BLE_MANUFACTURER_DATA_LEN 2				   // Length of the manufacturer specific advertising payload. Currently contains only the manufacturer ID (2 bytes)
+#define BLE_MANUFACTURER_DATA_LEN 2 // Length of the manufacturer specific advertising payload. Currently contains only the manufacturer ID (2 bytes)
 #define BLE_MANUFACTURER_DATA \
 	{                         \
 		0xFF, 0xFF            \
@@ -85,6 +85,11 @@
 		.adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY, \
 	};
 
+#define BLE_SERVICE_UUID_SIZE GATTS_SERVICE_NUM *ESP_UUID_LEN_128 // 2 services -> 2 128bit service UUIDs
+static uint8_t ble_service_uuid128[BLE_SERVICE_UUID_SIZE] = {
+	GATTS_BATTERY_SERVICE_UUID,
+	GATTS_TEACHERBUTTON_SERVICE_UUID};
+
 typedef struct s_gatts_service_inst
 {
 	uint16_t gatts_if;
@@ -98,6 +103,7 @@ typedef struct s_gatts_service_inst
 typedef struct s_gatts_char_inst
 {
 	s_gatts_service_inst_t *service;
+	uint16_t service_pos;
 	esp_bt_uuid_t char_uuid;
 	esp_gatt_perm_t char_perm;
 	esp_gatt_char_prop_t char_property;
@@ -110,6 +116,7 @@ typedef struct s_gatts_char_inst
 typedef struct s_gatts_descr_inst
 {
 	s_gatts_char_inst_t characteristic;
+	uint16_t char_pos;
 	esp_bt_uuid_t descr_uuid;
 	esp_gatt_perm_t descr_perm;
 	esp_attr_value_t *descr_val;

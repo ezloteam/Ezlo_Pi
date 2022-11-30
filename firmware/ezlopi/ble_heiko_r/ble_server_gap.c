@@ -29,7 +29,7 @@ void gaps_init(void)
     esp_err_t ret;
 
     char device_name[BLE_DEVICE_NAME_LEN];
-    sprintf(device_name, BLE_DEVICE_NAME, *gatts_char[GATTS_BUTTON_NUMBER_CHAR_POS].char_val->attr_value); // copy configured button number into the device name
+    sprintf(device_name, "EG Teacher's Button %02u", *gatts_char[GATTS_BUTTON_NUMBER_CHAR_POS].char_val->attr_value); // copy configured button number into the device name
     esp_ble_gap_set_device_name(device_name);
 
     ret = esp_ble_gap_config_adv_data(&ble_adv_data);

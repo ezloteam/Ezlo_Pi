@@ -3,22 +3,23 @@
 #include <string.h>
 #include "esp_system.h"
 #include "esp_log.h"
-#include "esp_bt.h"
 #include "cJSON.h"
-
 #include "lwip/ip_addr.h"
+
+#include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
 
-#include "sdkconfig.h"
 #include "trace.h"
-#include "ezlopi_ble_gatt_server.h"
+#include "sdkconfig.h"
+
 #include "ezlopi_nvs.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_factory_info.h"
+#include "ezlopi_ble_gatt_server.h"
 
 static char TEST_DEVICE_NAME[32];
 

@@ -21,6 +21,8 @@
 #include "ezlopi_ble_gatt_server.h"
 #include "gpio_isr_service.h"
 
+#include "ezlopi_ble_v2.h"
+
 static void blinky(void *pv);
 
 void app_main(void)
@@ -34,6 +36,7 @@ void app_main(void)
         err = nvs_flash_init();
     }
 
+    ezlopi_ble_v2_init();
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
@@ -50,21 +53,29 @@ static void blinky(void *pv)
     uint32_t state = 0;
     uint32_t count = 0;
     gpio_config(&io_conf);
+    uint32_t prev_free_heap = 0;
+    uint32_t prev_water_mark = 0;
 
     while (1)
     {
         state ^= 1;
         gpio_set_level(GPIO_NUM_2, state);
 
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        uint32_t free_heap = esp_get_free_heap_size();
+        uint32_t water_mark = esp_get_minimum_free_heap_size();
 
-        if (count++ > 2)
+        if ((count++ > 5) || (prev_free_heap != free_heap) || (prev_water_mark != water_mark))
         {
-            TRACE_D("-----------------------------------------");
-            TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
-            TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
-            TRACE_D("-----------------------------------------");
+            prev_free_heap = free_heap;
+            prev_water_mark = water_mark;
+
+            TRACE_D("--------------------------------");
+            TRACE_D("Free Heap - %d", free_heap);
+            TRACE_D("Water Mark - %u", water_mark);
+            TRACE_D("--------------------------------");
             count = 0;
         }
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }
