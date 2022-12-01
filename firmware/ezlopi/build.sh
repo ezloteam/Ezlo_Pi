@@ -1,4 +1,4 @@
-pronunciation#!/bin/bash
+#!/bin/bash
 
 project="Ezlo_Pi_v2x"
 versionFile="components/version/include/version.h"

@@ -14,11 +14,16 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
-#include <math.h>
 
 static void user_delay_us(uint32_t period, void *intf_ptr);
 static int8_t user_i2c_read(uint8_t reg_addr, uint8_t *sensor_data, uint32_t len, void *intf_ptr);
 static int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *sensor_data, uint32_t len, void *intf_ptr);
+
+typedef struct s_bme280_hal_arg
+{
+    uint32_t addr;
+    uint32_t channel;
+} s_bme280_hal_arg_t;
 
 bme280_identifier_t identifier = {
     .dev_addr = 0x76,
@@ -38,8 +43,8 @@ static sensor_bme280_dev_t device = {
     .intf_ptr = &identifier,
 };
 
-static int sensor_bme280_init();
 static int prepare_sensor(void *arg);
+static int sensor_bme280_init(s_ezlopi_device_properties_t *properties, void *user_arg);
 static int8_t sensor_bme280_read_value_from_sensor(s_ezlopi_device_properties_t *properties, sensor_bme280_data_t *data_ptr);
 static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_bme_device_properties, void *user_arg);
@@ -63,7 +68,7 @@ int sensor_bme280(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *prope
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        sensor_bme280_init(properties);
+        sensor_bme280_init(properties, user_arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -111,7 +116,7 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_pro
         }                                                                                                                  \
     }
 
-static void __prepare_sensor_config(sensor_bme280_dev_t *sensor_config, cJSON *cjson_device);
+static void __prepare_sensor_config(sensor_bme280_dev_t *sensor_config, cJSON *cjson_device, s_bme280_hal_arg_t *bme280_hal_arg);
 static int prepare_sensor(void *arg)
 {
     int ret = 0;
@@ -122,18 +127,26 @@ static int prepare_sensor(void *arg)
         sensor_bme280_dev_t *sensor_config = malloc(sizeof(sensor_bme280_dev_t));
         if (sensor_config)
         {
-            __prepare_sensor_config(sensor_config, prep_arg->cjson_device);
-            uint32_t device_id = ezlopi_device_generate_device_id();
-            ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
-            ADD_PROPERTIES_DEVICE_LIST(device_id, category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, prep_arg->cjson_device);
-            ADD_PROPERTIES_DEVICE_LIST(device_id, category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, prep_arg->cjson_device);
+            s_bme280_hal_arg_t *bme280_hal_arg = malloc(sizeof(s_bme280_hal_arg_t));
+            if (NULL != bme280_hal_arg)
+            {
+                __prepare_sensor_config(sensor_config, prep_arg->cjson_device, bme280_hal_arg);
+                uint32_t device_id = ezlopi_device_generate_device_id();
+                ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
+                ADD_PROPERTIES_DEVICE_LIST(device_id, category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, prep_arg->cjson_device);
+                ADD_PROPERTIES_DEVICE_LIST(device_id, category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, prep_arg->cjson_device);
+            }
+            else
+            {
+                free(sensor_config);
+            }
         }
     }
 
     return ret;
 }
 
-static void __prepare_sensor_config(sensor_bme280_dev_t *sensor_config, cJSON *cjson_device)
+static void __prepare_sensor_config(sensor_bme280_dev_t *sensor_config, cJSON *cjson_device, s_bme280_hal_arg_t *bme280_hal_arg)
 {
     sensor_config->read = user_i2c_read;
     sensor_config->write = user_i2c_write;
@@ -143,7 +156,7 @@ static void __prepare_sensor_config(sensor_bme280_dev_t *sensor_config, cJSON *c
     sensor_config->settings.osr_p = BME280_OVERSAMPLING_1X;
     sensor_config->settings.osr_t = BME280_OVERSAMPLING_1X;
     sensor_config->settings.filter = BME280_FILTER_COEFF_16;
-    sensor_config->intf_ptr = (void *)I2C_NUM_0;
+    sensor_config->intf_ptr = (void *)bme280_hal_arg;
     CJSON_GET_VALUE_INT(cjson_device, "slave_addr", sensor_config->chip_id);
 }
 
@@ -183,7 +196,6 @@ static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t d
 
             sensor_ble280_properties->interface.i2c_master.enable = true;
             sensor_ble280_properties->interface.i2c_master.clock_speed = 100000;
-            sensor_ble280_properties->interface.i2c_master.channel = EZLOPI_I2C_1;
         }
     }
 
@@ -195,10 +207,12 @@ static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t d
  *
  * @return returns 0 for successful initialization.
  */
-static int sensor_bme280_init(s_ezlopi_device_properties_t *properties)
+static int sensor_bme280_init(s_ezlopi_device_properties_t *properties, void *user_arg)
 {
     int ret = 0;
+    sensor_bme280_dev_t *sensor_config = (sensor_bme280_dev_t *)user_arg;
     ezlopi_i2c_master_init(&properties->interface.i2c_master);
+
     TRACE_I("I2C master init successfully.");
     uint8_t sampling_settting = BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL;
 

@@ -11,7 +11,7 @@ extern "C"
 
 #define ENABLE_TRACE 1
 
-    void __dump(const char *file_name, uint32_t line, void *_buff, uint32_t ofs, uint32_t cnt);
+    void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
 
 #ifndef __FILENAME__
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -39,7 +39,8 @@ extern "C"
 #define TRACE_I trace_imp
 #define TRACE_D trace
 #define TRACE_B trace_info
-#define dump(X, Y, Z) __dump(__FILE__, __LINE__, X, Y, Z) // ESP_LOG_BUFFER_HEX_LEVEL(__FILENAME__, (char *)((uint32_t)X + Y), Z, ESP_LOG_WARN)
+#define dump(buffer_name, X, Y, Z) __dump(__FILE__, __LINE__, buffer_name, X, Y, Z) // ESP_LOG_BUFFER_HEX_LEVEL(__FILENAME__, (char *)((uint32_t)X + Y), Z, ESP_LOG_WARN)
+    // #define dump(a, b, c, d)
 
 #else
 
