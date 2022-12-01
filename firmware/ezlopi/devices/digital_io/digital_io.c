@@ -21,7 +21,8 @@ static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *
 static s_ezlopi_device_properties_t *digital_io_prepare_item(cJSON *cjson_device);
 static void digital_io_write_gpio_value(s_ezlopi_device_properties_t *properties);
 static uint32_t digital_io_read_gpio_value(s_ezlopi_device_properties_t *properties);
-extern void digital_io_isr_service_init(s_ezlopi_device_properties_t *properties);
+static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t* properties);
+static void digital_io_toggle_gpio(s_ezlopi_device_properties_t* properties);
 
 int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
@@ -170,21 +171,33 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
         };
 
         gpio_config(&io_conf);
-        gpio_isr_service_register(properties, NULL, 1000);
+        gpio_isr_service_register(properties, digital_io_gpio_interrupt_upcall, 1000);
     }
 
     return ret;
 }
 
+static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t* properties)
+{
+    digital_io_toggle_gpio(properties);
+    ezlopi_device_value_updated_from_device(properties);
+}
+
+static void digital_io_toggle_gpio(s_ezlopi_device_properties_t* properties)
+{
+    uint32_t write_value = !(properties->interface.gpio.gpio_out.value);
+    esp_err_t error = gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, write_value);
+    properties->interface.gpio.gpio_out.value = write_value;
+}
+
 static void digital_io_write_gpio_value(s_ezlopi_device_properties_t *properties)
 {
     uint32_t write_value = (0 == properties->interface.gpio.gpio_out.invert) ? properties->interface.gpio.gpio_out.value : (properties->interface.gpio.gpio_out.value ? 0 : 1);
-    gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, write_value);
+    esp_err_t error = gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, write_value);
 }
 
 static uint32_t digital_io_read_gpio_value(s_ezlopi_device_properties_t *properties)
 {
-
     uint32_t read_value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
     read_value = (0 == properties->interface.gpio.gpio_in.invert) ? read_value : (read_value ? 0 : 1);
     return read_value;
