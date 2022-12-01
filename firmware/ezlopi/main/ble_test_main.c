@@ -22,6 +22,7 @@
 #include "gpio_isr_service.h"
 
 #include "ezlopi_ble_v2.h"
+#include "ezlopi_ble_gatt.h"
 
 static void blinky(void *pv);
 
@@ -37,6 +38,7 @@ void app_main(void)
     }
 
     ezlopi_ble_v2_init();
+    ezlopi_ble_gatt_print_profiles();
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 

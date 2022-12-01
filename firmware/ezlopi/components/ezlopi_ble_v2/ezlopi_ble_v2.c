@@ -40,6 +40,58 @@ void ezlopi_ble_v2_init(void)
 
     ezlopi_ble_start_secure_gatt_server();
 
+    esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_128, .uuid.uuid128 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}};
+    s_gatt_service_t *service = ezlopi_ble_gatt_create_service(&uuid);
+    uuid.len = ESP_UUID_LEN_16;
+    uuid.uuid.uuid16 = 0x2902;
+    s_gatt_char_t *character = ezlopi_ble_gatt_add_characteristic(service, &uuid, 0, 0);
+
+    uuid.uuid.uuid16 = 0x2903;
+    s_gatt_descr_t *descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
+    uuid.uuid.uuid16 = 0x2904;
+    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
+    uuid.uuid.uuid16 = 0x1902;
+    character = ezlopi_ble_gatt_add_characteristic(service, &uuid, 0, 0);
+
+    uuid.uuid.uuid16 = 0x1903;
+    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
+    uuid.uuid.uuid16 = 0x1904;
+    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
+    uuid.len = ESP_UUID_LEN_128;
+    uuid.uuid.uuid128[0] = 1;
+    uuid.uuid.uuid128[1] = 1;
+    uuid.uuid.uuid128[2] = 1;
+    uuid.uuid.uuid128[3] = 1;
+    uuid.uuid.uuid128[4] = 1;
+    uuid.uuid.uuid128[5] = 1;
+    uuid.uuid.uuid128[6] = 1;
+    uuid.uuid.uuid128[7] = 1;
+    uuid.uuid.uuid128[8] = 1;
+    uuid.uuid.uuid128[9] = 1;
+    service = ezlopi_ble_gatt_create_service(&uuid);
+    uuid.len = ESP_UUID_LEN_16;
+    uuid.uuid.uuid16 = 0x5502;
+    character = ezlopi_ble_gatt_add_characteristic(service, &uuid, 0, 0);
+
+    uuid.uuid.uuid16 = 0x5503;
+    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
+    uuid.uuid.uuid16 = 0x5504;
+    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
+    uuid.uuid.uuid16 = 0x1502;
+    character = ezlopi_ble_gatt_add_characteristic(service, &uuid, 0, 0);
+
+    uuid.uuid.uuid16 = 0x1503;
+    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
+    uuid.uuid.uuid16 = 0x1504;
+    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, 0);
+
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(0), "gatts app register error");
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_STATUS_APP_ID), "gatts app register error");
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_ERROR_APP_ID), "gatts app register error");
