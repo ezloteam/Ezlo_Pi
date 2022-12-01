@@ -214,7 +214,8 @@ static void qt_serial_set_wifi(const char *data)
             if (ssid && pass && (strlen(pass) >= 8))
             {
                 ezlopi_wifi_set_new_wifi_flag();
-                ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
+                esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
+                TRACE_E("wifi_error: %u", wifi_error);
             }
         }
 

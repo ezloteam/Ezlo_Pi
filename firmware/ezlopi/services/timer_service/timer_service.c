@@ -14,7 +14,7 @@
 
 static void event_process(void *pv);
 
-void sensor_service_init(void)
+void timer_service_init(void)
 {
     xTaskCreate(event_process, "event_process", 2 * 2048, NULL, 4, NULL);
 }

@@ -110,6 +110,7 @@ static l_ezlopi_configured_devices_t *ezlopi_device_list_create(s_ezlopi_device_
     l_ezlopi_configured_devices_t *device_list_element = (l_ezlopi_configured_devices_t *)malloc(sizeof(l_ezlopi_configured_devices_t));
     if (device_list_element)
     {
+        memset(device_list_element, 0, sizeof(l_ezlopi_configured_devices_t));
         device_list_element->device = device;
         device_list_element->properties = properties;
         device_list_element->next = NULL;
