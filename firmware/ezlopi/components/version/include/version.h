@@ -4,11 +4,11 @@
 extern "C"
 {
 #endif
-#define MAJOR 1
-#define MINOR 1
+#define MAJOR 2
+#define MINOR 0
 #define BATCH 2
-#define BUILD 114
-#define VERSION_STR "v1.1.2.114"
+#define BUILD 128
+#define VERSION_STR "v2.0.2"
 #ifdef __cplusplus
 }
 #endif

@@ -161,10 +161,11 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
                 qDebug() << "Failed opeaning serial port: " << ui->comboBox_uart_list->currentText();
                 if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append("Failed opeaning serial port: " + ui->comboBox_uart_list->currentText());
             }
-        } else {
-            qDebug() << ezlogic_serial_port_info.portName() <<  ": port is busy !";
-            if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
         }
+//        else {
+//            qDebug() << ezlogic_serial_port_info.portName() <<  ": port is busy !";
+//            if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
+//        }
     } else {
         ezlogic_serial_port->close();
         ui->tableWidget_device_table->clearContents();

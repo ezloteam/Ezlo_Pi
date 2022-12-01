@@ -3,7 +3,7 @@
 
 #include "mbedtls/aes.h"
 #include "cstring"
-#include "debug.h"
+#include "trace.h"
 #include "string"
 
 class aes_lib

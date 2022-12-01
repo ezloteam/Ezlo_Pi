@@ -1,0 +1,6 @@
+
+
+QPushButton
+{
+	background : blue
+}

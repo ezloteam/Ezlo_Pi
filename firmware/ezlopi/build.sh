@@ -1,5 +1,6 @@
-#!/bin/bash
+pronunciation#!/bin/bash
 
+project="Ezlo_Pi_v2x"
 versionFile="components/version/include/version.h"
 releaseNote="" # firmware/v$V_MAJOR_$V_MINOR_$V_BATCH_$V_BUILD/releaseNote.txt
 release=0
@@ -12,9 +13,9 @@ elif [[  "build" == $1 ]];then
 release=3
 fi
 
-V_MAJOR=1 # Major changes such as protocols, in-compatible APIs, Probably not compatible with prior version
-V_MINOR=1 # Minor changes, Are always compatible with prior versions, eg. feature additions, 
-V_BATCH=2 # Patch changes are like bug-fixes, security addition, and are strickly backward compatible
+V_MAJOR=2 # Major changes such as protocols, in-compatible APIs, Probably not compatible with prior version
+V_MINOR=0 # Minor changes, Are always compatible with prior versions, eg. feature additions, 
+V_BATCH=0 # Patch changes are like bug-fixes, security addition, and are strickly backward compatible
 V_BUILD=0 # Build count, Incremental, Increases by 1 on each build call
 
 S_MAJOR="MAJOR"
@@ -79,7 +80,7 @@ wait_for_key() {
 }
 
 copy_binaries() {
-    cp $1/ezlopi.bin $2/0x10000.bin
+    cp $1/$project.bin $2/0x10000.bin
     cp $1/bootloader/bootloader.bin $2/0x1000.bin
     cp $1/partition_table/partition-table.bin $2/0x8000.bin
     cp $1/ota_data_initial.bin $2/0xd000.bin
@@ -89,7 +90,7 @@ create_release() {
     release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}"
     mkdir $release_bins
     copy_binaries build $release_bins
-    # cp build/ezlopi.bin $release_bins/10000.bin
+    # cp build/$project.bin $release_bins/10000.bin
     # cp build/bootloader/bootloader.bin $release_bins/
     # cp build/partition_table/partition-table.bin $release_bins/
     # cp build/ota_data_initial.bin $release_bins/
@@ -99,7 +100,7 @@ create_test_release() {
     release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}_${V_BUILD}"
     mkdir $release_bins
     copy_binaries build $release_bins
-    # cp build/ezlopi.bin $release_bins/0x10000.bin
+    # cp build/$project.bin $release_bins/0x10000.bin
     # cp build/bootloader/bootloader.bin $release_bins/0x1000.bin
     # cp build/partition_table/partition-table.bin $release_bins/0x8000.bin
     # cp build/ota_data_initial.bin $release_bins/0xd000.bin
@@ -140,10 +141,10 @@ build_note() {
 
 idf.py build
 retVal=$?
+mkdir -p "firmware"
 if [ $retVal -ne 1 ]; then
     get_version_variables
     V_BUILD=$((V_BUILD+1))
-
 
     if [[ 0 == release ]];then
         wait_for_key
