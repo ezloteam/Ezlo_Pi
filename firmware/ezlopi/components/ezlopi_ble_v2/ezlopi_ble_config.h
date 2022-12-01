@@ -8,8 +8,8 @@ typedef struct s_gatt_descr
     // s_gatt_char_t *characteristic;
     uint16_t handle;
     esp_bt_uuid_t uuid;
-    esp_gatt_perm_t perm;
-    esp_attr_value_t *val;
+    esp_gatt_perm_t permission;
+    // esp_attr_value_t *val;
     esp_attr_control_t *control;
     struct s_gatt_descr *next;
 } s_gatt_descr_t;
@@ -22,7 +22,7 @@ typedef struct s_gatt_char
     esp_gatt_perm_t permission;
     esp_gatt_char_prop_t property;
     // esp_attr_value_t *char_val;
-    esp_attr_control_t *char_control;
+    esp_attr_control_t *control;
     s_gatt_descr_t *descriptor;
     struct s_gatt_char *next;
 } s_gatt_char_t;

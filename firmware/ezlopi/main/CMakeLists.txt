@@ -1,7 +1,3 @@
-# set(srcs    "main.cpp"
-# "example.cpp"
-# )
-
 file(GLOB_RECURSE SOURCES "*.c*")
 
 idf_component_register(SRCS ${SOURCES}
