@@ -23,7 +23,7 @@ static void digital_io_write_gpio_value(s_ezlopi_device_properties_t *properties
 static uint32_t digital_io_read_gpio_value(s_ezlopi_device_properties_t *properties);
 extern void digital_io_isr_service_init(s_ezlopi_device_properties_t *properties);
 
-int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg)
+int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -52,11 +52,6 @@ int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properti
         ret = digital_io_get_value_cjson(properties, arg);
         break;
     }
-    // case EZLOPI_ACTION_NOTIFY_1000_MS:
-    // {
-    //     ret = ezlopi_device_value_updated_from_device(properties);
-    //     break;
-    // }
     default:
     {
         break;
@@ -119,7 +114,7 @@ static int digital_io_prepare(void *arg)
         digital_io_device_properties = digital_io_prepare_item(cjson_device);
         if (digital_io_device_properties)
         {
-            if (0 == ezlopi_devices_list_add(prep_arg->device, digital_io_device_properties))
+            if (0 == ezlopi_devices_list_add(prep_arg->device, digital_io_device_properties, NULL))
             {
                 free(digital_io_device_properties);
             }
@@ -151,14 +146,13 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
                                 : GPIO_PULLDOWN_DISABLE,
             .intr_type = GPIO_INTR_DISABLE,
         };
-        
+
         gpio_config(&io_conf);
         digital_io_write_gpio_value(properties);
     }
 
     if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
     {
-        // TRACE_W("Setting up gpio_in");
         const gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
             .mode = GPIO_MODE_INPUT,
@@ -176,11 +170,8 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
         };
 
         gpio_config(&io_conf);
-        extern void gpio_isr_service_register(s_ezlopi_device_properties_t * properties, void (*__upcall)(s_ezlopi_device_properties_t * properties));
-        gpio_isr_service_register(properties, NULL);
-        // digital_io_isr_service_init(properties);
+        gpio_isr_service_register(properties, NULL, 1000);
     }
-    
 
     return ret;
 }

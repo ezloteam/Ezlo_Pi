@@ -373,3 +373,6 @@ firmware/bootloader/subproject/*
 
 # QT UI
 ui-qt/release/*
+ui-qt/esptool*
+ui-qt/ezpibins/*
+ui-qt/debug/*

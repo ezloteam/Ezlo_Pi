@@ -18,6 +18,7 @@ typedef struct s_ezlopi_i2c_master
     uint32_t scl;
     uint32_t clock_speed;
     uint32_t channel;
+    uint32_t address;
 } s_ezlopi_i2c_master_t;
 
 #define EZLOPI_I2C_MASTER_DEFAULT_CONF                                      \

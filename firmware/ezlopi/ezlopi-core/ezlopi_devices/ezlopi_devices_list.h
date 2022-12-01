@@ -12,6 +12,7 @@
 #define EZLOPI_SENSOR_0002_RELAY 2
 #define EZLOPI_SENSOR_0003_PLUG 3
 #define EZLOPI_SENSOR_0012_BME280_I2C 12
+#define EZLOPI_SENSOR_0018_DOOR 18
 #define EZLOPI_SENSOR_0019_PIR 19
 
 /**
@@ -19,26 +20,28 @@
  *
  */
 // int sensor_bme280(e_ezlopi_actions_t action, void *arg);
-typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg);
+typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 typedef struct s_ezlopi_device
 {
     uint32_t id;
     f_sensor_call_t func;
-    // s_ezlopi_device_properties_t *properties;
 } s_ezlopi_device_t;
 
 typedef struct l_ezlopi_configured_devices
 {
-    struct l_ezlopi_configured_devices *next;
-    s_ezlopi_device_properties_t *properties;
+    void *user_arg;
     s_ezlopi_device_t *device;
+    s_ezlopi_device_properties_t *properties;
+    struct l_ezlopi_configured_devices *next;
+
 } l_ezlopi_configured_devices_t;
 
 typedef struct s_ezlopi_prep_arg
 {
     cJSON *cjson_device;
     s_ezlopi_device_t *device;
-}  s_ezlopi_prep_arg_t;
+
+} s_ezlopi_prep_arg_t;
 
 /**
  * @brief Provides the list of available sensors
@@ -49,7 +52,8 @@ s_ezlopi_device_t *ezlopi_devices_list_get_list(void);
 
 // void ezlopi_devices_list_add(s_ezlopi_device_t *device);
 // int ezlopi_devices_list_add(s_ezlopi_device_t *device);
-int ezlopi_devices_list_add(s_ezlopi_device_t *device, s_ezlopi_device_properties_t *properties);
+// int ezlopi_devices_list_add(s_ezlopi_device_t *device, s_ezlopi_device_properties_t *properties);
+int ezlopi_devices_list_add(s_ezlopi_device_t *device, s_ezlopi_device_properties_t *properties, void *user_arg);
 l_ezlopi_configured_devices_t *ezlopi_devices_list_get_configured_items(void);
 
 #if 0
