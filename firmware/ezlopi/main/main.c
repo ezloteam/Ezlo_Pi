@@ -26,11 +26,6 @@ static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 
-static void upcall(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
-{
-    TRACE_I("Buffer data is %s", buffer);
-}
-
 
 void app_main(void)
 {

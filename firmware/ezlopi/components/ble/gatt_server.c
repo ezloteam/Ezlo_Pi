@@ -16,9 +16,9 @@
 
 #include "sdkconfig.h"
 #include "gatt_server.h"
-#include "factory_info.h"
-#include "wifi_interface.h"
-#include "debug.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_wifi.h"
+#include "trace.h"
 
 static RTC_DATA_ATTR char __SSID[32];
 static RTC_DATA_ATTR char __PWD[32];
