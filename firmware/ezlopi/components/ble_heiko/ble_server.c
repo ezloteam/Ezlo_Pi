@@ -444,6 +444,7 @@ void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp
 	switch (event)
 	{
 	case ESP_GATTS_REG_EVT:
+	{
 		ESP_LOGI(GATTS_TAG, "REGISTER_APP_EVT, status %d, app_id %d", param->reg.status, param->reg.app_id);
 
 		if (param->reg.status == ESP_GATT_OK)
@@ -460,7 +461,7 @@ void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp
 		gatts_service[param->reg.app_id].service_id.is_primary = true;
 		gatts_service[param->reg.app_id].service_id.id.inst_id = 0x00;
 		gatts_service[param->reg.app_id].service_id.id.uuid.len = ESP_UUID_LEN_128;
-		
+
 		for (uint8_t pos = 0; pos < ESP_UUID_LEN_128; pos++)
 		{
 			// copy correct part of ble_service_uuid128 byte by byte into the service struct
@@ -468,10 +469,13 @@ void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp
 			ESP_LOGI(GATTS_TAG, "Service %d UUID pos %d: %02x", param->reg.app_id, pos, ble_service_uuid128[pos + 16 * param->reg.app_id]);
 		}
 
-		ESP_LOGI(GATTS_TAG, "ble_service_uuid128[0] %d, gatts_service[param].uuid128[0] %d, gatts_service[ble_pos].uuid128[0] %d", ble_service_uuid128[0], gatts_service[param->reg.app_id].service_id.id.uuid.uuid.uuid128[0], gatts_service[ble_add_service_pos].service_id.id.uuid.uuid.uuid128[0]);
+		ESP_LOGI(GATTS_TAG, "ble_service_uuid128[0] %d, gatts_service[param].uuid128[0] %d, gatts_service[ble_pos].uuid128[0] %d",
+				 ble_service_uuid128[0], gatts_service[param->reg.app_id].service_id.id.uuid.uuid.uuid128[0], gatts_service[ble_add_service_pos].service_id.id.uuid.uuid.uuid128[0]);
 
 		esp_ble_gatts_create_service(gatts_if, &gatts_service[param->reg.app_id].service_id, gatts_service[param->reg.app_id].num_handles);
 		break;
+	}
+
 	case ESP_GATTS_READ_EVT:
 	{
 		ESP_LOGI(GATTS_TAG, "GATT_READ_EVT, conn_id %d, trans_id %d, handle %d", param->read.conn_id, param->read.trans_id, param->read.handle);
@@ -494,7 +498,8 @@ void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp
 		ESP_LOGI(GATTS_TAG, "CREATE_SERVICE_EVT, service %d, status %d,  service_handle %d", ble_add_service_pos, param->create.status, param->create.service_handle);
 		ESP_LOGI(GATTS_TAG, "ble_add_service_pos: %d, param->reg.app_id: %d", ble_add_service_pos, param->reg.app_id);
 		gatts_service[ble_add_service_pos].service_handle = param->create.service_handle;
-		ESP_LOGI(GATTS_TAG, "param->create.service_handle %d, gatts_service[param->reg.app_id].service_handle %d, gatts_service[ble_add_service_pos].service_handle %d\n", param->create.service_handle, gatts_service[param->reg.app_id].service_handle, gatts_service[ble_add_service_pos].service_handle);
+		ESP_LOGI(GATTS_TAG, "param->create.service_handle %d, gatts_service[param->reg.app_id].service_handle %d, gatts_service[ble_add_service_pos].service_handle %d\n",
+				 param->create.service_handle, gatts_service[param->reg.app_id].service_handle, gatts_service[ble_add_service_pos].service_handle);
 
 		esp_ble_gatts_start_service(gatts_service[ble_add_service_pos].service_handle);
 		gatts_add_char();
@@ -571,7 +576,7 @@ void gatts_init_values()
 	for (uint32_t pos = 0; pos < GATTS_CHAR_NUM; pos++)
 	{
 		if (gatts_char[pos].char_nvs[0] != '\0')
-		{ 
+		{
 			// If char_nvs is empty, skip reading it from NVS. The value is already initialized.
 			if (gatts_char[pos].char_val->attr_len == 1)
 			{ // TODO: this currently only works for single bytes (i.e. uint8_t) and uint16_t

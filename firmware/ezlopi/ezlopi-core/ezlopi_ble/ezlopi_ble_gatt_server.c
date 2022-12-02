@@ -79,14 +79,15 @@ static esp_ble_adv_data_t adv_data = {
     .min_interval = 0x0006, // slave connection min interval, Time = min_interval * 1.25 msec
     .max_interval = 0x0010, // slave connection max interval, Time = max_interval * 1.25 msec
     .appearance = 0x00,
-    .manufacturer_len = 0,       // TEST_MANUFACTURER_DATA_LEN,
-    .p_manufacturer_data = NULL, //&test_manufacturer[0],
+    .manufacturer_len = sizeof(test_manufacturer),
+    .p_manufacturer_data = test_manufacturer, //&test_manufacturer[0],
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = sizeof(adv_service_uuid128),
     .p_service_uuid = adv_service_uuid128,
     .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
 };
+
 // scan response data
 static esp_ble_adv_data_t scan_rsp_data = {
     .set_scan_rsp = true,
