@@ -20,6 +20,12 @@ s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj,
 s_gatt_descr_t *ezlopi_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission);
 s_gatt_service_t *ezlopi_ble_profile_get_head(void);
 
+int ezlopi_ble_gatt_number_of_services(void);
+
+void ezlopi_ble_gatt_print_descriptor(s_gatt_char_t *descriptor);
+void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t *characteristic);
+void ezlopi_ble_gatt_print_service(s_gatt_service_t *service);
+void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg);
 void ezlopi_ble_profile_print(void);
 
 #endif // __EZLOPI_BLE_PROFILE_H__

@@ -34,6 +34,7 @@ typedef struct s_gatt_char
     // esp_attr_value_t *char_val;
     esp_attr_control_t *control;
     s_gatt_descr_t *descriptor;
+    
     struct s_gatt_char *next;
 } s_gatt_char_t;
 

@@ -8,30 +8,31 @@
 #include "trace.h"
 #include "ezlopi_ble_gap.h"
 
+static esp_ble_adv_params_t adv_params = {
+    .adv_int_min = 0x20,
+    .adv_int_max = 0x40,
+    .adv_type = ADV_TYPE_IND,
+    .own_addr_type = BLE_ADDR_TYPE_PUBLIC,
+    .channel_map = ADV_CHNL_ALL,
+    .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
+};
+
 static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
+
+void ezlopi_ble_gap_start_advertising(void)
+{
+    esp_ble_gap_start_advertising(&adv_params);
+}
 
 void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
-    TRACE_W("BLE GAP Eevent: %s", ezlopi_ble_gap_event_to_str(event));
-#if 0
+    TRACE_W("BLE GAP Eevent: [%d]-%s", event, ezlopi_ble_gap_event_to_str(event));
     switch (event)
     {
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT: // 0
     {
-        adv_config_done &= (~ADV_CONFIG_FLAG);
-        if (adv_config_done == 0)
-        {
-            esp_ble_gap_start_advertising(&adv_params);
-        }
-        break;
-    }
-    case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT: // 1
-    {
-        adv_config_done &= (~SCAN_RSP_CONFIG_FLAG);
-        if (adv_config_done == 0)
-        {
-            esp_ble_gap_start_advertising(&adv_params);
-        }
+        TRACE_W("param->adv_data_cmpl.status: %d", param->adv_data_cmpl.status);
+        esp_ble_gap_start_advertising(&adv_params);
         break;
     }
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT: // 6
@@ -47,6 +48,19 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         }
         break;
     }
+
+    // case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT: // 1
+    // {
+    //     adv_config_done &= (~SCAN_RSP_CONFIG_FLAG);
+    //     if (adv_config_done == 0)
+    //     {
+    //         esp_ble_gap_start_advertising(&adv_params);
+    //     }
+    //     break;
+    // }
+
+#if 0
+
     case ESP_GAP_BLE_PASSKEY_REQ_EVT: // 12
     {
         TRACE_I("ESP_GAP_BLE_PASSKEY_REQ_EVT");
@@ -172,12 +186,12 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
                 param->update_conn_params.timeout);
         break;
     }
+#endif
     default:
     {
         break;
     }
     }
-#endif
 }
 
 static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)

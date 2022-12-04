@@ -93,8 +93,6 @@ static esp_ble_adv_data_t scan_rsp_data = {
     .set_scan_rsp = true,
     .include_name = true,
     .include_txpower = true,
-    //.min_interval = 0x0006,
-    //.max_interval = 0x0010,
     .appearance = 0x00,
     .manufacturer_len = sizeof(test_manufacturer), // TEST_MANUFACTURER_DATA_LEN,
     .p_manufacturer_data = test_manufacturer,      //&test_manufacturer[0],
@@ -974,7 +972,7 @@ static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 void GATT_SERVER_MAIN(void)
 {
     s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-    snprintf(TEST_DEVICE_NAME, sizeof(TEST_DEVICE_NAME), "ezlopi_%llu", factory->id);
+    snprintf(TEST_DEVICE_NAME, sizeof(TEST_DEVICE_NAME), "%llu", factory->id);
 
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     CHECK_PRINT_ERROR(esp_bt_controller_init(&bt_cfg), "initialize controller failed");
