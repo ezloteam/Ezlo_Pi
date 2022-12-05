@@ -8,6 +8,7 @@
 #include "mbedtls/config.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "ezlopi_timer.h"
 
 #include "ezlopi_timer.h"
 #include "timer_service.h"
@@ -21,63 +22,55 @@
 #include "ezlopi_ble_gatt_server.h"
 #include "gpio_isr_service.h"
 
-#include "ezlopi_ble_v2.h"
-#include "ezlopi_ble_gatt.h"
-#include "ezlopi_ble_profile.h"
-
 static void blinky(void *pv);
+
+extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 
 void app_main(void)
 {
-    esp_err_t err = nvs_flash_init();
+    qt_serial_init();
+    gpio_isr_service_init();
+    ezlopi_init();
+    web_provisioning_init();
+    GATT_SERVER_MAIN();
+    timer_service_init();
 
-    if (ESP_ERR_NVS_NO_FREE_PAGES == err || ESP_ERR_NVS_NEW_VERSION_FOUND == err)
-    {
-        TRACE_D("NVS Init Failed once!, Error: %s", esp_err_to_name(err));
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        err = nvs_flash_init();
-    }
-
-    ezlopi_ble_v2_init();
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
 static void blinky(void *pv)
 {
-    gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_2),
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
+    // gpio_config_t io_conf = {
+    //     .pin_bit_mask = (1ULL << GPIO_NUM_2),
+    //     .mode = GPIO_MODE_OUTPUT,
+    //     .pull_up_en = GPIO_PULLUP_DISABLE,
+    //     .pull_down_en = GPIO_PULLDOWN_DISABLE,
+    //     .intr_type = GPIO_INTR_DISABLE,
+    // };
 
-    uint32_t state = 0;
+    // uint32_t state = 0;
     uint32_t count = 0;
-    gpio_config(&io_conf);
-    uint32_t prev_free_heap = 0;
-    uint32_t prev_water_mark = 0;
+
+    // adc1_config_width(ADC_WIDTH_BIT_12);
+    // gpio_config(&io_conf);
 
     while (1)
     {
-        state ^= 1;
-        gpio_set_level(GPIO_NUM_2, state);
-
-        uint32_t free_heap = esp_get_free_heap_size();
-        uint32_t water_mark = esp_get_minimum_free_heap_size();
-
-        if ((count++ > 5) || (prev_free_heap != free_heap) || (prev_water_mark != water_mark))
-        {
-            prev_free_heap = free_heap;
-            prev_water_mark = water_mark;
-
-            TRACE_D("--------------------------------");
-            TRACE_D("Free Heap - %d", free_heap);
-            TRACE_D("Water Mark - %u", water_mark);
-            TRACE_D("--------------------------------");
-            count = 0;
-        }
+        // state ^= 1;
+        // gpio_set_level(GPIO_NUM_2, state);
+        // int hall_sensor_value = hall_sensor_read();
+        // int hall_sensor_value = 0;
+        // TRACE_D("Hall Sensor value: %d\r\n", hall_sensor_value);
 
         vTaskDelay(1000 / portTICK_RATE_MS);
+
+        if (count++ > 2)
+        {
+            TRACE_D("-----------------------------------------");
+            TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
+            TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
+            TRACE_D("-----------------------------------------");
+            count = 0;
+        }
     }
 }

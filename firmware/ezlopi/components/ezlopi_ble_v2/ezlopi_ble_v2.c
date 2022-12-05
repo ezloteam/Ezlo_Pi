@@ -68,9 +68,19 @@ void ezlopi_ble_v2_init(void)
     ezlopi_ble_set_scan_params();
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(0), "gatts app register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(1), "gatts app register error");
+    // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(1), "gatts app register error");
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_STATUS_APP_ID), "gatts app register error");
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_ERROR_APP_ID), "gatts app register error");
+}
+
+void write_func(esp_attr_value_t *value)
+{
+    TRACE_D("Write function called!");
+}
+
+void read_func(esp_attr_value_t *value)
+{
+    TRACE_D("Read function called!");
 }
 
 static void ezlopi_ble_set_profiles(void)
@@ -82,51 +92,51 @@ static void ezlopi_ble_set_profiles(void)
     uuid.uuid.uuid16 = 0x2902;
     esp_gatt_perm_t permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     esp_gatt_char_prop_t properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-    s_gatt_char_t *character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties);
+    s_gatt_char_t *character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, read_func, write_func);
 
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = 0x2903;
-    s_gatt_descr_t *descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    s_gatt_descr_t *descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x2904;
-    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    // uuid.uuid.uuid16 = 0x2904;
+    // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x1902;
-    character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties);
+    // uuid.uuid.uuid16 = 0x1902;
+    // character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x1903;
-    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    // uuid.uuid.uuid16 = 0x1903;
+    // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x1904;
-    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    // uuid.uuid.uuid16 = 0x1904;
+    // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
-    uuid.len = ESP_UUID_LEN_128;
-    uuid.uuid.uuid128[0] = 1;
-    uuid.uuid.uuid128[1] = 1;
-    uuid.uuid.uuid128[2] = 1;
-    uuid.uuid.uuid128[3] = 1;
-    uuid.uuid.uuid128[4] = 1;
-    uuid.uuid.uuid128[5] = 1;
-    service = ezlopi_ble_gatt_create_service(1, &uuid);
+    // uuid.len = ESP_UUID_LEN_128;
+    // uuid.uuid.uuid128[0] = 1;
+    // uuid.uuid.uuid128[1] = 1;
+    // uuid.uuid.uuid128[2] = 1;
+    // uuid.uuid.uuid128[3] = 1;
+    // uuid.uuid.uuid128[4] = 1;
+    // uuid.uuid.uuid128[5] = 1;
+    // service = ezlopi_ble_gatt_create_service(1, &uuid);
 
-    uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0x5502;
-    character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties);
+    // uuid.len = ESP_UUID_LEN_16;
+    // uuid.uuid.uuid16 = 0x5502;
+    // character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x5503;
-    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    // uuid.uuid.uuid16 = 0x5503;
+    // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x5504;
-    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    // uuid.uuid.uuid16 = 0x5504;
+    // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x1502;
-    character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties);
+    // uuid.uuid.uuid16 = 0x1502;
+    // character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x1503;
-    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    // uuid.uuid.uuid16 = 0x1503;
+    // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
-    uuid.uuid.uuid16 = 0x1504;
-    descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission);
+    // uuid.uuid.uuid16 = 0x1504;
+    // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
     ezlopi_ble_profile_print();
 }

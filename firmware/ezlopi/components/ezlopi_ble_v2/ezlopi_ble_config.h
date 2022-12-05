@@ -11,30 +11,33 @@ typedef enum e_gatt_status
     GATT_STATUS_MAX
 } e_gatt_status_t;
 
+typedef void (*f_upcall_t)(esp_attr_value_t *value);
+
 typedef struct s_gatt_descr
 {
-    // s_gatt_char_t *characteristic;
     uint16_t handle;
     esp_bt_uuid_t uuid;
     e_gatt_status_t status;
-    esp_gatt_perm_t permission;
     // esp_attr_value_t *val;
+    f_upcall_t read_upcall;
+    f_upcall_t write_upcall;
+    esp_gatt_perm_t permission;
     esp_attr_control_t *control;
     struct s_gatt_descr *next;
 } s_gatt_descr_t;
 
 typedef struct s_gatt_char
 {
-    // s_gatt_service_t *service;
     uint16_t handle;
     esp_bt_uuid_t uuid;
     e_gatt_status_t status;
     esp_gatt_perm_t permission;
     esp_gatt_char_prop_t property;
     // esp_attr_value_t *char_val;
-    esp_attr_control_t *control;
+    f_upcall_t read_upcall;
+    f_upcall_t write_upcall;
+    esp_attr_control_t control;
     s_gatt_descr_t *descriptor;
-    
     struct s_gatt_char *next;
 } s_gatt_char_t;
 
