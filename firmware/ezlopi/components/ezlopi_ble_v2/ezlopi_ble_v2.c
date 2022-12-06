@@ -89,13 +89,13 @@ static void ezlopi_ble_set_profiles(void)
     s_gatt_service_t *service = ezlopi_ble_gatt_create_service(0, &uuid);
 
     uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0x2902;
+    uuid.uuid.uuid16 = 0xEE01;
     esp_gatt_perm_t permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     esp_gatt_char_prop_t properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
     s_gatt_char_t *character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, read_func, write_func);
 
     uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0x2903;
+    uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
     s_gatt_descr_t *descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
 #if 0

@@ -343,8 +343,8 @@ void ezlopi_ble_gatt_print_descriptor(s_gatt_descr_t *descriptor)
         TRACE_B("|    |    |--------------Descriptor----------------------------");
         ezlopi_ble_gatt_print_uuid(&descriptor->uuid, "|    |    |-");
         TRACE_B("|    |    |- handle: %d", descriptor->handle);
-        TRACE_B("|    |    |- permission: %x", descriptor->permission);
-        TRACE_B("|    |    |- status: %x", descriptor->status);
+        TRACE_B("|    |    |- permission: 0x%x", descriptor->permission);
+        TRACE_B("|    |    |- status: 0x%x", descriptor->status);
     }
 }
 
@@ -355,9 +355,9 @@ void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t *characteristic)
         TRACE_B("|    |--------------------Characteristic-----------------------");
         ezlopi_ble_gatt_print_uuid(&characteristic->uuid, "|    |-");
         TRACE_B("|    |- handle: %d", characteristic->handle);
-        TRACE_B("|    |- permission: %x", characteristic->permission);
-        TRACE_B("|    |- property: %x", characteristic->property);
-        TRACE_B("|    |- status: %x", characteristic->status);
+        TRACE_B("|    |- permission: 0x%x", characteristic->permission);
+        TRACE_B("|    |- property: 0x%x", characteristic->property);
+        TRACE_B("|    |- status: 0x%x", characteristic->status);
     }
 }
 
