@@ -59,15 +59,15 @@ void ezlopi_ble_v2_init(void)
     CHECK_PRINT_ERROR(esp_bluedroid_enable(), "enable bluetooth failed");
     CHECK_PRINT_ERROR(esp_ble_gatts_register_callback(ezlopi_ble_gatts_event_handler), "gatts register error, error code");
     CHECK_PRINT_ERROR(esp_ble_gap_register_callback(ezlopi_ble_gap_event_handler), "gap register error");
-    CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_device_name("ezlopi_krishna"), "Set device name faile!");
-    CHECK_PRINT_ERROR(esp_ble_gap_config_adv_data(&adv_data), "config advertising data failed!");
+    // CHECK_PRINT_ERROR(esp_ble_gap_set_device_name("ezlopi_krishna"), "Set device name failed!");
 
-    ezlopi_ble_start_secure_gatt_server();
-
-    ezlopi_ble_set_scan_params();
+    // ezlopi_ble_set_scan_params();
+    // CHECK_PRINT_ERROR(esp_ble_gap_config_adv_data(&adv_data), "config advertising data failed!");
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(0), "gatts app register error");
+    CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
+    ezlopi_ble_start_secure_gatt_server();
+
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(1), "gatts app register error");
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_STATUS_APP_ID), "gatts app register error");
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_ERROR_APP_ID), "gatts app register error");
@@ -85,7 +85,7 @@ void read_func(esp_attr_value_t *value)
 
 static void ezlopi_ble_set_profiles(void)
 {
-    esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_128, .uuid.uuid128 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}};
+    esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_128, .uuid.uuid128 = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xEE, 0x00, 0x00, 0x00}};
     s_gatt_service_t *service = ezlopi_ble_gatt_create_service(0, &uuid);
 
     uuid.len = ESP_UUID_LEN_16;
@@ -98,6 +98,7 @@ static void ezlopi_ble_set_profiles(void)
     uuid.uuid.uuid16 = 0x2903;
     s_gatt_descr_t *descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
+#if 0
     // uuid.uuid.uuid16 = 0x2904;
     // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 
@@ -137,6 +138,7 @@ static void ezlopi_ble_set_profiles(void)
 
     // uuid.uuid.uuid16 = 0x1504;
     // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
+#endif
 
     ezlopi_ble_profile_print();
 }

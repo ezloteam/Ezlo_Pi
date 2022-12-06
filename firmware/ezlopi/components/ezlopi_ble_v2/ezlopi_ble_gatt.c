@@ -31,6 +31,11 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         if (service)
         {
             TRACE_D("Found app-id: %d", service->app_id);
+
+            esp_ble_gap_set_device_name("ezlopi_100004545");
+            ezlopi_ble_gap_config_adv_data();
+            ezlopi_ble_gap_config_scan_rsp_data();
+
             service->gatts_if = gatts_if;
             service->status = GATT_STATUS_PROCESSING;
             esp_ble_gatts_create_service(gatts_if, &service->service_id, service->num_handles);
@@ -96,13 +101,8 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         if (char_to_add)
         {
             char_to_add->status = GATT_STATUS_PROCESSING;
-            // esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
-            //                                        char_to_add->property, &gatts_demo_char1_val, &char_to_add->control);
-            esp_gatt_char_prop_t a_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-            esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
-                                                   a_property, NULL, NULL);
-            TRACE_W("Add characterstics:: permission: %02x, properties: %d", char_to_add->permission, char_to_add->property);
-            TRACE_W("Add characterstics:: permission: %02x, properties: %d", ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, a_property);
+            esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission, char_to_add->property, NULL, NULL);
+            ezlopi_ble_gatt_print_characteristic(char_to_add);
             if (err)
             {
                 TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
@@ -124,24 +124,37 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
 
         if (char_initiating)
         {
-            // char_initiating->status = GATT_STATUS_DONE;
             char_initiating->handle = param->add_char.attr_handle;
-            esp_err_t get_attr_ret = esp_ble_gatts_get_attr_value(param->add_char.attr_handle, &length, &prf_char);
-            if (get_attr_ret == ESP_FAIL)
-            {
-                TRACE_E("ILLEGAL HANDLE");
-            }
-
             s_gatt_descr_t *desc_to_init = ezlopi_ble_profile_get_descriptor_to_init(char_initiating);
             if (desc_to_init)
             {
                 desc_to_init->status = GATT_STATUS_PROCESSING;
-                esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, &gatts_demo_char1_val, NULL);
-                TRACE_W("Descriptor:: permission: %02x", desc_to_init->permission);
-
+                esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
+                ezlopi_ble_gatt_print_descriptor(desc_to_init);
                 if (add_descr_ret)
                 {
                     TRACE_E("add char descr failed, error code =%x", add_descr_ret);
+                }
+            }
+            else
+            {
+                char_initiating->status = GATT_STATUS_DONE;
+                s_gatt_char_t *char_to_add = ezlopi_ble_profile_get_characterstics_to_init(service);
+                if (char_to_add)
+                {
+                    char_to_add->status = GATT_STATUS_PROCESSING;
+                    esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
+                                                           char_to_add->property, NULL, NULL);
+                    ezlopi_ble_gatt_print_characteristic(char_to_add);
+                    if (err)
+                    {
+                        TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
+                    }
+                }
+                else
+                {
+
+                    service->status = GATT_STATUS_DONE;
                 }
             }
         }
@@ -167,6 +180,8 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         {
             desc_to_init->status = GATT_STATUS_PROCESSING;
             esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
+            ezlopi_ble_gatt_print_descriptor(desc_to_init);
+
             if (add_descr_ret)
             {
                 TRACE_E("add char descr failed, error code =%x", add_descr_ret);
@@ -181,7 +196,8 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             {
                 char_to_add->status = GATT_STATUS_PROCESSING;
                 esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
-                                                       char_to_add->property, &gatts_demo_char1_val, &char_to_add->control);
+                                                       char_to_add->property, NULL, NULL);
+                ezlopi_ble_gatt_print_characteristic(char_to_add);
                 if (err)
                 {
                     TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
@@ -189,7 +205,6 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             }
             else
             {
-
                 service->status = GATT_STATUS_DONE;
             }
         }
@@ -199,6 +214,8 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     case ESP_GATTS_READ_EVT:
     {
         ezlopi_ble_gatt_call_read_by_handle(gatts_if, param);
+        esp_gatt_rsp_t rsp = {.attr_value = {.len = 0, .value[0] = 0}, .handle = param->read.handle};
+        esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
         break;
         // esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
 #if 0
