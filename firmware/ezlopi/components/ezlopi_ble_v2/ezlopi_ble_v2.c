@@ -85,6 +85,7 @@ void read_func(esp_attr_value_t *value)
 
 static void ezlopi_ble_set_profiles(void)
 {
+    // 77880001-d229-11e4-8689-0002a5d5c51b
     esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_128, .uuid.uuid128 = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xEE, 0x00, 0x00, 0x00}};
     s_gatt_service_t *service = ezlopi_ble_gatt_create_service(0, &uuid);
 
