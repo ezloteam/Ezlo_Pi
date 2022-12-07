@@ -20,25 +20,35 @@
 #include "gatt_server.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_uart.h"
+#include "ezlopi_adc.h"
 
 static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 
-static void upcall(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void joystick_upcall(s_ezlopi_analog_data_t* adc_data, uint8_t channel)
 {
-    TRACE_I("Buffer data is %s", buffer);
+    if((uint8_t)ADC1_CHANNEL_6 == channel)
+    {
+        TRACE_I("Analog reading of Vrx is %d. Volatage reading is %dmV", adc_data->value, adc_data->voltage);
+    }
+    if((uint8_t)ADC1_CHANNEL_7 == channel)
+    {
+        TRACE_I("Analog reading of Vry is %d. Volatage reading is %dmV", adc_data->value, adc_data->voltage);
+    }
 }
-
 
 void app_main(void)
 {
-    qt_serial_init();
-    gpio_isr_service_init();
-    ezlopi_init();
-    web_provisioning_init();
-    GATT_SERVER_MAIN();
-    sensor_service_init();
+    // qt_serial_init();
+    // gpio_isr_service_init();
+    // ezlopi_init();
+    // web_provisioning_init();
+    // GATT_SERVER_MAIN();
+    // sensor_service_init();
+
+    ezlopi_adc_init(34, 3, joystick_upcall);
+    ezlopi_adc_init(35, 3, joystick_upcall);
 
     // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
