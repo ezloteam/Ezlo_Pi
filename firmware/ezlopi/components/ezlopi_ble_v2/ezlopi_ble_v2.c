@@ -25,7 +25,9 @@
 
 #include "ezlopi_ble_v2.h"
 
-static void ezlopi_ble_set_profiles(void);
+static void ezlopi_ble_set_wifi_profile(void);
+// static void ezlopi_ble_set_wifi_profile(void);
+
 static void ezlopi_ble_set_scan_params(void);
 static void ezlopi_ble_start_secure_gatt_server(void);
 
@@ -49,7 +51,8 @@ static esp_ble_adv_data_t adv_data =
 
 void ezlopi_ble_v2_init(void)
 {
-    ezlopi_ble_set_profiles();
+    ezlopi_ble_set_wifi_profile();
+    ezlopi_ble_profile_print();
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
@@ -73,17 +76,117 @@ void ezlopi_ble_v2_init(void)
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_ERROR_APP_ID), "gatts app register error");
 }
 
-void write_func(esp_attr_value_t *value)
+static prepare_type_env_t wifi_creds_prepare_write_env;
+void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Write function called!");
+    if (0 == param->write.is_prep) // Data received in single packet
+    {
+        dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
+
+        if (param->write.len == 2)
+        {
+            uint16_t descr_value = param->write.value[1] << 8 | param->write.value[0];
+            if (descr_value == 0x0001)
+            {
+            }
+            else if (descr_value == 0x0002)
+            {
+            }
+            else if (descr_value == 0x0000)
+            {
+                TRACE_I("notify/indicate disable ");
+            }
+            else
+            {
+                TRACE_E("unknown descr value");
+            }
+
+            if ((NULL != param->write.value) && (param->write.len > 0))
+            {
+                cJSON *root = cJSON_Parse((const char *)param->write.value);
+                if (root)
+                {
+                    char *ssid = cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring;
+                    char *password = cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring;
+                    esp_err_t wifi_error = ezlopi_wifi_connect(ssid, password);
+                    cJSON_Delete(root);
+                }
+            }
+        }
+    }
 }
 
-void read_func(esp_attr_value_t *value)
+void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("Read function called!");
+    static char *json_str_wifi_info;
+
+    if (NULL == json_str_wifi_info)
+    {
+        char wifi_creds[64];
+        memset(wifi_creds, 0, sizeof(wifi_creds));
+        ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
+
+        cJSON *cjson_wifi_info = cJSON_CreateObject();
+        if (cjson_wifi_info)
+        {
+            if (strlen(wifi_creds) >= 32)
+            {
+                wifi_creds[31] = '\0';
+            }
+            cJSON_AddStringToObject(cjson_wifi_info, "SSID", &wifi_creds[0]);
+            cJSON_AddStringToObject(cjson_wifi_info, "PSD", "********");
+
+            esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
+            cJSON_AddStringToObject(cjson_wifi_info, "ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
+            cJSON_AddStringToObject(cjson_wifi_info, "gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
+            cJSON_AddStringToObject(cjson_wifi_info, "netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
+
+            json_str_wifi_info = cJSON_Print(cjson_wifi_info);
+            if (json_str_wifi_info)
+            {
+                cJSON_Minify(json_str_wifi_info);
+                printf("WiFi read: %s", json_str_wifi_info);
+            }
+
+            cJSON_Delete(cjson_wifi_info);
+        }
+    }
+
+    if (NULL != json_str_wifi_info)
+    {
+        if (value)
+        {
+            if ((0 != strlen(json_str_wifi_info)) && (strlen(json_str_wifi_info) > param->read.offset))
+            {
+                strncpy((char *)value->value, json_str_wifi_info + param->read.offset, ESP_GATT_MAX_ATTR_LEN);
+                value->len = strlen((const char *)value->value);
+            }
+            else
+            {
+                value->len = 1;
+                value->value[0] = 0; // Read 0 if the device not provisioned yet.
+                free(json_str_wifi_info);
+                json_str_wifi_info = NULL;
+            }
+        }
+    }
+    else
+    {
+        if (value)
+        {
+            value->len = 1;
+            value->value[0] = 0; // Read 0 if the device not provisioned yet.
+        }
+    }
 }
 
-static void ezlopi_ble_set_profiles(void)
+void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+{
+    TRACE_D("Write execute function called.");
+}
+
+static void ezlopi_ble_set_wifi_profile(void)
 {
     // 77880001-d229-11e4-8689-0002a5d5c51b
     esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_128, .uuid.uuid128 = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xEE, 0x00, 0x00, 0x00}};
@@ -93,11 +196,11 @@ static void ezlopi_ble_set_profiles(void)
     uuid.uuid.uuid16 = 0xEE01;
     esp_gatt_perm_t permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     esp_gatt_char_prop_t properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-    s_gatt_char_t *character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, read_func, write_func);
+    s_gatt_char_t *character = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, wifi_creds_read_func, wifi_creds_write_func, wifi_creds_write_exec_func);
 
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
-    s_gatt_descr_t *descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
+    s_gatt_descr_t *descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, NULL, NULL, NULL);
 
 #if 0
     // uuid.uuid.uuid16 = 0x2904;
@@ -140,8 +243,6 @@ static void ezlopi_ble_set_profiles(void)
     // uuid.uuid.uuid16 = 0x1504;
     // descriptor = ezlopi_ble_gatt_add_descriptor(character, &uuid, permission, read_func, write_func);
 #endif
-
-    ezlopi_ble_profile_print();
 }
 
 static void ezlopi_ble_start_secure_gatt_server(void)

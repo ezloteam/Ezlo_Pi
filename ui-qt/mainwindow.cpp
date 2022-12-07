@@ -243,7 +243,7 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
 
     #endif
 
-    ezlogic_process_erase_flash->setProgram("esptool.exe");
+    ezlogic_process_erase_flash->setProgram("esptool");
     QStringList arguments;
     arguments.append("-p");
     arguments.append(ser_port);
@@ -281,7 +281,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     ui->tableWidget_device_table->clearContents();
     ui->pushButton_connect_uart->setEnabled(false);
 
-    ezlogic_process_write_flash->setProgram("esptool.exe");       
+    ezlogic_process_write_flash->setProgram("esptool");
 
 
     QStringList arguments;

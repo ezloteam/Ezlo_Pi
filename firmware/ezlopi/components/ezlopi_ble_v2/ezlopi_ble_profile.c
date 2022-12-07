@@ -154,7 +154,8 @@ s_gatt_service_t *ezlopi_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid_t 
     return service_obj;
 }
 
-s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission, esp_gatt_char_prop_t properties, f_upcall_t read_func, f_upcall_t write_func)
+s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission, esp_gatt_char_prop_t properties,
+                                                  f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
 {
     s_gatt_char_t *character_object = NULL;
     if (service_obj)
@@ -168,6 +169,7 @@ s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj,
             character_object->permission = permission;
             character_object->read_upcall = read_func;
             character_object->write_upcall = write_func;
+            character_object->write_exce_upcall = write_exec_func;
             memcpy(&character_object->uuid, uuid, sizeof(esp_bt_uuid_t));
             ezlopi_ble_gatt_append_characterstic_to_service(service_obj, character_object);
             service_obj->num_handles += 2;
@@ -177,7 +179,8 @@ s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj,
     return character_object;
 }
 
-s_gatt_descr_t *ezlopi_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission, f_upcall_t read_func, f_upcall_t write_func)
+s_gatt_descr_t *ezlopi_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission,
+                                               f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
 {
     s_gatt_descr_t *descriptor_obj = NULL;
 
@@ -190,6 +193,7 @@ s_gatt_descr_t *ezlopi_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp
             memset(descriptor_obj, 0, sizeof(s_gatt_descr_t));
             descriptor_obj->read_upcall = read_func;
             descriptor_obj->write_upcall = write_func;
+            descriptor_obj->write_exce_upcall = write_exec_func;
 
             if (NULL == uuid)
             {

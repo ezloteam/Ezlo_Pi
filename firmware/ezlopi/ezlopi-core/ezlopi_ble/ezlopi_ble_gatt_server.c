@@ -626,7 +626,6 @@ static void __gatts_profile_wifi_info_event_handler(esp_gatts_cb_event_t event, 
                 param->start.status, param->start.service_handle);
         break;
     }
-
     case ESP_GATTS_CONNECT_EVT:
     {
 #if 0 // for insecure communication
