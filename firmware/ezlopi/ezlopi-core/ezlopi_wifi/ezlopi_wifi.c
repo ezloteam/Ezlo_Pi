@@ -26,6 +26,7 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"
 #include "qt_serial.h"
+#include "ezlopi_wifi_err_reason.h"
 
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -51,6 +52,13 @@ static uint32_t new_wifi = 0;
 static int s_retry_num = 0;
 static char wifi_ssid_pass[64];
 static int station_got_ip = 0;
+static const char *const wifi_no_error_str = "NO_ERROR";
+static const char *last_disconnect_reason = wifi_no_error_str;
+
+const char *ezlopi_wifi_get_last_disconnect_reason(void)
+{
+    return last_disconnect_reason;
+}
 
 esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void)
 {
@@ -103,7 +111,7 @@ static void alert_qt_wifi_got_ip(void)
     }
 }
 
-static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+static void __event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
     {
@@ -111,6 +119,11 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
+        // event_data; //
+        wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
+        TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
+        last_disconnect_reason = ezlopi_wifi_err_reason_str(disconnected->reason);
+
         station_got_ip = 0;
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
         {
@@ -124,10 +137,11 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
             alert_qt_wifi_fail();
             s_retry_num = 0;
         }
-        TRACE_I("connect to the AP fail");
+        TRACE_W("connect to the AP fail");
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
+        last_disconnect_reason = wifi_no_error_str;
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         TRACE_I("got - ip:      " IPSTR, IP2STR(&event->ip_info.ip));
         TRACE_I("      netmask: " IPSTR, IP2STR(&event->ip_info.netmask));
@@ -144,6 +158,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 
 void ezlopi_wifi_initialize(void)
 {
+    memset(&my_ip, 0, sizeof(my_ip));
     s_wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_netif_init());
@@ -158,51 +173,66 @@ void ezlopi_wifi_initialize(void)
     esp_event_handler_instance_t instance_got_ip;
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL, &instance_any_id));
+        WIFI_EVENT, ESP_EVENT_ANY_ID, &__event_handler, NULL, &instance_any_id));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL, &instance_got_ip));
+        IP_EVENT, IP_EVENT_STA_GOT_IP, &__event_handler, NULL, &instance_got_ip));
 }
 
 void ezlopi_wifi_connect_from_nvs(void)
 {
-    char wifi_info[64];
-    memset(wifi_info, 0, sizeof(wifi_info));
-    ezlopi_nvs_read_wifi(wifi_info, sizeof(wifi_info));
+    memset(wifi_ssid_pass, 0, sizeof(wifi_ssid_pass));
+    ezlopi_nvs_read_wifi(wifi_ssid_pass, sizeof(wifi_ssid_pass));
 
-    if (wifi_info[0] == 0)
+    if (wifi_ssid_pass[0] == 0)
     {
-        strcpy(wifi_info, "Asialinks travels & tours");
-        strcpy(&wifi_info[32], "Tours       ");
+        strcpy(&wifi_ssid_pass[00], "ezlopitest");
+        strcpy(&wifi_ssid_pass[32], "ezlopitest");
         ezlopi_wifi_set_new_wifi_flag();
     }
-    ezlopi_wifi_connect(&wifi_info[0], &wifi_info[32]);
+
+    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass[0], &wifi_ssid_pass[32]);
+    TRACE_E("wifi_error: %u", wifi_error);
 }
 
-void ezlopi_wifi_connect(const char *ssid, const char *pass)
+esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 {
-    strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
-    strncpy((char *)&wifi_ssid_pass[32], pass, 32);
+    esp_err_t err = ESP_OK;
 
-    TRACE_D("SSID: %s, Password: %s\r\n", ssid, pass);
+    if ((NULL != ssid) && (NULL != pass))
+    {
+        if ((0 != strncmp(ssid, &wifi_ssid_pass[0], 32)) || ((0 != strncmp(pass, &wifi_ssid_pass[32], 32))))
+        {
+            ezlopi_wifi_set_new_wifi_flag();
+            strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
+            strncpy((char *)&wifi_ssid_pass[32], pass, 32);
+        }
 
-    wifi_config_t wifi_config = {
-        .sta = {
-            .pmf_cfg = {.capable = true, .required = false},
-        },
-    };
+        TRACE_D("SSID: %s, Password: %s\r\n", ssid, pass);
 
-    strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
-    strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
-    wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+        wifi_config_t wifi_config = {
+            .sta = {
+                .pmf_cfg = {.capable = true, .required = false},
+            },
+        };
 
-    esp_wifi_stop();
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
-    ESP_ERROR_CHECK(esp_wifi_start());
-    set_wifi_station_host_name();
+        strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
+        strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
+        wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+
+        esp_wifi_stop();
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+        err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+        ESP_ERROR_CHECK(esp_wifi_start());
+        set_wifi_station_host_name();
+    }
+
+    return err;
 }
 
 void ezlopi_wait_for_wifi_to_connect(void)
 {
-    xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+    if (NULL != s_wifi_event_group)
+    {
+        xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+    }
 }

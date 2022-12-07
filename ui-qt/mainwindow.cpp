@@ -133,7 +133,8 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
     ezlogic_serial_port->setPort(ezlogic_serial_port_info);
 
     if(ezlogic_flag_serial_port_open == false) {
-        if(!ezlogic_serial_port_info.isNull()) {
+        // if(!ezlogic_serial_port_info.isBusy())
+        {
 
             if(ezlogic_serial_port->open(QIODevice::ReadWrite)) {
                 ezlogic_flag_serial_port_open = true;
@@ -243,7 +244,15 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
 
     #endif
 
-    ezlogic_process_erase_flash->setProgram("esptool.exe");
+
+    #ifdef __linux__
+        ezlogic_process_erase_flash->setProgram("esptool");
+    #elif _WIN32
+        ezlogic_process_erase_flash->setProgram("esptool.exe");
+    #else
+
+    #endif
+
     QStringList arguments;
     arguments.append("-p");
     arguments.append(ser_port);
@@ -251,10 +260,10 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
 
     QString command = "";
     for(auto args : arguments) {
-        command += args;
+        command += " " + args;
     }
 
-    qDebug() << command;
+    qDebug() << "Erase flash command arguments: " << command;
 
     ezlogic_process_erase_flash->setArguments(arguments);
     ezlogic_process_erase_flash->start();
@@ -281,8 +290,14 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
     ui->tableWidget_device_table->clearContents();
     ui->pushButton_connect_uart->setEnabled(false);
 
-    ezlogic_process_write_flash->setProgram("esptool.exe");       
 
+    #ifdef __linux__
+        ezlogic_process_write_flash->setProgram("esptool");
+    #elif _WIN32
+        ezlogic_process_write_flash->setProgram("esptool.exe");
+    #else
+
+    #endif
 
     QStringList arguments;
 
@@ -876,7 +891,7 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
 
 void MainWindow::ezlogic_serial_receive_wif(ezpi_cmd cmd) {
     ezlogic_cmd_state = cmd;
-    ezlogic_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT_WIFI);
+    ezlogic_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT);
 }
 
 void MainWindow::ezlogic_clear_table_data(void) {

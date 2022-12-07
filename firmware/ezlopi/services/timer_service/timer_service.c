@@ -14,7 +14,7 @@
 
 static void event_process(void *pv);
 
-void sensor_service_init(void)
+void timer_service_init(void)
 {
     xTaskCreate(event_process, "event_process", 2 * 2048, NULL, 4, NULL);
 }
@@ -35,7 +35,7 @@ static void event_process(void *pv)
                 l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
                 while (NULL != registered_device)
                 {
-                    registered_device->device->func(event->action, registered_device->properties, event->arg);
+                    registered_device->device->func(event->action, registered_device->properties, event->arg, registered_device->user_arg);
                     registered_device = registered_device->next;
                 }
 
@@ -45,4 +45,3 @@ static void event_process(void *pv)
         }
     }
 }
-

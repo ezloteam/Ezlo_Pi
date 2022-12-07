@@ -11,13 +11,14 @@
 
 #include "ezlopi_timer.h"
 #include "timer_service.h"
+#include "gpio_isr_service.h"
 #include "ezlopi_event_queue.h"
 
 #include "trace.h"
 #include "ezlopi.h"
 #include "qt_serial.h"
 #include "web_provisioning.h"
-#include "gatt_server.h"
+#include "ezlopi_ble_gatt_server.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_uart.h"
 #include "ezlopi_adc.h"
@@ -50,7 +51,7 @@ void app_main(void)
     ezlopi_adc_init(34, 3, joystick_upcall);
     ezlopi_adc_init(35, 3, joystick_upcall);
 
-    // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+    xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
 static void blinky(void *pv)

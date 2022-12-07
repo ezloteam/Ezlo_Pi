@@ -9,7 +9,7 @@
 // const static char *ezlopi_item_name_lock_operation = "lock_operation";
 // const static char *ezlopi_item_name_user_code_operation = "user_code_operation";
 // const static char *ezlopi_item_name_dw_handle_state = "dw_handle_state";
-// const static char *ezlopi_item_name_dw_state = "dw_state";
+const static char *ezlopi_item_name_dw_state = "dw_state";
 // const static char *ezlopi_item_name_latch_state = "latch_state";
 // const static char *ezlopi_item_name_keypad_state = "keypad_state";
 // const static char *ezlopi_item_name_emergency_state = "emergency_state";
@@ -118,7 +118,7 @@ const static char *ezlopi_item_name_humidity = "humidity";
 // const static char *ezlopi_item_name_moisture = "moisture";
 const static char *ezlopi_item_name_motion = "motion";
 // const static char *ezlopi_item_name_power = "power";
-const static char *ezlopi_item_name_pressure = "pressure";
+// const static char *ezlopi_item_name_pressure = "pressure";
 // const static char *ezlopi_item_name_rgbcolor = "rgbcolor";
 // const static char *ezlopi_item_name_rgbcolor_down = "rgbcolor_down";
 // const static char *ezlopi_item_name_rgbcolor_stop = "rgbcolor_stop";
