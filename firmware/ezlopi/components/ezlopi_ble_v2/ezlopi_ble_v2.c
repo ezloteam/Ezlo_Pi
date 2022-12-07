@@ -24,33 +24,17 @@
 #include "ezlopi_ble_profile.h"
 
 #include "ezlopi_ble_v2.h"
+#include "ezlopi_ble_buffer.h"
 
 static void ezlopi_ble_set_wifi_profile(void);
-// static void ezlopi_ble_set_wifi_profile(void);
-
-static void ezlopi_ble_set_scan_params(void);
 static void ezlopi_ble_start_secure_gatt_server(void);
-
-static uint8_t manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
-static esp_ble_adv_data_t adv_data =
-    {
-        .set_scan_rsp = false,
-        .include_name = true,
-        .include_txpower = true,
-        .min_interval = 0x0006,
-        .max_interval = 0x0010,
-        .appearance = 0x00,
-        .manufacturer_len = sizeof(manufacturer),
-        .p_manufacturer_data = manufacturer,
-        .service_data_len = 0,
-        .p_service_data = NULL,
-        .service_uuid_len = 0,
-        .p_service_uuid = NULL,
-        .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
-};
 
 void ezlopi_ble_v2_init(void)
 {
+    char ble_device_name[32];
+    s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+    snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", factory->id);
+
     ezlopi_ble_set_wifi_profile();
     ezlopi_ble_profile_print();
 
@@ -62,10 +46,7 @@ void ezlopi_ble_v2_init(void)
     CHECK_PRINT_ERROR(esp_bluedroid_enable(), "enable bluetooth failed");
     CHECK_PRINT_ERROR(esp_ble_gatts_register_callback(ezlopi_ble_gatts_event_handler), "gatts register error, error code");
     CHECK_PRINT_ERROR(esp_ble_gap_register_callback(ezlopi_ble_gap_event_handler), "gap register error");
-    // CHECK_PRINT_ERROR(esp_ble_gap_set_device_name("ezlopi_krishna"), "Set device name failed!");
-
-    // ezlopi_ble_set_scan_params();
-    // CHECK_PRINT_ERROR(esp_ble_gap_config_adv_data(&adv_data), "config advertising data failed!");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_device_name(ble_device_name), "Set device name failed!");
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(0), "gatts app register error");
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
@@ -76,7 +57,23 @@ void ezlopi_ble_v2_init(void)
     // CHECK_PRINT_ERROR(esp_ble_gatts_app_register(PROFILE_WIFI_ERROR_APP_ID), "gatts app register error");
 }
 
-static prepare_type_env_t wifi_creds_prepare_write_env;
+static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
+
+void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
+{
+    if ((NULL != value) && (len > 0))
+    {
+        cJSON *root = cJSON_Parse((const char *)value);
+        if (root)
+        {
+            char *ssid = cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring;
+            char *password = cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring;
+            ezlopi_wifi_connect(ssid, password);
+            cJSON_Delete(root);
+        }
+    }
+}
+
 void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Write function called!");
@@ -86,7 +83,7 @@ void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *pa
 
         if (param->write.len == 2)
         {
-            uint16_t descr_value = param->write.value[1] << 8 | param->write.value[0];
+            uint16_t descr_value = (param->write.value[1] << 8) | param->write.value[0];
             if (descr_value == 0x0001)
             {
             }
@@ -95,24 +92,27 @@ void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *pa
             }
             else if (descr_value == 0x0000)
             {
-                TRACE_I("notify/indicate disable ");
+                TRACE_I("notify/indicate disable");
             }
             else
             {
                 TRACE_E("unknown descr value");
             }
-
-            if ((NULL != param->write.value) && (param->write.len > 0))
-            {
-                cJSON *root = cJSON_Parse((const char *)param->write.value);
-                if (root)
-                {
-                    char *ssid = cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring;
-                    char *password = cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring;
-                    esp_err_t wifi_error = ezlopi_wifi_connect(ssid, password);
-                    cJSON_Delete(root);
-                }
-            }
+        }
+        else if ((NULL != param->write.value) && (param->write.len > 2))
+        {
+            wifi_creds_parse_and_connect(param->write.value, param->write.len);
+        }
+    }
+    else
+    {
+        if (NULL == wifi_creds_linked_buffer)
+        {
+            wifi_creds_linked_buffer = ezlopi_ble_buffer_create(param);
+        }
+        else
+        {
+            ezlopi_ble_buffer_add_to_buffer(wifi_creds_linked_buffer, param);
         }
     }
 }
@@ -120,9 +120,11 @@ void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *pa
 void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     static char *json_str_wifi_info;
+    TRACE_W("1");
 
     if (NULL == json_str_wifi_info)
     {
+        TRACE_W("2");
         char wifi_creds[64];
         memset(wifi_creds, 0, sizeof(wifi_creds));
         ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
@@ -130,6 +132,7 @@ void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *par
         cJSON *cjson_wifi_info = cJSON_CreateObject();
         if (cjson_wifi_info)
         {
+            TRACE_W("3");
             if (strlen(wifi_creds) >= 32)
             {
                 wifi_creds[31] = '\0';
@@ -145,6 +148,7 @@ void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *par
             json_str_wifi_info = cJSON_Print(cjson_wifi_info);
             if (json_str_wifi_info)
             {
+                TRACE_W("4");
                 cJSON_Minify(json_str_wifi_info);
                 printf("WiFi read: %s", json_str_wifi_info);
             }
@@ -155,17 +159,29 @@ void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *par
 
     if (NULL != json_str_wifi_info)
     {
+        TRACE_W("5");
         if (value)
         {
+            TRACE_W("6");
             if ((0 != strlen(json_str_wifi_info)) && (strlen(json_str_wifi_info) > param->read.offset))
             {
+
+                TRACE_W("7");
                 strncpy((char *)value->value, json_str_wifi_info + param->read.offset, ESP_GATT_MAX_ATTR_LEN);
                 value->len = strlen((const char *)value->value);
             }
             else
             {
+                TRACE_W("8");
                 value->len = 1;
                 value->value[0] = 0; // Read 0 if the device not provisioned yet.
+            }
+
+            TRACE_W("param->read.offset: %d | %d : ", param->read.offset, strlen(json_str_wifi_info));
+
+            if (param->read.offset >= (strlen(json_str_wifi_info) - 1))
+            {
+                TRACE_W("11");
                 free(json_str_wifi_info);
                 json_str_wifi_info = NULL;
             }
@@ -173,8 +189,10 @@ void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *par
     }
     else
     {
+        TRACE_W("9");
         if (value)
         {
+            TRACE_W("10");
             value->len = 1;
             value->value[0] = 0; // Read 0 if the device not provisioned yet.
         }
@@ -184,6 +202,10 @@ void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *par
 void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Write execute function called.");
+    ezlopi_ble_buffer_accumulate_to_start(wifi_creds_linked_buffer);
+    wifi_creds_parse_and_connect(wifi_creds_linked_buffer->buffer, wifi_creds_linked_buffer->len);
+    ezlopi_ble_buffer_free_buffer(wifi_creds_linked_buffer);
+    wifi_creds_linked_buffer = NULL;
 }
 
 static void ezlopi_ble_set_wifi_profile(void)
@@ -264,49 +286,4 @@ static void ezlopi_ble_start_secure_gatt_server(void)
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, &oob_support, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_OOB_SUPPORT");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_SET_INIT_KEY");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_SET_RSP_KEY");
-}
-
-static void ezlopi_ble_set_scan_params(void)
-{ // scan response data
-    static esp_ble_adv_data_t scan_rsp_data = {
-        .set_scan_rsp = true,
-        .include_name = true,
-        .include_txpower = true,
-        .appearance = 0x00,
-        .manufacturer_len = sizeof(manufacturer), // TEST_MANUFACTURER_DATA_LEN,
-        .p_manufacturer_data = manufacturer,      //&manufacturer[0],
-        .service_data_len = 0,
-        .p_service_data = NULL,
-        .service_uuid_len = 0,
-        .p_service_uuid = NULL,
-        .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
-    };
-
-    int all_service_uuid_len = 0;
-    s_gatt_service_t *service_head = ezlopi_ble_profile_get_head();
-    while (service_head)
-    {
-        all_service_uuid_len += service_head->service_id.id.uuid.len;
-        service_head = service_head->next;
-    }
-
-    if (all_service_uuid_len)
-    {
-        uint8_t *service_uuids = malloc(ezlopi_ble_gatt_number_of_services() * ESP_UUID_LEN_128);
-        if (service_uuids)
-        {
-            int uuid_pos = 0;
-            service_head = ezlopi_ble_profile_get_head();
-            while (service_head)
-            {
-                memcpy(&service_uuids[uuid_pos], &service_head->service_id.id.uuid.uuid.uuid128, service_head->service_id.id.uuid.len);
-                uuid_pos += service_head->service_id.id.uuid.len;
-                service_head = service_head->next;
-            }
-
-            scan_rsp_data.service_uuid_len = all_service_uuid_len;
-            scan_rsp_data.p_service_uuid = service_uuids;
-            esp_ble_gap_config_adv_data(&scan_rsp_data);
-        }
-    }
 }

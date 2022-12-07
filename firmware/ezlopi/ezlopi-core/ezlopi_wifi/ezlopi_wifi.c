@@ -138,6 +138,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
             s_retry_num = 0;
         }
         TRACE_W("connect to the AP fail");
+        memset(&my_ip, 0, sizeof(esp_netif_ip_info_t));
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
@@ -148,8 +149,8 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         TRACE_I("      gw:      " IPSTR, IP2STR(&event->ip_info.gw));
 
         station_got_ip = 1;
-
         s_retry_num = 0;
+
         memcpy(&my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
         alert_qt_wifi_got_ip();

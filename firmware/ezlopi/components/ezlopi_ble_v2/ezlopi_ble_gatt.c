@@ -23,8 +23,6 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         if (service)
         {
             TRACE_D("Found app-id: %d", service->app_id);
-
-            esp_ble_gap_set_device_name("ezlopi_100004545");
             ezlopi_ble_gap_config_adv_data();
             ezlopi_ble_gap_config_scan_rsp_data();
 
@@ -162,61 +160,9 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     case ESP_GATTS_READ_EVT:
     {
         ezlopi_ble_gatt_call_read_by_handle(gatts_if, param);
-        esp_gatt_rsp_t rsp = {.attr_value = {.len = 0, .value[0] = 0}, .handle = param->read.handle};
-        esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
-        break;
+        // esp_gatt_rsp_t rsp = {.attr_value = {.len = 0, .value[0] = 0}, .handle = param->read.handle};
         // esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
-#if 0
-#warning "Need to fix data transfer for 'character-description'"
-        TRACE_I("GATT_READ_EVT, conn_id %d, trans_id %d, handle %d", param->read.conn_id, param->read.trans_id, param->read.handle);
-        esp_gatt_rsp_t rsp;
-        memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
-        rsp.attr_value.handle = param->read.handle;
-
-        char wifi_creds[64];
-        memset(wifi_creds, 0, sizeof(wifi_creds));
-        ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
-
-        cJSON *cjson_wifi_info = cJSON_CreateObject();
-        if (cjson_wifi_info)
-        {
-            if (strlen(wifi_creds) >= 32)
-            {
-                wifi_creds[31] = '\0';
-            }
-            cJSON_AddStringToObject(cjson_wifi_info, "SSID", &wifi_creds[0]);
-            cJSON_AddStringToObject(cjson_wifi_info, "PSD", "********");
-
-            esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
-            cJSON_AddStringToObject(cjson_wifi_info, "ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
-            cJSON_AddStringToObject(cjson_wifi_info, "gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
-            cJSON_AddStringToObject(cjson_wifi_info, "netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
-
-            char *json_str_wifi_info = cJSON_Print(cjson_wifi_info);
-            if (json_str_wifi_info)
-            {
-                cJSON_Minify(json_str_wifi_info);
-                if (0 != strlen(json_str_wifi_info) && strlen(json_str_wifi_info) > param->read.offset)
-                {
-                    strncpy((char *)rsp.attr_value.value, json_str_wifi_info + param->read.offset, ESP_GATT_MAX_ATTR_LEN);
-                    rsp.attr_value.len = strlen((const char *)rsp.attr_value.value);
-                }
-                else
-                {
-                    rsp.attr_value.len = 1;
-                    rsp.attr_value.value[0] = 0; // Read 0 if the device not provisioned yet.
-                }
-
-                dump("rsp.attr_value.value", rsp.attr_value.value, 0, rsp.attr_value.len);
-                esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
-                free(json_str_wifi_info);
-            }
-
-            cJSON_Delete(cjson_wifi_info);
-        }
-
         break;
-#endif
     }
     case ESP_GATTS_WRITE_EVT:
     {
@@ -244,6 +190,11 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     case ESP_GATTS_MTU_EVT: // 4
     {
         TRACE_I("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
+        break;
+    }
+    case ESP_GATTS_RESPONSE_EVT:
+    {
+        param->rsp.status
         break;
     }
     default:
@@ -336,7 +287,25 @@ static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble
     f_upcall_t write_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->write.handle, ESP_GATTS_WRITE_EVT);
     if (write_upcall)
     {
-        write_upcall(NULL, param);
+        esp_gatt_rsp_t gatt_rsp;
+        write_upcall(&gatt_rsp.attr_value, param);
+
+        if (param->write.need_rsp)
+        {
+            if (param->write.is_prep)
+            {
+                gatt_rsp.attr_value.len = param->write.len;
+                gatt_rsp.attr_value.handle = param->write.handle;
+                gatt_rsp.attr_value.offset = param->write.offset;
+                gatt_rsp.attr_value.auth_req = ESP_GATT_AUTH_REQ_NONE;
+                memcpy(gatt_rsp.attr_value.value, param->write.value, param->write.len);
+                esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, &gatt_rsp);
+            }
+            else
+            {
+                esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
+            }
+        }
     }
 }
 
@@ -345,10 +314,11 @@ static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, es
     f_upcall_t write_exec_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->write.handle, ESP_GATTS_EXEC_WRITE_EVT);
     if (write_exec_upcall)
     {
-        // static prepare_type_env_t a_prepare_write_env = NULL;
-
-        write_exec_upcall(NULL, param);
-        gatts_write_event_env(gatts_if, NULL, param);
+        esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
+        if (ESP_GATT_PREP_WRITE_EXEC == param->exec_write.exec_write_flag)
+        {
+            write_exec_upcall(NULL, param);
+        }
     }
 }
 
@@ -363,10 +333,6 @@ static void ezlopi_ble_gatt_call_read_by_handle(esp_gatt_if_t gatts_if, esp_ble_
         read_upcall(&rsp.attr_value, param);
         esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
     }
-
-    // esp_gatt_rsp_t rsp;
-    // memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
-    // rsp.attr_value.handle = param->read.handle;
 }
 
 static char *ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
