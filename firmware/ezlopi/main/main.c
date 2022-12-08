@@ -22,40 +22,27 @@
 #include "gpio_isr_service.h"
 #include "ezlopi_uart.h"
 #include "ezlopi_adc.h"
+#include "ezlopi_pwm.h"
 
 static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 
-static void joystick_upcall(s_ezlopi_analog_data_t* adc_data, uint8_t channel)
-{
-    if((uint8_t)ADC1_CHANNEL_4 == channel)
-    {
-        TRACE_I("Analog reading of Vrx is %d. Volatage reading is %dmV", adc_data->value, adc_data->voltage);
-    }
-    if((uint8_t)ADC1_CHANNEL_7 == channel)
-    {
-        TRACE_I("Analog reading of Vry is %d. Volatage reading is %dmV", adc_data->value, adc_data->voltage);
-    }
-}
 
-static void joystick_task(void* args)
+static void pwm_task(void* args)
 {
-    s_ezlopi_analog_data_t *data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+
+    s_ezlopi_channel_speed_t* channel_speed = ezlopi_pwm_init(GPIO_NUM_2, LEDC_TIMER_12_BIT, 10000, 0);
+    TRACE_B("channel is %d, speed is %d", channel_speed->channel, channel_speed->speed_mode);
     while(1)
     {
-        memset(data, 0, sizeof(s_ezlopi_analog_data_t));
-        ezlopi_adc_get_adc_data(32, data);
-        if((uint8_t)ADC1_CHANNEL_4 == ezlopi_adc_get_channel_number(32))
+        for(uint32_t i = 0; i < 4096; i +=   100)
         {
-            TRACE_I("Analog reading of Vrx is %d. Volatage reading is %dmV", data->value, data->voltage);
+            TRACE_E("Duty is: %d", i);
+            ezlopi_pwm_change_duty(channel_speed->channel, channel_speed->speed_mode, i);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
-        memset(data, 0, sizeof(s_ezlopi_analog_data_t));
-        ezlopi_adc_get_adc_data(35, data);
-        if((uint8_t)ADC1_CHANNEL_7 == ezlopi_adc_get_channel_number(35))
-        {
-            TRACE_I("Analog reading of Vry is %d. Volatage reading is %dmV", data->value, data->voltage);
-        }
+           
     }
 }
 
@@ -68,10 +55,8 @@ void app_main(void)
     // GATT_SERVER_MAIN();
     // sensor_service_init();
 
-    ezlopi_adc_init(32, 3);
-    ezlopi_adc_init(35, 3);
-    // ezlopi_uart_init(9600, 0, 16, uart_callback);
-    xTaskCreate(joystick_task, "joystick_task", 2 * 2048, NULL, 1, NULL);
+
+    xTaskCreate(pwm_task, "pwm_task", 2 * 2048, NULL, 1, NULL);
 
     // xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
