@@ -8,7 +8,7 @@ typedef struct s_linked_buffer
 {
     struct s_linked_buffer *next;
     uint32_t len;
-    uint8_t *buffer;
+    uint8_t *buffer; 
 } s_linked_buffer_t;
 
 s_linked_buffer_t *ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t *param);

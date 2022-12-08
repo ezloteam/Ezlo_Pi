@@ -102,6 +102,28 @@ void ezlopi_ble_gap_config_scan_rsp_data(void)
     adv_config_done |= SCAN_RSP_CONFIG_FLAG;
 }
 
+void ezlopi_ble_gap_dissociate_bonded_devices(void)
+{
+    int dev_num = esp_ble_get_bond_device_num();
+
+    esp_ble_bond_dev_t *dev_list = (esp_ble_bond_dev_t *)malloc(sizeof(esp_ble_bond_dev_t) * dev_num);
+    if (dev_list)
+    {
+        esp_ble_get_bond_device_list(&dev_num, dev_list);
+        TRACE_I("Bonded devices number : %d\n", dev_num);
+
+        TRACE_I("Bonded devices list : %d\n", dev_num);
+        for (int i = 0; i < dev_num; i++)
+        {
+            dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
+            esp_ble_gap_disconnect(dev_list[i].bd_addr);
+            esp_ble_remove_bond_device(dev_list[i].bd_addr);
+        }
+
+        free(dev_list);
+    }
+}
+
 void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
     TRACE_B("BLE GAP Eevent: [%d]-%s", event, ezlopi_ble_gap_event_to_str(event));
@@ -760,16 +782,19 @@ static void show_bonded_devices(void)
     int dev_num = esp_ble_get_bond_device_num();
 
     esp_ble_bond_dev_t *dev_list = (esp_ble_bond_dev_t *)malloc(sizeof(esp_ble_bond_dev_t) * dev_num);
-    esp_ble_get_bond_device_list(&dev_num, dev_list);
-    TRACE_I("Bonded devices number : %d\n", dev_num);
-
-    TRACE_I("Bonded devices list : %d\n", dev_num);
-    for (int i = 0; i < dev_num; i++)
+    if (dev_list)
     {
-        dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
-    }
+        esp_ble_get_bond_device_list(&dev_num, dev_list);
+        TRACE_I("Bonded devices number : %d\n", dev_num);
 
-    free(dev_list);
+        TRACE_I("Bonded devices list : %d\n", dev_num);
+        for (int i = 0; i < dev_num; i++)
+        {
+            dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
+        }
+
+        free(dev_list);
+    }
 }
 
 static void ezlopi_ble_setup_service_uuid(void)

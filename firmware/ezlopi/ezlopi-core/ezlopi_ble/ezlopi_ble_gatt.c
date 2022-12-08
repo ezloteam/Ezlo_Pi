@@ -5,11 +5,19 @@
 #include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_config.h"
 #include "ezlopi_ble_profile.h"
+#include "esp_gatt_common_api.h"
+
+static uint16_t g_mtu_size = ESP_GATT_DEF_BLE_MTU_SIZE;
 
 static char *ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event);
 static void ezlopi_ble_gatt_call_read_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
+
+uint16_t ezlopi_ble_gatt_get_max_data_size(void)
+{
+    return g_mtu_size;
+}
 
 void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
@@ -190,13 +198,10 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     case ESP_GATTS_MTU_EVT: // 4
     {
         TRACE_I("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
+        g_mtu_size = param->mtu.mtu;
         break;
     }
     case ESP_GATTS_RESPONSE_EVT:
-    {
-        param->rsp.status
-        break;
-    }
     default:
     {
         TRACE_W("BLE GATT Event: %s Not Implemented!", ezlopi_ble_gatt_event_to_string(event));

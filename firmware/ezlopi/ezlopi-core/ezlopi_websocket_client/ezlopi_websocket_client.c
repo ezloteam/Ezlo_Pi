@@ -31,8 +31,8 @@
 typedef struct s_ws_event_arg
 {
     esp_websocket_client_handle_t client;
-    void (*upcall)(const char *, uint32_t);
-    /* data */
+    void (*msg_upcall)(const char *, uint32_t);
+    void (*connection_upcall)(bool connected);
 } s_ws_event_arg_t;
 
 esp_websocket_client_handle_t client = NULL;
@@ -46,18 +46,26 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     case WEBSOCKET_EVENT_CONNECTED:
     {
         TRACE_I("WEBSOCKET_EVENT_CONNECTED");
+        if (event_arg && event_arg->connection_upcall)
+        {
+            event_arg->connection_upcall(1);
+        }
         break;
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
         TRACE_I("WEBSOCKET_EVENT_DISCONNECTED");
+        if (event_arg && event_arg->connection_upcall)
+        {
+            event_arg->connection_upcall(0);
+        }
         break;
     }
     case WEBSOCKET_EVENT_DATA:
     {
-        if ((NULL != data->data_ptr) && (data->data_len > 0) && (NULL != event_arg) && (NULL != event_arg->upcall))
+        if ((NULL != data->data_ptr) && (data->data_len > 0) && (NULL != event_arg) && (NULL != event_arg->msg_upcall))
         {
-            event_arg->upcall(data->data_ptr, data->data_len);
+            event_arg->msg_upcall(data->data_ptr, data->data_len);
         }
         break;
     }
@@ -89,13 +97,14 @@ int ezlopi_websocket_client_send(char *data, uint32_t len)
     return ret;
 }
 
-esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*upcall)(const char *, uint32_t))
+esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
 {
-    if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != upcall))
+    if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
         static s_ws_event_arg_t event_arg;
         event_arg.client = client;
-        event_arg.upcall = upcall;
+        event_arg.msg_upcall = msg_upcall;
+        event_arg.connection_upcall = connection_upcall;
 
         s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
 
@@ -169,12 +178,12 @@ int websocket_client::send(char *c_str)
     return ret;
 }
 
-esp_websocket_client_handle_t websocket_client::websocket_app_start(string &uri, void (*upcall)(const char *, uint32_t))
+esp_websocket_client_handle_t websocket_client::websocket_app_start(string &uri, void (*msg_upcall)(const char *, uint32_t))
 {
     if (!client)
     {
         static s_ws_event_arg_t event_arg = {
-            .upcall = upcall,
+            .msg_upcall = msg_upcall,
         };
 
         // ezlopi_factory_info *factory = ezlopi_factory_info::get_instance();

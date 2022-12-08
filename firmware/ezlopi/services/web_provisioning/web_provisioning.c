@@ -26,6 +26,7 @@
 
 static uint32_t message_counter = 0;
 
+static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
 static char *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 static char *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
@@ -114,9 +115,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
                 if (cjson_uri)
                 {
                     TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                    ezlopi_websocket_client_init(cjson_uri, __message_upcall);
-                    // ezlopi_client_init(cjson_uri->valuestring, __message_upcall);
-                    registration_init();
+                    ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
                     break;
                 }
             }
@@ -124,6 +123,26 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
     }
 
     vTaskDelete(NULL);
+}
+
+static void __connection_upcall(bool connected)
+{
+    static bool prev_status;
+    if (connected)
+    {
+        if (!prev_status)
+        {
+            TRACE_B("Starting registration process....");
+            registration_init();
+        }
+        TRACE_I("Web-socket re-connected.");
+    }
+    else
+    {
+        TRACE_E("Web-socket dis-connected!");
+    }
+    
+    prev_status = connected;
 }
 
 static void __message_upcall(const char *payload, uint32_t len)
