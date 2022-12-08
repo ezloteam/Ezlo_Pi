@@ -15,55 +15,39 @@ struct s_ezlopi_analog_object {
     adc_atten_t attenuation;
     uint32_t vRef;
     esp_adc_cal_characteristics_t* adc_characteristics;
-    __ezlopi_adc_upcall upcall;
 };
 
 static void ezlopi_adc_check_eFuse_support();
 static esp_adc_cal_characteristics_t* ezlopi_adc_get_adc_characteristics(adc_unit_t unit, adc_atten_t attenuation, adc_bits_width_t width, uint32_t vRef);
 static void ezlopi_adc_task(void* args);
+static int exlopi_adc_get_adc_channel(uint8_t gpio_num);
 
-static bool is_task_created = false;
-
+ 
 // object handle array to check if a channel is already configured.
-static ezlopi_analog_object_handle_t ezlopi_analog_object_array[ADC_CHANNEL_MAX] = {NULL};
+static ezlopi_analog_object_handle_t ezlopi_analog_object_array[ADC1_CHANNEL_MAX] = {NULL};
+
+#if CONFIG_IDF_TARGET_ESP32
+static uint8_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {36, 37, 38, 39, 32, 33, 34, 35};
+#elif CONFIG_IDF_TARGET_ESP32S3 ||  CONFIG_IDF_TARGET_ESP32S2
+static uint8_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+#endif
 
 
-int ezlopi_adc_init(uint8_t gpio_num, uint8_t width, __ezlopi_adc_upcall upcall)
+int ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
 {
     ezlopi_analog_object_handle_t ezlopi_analog_object_handle = (struct s_ezlopi_analog_object*)malloc(sizeof(struct s_ezlopi_analog_object));
     memset(ezlopi_analog_object_handle, 0, sizeof(struct s_ezlopi_analog_object));
     int ret = 0;
-    uint8_t channel = 0;
-    #if CONFIG_IDF_TARGET_ESP32
-    if(((gpio_num - 36) == 0) || ((gpio_num - 36) == 1) || ((gpio_num - 36) == 2) || ((gpio_num - 36) == 3))
-    {
-        channel = gpio_num - 36;
-    }
-    else if(((gpio_num - 28) == 4) || ((gpio_num - 28) == 5) || ((gpio_num - 28) == 6) || ((gpio_num - 28) == 7))
-    {
-        channel = gpio_num - 28;
-    }
-    else
-    {
-        TRACE_E("Invalid GPIO number provided.");
-    }
-    #elif CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32S2
-    channel = gpio_num - 1;
-    #endif
+    int channel = exlopi_adc_get_adc_channel(gpio_num);
 
-    if(ADC_WIDTH_MAX <= width)
+    if(-1 == channel)
+    {
+        TRACE_E("gpio_num %d is invalid for ADC.", gpio_num);
+        ret = -1;
+    }
+    else if(ADC_WIDTH_MAX <= width)
     {
         TRACE_E("Invalid width(%d) for ADC; must be less than %d", width, ADC_WIDTH_MAX);
-        ret = -1;
-    }
-     else if(ADC1_CHANNEL_MAX < channel)
-    {
-        TRACE_E("Invalid channel obtained form gpio_num(%d) for ADC channel; must be less than %d.", gpio_num, ADC1_CHANNEL_MAX + 1);
-        ret = -1;
-    }
-    else if(NULL == upcall)
-    {
-        TRACE_E("upcall was found null.");
         ret = -1;
     }
     else if(NULL != ezlopi_analog_object_array[channel])
@@ -82,7 +66,6 @@ int ezlopi_adc_init(uint8_t gpio_num, uint8_t width, __ezlopi_adc_upcall upcall)
         ezlopi_analog_object_handle->width = ADC_WIDTH_BIT_12;
         #endif
         ezlopi_analog_object_handle->vRef = 1100;
-        ezlopi_analog_object_handle->upcall = upcall;
         ezlopi_analog_object_handle->adc_characteristics = ezlopi_adc_get_adc_characteristics(ezlopi_analog_object_handle->unit, ezlopi_analog_object_handle->attenuation, 
                                                                                                     ezlopi_analog_object_handle->width, ezlopi_analog_object_handle->vRef);
         TRACE_D("Checking for eFuse support.");
@@ -95,39 +78,49 @@ int ezlopi_adc_init(uint8_t gpio_num, uint8_t width, __ezlopi_adc_upcall upcall)
 
         ezlopi_analog_object_array[ezlopi_analog_object_handle->adc_channel] = ezlopi_analog_object_handle;
 
-        if(false == is_task_created)
-        {
-            xTaskCreate(ezlopi_adc_task, "ezlopi_adc_task", 2*2048, NULL, 10, NULL);
-            is_task_created = true;
-        }
         ret = 0;
     }
     return ret;
 }
 
-adc_channel_t ezlopi_adc_get_channel_number(ezlopi_analog_object_handle_t ezlopi_analog_object_handle)
+int ezlopi_adc_get_channel_number(uint8_t gpio_num)
 {
-    return ezlopi_analog_object_handle->adc_channel;
+    int channel = exlopi_adc_get_adc_channel(gpio_num);
+    if(-1 == channel)
+    {
+        TRACE_E("gpio_num %d is invalid for ADC.", gpio_num);
+        channel = -1;
+    }
+    return channel;
 }
 
-static void ezlopi_adc_task(void* args)
+int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_analog_data)
 {
-    s_ezlopi_analog_data_t *data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
-    while(1)
+    uint8_t channel = exlopi_adc_get_adc_channel(gpio_num);
+    if(-1 == channel)
     {
-        for(uint8_t i = 0; i < ADC_CHANNEL_MAX; i++)
-        {
-            if(NULL != ezlopi_analog_object_array[i])
-            {
-                memset(data, 0, sizeof(s_ezlopi_analog_data_t));
+        TRACE_E("Invalid gpio_num(%d)", gpio_num);
+        channel = -1;
+    }
+    else if(NULL != ezlopi_analog_object_array[channel])
+    {
+        ezlopi_analog_data->value = adc1_get_raw((adc1_channel_t)ezlopi_analog_object_array[channel]->adc_channel);
+        ezlopi_analog_data->voltage = esp_adc_cal_raw_to_voltage(ezlopi_analog_data->value, ezlopi_analog_object_array[channel]->adc_characteristics);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+    return channel;
+    }
 
-                data->value = adc1_get_raw((adc1_channel_t)ezlopi_analog_object_array[i]->adc_channel);
-                data->voltage = esp_adc_cal_raw_to_voltage(data->value, ezlopi_analog_object_array[i]->adc_characteristics);
-                ezlopi_analog_object_array[i]->upcall(data, ezlopi_analog_object_array[i]->adc_channel);
-                vTaskDelay(500 / portTICK_PERIOD_MS);
-            }
+static int exlopi_adc_get_adc_channel(uint8_t gpio_num)
+{
+    for(uint8_t channel = 0; channel < ADC1_CHANNEL_MAX; channel++)
+    {
+        if(gpio_num == ezlopi_channel_to_gpio_map[channel])
+        {
+            return channel;
         }
     }
+    return -1;
 }
 
 static void ezlopi_adc_check_eFuse_support()
@@ -139,9 +132,9 @@ static void ezlopi_adc_check_eFuse_support()
         TRACE_E("eFuse Two Point support not available.");
     }
     if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK) {
-        printf("eFuse Vref support available");
+        TRACE_I("eFuse Vref support available");
     } else {
-        printf("eFuse Vref support not available");
+        TRACE_E("eFuse Vref support not available");
     }
     #elif CONFIG_IDF_TARGET_ESP32S3
     if(esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP))
