@@ -29,7 +29,7 @@ void Dialog_config_onewire::on_buttonBox_accepted() {
     ezpi_device_one_wire_t onewire_user_data;
     onewire_user_data.dev_type = EZPI_DEV_TYPE_ONE_WIRE;
     onewire_user_data.dev_name = ui->lineEdit_device_name->text();
-    onewire_user_data.id_room = 0; //TBD
+    onewire_user_data.id_room = ""; //TBD
 
     onewire_user_data.id_item = (ezpi_item_type)(EZPI_ITEM_TYPE_DHT11 + ui->comboBox_onewire_subtype->currentIndex());
 

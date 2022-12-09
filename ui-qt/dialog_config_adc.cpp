@@ -31,7 +31,7 @@ void Dialog_config_adc::on_buttonBox_accepted() {
 
     adc_user_data.dev_type = EZPI_DEV_TYPE_ANALOG_IP;
     adc_user_data.dev_name = ui->lineEdit_device_name->text();
-    adc_user_data.id_room = 0; //TBD
+    adc_user_data.id_room = ""; //TBD
 
     adc_user_data.id_item = (ezpi_item_type)(ui->comboBox_ADC_subtype->currentIndex() + EZPI_ITEM_TYPE_POT_GENERIC);
 
