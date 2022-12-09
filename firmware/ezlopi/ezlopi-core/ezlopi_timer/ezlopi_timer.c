@@ -165,6 +165,10 @@ static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_a
             ezlopi_timer_setup_struct(timer_config, event_type, timer_group_index_pair[timer_num][0], timer_group_index_pair[timer_num][1], time_ms);
             ezlopi_timer_alarm_enable(timer_config);
         }
+        else
+        {
+            TRACE_E("Timer config malloc failed!");
+        }
     }
     else
     {
@@ -189,12 +193,12 @@ static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t *timer_conf)
 {
     int ret = 1;
 
-    TIMER_ERROR_CHECK(timer_init(timer_conf->group, timer_conf->index, &timer_conf->internal), "");
-    TIMER_ERROR_CHECK(timer_set_counter_value(timer_conf->group, timer_conf->index, 0), "");
-    TIMER_ERROR_CHECK(timer_set_alarm_value(timer_conf->group, timer_conf->index, timer_conf->alarm_value), "");
-    TIMER_ERROR_CHECK(timer_enable_intr(timer_conf->group, timer_conf->index), "");
-    TIMER_ERROR_CHECK(timer_isr_callback_add(timer_conf->group, timer_conf->index, timer_group_isr_callback, timer_conf, 0), "");
-    TIMER_ERROR_CHECK(timer_start(timer_conf->group, timer_conf->index), "");
+    TIMER_ERROR_CHECK(timer_init(timer_conf->group, timer_conf->index, &timer_conf->internal), "timer_init failed!");
+    TIMER_ERROR_CHECK(timer_set_counter_value(timer_conf->group, timer_conf->index, 0), "timer_set_counter_value failed!");
+    TIMER_ERROR_CHECK(timer_set_alarm_value(timer_conf->group, timer_conf->index, timer_conf->alarm_value), "timer_set_alarm_value failed!");
+    TIMER_ERROR_CHECK(timer_enable_intr(timer_conf->group, timer_conf->index), "timer_enable_intr failed!");
+    TIMER_ERROR_CHECK(timer_isr_callback_add(timer_conf->group, timer_conf->index, timer_group_isr_callback, timer_conf, 0), "timer_isr_callback_add failed!");
+    TIMER_ERROR_CHECK(timer_start(timer_conf->group, timer_conf->index), "timer_start failed!");
 
     return ret;
 }

@@ -231,6 +231,11 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 
 void ezlopi_wait_for_wifi_to_connect(void)
 {
+    while(NULL == s_wifi_event_group)
+    {
+        vTaskDelay(100/portTICK_PERIOD_MS);
+    }
+    
     if (NULL != s_wifi_event_group)
     {
         xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);

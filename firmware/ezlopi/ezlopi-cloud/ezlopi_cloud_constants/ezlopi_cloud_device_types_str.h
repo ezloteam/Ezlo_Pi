@@ -2,7 +2,7 @@
 #define __EZLOPI_DEVICE_TYPES_STR_H__
 
 /// @brief https://api.ezlo.com/devices/devices/index.html
-// const static char *dev_type_device = "device";
+const static char *dev_type_device = "device";
 const static char *dev_type_sensor = "sensor";
 const static char *dev_type_sensor_motion = "sensor.motion";
 // const static char *dev_type_sensor_multisensor = "sensor.multisensor";
@@ -11,7 +11,7 @@ const static char *dev_type_sensor_motion = "sensor.motion";
 // const static char *dev_type_light_controller = "light.controller";
 // const static char *dev_type_thermostat = "thermostat";
 // const static char *dev_type_switch_outlet = "switch.outlet";
-// const static char *dev_type_dimmer_outlet = "dimmer.outlet";
+const static char *dev_type_dimmer_outlet = "dimmer.outlet";
 const static char *dev_type_switch_inwall = "switch.inwall";
 // const static char *dev_type_dimmer_inwall = "dimmer.inwall";
 // const static char *dev_type_multi_outlet = "multi.outlet";

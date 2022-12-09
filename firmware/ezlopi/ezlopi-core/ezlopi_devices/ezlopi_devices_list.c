@@ -4,6 +4,9 @@
 #include "digital_io.h"
 #include "sensor_pir.h"
 #include "sensor_door.h"
+#include "dimmable_bulb.h"
+#include "joystick_2_axis.h"
+#include "ultrasonic_MB1013.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -49,7 +52,27 @@ static s_ezlopi_device_t device_array[] = {
         .id = EZLOPI_SENSOR_0019_PIR,
         .func = sensor_pir,
     },
+#endif
 
+#ifdef EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS
+    {
+        .id = EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS,
+        .func = joystick_2_axis,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0021_DIMMABLE_BULB
+    {
+        .id = EZLOPI_SENSOR_0021_DIMMABLE_BULB,
+        .func = ezlopi_dimmable_bulb,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013
+    {
+        .id = EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013,
+        .func = ultrasonic_MB1013,
+    },
 #endif
 
     /**

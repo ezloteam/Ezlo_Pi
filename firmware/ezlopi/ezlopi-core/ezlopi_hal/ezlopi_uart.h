@@ -32,7 +32,7 @@ typedef void (*__uart_upcall)(uint8_t* buffer, s_ezlopi_uart_object_handle_t uar
 
 
 s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall);
-void ezlopi_uart_deinit(s_ezlopi_uart_object_handle_t uart_object_handle);
+ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle);
 
 
 #endif // __EZLOPI_UART_H__

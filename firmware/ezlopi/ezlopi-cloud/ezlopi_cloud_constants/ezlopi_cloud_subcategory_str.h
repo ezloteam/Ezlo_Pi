@@ -3,7 +3,7 @@
 
 /// @brief https://api.ezlo.com/devices/categories/index.html
 const static char *subcategory_not_defined = "";
-// const static char *subcategory_dimmable_bulb = "dimmable_bulb";
+const static char *subcategory_dimmable_bulb = "dimmable_bulb";
 // const static char *subcategory_dimmable_plugged = "dimmable_plugged";
 // const static char *subcategory_dimmable_in_wall = "dimmable_in_wall";
 // const static char *subcategory_dimmable_colored = "dimmable_colored";

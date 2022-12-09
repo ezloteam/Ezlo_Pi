@@ -6,7 +6,7 @@ file(GLOB_RECURSE SOURCES "./*.c*")
 
 idf_component_register(SRCS ${SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES trace sensor_bme280 esp_adc_cal)
+    REQUIRES trace  esp_adc_cal)
 
 # file( GLOB_RECURSE SOURCES "./*.cpp" )
 

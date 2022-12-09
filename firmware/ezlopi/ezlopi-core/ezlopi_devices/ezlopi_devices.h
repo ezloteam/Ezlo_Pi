@@ -7,6 +7,9 @@
 #include "ezlopi_spi_master.h"
 #include "ezlopi_onewire.h"
 #include "ezlopi_cloud.h"
+#include "ezlopi_pwm.h"
+#include "ezlopi_adc.h"
+#include "ezlopi_uart.h"
 
 #define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
     {                                                         \
@@ -69,6 +72,8 @@ typedef struct s_ezlopi_device_properties
         s_ezlopi_spi_master_t spi_master;
         s_ezlopi_onewire_t onewire_master;
         s_ezlopi_gpios_t gpio;
+        s_ezlopi_pwm_t pwm;
+        s_ezlopi_adc_t adc;
     } interface;
 
     s_ezlopi_cloud_info_t ezlopi_cloud;

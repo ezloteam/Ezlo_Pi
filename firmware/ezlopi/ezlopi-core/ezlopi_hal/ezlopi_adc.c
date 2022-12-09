@@ -8,38 +8,38 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-struct s_ezlopi_analog_object {
+
+typedef struct s_ezlopi_analog_object {
     adc_unit_t unit;
     adc_channel_t adc_channel;
     adc_bits_width_t width;
     adc_atten_t attenuation;
     uint32_t vRef;
     esp_adc_cal_characteristics_t* adc_characteristics;
-};
+}ezlopi_analog_object_handle_t;
+
 
 static void ezlopi_adc_check_eFuse_support();
 static esp_adc_cal_characteristics_t* ezlopi_adc_get_adc_characteristics(adc_unit_t unit, adc_atten_t attenuation, adc_bits_width_t width, uint32_t vRef);
-static void ezlopi_adc_task(void* args);
-static int exlopi_adc_get_adc_channel(uint8_t gpio_num);
+static int ezlopi_adc_get_adc_channel(uint8_t gpio_num);
 
  
 // object handle array to check if a channel is already configured.
-static ezlopi_analog_object_handle_t ezlopi_analog_object_array[ADC1_CHANNEL_MAX] = {NULL};
+static ezlopi_analog_object_handle_t* ezlopi_analog_object_array[ADC1_CHANNEL_MAX] = {NULL};
 
 #if CONFIG_IDF_TARGET_ESP32
-static uint8_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {36, 37, 38, 39, 32, 33, 34, 35};
+static int ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {36, 37, 38, 39, 32, 33, 34, 35};
 #elif CONFIG_IDF_TARGET_ESP32S3 ||  CONFIG_IDF_TARGET_ESP32S2
-static uint8_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+static int ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 #endif
 
 
 int ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
 {
-    ezlopi_analog_object_handle_t ezlopi_analog_object_handle = (struct s_ezlopi_analog_object*)malloc(sizeof(struct s_ezlopi_analog_object));
+    ezlopi_analog_object_handle_t* ezlopi_analog_object_handle = (struct s_ezlopi_analog_object*)malloc(sizeof(struct s_ezlopi_analog_object));
     memset(ezlopi_analog_object_handle, 0, sizeof(struct s_ezlopi_analog_object));
     int ret = 0;
-    int channel = exlopi_adc_get_adc_channel(gpio_num);
-
+    int channel = ezlopi_adc_get_channel_number(gpio_num);
     if(-1 == channel)
     {
         TRACE_E("gpio_num %d is invalid for ADC.", gpio_num);
@@ -85,7 +85,7 @@ int ezlopi_adc_init(uint8_t gpio_num, uint8_t width)
 
 int ezlopi_adc_get_channel_number(uint8_t gpio_num)
 {
-    int channel = exlopi_adc_get_adc_channel(gpio_num);
+    int channel = ezlopi_adc_get_adc_channel(gpio_num);
     if(-1 == channel)
     {
         TRACE_E("gpio_num %d is invalid for ADC.", gpio_num);
@@ -96,7 +96,7 @@ int ezlopi_adc_get_channel_number(uint8_t gpio_num)
 
 int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_analog_data)
 {
-    uint8_t channel = exlopi_adc_get_adc_channel(gpio_num);
+    int channel = ezlopi_adc_get_adc_channel(gpio_num);
     if(-1 == channel)
     {
         TRACE_E("Invalid gpio_num(%d)", gpio_num);
@@ -111,7 +111,7 @@ int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_ana
     return channel;
     }
 
-static int exlopi_adc_get_adc_channel(uint8_t gpio_num)
+static int ezlopi_adc_get_adc_channel(uint8_t gpio_num)
 {
     for(uint8_t channel = 0; channel < ADC1_CHANNEL_MAX; channel++)
     {

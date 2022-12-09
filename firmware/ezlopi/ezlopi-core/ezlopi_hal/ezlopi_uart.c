@@ -70,20 +70,6 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
 }
 
 
-
-void ezlopi_uart_deinit(s_ezlopi_uart_object_handle_t uart_object_handle)
-{
-    TRACE_E("Deleting channel %d", uart_object_handle->ezlopi_uart.channel);
-    if(uart_driver_delete(uart_object_handle->ezlopi_uart.channel) != ESP_OK)
-    {
-        TRACE_E("Unable to delete UART driver for channel %d.", uart_object_handle->ezlopi_uart.channel);
-    }
-    else 
-    {
-        TRACE_I("UART driver successfully deleted for channel %d.", uart_object_handle->ezlopi_uart.channel);
-    }
-}
-
 static ezlo_uart_channel_t get_available_channel()
 {
     TRACE_E("EZLOPI_UART_CHANNEL_MAX is : %d", EZLOPI_UART_CHANNEL_MAX);
@@ -129,4 +115,9 @@ static void ezlopi_uart_channel_task(void* args)
     }   
 }
 
+
+ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle)
+{
+    return ezlopi_uart_object_handle->ezlopi_uart.channel;
+}
 

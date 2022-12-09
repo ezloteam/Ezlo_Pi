@@ -2,7 +2,7 @@
 #define __EZLIPI_VALUES_STR_H__
 
 /// @brief https://api.ezlo.com/devices/item_value_types/index.html
-// const static char *value_type_int = "int";
+const static char *value_type_int = "int";
 // const static char *value_type_int64 = "int64";
 const static char *value_type_bool = "bool";
 // const static char *value_type_float = "float";

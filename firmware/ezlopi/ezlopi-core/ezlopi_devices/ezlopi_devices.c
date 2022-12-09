@@ -67,7 +67,37 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
             break;
         }
         case EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT:
+        {
+            TRACE_D("device->interface.adc.gpio_num: %d", device->interface.adc.gpio_num);
+            TRACE_D("device->interface.adc.resln_bit: %d", device->interface.adc.resln_bit);
+            TRACE_B("###################################################################################################");
+            break;
+        }
         case EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT:
+        {
+            break;
+        }
+        case EZLOPI_DEVICE_INTERFACE_PWM:
+        {
+            TRACE_D("device->interface.pwm.gpio_num: %d", device->interface.pwm.gpio_num);
+            TRACE_D("device->interface.pwm.channel: %d", device->interface.pwm.channel);
+            TRACE_D("device->interface.pwm.speed_mode: %d", device->interface.pwm.speed_mode);
+            TRACE_D("device->interface.pwm.pwm_resln: %d", device->interface.pwm.pwm_resln);
+            TRACE_D("device->interface.pwm.freq_hz: %d", device->interface.pwm.freq_hz);
+            TRACE_D("device->interface.pwm.duty_cycle: %d", device->interface.pwm.duty_cycle);
+            TRACE_B("###################################################################################################");
+            break;
+        }
+        case EZLOPI_DEVICE_INTERFACE_UART:
+        {
+            TRACE_D("device->interface.uart.channel: %d", device->interface.uart.channel);
+            TRACE_D("device->interface.uart.baudrate: %d", device->interface.uart.baudrate);
+            TRACE_D("device->interface.uart.tx: %d", device->interface.uart.tx);
+            TRACE_D("device->interface.uart.rx: %d", device->interface.uart.rx);
+            TRACE_D("device->interface.uart.enable: %d", device->interface.uart.enable);
+            TRACE_B("###################################################################################################");
+            break;
+        }
         case EZLOPI_DEVICE_INTERFACE_I2C_MASTER:
         {
             TRACE_D("device->interface.i2c_master.enable: %s", device->interface.i2c_master.enable ? "true" : "false");
