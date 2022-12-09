@@ -22,6 +22,9 @@ extern "C"
     int ezlopi_nvs_read_ble_passkey(uint32_t *passkey);
     int ezlopi_nvs_write_ble_passkey(uint32_t passkey);
 
+    int ezlopi_nvs_read_user_id_str(char **data);
+    int ezlopi_nvs_write_user_id_str(char *data);
+
 #ifdef __cplusplus
 }
 #endif

@@ -58,8 +58,9 @@ char *devices_list(const char *payload, uint32_t len, struct json_token *method,
                                 cJSON_AddBoolToObject(cjson_properties, "persistent", true);
                                 cJSON_AddBoolToObject(cjson_properties, "serviceNotification", false);
                                 cJSON_AddBoolToObject(cjson_properties, "armed", false);
-                                snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_devices->properties->ezlopi_cloud.room_id);
-                                cJSON_AddStringToObject(cjson_properties, "roomId", tmp_string);
+                                // snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_devices->properties->ezlopi_cloud.room_id);
+                                // cJSON_AddStringToObject(cjson_properties, "roomId", tmp_string);
+                                cJSON_AddStringToObject(cjson_properties, "roomId", "");
                                 cJSON_AddStringToObject(cjson_properties, "security", "");
                                 cJSON_AddBoolToObject(cjson_properties, "ready", true);
                                 cJSON_AddStringToObject(cjson_properties, "status", "synced");
