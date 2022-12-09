@@ -28,19 +28,16 @@ int ezlopi_dimmable_bulb(e_ezlopi_actions_t action, s_ezlopi_device_properties_t
     {
         case EZLOPI_ACTION_PREPARE:
         {
-            TRACE_I("EZLOPI_ACTION_PREPARE");
             ret = ezlopi_dimmable_bulb_prepare_and_add(arg);
             break;
         }
         case EZLOPI_ACTION_INITIALIZE:
         {
-            TRACE_I("EZLOPI_ACTION_INITIALIZE event.");
             ret = ezlopi_dimmable_bulb_init(properties);
             break;
         }
         case EZLOPI_ACTION_SET_VALUE:
         {
-            TRACE_I("EZLOPI_ACTION_SET_VALUE event.");
             ret = ezlopi_dimmable_bulb_set_value(properties, arg);
             break;
         }
