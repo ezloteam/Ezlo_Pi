@@ -11,10 +11,7 @@ static nvs_handle_t ezlopi_nvs_handle;
 static const char *storage_name = "storage";
 static const char *config_nvs_name = "confi_data";
 static const char *passkey_nvs_name = "passkey";
-<<<<<<< HEAD
 static const char *user_id_nvs_name = "user_id";
-=======
->>>>>>> 5cfa71f (BLE on-bording complete)
 
 void ezlopi_nvs_init(void)
 {
