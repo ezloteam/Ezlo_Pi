@@ -10,6 +10,7 @@
 #include "ezlopi_ble_gap.h"
 #include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_profile.h"
+#include "ezlopi_nvs.h"
 
 #include "ezlopi_ble_service.h"
 #include "ezlopi_ble_buffer.h"
@@ -34,14 +35,17 @@ void ezlopi_ble_service_passkey_init(void)
     ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, NULL, passkey_write_func, NULL);
 }
 
-static uint32_t passkey = 123456;
-
 static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (param->write.len == 4)
     {
-        passkey = (uint32_t)param->write.value;
-        ezlopi_ble_gap_dissociate_bonded_devices();
+        uint32_t passkey = *((uint32_t *)param->write.value);
+        if (passkey < 1000000)
+        {
+            TRACE_D("New passkey: %d", passkey);
+            ezlopi_ble_gap_set_passkey(passkey);
+            ezlopi_nvs_write_ble_passkey(passkey);
+            ezlopi_ble_gap_dissociate_bonded_devices();
+        }
     }
-    TRACE_D("New passkey: %d", passkey);
 }

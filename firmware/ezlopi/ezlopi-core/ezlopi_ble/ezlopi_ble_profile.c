@@ -143,12 +143,16 @@ s_gatt_service_t *ezlopi_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid_t 
     if (service_obj)
     {
         memset(service_obj, 0, sizeof(s_gatt_service_t));
-        ezlopi_ble_gatt_service_append_to_head(service_obj);
         service_obj->app_id = app_id;
         service_obj->num_handles = 1;
         service_obj->service_id.id.inst_id = 0x00;
         service_obj->service_id.is_primary = true;
         memcpy(&service_obj->service_id.id.uuid, service_uuid, sizeof(esp_bt_uuid_t));
+        ezlopi_ble_gatt_service_append_to_head(service_obj);
+    }
+    else
+    {
+        TRACE_E("Failed to create gatt-service!");
     }
 
     return service_obj;
@@ -173,6 +177,10 @@ s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj,
             memcpy(&character_object->uuid, uuid, sizeof(esp_bt_uuid_t));
             ezlopi_ble_gatt_append_characterstic_to_service(service_obj, character_object);
             service_obj->num_handles += 2;
+        }
+        else
+        {
+            TRACE_E("Failed to create gatt-characteristic!");
         }
     }
 
@@ -212,6 +220,10 @@ s_gatt_descr_t *ezlopi_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp
             {
                 cur_service->num_handles += 1;
             }
+        }
+        else
+        {
+            TRACE_E("Failed to create gatt-descriptor!");
         }
     }
 
@@ -292,7 +304,7 @@ static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t *service_obj
         s_gatt_service_t *cur_service = gatt_head_service;
         while (cur_service->next)
         {
-            cur_service->next = cur_service->next->next;
+            cur_service = cur_service->next;
         }
 
         cur_service->next = service_obj;
@@ -347,8 +359,8 @@ void ezlopi_ble_gatt_print_descriptor(s_gatt_descr_t *descriptor)
         TRACE_B("|    |    |--------------Descriptor----------------------------");
         ezlopi_ble_gatt_print_uuid(&descriptor->uuid, "|    |    |-");
         TRACE_B("|    |    |- handle: %d", descriptor->handle);
-        TRACE_B("|    |    |- permission: 0x%x", descriptor->permission);
-        TRACE_B("|    |    |- status: 0x%x", descriptor->status);
+        TRACE_B("|    |    |- permission: 0x%02x", descriptor->permission);
+        TRACE_B("|    |    |- status: 0x%02x", descriptor->status);
     }
 }
 
@@ -359,9 +371,9 @@ void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t *characteristic)
         TRACE_B("|    |--------------------Characteristic-----------------------");
         ezlopi_ble_gatt_print_uuid(&characteristic->uuid, "|    |-");
         TRACE_B("|    |- handle: %d", characteristic->handle);
-        TRACE_B("|    |- permission: 0x%x", characteristic->permission);
-        TRACE_B("|    |- property: 0x%x", characteristic->property);
-        TRACE_B("|    |- status: 0x%x", characteristic->status);
+        TRACE_B("|    |- permission: 0x%02x", characteristic->permission);
+        TRACE_B("|    |- property: 0x%02x", characteristic->property);
+        TRACE_B("|    |- status: 0x%02x", characteristic->status);
     }
 }
 
@@ -385,15 +397,15 @@ void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
     {
         if (ESP_UUID_LEN_16 == uuid->len)
         {
-            TRACE_B("%s uuid: 0x%04x", msg, uuid->uuid.uuid16);
+            TRACE_B("%s uuid: 0x%04X", msg, uuid->uuid.uuid16);
         }
         else if (ESP_UUID_LEN_32 == uuid->len)
         {
-            TRACE_B("%s uuid: 0x%08x", msg, uuid->uuid.uuid32);
+            TRACE_B("%s uuid: 0x%08X", msg, uuid->uuid.uuid32);
         }
         else
         {
-            TRACE_B("%s uuid: %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x", msg,
+            TRACE_B("%s uuid: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", msg,
                     uuid->uuid.uuid128[15], uuid->uuid.uuid128[14], uuid->uuid.uuid128[13], uuid->uuid.uuid128[12],
                     uuid->uuid.uuid128[11], uuid->uuid.uuid128[10],
                     uuid->uuid.uuid128[9], uuid->uuid.uuid128[8],

@@ -61,6 +61,11 @@ static char *esp_key_type_to_str(esp_ble_key_type_t key_type);
 static char *esp_auth_req_to_str(esp_ble_auth_req_t auth_req);
 static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
 
+void ezlopi_ble_gap_set_passkey(uint32_t passkey)
+{
+    esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t));
+}
+
 void ezlopi_ble_gap_start_advertising(void)
 {
     esp_ble_gap_start_advertising(&adv_params);
