@@ -1,8 +1,18 @@
 # Ezlo_Pi Guide
 ## Using ezlopi_ble:
 
-***One can take reference from application example 'services/ezlopi_ble_service'***
-1. **Create a ble service:**
+***Refer to the example in folder 'services/ezlopi_ble_service' for detialed use case.***
+1. **Dependencies**:
+    - ezlopi-core
+        - ezlopi_ble
+            - ezlopi_ble_buffer.h
+            - ezlopi_ble_gap.h
+            - ezlopi_ble_gatt.h
+            - ezlopi_ble_profile.h
+            - ezlopi_ble_config.h
+    - components
+        - trace.h    
+2. **Create a ble service:**
     1. Create service uuid 
         ```c
         esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_16, .uuid.uuid16 = 0x00E3};
@@ -15,7 +25,7 @@
         ```c
         s_gatt_service_t *service = ezlopi_ble_gatt_create_service(BLE_USER_ID_SERVICE_HANDLE, &uuid);
         ```
-2. **Create a Characteristics:**
+3. **Create a Characteristics:**
     1. Create uuid:
         ```c
         esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_16, .uuid.uuid16 = 0xE301};
@@ -114,10 +124,9 @@
         ```c
         s_gatt_char_t * characterisc = ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, read_func, write_func, write_exec_func);
         ```
-3. **Create Descriptor**
+4. **Create Descriptor**
     <br> This process is similar as step 2. (i.e. Create Characteristics), except one step. Descriptor does not require the argument properties.
-
-4. **Initialize BLE stack**
+5. **Initialize BLE stack**
     ```c
     char ble_device_name[32];
     snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_100004005");
@@ -132,14 +141,12 @@
     CHECK_PRINT_ERROR(esp_ble_gap_register_callback(ezlopi_ble_gap_event_handler), "gap register error");
     CHECK_PRINT_ERROR(esp_ble_gap_set_device_name(ble_device_name), "Set device name failed!");
     ```
-
-5. **Register Service**
+6. **Register Service**
     <br> 'XYZ_SERVICE_HANDLE' is used from section 1.2
     ```c
     esp_ble_gatts_app_register(XYZ_SERVICE_HANDLE);
     ```
-
-6. **Initiate Security features**
+7. **Initiate Security features**
     ```c
     const uint32_t default_passkey = 123456;
     uint32_t passkey;
