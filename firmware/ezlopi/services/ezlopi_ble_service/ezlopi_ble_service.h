@@ -15,7 +15,7 @@
 #define WIFI_ERROR_SERVICE_HANDLE 2
 #define BLE_PASSKEY_SERVICE_HANDLE 3
 #define BLE_USER_ID_SERVICE_HANDLE 4
-
+esp_bt_uuid_t uuid = {.len = ESP_UUID_LEN_16, .uuid.uuid16 = 0x00E3};
 void ezlopi_ble_service_init(void);
 
 #endif //  __EZLOPI_BLE_SERVICE_H__
