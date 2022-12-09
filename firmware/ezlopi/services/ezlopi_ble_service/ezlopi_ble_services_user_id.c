@@ -35,7 +35,7 @@ void ezlopi_ble_service_user_id_init(void)
     uuid.uuid.uuid16 = 0xE301;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
-    properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GA    ezlopi_ble_gatt_add_descriptor();TT_CHAR_PROP_BIT_READ;
+    properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ;
     ezlopi_ble_gatt_add_characteristic(service, &uuid, permission, properties, user_id_read_func, user_id_write_func, user_id_write_exec_func);
 }
 
