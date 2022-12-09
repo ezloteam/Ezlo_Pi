@@ -22,6 +22,8 @@
 #include "gpio_isr_service.h"
 
 #include "ezlopi_ble_v2.h"
+#include "ezlopi_ble_gatt.h"
+#include "ezlopi_ble_profile.h"
 
 static void blinky(void *pv);
 

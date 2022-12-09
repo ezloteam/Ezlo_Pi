@@ -37,9 +37,10 @@ char *room_list(const char *payload, uint32_t len, struct json_token *method, ui
                         cJSON *cjson_room_info = cJSON_CreateObject();
                         if (cjson_room_info)
                         {
-                            char tmp_string[64];
-                            snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.room_id);
-                            cJSON_AddStringToObject(cjson_room_info, "_id", tmp_string);
+                            // char tmp_string[64];
+                            // snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.room_id);
+                            // cJSON_AddStringToObject(cjson_room_info, "_id", tmp_string);
+                            cJSON_AddStringToObject(cjson_room_info, "_id", "");
                             cJSON_AddStringToObject(cjson_room_info, "name", registered_device->properties->ezlopi_cloud.room_name);
 
                             if (!cJSON_AddItemToArray(cjson_result_array, cjson_room_info))

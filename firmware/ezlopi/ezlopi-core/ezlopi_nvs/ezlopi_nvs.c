@@ -10,6 +10,8 @@
 static nvs_handle_t ezlopi_nvs_handle;
 static const char *storage_name = "storage";
 static const char *config_nvs_name = "confi_data";
+static const char *passkey_nvs_name = "passkey";
+static const char *user_id_nvs_name = "user_id";
 
 void ezlopi_nvs_init(void)
 {
@@ -106,6 +108,61 @@ int ezlopi_nvs_read_config_data_str(char **data)
     return ret;
 }
 
+int ezlopi_nvs_read_ble_passkey(uint32_t *passkey)
+{
+    int ret = 0;
+    if (passkey)
+    {
+        esp_err_t err = ESP_OK;
+
+        nvs_handle_t config_nvs_handle;
+        err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+
+        if (ESP_OK == err)
+        {
+            err = nvs_get_u32(config_nvs_handle, passkey_nvs_name, passkey);
+            TRACE_W("nvs_get_u32 - error: %s", esp_err_to_name(err));
+
+            if (ESP_OK == err)
+            {
+                ret = 1;
+            }
+            else
+            {
+                *passkey = 0;
+            }
+
+            nvs_close(config_nvs_handle);
+        }
+    }
+
+    return ret;
+}
+
+int ezlopi_nvs_write_ble_passkey(uint32_t passkey)
+{
+    int ret = 0;
+    esp_err_t err = ESP_OK;
+
+    nvs_handle_t config_nvs_handle;
+    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+
+    if (ESP_OK == err)
+    {
+        err = nvs_set_u32(config_nvs_handle, passkey_nvs_name, passkey);
+        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+
+        if (ESP_OK == err)
+        {
+            ret = 1;
+        }
+
+        nvs_close(config_nvs_handle);
+    }
+
+    return ret;
+}
+
 void ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len)
 {
     esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, "wifi_info", wifi_info, len);
@@ -131,6 +188,80 @@ void ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
     {
         TRACE_E("'wifi config' read-lenght error!, Required: %d | %d, Error: %s", required_size, len, esp_err_to_name(err));
     }
+}
+
+int ezlopi_nvs_write_user_id_str(char *data)
+{
+    int ret = 0;
+
+    esp_err_t err;
+    nvs_handle_t config_nvs_handle;
+
+    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+    TRACE_W("nvs_open - error: %s", esp_err_to_name(err));    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+    TRACE_W("nvs_open - error: %s", esp_err_to_name(err));
+
+    if (ESP_OK == err)
+    {
+        err = nvs_set_str(config_nvs_handle, user_id_nvs_name, data);
+        TRACE_W("nvs_set_str - error: %s", esp_err_to_name(err));
+
+        if (ESP_OK == err)
+        {
+            err = nvs_commit(config_nvs_handle);
+            TRACE_W("nvs_commit - error: %s", esp_err_to_name(err));
+
+            if (ESP_OK == err)
+            {
+                ret = 1;
+            }
+        }
+
+        nvs_close(config_nvs_handle);
+    }
+
+    return ret;
+}
+
+int ezlopi_nvs_read_user_id_str(char **data)
+{
+    int ret = 0;
+    esp_err_t err = ESP_OK;
+
+    nvs_handle_t config_nvs_handle;
+    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+
+    if (ESP_OK == err)
+    {
+        size_t buf_len_needed;
+        err = nvs_get_str(config_nvs_handle, user_id_nvs_name, NULL, &buf_len_needed);
+
+        if (buf_len_needed && (ESP_OK == err))
+        {
+            *data = malloc(buf_len_needed + 1);
+
+            if (*data)
+            {
+                err = nvs_get_str(config_nvs_handle, user_id_nvs_name, *data, &buf_len_needed);
+                data[buf_len_needed + 1] = '\0';
+                TRACE_W("nvs_get_str(data) error: %s", esp_err_to_name(err));
+
+                if (ESP_OK == err)
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    free(*data);
+                    *data = NULL;
+                }
+            }
+        }
+
+        nvs_close(config_nvs_handle);
+    }
+
+    return ret;
 }
 
 void ezlopi_nvs_deinit(void)

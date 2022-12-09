@@ -1,17 +1,5 @@
-# set(srcs    "main.cpp"
-# "example.cpp"
-# )
+file( GLOB_RECURSE src_files "*.c*" )
 
-file(GLOB_RECURSE SOURCES "./*.c*")
-
-idf_component_register(SRCS ${SOURCES}
-    INCLUDE_DIRS "."
-    REQUIRES json ezlopi_factory_info ezlopi_wifi ezlopi_nvs trace bt)
-
-# file( GLOB_RECURSE SOURCES "./*.cpp" )
-
-# idf_component_register( SRCS ${SOURCES}
-# INCLUDE_DIRS "")
-# REQUIRES common app_update soc
-# wifi_service2
-# time_service)
+idf_component_register(SRCS "${src_files}"
+                       INCLUDE_DIRS "."
+                       REQUIRES bt trace json ezlopi_nvs ezlopi_wifi)
