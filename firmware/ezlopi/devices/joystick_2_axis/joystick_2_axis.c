@@ -141,7 +141,6 @@ static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, v
     if (cjson_propertise)
     {
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        TRACE_E("value is: %d", ezlopi_analog_data->value);
         cJSON_AddNumberToObject(cjson_propertise, "value", ezlopi_analog_data->value);
         ret = 1;
     }

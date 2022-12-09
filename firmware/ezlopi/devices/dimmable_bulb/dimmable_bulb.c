@@ -111,11 +111,14 @@ static s_ezlopi_device_properties_t *ezlopi_dimmable_bulb_prepare(cJSON *cjson_d
         ezlopi_dimmable_bulb_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
         ezlopi_dimmable_bulb_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
 
-        // CJSON_GET_VALUE_INT(cjson_device, "gpio", ezlopi_dimmable_bulb_properties->interface.pwm.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "gpio", ezlopi_dimmable_bulb_properties->interface.pwm.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "duty_cycle", ezlopi_dimmable_bulb_properties->interface.pwm.duty_cycle);
+        CJSON_GET_VALUE_INT(cjson_device, "freq_hz", ezlopi_dimmable_bulb_properties->interface.pwm.freq_hz);
+        // CJSON_GET_VALUE_INT(cjson_device, "pwm_resln", ezlopi_dimmable_bulb_properties->interface.pwm.pwm_resln);
         
-        ezlopi_dimmable_bulb_properties->interface.pwm.gpio_num = 4;
-        ezlopi_dimmable_bulb_properties->interface.pwm.duty_cycle = 0;
-        ezlopi_dimmable_bulb_properties->interface.pwm.freq_hz = 10000;
+        // ezlopi_dimmable_bulb_properties->interface.pwm.gpio_num = 4;
+        // ezlopi_dimmable_bulb_properties->interface.pwm.duty_cycle = 0;
+        // ezlopi_dimmable_bulb_properties->interface.pwm.freq_hz = 10000;
         ezlopi_dimmable_bulb_properties->interface.pwm.pwm_resln = 12;
     }
 
@@ -156,7 +159,6 @@ static int ezlopi_dimmable_bulb_set_value(s_ezlopi_device_properties_t *properti
         if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.pwm.gpio_num))
         {
             int target_value = (int)((value * 4095) / 100);
-            TRACE_E("target value is %d", target_value);
             ezlopi_pwm_change_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode, target_value);
         }
     }
@@ -171,7 +173,6 @@ static int ezlopi_dimmable_bulb_get_value_cjson(s_ezlopi_device_properties_t *pr
     {
         uint32_t duty = ezlopi_pwm_get_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode);
         int target_duty = (int)((duty * 100) / 4095);
-        TRACE_E("target duty, %d, duty is %d", target_duty, duty);
         cJSON_AddNumberToObject(cjson_propertise, "value", target_duty);
         ret = 1;
     }
