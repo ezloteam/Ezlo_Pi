@@ -33,7 +33,7 @@ void Dialog_config_input::on_buttonBox_accepted() {
 
     digital_ip_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_IP;
     digital_ip_user_data.dev_name = ui->lineEdit_device_name->text();
-    digital_ip_user_data.id_room = 0; // TBD
+    digital_ip_user_data.id_room = ""; // TBD
 
     if(ui->comboBox_input_subtype->currentIndex() == 0) {
          digital_ip_user_data.id_item = (ezpi_item_type)EZPI_ITEM_TYPE_BUTTON;

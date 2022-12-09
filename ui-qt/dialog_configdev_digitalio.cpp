@@ -51,7 +51,7 @@ void Dialog_configdev_digitalio::on_buttonBox_accepted() {
         ezpi_device_digital_op_t digital_op_user_data;
      digital_op_user_data.dev_type = EZPI_DEV_TYPE_DIGITAL_OP;
      digital_op_user_data.dev_name = ui->lineEdit_device_name->text();
-     digital_op_user_data.id_room = 0; // TBD
+     digital_op_user_data.id_room = ""; // TBD
      digital_op_user_data.id_item = (ezpi_item_type)(ui->comboBox_output_subtype->currentIndex() + 1);
 
      ezpi_high_low digital_op_default_value = (ezpi_high_low)ui->comboBox_default_value_output->currentIndex();

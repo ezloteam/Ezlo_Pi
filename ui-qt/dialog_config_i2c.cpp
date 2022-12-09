@@ -65,7 +65,7 @@ void Dialog_config_i2c::on_buttonBox_accepted() {
 
     i2c_user_data.dev_type = EZPI_DEV_TYPE_I2C;
     i2c_user_data.dev_name = ui->lineEdit_device_name->text();
-    i2c_user_data.id_room = 0; //TBD
+    i2c_user_data.id_room = ""; //TBD
 
     i2c_user_data.id_item = (ezpi_item_type)(ui->comboBox_i2c_subtype->currentIndex() + EZPI_ITEM_TYPE_MPU6050);
 

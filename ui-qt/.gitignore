@@ -55,3 +55,6 @@ ui-qt/.qtc_clangd/
 ui-qt/dlls/*
 ui-qt/release/*
 ui-qt/debug/*
+ui-qt/ezpibins
+ui-qt/esptool
+ui-qt/*.o

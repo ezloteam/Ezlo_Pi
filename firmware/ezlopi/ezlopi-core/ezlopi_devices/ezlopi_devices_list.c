@@ -61,12 +61,6 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0021_DIMMABLE_BULB
-    {
-        .id = EZLOPI_SENSOR_0021_DIMMABLE_BULB,
-        .func = ezlopi_dimmable_bulb,
-    },
-#endif
 
 #ifdef EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013
     {
@@ -75,6 +69,12 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
+    {
+        .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
+        .func = ezlopi_dimmable_bulb,
+    },
+#endif
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.
