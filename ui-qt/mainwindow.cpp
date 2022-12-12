@@ -112,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->statusBar->addWidget(ezlogic_status);
 
-    ezpi_show_status_message("EzloPi V1.2.0, Build 2");
+    ezpi_show_status_message("EzloPi V1.3.4");
     // Build 0 : Release
     // Build 1 : S3 Support
     // Build 2 : Other device support
@@ -352,7 +352,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
             arguments.append("--flash_freq");
             arguments.append("40m");
             arguments.append("0x0");
-            arguments.append("ezpibins/esp32s3/bootloader.bin");
+            arguments.append("ezpibins/esp32s3/0x0000.bin");
             arguments.append("0x8000");
             arguments.append("ezpibins/esp32s3/0x8000.bin");
             arguments.append("0x10000");
@@ -452,6 +452,17 @@ void MainWindow::on_pushButton_remove_device_clicked() {
             EzloPi->EZPI_DELETE_AINPUT_DEVICE();
             ezlogic_table_row_device_map.pop_back();
             break;
+
+        case EZPI_DEV_TYPE_PWM:
+            EzloPi->EZPI_DELETE_PWM_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
+            break;
+
+        case EZPI_DEV_TYPE_UART:
+            EzloPi->EZPI_DELETE_UART_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
+            break;
+
         case EZPI_DEV_TYPE_ONE_WIRE:
             EzloPi->EZPI_DELETE_ONEWIRE_DEVICE();
             ezlogic_table_row_device_map.pop_back();
@@ -1324,13 +1335,13 @@ void MainWindow::on_actionDebug_triggered() {
 }
 
 void MainWindow::on_actionAbout_EzloPi_triggered() {
-    QMessageBox::about(this, "EzloPi V1.2.2", \
+    QMessageBox::about(this, "EzloPi V1.3.4", \
                        "EzloPi is an open-source project contributed by Ezlo Innovation "
                        "to extend the capabilities of ESP32 chipset-based devices "
                        "and platforms. It provides unparalleled capabilities to configure and "
                        "control your ESP-based devices and bring any of your automation ideas to life."
-                       "\nEzloPi UI Version 1.2.3\n"
-                       "EzloPi Firmware Version 2.0.1\n"
+                       "\nEzloPi UI Version 1.3.4\n"
+                       "EzloPi Firmware Version 2.0.7\n"
                        "Build type: Development\r\n"
                        "Web: https://www.ezlopi.com/\n"
                        "Project: https://github.com/ezloteam/Ezlo_Pi\n"
