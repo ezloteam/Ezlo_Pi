@@ -190,14 +190,14 @@
 | Service: 0x00EE (Wi-Fi Status)                   |
 |   |----------------------------------------------|
 |   | - Characteristic: 0xEE01                     |
-|   | - Permission: Read                           |
+|   | - Permission: Read, Notify                   |
 |   | - Value: 0 (Not connected), 1 (Connected)    |
 |   |----------------------------------------------|
 |--------------------------------------------------|
 | Service: 0xE100 (Wi-Fi Error)                    |
 |   |----------------------------------------------|
 |   | - Characteristic: 0xE101                     |
-|   | - Permission: Read                           |
+|   | - Permission: Read, Notify                   |
 |   | - Value: (Error message in string)           |
 |   |----------------------------------------------|
 |--------------------------------------------------|
