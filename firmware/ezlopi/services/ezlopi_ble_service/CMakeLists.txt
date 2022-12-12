@@ -1,6 +1,6 @@
 # file( GLOB_RECURSE provisioning_src "*.c*" "actions/*.c*" )
 file(GLOB_RECURSE src_files "./*.c*")
 
-idf_component_register(SRCS "ezlopi_ble_service_wifi.c" "ezlopi_ble_service.c" "ezlopi_ble_service_passkey.c" "${src_files}"
+idf_component_register(SRCS "ezlopi_ble_services_user_id.c" "ezlopi_ble_service_wifi.c" "ezlopi_ble_service.c" "ezlopi_ble_service_passkey.c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES driver freertos trace ezlopi_devices ezlopi_ble)
