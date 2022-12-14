@@ -28,7 +28,6 @@ void ezlopi_ble_service_user_id_init(void)
     esp_gatt_char_prop_t properties;
     s_gatt_service_t *service;
 
-    // wifi credentials
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = 0x00E3;
     service = ezlopi_ble_gatt_create_service(BLE_USER_ID_SERVICE_HANDLE, &uuid);
