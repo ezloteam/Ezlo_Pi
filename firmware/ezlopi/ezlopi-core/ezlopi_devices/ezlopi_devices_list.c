@@ -7,6 +7,9 @@
 #include "dimmable_bulb.h"
 #include "joystick_2_axis.h"
 #include "ultrasonic_MB1013.h"
+#include "servo_motor_MG_996R.h"
+#include "ultrasonic_HC_SR04.h"
+
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -73,6 +76,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
         .func = ezlopi_dimmable_bulb,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
+{
+        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .func = ultrasonic_HC_SR04,
     },
 #endif
     /**
