@@ -51,8 +51,15 @@ void Dialog_config_other::on_buttonBox_accepted() {
 
     other_user_data.dev_type = EZPI_DEV_TYPE_OTHER;
     other_user_data.dev_name = ui->lineEdit_device_name->text();
-    other_user_data.id_room = ""; // TBD
-    other_user_data.id_item = (ezpi_item_type)(ui->comboBox_other_device_subtype->currentIndex() + EZPI_ITEM_TYPE_DOOR_SENSOR);
+    other_user_data.id_room = ""; // TBD    
+
+    if(ui->comboBox_other_device_subtype->currentIndex() == 0) {
+        other_user_data.id_item = EZPI_ITEM_TYPE_DOOR_SENSOR;
+    } else if (ui->comboBox_other_device_subtype->currentIndex() == 1) {
+        other_user_data.id_item = EZPI_ITEM_TYPE_ULTRASONIC_SENSOR;
+    } else {
+        qDebug() << "Unknown selection !";
+    }
 
     other_user_data.en_gpio1 = ui->checkBox_gpio1->isChecked();
     other_user_data.gpio1 = ui->comboBox_gpio1->currentText().toInt();
@@ -78,7 +85,6 @@ void Dialog_config_other::on_buttonBox_accepted() {
     } else {
         // Do nothing
     }
-
 }
 
 
