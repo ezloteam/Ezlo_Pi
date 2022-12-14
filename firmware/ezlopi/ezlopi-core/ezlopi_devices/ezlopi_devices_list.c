@@ -9,6 +9,7 @@
 #include "ultrasonic_MB1013.h"
 #include "servo_motor_MG_996R.h"
 #include "ultrasonic_HC_SR04.h"
+#include "sensor_touch_tpp_223b.h"
 
 
 static s_ezlopi_device_t device_array[] = {
@@ -79,8 +80,15 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR,
+        .func = sensor_touch_ttp_223b,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
-{
+    {
         .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
         .func = ultrasonic_HC_SR04,
     },
