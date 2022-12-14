@@ -1,10 +1,10 @@
 #ifndef __SENSOR_BME280_H__
 #define __SENSOR_BME280_H__
 
-#include "ezlopi_actions.h"
+#include "driver/i2c.h"
 #include "bme280/bme280.h"
 #include "bme280/bme280_defs.h"
-#include "driver/i2c.h"
+#include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
 
 #define CHIP_ID 0x76

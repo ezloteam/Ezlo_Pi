@@ -11,3 +11,5 @@ idf_component_register(SRCS ${config_src}
     REQUIRES esp_common esp-tls esp_http_client common_components trace)
 
 
+
+    
