@@ -7,6 +7,7 @@
 #include "dimmable_bulb.h"
 #include "joystick_2_axis.h"
 #include "ultrasonic_MB1013.h"
+#include "sensor_sound.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -65,6 +66,13 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013
     {
         .id = EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013,
+        .func = ultrasonic_MB1013,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0021_SOUND_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0021_SOUND_SENSOR,
         .func = ultrasonic_MB1013,
     },
 #endif
