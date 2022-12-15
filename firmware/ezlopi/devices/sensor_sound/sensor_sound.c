@@ -13,14 +13,13 @@
 #include "ezlopi_cloud_constants.h"
 #include "stdlib.h"
 
-
 static bool is_motion_detected = false;
+static bool prev_motion_status = true;
 
-static int ezlopi_sound_prepare_and_add(void* args);
+static int ezlopi_sound_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device);
 static int ezlopi_sound_init(s_ezlopi_device_properties_t *properties);
 static int ezlopi_sound_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-
 
 int sound_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
@@ -28,39 +27,42 @@ int sound_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *proper
 
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            ret = ezlopi_sound_prepare_and_add(arg);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            ret = ezlopi_sound_init(properties);
-            break;
-        }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = ezlopi_sound_prepare_and_add(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = ezlopi_sound_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        if (prev_motion_status != is_motion_detected)
         {
             ret = ezlopi_device_value_updated_from_device(properties);
-            break;
+            prev_motion_status = is_motion_detected;
         }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            ezlopi_sound_get_value_cjson(properties, arg);
-            break;
-        }
-        default:
-        {
-            break;
-        }
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ezlopi_sound_get_value_cjson(properties, arg);
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
 
     return ret;
 }
 
-
-static int ezlopi_sound_prepare_and_add(void* args)
+static int ezlopi_sound_prepare_and_add(void *args)
 {
-     int ret = 0;
+    int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
@@ -82,10 +84,9 @@ static int ezlopi_sound_prepare_and_add(void* args)
     return ret;
 }
 
-
 static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
 {
-     s_ezlopi_device_properties_t *ezlopi_sound_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    s_ezlopi_device_properties_t *ezlopi_sound_properties = malloc(sizeof(s_ezlopi_device_properties_t));
 
     if (ezlopi_sound_properties)
     {
@@ -100,7 +101,7 @@ static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
         ezlopi_sound_properties->ezlopi_cloud.item_name = ezlopi_item_name_motion;
         ezlopi_sound_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
         ezlopi_sound_properties->ezlopi_cloud.value_type = value_type_bool;
-        ezlopi_sound_properties->ezlopi_cloud.has_getter = true;    
+        ezlopi_sound_properties->ezlopi_cloud.has_getter = true;
         ezlopi_sound_properties->ezlopi_cloud.has_setter = false;
         ezlopi_sound_properties->ezlopi_cloud.reachable = true;
         ezlopi_sound_properties->ezlopi_cloud.battery_powered = false;
@@ -109,7 +110,6 @@ static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
         ezlopi_sound_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
         ezlopi_sound_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
         ezlopi_sound_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
-
     }
     return ezlopi_sound_properties;
 }
@@ -117,10 +117,9 @@ static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
 static int ezlopi_sound_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-     ADS131_init();
+    ADS131_init();
     return ret;
 }
-
 
 static int ezlopi_sound_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {

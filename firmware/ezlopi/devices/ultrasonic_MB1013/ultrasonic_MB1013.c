@@ -13,15 +13,14 @@
 #include "ezlopi_cloud_constants.h"
 #include "stdlib.h"
 
-
 static bool is_motion_detected = false;
+static bool prev_val = true;
 
-static int ezlopi_ultrasonic_MB1013_prepare_and_add(void* args);
+static int ezlopi_ultrasonic_MB1013_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjson_device);
 static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *properties);
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-static void ezlopi_ultrasonic_MB1013_upcall(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
-
+static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
 
 int ultrasonic_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
@@ -29,44 +28,47 @@ int ultrasonic_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
 
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            ret = ezlopi_ultrasonic_MB1013_prepare_and_add(arg);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            ret = ezlopi_ultrasonic_MB1013_init(properties);
-            break;
-        }
-        case EZLOPI_ACTION_NOTIFY_200_MS:
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = ezlopi_ultrasonic_MB1013_prepare_and_add(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = ezlopi_ultrasonic_MB1013_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_200_MS:
+    {
+        if (prev_val != is_motion_detected)
         {
             ret = ezlopi_device_value_updated_from_device(properties);
-            break;
+            prev_val = is_motion_detected;
         }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            ezlopi_ultrasonic_MB1013_get_value_cjson(properties, arg);
-            break;
-        }
-        default:
-        {
-            break;
-        }
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ezlopi_ultrasonic_MB1013_get_value_cjson(properties, arg);
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
 
     return ret;
 }
 
-
-static void ezlopi_ultrasonic_MB1013_upcall(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
     // TRACE_E("Buffer is %s", buffer);
-    char* another_buffer = (char*)malloc(256);
-    memcpy(another_buffer, buffer+1, 4);
+    char *another_buffer = (char *)malloc(256);
+    memcpy(another_buffer, buffer + 1, 4);
 #warning "use ring buffer"
     int val = atoi(another_buffer);
-    if(val <= 500)
+    if (val <= 500)
     {
         is_motion_detected = true;
     }
@@ -74,13 +76,13 @@ static void ezlopi_ultrasonic_MB1013_upcall(uint8_t* buffer, s_ezlopi_uart_objec
     {
         is_motion_detected = false;
     }
-    
+
     free(another_buffer);
 }
 
-static int ezlopi_ultrasonic_MB1013_prepare_and_add(void* args)
+static int ezlopi_ultrasonic_MB1013_prepare_and_add(void *args)
 {
-     int ret = 0;
+    int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
@@ -102,10 +104,9 @@ static int ezlopi_ultrasonic_MB1013_prepare_and_add(void* args)
     return ret;
 }
 
-
 static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjson_device)
 {
-     s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_properties = malloc(sizeof(s_ezlopi_device_properties_t));
 
     if (ezlopi_ultrasonic_MB1013_properties)
     {
@@ -120,7 +121,7 @@ static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjs
         ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.item_name = ezlopi_item_name_motion;
         ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
         ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.value_type = value_type_bool;
-        ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.has_getter = true;    
+        ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.has_getter = true;
         ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.has_setter = false;
         ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.reachable = true;
         ezlopi_ultrasonic_MB1013_properties->ezlopi_cloud.battery_powered = false;
@@ -147,13 +148,12 @@ static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *propertie
     if (GPIO_IS_VALID_GPIO(properties->interface.uart.tx) && GPIO_IS_VALID_GPIO(properties->interface.uart.rx))
     {
         s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(properties->interface.uart.baudrate, properties->interface.uart.tx,
-                            properties->interface.uart.rx, ezlopi_ultrasonic_MB1013_upcall);
+                                                                                   properties->interface.uart.rx, ezlopi_ultrasonic_MB1013_upcall);
         properties->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
         ret = 0;
     }
     return ret;
 }
-
 
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
