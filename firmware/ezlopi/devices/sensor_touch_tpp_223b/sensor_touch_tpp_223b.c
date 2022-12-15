@@ -22,6 +22,7 @@ static s_ezlopi_device_properties_t* sensor_touch_tpp_223b_prepare(cJSON* cjson_
 static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties);
 static void sensor_touch_tpp_223b_value_updated_from_device(s_ezlopi_device_properties_t *properties);
 static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
+static void sensor_touch_tpp_223b_toggle_gpio(s_ezlopi_device_properties_t* properties);
 
 
 int sensor_touch_ttp_223b(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
@@ -59,7 +60,7 @@ int sensor_touch_ttp_223b(e_ezlopi_actions_t action, s_ezlopi_device_properties_
 
 static int sensor_touch_tpp_223b_prepare_and_add(void* args)
 {
-     int ret = 0;
+    int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
@@ -131,7 +132,7 @@ static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties)
             .mode = GPIO_MODE_INPUT,
             .pull_up_en = GPIO_PULLUP_DISABLE,
             .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
-            .intr_type = properties->interface.gpio.gpio_in.interrupt,
+            .intr_type = GPIO_INTR_POSEDGE,
         };
 
         ret = gpio_config(&io_conf);
@@ -153,9 +154,16 @@ static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties)
 
 static void sensor_touch_tpp_223b_value_updated_from_device(s_ezlopi_device_properties_t *properties)
 {
+    // sensor_touch_tpp_223b_toggle_gpio(properties);
     ezlopi_device_value_updated_from_device(properties);
 }
 
+static void sensor_touch_tpp_223b_toggle_gpio(s_ezlopi_device_properties_t* properties)
+{
+    uint32_t write_value = !(properties->interface.gpio.gpio_out.value);
+    // esp_err_t error = gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, write_value);
+    properties->interface.gpio.gpio_out.value = write_value;
+}
 
 static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
@@ -163,7 +171,8 @@ static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *p
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        properties->interface.gpio.gpio_out.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        // properties->interface.gpio.gpio_out.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        sensor_touch_tpp_223b_toggle_gpio(properties);
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
         ret = 1;
     }
