@@ -41,7 +41,7 @@ void Dialog_config_input::on_buttonBox_accepted() {
          digital_ip_user_data.id_item = (ezpi_item_type)EZPI_ITEM_TYPE_PIR_SENSOR;
     } else if(ui->comboBox_input_subtype->currentIndex() == 2) {
         digital_ip_user_data.id_item = (ezpi_item_type)EZPI_ITEM_TYPE_TTP223B_TOUCH_SENSOR;
-    } else if(ui->comboBox_input_subtype->currentIndex() == 2) {
+    } else if(ui->comboBox_input_subtype->currentIndex() == 3) {
         digital_ip_user_data.id_item = (ezpi_item_type)EZPI_ITEM_TYPE_LDR_DIGITAL_SENSOR;
     } else {
         qDebug() << "Unknown selection !";
