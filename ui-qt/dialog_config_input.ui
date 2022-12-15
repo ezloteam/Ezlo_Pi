@@ -197,6 +197,11 @@
      <string>TTP 223B Touch Sensor</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>LDR Switch</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_device_subtype">
    <property name="geometry">
