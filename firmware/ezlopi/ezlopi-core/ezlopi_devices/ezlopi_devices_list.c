@@ -10,7 +10,8 @@
 #include "servo_motor_MG_996R.h"
 #include "ultrasonic_HC_SR04.h"
 #include "sensor_touch_tpp_223b.h"
-#include "024_sens_ldr_module.h"
+#include "025_sens_ldr_digital_module.h"
+#include "026_sens_ldr_analog_sensor.h"
 
 
 static s_ezlopi_device_t device_array[] = {
@@ -62,7 +63,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS
     {
         .id = EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS,
-        .func = joystick_2_axis,
+        .func = sensor_ldr_analog_sensor,
     },
 #endif
 
@@ -98,7 +99,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
     {
         .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
-        .func = sensor_ldr_module,
+        .func = sensor_ldr_digital_module,
     },
 #endif
     /**
