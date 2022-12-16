@@ -10,6 +10,7 @@
 #include "servo_motor_MG_996R.h"
 #include "ultrasonic_HC_SR04.h"
 #include "sensor_touch_tpp_223b.h"
+#include "024_sens_ldr_module.h"
 
 
 static s_ezlopi_device_t device_array[] = {
@@ -91,6 +92,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
         .func = ultrasonic_HC_SR04,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .func = sensor_ldr_module,
     },
 #endif
     /**
