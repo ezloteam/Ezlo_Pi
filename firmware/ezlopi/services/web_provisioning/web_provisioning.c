@@ -28,15 +28,15 @@ static uint32_t message_counter = 0;
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
-static char *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-static char *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+static cJSON *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+static cJSON *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 static void web_provisioning_fetch_wss_endpoint(void *pv);
 
 typedef struct s_method_list
 {
     char *method_name;
-    char *(*method)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-    char *(*updater)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    cJSON *(*method)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    cJSON *(*updater)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 } s_method_list_t;
 
 s_method_list_t method_list[] = {
@@ -62,7 +62,7 @@ s_method_list_t method_list[] = {
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
     // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 
 uint32_t web_provisioning_get_message_count(void)
@@ -70,15 +70,24 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
-int web_provisioning_send_to_nma_websocket(char *data)
+int web_provisioning_send_to_nma_websocket(cJSON *cjson_data)
 {
     int ret = 0;
-    if (data)
+    if (cjson_data)
     {
-        // TRACE_D("WSS-SENDING: %s", data);
-        ezlopi_websocket_client_send(data, strlen(data));
-        // ret = wss_client_send(data, strlen(data));
-        message_counter++;
+        char *cjson_str_data = cJSON_Print(cjson_data);
+        if (cjson_str_data)
+        {
+            cJSON_Minify(cjson_str_data);
+            TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+            int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
+            if (ret > 0)
+            {
+                message_counter++;
+            }
+
+            free(cjson_str_data);
+        }
     }
 
     return ret;
@@ -141,19 +150,19 @@ static void __connection_upcall(bool connected)
     {
         TRACE_E("Web-socket dis-connected!");
     }
-    
+
     prev_status = connected;
 }
 
 static void __message_upcall(const char *payload, uint32_t len)
 {
-    char *j_response = NULL;
+    cJSON *cjson_response = NULL;
     int rpc_method_found = 0;
     struct json_token method_tok = JSON_INVALID_TOKEN;
 
     if (json_scanf(payload, len, "{method: %T}", &method_tok))
     {
-        TRACE_D("<< WS Rx '%.*s'[%d]:\r\n%.*s", method_tok.len, method_tok.ptr, len, len, payload);
+        TRACE_D("## WS Rx <<<<<<<<<<'%.*s'[%d]:\r\n%.*s", method_tok.len, method_tok.ptr, len, len, payload);
 
         uint32_t idx = sizeof(method_list) / sizeof(s_method_list_t);
 
@@ -165,31 +174,31 @@ static void __message_upcall(const char *payload, uint32_t len)
             {
                 if (NULL != method_list[idx].method)
                 {
-                    j_response = method_list[idx].method(payload, len, &method_tok, message_counter);
-                    if (j_response)
+                    cjson_response = method_list[idx].method(payload, len, &method_tok, message_counter);
+                    if (cjson_response)
                     {
-                        web_provisioning_send_to_nma_websocket(j_response);
-                        free(j_response);
-                        j_response = NULL;
+                        web_provisioning_send_to_nma_websocket(cjson_response);
+                        cJSON_Delete(cjson_response);
+                        cjson_response = NULL;
                     }
                     else
                     {
-                        TRACE_E("Error - j_response: %d", (uint32_t)j_response);
+                        TRACE_E("Error - cjson_response: %d", (uint32_t)cjson_response);
                     }
                 }
 
                 if (NULL != method_list[idx].updater)
                 {
-                    j_response = method_list[idx].updater(payload, len, &method_tok, message_counter);
-                    if (j_response)
+                    cjson_response = method_list[idx].updater(payload, len, &method_tok, message_counter);
+                    if (cjson_response)
                     {
-                        web_provisioning_send_to_nma_websocket(j_response);
-                        free(j_response);
-                        j_response = NULL;
+                        web_provisioning_send_to_nma_websocket(cjson_response);
+                        cJSON_Delete(cjson_response);
+                        cjson_response = NULL;
                     }
                     else
                     {
-                        TRACE_E("Error - j_response: %d", (uint32_t)j_response);
+                        TRACE_E("Error - cjson_response: %d", (uint32_t)cjson_response);
                     }
                 }
 
@@ -200,16 +209,16 @@ static void __message_upcall(const char *payload, uint32_t len)
 
         if (0 == rpc_method_found)
         {
-            j_response = __rpc_method_notfound(payload, len, &method_tok, message_counter);
-            if (j_response)
+            cjson_response = __rpc_method_notfound(payload, len, &method_tok, message_counter);
+            if (cjson_response)
             {
-                web_provisioning_send_to_nma_websocket(j_response);
-                free(j_response);
-                j_response = NULL;
+                web_provisioning_send_to_nma_websocket(cjson_response);
+                cJSON_Delete(cjson_response);
+                cjson_response = NULL;
             }
             else
             {
-                TRACE_E("Error - j_response: %d", (uint32_t)j_response);
+                TRACE_E("Error - cjson_response: %d", (uint32_t)cjson_response);
             }
         }
     }
@@ -219,29 +228,66 @@ static void __message_upcall(const char *payload, uint32_t len)
     }
 }
 
-static char *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+static cJSON *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
-    uint32_t buf_len = 300;
-    char *data_buf = (char *)malloc(buf_len);
+    cJSON *cjson_data = cJSON_CreateObject();
 
-    if (data_buf)
+    if (cjson_data)
     {
-        memset(data_buf, 0, buf_len);
         struct json_token msg_id = JSON_INVALID_TOKEN;
         struct json_token sender = JSON_INVALID_TOKEN;
-        static const char *rpc_notfound = "{\"msg_id\":%d,\"id\":\"%.*s\",\"method\":\"%.*s\",\"error\":{\"code\":-32602,\"data\":\"rpc.method.notfound\",\"message\":\"Unknown method\"},\"result\":{}, \"sender\":%.*s}";
 
         json_scanf(payload, len, "{id:%T}", &msg_id);
         int sender_status = json_scanf(payload, len, "{sender:%T}", &sender);
 
-        snprintf(data_buf, buf_len, rpc_notfound, msg_count, msg_id.len, msg_id.ptr, method->len, method->ptr, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-        TRACE_W(">> WSS-Tx: [%d]\r\n%s", strlen(data_buf), data_buf);
+        cJSON_AddNumberToObject(cjson_data, "msg_id", msg_count);
+        if (msg_id.len && msg_id.ptr && (JSON_TYPE_STRING == msg_id.type))
+        {
+            char tmp_bff[msg_id.len + 1];
+            snprintf(tmp_bff, sizeof(tmp_bff), "%.*s", msg_id.len, msg_id.ptr);
+            cJSON_AddStringToObject(cjson_data, "id", tmp_bff);
+        }
+
+        if (method && method->len && method->ptr && (JSON_TYPE_STRING == method->type))
+        {
+            char tmp_bff[method->len + 1];
+            snprintf(tmp_bff, sizeof(tmp_bff), "%.*s", method->len, method->ptr);
+            cJSON_AddStringToObject(cjson_data, "method", tmp_bff);
+        }
+
+        cJSON *cjson_error = cJSON_AddObjectToObject(cjson_data, "error");
+        if (cjson_error)
+        {
+            cJSON_AddNumberToObject(cjson_error, "code", -32602);
+            cJSON_AddStringToObject(cjson_error, "data", "rpc.method.notfound");
+            cJSON_AddStringToObject(cjson_error, "message", "Unknown method");
+        }
+
+        cJSON_AddObjectToObject(cjson_data, "result");
+
+        if (sender.len && sender.ptr && (JSON_TYPE_STRING == sender.type))
+        {
+            char tmp_bff[sender.len + 1];
+            snprintf(tmp_bff, sizeof(tmp_bff + 1), "%.*s", sender.len, sender.ptr);
+            cJSON_AddStringToObject(cjson_data, "sender", tmp_bff);
+        }
+        else
+        {
+            cJSON_AddObjectToObject(cjson_data, "sender");
+        }
+
+        char *str_cjson_data = cJSON_Parse(cjson_data);
+        if (str_cjson_data)
+        {
+            TRACE_W("%s", str_cjson_data);
+            free(str_cjson_data);
+        }
     }
 
-    return data_buf;
+    return cjson_data;
 }
 
-static char *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+static cJSON *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     esp_restart();
     return NULL;

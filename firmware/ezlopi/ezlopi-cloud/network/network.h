@@ -3,13 +3,14 @@
 
 #include <string.h>
 #include "frozen.h"
+#include "cJSON.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    char *network_get(const char *data, uint32_t len, struct json_token *method_tok, uint32_t msg_count);
+    cJSON *network_get(const char *data, uint32_t len, struct json_token *method_tok, uint32_t msg_count);
 
 #ifdef __cplusplus
 }

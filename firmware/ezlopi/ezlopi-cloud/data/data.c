@@ -28,8 +28,8 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
         {
             cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_data_value_list_request);
             cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
-            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_id_str, id);
-            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_sender_str, sender);
+            cJSON_AddStringToObject(cjson_response, ezlopi_id_str, id ? (id->valuestring ? id->valuestring : "") : "");
+            cJSON_AddStringToObject(cjson_response, ezlopi_sender_str, sender ? (sender->valuestring ? sender->valuestring : "{}") : "{}");
             cJSON_AddNullToObject(cjson_response, "error");
 
             cJSON *cjson_result = cJSON_CreateObject();
@@ -108,8 +108,9 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
 }
 #endif
 
-char *data_list(const char *data, uint32_t len, struct json_token *method, uint32_t msg_count)
+cJSON *data_list(const char *data, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
+    cJSON *cjson_response = NULL;
     uint32_t buf_len = 4096;
     char *send_buf = (char *)malloc(buf_len);
 
@@ -139,10 +140,11 @@ char *data_list(const char *data, uint32_t len, struct json_token *method, uint3
         }
 
         snprintf(&send_buf[strlen(send_buf)], buf_len - strlen(send_buf), data_list_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-        TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
+        cjson_response = cJSON_Parse(send_buf);
+        free(send_buf);
     }
 
-    return send_buf;
+    return cjson_response;
 }
 
 #if 0

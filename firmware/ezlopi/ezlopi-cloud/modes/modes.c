@@ -3,6 +3,7 @@
 #include "modes.h"
 #include "trace.h"
 #include "frozen.h"
+#include "cJSON.h"
 
 const char *modes_1_start = "{\"method\":\"hub.modes.get\",\"msg_id\":%d,\"api\":\"1.0\",\"error\":null,\"id\":\"%.*s\",\"result\":{\"current\":\"%s\",\"switchTo\":\"\",\"timeIsLeftToSwitch\":0,\"switchToDelay\":0,\"alarmDelay\":0,\"modes\":[";
 const char *modes_1_modes_start = "{\"_id\":\"%s\",\"name\":\"%s\",\"description\":\"%s\"";
@@ -15,14 +16,14 @@ const char *modes_1_protect = "\"protect\":[\"%s\"";
 const char *modes_1_item_end = "]";
 const char *modes_1_end = "]},\"sender\":%.*s}";
 
-char *modes_get(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+cJSON *modes_get(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     uint32_t buf_len = 2014;
     char *send_buf = (char *)malloc(buf_len);
+    cJSON *cjson_response = NULL;
 
     if (send_buf)
     {
-
         struct json_token msg_id = JSON_INVALID_TOKEN;
         json_scanf(payload, len, "{id: %T}", &msg_id);
 
@@ -33,8 +34,9 @@ char *modes_get(const char *payload, uint32_t len, struct json_token *method, ui
         int len_b = strlen(send_buf);
         snprintf(&send_buf[len_b], buf_len - len_b, modes_1_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
 
-        TRACE_B(">>>>>>>>>>> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
+        cjson_response = cJSON_Parse(send_buf);
+        free(send_buf);
     }
 
-    return send_buf;
+    return cjson_response;
 }

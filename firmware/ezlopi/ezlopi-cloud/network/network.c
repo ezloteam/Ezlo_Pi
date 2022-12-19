@@ -12,9 +12,9 @@
 
 #define MAC_ADDR_EXPANDED(mac) mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
 
-char *network_get(const char *payload, uint32_t len, struct json_token *method_tok, uint32_t msg_count)
+cJSON *network_get(const char *payload, uint32_t len, struct json_token *method_tok, uint32_t msg_count)
 {
-    char *string_response = NULL;
+    cJSON *cjson_response = cJSON_CreateObject();
     cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
 
     if (cjson_request)
@@ -22,19 +22,18 @@ char *network_get(const char *payload, uint32_t len, struct json_token *method_t
         cJSON *id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
         cJSON *sender = cJSON_GetObjectItem(cjson_request, ezlopi_sender_str);
 
-        cJSON *cjson_response = cJSON_CreateObject();
         if (cjson_response)
         {
             cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_network_get);
             cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
-            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_id_str, id);
-            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_sender_str, sender);
+            cJSON_AddStringToObject(cjson_response, ezlopi_id_str, id ? (id->valuestring ? id->valuestring : "") : "");
+            cJSON_AddStringToObject(cjson_response, ezlopi_sender_str, sender ? (sender->valuestring ? sender->valuestring : "{}") : "{}");
             cJSON_AddNullToObject(cjson_response, "error");
 
-            cJSON *cjson_result = cJSON_CreateObject();
+            cJSON *cjson_result = cJSON_AddObjectToObject(cjson_response, "result");
             if (cjson_result)
             {
-                cJSON *interfaces_array = cJSON_CreateArray();
+                cJSON *interfaces_array = cJSON_AddArrayToObject(cjson_result, "interfaces");
                 if (interfaces_array)
                 {
                     cJSON *wifi_properties = cJSON_CreateObject();
@@ -77,31 +76,12 @@ char *network_get(const char *payload, uint32_t len, struct json_token *method_t
                             cJSON_Delete(wifi_properties);
                         }
                     }
-
-                    if (!cJSON_AddItemToObjectCS(cjson_result, "interfaces", interfaces_array))
-                    {
-                        cJSON_Delete(interfaces_array);
-                    }
-                }
-
-                if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result))
-                {
-                    cJSON_Delete(cjson_result);
                 }
             }
-
-            string_response = cJSON_Print(cjson_response);
-            if (string_response)
-            {
-                TRACE_B("'%s' response:\r\n%s", method_hub_network_get, string_response);
-                cJSON_Minify(string_response);
-            }
-
-            cJSON_Delete(cjson_response);
         }
 
         cJSON_Delete(cjson_request);
     }
 
-    return string_response;
+    return cjson_response;
 }

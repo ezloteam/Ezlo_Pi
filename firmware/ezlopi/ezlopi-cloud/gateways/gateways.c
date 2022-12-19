@@ -28,10 +28,11 @@ static const char *gateways_1_start = "{\"method\":\"hub.gateways.list\",\"msg_i
 //     "\"updateDeviceFirmwareCommand\" : \"\"}";
 const char *gateways_1_end = "]},\"sender\":%.*s}";
 
-char *gateways_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+cJSON *gateways_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     uint32_t buf_len = 2048;
     char *send_buf = (char *)malloc(buf_len);
+    cJSON *cjson_response = NULL;
 
     if (send_buf)
     {
@@ -49,7 +50,9 @@ char *gateways_list(const char *payload, uint32_t len, struct json_token *method
         send_buf[len_b] = 0;
 
         TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
+        cjson_response = cJSON_Parse(send_buf);
+        free(send_buf);
     }
 
-    return send_buf;
+    return cjson_response;
 }

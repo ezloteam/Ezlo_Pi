@@ -110,26 +110,6 @@ static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
     if (0 == param->write.is_prep) // Data received in single packet
     {
         dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
-#if 0
-        if (param->write.len == 2)
-        {
-            uint16_t descr_value = (param->write.value[1] << 8) | param->write.value[0];
-            if (descr_value == 0x0001)
-            {
-            }
-            else if (descr_value == 0x0002)
-            {
-            }
-            else if (descr_value == 0x0000)
-            {
-                TRACE_I("notify/indicate disable");
-            }
-            else
-            {
-                TRACE_E("unknown descr value");
-            }
-        } else
-#endif
         if ((NULL != param->write.value) && (param->write.len > 0))
         {
             wifi_creds_parse_and_connect(param->write.value, param->write.len);
