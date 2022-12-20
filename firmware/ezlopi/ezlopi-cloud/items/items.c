@@ -17,72 +17,52 @@
 extern float dht11_service_get_temperature(void);
 static void parse_item_id(char *data, uint32_t len, char *item_id);
 
-cJSON *items_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+void items_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
 {
-
-    cJSON *cjson_response = cJSON_CreateObject();
-    cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
-
-    if (cjson_request)
-    {
-        cJSON *id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
-        cJSON *sender = cJSON_GetObjectItem(cjson_request, ezlopi_sender_str);
-
-        if (cjson_response)
+ 
+        cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");
+        if (cjson_result)
         {
-            cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_items_list);
-            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
-            cJSON_AddStringToObject(cjson_response, ezlopi_id_str, id ? (id->valuestring ? id->valuestring : "") : "");
-            cJSON_AddStringToObject(cjson_response, ezlopi_sender_str, sender ? (sender->valuestring ? sender->valuestring : "{}") : "{}");
-            cJSON_AddNullToObject(cjson_response, "error");
-            cJSON *cjson_result = cJSON_AddObjectToObject(cjson_response, "result");
-            if (cjson_result)
+            cJSON *cjson_items_array = cJSON_AddArrayToObject(cjson_result, "items");
+            if (cjson_items_array)
             {
-                cJSON *cjson_items_array = cJSON_AddArrayToObject(cjson_result, "items");
-                if (cjson_items_array)
+                l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
+                while (NULL != registered_device)
                 {
-                    l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
-                    while (NULL != registered_device)
+                    if (NULL != registered_device->properties)
                     {
-                        if (NULL != registered_device->properties)
+                        cJSON *cjson_properties = cJSON_CreateObject();
+                        if (cjson_properties)
                         {
-                            cJSON *cjson_properties = cJSON_CreateObject();
-                            if (cjson_properties)
+                            char tmp_string[64];
+                            snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.item_id);
+                            cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
+                            snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.device_id);
+                            cJSON_AddStringToObject(cjson_properties, "deviceId", tmp_string);
+                            cJSON_AddStringToObject(cjson_properties, "deviceName", registered_device->properties->ezlopi_cloud.device_name);
+                            cJSON_AddTrueToObject(cjson_properties, "deviceArmed");
+                            cJSON_AddBoolToObject(cjson_properties, "hasGetter", registered_device->properties->ezlopi_cloud.has_getter);
+                            cJSON_AddBoolToObject(cjson_properties, "hasSetter", registered_device->properties->ezlopi_cloud.has_setter);
+                            cJSON_AddStringToObject(cjson_properties, "name", registered_device->properties->ezlopi_cloud.item_name);
+                            cJSON_AddTrueToObject(cjson_properties, "show");
+                            cJSON_AddStringToObject(cjson_properties, "valueType", registered_device->properties->ezlopi_cloud.value_type);
+
+                            registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_properties, registered_device->user_arg);
+                            cJSON_AddStringToObject(cjson_properties, "valueFormatted", "false");
+                            cJSON_AddStringToObject(cjson_properties, "status", "synced");
+
+                            if (!cJSON_AddItemToArray(cjson_items_array, cjson_properties))
                             {
-                                char tmp_string[64];
-                                snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.item_id);
-                                cJSON_AddStringToObject(cjson_properties, "_id", tmp_string);
-                                snprintf(tmp_string, sizeof(tmp_string), "%08x", registered_device->properties->ezlopi_cloud.device_id);
-                                cJSON_AddStringToObject(cjson_properties, "deviceId", tmp_string);
-                                cJSON_AddStringToObject(cjson_properties, "deviceName", registered_device->properties->ezlopi_cloud.device_name);
-                                cJSON_AddTrueToObject(cjson_properties, "deviceArmed");
-                                cJSON_AddBoolToObject(cjson_properties, "hasGetter", registered_device->properties->ezlopi_cloud.has_getter);
-                                cJSON_AddBoolToObject(cjson_properties, "hasSetter", registered_device->properties->ezlopi_cloud.has_setter);
-                                cJSON_AddStringToObject(cjson_properties, "name", registered_device->properties->ezlopi_cloud.item_name);
-                                cJSON_AddTrueToObject(cjson_properties, "show");
-                                cJSON_AddStringToObject(cjson_properties, "valueType", registered_device->properties->ezlopi_cloud.value_type);
-
-                                registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cjson_properties, registered_device->user_arg);
-                                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "false");
-                                cJSON_AddStringToObject(cjson_properties, "status", "synced");
-
-                                if (!cJSON_AddItemToArray(cjson_items_array, cjson_properties))
-                                {
-                                    cJSON_Delete(cjson_properties);
-                                }
+                                cJSON_Delete(cjson_properties);
                             }
                         }
-
-                        registered_device = registered_device->next;
                     }
+
+                    registered_device = registered_device->next;
                 }
-            }
+            
         }
-
-        cJSON_Delete(cjson_request);
     }
-
-    return cjson_response;
 }
 
 cJSON *items_set_value(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)

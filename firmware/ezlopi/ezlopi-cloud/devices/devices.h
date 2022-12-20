@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-    cJSON *devices_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    void devices_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
     // char *devices_settings_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
     // char *devices_name_set(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 

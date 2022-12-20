@@ -17,12 +17,11 @@ void registration_init(void)
     xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
 }
 
-cJSON *registered(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+void registered(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
 {
     cJSON *ret = NULL;
     TRACE_I("Device registration successful.");
     is_registered = 1;
-    return ret;
 }
 
 static void registration_process(void *pv)

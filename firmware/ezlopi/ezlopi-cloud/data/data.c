@@ -108,43 +108,32 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
 }
 #endif
 
-cJSON *data_list(const char *data, uint32_t len, struct json_token *method, uint32_t msg_count)
+void data_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
 {
-    cJSON *cjson_response = NULL;
-    uint32_t buf_len = 4096;
-    char *send_buf = (char *)malloc(buf_len);
-
-    if (send_buf)
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");
+    if (cjson_result)
     {
-        int sender_status = 0;
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        struct json_token sender = JSON_INVALID_TOKEN;
-
-        json_scanf(data, len, "{id: %T}", &msg_id);
-        sender_status = json_scanf(data, len, "{sender: %T}", &sender);
-
-        snprintf(send_buf, buf_len, data_list_start, msg_count, msg_id.len, msg_id.ptr);
-        l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
-
-        while (NULL != registered_devices)
+        cJSON *cj_settings = cJSON_AddObjectToObject(cjson_result, "settings");
+        if (cj_settings)
         {
-            if (NULL != registered_devices->properties)
+            l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
+            while (NULL != registered_devices)
             {
-                int len_b = strlen(send_buf);
-                snprintf(&send_buf[len_b], buf_len - len_b, "%s", data_list_cont); //, devices[i].device_id, devices[i].name);
+                if (NULL != registered_devices->properties)
+                {
+                    cJSON *cj_first_start = cJSON_AddObjectToObject(cj_settings, "first_start");
+                    if (cj_first_start)
+                    {
+                        cJSON_AddNumberToObject(cj_first_start, "value", 0);
+                    }
 #warning "WARNING: Remove break from here!"
-                break;
+                    break;
+                }
+
+                registered_devices = registered_devices->next;
             }
-
-            registered_devices = registered_devices->next;
         }
-
-        snprintf(&send_buf[strlen(send_buf)], buf_len - strlen(send_buf), data_list_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-        cjson_response = cJSON_Parse(send_buf);
-        free(send_buf);
     }
-
-    return cjson_response;
 }
 
 #if 0

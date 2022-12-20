@@ -20,18 +20,20 @@
 #include "network.h"
 #include "ezlopi_websocket_client.h"
 
-#include "ezlopi_factory_info.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_http.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_cloud_constants.h"
 
 static uint32_t message_counter = 0;
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
-static cJSON *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-static cJSON *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+static void __hub_reboot(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
 static void web_provisioning_fetch_wss_endpoint(void *pv);
 
+#if 0
 typedef struct s_method_list
 {
     char *method_name;
@@ -39,7 +41,48 @@ typedef struct s_method_list
     cJSON *(*updater)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 } s_method_list_t;
 
-s_method_list_t method_list[] = {
+static const s_method_list_t method_list[] = {
+    /** Getter functions **/
+    {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
+    {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
+    {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
+    // {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
+    // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
+    // {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
+    // {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
+    // {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
+    // {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
+    // {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
+    // // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
+    // // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
+    // {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
+
+    // // // /** Setter functions **/
+    // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
+    // // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
+    // // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
+    // {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
+
+    // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+};
+#endif
+typedef enum e_trace_type
+{
+    TRACE_TYPE_B = 0,
+    TRACE_TYPE_I,
+    TRACE_TYPE_E
+} e_trace_type_t;
+
+typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+typedef struct s_method_list_v2
+{
+    char *method_name;
+    f_method_func_t method;
+    f_method_func_t updater;
+} s_method_list_v2_t;
+
+static const s_method_list_v2_t method_list_v2[] = {
     /** Getter functions **/
     {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
     {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
@@ -49,20 +92,20 @@ s_method_list_t method_list[] = {
     {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
     {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
     {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
-    {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
+    // {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
     {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
-    // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
-    // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
+    // // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
+    // // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
     {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
 
-    // // /** Setter functions **/
-    {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
-    // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
-    // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
+    // // // /** Setter functions **/
+    // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
+    // // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
+    // // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
-    // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 
 uint32_t web_provisioning_get_message_count(void)
@@ -70,7 +113,7 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
-int web_provisioning_send_to_nma_websocket(cJSON *cjson_data)
+int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
     if (cjson_data)
@@ -79,7 +122,28 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data)
         if (cjson_str_data)
         {
             cJSON_Minify(cjson_str_data);
-            TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+            switch (print_type)
+            {
+            case TRACE_TYPE_B:
+            {
+                TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                break;
+            }
+            case TRACE_TYPE_E:
+            {
+                TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                break;
+            }
+
+            case TRACE_TYPE_I:
+            {
+                TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                break;
+            }
+            default:
+                break;
+            }
+
             int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
             if (ret > 0)
             {
@@ -154,140 +218,111 @@ static void __connection_upcall(bool connected)
     prev_status = connected;
 }
 
-static void __message_upcall(const char *payload, uint32_t len)
+static uint32_t __search_method_in_list(cJSON *method)
 {
-    cJSON *cjson_response = NULL;
-    int rpc_method_found = 0;
-    struct json_token method_tok = JSON_INVALID_TOKEN;
+    uint32_t found_method = 0;
+    uint32_t idx = sizeof(method_list_v2) / sizeof(s_method_list_v2_t);
 
-    if (json_scanf(payload, len, "{method: %T}", &method_tok))
+    while (idx--)
     {
-        TRACE_D("## WS Rx <<<<<<<<<<'%.*s'[%d]:\r\n%.*s", method_tok.len, method_tok.ptr, len, len, payload);
-
-        uint32_t idx = sizeof(method_list) / sizeof(s_method_list_t);
-
-        while (idx--)
+        uint32_t request_method_name_len = strlen(method->valuestring);
+        uint32_t list_method_name_len = strlen(method_list_v2[idx].method_name);
+        uint32_t comp_len = list_method_name_len > request_method_name_len ? list_method_name_len : request_method_name_len;
+        if (0 == strncmp(method->valuestring, method_list_v2[idx].method_name, comp_len))
         {
-            uint32_t comp_len = strlen(method_list[idx].method_name) > method_tok.len ? strlen(method_list[idx].method_name) : method_tok.len;
-
-            if (0 == strncmp(method_tok.ptr, method_list[idx].method_name, comp_len))
-            {
-                if (NULL != method_list[idx].method)
-                {
-                    cjson_response = method_list[idx].method(payload, len, &method_tok, message_counter);
-                    if (cjson_response)
-                    {
-                        web_provisioning_send_to_nma_websocket(cjson_response);
-                        cJSON_Delete(cjson_response);
-                        cjson_response = NULL;
-                    }
-                    else
-                    {
-                        TRACE_E("Error - cjson_response: %d", (uint32_t)cjson_response);
-                    }
-                }
-
-                if (NULL != method_list[idx].updater)
-                {
-                    cjson_response = method_list[idx].updater(payload, len, &method_tok, message_counter);
-                    if (cjson_response)
-                    {
-                        web_provisioning_send_to_nma_websocket(cjson_response);
-                        cJSON_Delete(cjson_response);
-                        cjson_response = NULL;
-                    }
-                    else
-                    {
-                        TRACE_E("Error - cjson_response: %d", (uint32_t)cjson_response);
-                    }
-                }
-
-                rpc_method_found = 1;
-                break;
-            }
-        }
-
-        if (0 == rpc_method_found)
-        {
-            cjson_response = __rpc_method_notfound(payload, len, &method_tok, message_counter);
-            if (cjson_response)
-            {
-                web_provisioning_send_to_nma_websocket(cjson_response);
-                cJSON_Delete(cjson_response);
-                cjson_response = NULL;
-            }
-            else
-            {
-                TRACE_E("Error - cjson_response: %d", (uint32_t)cjson_response);
-            }
+            found_method = 1;
+            break;
         }
     }
-    else
-    {
-        TRACE_E("<< WS Rx '%.*s'[%d]:\r\n%.*s", method_tok.len, method_tok.ptr, len, len, payload);
-    }
+
+    return (found_method ? idx : UINT32_MAX);
 }
 
-static cJSON *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
 {
-    cJSON *cjson_data = cJSON_CreateObject();
-
-    if (cjson_data)
+    if (method_func)
     {
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        struct json_token sender = JSON_INVALID_TOKEN;
-
-        json_scanf(payload, len, "{id:%T}", &msg_id);
-        int sender_status = json_scanf(payload, len, "{sender:%T}", &sender);
-
-        cJSON_AddNumberToObject(cjson_data, "msg_id", msg_count);
-        if (msg_id.len && msg_id.ptr && (JSON_TYPE_STRING == msg_id.type))
+        if (registered == method_func)
         {
-            char tmp_bff[msg_id.len + 1];
-            snprintf(tmp_bff, sizeof(tmp_bff), "%.*s", msg_id.len, msg_id.ptr);
-            cJSON_AddStringToObject(cjson_data, "id", tmp_bff);
-        }
-
-        if (method && method->len && method->ptr && (JSON_TYPE_STRING == method->type))
-        {
-            char tmp_bff[method->len + 1];
-            snprintf(tmp_bff, sizeof(tmp_bff), "%.*s", method->len, method->ptr);
-            cJSON_AddStringToObject(cjson_data, "method", tmp_bff);
-        }
-
-        cJSON *cjson_error = cJSON_AddObjectToObject(cjson_data, "error");
-        if (cjson_error)
-        {
-            cJSON_AddNumberToObject(cjson_error, "code", -32602);
-            cJSON_AddStringToObject(cjson_error, "data", "rpc.method.notfound");
-            cJSON_AddStringToObject(cjson_error, "message", "Unknown method");
-        }
-
-        cJSON_AddObjectToObject(cjson_data, "result");
-
-        if (sender.len && sender.ptr && (JSON_TYPE_STRING == sender.type))
-        {
-            char tmp_bff[sender.len + 1];
-            snprintf(tmp_bff, sizeof(tmp_bff + 1), "%.*s", sender.len, sender.ptr);
-            cJSON_AddStringToObject(cjson_data, "sender", tmp_bff);
+            method_func(cj_request, NULL, NULL);
         }
         else
         {
-            cJSON_AddObjectToObject(cjson_data, "sender");
-        }
+            cJSON *cj_response = cJSON_CreateObject();
+            cJSON *cj_id = cJSON_GetObjectItem(cj_request, ezlopi_id_str);
+            cJSON *cj_sender = cJSON_GetObjectItem(cj_request, ezlopi_sender_str);
 
-        char *str_cjson_data = cJSON_Parse(cjson_data);
-        if (str_cjson_data)
-        {
-            TRACE_W("%s", str_cjson_data);
-            free(str_cjson_data);
+            if (NULL != cj_response)
+            {
+                cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
+                cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cj_id);
+                cJSON_AddItemReferenceToObject(cj_response, ezlopi_sender_str, cj_sender);
+                cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cj_method);
+                cJSON_AddNullToObject(cj_response, "error");
+
+                method_func(cj_request, cj_method, cj_response);
+
+                web_provisioning_send_to_nma_websocket(cj_response, print_type);
+                cJSON_Delete(cj_response);
+            }
+            else
+            {
+                TRACE_E("Error - cj_response: %d", (uint32_t)cj_response);
+            }
         }
     }
-
-    return cjson_data;
 }
 
-static cJSON *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+static void __message_upcall(const char *payload, uint32_t len)
+{
+    cJSON *cj_request = cJSON_ParseWithLength(payload, len);
+
+    if (cj_request)
+    {
+        cJSON *cj_error = cJSON_GetObjectItem(cj_request, "error");
+        cJSON *cj_method = cJSON_GetObjectItem(cj_request, "method");
+
+        if ((NULL == cj_error) || (NULL == cj_error->valuestring) || (0 == strncmp(cj_error->valuestring, "null", 4)))
+        {
+            if ((NULL != cj_method) && (NULL != cj_method->valuestring))
+            {
+                TRACE_D("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
+                uint32_t method_idx = __search_method_in_list(cj_method);
+                if (UINT32_MAX != method_idx)
+                {
+                    __call_method_func_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_B);
+                    __call_method_func_and_send_response(cj_request, cj_method, method_list_v2[method_idx].updater, TRACE_TYPE_B);
+                }
+                else
+                {
+                    __call_method_func_and_send_response(cj_request, cj_method, __rpc_method_notfound, TRACE_TYPE_E);
+                }
+            }
+        }
+        else
+        {
+            TRACE_E("## WS Rx <<<<<<<<<<'%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
+        }
+
+        cJSON_Delete(cj_request);
+    }
+}
+
+static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+{
+
+    cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, "error");
+    if (cjson_error)
+    {
+        cJSON_AddNumberToObject(cjson_error, "code", -32602);
+        cJSON_AddStringToObject(cjson_error, "data", "rpc.method.notfound");
+        cJSON_AddStringToObject(cjson_error, "message", "Unknown method");
+    }
+
+    cJSON_AddObjectToObject(cj_response, "result");
+}
+
+static void __hub_reboot(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
 {
     esp_restart();
     return NULL;

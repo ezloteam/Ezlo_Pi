@@ -7,57 +7,31 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_devices_list.h"
 
-cJSON *room_list(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+void room_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
 {
-    cJSON *cjson_response = cJSON_CreateObject();
-    cJSON *cjson_request = cJSON_ParseWithLength(payload, len);
 
-    if (cjson_request)
+    cJSON *cjson_result_array = cJSON_AddArrayToObject(cj_response, "result");
+    if (cjson_result_array)
     {
-        cJSON *id = cJSON_GetObjectItem(cjson_request, ezlopi_id_str);
-        cJSON *sender = cJSON_GetObjectItem(cjson_request, ezlopi_sender_str);
-
-        if (cjson_response)
+        l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
+        while (NULL != registered_device)
         {
-            cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_room_list);
-            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
-            cJSON_AddStringToObject(cjson_response, ezlopi_id_str, id ? (id->valuestring ? id->valuestring : "") : "");
-            cJSON_AddStringToObject(cjson_response, ezlopi_sender_str, sender ? (sender->valuestring ? sender->valuestring : "{}") : "{}");
-            cJSON_AddNullToObject(cjson_response, "error");
-
-            cJSON *cjson_result_array = cJSON_CreateArray();
-            if (cjson_result_array)
+            if (NULL != registered_device->properties)
             {
-                l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
-                while (NULL != registered_device)
+                cJSON *cjson_room_info = cJSON_CreateObject();
+                if (cjson_room_info)
                 {
-                    if (NULL != registered_device->properties)
+                    cJSON_AddStringToObject(cjson_room_info, "_id", "");
+                    cJSON_AddStringToObject(cjson_room_info, "name", registered_device->properties->ezlopi_cloud.room_name);
+
+                    if (!cJSON_AddItemToArray(cjson_result_array, cjson_room_info))
                     {
-                        cJSON *cjson_room_info = cJSON_CreateObject();
-                        if (cjson_room_info)
-                        {
-                            cJSON_AddStringToObject(cjson_room_info, "_id", "");
-                            cJSON_AddStringToObject(cjson_room_info, "name", registered_device->properties->ezlopi_cloud.room_name);
-
-                            if (!cJSON_AddItemToArray(cjson_result_array, cjson_room_info))
-                            {
-                                cJSON_Delete(cjson_room_info);
-                            }
-                        }
+                        cJSON_Delete(cjson_room_info);
                     }
-
-                    registered_device = registered_device->next;
-                }
-
-                if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result_array))
-                {
-                    cJSON_Delete(cjson_result_array);
                 }
             }
+
+            registered_device = registered_device->next;
         }
-
-        cJSON_Delete(cjson_request);
     }
-
-    return cjson_response;
 }
