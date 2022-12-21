@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-    void network_get(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+    void network_get(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-    void favorite_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+    void favorite_list(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

@@ -17,7 +17,7 @@ void registration_init(void)
     xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
 }
 
-void registered(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+void registered(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *ret = NULL;
     TRACE_I("Device registration successful.");

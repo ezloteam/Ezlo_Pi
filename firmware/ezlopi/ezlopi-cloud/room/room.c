@@ -7,7 +7,7 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_devices_list.h"
 
-void room_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+void room_list(cJSON *cj_request, cJSON *cj_response)
 {
 
     cJSON *cjson_result_array = cJSON_AddArrayToObject(cj_response, "result");

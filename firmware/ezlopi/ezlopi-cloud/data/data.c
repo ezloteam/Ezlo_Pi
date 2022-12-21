@@ -108,7 +108,7 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
 }
 #endif
 
-void data_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+void data_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");
     if (cjson_result)

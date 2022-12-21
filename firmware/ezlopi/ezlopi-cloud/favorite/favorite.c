@@ -9,7 +9,7 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_devices_list.h"
 
-void favorite_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+void favorite_list(cJSON *cj_request, cJSON *cj_response)
 {
 
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");

@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-    cJSON *modes_get(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    void modes_get(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

@@ -29,8 +29,8 @@ static uint32_t message_counter = 0;
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
-static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
-static void __hub_reboot(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
+static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void web_provisioning_fetch_wss_endpoint(void *pv);
 
 #if 0
@@ -74,7 +74,7 @@ typedef enum e_trace_type
     TRACE_TYPE_E
 } e_trace_type_t;
 
-typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
 {
     char *method_name;
@@ -92,16 +92,16 @@ static const s_method_list_v2_t method_list_v2[] = {
     {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
     {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
     {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
-    // {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
-    {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
-    // // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
-    // // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
+    {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
+    {.method_name = "hub.network.get", .method = network_get, .updater = NULL},
+    // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
+    // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
     {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
 
-    // // // /** Setter functions **/
-    // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
-    // // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
-    // // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
+    // // /** Setter functions **/
+    {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
+    // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
+    // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
     // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
@@ -244,7 +244,7 @@ static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_me
     {
         if (registered == method_func)
         {
-            method_func(cj_request, NULL, NULL);
+            method_func(cj_request, NULL);
         }
         else
         {
@@ -260,7 +260,7 @@ static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_me
                 cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cj_method);
                 cJSON_AddNullToObject(cj_response, "error");
 
-                method_func(cj_request, cj_method, cj_response);
+                method_func(cj_request, cj_response);
 
                 web_provisioning_send_to_nma_websocket(cj_response, print_type);
                 cJSON_Delete(cj_response);
@@ -308,7 +308,7 @@ static void __message_upcall(const char *payload, uint32_t len)
     }
 }
 
-static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 {
 
     cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, "error");
@@ -322,7 +322,7 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_method, cJSON *cj
     cJSON_AddObjectToObject(cj_response, "result");
 }
 
-static void __hub_reboot(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
 {
     esp_restart();
     return NULL;

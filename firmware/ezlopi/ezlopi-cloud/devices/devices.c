@@ -10,7 +10,7 @@
 #include "ezlopi_cloud_methods_str.h"
 #include "cJSON.h"
 
-void devices_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+void devices_list(cJSON *cj_request, cJSON *cj_response)
 {
 
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");

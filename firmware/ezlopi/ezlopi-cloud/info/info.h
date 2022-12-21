@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-    void info_get(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+    void info_get(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

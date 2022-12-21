@@ -5,7 +5,7 @@
 #include "frozen.h"
 #include "ezlopi_cloud_constants.h"
 
-void gateways_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+void gateways_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");
     if (cjson_result)

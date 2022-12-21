@@ -16,27 +16,16 @@ const char *modes_1_protect = "\"protect\":[\"%s\"";
 const char *modes_1_item_end = "]";
 const char *modes_1_end = "]},\"sender\":%.*s}";
 
-cJSON *modes_get(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+void modes_get(cJSON *cj_request, cJSON *cj_response)
 {
-    uint32_t buf_len = 2014;
-    char *send_buf = (char *)malloc(buf_len);
-    cJSON *cjson_response = NULL;
-
-    if (send_buf)
+    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+    if (cj_result)
     {
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        json_scanf(payload, len, "{id: %T}", &msg_id);
-
-        struct json_token sender = JSON_INVALID_TOKEN;
-        int sender_status = json_scanf(payload, len, "{sender: %T}", &sender);
-
-        snprintf(send_buf, buf_len, modes_1_start, msg_count, msg_id.len, msg_id.ptr, "");
-        int len_b = strlen(send_buf);
-        snprintf(&send_buf[len_b], buf_len - len_b, modes_1_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-
-        cjson_response = cJSON_Parse(send_buf);
-        free(send_buf);
+        cJSON_AddStringToObject(cj_result, "current", "");
+        cJSON_AddStringToObject(cj_result, "switchTo", "");
+        cJSON_AddStringToObject(cj_result, "timeIsLeftToSwitch", "");
+        cJSON_AddStringToObject(cj_result, "switchToDelay", "");
+        cJSON_AddStringToObject(cj_result, "alarmDelay", "");
+        cJSON_AddArrayToObject(cj_result, "modes");
     }
-
-    return cjson_response;
 }

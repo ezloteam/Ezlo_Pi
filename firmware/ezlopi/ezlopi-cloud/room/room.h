@@ -8,7 +8,7 @@
 extern "C"
 {
 #endif
-    void room_list(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response);
+    void room_list(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

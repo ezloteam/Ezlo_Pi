@@ -11,7 +11,7 @@
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
 
-void info_get(cJSON *cj_request, cJSON *cj_method, cJSON *cj_response)
+void info_get(cJSON *cj_request, cJSON *cj_response)
 {
 
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");
