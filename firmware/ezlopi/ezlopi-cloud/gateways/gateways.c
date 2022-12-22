@@ -7,7 +7,9 @@
 
 void gateways_list(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
     if (cjson_result)
     {
         cJSON_AddArrayToObject(cjson_result, "gateways");

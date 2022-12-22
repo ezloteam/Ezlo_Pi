@@ -9,8 +9,9 @@
 
 void room_list(cJSON *cj_request, cJSON *cj_response)
 {
-
-    cJSON *cjson_result_array = cJSON_AddArrayToObject(cj_response, "result");
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_result_array = cJSON_AddArrayToObject(cj_response, ezlopi_result);
     if (cjson_result_array)
     {
         l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();

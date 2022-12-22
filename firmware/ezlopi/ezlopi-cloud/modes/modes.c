@@ -4,6 +4,7 @@
 #include "trace.h"
 #include "frozen.h"
 #include "cJSON.h"
+#include "ezlopi_cloud_constants.h"
 
 const char *modes_1_start = "{\"method\":\"hub.modes.get\",\"msg_id\":%d,\"api\":\"1.0\",\"error\":null,\"id\":\"%.*s\",\"result\":{\"current\":\"%s\",\"switchTo\":\"\",\"timeIsLeftToSwitch\":0,\"switchToDelay\":0,\"alarmDelay\":0,\"modes\":[";
 const char *modes_1_modes_start = "{\"_id\":\"%s\",\"name\":\"%s\",\"description\":\"%s\"";
@@ -18,7 +19,9 @@ const char *modes_1_end = "]},\"sender\":%.*s}";
 
 void modes_get(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
     if (cj_result)
     {
         cJSON_AddStringToObject(cj_result, "current", "");

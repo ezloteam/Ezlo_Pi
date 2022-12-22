@@ -85,7 +85,7 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
                     }
                 }
 
-                if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result))
+                if (!cJSON_AddItemToObjectCS(cjson_response, ezlopi_result, cjson_result))
                 {
                     cJSON_Delete(cjson_result);
                 }
@@ -110,7 +110,9 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
 
 void data_list(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, "result");
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
     if (cjson_result)
     {
         cJSON *cj_settings = cJSON_AddObjectToObject(cjson_result, "settings");

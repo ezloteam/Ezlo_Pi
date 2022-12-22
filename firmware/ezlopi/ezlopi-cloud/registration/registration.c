@@ -6,6 +6,7 @@
 #include "trace.h"
 #include "registration.h"
 #include "web_provisioning.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_websocket_client.h"
 
 static volatile uint32_t is_registered = 0;
@@ -19,7 +20,8 @@ void registration_init(void)
 
 void registered(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON *ret = NULL;
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
     TRACE_I("Device registration successful.");
     is_registered = 1;
 }
