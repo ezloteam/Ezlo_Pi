@@ -60,6 +60,11 @@
      <string>POT : Generic</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>Water Leak Sensor</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_device_name">
    <property name="geometry">

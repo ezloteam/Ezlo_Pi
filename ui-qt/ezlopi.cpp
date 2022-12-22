@@ -45,6 +45,8 @@ EzPi::EzPi() {
     ezpi_item_types_str->append("TTP Touch Sensor");
     ezpi_item_types_str->append("HC SR04 Ultrasonic Sensor");
     ezpi_item_types_str->append("LDR Switch");
+    ezpi_item_types_str->append("LDR Sensor");
+    ezpi_item_types_str->append("Water Leak Sensor");
 
     ezpi_firmware_info = new ezpi_info_t;
 

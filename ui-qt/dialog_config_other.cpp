@@ -62,19 +62,28 @@ void Dialog_config_other::on_buttonBox_accepted() {
     }
 
     other_user_data.en_gpio1 = ui->checkBox_gpio1->isChecked();
-    other_user_data.gpio1 = ui->comboBox_gpio1->currentText().toInt();
     if(other_user_data.en_gpio1) {
+        other_user_data.gpio1 = ui->comboBox_gpio1->currentText().toInt();
         ezloPi_other->EZPI_SET_GPIO_POOL(other_user_data.gpio1, EZPI_DEV_TYPE_OTHER);
+    } else {
+        other_user_data.gpio1 = 0;
     }
 
     other_user_data.en_gpio2 = ui->checkBox_gpio2->isChecked();
-    other_user_data.gpio2 = ui->comboBox_gpio2->currentText().toInt();
+
     if(other_user_data.en_gpio2) {
+        other_user_data.gpio2 = ui->comboBox_gpio2->currentText().toInt();
         ezloPi_other->EZPI_SET_GPIO_POOL(other_user_data.gpio2, EZPI_DEV_TYPE_OTHER);
+    } else {
+        other_user_data.gpio2 = 0;
     }
 
     other_user_data.en_gpio3 = ui->checkBox_gpio3->isChecked();
-    other_user_data.gpio3 = ui->comboBox_gpio3->currentText().toInt();
+    if(other_user_data.en_gpio2) {
+        other_user_data.gpio3 = ui->comboBox_gpio3->currentText().toInt();
+    } else {
+        other_user_data.gpio3 = 0;
+    }
 
     // Adding device to the device vector
     if(ezloPi_other->EZPI_ADD_OTHER_DEVICE(other_user_data) == EZPI_SUCCESS) {
