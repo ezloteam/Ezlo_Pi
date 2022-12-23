@@ -12,6 +12,7 @@
 #include "sensor_touch_tpp_223b.h"
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
+#include "027_sens_water_sensor.h"
 
 
 static s_ezlopi_device_t device_array[] = {
@@ -46,6 +47,13 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
+// #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
+//     {
+//         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
+//         .func = NULL,
+//     },
+// #endif
+
 #ifdef EZLOPI_SENSOR_0018_DOOR
     {
         .id = EZLOPI_SENSOR_0018_DOOR,
@@ -63,7 +71,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS
     {
         .id = EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS,
-        .func = sensor_ldr_analog_sensor,
+        .func = joystick_2_axis,
     },
 #endif
 
@@ -100,6 +108,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
         .func = sensor_ldr_digital_module,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0027_WATER_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0027_WATER_SENSOR,
+        .func = sensor_water_sensor,
     },
 #endif
     /**
