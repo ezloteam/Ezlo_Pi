@@ -20,26 +20,69 @@
 #include "network.h"
 #include "ezlopi_websocket_client.h"
 
-#include "ezlopi_factory_info.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_http.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_cloud_constants.h"
 
 static uint32_t message_counter = 0;
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
-static char *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-static char *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
+static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void web_provisioning_fetch_wss_endpoint(void *pv);
 
+#if 0
 typedef struct s_method_list
 {
     char *method_name;
-    char *(*method)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-    char *(*updater)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    cJSON *(*method)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
+    cJSON *(*updater)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
 } s_method_list_t;
 
-s_method_list_t method_list[] = {
+static const s_method_list_t method_list[] = {
+    /** Getter functions **/
+    {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
+    {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
+    {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
+    // {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
+    // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
+    // {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
+    // {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
+    // {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
+    // {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
+    // {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
+    // // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
+    // // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
+    // {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
+
+    // // // /** Setter functions **/
+    // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
+    // // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
+    // // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
+    // {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
+
+    // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+};
+#endif
+typedef enum e_trace_type
+{
+    TRACE_TYPE_B = 0,
+    TRACE_TYPE_I,
+    TRACE_TYPE_E
+} e_trace_type_t;
+
+typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
+typedef struct s_method_list_v2
+{
+    char *method_name;
+    f_method_func_t method;
+    f_method_func_t updater;
+} s_method_list_v2_t;
+
+static const s_method_list_v2_t method_list_v2[] = {
     /** Getter functions **/
     {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
     {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
@@ -50,7 +93,7 @@ s_method_list_t method_list[] = {
     {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
     {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
     {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
-    {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
+    {.method_name = "hub.network.get", .method = network_get, .updater = NULL},
     // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
     // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
     {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
@@ -61,8 +104,8 @@ s_method_list_t method_list[] = {
     // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
-    // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 
 uint32_t web_provisioning_get_message_count(void)
@@ -70,15 +113,45 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
-int web_provisioning_send_to_nma_websocket(char *data)
+int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
-    if (data)
+    if (cjson_data)
     {
-        // TRACE_D("WSS-SENDING: %s", data);
-        ezlopi_websocket_client_send(data, strlen(data));
-        // ret = wss_client_send(data, strlen(data));
-        message_counter++;
+        char *cjson_str_data = cJSON_Print(cjson_data);
+        if (cjson_str_data)
+        {
+            cJSON_Minify(cjson_str_data);
+            switch (print_type)
+            {
+            case TRACE_TYPE_B:
+            {
+                TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                break;
+            }
+            case TRACE_TYPE_E:
+            {
+                TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                break;
+            }
+
+            case TRACE_TYPE_I:
+            {
+                TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                break;
+            }
+            default:
+                break;
+            }
+
+            int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
+            if (ret > 0)
+            {
+                message_counter++;
+            }
+
+            free(cjson_str_data);
+        }
     }
 
     return ret;
@@ -141,107 +214,113 @@ static void __connection_upcall(bool connected)
     {
         TRACE_E("Web-socket dis-connected!");
     }
-    
+
     prev_status = connected;
+}
+
+static uint32_t __search_method_in_list(cJSON *method)
+{
+    uint32_t found_method = 0;
+    uint32_t idx = sizeof(method_list_v2) / sizeof(s_method_list_v2_t);
+
+    while (idx--)
+    {
+        uint32_t request_method_name_len = strlen(method->valuestring);
+        uint32_t list_method_name_len = strlen(method_list_v2[idx].method_name);
+        uint32_t comp_len = list_method_name_len > request_method_name_len ? list_method_name_len : request_method_name_len;
+        if (0 == strncmp(method->valuestring, method_list_v2[idx].method_name, comp_len))
+        {
+            found_method = 1;
+            break;
+        }
+    }
+
+    return (found_method ? idx : UINT32_MAX);
+}
+
+static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
+{
+    if (method_func)
+    {
+        if (registered == method_func)
+        {
+            method_func(cj_request, NULL);
+        }
+        else
+        {
+            cJSON *cj_response = cJSON_CreateObject();
+            if (NULL != cj_response)
+            {
+                cJSON *cj_sender = cJSON_GetObjectItem(cj_request, ezlopi_sender_str);
+
+                cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
+                cJSON_AddItemReferenceToObject(cj_response, ezlopi_sender_str, cj_sender);
+                cJSON_AddNullToObject(cj_response, "error");
+
+                method_func(cj_request, cj_response);
+
+                web_provisioning_send_to_nma_websocket(cj_response, print_type);
+                cJSON_Delete(cj_response);
+            }
+            else
+            {
+                TRACE_E("Error - cj_response: %d", (uint32_t)cj_response);
+            }
+        }
+    }
 }
 
 static void __message_upcall(const char *payload, uint32_t len)
 {
-    char *j_response = NULL;
-    int rpc_method_found = 0;
-    struct json_token method_tok = JSON_INVALID_TOKEN;
+    cJSON *cj_request = cJSON_ParseWithLength(payload, len);
 
-    if (json_scanf(payload, len, "{method: %T}", &method_tok))
+    if (cj_request)
     {
-        TRACE_D("<< WS Rx '%.*s'[%d]:\r\n%.*s", method_tok.len, method_tok.ptr, len, len, payload);
+        cJSON *cj_error = cJSON_GetObjectItem(cj_request, "error");
+        cJSON *cj_method = cJSON_GetObjectItem(cj_request, "method");
 
-        uint32_t idx = sizeof(method_list) / sizeof(s_method_list_t);
-
-        while (idx--)
+        if ((NULL == cj_error) || (NULL == cj_error->valuestring) || (0 == strncmp(cj_error->valuestring, "null", 4)))
         {
-            uint32_t comp_len = strlen(method_list[idx].method_name) > method_tok.len ? strlen(method_list[idx].method_name) : method_tok.len;
-
-            if (0 == strncmp(method_tok.ptr, method_list[idx].method_name, comp_len))
+            if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
-                if (NULL != method_list[idx].method)
+                TRACE_D("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
+                uint32_t method_idx = __search_method_in_list(cj_method);
+                if (UINT32_MAX != method_idx)
                 {
-                    j_response = method_list[idx].method(payload, len, &method_tok, message_counter);
-                    if (j_response)
-                    {
-                        web_provisioning_send_to_nma_websocket(j_response);
-                        free(j_response);
-                        j_response = NULL;
-                    }
-                    else
-                    {
-                        TRACE_E("Error - j_response: %d", (uint32_t)j_response);
-                    }
+                    __call_method_func_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_B);
+                    __call_method_func_and_send_response(cj_request, cj_method, method_list_v2[method_idx].updater, TRACE_TYPE_B);
                 }
-
-                if (NULL != method_list[idx].updater)
+                else
                 {
-                    j_response = method_list[idx].updater(payload, len, &method_tok, message_counter);
-                    if (j_response)
-                    {
-                        web_provisioning_send_to_nma_websocket(j_response);
-                        free(j_response);
-                        j_response = NULL;
-                    }
-                    else
-                    {
-                        TRACE_E("Error - j_response: %d", (uint32_t)j_response);
-                    }
+                    __call_method_func_and_send_response(cj_request, cj_method, __rpc_method_notfound, TRACE_TYPE_E);
                 }
-
-                rpc_method_found = 1;
-                break;
             }
         }
-
-        if (0 == rpc_method_found)
+        else
         {
-            j_response = __rpc_method_notfound(payload, len, &method_tok, message_counter);
-            if (j_response)
-            {
-                web_provisioning_send_to_nma_websocket(j_response);
-                free(j_response);
-                j_response = NULL;
-            }
-            else
-            {
-                TRACE_E("Error - j_response: %d", (uint32_t)j_response);
-            }
+            TRACE_E("## WS Rx <<<<<<<<<<'%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
         }
-    }
-    else
-    {
-        TRACE_E("<< WS Rx '%.*s'[%d]:\r\n%.*s", method_tok.len, method_tok.ptr, len, len, payload);
+
+        cJSON_Delete(cj_request);
     }
 }
 
-static char *__rpc_method_notfound(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 {
-    uint32_t buf_len = 300;
-    char *data_buf = (char *)malloc(buf_len);
-
-    if (data_buf)
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, "error");
+    if (cjson_error)
     {
-        memset(data_buf, 0, buf_len);
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        struct json_token sender = JSON_INVALID_TOKEN;
-        static const char *rpc_notfound = "{\"msg_id\":%d,\"id\":\"%.*s\",\"method\":\"%.*s\",\"error\":{\"code\":-32602,\"data\":\"rpc.method.notfound\",\"message\":\"Unknown method\"},\"result\":{}, \"sender\":%.*s}";
-
-        json_scanf(payload, len, "{id:%T}", &msg_id);
-        int sender_status = json_scanf(payload, len, "{sender:%T}", &sender);
-
-        snprintf(data_buf, buf_len, rpc_notfound, msg_count, msg_id.len, msg_id.ptr, method->len, method->ptr, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-        TRACE_W(">> WSS-Tx: [%d]\r\n%s", strlen(data_buf), data_buf);
+        cJSON_AddNumberToObject(cjson_error, "code", -32602);
+        cJSON_AddStringToObject(cjson_error, "data", "rpc.method.notfound");
+        cJSON_AddStringToObject(cjson_error, "message", "Unknown method");
     }
 
-    return data_buf;
+    cJSON_AddObjectToObject(cj_response, ezlopi_result);
 }
 
-static char *__hub_reboot(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
+static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
 {
     esp_restart();
     return NULL;

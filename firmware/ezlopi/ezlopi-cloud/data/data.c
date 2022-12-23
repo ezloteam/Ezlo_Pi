@@ -28,8 +28,8 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
         {
             cJSON_AddStringToObject(cjson_response, ezlopi_key_method_str, method_hub_data_value_list_request);
             cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, msg_count);
-            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_id_str, id);
-            cJSON_AddItemReferenceToObject(cjson_response, ezlopi_sender_str, sender);
+            cJSON_AddStringToObject(cjson_response, ezlopi_id_str, id ? (id->valuestring ? id->valuestring : "") : "");
+            cJSON_AddStringToObject(cjson_response, ezlopi_sender_str, sender ? (sender->valuestring ? sender->valuestring : "{}") : "{}");
             cJSON_AddNullToObject(cjson_response, "error");
 
             cJSON *cjson_result = cJSON_CreateObject();
@@ -85,7 +85,7 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
                     }
                 }
 
-                if (!cJSON_AddItemToObjectCS(cjson_response, "result", cjson_result))
+                if (!cJSON_AddItemToObjectCS(cjson_response, ezlopi_result, cjson_result))
                 {
                     cJSON_Delete(cjson_result);
                 }
@@ -108,41 +108,34 @@ char *data_list_v2(const char *payload, uint32_t len, struct json_token *method,
 }
 #endif
 
-char *data_list(const char *data, uint32_t len, struct json_token *method, uint32_t msg_count)
+void data_list(cJSON *cj_request, cJSON *cj_response)
 {
-    uint32_t buf_len = 4096;
-    char *send_buf = (char *)malloc(buf_len);
-
-    if (send_buf)
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    if (cjson_result)
     {
-        int sender_status = 0;
-        struct json_token msg_id = JSON_INVALID_TOKEN;
-        struct json_token sender = JSON_INVALID_TOKEN;
-
-        json_scanf(data, len, "{id: %T}", &msg_id);
-        sender_status = json_scanf(data, len, "{sender: %T}", &sender);
-
-        snprintf(send_buf, buf_len, data_list_start, msg_count, msg_id.len, msg_id.ptr);
-        l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
-
-        while (NULL != registered_devices)
+        cJSON *cj_settings = cJSON_AddObjectToObject(cjson_result, "settings");
+        if (cj_settings)
         {
-            if (NULL != registered_devices->properties)
+            l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
+            while (NULL != registered_devices)
             {
-                int len_b = strlen(send_buf);
-                snprintf(&send_buf[len_b], buf_len - len_b, "%s", data_list_cont); //, devices[i].device_id, devices[i].name);
+                if (NULL != registered_devices->properties)
+                {
+                    cJSON *cj_first_start = cJSON_AddObjectToObject(cj_settings, "first_start");
+                    if (cj_first_start)
+                    {
+                        cJSON_AddNumberToObject(cj_first_start, "value", 0);
+                    }
 #warning "WARNING: Remove break from here!"
-                break;
+                    break;
+                }
+
+                registered_devices = registered_devices->next;
             }
-
-            registered_devices = registered_devices->next;
         }
-
-        snprintf(&send_buf[strlen(send_buf)], buf_len - strlen(send_buf), data_list_end, sender_status ? sender.len : 2, sender_status ? sender.ptr : "{}");
-        TRACE_B(">> WS Tx - '%.*s' [%d]\n\r%s", method->len, method->ptr, strlen(send_buf), send_buf);
     }
-
-    return send_buf;
 }
 
 #if 0
