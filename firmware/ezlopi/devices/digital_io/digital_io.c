@@ -21,8 +21,8 @@ static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *
 static s_ezlopi_device_properties_t *digital_io_prepare_item(cJSON *cjson_device);
 static void digital_io_write_gpio_value(s_ezlopi_device_properties_t *properties);
 static uint32_t digital_io_read_gpio_value(s_ezlopi_device_properties_t *properties);
-static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t* properties);
-static void digital_io_toggle_gpio(s_ezlopi_device_properties_t* properties);
+static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t *properties);
+static void digital_io_toggle_gpio(s_ezlopi_device_properties_t *properties);
 
 int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
@@ -32,19 +32,16 @@ int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properti
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        TRACE_I("EZLOPI_ACTION_PREPARE");
         ret = digital_io_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        TRACE_I("EZLOPI_ACTION_INITIALIZE event.");
         ret = digital_io_init(properties);
         break;
     }
     case EZLOPI_ACTION_SET_VALUE:
     {
-        TRACE_I("EZLOPI_ACTION_SET_VALUE event.");
         ret = digital_io_set_value(properties, arg);
         break;
     }
@@ -178,13 +175,13 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
     return ret;
 }
 
-static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t* properties)
+static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t *properties)
 {
     digital_io_toggle_gpio(properties);
     ezlopi_device_value_updated_from_device(properties);
 }
 
-static void digital_io_toggle_gpio(s_ezlopi_device_properties_t* properties)
+static void digital_io_toggle_gpio(s_ezlopi_device_properties_t *properties)
 {
     uint32_t write_value = !(properties->interface.gpio.gpio_out.value);
     esp_err_t error = gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, write_value);

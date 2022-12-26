@@ -19,6 +19,11 @@ uint16_t ezlopi_ble_gatt_get_max_data_size(void)
     return g_mtu_size;
 }
 
+void ezlopi_ble_gatts_characteristic_notify(s_gatt_service_t *service, s_gatt_char_t *characteristics, esp_gatt_value_t *value)
+{
+    esp_ble_gatts_send_indicate(service->gatts_if, service->conn_id, characteristics->handle, value->len, value->value, false);
+}
+
 void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_B("BLE GATT Event: %s, gatts_if: %d", ezlopi_ble_gatt_event_to_string(event), gatts_if);
@@ -240,8 +245,8 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
                 }
                 default:
                 {
-                    TRACE_I("Is a characteristic read.");
-                    return characteristic->read_upcall;
+                    TRACE_I("Characteristic upcall not found!");
+                    return NULL;
                 }
                 }
             }
@@ -272,8 +277,8 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
                     }
                     default:
                     {
-                        TRACE_I("Is a descriptor read.");
-                        return descriptor->read_upcall;
+                        TRACE_I("Descriptor upcall not found!");
+                        return NULL;
                     }
                     }
                 }

@@ -11,6 +11,8 @@ elif [[ "test" == $1 ]];then
 release=2
 elif [[  "build" == $1 ]];then
 release=3
+elif [[ "compile_binary" == $1 ]];then
+release=4
 fi
 
 V_MAJOR=2 # Major changes such as protocols, in-compatible APIs, Probably not compatible with prior version
@@ -164,6 +166,12 @@ if [ $retVal -ne 1 ]; then
         idf.py build
         create_test_release
         test_release_note
+        release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}_${V_BUILD}"
+        zip -r $release_bins.zip $release_bins
+        echo -e "Test release "$release_bins".zip successfully created."
+    elif [ 4 == $release ];then
+        idf.py build
+        create_release
         release_bins="firmware/v${V_MAJOR}_${V_MINOR}_${V_BATCH}_${V_BUILD}"
         zip -r $release_bins.zip $release_bins
         echo -e "Test release "$release_bins".zip successfully created."

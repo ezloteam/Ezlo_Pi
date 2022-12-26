@@ -1,13 +1,10 @@
 #include <string.h>
-
-#include "sensor_bme280.h"
-#include "ezlopi_actions.h"
-// #include "ezlopi_sensors.h"
-#include "ezlopi_timer.h"
-#include "items.h"
-#include "frozen.h"
-#include "trace.h"
 #include "cJSON.h"
+
+#include "trace.h"
+#include "sensor_bme280.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_subcategory_str.h"

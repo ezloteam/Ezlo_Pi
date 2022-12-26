@@ -135,10 +135,6 @@ static void ezlopi_device_parse_json(char *config_string)
             {
                 TRACE_B("Device-%d:", config_dev_idx);
 
-                // char *device_name = NULL;
-                // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-                // TRACE_D("device name: %s", device_name ? device_name : "");
-
                 int id_item = 0;
                 CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
                 TRACE_B("id_item: %d", id_item);
@@ -151,19 +147,11 @@ static void ezlopi_device_parse_json(char *config_string)
                     {
                         if (id_item == sensor_list[dev_idx].id)
                         {
-                             
                             s_ezlopi_prep_arg_t device_prep_arg = {.device = &sensor_list[dev_idx], .cjson_device = cjson_device};
                             sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
                         }
 
                         dev_idx++;
-                    }
-
-                    l_ezlopi_configured_devices_t *current_head = ezlopi_devices_list_get_configured_items();
-                    while (NULL != current_head)
-                    {
-                        ezlopi_device_print_properties(current_head->properties);
-                        current_head = current_head->next;
                     }
                 }
 
@@ -173,6 +161,13 @@ static void ezlopi_device_parse_json(char *config_string)
         }
 
         cJSON_Delete(cjson_config);
+    }
+
+    l_ezlopi_configured_devices_t *current_head = ezlopi_devices_list_get_configured_items();
+    while (NULL != current_head)
+    {
+        ezlopi_device_print_properties(current_head->properties);
+        current_head = current_head->next;
     }
 }
 
