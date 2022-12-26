@@ -13,7 +13,7 @@
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_sensor.h"
-
+#include "sensor_sound.h"
 
 static s_ezlopi_device_t device_array[] = {
 
