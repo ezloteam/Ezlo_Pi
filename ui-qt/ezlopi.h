@@ -46,7 +46,7 @@ typedef QString EZPI_STRING;
 
 #define     EZPI_ESP32_GENERIC_PINOUT_COUNT                     40
 #define     EZPI_ESP32_S3_PINOUT_COUNT                          49
-#define     EZPI_ESP32_C3_PINOUT_COUNT                          40
+#define     EZPI_ESP32_C3_PINOUT_COUNT                          22
 
 #define     SIZE_EZPI_OFFSET_CONN_ID_0                          0X0000
 #define     SIZE_EZPI_OFFSET_CONN_ID_1                          0X7000
