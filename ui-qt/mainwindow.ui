@@ -215,6 +215,11 @@
       <string>ESP32S3</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>ESP32C3</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_board_select">
     <property name="geometry">
