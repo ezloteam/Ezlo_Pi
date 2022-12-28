@@ -15,12 +15,14 @@
 
 
 static bool is_motion_detected = false;
+static bool previous_motion = false;
 
 static int ezlopi_ultrasonic_MB1013_prepare_and_add(void* args);
 static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjson_device);
 static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *properties);
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static void ezlopi_ultrasonic_MB1013_upcall(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
+static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t* properties);
 
 
 int ultrasonic_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
@@ -41,12 +43,12 @@ int ultrasonic_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
         }
         case EZLOPI_ACTION_NOTIFY_200_MS:
         {
-            ret = ezlopi_device_value_updated_from_device(properties);
+            ret = ezlopi_send_motion_detected_data(properties);
             break;
         }
         case EZLOPI_ACTION_GET_EZLOPI_VALUE:
         {
-            ezlopi_ultrasonic_MB1013_get_value_cjson(properties, arg);
+            ret = ezlopi_ultrasonic_MB1013_get_value_cjson(properties, arg);
             break;
         }
         default:
@@ -54,7 +56,6 @@ int ultrasonic_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
             break;
         }
     }
-
     return ret;
 }
 
@@ -74,7 +75,6 @@ static void ezlopi_ultrasonic_MB1013_upcall(uint8_t* buffer, s_ezlopi_uart_objec
     {
         is_motion_detected = false;
     }
-    
     free(another_buffer);
 }
 
@@ -141,6 +141,7 @@ static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjs
     return ezlopi_ultrasonic_MB1013_properties;
 }
 
+
 static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = -1;
@@ -154,6 +155,16 @@ static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *propertie
     return ret;
 }
 
+static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t* properties)
+{
+    int ret = 0;
+    if(is_motion_detected != previous_motion)
+    {
+        ret = ezlopi_device_value_updated_from_device(properties);
+        previous_motion = is_motion_detected;
+    }
+    return ret;
+}
 
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
