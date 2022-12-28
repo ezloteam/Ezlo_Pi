@@ -106,7 +106,7 @@ static s_ezlopi_device_t device_array[] = {
 
 #ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
     {
-        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .id = EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR,
         .func = sensor_ldr_digital_module,
     },
 #endif

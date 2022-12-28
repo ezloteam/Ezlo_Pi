@@ -52,7 +52,9 @@
 #define EZLOPI_TIMER_GRP_0 TIMER_GROUP_0
 #define EZLOPI_TIMER_GRP_1 TIMER_GROUP_1
 #define EZLOPI_TIMER_IDX_0 TIMER_0
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 #define EZLOPI_TIMER_IDX_1 TIMER_1
+#endif
 
 #define EZLOPI_TIMER_DIVIDER (1000) //  Hardware timer clock divider
 
@@ -60,7 +62,11 @@
 #define EZLOPI_TIMER_SCALE (XTAL_CLK_FREQ / (EZLOPI_TIMER_DIVIDER)) // convert counter value to seconds
 #endif
 
-#ifdef CONFIG_IDF_TARGET_ESP32
+#ifdef CONFIG_IDF_TARGET_ESP32 
+#define EZLOPI_TIMER_SCALE (APB_CLK_FREQ / EZLOPI_TIMER_DIVIDER) // convert counter value to seconds
+#endif
+
+#ifdef CONFIG_IDF_TARGET_ESP32C3
 #define EZLOPI_TIMER_SCALE (APB_CLK_FREQ / EZLOPI_TIMER_DIVIDER) // convert counter value to seconds
 #endif
 

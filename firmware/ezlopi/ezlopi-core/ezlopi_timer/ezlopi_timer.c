@@ -59,14 +59,22 @@ typedef struct s_ezlopi_timer
         }                               \
     }
 
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 #define MAX_TIMER 4
-
 const static int timer_group_index_pair[MAX_TIMER][2] = {
     {EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0},
     {EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_1},
     {EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_0},
     {EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_1},
 };
+#elif CONFIG_IDF_TARGET_ESP32C3
+#define MAX_TIMER 2
+const static int timer_group_index_pair[MAX_TIMER][2] = {
+    {EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0},
+    {EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_0},
+};
+#endif
+
 
 static void send_event_to_queue(e_ezlopi_actions_t action)
 {
@@ -144,6 +152,7 @@ void ezlopi_timer_start_200ms(void)
     ezlopi_timer_init_timer_event(1, 200, EZLOPI_ACTION_NOTIFY_200_MS);
 }
 
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 void ezlopi_timer_start_500ms(void)
 {
     ezlopi_timer_init_timer_event(2, 500, EZLOPI_ACTION_NOTIFY_500_MS);
@@ -153,6 +162,7 @@ void ezlopi_timer_start_1000ms(void)
 {
     ezlopi_timer_init_timer_event(3, 1000, EZLOPI_ACTION_NOTIFY_1000_MS);
 }
+#endif
 
 static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_actions_t event_type)
 {

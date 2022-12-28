@@ -34,6 +34,9 @@ static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {E
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2,
                                                             EZLOPI_GPIO_CHANNEL_3, EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5,
                                                             EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7, EZLOPI_GPIO_CHANNEL_8, EZLOPI_GPIO_CHANNEL_9};
+#elif CONFIG_IDF_TARGET_ESP32C3
+static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2,
+                                                            EZLOPI_GPIO_CHANNEL_3, EZLOPI_GPIO_CHANNEL_4};
 #endif
 
 

@@ -1,5 +1,7 @@
 
 
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3
+
 #include "ultrasonic_HC_SR04.h"
 #include "cJSON.h"
 #include "trace.h"
@@ -257,3 +259,5 @@ static int ezlopi_ultrasonic_HC_SR04_get_value_cjson(s_ezlopi_device_properties_
     }
     return ret;
 }
+
+#endif //CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3
