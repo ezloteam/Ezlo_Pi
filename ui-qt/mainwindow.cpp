@@ -861,6 +861,10 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_OTHER: {
+            if(EzloPi->EZPI_GET_BOARD_TYPE() == EZPI_BOARD_TYPE_ESP32_C3) {
+                QMessageBox::information(this, "Unsupported", "Not supported for board ESP32C3.");
+                break;
+            }
             ezlogic_form_config_other->setFixedHeight(270);
             ezlogic_form_config_other->setFixedWidth(185);
             ezlogic_form_config_other->setModal(true);
@@ -872,6 +876,16 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             QMessageBox::information(this, "Unknown", "Unknown type.");
         }
     }
+
+    delete ezlogic_form_configdev_digitalio;
+    delete ezlogic_form_config_digital_ip;
+    delete  ezlogic_form_config_analog_ip;
+    delete ezlogic_form_config_pwm;
+    delete ezlogic_form_config_uart;
+    delete ezlogic_form_config_onewire;
+    delete ezlogic_form_config_i2c;
+    delete ezlogic_form_config_spi;
+    delete ezlogic_form_config_other;
 }
 
 void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
