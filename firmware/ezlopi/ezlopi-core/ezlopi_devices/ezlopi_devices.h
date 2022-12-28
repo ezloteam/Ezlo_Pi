@@ -29,13 +29,13 @@
         }                                                     \
     }
 
-#define ASSIGN_DEVICE_NAME(digital_io_device_properties, device_name)                             \
+#define ASSIGN_DEVICE_NAME(digital_io_device_properties, dev_name)                                \
     {                                                                                             \
-        if ((NULL != device_name) && ('\0' != device_name[0]))                                    \
+        if ((NULL != dev_name) && ('\0' != dev_name[0]))                                          \
         {                                                                                         \
             snprintf(digital_io_device_properties->ezlopi_cloud.device_name,                      \
                      sizeof(digital_io_device_properties->ezlopi_cloud.device_name),              \
-                     "%s", device_name);                                                          \
+                     "%s", dev_name);                                                             \
         }                                                                                         \
         else                                                                                      \
         {                                                                                         \

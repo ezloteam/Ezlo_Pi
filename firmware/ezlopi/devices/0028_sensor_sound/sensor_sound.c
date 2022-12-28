@@ -39,11 +39,15 @@ int sound_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *proper
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (prev_motion_status != is_motion_detected)
+        static int count;
+        is_motion_detected = ADS131_value();
+        if ((prev_motion_status != is_motion_detected) || (count > 10))
         {
             ret = ezlopi_device_value_updated_from_device(properties);
             prev_motion_status = is_motion_detected;
+            count = 0;
         }
+        count++;
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -96,10 +100,10 @@ static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(ezlopi_sound_properties, device_name);
-        ezlopi_sound_properties->ezlopi_cloud.category = category_security_sensor;
-        ezlopi_sound_properties->ezlopi_cloud.subcategory = subcategory_motion;
-        ezlopi_sound_properties->ezlopi_cloud.item_name = ezlopi_item_name_motion;
-        ezlopi_sound_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
+        ezlopi_sound_properties->ezlopi_cloud.category = category_level_sensor;
+        ezlopi_sound_properties->ezlopi_cloud.subcategory = subcategory_sound;
+        ezlopi_sound_properties->ezlopi_cloud.item_name = ezlopi_item_name_sounding_mode;
+        ezlopi_sound_properties->ezlopi_cloud.device_type = dev_type_sensor;
         ezlopi_sound_properties->ezlopi_cloud.value_type = value_type_bool;
         ezlopi_sound_properties->ezlopi_cloud.has_getter = true;
         ezlopi_sound_properties->ezlopi_cloud.has_setter = false;
@@ -111,6 +115,7 @@ static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
         ezlopi_sound_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
         ezlopi_sound_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
     }
+
     return ezlopi_sound_properties;
 }
 
@@ -125,11 +130,17 @@ static int ezlopi_sound_get_value_cjson(s_ezlopi_device_properties_t *properties
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)args;
-    is_motion_detected = ADS131_value();
     if (cjson_propertise)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", is_motion_detected);
+        static const char *audible = "audible";
+        static const char *silent = "silent";
+
+        static bool value;
+        value = (false == value) ? true : false;
+        // cJSON_AddStringToObject(cjson_propertise, "value", is_motion_detected ? "audible" : "silent");
+        cJSON_AddBoolToObject(cjson_propertise, "value", value);
         ret = 1;
     }
+
     return ret;
 }

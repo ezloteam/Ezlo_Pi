@@ -51,7 +51,7 @@ static void registration_process(void *pv)
 
     while (0 == is_registered)
     {
-        web_provisioning_send_to_nma_websocket(cjson_data);
+        web_provisioning_send_to_nma_websocket(cjson_data, TRACE_TYPE_B);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 

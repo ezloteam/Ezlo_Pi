@@ -14,6 +14,7 @@
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_sensor.h"
 #include "sensor_sound.h"
+#include "1024_device_health.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -80,14 +81,6 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0021_SOUND_SENSOR
-    {
-        .id = EZLOPI_SENSOR_0021_SOUND_SENSOR,
-        // .func = ultrasonic_MB1013,
-        .func = sound_sensor,
-    },
-#endif
-
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
@@ -111,7 +104,7 @@ static s_ezlopi_device_t device_array[] = {
 
 #ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
     {
-        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .id = EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR,
         .func = sensor_ldr_digital_module,
     },
 #endif
@@ -120,6 +113,20 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0027_WATER_SENSOR,
         .func = sensor_water_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI
+    {
+        .id = EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI,
+        .func = sound_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_1024_DEVICE_HEALTH
+    {
+        .id = EZLOPI_SENSOR_1024_DEVICE_HEALTH,
+        .func = device_health,
     },
 #endif
     /**

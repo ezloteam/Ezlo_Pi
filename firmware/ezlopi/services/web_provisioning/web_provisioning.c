@@ -25,6 +25,8 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "web_provisioning.h"
+
 static uint32_t message_counter = 0;
 
 static void __connection_upcall(bool connected);
@@ -67,12 +69,6 @@ static const s_method_list_t method_list[] = {
     // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 #endif
-typedef enum e_trace_type
-{
-    TRACE_TYPE_B = 0,
-    TRACE_TYPE_I,
-    TRACE_TYPE_E
-} e_trace_type_t;
 
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
@@ -116,44 +112,46 @@ uint32_t web_provisioning_get_message_count(void)
 int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
-    if (cjson_data)
+    if (ezlopi_websocket_client_is_connected())
     {
-        char *cjson_str_data = cJSON_Print(cjson_data);
-        if (cjson_str_data)
+        if (cjson_data)
         {
-            cJSON_Minify(cjson_str_data);
-            switch (print_type)
+            char *cjson_str_data = cJSON_Print(cjson_data);
+            if (cjson_str_data)
             {
-            case TRACE_TYPE_B:
-            {
-                TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                break;
-            }
-            case TRACE_TYPE_E:
-            {
-                TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                break;
-            }
+                cJSON_Minify(cjson_str_data);
+                switch (print_type)
+                {
+                case TRACE_TYPE_B:
+                {
+                    TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    break;
+                }
+                case TRACE_TYPE_E:
+                {
+                    TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    break;
+                }
 
-            case TRACE_TYPE_I:
-            {
-                TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                break;
-            }
-            default:
-                break;
-            }
+                case TRACE_TYPE_I:
+                {
+                    TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    break;
+                }
+                default:
+                    break;
+                }
 
-            int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
-            if (ret > 0)
-            {
-                message_counter++;
-            }
+                int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
+                if (ret > 0)
+                {
+                    message_counter++;
+                }
 
-            free(cjson_str_data);
+                free(cjson_str_data);
+            }
         }
     }
-
     return ret;
 }
 

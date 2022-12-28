@@ -7,8 +7,8 @@ extern "C"
 #define MAJOR 2
 #define MINOR 0
 #define BATCH 7
-#define BUILD 135
-#define VERSION_STR "v2.0.7"
+#define BUILD 136
+#define VERSION_STR "v2.0.7.136"
 #ifdef __cplusplus
 }
 #endif

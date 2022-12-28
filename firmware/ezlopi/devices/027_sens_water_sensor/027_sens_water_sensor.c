@@ -14,11 +14,10 @@
 
 #include "027_sens_water_sensor.h"
 
+static char *ezlopi_water_previous_leak_state = NULL;
+static char *ezlopi_water_present_leak_state = NULL;
 
-static char* ezlopi_water_previous_leak_state = NULL;
-static char* ezlopi_water_present_leak_state = NULL;
-
-static int sensor_water_sensor_prepare_and_add(void* args);
+static int sensor_water_sensor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_water_sensor_prepare(cJSON *cjson_device);
 static int sensor_water_sensor_init(s_ezlopi_device_properties_t *properties);
 static int get_sensor_water_sensor_value_to_cloud(s_ezlopi_device_properties_t *properties, void *args);
@@ -26,42 +25,42 @@ static int sensor_water_sensor_get_value(s_ezlopi_device_properties_t *propertie
 
 int sensor_water_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
 {
-     int ret = 0;
+    int ret = 0;
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            ret = sensor_water_sensor_prepare_and_add(arg);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            ret = sensor_water_sensor_init(ezlo_device);
-            break;
-        }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            get_sensor_water_sensor_value_to_cloud(ezlo_device, arg);
-            break;
-        }
-        case EZLOPI_ACTION_NOTIFY_200_MS:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            sensor_water_sensor_get_value(ezlo_device);
-            break;
-        }
-        default:
-        {
-            break;
-        }
+    case EZLOPI_ACTION_PREPARE:
+    {
+        TRACE_I("%s", ezlopi_actions_to_string(action));
+        ret = sensor_water_sensor_prepare_and_add(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        TRACE_I("%s", ezlopi_actions_to_string(action));
+        ret = sensor_water_sensor_init(ezlo_device);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        TRACE_I("%s", ezlopi_actions_to_string(action));
+        get_sensor_water_sensor_value_to_cloud(ezlo_device, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_200_MS:
+    {
+        TRACE_I("%s", ezlopi_actions_to_string(action));
+        sensor_water_sensor_get_value(ezlo_device);
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
     return ret;
 }
 
-static int sensor_water_sensor_prepare_and_add(void* args)
+static int sensor_water_sensor_prepare_and_add(void *args)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
@@ -84,7 +83,6 @@ static int sensor_water_sensor_prepare_and_add(void* args)
 
     return ret;
 }
-
 
 static s_ezlopi_device_properties_t *sensor_water_sensor_prepare(cJSON *cjson_device)
 {
@@ -121,8 +119,6 @@ static s_ezlopi_device_properties_t *sensor_water_sensor_prepare(cJSON *cjson_de
     return sensor_water_sensor_properties;
 }
 
-
-
 static int sensor_water_sensor_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
@@ -133,7 +129,6 @@ static int sensor_water_sensor_init(s_ezlopi_device_properties_t *properties)
     }
     return ret;
 }
-
 
 static int get_sensor_water_sensor_value_to_cloud(s_ezlopi_device_properties_t *properties, void *arg)
 {
@@ -147,27 +142,28 @@ static int get_sensor_water_sensor_value_to_cloud(s_ezlopi_device_properties_t *
     return ret;
 }
 
-
 static int sensor_water_sensor_get_value(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+    s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
     TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
-    if(1000 <= ezlopi_analog_data->voltage)
+    if (1000 <= ezlopi_analog_data->voltage)
     {
         ezlopi_water_present_leak_state = "water_leak_detected";
     }
-    else 
+    else
     {
         ezlopi_water_present_leak_state = "no_water_leak";
     }
-    if(ezlopi_water_previous_leak_state != ezlopi_water_present_leak_state)
+
+    if (ezlopi_water_previous_leak_state != ezlopi_water_present_leak_state)
     {
         ezlopi_device_value_updated_from_device(properties);
         ezlopi_water_previous_leak_state = ezlopi_water_present_leak_state;
     }
+    
     free(ezlopi_analog_data);
     return ret;
 }
