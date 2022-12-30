@@ -861,6 +861,10 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_OTHER: {
+            if(EzloPi->EZPI_GET_BOARD_TYPE() == EZPI_BOARD_TYPE_ESP32_C3) {
+                QMessageBox::information(this, "Unsupported", "Not supported for board ESP32C3.");
+                break;
+            }
             ezlogic_form_config_other->setFixedHeight(270);
             ezlogic_form_config_other->setFixedWidth(185);
             ezlogic_form_config_other->setModal(true);

@@ -62,7 +62,7 @@ static s_ezlopi_device_properties_t *__prepare_start_time_property(void)
         properties->ezlopi_cloud.battery_powered = false;
         properties->ezlopi_cloud.category = category_interface;
         properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-        properties->ezlopi_cloud.item_name = ""
+        properties->ezlopi_cloud.item_name = "";
     }
 
     return properties;

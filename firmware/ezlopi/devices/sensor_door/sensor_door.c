@@ -1,5 +1,6 @@
+#include "sdkconfig.h"
 
-
+#ifdef CONFIG_IDF_TARGET_ESP32
 #include "trace.h"
 #include "sensor_door.h"
 #include "esp_err.h"
@@ -156,3 +157,5 @@ static int sensor_door_init(s_ezlopi_device_properties_t *properties)
     }
     return error;
 }
+
+#endif // CONFIG_IDF_TARGET_ESP32

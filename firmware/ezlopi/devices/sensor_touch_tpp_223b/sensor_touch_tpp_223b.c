@@ -22,7 +22,6 @@ static s_ezlopi_device_properties_t* sensor_touch_tpp_223b_prepare(cJSON* cjson_
 static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties);
 static void sensor_touch_tpp_223b_value_updated_from_device(s_ezlopi_device_properties_t *properties);
 static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-static void sensor_touch_tpp_223b_toggle_gpio(s_ezlopi_device_properties_t* properties);
 
 
 int sensor_touch_ttp_223b(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
@@ -154,15 +153,7 @@ static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties)
 
 static void sensor_touch_tpp_223b_value_updated_from_device(s_ezlopi_device_properties_t *properties)
 {
-    // sensor_touch_tpp_223b_toggle_gpio(properties);
     ezlopi_device_value_updated_from_device(properties);
-}
-
-static void sensor_touch_tpp_223b_toggle_gpio(s_ezlopi_device_properties_t* properties)
-{
-    uint32_t write_value = !(properties->interface.gpio.gpio_out.value);
-    // esp_err_t error = gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, write_value);
-    properties->interface.gpio.gpio_out.value = write_value;
 }
 
 static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
@@ -171,9 +162,9 @@ static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *p
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        // properties->interface.gpio.gpio_out.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        sensor_touch_tpp_223b_toggle_gpio(properties);
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        properties->interface.gpio.gpio_in.value = 0 == properties->interface.gpio.gpio_in.invert ? gpio_level : !gpio_level;
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
 

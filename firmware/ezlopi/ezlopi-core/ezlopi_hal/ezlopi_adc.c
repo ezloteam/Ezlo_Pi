@@ -34,6 +34,9 @@ static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {E
 static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2,
                                                             EZLOPI_GPIO_CHANNEL_3, EZLOPI_GPIO_CHANNEL_4, EZLOPI_GPIO_CHANNEL_5,
                                                             EZLOPI_GPIO_CHANNEL_6, EZLOPI_GPIO_CHANNEL_7, EZLOPI_GPIO_CHANNEL_8, EZLOPI_GPIO_CHANNEL_9};
+#elif CONFIG_IDF_TARGET_ESP32C3
+static e_ezlopi_gpio_channel_t ezlopi_channel_to_gpio_map[ADC1_CHANNEL_MAX] = {EZLOPI_GPIO_CHANNEL_0, EZLOPI_GPIO_CHANNEL_1, EZLOPI_GPIO_CHANNEL_2,
+                                                            EZLOPI_GPIO_CHANNEL_3, EZLOPI_GPIO_CHANNEL_4};
 #endif
 
 
@@ -100,6 +103,7 @@ int ezlopi_adc_get_channel_number(uint8_t gpio_num)
 int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_analog_data)
 {
     int channel = ezlopi_adc_get_adc_channel(gpio_num);
+    // TRACE_E("Channel is %d and gpio-num is %d", channel, gpio_num);
     if(-1 == channel)
     {
         TRACE_E("Invalid gpio_num(%d)", gpio_num);

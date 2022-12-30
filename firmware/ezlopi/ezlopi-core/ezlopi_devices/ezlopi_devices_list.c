@@ -49,7 +49,7 @@ static s_ezlopi_device_t device_array[] = {
 // #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
 //     {
 //         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
-//         .func = NULL,
+//         .func = sensor_ldr_analog_sensor,
 //     },
 // #endif
 
@@ -84,7 +84,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func = ezlopi_dimmable_bulb,
+        .func = ezlopi_servo_motor_MG_996R, //ezlopi_dimmable_bulb,
     },
 #endif
 

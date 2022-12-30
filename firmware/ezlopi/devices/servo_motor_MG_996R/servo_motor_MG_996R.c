@@ -117,7 +117,11 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num = 4;
         ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle = 13;
         ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz = 50;
+#if CONFIG_IDF_TARGET_ESP32C3
+        ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln = 9;
+#else
         ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln = 8;
+#endif
     }
     return ezlopi_servo_motor_MG_996R_properties;
 }
@@ -155,7 +159,7 @@ static int ezlopi_servo_motor_MG_996R_set_value(s_ezlopi_device_properties_t *pr
 
         if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.pwm.gpio_num))
         {
-            int target_value = (int)(((value * 17) / 120) + 13);
+            int target_value = (int)(((value * 17) / 100) + 13);
             ezlopi_pwm_change_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode, target_value);
         }
     }
@@ -169,7 +173,7 @@ static int ezlopi_servo_motor_MG_996R_get_value_cjson(s_ezlopi_device_properties
     if (cjson_propertise)
     {
         uint32_t duty = ezlopi_pwm_get_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode);
-        int target_duty = (int)(((duty - 13) * 120) / 17);
+        int target_duty = (int)(((duty - 13) * 100) / 17);
         cJSON_AddNumberToObject(cjson_propertise, "value", target_duty);
         ret = 1;
     }

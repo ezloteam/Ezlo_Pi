@@ -110,7 +110,7 @@ static s_ezlopi_device_properties_t* sensor_ldr_digital_module_prepare(cJSON* cj
         sensor_ldr_digital_module_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
 
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_ldr_digital_module_properties->interface.gpio.gpio_in.gpio_num);
-        CJSON_GET_VALUE_INT(cjson_device, "ip_inv", sensor_ldr_digital_module_properties->interface.gpio.gpio_in.invert);
+        CJSON_GET_VALUE_INT(cjson_device, "logic_inv", sensor_ldr_digital_module_properties->interface.gpio.gpio_in.invert);
         CJSON_GET_VALUE_INT(cjson_device, "val_ip", sensor_ldr_digital_module_properties->interface.gpio.gpio_in.value);
 
         sensor_ldr_digital_module_properties->interface.gpio.gpio_in.enable = true;
@@ -130,7 +130,7 @@ static int sensor_ldr_digital_module_init(s_ezlopi_device_properties_t *properti
             .mode = GPIO_MODE_INPUT,
             .pull_up_en = GPIO_PULLUP_DISABLE,
             .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_POSEDGE,
+            .intr_type = GPIO_INTR_ANYEDGE,
         };
 
         ret = gpio_config(&io_conf);
@@ -163,8 +163,10 @@ static int sensor_ldr_digital_module_get_value_cjson(s_ezlopi_device_properties_
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        int value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        cJSON_AddBoolToObject(cjson_propertise, "value", value);
+        int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        TRACE_E("properties->interface.gpio.gpio_in.invert is %d", properties->interface.gpio.gpio_in.invert);
+        properties->interface.gpio.gpio_in.value = 0 == properties->interface.gpio.gpio_in.invert ? gpio_level : !gpio_level;
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
 

@@ -32,6 +32,8 @@ static const int RX_BUF_SIZE = 3096;
 #define RXD_PIN (GPIO_NUM_3)
 #elif defined(CONFIG_IDF_TARGET_ESP32S2)
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
+#define TXD_PIN (GPIO_NUM_21)
+#define RXD_PIN (GPIO_NUM_20)
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
 #define TXD_PIN (GPIO_NUM_43)
 #define RXD_PIN (GPIO_NUM_44)

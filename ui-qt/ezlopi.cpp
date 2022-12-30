@@ -176,6 +176,8 @@ void EzPi::EZPI_INIT_BOARD(void) {
             break;
 
         case EZPI_BOARD_TYPE_ESP32_C3:  
+            // Referece
+            // https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/peripherals/gpio.html
             ezpi_gpio_pool.at(0) = EZPI_DEV_TYPE_UNCONFIGURED;
             ezpi_gpio_pool.at(1) = EZPI_DEV_TYPE_UNCONFIGURED;
             ezpi_gpio_pool.at(2) = EZPI_DEV_TYPE_UNCONFIGURED;
