@@ -6,6 +6,7 @@
 #include <cJSON.h>
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
+#include "sdkconfig.h"
 
 #define EZLOPI_SENSOR_NONE 0
 #define EZLOPI_SENSOR_0001_LED 1
@@ -30,7 +31,6 @@
 
 #define EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR 25
 #define EZLOPI_SENSOR_0027_WATER_SENSOR 27
-
 
 /**
  * @brief defining the type of sensor call function
