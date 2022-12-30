@@ -103,6 +103,7 @@ int ezlopi_adc_get_channel_number(uint8_t gpio_num)
 int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_analog_data)
 {
     int channel = ezlopi_adc_get_adc_channel(gpio_num);
+    // TRACE_E("Channel is %d and gpio-num is %d", channel, gpio_num);
     if(-1 == channel)
     {
         TRACE_E("Invalid gpio_num(%d)", gpio_num);

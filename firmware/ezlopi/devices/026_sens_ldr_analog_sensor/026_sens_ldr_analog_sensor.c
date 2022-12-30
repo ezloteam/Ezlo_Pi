@@ -14,11 +14,14 @@
 
 #include "026_sens_ldr_analog_sensor.h"
 
+static char* present_light_status = "no_light";
+static char* previous_light_status = "no_light";
 
 static int sensor_ldr_analog_sensor_prepare_and_add(void* args);
 static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjson_device);
 static int sensor_ldr_analog_sensor_init(s_ezlopi_device_properties_t *properties);
 static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
+static int sensor_ldr_set_detection(s_ezlopi_device_properties_t* properties);
 
 
 int sensor_ldr_analog_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
@@ -47,8 +50,7 @@ int sensor_ldr_analog_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properti
         case EZLOPI_ACTION_NOTIFY_200_MS:
         {
             TRACE_I("%s", ezlopi_actions_to_string(action));
-            // ezlopi_device_value_updated_from_device(ezlo_device);
-            get_sensor_ldr_analog_sensor_value(ezlo_device, arg);
+            sensor_ldr_set_detection(ezlo_device);
             break;
         }
         default:
@@ -95,11 +97,11 @@ static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjs
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_ldr_analog_sensor_properties, device_name);
-        sensor_ldr_analog_sensor_properties->ezlopi_cloud.category = category_not_defined;
+        sensor_ldr_analog_sensor_properties->ezlopi_cloud.category = category_light_sensor;
         sensor_ldr_analog_sensor_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-        sensor_ldr_analog_sensor_properties->ezlopi_cloud.item_name = "";
+        sensor_ldr_analog_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_light_alarm;
         sensor_ldr_analog_sensor_properties->ezlopi_cloud.device_type = dev_type_device;
-        sensor_ldr_analog_sensor_properties->ezlopi_cloud.value_type = value_type_int;
+        sensor_ldr_analog_sensor_properties->ezlopi_cloud.value_type = value_type_token;
         sensor_ldr_analog_sensor_properties->ezlopi_cloud.has_getter = true;
         sensor_ldr_analog_sensor_properties->ezlopi_cloud.has_setter = false;
         sensor_ldr_analog_sensor_properties->ezlopi_cloud.reachable = true;
@@ -129,21 +131,39 @@ static int sensor_ldr_analog_sensor_init(s_ezlopi_device_properties_t *propertie
     return ret;
 }
 
+static int sensor_ldr_set_detection(s_ezlopi_device_properties_t* properties)
+{
+    int ret = 0;
+    s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+    memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+    ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+    TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
+    if(150 >= ezlopi_analog_data->voltage)
+    {
+        present_light_status = "no_light";
+    }
+    else
+    {
+        present_light_status = "light_detected";
+    }
+    if(present_light_status != previous_light_status)
+    {
+        ezlopi_device_value_updated_from_device(properties);
+        previous_light_status = present_light_status;
+    }
+    free(ezlopi_analog_data);
+    return ret;
+}
+
 static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
-    s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
-    memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
     if (cjson_propertise)
     {
-        ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
-        // cJSON_AddNumberToObject(cjson_propertise, "value", ezlopi_analog_data->value);
+        cJSON_AddStringToObject(cjson_propertise, "value", present_light_status);
         ret = 1;
     }
-    ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-    TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
-    free(ezlopi_analog_data);
+    
     return ret;
 }
