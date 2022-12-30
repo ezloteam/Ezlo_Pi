@@ -14,8 +14,8 @@
 
 #include "026_sens_ldr_analog_sensor.h"
 
-static char* present_light_status = "no_light";
-static char* previous_light_status = "no_light";
+// static char* present_light_status = "no_light";
+// static char* previous_light_status = "no_light";
 
 static int sensor_ldr_analog_sensor_prepare_and_add(void* args);
 static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjson_device);
@@ -115,6 +115,7 @@ static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjs
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_ldr_analog_sensor_properties->interface.adc.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "resln_bit", sensor_ldr_analog_sensor_properties->interface.adc.resln_bit);
         sensor_ldr_analog_sensor_properties->interface.adc.resln_bit = 3;
+        sensor_ldr_analog_sensor_properties->interface.adc.user_data = (void*)"no_light";
     }
 
     return sensor_ldr_analog_sensor_properties;
@@ -131,37 +132,70 @@ static int sensor_ldr_analog_sensor_init(s_ezlopi_device_properties_t *propertie
     return ret;
 }
 
-static int sensor_ldr_set_detection(s_ezlopi_device_properties_t* properties)
+// static int sensor_ldr_set_detection(s_ezlopi_device_properties_t* properties)
+// {
+//     int ret = 0;
+//     s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+//     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+//     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+//     TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
+//     if(150 >= ezlopi_analog_data->voltage)
+//     {
+//         present_light_status = "no_light";
+//     }
+//     else
+//     {
+//         present_light_status = "light_detected";
+//     }
+//     if(present_light_status != previous_light_status)
+//     {
+//         ezlopi_device_value_updated_from_device(properties);
+//         previous_light_status = present_light_status;
+//     }
+//     free(ezlopi_analog_data);
+//     return ret;
+// }
+
+
+static int sensor_ldr_set_detection(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
+
+    char* water_leak_state = (char*)properties->interface.adc.user_data;
     s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+
+
     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-    TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
+
     if(150 >= ezlopi_analog_data->voltage)
     {
-        present_light_status = "no_light";
+        properties->interface.adc.user_data = (void*)"no_light";
     }
-    else
+    else 
     {
-        present_light_status = "light_detected";
+        properties->interface.adc.user_data = (void*)"light_detected";
     }
-    if(present_light_status != previous_light_status)
+    if(water_leak_state != (char*)properties->interface.adc.user_data)
     {
         ezlopi_device_value_updated_from_device(properties);
-        previous_light_status = present_light_status;
     }
+
+
     free(ezlopi_analog_data);
     return ret;
 }
+
+
 
 static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
+    char* value = (char*)properties->interface.adc.user_data;
     if (cjson_propertise)
     {
-        cJSON_AddStringToObject(cjson_propertise, "value", present_light_status);
+        cJSON_AddStringToObject(cjson_propertise, "value", value);
         ret = 1;
     }
     

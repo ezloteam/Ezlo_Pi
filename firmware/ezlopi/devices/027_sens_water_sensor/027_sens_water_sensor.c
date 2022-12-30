@@ -1,3 +1,5 @@
+
+#include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_category_str.h"
@@ -5,7 +7,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_adc.h"
+
 
 #include "esp_err.h"
 #include "items.h"
@@ -15,8 +17,8 @@
 #include "027_sens_water_sensor.h"
 
 
-static char* ezlopi_water_previous_leak_state = NULL;
-static char* ezlopi_water_present_leak_state = NULL;
+// static char* ezlopi_water_previous_leak_state = NULL;
+// static char* ezlopi_water_present_leak_state = NULL;
 
 static int sensor_water_sensor_prepare_and_add(void* args);
 static s_ezlopi_device_properties_t *sensor_water_sensor_prepare(cJSON *cjson_device);
@@ -116,6 +118,7 @@ static s_ezlopi_device_properties_t *sensor_water_sensor_prepare(cJSON *cjson_de
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_water_sensor_properties->interface.adc.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "resln_bit", sensor_water_sensor_properties->interface.adc.resln_bit);
         sensor_water_sensor_properties->interface.adc.resln_bit = 3;
+        sensor_water_sensor_properties->interface.adc.user_data = (void*)"no_water_leak";
     }
 
     return sensor_water_sensor_properties;
@@ -133,41 +136,73 @@ static int sensor_water_sensor_init(s_ezlopi_device_properties_t *properties)
     }
     return ret;
 }
-
+    
 
 static int get_sensor_water_sensor_value_to_cloud(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
+    char* value = (char*)properties->interface.adc.user_data;
     if (cjson_propertise)
     {
-        cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_leak_state);
+        cJSON_AddStringToObject(cjson_propertise, "value", value);
         ret = 1;
     }
     return ret;
 }
 
 
+// static int sensor_water_sensor_get_value(s_ezlopi_device_properties_t *properties)
+// {
+//     int ret = 0;
+//     s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+//     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+//     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+//     TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
+//     if(1000 <= ezlopi_analog_data->voltage)
+//     {
+//         ezlopi_water_present_leak_state = "water_leak_detected";
+//     }
+//     else 
+//     {
+//         ezlopi_water_present_leak_state = "no_water_leak";
+//     }
+//     if(ezlopi_water_previous_leak_state != ezlopi_water_present_leak_state)
+//     {
+//         ezlopi_device_value_updated_from_device(properties);
+//         ezlopi_water_previous_leak_state = ezlopi_water_present_leak_state;
+//     }
+//     free(ezlopi_analog_data);
+//     return ret;
+// }
+
 static int sensor_water_sensor_get_value(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
+
+    char* water_leak_state = (char*)properties->interface.adc.user_data;
     s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+
+
     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-    TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
+
     if(1000 <= ezlopi_analog_data->voltage)
     {
-        ezlopi_water_present_leak_state = "water_leak_detected";
+        properties->interface.adc.user_data = (void*)"water_leak_detected";
     }
     else 
     {
-        ezlopi_water_present_leak_state = "no_water_leak";
+        properties->interface.adc.user_data = (void*)"no_water_leak";
     }
-    if(ezlopi_water_previous_leak_state != ezlopi_water_present_leak_state)
+    if(water_leak_state != (char*)properties->interface.adc.user_data)
     {
         ezlopi_device_value_updated_from_device(properties);
-        ezlopi_water_previous_leak_state = ezlopi_water_present_leak_state;
     }
+
+
     free(ezlopi_analog_data);
     return ret;
 }
+
+
