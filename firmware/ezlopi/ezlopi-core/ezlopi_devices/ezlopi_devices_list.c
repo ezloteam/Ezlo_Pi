@@ -12,7 +12,7 @@
 #include "sensor_touch_tpp_223b.h"
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
-#include "027_sens_water_sensor.h"
+#include "027_sens_water_leak_sensor.h"
 #include "sensor_sound.h"
 #include "1024_device_health.h"
 
@@ -84,7 +84,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func = ezlopi_servo_motor_MG_996R, //ezlopi_dimmable_bulb,
+        .func = ezlopi_servo_motor_MG_996R, // ezlopi_dimmable_bulb,
     },
 #endif
 
@@ -109,10 +109,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0027_WATER_SENSOR
+#ifdef EZLOPI_SENSOR_0027_WATER_LEAK
     {
-        .id = EZLOPI_SENSOR_0027_WATER_SENSOR,
-        .func = sensor_water_sensor,
+        .id = EZLOPI_SENSOR_0027_WATER_LEAK,
+        .func = water_leak_sensor,
     },
 #endif
 

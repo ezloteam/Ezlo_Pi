@@ -14,54 +14,52 @@
 
 #include "026_sens_ldr_analog_sensor.h"
 
-static char* present_light_status = "no_light";
-static char* previous_light_status = "no_light";
+static char *present_light_status = "no_light";
+static char *previous_light_status = "no_light";
 
-static int sensor_ldr_analog_sensor_prepare_and_add(void* args);
+static int sensor_ldr_analog_sensor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjson_device);
 static int sensor_ldr_analog_sensor_init(s_ezlopi_device_properties_t *properties);
 static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
-static int sensor_ldr_set_detection(s_ezlopi_device_properties_t* properties);
-
+static int sensor_ldr_set_detection(s_ezlopi_device_properties_t *properties);
 
 int sensor_ldr_analog_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
 {
     int ret = 0;
+    TRACE_I("sensor_ldr_analog_sensor: %s", ezlopi_actions_to_string(action));
+
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            ret = sensor_ldr_analog_sensor_prepare_and_add(arg);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            ret = sensor_ldr_analog_sensor_init(ezlo_device);
-            break;
-        }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            get_sensor_ldr_analog_sensor_value(ezlo_device, arg);
-            break;
-        }
-        case EZLOPI_ACTION_NOTIFY_200_MS:
-        {
-            TRACE_I("%s", ezlopi_actions_to_string(action));
-            sensor_ldr_set_detection(ezlo_device);
-            break;
-        }
-        default:
-        {
-            break;
-        }
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = sensor_ldr_analog_sensor_prepare_and_add(arg);
+        break;
     }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = sensor_ldr_analog_sensor_init(ezlo_device);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        get_sensor_ldr_analog_sensor_value(ezlo_device, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_200_MS:
+    {
+        sensor_ldr_set_detection(ezlo_device);
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+
     return ret;
 }
 
-static int sensor_ldr_analog_sensor_prepare_and_add(void* args)
+static int sensor_ldr_analog_sensor_prepare_and_add(void *args)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
@@ -131,14 +129,14 @@ static int sensor_ldr_analog_sensor_init(s_ezlopi_device_properties_t *propertie
     return ret;
 }
 
-static int sensor_ldr_set_detection(s_ezlopi_device_properties_t* properties)
+static int sensor_ldr_set_detection(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+    s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
     TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
-    if(150 >= ezlopi_analog_data->voltage)
+    if (150 >= ezlopi_analog_data->voltage)
     {
         present_light_status = "no_light";
     }
@@ -146,7 +144,7 @@ static int sensor_ldr_set_detection(s_ezlopi_device_properties_t* properties)
     {
         present_light_status = "light_detected";
     }
-    if(present_light_status != previous_light_status)
+    if (present_light_status != previous_light_status)
     {
         ezlopi_device_value_updated_from_device(properties);
         previous_light_status = present_light_status;
@@ -164,6 +162,6 @@ static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *prop
         cJSON_AddStringToObject(cjson_propertise, "value", present_light_status);
         ret = 1;
     }
-    
+
     return ret;
 }
