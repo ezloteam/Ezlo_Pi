@@ -51,7 +51,6 @@ typedef struct s_ezlopi_analog_data{
 typedef struct s_ezlopi_adc{
     uint32_t gpio_num;
     uint8_t resln_bit;
-    void* user_data;
 }s_ezlopi_adc_t;
 
 

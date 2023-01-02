@@ -156,6 +156,7 @@ static int ezlopi_dimmable_bulb_set_value(s_ezlopi_device_properties_t *properti
         if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.pwm.gpio_num))
         {
             int target_value = (int)((value * 4095) / 100);
+            // TRACE_E("Target value is %d", target_value);
             ezlopi_pwm_change_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode, target_value);
             properties->interface.pwm.duty_cycle = target_value;
             properties->interface.pwm.value = value;

@@ -115,7 +115,7 @@ static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjs
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_ldr_analog_sensor_properties->interface.adc.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "resln_bit", sensor_ldr_analog_sensor_properties->interface.adc.resln_bit);
         sensor_ldr_analog_sensor_properties->interface.adc.resln_bit = 3;
-        sensor_ldr_analog_sensor_properties->interface.adc.user_data = (void*)"no_light";
+        sensor_ldr_analog_sensor_properties->user_arg = (void*)"no_light";
     }
 
     return sensor_ldr_analog_sensor_properties;
@@ -161,7 +161,7 @@ static int sensor_ldr_set_detection(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
 
-    char* water_leak_state = (char*)properties->interface.adc.user_data;
+    char* water_leak_state = (char*)properties->user_arg;
     s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
 
@@ -170,17 +170,16 @@ static int sensor_ldr_set_detection(s_ezlopi_device_properties_t *properties)
 
     if(150 >= ezlopi_analog_data->voltage)
     {
-        properties->interface.adc.user_data = (void*)"no_light";
+        properties->user_arg = (void*)"no_light";
     }
     else 
     {
-        properties->interface.adc.user_data = (void*)"light_detected";
+        properties->user_arg = (void*)"light_detected";
     }
-    if(water_leak_state != (char*)properties->interface.adc.user_data)
+    if(water_leak_state != (char*)properties->user_arg)
     {
         ezlopi_device_value_updated_from_device(properties);
     }
-
 
     free(ezlopi_analog_data);
     return ret;
@@ -192,7 +191,7 @@ static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *prop
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
-    char* value = (char*)properties->interface.adc.user_data;
+    char* value = (char*)properties->user_arg;
     if (cjson_propertise)
     {
         cJSON_AddStringToObject(cjson_propertise, "value", value);

@@ -10,13 +10,14 @@
 struct s_ezlopi_uart_object{
     s_ezlopi_uart_t ezlopi_uart;
     __uart_upcall upcall;
+    void* user_args;
     QueueHandle_t ezlopi_uart_queue_handle;
 };
 
 static void ezlopi_uart_channel_task(void* args);
 static ezlo_uart_channel_t get_available_channel();
 
-s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall)
+s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* user_args)
 {
     static QueueHandle_t ezlo_uart_channel_queue;
     s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object*)malloc(sizeof(struct s_ezlopi_uart_object));
@@ -58,7 +59,8 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
         uart_object_handle->ezlopi_uart.rx = rx;        
         uart_object_handle->ezlopi_uart.enable = true;  
         uart_object_handle->upcall = upcall;  
-        
+        uart_object_handle->user_args = user_args;
+       
         xTaskCreate(ezlopi_uart_channel_task, "ezlopi_uart_channel_task", 2048*2, (void*)uart_object_handle, 10, NULL); 
     }
     else 
@@ -72,7 +74,7 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
 
 static ezlo_uart_channel_t get_available_channel()
 {
-    TRACE_E("EZLOPI_UART_CHANNEL_MAX is : %d", EZLOPI_UART_CHANNEL_MAX);
+    // TRACE_E("EZLOPI_UART_CHANNEL_MAX is : %d", EZLOPI_UART_CHANNEL_MAX);
     for(ezlo_uart_channel_t channel = EZLOPI_UART_CHANNEL_1; channel < EZLOPI_UART_CHANNEL_MAX; channel++)
     {
         if(!uart_is_driver_installed(channel))
@@ -111,7 +113,7 @@ static void ezlopi_uart_channel_task(void* args)
                 }
             }
         }  
-        ezlopi_uart_object->upcall(buffer, ezlopi_uart_object); 
+        ezlopi_uart_object->upcall(buffer, ezlopi_uart_object, ezlopi_uart_object->user_args); 
     }   
 }
 

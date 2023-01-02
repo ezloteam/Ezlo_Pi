@@ -118,7 +118,7 @@ static s_ezlopi_device_properties_t *sensor_water_sensor_prepare(cJSON *cjson_de
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_water_sensor_properties->interface.adc.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "resln_bit", sensor_water_sensor_properties->interface.adc.resln_bit);
         sensor_water_sensor_properties->interface.adc.resln_bit = 3;
-        sensor_water_sensor_properties->interface.adc.user_data = (void*)"no_water_leak";
+        sensor_water_sensor_properties->user_arg = (void*)"no_water_leak";
     }
 
     return sensor_water_sensor_properties;
@@ -142,7 +142,7 @@ static int get_sensor_water_sensor_value_to_cloud(s_ezlopi_device_properties_t *
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
-    char* value = (char*)properties->interface.adc.user_data;
+    char* value = (char*)properties->user_arg;
     if (cjson_propertise)
     {
         cJSON_AddStringToObject(cjson_propertise, "value", value);
@@ -180,7 +180,7 @@ static int sensor_water_sensor_get_value(s_ezlopi_device_properties_t *propertie
 {
     int ret = 0;
 
-    char* water_leak_state = (char*)properties->interface.adc.user_data;
+    char* water_leak_state = (char*)properties->user_arg;
     s_ezlopi_analog_data_t* ezlopi_analog_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
 
@@ -189,18 +189,16 @@ static int sensor_water_sensor_get_value(s_ezlopi_device_properties_t *propertie
 
     if(1000 <= ezlopi_analog_data->voltage)
     {
-        properties->interface.adc.user_data = (void*)"water_leak_detected";
+        properties->user_arg = (void*)"water_leak_detected";
     }
     else 
     {
-        properties->interface.adc.user_data = (void*)"no_water_leak";
+        properties->user_arg = (void*)"no_water_leak";
     }
-    if(water_leak_state != (char*)properties->interface.adc.user_data)
+    if(water_leak_state != (char*)properties->user_arg)
     {
         ezlopi_device_value_updated_from_device(properties);
     }
-
-
     free(ezlopi_analog_data);
     return ret;
 }
