@@ -161,6 +161,8 @@ static int ezlopi_servo_motor_MG_996R_set_value(s_ezlopi_device_properties_t *pr
         {
             int target_value = (int)(((value * 17) / 100) + 13);
             ezlopi_pwm_change_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode, target_value);
+            properties->interface.pwm.duty_cycle = target_value;
+            properties->interface.pwm.value = value;
         }
     }
     return ret;
@@ -172,9 +174,9 @@ static int ezlopi_servo_motor_MG_996R_get_value_cjson(s_ezlopi_device_properties
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        uint32_t duty = ezlopi_pwm_get_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode);
-        int target_duty = (int)(((duty - 13) * 100) / 17);
-        cJSON_AddNumberToObject(cjson_propertise, "value", target_duty);
+        // uint32_t duty = ezlopi_pwm_get_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode);
+        // int target_duty = (int)(((duty - 13) * 100) / 17);
+        cJSON_AddNumberToObject(cjson_propertise, "value", properties->interface.pwm.value);
         ret = 1;
     }
     return ret;

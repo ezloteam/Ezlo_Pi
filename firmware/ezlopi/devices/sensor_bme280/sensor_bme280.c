@@ -181,7 +181,7 @@ static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t d
             sensor_ble280_properties->ezlopi_cloud.category = category;
             sensor_ble280_properties->ezlopi_cloud.subcategory = sub_category;
             sensor_ble280_properties->ezlopi_cloud.item_name = item_name;
-            sensor_ble280_properties->ezlopi_cloud.device_type = dev_type_sensor;
+            sensor_ble280_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
             sensor_ble280_properties->ezlopi_cloud.value_type = value_type;
             sensor_ble280_properties->ezlopi_cloud.has_getter = true;
             sensor_ble280_properties->ezlopi_cloud.has_setter = false;

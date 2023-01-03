@@ -47,12 +47,12 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-// #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
-//     {
-//         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
-//         .func = sensor_ldr_analog_sensor,
-//     },
-// #endif
+#ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
+    {
+        .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
+        .func = sensor_ldr_analog_sensor,
+    },
+#endif
 
 #ifdef EZLOPI_SENSOR_0018_DOOR
     {

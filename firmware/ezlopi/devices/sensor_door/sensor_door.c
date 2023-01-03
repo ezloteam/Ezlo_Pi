@@ -16,10 +16,14 @@
 #include "ezlopi_device_value_updated.h"
 #include "gpio_isr_service.h"
 
+static const char* dw_status_dw_is_closed = "dw_is_closed";
+static const char* dw_status_dw_is_opened = "dw_is_opened";
+
 static int sensor_door_init(s_ezlopi_device_properties_t *properties);
 static int get_door_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
 static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args);
 static int sensor_door_prepare(void *args);
+static int ezlopi_get_ezlopi_door_value(s_ezlopi_device_properties_t* properties, void* args);
 
 int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args, void *user_arg)
 {
@@ -38,12 +42,12 @@ int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *pr
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        get_door_sensor_value(properties, args);
+        ezlopi_get_ezlopi_door_value(properties, args);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_200_MS:
     {
-        ezlopi_device_value_updated_from_device(properties);
+        get_door_sensor_value(properties, args);
         break;
     }
     default:
@@ -112,6 +116,7 @@ static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args)
             sensor_door_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
             sensor_door_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
             sensor_door_properties->interface.gpio.gpio_in.gpio_num = GPIO_NUM_36;
+            sensor_door_properties->user_arg = (void*)dw_status_dw_is_closed;
         }
     }
     return sensor_door_properties;
@@ -120,23 +125,34 @@ static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args)
 static int get_door_sensor_value(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
+    char* dw_status = (char*)properties->user_arg;
 #ifdef CONFIG_IDF_TARGET_ESP32
     int sensor_data = hall_sensor_read();
 #else
     int sensor_data = 0;
 #endif
-    TRACE_E("Reading value from the door sensor.");
-    char *door_is = ((sensor_data >= 60) || (sensor_data <= 20)) ? "dw_is_closed" : "dw_is_opened";
-    // TRACE_I("The door is %s", door_is);
+    
+    properties->user_arg = (void*)(((sensor_data >= 60) || (sensor_data <= 20)) ? dw_status_dw_is_closed : dw_status_dw_is_opened);
+    // TRACE_I("The current door status is %s", (char*)properties->user_arg);
+    // TRACE_E("The previous door status is %s", dw_status);
+    if(dw_status != (char*)properties->user_arg)
+    {
+        ezlopi_device_value_updated_from_device(properties);
+    }
+    return ret;
+}
+
+static int ezlopi_get_ezlopi_door_value(s_ezlopi_device_properties_t* properties, void* args)
+{
+    int ret = 0;
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        if (cJSON_AddStringToObject(cjson_propertise, "value", door_is))
+        if (cJSON_AddStringToObject(cjson_propertise, "value", (char*)properties->user_arg))
         {
             ret = 1;
         }
     }
-
     return ret;
 }
 
@@ -149,7 +165,7 @@ static int sensor_door_init(s_ezlopi_device_properties_t *properties)
 #endif
     if (error)
     {
-        TRACE_E("Error 'sensor_door_init'. rror: %s)", esp_err_to_name(error));
+        TRACE_E("Error 'sensor_door_init'. error: %s)", esp_err_to_name(error));
     }
     else
     {
