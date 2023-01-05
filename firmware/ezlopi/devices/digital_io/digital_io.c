@@ -90,8 +90,9 @@ static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *
 
         if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
         {
-            value = (0 == properties->interface.gpio.gpio_out.invert) ? value : ((EZLOPI_GPIO_LOW == value) ? EZLOPI_GPIO_HIGH : EZLOPI_GPIO_LOW);
-            gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, value);
+            // value = (0 == properties->interface.gpio.gpio_out.invert) ? value : ((EZLOPI_GPIO_LOW == value) ? EZLOPI_GPIO_HIGH : EZLOPI_GPIO_LOW);
+            int temp_value = (0 == properties->interface.gpio.gpio_out.invert) ? value : !(value);
+            gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, temp_value);
             properties->interface.gpio.gpio_out.value = value;
         }
     }

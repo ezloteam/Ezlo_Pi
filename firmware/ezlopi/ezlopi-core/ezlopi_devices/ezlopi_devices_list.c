@@ -7,6 +7,12 @@
 #include "dimmable_bulb.h"
 #include "joystick_2_axis.h"
 #include "ultrasonic_MB1013.h"
+#include "servo_motor_MG_996R.h"
+#include "ultrasonic_HC_SR04.h"
+#include "sensor_touch_tpp_223b.h"
+#include "025_sens_ldr_digital_module.h"
+#include "026_sens_ldr_analog_sensor.h"
+#include "027_sens_water_sensor.h"
 #include "sensor_sound.h"
 
 static s_ezlopi_device_t device_array[] = {
@@ -38,6 +44,13 @@ static s_ezlopi_device_t device_array[] = {
         .func = sensor_bme280,
     },
 #endif
+
+// #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
+//     {
+//         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
+//         .func = NULL,
+//     },
+// #endif
 
 #ifdef EZLOPI_SENSOR_0018_DOOR
     {
@@ -79,6 +92,34 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
         .func = ezlopi_dimmable_bulb,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR,
+        .func = sensor_touch_ttp_223b,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .func = ultrasonic_HC_SR04,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .func = sensor_ldr_digital_module,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0027_WATER_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0027_WATER_SENSOR,
+        .func = sensor_water_sensor,
     },
 #endif
     /**

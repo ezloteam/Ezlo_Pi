@@ -53,6 +53,11 @@
      <string>Door Sensor</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>HC SR04 Ultrasonic Distance Sensor</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_device_other_subtype">
    <property name="geometry">

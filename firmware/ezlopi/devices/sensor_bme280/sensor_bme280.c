@@ -130,7 +130,9 @@ static int prepare_sensor(void *arg)
                 __prepare_sensor_config(sensor_config, prep_arg->cjson_device, bme280_hal_arg);
                 uint32_t device_id = ezlopi_device_generate_device_id();
                 ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
+                device_id = ezlopi_device_generate_device_id();
                 ADD_PROPERTIES_DEVICE_LIST(device_id, category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, prep_arg->cjson_device);
+                device_id = ezlopi_device_generate_device_id();
                 ADD_PROPERTIES_DEVICE_LIST(device_id, category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, prep_arg->cjson_device);
             }
             else

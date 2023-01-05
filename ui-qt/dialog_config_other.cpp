@@ -51,23 +51,39 @@ void Dialog_config_other::on_buttonBox_accepted() {
 
     other_user_data.dev_type = EZPI_DEV_TYPE_OTHER;
     other_user_data.dev_name = ui->lineEdit_device_name->text();
-    other_user_data.id_room = ""; // TBD
-    other_user_data.id_item = (ezpi_item_type)(ui->comboBox_other_device_subtype->currentIndex() + EZPI_ITEM_TYPE_DOOR_SENSOR);
+    other_user_data.id_room = ""; // TBD    
+
+    if(ui->comboBox_other_device_subtype->currentIndex() == 0) {
+        other_user_data.id_item = EZPI_ITEM_TYPE_DOOR_SENSOR;
+    } else if (ui->comboBox_other_device_subtype->currentIndex() == 1) {
+        other_user_data.id_item = EZPI_ITEM_TYPE_ULTRASONIC_SENSOR;
+    } else {
+        qDebug() << "Unknown selection !";
+    }
 
     other_user_data.en_gpio1 = ui->checkBox_gpio1->isChecked();
-    other_user_data.gpio1 = ui->comboBox_gpio1->currentText().toInt();
     if(other_user_data.en_gpio1) {
+        other_user_data.gpio1 = ui->comboBox_gpio1->currentText().toInt();
         ezloPi_other->EZPI_SET_GPIO_POOL(other_user_data.gpio1, EZPI_DEV_TYPE_OTHER);
+    } else {
+        other_user_data.gpio1 = 0;
     }
 
     other_user_data.en_gpio2 = ui->checkBox_gpio2->isChecked();
-    other_user_data.gpio2 = ui->comboBox_gpio2->currentText().toInt();
+
     if(other_user_data.en_gpio2) {
+        other_user_data.gpio2 = ui->comboBox_gpio2->currentText().toInt();
         ezloPi_other->EZPI_SET_GPIO_POOL(other_user_data.gpio2, EZPI_DEV_TYPE_OTHER);
+    } else {
+        other_user_data.gpio2 = 0;
     }
 
     other_user_data.en_gpio3 = ui->checkBox_gpio3->isChecked();
-    other_user_data.gpio3 = ui->comboBox_gpio3->currentText().toInt();
+    if(other_user_data.en_gpio2) {
+        other_user_data.gpio3 = ui->comboBox_gpio3->currentText().toInt();
+    } else {
+        other_user_data.gpio3 = 0;
+    }
 
     // Adding device to the device vector
     if(ezloPi_other->EZPI_ADD_OTHER_DEVICE(other_user_data) == EZPI_SUCCESS) {
@@ -78,7 +94,6 @@ void Dialog_config_other::on_buttonBox_accepted() {
     } else {
         // Do nothing
     }
-
 }
 
 

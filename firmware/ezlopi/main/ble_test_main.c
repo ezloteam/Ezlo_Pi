@@ -26,6 +26,7 @@ static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 
+
 void app_main(void)
 {
     qt_serial_init();
@@ -34,7 +35,6 @@ void app_main(void)
     web_provisioning_init();
     ezlopi_ble_service_init();
     timer_service_init();
-
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
