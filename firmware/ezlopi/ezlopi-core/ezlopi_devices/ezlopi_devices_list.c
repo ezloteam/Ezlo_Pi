@@ -13,6 +13,7 @@
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_sensor.h"
+#include "028_sens_i2c_accelerometer.h"
 
 
 static s_ezlopi_device_t device_array[] = {
@@ -41,7 +42,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0012_BME280_I2C
     {
         .id = EZLOPI_SENSOR_0012_BME280_I2C,
-        .func = sensor_bme280,
+        .func = sensor_i2c_accelerometer//sensor_bme280,
         // .is_configured = false,
         // .properties = NULL,
     },

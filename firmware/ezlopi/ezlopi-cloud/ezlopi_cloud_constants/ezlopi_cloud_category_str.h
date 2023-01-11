@@ -37,7 +37,7 @@ const static char *category_weather = "weather";
 // const static char *category_flow_meter = "flow_meter";
 // const static char *category_voltage_sensor = "voltage_sensor";
 // const static char *category_state_sensor = "state_sensor";
-// const static char *category_level_sensor = "level_sensor";
+const static char *category_level_sensor = "level_sensor";
 // const static char *category_clock = "clock";
 
 #endif // __EZLOPI_CATEGORY_H__

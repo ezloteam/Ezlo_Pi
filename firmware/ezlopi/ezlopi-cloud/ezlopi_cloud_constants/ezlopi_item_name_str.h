@@ -2,9 +2,9 @@
 #define __EZLOPI_ITEM_NAME_STR_H__
 
 /// @brief https://api.ezlo.com/devices/items/index.html
-// const static char *ezlopi_item_name_acceleration_x_axis = "acceleration_x_axis";
-// const static char *ezlopi_item_name_acceleration_y_axis = "acceleration_y_axis";
-// const static char *ezlopi_item_name_acceleration_z_axis = "acceleration_z_axis";
+const static char *ezlopi_item_name_acceleration_x_axis = "acceleration_x_axis";
+const static char *ezlopi_item_name_acceleration_y_axis = "acceleration_y_axis";
+const static char *ezlopi_item_name_acceleration_z_axis = "acceleration_z_axis";
 // const static char *ezlopi_item_name_appliance_status = "appliance_status";
 // const static char *ezlopi_item_name_lock_operation = "lock_operation";
 // const static char *ezlopi_item_name_user_code_operation = "user_code_operation";
