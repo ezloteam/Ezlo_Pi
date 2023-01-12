@@ -50,11 +50,6 @@
 // 1g = 9.80665 m/s^2
 #define STANDARD_G_TO_ACCEL_CONVERSION_VALUE           9.80665 
 
-typedef struct {
-    float x_value;
-    float y_value;
-    float z_value;
-}sensor_i2c_accelerometer_values_t;
 
 int sensor_i2c_accelerometer(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 

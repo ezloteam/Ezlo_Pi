@@ -42,7 +42,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0012_BME280_I2C
     {
         .id = EZLOPI_SENSOR_0012_BME280_I2C,
-        .func = sensor_i2c_accelerometer//sensor_bme280,
+        .func = sensor_bme280, //sensor_i2c_accelerometer,
         // .is_configured = false,
         // .properties = NULL,
     },
