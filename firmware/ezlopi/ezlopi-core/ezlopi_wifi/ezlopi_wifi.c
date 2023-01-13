@@ -208,6 +208,27 @@ void ezlopi_wifi_initialize(void)
         IP_EVENT, IP_EVENT_STA_GOT_IP, &__event_handler, NULL, &instance_got_ip));
 }
 
+void ezlopi_wifi_connect_from_id_bin(void)
+{
+    s_ezlopi_factory_info_t *factory_info = ezlopi_factory_info_get_info();
+    if ((NULL != factory_info) && (NULL != factory_info->default_wifi_password) && (NULL != factory_info->default_wifi_password) &&
+        ('\0' != factory_info->default_wifi_ssid[0]) && ('\0' != factory_info->default_wifi_password[0]))
+    {
+        memset(wifi_ssid_pass, 0, sizeof(wifi_ssid_pass));
+        snprintf(&wifi_ssid_pass[00], 31, "%s", factory_info->default_wifi_ssid);
+        snprintf(&wifi_ssid_pass[32], 31, "%s", factory_info->default_wifi_password);
+    }
+    else
+    {
+        strcpy(&wifi_ssid_pass[00], "ezlopitest");
+        strcpy(&wifi_ssid_pass[32], "ezlopitest");
+        ezlopi_wifi_set_new_wifi_flag();
+    }
+
+    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass[0], &wifi_ssid_pass[32]);
+    TRACE_E("wifi_error: %u", wifi_error);
+}
+
 void ezlopi_wifi_connect_from_nvs(void)
 {
     memset(wifi_ssid_pass, 0, sizeof(wifi_ssid_pass));

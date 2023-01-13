@@ -21,7 +21,17 @@ void ezlopi_init(void)
     ezlopi_initialize_devices();
 
     ezlopi_wifi_initialize();
-    ezlopi_wifi_connect_from_nvs();
+
+    if (ezlopi_nvs_get_first_boot())
+    {
+        ezlopi_nvs_set_first_boot_false();
+        ezlopi_wifi_connect_from_id_bin();
+    }
+    else
+    {
+        ezlopi_wifi_connect_from_nvs();
+    }
+
     ezlopi_event_queue_init();
 
     ezlopi_timer_start_50ms();

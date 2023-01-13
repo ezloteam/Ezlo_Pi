@@ -67,24 +67,3 @@ v2_0_7_142  Date: Wed Jan 11 05:51:26 PM +0545 2023
 v2_0_7_143  Date: Wed Jan 11 05:54:43 PM +0545 2023
 	kk
 
-v2_0_7_144  Date: Wed Jan 11 09:04:35 PM +0545 2023
-	test release, after modifying the device info
-
-v2_0_7_145  Date: Wed Jan 11 09:15:25 PM +0545 2023
-	test release, updated info, esp32s3
-
-v2_0_7_146  Date: Wed Jan 11 09:19:40 PM +0545 2023
-	test release, updated info, esp32c3
-
-v2_0_7_147  Date: Thu Jan 12 07:23:19 PM +0545 2023
-	test release, disabled debug
-
-v2_0_7_148  Date: Thu Jan 12 07:24:28 PM +0545 2023
-	test release, disabled debug
-
-v2_0_7_149  Date: Thu Jan 12 07:37:37 PM +0545 2023
-	test release, debug disabled
-
-v2_0_7_152  Date: Thu Jan 12 07:46:04 PM +0545 2023
-	test release, disabled debug
-

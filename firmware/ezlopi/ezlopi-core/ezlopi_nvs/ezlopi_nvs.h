@@ -25,6 +25,9 @@ extern "C"
     int ezlopi_nvs_read_user_id_str(char **data);
     int ezlopi_nvs_write_user_id_str(char *data);
 
+    uint32_t ezlopi_nvs_get_first_boot(void);
+    void ezlopi_nvs_set_first_boot_false(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -24,6 +24,9 @@
 #include "ezlopi_factory_info.h"
 #include "version.h"
 #include "sdkconfig.h"
+#include "esp_idf_version.h"
+
+#include "ezlopi_system_info.h"
 
 static const int RX_BUF_SIZE = 3096;
 
@@ -167,23 +170,30 @@ static void qt_serial_get_info()
         {
             cJSON_AddNumberToObject(get_info, "cmd", 1);
             cJSON_AddNumberToObject(get_info, "status", 1);
-            cJSON_AddNumberToObject(get_info, "v_sw", (MAJOR << 16) | (MINOR << 8) | BATCH);
-            cJSON_AddNumberToObject(get_info, "v_type", 4000);
+            cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
+            cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
             cJSON_AddNumberToObject(get_info, "build", BUILD);
-            cJSON_AddNumberToObject(get_info, "v_idf", (4 << 16) | (4 << 8) | 1);
-            cJSON_AddNumberToObject(get_info, "uptime", 1234);
-            cJSON_AddNumberToObject(get_info, "build_date", 1657623331);
-            cJSON_AddNumberToObject(get_info, "boot_count", 15);
-            cJSON_AddNumberToObject(get_info, "boot_reason", 2);
-            cJSON_AddNumberToObject(get_info, "mac", 45647894);
+            cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
+            cJSON_AddNumberToObject(get_info, "v_idf", (ESP_IDF_VERSION_MAJOR << 16) | (ESP_IDF_VERSION_MINOR << 8) | ESP_IDF_VERSION_PATCH);
+            cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount());
+            cJSON_AddNumberToObject(get_info, "build_date", BUILD_DATE);
+            cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
+            cJSON_AddNumberToObject(get_info, "boot_reason", esp_reset_reason());
+            uint8_t base_mac[6];
+            esp_read_mac(base_mac, ESP_MAC_WIFI_STA);
+            dump("mac", base_mac, 0, 6);
+            uint64_t long_mac = 0xFFFFFFFFFFFFULL & ((base_mac[0] & 0xFFULL) | ((base_mac[1] & 0xFFULL) << 8) | ((base_mac[2] & 0xFFULL) << 16) | ((base_mac[3] & 0xFFULL) << 24) | ((base_mac[4] & 0xFFULL) << 32) | ((base_mac[5] & 0xFFULL) << 40));
+            cJSON_AddNumberToObject(get_info, "mac", long_mac);
             cJSON_AddStringToObject(get_info, "uuid", factory->controller_uuid);
             cJSON_AddNumberToObject(get_info, "serial", factory->id);
             cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
-
-            cJSON_AddNumberToObject(get_info, "dev_type", 1);
-            cJSON_AddNumberToObject(get_info, "dev_flash", 64256);
-            cJSON_AddNumberToObject(get_info, "dev_free_flash", 300);
             cJSON_AddStringToObject(get_info, "dev_name", factory->name);
+            cJSON_AddNumberToObject(get_info, "dev_type", 1);
+            cJSON_AddStringToObject(get_info, "dev_flash", CONFIG_ESPTOOLPY_FLASHSIZE);
+            cJSON_AddStringToObject(get_info, "dev_free_flash", "Nan");
+            cJSON_AddStringToObject(get_info, "brand", "Ezlo_Pi");
+            cJSON_AddStringToObject(get_info, "manf_name", "Nepal Digital System");
+            cJSON_AddStringToObject(get_info, "model_num", "063DEX5024");
         }
 
         char *my_json_string = cJSON_Print(get_info);
@@ -191,6 +201,7 @@ static void qt_serial_get_info()
 
         if (my_json_string)
         {
+
             cJSON_Minify(my_json_string);
             qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
             cJSON_free(my_json_string);

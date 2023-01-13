@@ -49,7 +49,7 @@ extern "C"
 #define TRACE_I(X, ...)
 #define TRACE_D(X, ...)
 #define TRACE_B(x, ...)
-#define dump(X, Y, Z)
+#define dump(name, X, Y, Z)
 
 #endif
 

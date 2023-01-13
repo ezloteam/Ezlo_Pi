@@ -109,7 +109,6 @@ static s_ezlopi_device_properties_t *water_leak_sensor_prepare(cJSON *cjson_devi
 
         CJSON_GET_VALUE_INT(cjson_device, "gpio", water_leak_sensor_properties->interface.adc.gpio_num);
         water_leak_sensor_properties->interface.adc.resln_bit = 3;
-        water_leak_sensor_properties->user_arg
     }
 
     return water_leak_sensor_properties;

@@ -12,6 +12,8 @@ static const char *storage_name = "storage";
 static const char *config_nvs_name = "confi_data";
 static const char *passkey_nvs_name = "passkey";
 static const char *user_id_nvs_name = "user_id";
+static const char *wifi_info_nvs_name = "wifi_info";
+static const char *first_boot_nvs_name = "first_boot";
 
 void ezlopi_nvs_init(void)
 {
@@ -165,7 +167,7 @@ int ezlopi_nvs_write_ble_passkey(uint32_t passkey)
 
 void ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len)
 {
-    esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, "wifi_info", wifi_info, len);
+    esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, wifi_info_nvs_name, wifi_info, len);
     TRACE_D("'write_wifi' Error nvs_set_blob: %s", esp_err_to_name(err));
     err = nvs_commit(ezlopi_nvs_handle);
     TRACE_D("'write_wifi' Error nvs_commit: %s", esp_err_to_name(err));
@@ -174,10 +176,10 @@ void ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len)
 void ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
 {
     size_t required_size;
-    esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, "wifi_info", NULL, &required_size);
+    esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, wifi_info_nvs_name, NULL, &required_size);
     if ((ESP_OK == err) && (len >= required_size))
     {
-        err = nvs_get_blob(ezlopi_nvs_handle, "wifi_info", wifi_info, &required_size);
+        err = nvs_get_blob(ezlopi_nvs_handle, wifi_info_nvs_name, wifi_info, &required_size);
         TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
         if (ESP_OK == err)
         {
@@ -198,7 +200,8 @@ int ezlopi_nvs_write_user_id_str(char *data)
     nvs_handle_t config_nvs_handle;
 
     err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
-    TRACE_W("nvs_open - error: %s", esp_err_to_name(err));    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
+    TRACE_W("nvs_open - error: %s", esp_err_to_name(err));
+    err = nvs_open(storage_name, NVS_READWRITE, &config_nvs_handle);
     TRACE_W("nvs_open - error: %s", esp_err_to_name(err));
 
     if (ESP_OK == err)
@@ -268,4 +271,33 @@ void ezlopi_nvs_deinit(void)
 {
     nvs_close(ezlopi_nvs_handle);
     ezlopi_nvs_handle = 0;
+}
+
+uint32_t ezlopi_nvs_get_first_boot(void)
+{
+    size_t required_size = 4;
+    uint32_t is_first_boot = 1;
+    esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, first_boot_nvs_name, &is_first_boot, &required_size);
+    TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
+    if (ESP_OK == err)
+    {
+        is_first_boot = 0;
+        TRACE_D("Load first-boot status success.");
+    }
+    else
+    {
+        is_first_boot = 1;
+        TRACE_D("Load first-boot status failed.");
+    }
+
+    return is_first_boot;
+}
+
+void ezlopi_nvs_set_first_boot_false(void)
+{
+    uint32_t first_boot = 0;
+    esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, first_boot_nvs_name, &first_boot, sizeof(first_boot));
+    TRACE_D("'%s' Error nvs_set_blob: %s", first_boot_nvs_name, esp_err_to_name(err));
+    err = nvs_commit(ezlopi_nvs_handle);
+    TRACE_D("'%s' Error nvs_commit: %s", first_boot_nvs_name, esp_err_to_name(err));
 }
