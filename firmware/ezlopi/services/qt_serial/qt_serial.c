@@ -48,7 +48,7 @@ static void qt_serial_get_info();
 static void qt_serial_set_wifi(const char *data);
 static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
 static void qt_serial_save_config(const char *data);
-static void qt_serial_read_data(void);
+static void qt_serial_read_config(void);
 
 int qt_serial_tx_data(int len, uint8_t *data)
 {
@@ -101,12 +101,13 @@ static int qt_serial_parse_rx_data(const char *data)
             }
             case 3:
             {
+                TRACE_B("1");
                 qt_serial_save_config(data);
                 break;
             }
             case 4:
             {
-                qt_serial_read_data();
+                qt_serial_read_config();
                 break;
             }
             case 0:
@@ -120,14 +121,23 @@ static int qt_serial_parse_rx_data(const char *data)
 
             default:
             {
-                TRACE_E("InValid command");
+                TRACE_E("Invalid command!");
                 break;
             }
             }
         }
+        else
+        {
+            TRACE_E("'cmd' not found!");
+        }
 
         cJSON_Delete(root);
     }
+    else
+    {
+        TRACE_E("Failed to parse json!");
+    }
+
     return 1;
 }
 
@@ -170,8 +180,8 @@ static void qt_serial_get_info()
         {
             cJSON_AddNumberToObject(get_info, "cmd", 1);
             cJSON_AddNumberToObject(get_info, "status", 1);
-            cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
             cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
+            cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
             cJSON_AddNumberToObject(get_info, "build", BUILD);
             cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
             cJSON_AddNumberToObject(get_info, "v_idf", (ESP_IDF_VERSION_MAJOR << 16) | (ESP_IDF_VERSION_MINOR << 8) | ESP_IDF_VERSION_PATCH);
@@ -185,15 +195,17 @@ static void qt_serial_get_info()
             uint64_t long_mac = 0xFFFFFFFFFFFFULL & ((base_mac[0] & 0xFFULL) | ((base_mac[1] & 0xFFULL) << 8) | ((base_mac[2] & 0xFFULL) << 16) | ((base_mac[3] & 0xFFULL) << 24) | ((base_mac[4] & 0xFFULL) << 32) | ((base_mac[5] & 0xFFULL) << 40));
             cJSON_AddNumberToObject(get_info, "mac", long_mac);
             cJSON_AddStringToObject(get_info, "uuid", factory->controller_uuid);
+            cJSON_AddStringToObject(get_info, "uuid_prov", factory->provisioning_uuid);
             cJSON_AddNumberToObject(get_info, "serial", factory->id);
             cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
-            cJSON_AddStringToObject(get_info, "dev_name", factory->name);
+            cJSON_AddStringToObject(get_info, "dev_name", factory->product_name);
             cJSON_AddNumberToObject(get_info, "dev_type", 1);
+            cJSON_AddStringToObject(get_info, "dev_type_ezlopi", factory->ezlopi_device_type);
             cJSON_AddStringToObject(get_info, "dev_flash", CONFIG_ESPTOOLPY_FLASHSIZE);
             cJSON_AddStringToObject(get_info, "dev_free_flash", "Nan");
-            cJSON_AddStringToObject(get_info, "brand", "Ezlo_Pi");
-            cJSON_AddStringToObject(get_info, "manf_name", "Nepal Digital System");
-            cJSON_AddStringToObject(get_info, "model_num", "063DEX5024");
+            cJSON_AddStringToObject(get_info, "brand", factory->ezlopi_brand);
+            cJSON_AddStringToObject(get_info, "manf_name", factory->ezlopi_manufacturer);
+            cJSON_AddStringToObject(get_info, "model_num", factory->ezlopi_model);
         }
 
         char *my_json_string = cJSON_Print(get_info);
@@ -269,7 +281,9 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
 
 static void qt_serial_save_config(const char *data)
 {
-    uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
+    // uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
+    uint32_t ret = ezlopi_factory_info_set_ezlopi_config((char *)data);
+    TRACE_B("ezlopi_factory_info_set_ezlopi_config: %d", ret);
     if (ret)
     {
         TRACE_B("Successfully wrote config data..");
@@ -280,10 +294,10 @@ static void qt_serial_save_config(const char *data)
     return;
 }
 
-static void qt_serial_read_data(void)
+static void qt_serial_read_config(void)
 {
-    char *buf = NULL;
-    ezlopi_nvs_read_config_data_str(&buf);
+    cJSON *root = NULL;
+    char *buf = ezlopi_factory_info_get_ezlopi_config();
 
     if (buf)
     {
@@ -294,19 +308,36 @@ static void qt_serial_read_data(void)
         {
             cJSON_DeleteItemFromObject(root, "cmd");
             cJSON_AddNumberToObject(root, "cmd", 4);
+        }
+    }
 
-            char *my_json_string = cJSON_Print(root);
+    if (NULL == root)
+    {
+        TRACE_E("Reading config failed!");
+        root = cJSON_CreateObject();
+        if (root)
+        {
+            cJSON_AddNumberToObject(root, "cmd", 4);
+            TRACE_D("'root'");
+        }
+        else
+        {
+            TRACE_E("Failed to create 'root'!");
+        }
+    }
 
-            if (my_json_string)
-            {
-                cJSON_Minify(my_json_string);
-                cJSON_Delete(root); // free Json string
+    if (root)
+    {
+        char *my_json_string = cJSON_Print(root);
 
-                const int len = strlen(my_json_string);
-                const int txBytes = qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
-
-                cJSON_free(my_json_string);
-            }
+        if (my_json_string)
+        {
+            cJSON_Minify(my_json_string);
+            cJSON_Delete(root); // free Json string
+            const int len = strlen(my_json_string);
+            const int txBytes = qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
+            // TRACE_D("Sending: %s", my_json_string);
+            cJSON_free(my_json_string);
         }
     }
 }

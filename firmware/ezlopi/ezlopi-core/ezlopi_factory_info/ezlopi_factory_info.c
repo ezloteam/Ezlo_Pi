@@ -10,13 +10,18 @@ static s_ezlopi_factory_info_t *factory_info = NULL;
 static const esp_partition_t *partition_ctx = NULL;
 
 static unsigned long long ezlopi_factory_info_get_id(void);
-static char *ezlopi_factory_info_get_uuid(void);
+static char *ezlopi_factory_info_get_controller_uuid(void);
 static char *ezlopi_factory_info_get_zwave_region(void);
 static char *ezlopi_factory_info_get_default_wifi_ssid(void);
 static char *ezlopi_factory_info_get_default_wifi_password(void);
 static char *ezlopi_factory_info_get_name(void);
-static char *ezlopi_factory_info_get_device_mac(void);
+static void ezlopi_factory_info_get_ezlopi_mac(uint8_t *mac_buf);
+static char *ezlopi_factory_info_manufacturer(void);
+static char *ezlopi_factory_info_get_brand(void);
+static char *ezlopi_factory_info_get_model(void);
+static char *ezlopi_factory_info_get_ezlopi_device_type(void);
 
+static char *ezlopi_factory_info_get_provisioning_uuid(void);
 static char *ezlopi_factory_info_get_provisioning_server(void);
 static char *ezlopi_factory_info_get_provisioning_token(void);
 static char *ezlopi_factory_info_get_cloud_server(void);
@@ -26,7 +31,7 @@ static char *ezlopi_factory_info_get_ssl_shared_key(void);
 
 static void ezlopi_factory_info_set_default(void);
 static char *ezlopi_factory_info_read_string_from_flash(int offset, uint32_t length);
-static int ezlopi_factory_info_write_string_to_nvs_flash(int offset, int size, struct json_token *token);
+static int ezlopi_factory_info_write_string_to_flash(int offset, char *data);
 
 #define free_and_assign_new(buff, new_data) \
     {                                       \
@@ -84,15 +89,24 @@ s_ezlopi_factory_info_t *ezlopi_factory_info_init(void)
             TRACE_I("Partition found '%s' at offset '0x%x' with size '0x%x'",
                     partition_ctx->label, partition_ctx->address, partition_ctx->size);
 
+            factory_info->h_version = 0;
             factory_info->id = ezlopi_factory_info_get_id();
-            factory_info->controller_uuid = ezlopi_factory_info_get_uuid();
+            factory_info->controller_uuid = ezlopi_factory_info_get_controller_uuid();
             factory_info->zwave_region = ezlopi_factory_info_get_zwave_region();
             factory_info->default_wifi_ssid = ezlopi_factory_info_get_default_wifi_ssid();
             factory_info->default_wifi_password = ezlopi_factory_info_get_default_wifi_password();
-            factory_info->name = ezlopi_factory_info_get_name();
-            factory_info->cloud_server = ezlopi_factory_info_get_cloud_server();
+            factory_info->product_name = ezlopi_factory_info_get_name();
+            ezlopi_factory_info_get_ezlopi_mac(factory_info->ezlopi_mac);
+            factory_info->ezlopi_manufacturer = ezlopi_factory_info_manufacturer();
+            factory_info->ezlopi_brand = ezlopi_factory_info_get_brand();
+            factory_info->ezlopi_model = ezlopi_factory_info_get_model();
+            factory_info->ezlopi_device_type = ezlopi_factory_info_get_ezlopi_device_type();
+
+            factory_info->provisioning_uuid = ezlopi_factory_info_get_provisioning_uuid();
             factory_info->provisioning_server = ezlopi_factory_info_get_provisioning_server();
             factory_info->provisioning_token = ezlopi_factory_info_get_provisioning_token();
+            factory_info->cloud_server = ezlopi_factory_info_get_cloud_server();
+            factory_info->ezlopi_config = ezlopi_factory_info_get_ezlopi_config();
             factory_info->ca_certificate = ezlopi_factory_info_get_ca_certificate();
             factory_info->ssl_private_key = ezlopi_factory_info_get_ssl_private_key();
             factory_info->ssl_shared_key = ezlopi_factory_info_get_ssl_shared_key();
@@ -105,21 +119,49 @@ s_ezlopi_factory_info_t *ezlopi_factory_info_init(void)
         ezlopi_factory_info_set_default();
 
         TRACE_D("id [off: %d, len: %d]: %llu", ID_OFFSET, sizeof(long long), factory_info->id);
-
         PRINT_FACTORY_INFO("controller_uuid", UUID_OFFSET, factory_info->controller_uuid);
         PRINT_FACTORY_INFO("zwave_region", ZWAVE_REGION_OFFSET, factory_info->zwave_region);
-        PRINT_FACTORY_INFO("name", PRODUCT_NAME_OFFSET, factory_info->name);
         PRINT_FACTORY_INFO("default_wifi_ssid", WIFI_SSID_OFFSET, factory_info->default_wifi_ssid);
         PRINT_FACTORY_INFO("default_wifi_password", WIFI_PASSWORD_OFFSET, factory_info->default_wifi_password);
-        PRINT_FACTORY_INFO("cloud_server", CLOUD_SERVER_OFFSET, factory_info->cloud_server);
+        PRINT_FACTORY_INFO("product_name", PRODUCT_NAME_OFFSET, factory_info->product_name);
+        TRACE_D("ezlopi_mac [off: %d, len: %d]: %02x:%02x:%02x:%02x:%02x:%02x", EZLOPI_MAC_OFFSET, EZLOPI_MAC_LENGTH,
+                factory_info->ezlopi_mac[5], factory_info->ezlopi_mac[4], factory_info->ezlopi_mac[3], factory_info->ezlopi_mac[2], factory_info->ezlopi_mac[1], factory_info->ezlopi_mac[0]);
+        PRINT_FACTORY_INFO("ezlopi_manufacturer", MANUFACTURER_OFFSET, factory_info->ezlopi_manufacturer);
+        PRINT_FACTORY_INFO("ezlopi_brand", MANUFACTURER_OFFSET, factory_info->ezlopi_brand);
+        PRINT_FACTORY_INFO("ezlopi_model", MANUFACTURER_OFFSET, factory_info->ezlopi_model);
+        PRINT_FACTORY_INFO("ezlopi_device_type", MANUFACTURER_OFFSET, factory_info->ezlopi_device_type);
+
+        PRINT_FACTORY_INFO("provisioning_uuid", PROVISIONING_UUID_OFFSET, factory_info->provisioning_uuid);
         PRINT_FACTORY_INFO("provisioning_server", PROVISIONING_SERVER_OFFSET, factory_info->provisioning_server);
         PRINT_FACTORY_INFO("provisioning_token", PROVISIONING_TOKEN_OFFSET, factory_info->provisioning_token);
+        PRINT_FACTORY_INFO("cloud_server", CLOUD_SERVER_OFFSET, factory_info->cloud_server);
+        PRINT_FACTORY_INFO("ezlopi_config", CLOUD_SERVER_OFFSET, factory_info->ezlopi_config);
         PRINT_FACTORY_INFO("ca_certificate", CA_CERTIFICATE_OFFSET, factory_info->ca_certificate);
         PRINT_FACTORY_INFO("ssl_private_key", SSL_PRIVATE_KEY_OFFSET, factory_info->ssl_private_key);
         PRINT_FACTORY_INFO("ssl_shared_key", SSL_SHARED_KEY_OFFSET, factory_info->ssl_shared_key);
     }
 
     return factory_info;
+}
+
+char *ezlopi_factory_info_get_ezlopi_config(void)
+{
+    return ezlopi_factory_info_read_string_from_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+}
+
+int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config)
+{
+    int ret = 0;
+    if ((NULL != ezlopi_config) && (EZLOPI_CONFIG_LENGTH >= strlen(ezlopi_config)))
+    {
+        ret = ezlopi_factory_info_write_string_to_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, ezlopi_config);
+    }
+    else
+    {
+        TRACE_E("Error writing to flash!");
+    }
+
+    return ret;
 }
 
 static unsigned long long ezlopi_factory_info_get_id(void)
@@ -137,7 +179,7 @@ static unsigned long long ezlopi_factory_info_get_id(void)
     return _id;
 }
 
-static char *ezlopi_factory_info_get_uuid(void)
+static char *ezlopi_factory_read_uuid(uint32_t offset)
 {
     char *uuid_string = NULL;
     if (partition_ctx)
@@ -150,16 +192,12 @@ static char *ezlopi_factory_info_get_uuid(void)
 
             if (u_buf)
             {
-                if (ESP_OK == esp_partition_read(partition_ctx, HUB_INFO_0_OFFSET + UUID_OFFSET, u_buf, UUID_LENGTH))
+                if (ESP_OK == esp_partition_read(partition_ctx, offset, u_buf, UUID_LENGTH))
                 {
                     dump("UUID: ", u_buf, 0, UUID_LENGTH);
-
-                    if (uuid_string)
-                    {
-                        snprintf(uuid_string, 40, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-                                 u_buf[0], u_buf[1], u_buf[2], u_buf[3], u_buf[4], u_buf[5], u_buf[6], u_buf[7],
-                                 u_buf[8], u_buf[9], u_buf[10], u_buf[11], u_buf[12], u_buf[13], u_buf[14], u_buf[15]);
-                    }
+                    snprintf(uuid_string, 40, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+                             u_buf[0], u_buf[1], u_buf[2], u_buf[3], u_buf[4], u_buf[5], u_buf[6], u_buf[7],
+                             u_buf[8], u_buf[9], u_buf[10], u_buf[11], u_buf[12], u_buf[13], u_buf[14], u_buf[15]);
                 }
                 else
                 {
@@ -169,15 +207,25 @@ static char *ezlopi_factory_info_get_uuid(void)
                 free(u_buf);
             }
 
-            trace_imp("UUID from flash: %s", uuid_string);
+            TRACE_I("UUID from flash: %s", uuid_string);
         }
         else
         {
-            trace_err("UUID malloc failed!");
+            TRACE_E("UUID malloc failed!");
         }
     }
 
     return uuid_string;
+}
+
+static char *ezlopi_factory_info_get_controller_uuid(void)
+{
+    return ezlopi_factory_read_uuid(HUB_INFO_0_OFFSET + UUID_OFFSET);
+}
+
+static char *ezlopi_factory_info_get_provisioning_uuid(void)
+{
+    return ezlopi_factory_read_uuid(CONNECTION_INFO_0_OFFSET + PROVISIONING_UUID_OFFSET);
 }
 
 static char *ezlopi_factory_info_get_zwave_region(void)
@@ -200,9 +248,43 @@ static char *ezlopi_factory_info_get_name(void)
     return ezlopi_factory_info_read_string_from_flash(HUB_INFO_0_OFFSET + PRODUCT_NAME_OFFSET, PRODUCT_NAME_LENGTH);
 }
 
-static char *ezlopi_factory_info_get_device_mac(void)
+static void ezlopi_factory_info_get_ezlopi_mac(uint8_t *mac_buf)
 {
-    return NULL;
+    memset(mac_buf, 0, 6);
+
+    if (partition_ctx)
+    {
+        // CONNECTION_INFO_0_OFFSET + SSL_SHARED_KEY_OFFSET, SSL_SHARED_KEY_LENGTH
+        if (ESP_OK == esp_partition_read(partition_ctx, HUB_INFO_0_OFFSET + EZLOPI_MAC_OFFSET, mac_buf, EZLOPI_MAC_LENGTH))
+        {
+            TRACE_I("'ezlopi-mac' read from factory_info success");
+            TRACE_I("EZLO-PI-MAC: %02x:%02x:%02x:%02x:%02x:%02x", mac_buf[0], mac_buf[1], mac_buf[2], mac_buf[3], mac_buf[4], mac_buf[5]);
+        }
+        else
+        {
+            TRACE_E("Couldn't fetch 'ezlopi-mac' from factory_info!");
+        }
+    }
+}
+
+static char *ezlopi_factory_info_manufacturer(void)
+{
+    return ezlopi_factory_info_read_string_from_flash(HUB_INFO_0_OFFSET + MANUFACTURER_OFFSET, MANUFACTURER_LENGTH);
+}
+
+static char *ezlopi_factory_info_get_brand(void)
+{
+    return ezlopi_factory_info_read_string_from_flash(HUB_INFO_0_OFFSET + BRAND_OFFSET, BRAND_LENGTH);
+}
+
+static char *ezlopi_factory_info_get_model(void)
+{
+    return ezlopi_factory_info_read_string_from_flash(HUB_INFO_0_OFFSET + MODEL_OFFSET, MODEL_LENGTH);
+}
+
+static char *ezlopi_factory_info_get_ezlopi_device_type(void)
+{
+    return ezlopi_factory_info_read_string_from_flash(HUB_INFO_0_OFFSET + EZLOPI_DEVICE_TYPE_OFFSET, EZLOPI_DEVICE_TYPE_LENGTH);
 }
 
 static char *ezlopi_factory_info_get_provisioning_server(void)
@@ -251,14 +333,15 @@ static void ezlopi_factory_info_set_default(void)
         free_and_assign_new(factory_info->zwave_region, default_zwave_region);
         free_and_assign_new(factory_info->default_wifi_ssid, default_wifi_ssid_1);
         free_and_assign_new(factory_info->default_wifi_password, default_wifi_password_1);
-        free_and_assign_new(factory_info->name, default_name);
+        free_and_assign_new(factory_info->product_name, default_name);
+
         free_and_assign_new(factory_info->provisioning_server, default_provisioning_server);
         free_and_assign_new(factory_info->provisioning_token, default_provisioning_token);
         free_and_assign_new(factory_info->cloud_server, default_cloud_server);
         free_and_assign_new(factory_info->ca_certificate, default_ca_certificate);
         free_and_assign_new(factory_info->ssl_private_key, default_ssl_private_key);
         free_and_assign_new(factory_info->ssl_shared_key, default_ssl_shared_key);
-        free_and_assign_new(factory_info->ssl_public_key, NULL);
+        // free_and_assign_new(factory_info->ssl_public_key, NULL);
     }
     else
     {
@@ -295,14 +378,21 @@ static char *ezlopi_factory_info_read_string_from_flash(int offset, uint32_t len
     return read_string;
 }
 
-static int ezlopi_factory_info_write_string_to_nvs_flash(int offset, int size, struct json_token *token)
+static int ezlopi_factory_info_write_string_to_flash(int offset, char *data)
 {
     int ret = 0;
     if (partition_ctx != NULL)
     {
-        size_t length = (size_t)((token->len > size) ? size : token->len);
-        ret = esp_partition_write(partition_ctx, offset, token->ptr, length);
-        ret = ret | esp_partition_write(partition_ctx, offset + length, 0x00, 1);
+        uint32_t len = strlen(data);
+        TRACE_D("Writing to flash: %.*s", len, data);
+        ret = esp_partition_write(partition_ctx, offset, data, len);
+        TRACE_W("ret: %d", ret);
+        ret = ret | esp_partition_write(partition_ctx, offset + len, 0x00, 1);
+        TRACE_W("ret: %d", ret);
+    }
+    else
+    {
+        TRACE_E("'partition_ctx' is null!");
     }
     return ret;
 }

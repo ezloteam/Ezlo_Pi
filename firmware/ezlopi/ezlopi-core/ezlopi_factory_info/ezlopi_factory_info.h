@@ -37,57 +37,80 @@ extern "C"
 #define WIFI_SSID_LENGTH 32
 #define WIFI_PASSWORD_LENGTH 32
 #define PRODUCT_NAME_LENGTH 32
+#define EZLOPI_MAC_LENGTH 6
+#define MANUFACTURER_LENGTH 64
+#define BRAND_LENGTH 64
+#define MODEL_LENGTH 64
+#define EZLOPI_DEVICE_TYPE_LENGTH 32
 
 #define H_SN_OFFSET 0x00
 #define H_VERSION_OFFSET 0x02
 #define ID_OFFSET 0x04
-#define UUID_OFFSET 12
-#define ZWAVE_REGION_OFFSET 28
-#define WIFI_SSID_OFFSET 36
-#define WIFI_PASSWORD_OFFSET 68
-#define PRODUCT_NAME_OFFSET 132
+#define UUID_OFFSET 0x0C
+#define ZWAVE_REGION_OFFSET 0x1C
+#define WIFI_SSID_OFFSET 0x24
+#define WIFI_PASSWORD_OFFSET 0x44
+#define PRODUCT_NAME_OFFSET 0x84
+#define EZLOPI_MAC_OFFSET 0xC4
+#define MANUFACTURER_OFFSET 0xCA
+#define BRAND_OFFSET 0x10A
+#define MODEL_OFFSET 0x14A
+#define EZLOPI_DEVICE_TYPE_OFFSET 0x18A
 
 // Connection-INFO-0/1
 #define C_SN_LENGTH 2
 #define C_VERSION_LENGTH 2
+#define PROVISIONING_UUID_LENGTH 16
 #define PROVISIONING_SERVER_LENGTH 256
 #define PROVISIONING_TOKEN_LENGTH 256
-#define CLOUD_SERVER_LENGTH 128
-#define CA_CERTIFICATE_LENGTH 0x2000
+#define CLOUD_SERVER_LENGTH 256
+#define EZLOPI_CONFIG_LENGTH 0x1000
+#define CA_CERTIFICATE_LENGTH 0x1000
 #define SSL_PRIVATE_KEY_LENGTH 0x1000
 #define SSL_SHARED_KEY_LENGTH 0x2000
 
-#define C_SN_OFFSET 0
-#define C_VERSION_OFFSET 2
-#define PROVISIONING_SERVER_OFFSET 4
-#define PROVISIONING_TOKEN_OFFSET 260
-#define CLOUD_SERVER_OFFSET 516
-#define CA_CERTIFICATE_OFFSET 0x1000
-#define SSL_PRIVATE_KEY_OFFSET 0x3000
-#define SSL_SHARED_KEY_OFFSET 0x4000
+#define C_SN_OFFSET 0x00
+#define C_VERSION_OFFSET 0x02
+#define PROVISIONING_UUID_OFFSET 0x04
+#define PROVISIONING_SERVER_OFFSET 0x14
+#define PROVISIONING_TOKEN_OFFSET 0x114
+#define CLOUD_SERVER_OFFSET 0x214
+#define EZLOPI_CONFIG_OFFSET 0x1000
+#define CA_CERTIFICATE_OFFSET 0x3000
+#define SSL_PRIVATE_KEY_OFFSET 0x4000
+#define SSL_SHARED_KEY_OFFSET 0x5000
 
     typedef struct s_ezlopi_factory_info
     {
         short h_version;
         unsigned long long id;
-        char *name;
         char *controller_uuid;
         char *zwave_region;
         char *default_wifi_ssid;
         char *default_wifi_password;
-        char *device_mac;
+        char *product_name;
+        uint8_t ezlopi_mac[6];
+        char *ezlopi_manufacturer;
+        char *ezlopi_brand;
+        char *ezlopi_model;
+        char *ezlopi_device_type;
 
-        char *cloud_server;
+        char *provisioning_uuid;
         char *provisioning_server;
         char *provisioning_token;
+        char *cloud_server;
+        char *ezlopi_config;
         char *ca_certificate;
         char *ssl_private_key;
         char *ssl_shared_key;
-        char *ssl_public_key;
+
+        // char *ssl_public_key;
     } s_ezlopi_factory_info_t;
 
     s_ezlopi_factory_info_t *ezlopi_factory_info_init();
     s_ezlopi_factory_info_t *ezlopi_factory_info_get_info(void);
+    int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config);
+    char *ezlopi_factory_info_get_ezlopi_config(void);
 
 #ifdef __cplusplus
 }

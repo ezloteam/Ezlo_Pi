@@ -91,6 +91,3 @@ v2_0_7_152  Date: Thu Jan 12 07:46:04 PM +0545 2023
 v2_0_7_153  Date: Mon Jan 23 05:21:55 PM +0545 2023
 	applied the modification done by lomas for the web-flasher compatibility
 
-v2_0_7_154  Date: Mon Jan 23 05:27:39 PM +0545 2023
-	
-
