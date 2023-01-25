@@ -58,7 +58,7 @@ int ezlopi_dimmable_bulb(e_ezlopi_actions_t action, s_ezlopi_device_properties_t
 
 static int ezlopi_dimmable_bulb_prepare_and_add(void* args)
 {
-     int ret = 0;
+    int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))

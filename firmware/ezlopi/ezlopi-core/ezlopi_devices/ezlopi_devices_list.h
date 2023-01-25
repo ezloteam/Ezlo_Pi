@@ -32,6 +32,8 @@
 #define EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR 25
 #define EZLOPI_SENSOR_0027_WATER_SENSOR 27
 
+#define EZLOPI_SENSOR_029_IR_BLASTER 29
+
 /**
  * @brief defining the type of sensor call function
  *

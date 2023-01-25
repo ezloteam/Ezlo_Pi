@@ -14,6 +14,7 @@
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_sensor.h"
 #include "028_sens_i2c_accelerometer.h"
+#include "029_IR_blaster_remote.h"
 
 
 static s_ezlopi_device_t device_array[] = {
@@ -116,6 +117,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0027_WATER_SENSOR,
         .func = sensor_water_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_029_IR_BLASTER
+    {
+        .id = EZLOPI_SENSOR_029_IR_BLASTER,
+        .func = IR_blaster_remote
     },
 #endif
     /**
