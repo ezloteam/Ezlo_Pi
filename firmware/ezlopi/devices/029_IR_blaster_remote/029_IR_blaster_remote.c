@@ -113,7 +113,7 @@ static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_devi
         IR_Blaster_Remote_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
         IR_Blaster_Remote_properties->ezlopi_cloud.item_name = "IR_remote_model";
         IR_Blaster_Remote_properties->ezlopi_cloud.device_type = dev_type_device;
-        IR_Blaster_Remote_properties->ezlopi_cloud.value_type = value_type_int;
+        IR_Blaster_Remote_properties->ezlopi_cloud.value_type = value_type_dictionary;
         IR_Blaster_Remote_properties->ezlopi_cloud.has_getter = true;
         IR_Blaster_Remote_properties->ezlopi_cloud.has_setter = true;
         IR_Blaster_Remote_properties->ezlopi_cloud.reachable = true;
@@ -135,13 +135,21 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
     uint32_t model = 0; 
 
     cJSON* device_details = (cJSON*)arg;
+    cJSON* device_response = cJSON_CreateObject();
 
-    CJSON_GET_VALUE_INT(device_details, "device", device);
-    CJSON_GET_VALUE_INT(device_details, "brand", brand);
-    CJSON_GET_VALUE_INT(device_details, "model", model);
+    if(device_details && device_response)
+    {
+        CJSON_GET_VALUE_INT(device_details, "device", device);
+        CJSON_GET_VALUE_INT(device_details, "brand", brand);
+        CJSON_GET_VALUE_INT(device_details, "model", model);
 
-    // Call function to determine the protocol.
+        // Call function to determine the protocol.
 
-    // Call the function for RX and TX.
+        // Call the function for RX and TX.
+
+        
+
+    }
+
 
 }
