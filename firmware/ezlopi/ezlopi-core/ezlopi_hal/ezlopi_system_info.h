@@ -6,6 +6,5 @@
 
 char *ezlopi_system_info_get_chip_name(void);
 uint32_t ezlopi_system_info_get_boot_count(void);
-void ezlopi_system_info_increment_boot_count(void);
 
 #endif // __EZLOPI_SYSTEM_INFO_H__

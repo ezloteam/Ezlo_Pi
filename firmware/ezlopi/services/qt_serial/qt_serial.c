@@ -101,7 +101,6 @@ static int qt_serial_parse_rx_data(const char *data)
             }
             case 3:
             {
-                TRACE_B("1");
                 qt_serial_save_config(data);
                 break;
             }
@@ -301,6 +300,7 @@ static void qt_serial_read_config(void)
 
     if (buf)
     {
+        TRACE_D("buf[len: %d]: %s", strlen(buf), buf);
         cJSON *root = cJSON_Parse(buf);
         free(buf);
 
@@ -309,6 +309,14 @@ static void qt_serial_read_config(void)
             cJSON_DeleteItemFromObject(root, "cmd");
             cJSON_AddNumberToObject(root, "cmd", 4);
         }
+        else
+        {
+            TRACE_E("'root' is null!");
+        }
+    }
+    else
+    {
+        TRACE_E("'buf' is null!");
     }
 
     if (NULL == root)

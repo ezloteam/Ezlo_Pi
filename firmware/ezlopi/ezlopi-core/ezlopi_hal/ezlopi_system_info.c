@@ -1,16 +1,16 @@
+#include "ezlopi_nvs.h"
 #include "ezlopi_system_info.h"
-#include "esp_attr.h"
 #include "../../build/config/sdkconfig.h"
 
-static RTC_SLOW_ATTR uint32_t boot_count;
-
-void ezlopi_system_info_increment_boot_count(void)
-{
-    boot_count += 1;
-}
+static uint32_t boot_count = 0;
 
 uint32_t ezlopi_system_info_get_boot_count(void)
 {
+    if (0 == boot_count)
+    {
+        boot_count = ezlopi_nvs_get_boot_count();
+    }
+
     return boot_count;
 }
 

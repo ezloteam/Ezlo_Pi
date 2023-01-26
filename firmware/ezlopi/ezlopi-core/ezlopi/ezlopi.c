@@ -22,18 +22,18 @@ void ezlopi_init(void)
 
     ezlopi_wifi_initialize();
 
-    if (ezlopi_nvs_get_first_boot())
-    {
-        ezlopi_nvs_set_first_boot_false();
-        ezlopi_wifi_connect_from_id_bin();
-    }
-    else
+    uint32_t boot_count = ezlopi_nvs_get_boot_count();
+    if (boot_count > 1)
     {
         ezlopi_wifi_connect_from_nvs();
     }
+    else
+    {
+        ezlopi_wifi_connect_from_id_bin();
+    }
+    ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
-
     ezlopi_timer_start_50ms();
 }
 

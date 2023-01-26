@@ -3,6 +3,9 @@
 #include "esp_system.h"
 #include "esp_partition.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 #include "trace.h"
 #include "ezlopi_factory_info.h"
 
@@ -31,7 +34,8 @@ static char *ezlopi_factory_info_get_ssl_shared_key(void);
 
 static void ezlopi_factory_info_set_default(void);
 static char *ezlopi_factory_info_read_string_from_flash(int offset, uint32_t length);
-static int ezlopi_factory_info_write_string_to_flash(int offset, char *data);
+static int ezlopi_factory_info_write_string_to_flash(int offset, uint8_t *data, uint32_t len);
+static int ezlopi_factory_info_erase_range_of_flash(uint32_t offset, uint32_t len);
 
 #define free_and_assign_new(buff, new_data) \
     {                                       \
@@ -90,7 +94,7 @@ s_ezlopi_factory_info_t *ezlopi_factory_info_init(void)
                     partition_ctx->label, partition_ctx->address, partition_ctx->size);
 
             factory_info->h_version = 0;
-            factory_info->id = ezlopi_factory_info_get_id();
+            factory_info->id = ezlopi_factory_info_get_id(); // serial number of the device
             factory_info->controller_uuid = ezlopi_factory_info_get_controller_uuid();
             factory_info->zwave_region = ezlopi_factory_info_get_zwave_region();
             factory_info->default_wifi_ssid = ezlopi_factory_info_get_default_wifi_ssid();
@@ -106,6 +110,7 @@ s_ezlopi_factory_info_t *ezlopi_factory_info_init(void)
             factory_info->provisioning_server = ezlopi_factory_info_get_provisioning_server();
             factory_info->provisioning_token = ezlopi_factory_info_get_provisioning_token();
             factory_info->cloud_server = ezlopi_factory_info_get_cloud_server();
+            TRACE_B("Ezlopi-config");
             factory_info->ezlopi_config = ezlopi_factory_info_get_ezlopi_config();
             factory_info->ca_certificate = ezlopi_factory_info_get_ca_certificate();
             factory_info->ssl_private_key = ezlopi_factory_info_get_ssl_private_key();
@@ -151,10 +156,19 @@ char *ezlopi_factory_info_get_ezlopi_config(void)
 
 int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config)
 {
-    int ret = 0;
-    if ((NULL != ezlopi_config) && (EZLOPI_CONFIG_LENGTH >= strlen(ezlopi_config)))
+    int ret = -1;
+    uint32_t data_len = strlen(ezlopi_config);
+
+    if ((NULL != ezlopi_config) && (EZLOPI_CONFIG_LENGTH > data_len))
     {
-        ret = ezlopi_factory_info_write_string_to_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, ezlopi_config);
+        if (ESP_OK == ezlopi_factory_info_erase_range_of_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH))
+        {
+            ret = ezlopi_factory_info_write_string_to_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, (uint8_t *)ezlopi_config, data_len + 1);
+        }
+        else
+        {
+            TRACE_E("'ezlopi-cnfig' erase failed!");
+        }
     }
     else
     {
@@ -360,39 +374,58 @@ static char *ezlopi_factory_info_read_string_from_flash(int offset, uint32_t len
         {
             if (ESP_OK == esp_partition_read(partition_ctx, offset, buffer, length))
             {
+                dump("buffer", buffer, 0, length);
+
                 int s_length = (strlen(buffer) < length) ? strlen(buffer) : length;
                 read_string = (char *)malloc(s_length + 1);
                 if (NULL != read_string)
                 {
                     snprintf(read_string, s_length + 1, "%s", buffer);
                 }
+                else
+                {
+                    TRACE_E("'read_string' malloc failed!");
+                }
             }
             else
             {
-                TRACE_E("Couldn't fetch 'wifi_password' from factory_info!");
+                TRACE_E("Couldn't fetch 'string' from id-flash-region!");
             }
             free(buffer);
         }
-    }
-
-    return read_string;
-}
-
-static int ezlopi_factory_info_write_string_to_flash(int offset, char *data)
-{
-    int ret = 0;
-    if (partition_ctx != NULL)
-    {
-        uint32_t len = strlen(data);
-        TRACE_D("Writing to flash: %.*s", len, data);
-        ret = esp_partition_write(partition_ctx, offset, data, len);
-        TRACE_W("ret: %d", ret);
-        ret = ret | esp_partition_write(partition_ctx, offset + len, 0x00, 1);
-        TRACE_W("ret: %d", ret);
+        else
+        {
+            TRACE_E("MALLOC faield!");
+        }
     }
     else
     {
         TRACE_E("'partition_ctx' is null!");
     }
+
+    vTaskDelay(0);
+
+    return read_string;
+}
+
+static int ezlopi_factory_info_erase_range_of_flash(uint32_t offset, uint32_t len)
+{
+    esp_err_t ret = ESP_OK;
+    if (partition_ctx)
+    {
+        ret = esp_partition_erase_range(partition_ctx, offset, 0x1000);
+    }
+
+    return ret;
+}
+
+static int ezlopi_factory_info_write_string_to_flash(int offset, uint8_t *data, uint32_t len)
+{
+    int ret = -1;
+    if (partition_ctx != NULL)
+    {
+        ret = (ESP_OK == esp_partition_write(partition_ctx, offset, data, len)) ? len : ret;
+    }
+
     return ret;
 }
