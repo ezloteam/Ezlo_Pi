@@ -7,6 +7,7 @@
 #include "ezlopi_timer.h"
 #include "ezlopi_devices_list.h"
 #include "trace.h"
+#include "ezlopi_system_info.h"
 
 static void ezlopi_initialize_devices(void);
 
@@ -22,7 +23,7 @@ void ezlopi_init(void)
 
     ezlopi_wifi_initialize();
 
-    uint32_t boot_count = ezlopi_nvs_get_boot_count();
+    uint32_t boot_count = ezlopi_system_info_get_boot_count();
     if (boot_count > 1)
     {
         ezlopi_wifi_connect_from_nvs();
@@ -46,3 +47,4 @@ static void ezlopi_initialize_devices(void)
         registered_device = registered_device->next;
     }
 }
+

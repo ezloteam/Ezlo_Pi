@@ -301,8 +301,7 @@ static void qt_serial_read_config(void)
     if (buf)
     {
         TRACE_D("buf[len: %d]: %s", strlen(buf), buf);
-        cJSON *root = cJSON_Parse(buf);
-        free(buf);
+        root = cJSON_Parse(buf);
 
         if (root)
         {

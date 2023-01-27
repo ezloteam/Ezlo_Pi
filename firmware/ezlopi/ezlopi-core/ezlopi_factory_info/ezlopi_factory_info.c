@@ -110,7 +110,6 @@ s_ezlopi_factory_info_t *ezlopi_factory_info_init(void)
             factory_info->provisioning_server = ezlopi_factory_info_get_provisioning_server();
             factory_info->provisioning_token = ezlopi_factory_info_get_provisioning_token();
             factory_info->cloud_server = ezlopi_factory_info_get_cloud_server();
-            TRACE_B("Ezlopi-config");
             factory_info->ezlopi_config = ezlopi_factory_info_get_ezlopi_config();
             factory_info->ca_certificate = ezlopi_factory_info_get_ca_certificate();
             factory_info->ssl_private_key = ezlopi_factory_info_get_ssl_private_key();
@@ -151,7 +150,12 @@ s_ezlopi_factory_info_t *ezlopi_factory_info_init(void)
 
 char *ezlopi_factory_info_get_ezlopi_config(void)
 {
-    return ezlopi_factory_info_read_string_from_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+    if (NULL == factory_info->ezlopi_config)
+    {
+        factory_info->ezlopi_config = ezlopi_factory_info_read_string_from_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+    }
+
+    return factory_info->ezlopi_config;
 }
 
 int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config)
@@ -374,7 +378,8 @@ static char *ezlopi_factory_info_read_string_from_flash(int offset, uint32_t len
         {
             if (ESP_OK == esp_partition_read(partition_ctx, offset, buffer, length))
             {
-                dump("buffer", buffer, 0, length);
+                // dump("buffer", buffer, 0, length);
+                // vTaskDelay(1);
 
                 int s_length = (strlen(buffer) < length) ? strlen(buffer) : length;
                 read_string = (char *)malloc(s_length + 1);

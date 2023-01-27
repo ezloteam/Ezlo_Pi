@@ -277,7 +277,7 @@ void ezlopi_nvs_set_boot_count(uint32_t boot_count)
 {
     if (ezlopi_nvs_handle)
     {
-        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, passkey_nvs_name, boot_count);
+        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, boot_count_nvs_name, boot_count);
         TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
     }
 }
@@ -287,24 +287,15 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     uint32_t boot_count = 1;
     if (ezlopi_nvs_handle)
     {
-        size_t required_size = 4;
-        esp_err_t err = nvs_get_blob(ezlopi_nvs_handle, boot_count_nvs_name, &boot_count, &required_size);
+        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, boot_count_nvs_name, &boot_count);
+        TRACE_I("Boot count: %d", boot_count);
         TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
         if (ESP_OK != err)
         {
-            err = nvs_set_u32(ezlopi_nvs_handle, passkey_nvs_name, boot_count);
+            err = nvs_set_u32(ezlopi_nvs_handle, boot_count_nvs_name, boot_count);
             TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
         }
     }
 
     return boot_count;
-}
-
-void ezlopi_nvs_set_first_boot_false(void)
-{
-    uint32_t first_boot = 0;
-    esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, boot_count_nvs_name, &first_boot, sizeof(first_boot));
-    TRACE_D("'%s' Error nvs_set_blob: %s", boot_count_nvs_name, esp_err_to_name(err));
-    err = nvs_commit(ezlopi_nvs_handle);
-    TRACE_D("'%s' Error nvs_commit: %s", boot_count_nvs_name, esp_err_to_name(err));
 }

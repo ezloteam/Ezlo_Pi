@@ -5,6 +5,7 @@
 #include "ezlopi_nvs.h"
 #include "ezlopi_devices.h"
 #include "web_provisioning.h"
+#include "ezlopi_factory_info.h"
 
 static uint32_t device_id = 0;
 static uint32_t item_id = 0;
@@ -14,14 +15,13 @@ static void ezlopi_device_parse_json(char *config_string);
 
 void ezlopi_device_prepare(void)
 {
-    char *config_string = NULL;
-    ezlopi_nvs_read_config_data_str(&config_string);
+    char *config_string = ezlopi_factory_info_get_ezlopi_config();
     TRACE_D("config_string: %s", config_string ? config_string : "");
 
     if (config_string)
     {
         ezlopi_device_parse_json(config_string);
-        free(config_string);
+        // free(config_string);
     }
 }
 
