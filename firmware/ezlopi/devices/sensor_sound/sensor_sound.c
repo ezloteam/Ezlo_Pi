@@ -39,11 +39,12 @@ int sound_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *proper
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (prev_motion_status != is_motion_detected)
+        // if (prev_motion_status != is_motion_detected)
         {
             ret = ezlopi_device_value_updated_from_device(properties);
             prev_motion_status = is_motion_detected;
         }
+        // vTaskDelay(5000 /portTICK_PERIOD_MS);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:

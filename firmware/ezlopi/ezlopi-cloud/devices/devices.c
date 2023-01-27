@@ -43,7 +43,7 @@ void devices_list(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddBoolToObject(cj_properties, "reachable", registered_devices->properties->ezlopi_cloud.reachable);
                         cJSON_AddBoolToObject(cj_properties, "persistent", true);
                         cJSON_AddBoolToObject(cj_properties, "serviceNotification", false);
-                        cJSON_AddBoolToObject(cj_properties, "armed", false);
+                        cJSON_AddBoolToObject(cj_properties, "armed", true);
                         cJSON_AddStringToObject(cj_properties, "roomId", "");
                         cJSON_AddStringToObject(cj_properties, "security", "");
                         cJSON_AddBoolToObject(cj_properties, "ready", true);

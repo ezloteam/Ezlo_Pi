@@ -364,9 +364,9 @@ void findPTPAmp(ADS131M08 *adc)
 
     //   //Return the PTP amplitude to use in the soundLevel function.
     //   // You can also return the micOut_Volts if you prefer to use the voltage level.
-    //   for (uint8_t i = 0; i < 8; i++){
-    //     channelArr[i] = PTPAmp[i];
-    //   }
+      for (uint8_t i = 0; i < 8; i++){
+        channelArr[i] = PTPAmp[i]/15;
+      }
 }
 
 ADS131M08 adc((gpio_num_t)VSPI_MOSI, (gpio_num_t)VSPI_MISO, (gpio_num_t)VSPI_SCLK, VSPI_SS, XTAL_PIN, DRDY_PIN, 8192000);
@@ -406,7 +406,7 @@ bool ADS131_value(void)
            channelArr[5],
            channelArr[6],
            channelArr[7]);
-    if (channelArr[1] > 50)
+    if (abs(channelArr[5]) > 50 )
         return true;
     else
         return false;
