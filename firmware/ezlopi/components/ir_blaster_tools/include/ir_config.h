@@ -7,8 +7,8 @@ extern "C" {
 
 #include <sys/cdefs.h>
 #include "esp_log.h"
-#include "029_IR_blaster_remote_tools.h"
-#include "029_IR_blaster_remote_timings.h"
+#include "ir_tools.h"
+#include "ir_timings.h"
 #include "driver/rmt.h"
 
 static const char *TAG = "Example";

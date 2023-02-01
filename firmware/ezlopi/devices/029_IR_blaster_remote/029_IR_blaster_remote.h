@@ -6,9 +6,9 @@
 
 #include "ezlopi_devices.h"
 #include "ezlopi_actions.h"
-#include "029_IR_blaster_remote_config.h"
-#include "029_IR_blaster_remote_timings.h"
-#include "029_IR_blaster_remote_tools.h"
+#include "ir_config.h"
+#include "ir_timings.h"
+#include "ir_tools.h"
 
 
 int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);

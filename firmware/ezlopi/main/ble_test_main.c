@@ -25,7 +25,7 @@
 static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
-
+    
 
 void app_main(void)
 {

@@ -12,8 +12,9 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "sdkconfig.h"
 #include "driver/rmt.h"
-#include "029_IR_blaster_remote_tools.h"
-#include "029_IR_blaster_remote_timings.h"
+#include "ir_tools.h"
+#include "ir_timings.h"
+#include "ezlopi_device_value_updated.h"
 
 
 
@@ -22,6 +23,9 @@ static int IR_Blaster_Remote_prepare_and_add(void* args);
 static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_device);
 static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties);
 static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties, void *arg);
+static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
+
+
 
 
 
@@ -41,6 +45,17 @@ int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
         }
         case EZLOPI_ACTION_GET_EZLOPI_VALUE:
         {
+            IR_BLaster_Remote_get_value_cjson(properties, arg);
+            break;
+        }
+        case EZLOPI_ACTION_NOTIFY_1000_MS:
+        {
+            ezlopi_device_value_updated_from_device(properties);
+            break;
+        }
+        case EZLOPI_ACTION_SET_VALUE:
+        {
+            IR_BLaster_Remote_set_value(properties, arg);
             break;
         }
         default:
@@ -52,7 +67,7 @@ int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
     return ret;
 }
 
- 
+
 ir_parser_config_t rmt_rx_init(uint32_t ezlopi_ir_blaster_rx_gpio_num, rmt_channel_t ezlopi_ir_blaster_rx_channel) {
     rmt_config_t rmt_rx_config = RMT_DEFAULT_CONFIG_RX(ezlopi_ir_blaster_rx_gpio_num, ezlopi_ir_blaster_rx_channel);
     rmt_config(&rmt_rx_config);
@@ -102,18 +117,18 @@ static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_devi
     if(IR_Blaster_Remote_properties)
     {
         memset(IR_Blaster_Remote_properties, 0, sizeof(s_ezlopi_device_properties_t));
-        // ezlopi_dimmable_bulb_properties->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
+        IR_Blaster_Remote_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT;
         
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
 
         ASSIGN_DEVICE_NAME(IR_Blaster_Remote_properties, device_name);
-
+    
         IR_Blaster_Remote_properties->ezlopi_cloud.category = category_ir_tx;
-        IR_Blaster_Remote_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-        IR_Blaster_Remote_properties->ezlopi_cloud.item_name = "IR_remote_model";
+        IR_Blaster_Remote_properties->ezlopi_cloud.subcategory = subcategory_irt;
+        IR_Blaster_Remote_properties->ezlopi_cloud.item_name = ezlopi_item_name_ir_blaster;
         IR_Blaster_Remote_properties->ezlopi_cloud.device_type = dev_type_device;
-        IR_Blaster_Remote_properties->ezlopi_cloud.value_type = value_type_dictionary;
+        IR_Blaster_Remote_properties->ezlopi_cloud.value_type = value_type_ir_blaster;
         IR_Blaster_Remote_properties->ezlopi_cloud.has_getter = true;
         IR_Blaster_Remote_properties->ezlopi_cloud.has_setter = true;
         IR_Blaster_Remote_properties->ezlopi_cloud.reachable = true;
@@ -130,14 +145,16 @@ static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_devi
 
 static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
+
+    int ret = 0;
+
     uint32_t device = 0;
     uint32_t brand = 0;
     uint32_t model = 0; 
 
     cJSON* device_details = (cJSON*)arg;
-    cJSON* device_response = cJSON_CreateObject();
 
-    if(device_details && device_response)
+    if(device_details)
     {
         CJSON_GET_VALUE_INT(device_details, "device", device);
         CJSON_GET_VALUE_INT(device_details, "brand", brand);
@@ -147,9 +164,33 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
 
         // Call the function for RX and TX.
 
-        
-
     }
 
+    return ret;
 
 }
+
+
+
+static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
+{
+    int ret = 0;
+
+    cJSON* params = (cJSON*)args;
+
+    cJSON* value = cJSON_CreateObject();
+
+    cJSON_AddNumberToObject(value, "device", 1);
+    cJSON_AddNumberToObject(value, "brand", 2);
+    cJSON_AddNumberToObject(value, "model", 3);
+    cJSON_AddStringToObject(value, "commmand", "0xA0A0");
+
+    char* val = cJSON_Print(value);
+
+    cJSON_AddRawToObject(params, "value", val);
+
+    free(value);
+
+    return ret;
+}
+
