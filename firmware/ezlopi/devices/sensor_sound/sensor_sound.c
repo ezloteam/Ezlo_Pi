@@ -39,7 +39,8 @@ int sound_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *proper
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        // if (prev_motion_status != is_motion_detected)
+        is_motion_detected = ADS131_value();
+        if (prev_motion_status != is_motion_detected)
         {
             ret = ezlopi_device_value_updated_from_device(properties);
             prev_motion_status = is_motion_detected;
@@ -126,7 +127,6 @@ static int ezlopi_sound_get_value_cjson(s_ezlopi_device_properties_t *properties
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)args;
-    is_motion_detected = ADS131_value();
     if (cjson_propertise)
     {
         cJSON_AddBoolToObject(cjson_propertise, "value", is_motion_detected);

@@ -151,7 +151,7 @@ void ezlopi_timer_start_500ms(void)
 
 void ezlopi_timer_start_1000ms(void)
 {
-    ezlopi_timer_init_timer_event(3, 1000, EZLOPI_ACTION_NOTIFY_1000_MS);
+    ezlopi_timer_init_timer_event(3, 5000, EZLOPI_ACTION_NOTIFY_1000_MS);
 }
 
 static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_actions_t event_type)

@@ -19,7 +19,7 @@ const int sampleTime = 50;
 #define RESET -1    // 17
 
 int micOut[8];
-int32_t channelArr[8];
+static int32_t channelArr[8];
 void findPTPAmp(ADS131M08 *adc);
 
 ADS131M08::ADS131M08(gpio_num_t mosi, gpio_num_t miso, gpio_num_t sck, int cs, int xtal, int drdy, int clk)
@@ -325,7 +325,7 @@ void findPTPAmp(ADS131M08 *adc)
 {
     // Time variables to find the peak-to-peak amplitude
     unsigned long startTime = esp_timer_get_time() / 1000; // Start of sample window
-    unsigned int PTPAmp[8] = {0};
+    static unsigned int PTPAmp[8] = {0};
 
     // Signal variables to find the peak-to-peak amplitude
     int maxAmp[8];
@@ -406,8 +406,12 @@ bool ADS131_value(void)
            channelArr[5],
            channelArr[6],
            channelArr[7]);
-    if (abs(channelArr[1]) > 10000000 )
-        return true;
+    if (abs(channelArr[1]) > 1000 )
+        {
+            return true;
+        }
     else
-        return false;
+       {
+         return false;
+       }
 }

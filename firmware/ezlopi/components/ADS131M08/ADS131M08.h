@@ -106,6 +106,7 @@ class ADS131M08 {
                 gpio_num_t miso= (gpio_num_t)19,
                 gpio_num_t sck= (gpio_num_t)18, 
                 int cs=5, int xtal=22, int drdy=21, int clk = 2000000);
+    ~ADS131M08() {printf("Memory freed. \n");}
     void init(int clkin = 8192000);
     void readChannels(int8_t * channelArrPtr, int8_t channelArrLen, int32_t * outputArrPtr);
     void readAllChannels(int32_t inputArr[8]);
