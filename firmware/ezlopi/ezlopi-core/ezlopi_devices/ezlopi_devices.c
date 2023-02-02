@@ -16,7 +16,7 @@ static void ezlopi_device_parse_json(char *config_string);
 void ezlopi_device_prepare(void)
 {
     char *config_string = ezlopi_factory_info_get_ezlopi_config();
-    TRACE_D("config_string: %s", config_string ? config_string : "");
+    // TRACE_D("config_string: %s", config_string ? config_string : "");
 
     if (config_string)
     {

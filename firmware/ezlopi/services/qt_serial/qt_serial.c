@@ -288,7 +288,7 @@ static void qt_serial_save_config(const char *data)
         TRACE_B("Successfully wrote config data..");
     }
 
-    qt_serial_response(3, ret, 5);
+    qt_serial_response(3, ((ret > 0) ? 1 : 0), 5);
 
     return;
 }

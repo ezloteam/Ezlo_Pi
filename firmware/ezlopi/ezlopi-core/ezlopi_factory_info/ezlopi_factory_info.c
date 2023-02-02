@@ -197,53 +197,14 @@ static unsigned long long ezlopi_factory_info_get_id(void)
     return _id;
 }
 
-static char *ezlopi_factory_read_uuid(uint32_t offset)
-{
-    char *uuid_string = NULL;
-    if (partition_ctx)
-    {
-        uuid_string = (char *)malloc(40);
-
-        if (uuid_string)
-        {
-            char *u_buf = (char *)malloc(UUID_LENGTH);
-
-            if (u_buf)
-            {
-                if (ESP_OK == esp_partition_read(partition_ctx, offset, u_buf, UUID_LENGTH))
-                {
-                    dump("UUID: ", u_buf, 0, UUID_LENGTH);
-                    snprintf(uuid_string, 40, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-                             u_buf[0], u_buf[1], u_buf[2], u_buf[3], u_buf[4], u_buf[5], u_buf[6], u_buf[7],
-                             u_buf[8], u_buf[9], u_buf[10], u_buf[11], u_buf[12], u_buf[13], u_buf[14], u_buf[15]);
-                }
-                else
-                {
-                    TRACE_E("Couldn't fetch 'uuid' from factory_info!");
-                }
-
-                free(u_buf);
-            }
-
-            TRACE_I("UUID from flash: %s", uuid_string);
-        }
-        else
-        {
-            TRACE_E("UUID malloc failed!");
-        }
-    }
-
-    return uuid_string;
-}
-
 static char *ezlopi_factory_info_get_controller_uuid(void)
 {
-    return ezlopi_factory_read_uuid(HUB_INFO_0_OFFSET + UUID_OFFSET);
+    return ezlopi_factory_info_read_string_from_flash(HUB_INFO_0_OFFSET + UUID_OFFSET, PROVISIONING_SERVER_LENGTH);
 }
 
 static char *ezlopi_factory_info_get_provisioning_uuid(void)
 {
-    return ezlopi_factory_read_uuid(CONNECTION_INFO_0_OFFSET + PROVISIONING_UUID_OFFSET);
+    return ezlopi_factory_info_read_string_from_flash(CONNECTION_INFO_0_OFFSET + PROVISIONING_UUID_OFFSET, PROVISIONING_SERVER_LENGTH);
 }
 
 static char *ezlopi_factory_info_get_zwave_region(void)

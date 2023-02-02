@@ -5,12 +5,12 @@ extern "C"
 {
 #endif
 #define V_TYPE 2
-#define BUILD_DATE 1674809461
+#define BUILD_DATE 1675322174
 #define MAJOR 2
 #define MINOR 0
 #define BATCH 7
-#define BUILD 155
-#define VERSION_STR "v2.0.7.155"
+#define BUILD 156
+#define VERSION_STR "v2.0.7.156"
 #ifdef __cplusplus
 }
 #endif
