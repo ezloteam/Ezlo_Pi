@@ -8,14 +8,14 @@ extern "C" {
 
 
 /**
- * @brief IR REMOTE DEVICE TYPE STRUCTURE 
+ * @brief IR REMOTE DEVICE TYPE ENUM 
  *  
  */
 typedef enum ir_remote_device_s {
     IR_DEVICE_TV = 0,
     IR_DEVICE_AC,
-    IR_DEVICE_DVD,
-    IR_DEVICE_AVRECEIVER,
+    IR_DEVICE_BD_DVD,
+    IR_DEVICE_SOUND_BAR,
     IR_DEVICE_FAN,
     IR_DEVICE_PROJECTOR,
     IR_DEVICE_STB,                                         // STB = Set-Top-Box
@@ -25,7 +25,7 @@ typedef enum ir_remote_device_s {
 } ir_remote_device_t;
 
 /**
- * @brief IR REMOTE DEVICE BRAND TYPE STRUCTURE 
+ * @brief IR REMOTE DEVICE BRAND TYPE ENUM 
  *  
  */
 typedef enum ir_remote_device_brand_s {
@@ -45,11 +45,16 @@ typedef enum ir_remote_device_brand_s {
     IR_DEVICE_BRAND_AOC,
     IR_DEVICE_BRAND_VEONTV,
     IR_DEVICE_BRAND_ALOKA,
+    IR_DEVICE_BRAND_SOUNDCORE,
+    IR_DEVICE_BRAND_GOODMANS,
+    IR_DEVICE_BRAND_EDIFIER,
+    IR_DEVICE_BRAND_FUSION,
+    IR_DEVICE_BRAND_SUPRATV,
     IR_DEVICE_BRAND_MAX
 } ir_remote_device_brand_t;
 
 /**
- * @brief IR REMOTE DEVIE MODEL TYPE STRUCTURE 
+ * @brief IR REMOTE DEVIE MODEL TYPE ENUM 
  *  
  */
 typedef enum {
@@ -74,39 +79,40 @@ typedef enum {
     IR_DEVICE_PROJECTOR_BRAND_SONY_MODEL_V500_VPL_W400,                                     //      11
     IR_DEVICE_PROJECTOR_BRAND_EPSON_MODEL_12807990,                                         //      12
     IR_DEVICE_PROJECTOR_BRAND_EPSON_MODEL_PROJECTOR_1,                                      //      13
-    IR_DEVICE_PROJECTOR_BRAND_PANASONIC_MODEL_PROJECTOR_1,                                  //      14
+    IR_DEVICE_PROJECTOR_BRAND_EPSON_MODEL_PROJECTOR_2,                                      //      14
+    IR_DEVICE_PROJECTOR_BRAND_PANASONIC_MODEL_PROJECTOR_1,                                  //      15
 
 
-    IR_DEVICE_BD_DVD_BRAND_LG_MODEL_6710CDAP01B,                                            //      15
+    IR_DEVICE_BD_DVD_BRAND_LG_MODEL_6710CDAP01B,                                            //      16
     // IR_DEVICE_BD_DVD_BRAND_LG_MODEL_6710CDAL01G,
-    IR_DEVICE_BD_DVD_BRAND_LG_MODEL_BD300,                                                  //      16
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00008E,                                            //      17
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00011K,                                            //      18
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00021C,                                            //      19
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_000225G,                                           //      20
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_000225G_2,                                         //      21
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00049C,                                            //      22
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00052B,                                            //      23
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00054D,                                            //      24
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00056A,                                            //      25
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00092M,                                            //      26
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_SHOW_VIEW_00070_63,                                //      27
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_01043A,                                            //      28
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_633_205,                                           //      29
-    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_10329K,                                            //      30
-    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_DVP_S505,                                             //      31
-    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_BD_S1500,                                             //      32
-    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_RM_470,                                               //      33
-    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_RMT_V501E,                                            //      34
+    IR_DEVICE_BD_DVD_BRAND_LG_MODEL_BD300,                                                  //      17
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00008E,                                            //      18
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00011K,                                            //      19
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00021C,                                            //      20
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_000225G,                                           //      21
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_000225G_2,                                         //      22
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00049C,                                            //      23
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00052B,                                            //      24
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00054D,                                            //      25
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00056A,                                            //      26
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_00092M,                                            //      27
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_SHOW_VIEW_00070_63,                                //      28
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_01043A,                                            //      29
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_633_205,                                           //      30
+    IR_DEVICE_BD_DVD_BRAND_SAMSUNG_MODEL_10329K,                                            //      31
+    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_DVP_S505,                                             //      32
+    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_BD_S1500,                                             //      33
+    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_RM_470,                                               //      34
+    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_RMT_V501E,                                            //      35
     // IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_RMT_V501A,
-    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_RMT_V406B,                                            //      35
+    IR_DEVICE_BD_DVD_BRAND_SONY_MODEL_RMT_V406B,                                            //      36
 
 
-    IT_DEVICE_SOUND_BAR_BRAND_PANASONIC_MODEL_SCALL70T,                                     //      36
-    IT_DEVICE_SOUND_BAR_BRAND_SOUNDCORE_MODEL_INFINI_PRO,                                   //      37
-    IT_DEVICE_SOUND_BAR_BRAND_GOODMANS_MODEL_GDSBT1000P,                                    //      38
-    IT_DEVICE_SOUND_BAR_BRAND_EDIFIER_MODEL_R1850DB,                                        //      39
-    IT_DEVICE_SOUND_BAR_BRAND_SONY_MODEL_CMT_CP_100,                                        //      40
+    IR_DEVICE_SOUND_BAR_BRAND_PANASONIC_MODEL_SCALL70T,                                     //      37
+    IR_DEVICE_SOUND_BAR_BRAND_SOUNDCORE_MODEL_INFINI_PRO,                                   //      38
+    IR_DEVICE_SOUND_BAR_BRAND_GOODMANS_MODEL_GDSBT1000P,                                    //      39
+    IR_DEVICE_SOUND_BAR_BRAND_EDIFIER_MODEL_R1850DB,                                        //      40
+    IR_DEVICE_SOUND_BAR_BRAND_SONY_MODEL_CMT_CP_100,                                        //      41
 
 
     IR_DEVICE_BRAND_REMOTE_MODEL_MAX                                                        //      41
@@ -138,12 +144,12 @@ typedef enum ir_protocol_type_t {
     IR_REMOTE_PROTOCOL_AIRTON,  //15
     IR_REMOTE_PROTOCOL_AIWA,
     IR_REMOTE_PROTOCOL_MAX
-};
+}ir_protocol_type_t;
 
 
 typedef struct ir_protocol_init_s {
-    ir_builder_t ir_builder;
-    ir_parser_t ir_parser;
+    ir_builder_t* ir_builder;
+    ir_parser_t* ir_parser;
 } ir_protocol_init_t;
 
 /**
