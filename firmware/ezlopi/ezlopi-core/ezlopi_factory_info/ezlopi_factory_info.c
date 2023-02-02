@@ -152,7 +152,8 @@ char *ezlopi_factory_info_get_ezlopi_config(void)
 {
     if (NULL == factory_info->ezlopi_config)
     {
-        factory_info->ezlopi_config = ezlopi_factory_info_read_string_from_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+        // factory_info->ezlopi_config = ezlopi_factory_info_read_string_from_flash(CONNECTION_INFO_0_OFFSET + EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+        factory_info->ezlopi_config = switch_box_constant_config;
     }
 
     return factory_info->ezlopi_config;

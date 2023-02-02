@@ -114,6 +114,175 @@ extern "C"
     int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config);
     char *ezlopi_factory_info_get_ezlopi_config(void);
 
+    static const char *switch_box_constant_config =
+        "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\" : \"GXHTC3-Sensor\",\
+                \"dev_type\" : 8,\
+                \"gpio_scl\" : 26,\
+                \"gpio_sda\" : 16,\
+                \"id_item\" : 5,\
+                \"id_room\" : \"\",\
+                \"pullup_scl\" : true,\
+                \"pullup_sda\" : true,\
+                \"slave_addr\" : 0,\
+            },\
+            {\
+                \"dev_name\": \"Relay 1\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 39,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 2\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 38,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 3\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 15,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 4\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 4,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 5\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 5,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 6\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 6,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 7\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 7,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 8\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 12,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 9\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 17,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \" dev_name\": \"Relay 10\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 18,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            }\
+        ],\
+    \"dev_total\": 1}";
+
 #ifdef __cplusplus
 }
 #endif
