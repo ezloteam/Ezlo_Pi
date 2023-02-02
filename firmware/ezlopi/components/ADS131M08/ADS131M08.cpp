@@ -354,9 +354,9 @@ void findPTPAmp(ADS131M08 *adc)
         }
     }
 
-    //   for (uint8_t i = 0; i < 8; i++){
-    //   PTPAmp[i] = maxAmp[i] - minAmp[i]; // (max amp) - (min amp) = peak-to-peak amplitude
-    //   }
+      for (uint8_t i = 0; i < 8; i++){
+      PTPAmp[i] = maxAmp[i] - minAmp[i]; // (max amp) - (min amp) = peak-to-peak amplitude
+      }
     // //   double micOut_Volts = (PTPAmp * 3.3) / 4096; // Convert ADC into voltage
 
     //   //Uncomment this line for help debugging (be sure to also comment out the VUMeter function)
@@ -365,7 +365,7 @@ void findPTPAmp(ADS131M08 *adc)
     //   //Return the PTP amplitude to use in the soundLevel function.
     //   // You can also return the micOut_Volts if you prefer to use the voltage level.
       for (uint8_t i = 0; i < 8; i++){
-        channelArr[i] = PTPAmp[i]/15;
+        channelArr[i] = PTPAmp[i];
       }
 }
 
@@ -406,7 +406,7 @@ bool ADS131_value(void)
            channelArr[5],
            channelArr[6],
            channelArr[7]);
-    if (abs(channelArr[5]) > 50 )
+    if (abs(channelArr[1]) > 10000000 )
         return true;
     else
         return false;
