@@ -222,6 +222,7 @@ ir_parser_t *ir_parser_rmt_new_nec(const ir_parser_config_t *config)
         ir_protocol_parser->inverse = true;
     }
 
+    ESP_LOGE("ERROR","NEC CALLED");
     uint32_t counter_clk_hz = 0;
     IR_CHECK(rmt_get_counter_clock((rmt_channel_t)config->dev_hdl, &counter_clk_hz) == ESP_OK,
               "get rmt counter clock failed", err, NULL);
