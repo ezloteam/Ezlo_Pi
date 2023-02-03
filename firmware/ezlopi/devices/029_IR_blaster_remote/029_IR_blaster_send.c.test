@@ -1,0 +1,22 @@
+#include "029_IR_blaster_send.h"
+
+
+void ezlopi_ir_tx(uint32_t address, uint32_t command)
+{
+    rmt_item32_t *items = NULL;
+    size_t length = 0;
+    ir_builder_t *ir_builder = NULL;
+    //frame_builder_t frame_builder;
+
+    //TRACE_I("Send command 0x%x to address 0x%x", command, address);
+    // Send new key code
+    ESP_ERROR_CHECK(ir_builder->frame_builder_t.build_frame(ir_builder, address, command));
+
+    ESP_ERROR_CHECK(ir_builder->get_result(ir_builder, &items, &length));
+    //ESP_LOGI("INFO"," transmitted length = %d", length);
+    //To send data according to the waveform items.
+    rmt_write_items(RMT_TX_CHANNEL, items, length, false);
+    //TRACE_I("INFO"," data written on channel");
+    
+    ir_builder->del(ir_builder);
+}

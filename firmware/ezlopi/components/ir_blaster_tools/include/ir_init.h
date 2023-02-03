@@ -20,29 +20,32 @@ extern "C" {
  * @brief RMT IR receiver Initialization
  *
  */
-ir_parser_config_t* rmt_rx_init() 
+ir_parser_config_t rmt_rx_init() 
 {
     rmt_config_t rmt_rx_config = RMT_DEFAULT_CONFIG_RX(RMT_RX_GPIO, RMT_RX_CHANNEL);
     rmt_config(&rmt_rx_config);
     rmt_driver_install(RMT_RX_CHANNEL, 3000, 0);
-    ir_parser_config_t ir_parser_config = IR_PARSER_DEFAULT_CONFIG((ir_dev_t)RMT_RX_CHANNEL);
-    ir_parser_config.flags |= IR_TOOLS_FLAGS_PROTO_EXT;// Using extended IR protocols (both NEC and RC5 have extended version)
-    return &ir_parser_config;
+    ir_parser_config_t ir_parser_conf = IR_PARSER_DEFAULT_CONFIG((ir_dev_t)RMT_RX_CHANNEL);
+    ir_parser_conf.flags |= IR_TOOLS_FLAGS_PROTO_EXT;
+    //ir_parser_config = &ir_parser_conf;
+    return ir_parser_conf;
 }
 
 /**
  * @brief RMT IR receiver Initialization
  *
  */
-ir_builder_config_t* rmt_tx_init() 
+ir_builder_config_t rmt_tx_init() 
 {
     rmt_config_t rmt_tx_config = RMT_DEFAULT_CONFIG_TX(RMT_TX_GPIO, RMT_TX_CHANNEL);
     rmt_tx_config.tx_config.carrier_en = true;
     rmt_config(&rmt_tx_config);
     rmt_driver_install(RMT_TX_CHANNEL, 0, 0);
-    ir_builder_config_t ir_builder_config = IR_BUILDER_DEFAULT_CONFIG((ir_dev_t)RMT_TX_CHANNEL);
-    ir_builder_config.flags |= IR_TOOLS_FLAGS_PROTO_EXT; // Using extended IR protocols (both NEC and RC5 have extended version)
-    return &ir_builder_config;
+    ir_builder_config_t ir_builder_conf = IR_BUILDER_DEFAULT_CONFIG((ir_dev_t)RMT_TX_CHANNEL);
+    ir_builder_conf.flags |= IR_TOOLS_FLAGS_PROTO_EXT; 
+    //ir_builder_config = &ir_builder_config;
+
+    return ir_builder_conf;
 }
 
 /**

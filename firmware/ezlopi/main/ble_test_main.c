@@ -22,6 +22,7 @@
 #include "gpio_isr_service.h"
 #include "ezlopi_ble_service.h"
 
+
 static void blinky(void *pv);
 
 extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);

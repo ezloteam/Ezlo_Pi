@@ -17,11 +17,13 @@
 #include "ir_init.h"
 #include "ezlopi_device_value_updated.h"
 #include "string.h"
+#include "trace.h"
+//#include "029_IR_blaster_send.h"
 
 
-static ir_parser_config_t* ir_parser_config = NULL;
-static ir_builder_config_t* ir_builder_config = NULL;
-
+ir_parser_config_t ir_parser_config;
+ir_builder_config_t ir_builder_config;
+ir_protocol_init_t* ir_protocol_init_props = 0;
 
 static int IR_Blaster_Remote_prepare_and_add(void* args);
 static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_device);
@@ -53,11 +55,11 @@ int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
             IR_BLaster_Remote_get_value_cjson(properties, arg);
             break;
         }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
-        {
-            ezlopi_device_value_updated_from_device(properties);
-            break;
-        }
+        // case EZLOPI_ACTION_NOTIFY_1000_MS:
+        // {
+        //     ezlopi_device_value_updated_from_device(properties);
+        //     break;
+        // }
         case EZLOPI_ACTION_SET_VALUE:
         {
             IR_BLaster_Remote_set_value(properties, arg);
@@ -96,18 +98,24 @@ static int IR_Blaster_Remote_prepare_and_add(void* args)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
+    cJSON *cjson_device = device_prep_arg->cjson_device;
 
-    if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
+    s_ezlopi_device_properties_t *IR_Blaster_Remote_properties = NULL;
+
+    //if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
+    if((NULL == IR_Blaster_Remote_properties) && (NULL != cjson_device))
     {
-        s_ezlopi_device_properties_t *IR_Blaster_Remote_properties = IR_Blaster_Remote_prepare(device_prep_arg->cjson_device);
+        IR_Blaster_Remote_properties = IR_Blaster_Remote_prepare(cjson_device);
         if (IR_Blaster_Remote_properties)
         {
             if (0 == ezlopi_devices_list_add(device_prep_arg->device, IR_Blaster_Remote_properties, NULL))
             {
+                TRACE_E("Prepare and Add of IR Blaster Remote ERROR");
                 free(IR_Blaster_Remote_properties);
             }
             else
             {
+                TRACE_E("Prepare and Add of IR Blaster Remote");
                 ret = 1;
             }
         }
@@ -122,7 +130,7 @@ static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_devi
     if(IR_Blaster_Remote_properties)
     {
         memset(IR_Blaster_Remote_properties, 0, sizeof(s_ezlopi_device_properties_t));
-        IR_Blaster_Remote_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT;
+        IR_Blaster_Remote_properties->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
         
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
@@ -153,27 +161,45 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
 
     int ret = 0;
 
-    char* ir_remote_command = NULL;
-    char* ir_remote_address = NULL;
+    char* ir_remote_command = 0;
+    char* ir_remote_address = 0;
+    int addr;
+    int cmd;
 
     ir_remote_info_t *ir_remote_info_handler = (ir_remote_info_t*)malloc(sizeof(ir_remote_info_t));
     memset(ir_remote_info_handler, 0, sizeof(ir_remote_info_t));
 
+    //TRACE_B("HERE");
     cJSON* device_details = (cJSON*)arg;
 
     if(device_details && ir_remote_info_handler)
     {
-        CJSON_GET_VALUE_INT(device_details, "device", ir_remote_info_handler->ir_remote_device_type);
-        CJSON_GET_VALUE_INT(device_details, "brand", ir_remote_info_handler->ir_remote_brand_type);
-        CJSON_GET_VALUE_INT(device_details, "model", ir_remote_info_handler->ir_remote_model_type);
-        CJSON_GET_VALUE_STRING(device_details, "address", ir_remote_address);
-        CJSON_GET_VALUE_STRING(device_details, "command", ir_remote_command);
+        TRACE_B("HERE2");
+        cJSON* device_value = cJSON_GetObjectItem(device_details, "value");
 
+
+        //char* printed = cJSON_Print(device_value);
+        //TRACE_E("%s", printed);
+        CJSON_GET_VALUE_INT(device_value, "device", ir_remote_info_handler->ir_remote_device_type);
+        CJSON_GET_VALUE_INT(device_value, "brand", ir_remote_info_handler->ir_remote_brand_type);
+        CJSON_GET_VALUE_INT(device_value, "model", ir_remote_info_handler->ir_remote_model_type);
+        CJSON_GET_VALUE_STRING(device_value, "address", ir_remote_address);
+        CJSON_GET_VALUE_STRING(device_value, "command", ir_remote_command);
+
+        // TRACE_B("device is %d, Brand is %d, Model is %d", ir_remote_info_handler->ir_remote_device_type, ir_remote_info_handler->ir_remote_brand_type,
+        //                                                 ir_remote_info_handler->ir_remote_model_type);
         // Call function to initialize the protocol.
-        ir_protocol_init_t* ir_protocol_init_props = ir_protocol_init(ir_remote_info_handler, ir_parser_config, ir_builder_config);
+        addr = strtol(ir_remote_address, NULL, 16);
+        cmd = strtol(ir_remote_command, NULL, 16);
 
+        TRACE_B("device is %d, Brand is %d, Model is %d, Address is %d and command is %d", ir_remote_info_handler->ir_remote_device_type, ir_remote_info_handler->ir_remote_brand_type,
+                                                       ir_remote_info_handler->ir_remote_model_type, addr, cmd);
+
+        ir_protocol_init_props = ir_protocol_init(ir_remote_info_handler, &ir_parser_config, &ir_builder_config);
+        ezlopi_ir_tx(addr, cmd);
+        xTaskCreate(ezlopi_ir_rx_task,"ezlopi_ir_rx_task", 4*2048, NULL, 10, NULL);
         // Call the function for RX and TX.
-
+        
     }
 
     return ret;
@@ -184,6 +210,7 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
 static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties)
 {
     int ret = 0;
+    TRACE_E("CONFIG INIT");
     ir_parser_config = rmt_rx_init();
     ir_builder_config = rmt_tx_init();
     return ret;
@@ -213,3 +240,67 @@ static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *prope
     return ret;
 }
 
+void ezlopi_ir_tx(uint32_t address, uint32_t command)
+{
+    rmt_item32_t *items = NULL;
+    size_t length = 0;
+    //ir_builder_t *ir_builder = NULL;
+    //frame_builder_t frame_builder;
+
+    //TRACE_I("Send command 0x%x to address 0x%x", command, address);
+    // Send new key code
+    ESP_ERROR_CHECK(ir_protocol_init_props->ir_builder->frame_builder_t.build_frame(ir_protocol_init_props->ir_builder, address, command));
+
+    ESP_ERROR_CHECK(ir_protocol_init_props->ir_builder->get_result(ir_protocol_init_props->ir_builder, &items, &length));
+    //ESP_LOGI("INFO"," transmitted length = %d", length);
+    //To send data according to the waveform items.
+    rmt_write_items(RMT_TX_CHANNEL, items, length, false);
+    //TRACE_I("INFO"," data written on channel");
+    
+    //ir_protocol_init_props->ir_builder->del(ir_protocol_init_props->ir_builder);
+}
+
+/**
+ * @brief RMT Receive Task
+ *
+ */
+static void ezlopi_ir_rx_task(void *arg)
+{
+    uint32_t addr = 0;
+    uint32_t cmd = 0;
+    bool repeat = false;
+    size_t length = 0;
+    RingbufHandle_t rb = NULL;
+    rmt_item32_t *items = NULL;
+
+    //get RMT RX ringbuffer
+    rmt_get_ringbuf_handle(RMT_RX_CHANNEL, &rb);
+    assert(rb != NULL);
+    // Start receive
+    //ESP_LOGI("INFO", "START");
+    rmt_rx_start(RMT_RX_CHANNEL, true);
+    while (1) {
+        items = (rmt_item32_t *) xRingbufferReceive(rb, &length, portMAX_DELAY);
+       // ESP_LOGI("INFO"," Received raw length = %d", length);
+        if (items) 
+        {
+            length /= 4; // one RMT = 4 Bytes
+            TRACE_I(" Received RMT BYTE length = %d", length);
+            if (ir_protocol_init_props->ir_parser->input(ir_protocol_init_props->ir_parser, items, length) == ESP_OK) 
+            {
+                 TRACE_I(" Input ok");
+                if (ir_protocol_init_props->ir_parser->scan_code_t.get_scan_code(ir_protocol_init_props->ir_parser, &addr, &cmd, &repeat) == ESP_OK) 
+                {
+                    TRACE_I("Scan Code %s --- address: 0x%04x command: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
+                }
+            }
+            //after parsing the data, return spaces to ringbuffer.
+            vRingbufferReturnItem(rb, (void *) items);
+        }
+    }
+    //delete ring buffer
+    vRingbufferDelete(rb);
+   // ir_protocol_init_props->ir_parser->del(ir_protocol_init_props->ir_parser);
+   // rmt_driver_uninstall(example_rx_channel);
+    vTaskDelete(NULL);
+}

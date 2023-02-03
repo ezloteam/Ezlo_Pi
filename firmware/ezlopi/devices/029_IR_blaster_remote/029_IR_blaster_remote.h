@@ -11,7 +11,15 @@
 #include "ir_tools.h"
 
 
-int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
+int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+/**
+ * @brief RMT Transmit Task
+ *
+ */
+void ezlopi_ir_tx(uint32_t address, uint32_t command);
+
+static void ezlopi_ir_rx_task(void *arg);
 
 #endif //_029_IR_BLASTER_REMOTE_H_
+

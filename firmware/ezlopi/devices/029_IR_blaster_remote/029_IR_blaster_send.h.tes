@@ -1,0 +1,23 @@
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "driver/rmt.h"
+#include "ir_tools.h"
+#include "ir_init.h"
+#include "029_IR_blaster_send.h"
+//#include "trace.h"
+#include "ir_config.h"
+//#include "driver/rmt.h"
+
+/**
+ * @brief RMT Transmit Task
+ *
+ */
+void ezlopi_ir_tx(uint32_t address, uint32_t command);
+
+#ifdef __cplusplus
+}
+#endif

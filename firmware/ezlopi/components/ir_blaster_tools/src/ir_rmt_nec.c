@@ -39,10 +39,37 @@ static esp_err_t nec_build_frame(ir_builder_t *builder, uint32_t address, uint32
     esp_err_t ret = ESP_OK;
     ir_protocol_builder_t *ir_protocol_builder = __containerof(builder, ir_protocol_builder_t, parent);
     
-#if CONFIG_EXAMPLE_IR_PROTOCOL_AIWA
+// #if CONFIG_EXAMPLE_IR_PROTOCOL_AIWA
+//     builder->make_head(builder);
+//     // LSB -> MSB
+//     for (int i = 0; i < 26; i++) {
+//         if (address & (1 << i)) {
+//             builder->make_logic1(builder);
+//         } else {
+//             builder->make_logic0(builder);
+//         }
+//     }
+//     for (int i = 0; i < 16; i++) {
+//         if (command & (1 << i)) {
+//             builder->make_logic1(builder);
+//         } else {
+//             builder->make_logic0(builder);
+//         }
+//     }
+//     builder->make_end(builder);
+//     return ESP_OK;
+// #else
+    // if (!ir_protocol_builder->flags & IR_TOOLS_FLAGS_PROTO_EXT) {
+    //     uint8_t low_byte = address & 0xFF;
+    //     uint8_t high_byte = (address >> 8) & 0xFF;
+    //     IR_CHECK(low_byte == (~high_byte & 0xFF), "address not match standard NEC protocol", err, ESP_ERR_INVALID_ARG);
+    //     low_byte = command & 0xFF;
+    //     high_byte = (command >> 8) & 0xFF;
+    //     IR_CHECK(low_byte == (~high_byte & 0xFF), "command not match standard NEC protocol", err, ESP_ERR_INVALID_ARG);
+    // }
     builder->make_head(builder);
     // LSB -> MSB
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 16; i++) {
         if (address & (1 << i)) {
             builder->make_logic1(builder);
         } else {
@@ -57,37 +84,9 @@ static esp_err_t nec_build_frame(ir_builder_t *builder, uint32_t address, uint32
         }
     }
     builder->make_end(builder);
-    return ESP_OK;
-#else
-    if (!ir_protocol_builder->flags & IR_TOOLS_FLAGS_PROTO_EXT) {
-        uint8_t low_byte = address & 0xFF;
-        uint8_t high_byte = (address >> 8) & 0xFF;
-        IR_CHECK(low_byte == (~high_byte & 0xFF), "address not match standard NEC protocol", err, ESP_ERR_INVALID_ARG);
-        low_byte = command & 0xFF;
-        high_byte = (command >> 8) & 0xFF;
-        IR_CHECK(low_byte == (~high_byte & 0xFF), "command not match standard NEC protocol", err, ESP_ERR_INVALID_ARG);
-    }
-    builder->make_head(builder);
-    // LSB -> MSB
-    for (int i = 0; i < 16; i++) {
-        if (address & (1 << i)) {
-            builder->make_logic1(builder);
-        } else {
-            builder->make_logic0(builder);
-        }
-    }
-    for (int i = 0; i < 16; i++) {
-        if (command & (1 << i)) {
-            builder->make_logic1(builder);
-        } else {
-            builder->make_logic0(builder);
-        }
-    }
-    builder->make_end(builder);
-    return ESP_OK;
-err:
+    ret = ESP_OK;
     return ret;
-#endif
+//#endif
 }
 
 ir_builder_t *ir_builder_rmt_new_nec(const ir_builder_config_t *config)
@@ -174,8 +173,19 @@ static esp_err_t nec_parser_get_scan_code(ir_parser_t *parser, uint32_t *address
         }
     } else {
         if (ir_protocol_parse_head(ir_protocol_parser)) {
-#if CONFIG_EXAMPLE_IR_PROTOCOL_AIWA
-            for (int i = 0; i < 26; i++) {
+// #if CONFIG_EXAMPLE_IR_PROTOCOL_AIWA
+//             for (int i = 0; i < 26; i++) {
+//                 if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
+//                     addr |= (logic_value << i);
+//                 }
+//             }
+//             for (int i = 0; i < 16; i++) {
+//                 if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
+//                     cmd |= (logic_value << i);
+//                 }
+//             }
+// #else
+            for (int i = 0; i < 16; i++) {
                 if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
                     addr |= (logic_value << i);
                 }
@@ -185,18 +195,7 @@ static esp_err_t nec_parser_get_scan_code(ir_parser_t *parser, uint32_t *address
                     cmd |= (logic_value << i);
                 }
             }
-#else
-            for (int i = 0; i < 16; i++) {
-                if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
-                    addr |= (logic_value << i);
-                }
-            }
-            for (int i = 0; i < 16; i++) {
-                if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
-                    cmd |= (logic_value << i);
-                }
-            }
-#endif
+//#endif
             *address = addr;
             *command = cmd;
             *repeat = false;

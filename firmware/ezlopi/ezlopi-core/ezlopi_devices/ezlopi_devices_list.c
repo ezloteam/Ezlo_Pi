@@ -88,7 +88,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func =  ezlopi_dimmable_bulb, //IR_blaster_remote, 
+        .func =  IR_blaster_remote,//ezlopi_dimmable_bulb, // 
     },
 #endif
 
