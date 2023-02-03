@@ -49,12 +49,12 @@ int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
 
 void ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len)
 {
-    i2c_master_read_from_device(i2c_master_conf->channel, i2c_master_conf->address, read_buffer, read_len, 1000);
+    i2c_master_read_from_device(i2c_master_conf->channel, i2c_master_conf->address, read_buffer, read_len, 200);
 }
 
 void ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len)
 {
-    i2c_master_write_to_device(i2c_master_conf->channel, i2c_master_conf->address, write_buffer, write_len, 1000);
+    i2c_master_write_to_device(i2c_master_conf->channel, i2c_master_conf->address, write_buffer, write_len, 200);
 }
 
 void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf)

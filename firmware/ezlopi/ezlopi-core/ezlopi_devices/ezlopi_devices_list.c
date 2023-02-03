@@ -15,6 +15,7 @@
 #include "027_sens_water_leak_sensor.h"
 #include "sensor_sound.h"
 #include "1024_device_health.h"
+#include "0029_gxhtc3_rh_t_sensor.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -130,11 +131,11 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifndef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
+#ifdef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
     {
         .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
         .func = gxhtc3_rh_t_sensor,
-    }
+    },
 #endif
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.

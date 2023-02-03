@@ -72,6 +72,13 @@ static int digital_io_get_value_cjson(s_ezlopi_device_properties_t *properties, 
     return ret;
 }
 
+static void ___set_gpio_value(s_ezlopi_device_properties_t *properties, int value)
+{
+    int temp_value = (0 == properties->interface.gpio.gpio_out.invert) ? value : !(value);
+    gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, value);
+    properties->interface.gpio.gpio_out.value = value;
+}
+
 static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
@@ -88,11 +95,34 @@ static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *
         TRACE_I("prev value: %d", properties->interface.gpio.gpio_out.value);
         TRACE_I("cur value: %d", value);
 
-        if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
+        if (255 != properties->interface.gpio.gpio_out.gpio_num)
         {
-            int temp_value = (0 == properties->interface.gpio.gpio_out.invert) ? value : !(value);
-            gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, value);
+            if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
+            {
+                ___set_gpio_value(properties, value);
+            }
+        }
+        else
+        {
+            l_ezlopi_configured_devices_t *configured_devices = ezlopi_devices_list_get_configured_items();
+
+            while (configured_devices)
+            {
+
+                if ((EZLOPI_SENSOR_0001_LED == configured_devices->device->id) && (255 != configured_devices->properties->interface.gpio.gpio_out.gpio_num))
+                {
+                    TRACE_D("device-id: %d", configured_devices->device->id);
+                    TRACE_D("GPIO-pin: %d", configured_devices->properties->interface.gpio.gpio_out.gpio_num);
+                    TRACE_D("value: %d", value);
+                    ___set_gpio_value(configured_devices->properties, value);
+                    ezlopi_device_value_updated_from_device(configured_devices->properties);
+                }
+
+                configured_devices = configured_devices->next;
+            }
+
             properties->interface.gpio.gpio_out.value = value;
+            ezlopi_device_value_updated_from_device(properties);
         }
     }
 
@@ -129,27 +159,32 @@ static int digital_io_prepare(void *arg)
 static int digital_io_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
+    if (255 != properties->interface.gpio.gpio_out.gpio_num)
     {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_out.gpio_num),
-            .mode = GPIO_MODE_OUTPUT,
-            .pull_up_en = ((properties->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
-                           (properties->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                              ? GPIO_PULLUP_ENABLE
-                              : GPIO_PULLUP_DISABLE,
-            .pull_down_en = ((properties->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
-                             (properties->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                                ? GPIO_PULLDOWN_ENABLE
-                                : GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_DISABLE,
-        };
+        if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
+        {
+            const gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_out.gpio_num),
+                .mode = GPIO_MODE_OUTPUT,
+                .pull_up_en = ((properties->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
+                               (properties->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                  ? GPIO_PULLUP_ENABLE
+                                  : GPIO_PULLUP_DISABLE,
+                .pull_down_en = ((properties->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
+                                 (properties->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                    ? GPIO_PULLDOWN_ENABLE
+                                    : GPIO_PULLDOWN_DISABLE,
+                .intr_type = GPIO_INTR_DISABLE,
+            };
 
-        gpio_config(&io_conf);
-        digital_io_write_gpio_value(properties);
+            gpio_config(&io_conf);
+            digital_io_write_gpio_value(properties);
+        }
     }
 
-    if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
+    if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num) &&
+        (-1 != properties->interface.gpio.gpio_in.gpio_num) &&
+        (255 != properties->interface.gpio.gpio_in.gpio_num))
     {
         const gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),

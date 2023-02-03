@@ -128,12 +128,12 @@ extern "C"
                 \"id_room\" : \"\",\
                 \"pullup_scl\" : true,\
                 \"pullup_sda\" : true,\
-                \"slave_addr\" : 0,\
+                \"slave_addr\" : 0\
             },\
             {\
-                \"dev_name\": \"Relay 1\",\
+                \"dev_name\": \"Switch 1\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 39,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -146,9 +146,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 2\",\
+                \"dev_name\": \"Switch 2\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 38,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -161,9 +161,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 3\",\
+                \"dev_name\": \"Switch 3\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 15,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -176,9 +176,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 4\",\
+                \"dev_name\": \"Switch 4\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 4,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -191,9 +191,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 5\",\
+                \"dev_name\": \"Switch 5\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 5,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -206,9 +206,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 6\",\
+                \"dev_name\": \"Switch 6\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 6,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -221,9 +221,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 7\",\
+                \"dev_name\": \"Switch 7\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 7,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -236,9 +236,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 8\",\
+                \"dev_name\": \"Switch 8\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 12,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -251,9 +251,9 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 9\",\
+                \"dev_name\": \"Switch 9\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 17,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
@@ -266,10 +266,25 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \" dev_name\": \"Relay 10\",\
+                \"dev_name\": \"Switch 10\",\
                 \"dev_type\": 1,\
-                \"gpio_in\": 0,\
+                \"gpio_in\": -1,\
                 \"gpio_out\": 18,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Master Switch\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 255,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
                 \"ip_inv\": true,\

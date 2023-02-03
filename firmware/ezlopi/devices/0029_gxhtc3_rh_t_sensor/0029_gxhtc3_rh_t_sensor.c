@@ -17,7 +17,7 @@ static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_temperature(cJSON *c
 static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_relative_humidity(cJSON *cjson_device);
 static void wgxhtc3_sensor_init(s_ezlopi_device_properties_t *properties, void *user_arg);
 
-int water_leak_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
+int gxhtc3_rh_t_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
     static uint32_t count;
@@ -63,12 +63,12 @@ static void wgxhtc3_sensor_read_sensor_data(s_ezlopi_device_properties_t *proper
     uint8_t wakeup_cmd[] = {0x35, 0x17};
     uint8_t temp_measure_cmd[] = {0x7C, 0xA2}; // temperature first-clock stretching
 
-    ezlopi_i2c_master_write_to_device(properties, wakeup_cmd, 2);
+    ezlopi_i2c_master_write_to_device(&properties->interface.i2c_master, wakeup_cmd, 2);
     vTaskDelay(100);
-    ezlopi_i2c_master_write_to_device(properties, temp_measure_cmd, 2);
+    ezlopi_i2c_master_write_to_device(&properties->interface.i2c_master, temp_measure_cmd, 2);
     vTaskDelay(500);
     uint8_t read_buffer[6];
-    ezlopi_i2c_master_read_from_device(properties, read_buffer, 6);
+    ezlopi_i2c_master_read_from_device(&properties->interface.i2c_master, read_buffer, 6);
     dump("read_buffer", read_buffer, 0, 6);
 
     temperature = 100.0 * (read_buffer[0] << 8 | read_buffer[1]) / 65536.0;
@@ -87,13 +87,13 @@ static int gxhtc3_notify(s_ezlopi_device_properties_t *properties, void *args)
     {
         if (category_temperature == properties->ezlopi_cloud.category)
         {
-            TRACE_E("Temperature is: %f *C", temperature);
+            TRACE_D("Temperature is: %f *C", temperature);
             cJSON_AddNumberToObject(cjson_properties, "value", temperature);
             cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
         }
         if (category_humidity == properties->ezlopi_cloud.category)
         {
-            TRACE_E("Humidity is: %f %%", relative_humidity);
+            TRACE_D("Humidity is: %f %%", relative_humidity);
             cJSON_AddNumberToObject(cjson_properties, "value", relative_humidity);
             cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         }

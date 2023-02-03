@@ -15,13 +15,17 @@ void ezlopi_init(void)
 {
     // Init memories
     ezlopi_nvs_init();
+    vTaskDelay(10);
     ezlopi_factory_info_init();
+    vTaskDelay(10);
 
     // Init devices
     ezlopi_device_prepare();
+    vTaskDelay(10);
     ezlopi_initialize_devices();
-
+    vTaskDelay(10);
     ezlopi_wifi_initialize();
+    vTaskDelay(10);
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
     if (boot_count > 1)
@@ -47,4 +51,3 @@ static void ezlopi_initialize_devices(void)
         registered_device = registered_device->next;
     }
 }
-
