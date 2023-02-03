@@ -1,5 +1,5 @@
 #!/bin/bash
-controller="esp32"
+controller="esp32s3"
 usb_port="/dev/ttyUSB0"
 baud_rate=921600
 fimrware_loc="firmware/id"

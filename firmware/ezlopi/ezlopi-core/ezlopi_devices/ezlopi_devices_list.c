@@ -129,6 +129,13 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_health,
     },
 #endif
+
+#ifndef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
+    {
+        .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
+        .func = gxhtc3_rh_t_sensor,
+    }
+#endif
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

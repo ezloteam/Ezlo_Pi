@@ -124,7 +124,7 @@ extern "C"
                 \"dev_type\" : 8,\
                 \"gpio_scl\" : 26,\
                 \"gpio_sda\" : 16,\
-                \"id_item\" : 5,\
+                \"id_item\" : 29,\
                 \"id_room\" : \"\",\
                 \"pullup_scl\" : true,\
                 \"pullup_sda\" : true,\
