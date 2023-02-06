@@ -123,7 +123,8 @@ err:
     return ret;
 }
 
-static esp_err_t gree_parser_get_scan_code_gree(ir_parser_t *parser, uint32_t *address, uint32_t *footer, uint32_t *command, bool *repeat)
+// static esp_err_t gree_parser_get_scan_code_gree(ir_parser_t *parser, uint32_t *address, uint32_t *command, uint32_t *footer, bool *repeat)
+static esp_err_t gree_parser_get_scan_code_gree(ir_parser_t *parser, uint32_t *address, uint32_t *command, bool *repeat)
 {
     esp_err_t ret = ESP_FAIL;
     uint32_t addr = 0;
@@ -156,8 +157,9 @@ static esp_err_t gree_parser_get_scan_code_gree(ir_parser_t *parser, uint32_t *a
         }
         *address = addr;
         *command = cmd;
-        *footer = ftr;
+       // *footer = ftr;
         *repeat = false;
+        ESP_LOGI("GREEAC FOOTER"," = %d", ftr);
         // keep it as potential repeat code
         //ir_protocol_parser->last_address = addr;
         //ir_protocol_parser->last_command = cmd;

@@ -27,6 +27,7 @@ ir_parser_config_t rmt_rx_init()
     rmt_driver_install(RMT_RX_CHANNEL, 3000, 0);
     ir_parser_config_t ir_parser_conf = IR_PARSER_DEFAULT_CONFIG((ir_dev_t)RMT_RX_CHANNEL);
     ir_parser_conf.flags |= IR_TOOLS_FLAGS_PROTO_EXT;
+    // TRACE_E("RMT RX INIT");
     //ir_parser_config = &ir_parser_conf;
     return ir_parser_conf;
 }
@@ -44,7 +45,7 @@ ir_builder_config_t rmt_tx_init()
     ir_builder_config_t ir_builder_conf = IR_BUILDER_DEFAULT_CONFIG((ir_dev_t)RMT_TX_CHANNEL);
     ir_builder_conf.flags |= IR_TOOLS_FLAGS_PROTO_EXT; 
     //ir_builder_config = &ir_builder_config;
-
+    // TRACE_E("RMT TX INIT");
     return ir_builder_conf;
 }
 
@@ -115,6 +116,26 @@ ir_protocol_type_t ir_protocol_selection(ir_remote_info_t*  ir_remote_info_handl
             ir_protocol_type = IR_REMOTE_PROTOCOL_NEC;
             break;
 
+        case IR_DEVICE_TV_BRAND_DISH_MODEL_DISHTV1:
+            ir_protocol_type = IR_REMOTE_PROTOCOL_DISH;
+            break;
+
+        case IR_DEVICE_TV_BRAND_JVC_MODEL_JVCTV1:
+            ir_protocol_type = IR_REMOTE_PROTOCOL_JVC;
+            break;
+
+        case IR_DEVICE_TV_BRAND_LEGO_MODEL_LEGOTV1:
+            ir_protocol_type = IR_REMOTE_PROTOCOL_LEGO;
+            break;
+
+        case IR_DEVICE_TV_BRAND_AIRTON_MODEL_AIRTONTV1:
+            ir_protocol_type = IR_REMOTE_PROTOCOL_AIRTON;
+            break;
+
+        case IR_DEVICE_AC_BRAND_GREE_MODEL_GREEAC1:
+            ir_protocol_type = IR_REMOTE_PROTOCOL_GREE;
+            break;
+
         default:
             TRACE_E("NO REMOTE MODEL SELECTED");
             break;
@@ -126,9 +147,10 @@ ir_protocol_type_t ir_protocol_selection(ir_remote_info_t*  ir_remote_info_handl
  * @brief IR Protocol Initialization
  *
  */
-ir_protocol_init_t* ir_protocol_init(ir_remote_info_t *ir_remote_info_handler, ir_parser_config_t* ir_parser_config, ir_builder_config_t* ir_builder_config)
+void ir_protocol_init(ir_protocol_init_t *ir_protocol_init_props, ir_remote_info_t *ir_remote_info_handler, ir_parser_config_t* ir_parser_config, ir_builder_config_t* ir_builder_config)
 {
-    ir_protocol_init_t *ir_protocol_init_props = NULL;
+    //ir_protocol_init_t *ir_protocol_init_props = NULL;
+    //ir_protocol_init_t ir_protocol_init_props;
     ir_protocol_type_t ir_protocol_type;
     
     ir_protocol_type = ir_protocol_selection(ir_remote_info_handler);
@@ -266,7 +288,7 @@ ir_protocol_init_t* ir_protocol_init(ir_remote_info_t *ir_remote_info_handler, i
             break;
         }
     }
-    return ir_protocol_init_props;
+    //return ir_protocol_init_props;
 }
 
 #ifdef __cplusplus

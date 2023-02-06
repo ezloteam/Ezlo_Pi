@@ -1,35 +1,35 @@
-
-
 #include "029_IR_blaster_remote.h"
-#include "cJSON.h"
-#include "ezlopi_devices_list.h"
-#include "string.h"
-#include "stdlib.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
+// #include "cJSON.h"
+ #include "ezlopi_devices_list.h"
+// #include "string.h"
+// #include "stdlib.h"
+// #include "ezlopi_cloud_category_str.h"
+// #include "ezlopi_cloud_subcategory_str.h"
+// #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
-#include "sdkconfig.h"
-#include "driver/rmt.h"
-#include "ir_tools.h"
-#include "ir_timings.h"
+// #include "sdkconfig.h"
+// #include "driver/rmt.h"
+// #include "freertos/FreeRTOS.h"
+// #include "freertos/task.h"
+// #include "ir_tools.h"
+// #include "ir_timings.h"
 #include "ir_init.h"
-#include "ezlopi_device_value_updated.h"
-#include "string.h"
-#include "trace.h"
+// #include "ezlopi_device_value_updated.h"
+// #include "string.h"
+// #include "trace.h"
 //#include "029_IR_blaster_send.h"
 
 
 ir_parser_config_t ir_parser_config;
 ir_builder_config_t ir_builder_config;
-ir_protocol_init_t* ir_protocol_init_props = 0;
+static ir_protocol_init_t ir_protocol_init_props;
 
-static int IR_Blaster_Remote_prepare_and_add(void* args);
-static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_device);
-static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties);
-static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties, void *arg);
-static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
+// static int IR_Blaster_Remote_prepare_and_add(void* args);
+// static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_device);
+// static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties);
+// static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties, void *arg);
+// static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 
 
 
@@ -110,12 +110,12 @@ static int IR_Blaster_Remote_prepare_and_add(void* args)
         {
             if (0 == ezlopi_devices_list_add(device_prep_arg->device, IR_Blaster_Remote_properties, NULL))
             {
-                TRACE_E("Prepare and Add of IR Blaster Remote ERROR");
+                //TRACE_E("Prepare and Add of IR Blaster Remote ERROR");
                 free(IR_Blaster_Remote_properties);
             }
             else
             {
-                TRACE_E("Prepare and Add of IR Blaster Remote");
+                //TRACE_E("Prepare and Add of IR Blaster Remote");
                 ret = 1;
             }
         }
@@ -163,8 +163,8 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
 
     char* ir_remote_command = 0;
     char* ir_remote_address = 0;
-    int addr;
-    int cmd;
+    uint32_t addr;
+    uint32_t cmd;
 
     ir_remote_info_t *ir_remote_info_handler = (ir_remote_info_t*)malloc(sizeof(ir_remote_info_t));
     memset(ir_remote_info_handler, 0, sizeof(ir_remote_info_t));
@@ -174,11 +174,11 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
 
     if(device_details && ir_remote_info_handler)
     {
-        TRACE_B("HERE2");
+        //TRACE_B("HERE2");
         cJSON* device_value = cJSON_GetObjectItem(device_details, "value");
 
 
-        //char* printed = cJSON_Print(device_value);
+        char* printed = cJSON_Print(device_value);
         //TRACE_E("%s", printed);
         CJSON_GET_VALUE_INT(device_value, "device", ir_remote_info_handler->ir_remote_device_type);
         CJSON_GET_VALUE_INT(device_value, "brand", ir_remote_info_handler->ir_remote_brand_type);
@@ -192,12 +192,23 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
         addr = strtol(ir_remote_address, NULL, 16);
         cmd = strtol(ir_remote_command, NULL, 16);
 
-        TRACE_B("device is %d, Brand is %d, Model is %d, Address is %d and command is %d", ir_remote_info_handler->ir_remote_device_type, ir_remote_info_handler->ir_remote_brand_type,
-                                                       ir_remote_info_handler->ir_remote_model_type, addr, cmd);
+    //    TRACE_B("device is %d, Brand is %d, Model is %d, Address is %X and command is %X", ir_remote_info_handler->ir_remote_device_type, ir_remote_info_handler->ir_remote_brand_type,
+    //                                                   ir_remote_info_handler->ir_remote_model_type, addr, cmd);
 
-        ir_protocol_init_props = ir_protocol_init(ir_remote_info_handler, &ir_parser_config, &ir_builder_config);
+        //TRACE_E("config para flag = %d, margin us = %d", ir_parser_config.flags, ir_parser_config.margin_us);
+        //ir_protocol_init_props = ir_protocol_init(&ir_protocol_init_props, ir_remote_info_handler, &ir_parser_config, &ir_builder_config);
+        // ir_parser_config = rmt_rx_init();
+        //ir_builder_config = rmt_tx_init();
+        //ir_builder_config = rmt_tx_init();
+        //ir_parser_config = rmt_rx_init();
+        ir_protocol_init(&ir_protocol_init_props, ir_remote_info_handler, &ir_parser_config, &ir_builder_config);
+    
+        xTaskCreate(ezlopi_ir_rx_task,"ezlopi_ir_rx_task", 2048*4 , NULL, 10, NULL);
         ezlopi_ir_tx(addr, cmd);
-        xTaskCreate(ezlopi_ir_rx_task,"ezlopi_ir_rx_task", 4*2048, NULL, 10, NULL);
+
+        
+        //TRACE_E("address = %X", addr);
+        
         // Call the function for RX and TX.
         
     }
@@ -211,8 +222,9 @@ static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties)
 {
     int ret = 0;
     TRACE_E("CONFIG INIT");
-    ir_parser_config = rmt_rx_init();
+    // ir_parser_config = rmt_rx_init(); 
     ir_builder_config = rmt_tx_init();
+    ir_parser_config = rmt_rx_init();
     return ret;
 }
 
@@ -249,15 +261,19 @@ void ezlopi_ir_tx(uint32_t address, uint32_t command)
 
     //TRACE_I("Send command 0x%x to address 0x%x", command, address);
     // Send new key code
-    ESP_ERROR_CHECK(ir_protocol_init_props->ir_builder->frame_builder_t.build_frame(ir_protocol_init_props->ir_builder, address, command));
+    // if(address && command)
+    // {
+        ESP_ERROR_CHECK(ir_protocol_init_props.ir_builder->frame_builder_t.build_frame(ir_protocol_init_props.ir_builder, address, command));
 
-    ESP_ERROR_CHECK(ir_protocol_init_props->ir_builder->get_result(ir_protocol_init_props->ir_builder, &items, &length));
-    //ESP_LOGI("INFO"," transmitted length = %d", length);
-    //To send data according to the waveform items.
-    rmt_write_items(RMT_TX_CHANNEL, items, length, false);
-    //TRACE_I("INFO"," data written on channel");
-    
-    //ir_protocol_init_props->ir_builder->del(ir_protocol_init_props->ir_builder);
+        ESP_ERROR_CHECK(ir_protocol_init_props.ir_builder->get_result(ir_protocol_init_props.ir_builder, &items, &length));
+        //TRACE_E(" transmitted length = %d", length);
+        //To send data according to the waveform items.
+        rmt_write_items(RMT_TX_CHANNEL, items, length, false);
+        //TRACE_E("data written on channel");
+    // }
+
+    // ir_protocol_init_props.ir_builder->del(ir_protocol_init_props.ir_builder);
+    // rmt_driver_uninstall(RMT_TX_CHANNEL);
 }
 
 /**
@@ -281,17 +297,17 @@ static void ezlopi_ir_rx_task(void *arg)
     rmt_rx_start(RMT_RX_CHANNEL, true);
     while (1) {
         items = (rmt_item32_t *) xRingbufferReceive(rb, &length, portMAX_DELAY);
-       // ESP_LOGI("INFO"," Received raw length = %d", length);
+        //TRACE_E(" Received raw length = %d", length);
         if (items) 
         {
             length /= 4; // one RMT = 4 Bytes
-            TRACE_I(" Received RMT BYTE length = %d", length);
-            if (ir_protocol_init_props->ir_parser->input(ir_protocol_init_props->ir_parser, items, length) == ESP_OK) 
+            //TRACE_I(" Received RMT BYTE length = %d", length);
+            if (ir_protocol_init_props.ir_parser->input(ir_protocol_init_props.ir_parser, items, length) == ESP_OK) 
             {
-                 TRACE_I(" Input ok");
-                if (ir_protocol_init_props->ir_parser->scan_code_t.get_scan_code(ir_protocol_init_props->ir_parser, &addr, &cmd, &repeat) == ESP_OK) 
+                 //TRACE_I(" Input ok");
+                if (ir_protocol_init_props.ir_parser->scan_code_t.get_scan_code(ir_protocol_init_props.ir_parser, &addr, &cmd, &repeat) == ESP_OK) 
                 {
-                    TRACE_I("Scan Code %s --- address: 0x%04x command: 0x%04x", repeat ? "(repeat)" : "", addr, cmd);
+                    TRACE_I("Scan Code %s --- address: 0x%08x command: 0x%08x", repeat ? "(repeat)" : "", addr, cmd);
                 }
             }
             //after parsing the data, return spaces to ringbuffer.
@@ -300,7 +316,7 @@ static void ezlopi_ir_rx_task(void *arg)
     }
     //delete ring buffer
     vRingbufferDelete(rb);
-   // ir_protocol_init_props->ir_parser->del(ir_protocol_init_props->ir_parser);
-   // rmt_driver_uninstall(example_rx_channel);
+    ir_protocol_init_props.ir_parser->del(ir_protocol_init_props.ir_parser);
+    rmt_driver_uninstall(RMT_RX_CHANNEL);
     vTaskDelete(NULL);
 }

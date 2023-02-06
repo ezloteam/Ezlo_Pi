@@ -67,19 +67,28 @@ static esp_err_t nec_build_frame(ir_builder_t *builder, uint32_t address, uint32
     //     high_byte = (command >> 8) & 0xFF;
     //     IR_CHECK(low_byte == (~high_byte & 0xFF), "command not match standard NEC protocol", err, ESP_ERR_INVALID_ARG);
     // }
+   // ESP_LOGE("ERROR","NEC builder frame CALLED");
     builder->make_head(builder);
     // LSB -> MSB
-    for (int i = 0; i < 16; i++) {
-        if (address & (1 << i)) {
+    for (int i = 0; i < 16; i++) 
+    {
+        if (address & (1 << i)) 
+        {
             builder->make_logic1(builder);
-        } else {
+        } 
+        else 
+        {
             builder->make_logic0(builder);
         }
     }
-    for (int i = 0; i < 16; i++) {
-        if (command & (1 << i)) {
+    for (int i = 0; i < 16; i++) 
+    {
+        if (command & (1 << i))
+        {
             builder->make_logic1(builder);
-        } else {
+        } 
+        else 
+        {
             builder->make_logic0(builder);
         }
     }
@@ -104,7 +113,7 @@ ir_builder_t *ir_builder_rmt_new_nec(const ir_builder_config_t *config)
     if (config->flags & IR_TOOLS_FLAGS_INVERSE) {
         ir_protocol_builder->inverse = true;
     }
-
+    //ESP_LOGE("ERROR","NEC builder CALLED");
     uint32_t counter_clk_hz = 0;
     IR_CHECK(rmt_get_counter_clock((rmt_channel_t)config->dev_hdl, &counter_clk_hz) == ESP_OK,
               "get rmt counter clock failed", err, NULL);
@@ -222,7 +231,7 @@ ir_parser_t *ir_parser_rmt_new_nec(const ir_parser_config_t *config)
         ir_protocol_parser->inverse = true;
     }
 
-    ESP_LOGE("ERROR","NEC CALLED");
+    ESP_LOGE("ERROR","NEC Protocol Selected");
     uint32_t counter_clk_hz = 0;
     IR_CHECK(rmt_get_counter_clock((rmt_channel_t)config->dev_hdl, &counter_clk_hz) == ESP_OK,
               "get rmt counter clock failed", err, NULL);

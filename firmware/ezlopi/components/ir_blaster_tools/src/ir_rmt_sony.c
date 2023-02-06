@@ -36,7 +36,7 @@ static esp_err_t sony_build_frame(ir_builder_t *builder, uint32_t address, uint3
     esp_err_t ret = ESP_OK;
     ir_protocol_builder_t *ir_protocol_builder = __containerof(builder, ir_protocol_builder_t, parent);
     builder->make_head(builder);
-    #if CONFIG_EXAMPLE_IR_PROTOCOL_SONY_12
+   // #if CONFIG_EXAMPLE_IR_PROTOCOL_SONY_12
         // LSB -> MSB
         for (int i = 0; i < 7; i++) {
             if (command & (1 << i)) {
@@ -53,40 +53,40 @@ static esp_err_t sony_build_frame(ir_builder_t *builder, uint32_t address, uint3
             }
         }
 
-    #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_15
-        // LSB -> MSB
-        for (int i = 0; i < 7; i++) {
-            if (command & (1 << i)) {
-                builder->make_logic1(builder);
-            } else {
-                builder->make_logic0(builder);
-            }
-        }
-        for (int i = 0; i < 8; i++) {
-            if (address & (1 << i)) {
-                builder->make_logic1(builder);
-            } else {
-                builder->make_logic0(builder);
-            }
-        }
+    // #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_15
+    //     // LSB -> MSB
+    //     for (int i = 0; i < 7; i++) {
+    //         if (command & (1 << i)) {
+    //             builder->make_logic1(builder);
+    //         } else {
+    //             builder->make_logic0(builder);
+    //         }
+    //     }
+    //     for (int i = 0; i < 8; i++) {
+    //         if (address & (1 << i)) {
+    //             builder->make_logic1(builder);
+    //         } else {
+    //             builder->make_logic0(builder);
+    //         }
+    //     }
 
-    #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_20
-        // LSB -> MSB
-        for (int i = 0; i < 7; i++) {
-            if (command & (1 << i)) {
-                builder->make_logic1(builder);
-            } else {
-                builder->make_logic0(builder);
-            }
-        }
-        for (int i = 0; i < 13; i++) {
-            if (address & (1 << i)) {
-                builder->make_logic1(builder);
-            } else {
-                builder->make_logic0(builder);
-            }
-        }
-    #endif    
+    // #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_20
+    //     // LSB -> MSB
+    //     for (int i = 0; i < 7; i++) {
+    //         if (command & (1 << i)) {
+    //             builder->make_logic1(builder);
+    //         } else {
+    //             builder->make_logic0(builder);
+    //         }
+    //     }
+    //     for (int i = 0; i < 13; i++) {
+    //         if (address & (1 << i)) {
+    //             builder->make_logic1(builder);
+    //         } else {
+    //             builder->make_logic0(builder);
+    //         }
+    //     }
+    // #endif    
     return ESP_OK;
 }
 
@@ -174,7 +174,7 @@ static esp_err_t sony_parser_get_scan_code(ir_parser_t *parser, uint32_t *addres
         }
     } else {
         if (ir_protocol_parse_head(ir_protocol_parser)) {
-            #if CONFIG_EXAMPLE_IR_PROTOCOL_SONY_12
+           // #if CONFIG_EXAMPLE_IR_PROTOCOL_SONY_12
                 for (int i = 0; i < 7; i++) {
                     if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
                         cmd |= (logic_value << i);
@@ -185,29 +185,29 @@ static esp_err_t sony_parser_get_scan_code(ir_parser_t *parser, uint32_t *addres
                         addr |= (logic_value << i);
                     }
                 }
-            #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_15
-                for (int i = 0; i < 7; i++) {
-                    if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
-                        cmd |= (logic_value << i);
-                    }
-                }
-                for (int i = 0; i < 8; i++) {
-                    if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
-                        addr |= (logic_value << i);
-                    }
-                }   
-            #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_20
-                for (int i = 0; i < 7; i++) {
-                    if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
-                        cmd |= (logic_value << i);
-                    }
-                }
-                for (int i = 0; i < 13; i++) {
-                    if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
-                        addr |= (logic_value << i);
-                    }
-                }
-            #endif 
+            // #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_15
+            //     for (int i = 0; i < 7; i++) {
+            //         if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
+            //             cmd |= (logic_value << i);
+            //         }
+            //     }
+            //     for (int i = 0; i < 8; i++) {
+            //         if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
+            //             addr |= (logic_value << i);
+            //         }
+            //     }   
+            // #elif CONFIG_EXAMPLE_IR_PROTOCOL_SONY_20
+            //     for (int i = 0; i < 7; i++) {
+            //         if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
+            //             cmd |= (logic_value << i);
+            //         }
+            //     }
+            //     for (int i = 0; i < 13; i++) {
+            //         if (ir_protocol_parse_logic(parser, &logic_value) == ESP_OK) {
+            //             addr |= (logic_value << i);
+            //         }
+            //     }
+            // #endif 
             *address = addr;
             *command = cmd;
             *repeat = false;

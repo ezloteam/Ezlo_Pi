@@ -58,7 +58,7 @@ typedef enum ir_remote_device_brand_s {
  *  
  */
 typedef enum {
-    IR_DEVICE_TV_BRAND_PANASONIC_MODEL_PANASONICTV_1,                                       //      0
+    IR_DEVICE_TV_BRAND_PANASONIC_MODEL_PANASONICTV_1 = 0,                                       //      0
     IR_DEVICE_TV_BRAND_AOC_MODEL_M19W531,                                                   //      1
     IR_DEVICE_TV_BRAND_VEONTV_MODEL_SR0322016,                                              //      2
     IR_DEVICE_TV_BRAND_LG_MODEL_42H3000,                                                    //      3
@@ -114,8 +114,13 @@ typedef enum {
     IR_DEVICE_SOUND_BAR_BRAND_EDIFIER_MODEL_R1850DB,                                        //      40
     IR_DEVICE_SOUND_BAR_BRAND_SONY_MODEL_CMT_CP_100,                                        //      41
 
+    IR_DEVICE_TV_BRAND_DISH_MODEL_DISHTV1,                                                  //      42
+    IR_DEVICE_TV_BRAND_JVC_MODEL_JVCTV1,                                                    //      43
+    IR_DEVICE_TV_BRAND_LEGO_MODEL_LEGOTV1,                                                  //      44
+    IR_DEVICE_TV_BRAND_AIRTON_MODEL_AIRTONTV1,                                              //      45
+    IR_DEVICE_AC_BRAND_GREE_MODEL_GREEAC1,                                                  //      46
 
-    IR_DEVICE_BRAND_REMOTE_MODEL_MAX                                                        //      41
+    IR_DEVICE_BRAND_REMOTE_MODEL_MAX                                                        //      46
 } ir_remote_device_model_type_t;
 
 /** 

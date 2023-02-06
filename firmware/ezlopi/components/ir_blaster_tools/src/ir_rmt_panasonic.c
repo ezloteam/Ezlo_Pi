@@ -29,15 +29,16 @@ static esp_err_t panasonic_build_frame(ir_builder_t *builder, uint32_t address, 
 {
     esp_err_t ret = ESP_OK;
     ir_protocol_builder_t *ir_protocol_builder = __containerof(builder, ir_protocol_builder_t, parent);
-    if (!ir_protocol_builder->flags & IR_TOOLS_FLAGS_PROTO_EXT) {
-        uint8_t low_byte = address & 0xFF;
-        uint8_t high_byte = (address >> 8) & 0xFF;
-        IR_CHECK(low_byte == (~high_byte & 0xFF), "address not match standard PANASONIC protocol", err, ESP_ERR_INVALID_ARG);
-        low_byte = command & 0xFF;
-        high_byte = (command >> 8) & 0xFF;
-        IR_CHECK(low_byte == (~high_byte & 0xFF), "command not match standard PANASONIC protocol", err, ESP_ERR_INVALID_ARG);
-    }
-   builder->make_head(builder);
+    //  if (!ir_protocol_builder->flags & IR_TOOLS_FLAGS_PROTO_EXT) {
+    //     uint8_t low_byte = address & 0xFF;
+    //     uint8_t high_byte = (address >> 8) & 0xFF;
+    //     IR_CHECK(low_byte == (~high_byte & 0xFF), "address not match standard PANASONIC protocol", err, ESP_ERR_INVALID_ARG);
+    //     low_byte = command & 0xFF;
+    //     high_byte = (command >> 8) & 0xFF;
+    //     IR_CHECK(low_byte == (~high_byte & 0xFF), "command not match standard PANASONIC protocol", err, ESP_ERR_INVALID_ARG);
+    //  }
+    ESP_LOGE("ERROR", "PANASONIC BUILDER CALLED");
+    builder->make_head(builder);
     // LSB -> MSB
     for (int i = 0; i < 16; i++) {
         if (address & (1 << i)) {
@@ -46,16 +47,21 @@ static esp_err_t panasonic_build_frame(ir_builder_t *builder, uint32_t address, 
             builder->make_logic0(builder);
         }
     }
-    for (int i = 0; i < 32; i++) {
-        if (command & (1 << i)) {
+    for (int i = 0; i < 32; i++) 
+    {
+        if (command & (1 << i)) 
+        {
             builder->make_logic1(builder);
-        } else {
+        } 
+        else 
+        {
             builder->make_logic0(builder);
         }
     }
     builder->make_end(builder);
-    return ESP_OK;
-err:
+    ret = ESP_OK;
+//     return ESP_OK;
+// err:
     return ret;
 }
 
@@ -75,6 +81,7 @@ ir_builder_t *ir_builder_rmt_new_panasonic(const ir_builder_config_t *config)
         ir_protocol_builder->inverse = true;
     }
 
+    ESP_LOGE("ERROR","Panasonic Protocol Selected");
     uint32_t counter_clk_hz = 0;
     IR_CHECK(rmt_get_counter_clock((rmt_channel_t)config->dev_hdl, &counter_clk_hz) == ESP_OK,
               "get rmt counter clock failed", err, NULL);
@@ -113,7 +120,7 @@ static esp_err_t panasonic_parser_input(ir_parser_t *parser, void *raw_data, uin
     ir_protocol_parser_t *ir_protocol_parser = __containerof(parser, ir_protocol_parser_t, parent);
     IR_CHECK(raw_data, "input data can't be null", err, ESP_ERR_INVALID_ARG);
     ir_protocol_parser->buffer = raw_data;
-    // Data Frame costs 34 items and Repeat Frame costs 2 items
+    // Data Frame costs 50 items and Repeat Frame costs 2 items
     if (length == PANASONIC_DATA_FRAME_RMT_WORDS) {
         ir_protocol_parser->repeat = false;
     } else if (length == PANASONIC_REPEAT_FRAME_RMT_WORDS) {

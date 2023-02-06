@@ -247,7 +247,7 @@ typedef struct {
  */
 #define IR_BUILDER_DEFAULT_CONFIG(dev) \
     {                                  \
-        .buffer_size = 164,             \
+        .buffer_size = 200,             \
         .dev_hdl = dev,                \
         .flags = 0,                    \
     }
@@ -260,7 +260,7 @@ typedef struct {
     {                                 \
         .dev_hdl = dev,               \
         .flags = 0,                   \
-        .margin_us = 200,             \
+        .margin_us = 100,             \
     }
 
 /**
