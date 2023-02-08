@@ -82,6 +82,31 @@ extern "C"
 #define SSL_PRIVATE_KEY_OFFSET 0x4000
 #define SSL_SHARED_KEY_OFFSET 0x5000
 
+    typedef struct ezlopi_factory_info_v2
+    {
+        struct basic
+        {
+            uint16_t version;
+            char *name;
+            char *manufacturer;
+            char *brand;
+            char *model;
+            unsigned long long id;
+            char *device_uuid;
+            char *provisioning_uuid;
+            char *ssid;
+            char *password;
+            char *ezlo_device_mac;
+            char *cloud_server;
+        };
+
+        char *ca_certificate;
+        char *ssl_private_key;
+        char *ssl_shared_key;
+        char *ezlopi_config;
+
+    } ezlopi_factory_info_v2_t;
+
     typedef struct s_ezlopi_factory_info
     {
         short h_version;

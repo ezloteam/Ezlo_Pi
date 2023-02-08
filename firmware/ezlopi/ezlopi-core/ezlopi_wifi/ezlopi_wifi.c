@@ -253,6 +253,7 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
     {
         if ((0 != strncmp(ssid, &wifi_ssid_pass[0], 32)) || ((0 != strncmp(pass, &wifi_ssid_pass[32], 32))))
         {
+#warning "____________________---"
             ezlopi_wifi_set_new_wifi_flag();
             strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
             strncpy((char *)&wifi_ssid_pass[32], pass, 32);

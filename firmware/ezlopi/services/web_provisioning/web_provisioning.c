@@ -178,7 +178,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
         if (ws_endpoint)
         {
-            TRACE_D("ws_endpoint: %s", ws_endpoint);
+            TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
             cJSON *root = cJSON_Parse(ws_endpoint);
             if (root)
             {
@@ -233,8 +233,8 @@ static uint32_t __search_method_in_list(cJSON *method)
         }
     }
 
-    return (found_method ? idx : UINT32_MAX);
 }
+    return (found_method ? idx : UINT32_MAX);
 
 static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
 {

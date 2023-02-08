@@ -226,6 +226,7 @@ static void qt_serial_set_wifi(const char *data)
 
     if (root)
     {
+#warning "----------------------------------"
         if (cJSON_GetObjectItem(root, "cmd"))
         {
             uint8_t cmd_temp = cJSON_GetObjectItem(root, "cmd")->valueint;
