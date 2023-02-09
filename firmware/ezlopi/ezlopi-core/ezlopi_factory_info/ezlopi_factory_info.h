@@ -10,6 +10,72 @@ extern "C"
 #include "esp_partition.h"
 #include "frozen.h"
 
+#define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
+#define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 20480 // 20KB
+#define EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE 40
+#define EZLOPI_FACTORY_INFO_V2_SUBTYPE ESP_PARTITION_SUBTYPE_ANY
+
+    typedef enum e_ezlopi_factory_info_v2_offset
+    {
+        VERSION_OFFSET = 0x0000,
+        NAME_OFFSET = 0x0002,
+        MANUFACTURER_OFFSET = 0x0082,
+        BRAND_OFFSET = 0x00C2,
+        MODEL_OFFSET = 0x0102,
+        ID_OFFSET = 0x0142,
+        DEVICE_UUID_OFFSET = 0x014A,
+        PROVISIONING_UUID_OFFSET = 0x0172,
+        SSID_OFFSET = 0x019A,
+        PASSWORD_OFFSET = 0x01DA,
+        DEVICE_MAC_OFFSET = 0x021A,
+        CLOUD_SERVER_OFFSET = 0x0220,
+        CA_CERTIFICATE_OFFSET = 0x0400,
+        SSL_PRIVATE_KEY_OFFSET = 0x1400,
+        SSL_SHARED_KEY_OFFSET = 0x2400,
+        EZLOPI_CONFIG_OFFSET = 0x3400,
+    } e_ezlopi_factory_info_v2_offset_t;
+
+    typedef enum e_ezlopi_factory_info_v2_length
+    {
+        VERSION_LENGTH = 0x0002,
+        NAME_LENGTH = 0x0080,
+        MANUFACTURER_LENGTH = 0x0040,
+        BRAND_LENGTH = 0x0040,
+        MODEL_LENGTH = 0x0040,
+        ID_LENGTH = 0x0008,
+        DEVICE_UUID_LENGTH = 0x0028,
+        PROVISIONING_UUID_LENGTH = 0x0028,
+        SSID_LENGTH = 0x0040,
+        PASSWORD_LENGTH = 0x0040,
+        DEVICE_MAC_LENGTH = 0x0006,
+        CLOUD_SERVER_LENGTH = 0x0080,
+        CA_CERTIFICATE_LENGTH = 0x1000,
+        SSL_PRIVATE_KEY_LENGTH = 0x2000,
+        SSL_SHARED_KEY_LENGTH = 0x3000,
+        EZLOPI_CONFIG_LENGTH = 0x4000,
+    } e_ezlopi_factory_info_v2_length_t;
+
+    /* ezlopi_factory_info_v2 */
+    typedef struct ezlopi_factory_info_v2_basic
+    {
+        uint16_t version;
+        char *name;
+        char *manufacturer;
+        char *brand;
+        char *model;
+        unsigned long long id;
+        char *device_uuid;
+        char *provisioning_uuid;
+        char *ssid;
+        char *password;
+        char *ezlo_device_mac;
+        char *cloud_server;
+    } ezlopi_factory_info_v2_basic_t;
+
+////
+/////////
+///////
+/* ezlopi_factory_info */
 #define ENABLE_FACTORY_INFO_ENCRYPTION 0
 
 // #define FACTORY_INFO_PARTITION_NAME "factory_id"
@@ -81,31 +147,6 @@ extern "C"
 #define CA_CERTIFICATE_OFFSET 0x3000
 #define SSL_PRIVATE_KEY_OFFSET 0x4000
 #define SSL_SHARED_KEY_OFFSET 0x5000
-
-    typedef struct ezlopi_factory_info_v2
-    {
-        struct basic
-        {
-            uint16_t version;
-            char *name;
-            char *manufacturer;
-            char *brand;
-            char *model;
-            unsigned long long id;
-            char *device_uuid;
-            char *provisioning_uuid;
-            char *ssid;
-            char *password;
-            char *ezlo_device_mac;
-            char *cloud_server;
-        };
-
-        char *ca_certificate;
-        char *ssl_private_key;
-        char *ssl_shared_key;
-        char *ezlopi_config;
-
-    } ezlopi_factory_info_v2_t;
 
     typedef struct s_ezlopi_factory_info
     {
