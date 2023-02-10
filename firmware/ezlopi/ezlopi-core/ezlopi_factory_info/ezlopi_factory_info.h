@@ -11,9 +11,9 @@ extern "C"
 #include "frozen.h"
 
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
-#define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 20480 // 20KB
-#define EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE 40
-#define EZLOPI_FACTORY_INFO_V2_SUBTYPE ESP_PARTITION_SUBTYPE_ANY
+#define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0x1000 // 20480 // 20KB
+#define EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE 0x40
+#define EZLOPI_FACTORY_INFO_V2_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
 
     typedef enum e_ezlopi_factory_info_v2_offset
     {
@@ -29,6 +29,7 @@ extern "C"
         PASSWORD_OFFSET = 0x01DA,
         DEVICE_MAC_OFFSET = 0x021A,
         CLOUD_SERVER_OFFSET = 0x0220,
+        DEVICE_TYPE_OFFSET = 0x02A0,
         CA_CERTIFICATE_OFFSET = 0x0400,
         SSL_PRIVATE_KEY_OFFSET = 0x1400,
         SSL_SHARED_KEY_OFFSET = 0x2400,
@@ -49,12 +50,34 @@ extern "C"
         PASSWORD_LENGTH = 0x0040,
         DEVICE_MAC_LENGTH = 0x0006,
         CLOUD_SERVER_LENGTH = 0x0080,
+        DEVICE_TYPE_LENGTH = 0x0020,
         CA_CERTIFICATE_LENGTH = 0x1000,
         SSL_PRIVATE_KEY_LENGTH = 0x2000,
         SSL_SHARED_KEY_LENGTH = 0x3000,
         EZLOPI_CONFIG_LENGTH = 0x4000,
     } e_ezlopi_factory_info_v2_length_t;
 
+    void print_factory_info_v2(void);
+    void ezlopi_factory_info_v2_free(void *arg);
+    uint16_t ezlopi_factory_info_v2_get_version(void);
+    char *ezlopi_factory_info_v2_get_name(void);
+    char *ezlopi_factory_info_v2_get_manufacturer(void);
+    char *ezlopi_factory_info_v2_get_brand(void);
+    char *ezlopi_factory_info_v2_get_model(void);
+    unsigned long long ezlopi_factory_info_v2_get_id(void);
+    char *ezlopi_factory_info_v2_get_device_uuid(void);
+    char *ezlopi_factory_info_v2_get_provisioning_uuid(void);
+    char *ezlopi_factory_info_v2_get_ssid(void);
+    char *ezlopi_factory_info_v2_get_password(void);
+    void ezlopi_factory_info_v2_get_ezlopi_mac(uint8_t *mac);
+    char *ezlopi_factory_info_v2_get_cloud_server(void);
+    char *ezlopi_factory_info_v2_get_device_type(void);
+    char *ezlopi_factory_info_v2_get_ca_certificate(void);
+    char *ezlopi_factory_info_v2_get_ssl_private_key(void);
+    char *ezlopi_factory_info_v2_get_ssl_shared_key(void);
+    char *ezlopi_factory_info_v2_get_ezlopi_config(void);
+
+#if 0
     /* ezlopi_factory_info_v2 */
     typedef struct ezlopi_factory_info_v2_basic
     {
@@ -363,6 +386,7 @@ extern "C"
             }\
         ],\
     \"dev_total\": 1}";
+#endif
 
 #ifdef __cplusplus
 }

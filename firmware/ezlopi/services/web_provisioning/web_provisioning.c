@@ -162,7 +162,8 @@ void web_provisioning_init(void)
 
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
-    s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+    // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+
     char *ws_endpoint = NULL;
 
     while (1)
@@ -172,9 +173,19 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
         ezlopi_wait_for_wifi_to_connect();
 
+        char *cloud_server = ezlopi_factory_info_v2_get_cloud_server();
+        char *ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+        char *ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+        char *ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+
         char http_request[128];
-        snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", factory->cloud_server);
-        ws_endpoint = ezlopi_http_get_request(http_request, factory->ssl_private_key, factory->ssl_shared_key, factory->ca_certificate);
+        snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
+        ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+
+        ezlopi_factory_info_v2_free(cloud_server);
+        ezlopi_factory_info_v2_free(ca_certificate);
+        ezlopi_factory_info_v2_free(ssl_shared_key);
+        ezlopi_factory_info_v2_free(ssl_private_key);
 
         if (ws_endpoint)
         {
@@ -233,8 +244,8 @@ static uint32_t __search_method_in_list(cJSON *method)
         }
     }
 
-}
     return (found_method ? idx : UINT32_MAX);
+}
 
 static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
 {

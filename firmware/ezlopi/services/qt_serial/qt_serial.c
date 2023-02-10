@@ -171,48 +171,65 @@ static void qt_serial_get_info()
         char wifi_info[64];
         esp_chip_info_t chip_info;
         esp_chip_info(&chip_info);
-        s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
         memset(wifi_info, 0, sizeof(wifi_info));
         ezlopi_nvs_read_wifi(wifi_info, sizeof(wifi_info));
 
-        if (factory)
-        {
-            cJSON_AddNumberToObject(get_info, "cmd", 1);
-            cJSON_AddNumberToObject(get_info, "status", 1);
-            cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
-            cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
-            cJSON_AddNumberToObject(get_info, "build", BUILD);
-            cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
-            cJSON_AddNumberToObject(get_info, "v_idf", (ESP_IDF_VERSION_MAJOR << 16) | (ESP_IDF_VERSION_MINOR << 8) | ESP_IDF_VERSION_PATCH);
-            cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount());
-            cJSON_AddNumberToObject(get_info, "build_date", BUILD_DATE);
-            cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
-            cJSON_AddNumberToObject(get_info, "boot_reason", esp_reset_reason());
-            uint8_t base_mac[6];
-            esp_read_mac(base_mac, ESP_MAC_WIFI_STA);
-            dump("mac", base_mac, 0, 6);
-            uint64_t long_mac = 0xFFFFFFFFFFFFULL & ((base_mac[0] & 0xFFULL) | ((base_mac[1] & 0xFFULL) << 8) | ((base_mac[2] & 0xFFULL) << 16) | ((base_mac[3] & 0xFFULL) << 24) | ((base_mac[4] & 0xFFULL) << 32) | ((base_mac[5] & 0xFFULL) << 40));
-            cJSON_AddNumberToObject(get_info, "mac", long_mac);
-            cJSON_AddStringToObject(get_info, "uuid", factory->controller_uuid);
-            cJSON_AddStringToObject(get_info, "uuid_prov", factory->provisioning_uuid);
-            cJSON_AddNumberToObject(get_info, "serial", factory->id);
-            cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
-            cJSON_AddStringToObject(get_info, "dev_name", factory->product_name);
-            cJSON_AddNumberToObject(get_info, "dev_type", 1);
-            cJSON_AddStringToObject(get_info, "dev_type_ezlopi", factory->ezlopi_device_type);
-            cJSON_AddStringToObject(get_info, "dev_flash", CONFIG_ESPTOOLPY_FLASHSIZE);
-            cJSON_AddStringToObject(get_info, "dev_free_flash", "Nan");
-            cJSON_AddStringToObject(get_info, "brand", factory->ezlopi_brand);
-            cJSON_AddStringToObject(get_info, "manf_name", factory->ezlopi_manufacturer);
-            cJSON_AddStringToObject(get_info, "model_num", factory->ezlopi_model);
-        }
+        // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+        // if (factory)
+        // {
+
+        unsigned long long serial_id = ezlopi_factory_info_v2_get_id();
+        char *controller_uuid = ezlopi_factory_info_v2_get_device_uuid();
+        char *provisioning_uuid = ezlopi_factory_info_v2_get_provisioning_uuid();
+        char *device_model = ezlopi_factory_info_v2_get_model();
+        char *device_brand = ezlopi_factory_info_v2_get_brand();
+        char *device_manufacturer = ezlopi_factory_info_v2_get_manufacturer();
+        char *device_name = ezlopi_factory_info_v2_get_name();
+        char *device_type = ezlopi_factory_info_v2_get_device_type();
+
+        cJSON_AddNumberToObject(get_info, "cmd", 1);
+        cJSON_AddNumberToObject(get_info, "status", 1);
+        cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
+        cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
+        cJSON_AddNumberToObject(get_info, "build", BUILD);
+        cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
+        cJSON_AddNumberToObject(get_info, "v_idf", (ESP_IDF_VERSION_MAJOR << 16) | (ESP_IDF_VERSION_MINOR << 8) | ESP_IDF_VERSION_PATCH);
+        cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount());
+        cJSON_AddNumberToObject(get_info, "build_date", BUILD_DATE);
+        cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
+        cJSON_AddNumberToObject(get_info, "boot_reason", esp_reset_reason());
+        uint8_t base_mac[6];
+        esp_read_mac(base_mac, ESP_MAC_WIFI_STA);
+        dump("mac", base_mac, 0, 6);
+        uint64_t long_mac = 0xFFFFFFFFFFFFULL & ((base_mac[0] & 0xFFULL) | ((base_mac[1] & 0xFFULL) << 8) | ((base_mac[2] & 0xFFULL) << 16) | ((base_mac[3] & 0xFFULL) << 24) | ((base_mac[4] & 0xFFULL) << 32) | ((base_mac[5] & 0xFFULL) << 40));
+        cJSON_AddNumberToObject(get_info, "mac", long_mac);
+        cJSON_AddStringToObject(get_info, "uuid", controller_uuid);
+        cJSON_AddStringToObject(get_info, "uuid_prov", provisioning_uuid);
+        cJSON_AddNumberToObject(get_info, "serial", serial_id);
+        cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
+        cJSON_AddStringToObject(get_info, "dev_name", device_name);
+        cJSON_AddNumberToObject(get_info, "dev_type", 1);
+        cJSON_AddStringToObject(get_info, "dev_type_ezlopi", device_type);
+        cJSON_AddStringToObject(get_info, "dev_flash", CONFIG_ESPTOOLPY_FLASHSIZE);
+        cJSON_AddStringToObject(get_info, "dev_free_flash", "Nan");
+        cJSON_AddStringToObject(get_info, "brand", device_brand);
+        cJSON_AddStringToObject(get_info, "manf_name", device_manufacturer);
+        cJSON_AddStringToObject(get_info, "model_num", device_model);
+        // }
 
         char *my_json_string = cJSON_Print(get_info);
         cJSON_Delete(get_info); // free Json object
 
+        ezlopi_factory_info_v2_free(controller_uuid);
+        ezlopi_factory_info_v2_free(provisioning_uuid);
+        ezlopi_factory_info_v2_free(device_model);
+        ezlopi_factory_info_v2_free(device_brand);
+        ezlopi_factory_info_v2_free(device_manufacturer);
+        ezlopi_factory_info_v2_free(device_name);
+        ezlopi_factory_info_v2_free(device_type);
+
         if (my_json_string)
         {
-
             cJSON_Minify(my_json_string);
             qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
             cJSON_free(my_json_string);
@@ -226,11 +243,6 @@ static void qt_serial_set_wifi(const char *data)
 
     if (root)
     {
-#warning "----------------------------------"
-        if (cJSON_GetObjectItem(root, "cmd"))
-        {
-            uint8_t cmd_temp = cJSON_GetObjectItem(root, "cmd")->valueint;
-        }
         if (cJSON_GetObjectItem(root, "pass"))
         {
             char *ssid = cJSON_GetObjectItem(root, "ssid")->valuestring;
@@ -295,7 +307,8 @@ static void qt_serial_save_config(const char *data)
 static void qt_serial_read_config(void)
 {
     cJSON *root = NULL;
-    char *buf = ezlopi_factory_info_get_ezlopi_config();
+    // char *buf = ezlopi_factory_info_get_ezlopi_config();
+    char *buf = ezlopi_factory_info_v2_get_ezlopi_config();
 
     if (buf)
     {

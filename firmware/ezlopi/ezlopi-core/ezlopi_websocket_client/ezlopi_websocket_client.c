@@ -106,14 +106,17 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
         event_arg.msg_upcall = msg_upcall;
         event_arg.connection_upcall = connection_upcall;
 
-        s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+        // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri->valuestring,
             .task_stack = 8 * 1024,
-            .cert_pem = factory->ca_certificate,
-            .client_cert = factory->ssl_shared_key,
-            .client_key = factory->ssl_private_key,
+            // .cert_pem = factory->ca_certificate,
+            .cert_pem = ezlopi_factory_info_v2_get_ca_certificate(), // this needs to be freed after use
+            // .client_cert = factory->ssl_shared_key,
+            .client_cert = ezlopi_factory_info_v2_get_ssl_shared_key(), // this needs to be freed after use
+            // .client_key = factory->ssl_private_key,
+            .client_key = ezlopi_factory_info_v2_get_ssl_private_key(), // this needs to be freed after use
             .pingpong_timeout_sec = 20,
             .keep_alive_enable = 1,
             .ping_interval_sec = 10,
@@ -124,7 +127,13 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
         client = esp_websocket_client_init(&websocket_cfg);
         esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
         esp_websocket_client_start(client);
-        // event_arg.client = client;
+
+        ezlopi_factory_info_v2_free(websocket_cfg.cert_pem);
+        ezlopi_factory_info_v2_free(websocket_cfg.client_cert);
+        ezlopi_factory_info_v2_free(websocket_cfg.client_key);
+        websocket_cfg.cert_pem = NULL;
+        websocket_cfg.client_cert = NULL;
+        websocket_cfg.client_key = NULL;
     }
     else
     {

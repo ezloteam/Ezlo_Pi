@@ -16,7 +16,8 @@ void ezlopi_init(void)
     // Init memories
     ezlopi_nvs_init();
     vTaskDelay(10);
-    ezlopi_factory_info_init();
+    // ezlopi_factory_info_init();
+    print_factory_info_v2();
     vTaskDelay(10);
 
     // Init devices

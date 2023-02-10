@@ -15,14 +15,15 @@ static void ezlopi_device_parse_json(char *config_string);
 
 void ezlopi_device_prepare(void)
 {
-    char *config_string = ezlopi_factory_info_get_ezlopi_config();
+    // char *config_string = ezlopi_factory_info_get_ezlopi_config();
     // TRACE_D("config_string: %s", config_string ? config_string : "");
+    char *config_string = ezlopi_factory_info_v2_get_ezlopi_config();
 
     if (config_string)
     {
         ezlopi_device_parse_json(config_string);
-        // free(config_string);
     }
+    ezlopi_factory_info_v2_free(config_string);
 }
 
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)

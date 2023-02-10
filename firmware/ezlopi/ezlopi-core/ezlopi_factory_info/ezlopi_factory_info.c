@@ -76,23 +76,79 @@ static const esp_partition_t *partition_ctx_v2 = NULL;
 
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
 
-static int ezlopi_factory_info_v2_init(void)
+static const esp_partition_t *ezlopi_factory_info_v2_init(void)
 {
     if (NULL == partition_ctx_v2)
     {
         partition_ctx_v2 = esp_partition_find_first(EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE, EZLOPI_FACTORY_INFO_V2_SUBTYPE, EZLOPI_FACTORY_INFO_V2_PARTITION_NAME);
     }
 
-    return (NULL == partition_ctx_v2) ? 0 : 1;
+    return partition_ctx_v2;
 }
 
-static void ezlopi_factory_info_deinit(void)
+void ezlopi_factory_info_v2_free(void *arg)
 {
-    if (partition_ctx_v2)
+    if (arg)
     {
-        free(partition_ctx_v2);
-        partition_ctx_v2 = NULL;
+        free(arg);
     }
+}
+
+void print_factory_info_v2(void)
+{
+    uint16_t version = ezlopi_factory_info_v2_get_version();
+    char *name = ezlopi_factory_info_v2_get_name();
+    char *manufacturer = ezlopi_factory_info_v2_get_manufacturer();
+    char *brand = ezlopi_factory_info_v2_get_brand();
+    char *model = ezlopi_factory_info_v2_get_model();
+    unsigned long long id = ezlopi_factory_info_v2_get_id();
+    char *device_uuid = ezlopi_factory_info_v2_get_device_uuid();
+    char *provisioning_uuid = ezlopi_factory_info_v2_get_provisioning_uuid();
+    char *ssid = ezlopi_factory_info_v2_get_ssid();
+    char *password = ezlopi_factory_info_v2_get_password();
+    uint8_t mac[6];
+    memset(mac, 0, 6);
+    ezlopi_factory_info_v2_get_ezlopi_mac(mac);
+    char *cloud_server = ezlopi_factory_info_v2_get_cloud_server();
+    char *device_type = ezlopi_factory_info_v2_get_device_type();
+    char *ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+    char *ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+    char *ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+    char *ezlopi_config = ezlopi_factory_info_v2_get_ezlopi_config();
+
+    TRACE_D("----------------- Factory Info -----------------");
+    TRACE_W("version[off: 0x%04X, size: 0x%04X]:               %d", version);
+    TRACE_W("name [off: 0x%04X, size: 0x%04X]:                  %s", name ? name : "null");
+    TRACE_W("manufacturer [off: 0x%04X, size: 0x%04X]:          %s", manufacturer ? manufacturer : "null");
+    TRACE_W("brand [off: 0x%04X, size: 0x%04X]:                 %s", brand ? brand : "null");
+    TRACE_W("model [off: 0x%04X, size: 0x%04X]:                 %s", model ? model : "null");
+    TRACE_W("serial-id [off: 0x%04X, size: 0x%04X]:             %llu", id);
+    TRACE_W("device_uuid [off: 0x%04X, size: 0x%04X]:           %s", device_uuid ? device_uuid : "null");
+    TRACE_W("provisioning_uuid [off: 0x%04X, size: 0x%04X]:     %s", provisioning_uuid ? provisioning_uuid : "null");
+    TRACE_W("ssid [off: 0x%04X, size: 0x%04X]:                  %s", ssid ? ssid : "null");
+    TRACE_W("password [off: 0x%04X, size: 0x%04X]:              %s", password ? password : "null");
+    TRACE_W("mac [off: 0x%04X, size: 0x%04X]:                   %02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    TRACE_W("cloud_server [off: 0x%04X, size: 0x%04X]:          %s", cloud_server);
+    TRACE_W("device_type [off: 0x%04X, size: 0x%04X]:           %s", device_type);
+    TRACE_W("ca_certificate [off: 0x%04X, size: 0x%04X]:        %s", ca_certificate);
+    TRACE_W("ssl_private_key [off: 0x%04X, size: 0x%04X]:       %s", ssl_private_key);
+    TRACE_W("ssl_shared_key [off: 0x%04X, size: 0x%04X]:        %s", ssl_shared_key);
+    TRACE_W("ezlopi_config [off: 0x%04X, size: 0x%04X]:         %s", ezlopi_config);
+    TRACE_D("-------------------------------------------------");
+    ezlopi_factory_info_v2_free(name);
+    ezlopi_factory_info_v2_free(manufacturer);
+    ezlopi_factory_info_v2_free(brand);
+    ezlopi_factory_info_v2_free(model);
+    ezlopi_factory_info_v2_free(device_uuid);
+    ezlopi_factory_info_v2_free(provisioning_uuid);
+    ezlopi_factory_info_v2_free(ssid);
+    ezlopi_factory_info_v2_free(password);
+    ezlopi_factory_info_v2_free(cloud_server);
+    ezlopi_factory_info_v2_free(device_type);
+    ezlopi_factory_info_v2_free(ca_certificate);
+    ezlopi_factory_info_v2_free(ssl_private_key);
+    ezlopi_factory_info_v2_free(ssl_shared_key);
+    ezlopi_factory_info_v2_free(ezlopi_config);
 }
 
 /** Getter */
@@ -104,15 +160,18 @@ uint16_t ezlopi_factory_info_v2_get_version(void)
     {
         uint8_t tmp_version_arr[2];
         memset(tmp_version_arr, 0, 2);
-        esp_partition_read(partition_ctx_v2, VERSION_OFFSET, &tmp_version_arr, VERSION_LENGTH);
+        int read_couont = esp_partition_read(partition_ctx_v2, VERSION_OFFSET, &tmp_version_arr, VERSION_LENGTH);
+        TRACE_B("read-count: %d", read_couont);
 
         for (int i = 0; i < 8; i++)
         {
             _version |= tmp_version_arr[i] << (i * 8);
         }
     }
-
-    ezlopi_factory_info_deinit();
+    else
+    {
+        TRACE_E("'ezlopi_factory_info_v2' failed");
+    }
 
     return _version;
 }
@@ -153,8 +212,6 @@ unsigned long long ezlopi_factory_info_v2_get_id(void)
         }
     }
 
-    ezlopi_factory_info_deinit();
-
     return _id;
 }
 
@@ -178,19 +235,22 @@ char *ezlopi_factory_info_v2_get_password(void)
     return ezlopi_factory_info_v2_read_string(PASSWORD_OFFSET, PASSWORD_LENGTH);
 }
 
-uint8_t *ezlopi_factory_info_v2_get_ezlopi_mac(void)
+void ezlopi_factory_info_v2_get_ezlopi_mac(uint8_t *mac)
 {
     uint8_t *tmp_mac_arr = malloc(DEVICE_MAC_LENGTH);
 
     if (tmp_mac_arr)
     {
+        memset(tmp_mac_arr, 0, DEVICE_MAC_LENGTH);
         if (ezlopi_factory_info_v2_init())
         {
-            memset(tmp_mac_arr, 0, DEVICE_MAC_LENGTH);
             esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, &tmp_mac_arr, DEVICE_MAC_LENGTH);
         }
-
-        ezlopi_factory_info_deinit();
+        else
+        {
+            free(tmp_mac_arr);
+            tmp_mac_arr = NULL;
+        }
     }
 
     return tmp_mac_arr;
@@ -199,6 +259,11 @@ uint8_t *ezlopi_factory_info_v2_get_ezlopi_mac(void)
 char *ezlopi_factory_info_v2_get_cloud_server(void)
 {
     return ezlopi_factory_info_v2_read_string(CLOUD_SERVER_OFFSET, CLOUD_SERVER_LENGTH);
+}
+
+char *ezlopi_factory_info_v2_get_device_type(void)
+{
+    return ezlopi_factory_info_v2_read_string(DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH);
 }
 
 char *ezlopi_factory_info_v2_get_ca_certificate(void)
@@ -237,8 +302,6 @@ uint16_t ezlopi_factory_info_v2_set_version(void)
             _version |= tmp_version_arr[i] << (i * 8);
         }
     }
-
-    ezlopi_factory_info_deinit();
 
     return _version;
 }
@@ -279,8 +342,6 @@ unsigned long long ezlopi_factory_info_v2_set_id(void)
         }
     }
 
-    ezlopi_factory_info_deinit();
-
     return _id;
 }
 
@@ -315,8 +376,6 @@ uint8_t *ezlopi_factory_info_v2_set_ezlopi_mac(void)
             memset(tmp_mac_arr, 0, DEVICE_MAC_LENGTH);
             esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, &tmp_mac_arr, DEVICE_MAC_LENGTH);
         }
-
-        ezlopi_factory_info_deinit();
     }
 
     return tmp_mac_arr;
@@ -385,8 +444,6 @@ static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_
             TRACE_E("'tmp_buffer' malloc failed!");
         }
     }
-
-    ezlopi_factory_info_deinit();
 
     return read_string;
 }
@@ -536,7 +593,7 @@ int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config)
     return ret;
 }
 
-static unsigned long long ezlopi_factory_info_get_id(void)
+static unsigned long long ezlopi_factory_info_get_id(void) 
 {
     unsigned long long _id = 0ULL;
 

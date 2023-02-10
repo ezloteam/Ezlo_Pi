@@ -50,7 +50,7 @@ static esp_netif_ip_info_t my_ip;
 
 static uint32_t new_wifi = 0;
 static int s_retry_num = 0;
-static char wifi_ssid_pass[64];
+static char wifi_ssid_pass_global_buffer[64];
 static int station_got_ip = 0;
 static const char *const wifi_no_error_str = "NO_ERROR";
 static const char *last_disconnect_reason = wifi_no_error_str;
@@ -106,8 +106,9 @@ static void set_wifi_station_host_name(void)
 {
     static char station_host_name[32];
     // factory_info *factory = factory_info::get_instance();
-    s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", factory->id);
+    // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+    // snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", factory->id);
+    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", ezlopi_factory_info_v2_get_id());
     esp_err_t err = tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, station_host_name);
     TRACE_W("'tcpip_adapter_set_hostname' ERROR: %s", esp_err_to_name(err));
 }
@@ -117,7 +118,7 @@ static void alert_qt_wifi_got_ip(void)
     if (new_wifi)
     {
         new_wifi = 0;
-        ezlopi_nvs_write_wifi(wifi_ssid_pass, sizeof(wifi_ssid_pass));
+        ezlopi_nvs_write_wifi(wifi_ssid_pass_global_buffer, sizeof(wifi_ssid_pass_global_buffer));
 
         char *qt_resp = "{\"cmd\":2,\"status_write\":1,\"status_connect\":1}";
         qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
@@ -210,38 +211,62 @@ void ezlopi_wifi_initialize(void)
 
 void ezlopi_wifi_connect_from_id_bin(void)
 {
+#if 0
     s_ezlopi_factory_info_t *factory_info = ezlopi_factory_info_get_info();
     if ((NULL != factory_info) && (NULL != factory_info->default_wifi_password) && (NULL != factory_info->default_wifi_password) &&
         ('\0' != factory_info->default_wifi_ssid[0]) && ('\0' != factory_info->default_wifi_password[0]))
     {
-        memset(wifi_ssid_pass, 0, sizeof(wifi_ssid_pass));
-        snprintf(&wifi_ssid_pass[00], 31, "%s", factory_info->default_wifi_ssid);
-        snprintf(&wifi_ssid_pass[32], 31, "%s", factory_info->default_wifi_password);
+        memset(wifi_ssid_pass_global_buffer, 0, sizeof(wifi_ssid_pass_global_buffer));
+        snprintf(&wifi_ssid_pass_global_buffer[00], 31, "%s", factory_info->default_wifi_ssid);
+        snprintf(&wifi_ssid_pass_global_buffer[32], 31, "%s", factory_info->default_wifi_password);
     }
     else
     {
-        strcpy(&wifi_ssid_pass[00], "ezlopitest");
-        strcpy(&wifi_ssid_pass[32], "ezlopitest");
+        strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
+        strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
         ezlopi_wifi_set_new_wifi_flag();
     }
 
-    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass[0], &wifi_ssid_pass[32]);
+    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass_global_buffer[0], &wifi_ssid_pass_global_buffer[32]);
+    TRACE_E("wifi_error: %u", wifi_error);
+#endif
+    char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
+    char *wifi_password = ezlopi_factory_info_v2_get_password();
+
+    if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
+        (NULL != wifi_password) && ('\0' != wifi_password[0]))
+    {
+        memset(wifi_ssid_pass_global_buffer, 0, sizeof(wifi_ssid_pass_global_buffer));
+        snprintf(&wifi_ssid_pass_global_buffer[00], 31, "%s", wifi_ssid);
+        snprintf(&wifi_ssid_pass_global_buffer[32], 31, "%s", wifi_password);
+    }
+    else
+    {
+        strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
+        strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
+        ezlopi_wifi_set_new_wifi_flag();
+    }
+
+    ezlopi_factory_info_v2_free(wifi_ssid);
+    ezlopi_factory_info_v2_free(wifi_password);
+
+    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass_global_buffer[0], &wifi_ssid_pass_global_buffer[32]);
     TRACE_E("wifi_error: %u", wifi_error);
 }
 
 void ezlopi_wifi_connect_from_nvs(void)
 {
-    memset(wifi_ssid_pass, 0, sizeof(wifi_ssid_pass));
-    ezlopi_nvs_read_wifi(wifi_ssid_pass, sizeof(wifi_ssid_pass));
+    memset(wifi_ssid_pass_global_buffer, 0, sizeof(wifi_ssid_pass_global_buffer));
+    ezlopi_nvs_read_wifi(wifi_ssid_pass_global_buffer, sizeof(wifi_ssid_pass_global_buffer));
 
-    if (wifi_ssid_pass[0] == 0)
+    if (wifi_ssid_pass_global_buffer[0] == 0)
     {
-        strcpy(&wifi_ssid_pass[00], "ezlopitest");
-        strcpy(&wifi_ssid_pass[32], "ezlopitest");
+        strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
+        strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
         ezlopi_wifi_set_new_wifi_flag();
     }
 
-    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass[0], &wifi_ssid_pass[32]);
+    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass_global_buffer[0], &wifi_ssid_pass_global_buffer[32]);
     TRACE_E("wifi_error: %u", wifi_error);
 }
 
@@ -251,12 +276,12 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 
     if ((NULL != ssid) && (NULL != pass))
     {
-        if ((0 != strncmp(ssid, &wifi_ssid_pass[0], 32)) || ((0 != strncmp(pass, &wifi_ssid_pass[32], 32))))
+        if ((0 != strncmp(ssid, &wifi_ssid_pass_global_buffer[0], 32)) || ((0 != strncmp(pass, &wifi_ssid_pass_global_buffer[32], 32))))
         {
 #warning "____________________---"
             ezlopi_wifi_set_new_wifi_flag();
-            strncpy((char *)&wifi_ssid_pass[0], ssid, 32);
-            strncpy((char *)&wifi_ssid_pass[32], pass, 32);
+            strncpy((char *)&wifi_ssid_pass_global_buffer[0], ssid, 32);
+            strncpy((char *)&wifi_ssid_pass_global_buffer[32], pass, 32);
         }
 
         TRACE_D("SSID: %s, Password: %s\r\n", ssid, pass);
