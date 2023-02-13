@@ -128,12 +128,12 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
         esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
         esp_websocket_client_start(client);
 
-        ezlopi_factory_info_v2_free(websocket_cfg.cert_pem);
-        ezlopi_factory_info_v2_free(websocket_cfg.client_cert);
-        ezlopi_factory_info_v2_free(websocket_cfg.client_key);
-        websocket_cfg.cert_pem = NULL;
-        websocket_cfg.client_cert = NULL;
-        websocket_cfg.client_key = NULL;
+        // ezlopi_factory_info_v2_free(websocket_cfg.cert_pem);
+        // ezlopi_factory_info_v2_free(websocket_cfg.client_cert);
+        // ezlopi_factory_info_v2_free(websocket_cfg.client_key);
+        // websocket_cfg.cert_pem = NULL;
+        // websocket_cfg.client_cert = NULL;
+        // websocket_cfg.client_key = NULL;
     }
     else
     {
