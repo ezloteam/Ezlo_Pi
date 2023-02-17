@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: create bin
 
 on:
   push:
@@ -36,5 +36,5 @@ jobs:
     - name: Save build artifact
       uses: actions/upload-artifact@v2
       with:
-        name: build
-        path: 'firmware/ezlopi/build'
+        name: ezlopi.bin
+        path: 'firmware/ezlopi/build/ezlopi.bin'
