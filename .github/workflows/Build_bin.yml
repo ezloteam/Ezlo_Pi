@@ -32,3 +32,9 @@ jobs:
         esp_idf_version: v4.4
         path: 'firmware/ezlopi'
         target: esp32s3
+        
+    - name: Save build artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: build
+        path: build
