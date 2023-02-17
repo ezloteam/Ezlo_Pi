@@ -22,6 +22,10 @@ jobs:
         esp_idf_version: v4.4
         path: 'firmware/ezlopi'
         command: 'idf.py set-target esp32'
+    - name: Enable Bluetooth in project configuration
+      run: |
+        echo "CONFIG_BT_ENABLED=y" >> firmware/ezlopi/sdkconfig.defaults
+        echo "CONFIG_BLUEDROID_ENABLED=y" >> firmware/ezlopi/sdkconfig.defaults
     - name: esp-idf build
       uses: espressif/esp-idf-ci-action@v1
       with:
