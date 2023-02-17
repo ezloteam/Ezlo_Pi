@@ -19,4 +19,4 @@ jobs:
     - name: esp-idf build
       uses: espressif/esp-idf-ci-action@latest
       with:
-        path: 'Ezlo_Pi/firmware/ezlopi'
+        path: 'firmware/ezlopi'
