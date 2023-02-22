@@ -50,5 +50,6 @@ static void ezlopi_initialize_devices(void)
     {
         registered_device->device->func(EZLOPI_ACTION_INITIALIZE, registered_device->properties, NULL, NULL);
         registered_device = registered_device->next;
+        vTaskDelay(1);
     }
 }

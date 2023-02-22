@@ -303,9 +303,11 @@ char *ezlopi_factory_info_v2_get_ssl_shared_key(void)
 
 char *ezlopi_factory_info_v2_get_ezlopi_config(void)
 {
+#if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
     return switch_box_constant_config;
-
-    // return ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+#elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
+    return ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+#endif
 }
 
 /** Setter */
@@ -425,8 +427,11 @@ char *ezlopi_factory_info_v2_set_ssl_shared_key(void)
 
 char *ezlopi_factory_info_v2_set_ezlopi_config(void)
 {
+#if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
     return switch_box_constant_config;
-    // return ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+#elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
+    return ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+#endif
 }
 
 /** Reader */

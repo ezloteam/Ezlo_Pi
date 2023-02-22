@@ -118,11 +118,12 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         }
         }
     }
+    vTaskDelay(1);
 }
 
 static void ezlopi_device_parse_json(char *config_string)
 {
-    TRACE_I("PARSING - config_string: \n%s", config_string);
+    // TRACE_I("PARSING - config_string: \n%s", config_string);
     cJSON *cjson_config = cJSON_Parse(config_string);
 
     if (cjson_config)
@@ -173,7 +174,8 @@ static void ezlopi_device_parse_json(char *config_string)
     l_ezlopi_configured_devices_t *current_head = ezlopi_devices_list_get_configured_items();
     while (NULL != current_head)
     {
-        ezlopi_device_print_properties(current_head->properties);
+        // ezlopi_device_print_properties(current_head->properties);
+        TRACE_B("Device name: %s", current_head->properties->ezlopi_cloud.device_name ? current_head->properties->ezlopi_cloud.device_name : "");
         current_head = current_head->next;
     }
 }

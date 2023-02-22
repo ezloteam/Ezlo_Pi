@@ -7,6 +7,11 @@ extern "C"
 #endif
 
 // #include <string>
+#define EZLOPI_GENERIC 0
+#define EZLOPI_SWITCH_BOX 1
+
+#define EZLOPI_DEVICE_TYPE EZLOPI_SWITCH_BOX
+
 #include "esp_partition.h"
 #include "frozen.h"
 
@@ -77,8 +82,11 @@ extern "C"
     char *ezlopi_factory_info_v2_get_ssl_shared_key(void);
     char *ezlopi_factory_info_v2_get_ezlopi_config(void);
 
-    static const char *switch_box_constant_config =
-        "{\
+#if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
+
+#elif (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
+static const char *switch_box_constant_config =
+    "{\
         \"cmd\": 3,\
         \"dev_detail\":\
         [\
@@ -122,162 +130,27 @@ extern "C"
                 \"pullup_op\": true,\
                 \"val_ip\": true,\
                 \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 3\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 15,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 4\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 4,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 5\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 5,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 6\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 6,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 7\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 7,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 8\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 12,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 9\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 17,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Switch 10\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 18,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_name\": \"Master Switch\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 255,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
             }\
         ],\
     \"dev_total\": 1}";
-
+#endif
 #if 0
-    /* ezlopi_factory_info_v2 */
-    typedef struct ezlopi_factory_info_v2_basic
-    {
-        uint16_t version;
-        char *name;
-        char *manufacturer;
-        char *brand;
-        char *model;
-        unsigned long long id;
-        char *device_uuid;
-        char *provisioning_uuid;
-        char *ssid;
-        char *password;
-        char *ezlo_device_mac;
-        char *cloud_server;
-    } ezlopi_factory_info_v2_basic_t;
+/* ezlopi_factory_info_v2 */
+typedef struct ezlopi_factory_info_v2_basic
+{
+    uint16_t version;
+    char *name;
+    char *manufacturer;
+    char *brand;
+    char *model;
+    unsigned long long id;
+    char *device_uuid;
+    char *provisioning_uuid;
+    char *ssid;
+    char *password;
+    char *ezlo_device_mac;
+    char *cloud_server;
+} ezlopi_factory_info_v2_basic_t;
 
 ////
 /////////
@@ -355,37 +228,37 @@ extern "C"
 #define SSL_PRIVATE_KEY_OFFSET 0x4000
 #define SSL_SHARED_KEY_OFFSET 0x5000
 
-    typedef struct s_ezlopi_factory_info
-    {
-        short h_version;
-        unsigned long long id;
-        char *controller_uuid;
-        char *zwave_region;
-        char *default_wifi_ssid;
-        char *default_wifi_password;
-        char *product_name;
-        uint8_t ezlopi_mac[6];
-        char *ezlopi_manufacturer;
-        char *ezlopi_brand;
-        char *ezlopi_model;
-        char *ezlopi_device_type;
+typedef struct s_ezlopi_factory_info
+{
+    short h_version;
+    unsigned long long id;
+    char *controller_uuid;
+    char *zwave_region;
+    char *default_wifi_ssid;
+    char *default_wifi_password;
+    char *product_name;
+    uint8_t ezlopi_mac[6];
+    char *ezlopi_manufacturer;
+    char *ezlopi_brand;
+    char *ezlopi_model;
+    char *ezlopi_device_type;
 
-        char *provisioning_uuid;
-        char *provisioning_server;
-        char *provisioning_token;
-        char *cloud_server;
-        char *ezlopi_config;
-        char *ca_certificate;
-        char *ssl_private_key;
-        char *ssl_shared_key;
+    char *provisioning_uuid;
+    char *provisioning_server;
+    char *provisioning_token;
+    char *cloud_server;
+    char *ezlopi_config;
+    char *ca_certificate;
+    char *ssl_private_key;
+    char *ssl_shared_key;
 
-        // char *ssl_public_key;
-    } s_ezlopi_factory_info_t;
+    // char *ssl_public_key;
+} s_ezlopi_factory_info_t;
 
-    s_ezlopi_factory_info_t *ezlopi_factory_info_init();
-    s_ezlopi_factory_info_t *ezlopi_factory_info_get_info(void);
-    int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config);
-    char *ezlopi_factory_info_get_ezlopi_config(void);
+s_ezlopi_factory_info_t *ezlopi_factory_info_init();
+s_ezlopi_factory_info_t *ezlopi_factory_info_get_info(void);
+int ezlopi_factory_info_set_ezlopi_config(char *ezlopi_config);
+char *ezlopi_factory_info_get_ezlopi_config(void);
 
 #endif
 

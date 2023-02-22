@@ -285,6 +285,11 @@ static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_me
 
 static void __message_upcall(const char *payload, uint32_t len)
 {
+    if (payload && len)
+    {
+        TRACE_D("payload:: len: %d, data: %.*s", len, len, payload);
+    }
+
     cJSON *cj_request = cJSON_ParseWithLength(payload, len);
 
     if (cj_request)
