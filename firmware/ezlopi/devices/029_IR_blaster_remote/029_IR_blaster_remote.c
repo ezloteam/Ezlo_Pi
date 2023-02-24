@@ -324,6 +324,7 @@ esp_err_t blaster_mode_get_value_cjson(cJSON* params)
     ESP_LOGI(TAG, "decoded hex_string_data: %s\n", base64_data ? base64_data : "NULL");
     cJSON_AddStringToObject(params, "value", base64_data);
     TRACE_B("%s", cJSON_Print(params));
+    length = 0;
     // free(timing);
     // uint32_t* out_len = 0;
         // string_to_base64
@@ -338,10 +339,16 @@ esp_err_t learner_mode_get_value_cjson(cJSON* params)
     esp_err_t ret = ESP_OK;
     TRACE_B("LEARNER");
     TRACE_B("length = %d", length);
-    char *base64_data = create_base64_learned_data_packet(ir_protocol_parser.buffer, length);
+    char *base64_data = "";
+    if(length > 5)
+    {
+        base64_data = create_base64_learned_data_packet(ir_protocol_parser.buffer, length);
+    }
+    
     ESP_LOGI(TAG, "decoded hex_string_data: %s\n", base64_data ? base64_data : "NULL");
     cJSON_AddStringToObject(params, "value", base64_data);
     TRACE_B("%s", cJSON_Print(params));
+    length = 0;
     // free(val);
    // free(ir_protocol_parser.buffer);
     return  ret;
