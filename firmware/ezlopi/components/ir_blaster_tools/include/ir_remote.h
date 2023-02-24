@@ -120,7 +120,9 @@ typedef enum {
     IR_DEVICE_TV_BRAND_AIRTON_MODEL_AIRTONTV1,                                              //      45
     IR_DEVICE_AC_BRAND_GREE_MODEL_GREEAC1,                                                  //      46
 
-    IR_DEVICE_BRAND_REMOTE_MODEL_MAX                                                        //      46
+    IR_DEVICE_UNKNOWN_BRAND_UNKNOWN_MODEL_UNKNOWN,                                          //      47
+
+    IR_DEVICE_BRAND_REMOTE_MODEL_MAX                                                        //      47
 } ir_remote_device_model_type_t;
 
 /** 
@@ -148,6 +150,7 @@ typedef enum ir_protocol_type_t {
     IR_REMOTE_PROTOCOL_EPSON,
     IR_REMOTE_PROTOCOL_AIRTON,  //15
     IR_REMOTE_PROTOCOL_AIWA,
+    IR_REMOTE_PROTOCOL_UNKNOWN,
     IR_REMOTE_PROTOCOL_MAX
 }ir_protocol_type_t;
 

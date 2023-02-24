@@ -1,6 +1,5 @@
 
 
-
 #ifndef _029_IR_BLASTER_REMOTE_H_
 #define _029_IR_BLASTER_REMOTE_H_
 
@@ -8,6 +7,7 @@
 #include "ezlopi_actions.h"
 #include "cJSON.h"
 // #include "ezlopi_devices_list.h"
+#include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
 #include "ezlopi_cloud_category_str.h"
@@ -22,28 +22,32 @@
 #include "ir_tools.h"
 #include "ir_timings.h"
 #include "ir_config.h"
-//#include "ir_init.h"
+#include "ir_init.h"
 #include "ezlopi_device_value_updated.h"
 #include "trace.h"
 
 // ir_parser_config_t ir_parser_config;
 // ir_builder_config_t ir_builder_config;
 // static ir_protocol_init_t ir_protocol_init_props;
-
-static int IR_Blaster_Remote_prepare_and_add(void* args);
-static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(cJSON *cjson_device);
+static int IR_Blaster_prepare(void *arg);
+static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *properties, void *user_arg);
+// static int IR_Blaster_Remote_prepare_and_add(void* args);
+static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(uint32_t dev_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device);
 static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties);
 static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties, void *arg);
 static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-
+esp_err_t blaster_mode_get_value_cjson(cJSON* params);
+static esp_err_t learner_mode_get_value_cjson(cJSON* params);
+esp_err_t ir_remote_learner();
 int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
-/**
- * @brief RMT Transmit Task
- *
- */
-void ezlopi_ir_tx(uint32_t address, uint32_t command);
 
-static void ezlopi_ir_rx_task(void *arg);
+// void ezlopi_ir_tx(ir_protocol_init_t ir_protocol_init_props, uint32_t command_array_size, uint32_t* command_array);
+// esp_err_t ir_remote_blaster_database(char* Hex_string_data);
+esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data);
+// void ezlopi_ir_rx_task(void *arg);
+esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffer1, uint32_t timing_array_len);
+int capture();
+void store(rmt_item32_t *items, uint32_t len);
 
 #endif //_029_IR_BLASTER_REMOTE_H_
 

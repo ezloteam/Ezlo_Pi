@@ -11,7 +11,7 @@ const static char *value_type_bool = "bool";
 // const static char *value_type_usercode = "userCode";
 // const static char *value_type_dailyintervalarray = "array.daily_interval";
 // const static char *value_type_weeklyintervalarray = "array.weekly_interval";
-// const static char *value_type_string = "string";
+const static char *value_type_string = "string";
 // const static char *value_type_table = "table";
 // const static char *value_type_array = "array";
 const static char *value_type_token = "token";
@@ -67,5 +67,5 @@ const static char *value_type_temperature = "temperature";
 // const static char *value_keypad_lock_operation = "keypad_lock_operation";
 // const static char *value_keypad_unlock_operation = "keypad_unlock_operation";
 // const static char *value_manual_not_fully_locked_operation = "manual_not_fully_locked_operation";
-const static char* value_type_ir_blaster = "ir_blaster";
+
 #endif // __EZLOPI_VLAUES_STR_H__

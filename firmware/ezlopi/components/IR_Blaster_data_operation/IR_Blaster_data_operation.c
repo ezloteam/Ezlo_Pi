@@ -31,33 +31,30 @@ char *create_base64_learned_data_packet(const uint32_t *timing_data_hex_string, 
     return encoded_packet;
 }
 
-int get_packet_type(const char* packet)
+int timing_array_length(char *hex_string_data, uint32_t *len)
 {
-	uint32_t offset = 0;
-	int type = -1;
-	if(strncmp(packet+offset, "0000", 4) == 0)
-	{
-		offset += 4;
-		if(strncmp(packet+offset, "00", 2) == 0)
-		{
-			type = 0;
-		}
-		if(strncmp(packet+offset, "01", 2) == 0)
-		{
-			type = 1;
-		}
-	}
-	else
-	{
-		printf("No header was detected!!");
-	}
-	return type;
+    int ret = 0;
+    uint32_t length_idx = 6, length_char_len = 4;
+    if(hex_string_data)
+    {
+         uint32_t length = hex_string_2_uint32(hex_string_data + length_idx, length_char_len);
+         if(0 == (length%4))
+         {
+            *len = length / 4;
+            ret = 1;
+         }
+         else 
+         {
+            *len = 0;
+            ret = 0;
+         }
+    }
+    return ret;
 }
 
-uint32_t *hex_string_2_timing_array(char *hex_string_data, uint32_t *timing_array_len)
+int hex_string_2_timing_array(char *hex_string_data, uint32_t decoded_timing_data[])
 {
-    uint32_t *timing_array = NULL;
-
+    int ret = 0;
     if (hex_string_data)
     {
         uint32_t header_idx = 0, header_char_len = 4;
@@ -68,28 +65,32 @@ uint32_t *hex_string_2_timing_array(char *hex_string_data, uint32_t *timing_arra
         uint32_t type = hex_string_2_uint32(hex_string_data + type_idx, type_char_len);
         uint32_t length = hex_string_2_uint32(hex_string_data + length_idx, length_char_len);
 
+        // TRACE_I("header: %d\n", header);
+        // TRACE_I("type: %d\n", type);
+        // TRACE_I("length: %d\n", length);
+
         if (0 == (length % 4))
         {
             uint32_t tmp_array_len = length / 4;
-            timing_array = malloc(tmp_array_len);
 
+            // TRACE_I("tmp array len: %d\n", tmp_array_len);
 
             uint32_t timing_char_len = 4;
             uint32_t timing_idx = 10;
 
-            if (timing_array)
+            if (decoded_timing_data)
             {
-                *timing_array_len = tmp_array_len;
                 
                 for (uint32_t idx = 0; idx < tmp_array_len; idx++)
                 {
-                    timing_array[idx] = hex_string_2_uint32(hex_string_data + timing_idx + (idx * timing_char_len), timing_char_len);
+                    decoded_timing_data[idx] = hex_string_2_uint32(hex_string_data + timing_idx + (idx * timing_char_len), timing_char_len);
+                    // printf("%d ", timing_array[idx]);
                 }
+                ret = 1;
             }
         }
     }
-
-    return timing_array;
+    return ret;
 }
 
 uint32_t hex_string_2_uint32(char *data, uint32_t num_char_len)

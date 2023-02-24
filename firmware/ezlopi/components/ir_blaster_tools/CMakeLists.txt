@@ -1,4 +1,5 @@
-set(component_srcs "src/ir_rmt_nec.c"
+set(component_srcs "include/ir_init.c"
+                   "src/ir_rmt_nec.c"
                    "src/ir_rmt_samsung.c"
                    "src/ir_rmt_panasonic.c"
                    "src/ir_rmt_lg.c"

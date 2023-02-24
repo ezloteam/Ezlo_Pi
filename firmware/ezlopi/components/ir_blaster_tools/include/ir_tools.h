@@ -1,16 +1,3 @@
-// Copyright 2019 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 #pragma once
 
@@ -128,7 +115,7 @@ struct ir_builder_s {
     *      - ESP_FAIL: Build a complete frame failed because some error occurred
     */
     union frame_builder{
-        esp_err_t (*build_frame)(ir_builder_t *builder, uint32_t address, uint32_t command);
+        esp_err_t (*build_frame)(ir_builder_t *builder, uint32_t array_size, uint32_t* command);
         //   ONLY FOR TOSHIBA AC PROTOCOL (72 bit)
         esp_err_t (*build_frame_toshibaAC)(ir_builder_t *builder, uint32_t address, uint32_t command, uint32_t checksum, uint32_t addressR, uint32_t commandR, uint32_t cksumR);
     }frame_builder_t;
@@ -202,7 +189,7 @@ struct ir_parser_s {
     *      - ESP_FAIL: Get scan code failed because some error occurred
     */
     union scan_code{
-        esp_err_t (*get_scan_code)(ir_parser_t *parser, uint32_t *address, uint32_t *command, bool *repeat);
+        esp_err_t (*get_scan_code)(ir_parser_t *parser, uint32_t *command, bool *repeat);
         // ONLY GREE AC PROTOCOL
         esp_err_t (*get_scan_code_gree)(ir_parser_t *parser, uint32_t *address, uint32_t *footer, uint32_t *command, bool *repeat);
         // Toshiba AC (72 bit)
@@ -247,7 +234,7 @@ typedef struct {
  */
 #define IR_BUILDER_DEFAULT_CONFIG(dev) \
     {                                  \
-        .buffer_size = 200,             \
+        .buffer_size = 500,             \
         .dev_hdl = dev,                \
         .flags = 0,                    \
     }

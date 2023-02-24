@@ -5,7 +5,7 @@ static int mod_table[] = {0, 2, 1};
 static const unsigned char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static char decoding_table[256];
 
-static void build_decoding_table(void)
+void build_decoding_table(void)
 {
     memset(decoding_table, 0, sizeof(decoding_table));
 
