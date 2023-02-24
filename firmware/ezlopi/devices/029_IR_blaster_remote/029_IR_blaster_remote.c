@@ -6,7 +6,7 @@
 #include "IR_Blaster_encoder_decoder.h"
 #include "esp_log.h"
 // #include "ir_init.h"
-
+#define TIMEOUT_MS 30000 // 30 seconds in milliseconds
 // ir_parser_config_t ir_parser_config;
 // ir_builder_config_t ir_builder_config;
 uint32_t timing[200];
@@ -81,7 +81,7 @@ static int IR_Blaster_prepare(void *arg)
     {
         uint32_t device_id = ezlopi_device_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_ir_tx, subcategory_irt, ezlopi_item_name_send_ir_code, value_type_string, prep_arg->cjson_device);
-        device_id = ezlopi_device_generate_device_id();
+        // device_id = ezlopi_device_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_ir_tx, subcategory_irt, ezlopi_item_name_learn_ir_code, value_type_int, prep_arg->cjson_device);
 
     }
@@ -167,11 +167,6 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
             char *Hex_string = base64_to_string(Base64_string_value_from_Cloud);
             // ESP_LOGI(TAG, "decoded hex_string_data: %s\n", Hex_string ? Hex_string : "NULL");
 
-            // if(1 == get_packet_type(Hex_string))
-            // {
-            //     ir_remote_blaster_database(Hex_string);           ////////////CURRENTLY NO USE
-            // }    
-            // else if(0 == get_packet_type(Hex_string))
             if(ir_remote_blaster_learned_code(Hex_string) == ESP_OK)
             {
                 // capture();
@@ -388,29 +383,45 @@ int capture()
     rmt_rx_start(RMT_RX_CHANNEL, true);
     int count = 0;
     size_t len = 0;
+    // wait for an IR code for up to 30 seconds
+    TickType_t timeout_ticks = pdMS_TO_TICKS(TIMEOUT_MS);
+    TickType_t start_ticks = xTaskGetTickCount();
+    TickType_t elapsed_ticks;
     do
     {   
         // size_t len = 0;
-        items = (rmt_item32_t *) xRingbufferReceive(rb, &len, pdMS_TO_TICKS(2000));
-        count++;
-        if (items) 
-        {
+        // items = (rmt_item32_t *) xRingbufferReceive(rb, &len, pdMS_TO_TICKS(2000));
+        elapsed_ticks = xTaskGetTickCount() - start_ticks;
+        items = (rmt_item32_t *) xRingbufferReceive(rb, &len, timeout_ticks - elapsed_ticks);
+        // count++;
+        // if (items) 
+        // {
             len /= 4; // one RMT = 4 Bytes
             ESP_LOGI("INFO", "count = %d  and RECEIVED LENGTH = %d", count, len);
 
             // len = length;
-            if(len > 5)
-            {
-                store(items, len);
-                ret = 1;
-            }
+            // if(len > 5)
+            // {
+            //     store(items, len);
+            //     ret = 1;
+            // }
             //after parsing the data, return spaces to ringbuffer.
-            vRingbufferReturnItem(rb, (void *) items);
-            vTaskDelay(pdMS_TO_TICKS(50));
-        }
+            
+        // }
     }
-    while((count <= 15) && (len < 5));
-    
+    while(len < 5 && elapsed_ticks < timeout_ticks);
+    // while((count <= 15) && (len < 5));
+    if(items)
+    {
+        vRingbufferReturnItem(rb, (void *) items);
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+   
+    if(len > 5)
+    {
+        store(items, len);
+        ret = 1;
+    }
     rmt_rx_stop(RMT_RX_CHANNEL);
     //delete ring buffer
     // vRingbufferDelete(rb);
