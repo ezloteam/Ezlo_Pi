@@ -91,17 +91,6 @@ static const char *switch_box_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\" : \"GXHTC3-Sensor\",\
-                \"dev_type\" : 8,\
-                \"gpio_scl\" : 26,\
-                \"gpio_sda\" : 16,\
-                \"id_item\" : 29,\
-                \"id_room\" : \"\",\
-                \"pullup_scl\" : true,\
-                \"pullup_sda\" : true,\
-                \"slave_addr\" : 0\
-            },\
-            {\
                 \"dev_name\": \"Switch 1\",\
                 \"dev_type\": 1,\
                 \"gpio_in\": -1,\

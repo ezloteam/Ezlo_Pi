@@ -1,11 +1,11 @@
 
 
-
 #include "sensor_touch_tpp_223b.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 
+#include "ezlopi_cloud.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_item_name_str.h"
@@ -17,12 +17,11 @@
 #include "trace.h"
 #include "cJSON.h"
 
-static int sensor_touch_tpp_223b_prepare_and_add(void* args);
-static s_ezlopi_device_properties_t* sensor_touch_tpp_223b_prepare(cJSON* cjson_device);
+static int sensor_touch_tpp_223b_prepare_and_add(void *args);
+static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_prepare(cJSON *cjson_device);
 static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties);
 static void sensor_touch_tpp_223b_value_updated_from_device(s_ezlopi_device_properties_t *properties);
 static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-
 
 int sensor_touch_ttp_223b(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
 {
@@ -30,34 +29,32 @@ int sensor_touch_ttp_223b(e_ezlopi_actions_t action, s_ezlopi_device_properties_
 
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            ret = sensor_touch_tpp_223b_prepare_and_add(arg);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            ret = sensor_touch_tpp_223b_init(ezlo_device);
-            break;
-        }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            ret = sensor_touch_tpp_223b_get_value_cjson(ezlo_device, arg);
-            break;
-        }
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = sensor_touch_tpp_223b_prepare_and_add(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = sensor_touch_tpp_223b_init(ezlo_device);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = sensor_touch_tpp_223b_get_value_cjson(ezlo_device, arg);
+        break;
+    }
 
-        default:
-        {
-            break;
-        }
+    default:
+    {
+        break;
+    }
     }
 
     return ret;
-
 }
 
-
-static int sensor_touch_tpp_223b_prepare_and_add(void* args)
+static int sensor_touch_tpp_223b_prepare_and_add(void *args)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
@@ -81,9 +78,9 @@ static int sensor_touch_tpp_223b_prepare_and_add(void* args)
     return ret;
 }
 
-static s_ezlopi_device_properties_t* sensor_touch_tpp_223b_prepare(cJSON* cjson_device)
+static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_prepare(cJSON *cjson_device)
 {
-     s_ezlopi_device_properties_t *sensor_touch_tpp_223b_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    s_ezlopi_device_properties_t *sensor_touch_tpp_223b_properties = malloc(sizeof(s_ezlopi_device_properties_t));
 
     if (sensor_touch_tpp_223b_properties)
     {
@@ -104,9 +101,9 @@ static s_ezlopi_device_properties_t* sensor_touch_tpp_223b_prepare(cJSON* cjson_
         sensor_touch_tpp_223b_properties->ezlopi_cloud.battery_powered = false;
         sensor_touch_tpp_223b_properties->ezlopi_cloud.show = true;
         sensor_touch_tpp_223b_properties->ezlopi_cloud.room_name[0] = '\0';
-        sensor_touch_tpp_223b_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-        sensor_touch_tpp_223b_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-        sensor_touch_tpp_223b_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+        sensor_touch_tpp_223b_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        sensor_touch_tpp_223b_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        sensor_touch_tpp_223b_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.gpio_num);
         CJSON_GET_VALUE_INT(cjson_device, "ip_inv", sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.invert);
@@ -119,7 +116,6 @@ static s_ezlopi_device_properties_t* sensor_touch_tpp_223b_prepare(cJSON* cjson_
 
     return sensor_touch_tpp_223b_properties;
 }
-
 
 static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties)
 {

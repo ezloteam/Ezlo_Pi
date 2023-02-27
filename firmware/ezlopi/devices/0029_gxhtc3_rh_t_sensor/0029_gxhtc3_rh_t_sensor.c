@@ -1,3 +1,4 @@
+#include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_category_str.h"
@@ -144,9 +145,9 @@ static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_temperature(cJSON *c
         gxhtc3_properties->ezlopi_cloud.battery_powered = false;
         gxhtc3_properties->ezlopi_cloud.show = true;
         gxhtc3_properties->ezlopi_cloud.room_name[0] = '\0';
-        gxhtc3_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-        gxhtc3_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-        gxhtc3_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+        gxhtc3_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        gxhtc3_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        gxhtc3_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         gxhtc3_properties->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
         gxhtc3_properties->interface.i2c_master.enable = 1;
@@ -182,9 +183,9 @@ static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_relative_humidity(cJ
         gxhtc3_properties->ezlopi_cloud.battery_powered = false;
         gxhtc3_properties->ezlopi_cloud.show = true;
         gxhtc3_properties->ezlopi_cloud.room_name[0] = '\0';
-        gxhtc3_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-        gxhtc3_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-        gxhtc3_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+        gxhtc3_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        gxhtc3_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        gxhtc3_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         gxhtc3_properties->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
         gxhtc3_properties->interface.i2c_master.enable = 1;

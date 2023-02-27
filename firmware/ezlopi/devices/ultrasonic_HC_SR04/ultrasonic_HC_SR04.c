@@ -11,6 +11,7 @@
 #include "ezlopi_timer.h"
 #include "items.h"
 
+#include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
@@ -112,9 +113,9 @@ static s_ezlopi_device_properties_t *ezlopi_ultrasonic_HC_SR04_prepare(cJSON *cj
         ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.battery_powered = false;
         ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.show = true;
         ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.room_name[0] = '\0';
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         // CJSON_GET_VALUE_INT(cjson_device, "gpio1", ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "gpio2", ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.gpio_num);

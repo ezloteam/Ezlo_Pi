@@ -8,6 +8,7 @@
 #include "ezlopi_timer.h"
 #include "items.h"
 
+#include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
@@ -111,9 +112,9 @@ static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
         ezlopi_sound_properties->ezlopi_cloud.battery_powered = false;
         ezlopi_sound_properties->ezlopi_cloud.show = true;
         ezlopi_sound_properties->ezlopi_cloud.room_name[0] = '\0';
-        ezlopi_sound_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-        ezlopi_sound_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-        ezlopi_sound_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+        ezlopi_sound_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        ezlopi_sound_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        ezlopi_sound_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
     }
 
     return ezlopi_sound_properties;
