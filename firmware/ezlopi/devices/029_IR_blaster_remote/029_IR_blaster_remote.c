@@ -9,7 +9,7 @@
 #define TIMEOUT_MS 30000 // 30 seconds in milliseconds
 // ir_parser_config_t ir_parser_config;
 // ir_builder_config_t ir_builder_config;
-uint32_t timing[200];
+uint32_t timing[500];
 static ir_protocol_parser_t ir_protocol_parser;
 static ir_protocol_builder_t *ir_protocol_builder;
 // static ir_remote_info_t *ir_remote_info_handler;
@@ -253,39 +253,44 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
               "get rmt counter clock failed", err, NULL);
     float ratio = (float)counter_clk_hz / 1e6;
     IR_CHECK(buffer1, "data to be built can't be null", err, NULL);
-    TRACE_B("length OF DATA TO BE BUILT = %d", timing_array_len);
+    // TRACE_B("length OF DATA TO BE BUILT = %d", timing_array_len);
     length = timing_array_len;
-    
-    //  timing = buffer1;
+    memset(timing, 0, sizeof(timing));
+
     if(timing_array_len)
-    {
-        // timing = malloc(timing_array_len);
+    { 
         int i = 0;
         for(int j = 0; j < timing_array_len/2; j++)
         {
-            ESP_LOGE("ERROR","BUILDING FRAME");
-            ir_protocol_builder->cursor = j;
-            ir_protocol_builder->buffer[ir_protocol_builder->cursor].level0 = !ir_protocol_builder->inverse;
-            ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0 = (uint32_t)(ratio * buffer1[i]);
-            timing[i] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0;
-            TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
+            if(j < ir_protocol_builder->buffer_size)
+            {
+                ESP_LOGE("ERROR","BUILDING FRAME \r\n");
+                ir_protocol_builder->cursor = j;
+                ir_protocol_builder->buffer[ir_protocol_builder->cursor].level0 = !ir_protocol_builder->inverse;
+                ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0 = (uint32_t)(ratio * buffer1[i]);
+                timing[i] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0;
+                TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
 
-            ir_protocol_builder->buffer[ir_protocol_builder->cursor].level1 = ir_protocol_builder->inverse;
-            ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1 = (uint32_t)(ratio * buffer1[i+1]);
-            timing[i+1] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1;
-            TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
-            i+=2;
+                ir_protocol_builder->buffer[ir_protocol_builder->cursor].level1 = ir_protocol_builder->inverse;
+                ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1 = (uint32_t)(ratio * buffer1[i+1]);
+                timing[i+1] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1;
+                TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
+                i+=2;
+            }
+            else
+            {
+                TRACE_E("Buffer overflow \n");
+            }
         }
         ir_protocol_builder->cursor += 1;
         ir_protocol_builder->buffer[ir_protocol_builder->cursor].val = 0;
         ir_protocol_builder->cursor += 1;
         *(rmt_item32_t **)result = ir_protocol_builder->buffer;
-
-        // free(timing);
-        return ESP_OK;
+        return ESP_OK; 
     }
     else
     {
+        TRACE_E("No Data feed \n");
         err:
         return ESP_FAIL;
     }
