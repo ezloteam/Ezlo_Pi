@@ -1,0 +1,7 @@
+source "C:/Espressif/frameworks/esp-idf-v4.4.2/components/app_update/Kconfig.projbuild"
+source "C:/Espressif/frameworks/esp-idf-v4.4.2/components/bootloader/Kconfig.projbuild"
+source "C:/Espressif/frameworks/esp-idf-v4.4.2/components/esp_rom/Kconfig.projbuild"
+source "C:/Espressif/frameworks/esp-idf-v4.4.2/components/esptool_py/Kconfig.projbuild"
+source "C:/Espressif/frameworks/esp-idf-v4.4.2/components/partition_table/Kconfig.projbuild"
+source "C:/Users/soc20/Ezlo_IR_Blaster/firmware/ezlopi/components/common_components/Kconfig.projbuild"
+source "C:/Users/soc20/Ezlo_IR_Blaster/firmware/ezlopi/components/ssd1306/Kconfig.projbuild"

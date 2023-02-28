@@ -5,20 +5,16 @@
 #include "IR_Blaster_data_operation.h"
 #include "IR_Blaster_encoder_decoder.h"
 #include "esp_log.h"
-// #include "ir_init.h"
+
 #define TIMEOUT_MS 30000 // 30 seconds in milliseconds
-// ir_parser_config_t ir_parser_config;
-// ir_builder_config_t ir_builder_config;
+
 uint32_t timing[500];
 static ir_protocol_parser_t ir_protocol_parser;
 static ir_protocol_builder_t *ir_protocol_builder;
-// static ir_remote_info_t *ir_remote_info_handler;
+
 char* item_id;
 size_t length;
-// char *Hex_string;
-uint32_t cmd;
-#define IR_LEARNER_MODE  (0)
-#define IR_BLASTER_MODE  (1)
+
 
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                             \
     {                                                                                                                                 \
@@ -38,7 +34,6 @@ int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
      {
         case EZLOPI_ACTION_PREPARE:
         {   
-            TRACE_E("FIRST ACTION PREPARE");
             IR_Blaster_prepare(arg);
             break;
         }
@@ -59,7 +54,6 @@ int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
         // }
         case EZLOPI_ACTION_SET_VALUE:
         { 
-            TRACE_B("HERE");
             IR_BLaster_Remote_set_value(properties, arg);
             break;
         }
@@ -139,7 +133,7 @@ static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(uint32_t dev_id, 
 static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties)
 {
     int ret = 0;
-    TRACE_E("CONFIG INIT");
+    // TRACE_E("CONFIG INIT");
     build_decoding_table();
     return ret;
 }
@@ -151,21 +145,15 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
 
     if(device_details)
     {
-        //TRACE_B("HERE2");
-        // cJSON* device_value = cJSON_GetObjectItem(device_details, "params");
-        // device_value = cJSON_GetObjectItem(device_details, "value");
-        char* printed = cJSON_Print(device_details);
-        TRACE_E("%s", printed);
-       
-
+        // char* printed = cJSON_Print(device_details);
+        // TRACE_E("%s", printed);
         if(ezlopi_item_name_send_ir_code == properties->ezlopi_cloud.item_name)
         {   
             char *Base64_string_value_from_Cloud = NULL;
             CJSON_GET_VALUE_STRING(device_details, "value", Base64_string_value_from_Cloud); // Gets the string Base64
-            TRACE_E("%s", Base64_string_value_from_Cloud);
+            // TRACE_E("%s", Base64_string_value_from_Cloud);
             
             char *Hex_string = base64_to_string(Base64_string_value_from_Cloud);
-            // ESP_LOGI(TAG, "decoded hex_string_data: %s\n", Hex_string ? Hex_string : "NULL");
 
             if(ir_remote_blaster_learned_code(Hex_string) == ESP_OK)
             {
@@ -177,7 +165,7 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
                 TRACE_E("NOTHING BLASTING");
             }
         }
-        else
+        else if(ezlopi_item_name_learn_ir_code == properties->ezlopi_cloud.item_name)
         {
             int val = 5;
             CJSON_GET_VALUE_INT(device_details, "value", val);
@@ -186,22 +174,21 @@ static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties,
                 ir_remote_learner();
             }  
         }
-        // else
-        // {
-        //     TRACE_E("NO ITEM SELECTED");
-        // }
+        else
+        {
+            TRACE_E("NO ITEM SELECTED");
+        }
         
     }    
     return ret;
 }
-
 
 esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
 {
     esp_err_t ret = ESP_FAIL;
     rmt_item32_t *items = NULL;
     ir_builder_config_t ir_builder_config = rmt_tx_init();
-    ESP_LOGI(TAG, "decoded Hex_string_data: %s\n", Hex_string_data ? Hex_string_data : "NULL");
+    // ESP_LOGI(TAG, "decoded Hex_string_data: %s\n", Hex_string_data ? Hex_string_data : "NULL");
     uint32_t timing_array_len = 0;
     timing_array_length(Hex_string_data, &timing_array_len);
 
@@ -210,19 +197,19 @@ esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
     {
         uint32_t decoded_timing_data[timing_array_len];
         hex_string_2_timing_array(Hex_string_data, decoded_timing_data);
-        printf("[ ");
-        for(int i = 0; i < timing_array_len; i++)
-        {
-            printf("%d ", decoded_timing_data[i]);
-        }
-        printf("]\n");
+        // printf("[ ");
+        // for(int i = 0; i < timing_array_len; i++)
+        // {
+        //     printf("%d ", decoded_timing_data[i]);
+        // }
+        // printf("]\n");
         if(build(&items, &ir_builder_config, decoded_timing_data, timing_array_len) == ESP_OK)
         {
-            TRACE_E("BUILD SUCCESSFUL");
+            // TRACE_E("BUILD SUCCESSFUL");
             if(rmt_write_items(RMT_TX_CHANNEL, items, timing_array_len, false) == ESP_OK)
             {
                 // free(ir_protocol_builder);
-                TRACE_E("DATA Written on channel Successful");
+                // TRACE_E("DATA Written on channel Successful");
                 ret = ESP_OK;
             }
             
@@ -235,7 +222,7 @@ esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
 
 esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffer1, uint32_t timing_array_len)
 {
-    ir_builder_t *ret = NULL;
+    ir_protocol_builder_t *ret = NULL;
     IR_CHECK(config, "IR_PROTOCOL configuration can't be null", err, NULL);
     IR_CHECK(config->buffer_size, "buffer size can't be zero", err, NULL);
 
@@ -264,17 +251,17 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
         {
             if(j < ir_protocol_builder->buffer_size)
             {
-                ESP_LOGE("ERROR","BUILDING FRAME \r\n");
+                // ESP_LOGE("ERROR","BUILDING FRAME \r\n");
                 ir_protocol_builder->cursor = j;
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].level0 = !ir_protocol_builder->inverse;
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0 = (uint32_t)(ratio * buffer1[i]);
                 timing[i] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0;
-                TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
+                // TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
 
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].level1 = ir_protocol_builder->inverse;
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1 = (uint32_t)(ratio * buffer1[i+1]);
                 timing[i+1] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1;
-                TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
+                // TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
                 i+=2;
             }
             else
@@ -316,44 +303,36 @@ static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *prope
 esp_err_t blaster_mode_get_value_cjson(cJSON* params)
 {
     esp_err_t ret = ESP_OK;
-    TRACE_B("BLASTER");
-    // cJSON* value = cJSON_CreateObject();
-    TRACE_B("length = %d", length);
-    // uint32_t *timing = (uint32_t *)properties->user_arg;
+    // TRACE_B("BLASTER");
+    // TRACE_B("length = %d", length);
     char *base64_data = create_base64_learned_data_packet(timing, length);
-    ESP_LOGI(TAG, "decoded hex_string_data: %s\n", base64_data ? base64_data : "NULL");
+    // ESP_LOGI(TAG, "decoded hex_string_data: %s\n", base64_data ? base64_data : "NULL");
     cJSON_AddStringToObject(params, "value", base64_data);
-    TRACE_B("%s", cJSON_Print(params));
+    // TRACE_B("%s", cJSON_Print(params));
     length = 0;
-    // free(timing);
-    // uint32_t* out_len = 0;
-        // string_to_base64
-    // cJSON_AddStringToObject(params, "value", string_to_base64(Hex_string, strlen(Hex_string), out_len));
-
-    // free(value);
+    // free(base64_data);
     return ret;
 }
 
 esp_err_t learner_mode_get_value_cjson(cJSON* params)
 {
     esp_err_t ret = ESP_OK;
-    TRACE_B("LEARNER");
-    TRACE_B("length = %d", length);
+    // TRACE_B("LEARNER");
+    // TRACE_B("length = %d", length);
     char *base64_data = "";
     if(length > 5)
     {
         base64_data = create_base64_learned_data_packet(ir_protocol_parser.buffer, length);
     }
     
-    ESP_LOGI(TAG, "decoded hex_string_data: %s\n", base64_data ? base64_data : "NULL");
+    // ESP_LOGI(TAG, "decoded hex_string_data: %s\n", base64_data ? base64_data : "NULL");
     cJSON_AddStringToObject(params, "value", base64_data);
-    TRACE_B("%s", cJSON_Print(params));
+    // TRACE_B("%s", cJSON_Print(params));
     length = 0;
-    // free(val);
+    // free(base64_data);
    // free(ir_protocol_parser.buffer);
     return  ret;
 }
-
 
 // LEARNER MODE
 esp_err_t ir_remote_learner()
@@ -394,25 +373,10 @@ int capture()
     TickType_t elapsed_ticks;
     do
     {   
-        // size_t len = 0;
-        // items = (rmt_item32_t *) xRingbufferReceive(rb, &len, pdMS_TO_TICKS(2000));
         elapsed_ticks = xTaskGetTickCount() - start_ticks;
         items = (rmt_item32_t *) xRingbufferReceive(rb, &len, timeout_ticks - elapsed_ticks);
-        // count++;
-        // if (items) 
-        // {
-            len /= 4; // one RMT = 4 Bytes
-            ESP_LOGI("INFO", "count = %d  and RECEIVED LENGTH = %d", count, len);
-
-            // len = length;
-            // if(len > 5)
-            // {
-            //     store(items, len);
-            //     ret = 1;
-            // }
-            //after parsing the data, return spaces to ringbuffer.
-            
-        // }
+        len /= 4; // one RMT = 4 Bytes
+        // ESP_LOGI("INFO", "count = %d  and RECEIVED LENGTH = %d", count, len);
     }
     while(len < 5 && elapsed_ticks < timeout_ticks);
     // while((count <= 15) && (len < 5));
@@ -424,29 +388,29 @@ int capture()
    
     if(len > 5)
     {
-        store(items, len);
+        // store(items, len);
+        length = len;
+        ir_protocol_parser.buffer = items;
         ret = 1;
     }
     rmt_rx_stop(RMT_RX_CHANNEL);
-    //delete ring buffer
-    // vRingbufferDelete(rb);
     rmt_driver_uninstall(RMT_RX_CHANNEL);
     return ret;
 }
 
-void store(rmt_item32_t *items, uint32_t len)
-{
-    //ir_protocol_parser_t ir_protocol_parser;
-    ir_protocol_parser.buffer = items;
-    TRACE_B("NOW STORING DATA");
-    int j = 0;
-    length = len;
-    for(int i = 0; i < len; i++)
-    {
-        ir_protocol_parser.cursor = i;
-        ESP_LOGI("TIME INFO","bit %d High timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0);
-        ESP_LOGI("TIME INFO","bit %d Low timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1);
-        j+=2;
-    } 
-}
+// void store(rmt_item32_t *items, uint32_t len)
+// {
+//     //ir_protocol_parser_t ir_protocol_parser;
+//     ir_protocol_parser.buffer = items;
+//     TRACE_B("NOW STORING DATA");
+//     int j = 0;
+//     length = len;
+//     for(int i = 0; i < len; i++)
+//     {
+//         ir_protocol_parser.cursor = i;
+//         ESP_LOGI("TIME INFO","bit %d High timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0);
+//         ESP_LOGI("TIME INFO","bit %d Low timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1);
+//         j+=2;
+//     } 
+// }
 
