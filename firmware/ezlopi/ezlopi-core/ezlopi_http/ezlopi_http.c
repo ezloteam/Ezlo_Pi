@@ -35,7 +35,7 @@ char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_k
             .client_key_pem = private_key,
             .event_handler = ezlopi_http_event_handler,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
-            .user_data = (void *)(my_data),
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
 
         esp_http_client_handle_t client = esp_http_client_init(&config);
