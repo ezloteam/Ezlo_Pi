@@ -37,7 +37,7 @@ static void registration_process(void *pv)
     snprintf(reg_str, sizeof(reg_str),
              "{\"id\":\"%u\",\"method\":\"register\",\"params\":"
              "{\"firmware\":\"0.1\",\"timeOffset\":18000, \"media\":\"radio\","
-             "\"hubType\":\"32.1\",\"mac_address\":\"%s\"}}",
+             "\"hubType\":\"32.1\",\"mac_address\":\"%s\",\"maxFrameSize\":2048}}",
              esp_random(), "a2:97:1e:74:0b:52");
 
     while (false == ezlopi_websocket_client_is_connected())

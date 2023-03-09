@@ -1,2 +1,0 @@
---flash_mode dio --flash_freq 80m --flash_size 8MB
-0x10000 Ezlo_Pi_v2x.bin

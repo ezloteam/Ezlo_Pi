@@ -197,21 +197,21 @@ esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
     {
         uint32_t decoded_timing_data[timing_array_len];
         hex_string_2_timing_array(Hex_string_data, decoded_timing_data);
-        // printf("[ ");
-        // for(int i = 0; i < timing_array_len; i++)
-        // {
-        //     printf("%d ", decoded_timing_data[i]);
-        // }
-        // printf("]\n");
+        printf("[ ");
+        for(int i = 0; i < timing_array_len; i++)
+        {
+            printf("%d ", decoded_timing_data[i]);
+        }
+        printf("]\n");
         if(build(&items, &ir_builder_config, decoded_timing_data, timing_array_len) == ESP_OK)
         {
             // TRACE_E("BUILD SUCCESSFUL");
-            if(rmt_write_items(RMT_TX_CHANNEL, items, timing_array_len, false) == ESP_OK)
-            {
-                // free(ir_protocol_builder);
-                // TRACE_E("DATA Written on channel Successful");
-                ret = ESP_OK;
-            }
+            // if(rmt_write_items(RMT_TX_CHANNEL, ir_protocol_builder->buffer, ir_protocol_builder->cursor, false) == ESP_OK)
+            // {
+            //     TRACE_E("LENGTH WRITTEN IN CHANNEL = %d", ir_protocol_builder->cursor);
+            //     TRACE_E("DATA Written on channel Successful");
+            //     ret = ESP_OK;
+            // }
             
         }
     }
@@ -239,8 +239,8 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
     IR_CHECK(rmt_get_counter_clock((rmt_channel_t)config->dev_hdl, &counter_clk_hz) == ESP_OK,
               "get rmt counter clock failed", err, NULL);
     float ratio = (float)counter_clk_hz / 1e6;
-    IR_CHECK(buffer1, "data to be built can't be null", err, NULL);
-    // TRACE_B("length OF DATA TO BE BUILT = %d", timing_array_len);
+        IR_CHECK(buffer1, "data to be built can't be null", err, NULL);
+    TRACE_B("length OF DATA TO BE BUILT = %d", timing_array_len);
     length = timing_array_len;
     memset(timing, 0, sizeof(timing));
 
@@ -256,12 +256,12 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].level0 = !ir_protocol_builder->inverse;
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0 = (uint32_t)(ratio * buffer1[i]);
                 timing[i] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0;
-                // TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
+                TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
 
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].level1 = ir_protocol_builder->inverse;
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1 = (uint32_t)(ratio * buffer1[i+1]);
                 timing[i+1] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1;
-                // TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
+                TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
                 i+=2;
             }
             else
@@ -272,7 +272,14 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
         ir_protocol_builder->cursor += 1;
         ir_protocol_builder->buffer[ir_protocol_builder->cursor].val = 0;
         ir_protocol_builder->cursor += 1;
-        *(rmt_item32_t **)result = ir_protocol_builder->buffer;
+        // TRACE_E("BUILD SUCCESSFUL");
+        if(rmt_write_items(RMT_TX_CHANNEL, ir_protocol_builder->buffer, ir_protocol_builder->cursor, true) == ESP_OK)
+        {
+            TRACE_E("LENGTH WRITTEN IN CHANNEL = %d", ir_protocol_builder->cursor);
+            TRACE_E("DATA Written on channel Successful");
+            ret = ESP_OK;
+        }
+        // *(rmt_item32_t **)result = ir_protocol_builder->buffer;
         return ESP_OK; 
     }
     else
@@ -322,7 +329,7 @@ esp_err_t learner_mode_get_value_cjson(cJSON* params)
     char *base64_data = "";
     if(length > 5)
     {
-        base64_data = create_base64_learned_data_packet(ir_protocol_parser.buffer, length);
+            base64_data = create_base64_learned_data_packet(timing, length);
     }
     
     // ESP_LOGI(TAG, "decoded hex_string_data: %s\n", base64_data ? base64_data : "NULL");
@@ -388,9 +395,10 @@ int capture()
    
     if(len > 5)
     {
-        // store(items, len);
-        length = len;
-        ir_protocol_parser.buffer = items;
+        
+        // length = len;
+        store(items, len);
+        // ir_protocol_parser.buffer = items;
         ret = 1;
     }
     rmt_rx_stop(RMT_RX_CHANNEL);
@@ -398,19 +406,22 @@ int capture()
     return ret;
 }
 
-// void store(rmt_item32_t *items, uint32_t len)
-// {
-//     //ir_protocol_parser_t ir_protocol_parser;
-//     ir_protocol_parser.buffer = items;
-//     TRACE_B("NOW STORING DATA");
-//     int j = 0;
-//     length = len;
-//     for(int i = 0; i < len; i++)
-//     {
-//         ir_protocol_parser.cursor = i;
-//         ESP_LOGI("TIME INFO","bit %d High timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0);
-//         ESP_LOGI("TIME INFO","bit %d Low timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1);
-//         j+=2;
-//     } 
-// }
+void store(rmt_item32_t *items, uint32_t len)
+{
+    //ir_protocol_parser_t ir_protocol_parser;
+    ir_protocol_parser.buffer = items;
+    // TRACE_B("NOW STORING DATA");
+    int j = 0;
+    length = len * 2;
+    memset(timing, 0, sizeof(timing));
+    for(int i = 0; i < len; i++)
+    {
+        ir_protocol_parser.cursor = i;
+        timing[j] = ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0;
+        ESP_LOGI("TIME INFO","bit %d High timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0);
+        timing[j+1] = ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1;
+        ESP_LOGI("TIME INFO","bit %d Low timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1);
+        j+=2;
+    } 
+}
 
