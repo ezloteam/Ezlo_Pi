@@ -197,21 +197,14 @@ esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
     {
         uint32_t decoded_timing_data[timing_array_len];
         hex_string_2_timing_array(Hex_string_data, decoded_timing_data);
-        printf("[ ");
-        for(int i = 0; i < timing_array_len; i++)
-        {
-            printf("%d ", decoded_timing_data[i]);
-        }
-        printf("]\n");
+        // printf("[ ");
+        // for(int i = 0; i < timing_array_len; i++)
+        // {
+        //     printf("%d ", decoded_timing_data[i]);
+        // }
+        // printf("]\n");
         if(build(&items, &ir_builder_config, decoded_timing_data, timing_array_len) == ESP_OK)
         {
-            // TRACE_E("BUILD SUCCESSFUL");
-            // if(rmt_write_items(RMT_TX_CHANNEL, ir_protocol_builder->buffer, ir_protocol_builder->cursor, false) == ESP_OK)
-            // {
-            //     TRACE_E("LENGTH WRITTEN IN CHANNEL = %d", ir_protocol_builder->cursor);
-            //     TRACE_E("DATA Written on channel Successful");
-            //     ret = ESP_OK;
-            // }
             ret = ESP_OK;
         }
     }
@@ -222,6 +215,7 @@ esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
 
 esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffer1, uint32_t timing_array_len)
 {
+    esp_err_t return_val = ESP_FAIL;
     ir_protocol_builder_t *ret = NULL;
     IR_CHECK(config, "IR_PROTOCOL configuration can't be null", err, NULL);
     IR_CHECK(config->buffer_size, "buffer size can't be zero", err, NULL);
@@ -240,7 +234,7 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
               "get rmt counter clock failed", err, NULL);
     float ratio = (float)counter_clk_hz / 1e6;
         IR_CHECK(buffer1, "data to be built can't be null", err, NULL);
-    TRACE_B("length OF DATA TO BE BUILT = %d", timing_array_len);
+    // TRACE_B("length OF DATA TO BE BUILT = %d", timing_array_len);
     length = timing_array_len;
     memset(timing, 0, sizeof(timing));
 
@@ -256,12 +250,12 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].level0 = !ir_protocol_builder->inverse;
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0 = (uint32_t)(ratio * buffer1[i]);
                 timing[i] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0;
-                TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
+                // TRACE_B("timing%d = %d", i, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration0);
 
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].level1 = ir_protocol_builder->inverse;
                 ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1 = (uint32_t)(ratio * buffer1[i+1]);
                 timing[i+1] = ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1;
-                TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
+                // TRACE_B("timing%d = %d", i+1, ir_protocol_builder->buffer[ir_protocol_builder->cursor].duration1);
                 i+=2;
             }
             else
@@ -275,19 +269,19 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
         // TRACE_E("BUILD SUCCESSFUL");
         if(rmt_write_items(RMT_TX_CHANNEL, ir_protocol_builder->buffer, ir_protocol_builder->cursor, true) == ESP_OK)
         {
-            TRACE_E("LENGTH WRITTEN IN CHANNEL = %d", ir_protocol_builder->cursor);
+            // TRACE_E("LENGTH WRITTEN IN CHANNEL = %d", ir_protocol_builder->cursor);
             TRACE_E("DATA Written on channel Successful");
-            ret = ESP_OK;
+            return_val = ESP_OK;
         }
         // *(rmt_item32_t **)result = ir_protocol_builder->buffer;
-        return ESP_OK; 
+        // return ESP_OK; 
     }
     else
     {
         TRACE_E("No Data feed \n");
-        err:
-        return ESP_FAIL;
     }
+    err:
+        return return_val;
 }
 
 static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
@@ -317,7 +311,6 @@ esp_err_t blaster_mode_get_value_cjson(cJSON* params)
     cJSON_AddStringToObject(params, "value", base64_data);
     // TRACE_B("%s", cJSON_Print(params));
     length = 0;
-    // free(base64_data);
     return ret;
 }
 
@@ -336,8 +329,6 @@ esp_err_t learner_mode_get_value_cjson(cJSON* params)
     cJSON_AddStringToObject(params, "value", base64_data);
     // TRACE_B("%s", cJSON_Print(params));
     length = 0;
-    // free(base64_data);
-   // free(ir_protocol_parser.buffer);
     return  ret;
 }
 
@@ -418,9 +409,9 @@ void store(rmt_item32_t *items, uint32_t len)
     {
         ir_protocol_parser.cursor = i;
         timing[j] = ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0;
-        ESP_LOGI("TIME INFO","bit %d High timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0);
+        // ESP_LOGI("TIME INFO","bit %d High timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0);
         timing[j+1] = ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1;
-        ESP_LOGI("TIME INFO","bit %d Low timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1);
+        // ESP_LOGI("TIME INFO","bit %d Low timing: %d", i, ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration1);
         j+=2;
     } 
 }
