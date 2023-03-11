@@ -212,7 +212,7 @@ esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
             //     TRACE_E("DATA Written on channel Successful");
             //     ret = ESP_OK;
             // }
-            
+            ret = ESP_OK;
         }
     }
     free(ir_protocol_builder);
@@ -390,7 +390,7 @@ int capture()
     if(items)
     {
         vRingbufferReturnItem(rb, (void *) items);
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(200));
     }
    
     if(len > 5)
