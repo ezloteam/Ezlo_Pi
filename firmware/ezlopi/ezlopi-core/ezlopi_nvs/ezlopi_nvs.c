@@ -9,7 +9,7 @@
 
 static nvs_handle_t ezlopi_nvs_handle;
 static const char *storage_name = "storage";
-static const char *config_nvs_name = "confi_data";
+static const char *config_nvs_name = "config_data";
 static const char *passkey_nvs_name = "passkey";
 static const char *user_id_nvs_name = "user_id";
 static const char *wifi_info_nvs_name = "wifi_info";

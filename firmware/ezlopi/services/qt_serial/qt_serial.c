@@ -293,21 +293,20 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
 
 static void qt_serial_save_config(const char *data)
 {
-    // // uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
-    // uint32_t ret = ezlopi_factory_info_set_ezlopi_config((char *)data);
-    // TRACE_B("ezlopi_factory_info_set_ezlopi_config: %d", ret);
-    // if (ret)
-    // {
-    //     TRACE_B("Successfully wrote config data..");
-    // }
 
-    qt_serial_response(3, 0, 5);
+    uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
+    TRACE_B("ezlopi_factory_info_set_ezlopi_config: %d", ret);
+    if (ret)
+    {
+        TRACE_B("Successfully wrote config data..");
+    }
+
+    qt_serial_response(3, ret, 5);
 }
 
 static void qt_serial_read_config(void)
 {
     cJSON *root = NULL;
-    // char *buf = ezlopi_factory_info_get_ezlopi_config();
     char *buf = ezlopi_factory_info_v2_get_ezlopi_config();
 
     if (buf)

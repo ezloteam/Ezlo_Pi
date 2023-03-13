@@ -8,6 +8,7 @@
 
 #include "trace.h"
 #include "ezlopi_factory_info.h"
+#include "ezlopi_nvs.h"
 
 #if 0
 static s_ezlopi_factory_info_t *factory_info = NULL;
@@ -76,6 +77,7 @@ static const esp_partition_t *partition_ctx_v2 = NULL;
 static char *g_ca_certificate = NULL;
 static char *g_ssl_private_key = NULL;
 static char *g_ssl_shared_key = NULL;
+static char *g_ezlopi_config = NULL;
 
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
 
@@ -124,7 +126,12 @@ void print_factory_info_v2(void)
     char *ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     char *ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
     char *ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     char *ezlopi_config = ezlopi_factory_info_v2_get_ezlopi_config();
+#elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
+    char *ezlopi_config = NULL;
+    ezlopi_nvs_read_config_data_str(&ezlopi_config);
+#endif
 
     TRACE_D("----------------- Factory Info -----------------");
     TRACE_W("VERSION[off: 0x%04X, size: 0x%04X]:                %d", VERSION_OFFSET, VERSION_LENGTH, version);
@@ -143,7 +150,11 @@ void print_factory_info_v2(void)
     TRACE_W("CA_CERTIFICATE [off: 0x%04X, size: 0x%04X]:        %s", CA_CERTIFICATE_OFFSET, CA_CERTIFICATE_LENGTH, ca_certificate);
     TRACE_W("SSL_PRIVATE_KEY [off: 0x%04X, size: 0x%04X]:       %s", SSL_PRIVATE_KEY_OFFSET, SSL_PRIVATE_KEY_LENGTH, ssl_private_key);
     TRACE_W("SSL_SHARED_KEY [off: 0x%04X, size: 0x%04X]:        %s", SSL_SHARED_KEY_OFFSET, SSL_SHARED_KEY_LENGTH, ssl_shared_key);
+#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     TRACE_W("EZLOPI_CONFIG [off: 0x%04X, size: 0x%04X]:         %s", EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH, ezlopi_config);
+#elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
+    TRACE_W("EZLOPI_CONFIG:                                     %s", ezlopi_config ? ezlopi_config : "");
+#endif
     TRACE_D("-------------------------------------------------");
 
     ezlopi_factory_info_v2_free(name);
@@ -156,7 +167,6 @@ void print_factory_info_v2(void)
     ezlopi_factory_info_v2_free(wifi_password);
     ezlopi_factory_info_v2_free(cloud_server);
     ezlopi_factory_info_v2_free(device_type);
-    // ezlopi_factory_info_v2_free(ezlopi_config);
 }
 
 /** Getter */
@@ -303,11 +313,16 @@ char *ezlopi_factory_info_v2_get_ssl_shared_key(void)
 
 char *ezlopi_factory_info_v2_get_ezlopi_config(void)
 {
+#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
 #if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
     return switch_box_constant_config;
 #elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
-    return ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+    g_ezlopi_config = ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
 #endif
+#elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
+    ezlopi_nvs_read_config_data_str(&g_ezlopi_config);
+#endif
+    return g_ezlopi_config;
 }
 
 /** Setter */
