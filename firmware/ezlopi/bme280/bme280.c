@@ -1,40 +1,40 @@
 /**
-* Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
-*
-* BSD-3-Clause
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of the copyright holder nor the names of its
-*    contributors may be used to endorse or promote products derived from
-*    this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-* COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-* @file       bme280.c
-* @date       2020-03-28
-* @version    v3.5.0
-*
-*/
+ * Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+ *
+ * BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @file       bme280.c
+ * @date       2020-03-28
+ * @version    v3.5.0
+ *
+ */
 
 /*! @file bme280.c
  * @brief Sensor driver for BME280 sensor
@@ -43,10 +43,10 @@
 
 /**\name Internal macros */
 /* To identify osr settings selected by user */
-#define OVERSAMPLING_SETTINGS    UINT8_C(0x07)
+#define OVERSAMPLING_SETTINGS UINT8_C(0x07)
 
 /* To identify filter and standby settings selected by user */
-#define FILTER_STANDBY_SETTINGS  UINT8_C(0x18)
+#define FILTER_STANDBY_SETTINGS UINT8_C(0x18)
 
 /*!
  * @brief This internal API puts the device to sleep mode.
@@ -744,8 +744,8 @@ int8_t bme280_get_sensor_data(uint8_t sensor_comp, struct bme280_data *comp_data
     /* Array to store the pressure, temperature and humidity data read from
      * the sensor
      */
-    uint8_t reg_data[BME280_P_T_H_DATA_LEN] = { 0 };
-    struct bme280_uncomp_data uncomp_data = { 0 };
+    uint8_t reg_data[BME280_P_T_H_DATA_LEN] = {0};
+    struct bme280_uncomp_data uncomp_data = {0};
 
     /* Check for null pointer in the device structure*/
     rslt = null_ptr_check(dev);
@@ -861,7 +861,7 @@ uint32_t bme280_cal_meas_delay(const struct bme280_settings *settings)
     uint8_t hum_osr;
 
     /*Array to map OSR config register value to actual OSR */
-    uint8_t osr_sett_to_act_osr[] = { 0, 1, 2, 4, 8, 16 };
+    uint8_t osr_sett_to_act_osr[] = {0, 1, 2, 4, 8, 16};
 
     /* Mapping osr settings to the actual osr values e.g. 0b101 -> osr X16  */
     if (settings->osr_t <= 5)
@@ -894,7 +894,8 @@ uint32_t bme280_cal_meas_delay(const struct bme280_settings *settings)
     max_delay =
         (uint32_t)((BME280_MEAS_OFFSET + (BME280_MEAS_DUR * temp_osr) +
                     ((BME280_MEAS_DUR * pres_osr) + BME280_PRES_HUM_MEAS_OFFSET) +
-                    ((BME280_MEAS_DUR * hum_osr) + BME280_PRES_HUM_MEAS_OFFSET)) / BME280_MEAS_SCALING_FACTOR);
+                    ((BME280_MEAS_DUR * hum_osr) + BME280_PRES_HUM_MEAS_OFFSET)) /
+                   BME280_MEAS_SCALING_FACTOR);
 
     return max_delay;
 }
@@ -1195,7 +1196,7 @@ static double compensate_pressure(const struct bme280_uncomp_data *uncomp_data,
     /* avoid exception caused by division by zero */
     if (var1 > (0.0))
     {
-        pressure = 1048576.0 - (double) uncomp_data->pressure;
+        pressure = 1048576.0 - (double)uncomp_data->pressure;
         pressure = (pressure - (var2 / 4096.0)) * 6250.0 / var1;
         var1 = ((double)calib_data->dig_p9) * pressure * pressure / 2147483648.0;
         var2 = pressure * ((double)calib_data->dig_p8) / 32768.0;
@@ -1341,7 +1342,7 @@ static uint32_t compensate_pressure(const struct bme280_uncomp_data *uncomp_data
 
     return pressure;
 }
-#else /* 32 bit compensation for pressure data */
+#else                       /* 32 bit compensation for pressure data */
 
 /*!
  * @brief This internal API is used to compensate the raw pressure data and
@@ -1455,7 +1456,7 @@ static int8_t get_calib_data(struct bme280_dev *dev)
     uint8_t reg_addr = BME280_TEMP_PRESS_CALIB_DATA_ADDR;
 
     /* Array to store calibration data */
-    uint8_t calib_data[BME280_TEMP_PRESS_CALIB_DATA_LEN] = { 0 };
+    uint8_t calib_data[BME280_TEMP_PRESS_CALIB_DATA_LEN] = {0};
 
     /* Read the calibration data from the sensor */
     rslt = bme280_get_regs(reg_addr, calib_data, BME280_TEMP_PRESS_CALIB_DATA_LEN, dev);

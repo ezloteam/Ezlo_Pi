@@ -203,7 +203,7 @@ esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data)
         //     printf("%d ", decoded_timing_data[i]);
         // }
         // printf("]\n");
-        if(build(&items, &ir_builder_config, decoded_timing_data, timing_array_len) == ESP_OK)
+        if(ESP_OK == build(&items, &ir_builder_config, decoded_timing_data, timing_array_len))
         {
             ret = ESP_OK;
         }
@@ -226,7 +226,8 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
 
     ir_protocol_builder->buffer_size = config->buffer_size;
     ir_protocol_builder->flags = config->flags;
-    if (config->flags & IR_TOOLS_FLAGS_INVERSE) {
+    if (config->flags & IR_TOOLS_FLAGS_INVERSE) 
+    {
         ir_protocol_builder->inverse = true;
     }
     uint32_t counter_clk_hz = 0;
@@ -267,7 +268,7 @@ esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffe
         ir_protocol_builder->buffer[ir_protocol_builder->cursor].val = 0;
         ir_protocol_builder->cursor += 1;
         // TRACE_E("BUILD SUCCESSFUL");
-        if(rmt_write_items(RMT_TX_CHANNEL, ir_protocol_builder->buffer, ir_protocol_builder->cursor, true) == ESP_OK)
+        if(ESP_OK == rmt_write_items(RMT_TX_CHANNEL, ir_protocol_builder->buffer, ir_protocol_builder->cursor, true))
         {
             // TRACE_E("LENGTH WRITTEN IN CHANNEL = %d", ir_protocol_builder->cursor);
             TRACE_E("DATA Written on channel Successful");
@@ -341,7 +342,7 @@ esp_err_t ir_remote_learner()
     
     TRACE_I("LEARNING MODE ON: PLEASE PRESS A REMOTE BUTTON ONCE ONLY \n");
     r = capture();
-    if( r == 1)
+    if( 1 == r)
     {
         TRACE_I("LEARNED A REMOTE CODE");
     }
@@ -406,6 +407,7 @@ void store(rmt_item32_t *items, uint32_t len)
     length = len * 2;
     memset(timing, 0, sizeof(timing));
     for(int i = 0; i < len; i++)
+
     {
         ir_protocol_parser.cursor = i;
         timing[j] = ir_protocol_parser.buffer[ir_protocol_parser.cursor].duration0;

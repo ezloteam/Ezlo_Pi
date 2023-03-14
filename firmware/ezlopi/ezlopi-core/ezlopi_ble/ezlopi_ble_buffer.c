@@ -21,6 +21,11 @@ s_linked_buffer_t *ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t *param)
                 linked_buffer = NULL;
             }
         }
+        else
+        {
+            free(linked_buffer);
+            linked_buffer = NULL;
+        }
     }
 
     return linked_buffer;
@@ -74,7 +79,7 @@ void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t *l_buffer)
             {
                 free(l_buffer->buffer);
             }
-            
+
             l_buffer->buffer = tot_buffer;
             l_buffer->len = tot_len;
         }

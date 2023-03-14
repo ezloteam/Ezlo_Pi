@@ -54,6 +54,27 @@ static char wifi_ssid_pass[64];
 static int station_got_ip = 0;
 static const char *const wifi_no_error_str = "NO_ERROR";
 static const char *last_disconnect_reason = wifi_no_error_str;
+static ll_ezlopi_wifi_event_upcall_t *__event_upcall_head = NULL;
+
+static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg);
+
+void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall *upcall, void *arg)
+{
+    if (__event_upcall_head)
+    {
+        ll_ezlopi_wifi_event_upcall_t *curr_upcall_head = __event_upcall_head;
+        while (curr_upcall_head->next)
+        {
+            curr_upcall_head = curr_upcall_head->next;
+        }
+
+        curr_upcall_head->next = ezlopi_wifi_event_upcall_create(upcall, arg);
+    }
+    else
+    {
+        __event_upcall_head = ezlopi_wifi_event_upcall_create(upcall, arg);
+    }
+}
 
 const char *ezlopi_wifi_get_last_disconnect_reason(void)
 {
@@ -93,8 +114,6 @@ static void set_wifi_station_host_name(void)
 
 static void alert_qt_wifi_got_ip(void)
 {
-    // qt_serial *qt_ctx = qt_serial::get_instance();
-
     if (new_wifi)
     {
         new_wifi = 0;
@@ -154,6 +173,16 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         memcpy(&my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
         alert_qt_wifi_got_ip();
+    }
+
+    ll_ezlopi_wifi_event_upcall_t *curr_upcall = __event_upcall_head;
+    while (curr_upcall)
+    {
+        if (curr_upcall->upcall)
+        {
+            curr_upcall->upcall(event_base, curr_upcall->arg);
+        }
+        curr_upcall = curr_upcall->next;
     }
 }
 
@@ -232,13 +261,26 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 
 void ezlopi_wait_for_wifi_to_connect(void)
 {
-    while(NULL == s_wifi_event_group)
+    while (NULL == s_wifi_event_group)
     {
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
-    
+
     if (NULL != s_wifi_event_group)
     {
         xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
     }
+}
+
+static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg)
+{
+    ll_ezlopi_wifi_event_upcall_t *_upcall = malloc(sizeof(ll_ezlopi_wifi_event_upcall_t));
+    if (_upcall)
+    {
+        _upcall->arg = arg;
+        _upcall->upcall = upcall;
+        _upcall->next = NULL;
+    }
+
+    return _upcall;
 }

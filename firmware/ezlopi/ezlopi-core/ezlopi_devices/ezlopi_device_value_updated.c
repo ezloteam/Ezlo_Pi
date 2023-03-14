@@ -1,7 +1,7 @@
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_devices_list.h"
 #include "items.h"
 #include "web_provisioning.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_device_value_updated.h"
 
 int ezlopi_device_value_updated_from_device(s_ezlopi_device_properties_t *device_properties)
 {

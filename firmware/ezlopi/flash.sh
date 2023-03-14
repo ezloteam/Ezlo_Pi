@@ -1,13 +1,17 @@
 #!/bin/bash
-# controller="esp32s3"
 controller="esp32"
+# controller="esp32"
 usb_port="/dev/ttyUSB0"
 baud_rate=921600
 
-firmware_folder="/home/krishna/Desktop/v2_0_6_134/firmware/esp32_4mb"
+# firmware_folder="/home/krishna/Desktop/v2_0_6_134/firmware/esp32_4mb"
 # firmware_folder="/home/krishna/projects/nds/ezlo/Ezlo_Pi/firmware/ezlopi/firmware/v2_0_6_133"
+# firmware_folder="/home/krishna/projects/nds/ezlo/Ezlo_Pi/firmware/ezlopi/firmware/v2_0_7_esp32s3"
+firmware_folder="/home/krishna/projects/nds/ezlo/Ezlo_Pi/firmware/ezlopi/firmware/v2_0_7_esp32"
+# firmware_folder="/home/krishna/projects/nds/ezlo/Ezlo_Pi/firmware/ezlopi/firmware/v2_0_7_esp32s3"
 
 
+# bootloader="0x0000.bin"
 bootloader="0x1000.bin"
 partition_table="0x8000.bin"
 ota_data_initial="0xd000.bin"
