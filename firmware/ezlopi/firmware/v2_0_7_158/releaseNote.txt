@@ -106,6 +106,3 @@ v2_0_7_157  Date: Fri Feb 3 05:57:11 PM +0545 2023
 v2_0_7_158  Date: Mon Mar 13 06:46:22 PM +0545 2023
 	web-flasher test firmware
 
-v2_0_7_159  Date: Mon Mar 13 07:06:16 PM +0545 2023
-	web-flashter-test: debug disabled, header and trailer removed
-
