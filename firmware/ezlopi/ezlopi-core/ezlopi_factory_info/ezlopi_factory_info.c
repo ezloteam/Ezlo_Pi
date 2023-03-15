@@ -313,18 +313,15 @@ char *ezlopi_factory_info_v2_get_ssl_shared_key(void)
 
 char *ezlopi_factory_info_v2_get_ezlopi_config(void)
 {
-#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
 #if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
     return switch_box_constant_config;
 #elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
     g_ezlopi_config = ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
 #endif
-#elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
-    ezlopi_nvs_read_config_data_str(&g_ezlopi_config);
-#endif
     return g_ezlopi_config;
 }
 
+#if 0
 /** Setter */
 uint16_t ezlopi_factory_info_v2_set_version(void)
 {
@@ -438,6 +435,50 @@ char *ezlopi_factory_info_v2_set_ssl_private_key(void)
 char *ezlopi_factory_info_v2_set_ssl_shared_key(void)
 {
     return ezlopi_factory_info_v2_read_string(SSL_SHARED_KEY_OFFSET, SSL_SHARED_KEY_LENGTH);
+}
+#endif
+
+int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password)
+{
+    int ret = 0;
+
+    if (ssid && password)
+    {
+        if (ezlopi_factory_info_v2_init())
+        {
+            uint32_t length = 4 * 1024;
+            uint32_t hub_0_offset = 0xE000;
+
+            char *tmp_buffer = (char *)malloc(length);
+            if (tmp_buffer)
+            {
+                if (ESP_OK == esp_partition_read(partition_ctx_v2, hub_0_offset, tmp_buffer, length))
+                {
+                    snprintf(tmp_buffer + 0x0024, length, "%s", ssid);
+                    snprintf(tmp_buffer + 0x0044, length, "%s", password);
+                    if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, hub_0_offset, length))
+                    {
+                        if (ESP_OK == esp_partition_write(partition_ctx_v2, hub_0_offset, tmp_buffer, length))
+                        {
+                            ret = 1;
+                        }
+                    }
+                }
+                else
+                {
+                    TRACE_E("Couldn't fetch 'string' from id-flash-region!");
+                }
+
+                free(tmp_buffer);
+            }
+            else
+            {
+                TRACE_E("'tmp_buffer' malloc failed!");
+            }
+        }
+    }
+
+    return ret;
 }
 
 char *ezlopi_factory_info_v2_set_ezlopi_config(void)

@@ -118,6 +118,3 @@ v2_0_7_161  Date: Wed Mar 15 05:42:12 PM +0545 2023
 v2_0_7_162  Date: Wed Mar 15 05:50:04 PM +0545 2023
 	web-flasher-build: disabled log
 
-v2_0_7_163  Date: Wed Mar 15 06:15:30 PM +0545 2023
-	web-flasher-build: added response for ezlopi-config from flash
-

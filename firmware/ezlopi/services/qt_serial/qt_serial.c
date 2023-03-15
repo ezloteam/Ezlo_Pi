@@ -202,7 +202,10 @@ static void qt_serial_get_info()
         cJSON_AddStringToObject(get_info, "uuid", controller_uuid);
         cJSON_AddStringToObject(get_info, "uuid_prov", provisioning_uuid);
         cJSON_AddNumberToObject(get_info, "serial", serial_id);
-        cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
+
+        char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
+        // char *wifi_password = ezlopi_factory_info_v2_get_password();
+        cJSON_AddStringToObject(get_info, "ssid", wifi_ssid ? wifi_ssid : "");
         cJSON_AddStringToObject(get_info, "dev_name", device_name);
         cJSON_AddNumberToObject(get_info, "dev_type", 1);
         cJSON_AddStringToObject(get_info, "dev_type_ezlopi", device_type);
@@ -247,6 +250,7 @@ static void qt_serial_set_wifi(const char *data)
 
             if (ssid && pass && (strlen(pass) >= 8))
             {
+                ezlopi_factory_info_v2_set_wifi(ssid, pass);
                 ezlopi_wifi_set_new_wifi_flag();
                 esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
                 TRACE_W("wifi_error: %u", wifi_error);

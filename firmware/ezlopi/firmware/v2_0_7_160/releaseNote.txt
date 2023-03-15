@@ -112,12 +112,3 @@ v2_0_7_159  Date: Mon Mar 13 07:06:16 PM +0545 2023
 v2_0_7_160  Date: Wed Mar 15 03:41:59 PM +0545 2023
 	web-flasher: test release
 
-v2_0_7_161  Date: Wed Mar 15 05:42:12 PM +0545 2023
-	wifi-creds stored to flash, qt response for wifi corrected
-
-v2_0_7_162  Date: Wed Mar 15 05:50:04 PM +0545 2023
-	web-flasher-build: disabled log
-
-v2_0_7_163  Date: Wed Mar 15 06:15:30 PM +0545 2023
-	web-flasher-build: added response for ezlopi-config from flash
-
