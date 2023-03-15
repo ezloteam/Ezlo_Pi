@@ -29,14 +29,15 @@ void ezlopi_init(void)
     vTaskDelay(10);
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
-    if (boot_count > 1)
-    {
-        ezlopi_wifi_connect_from_nvs();
-    }
-    else
-    {
-        ezlopi_wifi_connect_from_id_bin();
-    }
+    // if (boot_count > 1)
+    // {
+    //     ezlopi_wifi_connect_from_nvs();
+    // }
+    // else
+    // {
+    //     ezlopi_wifi_connect_from_id_bin();
+    // }
+    ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
