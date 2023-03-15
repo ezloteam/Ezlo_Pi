@@ -25,6 +25,8 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "web_provisioning.h"
+
 static uint32_t message_counter = 0;
 
 static void __connection_upcall(bool connected);
@@ -67,12 +69,6 @@ static const s_method_list_t method_list[] = {
     // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 #endif
-typedef enum e_trace_type
-{
-    TRACE_TYPE_B = 0,
-    TRACE_TYPE_I,
-    TRACE_TYPE_E
-} e_trace_type_t;
 
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
@@ -116,44 +112,46 @@ uint32_t web_provisioning_get_message_count(void)
 int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
-    if (cjson_data)
+    if (ezlopi_websocket_client_is_connected())
     {
-        char *cjson_str_data = cJSON_Print(cjson_data);
-        if (cjson_str_data)
+        if (cjson_data)
         {
-            cJSON_Minify(cjson_str_data);
-            switch (print_type)
+            char *cjson_str_data = cJSON_Print(cjson_data);
+            if (cjson_str_data)
             {
-            case TRACE_TYPE_B:
-            {
-                TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                break;
-            }
-            case TRACE_TYPE_E:
-            {
-                TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                break;
-            }
+                cJSON_Minify(cjson_str_data);
+                switch (print_type)
+                {
+                case TRACE_TYPE_B:
+                {
+                    TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    break;
+                }
+                case TRACE_TYPE_E:
+                {
+                    TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    break;
+                }
 
-            case TRACE_TYPE_I:
-            {
-                TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                break;
-            }
-            default:
-                break;
-            }
+                case TRACE_TYPE_I:
+                {
+                    TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    break;
+                }
+                default:
+                    break;
+                }
 
-            int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
-            if (ret > 0)
-            {
-                message_counter++;
-            }
+                int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
+                if (ret > 0)
+                {
+                    message_counter++;
+                }
 
-            free(cjson_str_data);
+                free(cjson_str_data);
+            }
         }
     }
-
     return ret;
 }
 
@@ -162,9 +160,14 @@ void web_provisioning_init(void)
     xTaskCreate(web_provisioning_fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, NULL);
 }
 
+static char *cloud_server = NULL;
+static char *ca_certificate = NULL;
+static char *ssl_shared_key = NULL;
+static char *ssl_private_key = NULL;
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
-    s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+    // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+
     char *ws_endpoint = NULL;
 
     while (1)
@@ -174,13 +177,23 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
         ezlopi_wait_for_wifi_to_connect();
 
+        cloud_server = ezlopi_factory_info_v2_get_cloud_server();
+        ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+        ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+        ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+
         char http_request[128];
-        snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", factory->cloud_server);
-        ws_endpoint = ezlopi_http_get_request(http_request, factory->ssl_private_key, factory->ssl_shared_key, factory->ca_certificate);
+        snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
+        ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+
+        // ezlopi_factory_info_v2_free(cloud_server);
+        // ezlopi_factory_info_v2_free(ca_certificate);
+        // ezlopi_factory_info_v2_free(ssl_shared_key);
+        // ezlopi_factory_info_v2_free(ssl_private_key);
 
         if (ws_endpoint)
         {
-            TRACE_D("ws_endpoint: %s", ws_endpoint);
+            TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
             cJSON *root = cJSON_Parse(ws_endpoint);
             if (root)
             {
@@ -272,6 +285,11 @@ static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_me
 
 static void __message_upcall(const char *payload, uint32_t len)
 {
+    // if (payload && len)
+    // {
+    //     TRACE_D("payload:: len: %d, data: %.*s", len, len, payload);
+    // }
+
     cJSON *cj_request = cJSON_ParseWithLength(payload, len);
 
     if (cj_request)

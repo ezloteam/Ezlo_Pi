@@ -8,6 +8,7 @@
 #include "mbedtls/config.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "ezlopi_timer.h"
 
 #include "ezlopi_timer.h"
 #include "timer_service.h"
@@ -18,32 +19,11 @@
 #include "ezlopi.h"
 #include "qt_serial.h"
 #include "web_provisioning.h"
-#include "ezlopi_ble_gatt_server.h"
 #include "gpio_isr_service.h"
-#include "ezlopi_uart.h"
-#include "ezlopi_adc.h"
-#include "ezlopi_pwm.h"
+#include "ezlopi_ble_service.h"
+#include "ezlopi_system_info.h"
 
 static void blinky(void *pv);
-
-extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
-
-
-static void pwm_task(void* args)
-{
-    s_ezlopi_channel_speed_t* channel_speed = ezlopi_pwm_init(GPIO_NUM_2, LEDC_TIMER_12_BIT, 10000, 0);
-    TRACE_B("channel is %d, speed is %d", channel_speed->channel, channel_speed->speed_mode);
-    while(1)
-    {
-        for(uint32_t i = 0; i < 4096; i +=   100)
-        {
-            ezlopi_pwm_change_duty(channel_speed->channel, channel_speed->speed_mode, i);
-            TRACE_E("Duty is: %d", ezlopi_pwm_get_duty(channel_speed->channel, channel_speed->speed_mode));
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-        }
-           
-    }
-}
 
 void app_main(void)
 {
@@ -51,13 +31,9 @@ void app_main(void)
     gpio_isr_service_init();
     ezlopi_init();
     web_provisioning_init();
-    GATT_SERVER_MAIN();
-    // sensor_service_init();
+    ezlopi_ble_service_init();
     timer_service_init();
-
-
-    // xTaskCreate(pwm_task, "pwm_task", 2 * 2048, NULL, 1, NULL);
-
+    TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 

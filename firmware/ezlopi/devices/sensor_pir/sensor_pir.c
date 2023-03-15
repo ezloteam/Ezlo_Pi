@@ -1,5 +1,6 @@
 
 
+#include "ezlopi_cloud.h"
 #include "sensor_pir.h"
 #include "gpio_isr_service.h"
 
@@ -87,9 +88,9 @@ static s_ezlopi_device_properties_t *sensor_pir_prepare(cJSON *cjson_device)
         sensor_pir_properties->ezlopi_cloud.battery_powered = false;
         sensor_pir_properties->ezlopi_cloud.show = true;
         sensor_pir_properties->ezlopi_cloud.room_name[0] = '\0';
-        sensor_pir_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-        sensor_pir_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-        sensor_pir_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+        sensor_pir_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        sensor_pir_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        sensor_pir_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_pir_properties->interface.gpio.gpio_in.gpio_num);
         CJSON_GET_VALUE_INT(cjson_device, "ip_inv", sensor_pir_properties->interface.gpio.gpio_in.invert);

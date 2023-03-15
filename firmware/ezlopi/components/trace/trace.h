@@ -3,6 +3,7 @@
 
 #include "sdkconfig.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -49,7 +50,7 @@ extern "C"
 #define TRACE_I(X, ...)
 #define TRACE_D(X, ...)
 #define TRACE_B(x, ...)
-#define dump(X, Y, Z)
+#define dump(name, X, Y, Z)
 
 #endif
 

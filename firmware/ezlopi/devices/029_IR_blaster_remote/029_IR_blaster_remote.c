@@ -1,5 +1,6 @@
 #include "029_IR_blaster_remote.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cloud.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "IR_Blaster_data_operation.h"
@@ -73,7 +74,7 @@ static int IR_Blaster_prepare(void *arg)
 
     if ((NULL != prep_arg) && (NULL != prep_arg->cjson_device))
     {
-        uint32_t device_id = ezlopi_device_generate_device_id();
+        uint32_t device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_ir_tx, subcategory_irt, ezlopi_item_name_send_ir_code, value_type_string, prep_arg->cjson_device);
         // device_id = ezlopi_device_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_ir_tx, subcategory_irt, ezlopi_item_name_learn_ir_code, value_type_int, prep_arg->cjson_device);
@@ -115,7 +116,7 @@ static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(uint32_t dev_id, 
         IR_Blaster_Remote_properties->ezlopi_cloud.category = category;
         IR_Blaster_Remote_properties->ezlopi_cloud.subcategory = sub_category;
         IR_Blaster_Remote_properties->ezlopi_cloud.item_name = item_name;
-        IR_Blaster_Remote_properties->ezlopi_cloud.device_type = dev_type_device;
+        IR_Blaster_Remote_properties->ezlopi_cloud.device_type = dev_type_transmitter_ir;
         IR_Blaster_Remote_properties->ezlopi_cloud.value_type = value_type;
         IR_Blaster_Remote_properties->ezlopi_cloud.has_getter = true;
         IR_Blaster_Remote_properties->ezlopi_cloud.has_setter = true;
@@ -124,8 +125,8 @@ static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(uint32_t dev_id, 
         IR_Blaster_Remote_properties->ezlopi_cloud.show = true;
         IR_Blaster_Remote_properties->ezlopi_cloud.room_name[0] = '\0';
         IR_Blaster_Remote_properties->ezlopi_cloud.device_id = dev_id;
-        IR_Blaster_Remote_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-        IR_Blaster_Remote_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+        IR_Blaster_Remote_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        IR_Blaster_Remote_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
     }
     return IR_Blaster_Remote_properties;    
 }

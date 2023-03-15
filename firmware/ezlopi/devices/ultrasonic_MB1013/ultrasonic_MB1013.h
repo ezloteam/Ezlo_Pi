@@ -7,11 +7,6 @@
 #include "ezlopi_devices.h"
 #include "ezlopi_uart.h"
 
-typedef struct ultrasonic_MB1013_motion_state {
-    bool ultrasonic_MB1013_motion_state_present;
-    bool ultrasonic_MB1013_motion_state_previous;
-}ultrasonic_MB1013_motion_state_t;
-
 int ultrasonic_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg);
 
 #endif //_ULTRASONIC_MB1013_H_

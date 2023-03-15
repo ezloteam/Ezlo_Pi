@@ -4,15 +4,15 @@ spi_device_handle_t spi;
 char *rx_buffer;
 const int sampleTime = 50;
 
-#define MISO_PIN 19
-#define MOSI_PIN 23
-#define SCK_PIN 18
-#define CS_PIN 27
+// #define MISO_PIN 19
+// #define MOSI_PIN 23
+// #define SCK_PIN 18
+// #define CS_PIN 27
 
-#define VSPI_MISO MISO_PIN
-#define VSPI_MOSI MOSI_PIN
-#define VSPI_SCLK SCK_PIN
-#define VSPI_SS CS_PIN
+// #define ADS131M08_VSPI_MISO MISO_PIN
+// #define ADS131M08_VSPI_MOSI MOSI_PIN
+// #define ADS131M08_VSPI_SCLK SCK_PIN
+// #define ADS131M08_VSPI_SS CS_PIN
 
 #define DRDY_PIN -1 // 21
 #define XTAL_PIN -1 // 22
@@ -316,8 +316,8 @@ void ADS131M08::spi_init()
         .queue_size = 20,
         //.input_delay_ns = 25 // minimum of td(SCCS) = 25ns
     };
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, 0 /*dma_chan - 0 no DMA*/));
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &spi));
+    ESP_ERROR_CHECK(spi_bus_initialize(ADS131M08_SPI_PORT, &buscfg, 0 /*dma_chan - 0 no DMA*/));
+    ESP_ERROR_CHECK(spi_bus_add_device(ADS131M08_SPI_PORT, &devcfg, &spi));
 }
 
 // Find the Peak-to-Peak Amplitude Function
@@ -369,7 +369,7 @@ void findPTPAmp(ADS131M08 *adc)
     //   }
 }
 
-ADS131M08 adc((gpio_num_t)VSPI_MOSI, (gpio_num_t)VSPI_MISO, (gpio_num_t)VSPI_SCLK, VSPI_SS, XTAL_PIN, DRDY_PIN, 8192000);
+ADS131M08 adc((gpio_num_t)ADS131M08_VSPI_MOSI, (gpio_num_t)ADS131M08_VSPI_MISO, (gpio_num_t)ADS131M08_VSPI_SCLK, ADS131M08_VSPI_SS, XTAL_PIN, DRDY_PIN, 8192000);
 
 void ADS131_init(void)
 {

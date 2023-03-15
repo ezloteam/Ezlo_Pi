@@ -3,14 +3,6 @@
 
 #include <stdio.h>
 #include "driver/i2c.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-
-
-#define ACK_CHECK_EN 0x1
-
-
-SemaphoreHandle_t ezlopi_I2C_mutex;
 
 typedef enum e_ezlopi_i2c_channel
 {
@@ -35,7 +27,9 @@ typedef struct s_ezlopi_i2c_master
     }
 
 int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf);
-esp_err_t write_reg(uint32_t channel, uint8_t slave_addr, uint8_t data, uint8_t register_addr);
-esp_err_t read_reg(uint32_t channel, uint8_t slave_addr, uint8_t *data, uint8_t register_addr);
+void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf);
+
+void ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len);
+void ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len);
 
 #endif // __EZLOPI_HAL_H__

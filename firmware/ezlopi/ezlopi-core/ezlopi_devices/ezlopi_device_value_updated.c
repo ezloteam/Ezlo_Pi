@@ -16,11 +16,11 @@ int ezlopi_device_value_updated_from_device(s_ezlopi_device_properties_t *device
             {
                 if (registered_devices->properties == device_properties)
                 {
-                    char *response = ezlopi_cloud_items_updated_from_devices(registered_devices);
-                    if (response)
+                    cJSON *cj_response = ezlopi_cloud_items_updated_from_devices(registered_devices);
+                    if (cj_response)
                     {
-                        ret = web_provisioning_send_to_nma_websocket(response);
-                        free(response);
+                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
+                        cJSON_Delete(cj_response);
                     }
                 }
             }

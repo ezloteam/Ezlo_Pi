@@ -27,4 +27,9 @@ typedef struct s_ezlopi_cloud_info
 
 } s_ezlopi_cloud_info_t;
 
+uint32_t ezlopi_cloud_generate_device_id(void);
+uint32_t ezlopi_cloud_generate_item_id(void);
+uint32_t ezlopi_cloud_generate_room_id(void);
+uint32_t ezlopi_cloud_generate_gateway_id(void);
+
 #endif // __EZLOPI_CLOUD_H__

@@ -3,7 +3,7 @@
 
 /// @brief https://api.ezlo.com/devices/categories/index.html
 const static char *category_not_defined = "";
-// const static char *category_interface = "interface";
+const static char *category_interface = "interface";
 const static char *category_dimmable_light = "dimmable_light";
 const static char *category_switch = "switch";
 const static char *category_security_sensor = "security_sensor";

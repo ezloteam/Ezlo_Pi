@@ -12,10 +12,12 @@
 #include "sensor_touch_tpp_223b.h"
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
-#include "027_sens_water_sensor.h"
-#include "028_sens_i2c_accelerometer.h"
+#include "027_sens_water_leak_sensor.h"
+// #include "028_sens_i2c_accelerometer.h"
 #include "029_IR_blaster_remote.h"
 #include "sensor_sound.h"
+#include "1024_device_health.h"
+#include "0029_gxhtc3_rh_t_sensor.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -88,7 +90,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func =  IR_blaster_remote,//ezlopi_dimmable_bulb, 
+        .func =  IR_blaster_remote,//ezlopi_dimmable_bulb, ezlopi_servo_motor_MG_996R,
     },
 #endif
 
@@ -113,10 +115,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0027_WATER_SENSOR
+#ifdef EZLOPI_SENSOR_0027_WATER_LEAK
     {
-        .id = EZLOPI_SENSOR_0027_WATER_SENSOR,
-        .func = sensor_water_sensor,
+        .id = EZLOPI_SENSOR_0027_WATER_LEAK,
+        .func = water_leak_sensor,
     },
 #endif
 
@@ -127,11 +129,24 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0021_SOUND_SENSOR
+#ifdef EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI
     {
-        .id = EZLOPI_SENSOR_0021_SOUND_SENSOR,
-        // .func = ultrasonic_MB1013,
+        .id = EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI,
         .func = sound_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_1024_DEVICE_HEALTH
+    {
+        .id = EZLOPI_SENSOR_1024_DEVICE_HEALTH,
+        .func = device_health,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
+    {
+        .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
+        .func = gxhtc3_rh_t_sensor,
     },
 #endif
     /**

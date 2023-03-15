@@ -50,6 +50,12 @@ version_create () {
     echo -e "extern \"C\"" >> $versionFile
     echo -e "{" >> $versionFile
     echo -e "#endif" >> $versionFile
+    if [ $release == 1 ];then # Releasing the firmware for deployment
+        echo -e "#define V_TYPE 1" >> $versionFile
+    else
+        echo -e "#define V_TYPE 2" >> $versionFile
+    fi
+    echo -e "#define BUILD_DATE ${EPOCHSECONDS}" >> $versionFile
     echo -e "#define MAJOR ${V_MAJOR}" >> $versionFile
     echo -e "#define MINOR ${V_MINOR}" >> $versionFile
     echo -e "#define BATCH ${V_BATCH}" >> $versionFile

@@ -26,7 +26,7 @@ static void event_process(void *pv)
     while (1)
     {
         s_ezlo_event_t *event = NULL;
-        if (pdTRUE == ezlopi_event_queue_receive(&event, UINT32_MAX / portTICK_PERIOD_MS))
+        if (pdTRUE == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
         {
             old_tick = xTaskGetTickCount();
 
