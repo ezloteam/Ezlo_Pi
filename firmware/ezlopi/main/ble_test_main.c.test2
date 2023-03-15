@@ -21,22 +21,20 @@
 #include "web_provisioning.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_ble_service.h"
-//#include "029_IR_blaster_remote.h"
-
+#include "ezlopi_system_info.h"
 
 static void blinky(void *pv);
 
-extern int sensor_bme280(e_ezlopi_actions_t action, void *arg);
-    
-
 void app_main(void)
 {
+    ezlopi_system_info_increment_boot_count();
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();
     web_provisioning_init();
     ezlopi_ble_service_init();
     timer_service_init();
+    TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 

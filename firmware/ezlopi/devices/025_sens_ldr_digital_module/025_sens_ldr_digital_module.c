@@ -17,8 +17,8 @@
 
 #include "025_sens_ldr_digital_module.h"
 
-static int sensor_ldr_digital_module_prepare_and_add(void* args);
-static s_ezlopi_device_properties_t* sensor_ldr_digital_module_prepare(cJSON* cjson_device);
+static int sensor_ldr_digital_module_prepare_and_add(void *args);
+static s_ezlopi_device_properties_t *sensor_ldr_digital_module_prepare(cJSON *cjson_device);
 static int sensor_ldr_digital_module_init(s_ezlopi_device_properties_t *properties);
 static void sensor_ldr_digital_module_value_updated_from_device(s_ezlopi_device_properties_t *properties);
 static int sensor_ldr_digital_module_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
@@ -45,16 +45,16 @@ int sensor_ldr_digital_module(e_ezlopi_actions_t action, s_ezlopi_device_propert
             break;
         }
 
-        default:
-        {
-            break;
-        }
+    default:
+    {
+        break;
+    }
     }
 
     return ret;
 }
 
-static int sensor_ldr_digital_module_prepare_and_add(void* args)
+static int sensor_ldr_digital_module_prepare_and_add(void *args)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
@@ -78,7 +78,7 @@ static int sensor_ldr_digital_module_prepare_and_add(void* args)
     return ret;
 }
 
-static s_ezlopi_device_properties_t* sensor_ldr_digital_module_prepare(cJSON* cjson_device)
+static s_ezlopi_device_properties_t *sensor_ldr_digital_module_prepare(cJSON *cjson_device)
 {
     s_ezlopi_device_properties_t *sensor_ldr_digital_module_properties = malloc(sizeof(s_ezlopi_device_properties_t));
 
@@ -113,6 +113,7 @@ static s_ezlopi_device_properties_t* sensor_ldr_digital_module_prepare(cJSON* cj
         sensor_ldr_digital_module_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
         sensor_ldr_digital_module_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     }
+
     return sensor_ldr_digital_module_properties;
 }
 
@@ -152,8 +153,7 @@ static int sensor_ldr_digital_module_get_value_cjson(s_ezlopi_device_properties_
     if (cjson_propertise)
     {
         int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        // TRACE_E("properties->interface.gpio.gpio_in.invert is %d", properties->interface.gpio.gpio_in.invert);
-        properties->interface.gpio.gpio_in.value = 0 == properties->interface.gpio.gpio_in.invert ? gpio_level : !gpio_level;
+        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
