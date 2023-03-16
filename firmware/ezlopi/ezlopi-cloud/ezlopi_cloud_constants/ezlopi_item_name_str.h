@@ -2,9 +2,9 @@
 #define __EZLOPI_ITEM_NAME_STR_H__
 
 /// @brief https://api.ezlo.com/devices/items/index.html
-// const static char *ezlopi_item_name_acceleration_x_axis = "acceleration_x_axis";
-// const static char *ezlopi_item_name_acceleration_y_axis = "acceleration_y_axis";
-// const static char *ezlopi_item_name_acceleration_z_axis = "acceleration_z_axis";
+const static char *ezlopi_item_name_acceleration_x_axis = "acceleration_x_axis";
+const static char *ezlopi_item_name_acceleration_y_axis = "acceleration_y_axis";
+const static char *ezlopi_item_name_acceleration_z_axis = "acceleration_z_axis";
 // const static char *ezlopi_item_name_appliance_status = "appliance_status";
 // const static char *ezlopi_item_name_lock_operation = "lock_operation";
 // const static char *ezlopi_item_name_user_code_operation = "user_code_operation";
@@ -227,5 +227,7 @@ const static char *ezlopi_item_name_temp = "temp";
 // const static char *ezlopi_item_name_suction_pressure = "suction_pressure";
 // const static char *ezlopi_item_name_sulfur_dioxide = "sulfur_dioxide";
 // const static char *ezlopi_item_name_supply_air_temperature = "supply_air_temperature";
+const static char* ezlopi_item_name_send_ir_code = "send_ir_code";
+const static char* ezlopi_item_name_learn_ir_code = "learn_ir_code";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

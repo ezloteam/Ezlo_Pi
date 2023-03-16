@@ -4,6 +4,7 @@
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
 
+
 #if CONFIG_IDF_TARGET_ESP32
 typedef enum e_ezlopi_gpio_channel{
     EZLOPI_GPIO_CHANNEL_0       = 36,

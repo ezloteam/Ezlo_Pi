@@ -13,6 +13,7 @@
 
 #include "ezlopi_ble_service.h"
 #include "ezlopi_ble_buffer.h"
+#include "ezlopi_factory_info.h"
 
 static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
 static char *wifi_creds_jsonify(void);
@@ -190,6 +191,9 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
         {
             char *ssid = cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring;
             char *password = cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring;
+
+            ezlopi_factory_info_v2_set_wifi(ssid, password);
+
             ezlopi_wifi_connect(ssid, password);
             cJSON_Delete(root);
         }
@@ -199,18 +203,11 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
 static char *wifi_creds_jsonify(void)
 {
     char *json_str_wifi_info = NULL;
-    char wifi_creds[64];
-    memset(wifi_creds, 0, sizeof(wifi_creds));
-    ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
 
     cJSON *cjson_wifi_info = cJSON_CreateObject();
     if (cjson_wifi_info)
     {
-        if (strlen(wifi_creds) >= 32)
-        {
-            wifi_creds[31] = '\0';
-        }
-        cJSON_AddStringToObject(cjson_wifi_info, "SSID", &wifi_creds[0]);
+        cJSON_AddStringToObject(cjson_wifi_info, "SSID", ezlopi_factory_info_v2_get_ssid());
         cJSON_AddStringToObject(cjson_wifi_info, "PSD", "********");
 
         esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();

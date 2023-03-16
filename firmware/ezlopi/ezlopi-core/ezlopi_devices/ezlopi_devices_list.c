@@ -13,6 +13,8 @@
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_leak_sensor.h"
+// #include "028_sens_i2c_accelerometer.h"
+#include "029_IR_blaster_remote.h"
 #include "sensor_sound.h"
 #include "1024_device_health.h"
 #include "0029_gxhtc3_rh_t_sensor.h"
@@ -43,16 +45,18 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0012_BME280_I2C
     {
         .id = EZLOPI_SENSOR_0012_BME280_I2C,
-        .func = sensor_bme280,
+        .func = sensor_bme280, // sensor_i2c_accelerometer,
+        // .is_configured = false,
+        // .properties = NULL,
     },
 #endif
 
-// #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
-//     {
-//         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
-//         .func = sensor_ldr_analog_sensor,
-//     },
-// #endif
+#ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
+    {
+        .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
+        .func = sensor_ldr_analog_sensor,
+    },
+#endif
 
 #ifdef EZLOPI_SENSOR_0018_DOOR
     {
@@ -85,7 +89,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func = ezlopi_servo_motor_MG_996R, // ezlopi_dimmable_bulb,
+        .func = IR_blaster_remote, // ezlopi_dimmable_bulb, ezlopi_servo_motor_MG_996R,
     },
 #endif
 
@@ -124,17 +128,24 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_1024_DEVICE_HEALTH
-    {
-        .id = EZLOPI_SENSOR_1024_DEVICE_HEALTH,
-        .func = device_health,
-    },
-#endif
-
 #ifdef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
     {
         .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
         .func = gxhtc3_rh_t_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_030_IR_BLASTER
+    {
+        .id = EZLOPI_SENSOR_030_IR_BLASTER,
+        .func = IR_blaster_remote,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_1024_DEVICE_HEALTH
+    {
+        .id = EZLOPI_SENSOR_1024_DEVICE_HEALTH,
+        .func = device_health,
     },
 #endif
     /**

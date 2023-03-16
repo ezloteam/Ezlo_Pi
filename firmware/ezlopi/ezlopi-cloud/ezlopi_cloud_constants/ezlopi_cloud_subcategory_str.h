@@ -31,7 +31,7 @@ const static char *subcategory_gas = "gas";
 // const static char *subcategory_doorbell_cam = "doorbell_cam";
 // const static char *subcategory_window_cov = "window_cov";
 // const static char *subcategory_zrtsi = "zrtsi";
-// const static char *subcategory_irt = "irt";
+const static char *subcategory_irt = "irt";
 // const static char *subcategory_usbuirt = "usbuirt";
 // const static char *subcategory_generic_io = "generic_io";
 // const static char *subcategory_repeater = "repeater";
@@ -56,7 +56,7 @@ const static char *subcategory_gas = "gas";
 // const static char *subcategory_airpullution = "air_pollution";
 // const static char *subcategory_electricity = "electricity";
 const static char *subcategory_sound = "sound";
-// const static char *subcategory_navigation = "navigation";
+const static char *subcategory_navigation = "navigation";
 // const static char *subcategory_seismicity = "seismicity";
 // const static char *subcategory_time = "time";
 

@@ -67,12 +67,12 @@ typedef struct s_ezlopi_device_properties
     // hardware interface
     union
     {
-        s_ezlopi_uart_t uart;
+        s_ezlopi_uart_t uart; //
         s_ezlopi_i2c_master_t i2c_master;
         s_ezlopi_spi_master_t spi_master;
         s_ezlopi_onewire_t onewire_master;
         s_ezlopi_gpios_t gpio;
-        s_ezlopi_pwm_t pwm;
+        s_ezlopi_pwm_t pwm; // dev_type: 5
         s_ezlopi_adc_t adc;
     } interface;
 

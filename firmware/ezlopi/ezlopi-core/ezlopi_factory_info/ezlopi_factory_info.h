@@ -13,8 +13,9 @@ extern "C"
 
 #define EZLOPI_GENERIC 0
 #define EZLOPI_SWITCH_BOX 1
+#define EZLOPI_IR_BLASTER 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -170,6 +171,24 @@ static const char *switch_box_constant_config =
                 \"pullup_op\": true,\
                 \"val_ip\": true,\
                 \"val_op\": false\
+            }\
+        ],\
+    \"dev_total\": 1}";
+#elif (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
+static const char *ir_blaster_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\": \"IR_Blaster1\",\
+                \"dev_type\": 5,\
+                \"gpio\": 3,\
+                \"id_item\": 30,\
+                \"id_room\": \"\",\
+                \"pwm_resln\": 8,\
+                \"freq_hz\": 50,\
+                \"duty_cycle\": 30\
             }\
         ],\
     \"dev_total\": 1}";
