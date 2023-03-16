@@ -122,17 +122,17 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_029_IR_BLASTER
-    {
-        .id = EZLOPI_SENSOR_029_IR_BLASTER,
-        .func = IR_blaster_remote
-    },
-#endif
-
 #ifdef EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI
     {
         .id = EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI,
         .func = sound_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_029_IR_BLASTER
+    {
+        .id = EZLOPI_SENSOR_029_IR_BLASTER,
+        .func = IR_blaster_remote
     },
 #endif
 

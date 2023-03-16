@@ -260,6 +260,8 @@ void ezlopi_wifi_connect_from_nvs(void)
     {
         strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
         strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
+        // strcpy(&wifi_ssid_pass_global_buffer[00], "nepaldigisys");
+        // strcpy(&wifi_ssid_pass_global_buffer[32], "NDS_0ffice");
         ezlopi_wifi_set_new_wifi_flag();
     }
 

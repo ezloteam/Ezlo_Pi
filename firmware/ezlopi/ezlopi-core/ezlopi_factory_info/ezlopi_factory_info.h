@@ -8,9 +8,10 @@ extern "C"
 
 // #include <string>
 #define EZLOPI_GENERIC 0
-#define EZLOPI_SWITCH_BOX 1
+#define EZLOPI_SWITCH_BOX 0
+#define EZLOPI_IR_BLASTER 1
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_SWITCH_BOX
+#define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -22,23 +23,41 @@ extern "C"
 
     typedef enum e_ezlopi_factory_info_v2_offset
     {
-        VERSION_OFFSET = 0x0000,
-        NAME_OFFSET = 0x0002,
-        MANUFACTURER_OFFSET = 0x0082,
-        BRAND_OFFSET = 0x00C2,
-        MODEL_OFFSET = 0x0102,
-        ID_OFFSET = 0x0142,
-        DEVICE_UUID_OFFSET = 0x014A,
-        PROVISIONING_UUID_OFFSET = 0x0172,
-        SSID_OFFSET = 0x019A,
-        PASSWORD_OFFSET = 0x01DA,
-        DEVICE_MAC_OFFSET = 0x021A,
-        CLOUD_SERVER_OFFSET = 0x0220,
-        DEVICE_TYPE_OFFSET = 0x02A0,
-        CA_CERTIFICATE_OFFSET = 0x1000,
-        SSL_PRIVATE_KEY_OFFSET = 0x2000,
-        SSL_SHARED_KEY_OFFSET = 0x3000,
-        EZLOPI_CONFIG_OFFSET = 0x4000,
+        // VERSION_OFFSET = 0x0000,
+        // NAME_OFFSET = 0x0002,
+        // MANUFACTURER_OFFSET = 0x0082,
+        // BRAND_OFFSET = 0x00C2,
+        // MODEL_OFFSET = 0x0102,
+        // ID_OFFSET = 0x0142,
+        // DEVICE_UUID_OFFSET = 0x014A,
+        // PROVISIONING_UUID_OFFSET = 0x0172,
+        // SSID_OFFSET = 0x019A,
+        // PASSWORD_OFFSET = 0x01DA,
+        // DEVICE_MAC_OFFSET = 0x021A,
+        // CLOUD_SERVER_OFFSET = 0x0220,
+        // DEVICE_TYPE_OFFSET = 0x02A0,
+
+        // CA_CERTIFICATE_OFFSET = 0x1000,
+        // SSL_PRIVATE_KEY_OFFSET = 0x2000,
+        // SSL_SHARED_KEY_OFFSET = 0x3000,
+        // EZLOPI_CONFIG_OFFSET = 0x4000,
+        VERSION_OFFSET = 0xE000 + 0x0002,
+        NAME_OFFSET = 0xE000 + 0x0084,
+        MANUFACTURER_OFFSET = 0xE000 + 0x00CA,
+        BRAND_OFFSET = 0xE000 + 0x010A,
+        MODEL_OFFSET = 0xE000 + 0x014A,
+        ID_OFFSET = 0xE000 + 0x0004,
+        DEVICE_UUID_OFFSET = 0xE000 + 0x01AA,
+        PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314, /// fggggggggggg
+        SSID_OFFSET = 0xE000 + 0x0024,
+        PASSWORD_OFFSET = 0xE000 + 0x0044,
+        DEVICE_MAC_OFFSET = 0xE000 + 0x00C4,
+        CLOUD_SERVER_OFFSET = 0x0000 + 0x0214,
+        DEVICE_TYPE_OFFSET = 0xE000 + 0x018A,
+        CA_CERTIFICATE_OFFSET = 0x3000,
+        SSL_PRIVATE_KEY_OFFSET = 0x4000,
+        SSL_SHARED_KEY_OFFSET = 0x5000,
+        EZLOPI_CONFIG_OFFSET = 0x1000,
     } e_ezlopi_factory_info_v2_offset_t;
 
     typedef enum e_ezlopi_factory_info_v2_length
@@ -84,6 +103,24 @@ extern "C"
 
 #if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
 
+#elif (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
+static const char *ir_blaster_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\": \"IR_Blaster1\",\
+                \"dev_type\": 5,\
+                \"gpio\": 3,\
+                \"id_item\": 30,\
+                \"id_room\": \"\",\
+                \"pwm_resln\": 8,\
+                \"freq_hz\": 50,\
+                \"duty_cycle\": 30\
+            }\
+        ],\
+    \"dev_total\": 1}";
 #elif (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
 static const char *switch_box_constant_config =
     "{\
