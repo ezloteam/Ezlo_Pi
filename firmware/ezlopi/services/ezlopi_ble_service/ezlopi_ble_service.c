@@ -81,8 +81,9 @@ static void ezlopi_ble_start_secure_gatt_server(void)
 static void ezlopi_ble_basic_init(void)
 {
     char ble_device_name[32];
-    s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-    snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", factory->id);
+    // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+
+    snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v2_get_id());
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));

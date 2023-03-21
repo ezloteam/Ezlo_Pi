@@ -3,7 +3,7 @@
 
 /// @brief https://api.ezlo.com/devices/categories/index.html
 const static char *category_not_defined = "";
-// const static char *category_interface = "interface";
+const static char *category_interface = "interface";
 const static char *category_dimmable_light = "dimmable_light";
 const static char *category_switch = "switch";
 const static char *category_security_sensor = "security_sensor";
@@ -19,7 +19,7 @@ const static char *category_door_lock = "door_lock";
 // const static char *category_av = "av";
 const static char *category_humidity = "humidity";
 const static char *category_temperature = "temperature";
-// const static char *category_light_sensor = "light_sensor";
+const static char *category_light_sensor = "light_sensor";
 // const static char *category_zwave_int = "zwave_int";
 // const static char *category_insteon_int = "insteon_int";
 // const static char *category_power_meter = "power_meter";
@@ -37,7 +37,7 @@ const static char *category_weather = "weather";
 // const static char *category_flow_meter = "flow_meter";
 // const static char *category_voltage_sensor = "voltage_sensor";
 // const static char *category_state_sensor = "state_sensor";
-// const static char *category_level_sensor = "level_sensor";
+const static char *category_level_sensor = "level_sensor";
 // const static char *category_clock = "clock";
 
 #endif // __EZLOPI_CATEGORY_H__

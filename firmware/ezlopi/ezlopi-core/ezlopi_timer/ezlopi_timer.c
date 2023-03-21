@@ -59,14 +59,21 @@ typedef struct s_ezlopi_timer
         }                               \
     }
 
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 #define MAX_TIMER 4
-
 const static int timer_group_index_pair[MAX_TIMER][2] = {
     {EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0},
     {EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_1},
     {EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_0},
     {EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_1},
 };
+#elif CONFIG_IDF_TARGET_ESP32C3
+#define MAX_TIMER 2
+const static int timer_group_index_pair[MAX_TIMER][2] = {
+    {EZLOPI_TIMER_GRP_0, EZLOPI_TIMER_IDX_0},
+    {EZLOPI_TIMER_GRP_1, EZLOPI_TIMER_IDX_0},
+};
+#endif
 
 static void send_event_to_queue(e_ezlopi_actions_t action)
 {
@@ -101,22 +108,22 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
     if (EZLOPI_ACTION_NOTIFY_50_MS == _timer_conf->event_type)
     {
         static int count;
-        send_event_to_queue(EZLOPI_ACTION_NOTIFY_50_MS);
+        // send_event_to_queue(EZLOPI_ACTION_NOTIFY_50_MS);
 
-        if (0 == (count % 2)) // 100 ms
-        {
-            send_event_to_queue(EZLOPI_ACTION_NOTIFY_100_MS);
-        }
+        // if (0 == (count % 2)) // 100 ms
+        // {
+        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_100_MS);
+        // }
 
-        if (0 == (count % 4)) // 200 ms
-        {
-            send_event_to_queue(EZLOPI_ACTION_NOTIFY_200_MS);
-        }
+        // if (0 == (count % 4)) // 200 ms
+        // {
+        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_200_MS);
+        // }
 
-        if (0 == (count % 10)) // 500 ms
-        {
-            send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
-        }
+        // if (0 == (count % 10)) // 500 ms
+        // {
+        //     send_event_to_queue(EZLOPI_ACTION_NOTIFY_500_MS);
+        // }
 
         if (0 == (count % 20)) // 1000 ms
         {
@@ -144,6 +151,7 @@ void ezlopi_timer_start_200ms(void)
     ezlopi_timer_init_timer_event(1, 200, EZLOPI_ACTION_NOTIFY_200_MS);
 }
 
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 void ezlopi_timer_start_500ms(void)
 {
     ezlopi_timer_init_timer_event(2, 500, EZLOPI_ACTION_NOTIFY_500_MS);
@@ -153,6 +161,7 @@ void ezlopi_timer_start_1000ms(void)
 {
     ezlopi_timer_init_timer_event(3, 1000, EZLOPI_ACTION_NOTIFY_1000_MS);
 }
+#endif
 
 static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_actions_t event_type)
 {

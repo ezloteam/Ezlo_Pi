@@ -861,6 +861,10 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_OTHER: {
+            if(EzloPi->EZPI_GET_BOARD_TYPE() == EZPI_BOARD_TYPE_ESP32_C3) {
+                QMessageBox::information(this, "Unsupported", "Not supported for board ESP32C3.");
+                break;
+            }
             ezlogic_form_config_other->setFixedHeight(270);
             ezlogic_form_config_other->setFixedWidth(185);
             ezlogic_form_config_other->setModal(true);
@@ -1542,7 +1546,7 @@ void MainWindow::ezlogic_serial_receive(void) {
 
 //    qDebug() << "Date:"+formattedTime;
     if(ezlogic_log_level == EZPI_LOG_DEBUG) ui->textBrowser_console_log->append(formattedTime + ": " + QString::fromLocal8Bit(serial_read_temp));
-    qDebug() << formattedTime + ": " + QString::fromLocal8Bit(serial_read_temp);
+//    qDebug() << formattedTime + ": " + QString::fromLocal8Bit(serial_read_temp);
     serial_read_temp.clear();
 }
 
@@ -1577,6 +1581,16 @@ void MainWindow::ezlogic_serial_process(void) {
 
     idx = 0;
     rx_size = ezlogic_read_data_serial->count();
+    QThread::msleep(5);
+    while (rx_size != ezlogic_read_data_serial->count())
+    {
+        rx_size != ezlogic_read_data_serial->count();
+        QThread::msleep(5);
+    }
+
+    qDebug() << "Rx size: " << rx_size;
+    qDebug().noquote() << "Rx Data:\r\n" << QString::fromLocal8Bit(*ezlogic_read_data_serial);
+
     int opening_count = 0;
     int closing_count = 0;
 
@@ -1599,7 +1613,8 @@ void MainWindow::ezlogic_serial_process(void) {
         idx++;
     }
 
-    qDebug().noquote() << "Json data: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
+    qDebug().noquote() << "\r\n\r\nOpening count: " << opening_count << "Closing count: " << closing_count;
+    qDebug().noquote() << "\r\nFound start_byte: "<< found_start_bytes << "\r\n**************** Json data:\r\n" << QString::fromLocal8Bit(*ezlogic_read_data_serial);
 
     if( 0 == found_start_bytes ) {
         return;
@@ -1607,6 +1622,8 @@ void MainWindow::ezlogic_serial_process(void) {
 
 
     ui->textBrowser_console_log->append("Json Data: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
+
+
     switch (ezlogic_cmd_state) {
         case CMD_ACTION_RESET:
             ezlogic_action_restart(*ezlogic_read_data_serial);
@@ -1687,7 +1704,7 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
 #endif
     if(json_map_root_get_info["status"].toUInt() == 1) {
 
-        get_info_fmw_info.v_sw = json_map_root_get_info["v_sw"].toUInt();
+        get_info_fmw_info.v_sw = json_map_root_get_info["v_fmw"].toUInt();
         get_info_fmw_info.v_type = json_map_root_get_info["v_type"].toUInt();
         get_info_fmw_info.build = json_map_root_get_info["build"].toUInt();
         get_info_fmw_info.v_idf = json_map_root_get_info["v_idf"].toUInt();

@@ -38,8 +38,8 @@ static void registration_process(void *pv)
 
     snprintf(reg_str, sizeof(reg_str),
              "{\"id\":\"%u\",\"method\":\"register\",\"params\":"
-             "{\"firmware\":\"0.1\",\"timeOffset\":18000, \"media\":\"radio\","
-             "\"hubType\":\"32.1\",\"mac_address\":\"%s\"}}",
+             "{\"firmware\":\"v2.0.7.157\",\"timeOffset\":18000, \"media\":\"radio\","
+             "\"hubType\":\"32.1\",\"mac_address\":\"%s\",\"maxFrameSize\":2048}}",
              esp_random(), "a2:97:1e:74:0b:52");
 
     cJSON *cjson_data = cJSON_Parse(reg_str);
@@ -51,7 +51,7 @@ static void registration_process(void *pv)
 
     while (0 == is_registered)
     {
-        web_provisioning_send_to_nma_websocket(cjson_data);
+        web_provisioning_send_to_nma_websocket(cjson_data, TRACE_TYPE_B);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
