@@ -10,14 +10,36 @@
 #include "freertos/task.h"
 #include "trace.h"
 
-#include "led_strip/led_strip.h"
+#include "led_strip.h"
 
 static void blinky(void *pv);
 
 void app_main(void)
 {
+    led_strip_install();
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
+
+typedef struct s_rgb_color
+{
+    rgb_t rgb;
+    char *name;
+} s_rgb_color_t;
+
+static const s_rgb_color_t rgb_colors[] = {
+    {.rgb = {.r = 0x0f, .g = 0x0f, .b = 0x0f}, .name = "white"},       // white
+    {.rgb = {.r = 0x00, .g = 0x00, .b = 0x2f}, .name = "blue"},        // blue
+    {.rgb = {.r = 0x00, .g = 0x2f, .b = 0x00}, .name = "green"},       // green
+    {.rgb = {.r = 0x2f, .g = 0x00, .b = 0x00}, .name = "red"},         // red
+    {.rgb = {.r = 0x80, .g = 0x00, .b = 0x80}, .name = "purple"},      // purple
+    {.rgb = {.r = 0x70, .g = 0x80, .b = 0x90}, .name = "slate gray"},  // slate gray
+    {.rgb = {.r = 0xFA, .g = 0xA4, .b = 0x60}, .name = "sandy brown"}, // sandy brown
+    {.rgb = {.r = 0xFF, .g = 0x69, .b = 0xB4}, .name = "hot pink"},    // hot pink
+    {.rgb = {.r = 0xFF, .g = 0xFF, .b = 0x00}, .name = "yellow"},      // yellow
+    {.rgb = {.r = 0xD2, .g = 0x69, .b = 0x1E}, .name = "chocolate"},   // chocolate
+    {.rgb = {.r = 0xF0, .g = 0xFF, .b = 0xFF}, .name = "azure"},       // azure
+    {.rgb = {.r = 0x00, .g = 0x00, .b = 0x00}, .name = "off"},         // off
+};
 
 static void blinky(void *pv)
 {
@@ -29,13 +51,23 @@ static void blinky(void *pv)
         .intr_type = GPIO_INTR_DISABLE,
     };
 
+    led_strip_t strip = {
+        .type = LED_STRIP_WS2812,
+        .length = 4,
+        .gpio = 16,
+        .buf = NULL,
+#ifdef LED_STRIP_BRIGHTNESS
+        .brightness = 255,
+#endif
+    };
+
     uint32_t state = 0;
     uint32_t count = 0;
 
     adc1_config_width(ADC_WIDTH_BIT_12);
     gpio_config(&io_conf);
 
-    led_strip_install();
+    ESP_ERROR_CHECK(led_strip_init(&strip));
 
     while (1)
     {
@@ -45,15 +77,19 @@ static void blinky(void *pv)
         // int hall_sensor_value = 0;
         // TRACE_D("Hall Sensor value: %d\r\n", hall_sensor_value);
 
+        TRACE_D("Color: %s\r\n", rgb_colors[count % (sizeof(rgb_colors) / sizeof(s_rgb_color_t))].name);
+        ESP_ERROR_CHECK(led_strip_fill(&strip, 0, strip.length, rgb_colors[count % (sizeof(rgb_colors) / sizeof(s_rgb_color_t))].rgb));
+        ESP_ERROR_CHECK(led_strip_flush(&strip));
+
         vTaskDelay(1000 / portTICK_RATE_MS);
 
-        if (count++ > 2)
+        if (0 == count++ % 2)
         {
             TRACE_D("-----------------------------------------");
             TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
             TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
             TRACE_D("-----------------------------------------");
-            count = 0;
+            // count = 0;
         }
     }
 }

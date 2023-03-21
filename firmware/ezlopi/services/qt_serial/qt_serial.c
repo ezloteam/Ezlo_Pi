@@ -56,7 +56,7 @@ int qt_serial_tx_data(int len, uint8_t *data)
     // char start_bytes[] = {0x80, '\r', '\n'};
     // ret += uart_write_bytes(UART_NUM_0, start_bytes, sizeof(start_bytes));
     ret = uart_write_bytes(UART_NUM_0, data, len);
-    // ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
+    ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
 
     return ret;
 }
