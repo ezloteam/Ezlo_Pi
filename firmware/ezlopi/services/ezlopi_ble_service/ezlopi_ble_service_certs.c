@@ -39,7 +39,7 @@ void ezlopi_ble_service_certs_profile_init(void)
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
-    ezlopi_ble_gatt_add_characteristic(Certs_cred_service, &uuid, permission, properties, Certs_creds_read_func, Certs_creds_write_func, Certs_creds_write_exec_func);
+    ezlopi_ble_gatt_add_characteristic(Certs_cred_service, &uuid, permission, properties, certs_creds_write_exec_func, Certs_creds_write_func, Certs_creds_write_exec_func);
 
 
 }
@@ -107,38 +107,4 @@ static void Certs_creds_parse_and_save(uint8_t *value, uint32_t len)
             cJSON_Delete(root);
         }
     }
-}
-
-static char *wifi_creds_jsonify(void)
-{
-    char *json_str_wifi_info = NULL;
-    char wifi_creds[64];
-    memset(wifi_creds, 0, sizeof(wifi_creds));
-    ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
-
-    cJSON *cjson_wifi_info = cJSON_CreateObject();
-    if (cjson_wifi_info)
-    {
-        if (strlen(wifi_creds) >= 32)
-        {
-            wifi_creds[31] = '\0';
-        }
-        cJSON_AddStringToObject(cjson_wifi_info, "SSID", &wifi_creds[0]);
-        cJSON_AddStringToObject(cjson_wifi_info, "PSD", "********");
-
-        esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
-        cJSON_AddStringToObject(cjson_wifi_info, "ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
-        cJSON_AddStringToObject(cjson_wifi_info, "gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
-        cJSON_AddStringToObject(cjson_wifi_info, "netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
-
-        json_str_wifi_info = cJSON_Print(cjson_wifi_info);
-        if (json_str_wifi_info)
-        {
-            cJSON_Minify(json_str_wifi_info);
-        }
-
-        cJSON_Delete(cjson_wifi_info);
-    }
-
-    return json_str_wifi_info;
 }
