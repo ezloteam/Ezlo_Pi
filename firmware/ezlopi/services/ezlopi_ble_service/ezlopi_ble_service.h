@@ -15,6 +15,7 @@
 #define WIFI_ERROR_SERVICE_HANDLE 2
 #define BLE_PASSKEY_SERVICE_HANDLE 3
 #define BLE_USER_ID_SERVICE_HANDLE 4
+#define BLE_PROVISIONING_ID_HANDLE 5
 
 void ezlopi_ble_service_init(void);
 
