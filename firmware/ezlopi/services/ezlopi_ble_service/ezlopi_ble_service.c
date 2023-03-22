@@ -29,6 +29,7 @@
 extern void ezlopi_ble_service_user_id_init(void);
 extern void ezlopi_ble_service_passkey_init(void);
 extern void ezlopi_ble_service_wifi_profile_init(void);
+extern void ezlopi_ble_service_provisioning_init(void);
 
 static void ezlopi_ble_basic_init(void);
 static void ezlopi_ble_start_secure_gatt_server(void);
@@ -38,6 +39,7 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_service_wifi_profile_init();
     ezlopi_ble_service_passkey_init();
     ezlopi_ble_service_user_id_init();
+    ezlopi_ble_service_provisioning_init();
 
     ezlopi_ble_profile_print();
     ezlopi_ble_basic_init();
@@ -47,7 +49,8 @@ void ezlopi_ble_service_init(void)
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(WIFI_ERROR_SERVICE_HANDLE), "gatts app-2 register error");
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PASSKEY_SERVICE_HANDLE), "gatts app-3 register error");
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_USER_ID_SERVICE_HANDLE), "gatts app-4 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PROVISIONING_ID_HANDLE), "gatts app-5 register error");
+    // CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
     ezlopi_ble_start_secure_gatt_server();
 }
 

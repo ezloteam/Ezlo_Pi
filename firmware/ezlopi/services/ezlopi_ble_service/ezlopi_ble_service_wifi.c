@@ -40,6 +40,7 @@ void ezlopi_ble_service_wifi_profile_init(void)
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = 0x00FF;
     wifi_creds_service = ezlopi_ble_gatt_create_service(WIFI_CREDS_SERVICE_HANDLE, &uuid);
+
     uuid.uuid.uuid16 = 0xFF01;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
@@ -50,6 +51,7 @@ void ezlopi_ble_service_wifi_profile_init(void)
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = 0x00EE;
     wifi_status_service = ezlopi_ble_gatt_create_service(WIFI_STATUS_SERVICE_HANDLE, &uuid);
+
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = 0xEE01;
     permission = ESP_GATT_PERM_READ;
@@ -60,6 +62,7 @@ void ezlopi_ble_service_wifi_profile_init(void)
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = 0x00E1;
     wifi_error_service = ezlopi_ble_gatt_create_service(WIFI_ERROR_SERVICE_HANDLE, &uuid);
+
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = 0xE101;
     permission = ESP_GATT_PERM_READ;
