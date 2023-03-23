@@ -26,10 +26,10 @@
 #include "ezlopi_ble_service.h"
 #include "ezlopi_ble_buffer.h"
 
-extern void ezlopi_ble_service_user_id_init(void);
 extern void ezlopi_ble_service_passkey_init(void);
 extern void ezlopi_ble_service_wifi_profile_init(void);
 extern void ezlopi_ble_service_provisioning_init(void);
+extern void ezlopi_ble_service_device_info_init(void);
 
 static void ezlopi_ble_basic_init(void);
 static void ezlopi_ble_start_secure_gatt_server(void);
@@ -38,19 +38,17 @@ void ezlopi_ble_service_init(void)
 {
     ezlopi_ble_service_wifi_profile_init();
     ezlopi_ble_service_passkey_init();
-    ezlopi_ble_service_user_id_init();
     ezlopi_ble_service_provisioning_init();
+    ezlopi_ble_service_device_info_init();
 
     ezlopi_ble_profile_print();
     ezlopi_ble_basic_init();
 
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(WIFI_CREDS_SERVICE_HANDLE), "gatts app-0 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(WIFI_STATUS_SERVICE_HANDLE), "gatts app-1 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(WIFI_ERROR_SERVICE_HANDLE), "gatts app-2 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PASSKEY_SERVICE_HANDLE), "gatts app-3 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_USER_ID_SERVICE_HANDLE), "gatts app-4 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PROVISIONING_ID_HANDLE), "gatts app-5 register error");
-    // CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts app-0 register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PASSKEY_SERVICE_HANDLE), "gatts app-1 register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PROVISIONING_ID_HANDLE), "gatts app-2 register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_DEVICE_INFO_ID_HANDLE), "gatts app-3 register error");
+    CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
     ezlopi_ble_start_secure_gatt_server();
 }
 
@@ -59,8 +57,7 @@ static void ezlopi_ble_start_secure_gatt_server(void)
     const uint32_t default_passkey = 123456;
     uint32_t passkey;
     ezlopi_nvs_read_ble_passkey(&passkey);
-    passkey = (0 == passkey) ? default_passkey : passkey;
-    passkey = (passkey > 999999) ? default_passkey : passkey;
+    passkey = ((0 == passkey) || (passkey > 999999)) ? default_passkey : passkey;
     TRACE_D("Ble passkey: %d", passkey);
 
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND; // ESP_LE_AUTH_REQ_BOND_MITM;

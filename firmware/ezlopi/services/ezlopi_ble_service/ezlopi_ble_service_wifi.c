@@ -23,12 +23,9 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len);
 static void wifi_connection_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_connection_error_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
-static void ezlopi_ble_service_wifi_notify(void);
 static void wifi_event_notify_upcall(esp_event_base_t event, void *arg);
 
-static s_gatt_service_t *wifi_creds_service;
-static s_gatt_service_t *wifi_status_service;
-static s_gatt_service_t *wifi_error_service;
+static s_gatt_service_t *wifi_ble_service;
 
 void ezlopi_ble_service_wifi_profile_init(void)
 {
@@ -38,48 +35,40 @@ void ezlopi_ble_service_wifi_profile_init(void)
 
     // wifi credentials
     uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0x00FF;
-    wifi_creds_service = ezlopi_ble_gatt_create_service(WIFI_CREDS_SERVICE_HANDLE, &uuid);
+    uuid.uuid.uuid16 = BLE_WIFI_SERVICE_UUID;
+    wifi_ble_service = ezlopi_ble_gatt_create_service(BLE_WIFI_SERVICE_HANDLE, &uuid);
 
-    uuid.uuid.uuid16 = 0xFF01;
+    uuid.uuid.uuid16 = BLE_WIFI_CHAR_CREDS_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
-    ezlopi_ble_gatt_add_characteristic(wifi_creds_service, &uuid, permission, properties, wifi_creds_read_func, wifi_creds_write_func, wifi_creds_write_exec_func);
+    ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, wifi_creds_read_func, wifi_creds_write_func, wifi_creds_write_exec_func);
 
     // wifi connection status
     uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0x00EE;
-    wifi_status_service = ezlopi_ble_gatt_create_service(WIFI_STATUS_SERVICE_HANDLE, &uuid);
-
-    uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0xEE01;
+    uuid.uuid.uuid16 = BLE_WIFI_CHAR_STATUS_UUID;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-    ezlopi_ble_gatt_add_characteristic(wifi_status_service, &uuid, permission, properties, wifi_connection_status_read_func, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, wifi_connection_status_read_func, NULL, NULL);
 
     // wifi error
     uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0x00E1;
-    wifi_error_service = ezlopi_ble_gatt_create_service(WIFI_ERROR_SERVICE_HANDLE, &uuid);
-
-    uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0xE101;
+    uuid.uuid.uuid16 = BLE_WIFI_CHAR_ERROR_UUID;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-    ezlopi_ble_gatt_add_characteristic(wifi_error_service, &uuid, permission, properties, wifi_connection_error_read_func, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, wifi_connection_error_read_func, NULL, NULL);
 
-    ezlopi_wifi_event_add(wifi_event_notify_upcall, NULL);
+    // ezlopi_wifi_event_add(wifi_event_notify_upcall, NULL);
 }
 
 static void wifi_event_notify_upcall(esp_event_base_t event, void *arg)
 {
     esp_gatt_value_t value;
     wifi_connection_status_read_func(&value, NULL);
-    ezlopi_ble_gatts_characteristic_notify(wifi_status_service, wifi_status_service->characteristics, &value);
+    ezlopi_ble_gatts_characteristic_notify(wifi_ble_service, wifi_ble_service->characteristics, &value);
 
     wifi_connection_error_read_func(&value, NULL);
-    ezlopi_ble_gatts_characteristic_notify(wifi_error_service, wifi_error_service->characteristics, &value);
+    ezlopi_ble_gatts_characteristic_notify(wifi_ble_service, wifi_ble_service->characteristics, &value);
 }
 
 static void wifi_connection_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)

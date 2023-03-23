@@ -31,11 +31,11 @@ void ezlopi_ble_service_provisioning_init(void)
     esp_gatt_char_prop_t properties;
 
     uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0xFF00;
+    uuid.uuid.uuid16 = BLE_PROVISIONING_SERVICE_UUID;
     g_provisioning_service = ezlopi_ble_gatt_create_service(BLE_PROVISIONING_ID_HANDLE, &uuid);
     TRACE_W("'provisioning_service' service added to list");
 
-    uuid.uuid.uuid16 = 0xFF01;
+    uuid.uuid.uuid16 = BLE_PROVISIONING_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
