@@ -28,6 +28,9 @@ extern "C"
     uint32_t ezlopi_nvs_get_boot_count(void);
     void ezlopi_nvs_set_boot_count(uint32_t boot_count);
 
+    uint32_t ezlopi_nvs_get_provisioning_time(void);
+    void ezlopi_nvs_set_provisioning_time(uint32_t epoch_time);
+
 #ifdef __cplusplus
 }
 #endif

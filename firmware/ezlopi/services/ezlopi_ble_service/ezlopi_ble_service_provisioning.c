@@ -1,24 +1,29 @@
 #include "string.h"
+#include "time.h"
 
 #include "cJSON.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
+#include "mbedtls/base64.h"
 
 #include "trace.h"
-#include "ezlopi_wifi.h"
 
+#include "ezlopi_wifi.h"
 #include "ezlopi_nvs.h"
+#include "ezlopi_ble_buffer.h"
 #include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_profile.h"
-
 #include "ezlopi_ble_service.h"
-#include "ezlopi_ble_buffer.h"
-#include "mbedtls/base64.h"
+#include "ezlopi_factory_info.h"
+
+#define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
+#define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
 
 static s_gatt_service_t *g_provisioning_service;
 static s_linked_buffer_t *g_provisioning_linked_buffer = NULL;
 
 static void ezlopi_process_provisioning_info(uint8_t *value, uint32_t len);
+static void provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
 static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
@@ -33,37 +38,186 @@ void ezlopi_ble_service_provisioning_init(void)
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_PROVISIONING_SERVICE_UUID;
     g_provisioning_service = ezlopi_ble_gatt_create_service(BLE_PROVISIONING_ID_HANDLE, &uuid);
-    TRACE_W("'provisioning_service' service added to list");
 
     uuid.uuid.uuid16 = BLE_PROVISIONING_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
     ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, provisioning_info_read_func, provisioning_info_write_func, provisioning_info_exec_func);
-    TRACE_W("'provisioning_service' service added to list");
+
+    uuid.uuid.uuid16 = BLE_PROVISIONING_STATUS_CHAR_UUID;
+    uuid.len = ESP_UUID_LEN_16;
+    permission = ESP_GATT_PERM_READ;
+    properties = ESP_GATT_CHAR_PROP_BIT_READ;
+    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, provisioning_status_read_func, NULL, NULL);
+}
+
+static char *__provisioning_status_jsonify(void)
+{
+    char *prov_status_jstr = NULL;
+    cJSON *root = cJSON_CreateObject();
+    if (root)
+    {
+        cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v2_get_version());
+        cJSON_AddNumberToObject(root, "time", ezlopi_nvs_get_provisioning_time());
+
+        prov_status_jstr = cJSON_Print(root);
+        if (prov_status_jstr)
+        {
+            cJSON_Minify(prov_status_jstr);
+        }
+    }
+
+    return prov_status_jstr;
+}
+
+static void provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+{
+    if (value)
+    {
+        static char *prov_status_jstr;
+        if (NULL == prov_status_jstr)
+        {
+            prov_status_jstr = __provisioning_status_jsonify();
+        }
+
+        if (NULL != prov_status_jstr)
+        {
+            uint32_t total_data_len = strlen(prov_status_jstr);
+            uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
+            uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
+
+            if ((0 != total_data_len) && (total_data_len > param->read.offset))
+            {
+                strncpy((char *)value->value, prov_status_jstr + param->read.offset, copy_size);
+                value->len = copy_size;
+            }
+            else
+            {
+                value->len = 1;
+                value->value[0] = 0; // Read 0 if the device not provisioned yet.
+            }
+
+            if ((param->read.offset + copy_size) >= total_data_len)
+            {
+                free(prov_status_jstr);
+                prov_status_jstr = NULL;
+            }
+        }
+        else
+        {
+            TRACE_E("Unable to create json string");
+            value->len = 1;
+            value->value[0] = 0; // Read 0 if the device not provisioned yet.
+        }
+    }
+    else
+    {
+        TRACE_E("VALUE IS NULL");
+    }
+}
+
+static void __process_provisioning_info(uint32_t total_size)
+{
+    char *base64_buffer = malloc(total_size + 1);
+
+    if (base64_buffer)
+    {
+        uint32_t pos = 0;
+        s_linked_buffer_t *tmp_prov_buffer = g_provisioning_linked_buffer;
+
+        while (tmp_prov_buffer)
+        {
+            // TRACE_W("tmp_prov_buffer->buffer[%d]: %.*s", tmp_prov_buffer->len, tmp_prov_buffer->len, (char *)tmp_prov_buffer->buffer);
+            cJSON *root = cJSON_ParseWithLength((const char *)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
+            if (root)
+            {
+                uint32_t len = CJ_GET_NUMBER("len");
+                uint32_t tot_len = CJ_GET_NUMBER("total_len");
+                uint32_t sequence = CJ_GET_NUMBER("sequence");
+                char *data = CJ_GET_STRING("data");
+                if (data)
+                {
+                    memcpy(base64_buffer + pos, data, len);
+                    pos += len;
+                    base64_buffer[pos] = '\0';
+                }
+                else
+                {
+                    TRACE_E("DATA IS NULL");
+                }
+            }
+            else
+            {
+                TRACE_E("Failed to parse");
+            }
+
+            tmp_prov_buffer = tmp_prov_buffer->next;
+        }
+
+        TRACE_D("base64_buffer: %s", base64_buffer);
+
+        char *decoded_config_json = malloc(total_size);
+        if (decoded_config_json)
+        {
+            size_t o_len = 0;
+            bzero(decoded_config_json, total_size);
+            mbedtls_base64_decode((uint8_t *)decoded_config_json, (size_t)total_size, &o_len, (uint8_t *)base64_buffer, strlen(base64_buffer));
+            TRACE_D("Decoded data: %s", decoded_config_json);
+        }
+        else
+        {
+            TRACE_E("mALLOC FAILED");
+        }
+
+        free(base64_buffer);
+    }
 }
 
 static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Write function called!");
-    dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
+    TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
 
-    if (0 == param->write.is_prep) // Data received in single packet
+    time_t now;
+    time(&now);
+    TRACE_D("Provisioning time: %ld", now);
+    ezlopi_nvs_set_provisioning_time(now);
+
+    if (NULL == g_provisioning_linked_buffer)
     {
-        if ((NULL != param->write.value) && (param->write.len > 0))
-        {
-            ezlopi_process_provisioning_info(param->write.value, param->write.len);
-        }
+        g_provisioning_linked_buffer = ezlopi_ble_buffer_create(param);
     }
     else
     {
-        if (NULL == g_provisioning_linked_buffer)
+        ezlopi_ble_buffer_add_to_buffer(g_provisioning_linked_buffer, param);
+    }
+
+    if (g_provisioning_linked_buffer)
+    {
+        if ((NULL != param->write.value) && (param->write.len > 0))
         {
-            g_provisioning_linked_buffer = ezlopi_ble_buffer_create(param);
-        }
-        else
-        {
-            ezlopi_ble_buffer_add_to_buffer(g_provisioning_linked_buffer, param);
+            cJSON *root = cJSON_ParseWithLength((const char *)param->write.value, param->write.len);
+            if (root)
+            {
+                uint32_t len = CJ_GET_NUMBER("len");
+                uint32_t tot_len = CJ_GET_NUMBER("total_len");
+                uint32_t sequence = CJ_GET_NUMBER("sequence");
+
+                TRACE_D("Len: %d", len);
+                TRACE_D("tot_len: %d", tot_len);
+                TRACE_D("sequence: %d", sequence);
+
+                if (sequence && len && tot_len)
+                {
+                    if (((sequence - 1) * 400 + len) >= tot_len)
+                    {
+                        __process_provisioning_info(tot_len);
+                        ezlopi_ble_buffer_free_buffer(g_provisioning_linked_buffer);
+                        g_provisioning_linked_buffer = NULL;
+                    }
+                }
+            }
         }
     }
 }
@@ -128,5 +282,3 @@ static void ezlopi_process_provisioning_info(uint8_t *value, uint32_t len)
         }
     }
 }
-
-// ewogICAgInVzZXJfaWQiOiAibG9tYXNzdWJlZGkiLAogICAgImRldmljZV9uYW1lIjogIk15IERldmljZSIsCiAgICAiYnJhbmQiOiAiTkRTIFRoZXJtb3N0YXQiLAogICAgIm1hbnVmYWN0dXJlcl9uYW1lIjogIk5lcGFsIERpZ2l0YWwgU3lzdGVtcyIsCiAgICAibW9kZWxfbnVtYmVyIjogIjA2M0RFWDUyNCIsCiAgICAidXVpZCI6ICI2NTI2MWQ3Ni1lNTg0LTRkMzUtYWZmMS1kODRiZDA0MyIsCiAgICAidXVpZF9wcm92aXNpb25pbmciOiAiNWZlNmI0OTgtOTdiNi00NjdhLTk1OTgtYWJmMmViM2IxOTVmIiwKICAgICJzZXJpYWwiOiAxMDAwMDQwMzIsCiAgICAiY2xvdWRfc2VydmVyIjogImh0dHBzOi8vY2xvdWQuZXpsby5jb206NzAwMCIsCiAgICAic3NsX3ByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS0tLVxuTUlHRUFnRUFNQkFHQnlxR1NNNDlBZ0VHQlN1QkJBQUtCRzB3YXdJQkFRUWdsc2RGM0srU0tUdGExSEhIMERueVxuNitoT3kxT29ab1J3c1pZY2RjeGRRYWloUkFOQ0FBUnUzRExuWnZRMXQ0aG1oZVVyUThLSm5abWRKWEUzdGw2RVxuWGk0eXpxMW9kYjI5ZFNLaU5DQmovTUo2bXVtL2RxVEhVTjY1OHZkSE5xanJXbnlXenZPNFxuLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLVxuIiwKICAgICJzc2xfcHVibGljX2tleSI6ICItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUZZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUFvRFFnQUVidHd5NTJiME5iZUlab1hsSzBQQ2laMlpuU1Z4TjdaZVxuaEY0dU1zNnRhSFc5dlhVaW9qUWdZL3pDZXBycHYzYWt4MURldWZMM1J6YW82MXA4bHM3enVBPT1cbi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLSIsCiAgICAiY2FfY2VydCI6ICItLS0tLUJFR0lOIHhhQ0VSVElGSUNBVEUtLS0tLVxyXG5NSUlDYkRDQ0FoR2dBd0lCQWdJSkFPQnl6YUk3YUhZOU1Bb0dDQ3FHU000OUJBTURNSUdRTVFzd0NRWURWUVFHXHJcbkV3SlZVekVVTUJJR0ExVUVDQXdMSUU1bGR5QktaWEp6WlhreEVEQU9CZ05WQkFjTUIwTnNhV1owYjI0eER6QU5cclxuQmdOVkJBb01Ca2xVSUU5d2N6RVBNQTBHQTFVRUN3d0dTVlFnVDNCek1SUXdFZ1lEVlFRRERBdGxXa3hQSUV4VVxyXG5SQ0JEUVRFaE1COEdDU3FHU0liM0RRRUpBUllTYzNsellXUnRhVzV6UUdWNmJHOHVZMjl0TUNBWERURTVNRFV6XHJcbk1URTNNREUwTjFvWUR6SXhNVGt3TlRBM01UY3dNVFEzV2pDQmtERUxNQWtHQTFVRUJoTUNWVk14RkRBU0JnTlZcclxuQkFnTUN5Qk9aWGNnU21WeWMyVjVNUkF3RGdZRFZRUUhEQWREYkdsbWRHOXVNUTh3RFFZRFZRUUtEQVpKVkNCUFxyXG5jSE14RHpBTkJnTlZCQXNNQmtsVUlFOXdjekVVTUJJR0ExVUVBd3dMWlZwTVR5Qk1WRVFnUTBFeElUQWZCZ2txXHJcbmhraUc5dzBCQ1FFV0VuTjVjMkZrYldsdWMwQmxlbXh2TG1OdmJUQldNQkFHQnlxR1NNNDlBZ0VHQlN1QkJBQUtcclxuQTBJQUJITFFkaExEWXNhZklGWThwWmg5NmFER3FWbTZFNHI4blc5czRDZmRwWGFhL1I0Q25qYVZwRFFJN1VtUVxyXG45dlZER1puOG1jbW03VmpLeCtUU0NTME1JS09qVXpCUk1CMEdBMVVkRGdRV0JCUmlUbDhFejFsOTRqYXFjeGJpXHJcbnl4a1ZDMEZrQlRBZkJnTlZIU01FR0RBV2dCUmlUbDhFejFsOTRqYXFjeGJpeXhrVkMwRmtCVEFQQmdOVkhSTUJcclxuQWY4RUJUQURBUUgvTUFvR0NDcUdTTTQ5QkFNREEwa0FNRVlDSVFEN0VVczhqNTBqS0ZkLzQ2Wm85NU5iclBZUVxyXG5QdExUSEg5WWpVa01Fa1lENWdJaEFNUDR5N0UxYUI3OG5Rcm1kM0lYOE1NMzJrOWRNOHhUME16dFIxNk90c3VWXHJcbi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0iLAogICAgImRldmljZV90eXBlX2V6bG9waSI6ICJnZW5lcmljIgp9
