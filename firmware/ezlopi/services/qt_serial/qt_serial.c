@@ -53,10 +53,10 @@ static void qt_serial_read_config(void);
 int qt_serial_tx_data(int len, uint8_t *data)
 {
     int ret = 0;
-    char start_bytes[] = {0x80, '\r', '\n'};
-    ret += uart_write_bytes(UART_NUM_0, start_bytes, sizeof(start_bytes));
+    // char start_bytes[] = {0x80, '\r', '\n'};
+    // ret += uart_write_bytes(UART_NUM_0, start_bytes, sizeof(start_bytes));
     ret = uart_write_bytes(UART_NUM_0, data, len);
-    // ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
+    ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
 
     return ret;
 }
@@ -174,10 +174,6 @@ static void qt_serial_get_info()
         memset(wifi_info, 0, sizeof(wifi_info));
         ezlopi_nvs_read_wifi(wifi_info, sizeof(wifi_info));
 
-        // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-        // if (factory)
-        // {
-
         unsigned long long serial_id = ezlopi_factory_info_v2_get_id();
         char *controller_uuid = ezlopi_factory_info_v2_get_device_uuid();
         char *provisioning_uuid = ezlopi_factory_info_v2_get_provisioning_uuid();
@@ -206,7 +202,10 @@ static void qt_serial_get_info()
         cJSON_AddStringToObject(get_info, "uuid", controller_uuid);
         cJSON_AddStringToObject(get_info, "uuid_prov", provisioning_uuid);
         cJSON_AddNumberToObject(get_info, "serial", serial_id);
-        cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
+
+        char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
+        // char *wifi_password = ezlopi_factory_info_v2_get_password();
+        cJSON_AddStringToObject(get_info, "ssid", wifi_ssid ? wifi_ssid : "");
         cJSON_AddStringToObject(get_info, "dev_name", device_name);
         cJSON_AddNumberToObject(get_info, "dev_type", 1);
         cJSON_AddStringToObject(get_info, "dev_type_ezlopi", device_type);
@@ -239,6 +238,7 @@ static void qt_serial_get_info()
 
 static void qt_serial_set_wifi(const char *data)
 {
+    uint32_t status = 0;
     cJSON *root = cJSON_Parse(data);
 
     if (root)
@@ -250,13 +250,20 @@ static void qt_serial_set_wifi(const char *data)
 
             if (ssid && pass && (strlen(pass) >= 8))
             {
+                ezlopi_factory_info_v2_set_wifi(ssid, pass);
                 ezlopi_wifi_set_new_wifi_flag();
                 esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
-                TRACE_E("wifi_error: %u", wifi_error);
+                TRACE_W("wifi_error: %u", wifi_error);
+                status = 1;
             }
         }
 
         cJSON_Delete(root); // free Json string
+    }
+
+    if (0 == status)
+    {
+        qt_serial_response(2, 0, 5);
     }
 }
 
@@ -293,21 +300,20 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
 
 static void qt_serial_save_config(const char *data)
 {
-    // // uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
-    // uint32_t ret = ezlopi_factory_info_set_ezlopi_config((char *)data);
-    // TRACE_B("ezlopi_factory_info_set_ezlopi_config: %d", ret);
-    // if (ret)
-    // {
-    //     TRACE_B("Successfully wrote config data..");
-    // }
 
-    qt_serial_response(3, 0, 5);
+    uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
+    TRACE_B("ezlopi_factory_info_set_ezlopi_config: %d", ret);
+    if (ret)
+    {
+        TRACE_B("Successfully wrote config data..");
+    }
+
+    qt_serial_response(3, ret, 5);
 }
 
 static void qt_serial_read_config(void)
 {
     cJSON *root = NULL;
-    // char *buf = ezlopi_factory_info_get_ezlopi_config();
     char *buf = ezlopi_factory_info_v2_get_ezlopi_config();
 
     if (buf)

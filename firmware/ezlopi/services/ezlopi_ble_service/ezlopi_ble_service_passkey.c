@@ -25,9 +25,10 @@ void ezlopi_ble_service_passkey_init(void)
     s_gatt_service_t *service;
 
     uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = 0x00E2;
+    uuid.uuid.uuid16 = BLE_PASSKEY_SERVICE_UUID;
     service = ezlopi_ble_gatt_create_service(BLE_PASSKEY_SERVICE_HANDLE, &uuid);
-    uuid.uuid.uuid16 = 0xE201;
+
+    uuid.uuid.uuid16 = BLE_PASSKEY_CHAR_PASSKEY_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
