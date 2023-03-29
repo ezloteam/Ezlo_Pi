@@ -11,6 +11,15 @@
 #include "ezlopi_adc.h"
 #include "ezlopi_uart.h"
 
+#define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            item_val = o_item->valuedouble;                   \
+        }                                                     \
+    }
+
 #define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
     {                                                         \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
@@ -26,6 +35,7 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valuestring;                   \
+            TRACE_B("value: %s", item_val ? item_val : "");   \
         }                                                     \
     }
 
