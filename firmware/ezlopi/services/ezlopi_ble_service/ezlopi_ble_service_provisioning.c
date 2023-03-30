@@ -214,23 +214,24 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
 
                 if (sequence && len && tot_len)
                 {
-                    TRACE_D("Here");
+                    TRACE_W("Here");
                     if (((sequence - 1) * 400 + len) >= tot_len)
                     {
-                        TRACE_D("Here");
-                        // char *decoded_data = __base64_decode_provisioning_info(tot_len); // uncommente free as well
-                        static const char *decoded_data = "{\" serial \": 100004961,\" provision_server \": \" https : // req-disp-at0m.mios.com/\",\"cloud_server\": \"https://cloud.ezlo.com:7000\",\"provision_token\": \"c25415a5f1de9e5084dab5b0c92a28d2f5f64bb0079a9ffcc312eb005ff1d2b9bb896a097a565eb79fb15334f7c296e8ca67596cde8a87255d44e2507face3c288aed92624e355207700b07071365353acca8a1c3e6ac2e5dcce519021d2bc72cc7f5c4e85ebd0e75cc84c8b56a8a378672bcd9ac6975b511b77482001ab9a35\",\"ssl_private_key\": \"-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgpADG/nseS5R6XDv15FcM\ntU9zNVVal8X9qzESKrLzWDehRANCAATPmLXLTDUTxBvNIm6BFhzmGirTmW+wBE8B\nAEJJb1c9zuSdSMdMMUeb89KGb3scQUZotkiH/ki/VR0+3Lvorg8v\n-----END PRIVATE KEY-----\n\",\"ssl_public_key\": \"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEz5i1y0w1E8QbzSJugRYc5hoq05lvsARP\nAQBCSW9XPc7knUjHTDFHm/PShm97HEFGaLZIh/5Iv1UdPty76K4PLw==\n-----END PUBLIC KEY-----\",\"ssl_shared_key\": \"\n-----BEGIN CERTIFICATE-----\nMIICDTCCAbKgAwIBAgIDAzZDMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\nMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\nBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExURCBDQTEh\nMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTIxMTIwMjA4NDYx\nMFoYDzIyOTUwOTE2MDg0NjEwWjCBjDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCk5l\ndyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xEzARBgNVBAoMCmNvbnRyb2xsZXIx\nLTArBgNVBAsMJDRjMGQ5MDYwLTUzNGMtMTFlYy1iMmQ2LThmMjYwZjUyODdmYTES\nMBAGA1UEAwwJMTAwMDA0OTYxMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEz5i1y0w1\nE8QbzSJugRYc5hoq05lvsARPAQBCSW9XPc7knUjHTDFHm/PShm97HEFGaLZIh/5I\nv1UdPty76K4PLzAKBggqhkjOPQQDAgNJADBGAiEAseX9mwtQ2DN60jCplOIIPd2S\n+6bdgpQGiCeYNpY/sBcCIQDwduNJYOIlBGmQgH1KAk9nW5JxAzA2MsPKovjTUSFB\nyg==\n-----END CERTIFICATE-----\n\",\"signing_ca_certificate\": \"-----BEGIN CERTIFICATE-----\r\nMIICbDCCAhGgAwIBAgIJAOByzaI7aHY9MAoGCCqGSM49BAMDMIGQMQswCQYDVQQG\r\nEwJVUzEUMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzAN\r\nBgNVBAoMBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExU\r\nRCBDQTEhMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTE5MDUz\r\nMTE3MDE0N1oYDzIxMTkwNTA3MTcwMTQ3WjCBkDELMAkGA1UEBhMCVVMxFDASBgNV\r\nBAgMCyBOZXcgSmVyc2V5MRAwDgYDVQQHDAdDbGlmdG9uMQ8wDQYDVQQKDAZJVCBP\r\ncHMxDzANBgNVBAsMBklUIE9wczEUMBIGA1UEAwwLZVpMTyBMVEQgQ0ExITAfBgkq\r\nhkiG9w0BCQEWEnN5c2FkbWluc0BlemxvLmNvbTBWMBAGByqGSM49AgEGBSuBBAAK\r\nA0IABHLQdhLDYsafIFY8pZh96aDGqVm6E4r8nW9s4CfdpXaa/R4CnjaVpDQI7UmQ\r\n9vVDGZn8mcmm7VjKx+TSCS0MIKOjUzBRMB0GA1UdDgQWBBRiTl8Ez1l94jaqcxbi\r\nyxkVC0FkBTAfBgNVHSMEGDAWgBRiTl8Ez1l94jaqcxbiyxkVC0FkBTAPBgNVHRMB\r\nAf8EBTADAQH/MAoGCCqGSM49BAMDA0kAMEYCIQD7EUs8j50jKFd/46Zo95NbrPYQ\r\nPtLTHH9YjUkMEkYD5gIhAMP4y7E1aB78nQrmd3IX8MM32k9dM8xT0MztR16OtsuV\r\n-----END CERTIFICATE-----\",\"uuid\": \"4c0d9060-534c-11ec-b2d6-8f260f5287fa\",\"user_id\": \"lomas\",\"device_name\": \"My Device\",\"brand\": \"NDS Thermostat\",\"manufacturer_name\": \"Great Manif\",\"model_number\": \"063DEX524\",\"uuid_provisioning\": \"b558c598-a35a-4fdc-a2cd-5462ff11455a\",\"device_type_ezlopi\": \"generic\"}";
-                        // if (decoded_data)
+                        TRACE_W("Here");
+                        char *decoded_data = __base64_decode_provisioning_info(tot_len); // uncommente free as well
+                        // static const char *decoded_data = "{\" serial \": 100004961,\" provision_server \": \" https : // req-disp-at0m.mios.com/\",\"cloud_server\": \"https://cloud.ezlo.com:7000\",\"provision_token\": \"c25415a5f1de9e5084dab5b0c92a28d2f5f64bb0079a9ffcc312eb005ff1d2b9bb896a097a565eb79fb15334f7c296e8ca67596cde8a87255d44e2507face3c288aed92624e355207700b07071365353acca8a1c3e6ac2e5dcce519021d2bc72cc7f5c4e85ebd0e75cc84c8b56a8a378672bcd9ac6975b511b77482001ab9a35\",\"ssl_private_key\": \"-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgpADG/nseS5R6XDv15FcM\ntU9zNVVal8X9qzESKrLzWDehRANCAATPmLXLTDUTxBvNIm6BFhzmGirTmW+wBE8B\nAEJJb1c9zuSdSMdMMUeb89KGb3scQUZotkiH/ki/VR0+3Lvorg8v\n-----END PRIVATE KEY-----\n\",\"ssl_public_key\": \"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEz5i1y0w1E8QbzSJugRYc5hoq05lvsARP\nAQBCSW9XPc7knUjHTDFHm/PShm97HEFGaLZIh/5Iv1UdPty76K4PLw==\n-----END PUBLIC KEY-----\",\"ssl_shared_key\": \"\n-----BEGIN CERTIFICATE-----\nMIICDTCCAbKgAwIBAgIDAzZDMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\nMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\nBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExURCBDQTEh\nMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTIxMTIwMjA4NDYx\nMFoYDzIyOTUwOTE2MDg0NjEwWjCBjDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCk5l\ndyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xEzARBgNVBAoMCmNvbnRyb2xsZXIx\nLTArBgNVBAsMJDRjMGQ5MDYwLTUzNGMtMTFlYy1iMmQ2LThmMjYwZjUyODdmYTES\nMBAGA1UEAwwJMTAwMDA0OTYxMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEz5i1y0w1\nE8QbzSJugRYc5hoq05lvsARPAQBCSW9XPc7knUjHTDFHm/PShm97HEFGaLZIh/5I\nv1UdPty76K4PLzAKBggqhkjOPQQDAgNJADBGAiEAseX9mwtQ2DN60jCplOIIPd2S\n+6bdgpQGiCeYNpY/sBcCIQDwduNJYOIlBGmQgH1KAk9nW5JxAzA2MsPKovjTUSFB\nyg==\n-----END CERTIFICATE-----\n\",\"signing_ca_certificate\": \"-----BEGIN CERTIFICATE-----\r\nMIICbDCCAhGgAwIBAgIJAOByzaI7aHY9MAoGCCqGSM49BAMDMIGQMQswCQYDVQQG\r\nEwJVUzEUMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzAN\r\nBgNVBAoMBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExU\r\nRCBDQTEhMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTE5MDUz\r\nMTE3MDE0N1oYDzIxMTkwNTA3MTcwMTQ3WjCBkDELMAkGA1UEBhMCVVMxFDASBgNV\r\nBAgMCyBOZXcgSmVyc2V5MRAwDgYDVQQHDAdDbGlmdG9uMQ8wDQYDVQQKDAZJVCBP\r\ncHMxDzANBgNVBAsMBklUIE9wczEUMBIGA1UEAwwLZVpMTyBMVEQgQ0ExITAfBgkq\r\nhkiG9w0BCQEWEnN5c2FkbWluc0BlemxvLmNvbTBWMBAGByqGSM49AgEGBSuBBAAK\r\nA0IABHLQdhLDYsafIFY8pZh96aDGqVm6E4r8nW9s4CfdpXaa/R4CnjaVpDQI7UmQ\r\n9vVDGZn8mcmm7VjKx+TSCS0MIKOjUzBRMB0GA1UdDgQWBBRiTl8Ez1l94jaqcxbi\r\nyxkVC0FkBTAfBgNVHSMEGDAWgBRiTl8Ez1l94jaqcxbiyxkVC0FkBTAPBgNVHRMB\r\nAf8EBTADAQH/MAoGCCqGSM49BAMDA0kAMEYCIQD7EUs8j50jKFd/46Zo95NbrPYQ\r\nPtLTHH9YjUkMEkYD5gIhAMP4y7E1aB78nQrmd3IX8MM32k9dM8xT0MztR16OtsuV\r\n-----END CERTIFICATE-----\",\"uuid\": \"4c0d9060-534c-11ec-b2d6-8f260f5287fa\",\"user_id\": \"lomas\",\"device_name\": \"My Device\",\"brand\": \"NDS Thermostat\",\"manufacturer_name\": \"Great Manif\",\"model_number\": \"063DEX524\",\"uuid_provisioning\": \"b558c598-a35a-4fdc-a2cd-5462ff11455a\",\"device_type_ezlopi\": \"generic\"}";
+                        if (decoded_data)
                         {
-                            TRACE_D("Here");
+                            TRACE_W("Here");
                             cJSON *cj_config = cJSON_Parse(decoded_data);
                             if (cj_config)
                             {
-                                TRACE_D("Here");
+                                TRACE_W("Here");
                                 s_basic_factory_info_t *ezlopi_config_basic = malloc(sizeof(s_basic_factory_info_t));
                                 if (ezlopi_config_basic)
                                 {
-                                    TRACE_D("Here");
+                                    memset(ezlopi_config_basic, 0, sizeof(s_basic_factory_info_t));
+                                    TRACE_W("Here");
                                     CJSON_GET_VALUE_STRING(cj_config, "device_name", ezlopi_config_basic->device_name);
                                     CJSON_GET_VALUE_STRING(cj_config, "manufacturer_name", ezlopi_config_basic->manufacturer);
                                     CJSON_GET_VALUE_STRING(cj_config, "brand", ezlopi_config_basic->brand);
@@ -245,14 +246,14 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
                                     CJSON_GET_VALUE_STRING(cj_config, "user_id", ezlopi_config_basic->user_id);
                                     CJSON_GET_VALUE_STRING(cj_config, "device_type_ezlopi", ezlopi_config_basic->device_type);
 
-                                    TRACE_D("Here");
+                                    TRACE_W("Here");
 
                                     ezlopi_factory_info_v2_set_basic(ezlopi_config_basic);
                                     free(ezlopi_config_basic);
                                 }
 
                                 char *ssl_private_key = NULL;
-                                TRACE_D("Here");
+                                TRACE_W("Here");
                                 char *ssl_shared_key = NULL;
                                 char *ssl_public_key = NULL;
                                 char *ca_certs = NULL;
@@ -272,7 +273,7 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
                                 cJSON_Delete(cj_config);
                             }
 
-                            // free(decoded_data);
+                            free(decoded_data);
                         }
 
                         ezlopi_ble_buffer_free_buffer(g_provisioning_linked_buffer);

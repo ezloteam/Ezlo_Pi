@@ -439,12 +439,12 @@ char *ezlopi_factory_info_v2_set_ssl_shared_key(void)
 }
 #endif
 
-#define UPDATE_VALUE(data, offset)                                      \
-    {                                                                   \
-        if (data)                                                       \
-        {                                                               \
-            snprintf(tmp_buffer + offset, length - offset, "%s", data); \
-        }                                                               \
+#define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
+    {                                                      \
+        if (data)                                          \
+        {                                                  \
+            snprintf(buffer + offset, length, "%s", data); \
+        }                                                  \
     }
 
 int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic)
@@ -453,10 +453,10 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
 
     if (ezlopi_config_basic)
     {
-        TRACE_D("Here");
+        TRACE_W("Here");
         if (ezlopi_factory_info_v2_init())
         {
-            TRACE_D("Here");
+            TRACE_W("Here");
 #if (ID_BIN_VERSION_1 == ID_BIN_VERSION)
             uint32_t length = 4 * 1024;
             uint32_t flash_offset = 0xE000; // hub_0_offset
@@ -464,36 +464,42 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
             char *tmp_buffer = (char *)malloc(length);
             if (tmp_buffer)
             {
-                TRACE_D("Here");
+                TRACE_W("Here");
                 if (ESP_OK == esp_partition_read(partition_ctx_v2, flash_offset, tmp_buffer, length))
                 {
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x0084, length, "%s", ezlopi_config_basic->device_name);
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x00CA, length, "%s", ezlopi_config_basic->manufacturer);
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x010A, length, "%s", ezlopi_config_basic->brand);
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x014A, length, "%s", ezlopi_config_basic->model_number);
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x01AA, length, "%s", ezlopi_config_basic->device_uuid);
-                    TRACE_D("Here");
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_name, 0x0084, NAME_LENGTH);
+                    // snprintf(tmp_buffer + 0x0084, NAME_LENGTH, "%s", ezlopi_config_basic->device_name);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->manufacturer, 0x00CA, MANUFACTURER_LENGTH);
+                    // snprintf(tmp_buffer + 0x00CA, MANUFACTURER_LENGTH, "%s", ezlopi_config_basic->manufacturer);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->brand, 0x010A, BRAND_LENGTH);
+                    // snprintf(tmp_buffer + 0x010A, BRAND_LENGTH, "%s", ezlopi_config_basic->brand);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->model_number, 0x014A, MODEL_LENGTH);
+                    // snprintf(tmp_buffer + 0x014A, MODEL_LENGTH, "%s", ezlopi_config_basic->model_number);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_uuid, 0x01AA, DEVICE_UUID_LENGTH);
+                    // snprintf(tmp_buffer + 0x01AA, DEVICE_UUID_LENGTH, "%s", ezlopi_config_basic->device_uuid);
+                    TRACE_W("Here");
                     // snprintf(tmp_buffer + 0x0024, length, "%s", ezlopi_config_basic->wifi_ssid);
                     // snprintf(tmp_buffer + 0x0044, length, "%s", ezlopi_config_basic->wifi_password);
-                    snprintf(tmp_buffer + 0x018A, length, "%s", ezlopi_config_basic->device_type);
-                    TRACE_D("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_type, 0x018A, DEVICE_TYPE_LENGTH);
+                    // snprintf(tmp_buffer + 0x018A, DEVICE_TYPE_LENGTH, "%s", ezlopi_config_basic->device_type);
+                    TRACE_W("Here");
 
-                    memcpy(tmp_buffer + 0x00C4, ezlopi_config_basic->device_mac, sizeof(ezlopi_config_basic->device_mac));
-                    TRACE_D("Here");
-                    memcpy(tmp_buffer + 0x0004, ezlopi_config_basic->id, sizeof(ezlopi_config_basic->id));
-                    TRACE_D("Here");
+                    memcpy(tmp_buffer + 0x00C4, ezlopi_config_basic->device_mac, DEVICE_MAC_LENGTH);
+                    TRACE_W("Here");
+                    memcpy(tmp_buffer + 0x0004, &ezlopi_config_basic->id, ID_LENGTH);
+                    TRACE_W("Here");
 
                     if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, flash_offset, length))
                     {
-                        TRACE_D("Here");
+                        TRACE_W("Here");
                         if (ESP_OK == esp_partition_write(partition_ctx_v2, flash_offset, tmp_buffer, length))
                         {
-                            TRACE_D("Here");
+                            TRACE_W("Here");
                             ret = 1;
                         }
                     }
@@ -507,22 +513,26 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
 
                 if (ESP_OK == esp_partition_read(partition_ctx_v2, flash_offset, tmp_buffer, length))
                 {
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x0214, length, "%s", ezlopi_config_basic->cloud_server);
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x0314, length, "%s", ezlopi_config_basic->prov_uuid);
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x0014, length, "%s", ezlopi_config_basic->provision_server);
-                    TRACE_D("Here");
-                    snprintf(tmp_buffer + 0x0114, length, "%s", ezlopi_config_basic->provision_token);
-                    TRACE_D("Here");
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->cloud_server, 0x0214, CLOUD_SERVER_LENGTH);
+                    // snprintf(tmp_buffer + 0x0214, CLOUD_SERVER_LENGTH, "%s", ezlopi_config_basic->cloud_server);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->prov_uuid, 0x0314, PROVISIONING_UUID_LENGTH);
+                    // snprintf(tmp_buffer + 0x0314, PROVISIONING_UUID_LENGTH, "%s", ezlopi_config_basic->prov_uuid);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_server, 0x0014, CLOUD_SERVER_LENGTH);
+                    // snprintf(tmp_buffer + 0x0014, CLOUD_SERVER_LENGTH, "%s", ezlopi_config_basic->provision_server);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_token, 0x0114, 256);
+                    // snprintf(tmp_buffer + 0x0114, 256, "%s", ezlopi_config_basic->provision_token);
+                    TRACE_W("Here");
 
                     if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, flash_offset, length))
                     {
-                        TRACE_D("Here");
+                        TRACE_W("Here");
                         if (ESP_OK == esp_partition_write(partition_ctx_v2, flash_offset, tmp_buffer, length))
                         {
-                            TRACE_D("Here");
+                            TRACE_W("Here");
                             ret = (ret == 1) ? 1 : 0;
                         }
                     }

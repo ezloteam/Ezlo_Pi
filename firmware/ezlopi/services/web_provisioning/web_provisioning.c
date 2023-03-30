@@ -208,6 +208,8 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
                 }
             }
         }
+
+        vTaskDelay(5000 / portTICK_RATE_MS);
     }
 
     vTaskDelete(NULL);
@@ -345,3 +347,4 @@ static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
     esp_restart();
     return NULL;
 }
+
