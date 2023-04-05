@@ -13,6 +13,8 @@
 #include<dialog_configdev_digitalio.h>
 #include<dialog_config_input.h>
 #include<dialog_config_adc.h>
+#include<dialog_config_pwm.h>
+#include<dialog_config_uart.h>
 #include<dialog_config_onewire.h>
 #include<dialog_config_i2c.h>
 #include<dialog_config_spi.h>
@@ -86,9 +88,11 @@ private:
     login * ezlogic_form_login;
     Dialog_WiFi * ezlogic_form_WiFi;
     Dialog_devadd * ezlogic_form_devadd;
+    Dialog_configdev_digitalio * ezlogic_form_configdev_digitalio;
     Dialog_config_input * ezlogic_form_config_digital_ip;
     Dialog_config_adc * ezlogic_form_config_analog_ip;
-    Dialog_configdev_digitalio * ezlogic_form_configdev_digitalio;
+    Dialog_config_pwm * ezlogic_form_config_pwm;
+    Dialog_config_uart * ezlogic_form_config_uart;
     Dialog_config_onewire * ezlogic_form_config_onewire;
     Dialog_config_i2c * ezlogic_form_config_i2c;
     Dialog_config_spi * ezlogic_form_config_spi;
@@ -139,12 +143,16 @@ private:
 
     QLabel *ezlogic_status = nullptr;
 
+    QString  ezlogic_uuid_self_prov;
+
     ezpi_log_level ezlogic_log_level;
 
     // Private methods
     void ezlogic_table_adddev_digital_op(ezpi_device_digital_op_t);
     void ezlogic_table_adddev_digital_ip(ezpi_device_digital_ip_t);
     void ezlogic_table_adddev_analog_ip(ezpi_device_analog_ip_t);
+    void ezlogic_table_adddev_pwm(ezpi_device_pwm_t);
+    void ezlogic_table_adddev_uart(ezpi_device_uart_t);
     void ezlogic_table_adddev_onewire(ezpi_device_one_wire_t);
     void ezlogic_table_adddev_i2c(ezpi_device_I2C_t);
     void ezlogic_table_adddev_spi(ezpi_device_SPI_t);

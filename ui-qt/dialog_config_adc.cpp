@@ -31,13 +31,19 @@ void Dialog_config_adc::on_buttonBox_accepted() {
 
     adc_user_data.dev_type = EZPI_DEV_TYPE_ANALOG_IP;
     adc_user_data.dev_name = ui->lineEdit_device_name->text();
-    adc_user_data.id_room = 0; //TBD
+    adc_user_data.id_room = ""; //TBD
 
-    adc_user_data.id_item = (ezpi_item_type)(ui->comboBox_ADC_subtype->currentIndex() + EZPI_ITEM_TYPE_POT_GENERIC);
+    if( ui->comboBox_ADC_subtype->currentIndex() == 0) {
+        adc_user_data.id_item = EZPI_ITEM_TYPE_POT_GENERIC;
+    } else if(ui->comboBox_ADC_subtype->currentIndex() == 1) {
+        adc_user_data.id_item = EZPI_ITEM_TYPE_WATER_LEAK_SENSOR;
+    } else {
+        // do nothing
+    }
 
     adc_user_data.gpio = ui->comboBox_adc_gpio->currentText().toInt();
 
-    adc_user_data.resln_bit = (ezpi_adc_resln)(ui->comboBox_adc_resolution->currentIndex() + 1);
+    adc_user_data.resln_bit = (ezpi_adc_resln)(ui->comboBox_ADC_subtype->currentIndex() + 1);
 
     // Adding device to the device vector
     if(ezloPi_adc->EZPI_ADD_AINPUT_DEVICE(adc_user_data) == EZPI_SUCCESS) {

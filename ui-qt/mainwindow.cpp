@@ -112,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->statusBar->addWidget(ezlogic_status);
 
-    ezpi_show_status_message("EzloPi V1.2.0, Build 2");
+    ezpi_show_status_message("EzloPi V1.3.4");
     // Build 0 : Release
     // Build 1 : S3 Support
     // Build 2 : Other device support
@@ -133,7 +133,7 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
     ezlogic_serial_port->setPort(ezlogic_serial_port_info);
 
     if(ezlogic_flag_serial_port_open == false) {
-        if(!ezlogic_serial_port_info.isBusy()) {
+        if(!ezlogic_serial_port_info.isNull()) {
 
             if(ezlogic_serial_port->open(QIODevice::ReadWrite)) {
                 ezlogic_flag_serial_port_open = true;
@@ -160,10 +160,11 @@ void MainWindow::on_pushButton_connect_uart_clicked() {
                 qDebug() << "Failed opeaning serial port: " << ui->comboBox_uart_list->currentText();
                 if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append("Failed opeaning serial port: " + ui->comboBox_uart_list->currentText());
             }
-        } else {
-            qDebug() << ezlogic_serial_port_info.portName() <<  ": port is busy !";
-            if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
         }
+//        else {
+//            qDebug() << ezlogic_serial_port_info.portName() <<  ": port is busy !";
+//            if(ezlogic_log_level == EZPI_LOG_INFO) ui->textBrowser_console_log->append(ezlogic_serial_port_info.portName() + QString::fromLocal8Bit(": port is busy !"));
+//        }
     } else {
         ezlogic_serial_port->close();
         ui->tableWidget_device_table->clearContents();
@@ -258,10 +259,10 @@ void MainWindow::on_pushButton_erase_flash_clicked() {
 
     QString command = "";
     for(auto args : arguments) {
-        command += args;
+        command += " " + args;
     }
 
-    qDebug() << command;
+    qDebug() << "Erase flash command arguments: " << command;
 
     ezlogic_process_erase_flash->setArguments(arguments);
     ezlogic_process_erase_flash->start();
@@ -351,7 +352,7 @@ void MainWindow::on_pushButton_flash_ezpi_bins_clicked() {
             arguments.append("--flash_freq");
             arguments.append("40m");
             arguments.append("0x0");
-            arguments.append("ezpibins/esp32s3/bootloader.bin");
+            arguments.append("ezpibins/esp32s3/0x0000.bin");
             arguments.append("0x8000");
             arguments.append("ezpibins/esp32s3/0x8000.bin");
             arguments.append("0x10000");
@@ -451,6 +452,17 @@ void MainWindow::on_pushButton_remove_device_clicked() {
             EzloPi->EZPI_DELETE_AINPUT_DEVICE();
             ezlogic_table_row_device_map.pop_back();
             break;
+
+        case EZPI_DEV_TYPE_PWM:
+            EzloPi->EZPI_DELETE_PWM_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
+            break;
+
+        case EZPI_DEV_TYPE_UART:
+            EzloPi->EZPI_DELETE_UART_DEVICE();
+            ezlogic_table_row_device_map.pop_back();
+            break;
+
         case EZPI_DEV_TYPE_ONE_WIRE:
             EzloPi->EZPI_DELETE_ONEWIRE_DEVICE();
             ezlogic_table_row_device_map.pop_back();
@@ -478,17 +490,6 @@ void MainWindow::on_pushButton_remove_device_clicked() {
 
 void MainWindow::on_pushButton_get_ezpi_config_clicked() {
 
-#if 0
-    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,"
-                        "\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,"
-                        "\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1"
-                        "\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip"
-                        "\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up"
-                        "\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room"
-                        "\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,"
-                        "\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
-#endif
-
     QString response_data;
 
     QString json_send_get_config = "{\"cmd\":4}";
@@ -507,6 +508,8 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
     std::vector <ezpi_device_digital_op_t> device_digital_op = EzloPi->EZPI_GET_OUTPUT_DEVICES();
     std::vector <ezpi_device_digital_ip_t> device_digital_ip = EzloPi->EZPI_GET_INPUT_DEVICES();
     std::vector <ezpi_device_analog_ip_t> device_analog_ip = EzloPi->EZPI_GET_AINPUT_DEVICES();
+    std::vector <ezpi_device_pwm_t> device_pwm = EzloPi->EZPI_GET_PWM_DEVICES();
+    std::vector <ezpi_device_uart_t> device_uart = EzloPi->EZPI_GET_UART_DEVICES();
     std::vector <ezpi_device_one_wire_t> device_onewire = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
     std::vector <ezpi_device_I2C_t> device_i2c = EzloPi->EZPI_GET_I2C_DEVICES();
     std::vector <ezpi_device_SPI_t> device_spi = EzloPi->EZPI_GET_SPI_DEVICES();
@@ -572,6 +575,38 @@ void MainWindow::on_pushButton_set_ezpi_config_clicked() {
 
         array_device_detail.push_back(object_device_analog_input);
     }
+
+
+    for(EZPI_UINT8 i = 0; i < device_pwm.size(); i++) {
+        QJsonObject object_device_pwm;
+
+        object_device_pwm.insert("dev_type", device_pwm[i].dev_type);
+        object_device_pwm.insert("dev_name", device_pwm[i].dev_name);
+        object_device_pwm.insert("id_room", device_pwm[i].id_room);
+        object_device_pwm.insert("id_item", device_pwm[i].id_item);
+        object_device_pwm.insert("gpio", device_pwm[i].gpio);
+        object_device_pwm.insert("freq_hz", device_pwm[i].freq_hz);
+        object_device_pwm.insert("pwm_resln", device_pwm[i].pwm_resln);
+        object_device_pwm.insert("duty_cycle", device_pwm[i].duty_cycle);
+
+        array_device_detail.push_back(object_device_pwm);
+    }
+
+
+    for(EZPI_UINT8 i = 0; i < device_uart.size(); i++) {
+        QJsonObject object_device_uart;
+
+        object_device_uart.insert("dev_type", device_uart[i].dev_type);
+        object_device_uart.insert("dev_name", device_uart[i].dev_name);
+        object_device_uart.insert("id_room", device_uart[i].id_room);
+        object_device_uart.insert("id_item", device_uart[i].id_item);
+        object_device_uart.insert("gpio_rx", device_uart[i].gpio_rx);
+        object_device_uart.insert("gpio_tx", device_uart[i].gpio_tx);
+        object_device_uart.insert("baud_rate", device_uart[i].baud_rate);
+
+        array_device_detail.push_back(object_device_uart);
+    }
+
 
     for(EZPI_UINT8 i = 0; i < device_onewire.size(); i++) {
         QJsonObject object_device_onewire;
@@ -743,6 +778,8 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
     ezlogic_form_configdev_digitalio = new Dialog_configdev_digitalio(this, EzloPi);
     ezlogic_form_config_digital_ip = new Dialog_config_input(this, EzloPi);
     ezlogic_form_config_analog_ip = new Dialog_config_adc(this, EzloPi);
+    ezlogic_form_config_pwm = new Dialog_config_pwm(this, EzloPi);
+    ezlogic_form_config_uart = new Dialog_config_uart(this, EzloPi);
     ezlogic_form_config_onewire = new Dialog_config_onewire(this, EzloPi);
     ezlogic_form_config_i2c = new Dialog_config_i2c(this, EzloPi);
     ezlogic_form_config_spi = new Dialog_config_spi(this, EzloPi);
@@ -751,6 +788,8 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
     connect(ezlogic_form_configdev_digitalio, SIGNAL(ezpi_signal_dev_op_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_digital_ip, SIGNAL(ezpi_signal_dev_ip_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_analog_ip, SIGNAL(ezpi_signal_dev_adc_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
+    connect(ezlogic_form_config_pwm, SIGNAL(ezpi_signal_dev_pwm_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
+    connect(ezlogic_form_config_uart, SIGNAL(ezpi_signal_dev_uart_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_onewire, SIGNAL(ezpi_signal_dev_onewire_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_i2c, SIGNAL(ezpi_signal_dev_i2c_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
     connect(ezlogic_form_config_spi, SIGNAL(ezpi_signal_dev_spi_added(ezpi_dev_type)), this, SLOT(ezlogic_receive_added_dev(ezpi_dev_type)));
@@ -780,11 +819,15 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_PWM: {
-            QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
+            ezlogic_form_config_pwm->setFixedSize(220, 315);
+            ezlogic_form_config_pwm->setModal(true);
+            ezlogic_form_config_pwm->show();
             break;
         }
         case EZPI_DEV_TYPE_UART: {
-            QMessageBox::information(this, "Unsupported", "This feature is not supported yet!");
+            ezlogic_form_config_uart->setFixedSize(185, 280);
+            ezlogic_form_config_uart->setModal(true);
+            ezlogic_form_config_uart->show();
             break;
         }
         case EZPI_DEV_TYPE_ONE_WIRE: {
@@ -807,6 +850,10 @@ void MainWindow::ezlogic_receive_dev_type_selected(EZPI_UINT8 dev_type_index) {
             break;
         }
         case EZPI_DEV_TYPE_OTHER: {
+            if(EzloPi->EZPI_GET_BOARD_TYPE() == EZPI_BOARD_TYPE_ESP32_C3) {
+                QMessageBox::information(this, "Unsupported", "Not supported for board ESP32C3.");
+                break;
+            }
             ezlogic_form_config_other->setFixedHeight(270);
             ezlogic_form_config_other->setFixedWidth(185);
             ezlogic_form_config_other->setModal(true);
@@ -844,7 +891,6 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             ezlogic_table_adddev_digital_ip(input_device);
             break;
         }
-
         case EZPI_DEV_TYPE_ANALOG_IP: {
 
             std::vector <ezpi_device_analog_ip_t> adc_devices = EzloPi->EZPI_GET_AINPUT_DEVICES();
@@ -853,7 +899,20 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
             ezlogic_table_adddev_analog_ip(adc_device);
             break;
         }
-
+        case EZPI_DEV_TYPE_PWM: {
+            std::vector <ezpi_device_pwm_t> pwm_devices = EzloPi->EZPI_GET_PWM_DEVICES();
+            EZPI_UINT8 pwm_devices_total = (EZPI_UINT8)pwm_devices.size();
+            ezpi_device_pwm_t pwm_device = pwm_devices[pwm_devices_total - 1];
+            ezlogic_table_adddev_pwm(pwm_device);
+            break;
+        }
+        case EZPI_DEV_TYPE_UART: {
+            std::vector <ezpi_device_uart_t> uart_devices = EzloPi->EZPI_GET_UART_DEVICES();
+            EZPI_UINT8 uart_devices_total = (EZPI_UINT8)uart_devices.size();
+            ezpi_device_uart_t uart_device = uart_devices[uart_devices_total - 1];
+            ezlogic_table_adddev_uart(uart_device);
+            break;
+        }
         case EZPI_DEV_TYPE_ONE_WIRE: {
             std::vector <ezpi_device_one_wire_t> onewire_devices = EzloPi->EZPI_GET_ONEWIRE_DEVICES();
             EZPI_UINT8 onewire_devices_total = (EZPI_UINT8)onewire_devices.size();
@@ -889,7 +948,7 @@ void MainWindow::ezlogic_receive_added_dev(ezpi_dev_type ezpi_added_dev_type) {
 
 void MainWindow::ezlogic_serial_receive_wif(ezpi_cmd cmd) {
     ezlogic_cmd_state = cmd;
-    ezlogic_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT_WIFI);
+    ezlogic_timer_serial_complete.start(EZPI_SERIAL_READ_TIMEOUT);
 }
 
 void MainWindow::ezlogic_clear_table_data(void) {
@@ -905,7 +964,9 @@ void MainWindow::ezlogic_clear_table_data(void) {
     EzloPi->EZPI_CLEAR_OUTPUT_DEVICES();
     EzloPi->EZPI_CLEAR_INPUT_DEVICES();
     EzloPi->EZPI_CLEAR_AINPUT_DEVICES();
-    EzloPi->EZPI_CLEAR_ONEWIRE_DEVICES();
+    EzloPi->EZPI_CLEAR_PWM_DEVICES();
+    EzloPi->EZPI_CLEAR_UART_DEVICES();
+    EzloPi->EZPI_CLEAR_ONEWIRE_DEVICES();    
     EzloPi->EZPI_CLEAR_I2C_DEVICES();
     EzloPi->EZPI_CLEAR_SPI_DEVICES();
     ezlogic_table_row_device_map.clear();
@@ -981,6 +1042,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
         QJsonObject jobj_get_prov_json;
         QJsonObject jobj_param;
 
+        ezlogic_uuid_self_prov = uuid;
         jobj_param["uuid"] = uuid;
         jobj_get_prov_json["params"] = jobj_param;
         jobj_get_prov_json["call"] = QString("self_provision_get");
@@ -1000,7 +1062,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
         QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
         connect(manager, SIGNAL(finished(QNetworkReply*)),
-                this, SLOT(ezlogic_success_get_prov_jsons(QNetworkReply*)));
+                this, SLOT(ezlogic_success_get_prov_jsons(QNetworkReply*)));        
 
         // FIXME for debug
         qDebug() << "Sync" << QString::fromUtf8(get_prov_json.data(), get_prov_json.size());
@@ -1020,9 +1082,9 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
     struct uuid _uuid;
 
     QByteArray response_bytes = d->readAll();
-//    qDebug() << "\r\n\r\n";
-//    qDebug().noquote() << QString(response_bytes);
-//    qDebug() << "\r\n\r\n";
+    qDebug() << "\r\n\r\n";
+    qDebug().noquote() << QString(response_bytes);
+    qDebug() << "\r\n\r\n";
     QJsonParseError jerror;
 
     QJsonDocument jdoc_prov_data= QJsonDocument::fromJson(response_bytes, &jerror);
@@ -1055,7 +1117,7 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
         qDebug() << "default_wifi_ssid: " << jobj_prov_data_prov_data["default_wifi_ssid"].toString();
         qDebug() << "default_wifi_password: " << jobj_prov_data_prov_data["default_wifi_password"].toString();
         qDebug() << "id: " << jobj_prov_data_prov_data["id"].toInt();
-        qDebug() << "controller_uuid: " << jobj_prov_data_data["controller_uuid"].toString();
+        qDebug() << "uuid: " << jobj_prov_data_data["controller_uuid"].toString();
 
         ui->textBrowser_console_log->append( QString::fromStdString("provision_server: ") + jobj_prov_data_prov_data["provision_server"].toString());
         ui->textBrowser_console_log->append( QString::fromStdString("cloud_server: ") + jobj_prov_data_prov_data["cloud_server"].toString());
@@ -1066,81 +1128,180 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
 
         ser_ver.data = 0;
         // For Connection-ID-0
-        ld_binary_array.insert(0, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
-        ld_binary_array.insert(4, jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_RESERVE_I,
+                               QString::fromStdString("").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_PROV_SERVER,
+                               jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x104, jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_PROV_TOKEN,
+                               jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x204, jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_CLOUD_SERVER,
+                               jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x1000, jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_PROV_UUID,
+                               ezlogic_uuid_self_prov.toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x3000, jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_CA_CERT,
+                               jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x4000, jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_SSL_PRIVATE_KEY,
+                               jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_SSL_SHARED_KEY,
+                               jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
 
         // For Connection ID 1
-        ser_ver.data = 1;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));          // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));      // Version
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 4, jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 260, jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 516, jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 0x1000, jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 0x3000, jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 0x4000, jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_RESERVE_I,
+                               QString::fromStdString("").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_PROV_SERVER,
+                               jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
 
-//        qDebug() << "Device ID : " << jobj_prov_data_prov_data["id"].toInt();
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_PROV_TOKEN,
+                               jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_CLOUD_SERVER,
+                               jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_PROV_UUID,
+                               ezlogic_uuid_self_prov.toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_CA_CERT,
+                               jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_SSL_PRIVATE_KEY,
+                               jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_SSL_SHARED_KEY,
+                               jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
 
         ser_ver.data = 0;
-        // For Connection-ID-0
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
-        id.data = jobj_prov_data_prov_data["id"].toInt();
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 4, QByteArray::fromRawData((const char *)id.data_bytes, 8));
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x0C, dev_uuid.toLocal8Bit());
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x1C, QString::fromStdString("US").toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x24, jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x44, jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi").toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x104, jobj_prov_data_prov_data["id"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
+        // For HUB-ID-0
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
 
-        ser_ver.data = 0;
-        // For Connection-ID-0
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
         id.data = jobj_prov_data_prov_data["id"].toInt();
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 4, QByteArray::fromRawData((const char *)id.data_bytes, 8));
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x0C, dev_uuid.toLocal8Bit());
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x1C, QString::fromStdString("US").toLocal8Bit());
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_ID,
+                               QByteArray::fromRawData((const char *)id.data_bytes, 8));
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_ZWAVE_REGION,
+                               QString::fromStdString("US").toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x24, jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_WIFI_SSID,
+                               jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x44, jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_WIFI_PASS,
+                               jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_NAME,
+                               QString::fromStdString("EzloPi").toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x104, jobj_prov_data_prov_data["id"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_MANUFACTURER,
+                               QString::fromStdString("EzloPi Manufacturer").toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_BRAND,
+                               QString::fromStdString("EzloPi Brand").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_MODEL,
+                               QString::fromStdString("EzloPi Model").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_EZLOPI_DEV_TYPE,
+                               QString::fromStdString("generic").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_UUID,
+                               jobj_prov_data_data["controller_uuid"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        // For HUB-ID-1
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
+        id.data = jobj_prov_data_prov_data["id"].toInt();
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_ID,
+                               QByteArray::fromRawData((const char *)id.data_bytes, 8));
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_ZWAVE_REGION,
+                               QString::fromStdString("US").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_WIFI_SSID,
+                               jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_WIFI_PASS,
+                               jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_NAME,
+                               QString::fromStdString("EzloPi").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_MANUFACTURER,
+                               QString::fromStdString("EzloPi Manufacturer").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_BRAND,
+                               QString::fromStdString("EzloPi Brand").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_MODEL,
+                               QString::fromStdString("EzloPi Model").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_EZLOPI_DEV_TYPE,
+                               QString::fromStdString("generic").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_UUID,
+                               jobj_prov_data_data["controller_uuid"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
 
         qDebug() << "Current dir: " << QDir::currentPath();
@@ -1267,13 +1428,13 @@ void MainWindow::on_actionDebug_triggered() {
 }
 
 void MainWindow::on_actionAbout_EzloPi_triggered() {
-    QMessageBox::about(this, "EzloPi V1.2.2", \
+    QMessageBox::about(this, "EzloPi V1.3.4", \
                        "EzloPi is an open-source project contributed by Ezlo Innovation "
                        "to extend the capabilities of ESP32 chipset-based devices "
                        "and platforms. It provides unparalleled capabilities to configure and "
                        "control your ESP-based devices and bring any of your automation ideas to life."
-                       "\nEzloPi UI Version 1.2.3\n"
-                       "EzloPi Firmware Version 2.0.1\n"
+                       "\nEzloPi UI Version 1.3.4\n"
+                       "EzloPi Firmware Version 2.0.7\n"
                        "Build type: Development\r\n"
                        "Web: https://www.ezlopi.com/\n"
                        "Project: https://github.com/ezloteam/Ezlo_Pi\n"
@@ -1340,6 +1501,45 @@ void MainWindow::ezlogic_table_adddev_analog_ip(ezpi_device_analog_ip_t adc_devi
     table_item_ezpi_devices = new QTableWidgetItem(QString::number(adc_device.gpio));
     ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
     ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_ANALOG_IP);
+
+}
+
+void MainWindow::ezlogic_table_adddev_pwm(ezpi_device_pwm_t pwm_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(pwm_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(pwm_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(pwm_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(QString::number(pwm_device.gpio));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+    ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_PWM);
+
+}
+
+void MainWindow::ezlogic_table_adddev_uart(ezpi_device_uart_t uart_device) {
+
+    QTableWidgetItem * table_item_ezpi_devices;
+    EZPI_UINT8 count_row =  ui->tableWidget_device_table->rowCount();
+    ui->tableWidget_device_table->setRowCount(count_row + 1);
+
+    table_item_ezpi_devices = new QTableWidgetItem(uart_device.dev_name);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_NAME, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_DEV_TYPE(uart_device.dev_type));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_DEV_TYPE, table_item_ezpi_devices);
+    table_item_ezpi_devices = new QTableWidgetItem(EzloPi->EZPI_GET_ITEM_TYPE(uart_device.id_item));
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_ITEM_TYPE, table_item_ezpi_devices);
+
+    EZPI_STRING GPIOs;
+    GPIOs = "RX: " + QString::number(uart_device.gpio_rx) + ", TX: " + QString::number(uart_device.gpio_tx) + ", Baud:" + QString::number(uart_device.baud_rate);
+    table_item_ezpi_devices = new QTableWidgetItem(GPIOs);
+    ui->tableWidget_device_table->setItem(count_row, EZLOZIC_TABLE_COLUMN_GPIOS, table_item_ezpi_devices);
+    ezlogic_table_row_device_map.push_back(EZPI_DEV_TYPE_UART);
 
 }
 
@@ -1452,21 +1652,21 @@ void MainWindow::ezlogic_serial_process(void) {
     }
 
     int idx = 0;    
-    int found_start_bytes = 0;
+//    int found_start_bytes = 0;
 
-    while (idx != (rx_size - 8)) {
-        if( (ezlogic_read_data_serial->at(idx) == '\200') &&
-            (ezlogic_read_data_serial->at(idx+1) == '\r') &&
-            (ezlogic_read_data_serial->at(idx+2) == '\n') &&
-            (ezlogic_read_data_serial->at(idx+3) == '{') )
-        {
-            found_start_bytes = 1;
-            ezlogic_read_data_serial->remove(0, idx+3);
-            break;
-        }
+//    while (idx != (rx_size - 8)) {
+//        if( (ezlogic_read_data_serial->at(idx) == '\200') &&
+//            (ezlogic_read_data_serial->at(idx+1) == '\r') &&
+//            (ezlogic_read_data_serial->at(idx+2) == '\n') &&
+//            (ezlogic_read_data_serial->at(idx+3) == '{') )
+//        {
+//            found_start_bytes = 1;
+//            ezlogic_read_data_serial->remove(0, idx+3);
+//            break;
+//        }
 
-        idx++;
-    }
+//        idx++;
+//    }
 
     idx = 0;
     rx_size = ezlogic_read_data_serial->count();
@@ -1494,9 +1694,9 @@ void MainWindow::ezlogic_serial_process(void) {
 
     qDebug().noquote() << "Json data: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
 
-    if( 0 == found_start_bytes ) {
-        return;
-    }
+//    if( 0 == found_start_bytes ) {
+//        return;
+//    }
 
 
     ui->textBrowser_console_log->append("Json Data: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
@@ -1580,7 +1780,7 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
 #endif
     if(json_map_root_get_info["status"].toUInt() == 1) {
 
-        get_info_fmw_info.v_sw = json_map_root_get_info["v_sw"].toUInt();
+        get_info_fmw_info.v_sw = json_map_root_get_info["v_fmw"].toUInt();
         get_info_fmw_info.v_type = json_map_root_get_info["v_type"].toUInt();
         get_info_fmw_info.build = json_map_root_get_info["build"].toUInt();
         get_info_fmw_info.v_idf = json_map_root_get_info["v_idf"].toUInt();
@@ -1618,6 +1818,8 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
     ezpi_device_digital_op_t device_digital_op;
     ezpi_device_digital_ip_t device_digital_ip;
     ezpi_device_analog_ip_t device_analog_ip;
+    ezpi_device_pwm_t device_pwm;
+    ezpi_device_uart_t device_uart;
     ezpi_device_one_wire_t device_onewire;
     ezpi_device_I2C_t device_i2c;
     ezpi_device_SPI_t device_spi;
@@ -1632,6 +1834,8 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
     EzloPi->EZPI_CLEAR_OUTPUT_DEVICES();
     EzloPi->EZPI_CLEAR_INPUT_DEVICES();
     EzloPi->EZPI_CLEAR_AINPUT_DEVICES();
+    EzloPi->EZPI_CLEAR_PWM_DEVICES();
+    EzloPi->EZPI_CLEAR_UART_DEVICES();
     EzloPi->EZPI_CLEAR_ONEWIRE_DEVICES();
     EzloPi->EZPI_CLEAR_I2C_DEVICES();
     EzloPi->EZPI_CLEAR_SPI_DEVICES();
@@ -1647,7 +1851,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
             case EZPI_DEV_TYPE_DIGITAL_OP:
                 device_digital_op.dev_name = get_config_device["dev_name"].toString();
                 device_digital_op.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
-                device_digital_op.id_room = get_config_device["id_room"].toUInt();
+                device_digital_op.id_room = get_config_device["id_room"].toString();
                 device_digital_op.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
                 device_digital_op.val_ip = get_config_device["val_ip"].toBool();
                 device_digital_op.val_op = get_config_device["val_op"].toBool();
@@ -1667,7 +1871,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
             case EZPI_DEV_TYPE_DIGITAL_IP:
                 device_digital_ip.dev_name = get_config_device["dev_name"].toString();
                 device_digital_ip.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
-                device_digital_ip.id_room = get_config_device["id_room"].toUInt();
+                device_digital_ip.id_room = get_config_device["id_room"].toString();
                 device_digital_ip.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
                 device_digital_ip.val_ip = get_config_device["val_ip"].toBool();
                 device_digital_ip.gpio = get_config_device["gpio"].toUInt();
@@ -1679,10 +1883,11 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
                 ezlogic_table_adddev_digital_ip(device_digital_ip);
                 break;
 
+
         case EZPI_DEV_TYPE_ANALOG_IP:
             device_analog_ip.dev_name = get_config_device["dev_name"].toString();
             device_analog_ip.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
-            device_analog_ip.id_room = get_config_device["id_room"].toUInt();
+            device_analog_ip.id_room = get_config_device["id_room"].toString();
             device_analog_ip.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
             device_analog_ip.gpio = get_config_device["gpio"].toUInt();
             device_analog_ip.resln_bit = (ezpi_adc_resln)get_config_device["resln_bit"].toUInt();
@@ -1692,10 +1897,39 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
             ezlogic_table_adddev_analog_ip(device_analog_ip);
             break;
 
+            case EZPI_DEV_TYPE_PWM:
+                device_pwm.dev_name = get_config_device["dev_name"].toString();
+                device_pwm.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_pwm.id_room = get_config_device["id_room"].toString();
+                device_pwm.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_pwm.gpio = get_config_device["gpio"].toUInt();
+                device_pwm.pwm_resln = (ezpi_pwm_resln)get_config_device["pwm_resln"].toUInt();
+                device_pwm.duty_cycle = get_config_device["duty_cycle"].toUInt();
+                device_pwm.freq_hz = get_config_device["freq_hz"].toUInt();
+
+                EzloPi->EZPI_ADD_PWM_DEVICE(device_pwm);
+
+                ezlogic_table_adddev_pwm(device_pwm);
+                break;
+
+            case EZPI_DEV_TYPE_UART:
+                device_uart.dev_name = get_config_device["dev_name"].toString();
+                device_uart.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
+                device_uart.id_room = get_config_device["id_room"].toString();
+                device_uart.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
+                device_uart.gpio_rx = get_config_device["gpio_rx"].toUInt();
+                device_uart.gpio_tx = get_config_device["gpio_tx"].toUInt();
+                device_uart.baud_rate = get_config_device["baud_rate"].toUInt();
+
+                EzloPi->EZPI_ADD_UART_DEVICE(device_uart);
+
+                ezlogic_table_adddev_uart(device_uart);
+                break;
+
             case EZPI_DEV_TYPE_ONE_WIRE:
                 device_onewire.dev_name = get_config_device["dev_name"].toString();
                 device_onewire.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
-                device_onewire.id_room = get_config_device["id_room"].toUInt();
+                device_onewire.id_room = get_config_device["id_room"].toString();
                 device_onewire.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
                 device_onewire.gpio = get_config_device["gpio"].toUInt();
 
@@ -1707,7 +1941,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
             case EZPI_DEV_TYPE_I2C:
                 device_i2c.dev_name = get_config_device["dev_name"].toString();
                 device_i2c.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
-                device_i2c.id_room = get_config_device["id_room"].toUInt();
+                device_i2c.id_room = get_config_device["id_room"].toString();
                 device_i2c.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
                 device_i2c.gpio_sda = get_config_device["gpio_sda"].toUInt();
                 device_i2c.gpio_scl = get_config_device["gpio_scl"].toUInt();
@@ -1723,7 +1957,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
             case EZPI_DEV_TYPE_SPI:
                 device_spi.dev_name = get_config_device["dev_name"].toString();
                 device_spi.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
-                device_spi.id_room = get_config_device["id_room"].toUInt();
+                device_spi.id_room = get_config_device["id_room"].toString();
                 device_spi.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
                 device_spi.gpio_miso = get_config_device["gpio_miso"].toUInt();
                 device_spi.gpio_mosi = (ezpi_dev_type)get_config_device["gpio_mosi"].toUInt();
@@ -1738,7 +1972,7 @@ void MainWindow::ezlogic_action_get_config_process(QByteArray serial_read) {
             case EZPI_DEV_TYPE_OTHER:
                 device_other.dev_name = get_config_device["dev_name"].toString();
                 device_other.dev_type = (ezpi_dev_type)get_config_device["dev_type"].toUInt();
-                device_other.id_room = get_config_device["id_room"].toUInt();
+                device_other.id_room = get_config_device["id_room"].toString();
                 device_other.id_item = (ezpi_item_type)get_config_device["id_item"].toUInt();
                 device_other.en_gpio1 = get_config_device["en_gpio1"].toBool();
                 device_other.gpio1 = get_config_device["gpio1"].toUInt();

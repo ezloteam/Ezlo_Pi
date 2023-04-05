@@ -39,8 +39,17 @@ EzPi::EzPi() {
     ezpi_item_types_str->append("POT");
     ezpi_item_types_str->append("Door Sensor");
     ezpi_item_types_str->append("PIR Sensor");
+    ezpi_item_types_str->append("Parallax 2-Axis Joystick");
+    ezpi_item_types_str->append("MB1013 Sonar");
+    ezpi_item_types_str->append("PWM Generic Load");
+    ezpi_item_types_str->append("TTP Touch Sensor");
+    ezpi_item_types_str->append("HC SR04 Ultrasonic Sensor");
+    ezpi_item_types_str->append("LDR Switch");
+    ezpi_item_types_str->append("LDR Sensor");
+    ezpi_item_types_str->append("Water Leak Sensor");
+    ezpi_item_types_str->append("DS18B20 Temperature Sensor");
 
-     ezpi_firmware_info = new ezpi_info_t;
+    ezpi_firmware_info = new ezpi_info_t;
 
 }
 
@@ -58,6 +67,9 @@ void EzPi::EZPI_SET_BOARD_TYPE(ezpi_board_type board_type) {
     case EZPI_BOARD_TYPE_ESP32_S3:
         ezpi_gpio_pool.resize(EZPI_ESP32_S3_PINOUT_COUNT);
         break;
+    case EZPI_BOARD_TYPE_ESP32_C3:
+        ezpi_gpio_pool.resize(EZPI_ESP32_C3_PINOUT_COUNT);
+        break;        
     default:
         break;
     }
@@ -163,6 +175,33 @@ void EzPi::EZPI_INIT_BOARD(void) {
             ezpi_gpio_pool.at(47) = EZPI_DEV_TYPE_UNCONFIGURED;
             ezpi_gpio_pool.at(48) = EZPI_DEV_TYPE_UNCONFIGURED;
             break;
+
+        case EZPI_BOARD_TYPE_ESP32_C3:  
+            // Referece
+            // https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/peripherals/gpio.html
+            ezpi_gpio_pool.at(0) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(1) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(2) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(3) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(4) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(5) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(6) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(7) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(8) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(9) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(10) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(11) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(12) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(13) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(14) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(15) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(16) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(17) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(18) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(19) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(20) = EZPI_DEV_TYPE_UNCONFIGURED;
+            ezpi_gpio_pool.at(21) = EZPI_DEV_TYPE_UNCONFIGURED;
+        break;          
         default:
             break;
     }
@@ -191,6 +230,21 @@ ezpi_error_codes_configurator EzPi::EZPI_ADD_AINPUT_DEVICE(ezpi_device_analog_ip
     if(ezpi_analog_input_devices.size() >= EZPI_MAX_DEV_AIP) return EZPI_ERROR_REACHED_MAX_DEV;
     EZPI_SET_GPIO_POOL(d.gpio, EZPI_DEV_TYPE_ANALOG_IP);
     ezpi_analog_input_devices.push_back(d);
+    return EZPI_SUCCESS;
+}
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_PWM_DEVICE(ezpi_device_pwm_t d) {
+    if(ezpi_pwm_devices.size() >= EZPI_MAX_DEV_PWM) return EZPI_ERROR_REACHED_MAX_DEV;
+    EZPI_SET_GPIO_POOL(d.gpio, EZPI_DEV_TYPE_PWM);
+    ezpi_pwm_devices.push_back(d);
+    return EZPI_SUCCESS;
+}
+
+ezpi_error_codes_configurator EzPi::EZPI_ADD_UART_DEVICE(ezpi_device_uart_t d) {
+    if(ezpi_uart_devices.size() >= EZPI_MAX_DEV_UART) return EZPI_ERROR_REACHED_MAX_DEV;
+    EZPI_SET_GPIO_POOL(d.gpio_rx, EZPI_DEV_TYPE_UART);
+    EZPI_SET_GPIO_POOL(d.gpio_tx, EZPI_DEV_TYPE_UART);
+    ezpi_uart_devices.push_back(d);
     return EZPI_SUCCESS;
 }
 
@@ -247,6 +301,19 @@ void EzPi::EZPI_DELETE_AINPUT_DEVICE(void) {
     ezpi_device_analog_ip_t d = ezpi_analog_input_devices.back();
     ezpi_gpio_pool[d.gpio] = EZPI_DEV_TYPE_UNCONFIGURED;
     ezpi_analog_input_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_PWM_DEVICE(void) {
+    ezpi_device_pwm_t d = ezpi_pwm_devices.back();
+    ezpi_gpio_pool[d.gpio] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_pwm_devices.pop_back();
+}
+
+void EzPi::EZPI_DELETE_UART_DEVICE(void) {
+    ezpi_device_uart_t d = ezpi_uart_devices.back();
+    ezpi_gpio_pool[d.gpio_rx] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_gpio_pool[d.gpio_tx] = EZPI_DEV_TYPE_UNCONFIGURED;
+    ezpi_uart_devices.pop_back();
 }
 
 void EzPi::EZPI_DELETE_ONEWIRE_DEVICE(void) {

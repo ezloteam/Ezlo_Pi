@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>167</width>
+    <width>191</width>
     <height>262</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Analog Output</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ezlopi.qrc">
@@ -58,6 +58,11 @@
    <item>
     <property name="text">
      <string>POT : Generic</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Water Leak Sensor</string>
     </property>
    </item>
   </widget>
@@ -123,7 +128,7 @@
     <string>Device sub type</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_adc_resolution">
+  <widget class="QComboBox" name="comboBox">
    <property name="geometry">
     <rect>
      <x>10</x>

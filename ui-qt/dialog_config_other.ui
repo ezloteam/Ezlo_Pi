@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Other</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="ezlopi.qrc">
+    <normaloff>:/res/icon.png</normaloff>:/res/icon.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -51,6 +55,11 @@
    <item>
     <property name="text">
      <string>Door Sensor</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HC SR04 Ultrasonic Distance Sensor</string>
     </property>
    </item>
   </widget>
@@ -156,7 +165,9 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="ezlopi.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

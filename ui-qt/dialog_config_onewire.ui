@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>One Wire</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ezlopi.qrc">
@@ -99,6 +99,11 @@
    <item>
     <property name="text">
      <string>DHT22</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>DS18B20</string>
     </property>
    </item>
   </widget>
