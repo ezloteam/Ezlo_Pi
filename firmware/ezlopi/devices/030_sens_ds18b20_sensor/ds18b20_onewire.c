@@ -1,6 +1,6 @@
 
 
-#include "onewire.h"
+#include "ds18b20_onewire.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
@@ -10,10 +10,6 @@
 static esp_err_t one_wire_write_bit_to_line(uint8_t bit, uint32_t gpio_pin);
 static esp_err_t one_wire_read_bit_from_line(uint8_t* bit, uint32_t gpio_pin);
 
-void onewire_init()
-{
-    ESP_LOGI(ONEWIRE_TAG, "(%d, func: %s)", ONEWIRE_GET_LINE, __func__);
-}
 
 esp_err_t one_wire_write_byte_to_line(uint8_t* data, uint32_t gpio_pin)
 {
@@ -113,5 +109,6 @@ bool one_wire_reset_line(uint32_t gpio_pin)
 
     return (presence == 0) ?  true: false;
 }
+
 
 

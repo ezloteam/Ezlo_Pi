@@ -1,3 +1,9 @@
+
+
+
+// Reference for onewire: https://www.analog.com/en/technical-articles/1wire-communication-through-software.html
+
+
 #ifndef _ONEWIRE_H_
 #define _ONEWIRE_H_
 
@@ -7,6 +13,8 @@
 #include "freertos/semphr.h"
 #include "stdbool.h"
 
+#define ONEWIRE_TAG             __FILE__
+#define ONEWIRE_GET_LINE        __LINE__
 
 #define onewireENTER_CRITICAL_REGION() portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;taskENTER_CRITICAL(&mux)
 #define onewireEXIT_CRITICAL_REGION()  taskEXIT_CRITICAL(&mux)
@@ -28,9 +36,10 @@
 #define ONE_WIRE_RESET_LINE_SAMPLING_US                         410     // 410us
 
 
-void onewire_init();
+
 esp_err_t one_wire_write_byte_to_line(uint8_t* data, uint32_t gpio_pin);
 esp_err_t one_wire_read_byte_from_line(uint8_t* data, uint32_t gpio_pin);
 bool one_wire_reset_line(uint32_t gpio_pin);
 
 #endif // _ONEWIRE_H_
+
