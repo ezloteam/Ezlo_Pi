@@ -37,7 +37,13 @@ void Dialog_config_pwm::on_buttonBox_accepted()
     pwm_user_data.dev_name = ui->lineEdit_device_name->text();
     pwm_user_data.id_room = ""; //TBD
 
-    pwm_user_data.id_item = (ezpi_item_type)(ui->comboBox_pwm_device_subtype->currentIndex() + EZPI_ITEM_TYPE_PWM_GENERIC_LOAD);
+    if(ui->comboBox_pwm_device_subtype->currentIndex()  == 0) {
+        pwm_user_data.id_item = EZPI_ITEM_TYPE_PWM_GENERIC_LOAD;
+    } else if(ui->comboBox_pwm_device_subtype->currentIndex()  == 1) {
+        pwm_user_data.id_item = EZPI_ITEM_TYPE_JSNSR04T;
+    } else {
+
+    }
 
     pwm_user_data.gpio = ui->comboBox_pwm_gpio->currentText().toInt();
 

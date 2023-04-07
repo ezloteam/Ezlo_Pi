@@ -490,17 +490,6 @@ void MainWindow::on_pushButton_remove_device_clicked() {
 
 void MainWindow::on_pushButton_get_ezpi_config_clicked() {
 
-#if 0
-    QString test_json = "{\"cmd\":4,\"dev_detail\":[{\"dev_name\":\"Digital Out 1\",\"dev_type\":1,\"gpio_in\":4,"
-                        "\"gpio_out\":2,\"id_item\":1,\"id_room\":0,\"ip_inv\":false,\"is_ip\":true,\"op_inv\":false,"
-                        "\"pullup_ip\":true,\"pullup_op\":true,\"val_ip\":false,\"val_op\":false},{\"dev_name\":\"Digital In 1"
-                        "\",\"dev_type\":2,\"gpio\":5,\"id_item\":4,\"id_room\":0,\"logic_inv\":false,\"pull_up\":true,\"val_ip"
-                        "\":false},{\"dev_name\":\"Onewire 1\",\"dev_type\":7,\"gpio\":13,\"id_item\":15,\"id_room\":0,\"pull_up"
-                        "\":true,\"val_ip\":false},{\"dev_name\":\"I2C 1\",\"gpio_scl\":15,\"gpio_sda\":14,\"id_item\":5,\"id_room"
-                        "\":0,\"pullup_scl\":false,\"pullup_sda\":false,\"slave_addr\":0},{\"dev_name\":\"SPI 1\",\"dev_type\":9,"
-                        "\"gpio_cs\":19,\"gpio_miso\":17,\"gpio_mosi\":16,\"gpio_sck\":18,\"id_item\":13,\"id_room\":0}],\"dev_total\":5}";
-#endif
-
     QString response_data;
 
     QString json_send_get_config = "{\"cmd\":4}";
@@ -1053,6 +1042,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
         QJsonObject jobj_get_prov_json;
         QJsonObject jobj_param;
 
+        ezlogic_uuid_self_prov = uuid;
         jobj_param["uuid"] = uuid;
         jobj_get_prov_json["params"] = jobj_param;
         jobj_get_prov_json["call"] = QString("self_provision_get");
@@ -1072,7 +1062,7 @@ void MainWindow::ezlogic_success_prov_dat(QNetworkReply *d) {
         QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
         connect(manager, SIGNAL(finished(QNetworkReply*)),
-                this, SLOT(ezlogic_success_get_prov_jsons(QNetworkReply*)));
+                this, SLOT(ezlogic_success_get_prov_jsons(QNetworkReply*)));        
 
         // FIXME for debug
         qDebug() << "Sync" << QString::fromUtf8(get_prov_json.data(), get_prov_json.size());
@@ -1092,9 +1082,9 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
     struct uuid _uuid;
 
     QByteArray response_bytes = d->readAll();
-//    qDebug() << "\r\n\r\n";
-//    qDebug().noquote() << QString(response_bytes);
-//    qDebug() << "\r\n\r\n";
+    qDebug() << "\r\n\r\n";
+    qDebug().noquote() << QString(response_bytes);
+    qDebug() << "\r\n\r\n";
     QJsonParseError jerror;
 
     QJsonDocument jdoc_prov_data= QJsonDocument::fromJson(response_bytes, &jerror);
@@ -1127,7 +1117,7 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
         qDebug() << "default_wifi_ssid: " << jobj_prov_data_prov_data["default_wifi_ssid"].toString();
         qDebug() << "default_wifi_password: " << jobj_prov_data_prov_data["default_wifi_password"].toString();
         qDebug() << "id: " << jobj_prov_data_prov_data["id"].toInt();
-        qDebug() << "controller_uuid: " << jobj_prov_data_data["controller_uuid"].toString();
+        qDebug() << "uuid: " << jobj_prov_data_data["controller_uuid"].toString();
 
         ui->textBrowser_console_log->append( QString::fromStdString("provision_server: ") + jobj_prov_data_prov_data["provision_server"].toString());
         ui->textBrowser_console_log->append( QString::fromStdString("cloud_server: ") + jobj_prov_data_prov_data["cloud_server"].toString());
@@ -1138,81 +1128,180 @@ void MainWindow::ezlogic_success_get_prov_jsons(QNetworkReply *d) {
 
         ser_ver.data = 0;
         // For Connection-ID-0
-        ld_binary_array.insert(0, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
-        ld_binary_array.insert(4, jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_RESERVE_I,
+                               QString::fromStdString("").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_PROV_SERVER,
+                               jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x104, jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_PROV_TOKEN,
+                               jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x204, jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_CLOUD_SERVER,
+                               jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x1000, jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_PROV_UUID,
+                               ezlogic_uuid_self_prov.toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x3000, jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_CA_CERT,
+                               jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(0x4000, jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_SSL_PRIVATE_KEY,
+                               jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_0 + EZPI_PROV_CONN_ID_PARAM_SSL_SHARED_KEY,
+                               jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
 
         // For Connection ID 1
-        ser_ver.data = 1;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));          // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));      // Version
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 4, jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 260, jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 516, jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 0x1000, jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 0x3000, jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + 0x4000, jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_RESERVE_I,
+                               QString::fromStdString("").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_PROV_SERVER,
+                               jobj_prov_data_prov_data["provision_server"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
 
-//        qDebug() << "Device ID : " << jobj_prov_data_prov_data["id"].toInt();
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_PROV_TOKEN,
+                               jobj_prov_data_prov_data["provision_token"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_CLOUD_SERVER,
+                               jobj_prov_data_prov_data["cloud_server"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_PROV_UUID,
+                               ezlogic_uuid_self_prov.toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_CA_CERT,
+                               jobj_prov_data_prov_data["signing_ca_certificate"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_SSL_PRIVATE_KEY,
+                               jobj_prov_data_prov_data["ssl_private_key"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_CONN_ID_1 + EZPI_PROV_CONN_ID_PARAM_SSL_SHARED_KEY,
+                               jobj_prov_data_prov_data["ssl_shared_key"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
 
         ser_ver.data = 0;
-        // For Connection-ID-0
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
-        id.data = jobj_prov_data_prov_data["id"].toInt();
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 4, QByteArray::fromRawData((const char *)id.data_bytes, 8));
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x0C, dev_uuid.toLocal8Bit());
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x1C, QString::fromStdString("US").toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x24, jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + 0x44, jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi").toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x104, jobj_prov_data_prov_data["id"].toString().toLocal8Bit());
-        ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
+        // For HUB-ID-0
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
 
-        ser_ver.data = 0;
-        // For Connection-ID-0
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
-        ser_ver.data = 100;
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 2, QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
         id.data = jobj_prov_data_prov_data["id"].toInt();
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 4, QByteArray::fromRawData((const char *)id.data_bytes, 8));
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x0C, dev_uuid.toLocal8Bit());
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x1C, QString::fromStdString("US").toLocal8Bit());
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_ID,
+                               QByteArray::fromRawData((const char *)id.data_bytes, 8));
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_ZWAVE_REGION,
+                               QString::fromStdString("US").toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x24, jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_WIFI_SSID,
+                               jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x44, jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_WIFI_PASS,
+                               jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x84, QString::fromStdString("EzloPi").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_NAME,
+                               QString::fromStdString("EzloPi").toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x104, jobj_prov_data_prov_data["id"].toString().toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_MANUFACTURER,
+                               QString::fromStdString("EzloPi Manufacturer").toLocal8Bit());
         ld_binary_array.append('\0');
-        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + 0x124, QString::fromStdString("unknown").toLocal8Bit());
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_BRAND,
+                               QString::fromStdString("EzloPi Brand").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_MODEL,
+                               QString::fromStdString("EzloPi Model").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_EZLOPI_DEV_TYPE,
+                               QString::fromStdString("generic").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_0 + EZPI_PROV_HUB_ID_PARAM_UUID,
+                               jobj_prov_data_data["controller_uuid"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        // For HUB-ID-1
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_SN,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Serial
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_VERSION,
+                               QByteArray::fromRawData((const char *)ser_ver.data_bytes, 2));           // Version
+
+        id.data = jobj_prov_data_prov_data["id"].toInt();
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_ID,
+                               QByteArray::fromRawData((const char *)id.data_bytes, 8));
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_ZWAVE_REGION,
+                               QString::fromStdString("US").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_WIFI_SSID,
+                               jobj_prov_data_prov_data["default_wifi_ssid"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_WIFI_PASS,
+                               jobj_prov_data_prov_data["default_wifi_password"].toString().toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_NAME,
+                               QString::fromStdString("EzloPi").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_MANUFACTURER,
+                               QString::fromStdString("EzloPi Manufacturer").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_BRAND,
+                               QString::fromStdString("EzloPi Brand").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_MODEL,
+                               QString::fromStdString("EzloPi Model").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_EZLOPI_DEV_TYPE,
+                               QString::fromStdString("generic").toLocal8Bit());
+        ld_binary_array.append('\0');
+
+        ld_binary_array.insert(SIZE_EZPI_OFFSET_HUB_ID_1 + EZPI_PROV_HUB_ID_PARAM_UUID,
+                               jobj_prov_data_data["controller_uuid"].toString().toLocal8Bit());
         ld_binary_array.append('\0');
 
         qDebug() << "Current dir: " << QDir::currentPath();

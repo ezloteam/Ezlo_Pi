@@ -37,8 +37,10 @@ void Dialog_config_adc::on_buttonBox_accepted() {
         adc_user_data.id_item = EZPI_ITEM_TYPE_POT_GENERIC;
     } else if(ui->comboBox_ADC_subtype->currentIndex() == 1) {
         adc_user_data.id_item = EZPI_ITEM_TYPE_WATER_LEAK_SENSOR;
+    } else if (adc_user_data.id_item == 2){
+        adc_user_data.id_item = EZPI_ITEM_TYPE_SOIL_MOISTURE_SENSOR;
     } else {
-        // do nothing
+
     }
 
     adc_user_data.gpio = ui->comboBox_adc_gpio->currentText().toInt();
