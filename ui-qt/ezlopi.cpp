@@ -47,7 +47,11 @@ EzPi::EzPi() {
     ezpi_item_types_str->append("LDR Switch");
     ezpi_item_types_str->append("LDR Sensor");
     ezpi_item_types_str->append("Water Leak Sensor");
+    ezpi_item_types_str->append("GY291 Digital Accelerometer");
+    ezpi_item_types_str->append("IR Blaster");
     ezpi_item_types_str->append("DS18B20 Temperature Sensor");
+    ezpi_item_types_str->append("JSNR04T Water Level Sensor");
+    ezpi_item_types_str->append("Soil Moisture Sensor");
 
     ezpi_firmware_info = new ezpi_info_t;
 

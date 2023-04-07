@@ -60,6 +60,11 @@
      <string>Generic PWM Load</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>JSNR04T Water Level Sensor</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLineEdit" name="lineEdit_device_name">
    <property name="geometry">

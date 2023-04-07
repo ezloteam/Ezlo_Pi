@@ -211,6 +211,11 @@
      <string>LNA219</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>GY291 Digital Accelerometer</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_device_sub_type">
    <property name="geometry">

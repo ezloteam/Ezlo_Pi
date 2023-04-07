@@ -65,6 +65,11 @@
      <string>Water Leak Sensor</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>Soil Moisture Sensor</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_device_name">
    <property name="geometry">

@@ -93,11 +93,6 @@
    </property>
    <item>
     <property name="text">
-     <string>DHT11</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
      <string>DHT22</string>
     </property>
    </item>
