@@ -1652,21 +1652,21 @@ void MainWindow::ezlogic_serial_process(void) {
     }
 
     int idx = 0;    
-//    int found_start_bytes = 0;
+    int found_start_bytes = 0;
 
-//    while (idx != (rx_size - 8)) {
-//        if( (ezlogic_read_data_serial->at(idx) == '\200') &&
-//            (ezlogic_read_data_serial->at(idx+1) == '\r') &&
-//            (ezlogic_read_data_serial->at(idx+2) == '\n') &&
-//            (ezlogic_read_data_serial->at(idx+3) == '{') )
-//        {
-//            found_start_bytes = 1;
-//            ezlogic_read_data_serial->remove(0, idx+3);
-//            break;
-//        }
+    while (idx != (rx_size - 8)) {
+        if( (ezlogic_read_data_serial->at(idx) == '\200') &&
+            (ezlogic_read_data_serial->at(idx+1) == '\r') &&
+            (ezlogic_read_data_serial->at(idx+2) == '\n') &&
+            (ezlogic_read_data_serial->at(idx+3) == '{') )
+        {
+            found_start_bytes = 1;
+            ezlogic_read_data_serial->remove(0, idx+3);
+            break;
+        }
 
-//        idx++;
-//    }
+        idx++;
+    }
 
     idx = 0;
     rx_size = ezlogic_read_data_serial->count();
@@ -1694,9 +1694,9 @@ void MainWindow::ezlogic_serial_process(void) {
 
     qDebug().noquote() << "Json data: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
 
-//    if( 0 == found_start_bytes ) {
-//        return;
-//    }
+    if( 0 == found_start_bytes ) {
+        return;
+    }
 
 
     ui->textBrowser_console_log->append("Json Data: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
