@@ -39,6 +39,17 @@ void ezlopi_nvs_init(void)
     }
 }
 
+int ezlopi_nvs_factory_reset(void)
+{
+    int ret = 0;
+    if (ESP_OK == nvs_flash_erase())
+    {
+        ret = 1;
+    }
+
+    return ret;
+}
+
 int ezlopi_nvs_write_config_data_str(char *data)
 {
     int ret = 0;
@@ -113,6 +124,7 @@ int ezlopi_nvs_read_config_data_str(char **data)
 
 int ezlopi_nvs_read_ble_passkey(uint32_t *passkey)
 {
+    const uint32_t default_passkey = 123456;
     int ret = 0;
     if (passkey)
     {
@@ -137,6 +149,8 @@ int ezlopi_nvs_read_ble_passkey(uint32_t *passkey)
 
             nvs_close(config_nvs_handle);
         }
+
+        *passkey = ((0 == *passkey) || (*passkey > 999999)) ? default_passkey : *passkey;
     }
 
     return ret;

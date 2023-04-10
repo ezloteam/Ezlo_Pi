@@ -54,10 +54,10 @@ void ezlopi_ble_service_init(void)
 
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
-    const uint32_t default_passkey = 123456;
+    // const uint32_t default_passkey = 123456;
     uint32_t passkey;
     ezlopi_nvs_read_ble_passkey(&passkey);
-    passkey = ((0 == passkey) || (passkey > 999999)) ? default_passkey : passkey;
+    // passkey = ((0 == passkey) || (passkey > 999999)) ? default_passkey : passkey;
     TRACE_D("Ble passkey: %d", passkey);
 
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND; // ESP_LE_AUTH_REQ_BOND_MITM;

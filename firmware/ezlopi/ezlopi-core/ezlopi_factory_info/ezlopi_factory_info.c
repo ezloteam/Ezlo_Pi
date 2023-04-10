@@ -636,6 +636,21 @@ static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
     return ret;
 }
 
+int ezlopi_factory_info_v2_factory_reset(void)
+{
+    int ret = 0;
+    if (ezlopi_factory_info_v2_init())
+    {
+
+        if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, 0, EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE))
+        {
+            ret = 1;
+        }
+    }
+
+    return ret;
+}
+
 /** Reader */
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length)
 {

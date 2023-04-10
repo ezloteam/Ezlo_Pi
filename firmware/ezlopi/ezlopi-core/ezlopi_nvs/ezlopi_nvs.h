@@ -13,6 +13,8 @@ extern "C"
     void ezlopi_nvs_init(void);
     void ezlopi_nvs_deinit(void);
 
+    int ezlopi_nvs_factory_reset(void);
+
     int ezlopi_nvs_write_config_data_str(char *data);
     int ezlopi_nvs_read_config_data_str(char **data);
 

@@ -51,7 +51,10 @@ void ezlopi_ble_service_provisioning_init(void)
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
     ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, provisioning_status_read_func, NULL, NULL);
+
 }
+
+
 
 static char *__provisioning_status_jsonify(void)
 {

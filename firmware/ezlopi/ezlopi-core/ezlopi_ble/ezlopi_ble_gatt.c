@@ -317,6 +317,10 @@ static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble
             }
         }
     }
+    else
+    {
+        TRACE_E("error: Function not available!");
+    }
 }
 
 static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)

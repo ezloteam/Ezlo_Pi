@@ -20,7 +20,7 @@ extern "C"
 #include "frozen.h"
 
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
-#define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0x1000 // 20480 // 20KB
+#define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0xF000 // 20480 // 20KB
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE 0x40
 #define EZLOPI_FACTORY_INFO_V2_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
 
@@ -159,6 +159,8 @@ typedef struct s_basic_factory_info
     int ezlopi_factory_info_v2_set_ca_cert(char *data);
     int ezlopi_factory_info_v2_set_ssl_shared_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
+
+    int ezlopi_factory_info_v2_factory_reset(void);
 
 #if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
 
