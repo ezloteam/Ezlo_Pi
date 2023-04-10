@@ -110,8 +110,8 @@ ezlopi_wifi_status_t * ezlopi_wifi_status(void) {
     if(ezlopi_flag_wifi_status) {
 
         wifi_stat->wifi_connection = true;
-        wifi_stat->wifi_mode = STA;
-        *wifi_stat->ip = ezlopi_wifi_get_ip_infos()->ip;
+        wifi_stat->wifi_mode = WIFI_MODE_STA;
+        wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
 
     } else {
 

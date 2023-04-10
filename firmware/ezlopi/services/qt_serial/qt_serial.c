@@ -220,10 +220,20 @@ static void qt_serial_get_info()
         ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();        
 
         if(wifi_status->wifi_connection == true) {     
-            char *ip_addr = (char * )malloc(sizeof(char) * 20);                   
-            ip_addr = esp_ip4addr_ntoa(wifi_status->ip, ip_addr, 20);                     
+            char *ip_addr = (char * )malloc(sizeof(char) * 20);   
+
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->ip, ip_addr, 20);                     
+            
             cJSON_AddBoolToObject(get_info, "sta_connection", true);
+            
             cJSON_AddStringToObject(get_info, "ip_sta", ip_addr);
+
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->netmask, ip_addr, 20);    
+            cJSON_AddStringToObject(get_info, "ip_nmask", ip_addr);
+
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->gw, ip_addr, 20);    
+            cJSON_AddStringToObject(get_info, "ip_gw", ip_addr);            
+
             free(ip_addr); 
         } else {
             cJSON_AddBoolToObject(get_info, "sta_connection", false);
