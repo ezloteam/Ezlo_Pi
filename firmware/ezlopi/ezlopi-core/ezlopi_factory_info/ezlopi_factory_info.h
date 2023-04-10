@@ -14,7 +14,7 @@ extern "C"
 #define EZLOPI_GENERIC 0
 #define EZLOPI_SWITCH_BOX 1
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_SWITCH_BOX
+#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -86,6 +86,7 @@ typedef enum e_ezlopi_factory_info_v2_offset
     CA_CERTIFICATE_OFFSET = 0x0000 + 0x3000,
     SSL_PRIVATE_KEY_OFFSET = 0x0000 + 0x4000,
     SSL_SHARED_KEY_OFFSET = 0x0000 + 0x5000,
+    EZLOPI_CONFIG_OFFSET = 0x0000 + 0x1000,
 } e_ezlopi_factory_info_v2_offset_t;
 
 typedef enum e_ezlopi_factory_info_v2_length
@@ -106,6 +107,7 @@ typedef enum e_ezlopi_factory_info_v2_length
     CA_CERTIFICATE_LENGTH = 0x1000,
     SSL_PRIVATE_KEY_LENGTH = 0x1000,
     SSL_SHARED_KEY_LENGTH = 0x2000,
+    EZLOPI_CONFIG_LENGTH = 0x1000,
 } e_ezlopi_factory_info_v2_length_t;
 #endif
 
@@ -128,6 +130,8 @@ typedef enum e_ezlopi_factory_info_v2_length
     char *ezlopi_factory_info_v2_get_ssl_private_key(void);
     char *ezlopi_factory_info_v2_get_ssl_shared_key(void);
     char *ezlopi_factory_info_v2_get_ezlopi_config(void);
+
+    int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password);
 
 #if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
 

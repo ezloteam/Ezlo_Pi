@@ -24,7 +24,6 @@ void ezlopi_device_prepare(void)
     {
         ezlopi_device_parse_json(config_string);
     }
-
 }
 
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)

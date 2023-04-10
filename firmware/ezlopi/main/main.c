@@ -8,7 +8,6 @@
 #include "mbedtls/config.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "ezlopi_timer.h"
 
 #include "ezlopi_timer.h"
 #include "timer_service.h"

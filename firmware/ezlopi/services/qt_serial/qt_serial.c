@@ -18,14 +18,15 @@
 #include "driver/gpio.h"
 #include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_nvs.h"
-#include "qt_serial.h"
-#include "ezlopi_wifi.h"
-#include "ezlopi_factory_info.h"
-#include "version.h"
+#include "esp_netif.h"
 #include "sdkconfig.h"
 #include "esp_idf_version.h"
 
+#include "ezlopi_nvs.h"
+#include "qt_serial.h"
+#include "ezlopi_factory_info.h"
+#include "version.h"
+#include "ezlopi_wifi.h"
 #include "ezlopi_system_info.h"
 
 static const int RX_BUF_SIZE = 3096;
@@ -53,10 +54,10 @@ static void qt_serial_read_config(void);
 int qt_serial_tx_data(int len, uint8_t *data)
 {
     int ret = 0;
-    char start_bytes[] = {0x80, '\r', '\n'};
-    ret += uart_write_bytes(UART_NUM_0, start_bytes, sizeof(start_bytes));
+    // char start_bytes[] = {0x80, '\r', '\n'};
+    // ret += uart_write_bytes(UART_NUM_0, start_bytes, sizeof(start_bytes));
     ret = uart_write_bytes(UART_NUM_0, data, len);
-    // ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
+    ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
 
     return ret;
 }
@@ -174,10 +175,6 @@ static void qt_serial_get_info()
         memset(wifi_info, 0, sizeof(wifi_info));
         ezlopi_nvs_read_wifi(wifi_info, sizeof(wifi_info));
 
-        // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-        // if (factory)
-        // {
-
         unsigned long long serial_id = ezlopi_factory_info_v2_get_id();
         char *controller_uuid = ezlopi_factory_info_v2_get_device_uuid();
         char *provisioning_uuid = ezlopi_factory_info_v2_get_provisioning_uuid();
@@ -189,7 +186,8 @@ static void qt_serial_get_info()
 
         cJSON_AddNumberToObject(get_info, "cmd", 1);
         cJSON_AddNumberToObject(get_info, "status", 1);
-        cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
+        // cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
+        cJSON_AddStringToObject(get_info, "v_fmw", VERSION_STR);        
         cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
         cJSON_AddNumberToObject(get_info, "build", BUILD);
         cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
@@ -206,16 +204,33 @@ static void qt_serial_get_info()
         cJSON_AddStringToObject(get_info, "uuid", controller_uuid);
         cJSON_AddStringToObject(get_info, "uuid_prov", provisioning_uuid);
         cJSON_AddNumberToObject(get_info, "serial", serial_id);
-        cJSON_AddStringToObject(get_info, "ssid", &wifi_info[0]);
+
+        char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
+        // char *wifi_password = ezlopi_factory_info_v2_get_password();
+        cJSON_AddStringToObject(get_info, "ssid", wifi_ssid ? wifi_ssid : "");
         cJSON_AddStringToObject(get_info, "dev_name", device_name);
         cJSON_AddNumberToObject(get_info, "dev_type", 1);
         cJSON_AddStringToObject(get_info, "dev_type_ezlopi", device_type);
         cJSON_AddStringToObject(get_info, "dev_flash", CONFIG_ESPTOOLPY_FLASHSIZE);
-        cJSON_AddStringToObject(get_info, "dev_free_flash", "Nan");
+        cJSON_AddStringToObject(get_info, "dev_free_flash", "");
         cJSON_AddStringToObject(get_info, "brand", device_brand);
         cJSON_AddStringToObject(get_info, "manf_name", device_manufacturer);
         cJSON_AddStringToObject(get_info, "model_num", device_model);
-        // }
+
+        ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();        
+
+        if(wifi_status->wifi_connection == true) {     
+            char *ip_addr = (char * )malloc(sizeof(char) * 20);                   
+            ip_addr = esp_ip4addr_ntoa(wifi_status->ip, ip_addr, 20);                     
+            cJSON_AddBoolToObject(get_info, "sta_connection", true);
+            cJSON_AddStringToObject(get_info, "ip_sta", ip_addr);
+            free(ip_addr); 
+        } else {
+            cJSON_AddBoolToObject(get_info, "sta_connection", false);
+            cJSON_AddStringToObject(get_info, "ip_sta", "");
+        }
+        
+        free(wifi_status);
 
         char *my_json_string = cJSON_Print(get_info);
         cJSON_Delete(get_info); // free Json object
@@ -239,6 +254,7 @@ static void qt_serial_get_info()
 
 static void qt_serial_set_wifi(const char *data)
 {
+    uint32_t status = 0;
     cJSON *root = cJSON_Parse(data);
 
     if (root)
@@ -250,13 +266,20 @@ static void qt_serial_set_wifi(const char *data)
 
             if (ssid && pass && (strlen(pass) >= 8))
             {
+                ezlopi_factory_info_v2_set_wifi(ssid, pass);
                 ezlopi_wifi_set_new_wifi_flag();
                 esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
-                TRACE_E("wifi_error: %u", wifi_error);
+                TRACE_W("wifi_error: %u", wifi_error);
+                status = 1;
             }
         }
 
         cJSON_Delete(root); // free Json string
+    }
+
+    if (0 == status)
+    {
+        qt_serial_response(2, 0, 5);
     }
 }
 
