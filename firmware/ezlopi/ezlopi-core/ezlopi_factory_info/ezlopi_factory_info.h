@@ -14,8 +14,10 @@ extern "C"
 #define EZLOPI_GENERIC 0
 #define EZLOPI_SWITCH_BOX 1
 #define EZLOPI_IR_BLASTER 2
+#define EZLOPI_WATER_LEVEL_SENSOR 3
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
+// #define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
+#define EZLOPI_DEVICE_TYPE EZLOPI_WATER_LEVEL_SENSOR
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -187,6 +189,26 @@ static const char *ir_blaster_constant_config =
                 \"id_item\": 30,\
                 \"id_room\": \"\",\
                 \"pwm_resln\": 8,\
+                \"freq_hz\": 50,\
+                \"duty_cycle\": 30\
+            }\
+        ],\
+    \"dev_total\": 1}";
+
+#elif (EZLOPI_WATER_LEVEL_SENSOR == EZLOPI_DEVICE_TYPE)
+static const char *water_level_sensor_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\": \"Water_Level_Sensor1\",\
+                \"dev_type\": 5,\
+                \"gpio_in\": 14,\
+                \"gpio_out\": 16,\
+                \"id_item\": 31,\
+                \"id_room\": \"\",\
+                \"pwm_resln\": 80,\
                 \"freq_hz\": 50,\
                 \"duty_cycle\": 30\
             }\

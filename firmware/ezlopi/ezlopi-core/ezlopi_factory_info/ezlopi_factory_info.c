@@ -315,6 +315,8 @@ char *ezlopi_factory_info_v2_get_ezlopi_config(void)
     return g_ezlopi_config;
 #elif (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
     return ir_blaster_constant_config;
+#elif (EZLOPI_WATER_LEVEL_SENSOR == EZLOPI_DEVICE_TYPE)
+    return water_level_sensor_constant_config;
 #endif
 }
 
