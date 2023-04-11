@@ -18,6 +18,7 @@
 #include "sensor_sound.h"
 #include "1024_device_health.h"
 #include "0029_gxhtc3_rh_t_sensor.h"
+#include "030_sens_ds18b20_sensor.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -147,6 +148,12 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
         .func = gxhtc3_rh_t_sensor,
+    },
+#endif
+#ifdef EZLOPI_SENSOR_030_DS18B20
+    {
+        .id = EZLOPI_SENSOR_030_DS18B20,
+        .func = ds18b20_sensor,
     },
 #endif
     /**

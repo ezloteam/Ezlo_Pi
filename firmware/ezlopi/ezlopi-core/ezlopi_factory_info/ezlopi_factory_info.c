@@ -318,6 +318,8 @@ char *ezlopi_factory_info_v2_get_ezlopi_config(void)
 //     return switch_box_constant_config;
 #if (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
     return ir_blaster_constant_config;
+#elif(EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    return test_device_constant_config;
 #elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
     g_ezlopi_config = ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
 #endif

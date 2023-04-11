@@ -14,6 +14,7 @@ extern "C"
 #define EZLOPI_GENERIC 0
 #define EZLOPI_SWITCH_BOX 0
 #define EZLOPI_IR_BLASTER 1
+#define EZLOPI_TEST_DEVICE 2
 
 #define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
 
@@ -236,6 +237,21 @@ static const char *switch_box_constant_config =
                 \"pullup_op\": true,\
                 \"val_ip\": true,\
                 \"val_op\": false\
+            }\
+        ],\
+    \"dev_total\": 1}";
+#elif(EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+static const char *test_device_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\": \"DS18B20\",\
+                \"dev_type\": 7,\
+                \"gpio\": 2,\
+                \"id_item\": 30,\
+                \"id_room\": \"\"\
             }\
         ],\
     \"dev_total\": 1}";

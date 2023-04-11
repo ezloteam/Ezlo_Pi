@@ -121,10 +121,10 @@ static s_ezlopi_device_properties_t *ds18b20_sensor_prepare(cJSON *cjson_device)
         ds18b20_sensor_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
         ds18b20_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        // CJSON_GET_VALUE_INT(cjson_device, "gpio", ds18b20_sensor_properties->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "gpio", ds18b20_sensor_properties->interface.gpio.gpio_in.gpio_num);
         ds18b20_sensor_properties->interface.gpio.gpio_out.enable = false;
         ds18b20_sensor_properties->interface.gpio.gpio_in.enable = true;
-        ds18b20_sensor_properties->interface.gpio.gpio_in.gpio_num = 2;
+        // ds18b20_sensor_properties->interface.gpio.gpio_in.gpio_num = 2;
         ds18b20_sensor_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
         ds18b20_sensor_properties->interface.gpio.gpio_in.invert = false;
         ds18b20_sensor_properties->interface.gpio.gpio_in.mode = GPIO_MODE_DISABLE;
@@ -159,7 +159,7 @@ static int get_ds18b20_sensor_value_to_cloud(s_ezlopi_device_properties_t *prope
     if(cjson_properties)
     {
         ds18b20_get_temperature_data(&temperature, properties->interface.gpio.gpio_in.gpio_num);
-        TRACE_B("Temperature is: %f", temperature);
+        TRACE_B("Temperature is: %f degree censius", temperature);
         cJSON_AddNumberToObject(cjson_properties, "value", temperature);
         cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
     }
