@@ -13,6 +13,8 @@ extern "C"
     void ezlopi_nvs_init(void);
     void ezlopi_nvs_deinit(void);
 
+    int ezlopi_nvs_factory_reset(void);
+
     int ezlopi_nvs_write_config_data_str(char *data);
     int ezlopi_nvs_read_config_data_str(char **data);
 
@@ -24,6 +26,12 @@ extern "C"
 
     int ezlopi_nvs_read_user_id_str(char **data);
     int ezlopi_nvs_write_user_id_str(char *data);
+
+    uint32_t ezlopi_nvs_get_boot_count(void);
+    void ezlopi_nvs_set_boot_count(uint32_t boot_count);
+
+    uint32_t ezlopi_nvs_get_provisioning_time(void);
+    void ezlopi_nvs_set_provisioning_time(uint32_t epoch_time);
 
 #ifdef __cplusplus
 }

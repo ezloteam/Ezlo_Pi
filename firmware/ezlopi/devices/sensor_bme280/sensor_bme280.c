@@ -3,6 +3,7 @@
 
 #include "trace.h"
 #include "sensor_bme280.h"
+#include "ezlopi_cloud.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_cloud_category_str.h"
@@ -128,11 +129,11 @@ static int prepare_sensor(void *arg)
             if (NULL != bme280_hal_arg)
             {
                 __prepare_sensor_config(sensor_config, prep_arg->cjson_device, bme280_hal_arg);
-                uint32_t device_id = ezlopi_device_generate_device_id();
+                uint32_t device_id = ezlopi_cloud_generate_device_id();
                 ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
-                device_id = ezlopi_device_generate_device_id();
+                device_id = ezlopi_cloud_generate_device_id();
                 ADD_PROPERTIES_DEVICE_LIST(device_id, category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, prep_arg->cjson_device);
-                device_id = ezlopi_device_generate_device_id();
+                device_id = ezlopi_cloud_generate_device_id();
                 ADD_PROPERTIES_DEVICE_LIST(device_id, category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, prep_arg->cjson_device);
             }
             else
@@ -187,8 +188,8 @@ static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t d
             sensor_ble280_properties->ezlopi_cloud.show = true;
             sensor_ble280_properties->ezlopi_cloud.room_name[0] = '\0';
             sensor_ble280_properties->ezlopi_cloud.device_id = device_id;
-            sensor_ble280_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-            sensor_ble280_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+            sensor_ble280_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+            sensor_ble280_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
             CJSON_GET_VALUE_INT(cjson_device, "gpio_scl", sensor_ble280_properties->interface.i2c_master.scl);
             CJSON_GET_VALUE_INT(cjson_device, "gpio_sda", sensor_ble280_properties->interface.i2c_master.sda);

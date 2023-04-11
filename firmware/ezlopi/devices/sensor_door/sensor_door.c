@@ -1,5 +1,6 @@
+#include "sdkconfig.h"
 
-
+#ifdef CONFIG_IDF_TARGET_ESP32
 #include "trace.h"
 #include "sensor_door.h"
 #include "esp_err.h"
@@ -7,6 +8,8 @@
 #include "ezlopi_timer.h"
 #include "items.h"
 #include "cJSON.h"
+
+#include "ezlopi_cloud.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
@@ -107,9 +110,9 @@ static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args)
             sensor_door_properties->ezlopi_cloud.battery_powered = false;
             sensor_door_properties->ezlopi_cloud.show = true;
             sensor_door_properties->ezlopi_cloud.room_name[0] = '\0';
-            sensor_door_properties->ezlopi_cloud.device_id = ezlopi_device_generate_device_id();
-            sensor_door_properties->ezlopi_cloud.room_id = ezlopi_device_generate_room_id();
-            sensor_door_properties->ezlopi_cloud.item_id = ezlopi_device_generate_item_id();
+            sensor_door_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+            sensor_door_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+            sensor_door_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
             sensor_door_properties->interface.gpio.gpio_in.gpio_num = GPIO_NUM_36;
         }
     }
@@ -156,3 +159,5 @@ static int sensor_door_init(s_ezlopi_device_properties_t *properties)
     }
     return error;
 }
+
+#endif // CONFIG_IDF_TARGET_ESP32

@@ -11,6 +11,15 @@
 #include "ezlopi_adc.h"
 #include "ezlopi_uart.h"
 
+#define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            item_val = o_item->valuedouble;                   \
+        }                                                     \
+    }
+
 #define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
     {                                                         \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
@@ -20,22 +29,27 @@
         }                                                     \
     }
 
-#define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            item_val = o_item->valuestring;                   \
-        }                                                     \
+#define CJSON_GET_VALUE_STRING(root, item_name, item_val)           \
+    {                                                               \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name);       \
+        if (o_item)                                                 \
+        {                                                           \
+            item_val = o_item->valuestring;                         \
+            TRACE_B("%s: %s", item_name, item_val ? item_val : ""); \
+        }                                                           \
+        else                                                        \
+        {                                                           \
+            TRACE_E("%s: NULL", item_name);                         \
+        }                                                           \
     }
 
-#define ASSIGN_DEVICE_NAME(digital_io_device_properties, device_name)                             \
+#define ASSIGN_DEVICE_NAME(digital_io_device_properties, dev_name)                                \
     {                                                                                             \
-        if ((NULL != device_name) && ('\0' != device_name[0]))                                    \
+        if ((NULL != dev_name) && ('\0' != dev_name[0]))                                          \
         {                                                                                         \
             snprintf(digital_io_device_properties->ezlopi_cloud.device_name,                      \
                      sizeof(digital_io_device_properties->ezlopi_cloud.device_name),              \
-                     "%s", device_name);                                                          \
+                     "%s", dev_name);                                                             \
         }                                                                                         \
         else                                                                                      \
         {                                                                                         \
@@ -76,15 +90,16 @@ typedef struct s_ezlopi_device_properties
         s_ezlopi_adc_t adc;
     } interface;
 
-    s_ezlopi_cloud_info_t ezlopi_cloud;
     void *user_arg;
+    s_ezlopi_cloud_info_t ezlopi_cloud;
 
 } s_ezlopi_device_properties_t;
 
 void ezlopi_device_prepare(void);
-uint32_t ezlopi_device_generate_device_id(void);
-uint32_t ezlopi_device_generate_item_id(void);
-uint32_t ezlopi_device_generate_room_id(void);
+// uint32_t ezlopi_device_generate_device_id(void);
+// uint32_t ezlopi_device_generate_item_id(void);
+// uint32_t ezlopi_device_generate_room_id(void);
+// uint32_t ezlopi_device_generate_gateway_id(void);
 
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
 

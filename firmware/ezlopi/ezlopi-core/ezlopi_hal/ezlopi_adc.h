@@ -30,6 +30,15 @@ typedef enum e_ezlopi_gpio_channel{
     EZLOPI_GPIO_CHANNEL_9       = 10,
     EZLOPI_GPIO_CHANNEL_MAX
 }e_ezlopi_gpio_channel_t;
+#elif CONFIG_IDF_TARGET_ESP32C3
+typedef enum e_ezlopi_gpio_channel{
+    EZLOPI_GPIO_CHANNEL_0       = 0,
+    EZLOPI_GPIO_CHANNEL_1       = 1,
+    EZLOPI_GPIO_CHANNEL_2       = 2,
+    EZLOPI_GPIO_CHANNEL_3       = 3,
+    EZLOPI_GPIO_CHANNEL_4       = 4,
+    EZLOPI_GPIO_CHANNEL_MAX
+}e_ezlopi_gpio_channel_t;
 #endif
 
 

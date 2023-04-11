@@ -11,9 +11,8 @@
 #include "driver/gpio.h"
 #include "math.h"
 
-//ADS131M08.cpp LGPL 
-//Adapted for the 8 channel device from https://github.com/icl-rocketry/ADS131M04-Lib (LGPL)
-
+// ADS131M08.cpp LGPL
+// Adapted for the 8 channel device from https://github.com/icl-rocketry/ADS131M04-Lib (LGPL)
 
 /* Definitions of all the addresses of the registers of the ADS131M04
    Chip. For the content of the registers, please refer to the datasheet:
@@ -26,15 +25,16 @@
 
 static const char *TAG = "ADS131M08 ---------- ";
 
-#define MISO_PIN              19
-#define MOSI_PIN              23
-#define SCK_PIN               18
-#define CS_PIN                27
+#define MISO_PIN 19
+#define MOSI_PIN 23
+#define SCK_PIN 18
+#define CS_PIN 27
 
-#define VSPI_MISO             MISO_PIN
-#define VSPI_MOSI             MOSI_PIN
-#define VSPI_SCLK             SCK_PIN
-#define VSPI_SS               CS_PIN
+#define ADS131M08_SPI_PORT SPI2_HOST
+#define ADS131M08_VSPI_MISO MISO_PIN
+#define ADS131M08_VSPI_MOSI MOSI_PIN
+#define ADS131M08_VSPI_SCLK SCK_PIN
+#define ADS131M08_VSPI_SS CS_PIN
 
 #define ADS131_ID 0x00
 #define ADS131_STATUS 0x01
@@ -87,27 +87,26 @@ static const char *TAG = "ADS131M08 ---------- ";
 #define ADS131_CH7_GCAL_MSB 0x2F
 #define ADS131_CH7_GCAL_LSB 0x30
 
-
 #define ADS131_REGMAP_CRC 0x3E
 #define ADS131_RESERVED 0x3F
 
 #ifdef __cplusplus
-class ADS131M08 {
-    public:
-
-    int mosi,miso,sck;
+class ADS131M08
+{
+public:
+    int mosi, miso, sck;
     int CS, XTAL, DRDY;
     int SpiClk;
 
     bool firstRead = true;
     int nFrameWords = 10;
     // Dummy word frame to write ADC during ADC data reads
-    ADS131M08(  gpio_num_t mosi= (gpio_num_t)23,
-                gpio_num_t miso= (gpio_num_t)19,
-                gpio_num_t sck= (gpio_num_t)18, 
-                int cs=5, int xtal=22, int drdy=21, int clk = 2000000);
+    ADS131M08(gpio_num_t mosi = (gpio_num_t)23,
+              gpio_num_t miso = (gpio_num_t)19,
+              gpio_num_t sck = (gpio_num_t)18,
+              int cs = 5, int xtal = 22, int drdy = 21, int clk = 2000000);
     void init(int clkin = 8192000);
-    void readChannels(int8_t * channelArrPtr, int8_t channelArrLen, int32_t * outputArrPtr);
+    void readChannels(int8_t *channelArrPtr, int8_t channelArrLen, int32_t *outputArrPtr);
     void readAllChannels(int32_t inputArr[8]);
     int32_t readChannelSingle(int8_t channel);
     bool globalChop(bool enabled, uint8_t log2delay);
@@ -115,20 +114,21 @@ class ADS131M08 {
     uint16_t readReg(uint8_t reg);
     bool setGain(int gain);
     uint32_t spiTransferWord(uint16_t inputData = 0x0000);
-    void spiCommFrame(uint32_t * outPtr, uint16_t command = 0x0000);
+    void spiCommFrame(uint32_t *outPtr, uint16_t command = 0x0000);
     int32_t twoCompDeco(uint32_t data);
     void spi_init(void);
     void csHigh(void);
     void csLow(void);
-
 };
 #endif
+
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void ADS131_init(void);
-bool ADS131_value(void);
+    void ADS131_init(void);
+    bool ADS131_value(void);
 #ifdef __cplusplus
 }
 #endif
