@@ -33,8 +33,8 @@
    If you'd rather not, just change the below entries to strings with
    the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
 */
-#define EXAMPLE_ESP_WIFI_SSID "nepaldigisys"
-#define EXAMPLE_ESP_WIFI_PASS "NDS_0ffice"
+// #define EXAMPLE_ESP_WIFI_SSID "nepaldigisys"
+// #define EXAMPLE_ESP_WIFI_PASS "NDS_0ffice"
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
 /* FreeRTOS event group to signal when we are connected*/
@@ -55,6 +55,7 @@ static int station_got_ip = 0;
 static const char *const wifi_no_error_str = "NO_ERROR";
 static const char *last_disconnect_reason = wifi_no_error_str;
 static ll_ezlopi_wifi_event_upcall_t *__event_upcall_head = NULL;
+static bool ezlopi_flag_wifi_status = false;
 
 static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg);
 
@@ -100,6 +101,24 @@ int ezlopi_wifi_got_ip(void)
 void ezlopi_wifi_set_new_wifi_flag(void)
 {
     new_wifi = 1;
+}
+
+ezlopi_wifi_status_t * ezlopi_wifi_status(void) {
+    
+    ezlopi_wifi_status_t *wifi_stat = (ezlopi_wifi_status_t *)malloc(sizeof(ezlopi_wifi_status_t));
+
+    if(ezlopi_flag_wifi_status) {
+
+        wifi_stat->wifi_connection = true;
+        wifi_stat->wifi_mode = WIFI_MODE_STA;
+        wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
+
+    } else {
+
+        wifi_stat->wifi_connection = false;
+    }
+    
+    return wifi_stat;
 }
 
 static void set_wifi_station_host_name(void)
@@ -170,6 +189,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
 
         memcpy(&my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+        ezlopi_flag_wifi_status = true;
         alert_qt_wifi_got_ip();
     }
 

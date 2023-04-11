@@ -102,7 +102,7 @@ static char *device_info_jsonify(void)
         cJSON_AddNumberToObject(root, "build_date", 123456);
         cJSON_AddStringToObject(root, "mac", "12:23:34:45:56:67");
         cJSON_AddStringToObject(root, "ezlopi_device_type", "generic");
-        cJSON_AddStringToObject(root, "provisioned_status", "true");
+        cJSON_AddBoolToObject(root, "provisioned_status", true);
 
         device_info = cJSON_Print(root);
         if (device_info)

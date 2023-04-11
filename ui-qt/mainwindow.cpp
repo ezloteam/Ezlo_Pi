@@ -1793,7 +1793,8 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
 #endif
     if(json_map_root_get_info["status"].toUInt() == 1) {
 
-        get_info_fmw_info.v_sw = json_map_root_get_info["v_fmw"].toUInt();
+        get_info_fmw_info.v_sw = 123;
+        /*get_info_fmw_info.v_sw = json_map_root_get_info["v_fmw"].toUInt();*/
         get_info_fmw_info.v_type = json_map_root_get_info["v_type"].toUInt();
         get_info_fmw_info.build = json_map_root_get_info["build"].toUInt();
         get_info_fmw_info.v_idf = json_map_root_get_info["v_idf"].toUInt();
@@ -1802,8 +1803,10 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
 
         EzloPi->EZPI_SET_FMW_INFO(get_info_fmw_info);
 
-        if(get_info_fmw_info.v_sw > 1)    ezlogic_flag_fimware_present = true;
-        else ezlogic_flag_fimware_present = false;
+        ezlogic_flag_fimware_present = true;
+
+//        if(get_info_fmw_info.v_sw > 1)    ezlogic_flag_fimware_present = true;
+//        else ezlogic_flag_fimware_present = false;
     }
 }
 
