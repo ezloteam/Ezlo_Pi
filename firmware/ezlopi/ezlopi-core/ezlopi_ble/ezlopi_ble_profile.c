@@ -168,7 +168,7 @@ s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj,
         if (character_object)
         {
             memset(character_object, 0, sizeof(s_gatt_char_t));
-            character_object->control.auto_rsp = ESP_GATT_AUTO_RSP;
+            character_object->control.auto_rsp = ESP_GATT_RSP_BY_APP;
             character_object->property = properties;
             character_object->permission = permission;
             character_object->read_upcall = read_func;

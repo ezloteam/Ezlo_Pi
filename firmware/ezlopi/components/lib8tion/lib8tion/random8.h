@@ -32,7 +32,7 @@
 ///@{
 
 // X(n+1) = (2053 * X(n)) + 13849)
-#define FASTLED_RAND16_2053 ((uint16_t)(2053))
+#define FASTLED_RAND16_2053  ((uint16_t)(2053))
 #define FASTLED_RAND16_13849 ((uint16_t)(13849))
 
 #define APPLY_FASTLED_RAND16_2053(x) (x * FASTLED_RAND16_2053)
@@ -80,7 +80,7 @@ LIB8STATIC uint8_t random8_between(uint8_t min, uint8_t lim)
 LIB8STATIC uint16_t random16_to(uint16_t lim)
 {
     uint16_t r = random16();
-    uint32_t p = (uint32_t)lim * (uint32_t)r;
+    uint32_t p = (uint32_t) lim * (uint32_t) r;
     r = p >> 16;
     return r;
 }

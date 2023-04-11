@@ -46,8 +46,8 @@
 /// @returns sin of theta, value between -32767 to 32767.
 LIB8STATIC int16_t sin16(uint16_t theta)
 {
-    static const uint16_t base[] = {0, 6393, 12539, 18204, 23170, 27245, 30273, 32137};
-    static const uint8_t slope[] = {49, 48, 44, 38, 31, 23, 14, 4};
+    static const uint16_t base[] = { 0, 6393, 12539, 18204, 23170, 27245, 30273, 32137 };
+    static const uint8_t slope[] = { 49, 48, 44, 38, 31, 23, 14, 4 };
 
     uint16_t offset = (theta & 0x3FFF) >> 3; // 0..2047
     if (theta & 0x4000)
@@ -108,7 +108,7 @@ LIB8STATIC int16_t cos16(uint16_t theta)
 /// @returns sin of theta, value between 0 and 255
 LIB8STATIC uint8_t sin8(uint8_t theta)
 {
-    static const uint8_t b_m16_interleave[] = {0, 49, 49, 41, 90, 27, 117, 10};
+    static const uint8_t b_m16_interleave[] = { 0, 49, 49, 41, 90, 27, 117, 10 };
 
     uint8_t offset = theta;
     if (theta & 0x40)

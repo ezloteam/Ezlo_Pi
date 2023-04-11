@@ -11,6 +11,15 @@
 #include "ezlopi_adc.h"
 #include "ezlopi_uart.h"
 
+#define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            item_val = o_item->valuedouble;                   \
+        }                                                     \
+    }
+
 #define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
     {                                                         \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
@@ -20,13 +29,18 @@
         }                                                     \
     }
 
-#define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            item_val = o_item->valuestring;                   \
-        }                                                     \
+#define CJSON_GET_VALUE_STRING(root, item_name, item_val)           \
+    {                                                               \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name);       \
+        if (o_item)                                                 \
+        {                                                           \
+            item_val = o_item->valuestring;                         \
+            TRACE_B("%s: %s", item_name, item_val ? item_val : ""); \
+        }                                                           \
+        else                                                        \
+        {                                                           \
+            TRACE_E("%s: NULL", item_name);                         \
+        }                                                           \
     }
 
 #define ASSIGN_DEVICE_NAME(digital_io_device_properties, dev_name)                                \

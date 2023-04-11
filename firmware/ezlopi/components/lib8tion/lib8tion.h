@@ -25,52 +25,72 @@
 #define __INC_LIB8TION_H
 
 /*
+
  Fast, efficient 8-bit math functions specifically
  designed for high-performance LED programming.
+
  Included are:
+
  - Saturating unsigned 8-bit add and subtract.
  Instead of wrapping around if an overflow occurs,
  these routines just 'clamp' the output at a maxumum
  of 255, or a minimum of 0.  Useful for adding pixel
  values.  E.g., qadd8(200, 100) = 255.
+
  qadd8(i, j) == MIN((i + j), 0xFF)
  qsub8(i, j) == MAX((i - j), 0)
+
  - Saturating signed 8-bit ("7-bit") add.
  qadd7(i, j) == MIN((i + j), 0x7F)
+
+
  - Scaling (down) of unsigned 8- and 16- bit values.
  Scaledown value is specified in 1/256ths.
  scale8(i, sc) == (i * sc) / 256
  scale16by8(i, sc) == (i * sc) / 256
+
  Example: scaling a 0-255 value down into a
  range from 0-99:
  downscaled = scale8(originalnumber, 100);
+
  A special version of scale8 is provided for scaling
  LED brightness values, to make sure that they don't
  accidentally scale down to total black at low
  dimming levels, since that would look wrong:
  scale8_video(i, sc) = ((i * sc) / 256) +? 1
+
  Example: reducing an LED brightness by a
  dimming factor:
  new_bright = scale8_video(orig_bright, dimming);
+
+
  - Fast 8- and 16- bit unsigned random numbers.
  Significantly faster than Arduino random(), but
  also somewhat less random.  You can add entropy.
  random8()       == random from 0..255
  random8(n)     == random from 0..(N-1)
  random8(n, m)  == random from N..(M-1)
+
  random16()      == random from 0..65535
  random16(n)    == random from 0..(N-1)
  random16(n, m) == random from N..(M-1)
+
  random16_set_seed(k)    ==  seed = k
  random16_add_entropy(k) ==  seed += k
+
+
  - Absolute value of a signed 8-bit value.
  abs8(i)     == abs(i)
+
+
  - 8-bit math operations which return 8-bit values.
  These are provided mostly for completeness,
  not particularly for performance.
  mul8(i, j)  == (i * j) & 0xFF
  add8(i, j)  == (i + j) & 0xFF
  sub8(i, j)  == (i - j) & 0xFF
+
+
  - Fast 16-bit approximations of sin and cos.
  Input angle is a uint16_t from 0-65535.
  Output is a signed int16_t from -32767 to 32767.
@@ -83,6 +103,8 @@
  sin8(x)  == (sin((x/128.0) * pi) * 128) + 128
  cos8(x)  == (cos((x/128.0) * pi) * 128) + 128
  Accurate to within about 2%.
+
+
  - Fast 8-bit "easing in/out" function.
  ease8InOutCubic(x) == 3(x^i) - 2(x^3)
  ease8InOutApprox(x) ==
@@ -110,6 +132,8 @@
  brighten8_lin(x) == 255 - dim8_lin(255 - x)
  The dimming functions in particular are suitable
  for making LED light output appear more 'linear'.
+
+
  - Linear interpolation between two values, with the
  fraction between them expressed as an 8- or 16-bit
  fixed point fraction (fract8 or fract16).
@@ -139,18 +163,20 @@
  e.g. 120, or Q8.8 fixed-point form.
  BPM88 is beats per minute in ONLY Q8.8 fixed-point
  form.
+
  Lib8tion is pronounced like 'libation': lie-BAY-shun
+
  */
 
 #include <stdint.h>
 #include <string.h>
 #include <esp_timer.h>
 
-#define LIB8STATIC __attribute__((unused)) static inline
-#define LIB8STATIC_ALWAYS_INLINE __attribute__((always_inline)) static inline
+#define LIB8STATIC               __attribute__ ((unused)) static inline
+#define LIB8STATIC_ALWAYS_INLINE __attribute__ ((always_inline)) static inline
 
 ///@defgroup lib8tion Fast math functions
-/// A variety of functions for working with numbers.
+///A variety of functions for working with numbers.
 ///@{
 
 ///////////////////////////////////////////////////////////////////////
@@ -181,15 +207,15 @@
 
 /// ANSI unsigned short _Fract.  range is 0 to 0.99609375
 ///                 in steps of 0.00390625
-typedef uint8_t fract8; ///< ANSI: unsigned short _Fract
+typedef uint8_t fract8;   ///< ANSI: unsigned short _Fract
 
 ///  ANSI: signed short _Fract.  range is -0.9921875 to 0.9921875
 ///                 in steps of 0.0078125
-typedef int8_t sfract7; ///< ANSI: signed   short _Fract
+typedef int8_t sfract7;  ///< ANSI: signed   short _Fract
 
 ///  ANSI: unsigned _Fract.  range is 0 to 0.99998474121
 ///                 in steps of 0.00001525878
-typedef uint16_t fract16; ///< ANSI: unsigned       _Fract
+typedef uint16_t fract16;  ///< ANSI: unsigned       _Fract
 
 ///  ANSI: signed _Fract.  range is -0.99996948242 to 0.99996948242
 ///                 in steps of 0.00003051757
@@ -199,12 +225,12 @@ typedef int16_t sfract15; ///< ANSI: signed         _Fract
 //         and Y bits of fraction.
 //         E.g., accum88 has 8 bits of int, 8 bits of fraction
 
-typedef uint16_t accum88;   ///< ANSI: unsigned short _Accum.  8 bits int, 8 bits fraction
-typedef int16_t saccum78;   ///< ANSI: signed   short _Accum.  7 bits int, 8 bits fraction
-typedef uint32_t accum1616; ///< ANSI: signed         _Accum. 16 bits int, 16 bits fraction
-typedef int32_t saccum1516; ///< ANSI: signed         _Accum. 15 bits int, 16 bits fraction
-typedef uint16_t accum124;  ///< no direct ANSI counterpart. 12 bits int, 4 bits fraction
-typedef int32_t saccum114;  ///< no direct ANSI counterpart. 1 bit int, 14 bits fraction
+typedef uint16_t accum88;    ///< ANSI: unsigned short _Accum.  8 bits int, 8 bits fraction
+typedef int16_t  saccum78;   ///< ANSI: signed   short _Accum.  7 bits int, 8 bits fraction
+typedef uint32_t accum1616;  ///< ANSI: signed         _Accum. 16 bits int, 16 bits fraction
+typedef int32_t  saccum1516; ///< ANSI: signed         _Accum. 15 bits int, 16 bits fraction
+typedef uint16_t accum124;   ///< no direct ANSI counterpart. 12 bits int, 4 bits fraction
+typedef int32_t  saccum114;  ///< no direct ANSI counterpart. 1 bit int, 14 bits fraction
 
 /// typedef for IEEE754 "binary32" float type internals
 typedef union
@@ -213,22 +239,22 @@ typedef union
     float f;
     struct
     {
-        uint32_t mantissa : 23;
-        uint32_t exponent : 8;
-        uint32_t signbit : 1;
+        uint32_t mantissa :23;
+        uint32_t exponent :8;
+        uint32_t signbit :1;
     };
     struct
     {
-        uint32_t mant7 : 7;
-        uint32_t mant16 : 16;
-        uint32_t exp_ : 8;
-        uint32_t sb_ : 1;
+        uint32_t mant7 :7;
+        uint32_t mant16 :16;
+        uint32_t exp_ :8;
+        uint32_t sb_ :1;
     };
     struct
     {
-        uint32_t mant_lo8 : 8;
-        uint32_t mant_hi16_exp_lo1 : 16;
-        uint32_t sb_exphi7 : 8;
+        uint32_t mant_lo8 :8;
+        uint32_t mant_hi16_exp_lo1 :16;
+        uint32_t sb_exphi7 :8;
     };
 } IEEE754binary32_t;
 
@@ -446,7 +472,7 @@ LIB8STATIC fract8 ease8InOutCubic(fract8 i)
     uint8_t ii = scale8(i, i);
     uint8_t iii = scale8(ii, i);
 
-    uint16_t r1 = (3 * (uint16_t)(ii)) - (2 * (uint16_t)(iii));
+    uint16_t r1 = (3 * (uint16_t) (ii)) - (2 * (uint16_t) (iii));
 
     /* the code generated for the above *'s automatically
      cleans up R1, so there's no need to explicitily call

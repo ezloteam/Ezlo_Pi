@@ -20,7 +20,7 @@ extern "C"
 #include "frozen.h"
 
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
-#define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0x1000 // 20480 // 20KB
+#define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0xF000 // 20480 // 20KB
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE 0x40
 #define EZLOPI_FACTORY_INFO_V2_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
 
@@ -77,12 +77,14 @@ typedef enum e_ezlopi_factory_info_v2_offset
     MODEL_OFFSET = 0xE000 + 0x014A,
     ID_OFFSET = 0xE000 + 0x0004,
     DEVICE_UUID_OFFSET = 0xE000 + 0x01AA,
-    PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314, /// fggggggggggg
     SSID_OFFSET = 0xE000 + 0x0024,
     PASSWORD_OFFSET = 0xE000 + 0x0044,
     DEVICE_MAC_OFFSET = 0xE000 + 0x00C4,
-    CLOUD_SERVER_OFFSET = 0x0000 + 0x0214,
     DEVICE_TYPE_OFFSET = 0xE000 + 0x018A,
+
+    CLOUD_SERVER_OFFSET = 0x0000 + 0x0214,
+    PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314, /// fggggggggggg
+
     CA_CERTIFICATE_OFFSET = 0x0000 + 0x3000,
     SSL_PRIVATE_KEY_OFFSET = 0x0000 + 0x4000,
     SSL_SHARED_KEY_OFFSET = 0x0000 + 0x5000,
@@ -109,6 +111,26 @@ typedef enum e_ezlopi_factory_info_v2_length
     SSL_SHARED_KEY_LENGTH = 0x2000,
     EZLOPI_CONFIG_LENGTH = 0x1000,
 } e_ezlopi_factory_info_v2_length_t;
+
+typedef struct s_basic_factory_info
+{
+    int16_t version;
+    char *device_name;
+    char *manufacturer;
+    char *brand;
+    char *model_number;
+    unsigned long long id;
+    char *device_uuid;
+    char *prov_uuid;
+    // char *wifi_ssid;
+    // char *wifi_password;
+    uint8_t device_mac[6];
+    char *cloud_server;
+    char *device_type;
+    char *provision_server;
+    char *provision_token;
+    char *user_id;
+} s_basic_factory_info_t;
 #endif
 
     void print_factory_info_v2(void);
@@ -132,6 +154,13 @@ typedef enum e_ezlopi_factory_info_v2_length
     char *ezlopi_factory_info_v2_get_ezlopi_config(void);
 
     int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password);
+    int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic);
+    int ezlopi_factory_info_v2_set_ezlopi_config(char *data);
+    int ezlopi_factory_info_v2_set_ca_cert(char *data);
+    int ezlopi_factory_info_v2_set_ssl_shared_key(char *data);
+    int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
+
+    int ezlopi_factory_info_v2_factory_reset(void);
 
 #if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
 

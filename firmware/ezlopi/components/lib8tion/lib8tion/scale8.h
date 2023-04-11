@@ -42,7 +42,7 @@
 ///  4 clocks AVR with MUL, 2 clocks ARM
 LIB8STATIC_ALWAYS_INLINE uint8_t scale8(uint8_t i, fract8 scale)
 {
-    return (((uint16_t)i) * (1 + (uint16_t)(scale))) >> 8;
+    return (((uint16_t) i) * (1 + (uint16_t) (scale))) >> 8;
 }
 
 ///  The "video" version of scale8 guarantees that the output will
@@ -52,7 +52,7 @@ LIB8STATIC_ALWAYS_INLINE uint8_t scale8(uint8_t i, fract8 scale)
 ///  several additional cycles.
 LIB8STATIC_ALWAYS_INLINE uint8_t scale8_video(uint8_t i, fract8 scale)
 {
-    return (((int)i * (int)scale) >> 8) + ((i && scale) ? 1 : 0);
+    return (((int) i * (int) scale) >> 8) + ((i && scale) ? 1 : 0);
 }
 
 /// scale three one byte values by a fourth one, which is treated as
@@ -63,9 +63,9 @@ LIB8STATIC_ALWAYS_INLINE uint8_t scale8_video(uint8_t i, fract8 scale)
 LIB8STATIC void nscale8x3(uint8_t *r, uint8_t *g, uint8_t *b, fract8 scale)
 {
     uint16_t scale_fixed = scale + 1;
-    *r = (((uint16_t)*r) * scale_fixed) >> 8;
-    *g = (((uint16_t)*g) * scale_fixed) >> 8;
-    *b = (((uint16_t)*b) * scale_fixed) >> 8;
+    *r = (((uint16_t) *r) * scale_fixed) >> 8;
+    *g = (((uint16_t) *g) * scale_fixed) >> 8;
+    *b = (((uint16_t) *b) * scale_fixed) >> 8;
 }
 
 /// scale three one byte values by a fourth one, which is treated as
@@ -78,9 +78,9 @@ LIB8STATIC void nscale8x3(uint8_t *r, uint8_t *g, uint8_t *b, fract8 scale)
 LIB8STATIC void nscale8x3_video(uint8_t *r, uint8_t *g, uint8_t *b, fract8 scale)
 {
     uint8_t nonzeroscale = (scale != 0) ? 1 : 0;
-    *r = (*r == 0) ? 0 : (((int)*r * (int)(scale)) >> 8) + nonzeroscale;
-    *g = (*g == 0) ? 0 : (((int)*g * (int)(scale)) >> 8) + nonzeroscale;
-    *b = (*b == 0) ? 0 : (((int)*b * (int)(scale)) >> 8) + nonzeroscale;
+    *r = (*r == 0) ? 0 : (((int) *r * (int) (scale)) >> 8) + nonzeroscale;
+    *g = (*g == 0) ? 0 : (((int) *g * (int) (scale)) >> 8) + nonzeroscale;
+    *b = (*b == 0) ? 0 : (((int) *b * (int) (scale)) >> 8) + nonzeroscale;
 }
 
 ///  scale two one byte values by a third one, which is treated as
@@ -91,8 +91,8 @@ LIB8STATIC void nscale8x3_video(uint8_t *r, uint8_t *g, uint8_t *b, fract8 scale
 LIB8STATIC void nscale8x2(uint8_t *i, uint8_t *j, fract8 scale)
 {
     uint16_t scale_fixed = scale + 1;
-    *i = (((uint16_t)*i) * scale_fixed) >> 8;
-    *j = (((uint16_t)*j) * scale_fixed) >> 8;
+    *i = (((uint16_t) *i) * scale_fixed) >> 8;
+    *j = (((uint16_t) *j) * scale_fixed) >> 8;
 }
 
 ///  scale two one byte values by a third one, which is treated as
@@ -105,8 +105,8 @@ LIB8STATIC void nscale8x2(uint8_t *i, uint8_t *j, fract8 scale)
 LIB8STATIC void nscale8x2_video(uint8_t *i, uint8_t *j, fract8 scale)
 {
     uint8_t nonzeroscale = (scale != 0) ? 1 : 0;
-    *i = (*i == 0) ? 0 : (((int)*i * (int)(scale)) >> 8) + nonzeroscale;
-    *j = (*j == 0) ? 0 : (((int)*j * (int)(scale)) >> 8) + nonzeroscale;
+    *i = (*i == 0) ? 0 : (((int) *i * (int) (scale)) >> 8) + nonzeroscale;
+    *j = (*j == 0) ? 0 : (((int) *j * (int) (scale)) >> 8) + nonzeroscale;
 }
 
 /// scale a 16-bit unsigned value by an 8-bit value,
@@ -114,7 +114,7 @@ LIB8STATIC void nscale8x2_video(uint8_t *i, uint8_t *j, fract8 scale)
 ///         is 256. In other words, it computes i * (scale / 256)
 LIB8STATIC_ALWAYS_INLINE uint16_t scale16by8(uint16_t i, fract8 scale)
 {
-    return (i * (1 + ((uint16_t)scale))) >> 8;
+    return (i * (1 + ((uint16_t) scale))) >> 8;
 }
 
 /// scale a 16-bit unsigned value by a 16-bit value,
@@ -123,7 +123,7 @@ LIB8STATIC_ALWAYS_INLINE uint16_t scale16by8(uint16_t i, fract8 scale)
 
 LIB8STATIC uint16_t scale16(uint16_t i, fract16 scale)
 {
-    return ((uint32_t)(i) * (1 + (uint32_t)(scale))) / 65536;
+    return ((uint32_t) (i) * (1 + (uint32_t) (scale))) / 65536;
 }
 ///@}
 
