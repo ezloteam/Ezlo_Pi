@@ -1652,23 +1652,23 @@ void MainWindow::ezlogic_serial_process(void) {
     }
 
     int idx = 0;    
-    int found_start_bytes = 0;
+//    int found_start_bytes = 0;
 
-    while (idx != (rx_size - 8)) {
-        if( (ezlogic_read_data_serial->at(idx) == '\200') &&
-            (ezlogic_read_data_serial->at(idx+1) == '\r') &&
-            (ezlogic_read_data_serial->at(idx+2) == '\n') &&
-            (ezlogic_read_data_serial->at(idx+3) == '{') )
-        {
-            found_start_bytes = 1;
-            ezlogic_read_data_serial->remove(0, idx+3);
-            break;
-        }
+//    while (idx != (rx_size - 8)) {
+//        if( (ezlogic_read_data_serial->at(idx) == '\200') &&
+//            (ezlogic_read_data_serial->at(idx+1) == '\r') &&
+//            (ezlogic_read_data_serial->at(idx+2) == '\n') &&
+//            (ezlogic_read_data_serial->at(idx+3) == '{') )
+//        {
+//            found_start_bytes = 1;
+//            ezlogic_read_data_serial->remove(0, idx+3);
+//            break;
+//        }
 
-        idx++;
-    }
+//        idx++;
+//    }
 
-    idx = 0;
+//    idx = 0;
     rx_size = ezlogic_read_data_serial->count();
     int opening_count = 0;
     int closing_count = 0;
@@ -1694,9 +1694,9 @@ void MainWindow::ezlogic_serial_process(void) {
 
     qDebug().noquote() << "Json data: " << QString::fromLocal8Bit(*ezlogic_read_data_serial);
 
-    if( 0 == found_start_bytes ) {
-        return;
-    }
+//    if( 0 == found_start_bytes ) {
+//        return;
+//    }
 
 
     ui->textBrowser_console_log->append("Json Data: " + QString::fromLocal8Bit(*ezlogic_read_data_serial));
@@ -1780,7 +1780,7 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
 #endif
     if(json_map_root_get_info["status"].toUInt() == 1) {
 
-        get_info_fmw_info.v_sw = json_map_root_get_info["v_fmw"].toUInt();
+//        get_info_fmw_info.v_sw = json_map_root_get_info["v_fmw"].toUInt();
         get_info_fmw_info.v_type = json_map_root_get_info["v_type"].toUInt();
         get_info_fmw_info.build = json_map_root_get_info["build"].toUInt();
         get_info_fmw_info.v_idf = json_map_root_get_info["v_idf"].toUInt();
@@ -1788,9 +1788,9 @@ void MainWindow::ezlogic_action_check_info(QByteArray serial_read) {
         get_info_fmw_info.build_date = json_map_root_get_info["build_date"].toUInt();
 
         EzloPi->EZPI_SET_FMW_INFO(get_info_fmw_info);
-
-        if(get_info_fmw_info.v_sw > 1)    ezlogic_flag_fimware_present = true;
-        else ezlogic_flag_fimware_present = false;
+        ezlogic_flag_fimware_present = true;
+//        if(get_info_fmw_info.v_sw > 1)    ezlogic_flag_fimware_present = true;
+//        else ezlogic_flag_fimware_present = false;
     }
 }
 
