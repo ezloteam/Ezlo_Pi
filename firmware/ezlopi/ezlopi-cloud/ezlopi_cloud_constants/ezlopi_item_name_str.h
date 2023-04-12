@@ -229,5 +229,6 @@ const static char *ezlopi_item_name_temp = "temp";
 // const static char *ezlopi_item_name_supply_air_temperature = "supply_air_temperature";
 const static char* ezlopi_item_name_send_ir_code = "send_ir_code";
 const static char* ezlopi_item_name_learn_ir_code = "learn_ir_code";
+const static char* ezlopi_item_name_soil_humidity = "soil_humidity";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

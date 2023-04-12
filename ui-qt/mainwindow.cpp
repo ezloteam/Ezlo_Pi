@@ -1693,7 +1693,7 @@ void MainWindow::ezlogic_serial_process(void) {
     }
 
     qDebug().noquote() << "\r\n\r\nOpening count: " << opening_count << "Closing count: " << closing_count;
-    qDebug().noquote() << "\r\nFound start_byte: "<< found_start_bytes << "\r\n**************** Json data:\r\n" << QString::fromLocal8Bit(*ezlogic_read_data_serial);
+//    qDebug().noquote() << "\r\nFound start_byte: "<< found_start_bytes << "\r\n**************** Json data:\r\n" << QString::fromLocal8Bit(*ezlogic_read_data_serial);
 
 //    if( 0 == found_start_bytes ) {
 //        return;
