@@ -20,6 +20,7 @@
 #include "0029_gxhtc3_rh_t_sensor.h"
 #include "030_sens_ds18b20_sensor.h"
 #include "032_sens_soil_moisture.h"
+#include "016_sens_dht22_sensor.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -52,7 +53,12 @@ static s_ezlopi_device_t device_array[] = {
         // .properties = NULL,
     },
 #endif
-
+#ifdef EZLOPI_SENSOR_033_DHT22_SENSOR
+{
+    .id = EZLOPI_SENSOR_033_DHT22_SENSOR,
+    .func = dht22_sensor,
+},
+#endif
 #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
     {
         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
@@ -163,6 +169,7 @@ static s_ezlopi_device_t device_array[] = {
         .func = soil_moisture_sensor,
     },
 #endif
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

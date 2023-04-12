@@ -247,10 +247,10 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Soil Moisture\",\
-                \"dev_type\": 3,\
+                \"dev_name\": \"DHT22 Sensor\",\
+                \"dev_type\": 7,\
                 \"gpio\": 2,\
-                \"id_item\": 32,\
+                \"id_item\": 16,\
                 \"id_room\": \"\"\
             }\
         ],\
