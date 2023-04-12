@@ -102,8 +102,8 @@ static const s_method_list_v2_t method_list_v2[] = {
     // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
-    // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 
 uint32_t web_provisioning_get_message_count(void)
