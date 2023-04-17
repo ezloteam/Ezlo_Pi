@@ -20,7 +20,7 @@ static const char *TURBIDITY_TAG = "Ezlopi_turbidity sensor";
 static int ezlopi_turbidity_sensor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ezlopi_turbidity_sensor_prepare(cJSON *cjson_device);
 static int ezlopi_turbidity_sensor_init(s_ezlopi_device_properties_t *properties);
-static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *properties);
+static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *properties, void *arg);
 static int ezlopi_turbidity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 
 int turbidity_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);

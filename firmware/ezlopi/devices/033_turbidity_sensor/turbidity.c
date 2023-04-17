@@ -4,7 +4,7 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_adc.h"
 static const char *ezlopi_water_present_turbidity_state = NULL;
-
+int count = 0;
 int turbidity_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
@@ -35,7 +35,12 @@ int turbidity_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *pr
         }
         case EZLOPI_ACTION_NOTIFY_1000_MS:
         {
-            ret = ezlopi_turbidity_sensor_update_value(properties);
+            count++;
+            if(5 == count)
+            {
+                ret = ezlopi_turbidity_sensor_update_value(properties, arg);
+                count = 0;
+            }
             break;
         }
         default:
@@ -116,7 +121,7 @@ static int ezlopi_turbidity_sensor_init(s_ezlopi_device_properties_t *properties
     return ret;
 }
 
-static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *properties)
+static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     static char *ezlopi_water_previous_turbidity_state;
