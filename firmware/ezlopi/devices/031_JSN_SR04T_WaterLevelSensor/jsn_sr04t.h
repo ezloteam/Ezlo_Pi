@@ -74,7 +74,7 @@ esp_err_t init_JSN_SR04T(jsn_sr04t_config_t *jsn_sr04t_config);
 esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_data_t *jsn_sr04t_raw_data);
 esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *jsn_sr04t_data);
 static int ezlopi_JSN_SR04T_prepare_and_add(void *args);
-static s_ezlopi_device_properties_t *water_level_sensor_prepare(cJSON *cjson_device);
+static s_ezlopi_device_properties_t *JSN_SR04T_sensor_prepare(cJSON *cjson_device);
 static int ezlopi_JSN_SR04T_init(s_ezlopi_device_properties_t* properties);
 static int ezlopi_JSN_SR04T_update_value(s_ezlopi_device_properties_t *properties, void *arg);
 static int ezlopi_JSN_SR04T_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);

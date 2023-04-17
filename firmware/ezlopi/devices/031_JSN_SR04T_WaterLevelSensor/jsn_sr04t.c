@@ -88,12 +88,12 @@ static int ezlopi_JSN_SR04T_prepare_and_add(void *args)
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        s_ezlopi_device_properties_t *water_level_sensor_properties = water_level_sensor_prepare(device_prep_arg->cjson_device);
-        if (water_level_sensor_properties)
+        s_ezlopi_device_properties_t *JSN_SR04T_sensor_properties = JSN_SR04T_sensor_prepare(device_prep_arg->cjson_device);
+        if (JSN_SR04T_sensor_properties)
         {
-            if (0 == ezlopi_devices_list_add(device_prep_arg->device, water_level_sensor_properties, NULL))
+            if (0 == ezlopi_devices_list_add(device_prep_arg->device, JSN_SR04T_sensor_properties, NULL))
             {
-                free(water_level_sensor_properties);
+                free(JSN_SR04T_sensor_properties);
             }
             else
             {
@@ -105,52 +105,52 @@ static int ezlopi_JSN_SR04T_prepare_and_add(void *args)
     return ret;
 }
 
-static s_ezlopi_device_properties_t *water_level_sensor_prepare(cJSON *cjson_device)
+static s_ezlopi_device_properties_t *JSN_SR04T_sensor_prepare(cJSON *cjson_device)
 {
-    s_ezlopi_device_properties_t *water_level_sensor_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    s_ezlopi_device_properties_t *JSN_SR04T_sensor_properties = malloc(sizeof(s_ezlopi_device_properties_t));
 
-    if (water_level_sensor_properties)
+    if (JSN_SR04T_sensor_properties)
     {
-        memset(water_level_sensor_properties, 0, sizeof(s_ezlopi_device_properties_t));
-        water_level_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
+        memset(JSN_SR04T_sensor_properties, 0, sizeof(s_ezlopi_device_properties_t));
+        JSN_SR04T_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
 
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-        ASSIGN_DEVICE_NAME(water_level_sensor_properties, device_name);
-        water_level_sensor_properties->ezlopi_cloud.category = category_level_sensor;
-        water_level_sensor_properties->ezlopi_cloud.subcategory = subcategory_water;
-        water_level_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_water_level_alarm;
-        water_level_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor;
-        water_level_sensor_properties->ezlopi_cloud.value_type = value_type_token;
-        water_level_sensor_properties->ezlopi_cloud.has_getter = true;
-        water_level_sensor_properties->ezlopi_cloud.has_setter = false;
-        water_level_sensor_properties->ezlopi_cloud.reachable = true;
-        water_level_sensor_properties->ezlopi_cloud.battery_powered = false;
-        water_level_sensor_properties->ezlopi_cloud.show = true;
-        water_level_sensor_properties->ezlopi_cloud.room_name[0] = '\0';
-        water_level_sensor_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
-        water_level_sensor_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-        water_level_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
+        ASSIGN_DEVICE_NAME(JSN_SR04T_sensor_properties, device_name);
+        JSN_SR04T_sensor_properties->ezlopi_cloud.category = category_level_sensor;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.subcategory = subcategory_water;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_water_level_alarm;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.value_type = value_type_token;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.has_getter = true;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.has_setter = false;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.reachable = true;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.battery_powered = false;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.show = true;
+        JSN_SR04T_sensor_properties->ezlopi_cloud.room_name[0] = '\0';
+        JSN_SR04T_sensor_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        JSN_SR04T_sensor_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        JSN_SR04T_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        CJSON_GET_VALUE_INT(cjson_device, "gpio_in", water_level_sensor_properties->interface.gpio.gpio_in.gpio_num);
-        CJSON_GET_VALUE_INT(cjson_device, "gpio_out", water_level_sensor_properties->interface.gpio.gpio_out.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "gpio_in", JSN_SR04T_sensor_properties->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "gpio_out", JSN_SR04T_sensor_properties->interface.gpio.gpio_out.gpio_num);
 
-        water_level_sensor_properties->interface.gpio.gpio_out.enable = true;
-        water_level_sensor_properties->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
-        water_level_sensor_properties->interface.gpio.gpio_out.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
-        water_level_sensor_properties->interface.gpio.gpio_out.mode = GPIO_MODE_OUTPUT;
-        water_level_sensor_properties->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
-        water_level_sensor_properties->interface.gpio.gpio_out.value = 0;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_out.enable = true;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_out.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_out.mode = GPIO_MODE_OUTPUT;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_out.value = 0;
 
-        water_level_sensor_properties->interface.gpio.gpio_in.enable = true;
-        water_level_sensor_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
-        water_level_sensor_properties->interface.gpio.gpio_in.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
-        water_level_sensor_properties->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
-        water_level_sensor_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_DISABLE;
-        water_level_sensor_properties->interface.gpio.gpio_in.value = 0;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_in.enable = true;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_in.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_DISABLE;
+        JSN_SR04T_sensor_properties->interface.gpio.gpio_in.value = 0;
     }
 
-    return water_level_sensor_properties;
+    return JSN_SR04T_sensor_properties;
 }
 
 static int ezlopi_JSN_SR04T_init(s_ezlopi_device_properties_t *properties)
@@ -181,7 +181,7 @@ static int ezlopi_JSN_SR04T_update_value(s_ezlopi_device_properties_t *propertie
     if (ESP_OK == ret)
     {
         jsn_sr04t_print_data(jsn_sr04t_data);
-        
+
         // arg = &jsn_sr04t_data;
     }
     else

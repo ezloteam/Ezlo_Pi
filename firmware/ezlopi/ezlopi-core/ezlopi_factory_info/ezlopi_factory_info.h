@@ -15,9 +15,11 @@ extern "C"
 #define EZLOPI_SWITCH_BOX 1
 #define EZLOPI_IR_BLASTER 2
 #define EZLOPI_WATER_LEVEL_SENSOR 3
+#define EZLOPI_TURBIDITY_SENSOR 4
 
 // #define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
-#define EZLOPI_DEVICE_TYPE EZLOPI_WATER_LEVEL_SENSOR
+// #define EZLOPI_DEVICE_TYPE EZLOPI_WATER_LEVEL_SENSOR
+#define EZLOPI_DEVICE_TYPE EZLOPI_TURBIDITY_SENSOR
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -203,17 +205,32 @@ static const char *water_level_sensor_constant_config =
         [\
             {\
                 \"dev_name\": \"Water_Level_Sensor1\",\
-                \"dev_type\": 5,\
+                \"dev_type\": 10,\
                 \"gpio_in\": 14,\
                 \"gpio_out\": 16,\
                 \"id_item\": 31,\
-                \"id_room\": \"\",\
-                \"pwm_resln\": 80,\
-                \"freq_hz\": 50,\
-                \"duty_cycle\": 30\
+                \"id_room\": \"\"\
             }\
         ],\
     \"dev_total\": 1}";
+
+#elif (EZLOPI_TURBIDITY_SENSOR == EZLOPI_DEVICE_TYPE)
+static const char *water_turbidity_sensor_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\": \"Water_Turbidity_Sensor\",\
+                \"dev_type\": 3,\
+                \"gpio\": 1,\
+                \"id_item\": 33,\
+                \"id_room\": \"\",\
+                \"resln_bit\": 12\
+            }\
+        ],\
+    \"dev_total\": 1}";
+
 #endif
 
 #ifdef __cplusplus

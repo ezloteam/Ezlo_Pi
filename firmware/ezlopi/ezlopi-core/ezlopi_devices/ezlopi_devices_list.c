@@ -19,7 +19,7 @@
 #include "1024_device_health.h"
 #include "0029_gxhtc3_rh_t_sensor.h"
 #include "jsn_sr04t.h"
-
+#include "turbidity.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -148,6 +148,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_031_JSN_SR04T_WaterLevelSensor,
         .func = JSN_SR04T,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_033_Turbidity_Sensor
+    {
+        .id = EZLOPI_SENSOR_033_Turbidity_Sensor,
+        .func = turbidity_sensor,
     },
 #endif
 
