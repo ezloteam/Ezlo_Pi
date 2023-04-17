@@ -160,7 +160,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
         TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
         last_disconnect_reason = ezlopi_wifi_err_reason_str(disconnected->reason);
-        ezlopi_flag_wifi_status = true;
+        ezlopi_flag_wifi_status = false;
 
         station_got_ip = 0;
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
