@@ -5,6 +5,9 @@
 #include "esp_bt_defs.h"
 #include "ezlopi_ble_config.h"
 
+#define EZLOPI_BLE_ENALBE_PASSKEY 0
+
+void ezlopi_ble_setup_adv_config(void);
 void ezlopi_ble_gap_set_passkey(uint32_t passkey);
 void ezlopi_ble_gap_dissociate_bonded_devices(void);
 void ezlopi_ble_gap_config_adv_data(void);

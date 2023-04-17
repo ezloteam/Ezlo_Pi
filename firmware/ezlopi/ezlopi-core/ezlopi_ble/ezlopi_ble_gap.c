@@ -25,21 +25,22 @@ static esp_ble_adv_data_t adv_data = {
     .min_interval = 0x0006,
     .max_interval = 0x0010,
     .appearance = 0x00,
-    .manufacturer_len = sizeof(manufacturer),
-    .p_manufacturer_data = manufacturer,
+    .manufacturer_len = 0,       // sizeof(manufacturer),
+    .p_manufacturer_data = NULL, //  manufacturer,
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = 0,
     .p_service_uuid = NULL,
     .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
 };
+
 esp_ble_adv_data_t scan_rsp_data = {
     .set_scan_rsp = true,
     .include_name = true,
     .include_txpower = true,
     .appearance = 0x00,
-    .manufacturer_len = sizeof(manufacturer), // TEST_MANUFACTURER_DATA_LEN,
-    .p_manufacturer_data = manufacturer,      //&manufacturer[0],
+    .manufacturer_len = 0,       // sizeof(manufacturer), // TEST_MANUFACTURER_DATA_LEN,
+    .p_manufacturer_data = NULL, // manufacturer, //&manufacturer[0],
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = 0,
@@ -50,6 +51,10 @@ static esp_ble_adv_params_t adv_params = {
     .adv_int_min = 0x20,
     .adv_int_max = 0x40,
     .adv_type = ADV_TYPE_IND,
+    // .adv_type = ADV_TYPE_DIRECT_IND_HIGH,
+    // .adv_type = ADV_TYPE_SCAN_IND,
+    // .adv_type = ADV_TYPE_NONCONN_IND,
+    // .adv_type = ADV_TYPE_DIRECT_IND_LOW,
     .own_addr_type = BLE_ADDR_TYPE_PUBLIC,
     .channel_map = ADV_CHNL_ALL,
     .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
@@ -60,11 +65,14 @@ static void show_bonded_devices(void);
 static char *esp_key_type_to_str(esp_ble_key_type_t key_type);
 static char *esp_auth_req_to_str(esp_ble_auth_req_t auth_req);
 static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
+// static void ezlopi_ble_setup_adv_config(void);
 
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
 void ezlopi_ble_gap_set_passkey(uint32_t passkey)
 {
     esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t));
 }
+#endif
 
 void ezlopi_ble_gap_start_advertising(void)
 {
@@ -86,6 +94,10 @@ void ezlopi_ble_gap_config_adv_data(void)
     {
         TRACE_E("config adv data failed, error code = %x", ret);
     }
+    else
+    {
+        TRACE_I("Adv-data set complete");
+    }
     adv_config_done |= ADV_CONFIG_FLAG;
 }
 
@@ -103,6 +115,10 @@ void ezlopi_ble_gap_config_scan_rsp_data(void)
     if (ret)
     {
         TRACE_E("config scan response data failed, error code = %x", ret);
+    }
+    else
+    {
+        TRACE_I("Scan response set complete");
     }
     adv_config_done |= SCAN_RSP_CONFIG_FLAG;
 }
@@ -126,6 +142,39 @@ void ezlopi_ble_gap_dissociate_bonded_devices(void)
         }
 
         free(dev_list);
+    }
+}
+
+void ezlopi_ble_setup_adv_config(void)
+{
+    if (NULL == all_service_uuid)
+    {
+        ezlopi_ble_setup_service_uuid();
+    }
+
+    adv_data.p_service_uuid = all_service_uuid;
+    adv_data.service_uuid_len = all_service_uuid_len;
+
+    esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
+    if (ret)
+    {
+        TRACE_E("config adv data failed, error code = %x", ret);
+    }
+    else
+    {
+        adv_config_done |= ADV_CONFIG_FLAG;
+    }
+
+    scan_rsp_data.p_service_uuid = all_service_uuid;
+    scan_rsp_data.service_uuid_len = all_service_uuid_len;
+    ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
+    if (ret)
+    {
+        TRACE_E("config adv data failed, error code = %x", ret);
+    }
+    else
+    {
+        adv_config_done |= SCAN_RSP_CONFIG_FLAG;
     }
 }
 
@@ -166,6 +215,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         break;
     }
 
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     case ESP_GAP_BLE_PASSKEY_REQ_EVT: // 12
     {
         break;
@@ -226,6 +276,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         TRACE_I("------------------------------------");
         break;
     }
+#endif
     case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT: // 17
     {
         if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS)
@@ -247,10 +298,14 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
                 param->update_conn_params.conn_int,
                 param->update_conn_params.latency,
                 param->update_conn_params.timeout);
+        ezlopi_ble_setup_adv_config();
         break;
     }
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
+        ezlopi_ble_setup_adv_config(param);
+#if 0
         if (param->local_privacy_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {
             TRACE_E("config local privacy failed, error status = %x", param->local_privacy_cmpl.status);
@@ -285,70 +340,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         {
             adv_config_done |= SCAN_RSP_CONFIG_FLAG;
         }
-
-        break;
-    }
-#if 0
-    case ESP_GAP_BLE_LOCAL_IR_EVT: // 14
-    {
-        TRACE_I("ESP_GAP_BLE_LOCAL_IR_EVT");
-        break;
-    }
-    case ESP_GAP_BLE_LOCAL_ER_EVT: // 15
-    {
-        TRACE_I("ESP_GAP_BLE_LOCAL_ER_EVT");
-        break;
-    }
-    case ESP_GAP_BLE_PASSKEY_NOTIF_EVT: // 11
-    {
-        TRACE_I("The passkey Notify number:%06d", param->ble_security.key_notif.passkey);
-        break;
-    }
-    case ESP_GAP_BLE_KEY_EVT: // 9
-    {
-        TRACE_I("key type = %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
-        break;
-    }
-    case ESP_GAP_BLE_AUTH_CMPL_EVT: // 8
-    {
-        esp_bd_addr_t bd_addr;
-        memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
-        dump("remote BD_ADDR", bd_addr, 0, 6);
-        TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
-        if (!param->ble_security.auth_cmpl.success)
-        {
-            TRACE_W("pair status = fail");
-            TRACE_W("fail reason = 0x%x", param->ble_security.auth_cmpl.fail_reason);
-            esp_ble_gap_disconnect(bd_addr);
-        }
-        else
-        {
-            TRACE_I("pair status = success");
-            TRACE_I("auth mode =  %s", esp_auth_req_to_str(param->ble_security.auth_cmpl.auth_mode));
-        }
-        show_bonded_devices();
-        break;
-    }
-    case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: // 23
-    {
-        TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
-        TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
-        TRACE_I("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
-        dump("", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
-        TRACE_I("------------------------------------");
-        break;
-    }
-
-    case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT: // 17
-    {
-        if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS)
-        {
-            TRACE_E("Advertising stop failed");
-        }
-        else
-        {
-            TRACE_I("Stop adv successfully");
-        }
+#endif
         break;
     }
 #endif
@@ -516,7 +508,7 @@ static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
         ret = "ESP_GAP_BLE_UPDATE_DUPLICATE_EXCEPTIONAL_LIST_COMPLETE_EVT";
         break;
     }
-#endif                                 //#if (BLE_42_FEATURE_SUPPORT == TRUE)
+#endif                                 // #if (BLE_42_FEATURE_SUPPORT == TRUE)
     case ESP_GAP_BLE_SET_CHANNELS_EVT: /*!< When setting BLE channels complete, the event comes */
     {
         ret = "ESP_GAP_BLE_SET_CHANNELS_EVT";
@@ -826,4 +818,6 @@ static void ezlopi_ble_setup_service_uuid(void)
             }
         }
     }
+
+    dump("complete-uuid", (all_service_uuid ? all_service_uuid : ""), 0, all_service_uuid_len);
 }

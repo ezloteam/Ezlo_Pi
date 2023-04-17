@@ -17,10 +17,13 @@
 #include "ezlopi_ble_buffer.h"
 
 s_gatt_service_t *passkey_service = NULL;
-s_gatt_char_t *passkey_characterstic = NULL;
-s_gatt_char_t *factory_reset_characterstic = NULL;
 
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+s_gatt_char_t *passkey_characterstic = NULL;
 static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+#endif
+
+s_gatt_char_t *factory_reset_characterstic = NULL;
 static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
@@ -35,11 +38,13 @@ void ezlopi_ble_service_passkey_init(void)
     uuid.uuid.uuid16 = BLE_PASSKEY_SERVICE_UUID;
     passkey_service = ezlopi_ble_gatt_create_service(BLE_PASSKEY_SERVICE_HANDLE, &uuid);
 
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     uuid.uuid.uuid16 = BLE_PASSKEY_CHAR_PASSKEY_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
     passkey_characterstic = ezlopi_ble_gatt_add_characteristic(passkey_service, &uuid, permission, properties, NULL, passkey_write_func, NULL);
+#endif
 
     uuid.uuid.uuid16 = BLE_PASSKEY_FACTORY_RESET_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
@@ -48,6 +53,7 @@ void ezlopi_ble_service_passkey_init(void)
     factory_reset_characterstic = ezlopi_ble_gatt_add_characteristic(passkey_service, &uuid, permission, properties, NULL, factory_reset_write_func, NULL);
 }
 
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
 static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     if (param->write.len == 4)
@@ -62,26 +68,61 @@ static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t
         }
     }
 }
+#endif
 
 static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("Here");
+
     if (param && param->write.len && param->write.value)
     {
-        TRACE_D("Here");
+
         cJSON *root = cJSON_ParseWithLength((const char *)param->write.value, param->write.len);
         if (root)
         {
-            TRACE_D("Here");
+
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
             static uint32_t authenticated_flag;
             static uint32_t start_tick;
+#endif
+
             uint32_t cmd = CJ_GET_NUMBER("cmd");
 
             TRACE_D("cmd: %d", cmd);
-
-            if (1 == cmd) // authentication request for soft-factory-reset
+            if (2 == cmd) // factory reset command
             {
-                TRACE_D("Here");
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+                uint32_t current_tick = xTaskGetTickCount();
+                if ((current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS) && (1 == authenticated_flag)) // once authenticated, valid for 30 seconds only
+                {
+#endif
+                    int ret = ezlopi_factory_info_v2_factory_reset();
+                    if (ret)
+                    {
+                        TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
+                    }
+
+                    ret = ezlopi_nvs_factory_reset();
+                    if (ret)
+                    {
+                        TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
+                    }
+
+                    TRACE_B("factory reset done, rebooting now .............................................");
+                    vTaskDelay(2000 / portTICK_RATE_MS);
+                    esp_restart();
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+                }
+                else
+                {
+                    authenticated_flag = 0;
+                    TRACE_W("Not authenticated for factory-reset!");
+                }
+#endif
+            }
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+            else if (1 == cmd) // authentication request for soft-factory-reset
+            {
+
                 uint32_t passkey = CJ_GET_NUMBER("passkey");
                 uint32_t original_passkey = 0;
                 ezlopi_nvs_read_ble_passkey(&original_passkey);
@@ -100,35 +141,7 @@ static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_p
                     TRACE_W("Not authenticated!");
                 }
             }
-            else if (2 == cmd) // factory reset command
-            {
-                uint32_t current_tick = xTaskGetTickCount();
-
-                if ((current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS) && (1 == authenticated_flag)) // once authenticated, valid for 30 seconds only
-                {
-
-                    int ret = ezlopi_factory_info_v2_factory_reset();
-                    if (ret)
-                    {
-                        TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
-                    }
-
-                    ret = ezlopi_nvs_factory_reset();
-                    if (ret)
-                    {
-                        TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
-                    }
-
-                    TRACE_B("factory reset done, rebooting now .............................................");
-                    vTaskDelay(2000 / portTICK_RATE_MS);
-                    esp_restart();
-                }
-                else
-                {
-                    authenticated_flag = 0;
-                    TRACE_W("Not authenticated for factory-reset!");
-                }
-            }
+#endif
             else
             {
                 TRACE_W("Command not valid: [cmd: %u].", cmd);

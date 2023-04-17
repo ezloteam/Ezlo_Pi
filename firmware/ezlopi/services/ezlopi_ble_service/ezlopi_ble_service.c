@@ -48,16 +48,18 @@ void ezlopi_ble_service_init(void)
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PASSKEY_SERVICE_HANDLE), "gatts app-1 register error");
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PROVISIONING_ID_HANDLE), "gatts app-2 register error");
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_DEVICE_INFO_ID_HANDLE), "gatts app-3 register error");
+
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
-    ezlopi_ble_start_secure_gatt_server();
+    // ezlopi_ble_start_secure_gatt_server();
 }
 
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
-    // const uint32_t default_passkey = 123456;
+    const uint32_t default_passkey = 123456;
     uint32_t passkey;
     ezlopi_nvs_read_ble_passkey(&passkey);
-    // passkey = ((0 == passkey) || (passkey > 999999)) ? default_passkey : passkey;
+    passkey = (0 == passkey) ? default_passkey : passkey;
+    passkey = (passkey > 999999) ? default_passkey : passkey;
     TRACE_D("Ble passkey: %d", passkey);
 
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND; // ESP_LE_AUTH_REQ_BOND_MITM;
@@ -80,10 +82,26 @@ static void ezlopi_ble_start_secure_gatt_server(void)
 
 static void ezlopi_ble_basic_init(void)
 {
+    // static const char *ble_device_name = "LED";
     char ble_device_name[32];
     // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
+    // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v2_get_id());
+    char *device_type = ezlopi_factory_info_v2_get_device_type();
+    if ((NULL != device_type) && (isprint(device_type[0])))
+    {
+        snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%s", device_type);
+    }
+    else
+    {
+        uint8_t mac[6];
+        memset(mac, 0, sizeof(mac));
+        esp_read_mac(mac, ESP_MAC_BT);
+        snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%02x%02x%02x%02x%02x%02x",
+                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        ble_device_name[19] = '\0';
+    }
 
-    snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v2_get_id());
+    dump("ble_device_name", ble_device_name, 0, 32);
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));

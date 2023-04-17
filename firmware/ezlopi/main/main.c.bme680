@@ -92,13 +92,18 @@ void user_task(void *pvParameters)
         {
             // passive waiting until measurement results are available
             vTaskDelay(duration);
+            bme680_measure_float(sensor, &values);
+            printf("1 - %.3f BME680 Sensor: %.2f °C, %.2f %%, %.2f hPa, %.2f Ohm\n",
+                   (double)sdk_system_get_time() * 1e-3,
+                   values.temperature, values.humidity,
+                   values.pressure, values.gas_resistance);
 
             // alternatively: busy waiting until measurement results are available
             // while (bme680_is_measuring (sensor)) ;
 
             // get the results and do something with them
             if (bme680_get_results_float(sensor, &values))
-                printf("%.3f BME680 Sensor: %.2f °C, %.2f %%, %.2f hPa, %.2f Ohm\n",
+                printf("2 - %.3f BME680 Sensor: %.2f °C, %.2f %%, %.2f hPa, %.2f Ohm\n",
                        (double)sdk_system_get_time() * 1e-3,
                        values.temperature, values.humidity,
                        values.pressure, values.gas_resistance);

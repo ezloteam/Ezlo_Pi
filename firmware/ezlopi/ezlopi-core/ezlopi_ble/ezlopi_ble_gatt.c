@@ -37,12 +37,16 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         {
             TRACE_D("Found app-id: %d", service->app_id);
             ezlopi_ble_gap_config_adv_data();
-            ezlopi_ble_gap_config_scan_rsp_data();
+            // ezlopi_ble_gap_config_scan_rsp_data();
 
             service->gatts_if = gatts_if;
             service->status = GATT_STATUS_PROCESSING;
             esp_ble_gatts_create_service(gatts_if, &service->service_id, service->num_handles);
             TRACE_D("service->num_handles: %d", service->num_handles);
+        }
+        else
+        {
+            TRACE_D("service is null");
         }
         break;
     }
@@ -74,6 +78,8 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     }
     case ESP_GATTS_ADD_CHAR_EVT:
     {
+        uint16_t length = 0;
+
         TRACE_I("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
 
@@ -88,7 +94,6 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
             {
                 desc_to_init->status = GATT_STATUS_PROCESSING;
                 esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(service->service_handle, &desc_to_init->uuid, desc_to_init->permission, NULL, NULL);
-                // ezlopi_ble_gatt_print_descriptor(desc_to_init);
                 if (add_descr_ret)
                 {
                     TRACE_E("add char descr failed, error code =%x", add_descr_ret);
@@ -103,7 +108,6 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
                     char_to_add->status = GATT_STATUS_PROCESSING;
                     esp_err_t err = esp_ble_gatts_add_char(service->service_handle, &char_to_add->uuid, char_to_add->permission,
                                                            char_to_add->property, NULL, NULL);
-                    // ezlopi_ble_gatt_print_characteristic(char_to_add);
                     if (err)
                     {
                         TRACE_E("esp_ble_gatts_add_char: %s", esp_err_to_name(err));
@@ -185,6 +189,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         ezlopi_ble_gatt_call_write_exec_by_handle(gatts_if, param);
         break;
     }
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     case ESP_GATTS_CONNECT_EVT:
     {
         TRACE_I("ESP_GATTS_CONNECT_EVT");
@@ -192,6 +197,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM);
         break;
     }
+#endif
     case ESP_GATTS_DISCONNECT_EVT:
     {
         TRACE_I("ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
@@ -200,13 +206,12 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     }
     case ESP_GATTS_MTU_EVT: // 4
     {
+        ezlopi_ble_setup_adv_config();
         TRACE_I("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
         g_mtu_size = param->mtu.mtu;
         break;
     }
     case ESP_GATTS_RESPONSE_EVT:
-    {
-    }
     default:
     {
         TRACE_W("BLE GATT Event: %s Not Implemented!", ezlopi_ble_gatt_event_to_string(event));
@@ -316,10 +321,6 @@ static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble
                 esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
             }
         }
-    }
-    else
-    {
-        TRACE_E("error: Function not available!");
     }
 }
 
