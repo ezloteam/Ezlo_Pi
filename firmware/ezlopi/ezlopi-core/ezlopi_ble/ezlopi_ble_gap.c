@@ -304,7 +304,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
-        ezlopi_ble_setup_adv_config(param);
+        ezlopi_ble_setup_adv_config();
 #if 0
         if (param->local_privacy_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {
