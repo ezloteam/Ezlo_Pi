@@ -20,6 +20,7 @@
 #include "0029_gxhtc3_rh_t_sensor.h"
 #include "jsn_sr04t.h"
 #include "turbidity.h"
+#include "proximity.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -155,6 +156,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_033_Turbidity_Sensor,
         .func = turbidity_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_034_Proximity_Sensor
+    {
+        .id = EZLOPI_SENSOR_034_Proximity_Sensor,
+        .func = proximity_sensor,
     },
 #endif
 

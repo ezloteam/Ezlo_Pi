@@ -16,10 +16,12 @@ extern "C"
 #define EZLOPI_IR_BLASTER 2
 #define EZLOPI_WATER_LEVEL_SENSOR 3
 #define EZLOPI_TURBIDITY_SENSOR 4
+#define EZLOPI_PROXIMITY_SENSOR 5
 
 // #define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
 // #define EZLOPI_DEVICE_TYPE EZLOPI_WATER_LEVEL_SENSOR
-#define EZLOPI_DEVICE_TYPE EZLOPI_TURBIDITY_SENSOR
+// #define EZLOPI_DEVICE_TYPE EZLOPI_TURBIDITY_SENSOR
+#define EZLOPI_DEVICE_TYPE EZLOPI_PROXIMITY_SENSOR
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -227,6 +229,23 @@ static const char *water_turbidity_sensor_constant_config =
                 \"id_item\": 33,\
                 \"id_room\": \"\",\
                 \"resln_bit\": 12\
+            }\
+        ],\
+    \"dev_total\": 1}";
+
+#elif (EZLOPI_PROXIMITY_SENSOR == EZLOPI_DEVICE_TYPE)
+static const char *proximity_sensor_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\": \"Proximity_Sensor\",\
+                \"dev_type\": 2,\
+                \"gpio\": 14,\
+                \"id_item\": 34,\
+                \"id_room\": \"\",\
+                \"logic_inv\": true\
             }\
         ],\
     \"dev_total\": 1}";

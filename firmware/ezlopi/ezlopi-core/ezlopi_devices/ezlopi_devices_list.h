@@ -36,6 +36,7 @@
 #define EZLOPI_SENSOR_030_IR_BLASTER 30
 #define EZLOPI_SENSOR_031_JSN_SR04T_WaterLevelSensor 31
 #define EZLOPI_SENSOR_033_Turbidity_Sensor 33
+#define EZLOPI_SENSOR_034_Proximity_Sensor 34
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
 
 /**
