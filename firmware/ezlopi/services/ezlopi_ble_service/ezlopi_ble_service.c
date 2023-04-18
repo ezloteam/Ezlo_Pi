@@ -63,7 +63,7 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
     const uint8_t oob_support = ESP_BLE_OOB_ENABLE; // ESP_BLE_OOB_ENABLE; // ESP_BLE_OOB_DISABLE;
     const uint8_t init_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
     const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-i
+
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_IOCAP_MODE");
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, &auth_option, sizeof(uint8_t)), "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
@@ -108,7 +108,7 @@ static void ezlopi_ble_basic_init(void)
     char *device_type = ezlopi_factory_info_v2_get_device_type();
     if ((NULL != device_type) && (isprint(device_type[0])))
     {
-        snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%s", device_type);
+        snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%s_%llu", device_type, ezlopi_factory_info_v2_get_id());
     }
     else
     {

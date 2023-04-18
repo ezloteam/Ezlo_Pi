@@ -14,7 +14,7 @@ extern "C"
 #define EZLOPI_GENERIC 0
 #define EZLOPI_SWITCH_BOX 1
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_SWITCH_BOX
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -171,6 +171,17 @@ static const char *switch_box_constant_config =
         \"dev_detail\":\
         [\
             {\
+                \"dev_name\" : \"GXHTC3-Sensor\",\
+                \"dev_type\" : 8,\
+                \"gpio_scl\" : 45,\
+                \"gpio_sda\" : 46,\
+                \"id_item\" : 29,\
+                \"id_room\" : \"\",\
+                \"pullup_scl\" : true,\
+                \"pullup_sda\" : true,\
+                \"slave_addr\" : 0\
+            },\
+            {\
                 \"dev_name\": \"Switch 1\",\
                 \"dev_type\": 1,\
                 \"gpio_in\": -1,\
@@ -199,9 +210,144 @@ static const char *switch_box_constant_config =
                 \"pullup_op\": true,\
                 \"val_ip\": true,\
                 \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 3\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 15,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 4\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 4,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 5\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 5,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 6\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 6,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 7\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 7,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 8\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 12,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 9\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 17,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Switch 10\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 18,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_name\": \"Master Switch\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 255,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
             }\
         ],\
-    \"dev_total\": 1}";
+    \"dev_total\": 12}";
 #endif
 
 #ifdef __cplusplus

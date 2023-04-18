@@ -19,6 +19,21 @@
 
 static s_ezlopi_device_t device_array[] = {
 
+#if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
+#ifdef EZLOPI_SENSOR_0001_LED
+    {
+        .id = EZLOPI_SENSOR_0001_LED,
+        .func = digital_io,
+    },
+#ifdef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
+    {
+        .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
+        .func = gxhtc3_rh_t_sensor,
+    },
+#endif
+#endif
+#else
+
 #ifdef EZLOPI_SENSOR_0001_LED
     {
         .id = EZLOPI_SENSOR_0001_LED,
@@ -145,6 +160,7 @@ static s_ezlopi_device_t device_array[] = {
         .id = EZLOPI_SENSOR_NONE,
         .func = NULL,
     },
+#endif
 };
 
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void)
