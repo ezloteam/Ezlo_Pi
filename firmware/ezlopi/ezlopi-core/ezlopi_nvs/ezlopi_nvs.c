@@ -1,4 +1,5 @@
 #include "string.h"
+#include "time.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -14,7 +15,7 @@ static const char *passkey_nvs_name = "passkey";
 static const char *user_id_nvs_name = "user_id";
 static const char *wifi_info_nvs_name = "wifi_info";
 static const char *boot_count_nvs_name = "boot_count";
-static const char *provisioning_time_nvs_name = "prov_time";
+static const char *provisioning_status_nvs_name = "prov_stat";
 
 void ezlopi_nvs_init(void)
 {
@@ -288,31 +289,30 @@ void ezlopi_nvs_deinit(void)
     ezlopi_nvs_handle = 0;
 }
 
-void ezlopi_nvs_set_provisioning_time(uint32_t epoch_time)
+void ezlopi_nvs_set_provisioning_status(void)
 {
     if (ezlopi_nvs_handle)
     {
-        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, provisioning_time_nvs_name, epoch_time);
-        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, provisioning_status_nvs_name, 1);
+        TRACE_E("nvs_set_u32 - error: %s", esp_err_to_name(err));
     }
 }
 
-uint32_t ezlopi_nvs_get_provisioning_time(void)
+uint32_t ezlopi_nvs_get_provisioning_status(void)
 {
-    uint32_t provisioning_time = 1;
+    uint32_t provisioning_status = 0;
     if (ezlopi_nvs_handle)
     {
-        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, provisioning_time_nvs_name, &provisioning_time);
-        TRACE_I("Boot count: %d", provisioning_time);
-        TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
+        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, provisioning_status_nvs_name, &provisioning_status);
+        TRACE_I("Provisioning_Status: %d", provisioning_status);
         if (ESP_OK != err)
         {
-            err = nvs_set_u32(ezlopi_nvs_handle, provisioning_time_nvs_name, provisioning_time);
-            TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+            provisioning_status = 0;
+            TRACE_E("Error nvs_get_u32: %s", esp_err_to_name(err));
         }
     }
 
-    return provisioning_time;
+    return provisioning_status;
 }
 
 void ezlopi_nvs_set_boot_count(uint32_t boot_count)

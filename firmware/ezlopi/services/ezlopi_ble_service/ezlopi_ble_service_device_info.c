@@ -103,6 +103,12 @@ static char *device_info_jsonify(void)
         cJSON_AddStringToObject(root, "mac", "12:23:34:45:56:67");
         cJSON_AddStringToObject(root, "ezlopi_device_type", "generic");
         cJSON_AddBoolToObject(root, "provisioned_status", true);
+        // ssid, ips
+        // manufacturer
+        // model
+        // device-type
+        // device-name
+        // brand
 
         device_info = cJSON_Print(root);
         if (device_info)

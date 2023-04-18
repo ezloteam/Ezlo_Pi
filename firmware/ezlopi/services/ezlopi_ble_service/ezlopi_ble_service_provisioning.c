@@ -61,8 +61,17 @@ static char *__provisioning_status_jsonify(void)
     cJSON *root = cJSON_CreateObject();
     if (root)
     {
-        cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v2_get_version());
-        cJSON_AddNumberToObject(root, "time", ezlopi_nvs_get_provisioning_time());
+        uint32_t prov_stat = ezlopi_nvs_get_provisioning_status();
+        if (1 == prov_stat)
+        {
+            cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v2_get_version());
+            cJSON_AddNumberToObject(root, "status", prov_stat);
+        }
+        else
+        {
+            cJSON_AddNumberToObject(root, "version", 0);
+            cJSON_AddNumberToObject(root, "status", 0);
+        }
 
         prov_status_jstr = cJSON_Print(root);
         if (prov_status_jstr)
@@ -185,10 +194,7 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
     TRACE_D("Write function called!");
     TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
 
-    time_t now;
-    time(&now);
-    TRACE_D("Provisioning time: %ld", now);
-    ezlopi_nvs_set_provisioning_time(now);
+    ezlopi_nvs_set_provisioning_status();
 
     if (NULL == g_provisioning_linked_buffer)
     {
