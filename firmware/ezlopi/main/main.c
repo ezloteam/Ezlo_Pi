@@ -23,6 +23,8 @@
 #include "ezlopi_system_info.h"
 #include "029_IR_blaster_remote.h"
 
+#include "mac_uuid.h"
+
 static void blinky(void *pv);
 
 void app_main(void)
@@ -54,7 +56,7 @@ static void blinky(void *pv)
 
     // adc1_config_width(ADC_WIDTH_BIT_12);
     // gpio_config(&io_conf);
-
+    char uuid[37] = {0};
     while (1)
     {
         // state ^= 1;
@@ -68,6 +70,8 @@ static void blinky(void *pv)
         if (count++ > 2)
         {
             TRACE_D("-----------------------------------------");
+            ezlopi_generate_UUID(uuid);
+            TRACE_D("UUID: %s", uuid);
             TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
             TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
             TRACE_D("-----------------------------------------");
