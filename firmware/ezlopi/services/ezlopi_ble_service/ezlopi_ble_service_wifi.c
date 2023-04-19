@@ -14,8 +14,8 @@
 #include "ezlopi_ble_service.h"
 #include "ezlopi_ble_buffer.h"
 #include "ezlopi_factory_info.h"
+#include "ezlopi_ble_auth.h"
 
-static char *g_auth_error = NULL;
 static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
 
 static char *wifi_creds_jsonify(void);
@@ -167,6 +167,7 @@ static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
     }
 }
 
+#if 0
 static void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     static char *json_str_wifi_info;
@@ -210,6 +211,7 @@ static void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param
         }
     }
 }
+#endif
 
 static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
@@ -227,12 +229,32 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
         cJSON *root = cJSON_Parse((const char *)value);
         if (root)
         {
-            char *ssid = cJSON_GetObjectItemCaseSensitive(root, "wifi_ssid")->valuestring;
-            char *password = cJSON_GetObjectItemCaseSensitive(root, "wifi_password")->valuestring;
-            if (ssid && password)
+
+            cJSON *cj_user_id = cJSON_GetObjectItemCaseSensitive(root, "user_id");
+            cJSON *cj_ssid = cJSON_GetObjectItemCaseSensitive(root, "wifi_ssid")->valuestring;
+            cJSON *cj_password = cJSON_GetObjectItemCaseSensitive(root, "wifi_password")->valuestring;
+
+            if (cj_user_id && cj_password && cj_ssid)
             {
-                ezlopi_wifi_connect(ssid, password);
-                ezlopi_factory_info_v2_set_wifi(ssid, password);
+                char *ssid = cj_ssid->valuestring;
+                char *password = cj_password->valuestring;
+                char *user_id_str = cj_user_id->valuestring;
+
+                if (user_id_str && ssid && password)
+                {
+                    e_auth_status_t check_status = ezlopi_ble_auth_check_user_id(user_id_str);
+                    if (BLE_AUTH_SUCCESS == check_status)
+                    {
+                        ezlopi_wifi_connect(ssid, password);
+                        ezlopi_factory_info_v2_set_wifi(ssid, password);
+                    }
+                    else if (BLE_AUTH_USER_ID_NOT_FOUND == check_status)
+                    {
+                        ezlopi_wifi_connect(ssid, password);
+                        ezlopi_factory_info_v2_set_wifi(ssid, password);
+                        ezlopi_ble_auth_store_user_id(user_id_str);
+                    }
+                }
             }
 
             cJSON_Delete(root);
@@ -256,15 +278,13 @@ static char *wifi_creds_jsonify(void)
             wifi_creds[31] = '\0';
         }
         cJSON_AddStringToObject(cjson_wifi_info, "wifi_ssid", ssid ? ssid : "");
-        // cJSON_AddStringToObject(cjson_wifi_info, "SSID", &wifi_creds[0]);
-        // cJSON_AddStringToObject(cjson_wifi_info, "PSD", "********");
-
         esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
         cJSON_AddStringToObject(cjson_wifi_info, "ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
         cJSON_AddStringToObject(cjson_wifi_info, "gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
         cJSON_AddStringToObject(cjson_wifi_info, "netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
         cJSON_AddNumberToObject(cjson_wifi_info, "connection_status", ezlopi_wifi_got_ip());
-        cJSON_AddStringToObject(cjson_wifi_info, "error", g_auth_error ? g_auth_error : ezlopi_wifi_get_last_disconnect_reason());
+        cJSON_AddStringToObject(cjson_wifi_info, "error", ezlopi_wifi_get_last_disconnect_reason());
+        cJSON_AddStringToObject(cjson_wifi_info, "auth_status", ezlopi_ble_auth_status_to_string(ezlopi_ble_auth_last_status()));
 
         json_str_wifi_info = cJSON_Print(cjson_wifi_info);
         if (json_str_wifi_info)

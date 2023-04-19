@@ -5,6 +5,7 @@
 #include "esp_event_base.h"
 
 #include "trace.h"
+#include "version.h"
 #include "ezlopi_wifi.h"
 
 #include "ezlopi_nvs.h"
@@ -94,8 +95,8 @@ static char *device_info_jsonify(void)
     cJSON *root = cJSON_CreateObject();
     if (root)
     {
-        cJSON_AddNumberToObject(root, "firmware_version", 0);
-        cJSON_AddNumberToObject(root, "firmware_build", 1);
+        cJSON_AddStringToObject(root, "firmware_version", VERSION_STR);
+        cJSON_AddNumberToObject(root, "firmware_build", BUILD);
         cJSON_AddStringToObject(root, "chip", "ESP32S3");
         cJSON_AddNumberToObject(root, "version_idf", 1234);
         cJSON_AddNumberToObject(root, "uptime", 0);

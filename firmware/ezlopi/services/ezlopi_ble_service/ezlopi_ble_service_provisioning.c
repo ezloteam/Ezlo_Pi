@@ -16,6 +16,7 @@
 #include "ezlopi_ble_service.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_devices.h"
+#include "ezlopi_ble_auth.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
@@ -46,7 +47,7 @@ void ezlopi_ble_service_provisioning_init(void)
     // properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
-    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, provisioning_info_read_func, provisioning_info_write_func, provisioning_info_exec_func);
+    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, NULL, provisioning_info_write_func, provisioning_info_exec_func);
 
     uuid.uuid.uuid16 = BLE_PROVISIONING_STATUS_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
@@ -235,48 +236,54 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
                             if (cj_config)
                             {
                                 TRACE_W("Here");
-                                s_basic_factory_info_t *ezlopi_config_basic = malloc(sizeof(s_basic_factory_info_t));
-                                if (ezlopi_config_basic)
+                                char *user_id = NULL;
+                                CJSON_GET_VALUE_STRING(cj_config, "user_id", user_id);
+
+                                if (user_id && (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id)))
                                 {
-                                    memset(ezlopi_config_basic, 0, sizeof(s_basic_factory_info_t));
+                                    s_basic_factory_info_t *ezlopi_config_basic = malloc(sizeof(s_basic_factory_info_t));
+                                    if (ezlopi_config_basic)
+                                    {
+                                        // ezlopi_config_basic->user_id = user_id;
+                                        memset(ezlopi_config_basic, 0, sizeof(s_basic_factory_info_t));
+                                        TRACE_W("Here");
+                                        CJSON_GET_VALUE_STRING(cj_config, "device_name", ezlopi_config_basic->device_name);
+                                        CJSON_GET_VALUE_STRING(cj_config, "manufacturer_name", ezlopi_config_basic->manufacturer);
+                                        CJSON_GET_VALUE_STRING(cj_config, "brand", ezlopi_config_basic->brand);
+                                        CJSON_GET_VALUE_STRING(cj_config, "model_number", ezlopi_config_basic->model_number);
+                                        CJSON_GET_VALUE_DOUBLE(cj_config, "serial", ezlopi_config_basic->id);
+                                        CJSON_GET_VALUE_STRING(cj_config, "uuid", ezlopi_config_basic->device_uuid);
+                                        CJSON_GET_VALUE_STRING(cj_config, "uuid_provisioning", ezlopi_config_basic->prov_uuid);
+
+                                        CJSON_GET_VALUE_STRING(cj_config, "provision_server", ezlopi_config_basic->provision_server);
+                                        CJSON_GET_VALUE_STRING(cj_config, "cloud_server", ezlopi_config_basic->cloud_server);
+                                        CJSON_GET_VALUE_STRING(cj_config, "provision_token", ezlopi_config_basic->provision_token);
+                                        CJSON_GET_VALUE_STRING(cj_config, "device_type_ezlopi", ezlopi_config_basic->device_type);
+
+                                        TRACE_W("Here");
+
+                                        ezlopi_factory_info_v2_set_basic(ezlopi_config_basic);
+                                        free(ezlopi_config_basic);
+                                    }
+
+                                    char *ssl_private_key = NULL;
                                     TRACE_W("Here");
-                                    CJSON_GET_VALUE_STRING(cj_config, "device_name", ezlopi_config_basic->device_name);
-                                    CJSON_GET_VALUE_STRING(cj_config, "manufacturer_name", ezlopi_config_basic->manufacturer);
-                                    CJSON_GET_VALUE_STRING(cj_config, "brand", ezlopi_config_basic->brand);
-                                    CJSON_GET_VALUE_STRING(cj_config, "model_number", ezlopi_config_basic->model_number);
-                                    CJSON_GET_VALUE_DOUBLE(cj_config, "serial", ezlopi_config_basic->id);
-                                    CJSON_GET_VALUE_STRING(cj_config, "uuid", ezlopi_config_basic->device_uuid);
-                                    CJSON_GET_VALUE_STRING(cj_config, "uuid_provisioning", ezlopi_config_basic->prov_uuid);
+                                    char *ssl_shared_key = NULL;
+                                    char *ssl_public_key = NULL;
+                                    char *ca_certs = NULL;
+                                    char *ezlopi_config = NULL;
 
-                                    CJSON_GET_VALUE_STRING(cj_config, "provision_server", ezlopi_config_basic->provision_server);
-                                    CJSON_GET_VALUE_STRING(cj_config, "cloud_server", ezlopi_config_basic->cloud_server);
-                                    CJSON_GET_VALUE_STRING(cj_config, "provision_token", ezlopi_config_basic->provision_token);
-                                    CJSON_GET_VALUE_STRING(cj_config, "user_id", ezlopi_config_basic->user_id);
-                                    CJSON_GET_VALUE_STRING(cj_config, "device_type_ezlopi", ezlopi_config_basic->device_type);
+                                    CJSON_GET_VALUE_STRING(cj_config, "ssl_private_key", ssl_private_key);
+                                    CJSON_GET_VALUE_STRING(cj_config, "ssl_public_key", ssl_public_key);
+                                    CJSON_GET_VALUE_STRING(cj_config, "ssl_shared_key", ssl_shared_key);
+                                    CJSON_GET_VALUE_STRING(cj_config, "signing_ca_certificate", ca_certs);
+                                    CJSON_GET_VALUE_STRING(cj_config, "ezlopi_config", ezlopi_config);
 
-                                    TRACE_W("Here");
-
-                                    ezlopi_factory_info_v2_set_basic(ezlopi_config_basic);
-                                    free(ezlopi_config_basic);
+                                    ezlopi_factory_info_v2_set_ezlopi_config(ezlopi_config);
+                                    ezlopi_factory_info_v2_set_ca_cert(ca_certs);
+                                    ezlopi_factory_info_v2_set_ssl_shared_key(ssl_shared_key);
+                                    ezlopi_factory_info_v2_set_ssl_private_key(ssl_private_key);
                                 }
-
-                                char *ssl_private_key = NULL;
-                                TRACE_W("Here");
-                                char *ssl_shared_key = NULL;
-                                char *ssl_public_key = NULL;
-                                char *ca_certs = NULL;
-                                char *ezlopi_config = NULL;
-
-                                CJSON_GET_VALUE_STRING(cj_config, "ssl_private_key", ssl_private_key);
-                                CJSON_GET_VALUE_STRING(cj_config, "ssl_public_key", ssl_public_key);
-                                CJSON_GET_VALUE_STRING(cj_config, "ssl_shared_key", ssl_shared_key);
-                                CJSON_GET_VALUE_STRING(cj_config, "signing_ca_certificate", ca_certs);
-                                CJSON_GET_VALUE_STRING(cj_config, "ezlopi_config", ezlopi_config);
-
-                                ezlopi_factory_info_v2_set_ezlopi_config(ezlopi_config);
-                                ezlopi_factory_info_v2_set_ca_cert(ca_certs);
-                                ezlopi_factory_info_v2_set_ssl_shared_key(ssl_shared_key);
-                                ezlopi_factory_info_v2_set_ssl_private_key(ssl_private_key);
 
                                 cJSON_Delete(cj_config);
                             }
