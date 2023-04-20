@@ -35,11 +35,13 @@ int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
      {
         case EZLOPI_ACTION_PREPARE:
         {   
+            TRACE_B("PREPARE");
             IR_Blaster_prepare(arg);
             break;
         }
         case EZLOPI_ACTION_INITIALIZE:
         {
+            TRACE_B("INIT");
             IR_BLaster_Remote_init(properties);
             break;
         }

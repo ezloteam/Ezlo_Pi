@@ -20,6 +20,9 @@
 #include "0029_gxhtc3_rh_t_sensor.h"
 #include "jsn_sr04t.h"
 #include "turbidity.h"
+#include "030_sens_ds18b20_sensor.h"
+#include "032_sens_soil_moisture.h"
+#include "016_sens_dht22_sensor.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -52,7 +55,12 @@ static s_ezlopi_device_t device_array[] = {
         // .properties = NULL,
     },
 #endif
-
+#ifdef EZLOPI_SENSOR_033_DHT22_SENSOR
+{
+    .id = EZLOPI_SENSOR_033_DHT22_SENSOR,
+    .func = dht22_sensor,
+},
+#endif
 #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
     {
         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
@@ -130,24 +138,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
+#ifdef EZLOPI_SENSOR_029_IR_BLASTER
     {
-        .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
-        .func = gxhtc3_rh_t_sensor,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_030_IR_BLASTER
-    {
-        .id = EZLOPI_SENSOR_030_IR_BLASTER,
-        .func = IR_blaster_remote,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_031_JSN_SR04T_WaterLevelSensor
-    {
-        .id = EZLOPI_SENSOR_031_JSN_SR04T_WaterLevelSensor,
-        .func = JSN_SR04T,
+        .id = EZLOPI_SENSOR_029_IR_BLASTER,
+        .func = IR_blaster_remote
     },
 #endif
 
@@ -164,6 +158,26 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_health,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
+    {
+        .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
+        .func = gxhtc3_rh_t_sensor,
+    },
+#endif
+#ifdef EZLOPI_SENSOR_030_DS18B20
+    {
+        .id = EZLOPI_SENSOR_030_DS18B20,
+        .func = ds18b20_sensor,
+    },
+#endif
+#ifdef EZLOPI_SENSOR_032_SOIL_MOISTURE
+    {
+        .id = EZLOPI_SENSOR_032_SOIL_MOISTURE,
+        .func = soil_moisture_sensor,
+    },
+#endif
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

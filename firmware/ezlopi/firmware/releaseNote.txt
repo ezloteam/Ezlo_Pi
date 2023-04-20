@@ -121,3 +121,9 @@ v2_0_7_162  Date: Wed Mar 15 05:50:04 PM +0545 2023
 v2_0_7_163  Date: Wed Mar 15 06:15:30 PM +0545 2023
 	web-flasher-build: added response for ezlopi-config from flash
 
+v2_0_8
+	Release Date: Mon Mar 20 01:29:16 PM +0545 2023
+	164: Reased based on web-flasher by mehran team, working fine
+
+
+

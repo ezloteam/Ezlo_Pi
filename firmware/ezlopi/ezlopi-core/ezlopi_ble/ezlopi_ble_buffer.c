@@ -1,3 +1,4 @@
+#include "trace.h"
 #include "string.h"
 #include "ezlopi_ble_buffer.h"
 #include "esp_gatts_api.h"
@@ -14,18 +15,25 @@ s_linked_buffer_t *ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t *param)
             if (linked_buffer->buffer)
             {
                 memcpy(linked_buffer->buffer, param->write.value, param->write.len);
+                linked_buffer->len = param->write.len;
             }
             else
             {
+                TRACE_E("MALLOC FAILED");
                 free(linked_buffer);
                 linked_buffer = NULL;
             }
         }
         else
         {
+            TRACE_E("MALLOC FAILED");
             free(linked_buffer);
             linked_buffer = NULL;
         }
+    }
+    else
+    {
+        TRACE_E("MALLOC FAILED");
     }
 
     return linked_buffer;
