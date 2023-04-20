@@ -51,8 +51,13 @@ void ezlopi_ble_service_init(void)
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_DEVICE_INFO_ID_HANDLE), "gatts app-3 register error");
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
-    // ezlopi_ble_start_secure_gatt_server();
+#if (1 == EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+    ezlopi_ble_start_secure_gatt_server();
+#else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
+#endif
+#endif
 }
 
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)

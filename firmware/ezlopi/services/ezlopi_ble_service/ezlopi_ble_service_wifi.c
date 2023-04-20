@@ -229,10 +229,9 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
         cJSON *root = cJSON_Parse((const char *)value);
         if (root)
         {
-
             cJSON *cj_user_id = cJSON_GetObjectItemCaseSensitive(root, "user_id");
-            cJSON *cj_ssid = cJSON_GetObjectItemCaseSensitive(root, "wifi_ssid")->valuestring;
-            cJSON *cj_password = cJSON_GetObjectItemCaseSensitive(root, "wifi_password")->valuestring;
+            cJSON *cj_ssid = cJSON_GetObjectItemCaseSensitive(root, "wifi_ssid");
+            cJSON *cj_password = cJSON_GetObjectItemCaseSensitive(root, "wifi_password");
 
             if (cj_user_id && cj_password && cj_ssid)
             {
@@ -242,19 +241,33 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
 
                 if (user_id_str && ssid && password)
                 {
-                    e_auth_status_t check_status = ezlopi_ble_auth_check_user_id(user_id_str);
-                    if (BLE_AUTH_SUCCESS == check_status)
+                    TRACE_E("user_id: %s, ssid: %s, password: %s,", user_id_str, ssid, password);
+                    e_auth_status_t l_ble_auth_status = ezlopi_ble_auth_check_user_id(user_id_str);
+
+                    if (BLE_AUTH_SUCCESS == l_ble_auth_status)
                     {
                         ezlopi_wifi_connect(ssid, password);
                         ezlopi_factory_info_v2_set_wifi(ssid, password);
                     }
-                    else if (BLE_AUTH_USER_ID_NOT_FOUND == check_status)
+                    else if (BLE_AUTH_USER_ID_NOT_FOUND == l_ble_auth_status)
                     {
                         ezlopi_wifi_connect(ssid, password);
                         ezlopi_factory_info_v2_set_wifi(ssid, password);
                         ezlopi_ble_auth_store_user_id(user_id_str);
                     }
+                    else
+                    {
+                        TRACE_E("user-id error: %s", ezlopi_ble_auth_status_to_string(l_ble_auth_status));
+                    }
                 }
+                else
+                {
+                    TRACE_E("parameter-value missing: user_id: %p, ssid: %p, password: %p", user_id_str, ssid, password);
+                }
+            }
+            else
+            {
+                TRACE_E("parameter missing: user_id: %p, ssid: %p, password: %p", cj_user_id, cj_ssid, cj_password);
             }
 
             cJSON_Delete(root);

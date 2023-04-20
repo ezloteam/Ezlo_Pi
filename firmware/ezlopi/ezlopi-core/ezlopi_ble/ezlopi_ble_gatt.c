@@ -189,7 +189,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         ezlopi_ble_gatt_call_write_exec_by_handle(gatts_if, param);
         break;
     }
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == EZLOPI_BLE_ENALBE_PAIRING)
     case ESP_GATTS_CONNECT_EVT:
     {
         TRACE_I("ESP_GATTS_CONNECT_EVT");

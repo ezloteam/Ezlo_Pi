@@ -130,8 +130,7 @@ void print_factory_info_v2(void)
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     char *ezlopi_config = ezlopi_factory_info_v2_get_ezlopi_config();
 #elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
-    char *ezlopi_config = NULL;
-    ezlopi_nvs_read_config_data_str(&ezlopi_config);
+    char *ezlopi_config = ezlopi_nvs_read_config_data_str();
 #endif
 
     TRACE_D("----------------- Factory Info -----------------");

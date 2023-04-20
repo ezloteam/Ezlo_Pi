@@ -17,7 +17,7 @@ static const char *wifi_info_nvs_name = "wifi_info";
 static const char *boot_count_nvs_name = "boot_count";
 static const char *provisioning_status_nvs_name = "prov_stat";
 
-static int ezlopi_nvs_read_str(char **data, char *nvs_name);
+static char *ezlopi_nvs_read_str(char *nvs_name);
 static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name);
 
 int ezlopi_nvs_init(void)
@@ -75,14 +75,9 @@ int ezlopi_nvs_write_config_data_str(char *data)
     return ret;
 }
 
-int ezlopi_nvs_read_config_data_str(char **data)
+char *ezlopi_nvs_read_config_data_str(void)
 {
-    int ret = 0;
-    if (1 == ezlopi_nvs_read_str(data, config_nvs_name))
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_read_str(config_nvs_name);
 }
 
 int ezlopi_nvs_read_ble_passkey(uint32_t *passkey)
@@ -194,16 +189,9 @@ int ezlopi_nvs_write_user_id_str(char *data)
     return ret;
 }
 
-int ezlopi_nvs_read_user_id_str(char **data)
+char *ezlopi_nvs_read_user_id_str(void)
 {
-    int ret = 0;
-
-    if (1 == ezlopi_nvs_read_str(data, user_id_nvs_name))
-    {
-        ret = 1;
-    }
-
-    return ret;
+    return ezlopi_nvs_read_str(user_id_nvs_name);
 }
 
 void ezlopi_nvs_deinit(void)
@@ -297,9 +285,9 @@ static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
     return ret;
 }
 
-static int ezlopi_nvs_read_str(char **data, char *nvs_name)
+static char *ezlopi_nvs_read_str(char *nvs_name)
 {
-    int ret = 0;
+    char *return_str = NULL;
 
     if (1 == ezlopi_nvs_init())
     {
@@ -309,35 +297,29 @@ static int ezlopi_nvs_read_str(char **data, char *nvs_name)
 
         if (buf_len_needed && (ESP_OK == err))
         {
-            int can_free = 0;
-            if (NULL == *data)
-            {
-                *data = malloc(buf_len_needed + 1);
-                can_free = 1;
-            }
+            return_str = malloc(buf_len_needed + 1);
 
-            if (*data)
+            if (return_str)
             {
-                err = nvs_get_str(ezlopi_nvs_handle, nvs_name, *data, &buf_len_needed);
-                data[buf_len_needed + 1] = '\0';
+                err = nvs_get_str(ezlopi_nvs_handle, nvs_name, return_str, &buf_len_needed);
 
                 if (ESP_OK == err)
                 {
-                    TRACE_D("%s read success. Data: %s", nvs_name, (char *)data);
-                    ret = 1;
+                    TRACE_D("%s read success. Data[%d]: %s", nvs_name, buf_len_needed, return_str);
                 }
                 else
                 {
                     TRACE_E("%s read error: %s", nvs_name, esp_err_to_name(err));
-                    if (can_free)
-                    {
-                        free(*data);
-                        *data = NULL;
-                    }
+                    free(return_str);
+                    return_str = NULL;
                 }
+            }
+            else
+            {
+                TRACE_E("MALLOC ERROR");
             }
         }
     }
 
-    return ret;
+    return return_str;
 }

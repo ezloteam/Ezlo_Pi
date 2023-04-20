@@ -281,7 +281,7 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
             strncpy((char *)&wifi_ssid_pass_global_buffer[32], pass, 32);
         }
 
-        TRACE_D("SSID: %s, Password: %s\r\n", ssid, pass);
+        TRACE_D("SSID: %s, Password: %s,\r\n", ssid, pass);
 
         wifi_config_t wifi_config = {
             .sta = {

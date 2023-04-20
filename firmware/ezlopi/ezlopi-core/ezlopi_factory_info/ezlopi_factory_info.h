@@ -14,7 +14,7 @@ extern "C"
 #define EZLOPI_GENERIC 0
 #define EZLOPI_SWITCH_BOX 1
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_SWITCH_BOX
+#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
 
 #include "esp_partition.h"
 #include "frozen.h"

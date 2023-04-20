@@ -16,7 +16,7 @@ extern "C"
     int ezlopi_nvs_factory_reset(void);
 
     int ezlopi_nvs_write_config_data_str(char *data);
-    int ezlopi_nvs_read_config_data_str(char **data);
+    char * ezlopi_nvs_read_config_data_str(void);
 
     int ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len);
     int ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len);
@@ -24,7 +24,7 @@ extern "C"
     int ezlopi_nvs_read_ble_passkey(uint32_t *passkey);
     int ezlopi_nvs_write_ble_passkey(uint32_t passkey);
 
-    int ezlopi_nvs_read_user_id_str(char **data);
+    char *ezlopi_nvs_read_user_id_str(void);
     int ezlopi_nvs_write_user_id_str(char *data);
 
     uint32_t ezlopi_nvs_get_boot_count(void);
