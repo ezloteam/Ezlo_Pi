@@ -196,6 +196,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         if (ws_endpoint)
         {
             TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
+            TRACE_D("http_request: %s", http_request); 
             cJSON *root = cJSON_Parse(ws_endpoint);
             if (root)
             {
@@ -208,6 +209,8 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
                 }
             }
         }
+
+        vTaskDelay(5000 / portTICK_RATE_MS);
     }
 
     vTaskDelete(NULL);
@@ -345,3 +348,4 @@ static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
     esp_restart();
     return NULL;
 }
+

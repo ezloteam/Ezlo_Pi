@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Analog Output</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ezlopi.qrc">
@@ -63,6 +63,11 @@
    <item>
     <property name="text">
      <string>Water Leak Sensor</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Soil Moisture Sensor</string>
     </property>
    </item>
   </widget>

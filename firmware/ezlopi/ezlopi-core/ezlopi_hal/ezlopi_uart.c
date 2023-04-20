@@ -92,6 +92,7 @@ static void ezlopi_uart_channel_task(void *args)
     // s_ezlopi_uart_object_t *ezlopi_uart_object = (s_ezlopi_uart_object_t*)args;
     s_ezlopi_uart_object_handle_t ezlopi_uart_object = (s_ezlopi_uart_object_handle_t)args;
     vTaskDelay(1000 / portTICK_PERIOD_MS);
+    
     while (1)
     {
         // Start reveceiving UART events for first channel.

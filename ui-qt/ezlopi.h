@@ -48,13 +48,49 @@ typedef QString EZPI_STRING;
 #define     EZPI_ESP32_S3_PINOUT_COUNT                          49
 #define     EZPI_ESP32_C3_PINOUT_COUNT                          22
 
+
+#define     EZPI_SERIAL_READ_TIMEOUT                            4000
+#define     EZPI_FIRMWARE_CHECK_TIMEOUT                         5000
+
+// Provisioning info group offset
 #define     SIZE_EZPI_OFFSET_CONN_ID_0                          0X0000
 #define     SIZE_EZPI_OFFSET_CONN_ID_1                          0X7000
 #define     SIZE_EZPI_OFFSET_HUB_ID_0                           0XE000
 #define     SIZE_EZPI_OFFSET_HUB_ID_1                           0XF000
 
-#define     EZPI_SERIAL_READ_TIMEOUT                            4000
-#define     EZPI_FIRMWARE_CHECK_TIMEOUT                         5000
+// Provisioning binary param offset
+#define     EZPI_PROV_CONN_ID_PARAM_SN                           0x0
+#define     EZPI_PROV_CONN_ID_PARAM_VERSION                      0x02
+#define     EZPI_PROV_CONN_ID_PARAM_RESERVE_I                    0x04
+#define     EZPI_PROV_CONN_ID_PARAM_PROV_SERVER                  0x14
+#define     EZPI_PROV_CONN_ID_PARAM_PROV_TOKEN                   0x114
+#define     EZPI_PROV_CONN_ID_PARAM_CLOUD_SERVER                 0x214
+#define     EZPI_PROV_CONN_ID_PARAM_PROV_UUID                    0x314
+#define     EZPI_PROV_CONN_ID_PARAM_RESERVE_II                   0x1D2
+#define     EZPI_PROV_CONN_ID_PARAM_EZLOPI_CONFIG                0x1000
+#define     EZPI_PROV_CONN_ID_PARAM_RESERVE_III                  0x2000
+#define     EZPI_PROV_CONN_ID_PARAM_CA_CERT                      0x3000
+#define     EZPI_PROV_CONN_ID_PARAM_SSL_PRIVATE_KEY              0x4000
+#define     EZPI_PROV_CONN_ID_PARAM_SSL_SHARED_KEY               0x5000
+
+
+#define     EZPI_PROV_HUB_ID_PARAM_SN                           0x0
+#define     EZPI_PROV_HUB_ID_PARAM_VERSION                      0x2
+#define     EZPI_PROV_HUB_ID_PARAM_ID                           0x04
+#define     EZPI_PROV_HUB_ID_PARAM_RESERVE_I                    0x0C
+#define     EZPI_PROV_HUB_ID_PARAM_ZWAVE_REGION                 0x1C
+#define     EZPI_PROV_HUB_ID_PARAM_WIFI_SSID                    0x24
+#define     EZPI_PROV_HUB_ID_PARAM_WIFI_PASS                    0x44
+#define     EZPI_PROV_HUB_ID_PARAM_NAME                         0x84
+#define     EZPI_PROV_HUB_ID_PARAM_DEVICE_MAC                   0xC4
+#define     EZPI_PROV_HUB_ID_PARAM_MANUFACTURER                 0xCA
+#define     EZPI_PROV_HUB_ID_PARAM_BRAND                        0x10A
+#define     EZPI_PROV_HUB_ID_PARAM_MODEL                        0x14A
+#define     EZPI_PROV_HUB_ID_PARAM_EZLOPI_DEV_TYPE              0x18A
+#define     EZPI_PROV_HUB_ID_PARAM_UUID                         0x1AA
+#define     EZPI_PROV_HUB_ID_PARAM_RESERVE_II                   0x1D2
+
+
 
 enum ezpi_high_low {
     EZPI_LOW,
@@ -113,6 +149,11 @@ enum ezpi_item_type {
     EZPI_ITEM_TYPE_LDR_DIGITAL_SENSOR,
     EZPI_ITEM_TYPE_LDR_ANALOG_SENSOR,
     EZPI_ITEM_TYPE_WATER_LEAK_SENSOR,
+    EZPI_ITEM_TYPE_GY291,
+    EZPI_ITEM_TYPE_IR_BLASTER,
+    EZPI_ITEM_TYPE_DS18B20,
+    EZPI_ITEM_TYPE_JSNSR04T,
+    EZPI_ITEM_TYPE_SOIL_MOISTURE_SENSOR,
     EZPI_ITEM_TYPE_TOTAL
 };
 

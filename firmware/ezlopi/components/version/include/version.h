@@ -4,13 +4,13 @@
 extern "C"
 {
 #endif
-#define V_TYPE 2
-#define BUILD_DATE 1678883404
+#define V_TYPE 1
+#define BUILD_DATE 1679298225
 #define MAJOR 2
 #define MINOR 0
-#define BATCH 7
-#define BUILD 163
-#define VERSION_STR "v2.0.7.163"
+#define BATCH 8
+#define BUILD 164
+#define VERSION_STR "2.0.8"
 #ifdef __cplusplus
 }
 #endif
