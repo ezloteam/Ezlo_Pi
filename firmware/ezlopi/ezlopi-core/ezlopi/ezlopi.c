@@ -8,6 +8,7 @@
 #include "ezlopi_devices_list.h"
 #include "trace.h"
 #include "ezlopi_system_info.h"
+#include "mac_uuid.h"
 
 static void ezlopi_initialize_devices(void);
 

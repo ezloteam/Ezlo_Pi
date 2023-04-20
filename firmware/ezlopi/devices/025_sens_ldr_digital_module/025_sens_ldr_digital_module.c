@@ -29,21 +29,21 @@ int sensor_ldr_digital_module(e_ezlopi_actions_t action, s_ezlopi_device_propert
 
     switch (action)
     {
-    case EZLOPI_ACTION_PREPARE:
-    {
-        ret = sensor_ldr_digital_module_prepare_and_add(arg);
-        break;
-    }
-    case EZLOPI_ACTION_INITIALIZE:
-    {
-        ret = sensor_ldr_digital_module_init(ezlo_device);
-        break;
-    }
-    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-    {
-        ret = sensor_ldr_digital_module_get_value_cjson(ezlo_device, arg); // updater function missing
-        break;
-    }
+        case EZLOPI_ACTION_PREPARE:
+        {
+            ret = sensor_ldr_digital_module_prepare_and_add(arg);
+            break;
+        }
+        case EZLOPI_ACTION_INITIALIZE:
+        {
+            ret = sensor_ldr_digital_module_init(ezlo_device);
+            break;
+        }
+        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+        {
+            ret = sensor_ldr_digital_module_get_value_cjson(ezlo_device, arg); // updater function missing
+            break;
+        }
 
     default:
     {
