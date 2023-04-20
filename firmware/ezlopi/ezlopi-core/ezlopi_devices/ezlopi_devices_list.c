@@ -18,7 +18,12 @@
 #include "sensor_sound.h"
 #include "1024_device_health.h"
 #include "0029_gxhtc3_rh_t_sensor.h"
+#include "jsn_sr04t.h"
+#include "turbidity.h"
+#include "proximity.h"
 #include "030_sens_ds18b20_sensor.h"
+#include "032_sens_soil_moisture.h"
+#include "016_sens_dht22_sensor.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -46,12 +51,17 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0012_BME280_I2C
     {
         .id = EZLOPI_SENSOR_0012_BME280_I2C,
-        .func = sensor_bme280, //sensor_i2c_accelerometer,
+        .func = sensor_bme280, // sensor_i2c_accelerometer,
         // .is_configured = false,
         // .properties = NULL,
     },
 #endif
-
+#ifdef EZLOPI_SENSOR_033_DHT22_SENSOR
+{
+    .id = EZLOPI_SENSOR_033_DHT22_SENSOR,
+    .func = dht22_sensor,
+},
+#endif
 #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
     {
         .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
@@ -80,7 +90,6 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-
 #ifdef EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013
     {
         .id = EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013,
@@ -91,7 +100,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func =  IR_blaster_remote,//ezlopi_dimmable_bulb, ezlopi_servo_motor_MG_996R,
+        .func = IR_blaster_remote, // ezlopi_dimmable_bulb, ezlopi_servo_motor_MG_996R,
     },
 #endif
 
@@ -137,6 +146,20 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_033_Turbidity_Sensor
+    {
+        .id = EZLOPI_SENSOR_033_Turbidity_Sensor,
+        .func = turbidity_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_034_Proximity_Sensor
+    {
+        .id = EZLOPI_SENSOR_034_Proximity_Sensor,
+        .func = proximity_sensor,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_1024_DEVICE_HEALTH
     {
         .id = EZLOPI_SENSOR_1024_DEVICE_HEALTH,
@@ -156,6 +179,13 @@ static s_ezlopi_device_t device_array[] = {
         .func = ds18b20_sensor,
     },
 #endif
+#ifdef EZLOPI_SENSOR_032_SOIL_MOISTURE
+    {
+        .id = EZLOPI_SENSOR_032_SOIL_MOISTURE,
+        .func = soil_moisture_sensor,
+    },
+#endif
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

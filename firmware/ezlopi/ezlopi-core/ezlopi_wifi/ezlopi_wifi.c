@@ -135,7 +135,7 @@ static void alert_qt_wifi_got_ip(void)
     if (new_wifi)
     {
         new_wifi = 0;
-        ezlopi_nvs_write_wifi(wifi_ssid_pass_global_buffer, sizeof(wifi_ssid_pass_global_buffer));
+        // ezlopi_nvs_write_wifi(wifi_ssid_pass_global_buffer, sizeof(wifi_ssid_pass_global_buffer));
 
         char *qt_resp = "{\"cmd\":2,\"status_write\":1,\"status_connect\":1}";
         qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);

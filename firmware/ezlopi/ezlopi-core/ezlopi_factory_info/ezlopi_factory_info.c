@@ -256,23 +256,15 @@ char *ezlopi_factory_info_v2_get_password(void)
 
 void ezlopi_factory_info_v2_get_ezlopi_mac(uint8_t *mac)
 {
-    uint8_t *tmp_mac_arr = malloc(DEVICE_MAC_LENGTH);
 
-    if (tmp_mac_arr)
+    if (mac)
     {
-        memset(tmp_mac_arr, 0, DEVICE_MAC_LENGTH);
+        memset(mac, 0, DEVICE_MAC_LENGTH);
         if (ezlopi_factory_info_v2_init())
         {
-            esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, &tmp_mac_arr, DEVICE_MAC_LENGTH);
-        }
-        else
-        {
-            free(tmp_mac_arr);
-            tmp_mac_arr = NULL;
+            esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, &mac, DEVICE_MAC_LENGTH);
         }
     }
-
-    return tmp_mac_arr;
 }
 
 char *ezlopi_factory_info_v2_get_cloud_server(void)
@@ -321,9 +313,20 @@ char *ezlopi_factory_info_v2_get_ezlopi_config(void)
 #elif(EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
     return test_device_constant_config;
 #elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
-    g_ezlopi_config = ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
-#endif
+    if (NULL == g_ezlopi_config)
+    {
+        g_ezlopi_config = ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
+    }
     return g_ezlopi_config;
+#elif (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
+    return ir_blaster_constant_config;
+#elif (EZLOPI_WATER_LEVEL_SENSOR == EZLOPI_DEVICE_TYPE)
+    return water_level_sensor_constant_config;
+#elif (EZLOPI_TURBIDITY_SENSOR == EZLOPI_DEVICE_TYPE)
+    return water_turbidity_sensor_constant_config;
+#elif (EZLOPI_PROXIMITY_SENSOR == EZLOPI_DEVICE_TYPE)
+    return proximity_sensor_constant_config;
+#endif
 }
 
 #if 0

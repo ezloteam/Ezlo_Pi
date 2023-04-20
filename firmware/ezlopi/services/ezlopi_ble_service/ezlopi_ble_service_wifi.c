@@ -183,6 +183,9 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
         {
             char *ssid = cJSON_GetObjectItemCaseSensitive(root, "SSID")->valuestring;
             char *password = cJSON_GetObjectItemCaseSensitive(root, "PSD")->valuestring;
+
+            ezlopi_factory_info_v2_set_wifi(ssid, password);
+
             ezlopi_wifi_connect(ssid, password);
             ezlopi_factory_info_v2_set_wifi(ssid, password);
             cJSON_Delete(root);
