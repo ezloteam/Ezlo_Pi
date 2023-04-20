@@ -48,7 +48,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0012_BME280_I2C
     {
         .id = EZLOPI_SENSOR_0012_BME280_I2C,
-        .func = sensor_bme280, //sensor_i2c_accelerometer,
+        .func = sensor_bme280, // sensor_i2c_accelerometer,
         // .is_configured = false,
         // .properties = NULL,
     },
@@ -87,7 +87,6 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-
 #ifdef EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013
     {
         .id = EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013,
@@ -98,7 +97,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func =  IR_blaster_remote,//ezlopi_dimmable_bulb, ezlopi_servo_motor_MG_996R,
+        .func = IR_blaster_remote, // ezlopi_dimmable_bulb, ezlopi_servo_motor_MG_996R,
     },
 #endif
 
