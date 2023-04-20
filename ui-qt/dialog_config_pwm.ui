@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>EzloPi PWM</string>
+   <string>PWM</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ezlopi.qrc">
@@ -58,6 +58,11 @@
    <item>
     <property name="text">
      <string>Generic PWM Load</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>JSNR04T Water Level Sensor</string>
     </property>
    </item>
   </widget>

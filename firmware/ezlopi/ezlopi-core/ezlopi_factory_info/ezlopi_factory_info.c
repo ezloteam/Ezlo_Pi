@@ -79,6 +79,7 @@ static char *g_ssl_private_key = NULL;
 static char *g_ssl_shared_key = NULL;
 static char *g_ezlopi_config = NULL;
 
+static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
 
 static const esp_partition_t *ezlopi_factory_info_v2_init(void)
@@ -305,8 +306,12 @@ char *ezlopi_factory_info_v2_get_ssl_shared_key(void)
 
 char *ezlopi_factory_info_v2_get_ezlopi_config(void)
 {
-#if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
-    return switch_box_constant_config;
+// #if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
+//     return switch_box_constant_config;
+#if (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
+    return ir_blaster_constant_config;
+#elif(EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    return test_device_constant_config;
 #elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
     if (NULL == g_ezlopi_config)
     {
@@ -437,6 +442,118 @@ char *ezlopi_factory_info_v2_set_ssl_shared_key(void)
 }
 #endif
 
+#define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
+    {                                                      \
+        if (data)                                          \
+        {                                                  \
+            snprintf(buffer + offset, length, "%s", data); \
+        }                                                  \
+    }
+
+int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic)
+{
+    int ret = 0;
+
+    if (ezlopi_config_basic)
+    {
+        TRACE_W("Here");
+        if (ezlopi_factory_info_v2_init())
+        {
+            TRACE_W("Here");
+#if (ID_BIN_VERSION_1 == ID_BIN_VERSION)
+            uint32_t length = 4 * 1024;
+            uint32_t flash_offset = 0xE000; // hub_0_offset
+
+            char *tmp_buffer = (char *)malloc(length);
+            if (tmp_buffer)
+            {
+                TRACE_W("Here");
+                if (ESP_OK == esp_partition_read(partition_ctx_v2, flash_offset, tmp_buffer, length))
+                {
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_name, 0x0084, NAME_LENGTH);
+                    // snprintf(tmp_buffer + 0x0084, NAME_LENGTH, "%s", ezlopi_config_basic->device_name);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->manufacturer, 0x00CA, MANUFACTURER_LENGTH);
+                    // snprintf(tmp_buffer + 0x00CA, MANUFACTURER_LENGTH, "%s", ezlopi_config_basic->manufacturer);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->brand, 0x010A, BRAND_LENGTH);
+                    // snprintf(tmp_buffer + 0x010A, BRAND_LENGTH, "%s", ezlopi_config_basic->brand);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->model_number, 0x014A, MODEL_LENGTH);
+                    // snprintf(tmp_buffer + 0x014A, MODEL_LENGTH, "%s", ezlopi_config_basic->model_number);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_uuid, 0x01AA, DEVICE_UUID_LENGTH);
+                    // snprintf(tmp_buffer + 0x01AA, DEVICE_UUID_LENGTH, "%s", ezlopi_config_basic->device_uuid);
+                    TRACE_W("Here");
+                    // snprintf(tmp_buffer + 0x0024, length, "%s", ezlopi_config_basic->wifi_ssid);
+                    // snprintf(tmp_buffer + 0x0044, length, "%s", ezlopi_config_basic->wifi_password);
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_type, 0x018A, DEVICE_TYPE_LENGTH);
+                    // snprintf(tmp_buffer + 0x018A, DEVICE_TYPE_LENGTH, "%s", ezlopi_config_basic->device_type);
+                    TRACE_W("Here");
+
+                    memcpy(tmp_buffer + 0x00C4, ezlopi_config_basic->device_mac, DEVICE_MAC_LENGTH);
+                    TRACE_W("Here");
+                    memcpy(tmp_buffer + 0x0004, &ezlopi_config_basic->id, ID_LENGTH);
+                    TRACE_W("Here");
+
+                    if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, flash_offset, length))
+                    {
+                        TRACE_W("Here");
+                        if (ESP_OK == esp_partition_write(partition_ctx_v2, flash_offset, tmp_buffer, length))
+                        {
+                            TRACE_W("Here");
+                            ret = 1;
+                        }
+                    }
+                }
+                else
+                {
+                    TRACE_E("Couldn't fetch 'data' from id-flash-region!");
+                }
+
+                flash_offset = 0x0000;
+
+                if (ESP_OK == esp_partition_read(partition_ctx_v2, flash_offset, tmp_buffer, length))
+                {
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->cloud_server, 0x0214, CLOUD_SERVER_LENGTH);
+                    // snprintf(tmp_buffer + 0x0214, CLOUD_SERVER_LENGTH, "%s", ezlopi_config_basic->cloud_server);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->prov_uuid, 0x0314, PROVISIONING_UUID_LENGTH);
+                    // snprintf(tmp_buffer + 0x0314, PROVISIONING_UUID_LENGTH, "%s", ezlopi_config_basic->prov_uuid);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_server, 0x0014, CLOUD_SERVER_LENGTH);
+                    // snprintf(tmp_buffer + 0x0014, CLOUD_SERVER_LENGTH, "%s", ezlopi_config_basic->provision_server);
+                    TRACE_W("Here");
+                    UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_token, 0x0114, 256);
+                    // snprintf(tmp_buffer + 0x0114, 256, "%s", ezlopi_config_basic->provision_token);
+                    TRACE_W("Here");
+
+                    if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, flash_offset, length))
+                    {
+                        TRACE_W("Here");
+                        if (ESP_OK == esp_partition_write(partition_ctx_v2, flash_offset, tmp_buffer, length))
+                        {
+                            TRACE_W("Here");
+                            ret = (ret == 1) ? 1 : 0;
+                        }
+                    }
+                }
+                else
+                {
+                    TRACE_E("Couldn't fetch 'string' from id-flash-region!");
+                }
+
+                free(tmp_buffer);
+            }
+#endif
+        }
+    }
+
+    return ret;
+}
+
 int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password)
 {
     int ret = 0;
@@ -480,14 +597,61 @@ int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password)
     return ret;
 }
 
-char *ezlopi_factory_info_v2_set_ezlopi_config(void)
+int ezlopi_factory_info_v2_set_ssl_private_key(char *data)
 {
-#if (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
-    return switch_box_constant_config;
-#elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
-    return ezlopi_factory_info_v2_read_string(EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH);
-#endif
-    return NULL;
+    return ezlopi_factory_info_v2_set_4kb(data, 0x4000);
+}
+
+// int ezlopi_factory_info_v2_set_ssl_public_key(char *data)
+// {
+//     return ezlopi_factory_info_v2_set_4kb(data, 0x4000);
+// }
+
+int ezlopi_factory_info_v2_set_ssl_shared_key(char *data)
+{
+    return ezlopi_factory_info_v2_set_4kb(data, 0x5000);
+}
+
+int ezlopi_factory_info_v2_set_ca_cert(char *data)
+{
+    return ezlopi_factory_info_v2_set_4kb(data, 0x3000);
+}
+
+int ezlopi_factory_info_v2_set_ezlopi_config(char *data)
+{
+    return ezlopi_factory_info_v2_set_4kb(data, 0x1000);
+}
+
+static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
+{
+    int ret = 0;
+    if (data)
+    {
+        if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, offset, 0x1000))
+        {
+            if (ESP_OK == esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1))
+            {
+                ret = 1;
+            }
+        }
+    }
+
+    return ret;
+}
+
+int ezlopi_factory_info_v2_factory_reset(void)
+{
+    int ret = 0;
+    if (ezlopi_factory_info_v2_init())
+    {
+
+        if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, 0, EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE))
+        {
+            ret = 1;
+        }
+    }
+
+    return ret;
 }
 
 /** Reader */

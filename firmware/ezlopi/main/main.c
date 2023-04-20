@@ -21,6 +21,7 @@
 #include "gpio_isr_service.h"
 #include "ezlopi_ble_service.h"
 #include "ezlopi_system_info.h"
+#include "029_IR_blaster_remote.h"
 
 static void blinky(void *pv);
 
@@ -34,6 +35,8 @@ void app_main(void)
     timer_service_init();
     TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+
+    // IR_Blaster_prepare();
 }
 
 static void blinky(void *pv)
