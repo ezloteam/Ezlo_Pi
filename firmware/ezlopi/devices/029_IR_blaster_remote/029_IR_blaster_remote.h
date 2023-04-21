@@ -21,21 +21,19 @@
 #include "ezlopi_device_value_updated.h"
 #include "trace.h"
 
-
-static int IR_Blaster_prepare(void *arg);
+static int IR_Blaster_prepare(void *arg); // don't declare static function in header file
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *properties, void *user_arg);
-static s_ezlopi_device_properties_t* IR_Blaster_Remote_prepare(uint32_t dev_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device);
-static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t* properties);
+static s_ezlopi_device_properties_t *IR_Blaster_Remote_prepare(uint32_t dev_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device);
+static int IR_BLaster_Remote_init(s_ezlopi_device_properties_t *properties); //
 static int IR_BLaster_Remote_set_value(s_ezlopi_device_properties_t *properties, void *arg);
 static int IR_BLaster_Remote_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-esp_err_t blaster_mode_get_value_cjson(cJSON* params);
-static esp_err_t learner_mode_get_value_cjson(cJSON* params);
+esp_err_t blaster_mode_get_value_cjson(cJSON *params);
+static esp_err_t learner_mode_get_value_cjson(cJSON *params);
 esp_err_t ir_remote_learner();
 int IR_blaster_remote(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
-esp_err_t ir_remote_blaster_learned_code(char* Hex_string_data);
-esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t* buffer1, uint32_t timing_array_len);
-int capture();
+esp_err_t ir_remote_blaster_learned_code(char *Hex_string_data);
+esp_err_t build(void *result, const ir_builder_config_t *config, uint32_t *buffer1, uint32_t timing_array_len);
+int capture(); // 
 void store(rmt_item32_t *items, uint32_t len);
 
 #endif //_029_IR_BLASTER_REMOTE_H_
-
