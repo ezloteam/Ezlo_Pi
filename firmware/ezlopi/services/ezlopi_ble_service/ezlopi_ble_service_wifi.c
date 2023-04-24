@@ -15,6 +15,7 @@
 #include "ezlopi_ble_buffer.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_ble_auth.h"
+#include "ezlopi_ping.h"
 
 static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
 
@@ -298,6 +299,9 @@ static char *wifi_creds_jsonify(void)
         cJSON_AddNumberToObject(cjson_wifi_info, "connection_status", ezlopi_wifi_got_ip());
         cJSON_AddStringToObject(cjson_wifi_info, "error", ezlopi_wifi_get_last_disconnect_reason());
         cJSON_AddStringToObject(cjson_wifi_info, "auth_status", ezlopi_ble_auth_status_to_string(ezlopi_ble_auth_last_status()));
+
+        const char *internet_status_str = ezlopi_ping_get_internet_status() ? "Internet available" : "Internet not available";
+        cJSON_AddStringToObject(cjson_wifi_info, "internet_status", internet_status_str);
 
         json_str_wifi_info = cJSON_Print(cjson_wifi_info);
         if (json_str_wifi_info)

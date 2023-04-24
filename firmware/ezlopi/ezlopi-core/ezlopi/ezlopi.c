@@ -8,6 +8,7 @@
 #include "ezlopi_devices_list.h"
 #include "trace.h"
 #include "ezlopi_system_info.h"
+#include "ezlopi_ping.h"
 
 static void ezlopi_initialize_devices(void);
 
@@ -42,6 +43,7 @@ void ezlopi_init(void)
 
     ezlopi_event_queue_init();
     ezlopi_timer_start_50ms();
+    ezlopi_ping_init();
 }
 
 static void ezlopi_initialize_devices(void)
