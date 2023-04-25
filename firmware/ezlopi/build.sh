@@ -61,9 +61,9 @@ version_create () {
     echo -e "#define BATCH ${V_BATCH}" >> $versionFile
     echo -e "#define BUILD ${V_BUILD}" >> $versionFile
     if [ "add_build_version" == $1 ]; then
-        echo -e "#define VERSION_STR \"v${V_MAJOR}.${V_MINOR}.${V_BATCH}.${V_BUILD}\"" >> $versionFile
+        echo -e "#define VERSION_STR \"${V_MAJOR}.${V_MINOR}.${V_BATCH}.${V_BUILD}\"" >> $versionFile
     else
-        echo -e "#define VERSION_STR \"v${V_MAJOR}.${V_MINOR}.${V_BATCH}\"" >> $versionFile
+        echo -e "#define VERSION_STR \"${V_MAJOR}.${V_MINOR}.${V_BATCH}\"" >> $versionFile
     fi
     echo -e "#ifdef __cplusplus" >> $versionFile
     echo -e "}" >> $versionFile

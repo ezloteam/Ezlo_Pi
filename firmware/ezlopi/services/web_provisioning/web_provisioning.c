@@ -91,7 +91,8 @@ static const s_method_list_v2_t method_list_v2[] = {
     {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
     {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
     {.method_name = "hub.network.get", .method = network_get, .updater = NULL},
-    {.method_name = "hub.firmware.update", .method = firmware_update, .updater = NULL},
+    {.method_name = "hub.firmware.update.start", .method = firmware_update_start, .updater = NULL},
+    {.method_name = "cloud.firmware.info.get", .method = firmware_info_get, .updater = NULL},
     // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
     // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
     {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
@@ -168,8 +169,6 @@ static char *ssl_shared_key = NULL;
 static char *ssl_private_key = NULL;
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
-    // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-
     char *ws_endpoint = NULL;
 
     while (1)
@@ -188,11 +187,6 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
         ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
 
-        // ezlopi_factory_info_v2_free(cloud_server);
-        // ezlopi_factory_info_v2_free(ca_certificate);
-        // ezlopi_factory_info_v2_free(ssl_shared_key);
-        // ezlopi_factory_info_v2_free(ssl_private_key);
-
         if (ws_endpoint)
         {
             TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
@@ -207,10 +201,26 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
                     break;
                 }
             }
+
+            free(ws_endpoint);
         }
 
-        vTaskDelay(5000 / portTICK_RATE_MS);
+        vTaskDelay(2000 / portTICK_RATE_MS);
     }
+
+    // while (1)
+    // {
+    //     TRACE_D("Sending firmware check request...");
+    //     cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+    //     if (NULL != firmware_info_request)
+    //     {
+    //         web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
+    //         cJSON_Delete(firmware_info_request);
+    //         firmware_info_request = NULL;
+    //     }
+
+    //     vTaskDelay(30 * 1000 / portTICK_RATE_MS);
+    // }
 
     vTaskDelete(NULL);
 }
@@ -220,12 +230,12 @@ static void __connection_upcall(bool connected)
     static bool prev_status;
     if (connected)
     {
-        if (!prev_status)
+        if (prev_status != connected)
         {
+            TRACE_I("Web-socket re-connected.");
             TRACE_B("Starting registration process....");
             registration_init();
         }
-        TRACE_I("Web-socket re-connected.");
     }
     else
     {
@@ -347,4 +357,3 @@ static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
     esp_restart();
     return NULL;
 }
-
