@@ -208,19 +208,19 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
-    // while (1)
-    // {
-    //     TRACE_D("Sending firmware check request...");
-    //     cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
-    //     if (NULL != firmware_info_request)
-    //     {
-    //         web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
-    //         cJSON_Delete(firmware_info_request);
-    //         firmware_info_request = NULL;
-    //     }
+    while (1)
+    {
+        TRACE_D("Sending firmware check request...");
+        cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+        if (NULL != firmware_info_request)
+        {
+            web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
+            cJSON_Delete(firmware_info_request);
+            firmware_info_request = NULL;
+        }
 
-    //     vTaskDelay(30 * 1000 / portTICK_RATE_MS);
-    // }
+        vTaskDelay(30 * 1000 / portTICK_RATE_MS);
+    }
 
     vTaskDelete(NULL);
 }

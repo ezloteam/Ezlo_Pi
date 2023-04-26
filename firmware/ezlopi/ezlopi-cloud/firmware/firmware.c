@@ -1,4 +1,5 @@
 #include <string.h>
+#include <ctype.h>
 
 #include "cJSON.h"
 #include "data.h"
@@ -8,8 +9,9 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 
-#include "ezlopi_ota.h"
 #include "version.h"
+#include "ezlopi_ota.h"
+#include "ezlopi_factory_info.h"
 
 void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 {
@@ -42,6 +44,7 @@ void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
         }
         else
         {
+            // firmware_send_firmware_query_to_nma_server();
             // send "cloud.firmware.info.get"
         }
     }
@@ -89,13 +92,38 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
     if (NULL != cj_request)
     {
         cJSON_AddStringToObject(cj_request, "method", "cloud.firmware.info.get");
-        cJSON_AddStringToObject(cj_request, "id", message_count);
+        cJSON_AddNumberToObject(cj_request, "id", message_count);
         cJSON *cj_params = cJSON_AddObjectToObject(cj_request, "params");
         if (cj_params)
         {
             cJSON_AddStringToObject(cj_params, "firmware_version", VERSION_STR);
-            cJSON_AddStringToObject(cj_params, "firmware_type", "sound sensor");
+
+            char *device_type = ezlopi_factory_info_v2_get_device_type();
+            if (device_type)
+            {
+                if (isalpha(device_type[0]))
+                {
+                    cJSON_AddStringToObject(cj_params, "firmware_type", device_type);
+                }
+                else
+                {
+                    cJSON_AddStringToObject(cj_params, "firmware_type", "generic");
+                }
+                free(device_type);
+            }
+            else
+            {
+                cJSON_AddStringToObject(cj_params, "firmware_type", "generic");
+            }
             cJSON_AddStringToObject(cj_params, "firmware_hardware", "ezlopi");
+        }
+
+        char *str_request = cJSON_Print(cj_request);
+        cJSON_Minify(str_request);
+        if (str_request)
+        {
+            TRACE_I("firmware status request: \n%s", str_request);
+            free(str_request);
         }
     }
 
