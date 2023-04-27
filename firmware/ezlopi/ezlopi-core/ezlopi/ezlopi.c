@@ -9,6 +9,7 @@
 #include "trace.h"
 #include "ezlopi_system_info.h"
 #include "ezlopi_ping.h"
+#include "ezlopi_event_group.h"
 
 static void ezlopi_initialize_devices(void);
 
@@ -22,6 +23,7 @@ void ezlopi_init(void)
     vTaskDelay(10);
 
     // Init devices
+    ezlopi_event_group_create();
     ezlopi_device_prepare();
     vTaskDelay(10);
     ezlopi_initialize_devices();

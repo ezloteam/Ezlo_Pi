@@ -22,11 +22,13 @@
 // #include "esp_netif_lwip_internal.h"
 
 #include "trace.h"
+#include "qt_serial.h"
+
+#include "ezlopi_nvs.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_factory_info.h"
-#include "ezlopi_nvs.h"
-#include "qt_serial.h"
 #include "ezlopi_wifi_err_reason.h"
+#include "ezlopi_event_group.h"
 
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -38,15 +40,15 @@
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
 /* FreeRTOS event group to signal when we are connected*/
-static EventGroupHandle_t s_wifi_event_group;
+// static EventGroupHandle_t s_wifi_event_group;
 static esp_netif_t *wifi_sta_netif = NULL;
 static esp_netif_ip_info_t my_ip;
 
 /* The event group allows multiple bits for each event, but we only care about two events:
  * - we are connected to the AP with an IP
  * - we failed to connect after the maximum amount of retries */
-#define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAIL_BIT BIT1
+// #define WIFI_CONNECTED_BIT BIT0
+// #define WIFI_FAIL_BIT BIT1
 
 static uint32_t new_wifi = 0;
 static int s_retry_num = 0;
@@ -150,7 +152,8 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         }
         else
         {
-            xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
+            // xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
+            ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_FAIL);
             alert_qt_wifi_fail();
             s_retry_num = 0;
         }
@@ -169,7 +172,9 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         s_retry_num = 0;
 
         memcpy(&my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
-        xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+        // xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+        ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
+
         alert_qt_wifi_got_ip();
     }
 
@@ -187,7 +192,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
 void ezlopi_wifi_initialize(void)
 {
     memset(&my_ip, 0, sizeof(my_ip));
-    s_wifi_event_group = xEventGroupCreate();
+    // s_wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_netif_init());
 
@@ -275,7 +280,7 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
     {
         if ((0 != strncmp(ssid, &wifi_ssid_pass_global_buffer[0], 32)) || ((0 != strncmp(pass, &wifi_ssid_pass_global_buffer[32], 32))))
         {
-#warning "____________________---"
+#warning "-------------------------"
             ezlopi_wifi_set_new_wifi_flag();
             strncpy((char *)&wifi_ssid_pass_global_buffer[0], ssid, 32);
             strncpy((char *)&wifi_ssid_pass_global_buffer[32], pass, 32);
@@ -305,15 +310,12 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 
 void ezlopi_wait_for_wifi_to_connect(void)
 {
-    while (NULL == s_wifi_event_group)
+    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, portMAX_DELAY, 0))
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    if (NULL != s_wifi_event_group)
-    {
-        xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
-    }
+    ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, portMAX_DELAY, 0);
 }
 
 static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg)

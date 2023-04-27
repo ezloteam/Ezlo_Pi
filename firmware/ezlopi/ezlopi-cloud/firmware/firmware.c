@@ -12,6 +12,7 @@
 #include "version.h"
 #include "ezlopi_ota.h"
 #include "ezlopi_factory_info.h"
+#include "ezlopi_event_queue.h"
 
 void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 {

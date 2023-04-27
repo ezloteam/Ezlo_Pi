@@ -210,13 +210,16 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
     while (1)
     {
-        TRACE_D("Sending firmware check request...");
-        cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
-        if (NULL != firmware_info_request)
+        if (-1 != ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 30 * 1000, 1))
         {
-            web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
-            cJSON_Delete(firmware_info_request);
-            firmware_info_request = NULL;
+            TRACE_D("Sending firmware check request...");
+            cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+            if (NULL != firmware_info_request)
+            {
+                web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
+                cJSON_Delete(firmware_info_request);
+                firmware_info_request = NULL;
+            }
         }
 
         vTaskDelay(30 * 1000 / portTICK_RATE_MS);
