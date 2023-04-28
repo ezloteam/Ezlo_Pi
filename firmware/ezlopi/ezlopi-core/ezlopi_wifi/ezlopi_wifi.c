@@ -316,6 +316,7 @@ void ezlopi_wait_for_wifi_to_connect(void)
     }
 
     ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, portMAX_DELAY, 0);
+    TRACE_W("EVENT GROUP SEEMS WORKING......");
 }
 
 static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg)

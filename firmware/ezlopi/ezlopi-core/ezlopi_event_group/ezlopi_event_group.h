@@ -3,17 +3,17 @@
 
 #include "ctype.h"
 #include "string.h"
+#include "esp_bit_defs.h"
 
 #define EZLOPI_EVENT_BASE 0x10
 
 typedef enum e_ezlopi_event
 {
-    EZLOPI_EVENT_NONE = 0,
-    EZLOPI_EVENT_OTA = 1,
-    EZLOPI_EVENT_WIFI_CONNECTED = 2,
-    EZLOPI_EVENT_WIFI_FAIL = 3,
+    EZLOPI_EVENT_OTA = BIT0,
+    EZLOPI_EVENT_WIFI_CONNECTED = BIT1,
+    EZLOPI_EVENT_WIFI_FAIL = BIT2,
 
-    EZLOPI_EVENT_MAX, // can not be more than 32
+    // can not be more than BIT31
 } e_ezlopi_event_t;
 
 void ezlopi_event_group_create(void);

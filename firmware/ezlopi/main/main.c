@@ -17,6 +17,7 @@
 #include "trace.h"
 #include "ezlopi.h"
 #include "qt_serial.h"
+#include "ota_service.h"
 #include "web_provisioning.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_ble_service.h"
@@ -33,6 +34,7 @@ void app_main(void)
     gpio_isr_service_init();
     ezlopi_init();
     web_provisioning_init();
+    ota_service_init();
     ezlopi_ble_service_init();
     timer_service_init();
     TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());

@@ -1,9 +1,9 @@
 #include "string.h"
 
+#include "esp_bit_defs.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
-#include "esp_event.h"
 
 #include "ezlopi_event_group.h"
 
@@ -19,9 +19,9 @@ void ezlopi_event_group_create(void)
 
 void ezlopi_event_group_set_event(e_ezlopi_event_t event)
 {
-    if (ezlopi_event_group_handle && (event < EZLOPI_EVENT_MAX))
+    if (ezlopi_event_group_handle && (event < BIT31))
     {
-        xEventGroupSetBits(ezlopi_event_group_handle, (1 << event));
+        xEventGroupSetBits(ezlopi_event_group_handle, event);
     }
 }
 
@@ -31,7 +31,7 @@ int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time
     if (ezlopi_event_group_handle)
     {
         EventBits_t event_bit = xEventGroupWaitBits(ezlopi_event_group_handle, event, clear_on_exit ? pdTRUE : pdFALSE, pdFALSE, wait_time_ms / portTICK_RATE_MS);
-        if (event_bit & (1 << event_bit))
+        if (event_bit & event)
         {
             ret = 1;
         }

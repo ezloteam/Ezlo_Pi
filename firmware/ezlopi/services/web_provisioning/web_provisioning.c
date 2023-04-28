@@ -208,6 +208,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
+#if 0
     while (1)
     {
         if (-1 != ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 30 * 1000, 1))
@@ -224,6 +225,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
         vTaskDelay(30 * 1000 / portTICK_RATE_MS);
     }
+#endif
 
     vTaskDelete(NULL);
 }

@@ -12,7 +12,7 @@
 #include "version.h"
 #include "ezlopi_ota.h"
 #include "ezlopi_factory_info.h"
-#include "ezlopi_event_queue.h"
+#include "ezlopi_event_group.h"
 
 void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 {
@@ -47,6 +47,7 @@ void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
         {
             // firmware_send_firmware_query_to_nma_server();
             // send "cloud.firmware.info.get"
+            ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
         }
     }
 }
