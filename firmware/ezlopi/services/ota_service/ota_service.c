@@ -22,7 +22,7 @@ static void ota_service_process(void *pv)
     while (1)
     {
         int ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 30 * 1000, 1);
-        TRACE_D("ezlopi_event_group_wait_for_event: %d", ret);
+        TRACE_D("Configuration Selection %d", ret);
         if (-1 != ret)
         {
             TRACE_D("Sending firmware check request...");
