@@ -14,6 +14,7 @@
 #include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_profile.h"
 
+#include "ezlopi_ping.h"
 #include "ezlopi_ble_buffer.h"
 #include "ezlopi_ble_service.h"
 #include "ezlopi_factory_info.h"
@@ -112,6 +113,7 @@ static char *device_info_jsonify(void)
         cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
         cJSON_AddBoolToObject(root, "provisioned_status", ezlopi_nvs_get_provisioning_status());
+
         uint8_t ble_mac[6];
         esp_read_mac(ble_mac, ESP_MAC_BT);
         char mac_string[32];
@@ -125,12 +127,16 @@ static char *device_info_jsonify(void)
         __add_factory_info_to_root(root, "brand", ezlopi_factory_info_v2_get_brand());
         __add_factory_info_to_root(root, "manufacturer", ezlopi_factory_info_v2_get_manufacturer());
 
-        // ssid, ips
-        // manufacturer
-        // model
-        // device-type
-        // device-name
-        // brand
+        char *ssid = ezlopi_factory_info_v2_get_ssid();
+        cJSON_AddStringToObject(root, "wifi_ssid", ssid ? ssid : "");
+        esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
+        cJSON_AddStringToObject(root, "wifi-ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
+        cJSON_AddStringToObject(root, "wifi-gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
+        cJSON_AddStringToObject(root, "wifi-netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
+        cJSON_AddNumberToObject(root, "wifi-connection_status", ezlopi_wifi_got_ip());
+        cJSON_AddStringToObject(root, "wifi-error", ezlopi_wifi_get_last_disconnect_reason());
+        const char *internet_status_str = ezlopi_ping_get_internet_status() ? "Internet available" : "Internet not available";
+        cJSON_AddStringToObject(root, "internet_status", internet_status_str);
 
         device_info = cJSON_Print(root);
         if (device_info)

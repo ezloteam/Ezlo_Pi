@@ -26,7 +26,7 @@
 #include "ezlopi_ble_service.h"
 #include "ezlopi_ble_buffer.h"
 
-extern void ezlopi_ble_service_passkey_init(void);
+extern void ezlopi_ble_service_security_init(void);
 extern void ezlopi_ble_service_wifi_profile_init(void);
 extern void ezlopi_ble_service_provisioning_init(void);
 extern void ezlopi_ble_service_device_info_init(void);
@@ -38,7 +38,7 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 void ezlopi_ble_service_init(void)
 {
     ezlopi_ble_service_wifi_profile_init();
-    ezlopi_ble_service_passkey_init();
+    ezlopi_ble_service_security_init();
     ezlopi_ble_service_provisioning_init();
     ezlopi_ble_service_device_info_init();
 
@@ -46,7 +46,7 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_basic_init();
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts app-0 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PASSKEY_SERVICE_HANDLE), "gatts app-1 register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_SECURITY_SERVICE_HANDLE), "gatts app-1 register error");
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PROVISIONING_ID_HANDLE), "gatts app-2 register error");
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_DEVICE_INFO_ID_HANDLE), "gatts app-3 register error");
 

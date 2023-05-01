@@ -4,6 +4,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+
+typedef struct s_ezlopi_cloud_item {
+
+} s_ezlopi_cloud_item_t;
+
+typedef struct s_ezlopi_cloud_device {
+
+} s_ezlopi_cloud_device_t;
+
 typedef struct s_ezlopi_cloud_info
 {
     // cloud information

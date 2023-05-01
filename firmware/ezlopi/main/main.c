@@ -27,9 +27,6 @@ static void blinky(void *pv);
 
 void app_main(void)
 {
-    TRACE_B("sizeof long: %u", sizeof(long));
-    TRACE_B("sizeof long-long: %u", sizeof(long long));
-    TRACE_B("sizeof time_t: %u", sizeof(time_t));
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();
@@ -43,6 +40,11 @@ void app_main(void)
 
 static void blinky(void *pv)
 {
+    // printf("sizeof long: %u\r\n", sizeof(long));
+    // printf("sizeof long-long: %u\r\n", sizeof(long long));
+    // printf("sizeof time_t: %u\r\n", sizeof(time_t));
+    // printf("IDF-Version: %s\r\n", esp_get_idf_version());
+
     // gpio_config_t io_conf = {
     //     .pin_bit_mask = (1ULL << GPIO_NUM_2),
     //     .mode = GPIO_MODE_OUTPUT,

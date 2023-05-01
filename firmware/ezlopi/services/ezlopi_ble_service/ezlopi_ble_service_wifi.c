@@ -19,13 +19,15 @@
 
 static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
 
-static char *wifi_creds_jsonify(void);
 static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len);
+#if 0
+static char *wifi_creds_jsonify(void);
+static void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_connection_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_connection_error_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+#endif
 
 static void wifi_event_notify_upcall(esp_event_base_t event, void *arg);
 
@@ -48,13 +50,13 @@ void ezlopi_ble_service_wifi_profile_init(void)
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
     ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, NULL, wifi_creds_write_func, wifi_creds_write_exec_func);
 
+#if 0
     // wifi connection status
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_WIFI_CHAR_STATUS_UUID;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
     ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, wifi_connection_status_read_func, NULL, NULL);
-
     // wifi error
     // uuid.len = ESP_UUID_LEN_16;
     // uuid.uuid.uuid16 = BLE_WIFI_CHAR_ERROR_UUID;
@@ -63,8 +65,10 @@ void ezlopi_ble_service_wifi_profile_init(void)
     // ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, wifi_connection_error_read_func, NULL, NULL);
 
     // ezlopi_wifi_event_add(wifi_event_notify_upcall, NULL);
+#endif
 }
 
+#if 0
 static void wifi_event_notify_upcall(esp_event_base_t event, void *arg)
 {
     esp_gatt_value_t value;
@@ -132,6 +136,7 @@ static void wifi_connection_status_read_func(esp_gatt_value_t *value, esp_ble_ga
     }
 #endif
 }
+#endif
 
 #if 0
 static void wifi_connection_error_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
@@ -276,21 +281,16 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
     }
 }
 
+#if 0
 static char *wifi_creds_jsonify(void)
 {
     char *json_str_wifi_info = NULL;
-    char wifi_creds[64];
-    memset(wifi_creds, 0, sizeof(wifi_creds));
     // ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
     char *ssid = ezlopi_factory_info_v2_get_ssid();
 
     cJSON *cjson_wifi_info = cJSON_CreateObject();
     if (cjson_wifi_info)
     {
-        if (strlen(wifi_creds) >= 32)
-        {
-            wifi_creds[31] = '\0';
-        }
         cJSON_AddStringToObject(cjson_wifi_info, "wifi_ssid", ssid ? ssid : "");
         esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
         cJSON_AddStringToObject(cjson_wifi_info, "ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
@@ -298,7 +298,7 @@ static char *wifi_creds_jsonify(void)
         cJSON_AddStringToObject(cjson_wifi_info, "netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
         cJSON_AddNumberToObject(cjson_wifi_info, "connection_status", ezlopi_wifi_got_ip());
         cJSON_AddStringToObject(cjson_wifi_info, "error", ezlopi_wifi_get_last_disconnect_reason());
-        cJSON_AddStringToObject(cjson_wifi_info, "auth_status", ezlopi_ble_auth_status_to_string(ezlopi_ble_auth_last_status()));
+        // cJSON_AddStringToObject(cjson_wifi_info, "auth_status", ezlopi_ble_auth_status_to_string(ezlopi_ble_auth_last_status()));
 
         const char *internet_status_str = ezlopi_ping_get_internet_status() ? "Internet available" : "Internet not available";
         cJSON_AddStringToObject(cjson_wifi_info, "internet_status", internet_status_str);
@@ -325,3 +325,5 @@ uint32_t ezlopi_ble_auth_user_id(char *user_id)
 
     return start_tick;
 }
+
+#endif
