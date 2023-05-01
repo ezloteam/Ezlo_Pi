@@ -122,7 +122,7 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
 
 static void ezlopi_device_parse_json(char *config_string)
 {
-    // TRACE_I("PARSING - config_string: \n%s", config_string);
+    TRACE_I("PARSING - config_string: \n%s", config_string);
     cJSON *cjson_config = cJSON_Parse(config_string);
 
     if (cjson_config)

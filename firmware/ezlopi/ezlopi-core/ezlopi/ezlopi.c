@@ -10,6 +10,7 @@
 #include "ezlopi_system_info.h"
 #include "ezlopi_ping.h"
 #include "ezlopi_event_group.h"
+#include "mac_uuid.h"
 
 static void ezlopi_initialize_devices(void);
 

@@ -43,10 +43,10 @@
 
 /**\name Internal macros */
 /* To identify osr settings selected by user */
-#define OVERSAMPLING_SETTINGS UINT8_C(0x07)
+#define OVERSAMPLING_SETTINGS    UINT8_C(0x07)
 
 /* To identify filter and standby settings selected by user */
-#define FILTER_STANDBY_SETTINGS UINT8_C(0x18)
+#define FILTER_STANDBY_SETTINGS  UINT8_C(0x18)
 
 /*!
  * @brief This internal API puts the device to sleep mode.

@@ -67,7 +67,29 @@ void Dialog_config_i2c::on_buttonBox_accepted() {
     i2c_user_data.dev_name = ui->lineEdit_device_name->text();
     i2c_user_data.id_room = ""; //TBD
 
-    i2c_user_data.id_item = (ezpi_item_type)(ui->comboBox_i2c_subtype->currentIndex() + EZPI_ITEM_TYPE_MPU6050);
+    if(ui->comboBox_i2c_subtype->currentIndex() == 0) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_MPU6050;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 1) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_ADXL345;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 2) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_GY271;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 3) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_MCP4725;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 4) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_GY530;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 5) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_DS1307;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 6) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_MAX30100;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 7) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_BMP280_I2C;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 8) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_LNA219;
+    } else if(ui->comboBox_i2c_subtype->currentIndex() == 9) {
+        i2c_user_data.id_item = EZPI_ITEM_TYPE_GY291;
+    } else {
+
+    }
 
     i2c_user_data.gpio_sda = ui->comboBox_i2c_gpio_sda->currentText().toInt();
     i2c_user_data.gpio_scl = ui->comboBox_i2c_gpio_scl->currentText().toInt();

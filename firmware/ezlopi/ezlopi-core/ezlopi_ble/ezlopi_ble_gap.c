@@ -86,8 +86,8 @@ void ezlopi_ble_gap_config_adv_data(void)
         ezlopi_ble_setup_service_uuid();
     }
 
-    adv_data.p_service_uuid = all_service_uuid;
-    adv_data.service_uuid_len = all_service_uuid_len;
+    // adv_data.p_service_uuid = all_service_uuid;
+    // adv_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
     if (ret)
@@ -108,8 +108,8 @@ void ezlopi_ble_gap_config_scan_rsp_data(void)
         ezlopi_ble_setup_service_uuid();
     }
 
-    scan_rsp_data.p_service_uuid = all_service_uuid;
-    scan_rsp_data.service_uuid_len = all_service_uuid_len;
+    // scan_rsp_data.p_service_uuid = all_service_uuid;
+    // scan_rsp_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
     if (ret)
