@@ -74,6 +74,30 @@ typedef enum e_ezlopi_device_interface_type
     EZLOPI_DEVICE_INTERFACE_MAX
 } e_ezlopi_device_interface_type_t;
 
+typedef struct s_ezlopi_item
+{
+    s_ezlopi_cloud_item_t cloud_properties;
+    e_ezlopi_device_interface_type_t interface_type;
+    union
+    {
+        s_ezlopi_uart_t uart;
+        s_ezlopi_i2c_master_t i2c_master;
+        s_ezlopi_spi_master_t spi_master;
+        s_ezlopi_onewire_t onewire_master;
+        s_ezlopi_gpios_t gpio;
+        s_ezlopi_pwm_t pwm;
+        s_ezlopi_adc_t adc;
+    } interface;
+
+    struct s_ezlopi_items *next;
+} s_ezlopi_item_t;
+
+typedef struct s_ezlopi_device {
+    s_ezlopi_item_t items;
+    s_ezlopi_cloud_device_t cloud_properties;
+    struct s_ezlopi_device *next;
+} s_ezlopi_device_t;
+
 typedef struct s_ezlopi_device_properties
 {
     // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
@@ -96,7 +120,7 @@ typedef struct s_ezlopi_device_properties
 } s_ezlopi_device_properties_t;
 
 void ezlopi_device_prepare(void);
-// uint32_t ezlopi_device_generate_device_id(void); 
+// uint32_t ezlopi_device_generate_device_id(void);
 // uint32_t ezlopi_device_generate_item_id(void);
 // uint32_t ezlopi_device_generate_room_id(void);
 // uint32_t ezlopi_device_generate_gateway_id(void);
