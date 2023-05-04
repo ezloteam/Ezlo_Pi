@@ -267,3 +267,57 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device)
 
     return new_item;
 }
+
+static void ezlopi_device_free_item(l_ezlopi_item_t *items)
+{
+    if (items->next)
+    {
+        ezlopi_device_free_item(items->next);
+    }
+
+    free(items);
+}
+
+static void ezlopi_device_free(l_ezlopi_device_t *device)
+{
+    if (device->items)
+    {
+        ezlopi_device_free_item(device->items);
+    }
+    free(device);
+}
+
+void ezlopi_device_free_device(l_ezlopi_device_t *device)
+{
+    if (device)
+    {
+        if (l_device_head)
+        {
+            if (l_device_head == device)
+            {
+                ezlopi_device_free(l_device_head);
+                l_device_head = NULL;
+            }
+            else
+            {
+                l_ezlopi_device_t *curr_device = l_device_head;
+                while (curr_device->next)
+                {
+                    if (curr_device->next == device)
+                    {
+                        break;
+                    }
+
+                    curr_device = curr_device->next;
+                }
+
+                if (curr_device->next)
+                {
+                    l_ezlopi_device_t *free_device = curr_device->next;
+                    curr_device->next = curr_device->next->next;
+                    ezlopi_device_free(free_device);
+                }
+            }
+        }
+    }
+}
