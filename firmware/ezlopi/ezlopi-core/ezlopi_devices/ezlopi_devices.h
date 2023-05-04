@@ -74,7 +74,7 @@ typedef enum e_ezlopi_device_interface_type
     EZLOPI_DEVICE_INTERFACE_MAX
 } e_ezlopi_device_interface_type_t;
 
-typedef struct s_ezlopi_item
+typedef struct l_ezlopi_item
 {
     s_ezlopi_cloud_item_t cloud_properties;
     e_ezlopi_device_interface_type_t interface_type;
@@ -89,14 +89,15 @@ typedef struct s_ezlopi_item
         s_ezlopi_adc_t adc;
     } interface;
 
-    struct s_ezlopi_items *next;
-} s_ezlopi_item_t;
+    struct l_ezlopi_items *next;
+} l_ezlopi_item_t;
 
-typedef struct s_ezlopi_device {
-    s_ezlopi_item_t items;
+typedef struct l_ezlopi_device
+{
+    l_ezlopi_item_t *items;
     s_ezlopi_cloud_device_t cloud_properties;
     struct s_ezlopi_device *next;
-} s_ezlopi_device_t;
+} l_ezlopi_device_t;
 
 typedef struct s_ezlopi_device_properties
 {

@@ -7,10 +7,14 @@
 #include "web_provisioning.h"
 #include "ezlopi_factory_info.h"
 
+#if 0
 static uint32_t device_id = 0;
 static uint32_t item_id = 0;
 static uint32_t room_id = 0;
 static uint32_t gateway_id = 0;
+#endif
+
+static l_ezlopi_device_t *l_device_head = NULL;
 
 static void ezlopi_device_parse_json(char *config_string);
 
@@ -179,6 +183,7 @@ static void ezlopi_device_parse_json(char *config_string)
     }
 }
 
+#if 0
 // uint32_t ezlopi_device_generate_device_id(void)
 // {
 //     device_id = (0 == device_id) ? 0x30000001 : device_id + 1;
@@ -206,3 +211,59 @@ static void ezlopi_device_parse_json(char *config_string)
 //     // TRACE_D("gateway_id: %u\r\n", gateway_id);
 //     return gateway_id;
 // }
+#endif
+
+l_ezlopi_device_t *ezlopi_device_add_device(void)
+{
+    l_ezlopi_device_t *new_device = malloc(sizeof(l_ezlopi_device_t));
+    if (new_device)
+    {
+        memset(new_device, 0, sizeof(l_ezlopi_device_t));
+        if (NULL == l_device_head)
+        {
+            l_device_head = new_device;
+        }
+        else
+        {
+            l_ezlopi_device_t *curr_device = l_device_head;
+            while (curr_device->next)
+            {
+                curr_device = curr_device->next;
+            }
+
+            curr_device->next = new_device;
+        }
+    }
+
+    return new_device;
+}
+
+l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device)
+{
+    l_ezlopi_item_t *new_item = NULL;
+    if (device)
+    {
+        new_item = malloc(sizeof(l_ezlopi_item_t));
+        if (new_item)
+        {
+            memset(new_item, 0, sizeof(l_ezlopi_item_t));
+
+            if (NULL == device->items)
+            {
+                device->items = new_item;
+            }
+            else
+            {
+                l_ezlopi_item_t *curr_item = device->items;
+                while (curr_item->next)
+                {
+                    curr_item = curr_item->next;
+                }
+
+                curr_item->next = new_item;
+            }
+        }
+    }
+
+    return new_item;
+}
