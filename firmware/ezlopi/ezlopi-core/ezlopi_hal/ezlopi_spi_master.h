@@ -35,4 +35,6 @@ typedef struct s_ezlopi_spi_master
 
 } s_ezlopi_spi_master_t;
 
+int ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config);
+
 #endif // __EZLOPI_SPI_MASTER_H__
