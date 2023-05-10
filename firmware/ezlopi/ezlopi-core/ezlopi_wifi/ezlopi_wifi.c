@@ -103,22 +103,25 @@ void ezlopi_wifi_set_new_wifi_flag(void)
     new_wifi = 1;
 }
 
-ezlopi_wifi_status_t * ezlopi_wifi_status(void) {
-    
+ezlopi_wifi_status_t *ezlopi_wifi_status(void)
+{
+
     ezlopi_wifi_status_t *wifi_stat = (ezlopi_wifi_status_t *)malloc(sizeof(ezlopi_wifi_status_t));
 
-    if(ezlopi_flag_wifi_status) {
+    if (ezlopi_flag_wifi_status)
+    {
 
         wifi_stat->wifi_connection = true;
         wifi_stat->wifi_mode = WIFI_MODE_STA;
         wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
-
-    } else {    
+    }
+    else
+    {
         wifi_stat->wifi_mode = WIFI_MODE_STA;
         wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
         wifi_stat->wifi_connection = false;
     }
-    
+
     return wifi_stat;
 }
 
@@ -163,9 +166,10 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         ezlopi_flag_wifi_status = false;
 
         station_got_ip = 0;
+        esp_wifi_connect();
+
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
         {
-            esp_wifi_connect();
             s_retry_num++;
             TRACE_I("retry to connect to the AP");
         }

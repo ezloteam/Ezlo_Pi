@@ -26,25 +26,27 @@ void ezlopi_init(void)
     vTaskDelay(10);
     ezlopi_initialize_devices();
     vTaskDelay(10);
-    // ezlopi_wifi_initialize();
+    ezlopi_wifi_initialize();
     vTaskDelay(10);
 
     ezlopi_ethernet_init();
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
-    // if (boot_count > 1)
-    // {
-    //     ezlopi_wifi_connect_from_nvs();
-    // }
-    // else
-    // {
-    //     ezlopi_wifi_connect_from_id_bin();
-    // }
-    // ezlopi_wifi_connect_from_id_bin();
+#if 0
+    if (boot_count > 1)
+    {
+        ezlopi_wifi_connect_from_nvs();
+    }
+    else
+    {
+        ezlopi_wifi_connect_from_id_bin();
+    }
+#endif
+    ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
-    ezlopi_timer_start_1000ms();
+    ezlopi_timer_start_50ms();
 }
 
 static void ezlopi_initialize_devices(void)
