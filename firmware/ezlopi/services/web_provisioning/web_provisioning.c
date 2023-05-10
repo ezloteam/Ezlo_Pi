@@ -177,7 +177,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
         TRACE_D("water_mark: %d", water_mark);
 
-        ezlopi_wait_for_wifi_to_connect();
+        // ezlopi_wait_for_wifi_to_connect();
 
         cloud_server = ezlopi_factory_info_v2_get_cloud_server();
         ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
@@ -188,15 +188,10 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
         ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
 
-        // ezlopi_factory_info_v2_free(cloud_server);
-        // ezlopi_factory_info_v2_free(ca_certificate);
-        // ezlopi_factory_info_v2_free(ssl_shared_key);
-        // ezlopi_factory_info_v2_free(ssl_private_key);
-
         if (ws_endpoint)
         {
             TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
-            TRACE_D("http_request: %s", http_request); 
+            TRACE_D("http_request: %s", http_request);
             cJSON *root = cJSON_Parse(ws_endpoint);
             if (root)
             {
@@ -348,4 +343,3 @@ static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
     esp_restart();
     return NULL;
 }
-

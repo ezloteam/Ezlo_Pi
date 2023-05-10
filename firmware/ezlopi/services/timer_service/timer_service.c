@@ -28,6 +28,7 @@ static void event_process(void *pv)
         s_ezlo_event_t *event = NULL;
         if (pdTRUE == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
         {
+            TRACE_D("event tick: %d", xTaskGetTickCount() - old_tick);
             old_tick = xTaskGetTickCount();
 
             if (NULL != event)
@@ -37,6 +38,7 @@ static void event_process(void *pv)
                 {
                     registered_device->device->func(event->action, registered_device->properties, event->arg, registered_device->user_arg);
                     registered_device = registered_device->next;
+                    vTaskDelay(50);
                 }
 
                 free(event);

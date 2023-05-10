@@ -29,6 +29,7 @@ static void blinky(void *pv);
 
 void app_main(void)
 {
+    gpio_install_isr_service(0);
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();

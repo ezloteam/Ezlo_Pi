@@ -2,6 +2,7 @@
 #include "sdkconfig.h"
 #include "driver/spi_common.h"
 #include "driver/spi_master.h"
+#include "esp_intr_alloc.h"
 
 #include "ezlopi_spi_master.h"
 #include "trace.h"
@@ -37,19 +38,23 @@ int ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config)
                 .sclk_io_num = spi_config->sck,
                 .quadhd_io_num = -1,
                 .quadwp_io_num = -1,
-                .max_transfer_sz = 16,
+                .max_transfer_sz = spi_config->transfer_sz,
+                .flags = spi_config->flags,
+#if CONFIG_SPI_MASTER_ISR_IN_IRAM
+                .intr_flags = ESP_INTR_FLAG_IRAM
+#endif
             };
 
             spi_device_interface_config_t devcfg = {
-                .command_bits = 10,
-                .clock_speed_hz = spi_config->clock_speed,
-                .mode = EZLOPI_SPI_CPOL_LOW_CPHA_LOW, // SPI mode 0
-                .spics_io_num = -1,                   // not used
-                .queue_size = 1,
-                .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_POSITIVE_CS,
+                .command_bits = spi_config->command_bits,
+                .address_bits = spi_config->addr_bits,
+                .mode = spi_config->mode,       // SPI mode 0
+                .clock_speed_hz = spi_config->clock_speed_mhz * 1000000,
+                .queue_size = spi_config->queue_size,
                 .pre_cb = NULL,
                 .post_cb = NULL,
-                .input_delay_ns = 0, // the EEPROM output the data half a SPI clock behind.
+                .input_delay_ns = 0,            // the EEPROM output the data half a SPI clock behind.
+                .spics_io_num = spi_config->cs, // not used
             };
 
             do

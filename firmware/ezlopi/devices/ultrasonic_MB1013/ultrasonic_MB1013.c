@@ -40,11 +40,11 @@ int ultrasonic_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *p
         ret = ezlopi_ultrasonic_MB1013_init(properties);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_200_MS:
-    {
-        ret = ezlopi_send_motion_detected_data(properties);
-        break;
-    }
+    // case EZLOPI_ACTION_NOTIFY_200_MS:
+    // {
+    //     ret = ezlopi_send_motion_detected_data(properties);
+    //     break;
+    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ezlopi_ultrasonic_MB1013_get_value_cjson(properties, arg);
@@ -151,16 +151,16 @@ static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *propertie
     return ret;
 }
 
-static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t *properties)
-{
-    int ret = 0;
-    if (is_motion_detected != previous_motion)
-    {
-        ret = ezlopi_device_value_updated_from_device(properties);
-        previous_motion = is_motion_detected;
-    }
-    return ret;
-}
+// static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t *properties)
+// {
+//     int ret = 0;
+//     if (is_motion_detected != previous_motion)
+//     {
+//         ret = ezlopi_device_value_updated_from_device(properties);
+//         previous_motion = is_motion_detected;
+//     }
+//     return ret;
+// }
 
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {

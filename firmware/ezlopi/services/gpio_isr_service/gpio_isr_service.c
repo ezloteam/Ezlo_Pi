@@ -28,7 +28,6 @@ static void digital_io_isr_service(void *pv);
 void gpio_isr_service_init(void)
 {
     TRACE_I("Started gpio-isr service");
-    gpio_install_isr_service(0);
     gpio_evt_queue = xQueueCreate(20, sizeof(s_ezlopi_device_properties_t *));
     xTaskCreate(digital_io_isr_service, "digital-io-isr-service", 2 * 2048, NULL, 3, NULL);
 }
