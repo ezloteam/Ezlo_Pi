@@ -4,4 +4,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "ezlopi_ethernet.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES trace ezlopi_actions ezlopi_spi_master ezlopi_boards)
+    REQUIRES trace ezlopi_actions ezlopi_hal ezlopi_boards)

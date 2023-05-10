@@ -42,7 +42,6 @@ static void ezlopi_ethernet_setup_basic(void)
 
     s_ezlopi_spi_master_t *spi_conf = ezlopi_ethernet_spi_setup();
 
-    esp_eth_handle_t eth_handle_spi = NULL;
 
     eth_w5500_config_t w5500_config = ETH_W5500_DEFAULT_CONFIG(spi_conf->handle);
 
@@ -53,6 +52,7 @@ static void ezlopi_ethernet_setup_basic(void)
     esp_eth_mac_t *mac_spi = esp_eth_mac_new_w5500(&w5500_config, &mac_config_spi);
     esp_eth_phy_t *phy_spi = esp_eth_phy_new_w5500(&phy_config_spi);
 
+    esp_eth_handle_t eth_handle_spi = NULL;
     esp_eth_config_t eth_config_spi = ETH_DEFAULT_CONFIG(mac_spi, phy_spi);
     ESP_ERROR_CHECK(esp_eth_driver_install(&eth_config_spi, &eth_handle_spi));
 
