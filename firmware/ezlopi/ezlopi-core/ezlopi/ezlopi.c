@@ -1,3 +1,8 @@
+#include "esp_netif.h"
+#include "esp_event.h"
+
+#include "trace.h"
+
 #include "ezlopi.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_devices.h"
@@ -6,7 +11,6 @@
 #include "ezlopi_nvs.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_devices_list.h"
-#include "trace.h"
 #include "ezlopi_system_info.h"
 #include "ezlopi_ethernet.h"
 
@@ -16,6 +20,8 @@ void ezlopi_init(void)
 {
     // Init memories
     ezlopi_nvs_init();
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
     vTaskDelay(10);
     // ezlopi_factory_info_init();
     print_factory_info_v2();

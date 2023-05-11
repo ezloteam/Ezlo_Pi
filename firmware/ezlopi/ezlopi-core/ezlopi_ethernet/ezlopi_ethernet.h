@@ -19,6 +19,21 @@
 #define EZLOPI_ETHERNET_W5500_PHY_ADDR -1
 #endif
 
+typedef enum e_ethernet_status
+{
+    ETHERNET_STATUS_UNKNOWN = 0,
+    ETHERNET_STATUS_STARTED,
+    ETHERNET_STATUS_STOPPED,
+    ETHERNET_STATUS_LINK_DOWN,
+    ETHERNET_STATUS_LINK_UP,
+    ETHERNET_STATUS_GOT_IP,
+    ETHERNET_STATUS_LOST_IP,
+
+} e_ethernet_status_t;
+
 void ezlopi_ethernet_init(void);
+void ezlopi_ethernet_deinit(void);
+e_ethernet_status_t ezlopi_ethernet_get_status(void);
+esp_netif_ip_info_t *ezlopi_ethernet_get_ip_info(void);
 
 #endif // __EZLOPI_ETHERNET_H__
