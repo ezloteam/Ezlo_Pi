@@ -97,7 +97,6 @@
  sin16(x)  == sin((x/32768.0) * pi) * 32767
  cos16(x)  == cos((x/32768.0) * pi) * 32767
  Accurate to more than 99% in all cases.
-
  - Fast 8-bit approximations of sin and cos.
  Input angle is a uint8_t from 0-255.
  Output is an UNsigned uint8_t from 0 to 255.
@@ -111,7 +110,6 @@
  ease8InOutApprox(x) ==
  faster, rougher, approximation of cubic easing
  ease8InOutQuad(x) == quadratic (vs cubic) easing
-
  - Cubic, Quadratic, and Triangle wave functions.
  Input is a uint8_t representing phase withing the wave,
  similar to how sin8 takes an angle 'theta'.
@@ -120,12 +118,10 @@
  cubicwave8(x)
  quadwave8(x)
  triwave8(x)
-
  - Square root for 16-bit integers.  About three times
  faster and five times smaller than Arduino's built-in
  generic 32-bit sqrt routine.
  sqrt16(uint16_t x) == sqrt(x)
-
  - Dimming and brightening functions for 8-bit
  light values.
  dim8_video(x)  == scale8_video(x, x)
@@ -149,7 +145,6 @@
  == from + ((to - from) * fract16) / 65536)
  map8(in, rangeStart, rangeEnd)
  == map(in, 0, 255, rangeStart, rangeEnd);
-
  - Beat generators which return sine or sawtooth
  waves in a specified number of Beats Per Minute.
  Sine wave beat generators can specify a low and

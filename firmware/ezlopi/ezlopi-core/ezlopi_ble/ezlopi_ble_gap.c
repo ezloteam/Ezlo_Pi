@@ -25,8 +25,10 @@ static esp_ble_adv_data_t adv_data = {
     .min_interval = 0x0006,
     .max_interval = 0x0010,
     .appearance = 0x00,
-    .manufacturer_len = 0,       // sizeof(manufacturer),
-    .p_manufacturer_data = NULL, //  manufacturer,
+    // .manufacturer_len = sizeof(manufacturer),
+    // .p_manufacturer_data = manufacturer,
+    .manufacturer_len = 0,
+    .p_manufacturer_data = NULL,    
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = 0,
@@ -39,8 +41,10 @@ esp_ble_adv_data_t scan_rsp_data = {
     .include_name = true,
     .include_txpower = true,
     .appearance = 0x00,
-    .manufacturer_len = 0,       // sizeof(manufacturer), // TEST_MANUFACTURER_DATA_LEN,
-    .p_manufacturer_data = NULL, // manufacturer, //&manufacturer[0],
+    // .manufacturer_len = sizeof(manufacturer), // TEST_MANUFACTURER_DATA_LEN,
+    // .p_manufacturer_data = manufacturer,      //&manufacturer[0],
+    .manufacturer_len = 0, // TEST_MANUFACTURER_DATA_LEN,
+    .p_manufacturer_data = NULL,      //&manufacturer[0],    
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = 0,
@@ -86,8 +90,8 @@ void ezlopi_ble_gap_config_adv_data(void)
         ezlopi_ble_setup_service_uuid();
     }
 
-    adv_data.p_service_uuid = all_service_uuid;
-    adv_data.service_uuid_len = all_service_uuid_len;
+    // adv_data.p_service_uuid = all_service_uuid;
+    // adv_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
     if (ret)
@@ -108,8 +112,8 @@ void ezlopi_ble_gap_config_scan_rsp_data(void)
         ezlopi_ble_setup_service_uuid();
     }
 
-    scan_rsp_data.p_service_uuid = all_service_uuid;
-    scan_rsp_data.service_uuid_len = all_service_uuid_len;
+    // scan_rsp_data.p_service_uuid = all_service_uuid;
+    // scan_rsp_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
     if (ret)

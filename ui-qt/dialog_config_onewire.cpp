@@ -31,7 +31,13 @@ void Dialog_config_onewire::on_buttonBox_accepted() {
     onewire_user_data.dev_name = ui->lineEdit_device_name->text();
     onewire_user_data.id_room = ""; //TBD
 
-    onewire_user_data.id_item = (ezpi_item_type)(EZPI_ITEM_TYPE_DHT11 + ui->comboBox_onewire_subtype->currentIndex());
+    if(ui->comboBox_onewire_subtype->currentIndex() == 0) {
+        onewire_user_data.id_item = EZPI_ITEM_TYPE_DHT22;
+    } else if(ui->comboBox_onewire_subtype->currentIndex() == 1) {
+        onewire_user_data.id_item = EZPI_ITEM_TYPE_DS18B20;
+    } else {
+
+    }
 
     onewire_user_data.gpio = ui->comboBox_onewire_gpio->currentText().toInt();
 

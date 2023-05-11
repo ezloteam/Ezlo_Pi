@@ -143,6 +143,8 @@ private:
 
     QLabel *ezlogic_status = nullptr;
 
+    QString  ezlogic_uuid_self_prov;
+
     ezpi_log_level ezlogic_log_level;
 
     // Private methods

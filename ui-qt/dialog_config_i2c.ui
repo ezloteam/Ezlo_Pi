@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>I2C</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ezlopi.qrc">
@@ -209,6 +209,11 @@
    <item>
     <property name="text">
      <string>LNA219</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>GY291 Digital Accelerometer</string>
     </property>
    </item>
   </widget>

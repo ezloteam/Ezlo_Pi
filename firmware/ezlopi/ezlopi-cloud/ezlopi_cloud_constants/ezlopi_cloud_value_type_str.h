@@ -5,13 +5,13 @@
 const static char *value_type_int = "int";
 // const static char *value_type_int64 = "int64";
 const static char *value_type_bool = "bool";
-// const static char *value_type_float = "float";
+const static char *value_type_float = "float";
 // const static char *value_type_scaleble = "scaleble";
 // const static char *value_type_rgb = "rgb";
 // const static char *value_type_usercode = "userCode";
 // const static char *value_type_dailyintervalarray = "array.daily_interval";
 // const static char *value_type_weeklyintervalarray = "array.weekly_interval";
-// const static char *value_type_string = "string";
+const static char *value_type_string = "string";
 // const static char *value_type_table = "table";
 // const static char *value_type_array = "array";
 const static char *value_type_token = "token";
@@ -22,7 +22,7 @@ const static char *value_type_pressure = "pressure";
 // const static char *value_type_power = "power";
 const static char *value_type_humidity = "humidity";
 // const static char *value_type_velocity = "velocity";
-// const static char *value_type_acceleration = "acceleration";
+const static char *value_type_acceleration = "acceleration";
 // const static char *value_type_direction = "direction";
 // const static char *value_type_general_purpose = "general_purpose";
 // const static char *value_type_acidity = "acidity";
@@ -67,4 +67,5 @@ const static char *value_type_temperature = "temperature";
 // const static char *value_keypad_lock_operation = "keypad_lock_operation";
 // const static char *value_keypad_unlock_operation = "keypad_unlock_operation";
 // const static char *value_manual_not_fully_locked_operation = "manual_not_fully_locked_operation";
+
 #endif // __EZLOPI_VLAUES_STR_H__

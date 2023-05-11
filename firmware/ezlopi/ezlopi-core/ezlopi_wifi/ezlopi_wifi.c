@@ -35,8 +35,8 @@
    If you'd rather not, just change the below entries to strings with
    the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
 */
-#define EXAMPLE_ESP_WIFI_SSID "nepaldigisys"
-#define EXAMPLE_ESP_WIFI_PASS "NDS_0ffice"
+// #define EXAMPLE_ESP_WIFI_SSID "nepaldigisys"
+// #define EXAMPLE_ESP_WIFI_PASS "NDS_0ffice"
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
 /* FreeRTOS event group to signal when we are connected*/
@@ -57,6 +57,7 @@ static int station_got_ip = 0;
 static const char *const wifi_no_error_str = "NO_ERROR";
 static const char *last_disconnect_reason = wifi_no_error_str;
 static ll_ezlopi_wifi_event_upcall_t *__event_upcall_head = NULL;
+static bool ezlopi_flag_wifi_status = false;
 
 static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg);
 
@@ -104,6 +105,28 @@ void ezlopi_wifi_set_new_wifi_flag(void)
     new_wifi = 1;
 }
 
+ezlopi_wifi_status_t *ezlopi_wifi_status(void)
+{
+
+    ezlopi_wifi_status_t *wifi_stat = (ezlopi_wifi_status_t *)malloc(sizeof(ezlopi_wifi_status_t));
+
+    if (ezlopi_flag_wifi_status)
+    {
+
+        wifi_stat->wifi_connection = true;
+        wifi_stat->wifi_mode = WIFI_MODE_STA;
+        wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
+    }
+    else
+    {
+        wifi_stat->wifi_mode = WIFI_MODE_STA;
+        wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
+        wifi_stat->wifi_connection = false;
+    }
+
+    return wifi_stat;
+}
+
 static void set_wifi_station_host_name(void)
 {
     static char station_host_name[32];
@@ -117,7 +140,7 @@ static void alert_qt_wifi_got_ip(void)
     if (new_wifi)
     {
         new_wifi = 0;
-        ezlopi_nvs_write_wifi(wifi_ssid_pass_global_buffer, sizeof(wifi_ssid_pass_global_buffer));
+        // ezlopi_nvs_write_wifi(wifi_ssid_pass_global_buffer, sizeof(wifi_ssid_pass_global_buffer));
 
         char *qt_resp = "{\"cmd\":2,\"status_write\":1,\"status_connect\":1}";
         qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
@@ -142,11 +165,13 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
         TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
         last_disconnect_reason = ezlopi_wifi_err_reason_str(disconnected->reason);
+        ezlopi_flag_wifi_status = false;
 
         station_got_ip = 0;
+        esp_wifi_connect();
+
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
         {
-            esp_wifi_connect();
             s_retry_num++;
             TRACE_I("retry to connect to the AP");
         }
@@ -194,9 +219,6 @@ void ezlopi_wifi_initialize(void)
     memset(&my_ip, 0, sizeof(my_ip));
     // s_wifi_event_group = xEventGroupCreate();
 
-    ESP_ERROR_CHECK(esp_netif_init());
-
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
     wifi_sta_netif = esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -265,6 +287,8 @@ void ezlopi_wifi_connect_from_nvs(void)
     {
         strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
         strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
+        // strcpy(&wifi_ssid_pass_global_buffer[00], "nepaldigisys");
+        // strcpy(&wifi_ssid_pass_global_buffer[32], "NDS_0ffice");
         ezlopi_wifi_set_new_wifi_flag();
     }
 

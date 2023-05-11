@@ -103,8 +103,8 @@ static const s_method_list_v2_t method_list_v2[] = {
     // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
-    // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 
 uint32_t web_provisioning_get_message_count(void)
@@ -176,7 +176,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
         TRACE_D("water_mark: %d", water_mark);
 
-        ezlopi_wait_for_wifi_to_connect();
+        // ezlopi_wait_for_wifi_to_connect();
 
         cloud_server = ezlopi_factory_info_v2_get_cloud_server();
         ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
@@ -190,6 +190,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         if (ws_endpoint)
         {
             TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
+            TRACE_D("http_request: %s", http_request);
             cJSON *root = cJSON_Parse(ws_endpoint);
             if (root)
             {

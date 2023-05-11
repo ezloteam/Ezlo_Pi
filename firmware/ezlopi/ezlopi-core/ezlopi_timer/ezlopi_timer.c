@@ -104,6 +104,23 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
         timer_counter_value += _timer_conf->alarm_value * EZLOPI_TIMER_SCALE;
         timer_group_set_alarm_value_in_isr(_timer_conf->group, _timer_conf->index, timer_counter_value);
     }
+#if 0
+    if (EZLOPI_ACTION_NOTIFY_1000_MS == _timer_conf->event_type)
+    {
+        send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
+    }
+
+    if (EZLOPI_ACTION_NOTIFY_200_MS == _timer_conf->event_type)
+    {
+        static int count;
+        if (0 == (count % 5))
+        {
+            send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
+            count = 0;
+        }
+        count++;
+    }
+#endif
 
     if (EZLOPI_ACTION_NOTIFY_50_MS == _timer_conf->event_type)
     {
@@ -141,25 +158,30 @@ static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t *timer_conf);
 static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_actions_t event_type);
 static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_actions_t event_type, int group, int index, int alarm_ms);
 
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 void ezlopi_timer_start_50ms(void)
 {
     ezlopi_timer_init_timer_event(0, 50, EZLOPI_ACTION_NOTIFY_50_MS);
 }
 
-void ezlopi_timer_start_200ms(void)
-{
-    ezlopi_timer_init_timer_event(1, 200, EZLOPI_ACTION_NOTIFY_200_MS);
-}
+// void ezlopi_timer_start_200ms(void)
+// {
+//     ezlopi_timer_init_timer_event(1, 200, EZLOPI_ACTION_NOTIFY_200_MS);
+// }
 
-#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
-void ezlopi_timer_start_500ms(void)
-{
-    ezlopi_timer_init_timer_event(2, 500, EZLOPI_ACTION_NOTIFY_500_MS);
-}
+// void ezlopi_timer_start_500ms(void)
+// {
+//     ezlopi_timer_init_timer_event(2, 500, EZLOPI_ACTION_NOTIFY_500_MS);
+// }
 
 void ezlopi_timer_start_1000ms(void)
 {
     ezlopi_timer_init_timer_event(3, 1000, EZLOPI_ACTION_NOTIFY_1000_MS);
+}
+#else
+void ezlopi_timer_start_1000ms(void)
+{
+    ezlopi_timer_init_timer_event(0, 1000, EZLOPI_ACTION_NOTIFY_1000_MS);
 }
 #endif
 

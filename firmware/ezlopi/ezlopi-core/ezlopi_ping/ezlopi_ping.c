@@ -11,22 +11,22 @@
 #include "trace.h"
 #include "ezlopi_ping.h"
 
+static esp_ping_handle_t ping_handle = NULL;
 static uint32_t __ping_fail_count = 0;
-static uint32_t __internet_status = 0;
+static e_ping_status_t __ping_status = EZLOPI_PING_STATUS_UNKNOWN;
 
 static void ezlopi_ping_on_ping_end(esp_ping_handle_t hdl, void *args);
 static void ezlopi_ping_on_ping_success(esp_ping_handle_t hdl, void *args);
 static void ezlopi_ping_on_ping_timeout(esp_ping_handle_t hdl, void *args);
 
-uint32_t ezlopi_ping_get_internet_status(void)
+e_ping_status_t ezlopi_ping_get_internet_status(void)
 {
-    return __internet_status;
+    return __ping_status;
 }
 
 void ezlopi_ping_init(void)
 {
     esp_ping_config_t config = ESP_PING_DEFAULT_CONFIG();
-    static esp_ping_handle_t ping;
 
     config.interval_ms = 5000;
     config.count = 1000;
@@ -41,7 +41,7 @@ void ezlopi_ping_init(void)
     /* convert domain name to IP address */
     if (getaddrinfo("1.1.1.1", NULL, &hint, &res) != 0)
     {
-        TRACE_D("ping: unknown host '1.1.1.1'.");
+        TRACE_D("ping_handle: unknown host '1.1.1.1'.");
         return 1;
     }
     if (res->ai_family == AF_INET)
@@ -64,10 +64,19 @@ void ezlopi_ping_init(void)
         .on_ping_end = ezlopi_ping_on_ping_end,
         .cb_args = NULL};
 
-    esp_ping_new_session(&config, &cbs, &ping);
-    esp_ping_start(ping);
+    esp_ping_new_session(&config, &cbs, &ping_handle);
+    esp_ping_start(ping_handle);
 
     return 0;
+}
+
+void ezlopi_ping_stop(void)
+{
+    if (ping_handle)
+    {
+        esp_ping_stop(ping_handle);
+        __ping_status = EZLOPI_PING_STATUS_UNKNOWN;
+    }
 }
 
 static void ezlopi_ping_on_ping_success(esp_ping_handle_t hdl, void *args)
@@ -84,7 +93,7 @@ static void ezlopi_ping_on_ping_success(esp_ping_handle_t hdl, void *args)
     TRACE_I("%d bytes from %s icmp_seq=%d ttl=%d time=%d ms\n",
             recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
     __ping_fail_count = 0;
-    __internet_status = 1;
+    __ping_status = EZLOPI_PING_STATUS_LIVE;
 }
 
 static void ezlopi_ping_on_ping_timeout(esp_ping_handle_t hdl, void *args)
@@ -98,7 +107,7 @@ static void ezlopi_ping_on_ping_timeout(esp_ping_handle_t hdl, void *args)
     __ping_fail_count++;
     if (__ping_fail_count > 2)
     {
-        __internet_status = 0;
+        __ping_status = EZLOPI_PING_STATUS_DISCONNECTED;
     }
 }
 
@@ -118,18 +127,18 @@ static void ezlopi_ping_on_ping_end(esp_ping_handle_t hdl, void *args)
 
     if (IP_IS_V4(&target_addr))
     {
-        TRACE_D("--- %s ping statistics ---\n", inet_ntoa(*ip_2_ip4(&target_addr)));
+        TRACE_D("--- %s ping_handle statistics ---\n", inet_ntoa(*ip_2_ip4(&target_addr)));
     }
     else
     {
-        TRACE_D("--- %s ping statistics ---\n", inet6_ntoa(*ip_2_ip6(&target_addr)));
+        TRACE_D("--- %s ping_handle statistics ---\n", inet6_ntoa(*ip_2_ip6(&target_addr)));
     }
     TRACE_D("%d packets transmitted, %d received, %d%% packet loss, time %dms\n",
             transmitted, received, loss, total_time_ms);
-    // delete the ping sessions, so that we clean up all resources and can create a new ping session
+    // delete the ping_handle sessions, so that we clean up all resources and can create a new ping_handle session
     // we don't have to call delete function in the callback, instead we can call delete function from other tasks
     esp_ping_start(hdl);
-    TRACE_D("Re-starting ping...");
+    TRACE_D("Re-starting ping_handle...");
 
     // esp_ping_delete_session(hdl);
 }

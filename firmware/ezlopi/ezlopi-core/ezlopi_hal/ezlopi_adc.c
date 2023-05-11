@@ -116,7 +116,8 @@ int ezlopi_adc_get_adc_data(uint8_t gpio_num, s_ezlopi_analog_data_t* ezlopi_ana
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
     return channel;
-    }
+}
+
 
 static int ezlopi_adc_get_adc_channel(uint8_t gpio_num)
 {
@@ -125,7 +126,8 @@ static int ezlopi_adc_get_adc_channel(uint8_t gpio_num)
         if(gpio_num == ezlopi_channel_to_gpio_map[channel])
         {
             return channel;
-        }}
+        }
+    }
     return -1;
 }
 
