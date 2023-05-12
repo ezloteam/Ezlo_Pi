@@ -140,7 +140,7 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
 static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-    const esp_netif_ip_info_t *eth_ip_info = &event->eth_ip_info;
+    const esp_netif_ip_info_t *eth_ip_info = &event->ip_info;
 
     switch (event_id)
     {
