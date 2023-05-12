@@ -175,12 +175,14 @@ static void ezlopi_device_parse_json(char *config_string)
     }
 
     l_ezlopi_configured_devices_t *current_head = ezlopi_devices_list_get_configured_items();
+#if 0
     while (NULL != current_head)
     {
         // ezlopi_device_print_properties(current_head->properties);
         TRACE_B("Device name: %.*s", sizeof(current_head->properties->ezlopi_cloud.device_name), current_head->properties->ezlopi_cloud.device_name);
         current_head = current_head->next;
     }
+#endif
 }
 
 #if 0
