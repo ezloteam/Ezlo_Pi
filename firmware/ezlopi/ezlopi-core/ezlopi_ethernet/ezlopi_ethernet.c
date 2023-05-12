@@ -200,7 +200,7 @@ static void ezlopi_ethernet_setup_basic(void)
     dump("ethernet mac", base_mac, 0, sizeof(base_mac));
     ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle_spi, ETH_CMD_S_MAC_ADDR, base_mac));
     eth_glue = esp_eth_new_netif_glue(eth_handle_spi);
-    ESP_ERROR_CHECK(esp_netif_attach(eth_netif_spi, esp_eth_new_netif_glue(eth_handle_spi)));
+    ESP_ERROR_CHECK(esp_netif_attach(eth_netif_spi, eth_glue));
 
     ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_ETH_GOT_IP, &__ip_event_handler, NULL));
