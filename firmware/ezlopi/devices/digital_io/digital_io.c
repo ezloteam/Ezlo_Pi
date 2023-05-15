@@ -71,12 +71,18 @@ static void digital_io_setup_device_cloud_properties(l_ezlopi_device_t *device, 
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
 
-        // ASSIGN_DEVICE_NAME(digital_io_device_properties, device_name);
+        ASSIGN_DEVICE_NAME_V2(device, device_name);
         device->cloud_properties.category = category_switch;
         device->cloud_properties.subcategory = subcategory_in_wall;
         device->cloud_properties.device_type = dev_type_switch_inwall;
         device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     }
+}
+
+static void digital_io_setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cJSON_device)
+{
+    CJSON_GET_VALUE_INT(cJSON_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cJSON_device, "dev_type", item->interface.gpio.gpio_in.);
 }
 
 static int digital_io_prepare(void *arg)
@@ -95,7 +101,7 @@ static int digital_io_prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device);
                 if (item)
                 {
-
+                    digital_io_setup_item_cloud_properties(item, cjson_device);
                     ret = 1;
                 }
                 else
