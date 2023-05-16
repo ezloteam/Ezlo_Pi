@@ -79,10 +79,32 @@ static void digital_io_setup_device_cloud_properties(l_ezlopi_device_t *device, 
     }
 }
 
-static void digital_io_setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cJSON_device)
+static void digital_io_setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 {
-    CJSON_GET_VALUE_INT(cJSON_device, "dev_type", item->interface_type);
-    CJSON_GET_VALUE_INT(cJSON_device, "dev_type", item->interface.gpio.gpio_in.);
+    int tmp_var = 0;
+    CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
+    item->cloud_properties.has_getter = true;
+    item->cloud_properties.has_setter = true;
+    item->cloud_properties.item_name = ezlopi_item_name_switch;
+    item->cloud_properties.value_type = value_type_bool;
+    item->cloud_properties.show = true;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+
+    CJSON_GET_VALUE_INT(cjson_device, "is_ip", item->interface.gpio.gpio_in.enable);
+    CJSON_GET_VALUE_INT(cjson_device, "gpio_in", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cjson_device, "ip_inv", item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cjson_device, "val_ip", item->interface.gpio.gpio_in.value);
+    CJSON_GET_VALUE_INT(cjson_device, "pullup_ip", tmp_var);
+    item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
+    item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
+
+    item->interface.gpio.gpio_out.enable = true;
+    CJSON_GET_VALUE_INT(cjson_device, "gpio_out", item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_INT(cjson_device, "op_inv", item->interface.gpio.gpio_out.invert);
+    CJSON_GET_VALUE_INT(cjson_device, "val_op", item->interface.gpio.gpio_out.value);
+    CJSON_GET_VALUE_INT(cjson_device, "pullup_op", tmp_var);
+    item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
+    item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
 }
 
 static int digital_io_prepare(void *arg)
@@ -118,7 +140,7 @@ static int digital_io_prepare(void *arg)
 static int digital_io_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-#if 0
+#if 1
     if (255 != properties->interface.gpio.gpio_out.gpio_num)
     {
         if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.gpio.gpio_out.gpio_num))
@@ -364,8 +386,6 @@ static s_ezlopi_device_properties_t *digital_io_prepare_item(cJSON *cjson_device
         digital_io_device_properties->ezlopi_cloud.item_name = ezlopi_item_name_switch;
         digital_io_device_properties->ezlopi_cloud.device_type = dev_type_switch_inwall;
         digital_io_device_properties->ezlopi_cloud.value_type = value_type_bool;
-        digital_io_device_properties->ezlopi_cloud.has_getter = true;
-        digital_io_device_properties->ezlopi_cloud.has_setter = true;
         digital_io_device_properties->ezlopi_cloud.reachable = true;
         digital_io_device_properties->ezlopi_cloud.battery_powered = false;
         digital_io_device_properties->ezlopi_cloud.show = true;
