@@ -17,8 +17,10 @@ static uint32_t gateway_id = 0;
 #endif
 
 static l_ezlopi_device_t *l_device_head = NULL;
+static s_ezlopi_cloud_controller_t s_controller_information;
 
 static void ezlopi_device_parse_json(char *config_string);
+static void ezlopi_device_print_controller_cloud_information(void);
 
 void ezlopi_device_prepare(void)
 {
@@ -29,6 +31,70 @@ void ezlopi_device_prepare(void)
     if (config_string)
     {
         ezlopi_device_parse_json(config_string);
+    }
+}
+
+static void ezlopi_device_print_controller_cloud_information(void)
+{
+    TRACE_D("Armed: %d", s_controller_information.armed);
+    TRACE_D("Battery Powered: %d", s_controller_information.battery_powered);
+    TRACE_D("Device Type Id: %.*s", sizeof(s_controller_information.device_type_id), s_controller_information.device_type_id);
+    TRACE_D("Gateway Id: %.*s", sizeof(s_controller_information.gateway_id), s_controller_information.gateway_id);
+    TRACE_D("Parent Device Id: %.*s", sizeof(s_controller_information.parent_device_id), s_controller_information.parent_device_id);
+    TRACE_D("Persistent: %d", s_controller_information.persistent);
+    TRACE_D("Reachable: %d", s_controller_information.reachable);
+    TRACE_D("Room Id: %.*s", sizeof(s_controller_information.room_id), s_controller_information.room_id);
+    TRACE_D("Security: %s", s_controller_information.security ? s_controller_information.security : "null");
+    TRACE_D("Service Notification: %d", s_controller_information.service_notification);
+    TRACE_D("Status: %s", s_controller_information.status ? s_controller_information.status : "null");
+}
+
+static void ezlopi_device_print_interface_gpio(void) {}
+
+static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item)
+{
+    switch (item->interface_type)
+    {
+    case EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_PWM:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_UART:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_I2C_MASTER:
+    {
+        break;
+    }
+    case EZLOPI_DEVICE_INTERFACE_SPI_MASTER:
+    {
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
 }
 
@@ -53,6 +119,7 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
         // TRACE_D("device->ezlopi_cloud.room_id: 0x%08x", device->ezlopi_cloud.room_id);
         TRACE_D("device->ezlopi_cloud.room_id: \"\"");
         TRACE_D("device->ezlopi_cloud.item_id: 0x%08x", device->ezlopi_cloud.item_id);
+
         switch (device->interface_type)
         {
         case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
@@ -176,6 +243,8 @@ static void ezlopi_device_parse_json(char *config_string)
         TRACE_E("EZLOPI-CONFIG parse- failed!");
     }
 
+    ezlopi_device_print_controller_cloud_information();
+
     int device_count = 0;
     l_ezlopi_device_t *tm_device_l_list = l_device_head;
     while (tm_device_l_list)
@@ -212,7 +281,7 @@ static void ezlopi_device_parse_json(char *config_string)
     l_ezlopi_configured_devices_t *current_head = ezlopi_devices_list_get_configured_items();
     while (NULL != current_head)
     {
-        // ezlopi_device_print_properties(current_head->properties);
+        ezlopi_device_print_properties(current_head->properties);
         TRACE_B("Device name: %.*s", sizeof(current_head->properties->ezlopi_cloud.device_name), current_head->properties->ezlopi_cloud.device_name);
         current_head = current_head->next;
     }

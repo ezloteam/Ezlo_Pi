@@ -160,7 +160,7 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
             };
 
             gpio_config(&io_conf);
-            digital_io_write_gpio_value(properties);
+            // digital_io_write_gpio_value(properties);
         }
     }
 
@@ -185,7 +185,7 @@ static int digital_io_init(s_ezlopi_device_properties_t *properties)
         };
 
         gpio_config(&io_conf);
-        gpio_isr_service_register(properties, digital_io_gpio_interrupt_upcall, 1000);
+        // gpio_isr_service_register(properties, digital_io_gpio_interrupt_upcall, 1000);
     }
 #endif
     return ret;
