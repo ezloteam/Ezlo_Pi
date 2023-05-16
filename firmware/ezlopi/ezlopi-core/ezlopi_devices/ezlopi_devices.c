@@ -49,46 +49,119 @@ static void ezlopi_device_print_controller_cloud_information(void)
     TRACE_D("Status: %s", s_controller_information.status ? s_controller_information.status : "null");
 }
 
-static void ezlopi_device_print_interface_gpio(void) {}
+static void ezlopi_device_print_interface_digital_io(l_ezlopi_item_t *item)
+{
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.enable: %s", item->interface.gpio.gpio_in.enable ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.gpio_num: %d", item->interface.gpio.gpio_in.gpio_num);
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.invert: %s", item->interface.gpio.gpio_in.invert ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.value: %d", item->interface.gpio.gpio_in.value);
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.pull: %d", item->interface.gpio.gpio_in.pull);
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.interrupt: %d", item->interface.gpio.gpio_in.interrupt);
+
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.enable: %s", item->interface.gpio.gpio_out.enable ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.invert: %s", item->interface.gpio.gpio_out.invert ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.value: %d", item->interface.gpio.gpio_out.value);
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.pull: %d", item->interface.gpio.gpio_out.pull);
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.interrupt: %d", item->interface.gpio.gpio_in.interrupt);
+}
+
+static void ezlopi_device_print_interface_analogue_input(l_ezlopi_item_t *item)
+{
+    TRACE_D(" |~~~|- item->interface.adc.gpio_num: %d", item->interface.adc.gpio_num);
+    TRACE_D(" |~~~|- item->interface.adc.resln_bit: %d", item->interface.adc.resln_bit);
+}
+
+static void ezlopi_device_print_interface_analogue_output(l_ezlopi_item_t *item) {}
+
+static void ezlopi_device_print_interface_pwm(l_ezlopi_item_t *item)
+{
+    TRACE_D(" |~~~|- item->interface.pwm.gpio_num: %d", item->interface.pwm.gpio_num);
+    TRACE_D(" |~~~|- item->interface.pwm.channel: %d", item->interface.pwm.channel);
+    TRACE_D(" |~~~|- item->interface.pwm.speed_mode: %d", item->interface.pwm.speed_mode);
+    TRACE_D(" |~~~|- item->interface.pwm.pwm_resln: %d", item->interface.pwm.pwm_resln);
+    TRACE_D(" |~~~|- item->interface.pwm.freq_hz: %d", item->interface.pwm.freq_hz);
+    TRACE_D(" |~~~|- item->interface.pwm.duty_cycle: %d", item->interface.pwm.duty_cycle);
+}
+
+static void ezlopi_device_print_interface_uart(l_ezlopi_item_t *item)
+{
+    TRACE_D(" |~~~|- item->interface.uart.channel: %d", item->interface.uart.channel);
+    TRACE_D(" |~~~|- item->interface.uart.baudrate: %d", item->interface.uart.baudrate);
+    TRACE_D(" |~~~|- item->interface.uart.tx: %d", item->interface.uart.tx);
+    TRACE_D(" |~~~|- item->interface.uart.rx: %d", item->interface.uart.rx);
+    TRACE_D(" |~~~|- item->interface.uart.enable: %d", item->interface.uart.enable);
+}
+
+static void ezlopi_device_print_interface_i2c_master(l_ezlopi_item_t *item)
+{
+    TRACE_D(" |~~~|- item->interface.i2c_master.enable: %s", item->interface.i2c_master.enable ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.i2c_master.channel: %d", item->interface.i2c_master.channel);
+    TRACE_D(" |~~~|- item->interface.i2c_master.clock_speed: %d", item->interface.i2c_master.clock_speed);
+    TRACE_D(" |~~~|- item->interface.i2c_master.scl: %d", item->interface.i2c_master.scl);
+    TRACE_D(" |~~~|- item->interface.i2c_master.sda: %d", item->interface.i2c_master.sda);
+}
+
+static void ezlopi_device_print_interface_spi_master(l_ezlopi_item_t *item)
+{
+    TRACE_D(" |~~~|- item->interface.spi_master.enable: %d", item->interface.spi_master.enable);
+    TRACE_D(" |~~~|- item->interface.spi_master.channel: %d", item->interface.spi_master.channel);
+    TRACE_D(" |~~~|- item->interface.spi_master.mode: %d", item->interface.spi_master.mode);
+    TRACE_D(" |~~~|- item->interface.spi_master.mosi: %d", item->interface.spi_master.mosi);
+    TRACE_D(" |~~~|- item->interface.spi_master.miso: %d", item->interface.spi_master.miso);
+    TRACE_D(" |~~~|- item->interface.spi_master.sck: %d", item->interface.spi_master.sck);
+    TRACE_D(" |~~~|- item->interface.spi_master.cs: %d", item->interface.spi_master.cs);
+    TRACE_D(" |~~~|- item->interface.spi_master.clock_speed_mhz: %d", item->interface.spi_master.clock_speed_mhz);
+    TRACE_D(" |~~~|- item->interface.spi_master.command_bits: %d", item->interface.spi_master.command_bits);
+    TRACE_D(" |~~~|- item->interface.spi_master.addr_bits: %d", item->interface.spi_master.addr_bits);
+    TRACE_D(" |~~~|- item->interface.spi_master.queue_size: %d", item->interface.spi_master.queue_size);
+    TRACE_D(" |~~~|- item->interface.spi_master.transfer_sz: %d", item->interface.spi_master.transfer_sz);
+    TRACE_D(" |~~~|- item->interface.spi_master.flags: %d", item->interface.spi_master.flags);
+}
 
 static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item)
 {
     switch (item->interface_type)
     {
     case EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT:
-    {
-        break;
-    }
     case EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT:
     {
+        ezlopi_device_print_interface_digital_io(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT:
     {
+        ezlopi_device_print_interface_analogue_input(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_ANALOG_OUTPUT:
     {
+        ezlopi_device_print_interface_analogue_output(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_PWM:
     {
+        ezlopi_device_print_interface_pwm(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_UART:
     {
+        ezlopi_device_print_interface_uart(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER:
     {
+        ezlopi_device_print_interface_uart(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_I2C_MASTER:
     {
+        ezlopi_device_print_interface_i2c_master(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_SPI_MASTER:
     {
+        ezlopi_device_print_interface_spi_master(item);
         break;
     }
     default:
@@ -262,10 +335,12 @@ static void ezlopi_device_parse_json(char *config_string)
         {
             TRACE_D("|~~~|--------------- Item - %d ---------------|", item_count);
             TRACE_D("|~~~|- Id: %08X", tm_itme_l_list->cloud_properties.item_id);
-            TRACE_D("|~~~|- Interface-type: %d", tm_itme_l_list->interface_type);
             TRACE_D("|~~~|- Category: %s", tm_itme_l_list->cloud_properties.item_name ? tm_itme_l_list->cloud_properties.item_name : "null");
             TRACE_D("|~~~|- Value: %s", tm_itme_l_list->cloud_properties.value_type ? tm_itme_l_list->cloud_properties.value_type : "null");
             TRACE_D("|~~~|- Device-type: %.*s", 32, tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : "null");
+
+            TRACE_D("|~~~|- Interface-type: %d", tm_itme_l_list->interface_type);
+            ezlopi_device_print_interface_type(tm_itme_l_list);
 
             tm_itme_l_list = tm_itme_l_list->next;
             item_count++;
