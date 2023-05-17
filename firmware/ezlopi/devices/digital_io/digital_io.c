@@ -79,7 +79,7 @@ static void digital_io_setup_device_cloud_properties(l_ezlopi_device_t *device, 
     }
 }
 
-static void digital_io_setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
+static void digital_io_setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 {
     int tmp_var = 0;
     CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
@@ -123,7 +123,7 @@ static int digital_io_prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device);
                 if (item)
                 {
-                    digital_io_setup_item_cloud_properties(item, cjson_device);
+                    digital_io_setup_item_properties(item, cjson_device);
                     ret = 1;
                 }
                 else

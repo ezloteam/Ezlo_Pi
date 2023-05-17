@@ -24,6 +24,22 @@ static void ezlopi_device_print_controller_cloud_information(void);
 
 void ezlopi_device_prepare(void)
 {
+    s_controller_information.armed = false;
+    s_controller_information.battery_powered = false;
+    s_controller_information.device_type_id[0] = '\0';
+    // snprintf(s_controller_information.device_type_id, sizeof(s_controller_information.device_type_id), "ezlopi");
+    s_controller_information.gateway_id[0] = '\0';
+    // snprintf(s_controller_information.gateway_id, sizeof(s_controller_information.gateway_id), "\0");
+    s_controller_information.parent_device_id[0] = '\0';
+    // snprintf(s_controller_information.parent_device_id, sizeof(s_controller_information.parent_device_id), "\0");
+    s_controller_information.persistent = false;
+    s_controller_information.reachable = false;
+    s_controller_information.room_id[0] = '\0';
+    // snprintf(s_controller_information.room_id, sizeof(s_controller_information.room_id), "\0");
+    s_controller_information.security = "null";
+    s_controller_information.service_notification = false;
+    s_controller_information.status = "ready";
+
     // char *config_string = ezlopi_factory_info_get_ezlopi_config();
     // TRACE_D("config_string: %s", config_string ? config_string : "");
     char *config_string = ezlopi_factory_info_v2_get_ezlopi_config();
@@ -36,17 +52,17 @@ void ezlopi_device_prepare(void)
 
 static void ezlopi_device_print_controller_cloud_information(void)
 {
-    TRACE_D("Armed: %d", s_controller_information.armed);
-    TRACE_D("Battery Powered: %d", s_controller_information.battery_powered);
-    TRACE_D("Device Type Id: %.*s", sizeof(s_controller_information.device_type_id), s_controller_information.device_type_id);
-    TRACE_D("Gateway Id: %.*s", sizeof(s_controller_information.gateway_id), s_controller_information.gateway_id);
-    TRACE_D("Parent Device Id: %.*s", sizeof(s_controller_information.parent_device_id), s_controller_information.parent_device_id);
-    TRACE_D("Persistent: %d", s_controller_information.persistent);
-    TRACE_D("Reachable: %d", s_controller_information.reachable);
-    TRACE_D("Room Id: %.*s", sizeof(s_controller_information.room_id), s_controller_information.room_id);
-    TRACE_D("Security: %s", s_controller_information.security ? s_controller_information.security : "null");
-    TRACE_D("Service Notification: %d", s_controller_information.service_notification);
-    TRACE_D("Status: %s", s_controller_information.status ? s_controller_information.status : "null");
+    TRACE_B("Armed: %d", s_controller_information.armed);
+    TRACE_B("Battery Powered: %d", s_controller_information.battery_powered);
+    TRACE_B("Device Type Id: %.*s", sizeof(s_controller_information.device_type_id), s_controller_information.device_type_id);
+    TRACE_B("Gateway Id: %.*s", sizeof(s_controller_information.gateway_id), s_controller_information.gateway_id);
+    TRACE_B("Parent Device Id: %.*s", sizeof(s_controller_information.parent_device_id), s_controller_information.parent_device_id);
+    TRACE_B("Persistent: %d", s_controller_information.persistent);
+    TRACE_B("Reachable: %d", s_controller_information.reachable);
+    TRACE_B("Room Id: %.*s", sizeof(s_controller_information.room_id), s_controller_information.room_id);
+    TRACE_B("Security: %s", s_controller_information.security ? s_controller_information.security : "null");
+    TRACE_B("Service Notification: %d", s_controller_information.service_notification);
+    TRACE_B("Status: %s", s_controller_information.status ? s_controller_information.status : "null");
 }
 
 static void ezlopi_device_print_interface_digital_io(l_ezlopi_item_t *item)
@@ -95,11 +111,11 @@ static void ezlopi_device_print_interface_uart(l_ezlopi_item_t *item)
 
 static void ezlopi_device_print_interface_i2c_master(l_ezlopi_item_t *item)
 {
-    TRACE_D(" |~~~|- item->interface.i2c_master.enable: %s", item->interface.i2c_master.enable ? "true" : "false");
-    TRACE_D(" |~~~|- item->interface.i2c_master.channel: %d", item->interface.i2c_master.channel);
-    TRACE_D(" |~~~|- item->interface.i2c_master.clock_speed: %d", item->interface.i2c_master.clock_speed);
-    TRACE_D(" |~~~|- item->interface.i2c_master.scl: %d", item->interface.i2c_master.scl);
-    TRACE_D(" |~~~|- item->interface.i2c_master.sda: %d", item->interface.i2c_master.sda);
+    TRACE_D("|~~~|- item->interface.i2c_master.enable: %s", item->interface.i2c_master.enable ? "true" : "false");
+    TRACE_D("|~~~|- item->interface.i2c_master.channel: %d", item->interface.i2c_master.channel);
+    TRACE_D("|~~~|- item->interface.i2c_master.clock_speed: %d", item->interface.i2c_master.clock_speed);
+    TRACE_D("|~~~|- item->interface.i2c_master.scl: %d", item->interface.i2c_master.scl);
+    TRACE_D("|~~~|- item->interface.i2c_master.sda: %d", item->interface.i2c_master.sda);
 }
 
 static void ezlopi_device_print_interface_spi_master(l_ezlopi_item_t *item)

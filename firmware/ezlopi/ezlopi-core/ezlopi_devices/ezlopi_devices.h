@@ -59,20 +59,20 @@
         }                                                                                         \
     }
 
-#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                                    \
-    {                                                                              \
-        if ((NULL != dev_name) && ('\0' != dev_name[0]))                           \
-        {                                                                          \
-            snprintf(device->cloud_properties.device_name,                         \
-                     sizeof(device->cloud_properties.device_name),                 \
-                     "%s", dev_name);                                              \
-        }                                                                          \
-        else                                                                       \
-        {                                                                          \
-            snprintf(device->cloud_properties.device_name,                         \
-                     sizeof(device->cloud_properties.device_name),                 \
+#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                                   \
+    {                                                                             \
+        if ((NULL != dev_name) && ('\0' != dev_name[0]))                          \
+        {                                                                         \
+            snprintf(device->cloud_properties.device_name,                        \
+                     sizeof(device->cloud_properties.device_name),                \
+                     "%s", dev_name);                                             \
+        }                                                                         \
+        else                                                                      \
+        {                                                                         \
+            snprintf(device->cloud_properties.device_name,                        \
+                     sizeof(device->cloud_properties.device_name),                \
                      "device-%d:digital_io", device->cloud_properties.device_id); \
-        }                                                                          \
+        }                                                                         \
     }
 
 typedef enum e_ezlopi_device_interface_type

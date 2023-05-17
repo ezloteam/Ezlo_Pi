@@ -2,20 +2,20 @@
 
 /*------------------------------------------------------------------------------
 
-	DHT22 temperature & humidity sensor AM2302 (DHT22) driver for ESP32
+    DHT22 temperature & humidity sensor AM2302 (DHT22) driver for ESP32
 
-	Jun 2017:	Ricardo Timmermann, new for DHT22  	
+    Jun 2017:	Ricardo Timmermann, new for DHT22
 
-	Code Based on Adafruit Industries and Sam Johnston and Coffe & Beer. Please help
-	to improve this code. 
-	
-	This example code is in the Public Domain (or CC0 licensed, at your option.)
+    Code Based on Adafruit Industries and Sam Johnston and Coffe & Beer. Please help
+    to improve this code.
 
-	Unless required by applicable law or agreed to in writing, this
-	software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-	CONDITIONS OF ANY KIND, either express or implied.
+    This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-	PLEASE KEEP THIS CODE IN LESS THAN 0XFF LINES. EACH LINE MAY CONTAIN ONE BUG !!!
+    Unless required by applicable law or agreed to in writing, this
+    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+    CONDITIONS OF ANY KIND, either express or implied.
+
+    PLEASE KEEP THIS CODE IN LESS THAN 0XFF LINES. EACH LINE MAY CONTAIN ONE BUG !!!
 
 ---------------------------------------------------------------------------------*/
 
@@ -30,9 +30,9 @@
 
 static const char *TAG = "DHT";
 
-int DHTgpio = GPIO_NUM_4; // my default DHT pin = 4
-float humidity = 0.;
-float temperature = 0.;
+static int DHTgpio = GPIO_NUM_4; // my default DHT pin = 4
+static float humidity = 0.;
+static float temperature = 0.;
 
 // == set the DHT used pin=========================================
 
@@ -71,7 +71,7 @@ void errorHandler(int response)
 
 /*-------------------------------------------------------------------------------
 ;
-;	get next state 
+;	get next state
 ;
 ;	I don't like this logic. It needs some interrupt blocking / priority
 ;	to ensure it runs in realtime.
@@ -113,7 +113,7 @@ Binary system Decimal system: RH=652/10=65.2%RH
 2) we convert 16 bits T data from binary system to decimal system, 0000 0001 0101 1111 → 351
 Binary system Decimal system: T=351/10=35.1°C
 
-When highest bit of temperature is 1, it means the temperature is below 0 degree Celsius. 
+When highest bit of temperature is 1, it means the temperature is below 0 degree Celsius.
 Example: 1000 0000 0110 0101, T= minus 10.1°C: 16 bits T data
 
 3) Check Sum=0000 0010+1000 1100+0000 0001+0101 1111=1110 1110 Check-sum=the last 8 bits of Sum=11101110
@@ -126,12 +126,12 @@ To request data from DHT:
 
 1) Sent low pulse for > 1~10 ms (MILI SEC)
 2) Sent high pulse for > 20~40 us (Micros).
-3) When DHT detects the start signal, it will pull low the bus 80us as response signal, 
+3) When DHT detects the start signal, it will pull low the bus 80us as response signal,
    then the DHT pulls up 80us for preparation to send data.
-4) When DHT is sending data to MCU, every bit's transmission begin with low-voltage-level that last 50us, 
+4) When DHT is sending data to MCU, every bit's transmission begin with low-voltage-level that last 50us,
    the following high-voltage-level signal's length decide the bit is "1" or "0".
-	0: 26~28 us
-	1: 70 us
+    0: 26~28 us
+    1: 70 us
 
 ;----------------------------------------------------------------------------*/
 

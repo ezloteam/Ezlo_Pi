@@ -213,7 +213,7 @@ static const char *switch_box_constant_config =
                 \"dev_type\" : 8,\
                 \"gpio_scl\" : 45,\
                 \"gpio_sda\" : 46,\
-                \"id_item\" : 29,\
+                \"id_item\" : 35,\
                 \"id_room\" : \"\",\
                 \"pullup_scl\" : true,\
                 \"pullup_sda\" : true,\
@@ -393,19 +393,15 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Switch 1\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 47,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
+                \"dev_name\" : \"GXHTC3-Sensor\",\
+                \"dev_type\" : 8,\
+                \"gpio_scl\" : 45,\
+                \"gpio_sda\" : 46,\
+                \"id_item\" : 35,\
+                \"id_room\" : \"\",\
+                \"pullup_scl\" : true,\
+                \"pullup_sda\" : true,\
+                \"slave_addr\" : 0\
             }\
         ],\
     \"dev_total\": 1}";
