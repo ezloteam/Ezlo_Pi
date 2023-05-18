@@ -69,3 +69,13 @@ static void ezlopi_initialize_devices(void)
         vTaskDelay(1);
     }
 }
+
+static void ezlopi_initialize_devices_v3(void)
+{
+    l_ezlopi_device_t * curr_device = ezlopi_device_get_head();
+    while (curr_device)
+    {
+        
+        curr_device = curr_device->next;
+    }
+}

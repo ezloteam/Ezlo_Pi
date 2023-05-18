@@ -6,9 +6,9 @@ extern "C"
 #endif
 #define V_TYPE 1
 #define BUILD_DATE 1679298225
-#define MAJOR 2
+#define MAJOR 3
 #define MINOR 0
-#define BATCH 8
+#define BATCH 0
 #define BUILD 164
 #define VERSION_STR "2.0.8"
 #ifdef __cplusplus

@@ -57,10 +57,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 #ifdef EZLOPI_SENSOR_033_DHT22_SENSOR
-{
-    .id = EZLOPI_SENSOR_033_DHT22_SENSOR,
-    .func = dht22_sensor,
-},
+    {
+        .id = EZLOPI_SENSOR_033_DHT22_SENSOR,
+        .func = dht22_sensor,
+    },
 #endif
 #ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
     {
@@ -140,10 +140,8 @@ static s_ezlopi_device_t device_array[] = {
 #endif
 
 #ifdef EZLOPI_SENSOR_029_IR_BLASTER
-    {
-        .id = EZLOPI_SENSOR_029_IR_BLASTER,
-        .func = IR_blaster_remote
-    },
+    {.id = EZLOPI_SENSOR_029_IR_BLASTER,
+     .func = IR_blaster_remote},
 #endif
 
 #ifdef EZLOPI_SENSOR_033_Turbidity_Sensor
@@ -196,6 +194,11 @@ static s_ezlopi_device_t device_array[] = {
     },
 };
 
+#if 1 // version 3.x.x
+
+#endif
+
+#if 1 // version 1.x.x to 2.x.x
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void)
 {
     return device_array;
@@ -255,3 +258,4 @@ static l_ezlopi_configured_devices_t *ezlopi_device_list_create(s_ezlopi_device_
     }
     return device_list_element;
 }
+#endif

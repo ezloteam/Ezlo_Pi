@@ -18,7 +18,7 @@ static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_temperature(cJSON *c
 static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_relative_humidity(cJSON *cjson_device);
 static void wgxhtc3_sensor_init(s_ezlopi_device_properties_t *properties, void *user_arg);
 
-static void wgxhtc3_sensor_prepare_v2(void *arg);
+static void wgxhtc3_sensor_prepare_v3(void *arg);
 static void wgxhtc3_sensor_prepare_device_cloud_properties_temperature(l_ezlopi_device_t *device, cJSON *cjson_device);
 static void wgxhtc3_sensor_prepare_device_cloud_properties_humidity(l_ezlopi_device_t *device, cJSON *cjson_device);
 static void wgxhtc3_sensor_prepare_temperature_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device);
@@ -33,8 +33,8 @@ int gxhtc3_rh_t_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        // wgxhtc3_sensor_prepare(arg);
-        wgxhtc3_sensor_prepare_v2(arg);
+        wgxhtc3_sensor_prepare(arg);
+        wgxhtc3_sensor_prepare_v3(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
@@ -110,7 +110,7 @@ static int gxhtc3_notify(s_ezlopi_device_properties_t *properties, void *args)
     return 1;
 }
 
-static void wgxhtc3_sensor_prepare_v2(void *arg)
+static void wgxhtc3_sensor_prepare_v3(void *arg)
 {
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
 

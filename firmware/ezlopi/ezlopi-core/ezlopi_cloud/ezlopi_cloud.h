@@ -16,6 +16,7 @@ typedef struct s_ezlopi_cloud_controller
     bool persistent;           // 'persistent' -> https://api.ezlo.com/hub/devices_api/index.html
     bool service_notification; // 'serviceNotification' -> https://api.ezlo.com/hub/devices_api/index.html
     char *security;            // 'security' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_security_str.h
+    bool ready;                // 'ready' -> https://api.ezlo.com/hub/devices_api/index.html
     char *status;              // 'status' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_status_str.h
 
 } s_ezlopi_cloud_controller_t;

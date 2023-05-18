@@ -115,6 +115,7 @@ typedef struct l_ezlopi_device
     struct l_ezlopi_device *next;
 } l_ezlopi_device_t;
 
+#if 1 // 
 typedef struct s_ezlopi_device_properties
 {
     // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
@@ -135,6 +136,7 @@ typedef struct s_ezlopi_device_properties
     s_ezlopi_cloud_info_t ezlopi_cloud;
 
 } s_ezlopi_device_properties_t;
+#endif
 
 void ezlopi_device_prepare(void);
 // uint32_t ezlopi_device_generate_device_id(void);
@@ -144,6 +146,7 @@ void ezlopi_device_prepare(void);
 
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
 
+l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 

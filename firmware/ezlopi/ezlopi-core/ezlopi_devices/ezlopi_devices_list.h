@@ -52,11 +52,15 @@
  */
 // int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+
 typedef struct s_ezlopi_device
 {
     uint32_t id;
     f_sensor_call_t func;
 } s_ezlopi_device_t;
+
+
+#if 1
 
 typedef struct l_ezlopi_configured_devices
 {

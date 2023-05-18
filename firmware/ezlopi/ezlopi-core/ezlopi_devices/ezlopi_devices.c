@@ -26,19 +26,20 @@ void ezlopi_device_prepare(void)
 {
     s_controller_information.armed = false;
     s_controller_information.battery_powered = false;
-    s_controller_information.device_type_id[0] = '\0';
-    // snprintf(s_controller_information.device_type_id, sizeof(s_controller_information.device_type_id), "ezlopi");
+    // s_controller_information.device_type_id[0] = '\0';
+    snprintf(s_controller_information.device_type_id, sizeof(s_controller_information.device_type_id), "ezlopi");
     s_controller_information.gateway_id[0] = '\0';
     // snprintf(s_controller_information.gateway_id, sizeof(s_controller_information.gateway_id), "\0");
     s_controller_information.parent_device_id[0] = '\0';
     // snprintf(s_controller_information.parent_device_id, sizeof(s_controller_information.parent_device_id), "\0");
-    s_controller_information.persistent = false;
-    s_controller_information.reachable = false;
+    s_controller_information.persistent = true;
+    s_controller_information.reachable = true;
     s_controller_information.room_id[0] = '\0';
     // snprintf(s_controller_information.room_id, sizeof(s_controller_information.room_id), "\0");
     s_controller_information.security = "null";
     s_controller_information.service_notification = false;
-    s_controller_information.status = "ready";
+    s_controller_information.ready = true;
+    s_controller_information.status = "synced";
 
     // char *config_string = ezlopi_factory_info_get_ezlopi_config();
     // TRACE_D("config_string: %s", config_string ? config_string : "");
@@ -62,6 +63,7 @@ static void ezlopi_device_print_controller_cloud_information(void)
     TRACE_B("Room Id: %.*s", sizeof(s_controller_information.room_id), s_controller_information.room_id);
     TRACE_B("Security: %s", s_controller_information.security ? s_controller_information.security : "null");
     TRACE_B("Service Notification: %d", s_controller_information.service_notification);
+    TRACE_B("Ready: %d", s_controller_information.ready);
     TRACE_B("Status: %s", s_controller_information.status ? s_controller_information.status : "null");
 }
 
@@ -408,6 +410,11 @@ static void ezlopi_device_parse_json(char *config_string)
 //     return gateway_id;
 // }
 #endif
+
+l_ezlopi_device_t *ezlopi_device_get_head(void)
+{
+    return l_device_head;
+}
 
 l_ezlopi_device_t *ezlopi_device_add_device(void)
 {
