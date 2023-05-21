@@ -121,9 +121,10 @@ static int digital_io_prepare_v3(void *arg)
             if (device)
             {
                 digital_io_setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, prep_arg->device->func);
                 if (item)
                 {
+                    item->item_func = prep_arg->device->func;
                     digital_io_setup_item_properties(item, cjson_device);
                     ret = 1;
                 }

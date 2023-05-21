@@ -75,6 +75,8 @@
         }                                                                         \
     }
 
+typedef int (*f_item_func_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+
 typedef enum e_ezlopi_device_interface_type
 {
     EZLOPI_DEVICE_INTERFACE_NONE = 0,
@@ -105,6 +107,8 @@ typedef struct l_ezlopi_item
         s_ezlopi_adc_t adc;
     } interface;
 
+    f_item_func_t func;
+
     struct l_ezlopi_items *next;
 } l_ezlopi_item_t;
 
@@ -115,7 +119,7 @@ typedef struct l_ezlopi_device
     struct l_ezlopi_device *next;
 } l_ezlopi_device_t;
 
-#if 1 // 
+#if 1 // v1.x.x to v2.x.x
 typedef struct s_ezlopi_device_properties
 {
     // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
@@ -149,6 +153,7 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
 l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
+l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, f_item_func_t *item_func);
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
 
