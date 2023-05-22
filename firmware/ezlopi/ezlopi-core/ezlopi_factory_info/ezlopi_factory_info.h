@@ -387,6 +387,7 @@ static const char *switch_box_constant_config =
         ],\
     \"dev_total\": 12}";
 #elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+#if 0
 static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\
@@ -402,6 +403,30 @@ static const char *test_device_constant_config =
                 \"pullup_scl\" : true,\
                 \"pullup_sda\" : true,\
                 \"slave_addr\" : 0\
+            }\
+        ],\
+    \"dev_total\": 1}";
+#endif
+
+static const char *test_device_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_name\": \"Master Switch\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 255,\
+                \"id_item\": 1,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
             }\
         ],\
     \"dev_total\": 1}";

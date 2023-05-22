@@ -10,6 +10,7 @@
 #include "ezlopi_pwm.h"
 #include "ezlopi_adc.h"
 #include "ezlopi_uart.h"
+#include "ezlopi_actions.h"
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
     {                                                         \
@@ -75,7 +76,7 @@
         }                                                                         \
     }
 
-typedef int (*f_item_func_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+// typedef int (*f_item_func_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
 typedef enum e_ezlopi_device_interface_type
 {
@@ -107,7 +108,8 @@ typedef struct l_ezlopi_item
         s_ezlopi_adc_t adc;
     } interface;
 
-    f_item_func_t func;
+    // f_item_func_t func;
+    int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
 
     struct l_ezlopi_items *next;
 } l_ezlopi_item_t;
@@ -152,8 +154,9 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
 
 l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);
-l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
-l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, f_item_func_t *item_func);
+// l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
+l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
+                                                  int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item, void *arg, void *user_arg));
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
 

@@ -10,39 +10,39 @@
 
 #define EZLOPI_SENSOR_NONE 0
 #define EZLOPI_SENSOR_0001_LED 1
-#define EZLOPI_SENSOR_0002_RELAY 2
-#define EZLOPI_SENSOR_0003_PLUG 3
-#define EZLOPI_SENSOR_0012_BME280_I2C 12
-#define EZLOPI_SENSOR_033_DHT22_SENSOR 16
-#define EZLOPI_SENSOR_0017_POTENTIOMETER 17
+// #define EZLOPI_SENSOR_0002_RELAY 2
+// #define EZLOPI_SENSOR_0003_PLUG 3
+// #define EZLOPI_SENSOR_0012_BME280_I2C 12
+// #define EZLOPI_SENSOR_033_DHT22_SENSOR 16
+// #define EZLOPI_SENSOR_0017_POTENTIOMETER 17
 
-#if CONFIG_IDF_TARGET_ESP32
-#define EZLOPI_SENSOR_0018_DOOR 18
-#endif
+// #if CONFIG_IDF_TARGET_ESP32
+// #define EZLOPI_SENSOR_0018_DOOR 18
+// #endif
 
-#define EZLOPI_SENSOR_0019_PIR 19
-#define EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS 20
-#define EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013 21
-#define EZLOPI_SENSOR_0022_DIMMABLE_BULB 22
-#define EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR 23
+// #define EZLOPI_SENSOR_0019_PIR 19
+// #define EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS 20
+// #define EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013 21
+// #define EZLOPI_SENSOR_0022_DIMMABLE_BULB 22
+// #define EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR 23
 
-#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3
-#define EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR 24
-#endif
+// #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3
+// #define EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR 24
+// #endif
 
-#define EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR 25
-#define EZLOPI_SENSOR_0027_WATER_LEAK 27
-#define EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI 28
+// #define EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR 25
+// #define EZLOPI_SENSOR_0027_WATER_LEAK 27
+// #define EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI 28
 
-#define EZLOPI_SENSOR_029_IR_BLASTER 29
-#define EZLOPI_SENSOR_030_DS18B20 30
-#define EZLOPI_SENSOR_031_JSN_SR04T_WaterLevelSensor 31
-#define EZLOPI_SENSOR_032_SOIL_MOISTURE 32
+// #define EZLOPI_SENSOR_029_IR_BLASTER 29
+// #define EZLOPI_SENSOR_030_DS18B20 30
+// #define EZLOPI_SENSOR_031_JSN_SR04T_WaterLevelSensor 31
+// #define EZLOPI_SENSOR_032_SOIL_MOISTURE 32
 
-#define EZLOPI_SENSOR_033_Turbidity_Sensor 33
-#define EZLOPI_SENSOR_034_Proximity_Sensor 34
+// #define EZLOPI_SENSOR_033_Turbidity_Sensor 33
+// #define EZLOPI_SENSOR_034_Proximity_Sensor 34
 
-#define EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C 35
+// #define EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C 35
 
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
 
@@ -52,6 +52,7 @@
  */
 // int sensor_bme280(e_ezlopi_actions_t action, void *arg);
 typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+typedef int (*f_sensor_call_v3_t)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 typedef struct s_ezlopi_device
 {
@@ -59,8 +60,13 @@ typedef struct s_ezlopi_device
     f_sensor_call_t func;
 } s_ezlopi_device_t;
 
+typedef struct s_ezlopi_device_v3
+{
+    uint32_t id;
+    f_sensor_call_v3_t func;
+} s_ezlopi_device_v3_t;
 
-#if 1
+// #if 1
 
 typedef struct l_ezlopi_configured_devices
 {
@@ -77,6 +83,8 @@ typedef struct s_ezlopi_prep_arg
     s_ezlopi_device_t *device;
 
 } s_ezlopi_prep_arg_t;
+
+s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void);
 
 /**
  * @brief Provides the list of available sensors

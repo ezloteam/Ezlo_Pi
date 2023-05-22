@@ -17,6 +17,7 @@
 #include "ezlopi_ethernet.h"
 
 static void ezlopi_initialize_devices(void);
+static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
 {
@@ -33,7 +34,8 @@ void ezlopi_init(void)
     ezlopi_event_group_create();
     ezlopi_device_prepare();
     vTaskDelay(10);
-    ezlopi_initialize_devices();
+    // ezlopi_initialize_devices();
+    ezlopi_initialize_devices_v3();
     vTaskDelay(10);
     ezlopi_wifi_initialize();
     vTaskDelay(10);
@@ -72,10 +74,22 @@ static void ezlopi_initialize_devices(void)
 
 static void ezlopi_initialize_devices_v3(void)
 {
-    l_ezlopi_device_t * curr_device = ezlopi_device_get_head();
+    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
     while (curr_device)
     {
-        
+        l_ezlopi_item_t *curr_item = curr_device->items;
+        while (curr_item)
+        {
+            if (curr_item->func)
+            {
+                curr_item->func(EZLOPI_ACTION_INITIALIZE, curr_item, NULL, NULL);
+            }
+            else
+            {
+                TRACE_E("Function is not defined!");
+            }
+            curr_item = curr_item->next;
+        }
         curr_device = curr_device->next;
     }
 }

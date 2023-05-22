@@ -25,12 +25,38 @@
 #include "032_sens_soil_moisture.h"
 #include "016_sens_dht22_sensor.h"
 
-static s_ezlopi_device_t device_array[] = {
-
+static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
     {
         .id = EZLOPI_SENSOR_0001_LED,
+        // .func = digital_io,
+        .func = digital_io_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0002_RELAY
+    {
+        .id = EZLOPI_SENSOR_0002_RELAY,
         .func = digital_io,
+    },
+    /**
+     * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
+     * This is essential for terminating the loop termination of loop.
+     */
+    {
+        .id = EZLOPI_SENSOR_NONE,
+        .func = NULL,
+    },
+#endif
+};
+
+#if 0
+static s_ezlopi_device_t device_array[] = {
+#ifdef EZLOPI_SENSOR_0001_LED
+    {
+        .id = EZLOPI_SENSOR_0001_LED,
+        // .func = digital_io,
+        .func = digital_io_v3,
     },
 #endif
 
@@ -140,8 +166,7 @@ static s_ezlopi_device_t device_array[] = {
 #endif
 
 #ifdef EZLOPI_SENSOR_029_IR_BLASTER
-    {.id = EZLOPI_SENSOR_029_IR_BLASTER,
-     .func = IR_blaster_remote},
+    {.id = EZLOPI_SENSOR_029_IR_BLASTER, .func = IR_blaster_remote},
 #endif
 
 #ifdef EZLOPI_SENSOR_033_Turbidity_Sensor
@@ -193,15 +218,20 @@ static s_ezlopi_device_t device_array[] = {
         .func = NULL,
     },
 };
+#endif
 
 #if 1 // version 3.x.x
-
+s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void)
+{
+    return device_array_v3;
+}
 #endif
 
 #if 1 // version 1.x.x to 2.x.x
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void)
 {
-    return device_array;
+    return NULL;
+    // device_array;
 }
 
 static l_ezlopi_configured_devices_t *configured_device = NULL;

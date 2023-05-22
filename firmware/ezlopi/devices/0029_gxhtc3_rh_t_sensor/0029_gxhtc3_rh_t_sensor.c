@@ -120,7 +120,7 @@ static void wgxhtc3_sensor_prepare_v3(void *arg)
         if (device)
         {
             wgxhtc3_sensor_prepare_device_cloud_properties_temperature(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device);
+            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, prep_arg->device->func);
             if (item)
             {
                 wgxhtc3_sensor_prepare_temperature_item_properties(item, prep_arg->cjson_device);
@@ -135,7 +135,7 @@ static void wgxhtc3_sensor_prepare_v3(void *arg)
         if (device)
         {
             wgxhtc3_sensor_prepare_device_cloud_properties_humidity(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device);
+            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, prep_arg->device->func);
             if (item)
             {
                 wgxhtc3_sensor_prepare_humidity_item_properties(item, prep_arg->cjson_device);
