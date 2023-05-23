@@ -109,6 +109,7 @@ typedef struct l_ezlopi_item
     } interface;
 
     // f_item_func_t func;
+    void *user_arg;
     int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
 
     struct l_ezlopi_items *next;

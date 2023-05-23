@@ -83,9 +83,11 @@ static const s_method_list_v2_t method_list_v2[] = {
     /** Getter functions **/
     {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
     {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
-    {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
+    // {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
+    {.method_name = "hub.items.list", .method = items_list_v3, .updater = NULL},
     {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
-    {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
+    // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
+    {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},
     {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
     {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
     {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
@@ -98,7 +100,8 @@ static const s_method_list_v2_t method_list_v2[] = {
     {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
 
     // // /** Setter functions **/
-    {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
+    // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
+    {.method_name = "hub.item.value.set", .method = items_set_value_v3, .updater = items_update},
     // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
     // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last

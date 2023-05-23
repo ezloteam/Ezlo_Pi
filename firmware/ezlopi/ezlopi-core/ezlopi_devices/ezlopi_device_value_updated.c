@@ -1,3 +1,4 @@
+#include "trace.h"
 #include "items.h"
 #include "web_provisioning.h"
 #include "ezlopi_devices_list.h"
@@ -9,15 +10,22 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
 
     if (item)
     {
-#warning "Requires working on this"
+
         l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
         while (curr_device)
         {
             l_ezlopi_item_t *curr_item = curr_device->items;
             while (curr_item)
             {
-                if (curr_item->func)
+                if (item == curr_item)
                 {
+                    TRACE_D("item match found");
+                    cJSON *cj_response = ezlopi_cloud_items_updated_from_devices_v3(curr_device, item);
+                    if (cj_response)
+                    {
+                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
+                        cJSON_Delete(cj_response);
+                    }
                     curr_item->func(EZLOPI_ACTION_INITIALIZE, curr_item, NULL, NULL);
                 }
                 else

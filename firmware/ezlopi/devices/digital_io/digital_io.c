@@ -24,6 +24,7 @@ static void ___set_gpio_value_v3(l_ezlopi_item_t *item, int value);
 static void digital_io_write_gpio_value_v3(l_ezlopi_item_t *item);
 static void digital_io_gpio_interrupt_upcall_v3(l_ezlopi_item_t *item);
 static void digital_io_toggle_gpio_v3(l_ezlopi_item_t *item);
+static int digital_io_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg);
 
 #if 1
 static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg);
@@ -88,14 +89,15 @@ int digital_io_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, v
     }
     case EZLOPI_ACTION_SET_VALUE:
     {
-        ret = digital_io_set_value(item, arg);
+        ret = digital_io_set_value_v3(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        ret = digital_io_get_value_cjson(item, arg);
+        ret = digital_io_get_value_cjson_v3(item, arg);
         break;
     }
+
     default:
     {
         break;
@@ -236,13 +238,13 @@ static int digital_io_init_v3(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int digital_io_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
+static int digital_io_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        cJSON_AddBoolToObject(cjson_propertise, "value", item->interface.gpio.gpio_out.value);
         ret = 1;
     }
 
@@ -327,6 +329,18 @@ static void digital_io_toggle_gpio_v3(l_ezlopi_item_t *item)
 }
 
 #if 1
+static int digital_io_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        ret = 1;
+    }
+
+    return ret;
+}
 
 static void ___set_gpio_value(s_ezlopi_device_properties_t *properties, int value)
 {

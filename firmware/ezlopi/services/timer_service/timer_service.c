@@ -13,10 +13,47 @@
 #include "ezlopi_event_queue.h"
 
 static void event_process(void *pv);
+static void event_process_v3(void *pv);
 
 void timer_service_init(void)
 {
-    xTaskCreate(event_process, "event_process", 2 * 2048, NULL, 4, NULL);
+    // xTaskCreate(event_process, "event_process", 2 * 2048, NULL, 4, NULL);
+    xTaskCreate(event_process_v3, "event_process_v3", 2 * 2048, NULL, 4, NULL);
+}
+
+static void event_process_v3(void *pv)
+{
+    TickType_t old_tick = xTaskGetTickCount();
+
+    while (1)
+    {
+        s_ezlo_event_t *event = NULL;
+        if (pdTRUE == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
+        {
+            TRACE_D("event tick: %d", xTaskGetTickCount() - old_tick);
+            old_tick = xTaskGetTickCount();
+
+            if (NULL != event)
+            {
+                l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+                while (curr_device)
+                {
+                    l_ezlopi_item_t *curr_item = curr_device->items;
+                    while (curr_item)
+                    {
+                        curr_item->func(event->action, curr_item, event->arg, curr_item->user_arg);
+                        curr_item = curr_item->next;
+                        vTaskDelay(5 / portTICK_RATE_MS);
+                    }
+
+                    curr_device = curr_device->next;
+                }
+
+                free(event);
+                event = NULL;
+            }
+        }
+    }
 }
 
 static void event_process(void *pv)
