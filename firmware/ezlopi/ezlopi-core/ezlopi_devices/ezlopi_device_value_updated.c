@@ -19,14 +19,13 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
             {
                 if (item == curr_item)
                 {
-                    TRACE_D("item match found");
                     cJSON *cj_response = ezlopi_cloud_items_updated_from_devices_v3(curr_device, item);
                     if (cj_response)
                     {
                         ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
                         cJSON_Delete(cj_response);
                     }
-                    curr_item->func(EZLOPI_ACTION_INITIALIZE, curr_item, NULL, NULL);
+                    break;
                 }
                 else
                 {
@@ -35,27 +34,6 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
                 curr_item = curr_item->next;
             }
             curr_device = curr_device->next;
-        }
-
-        ////////
-
-        l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
-        while (registered_devices)
-        {
-            if (NULL != registered_devices->properties)
-            {
-                if (registered_devices->properties == item)
-                {
-                    cJSON *cj_response = ezlopi_cloud_items_updated_from_devices(registered_devices);
-                    if (cj_response)
-                    {
-                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
-                        cJSON_Delete(cj_response);
-                    }
-                }
-            }
-
-            registered_devices = registered_devices->next;
         }
     }
 

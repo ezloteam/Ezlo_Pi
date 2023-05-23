@@ -20,7 +20,7 @@ static int digital_io_get_value_cjson(s_ezlopi_device_properties_t *properties, 
 static int digital_io_set_value_v3(l_ezlopi_item_t *item, void *arg);
 static int digital_io_prepare_v3(void *arg);
 static int digital_io_init_v3(l_ezlopi_item_t *item);
-static void ___set_gpio_value_v3(l_ezlopi_item_t *item, int value);
+static void digital_io_set_gpio_value_v3(l_ezlopi_item_t *item, int value);
 static void digital_io_write_gpio_value_v3(l_ezlopi_item_t *item);
 static void digital_io_gpio_interrupt_upcall_v3(l_ezlopi_item_t *item);
 static void digital_io_toggle_gpio_v3(l_ezlopi_item_t *item);
@@ -122,7 +122,7 @@ static void digital_io_setup_device_cloud_properties(l_ezlopi_device_t *device, 
     }
 }
 
-static void digital_io_setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
+static void digital_io_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cjson_device)
 {
     int tmp_var = 0;
     CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
@@ -167,7 +167,7 @@ static int digital_io_prepare_v3(void *arg)
                 if (item)
                 {
                     item->func = prep_arg->device->func;
-                    digital_io_setup_item_properties(item, cjson_device);
+                    digital_io_setup_item_properties_v3(item, cjson_device);
                     ret = 1;
                 }
                 else
@@ -251,7 +251,7 @@ static int digital_io_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static void ___set_gpio_value_v3(l_ezlopi_item_t *item, int value)
+static void digital_io_set_gpio_value_v3(l_ezlopi_item_t *item, int value)
 {
     int temp_value = (0 == item->interface.gpio.gpio_out.invert) ? value : !(value);
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, value);
@@ -278,31 +278,31 @@ static int digital_io_set_value_v3(l_ezlopi_item_t *item, void *arg)
         {
             if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
             {
-                ___set_gpio_value_v3(item, value);
+                digital_io_set_gpio_value_v3(item, value);
             }
         }
         else
         {
-            l_ezlopi_configured_devices_t *configured_devices = NULL;
-            // ezlopi_devices_list_get_configured_items();
-
-            // while (configured_devices)
-            // {
-
-            //     if ((EZLOPI_SENSOR_0001_LED == configured_devices->device->id) && (255 != configured_devices->item->interface.gpio.gpio_out.gpio_num))
-            //     {
-            //         TRACE_D("device-id: %d", configured_devices->device->id);
-            //         TRACE_D("GPIO-pin: %d", configured_devices->item->interface.gpio.gpio_out.gpio_num);
-            //         TRACE_D("value: %d", value);
-            //         // ___set_gpio_value(configured_devices->item, value);
-            //         // ezlopi_device_value_updated_from_device(configured_devices->item);
-            //     }
-
-            //     configured_devices = configured_devices->next;
-            // }
+            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+            while (curr_device)
+            {
+                l_ezlopi_item_t *curr_item = curr_device->items;
+                while (curr_item)
+                {
+                    if ((EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type) && (255 != curr_item->interface.gpio.gpio_out.gpio_num))
+                    {
+                        TRACE_D("GPIO-pin: %d", curr_item->interface.gpio.gpio_out.gpio_num);
+                        TRACE_D("value: %d", value);
+                        digital_io_set_gpio_value_v3(curr_item, value);
+                        ezlopi_device_value_updated_from_device_v3(curr_item);
+                    }
+                    curr_item = curr_item->next;
+                }
+                curr_device = curr_device->next;
+            }
 
             item->interface.gpio.gpio_out.value = value;
-            // ezlopi_device_value_updated_from_device(item);
+            ezlopi_device_value_updated_from_device_v3(item);
         }
     }
 
@@ -411,15 +411,15 @@ static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *
                     TRACE_D("device-id: %d", configured_devices->device->id);
                     TRACE_D("GPIO-pin: %d", configured_devices->properties->interface.gpio.gpio_out.gpio_num);
                     TRACE_D("value: %d", value);
-                    // ___set_gpio_value(configured_devices->properties, value);
-                    // ezlopi_device_value_updated_from_device(configured_devices->properties);
+                    ___set_gpio_value(configured_devices->properties, value);
+                    ezlopi_device_value_updated_from_device(configured_devices->properties);
                 }
 
                 configured_devices = configured_devices->next;
             }
 
             properties->interface.gpio.gpio_out.value = value;
-            // ezlopi_device_value_updated_from_device(properties);
+            ezlopi_device_value_updated_from_device(properties);
         }
     }
 

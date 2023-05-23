@@ -414,10 +414,10 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Master Switch\",\
+                \"dev_name\": \"Switch 10\",\
                 \"dev_type\": 1,\
                 \"gpio_in\": -1,\
-                \"gpio_out\": 255,\
+                \"gpio_out\": 18,\
                 \"id_item\": 1,\
                 \"id_room\": \"\",\
                 \"ip_inv\": true,\

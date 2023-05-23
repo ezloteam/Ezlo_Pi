@@ -93,8 +93,15 @@ typedef enum e_ezlopi_device_interface_type
     EZLOPI_DEVICE_INTERFACE_MAX
 } e_ezlopi_device_interface_type_t;
 
+typedef struct s_ezlopi_saved_item_info
+{
+    uint32_t item_id;
+    bool favorite;
+} s_ezlopi_saved_item_info_t;
+
 typedef struct l_ezlopi_item
 {
+    s_ezlopi_saved_item_info_t saved_info;
     s_ezlopi_cloud_item_t cloud_properties;
     e_ezlopi_device_interface_type_t interface_type;
     union
