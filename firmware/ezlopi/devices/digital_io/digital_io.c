@@ -181,7 +181,6 @@ static int digital_io_prepare_v3(void *arg)
     return ret;
 }
 
-// static int digital_io_init_v3(s_ezlopi_device_properties_t *properties)
 static int digital_io_init_v3(l_ezlopi_item_t *item)
 {
     TRACE_B("WE ARE HERE");

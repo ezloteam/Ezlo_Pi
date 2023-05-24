@@ -19,8 +19,8 @@ static uint32_t gateway_id = 0;
 static l_ezlopi_device_t *l_device_head = NULL;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static void ezlopi_device_parse_json(char *config_string);
-static void ezlopi_device_print_controller_cloud_information(void);
+static void ezlopi_device_parse_json_v3(char *config_string);
+static void ezlopi_device_print_controller_cloud_information_v3(void);
 
 void ezlopi_device_prepare(void)
 {
@@ -47,11 +47,11 @@ void ezlopi_device_prepare(void)
 
     if (config_string)
     {
-        ezlopi_device_parse_json(config_string);
+        ezlopi_device_parse_json_v3(config_string);
     }
 }
 
-static void ezlopi_device_print_controller_cloud_information(void)
+static void ezlopi_device_print_controller_cloud_information_v3(void)
 {
     TRACE_B("Armed: %d", s_controller_information.armed);
     TRACE_B("Battery Powered: %d", s_controller_information.battery_powered);
@@ -284,7 +284,7 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
     vTaskDelay(1);
 }
 
-static void ezlopi_device_parse_json(char *config_string)
+static void ezlopi_device_parse_json_v3(char *config_string)
 {
     TRACE_I("PARSING - config_string: \n%s", config_string);
     cJSON *cjson_config = cJSON_Parse(config_string);
@@ -350,7 +350,7 @@ static void ezlopi_device_parse_json(char *config_string)
         TRACE_E("EZLOPI-CONFIG parse- failed!");
     }
 
-    ezlopi_device_print_controller_cloud_information();
+    ezlopi_device_print_controller_cloud_information_v3();
 
     int device_count = 0;
     l_ezlopi_device_t *tm_device_l_list = l_device_head;

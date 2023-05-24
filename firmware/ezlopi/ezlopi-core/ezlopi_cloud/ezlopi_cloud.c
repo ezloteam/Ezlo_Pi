@@ -5,6 +5,16 @@ static uint32_t item_id = 0;
 static uint32_t room_id = 0;
 static uint32_t gateway_id = 0;
 
+uint32_t ezlopi_cloud_get_gateway_id(void)
+{
+    if (0 == gateway_id)
+    {
+        ezlopi_cloud_generate_gateway_id();
+    }
+
+    return gateway_id;
+}
+
 uint32_t ezlopi_cloud_generate_device_id(void)
 {
     device_id = (0 == device_id) ? 0x30000001 : device_id + 1;

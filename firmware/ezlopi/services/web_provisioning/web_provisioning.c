@@ -101,7 +101,7 @@ static const s_method_list_v2_t method_list_v2[] = {
 
     // // /** Setter functions **/
     // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
-    {.method_name = "hub.item.value.set", .method = items_set_value_v3, .updater = items_update},
+    {.method_name = "hub.item.value.set", .method = items_set_value_v3, .updater = items_update_v3},
     // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
     // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last

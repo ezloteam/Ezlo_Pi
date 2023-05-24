@@ -118,22 +118,25 @@ void data_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_settings = cJSON_AddObjectToObject(cjson_result, "settings");
         if (cj_settings)
         {
+            cJSON *cj_first_start = cJSON_AddObjectToObject(cj_settings, "first_start");
+            if (cj_first_start)
+            {
+                cJSON_AddNumberToObject(cj_first_start, "value", 0);
+            }
+
+#warning "WARNING: work required here!"
+#if 0
             l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
             while (NULL != registered_devices)
             {
                 if (NULL != registered_devices->properties)
                 {
-                    cJSON *cj_first_start = cJSON_AddObjectToObject(cj_settings, "first_start");
-                    if (cj_first_start)
-                    {
-                        cJSON_AddNumberToObject(cj_first_start, "value", 0);
-                    }
-#warning "WARNING: Remove break from here!"
                     break;
                 }
 
                 registered_devices = registered_devices->next;
             }
+#endif
         }
     }
 }
