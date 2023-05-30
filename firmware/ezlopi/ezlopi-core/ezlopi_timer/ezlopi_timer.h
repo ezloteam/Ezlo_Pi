@@ -71,7 +71,7 @@
 #endif
 
 void ezlopi_timer_start_50ms(void);
-void ezlopi_timer_start_200ms(void);
+// void ezlopi_timer_start_200ms(void);
 // void ezlopi_timer_start_500ms(void);
 void ezlopi_timer_start_1000ms(void);
 

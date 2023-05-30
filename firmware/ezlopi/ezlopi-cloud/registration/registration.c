@@ -18,6 +18,12 @@ void registration_init(void)
     xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
 }
 
+void register_repeat(cJSON *cj_request, cJSON *cj_response)
+{
+    is_registered = 0;
+    registration_init();
+}
+
 void registered(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));

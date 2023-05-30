@@ -13,6 +13,10 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response,ezlopi_result);
     if (cjson_result)
     {
-        cJSON *cjson_devices_array = cJSON_AddArrayToObject(cjson_result, "scenes");
+        cJSON *cjson_scenes_array = cJSON_AddArrayToObject(cjson_result, "scenes");
+        if (cjson_scenes_array)
+        {
+            
+        }
     }
 }

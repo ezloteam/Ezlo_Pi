@@ -95,6 +95,7 @@ static const s_method_list_v2_t method_list_v2[] = {
     {.method_name = "hub.network.get", .method = network_get, .updater = NULL},
     {.method_name = "hub.firmware.update.start", .method = firmware_update_start, .updater = NULL},
     {.method_name = "cloud.firmware.info.get", .method = firmware_info_get, .updater = NULL},
+    {.method_name = "hub.nma.register.repeat", .method = register_repeat, .updater = NULL},
     // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
     // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
     {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
