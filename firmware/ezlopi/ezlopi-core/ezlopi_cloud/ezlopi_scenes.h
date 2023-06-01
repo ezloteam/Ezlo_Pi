@@ -3,38 +3,47 @@
 
 // https://api.ezlo.com/hub/scenes/local_scenes_api/index.html#hubsceneslist
 
+typedef struct s_args
 {
-    "blockOptions" : {
-        "method" : {
-            "args" : {
-                "item" : "item",
-                "value" : "value"
-            },
-            "name" : "setItemValue"
-        }
-    },
-                     "blockType" : "then",
-                                   "fields" : [
-                                       {
-                                           "name" : "item",
-                                           "type" : "item",
-                                           "value" : "897607_32771_1"
-                                       },
-                                       {
-                                           "name" : "value",
-                                           "type" : "int",
-                                           "value" : 10
-                                       }
-                                   ]
+    char item[32];
+    char value[32];
+} s_args_t;
+
+typedef struct s_method
+{
+    char name[32];
+    s_args_t args;
+} s_method_t;
+
+typedef struct s_block_options
+{
+    s_method_t method;
+} s_block_options_t;
+
+typedef struct l_fields
+{
+    char name[32];
+    char type[32];
+
+    union value
+    {
+        char value_string[32];
+        char value_int;
+    };
+    struct l_fields *next;
 }
 
 typedef struct l_then_block
 {
+
+    char block_type[32];
+    s_block_options_t block_options;
     struct l_then_block *next;
 } l_then_block_t;
 
 typedef struct l_when_block
 {
+    s_block_options_t block_options;
     struct l_when_block *next;
 } l_when_block_t;
 
