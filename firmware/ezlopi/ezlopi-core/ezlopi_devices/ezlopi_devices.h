@@ -44,6 +44,16 @@
         }                                                           \
     }
 
+#define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \
+    {                                                                 \
+        char *tmp_item_val = NULL;                                    \
+        CJSON_GET_VALUE_STRING(root, item_name, tmp_item_val);        \
+        if (tmp_item_val)                                             \
+        {                                                             \
+            snprintf(item_val, sizeof(item_val), "%s", tmp_item_val); \
+        }                                                             \
+    }
+
 #define ASSIGN_DEVICE_NAME(digital_io_device_properties, dev_name)                                \
     {                                                                                             \
         if ((NULL != dev_name) && ('\0' != dev_name[0]))                                          \

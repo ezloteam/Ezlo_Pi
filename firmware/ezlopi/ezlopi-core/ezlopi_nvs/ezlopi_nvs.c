@@ -16,6 +16,7 @@ static const char *user_id_nvs_name = "user_id";
 static const char *wifi_info_nvs_name = "wifi_info";
 static const char *boot_count_nvs_name = "boot_count";
 static const char *provisioning_status_nvs_name = "prov_stat";
+static const char *ezlopi_scenes_nvs_name = "ezlopi_scene";
 
 static char *ezlopi_nvs_read_str(char *nvs_name);
 static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name);
@@ -251,6 +252,16 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     }
 
     return boot_count;
+}
+
+char *ezlopi_nvs_get_scenes(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_scenes_nvs_name);
+}
+
+int ezlopi_nvs_set_scenes(char *data, uint32_t len)
+{
+    return ezlopi_nvs_write_str(data, len, ezlopi_scenes_nvs_name);
 }
 
 static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)

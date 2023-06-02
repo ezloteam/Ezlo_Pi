@@ -16,7 +16,7 @@ extern "C"
     int ezlopi_nvs_factory_reset(void);
 
     int ezlopi_nvs_write_config_data_str(char *data);
-    char * ezlopi_nvs_read_config_data_str(void);
+    char *ezlopi_nvs_read_config_data_str(void);
 
     int ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len);
     int ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len);
@@ -32,6 +32,9 @@ extern "C"
 
     uint32_t ezlopi_nvs_get_provisioning_status(void);
     void ezlopi_nvs_set_provisioning_status(void);
+
+    char *ezlopi_nvs_get_scenes(void);
+    int ezlopi_nvs_set_scenes(char *data, uint32_t len);
 
 #ifdef __cplusplus
 }
