@@ -26,7 +26,7 @@ void ezlopi_init(void)
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     vTaskDelay(10);
-    ezlopi_factory_info_init();
+    ezlopi_factory_info_v2_init();
     print_factory_info_v2();
     vTaskDelay(10);
 

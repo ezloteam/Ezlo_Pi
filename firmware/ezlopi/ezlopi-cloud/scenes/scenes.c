@@ -23,7 +23,7 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
 
                 while (0)
                 {
-                    cJSON_AddStringToObject(cj_scene, "_id", );
+                    // cJSON_AddStringToObject(cj_scene, "_id", );
 
                     if (!cJSON_AddItemToArray(cjson_scenes_array, cj_scene))
                     {
@@ -33,7 +33,7 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
             }
         }
 
-#if 1
+#if 0
         cJSON *cjson_devices_array = cJSON_AddArrayToObject(cjson_result, "devices");
         if (cjson_devices_array)
         {

@@ -82,7 +82,7 @@ static char *g_ezlopi_config = NULL;
 static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
 
-static const esp_partition_t *ezlopi_factory_info_v2_init(void)
+const esp_partition_t *ezlopi_factory_info_v2_init(void)
 {
     if (NULL == partition_ctx_v2)
     {
@@ -309,7 +309,7 @@ char *ezlopi_factory_info_v2_get_ezlopi_config(void)
 //     return switch_box_constant_config;
 #if (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
     return ir_blaster_constant_config;
-#elif(EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+#elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
     return test_device_constant_config;
 #elif (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
     if (NULL == g_ezlopi_config)

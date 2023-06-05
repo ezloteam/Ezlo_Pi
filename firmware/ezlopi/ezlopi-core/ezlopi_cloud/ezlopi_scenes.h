@@ -28,8 +28,8 @@ typedef struct l_fields
     union value
     {
         char value_string[32];
-        char value_int;
-    };
+        int value_int;
+    } value;
     struct l_fields *next;
 } l_fields_t;
 
@@ -58,15 +58,15 @@ typedef struct l_user_notification
 
 typedef struct l_house_modes
 {
-    char house_mode[4];
+    char house_mode[8];
     struct l_house_modes *next;
 } l_house_modes_t;
 
 typedef struct l_scenes_list
 {
     char _id[32];
-    bool enabled;
-    bool is_group;
+    uint32_t enabled;
+    uint32_t is_group;
     char group_id[32];
     char name[32];
     char parent_id[32];
