@@ -112,7 +112,7 @@ static char *device_info_jsonify(void)
         cJSON_AddNumberToObject(root, "build_date", BUILD_DATE);
         cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
-        cJSON_AddBoolToObject(root, "provisioned_status", ezlopi_nvs_get_provisioning_status());
+        cJSON_AddBoolToObject(root, "provisioned_status", ezlopi_factory_info_v2_get_provisioning_status());
 
         uint8_t ble_mac[6];
         esp_read_mac(ble_mac, ESP_MAC_BT);

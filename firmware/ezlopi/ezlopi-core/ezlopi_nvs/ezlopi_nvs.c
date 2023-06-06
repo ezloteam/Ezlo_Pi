@@ -16,7 +16,7 @@ static const char *user_id_nvs_name = "user_id";
 static const char *wifi_info_nvs_name = "wifi_info";
 static const char *boot_count_nvs_name = "boot_count";
 static const char *provisioning_status_nvs_name = "prov_stat";
-static const char *ezlopi_scenes_nvs_name = "ezlopi_scene";
+static const char *ezlopi_scenes_nvs_name = "ezlopi_scenes";
 
 static char *ezlopi_nvs_read_str(char *nvs_name);
 static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name);

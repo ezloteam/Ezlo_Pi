@@ -78,6 +78,7 @@ static char *g_ca_certificate = NULL;
 static char *g_ssl_private_key = NULL;
 static char *g_ssl_shared_key = NULL;
 static char *g_ezlopi_config = NULL;
+static uint32_t g_provisioning_status = 0;
 
 static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
@@ -170,6 +171,11 @@ void print_factory_info_v2(void)
 }
 
 /** Getter */
+uint32_t ezlopi_factory_info_v2_get_provisioning_status(void)
+{
+    return g_provisioning_status;
+}
+
 uint16_t ezlopi_factory_info_v2_get_version(void)
 {
     uint16_t _version = 0ULL;
@@ -268,7 +274,12 @@ void ezlopi_factory_info_v2_get_ezlopi_mac(uint8_t *mac)
 
 char *ezlopi_factory_info_v2_get_cloud_server(void)
 {
-    return ezlopi_factory_info_v2_read_string(CLOUD_SERVER_OFFSET, CLOUD_SERVER_LENGTH);
+    char *cloud_server = ezlopi_factory_info_v2_read_string(CLOUD_SERVER_OFFSET, CLOUD_SERVER_LENGTH);
+    if (cloud_server && strstr(cloud_server, "https://"))
+    {
+        g_provisioning_status = 1;
+    }
+    return cloud_server;
 }
 
 char *ezlopi_factory_info_v2_get_device_type(void)

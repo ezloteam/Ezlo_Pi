@@ -154,6 +154,7 @@ typedef struct s_basic_factory_info
 #endif
 
     void print_factory_info_v2(void);
+    uint32_t ezlopi_factory_info_v2_get_provisioning_status(void);
     const esp_partition_t *ezlopi_factory_info_v2_init(void);
     void ezlopi_factory_info_v2_free(void *arg);
     uint16_t ezlopi_factory_info_v2_get_version(void);
