@@ -135,7 +135,7 @@ static char *device_info_jsonify(void)
         cJSON_AddStringToObject(root, "wifi-netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
         cJSON_AddNumberToObject(root, "wifi-connection_status", ezlopi_wifi_got_ip());
         cJSON_AddStringToObject(root, "wifi-error", ezlopi_wifi_get_last_disconnect_reason());
-        const char *internet_status_str = ezlopi_ping_get_internet_status() ? "Internet available" : "Internet not available";
+        const char *internet_status_str = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? "Internet available" : "Internet not available";
         cJSON_AddStringToObject(root, "internet_status", internet_status_str);
 
         device_info = cJSON_Print(root);

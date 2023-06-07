@@ -152,6 +152,10 @@ static void wifi_connection_error_read_func(esp_gatt_value_t *value, esp_ble_gat
 static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Write function called!");
+    TRACE_D("param->write.is_prep: %d", param->write.is_prep);
+    TRACE_D("param->write.offset: %d", param->write.offset);
+    TRACE_D("param->write.len: %d", param->write.len);
+
     if (0 == param->write.is_prep) // Data received in single packet
     {
         dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);

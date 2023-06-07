@@ -9,42 +9,15 @@
 
 static l_scenes_list_t *scenes_list_head = NULL;
 
+static void __new_args_create(s_args_t *p_args, cJSON *cj_args);
+static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options);
+static l_then_block_t *__new_then_block_create(cJSON *cj_then_block);
+static l_then_block_t *__then_blocks_add(cJSON *cj_then_blocks);
+
 static l_house_modes_t *__new_house_mode_create(cJSON *cj_house_mode);
 static l_house_modes_t *__house_modes_add(cJSON *cj_house_modes);
 static l_user_notification_t *__new_user_notification_create(cJSON *cj_user_notification);
 static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notifications);
-
-static l_then_block_t *__then_blocks_add(cJSON *cj_then_blocks)
-{
-    l_then_block_t *tmp_then_block_head = NULL;
-    if (cj_then_blocks)
-    {
-        int then_block_idx = cJSON_GetArraySize(cj_then_blocks);
-        cJSON *cj_then_block = NULL;
-
-        while (NULL != (cj_then_block = cJSON_GetArrayItem(cj_then_blocks, then_block_idx)))
-        {
-            TRACE_B("then_block-%d:", then_block_idx);
-
-            if (tmp_then_block_head)
-            {
-                l_then_block_t *tmp_then_block = tmp_then_block_head;
-                while (tmp_then_block->next)
-                {
-                    tmp_then_block = tmp_then_block->next;
-                }
-
-                tmp_then_block->next = __new_then_block_create(cj_then_block);
-            }
-            else
-            {
-                tmp_then_block_head = __new_then_block_create(cj_then_block);
-            }
-        }
-    }
-
-    return tmp_then_block_head;
-}
 
 static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
 {
@@ -81,6 +54,11 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
             }
 
             {
+                cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, "then");
+                if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
+                {
+                    new_scene->then = __then_blocks_add(cj_then_blocks);
+                }
             }
 
             if (0 == tmp_success_creating_scene)
@@ -181,12 +159,12 @@ static l_user_notification_t *__new_user_notification_create(cJSON *cj_user_noti
 {
     l_user_notification_t *new_user_notification = NULL;
 
-    if (cj_user_notification)
+    if (cj_user_notification && cj_user_notification->valuestring)
     {
         new_user_notification = malloc(sizeof(l_user_notification_t));
         if (new_user_notification)
         {
-            snprintf(new_user_notification->user_id, sizeof(new_user_notification->user_id, "%s", cj_user_notification->valuestring));
+            snprintf(new_user_notification->user_id, sizeof(new_user_notification->user_id), "%s", cj_user_notification->valuestring);
             new_user_notification->next = NULL;
         }
     }
@@ -221,4 +199,76 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
     }
 
     return tmp_user_notifications_head;
+}
+
+static void __new_args_create(s_args_t *p_args, cJSON *cj_args)
+{
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "item", p_args->item);
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "value", p_args->value);
+}
+
+static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
+{
+    CJSON_GET_VALUE_STRING_BY_COPY(cj_method, "name", p_method->name);
+    cJSON *cj_args = cJSON_GetObjectItem(cj_method, "args");
+    if (cj_args)
+    {
+        __new_args_create(&p_method->args, cj_args);
+    }
+}
+
+static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options)
+{
+    cJSON *cj_method = cJSON_GetObjectItem(cj_block_options, "method");
+    if (cj_method)
+    {
+        __new_method_create(&p_block_options->method, cj_method);
+    }
+}
+
+static l_then_block_t *__new_then_block_create(cJSON *cj_then_block)
+{
+    l_then_block_t *new_then_block = malloc(sizeof(l_then_block_t));
+    if (new_then_block)
+    {
+        cJSON *cj_block_options = cJSON_GetObjectItem(cj_then_block, "blockOptions");
+        if (cj_block_options)
+        {
+            __new_block_options_create(&new_then_block->block_options, cj_block_options);
+        }
+    }
+
+    return new_then_block;
+}
+
+static l_then_block_t *__then_blocks_add(cJSON *cj_then_blocks)
+{
+    l_then_block_t *tmp_then_block_head = NULL;
+    if (cj_then_blocks)
+    {
+        int then_block_idx = cJSON_GetArraySize(cj_then_blocks);
+        cJSON *cj_then_block = NULL;
+
+        while (NULL != (cj_then_block = cJSON_GetArrayItem(cj_then_blocks, then_block_idx)))
+        {
+            TRACE_B("then_block-%d:", then_block_idx);
+
+            if (tmp_then_block_head)
+            {
+                l_then_block_t *tmp_then_block = tmp_then_block_head;
+                while (tmp_then_block->next)
+                {
+                    tmp_then_block = tmp_then_block->next;
+                }
+
+                tmp_then_block->next = __new_then_block_create(cj_then_block);
+            }
+            else
+            {
+                tmp_then_block_head = __new_then_block_create(cj_then_block);
+            }
+        }
+    }
+
+    return tmp_then_block_head;
 }

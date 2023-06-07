@@ -228,9 +228,12 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
         s_gatt_char_t *characteristic = service->characteristics;
         while (characteristic)
         {
+            TRACE_D("handle: %d", handle);
+            TRACE_D("characteristic->handle: %d", characteristic->handle);
+
             if (handle == characteristic->handle)
             {
-                // ezlopi_ble_gatt_print_characteristic(characteristic);
+                ezlopi_ble_gatt_print_characteristic(characteristic);
                 switch (event)
                 {
                 case ESP_GATTS_READ_EVT:
@@ -293,6 +296,10 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
             characteristic = characteristic->next;
         }
     }
+    else
+    {
+        TRACE_E("Service not found!");
+    }
 
     return NULL;
 }
@@ -330,10 +337,15 @@ static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, es
     if (write_exec_upcall)
     {
         esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
+        TRACE_D("EXEC-WRITE-FLAG: %d | %d", ESP_GATT_PREP_WRITE_EXEC, param->exec_write.exec_write_flag);
         if (ESP_GATT_PREP_WRITE_EXEC == param->exec_write.exec_write_flag)
         {
             write_exec_upcall(NULL, param);
         }
+    }
+    else
+    {
+        TRACE_E("'write_exec_upcall' not found!");
     }
 }
 

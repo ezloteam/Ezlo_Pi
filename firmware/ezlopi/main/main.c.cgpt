@@ -1,0 +1,547 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "cJSON.h"
+
+typedef struct s_args
+{
+    char item[32];
+    char value[32];
+} s_args_t;
+
+typedef struct s_method
+{
+    char name[32];
+    s_args_t args;
+} s_method_t;
+
+typedef struct s_block_options
+{
+    s_method_t method;
+} s_block_options_t;
+
+typedef struct l_fields
+{
+    char name[32];
+    char type[32];
+
+    union value
+    {
+        char value_string[32];
+        int value_int;
+    } value;
+    struct l_fields *next;
+} l_fields_t;
+
+typedef struct l_then_block
+{
+    s_block_options_t block_options;
+    char block_type[32];
+    l_fields_t *fields;
+    struct l_then_block *next;
+} l_then_block_t;
+
+typedef struct l_when_block
+{
+    s_block_options_t block_options;
+    char block_type[32];
+    l_fields_t *fields;
+    struct l_when_block *next;
+} l_when_block_t;
+
+typedef struct l_user_notification
+{
+    char user_id[32];
+    struct l_user_notification *next;
+} l_user_notification_t;
+
+typedef struct l_house_modes
+{
+    char house_mode[8];
+    struct l_house_modes *next;
+} l_house_modes_t;
+
+typedef struct l_scenes_list
+{
+    char _id[32];
+    uint32_t enabled;
+    uint32_t is_group;
+    char group_id[32];
+    char name[32];
+    char parent_id[32];
+
+    l_user_notification_t *user_notifications;
+    l_house_modes_t *house_modes;
+    l_then_block_t *then;
+    l_when_block_t *when;
+
+    struct l_scenes_list *next;
+} l_scenes_list_t;
+
+void parseArgs(cJSON *json, s_args_t *args)
+{
+    cJSON *item = cJSON_GetObjectItem(json, "item");
+    cJSON *value = cJSON_GetObjectItem(json, "value");
+    if (item && value)
+    {
+        strncpy(args->item, item->valuestring, sizeof(args->item));
+        strncpy(args->value, value->valuestring, sizeof(args->value));
+    }
+}
+
+void parseMethod(cJSON *json, s_method_t *method)
+{
+    cJSON *name = cJSON_GetObjectItem(json, "name");
+    cJSON *args = cJSON_GetObjectItem(json, "args");
+    if (name && args)
+    {
+        strncpy(method->name, name->valuestring, sizeof(method->name));
+        parseArgs(args, &(method->args));
+    }
+}
+
+void parseBlockOptions(cJSON *json, s_block_options_t *blockOptions)
+{
+    cJSON *method = cJSON_GetObjectItem(json, "method");
+    if (method)
+    {
+        parseMethod(method, &(blockOptions->method));
+    }
+}
+
+void parseFields(cJSON *json, l_fields_t **fields)
+{
+    cJSON *name = cJSON_GetObjectItem(json, "name");
+    cJSON *type = cJSON_GetObjectItem(json, "type");
+    cJSON *value = cJSON_GetObjectItem(json, "value");
+    if (name && type && value)
+    {
+        l_fields_t *field = malloc(sizeof(l_fields_t));
+        strncpy(field->name, name->valuestring, sizeof(field->name));
+        strncpy(field->type, type->valuestring, sizeof(field->type));
+
+        if (strcmp(type->valuestring, "int") == 0)
+        {
+            field->value.value_int = value->valueint;
+        }
+        else if (strcmp(type->valuestring, "item") == 0)
+        {
+            strncpy(field->value.value_string, value->valuestring, sizeof(field->value.value_string));
+        }
+
+        field->next = NULL;
+
+        if (*fields == NULL)
+        {
+            *fields = field;
+        }
+        else
+        {
+            l_fields_t *temp = *fields;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = field;
+        }
+    }
+}
+
+void parseThenBlock(cJSON *json, l_then_block_t **thenBlock)
+{
+    cJSON *blockOptions = cJSON_GetObjectItem(json, "blockOptions");
+    cJSON *blockType = cJSON_GetObjectItem(json, "blockType");
+    cJSON *fields = cJSON_GetObjectItem(json, "fields");
+    if (blockOptions && blockType && fields)
+    {
+        l_then_block_t *block = malloc(sizeof(l_then_block_t));
+        parseBlockOptions(blockOptions, &(block->block_options));
+        strncpy(block->block_type, blockType->valuestring, sizeof(block->block_type));
+
+        l_fields_t *fieldList = NULL;
+        cJSON *field = NULL;
+        cJSON_ArrayForEach(field, fields)
+        {
+            parseFields(field, &fieldList);
+        }
+        block->fields = fieldList;
+        block->next = NULL;
+
+        if (*thenBlock == NULL)
+        {
+            *thenBlock = block;
+        }
+        else
+        {
+            l_then_block_t *temp = *thenBlock;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = block;
+        }
+    }
+}
+
+void parseWhenBlock(cJSON *json, l_when_block_t **whenBlock)
+{
+    cJSON *blockOptions = cJSON_GetObjectItem(json, "blockOptions");
+    cJSON *blockType = cJSON_GetObjectItem(json, "blockType");
+    cJSON *fields = cJSON_GetObjectItem(json, "fields");
+    if (blockOptions && blockType && fields)
+    {
+        l_when_block_t *block = malloc(sizeof(l_when_block_t));
+        parseBlockOptions(blockOptions, &(block->block_options));
+        strncpy(block->block_type, blockType->valuestring, sizeof(block->block_type));
+
+        l_fields_t *fieldList = NULL;
+        cJSON *field = NULL;
+        cJSON_ArrayForEach(field, fields)
+        {
+            parseFields(field, &fieldList);
+        }
+        block->fields = fieldList;
+        block->next = NULL;
+
+        if (*whenBlock == NULL)
+        {
+            *whenBlock = block;
+        }
+        else
+        {
+            l_when_block_t *temp = *whenBlock;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = block;
+        }
+    }
+}
+
+void parseUserNotifications(cJSON *json, l_user_notification_t **userNotifications)
+{
+    cJSON *item = NULL;
+    cJSON_ArrayForEach(item, json)
+    {
+        if (item && item->valuestring)
+        {
+            l_user_notification_t *notification = malloc(sizeof(l_user_notification_t));
+            strncpy(notification->user_id, item->valuestring, sizeof(notification->user_id));
+            notification->next = NULL;
+
+            if (*userNotifications == NULL)
+            {
+                *userNotifications = notification;
+            }
+            else
+            {
+                l_user_notification_t *temp = *userNotifications;
+                while (temp->next != NULL)
+                {
+                    temp = temp->next;
+                }
+                temp->next = notification;
+            }
+        }
+    }
+}
+
+void parseHouseModes(cJSON *json, l_house_modes_t **houseModes)
+{
+    cJSON *item = NULL;
+    cJSON_ArrayForEach(item, json)
+    {
+        if (item && item->valuestring)
+        {
+            l_house_modes_t *mode = malloc(sizeof(l_house_modes_t));
+            strncpy(mode->house_mode, item->valuestring, sizeof(mode->house_mode));
+            mode->next = NULL;
+
+            if (*houseModes == NULL)
+            {
+                *houseModes = mode;
+            }
+            else
+            {
+                l_house_modes_t *temp = *houseModes;
+                while (temp->next != NULL)
+                {
+                    temp = temp->next;
+                }
+                temp->next = mode;
+            }
+        }
+    }
+}
+
+void parseJsonPacket(const char *jsonPacket, l_scenes_list_t **scenesList)
+{
+    cJSON *root = cJSON_Parse(jsonPacket);
+    if (root == NULL)
+    {
+        printf("Failed to parse JSON.\n");
+        return;
+    }
+
+    cJSON *scene = NULL;
+    cJSON_ArrayForEach(scene, root)
+    {
+        l_scenes_list_t *sceneItem = malloc(sizeof(l_scenes_list_t));
+
+        cJSON *enabled = cJSON_GetObjectItem(scene, "enabled");
+        cJSON *groupId = cJSON_GetObjectItem(scene, "group_id");
+        cJSON *isGroup = cJSON_GetObjectItem(scene, "is_group");
+        cJSON *name = cJSON_GetObjectItem(scene, "name");
+        cJSON *parentId = cJSON_GetObjectItem(scene, "parent_id");
+        cJSON *userNotifications = cJSON_GetObjectItem(scene, "user_notifications");
+        cJSON *houseModes = cJSON_GetObjectItem(scene, "house_modes");
+        cJSON *then = cJSON_GetObjectItem(scene, "then");
+        cJSON *when = cJSON_GetObjectItem(scene, "when");
+
+        sceneItem->next = NULL;
+
+        if (enabled && cJSON_IsBool(enabled))
+        {
+            sceneItem->enabled = (uint32_t)enabled->valueint;
+        }
+
+        if (groupId && cJSON_IsNull(groupId))
+        {
+            strncpy(sceneItem->group_id, "", sizeof(sceneItem->group_id));
+        }
+        else if (groupId && cJSON_IsString(groupId))
+        {
+            strncpy(sceneItem->group_id, groupId->valuestring, sizeof(sceneItem->group_id));
+        }
+
+        if (isGroup && cJSON_IsBool(isGroup))
+        {
+            sceneItem->is_group = (uint32_t)isGroup->valueint;
+        }
+
+        if (name && cJSON_IsString(name))
+        {
+            strncpy(sceneItem->name, name->valuestring, sizeof(sceneItem->name));
+        }
+
+        if (parentId && cJSON_IsString(parentId))
+        {
+            strncpy(sceneItem->parent_id, parentId->valuestring, sizeof(sceneItem->parent_id));
+        }
+
+        l_user_notification_t *userNotificationList = NULL;
+        if (userNotifications && cJSON_IsArray(userNotifications))
+        {
+            parseUserNotifications(userNotifications, &userNotificationList);
+        }
+        sceneItem->user_notifications = userNotificationList;
+
+        l_house_modes_t *houseModesList = NULL;
+        if (houseModes && cJSON_IsArray(houseModes))
+        {
+            parseHouseModes(houseModes, &houseModesList);
+        }
+        sceneItem->house_modes = houseModesList;
+
+        l_then_block_t *thenBlockList = NULL;
+        if (then && cJSON_IsArray(then))
+        {
+            cJSON *item = NULL;
+            cJSON_ArrayForEach(item, then)
+            {
+                parseThenBlock(item, &thenBlockList);
+            }
+        }
+        sceneItem->then = thenBlockList;
+
+        l_when_block_t *whenBlockList = NULL;
+        if (when && cJSON_IsArray(when))
+        {
+            cJSON *item = NULL;
+            cJSON_ArrayForEach(item, when)
+            {
+                parseWhenBlock(item, &whenBlockList);
+            }
+        }
+        sceneItem->when = whenBlockList;
+
+        if (*scenesList == NULL)
+        {
+            *scenesList = sceneItem;
+        }
+        else
+        {
+            l_scenes_list_t *temp = *scenesList;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = sceneItem;
+        }
+    }
+
+    cJSON_Delete(root);
+}
+
+void printSceneList(l_scenes_list_t *scenesList)
+{
+    l_scenes_list_t *scene = scenesList;
+    while (scene != NULL)
+    {
+        printf("Scene ID: %s\n", scene->_id);
+        printf("Enabled: %u\n", scene->enabled);
+        printf("Group ID: %s\n", scene->group_id);
+        printf("Is Group: %u\n", scene->is_group);
+        printf("Name: %s\n", scene->name);
+        printf("Parent ID: %s\n", scene->parent_id);
+
+        printf("User Notifications:\n");
+        l_user_notification_t *notification = scene->user_notifications;
+        while (notification != NULL)
+        {
+            printf("- User ID: %s\n", notification->user_id);
+            notification = notification->next;
+        }
+
+        printf("House Modes:\n");
+        l_house_modes_t *mode = scene->house_modes;
+        while (mode != NULL)
+        {
+            printf("- House Mode: %s\n", mode->house_mode);
+            mode = mode->next;
+        }
+
+        printf("Then Blocks:\n");
+        l_then_block_t *thenBlock = scene->then;
+        while (thenBlock != NULL)
+        {
+            printf("- Block Type: %s\n", thenBlock->block_type);
+            printf("  Block Method: %s\n", thenBlock->block_options.method.name);
+            printf("  Block Method Args: %s, %s\n", thenBlock->block_options.method.args.item, thenBlock->block_options.method.args.value);
+
+            printf("  Fields:\n");
+            l_fields_t *field = thenBlock->fields;
+            while (field != NULL)
+            {
+                printf("  - Field Name: %s\n", field->name);
+                printf("    Field Type: %s\n", field->type);
+
+                if (strcmp(field->type, "int") == 0)
+                {
+                    printf("    Field Value: %d\n", field->value.value_int);
+                }
+                else if (strcmp(field->type, "item") == 0)
+                {
+                    printf("    Field Value: %s\n", field->value.value_string);
+                }
+
+                field = field->next;
+            }
+
+            thenBlock = thenBlock->next;
+        }
+
+        printf("When Blocks:\n");
+        l_when_block_t *whenBlock = scene->when;
+        while (whenBlock != NULL)
+        {
+            printf("- Block Type: %s\n", whenBlock->block_type);
+            printf("  Block Method: %s\n", whenBlock->block_options.method.name);
+            printf("  Block Method Args: %s, %s\n", whenBlock->block_options.method.args.item, whenBlock->block_options.method.args.value);
+
+            printf("  Fields:\n");
+            l_fields_t *field = whenBlock->fields;
+            while (field != NULL)
+            {
+                printf("  - Field Name: %s\n", field->name);
+                printf("    Field Type: %s\n", field->type);
+
+                if (strcmp(field->type, "int") == 0)
+                {
+                    printf("    Field Value: %d\n", field->value.value_int);
+                }
+                else if (strcmp(field->type, "item") == 0)
+                {
+                    printf("    Field Value: %s\n", field->value.value_string);
+                }
+
+                field = field->next;
+            }
+
+            whenBlock = whenBlock->next;
+        }
+
+        printf("--------------------\n");
+
+        scene = scene->next;
+    }
+}
+
+void app_main(void)
+{
+    const char *jsonPacket = "{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}";
+    l_scenes_list_t *scenesList = NULL;
+    parseJsonPacket(jsonPacket, &scenesList);
+
+    printSceneList(scenesList);
+
+    // Clean up the allocated memory
+    l_scenes_list_t *scene = scenesList;
+    while (scene != NULL)
+    {
+        l_user_notification_t *notification = scene->user_notifications;
+        while (notification != NULL)
+        {
+            l_user_notification_t *temp = notification;
+            notification = notification->next;
+            free(temp);
+        }
+
+        l_house_modes_t *mode = scene->house_modes;
+        while (mode != NULL)
+        {
+            l_house_modes_t *temp = mode;
+            mode = mode->next;
+            free(temp);
+        }
+
+        l_then_block_t *thenBlock = scene->then;
+        while (thenBlock != NULL)
+        {
+            l_fields_t *field = thenBlock->fields;
+            while (field != NULL)
+            {
+                l_fields_t *temp = field;
+                field = field->next;
+                free(temp);
+            }
+
+            l_then_block_t *temp = thenBlock;
+            thenBlock = thenBlock->next;
+            free(temp);
+        }
+
+        l_when_block_t *whenBlock = scene->when;
+        while (whenBlock != NULL)
+        {
+            l_fields_t *field = whenBlock->fields;
+            while (field != NULL)
+            {
+                l_fields_t *temp = field;
+                field = field->next;
+                free(temp);
+            }
+
+            l_when_block_t *temp = whenBlock;
+            whenBlock = whenBlock->next;
+            free(temp);
+        }
+
+        l_scenes_list_t *temp = scene;
+        scene = scene->next;
+        free(temp);
+    }
+
+    return 0;
+}

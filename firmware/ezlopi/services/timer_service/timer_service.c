@@ -53,6 +53,10 @@ static void event_process_v3(void *pv)
                 event = NULL;
             }
         }
+        else
+        {
+            vTaskDelay(5);
+        }
     }
 }
 
