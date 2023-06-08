@@ -155,10 +155,10 @@ static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
     TRACE_D("param->write.is_prep: %d", param->write.is_prep);
     TRACE_D("param->write.offset: %d", param->write.offset);
     TRACE_D("param->write.len: %d", param->write.len);
+    dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
 
     if (0 == param->write.is_prep) // Data received in single packet
     {
-        dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
         if ((NULL != param->write.value) && (param->write.len > 0))
         {
             wifi_creds_parse_and_connect(param->write.value, param->write.len);
@@ -226,10 +226,15 @@ static void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param
 static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Write execute function called.");
-    ezlopi_ble_buffer_accumulate_to_start(wifi_creds_linked_buffer);
-    wifi_creds_parse_and_connect(wifi_creds_linked_buffer->buffer, wifi_creds_linked_buffer->len);
-    ezlopi_ble_buffer_free_buffer(wifi_creds_linked_buffer);
-    wifi_creds_linked_buffer = NULL;
+    if (wifi_creds_linked_buffer)
+    {
+        TRACE_D("wifi_creds_linked_buffer");
+        ezlopi_ble_buffer_accumulate_to_start(wifi_creds_linked_buffer);
+        dump("wifi_creds_linked_buffer->buffer", wifi_creds_linked_buffer->buffer, 0, wifi_creds_linked_buffer->len);
+        wifi_creds_parse_and_connect(wifi_creds_linked_buffer->buffer, wifi_creds_linked_buffer->len);
+        ezlopi_ble_buffer_free_buffer(wifi_creds_linked_buffer);
+        wifi_creds_linked_buffer = NULL;
+    }
 }
 
 static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)

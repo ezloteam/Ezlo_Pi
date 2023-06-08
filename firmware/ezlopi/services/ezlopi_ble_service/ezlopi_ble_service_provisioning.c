@@ -305,11 +305,14 @@ static void provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_c
 
 static void provisioning_info_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("Write execute function called.");
-    ezlopi_ble_buffer_accumulate_to_start(g_provisioning_linked_buffer);
-    ezlopi_process_provisioning_info(g_provisioning_linked_buffer->buffer, g_provisioning_linked_buffer->len);
-    ezlopi_ble_buffer_free_buffer(g_provisioning_linked_buffer);
-    g_provisioning_linked_buffer = NULL;
+    if (g_provisioning_linked_buffer)
+    {
+        TRACE_D("Write execute function called.");
+        ezlopi_ble_buffer_accumulate_to_start(g_provisioning_linked_buffer);
+        ezlopi_process_provisioning_info(g_provisioning_linked_buffer->buffer, g_provisioning_linked_buffer->len);
+        ezlopi_ble_buffer_free_buffer(g_provisioning_linked_buffer);
+        g_provisioning_linked_buffer = NULL;
+    }
 }
 
 static void ezlopi_process_provisioning_info(uint8_t *value, uint32_t len)

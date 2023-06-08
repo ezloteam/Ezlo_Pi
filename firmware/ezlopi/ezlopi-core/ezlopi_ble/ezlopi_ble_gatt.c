@@ -231,9 +231,15 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
             TRACE_D("handle: %d", handle);
             TRACE_D("characteristic->handle: %d", characteristic->handle);
 
+            if (ESP_GATTS_EXEC_WRITE_EVT == event)
+            {
+                TRACE_I("Is a characteristic 'write_exce'.");
+                return characteristic->write_exce_upcall;
+            }
+
             if (handle == characteristic->handle)
             {
-                ezlopi_ble_gatt_print_characteristic(characteristic);
+                // ezlopi_ble_gatt_print_characteristic(characteristic);
                 switch (event)
                 {
                 case ESP_GATTS_READ_EVT:
@@ -306,6 +312,7 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
 
 static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
+    TRACE_D("param->read.handle: %d", param->read.handle);
     f_upcall_t write_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->write.handle, ESP_GATTS_WRITE_EVT);
     if (write_upcall)
     {
@@ -333,6 +340,7 @@ static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble
 
 static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
+    TRACE_D("param->read.handle: %d", param->read.handle);
     f_upcall_t write_exec_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->write.handle, ESP_GATTS_EXEC_WRITE_EVT);
     if (write_exec_upcall)
     {
@@ -351,6 +359,8 @@ static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, es
 
 static void ezlopi_ble_gatt_call_read_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
+    TRACE_D("param->read.handle: %d", param->read.handle);
+
     f_upcall_t read_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->read.handle, ESP_GATTS_READ_EVT);
 
     if (read_upcall)

@@ -374,9 +374,9 @@ void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t *characteristic)
         TRACE_B("|    |- permission: 0x%02x", characteristic->permission);
         TRACE_B("|    |- property: 0x%02x", characteristic->property);
         TRACE_B("|    |- status: 0x%02x", characteristic->status);
-        TRACE_B("|    |- read_upcall: 0x%02x", (uint32_t)characteristic->read_upcall);
-        TRACE_B("|    |- write_upcall: 0x%02x", (uint32_t)characteristic->write_upcall);
-        TRACE_B("|    |- write_exce_upcall: 0x%02x", (uint32_t)characteristic->write_exce_upcall);
+        // TRACE_B("|    |- read_upcall: 0x%02x", (uint32_t)characteristic->read_upcall);
+        // TRACE_B("|    |- write_upcall: 0x%02x", (uint32_t)characteristic->write_upcall);
+        // TRACE_B("|    |- write_exce_upcall: 0x%02x", (uint32_t)characteristic->write_exce_upcall);
     }
 }
 
