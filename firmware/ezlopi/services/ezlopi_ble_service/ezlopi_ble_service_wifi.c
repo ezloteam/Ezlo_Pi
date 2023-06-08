@@ -22,13 +22,6 @@ static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
 static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len);
-#if 0
-static char *wifi_creds_jsonify(void);
-static void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void wifi_connection_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void wifi_connection_error_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-#endif
-
 static void wifi_event_notify_upcall(esp_event_base_t event, void *arg);
 
 static s_gatt_service_t *wifi_ble_service;
@@ -49,114 +42,10 @@ void ezlopi_ble_service_wifi_profile_init(void)
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
     ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, NULL, wifi_creds_write_func, wifi_creds_write_exec_func);
-
-#if 0
-    // wifi connection status
-    uuid.len = ESP_UUID_LEN_16;
-    uuid.uuid.uuid16 = BLE_WIFI_CHAR_STATUS_UUID;
-    permission = ESP_GATT_PERM_READ;
-    properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-    ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, wifi_connection_status_read_func, NULL, NULL);
-    // wifi error
-    // uuid.len = ESP_UUID_LEN_16;
-    // uuid.uuid.uuid16 = BLE_WIFI_CHAR_ERROR_UUID;
-    // permission = ESP_GATT_PERM_READ;
-    // properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-    // ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, wifi_connection_error_read_func, NULL, NULL);
-
-    // ezlopi_wifi_event_add(wifi_event_notify_upcall, NULL);
-#endif
 }
-
-#if 0
-static void wifi_event_notify_upcall(esp_event_base_t event, void *arg)
-{
-    esp_gatt_value_t value;
-    wifi_connection_status_read_func(&value, NULL);
-    ezlopi_ble_gatts_characteristic_notify(wifi_ble_service, wifi_ble_service->characteristics, &value);
-
-    wifi_connection_error_read_func(&value, NULL);
-    ezlopi_ble_gatts_characteristic_notify(wifi_ble_service, wifi_ble_service->characteristics, &value);
-}
-
-static void wifi_connection_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
-{
-    static char *json_str_wifi_info;
-
-    if (NULL == json_str_wifi_info)
-    {
-        json_str_wifi_info = wifi_creds_jsonify();
-    }
-
-    if (NULL != json_str_wifi_info)
-    {
-        if (value)
-        {
-            uint32_t total_data_len = strlen(json_str_wifi_info);
-            uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
-            uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
-            if ((0 != total_data_len) && (total_data_len > param->read.offset))
-            {
-                strncpy((char *)value->value, json_str_wifi_info + param->read.offset, copy_size);
-                value->len = copy_size;
-            }
-            else
-            {
-                value->len = 1;
-                value->value[0] = 0; // Read 0 if the device not provisioned yet.
-            }
-
-            if ((param->read.offset + copy_size) >= total_data_len)
-            {
-                free(json_str_wifi_info);
-                json_str_wifi_info = NULL;
-            }
-        }
-    }
-    else
-    {
-        if (value)
-        {
-            value->len = 1;
-            value->value[0] = 0; // Read 0 if the device not provisioned yet.
-        }
-    }
-#if 0
-    if (value)
-    {
-        value->len = 1;
-        if (ezlopi_wifi_got_ip())
-        {
-            value->value[0] = 1;
-        }
-        else
-        {
-            value->value[0] = 0;
-        }
-    }
-#endif
-}
-#endif
-
-#if 0
-static void wifi_connection_error_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
-{
-    if (value)
-    {
-        value->len = strlen(ezlopi_wifi_get_last_disconnect_reason());
-        snprintf((char *)value->value, ezlopi_ble_gatt_get_max_data_size(), "%s", ezlopi_wifi_get_last_disconnect_reason());
-    }
-}
-#endif
 
 static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("Write function called!");
-    TRACE_D("param->write.is_prep: %d", param->write.is_prep);
-    TRACE_D("param->write.offset: %d", param->write.offset);
-    TRACE_D("param->write.len: %d", param->write.len);
-    dump("GATT_WRITE_EVT value", param->write.value, 0, param->write.len);
-
     if (0 == param->write.is_prep) // Data received in single packet
     {
         if ((NULL != param->write.value) && (param->write.len > 0))
@@ -177,60 +66,11 @@ static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
     }
 }
 
-#if 0
-static void wifi_creds_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
-{
-    static char *json_str_wifi_info;
-
-    if (NULL == json_str_wifi_info)
-    {
-        json_str_wifi_info = wifi_creds_jsonify();
-    }
-
-    if (NULL != json_str_wifi_info)
-    {
-        if (value)
-        {
-            uint32_t total_data_len = strlen(json_str_wifi_info);
-            uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
-            uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
-            if ((0 != total_data_len) && (total_data_len > param->read.offset))
-            {
-                strncpy((char *)value->value, json_str_wifi_info + param->read.offset, copy_size);
-                value->len = copy_size;
-            }
-            else
-            {
-                value->len = 1;
-                value->value[0] = 0; // Read 0 if the device not provisioned yet.
-            }
-
-            if ((param->read.offset + copy_size) >= total_data_len)
-            {
-                free(json_str_wifi_info);
-                json_str_wifi_info = NULL;
-            }
-        }
-    }
-    else
-    {
-        if (value)
-        {
-            value->len = 1;
-            value->value[0] = 0; // Read 0 if the device not provisioned yet.
-        }
-    }
-}
-#endif
-
 static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("Write execute function called.");
     if (wifi_creds_linked_buffer)
     {
-        TRACE_D("wifi_creds_linked_buffer");
         ezlopi_ble_buffer_accumulate_to_start(wifi_creds_linked_buffer);
-        dump("wifi_creds_linked_buffer->buffer", wifi_creds_linked_buffer->buffer, 0, wifi_creds_linked_buffer->len);
         wifi_creds_parse_and_connect(wifi_creds_linked_buffer->buffer, wifi_creds_linked_buffer->len);
         ezlopi_ble_buffer_free_buffer(wifi_creds_linked_buffer);
         wifi_creds_linked_buffer = NULL;
@@ -256,7 +96,6 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
 
                 if (user_id_str && ssid && password)
                 {
-                    TRACE_E("user_id: %s, ssid: %s, password: %s,", user_id_str, ssid, password);
                     e_auth_status_t l_ble_auth_status = ezlopi_ble_auth_check_user_id(user_id_str);
 
                     if (BLE_AUTH_SUCCESS == l_ble_auth_status)
@@ -270,69 +109,10 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
                         ezlopi_factory_info_v2_set_wifi(ssid, password);
                         ezlopi_ble_auth_store_user_id(user_id_str);
                     }
-                    else
-                    {
-                        TRACE_E("user-id error: %s", ezlopi_ble_auth_status_to_string(l_ble_auth_status));
-                    }
                 }
-                else
-                {
-                    TRACE_E("parameter-value missing: user_id: %p, ssid: %p, password: %p", user_id_str, ssid, password);
-                }
-            }
-            else
-            {
-                TRACE_E("parameter missing: user_id: %p, ssid: %p, password: %p", cj_user_id, cj_ssid, cj_password);
             }
 
             cJSON_Delete(root);
         }
     }
 }
-
-#if 0
-static char *wifi_creds_jsonify(void)
-{
-    char *json_str_wifi_info = NULL;
-    // ezlopi_nvs_read_wifi(wifi_creds, sizeof(wifi_creds));
-    char *ssid = ezlopi_factory_info_v2_get_ssid();
-
-    cJSON *cjson_wifi_info = cJSON_CreateObject();
-    if (cjson_wifi_info)
-    {
-        cJSON_AddStringToObject(cjson_wifi_info, "wifi_ssid", ssid ? ssid : "");
-        esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
-        cJSON_AddStringToObject(cjson_wifi_info, "ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
-        cJSON_AddStringToObject(cjson_wifi_info, "gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
-        cJSON_AddStringToObject(cjson_wifi_info, "netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
-        cJSON_AddNumberToObject(cjson_wifi_info, "connection_status", ezlopi_wifi_got_ip());
-        cJSON_AddStringToObject(cjson_wifi_info, "error", ezlopi_wifi_get_last_disconnect_reason());
-        // cJSON_AddStringToObject(cjson_wifi_info, "auth_status", ezlopi_ble_auth_status_to_string(ezlopi_ble_auth_last_status()));
-
-        const char *internet_status_str = ezlopi_ping_get_internet_status() ? "Internet available" : "Internet not available";
-        cJSON_AddStringToObject(cjson_wifi_info, "internet_status", internet_status_str);
-
-        json_str_wifi_info = cJSON_Print(cjson_wifi_info);
-        if (json_str_wifi_info)
-        {
-            cJSON_Minify(json_str_wifi_info);
-        }
-
-        cJSON_Delete(cjson_wifi_info);
-    }
-
-    return json_str_wifi_info;
-}
-
-uint32_t ezlopi_ble_auth_user_id(char *user_id)
-{
-    static uint32_t start_tick;
-
-    if (user_id)
-    {
-    }
-
-    return start_tick;
-}
-
-#endif

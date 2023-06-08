@@ -30,26 +30,10 @@
 #include "ezlopi_wifi_err_reason.h"
 #include "ezlopi_event_group.h"
 
-/* The examples use WiFi configuration that you can set via project configuration menu
-
-   If you'd rather not, just change the below entries to strings with
-   the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
-*/
-// #define EXAMPLE_ESP_WIFI_SSID "nepaldigisys"
-// #define EXAMPLE_ESP_WIFI_PASS "NDS_0ffice"
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
-/* FreeRTOS event group to signal when we are connected*/
-// static EventGroupHandle_t s_wifi_event_group;
 static esp_netif_t *wifi_sta_netif = NULL;
 static esp_netif_ip_info_t my_ip;
-
-/* The event group allows multiple bits for each event, but we only care about two events:
- * - we are connected to the AP with an IP
- * - we failed to connect after the maximum amount of retries */
-// #define WIFI_CONNECTED_BIT BIT0
-// #define WIFI_FAIL_BIT BIT1
-
 static uint32_t new_wifi = 0;
 static int s_retry_num = 0;
 static char wifi_ssid_pass_global_buffer[64];
@@ -140,8 +124,6 @@ static void alert_qt_wifi_got_ip(void)
     if (new_wifi)
     {
         new_wifi = 0;
-        // ezlopi_nvs_write_wifi(wifi_ssid_pass_global_buffer, sizeof(wifi_ssid_pass_global_buffer));
-
         char *qt_resp = "{\"cmd\":2,\"status_write\":1,\"status_connect\":1}";
         qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
     }
@@ -177,7 +159,6 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         }
         else
         {
-            // xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
             ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_FAIL);
             alert_qt_wifi_fail();
             s_retry_num = 0;
@@ -197,7 +178,6 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         s_retry_num = 0;
 
         memcpy(&my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
-        // xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
         ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
 
         alert_qt_wifi_got_ip();
@@ -217,8 +197,6 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
 void ezlopi_wifi_initialize(void)
 {
     memset(&my_ip, 0, sizeof(my_ip));
-    // s_wifi_event_group = xEventGroupCreate();
-
     wifi_sta_netif = esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -235,25 +213,6 @@ void ezlopi_wifi_initialize(void)
 
 void ezlopi_wifi_connect_from_id_bin(void)
 {
-#if 0
-    s_ezlopi_factory_info_t *factory_info = ezlopi_factory_info_get_info();
-    if ((NULL != factory_info) && (NULL != factory_info->default_wifi_password) && (NULL != factory_info->default_wifi_password) &&
-        ('\0' != factory_info->default_wifi_ssid[0]) && ('\0' != factory_info->default_wifi_password[0]))
-    {
-        memset(wifi_ssid_pass_global_buffer, 0, sizeof(wifi_ssid_pass_global_buffer));
-        snprintf(&wifi_ssid_pass_global_buffer[00], 31, "%s", factory_info->default_wifi_ssid);
-        snprintf(&wifi_ssid_pass_global_buffer[32], 31, "%s", factory_info->default_wifi_password);
-    }
-    else
-    {
-        strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
-        strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
-        ezlopi_wifi_set_new_wifi_flag();
-    }
-
-    esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass_global_buffer[0], &wifi_ssid_pass_global_buffer[32]);
-    TRACE_E("wifi_error: %u", wifi_error);
-#endif
     char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
     char *wifi_password = ezlopi_factory_info_v2_get_password();
     ezlopi_wifi_set_new_wifi_flag();
@@ -287,8 +246,6 @@ void ezlopi_wifi_connect_from_nvs(void)
     {
         strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
         strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
-        // strcpy(&wifi_ssid_pass_global_buffer[00], "nepaldigisys");
-        // strcpy(&wifi_ssid_pass_global_buffer[32], "NDS_0ffice");
         ezlopi_wifi_set_new_wifi_flag();
     }
 
@@ -304,7 +261,6 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
     {
         if ((0 != strncmp(ssid, &wifi_ssid_pass_global_buffer[0], 32)) || ((0 != strncmp(pass, &wifi_ssid_pass_global_buffer[32], 32))))
         {
-#warning "-------------------------"
             ezlopi_wifi_set_new_wifi_flag();
             strncpy((char *)&wifi_ssid_pass_global_buffer[0], ssid, 32);
             strncpy((char *)&wifi_ssid_pass_global_buffer[32], pass, 32);
@@ -340,7 +296,6 @@ void ezlopi_wait_for_wifi_to_connect(void)
     }
 
     ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, portMAX_DELAY, 0);
-    TRACE_W("EVENT GROUP SEEMS WORKING......");
 }
 
 static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg)

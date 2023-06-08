@@ -14,6 +14,7 @@ s_linked_buffer_t *ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t *param)
             linked_buffer->buffer = malloc(param->write.len);
             if (linked_buffer->buffer)
             {
+                linked_buffer->len = param->write.len;
                 memcpy(linked_buffer->buffer, param->write.value, param->write.len);
             }
             else
@@ -78,7 +79,6 @@ void ezlopi_ble_buffer_accumulate_to_start(s_linked_buffer_t *l_buffer)
             while (tmp_buffer)
             {
                 memcpy(&tot_buffer[pos], tmp_buffer->buffer, tmp_buffer->len);
-                dump("tmp_buffer->buffer", tmp_buffer->buffer, 0, tmp_buffer->len);
                 pos += tmp_buffer->len;
                 tmp_buffer = tmp_buffer->next;
             }

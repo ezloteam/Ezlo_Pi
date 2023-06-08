@@ -28,7 +28,7 @@ static esp_ble_adv_data_t adv_data = {
     // .manufacturer_len = sizeof(manufacturer),
     // .p_manufacturer_data = manufacturer,
     .manufacturer_len = 0,
-    .p_manufacturer_data = NULL,    
+    .p_manufacturer_data = NULL,
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = 0,
@@ -43,14 +43,15 @@ esp_ble_adv_data_t scan_rsp_data = {
     .appearance = 0x00,
     // .manufacturer_len = sizeof(manufacturer), // TEST_MANUFACTURER_DATA_LEN,
     // .p_manufacturer_data = manufacturer,      //&manufacturer[0],
-    .manufacturer_len = 0, // TEST_MANUFACTURER_DATA_LEN,
-    .p_manufacturer_data = NULL,      //&manufacturer[0],    
+    .manufacturer_len = 0,       // TEST_MANUFACTURER_DATA_LEN,
+    .p_manufacturer_data = NULL, //&manufacturer[0],
     .service_data_len = 0,
     .p_service_data = NULL,
     .service_uuid_len = 0,
     .p_service_uuid = NULL,
     .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
 };
+
 static esp_ble_adv_params_t adv_params = {
     .adv_int_min = 0x20,
     .adv_int_max = 0x40,
@@ -691,9 +692,24 @@ static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
     }
 
 #endif // #if (BLE_50_FEATURE_SUPPORT == TRUE)
+    case ESP_GAP_BLE_SC_OOB_REQ_EVT:
+    {
+        ret = "ESP_GAP_BLE_SC_OOB_REQ_EVT";
+        break;
+    }
     case ESP_GAP_BLE_EVT_MAX:
     {
         ret = "ESP_GAP_BLE_EVT_MAX";
+        break;
+    }
+    case ESP_GAP_BLE_SC_CR_LOC_OOB_EVT:
+    {
+        ret = "ESP_GAP_BLE_SC_CR_LOC_OOB_EVT";
+        break;
+    }
+    case ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT:
+    {
+        ret = "ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT";
         break;
     }
     }

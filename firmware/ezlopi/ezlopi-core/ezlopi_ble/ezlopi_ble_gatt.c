@@ -228,38 +228,29 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
         s_gatt_char_t *characteristic = service->characteristics;
         while (characteristic)
         {
-            TRACE_D("handle: %d", handle);
-            TRACE_D("characteristic->handle: %d", characteristic->handle);
-
             if (ESP_GATTS_EXEC_WRITE_EVT == event)
             {
-                TRACE_I("Is a characteristic 'write_exce'.");
                 return characteristic->write_exce_upcall;
             }
 
             if (handle == characteristic->handle)
             {
-                // ezlopi_ble_gatt_print_characteristic(characteristic);
                 switch (event)
                 {
                 case ESP_GATTS_READ_EVT:
                 {
-                    TRACE_I("Is a characteristic 'read'.");
                     return characteristic->read_upcall;
                 }
                 case ESP_GATTS_WRITE_EVT:
                 {
-                    TRACE_I("Is a characteristic 'write'.");
                     return characteristic->write_upcall;
                 }
                 case ESP_GATTS_EXEC_WRITE_EVT:
                 {
-                    TRACE_I("Is a characteristic 'write_exce'.");
                     return characteristic->write_exce_upcall;
                 }
                 default:
                 {
-                    TRACE_I("Characteristic upcall not found!");
                     return NULL;
                 }
                 }
@@ -270,28 +261,23 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
             {
                 if (handle == descriptor->handle)
                 {
-                    TRACE_I("Is a descriptor %s.", event ? "read" : "write");
-                    // ezlopi_ble_gatt_print_descriptor(descriptor);
                     switch (event)
                     {
                     case ESP_GATTS_READ_EVT:
                     {
-                        TRACE_I("Is a descriptor 'read'.");
                         return descriptor->read_upcall;
                     }
                     case ESP_GATTS_WRITE_EVT:
                     {
-                        TRACE_I("Is a descriptor 'write'.");
                         return descriptor->write_upcall;
                     }
                     case ESP_GATTS_EXEC_WRITE_EVT:
                     {
-                        TRACE_I("Is a descriptor 'write_exce'.");
                         return descriptor->write_exce_upcall;
                     }
                     default:
                     {
-                        TRACE_I("Descriptor upcall not found!");
+                        TRACE_W("Descriptor upcall not found!");
                         return NULL;
                     }
                     }
@@ -312,7 +298,6 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
 
 static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("param->read.handle: %d", param->read.handle);
     f_upcall_t write_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->write.handle, ESP_GATTS_WRITE_EVT);
     if (write_upcall)
     {
@@ -340,12 +325,10 @@ static void ezlopi_ble_gatt_call_write_by_handle(esp_gatt_if_t gatts_if, esp_ble
 
 static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("param->read.handle: %d", param->read.handle);
     f_upcall_t write_exec_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->write.handle, ESP_GATTS_EXEC_WRITE_EVT);
     if (write_exec_upcall)
     {
         esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
-        TRACE_D("EXEC-WRITE-FLAG: %d | %d", ESP_GATT_PREP_WRITE_EXEC, param->exec_write.exec_write_flag);
         if (ESP_GATT_PREP_WRITE_EXEC == param->exec_write.exec_write_flag)
         {
             write_exec_upcall(NULL, param);
@@ -359,8 +342,6 @@ static void ezlopi_ble_gatt_call_write_exec_by_handle(esp_gatt_if_t gatts_if, es
 
 static void ezlopi_ble_gatt_call_read_by_handle(esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_D("param->read.handle: %d", param->read.handle);
-
     f_upcall_t read_upcall = ezlopi_ble_gatt_call_by_handle(gatts_if, param->read.handle, ESP_GATTS_READ_EVT);
 
     if (read_upcall)

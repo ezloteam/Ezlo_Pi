@@ -30,12 +30,12 @@ static void blinky(void *pv);
 
 void app_main(void)
 {
-    // gpio_install_isr_service(0);
-    // qt_serial_init();
-    // gpio_isr_service_init();
+    gpio_install_isr_service(0);
+    qt_serial_init();
+    gpio_isr_service_init();
     ezlopi_init();
-    // web_provisioning_init();
-    // ota_service_init();
+    web_provisioning_init();
+    ota_service_init();
     ezlopi_ble_service_init();
     timer_service_init();
     TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
