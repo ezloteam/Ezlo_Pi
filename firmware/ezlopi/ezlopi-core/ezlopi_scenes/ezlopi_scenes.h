@@ -25,10 +25,11 @@ typedef struct l_fields
     char name[32];
     char type[32];
 
+    uint32_t value_type; // 0: double, 1: string
     union value
     {
         char value_string[32];
-        int value_int;
+        double value_double;
     } value;
     struct l_fields *next;
 } l_fields_t;

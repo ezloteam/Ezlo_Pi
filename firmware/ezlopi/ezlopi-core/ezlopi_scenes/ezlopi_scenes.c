@@ -13,6 +13,8 @@ static void __new_args_create(s_args_t *p_args, cJSON *cj_args);
 static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options);
 static l_then_block_t *__new_then_block_create(cJSON *cj_then_block);
 static l_then_block_t *__then_blocks_add(cJSON *cj_then_blocks);
+static l_when_block_t *__new_when_block_create(cJSON *cj_when_block);
+static l_when_block_t *__when_blocks_add(cJSON *cj_when_blocks);
 
 static l_house_modes_t *__new_house_mode_create(cJSON *cj_house_mode);
 static l_house_modes_t *__house_modes_add(cJSON *cj_house_modes);
@@ -55,6 +57,14 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
 
             {
                 cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, "then");
+                if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
+                {
+                    new_scene->then = __then_blocks_add(cj_then_blocks);
+                }
+            }
+
+            {
+                cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, "when");
                 if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
                 {
                     new_scene->then = __then_blocks_add(cj_then_blocks);
@@ -226,6 +236,71 @@ static void __new_block_options_create(s_block_options_t *p_block_options, cJSON
     }
 }
 
+static l_fields_t *__new_field_create(cJSON *cj_field)
+{
+    l_fields_t *field = NULL;
+    if (cj_field)
+    {
+        field = malloc(sizeof(l_fields_t));
+        if (field)
+        {
+            field->next = NULL;
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_field, "name", field->name);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_field, "name", field->type);
+            cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
+            if (cj_value)
+            {
+                if (cJSON_Number == cj_value->type)
+                {
+                    field->value_type = 0;
+                    field->value.value_double = cj_value->valuedouble;
+                }
+                else if (cJSON_String == cj_value->type)
+                {
+                    field->value_type = 1;
+                    snprintf(field->value.value_string, sizeof(field->value.value_string), "%s", cj_value->valuestring);
+                }
+                else
+                {
+                    TRACE_E("Value type mismatced!");
+                }
+            }
+        }
+    }
+
+    return field;
+}
+
+static l_fields_t *__fields_add(cJSON *cj_fields)
+{
+    l_fields_t *tmp_fields_head = NULL;
+    if (cj_fields)
+    {
+        int fields_idx = cJSON_GetArraySize(cj_fields);
+        cJSON *cj_field = NULL;
+        while (NULL != (cj_field == cJSON_GetArrayItem(cj_fields, fields_idx)))
+        {
+            TRACE_B("field-idx: %d", fields_idx);
+            if (tmp_fields_head)
+            {
+                l_fields_t *tmp_flield = tmp_fields_head;
+                while (tmp_flield->next)
+                {
+                    tmp_flield = tmp_flield->next;
+                }
+
+                tmp_flield->next = __new_field_create(cj_field);
+            }
+            else
+            {
+                tmp_fields_head = __new_field_create(cj_field);
+            }
+        }
+    }
+
+    return tmp_fields_head;
+}
+
 static l_then_block_t *__new_then_block_create(cJSON *cj_then_block)
 {
     l_then_block_t *new_then_block = malloc(sizeof(l_then_block_t));
@@ -235,6 +310,12 @@ static l_then_block_t *__new_then_block_create(cJSON *cj_then_block)
         if (cj_block_options)
         {
             __new_block_options_create(&new_then_block->block_options, cj_block_options);
+        }
+
+        cJSON *cj_fields = cJSON_GetObjectItem(cj_then_block, "fields");
+        if (cj_fields)
+        {
+            new_then_block->fields = __fields_add(cj_fields);
         }
     }
 
@@ -271,4 +352,57 @@ static l_then_block_t *__then_blocks_add(cJSON *cj_then_blocks)
     }
 
     return tmp_then_block_head;
+}
+
+static l_when_block_t *__new_when_block_create(cJSON *cj_when_block)
+{
+    l_when_block_t *new_when_block = malloc(sizeof(l_when_block_t));
+    if (new_when_block)
+    {
+        cJSON *cj_block_options = cJSON_GetObjectItem(cj_when_block, "blockOptions");
+        if (cj_block_options)
+        {
+            __new_block_options_create(&new_when_block->block_options, cj_block_options);
+        }
+
+        cJSON *cj_fields = cJSON_GetObjectItem(cj_when_block, "fields");
+        if (cj_fields)
+        {
+            new_when_block->fields = __fields_add(cj_fields);
+        }
+    }
+
+    return new_when_block;
+}
+
+static l_when_block_t *__when_blocks_add(cJSON *cj_when_blocks)
+{
+    l_when_block_t *tmp_when_block_head = NULL;
+    if (cj_when_blocks)
+    {
+        int when_block_idx = cJSON_GetArraySize(cj_when_blocks);
+        cJSON *cj_when_block = NULL;
+
+        while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx)))
+        {
+            TRACE_B("when_block-%d:", when_block_idx);
+
+            if (tmp_when_block_head)
+            {
+                l_when_block_t *tmp_when_block = tmp_when_block_head;
+                while (tmp_when_block->next)
+                {
+                    tmp_when_block = tmp_when_block->next;
+                }
+
+                tmp_when_block->next = __new_when_block_create(cj_when_block);
+            }
+            else
+            {
+                tmp_when_block_head = __new_when_block_create(cj_when_block);
+            }
+        }
+    }
+
+    return tmp_when_block_head;
 }
