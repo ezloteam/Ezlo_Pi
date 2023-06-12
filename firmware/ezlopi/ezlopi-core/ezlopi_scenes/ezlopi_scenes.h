@@ -3,6 +3,20 @@
 
 // https://api.ezlo.com/hub/scenes/local_scenes_api/index.html#hubsceneslist
 
+#include "string.h"
+#include "ctype.h"
+#include "stdint.h"
+
+typedef enum e_scene_value_type
+{
+    SCENE_VALUE_TYPE_UNDEFINED = 0,
+    SCENE_VALUE_TYPE_FALSE = 1,
+    SCENE_VALUE_TYPE_TRUE = 2,
+    SCENE_VALUE_TYPE_NUMBER = 3,
+    SCENE_VALUE_TYPE_STRING = 4,
+    SCENE_VALUE_TYPE_MAX
+} e_scene_value_type_t;
+
 typedef struct s_args
 {
     char item[32];
@@ -25,7 +39,7 @@ typedef struct l_fields
     char name[32];
     char type[32];
 
-    uint32_t value_type; // 0: double, 1: string
+    e_scene_value_type_t value_type; // 0: double, 1: string
     union value
     {
         char value_string[32];
@@ -79,5 +93,16 @@ typedef struct l_scenes_list
 
     struct l_scenes_list *next;
 } l_scenes_list_t;
+
+void ezlopi_scene_init(void);
+void ezlopi_scenes_print(l_scenes_list_t *scene_link_list);
+void ezlopi_print_when_blocks(l_when_block_t *when_blocks);
+void ezlopi_print_user_notifications(l_user_notification_t *user_notification);
+void ezlopi_print_house_modes(l_house_modes_t *house_modes);
+void ezlopi_print_then_blocks(l_then_block_t *then_blocks);
+void ezlopi_print_fields(l_fields_t *fields);
+void ezlopi_print_block_options(s_block_options_t *block_options);
+void ezlopi_print_methods(s_method_t *methods);
+void ezlopi_print_args(s_args_t *args);
 
 #endif //  __EZLOPI_SCENES_H__

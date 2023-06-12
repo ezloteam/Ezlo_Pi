@@ -18,6 +18,11 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valuedouble;                   \
+            TRACE_B("%s: %f", item_name, (double)item_val);   \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
 
@@ -27,13 +32,18 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valueint;                      \
+            TRACE_B("%s: %d", item_name, item_val);           \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)           \
     {                                                               \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name);       \
-        if (o_item)                                                 \
+        if (o_item && o_item->valuestring)                          \
         {                                                           \
             item_val = o_item->valuestring;                         \
             TRACE_B("%s: %s", item_name, item_val ? item_val : ""); \
@@ -51,6 +61,10 @@
         if (tmp_item_val)                                             \
         {                                                             \
             snprintf(item_val, sizeof(item_val), "%s", tmp_item_val); \
+        }                                                             \
+        else                                                          \
+        {                                                             \
+            TRACE_E("tmp_item_val is NULL!");                         \
         }                                                             \
     }
 
