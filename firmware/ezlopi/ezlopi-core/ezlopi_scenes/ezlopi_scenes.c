@@ -88,6 +88,14 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
     return new_scene;
 }
 
+void ezlopi_scene_list_to_json_string(l_scenes_list_t *scenes_list)
+{
+    if (scenes_list)
+    {
+        
+    }
+}
+
 void ezlopi_scene_add(cJSON *cj_scene)
 {
     if (scenes_list_head)

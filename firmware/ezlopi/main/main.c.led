@@ -57,7 +57,7 @@ static void blinky(void *pv)
         .gpio = 16,
         .buf = NULL,
 #ifdef LED_STRIP_BRIGHTNESS
-        .brightness = 255,
+        .brightness = 50,
 #endif
     };
 
