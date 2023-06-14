@@ -6,6 +6,7 @@
 #include "string.h"
 #include "ctype.h"
 #include "stdint.h"
+#include "cJSON.h"
 
 typedef enum e_scene_value_type
 {
@@ -79,7 +80,8 @@ typedef struct l_house_modes
 
 typedef struct l_scenes_list
 {
-    char _id[32];
+    // char _id[32];
+    uint32_t _id;
     uint32_t enabled;
     uint32_t is_group;
     char group_id[32];
@@ -95,6 +97,10 @@ typedef struct l_scenes_list
 } l_scenes_list_t;
 
 void ezlopi_scene_init(void);
+void ezlopi_scene_add(cJSON *cj_scene);
+l_scenes_list_t *ezlopi_scene_get_scenes_list(void);
+void ezlopi_scene_update_nvs(void);
+
 void ezlopi_scenes_print(l_scenes_list_t *scene_link_list);
 void ezlopi_print_when_blocks(l_when_block_t *when_blocks);
 void ezlopi_print_user_notifications(l_user_notification_t *user_notification);
@@ -104,5 +110,8 @@ void ezlopi_print_fields(l_fields_t *fields);
 void ezlopi_print_block_options(s_block_options_t *block_options);
 void ezlopi_print_methods(s_method_t *methods);
 void ezlopi_print_args(s_args_t *args);
+
+cJSON *ezlopi_scenes_create_cjson(l_scenes_list_t *scenes_list);
+char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list);
 
 #endif //  __EZLOPI_SCENES_H__

@@ -62,10 +62,6 @@
         {                                                             \
             snprintf(item_val, sizeof(item_val), "%s", tmp_item_val); \
         }                                                             \
-        else                                                          \
-        {                                                             \
-            TRACE_E("tmp_item_val is NULL!");                         \
-        }                                                             \
     }
 
 #define ASSIGN_DEVICE_NAME(digital_io_device_properties, dev_name)                                \

@@ -32,19 +32,16 @@ static void blinky(void *pv);
 
 void app_main(void)
 {
-    ezlopi_scene_init();
-    // gpio_install_isr_service(0);
-    // qt_serial_init();
-    // gpio_isr_service_init();
-    // ezlopi_init();
-    // web_provisioning_init();
-    // ota_service_init();
-    // ezlopi_ble_service_init();
-    // timer_service_init();
-    // TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
+    gpio_install_isr_service(0);
+    qt_serial_init();
+    gpio_isr_service_init();
+    ezlopi_init();
+    web_provisioning_init();
+    ota_service_init();
+    ezlopi_ble_service_init();
+    timer_service_init();
+    TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
-
-    // IR_Blaster_prepare();
 }
 
 static void blinky(void *pv)

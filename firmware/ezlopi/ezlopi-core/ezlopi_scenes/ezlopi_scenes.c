@@ -3,97 +3,44 @@
 
 #include "trace.h"
 
+#include "ezlopi_nvs.h"
 #include "ezlopi_scenes.h"
 #include "ezlopi_devices.h"
-#include "ezlopi_nvs.h"
 
-static const char *test_scene_create_str = "{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}";
+static const char *test_scene_create_str = "[{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}]";
 
 static l_scenes_list_t *scenes_list_head = NULL;
 
 static void __new_args_create(s_args_t *p_args, cJSON *cj_args);
 static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options);
+
 static l_then_block_t *__new_then_block_create(cJSON *cj_then_block);
 static l_then_block_t *__then_blocks_add(cJSON *cj_then_blocks);
+
 static l_when_block_t *__new_when_block_create(cJSON *cj_when_block);
 static l_when_block_t *__when_blocks_add(cJSON *cj_when_blocks);
 
 static l_house_modes_t *__new_house_mode_create(cJSON *cj_house_mode);
 static l_house_modes_t *__house_modes_add(cJSON *cj_house_modes);
+
 static l_user_notification_t *__new_user_notification_create(cJSON *cj_user_notification);
 static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notifications);
 
-static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
+static l_scenes_list_t *__new_scene_create(cJSON *cj_scene);
+
+void ezlopi_scene_update_nvs(void)
 {
-    l_scenes_list_t *new_scene = NULL;
-    if (cj_scene)
+    char *scene_json_str = ezlopi_scenes_create_json_string(scenes_list_head);
+    if (scene_json_str)
     {
-        new_scene = malloc(sizeof(l_scenes_list_t));
-        if (new_scene)
-        {
-            memset(new_scene, 0, sizeof(l_scenes_list_t));
-
-            uint32_t tmp_success_creating_scene = 1;
-
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "_id", new_scene->_id);
-            CJSON_GET_VALUE_INT(cj_scene, "enabled", new_scene->enabled);
-            CJSON_GET_VALUE_INT(cj_scene, "is_group", new_scene->is_group);
-            // if (new_scene->is_group)
-            {
-                CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "group_id", new_scene->group_id);
-                TRACE_D("group_id: %s", new_scene->group_id);
-            }
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "name", new_scene->name);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "parent_id", new_scene->parent_id);
-
-            {
-                cJSON *cj_user_notifications = cJSON_GetObjectItem(cj_scene, "user_notifications");
-                if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
-                {
-                    new_scene->user_notifications = __user_notifications_add(cj_user_notifications);
-                }
-            }
-
-            {
-                cJSON *cj_house_modes = cJSON_GetObjectItem(cj_scene, "house_modes");
-                if (cj_house_modes && (cJSON_Array == cj_house_modes->type))
-                {
-                    new_scene->house_modes = __house_modes_add(cj_house_modes);
-                }
-            }
-
-            {
-                cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, "then");
-                if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
-                {
-                    new_scene->then = __then_blocks_add(cj_then_blocks);
-                }
-            }
-
-            {
-                cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, "when");
-                if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
-                {
-                    new_scene->when = __when_blocks_add(cj_then_blocks);
-                }
-            }
-
-            if (0 == tmp_success_creating_scene)
-            {
-                // delete new_scene
-            }
-        }
+        ezlopi_nvs_scene_set(scene_json_str);
+        free(scene_json_str);
     }
-
-    return new_scene;
 }
 
-void ezlopi_scene_list_to_json_string(l_scenes_list_t *scenes_list)
+l_scenes_list_t *ezlopi_scene_get_scenes_list(void)
 {
-    if (scenes_list)
-    {
-        
-    }
+    return scenes_list_head;
 }
 
 void ezlopi_scene_add(cJSON *cj_scene)
@@ -117,6 +64,7 @@ void ezlopi_scene_add(cJSON *cj_scene)
 void ezlopi_scene_init(void)
 {
     const char *scenes_list = test_scene_create_str;
+    // const char *scenes_list = ezlopi_nvs_scene_get();
     if (scenes_list)
     {
         cJSON *cj_scenes_list = cJSON_Parse(scenes_list);
@@ -140,10 +88,17 @@ void ezlopi_scene_init(void)
 
         ezlopi_scenes_print(scenes_list_head);
     }
+
+    char *scenes_json_str = ezlopi_scenes_create_json_string(scenes_list_head);
+    if (scenes_json_str)
+    {
+        free(scenes_json_str);
+    }
 }
 
 void ezlopi_scene_delete(void)
 {
+    TRACE_W("Needs implementation!");
 }
 
 static l_house_modes_t *__new_house_mode_create(cJSON *cj_house_mode)
@@ -449,4 +404,72 @@ static l_when_block_t *__when_blocks_add(cJSON *cj_when_blocks)
     }
 
     return tmp_when_block_head;
+}
+
+static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
+{
+    l_scenes_list_t *new_scene = NULL;
+    if (cj_scene)
+    {
+        new_scene = malloc(sizeof(l_scenes_list_t));
+        if (new_scene)
+        {
+            memset(new_scene, 0, sizeof(l_scenes_list_t));
+
+            uint32_t tmp_success_creating_scene = 1;
+
+            new_scene->_id = ezlopi_cloud_generate_scene_id();
+            // snprintf(new_scene->_id, sizeof(new_scene->_id), "%08x", ezlopi_cloud_generate_scene_id());
+            // CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "_id", new_scene->_id);
+
+            CJSON_GET_VALUE_INT(cj_scene, "enabled", new_scene->enabled);
+            CJSON_GET_VALUE_INT(cj_scene, "is_group", new_scene->is_group);
+            // if (new_scene->is_group)
+            {
+                CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "group_id", new_scene->group_id);
+                TRACE_D("group_id: %s", new_scene->group_id);
+            }
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "name", new_scene->name);
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "parent_id", new_scene->parent_id);
+
+            {
+                cJSON *cj_user_notifications = cJSON_GetObjectItem(cj_scene, "user_notifications");
+                if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
+                {
+                    new_scene->user_notifications = __user_notifications_add(cj_user_notifications);
+                }
+            }
+
+            {
+                cJSON *cj_house_modes = cJSON_GetObjectItem(cj_scene, "house_modes");
+                if (cj_house_modes && (cJSON_Array == cj_house_modes->type))
+                {
+                    new_scene->house_modes = __house_modes_add(cj_house_modes);
+                }
+            }
+
+            {
+                cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, "then");
+                if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
+                {
+                    new_scene->then = __then_blocks_add(cj_then_blocks);
+                }
+            }
+
+            {
+                cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, "when");
+                if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
+                {
+                    new_scene->when = __when_blocks_add(cj_then_blocks);
+                }
+            }
+
+            if (0 == tmp_success_creating_scene)
+            {
+                // delete new_scene
+            }
+        }
+    }
+
+    return new_scene;
 }

@@ -55,6 +55,21 @@ int ezlopi_nvs_init(void)
     return ret;
 }
 
+int ezlopi_nvs_scene_set(char *scene)
+{
+    int ret = 0;
+    if (scene)
+    {
+        ret = ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_nvs_name);
+    }
+    return ret;
+}
+
+char * ezlopi_nvs_scene_get(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_scenes_nvs_name);
+}
+
 int ezlopi_nvs_factory_reset(void)
 {
     int ret = 0;
@@ -252,16 +267,6 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     }
 
     return boot_count;
-}
-
-char *ezlopi_nvs_get_scenes(void)
-{
-    return ezlopi_nvs_read_str(ezlopi_scenes_nvs_name);
-}
-
-int ezlopi_nvs_set_scenes(char *data, uint32_t len)
-{
-    return ezlopi_nvs_write_str(data, len, ezlopi_scenes_nvs_name);
 }
 
 static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)

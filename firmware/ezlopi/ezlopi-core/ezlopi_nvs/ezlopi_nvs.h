@@ -33,8 +33,8 @@ extern "C"
     uint32_t ezlopi_nvs_get_provisioning_status(void);
     void ezlopi_nvs_set_provisioning_status(void);
 
-    char *ezlopi_nvs_get_scenes(void);
-    int ezlopi_nvs_set_scenes(char *data, uint32_t len);
+    char *ezlopi_nvs_scene_get(void);
+    int ezlopi_nvs_scene_set(char *scene);
 
 #ifdef __cplusplus
 }
