@@ -86,6 +86,7 @@ static const s_method_list_v2_t method_list_v2[] = {
     // {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
     {.method_name = "hub.items.list", .method = items_list_v3, .updater = NULL},
     {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
+    {.method_name = "hub.scenes.get", .method = scenes_get, .updater = NULL},
     // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
     {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},
     {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
@@ -327,6 +328,8 @@ static void __message_upcall(const char *payload, uint32_t len)
             {
                 TRACE_D("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
                 uint32_t method_idx = __search_method_in_list(cj_method);
+                // TRACE_D("Method: %s", method_list_v2[method_idx].method_name);
+                TRACE_D("Method[%d]: %s", method_idx, method_list_v2[method_idx].method_name);
                 if (UINT32_MAX != method_idx)
                 {
                     __call_method_func_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_B);

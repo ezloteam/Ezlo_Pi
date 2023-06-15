@@ -11,6 +11,7 @@ extern "C"
 #endif
 
     void scenes_list(cJSON *cj_request, cJSON *cj_response);
+    void scenes_get(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

@@ -97,9 +97,11 @@ typedef struct l_scenes_list
 } l_scenes_list_t;
 
 void ezlopi_scene_init(void);
-void ezlopi_scene_add(cJSON *cj_scene);
-l_scenes_list_t *ezlopi_scene_get_scenes_list(void);
 void ezlopi_scene_update_nvs(void);
+void ezlopi_scene_add(cJSON *cj_scene);
+void ezlopi_scene_delete(l_scenes_list_t *scenes_list);
+l_scenes_list_t *ezlopi_scene_get_scenes_list(void);
+l_scenes_list_t *ezlopi_scenes_get_by_id(uint32_t id);
 
 void ezlopi_scenes_print(l_scenes_list_t *scene_link_list);
 void ezlopi_print_when_blocks(l_when_block_t *when_blocks);
@@ -111,7 +113,10 @@ void ezlopi_print_block_options(s_block_options_t *block_options);
 void ezlopi_print_methods(s_method_t *methods);
 void ezlopi_print_args(s_args_t *args);
 
-cJSON *ezlopi_scenes_create_cjson(l_scenes_list_t *scenes_list);
+cJSON *ezlopi_ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene);
+cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_t *scenes_list);
 char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list);
+
+void ezlopi_scenes_delete(l_scenes_list_t *scenes_list);
 
 #endif //  __EZLOPI_SCENES_H__

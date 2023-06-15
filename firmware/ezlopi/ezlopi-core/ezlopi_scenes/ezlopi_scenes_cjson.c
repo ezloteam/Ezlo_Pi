@@ -198,28 +198,43 @@ static void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *whe
     }
 }
 
-cJSON *ezlopi_scenes_create_cjson(l_scenes_list_t *scenes_list)
+cJSON *ezlopi_ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene)
+{
+    cJSON *cj_scene = NULL;
+    if (scene)
+    {
+        cj_scene = cJSON_CreateObject();
+        if (cj_scene)
+        {
+            char tmp_str[16] = {0};
+            snprintf(tmp_str, sizeof(tmp_str), "%08x", scene->_id);
+            // cJSON_AddNumberToObject(cj_scene, "_id", scene->_id);
+            cJSON_AddStringToObject(cj_scene, "_id", tmp_str);
+            cJSON_AddBoolToObject(cj_scene, "enabled", scene->enabled);
+            ezlopi_scenes_cjson_add_string(cj_scene, "group_id", scene->group_id);
+            cJSON_AddBoolToObject(cj_scene, "is_group", scene->is_group);
+            ezlopi_scenes_cjson_add_string(cj_scene, "name", scene->name);
+            ezlopi_scenes_cjson_add_string(cj_scene, "parent_id", scene->parent_id);
+            ezlopi_scenes_cjson_add_user_notifications(cj_scene, scene->user_notifications);
+            ezlopi_scenes_cjson_add_house_modes(cj_scene, scene->house_modes);
+            ezlopi_scenes_cjson_add_then_blocks(cj_scene, scene->then);
+            ezlopi_scenes_cjson_add_when_blocks(cj_scene, scene->when);
+        }
+    }
+
+    return cj_scene;
+}
+
+cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_t *scenes_list)
 {
     cJSON *cj_scenes_array = cJSON_CreateArray();
     if (cj_scenes_array)
     {
         while (scenes_list)
         {
-            cJSON *cj_scene = cJSON_CreateObject();
+            cJSON *cj_scene = ezlopi_ezlopi_scenes_create_cjson_scene(scenes_list);
             if (cj_scene)
             {
-                // ezlopi_scenes_cjson_add_string(cj_scene, "_id", scenes_list->_id);
-                cJSON_AddNumberToObject(cj_scene, "_id", scenes_list->_id);
-                cJSON_AddBoolToObject(cj_scene, "enabled", scenes_list->enabled);
-                ezlopi_scenes_cjson_add_string(cj_scene, "group_id", scenes_list->group_id);
-                cJSON_AddBoolToObject(cj_scene, "is_group", scenes_list->is_group);
-                ezlopi_scenes_cjson_add_string(cj_scene, "name", scenes_list->name);
-                ezlopi_scenes_cjson_add_string(cj_scene, "parent_id", scenes_list->parent_id);
-                ezlopi_scenes_cjson_add_user_notifications(cj_scene, scenes_list->user_notifications);
-                ezlopi_scenes_cjson_add_house_modes(cj_scene, scenes_list->house_modes);
-                ezlopi_scenes_cjson_add_then_blocks(cj_scene, scenes_list->then);
-                ezlopi_scenes_cjson_add_when_blocks(cj_scene, scenes_list->when);
-
                 if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
                 {
                     cJSON_Delete(cj_scene);
@@ -237,7 +252,7 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list)
 {
     char *scenes_list_str = NULL;
 
-    cJSON *cj_scenes_array = ezlopi_scenes_create_cjson(scenes_list);
+    cJSON *cj_scenes_array = ezlopi_scenes_create_cjson_scene_list(scenes_list);
     if (cj_scenes_array)
     {
         char *scenes_list_str = cJSON_Print(cj_scenes_array);

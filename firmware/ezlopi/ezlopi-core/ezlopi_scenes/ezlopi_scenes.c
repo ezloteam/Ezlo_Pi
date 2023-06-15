@@ -28,6 +28,63 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
 
 static l_scenes_list_t *__new_scene_create(cJSON *cj_scene);
 
+l_scenes_list_t *ezlopi_scenes_get_by_id(uint32_t id)
+{
+    l_scenes_list_t *tmp_scenes_list = scenes_list_head;
+    while (tmp_scenes_list)
+    {
+        if (tmp_scenes_list->_id == id)
+        {
+            break;
+        }
+        tmp_scenes_list = tmp_scenes_list->next;
+    }
+
+    return tmp_scenes_list;
+}
+
+void ezlopi_scenes_update_by_id(uint32_t _id, cJSON *cj_scene)
+{
+    if (_id && cj_scene && scenes_list_head)
+    {
+        if (_id == scenes_list_head->_id)
+        {
+            l_scenes_list_t *updated_scene = __new_scene_create(cj_scene);
+            if (updated_scene)
+            {
+                l_scenes_list_t *tmp_scene = scenes_list_head;
+                updated_scene->next = scenes_list_head->next;
+                scenes_list_head = updated_scene;
+                tmp_scene->next = NULL;
+                ezlopi_scenes_delete(tmp_scene);
+            }
+        }
+        else
+        {
+            l_scenes_list_t *curr_scene = scenes_list_head;
+            while (curr_scene->next)
+            {
+                if (_id == curr_scene->next->_id)
+                {
+                    l_scenes_list_t *updated_scene = __new_scene_create(cj_scene);
+                    if (updated_scene)
+                    {
+                        l_scenes_list_t *tmp_scene = curr_scene->next;
+                        updated_scene->next = curr_scene->next->next;
+                        curr_scene->next = updated_scene;
+                        tmp_scene->next = NULL;
+                        ezlopi_scenes_delete(tmp_scene);
+                    }
+
+                    break;
+                }
+
+                curr_scene = curr_scene->next;
+            }
+        }
+    }
+}
+
 void ezlopi_scene_update_nvs(void)
 {
     char *scene_json_str = ezlopi_scenes_create_json_string(scenes_list_head);
@@ -73,9 +130,10 @@ void ezlopi_scene_init(void)
         {
             if (cJSON_Array == cj_scenes_list->type)
             {
-                int scenes_idx = cJSON_GetArraySize(cj_scenes_list);
+                int scenes_size = cJSON_GetArraySize(cj_scenes_list);
+                int scenes_idx = 0;
                 cJSON *cj_scene = NULL;
-                while (NULL != (cj_scene = cJSON_GetArrayItem(cj_scenes_list, --scenes_idx)))
+                while (NULL != (cj_scene = cJSON_GetArrayItem(cj_scenes_list, scenes_idx++)))
                 {
                     ezlopi_scene_add(cj_scene);
                 }
@@ -94,11 +152,6 @@ void ezlopi_scene_init(void)
     {
         free(scenes_json_str);
     }
-}
-
-void ezlopi_scene_delete(void)
-{
-    TRACE_W("Needs implementation!");
 }
 
 static l_house_modes_t *__new_house_mode_create(cJSON *cj_house_mode)
@@ -124,10 +177,10 @@ static l_house_modes_t *__house_modes_add(cJSON *cj_house_modes)
     l_house_modes_t *tmp_house_mode_head = NULL;
     if (cj_house_modes)
     {
-        int house_mode_idx = cJSON_GetArraySize(cj_house_modes);
+        int house_mode_idx = 0;
         cJSON *cj_house_mode = NULL;
 
-        while (NULL != (cj_house_mode = cJSON_GetArrayItem(cj_house_modes, --house_mode_idx)))
+        while (NULL != (cj_house_mode = cJSON_GetArrayItem(cj_house_modes, house_mode_idx++)))
         {
             if (tmp_house_mode_head)
             {
@@ -173,9 +226,9 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
     if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
     {
         cJSON *cj_user_notification = NULL;
-        int user_notifications_idx = cJSON_GetArraySize(cj_user_notifications);
+        int user_notifications_idx = 0;
 
-        while (NULL != (cj_user_notification = cJSON_GetArrayItem(cj_user_notifications, --user_notifications_idx)))
+        while (NULL != (cj_user_notification = cJSON_GetArrayItem(cj_user_notifications, user_notifications_idx++)))
         {
             if (tmp_user_notifications_head)
             {
@@ -273,10 +326,9 @@ static l_fields_t *__fields_add(cJSON *cj_fields)
     l_fields_t *tmp_fields_head = NULL;
     if (cj_fields)
     {
-        int fields_idx = cJSON_GetArraySize(cj_fields);
-        TRACE_D("fields_idx: %d", fields_idx);
+        int fields_idx = 0;
         cJSON *cj_field = NULL;
-        while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, --fields_idx)))
+        while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, fields_idx++)))
         {
             if (tmp_fields_head)
             {
@@ -327,10 +379,10 @@ static l_then_block_t *__then_blocks_add(cJSON *cj_then_blocks)
     l_then_block_t *tmp_then_block_head = NULL;
     if (cj_then_blocks)
     {
-        int then_block_idx = cJSON_GetArraySize(cj_then_blocks);
+        int then_block_idx = 0;
         cJSON *cj_then_block = NULL;
 
-        while (NULL != (cj_then_block = cJSON_GetArrayItem(cj_then_blocks, --then_block_idx)))
+        while (NULL != (cj_then_block = cJSON_GetArrayItem(cj_then_blocks, then_block_idx++)))
         {
             if (tmp_then_block_head)
             {
@@ -381,10 +433,10 @@ static l_when_block_t *__when_blocks_add(cJSON *cj_when_blocks)
     l_when_block_t *tmp_when_block_head = NULL;
     if (cj_when_blocks)
     {
-        int when_block_idx = cJSON_GetArraySize(cj_when_blocks);
+        int when_block_idx = 0;
         cJSON *cj_when_block = NULL;
 
-        while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, --when_block_idx)))
+        while (NULL != (cj_when_block = cJSON_GetArrayItem(cj_when_blocks, when_block_idx++)))
         {
             if (tmp_when_block_head)
             {
@@ -419,9 +471,6 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
             uint32_t tmp_success_creating_scene = 1;
 
             new_scene->_id = ezlopi_cloud_generate_scene_id();
-            // snprintf(new_scene->_id, sizeof(new_scene->_id), "%08x", ezlopi_cloud_generate_scene_id());
-            // CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "_id", new_scene->_id);
-
             CJSON_GET_VALUE_INT(cj_scene, "enabled", new_scene->enabled);
             CJSON_GET_VALUE_INT(cj_scene, "is_group", new_scene->is_group);
             // if (new_scene->is_group)

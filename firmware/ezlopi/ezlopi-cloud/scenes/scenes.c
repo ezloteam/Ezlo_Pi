@@ -16,7 +16,7 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
     if (cjson_result)
     {
-        cJSON *cjson_scenes_array = ezlopi_scenes_create_cjson(ezlopi_scene_get_scenes_list());
+        cJSON *cjson_scenes_array = ezlopi_scenes_create_cjson_scene_list(ezlopi_scene_get_scenes_list());
         if (cjson_scenes_array)
         {
             if (!cJSON_AddItemToObject(cjson_result, "scenes", cjson_scenes_array))
@@ -45,25 +45,60 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+
+    uint32_t tmp_added_result = 0;
 
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
     if (cj_params)
     {
         cJSON *cj_ids = cJSON_GetObjectItem(cj_params, "_id");
-        if (cj_ids)
+        if (cj_ids && cj_ids->valuestring)
         {
-            uint32_t incoming_scene_id = (uint32_t)cj_ids->valuedouble;
+            uint32_t incoming_scene_id = strtoul(cj_ids->valuestring, NULL, 16);
             l_scenes_list_t *scenes_list = ezlopi_scene_get_scenes_list();
 
             while (scenes_list)
             {
                 if (incoming_scene_id == scenes_list->_id)
                 {
-#warning "Fetch individual scene form scene list"
+                    cJSON *cj_scene = ezlopi_ezlopi_scenes_create_cjson_scene(scenes_list);
+                    if (cj_scene)
+                    {
+                        if (cJSON_AddItemToObject(cj_response, ezlopi_result, cj_scene))
+                        {
+                            tmp_added_result = 1;
+                        }
+                        else
+                        {
+                            cJSON_Delete(cj_scene);
+                        }
+                    }
                 }
                 scenes_list = scenes_list->next;
             }
+        }
+    }
+
+    if (0 == tmp_added_result)
+    {
+        cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    }
+}
+
+void scenes_edit(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    if (cj_params)
+    {
+        cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
+        if (cj_id && cj_id->valuestring)
+        {
+            uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
+            l_scenes_list_t *scene = ezlopi_scenes_get_by_id(u_id);
+            
         }
     }
 }
