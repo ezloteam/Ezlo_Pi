@@ -28,6 +28,35 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
 
 static l_scenes_list_t *__new_scene_create(cJSON *cj_scene);
 
+l_scenes_list_t *ezlopi_scenes_pop_by_id(uint32_t _id)
+{
+    l_scenes_list_t *ret_scene = NULL;
+
+    if (_id == scenes_list_head->_id)
+    {
+        ret_scene = scenes_list_head;
+        scenes_list_head = scenes_list_head->next;
+        ret_scene->next = NULL;
+    }
+    else
+    {
+        l_scenes_list_t *scenes_list = scenes_list_head;
+        while (scenes_list->next)
+        {
+            if (_id == scenes_list->next->_id)
+            {
+                ret_scene = scenes_list->next;
+                scenes_list->next = scenes_list->next->next;
+                ret_scene->next = NULL;
+                break;
+            }
+            scenes_list = scenes_list->next;
+        }
+    }
+
+    return ret_scene;
+}
+
 l_scenes_list_t *ezlopi_scenes_get_by_id(uint32_t id)
 {
     l_scenes_list_t *tmp_scenes_list = scenes_list_head;

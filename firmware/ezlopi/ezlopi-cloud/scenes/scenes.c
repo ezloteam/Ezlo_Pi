@@ -105,3 +105,21 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+
+void scenes_delete(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, "result");
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    if (cj_params)
+    {
+        cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
+        if (cj_id && cj_id->valuestring)
+        {
+            uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
+            ezlopi_scenes_delete_by_id(u_id);
+        }
+    }
+}

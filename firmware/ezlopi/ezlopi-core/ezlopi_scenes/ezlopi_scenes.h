@@ -102,6 +102,7 @@ void ezlopi_scene_add(cJSON *cj_scene);
 void ezlopi_scene_delete(l_scenes_list_t *scenes_list);
 l_scenes_list_t *ezlopi_scene_get_scenes_list(void);
 l_scenes_list_t *ezlopi_scenes_get_by_id(uint32_t id);
+l_scenes_list_t *ezlopi_scenes_pop_by_id(uint32_t _id);
 void ezlopi_scenes_update_by_id(uint32_t _id, cJSON *cj_scene);
 
 void ezlopi_scenes_print(l_scenes_list_t *scene_link_list);
@@ -119,5 +120,6 @@ cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_t *scenes_list);
 char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list);
 
 void ezlopi_scenes_delete(l_scenes_list_t *scenes_list);
+void ezlopi_scenes_delete_by_id(uint32_t _id);
 
 #endif //  __EZLOPI_SCENES_H__

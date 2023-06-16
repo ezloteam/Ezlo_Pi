@@ -68,3 +68,8 @@ void ezlopi_scenes_delete(l_scenes_list_t *scenes_list)
         free(scenes_list);
     }
 }
+
+void ezlopi_scenes_delete_by_id(uint32_t _id)
+{
+    ezlopi_scenes_delete(ezlopi_scenes_pop_by_id(_id));
+}
