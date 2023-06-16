@@ -677,6 +677,11 @@ static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
         break;
     }
 #endif
+    default:
+    {
+        ret = "ESP_GAP_BLE_EVT_MAX";
+        break;
+    }
     }
 
     return ret;

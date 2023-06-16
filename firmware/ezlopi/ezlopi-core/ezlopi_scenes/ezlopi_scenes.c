@@ -470,7 +470,15 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
 
             uint32_t tmp_success_creating_scene = 1;
 
-            new_scene->_id = ezlopi_cloud_generate_scene_id();
+            cJSON *cj_id = cJSON_GetObjectItem(cj_scene, "_id");
+            if (cj_id && cj_id->valuestring)
+            {
+                new_scene->_id = strtoul(cj_id->valuestring, NULL, 16);
+            }
+            else
+            {
+                new_scene->_id = ezlopi_cloud_generate_scene_id();
+            }
             CJSON_GET_VALUE_INT(cj_scene, "enabled", new_scene->enabled);
             CJSON_GET_VALUE_INT(cj_scene, "is_group", new_scene->is_group);
             // if (new_scene->is_group)

@@ -97,8 +97,11 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
         if (cj_id && cj_id->valuestring)
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
-            l_scenes_list_t *scene = ezlopi_scenes_get_by_id(u_id);
-            
+            cJSON *cj_eo = cJSON_GetObjectItem(cj_params, "eo");
+            if (cj_eo)
+            {
+                ezlopi_scenes_update_by_id(u_id, cj_eo);
+            }
         }
     }
 }
