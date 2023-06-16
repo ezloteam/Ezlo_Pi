@@ -8,6 +8,14 @@
 #include "stdint.h"
 #include "cJSON.h"
 
+typedef enum e_scenes_block_type
+{
+    SCENE_BLOCK_TYPE_NONE = 0,
+    SCENE_BLOCK_TYPE_WHEN = 1,
+    SCENE_BLOCK_TYPE_THEN = 2,
+    SCENE_BLOCK_TYPE_MAX,
+} e_scenes_block_type_t;
+
 typedef enum e_scene_value_type
 {
     SCENE_VALUE_TYPE_UNDEFINED = 0,
@@ -51,17 +59,16 @@ typedef struct l_fields
 
 typedef struct l_then_block
 {
-
+    e_scenes_block_type_t block_type;
     s_block_options_t block_options;
-    char block_type[32];
     l_fields_t *fields;
     struct l_then_block *next;
 } l_then_block_t;
 
 typedef struct l_when_block
 {
+    e_scenes_block_type_t block_type;
     s_block_options_t block_options;
-    char block_type[32];
     l_fields_t *fields;
     struct l_when_block *next;
 } l_when_block_t;
@@ -115,6 +122,8 @@ void ezlopi_print_block_options(s_block_options_t *block_options);
 void ezlopi_print_methods(s_method_t *methods);
 void ezlopi_print_args(s_args_t *args);
 
+void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_blocks);
+void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_blocks);
 cJSON *ezlopi_ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene);
 cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_t *scenes_list);
 char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list);

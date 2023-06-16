@@ -59,7 +59,7 @@ void ezlopi_print_then_blocks(l_then_block_t *then_blocks)
     while (then_blocks)
     {
         ezlopi_print_block_options(&then_blocks->block_options);
-        TRACE_D("\t\t|-- blockType: %s", then_blocks->block_type);
+        TRACE_D("\t\t|-- blockType: then");
         ezlopi_print_fields(then_blocks->fields);
 
         then_blocks = then_blocks->next;
@@ -96,7 +96,7 @@ void ezlopi_print_when_blocks(l_when_block_t *when_blocks)
     while (when_blocks)
     {
         ezlopi_print_block_options(&when_blocks->block_options);
-        TRACE_D("\t\t|-- blockType: %s", when_blocks->block_type);
+        TRACE_D("\t\t|-- blockType: when");
         ezlopi_print_fields(when_blocks->fields);
         when_blocks = when_blocks->next;
     }

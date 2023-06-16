@@ -317,31 +317,39 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
             cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
             if (cj_value)
             {
-                if (cJSON_Number == cj_value->type)
+                switch (cj_value->type)
+                {
+                case cJSON_Number:
                 {
                     field->value_type = SCENE_VALUE_TYPE_NUMBER;
                     field->value.value_double = cj_value->valuedouble;
                     TRACE_B("value: %f", field->value.value_double);
+                    break;
                 }
-                else if (cJSON_String == cj_value->type)
+                case cJSON_String:
                 {
                     field->value_type = SCENE_VALUE_TYPE_STRING;
                     snprintf(field->value.value_string, sizeof(field->value.value_string), "%s", cj_value->valuestring);
                     TRACE_B("value: %s", field->value.value_string);
+                    break;
                 }
-                else if (cJSON_True == cj_value->type)
+                case cJSON_True:
                 {
                     field->value_type = SCENE_VALUE_TYPE_TRUE;
                     field->value.value_double = 1;
+                    break;
                 }
-                else if (cJSON_False == cj_value->type)
+                case cJSON_False:
                 {
                     field->value_type = SCENE_VALUE_TYPE_FALSE;
                     field->value.value_double = 0;
+                    break;
                 }
-                else
+                default:
                 {
                     TRACE_E("cj_value type: %d", cj_value->type);
+                    break;
+                }
                 }
             }
         }
@@ -391,7 +399,7 @@ static l_then_block_t *__new_then_block_create(cJSON *cj_then_block)
             __new_block_options_create(&new_then_block->block_options, cj_block_options);
         }
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_then_block, "blockType", new_then_block->block_type);
+        new_then_block->block_type = SCENE_BLOCK_TYPE_THEN;
 
         cJSON *cj_fields = cJSON_GetObjectItem(cj_then_block, "fields");
         if (cj_fields)
@@ -445,7 +453,7 @@ static l_when_block_t *__new_when_block_create(cJSON *cj_when_block)
             __new_block_options_create(&new_when_block->block_options, cj_block_options);
         }
 
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_when_block, "blockType", new_when_block->block_type);
+        new_when_block->block_type = SCENE_BLOCK_TYPE_WHEN;
 
         cJSON *cj_fields = cJSON_GetObjectItem(cj_when_block, "fields");
         if (cj_fields)

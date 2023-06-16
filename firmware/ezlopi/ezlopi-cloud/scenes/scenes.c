@@ -123,3 +123,101 @@ void scenes_delete(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+
+void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, "result");
+
+    TRACE_E("Not implemented!");
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    if (cj_params)
+    {
+        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");
+        if (cj_scene_id && cj_scene_id->valuestring)
+        {
+            uint32_t u_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+        }
+    }
+}
+
+static e_scenes_block_type_t __get_block_type(cJSON *cj_block_type)
+{
+    e_scenes_block_type_t ret = SCENE_BLOCK_TYPE_NONE;
+    if (strncmp("when", cj_block_type->valuestring, 4))
+    {
+        ret = SCENE_BLOCK_TYPE_WHEN;
+    }
+    else if (strncmp("then", cj_block_type->valuestring, 4))
+    {
+        ret = SCENE_BLOCK_TYPE_THEN;
+    }
+    return ret;
+}
+
+void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi__id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+    if (cj_result)
+    {
+        cJSON *cj_paramas = cJSON_GetObjectItem(cj_request, "params");
+        if (cj_paramas && cj_paramas->valuestring)
+        {
+            cJSON *cj_block_type = cJSON_GetObjectItem(cj_paramas, "bockType");
+            if (cj_block_type && cj_block_type->valuestring)
+            {
+                cJSON *cj_block = NULL;
+                e_scenes_block_type_t block_type = SCENE_BLOCK_TYPE_NONE;
+                if (strncmp("when", cj_block_type->valuestring, 4))
+                {
+                    cj_block = cJSON_AddArrayToObject(cj_result, "when");
+                    block_type = SCENE_BLOCK_TYPE_WHEN;
+                }
+                else if (strncmp("then", cj_block_type->valuestring, 4))
+                {
+                    cj_block = cJSON_AddArrayToObject(cj_result, "then");
+                    block_type = SCENE_BLOCK_TYPE_THEN;
+                }
+
+                if (cj_block && block_type)
+                {
+                    cJSON *cj_devices_array = cJSON_GetObjectItem(cj_paramas, "devices");
+                    if (cj_devices_array && (cJSON_Array == cj_devices_array->type))
+                    {
+                        int device_id_idx = 0;
+                        cJSON *cj_device_id = NULL;
+                        while (NULL != (cj_device_id = cJSON_GetArrayItem(cj_devices_array, device_id_idx++)))
+                        {
+                            uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
+                            l_scenes_list_t *req_scene = ezlopi_scenes_get_by_id(device_id);
+                            cJSON *cj_block = NULL;
+
+                            switch (block_type)
+                            {
+                            case SCENE_BLOCK_TYPE_WHEN:
+                            {
+                                ezlopi_scenes_cjson_add_then_blocks(cj_block, req_scene->then);
+                                break;
+                            }
+                            case SCENE_BLOCK_TYPE_THEN:
+                            {
+                                ezlopi_scenes_cjson_add_when_blocks(cj_block, req_scene->when);
+                                break;
+                            }
+                            default:
+                            {
+                                break;
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

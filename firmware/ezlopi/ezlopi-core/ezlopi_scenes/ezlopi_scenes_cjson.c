@@ -143,7 +143,7 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_scenes_list_t *fie
     }
 }
 
-static void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_blocks)
+void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_blocks)
 {
     if (root && then_blocks)
     {
@@ -155,8 +155,7 @@ static void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *the
                 cJSON *cj_then_block = cJSON_CreateObject();
                 if (cj_then_block)
                 {
-                    ezlopi_scenes_cjson_add_block_options(cj_then_block, &then_blocks->block_options);
-                    ezlopi_scenes_cjson_add_string(cj_then_block, "blockType", then_blocks->block_type);
+                    ezlopi_scenes_cjson_add_string(cj_then_block, "blockType", "then");
                     ezlopi_scenes_cjson_add_fields(cj_then_block, then_blocks->fields);
                     if (!cJSON_AddItemToArray(cj_then_block_array, cj_then_block))
                     {
@@ -170,7 +169,7 @@ static void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *the
     }
 }
 
-static void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_blocks)
+void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_blocks)
 {
     if (root && when_blocks)
     {
@@ -183,7 +182,7 @@ static void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *whe
                 if (cj_when_block)
                 {
                     ezlopi_scenes_cjson_add_block_options(cj_when_block, &when_blocks->block_options);
-                    ezlopi_scenes_cjson_add_string(cj_when_block, "blockType", when_blocks->block_type);
+                    ezlopi_scenes_cjson_add_string(cj_when_block, "blockType", "when");
                     ezlopi_scenes_cjson_add_fields(cj_when_block, when_blocks->fields);
 
                     if (!cJSON_AddItemToArray(cj_when_block_array, cj_when_block))
