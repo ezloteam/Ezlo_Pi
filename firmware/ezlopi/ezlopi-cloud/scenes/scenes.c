@@ -143,20 +143,6 @@ void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-static e_scenes_block_type_t __get_block_type(cJSON *cj_block_type)
-{
-    e_scenes_block_type_t ret = SCENE_BLOCK_TYPE_NONE;
-    if (strncmp("when", cj_block_type->valuestring, 4))
-    {
-        ret = SCENE_BLOCK_TYPE_WHEN;
-    }
-    else if (strncmp("then", cj_block_type->valuestring, 4))
-    {
-        ret = SCENE_BLOCK_TYPE_THEN;
-    }
-    return ret;
-}
-
 void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi__id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
@@ -171,20 +157,20 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_block_type = cJSON_GetObjectItem(cj_paramas, "bockType");
             if (cj_block_type && cj_block_type->valuestring)
             {
-                cJSON *cj_block = NULL;
+                cJSON *cj_block_array = NULL;
                 e_scenes_block_type_t block_type = SCENE_BLOCK_TYPE_NONE;
                 if (strncmp("when", cj_block_type->valuestring, 4))
                 {
-                    cj_block = cJSON_AddArrayToObject(cj_result, "when");
+                    cj_block_array = cJSON_AddArrayToObject(cj_result, "when");
                     block_type = SCENE_BLOCK_TYPE_WHEN;
                 }
                 else if (strncmp("then", cj_block_type->valuestring, 4))
                 {
-                    cj_block = cJSON_AddArrayToObject(cj_result, "then");
+                    cj_block_array = cJSON_AddArrayToObject(cj_result, "then");
                     block_type = SCENE_BLOCK_TYPE_THEN;
                 }
 
-                if (cj_block && block_type)
+                if (cj_block_array && block_type)
                 {
                     cJSON *cj_devices_array = cJSON_GetObjectItem(cj_paramas, "devices");
                     if (cj_devices_array && (cJSON_Array == cj_devices_array->type))
@@ -195,24 +181,51 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
                         {
                             uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
                             l_scenes_list_t *req_scene = ezlopi_scenes_get_by_id(device_id);
-                            cJSON *cj_block = NULL;
 
-                            switch (block_type)
+                            if (req_scene)
                             {
-                            case SCENE_BLOCK_TYPE_WHEN:
-                            {
-                                ezlopi_scenes_cjson_add_then_blocks(cj_block, req_scene->then);
-                                break;
-                            }
-                            case SCENE_BLOCK_TYPE_THEN:
-                            {
-                                ezlopi_scenes_cjson_add_when_blocks(cj_block, req_scene->when);
-                                break;
-                            }
-                            default:
-                            {
-                                break;
-                            }
+                                switch (block_type)
+                                {
+                                case SCENE_BLOCK_TYPE_WHEN:
+                                {
+                                    l_when_block_t *curr_when_block = req_scene->when;
+                                    while (curr_when_block)
+                                    {
+                                        cJSON *cj_when_block = ezlopi_scenes_cjson_create_when_block(req_scene->when);
+                                        if (cj_when_block)
+                                        {
+                                            if (!cJSON_AddItemToArray(cj_block_array, cj_when_block))
+                                            {
+                                                cJSON_Delete(cj_when_block);
+                                            }
+                                        }
+                                        curr_when_block = curr_when_block->next;
+                                    }
+
+                                    break;
+                                }
+                                case SCENE_BLOCK_TYPE_THEN:
+                                {
+                                    l_then_block_t *curr_then_block = req_scene->then;
+                                    while (curr_then_block)
+                                    {
+                                        cJSON *cj_then_block = ezlopi_scenes_cjson_create_then_block(req_scene->then);
+                                        if (cj_then_block)
+                                        {
+                                            if (!cJSON_AddItemToArray(cj_block_array, cj_then_block))
+                                            {
+                                                cJSON_Delete(cj_then_block);
+                                            }
+                                        }
+                                        curr_then_block = curr_then_block->next;
+                                    }
+                                    break;
+                                }
+                                default:
+                                {
+                                    break;
+                                }
+                                }
                             }
                         }
                     }

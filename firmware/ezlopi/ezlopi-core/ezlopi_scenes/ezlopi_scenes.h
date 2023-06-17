@@ -122,6 +122,8 @@ void ezlopi_print_block_options(s_block_options_t *block_options);
 void ezlopi_print_methods(s_method_t *methods);
 void ezlopi_print_args(s_args_t *args);
 
+cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_t *then_block);
+cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_t *when_block);
 void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_blocks);
 void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_blocks);
 cJSON *ezlopi_ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene);

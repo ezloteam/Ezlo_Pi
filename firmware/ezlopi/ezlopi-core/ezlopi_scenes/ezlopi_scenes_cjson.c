@@ -66,11 +66,11 @@ static void ezlopi_scenes_cjson_add_house_modes(cJSON *root, l_house_modes_t *ho
     }
 }
 
-static void ezlopi_scenes_cjson_add_block_options(cJSON *cj_then_block_array, s_block_options_t *block_option)
+static void ezlopi_scenes_cjson_add_block_options(cJSON *cj_block_array, s_block_options_t *block_option)
 {
-    if (cj_then_block_array && block_option)
+    if (cj_block_array && block_option)
     {
-        cJSON *cj_block_options = cJSON_AddObjectToObject(cj_then_block_array, "blockOptions");
+        cJSON *cj_block_options = cJSON_AddObjectToObject(cj_block_array, "blockOptions");
         if (cj_block_options)
         {
             cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, "method");
@@ -143,6 +143,23 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_scenes_list_t *fie
     }
 }
 
+cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_t *then_block)
+{
+    cJSON *cj_then_block = NULL;
+    if (then_block)
+    {
+        cj_then_block = cJSON_CreateObject();
+        if (cj_then_block)
+        {
+            ezlopi_scenes_cjson_add_block_options(cj_then_block, &then_block->block_options);
+            ezlopi_scenes_cjson_add_string(cj_then_block, "blockType", "then");
+            ezlopi_scenes_cjson_add_fields(cj_then_block, then_block->fields);
+        }
+    }
+
+    return cj_then_block;
+}
+
 void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_blocks)
 {
     if (root && then_blocks)
@@ -152,11 +169,9 @@ void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_block
         {
             while (then_blocks)
             {
-                cJSON *cj_then_block = cJSON_CreateObject();
+                cJSON *cj_then_block = ezlopi_scenes_cjson_create_then_block(then_blocks);
                 if (cj_then_block)
                 {
-                    ezlopi_scenes_cjson_add_string(cj_then_block, "blockType", "then");
-                    ezlopi_scenes_cjson_add_fields(cj_then_block, then_blocks->fields);
                     if (!cJSON_AddItemToArray(cj_then_block_array, cj_then_block))
                     {
                         cJSON_Delete(cj_then_block);
@@ -169,6 +184,23 @@ void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_block
     }
 }
 
+cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_t *when_block)
+{
+    cJSON *cj_when_block = NULL;
+    if (when_block)
+    {
+        cj_when_block = cJSON_CreateObject();
+        if (cj_when_block)
+        {
+            ezlopi_scenes_cjson_add_block_options(cj_when_block, &when_block->block_options);
+            ezlopi_scenes_cjson_add_string(cj_when_block, "blockType", "when");
+            ezlopi_scenes_cjson_add_fields(cj_when_block, when_block->fields);
+        }
+    }
+
+    return cj_when_block;
+}
+
 void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_blocks)
 {
     if (root && when_blocks)
@@ -178,13 +210,9 @@ void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_block
         {
             while (when_blocks)
             {
-                cJSON *cj_when_block = cJSON_CreateObject();
+                cJSON *cj_when_block = ezlopi_scenes_cjson_create_when_block(when_blocks);
                 if (cj_when_block)
                 {
-                    ezlopi_scenes_cjson_add_block_options(cj_when_block, &when_blocks->block_options);
-                    ezlopi_scenes_cjson_add_string(cj_when_block, "blockType", "when");
-                    ezlopi_scenes_cjson_add_fields(cj_when_block, when_blocks->fields);
-
                     if (!cJSON_AddItemToArray(cj_when_block_array, cj_when_block))
                     {
                         cJSON_Delete(cj_when_block);
