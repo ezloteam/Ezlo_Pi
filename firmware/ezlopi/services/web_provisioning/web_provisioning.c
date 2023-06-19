@@ -85,8 +85,16 @@ static const s_method_list_v2_t method_list_v2[] = {
     {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
     // {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
     {.method_name = "hub.items.list", .method = items_list_v3, .updater = NULL},
+
     {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
+    {.method_name = "hub.scenes.create", .method = scenes_create, .updater = NULL},
     {.method_name = "hub.scenes.get", .method = scenes_get, .updater = NULL},
+    {.method_name = "hub.scenes.edit", .method = scenes_edit, .updater = NULL},
+    {.method_name = "hub.scenes.delete", .method = scenes_delete, .updater = NULL},
+    // {.method_name = "hub.scenes.status.get", .method = scenes_status_get, .updater = NULL}, // Implementation remains
+    {.method_name = "hub.scenes.blocks.list", .method = scenes_blocks_list, .updater = NULL},
+    {.method_name = "hub.scenes.block.data.list", .method = scenes_blocks_list, .updater = NULL},
+
     // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
     {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},
     {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
@@ -310,11 +318,7 @@ static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_me
 
 static void __message_upcall(const char *payload, uint32_t len)
 {
-    // if (payload && len)
-    // {
-    //     TRACE_D("payload:: len: %d, data: %.*s", len, len, payload);
-    // }
-
+    // TRACE_W("__message_upcall: \r\n%.*s", len, payload);
     cJSON *cj_request = cJSON_ParseWithLength(payload, len);
 
     if (cj_request)
@@ -322,7 +326,16 @@ static void __message_upcall(const char *payload, uint32_t len)
         cJSON *cj_error = cJSON_GetObjectItem(cj_request, "error");
         cJSON *cj_method = cJSON_GetObjectItem(cj_request, "method");
 
-        if ((NULL == cj_error) || (NULL == cj_error->valuestring) || (0 == strncmp(cj_error->valuestring, "null", 4)))
+#if 0
+        TRACE_B("cj_error: %p", cj_error);
+        if (cj_error)
+        {
+            TRACE_W("cj_error->type: %d", cj_error->type);
+            TRACE_W("cj_error->valuestring: %p", cj_error->valuestring);
+        }
+#endif
+
+        if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, "null", 4))))
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {

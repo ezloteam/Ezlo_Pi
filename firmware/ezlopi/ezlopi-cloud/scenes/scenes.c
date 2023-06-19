@@ -131,6 +131,7 @@ void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddObjectToObject(cj_response, "result");
 
     TRACE_E("Not implemented!");
+#warning "Incomplete"
 
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
     if (cj_params)
@@ -152,19 +153,19 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
     if (cj_result)
     {
         cJSON *cj_paramas = cJSON_GetObjectItem(cj_request, "params");
-        if (cj_paramas && cj_paramas->valuestring)
+        if (cj_paramas)
         {
-            cJSON *cj_block_type = cJSON_GetObjectItem(cj_paramas, "bockType");
+            cJSON *cj_block_type = cJSON_GetObjectItem(cj_paramas, "blockType");
             if (cj_block_type && cj_block_type->valuestring)
             {
                 cJSON *cj_block_array = NULL;
                 e_scenes_block_type_t block_type = SCENE_BLOCK_TYPE_NONE;
-                if (strncmp("when", cj_block_type->valuestring, 4))
+                if (0 == strncmp("when", cj_block_type->valuestring, 4))
                 {
                     cj_block_array = cJSON_AddArrayToObject(cj_result, "when");
                     block_type = SCENE_BLOCK_TYPE_WHEN;
                 }
-                else if (strncmp("then", cj_block_type->valuestring, 4))
+                else if (0 == strncmp("then", cj_block_type->valuestring, 4))
                 {
                     cj_block_array = cJSON_AddArrayToObject(cj_result, "then");
                     block_type = SCENE_BLOCK_TYPE_THEN;
@@ -227,10 +228,31 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
                                 }
                                 }
                             }
+                            else
+                            {
+                                TRACE_E("Here");
+                            }
                         }
                     }
+                    else
+                    {
+                        TRACE_E("Here");
+                    }
                 }
+                else
+                {
+                    TRACE_E("Here");
+                }
+            }
+            else
+            {
+                TRACE_E("Here");
             }
         }
     }
+}
+
+void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
+{
+
 }
