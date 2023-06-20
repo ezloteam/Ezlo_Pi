@@ -65,7 +65,7 @@ int ezlopi_nvs_scene_set(char *scene)
     return ret;
 }
 
-char * ezlopi_nvs_scene_get(void)
+char *ezlopi_nvs_scene_get(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_nvs_name);
 }
@@ -317,6 +317,7 @@ static char *ezlopi_nvs_read_str(char *nvs_name)
 
             if (return_str)
             {
+                memset(return_str, 0, buf_len_needed + 1);
                 err = nvs_get_str(ezlopi_nvs_handle, nvs_name, return_str, &buf_len_needed);
 
                 if (ESP_OK == err)

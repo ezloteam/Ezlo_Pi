@@ -254,5 +254,26 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 
 void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
 {
+}
 
+void scenes_run(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    if (cj_params)
+    {
+        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");
+        if (cj_scene_id && cj_scene_id->valuestring)
+        {
+            uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+            l_scenes_list_t *scene_object = ezlopi_scenes_get_by_id(u32_scene_id);
+            if (scene_object)
+            {
+#warning "Need to call Secene logic execute here."
+            }
+        }
+    }
 }

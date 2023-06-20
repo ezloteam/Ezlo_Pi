@@ -66,6 +66,56 @@ static void ezlopi_scenes_cjson_add_house_modes(cJSON *root, l_house_modes_t *ho
     }
 }
 
+static e_arg_type_t ezlopi_scenes_parse_arg_type(char *method_name)
+{
+    e_arg_type_t arg_type = EZLOPI_SCENE_ARG_TYPE_NONE;
+    if (method_name)
+    {
+        if (0 == strncmp(method_name, "setItemValue", 12))
+        {
+            arg_type = EZLOPI_SCENE_ARG_TYPE_DEVICE;
+        }
+        else if (0 == strncmp(method_name, "sendHttpRequest", 15))
+        {
+            arg_type = EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST;
+        }
+        else if (0 == strncmp(method_name, "switchHouseMode", 15))
+        {
+            arg_type = EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE;
+        }
+        // else if (0 == strncmp(method_name, "lua", 12)) // remains
+        // {
+        //     arg_type = EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT;
+        // }
+    }
+
+    return arg_type;
+}
+
+static void ezlopi_scenes_cjson_add_arg_device(s_arg_device_t *device_arg, cJSON *cj_args)
+{
+    ezlopi_scenes_cjson_add_string(cj_args, "item", device_arg->item);
+    ezlopi_scenes_cjson_add_string(cj_args, "value", device_arg->value);
+}
+
+static void ezlopi_scenes_cjson_add_arg_http_request(s_arg_http_request_t *http_request_arg, cJSON *cj_args)
+{
+    ezlopi_scenes_cjson_add_string(cj_args, "content", http_request_arg->content);
+    ezlopi_scenes_cjson_add_string(cj_args, "contentType", http_request_arg->content_type);
+    ezlopi_scenes_cjson_add_string(cj_args, "credential", http_request_arg->credential);
+    ezlopi_scenes_cjson_add_string(cj_args, "headers", http_request_arg->headers);
+    ezlopi_scenes_cjson_add_string(cj_args, "skipSecurity", http_request_arg->skip_security);
+    ezlopi_scenes_cjson_add_string(cj_args, "url", http_request_arg->url);
+}
+
+static void ezlopi_scenes_cjson_add_arg_house_modes(s_arg_house_mode_t *house_mode_arg, cJSON *cj_args)
+{
+}
+
+static void ezlopi_scenes_cjson_add_arg_lua_script(s_arg_lua_script_t *lua_script_arg, cJSON *cj_args)
+{
+}
+
 static void ezlopi_scenes_cjson_add_block_options(cJSON *cj_block_array, s_block_options_t *block_option)
 {
     if (cj_block_array && block_option)
@@ -76,13 +126,40 @@ static void ezlopi_scenes_cjson_add_block_options(cJSON *cj_block_array, s_block
             cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, "method");
             if (cj_method)
             {
+                ezlopi_scenes_cjson_add_string(cj_method, "name", block_option->method.name);
+                block_option->method.arg_type = ezlopi_scenes_parse_arg_type(block_option->method.name);
+
                 cJSON *cj_args = cJSON_AddObjectToObject(cj_method, "args");
                 if (cj_args)
                 {
-                    ezlopi_scenes_cjson_add_string(cj_args, "item", block_option->method.args.item);
-                    ezlopi_scenes_cjson_add_string(cj_args, "value", block_option->method.args.value);
+                    switch (block_option->method.arg_type)
+                    {
+                    case EZLOPI_SCENE_ARG_TYPE_DEVICE:
+                    {
+                        ezlopi_scenes_cjson_add_arg_device(&block_option->method.u_arg.device, cj_args);
+                        break;
+                    }
+                    case EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST:
+                    {
+                        ezlopi_scenes_cjson_add_arg_http_request(&block_option->method.u_arg.http_request, cj_args);
+                        break;
+                    }
+                    case EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE:
+                    {
+                        ezlopi_scenes_cjson_add_arg_house_modes(&block_option->method.u_arg.house_mode, cj_args);
+                        break;
+                    }
+                    case EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT:
+                    {
+                        ezlopi_scenes_cjson_add_arg_lua_script(&block_option->method.u_arg.lua, cj_args);
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                    }
                 }
-                ezlopi_scenes_cjson_add_string(cj_method, "name", block_option->method.name);
             }
         }
     }

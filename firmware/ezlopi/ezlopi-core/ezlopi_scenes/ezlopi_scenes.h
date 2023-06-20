@@ -26,16 +26,53 @@ typedef enum e_scene_value_type
     SCENE_VALUE_TYPE_MAX
 } e_scene_value_type_t;
 
-typedef struct s_args
+typedef enum e_arg_type
+{
+    EZLOPI_SCENE_ARG_TYPE_NONE = 0,
+    EZLOPI_SCENE_ARG_TYPE_DEVICE = 1,
+    EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST = 2,
+    EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE = 3,
+    EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT = 4,
+    EZLOPI_SCENE_ARG_TYPE_MAX
+} e_arg_type_t;
+
+typedef struct s_arg_device
 {
     char item[32];
     char value[32];
-} s_args_t;
+} s_arg_device_t;
+
+typedef struct s_arg_http_request
+{
+    char content[32];
+    char content_type[32];
+    char credential[32];
+    char headers[32];
+    char skip_security[32];
+    char url[64];
+} s_arg_http_request_t;
+
+typedef struct s_arg_house_mode
+{
+    char house_mode[32];
+} s_arg_house_mode_t;
+
+typedef struct s_arg_lua_script
+{
+    char dummy[32];
+} s_arg_lua_script_t;
 
 typedef struct s_method
 {
     char name[32];
-    s_args_t args;
+    e_arg_type_t arg_type;
+    union
+    {
+        s_arg_device_t device;
+        s_arg_http_request_t http_request;
+        s_arg_house_mode_t house_mode;
+        s_arg_lua_script_t lua;
+    } u_arg;
 } s_method_t;
 
 typedef struct s_block_options
@@ -120,7 +157,7 @@ void ezlopi_print_then_blocks(l_then_block_t *then_blocks);
 void ezlopi_print_fields(l_fields_t *fields);
 void ezlopi_print_block_options(s_block_options_t *block_options);
 void ezlopi_print_methods(s_method_t *methods);
-void ezlopi_print_args(s_args_t *args);
+void ezlopi_print_args(s_method_t *method);
 
 cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_t *then_block);
 cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_t *when_block);

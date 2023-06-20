@@ -337,12 +337,14 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
                 {
                     field->value_type = SCENE_VALUE_TYPE_TRUE;
                     field->value.value_double = 1;
+                    TRACE_B("value: 1");
                     break;
                 }
                 case cJSON_False:
                 {
                     field->value_type = SCENE_VALUE_TYPE_FALSE;
                     field->value.value_double = 0;
+                    TRACE_B("value: 0");
                     break;
                 }
                 default:
