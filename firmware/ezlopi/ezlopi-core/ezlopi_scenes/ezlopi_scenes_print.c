@@ -12,7 +12,8 @@ void ezlopi_print_arg_type_http_request(s_arg_http_request_t *http_request_arg)
     TRACE_D("\t\t\t\t\t\t|-- content: %s", http_request_arg->content);
     TRACE_D("\t\t\t\t\t\t|-- content_type: %s", http_request_arg->content_type);
     TRACE_D("\t\t\t\t\t\t|-- credential: %s", http_request_arg->credential);
-    TRACE_D("\t\t\t\t\t\t|-- headers: %s", http_request_arg->headers);
+    // TRACE_D("\t\t\t\t\t\t|-- headers: %s", http_request_arg->headers);
+    TRACE_E("\t\t\t\t\t\t|-- headers: Not Implemented!");
     TRACE_D("\t\t\t\t\t\t|-- skip_security: %s", http_request_arg->skip_security);
     TRACE_D("\t\t\t\t\t\t|-- url: %s", http_request_arg->url);
 }

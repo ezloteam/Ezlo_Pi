@@ -42,12 +42,19 @@ typedef struct s_arg_device
     char value[32];
 } s_arg_device_t;
 
+typedef struct l_arg_http_header
+{
+    char key[32];
+    char *value; // value size may be over 512 for token
+    struct l_arg_http_header *next;
+} l_arg_http_header_t;
+
 typedef struct s_arg_http_request
 {
     char content[32];
     char content_type[32];
     char credential[32];
-    char headers[32];
+    l_arg_http_header_t headers;
     char skip_security[32];
     char url[64];
 } s_arg_http_request_t;
@@ -80,6 +87,14 @@ typedef struct s_block_options
     s_method_t method;
 } s_block_options_t;
 
+typedef struct s_action_delay
+{
+    uint16_t days;
+    uint16_t hours;
+    uint16_t minutes;
+    uint16_t seconds;
+} s_action_delay_t;
+
 typedef struct l_fields
 {
     char name[32];
@@ -98,6 +113,7 @@ typedef struct l_then_block
 {
     e_scenes_block_type_t block_type;
     s_block_options_t block_options;
+    s_action_delay_t delay;
     l_fields_t *fields;
     struct l_then_block *next;
 } l_then_block_t;

@@ -11,7 +11,6 @@ static const char *test_scene_create_str = "[{\"enabled\":true,\"group_id\":null
 
 static l_scenes_list_t *scenes_list_head = NULL;
 
-static void __new_args_create(s_args_t *p_args, cJSON *cj_args);
 static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options);
 
 static l_then_block_t *__new_then_block_create(cJSON *cj_then_block);
@@ -149,10 +148,11 @@ void ezlopi_scene_add(cJSON *cj_scene)
 
 void ezlopi_scene_init(void)
 {
-    const char *scenes_list = test_scene_create_str;
-    // const char *scenes_list = ezlopi_nvs_scene_get();
+    // const char *scenes_list = test_scene_create_str;
+    const char *scenes_list = ezlopi_nvs_scene_get();
     if (scenes_list)
     {
+        TRACE_D("Scene read from NVS:\r\n%s", scenes_list);
         cJSON *cj_scenes_list = cJSON_Parse(scenes_list);
 
         if (cj_scenes_list)
@@ -174,6 +174,10 @@ void ezlopi_scene_init(void)
         }
 
         ezlopi_scenes_print(scenes_list_head);
+    }
+    else
+    {
+        TRACE_E("Scene read from NVS is NULL!");
     }
 
     char *scenes_json_str = ezlopi_scenes_create_json_string(scenes_list_head);
@@ -278,10 +282,75 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
     return tmp_user_notifications_head;
 }
 
-static void __new_args_create(s_args_t *p_args, cJSON *cj_args)
+static e_arg_type_t __parse_arg_type(char *method_name)
 {
-    CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "item", p_args->item);
-    CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "value", p_args->value);
+    e_arg_type_t arg_type = EZLOPI_SCENE_ARG_TYPE_NONE;
+    if (method_name)
+    {
+        if (0 == strncmp(method_name, "setItemValue", 12))
+        {
+            arg_type = EZLOPI_SCENE_ARG_TYPE_DEVICE;
+        }
+        else if (0 == strncmp(method_name, "sendHttpRequest", 15))
+        {
+            arg_type = EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST;
+        }
+        else if (0 == strncmp(method_name, "switchHouseMode", 15))
+        {
+            arg_type = EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE;
+        }
+        else if (0 == strncmp(method_name, "lua", 12)) // remains
+        {
+            TRACE_E("Not Imeplemented!");
+            arg_type = EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT;
+        }
+        else
+        {
+            TRACE_E("Not Imeplemented!");
+        }
+    }
+
+    return arg_type;
+}
+
+static void __new_args_create_device(s_arg_device_t *arg_device, cJSON *cj_args)
+{
+    if (arg_device && cj_args)
+    {
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "item", arg_device->item);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "value", arg_device->value);
+    }
+}
+
+// static void __nwe_args_create_http_request_header(s_args)
+
+static void __new_args_create_http_request(s_arg_http_request_t *arg_http_request, cJSON *cj_args)
+{
+    if (arg_http_request && cj_args)
+    {
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "content", arg_http_request->content);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "contentType", arg_http_request->content_type);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "credential", arg_http_request->credential);
+        // CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "headers", arg_http_request->headers);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "skipSecurity", arg_http_request->skip_security);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "url", arg_http_request->url);
+    }
+}
+
+static void __new_args_create_house_mode(s_arg_house_mode_t *arg_house_mode, cJSON *cj_args)
+{
+    if (arg_house_mode && cj_args)
+    {
+        TRACE_E("Not Implemented!");
+    }
+}
+
+static void __new_args_create_lua_script(s_arg_lua_script_t *arg_lua_script, cJSON *cj_args)
+{
+    if (arg_lua_script && cj_args)
+    {
+        TRACE_E("Not Implemented!");
+    }
 }
 
 static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
@@ -290,7 +359,35 @@ static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
     cJSON *cj_args = cJSON_GetObjectItem(cj_method, "args");
     if (cj_args)
     {
-        __new_args_create(&p_method->args, cj_args);
+        p_method->arg_type = __parse_arg_type(p_method->name);
+        switch (p_method->arg_type)
+        {
+        case EZLOPI_SCENE_ARG_TYPE_DEVICE:
+        {
+            __new_args_create_device(&p_method->u_arg.device, cj_args);
+            break;
+        }
+        case EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST:
+        {
+            __new_args_create_http_request(&p_method->u_arg.http_request, cj_args);
+            break;
+        }
+        case EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE:
+        {
+            __new_args_create_house_mode(&p_method->u_arg.house_mode, cj_args);
+            break;
+        }
+        case EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT:
+        {
+            __new_args_create_lua_script(&p_method->u_arg.lua, cj_args);
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+        }
     }
 }
 
@@ -300,6 +397,17 @@ static void __new_block_options_create(s_block_options_t *p_block_options, cJSON
     if (cj_method)
     {
         __new_method_create(&p_block_options->method, cj_method);
+    }
+}
+
+static void __new_action_delay(s_action_delay_t *action_delay, cJSON *cj_delay)
+{
+    if (action_delay && cj_delay)
+    {
+        CJSON_GET_VALUE_DOUBLE(cj_delay, "days", action_delay->days);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, "hours", action_delay->hours);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, "minutes", action_delay->minutes);
+        CJSON_GET_VALUE_DOUBLE(cj_delay, "seconds", action_delay->seconds);
     }
 }
 
@@ -402,6 +510,11 @@ static l_then_block_t *__new_then_block_create(cJSON *cj_then_block)
         }
 
         new_then_block->block_type = SCENE_BLOCK_TYPE_THEN;
+        cJSON *cj_delay = cJSON_GetObjectItem(cj_then_block, "delay");
+        if (cj_delay)
+        {
+            __new_action_delay(&new_then_block->delay, cj_delay);
+        }
 
         cJSON *cj_fields = cJSON_GetObjectItem(cj_then_block, "fields");
         if (cj_fields)
