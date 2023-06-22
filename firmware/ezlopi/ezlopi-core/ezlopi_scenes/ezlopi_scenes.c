@@ -306,7 +306,7 @@ static e_arg_type_t __parse_arg_type(char *method_name)
         }
         else
         {
-            TRACE_E("Not Imeplemented!");
+            TRACE_E("Not Imeplemented!, arg_type: %d", arg_type);
         }
     }
 

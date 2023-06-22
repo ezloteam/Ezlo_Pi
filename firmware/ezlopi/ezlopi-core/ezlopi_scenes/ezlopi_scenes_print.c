@@ -25,6 +25,7 @@ void ezlopi_print_arg_type_house_mode(s_arg_house_mode_t *house_mode_arg)
 
 void ezlopi_print_arg_type_lua_script(s_arg_lua_script_t *lua_script_arg)
 {
+    TRACE_E("Not Implemented!");
 }
 
 void ezlopi_print_args(s_method_t *method)
