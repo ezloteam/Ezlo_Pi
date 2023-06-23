@@ -16,7 +16,7 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
     if (cjson_result)
     {
-        cJSON *cjson_scenes_array = ezlopi_scenes_create_cjson_scene_list(ezlopi_scene_get_scenes_list());
+        cJSON *cjson_scenes_array = ezlopi_scenes_create_cjson_scene_list(ezlopi_scenes_get_scenes_list());
         if (cjson_scenes_array)
         {
             if (!cJSON_AddItemToObject(cjson_result, "scenes", cjson_scenes_array))
@@ -55,13 +55,13 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
         if (cj_ids && cj_ids->valuestring)
         {
             uint32_t incoming_scene_id = strtoul(cj_ids->valuestring, NULL, 16);
-            l_scenes_list_t *scenes_list = ezlopi_scene_get_scenes_list();
+            l_scenes_list_t *scenes_list = ezlopi_scenes_get_scenes_list();
 
             while (scenes_list)
             {
                 if (incoming_scene_id == scenes_list->_id)
                 {
-                    cJSON *cj_scene = ezlopi_ezlopi_scenes_create_cjson_scene(scenes_list);
+                    cJSON *cj_scene = ezlopi_scenes_create_cjson_scene(scenes_list);
                     if (cj_scene)
                     {
                         if (cJSON_AddItemToObject(cj_response, ezlopi_result, cj_scene))

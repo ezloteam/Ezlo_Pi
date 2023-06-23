@@ -157,7 +157,7 @@ static void ezlopi_scenes_cjson_add_action_delay(cJSON *cj_then_block, s_action_
     }
 }
 
-static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_scenes_list_t *fields)
+static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_t *fields)
 {
     if (cj_block)
     {
@@ -271,7 +271,7 @@ cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_t *when_block)
     return cj_when_block;
 }
 
-void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_blocks)
+void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_when_block_t *when_blocks)
 {
     if (root && when_blocks)
     {
@@ -295,7 +295,7 @@ void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_then_block_t *when_block
     }
 }
 
-cJSON *ezlopi_ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene)
+cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene)
 {
     cJSON *cj_scene = NULL;
     if (scene)
@@ -329,7 +329,7 @@ cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_t *scenes_list)
     {
         while (scenes_list)
         {
-            cJSON *cj_scene = ezlopi_ezlopi_scenes_create_cjson_scene(scenes_list);
+            cJSON *cj_scene = ezlopi_scenes_create_cjson_scene(scenes_list);
             if (cj_scene)
             {
                 if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))

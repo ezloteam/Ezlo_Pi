@@ -123,7 +123,7 @@ void ezlopi_scene_update_nvs(void)
     }
 }
 
-l_scenes_list_t *ezlopi_scene_get_scenes_list(void)
+l_scenes_list_t *ezlopi_scenes_get_scenes_list(void)
 {
     return scenes_list_head;
 }

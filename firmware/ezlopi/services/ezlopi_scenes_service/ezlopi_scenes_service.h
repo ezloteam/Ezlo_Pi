@@ -1,0 +1,6 @@
+#ifndef __EZLOPI_SCENES_SERVICE__
+#define __EZLOPI_SCENES_SERVICE__
+
+
+
+#endif // __EZLOPI_SCENES_SERVICE__
