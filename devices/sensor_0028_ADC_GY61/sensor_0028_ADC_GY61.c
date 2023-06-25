@@ -128,6 +128,18 @@ static s_ezlopi_device_properties_t *sensor_gy61_analog_sensor_prepare_propertie
         sensor_gy61_analog_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
 
         char *device_name = NULL;
+        if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
+        {
+            device_name = "Acceleration-X";
+        }
+        if (ezlopi_item_name_acceleration_y_axis == ITEM_NAME)
+        {
+            device_name = "Acceleration-Y";
+        }
+        if (ezlopi_item_name_acceleration_z_axis == ITEM_NAME)
+        {
+            device_name = "Acceleration-Z";
+        }
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_gy61_analog_sensor_properties, device_name);
         sensor_gy61_analog_sensor_properties->ezlopi_cloud.category = CATEGORY;

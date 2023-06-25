@@ -24,8 +24,7 @@ idf_component_register(
         sensor_0006_I2C_ADXL345
         sensor_0007_I2C_GY271
         sensor_0005_I2C_MPU6050
-        sensor_0006_I2C_ADXL345  
-        sensor_0012_I2C_BME280      
+        sensor_0006_I2C_ADXL345     
         sensor_0008_I2C_LTR303ALS
         device_0009_other_RMT_SK6812
         sensor_0010_I2C_BME680
@@ -39,7 +38,6 @@ idf_component_register(
         sensor_0021_UART_MB1013
         device_0022_PWM_dimmable_lamp
         sensor_0023_digitalIn_touch_switch_TTP223B
-        sensor_0024_other_HCSR04
         sensor_0024_other_HCSR04
         sensor_0025_digitalIn_LDR
         sensor_0026_ADC_LDR
@@ -55,6 +53,7 @@ idf_component_register(
         device_0036_PWM_servo_MG996R
         device_0038_digitalOut_RGB
         # sensor_0039_I2C_MAX30102
+        sensor_0040_PWM_TCS230
 )
 
 

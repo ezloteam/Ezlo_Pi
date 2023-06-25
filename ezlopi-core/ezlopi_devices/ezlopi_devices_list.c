@@ -14,16 +14,16 @@
 #include "sensor_0010_I2C_BME680.h"
 // TODO Include for 0011
 #include "sensor_0012_I2C_BME280.h"
+// TODO Include for 0013
 #include "sensor_0014_UART_PMS5003.h"
-#include "sensor_0012_I2C_BME280.h"
+// TODO Include for 0015
 #include "sensor_0016_oneWire_DHT22.h"
 #include "sensor_0017_ADC_potentiometer.h"
 #include "sensor_0018_internal_hall_effect.h"
 #include "sensor_0019_digitalIn_PIR.h"
-#include "device_0022_PWM_dimmable_lamp.h"
 #include "sensor_0020_ADC_2axis_joystick.h"
 #include "sensor_0021_UART_MB1013.h"
-#include "sensor_0024_other_HCSR04.h"
+#include "device_0022_PWM_dimmable_lamp.h"
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 #include "sensor_0024_other_HCSR04.h"
 #include "sensor_0025_digitalIn_LDR.h"
@@ -34,15 +34,13 @@
 #include "sensor_0030_oneWire_DS18B20.h"
 #include "sensor_0031_other_JSNSR04T.h"
 #include "sensor_0032_ADC_soilMoisture.h"
+#include "sensor_0033_ADC_turbidity.h"
+#include "sensor_0034_digitalIn_proximity.h"
 #include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
-#include "device_0036_PWM_servo_MG996R.h"
-#include "sensor_0016_oneWire_DHT22.h"
-#include "sensor_0032_ADC_soilMoisture.h"
-#include "sensor_0031_other_JSNSR04T.h"
-#include "sensor_0017_ADC_potentiometer.h"
 #include "device_0036_PWM_servo_MG996R.h"
 #include "device_0038_digitalOut_RGB.h"
 // #include "sensor_0039_I2C_MAX30102.h"
+#include "sensor_0040_PWM_TCS230.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -128,12 +126,14 @@ static s_ezlopi_device_t device_array[] = {
 //         .func =
 //     },
 // #endif
-// #ifdef EZLOPI_SENSOR_0012_I2C_BME280
-//     {
-//         .id = EZLOPI_SENSOR_0012_I2C_BME280,
-//         .func = sensor_0012_I2C_BME280,
-//     },
-// #endif
+
+#ifdef EZLOPI_SENSOR_0012_I2C_BME280
+    {
+        .id = EZLOPI_SENSOR_0012_I2C_BME280,
+        .func = sensor_0012_I2C_BME280,
+    },
+#endif
+
 // #ifdef EZLOPI_SENSOR_0013_SPI_BME280
 //     {
 //         .id = EZLOPI_SENSOR_0013_SPI_BME280,
@@ -274,18 +274,19 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-// #ifdef EZLOPI_SENSOR_0033_ADC_TURBIDITY
-//     {
-//         .id = EZLOPI_SENSOR_0033_ADC_TURBIDITY,
-//         .func = ,
-//     },
-// #endif
-// #ifdef EZLOPI_SENSOR_0034_DIGITAL_IN_PROXIMITY
-//     {
-//         .id = EZLOPI_SENSOR_0034_DIGITAL_IN_PROXIMITY,
-//         .func = ,
-//     },
-// #endif
+#ifdef EZLOPI_SENSOR_0033_ADC_TURBIDITY
+    {
+        .id = EZLOPI_SENSOR_0033_ADC_TURBIDITY,
+        .func = sensor_0033_ADC_turbidity,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0034_DIGITAL_IN_PROXIMITY
+    {
+        .id = EZLOPI_SENSOR_0034_DIGITAL_IN_PROXIMITY,
+        .func = sensor_0034_digitalIn_proximity,
+    },
+#endif
 
 #ifdef EZLOPI_SENSOR_0035_DIGITAL_IN_TPP223B_TOUCH_SENSOR
     {
@@ -293,24 +294,28 @@ static s_ezlopi_device_t device_array[] = {
         .func = sensor_0035_digitalIn_touch_sensor_TPP223B,
     },
 #endif
+
 #ifdef EZLOPI_DEVICE_0036_PWM_SERVO_MG996R
     {
         .id = EZLOPI_DEVICE_0036_PWM_SERVO_MG996R,
         .func = device_0036_PWM_servo_MG996R,
     },
 #endif
+
 #ifdef EZLOPI_SENSOR_0037_DIGITAL_OUTPUT_PMS5003_GPIO
     {
         .id = EZLOPI_SENSOR_0037_DIGITAL_OUTPUT_PMS5003_GPIO,
         .func = sensor_0014_UART_PMS5003,
     },
 #endif
+
 #ifdef EZLOPI_DEVICE_0038_DIGITAL_OUTPUT_RGB_LED
     {
         .id = EZLOPI_DEVICE_0038_DIGITAL_OUTPUT_RGB_LED,
         .func = device_0038_digitalOut_RGB,
     },
 #endif
+
 // #ifdef EZLOPI_SENSOR_0039_I2C_MAX30102
 //     {
 //         .id = EZLOPI_SENSOR_0039_I2C_MAX30102,
@@ -318,19 +323,26 @@ static s_ezlopi_device_t device_array[] = {
 //     },
 // #endif
 
+#ifdef EZLOPI_SENSOR_0040_PWM_TCS230
+    {
+        .id = EZLOPI_SENSOR_0040_PWM_TCS230,
+        .func = sensor_0040_PWM_TCS230,
+    },
+#endif
+
 #elif (EZLOPI_DEVICE_TYPE_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
-    #ifdef EZLOPI_DEVICE_0001_DIGITAL_OUT_LED
-        {
-            .id = EZLOPI_DEVICE_0001_DIGITAL_OUT_LED,
-            .func = device_0001_digitalOut_generic,
-        },
-    #endif
-    #ifdef EZLOPI_SENSOR_0029_I2C_GXHTC3
-        {
-            .id = EZLOPI_SENSOR_0029_I2C_GXHTC3,
-            .func = sensor_0029_I2C_GXHTC3,
-        },
-    #endif
+#ifdef EZLOPI_DEVICE_0001_DIGITAL_OUT_LED
+    {
+        .id = EZLOPI_DEVICE_0001_DIGITAL_OUT_LED,
+        .func = device_0001_digitalOut_generic,
+    },
+#endif
+#ifdef EZLOPI_SENSOR_0029_I2C_GXHTC3
+    {
+        .id = EZLOPI_SENSOR_0029_I2C_GXHTC3,
+        .func = sensor_0029_I2C_GXHTC3,
+    },
+#endif
 #elif (EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO == EZLOPI_DEVICE_TYPE)
 // #ifdef EZLOPI_DEVICE_0009_OTHER_RMT_SK6812
 //     {

@@ -14,7 +14,7 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
 #define EZLOPI_DEVICE_TYPE_SWITCH_BOX 1
-#define EZLOPI_DEVICE_TYPE_IR_RF_BLASTER 2
+#define EZLOPI_DEVICE_TYPE_IR_BLASTER 2
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
@@ -396,15 +396,17 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 8,\
-                \"dev_name\": \"GY271 Sensor\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"TCS230 Sensor\",\
                 \"id_room\": \"\",\
-                \"id_item\": 7,\
-                \"gpio_sda\": 21,\
-                \"gpio_scl\": 22,\
-                \"pullup_scl\": true,\
-                \"pullup_sda\" : true\
-            }\
+                \"id_item\": 40,\
+                \"gpio_s0\": 25,\
+                \"gpio_s1\": 26,\
+                \"gpio_s2\": 12,\
+                \"gpio_s3\": 14,\
+                \"gpio_output_en\": 13,\
+                \"gpio_pulse_output\": 15\
+          }\
         ],\
     \"dev_total\": 1}";
 

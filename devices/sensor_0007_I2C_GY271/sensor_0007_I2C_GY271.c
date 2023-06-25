@@ -4,7 +4,6 @@
 #include "math.h"
 #include "ezlopi_i2c_master.h"
 #include "sensor_0007_I2C_GY271.h"
-#include "ezlopi_devices_list.h"
 #include "ezlopi_timer.h"
 #include "cJSON.h"
 #include "ezlopi_cloud_category_str.h"
