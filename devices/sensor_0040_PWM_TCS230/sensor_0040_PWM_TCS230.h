@@ -6,15 +6,6 @@
 #include "driver/gpio.h"
 
 #define QUEUE_SIZE 5
-// hard coded gpio_pin values
-
-// #define SENSOR_COLOR_S0 GPIO_NUM_25
-// #define SENSOR_COLOR_S1 GPIO_NUM_26
-// #define SENSOR_COLOR_S2 GPIO_NUM_12
-// #define SENSOR_COLOR_S3 GPIO_NUM_14
-// #define SENSOR_COLOR_OUTPUT_EN GPIO_NUM_13
-// #define SENSOR_COLOR_PULSE_INPUT GPIO_NUM_15
-
 typedef enum TCS230_queue_enum
 {
     TCS230_QUEUE_RESET = 0,

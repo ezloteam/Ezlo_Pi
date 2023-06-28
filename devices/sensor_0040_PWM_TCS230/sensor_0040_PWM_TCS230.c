@@ -62,8 +62,8 @@ static void tcs230_setup_gpio(gpio_num_t s0_pin,
                               gpio_num_t s1_pin,
                               gpio_num_t s2_pin,
                               gpio_num_t s3_pin,
-                              gpio_num_t gpio_freq_scale_pin,
-                              gpio_num_t gpio_freq_out_pin);
+                              gpio_num_t gpio_output_en,
+                              gpio_num_t gpio_pulse_output);
 
 static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32_t *Time_period);
 
@@ -158,13 +158,13 @@ static void tcs230_setup_gpio(gpio_num_t s0_pin,
                               gpio_num_t s1_pin,
                               gpio_num_t s2_pin,
                               gpio_num_t s3_pin,
-                              gpio_num_t gpio_freq_scale_pin,
-                              gpio_num_t gpio_freq_out_pin)
+                              gpio_num_t gpio_output_en,
+                              gpio_num_t gpio_pulse_output)
 {
     esp_err_t ret = ESP_FAIL;
     // Configure GPIO ouput pins (S0, S1, S2, S3 & Freq_scale) for TCS230.
     gpio_config_t output_conf;
-    output_conf.pin_bit_mask = (1ULL << s0_pin) | (1ULL << s1_pin) | (1ULL << s2_pin) | (1ULL << s3_pin) | (1ULL << gpio_freq_scale_pin);
+    output_conf.pin_bit_mask = (1ULL << s0_pin) | (1ULL << s1_pin) | (1ULL << s2_pin) | (1ULL << s3_pin) | (1ULL << gpio_output_en);
     output_conf.intr_type = GPIO_INTR_DISABLE;
     output_conf.mode = GPIO_MODE_OUTPUT;
     output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
@@ -173,7 +173,7 @@ static void tcs230_setup_gpio(gpio_num_t s0_pin,
 
     // Configures GPIO input pins (Freq_Out_pin) for TCS230.
     gpio_config_t input_conf;
-    input_conf.pin_bit_mask = (1ULL << gpio_freq_out_pin);
+    input_conf.pin_bit_mask = (1ULL << gpio_pulse_output);
     input_conf.intr_type = GPIO_INTR_POSEDGE;
     input_conf.mode = GPIO_MODE_INPUT;
     input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
@@ -492,7 +492,8 @@ static s_ezlopi_device_properties_t *sensor_pwm_tcs230_prepare_properties(uint32
 static int sensor_pwm_tcs230_prepare(void *arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;\
+    //create a ' TCS230_data_t ' type dummy pointer 
     TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)malloc(sizeof(TCS230_data_t));
 
     if ((NULL != prep_arg) && (NULL != prep_arg->cjson_device) && (NULL != sensor_0040_PWM_TCS230_data))
@@ -548,14 +549,12 @@ static int sensor_pwm_tcs230_get_value_cjson(s_ezlopi_device_properties_t *prope
             // TRACE_I("Green : %d", (sensor_0040_PWM_TCS230_data->green_mapped));
 
             // cjson_properties = cJSON_CreateArray();
-            if (cjson_properties != NULL)
-            {
-                // Values = cJSON_CreateObject();
-                // cJSON_AddItemToArray(cjson_properties, Values);
-                cJSON_AddNumberToObject(cjson_properties, "red", sensor_0040_PWM_TCS230_data->red_mapped);
-                cJSON_AddNumberToObject(cjson_properties, "green", sensor_0040_PWM_TCS230_data->green_mapped);
-                cJSON_AddNumberToObject(cjson_properties, "blue", sensor_0040_PWM_TCS230_data->blue_mapped);
-            }
+
+            // Values = cJSON_CreateObject();
+            cJSON *Color_Values = cJSON_AddObjectToObject(cjson_properties, "value");
+            cJSON_AddNumberToObject(Color_Values, "red", sensor_0040_PWM_TCS230_data->red_mapped);
+            cJSON_AddNumberToObject(Color_Values, "green", sensor_0040_PWM_TCS230_data->green_mapped);
+            cJSON_AddNumberToObject(Color_Values, "blue", sensor_0040_PWM_TCS230_data->blue_mapped);
         }
         ret = 1;
     }

@@ -1,6 +1,9 @@
 
 
 #include "cJSON.h"
+#include "trace.h"
+#include "ezlopi_adc.h"
+#include "math.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
@@ -9,17 +12,13 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
-#include "trace.h"
-#include "ezlopi_adc.h"
-#include "math.h"
 
 #include "sensor_0032_ADC_soilMoisture.h"
 
-
-static int soil_moisture_sensor_prepare_and_add(void *args);
+static int soil_moisture_sensor_prepare_and_add(void *arg);
 static s_ezlopi_device_properties_t *soil_moisture_sensor_prepare(cJSON *cjson_device);
 static int soil_moisture_sensor_init(s_ezlopi_device_properties_t *properties);
-static int get_soil_moisture_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
+static int get_soil_moisture_sensor_value(s_ezlopi_device_properties_t *properties, void *arg);
 
 int sensor_0032_ADC_soilMoisture(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_args)
 {
@@ -55,10 +54,10 @@ int sensor_0032_ADC_soilMoisture(e_ezlopi_actions_t action, s_ezlopi_device_prop
     return ret;
 }
 
-static int soil_moisture_sensor_prepare_and_add(void *args)
+static int soil_moisture_sensor_prepare_and_add(void *arg) // cjson -> arg
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
+    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
@@ -78,7 +77,7 @@ static int soil_moisture_sensor_prepare_and_add(void *args)
 
     return ret;
 }
-    
+
 static s_ezlopi_device_properties_t *soil_moisture_sensor_prepare(cJSON *cjson_device)
 {
     s_ezlopi_device_properties_t *soil_moisture_sensor_properties = malloc(sizeof(s_ezlopi_device_properties_t));
@@ -114,7 +113,6 @@ static s_ezlopi_device_properties_t *soil_moisture_sensor_prepare(cJSON *cjson_d
     return soil_moisture_sensor_properties;
 }
 
-
 static int soil_moisture_sensor_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
@@ -143,4 +141,3 @@ static int get_soil_moisture_sensor_value(s_ezlopi_device_properties_t *properti
     free(ezlopi_analog_data);
     return ret;
 }
-

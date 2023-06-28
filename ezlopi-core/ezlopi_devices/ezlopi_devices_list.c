@@ -41,6 +41,8 @@
 #include "device_0038_digitalOut_RGB.h"
 // #include "sensor_0039_I2C_MAX30102.h"
 #include "sensor_0040_PWM_TCS230.h"
+#include "sensor_0041_ADC_FC28_soilMoisture.h"
+#include "sensor_0042_ADC_shunt_voltmeter.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -79,11 +81,6 @@ static s_ezlopi_device_t device_array[] = {
         .id = EZLOPI_SENSOR_0005_I2C_MPU6050,
         .func = sensor_0005_I2C_MPU6050,
     },
-#endif
-
-#ifdef EZLOPI_SENSOR_0005_I2C_MPU6050
-    {.id = EZLOPI_SENSOR_0005_I2C_MPU6050,
-     .func = sensor_0005_I2C_MPU6050},
 #endif
 
 #ifdef EZLOPI_SENSOR_0006_I2C_ADXL345
@@ -327,6 +324,20 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0040_PWM_TCS230,
         .func = sensor_0040_PWM_TCS230,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0041_ADC_FC28_soilMoisture
+    {
+        .id = EZLOPI_SENSOR_0041_ADC_FC28_soilMoisture,
+        .func = sensor_0041_ADC_FC28_soilMoisture,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0042_ADC_shunt_voltmeter
+    {
+        .id = EZLOPI_SENSOR_0042_ADC_shunt_voltmeter,
+        .func = sensor_0042_ADC_shunt_voltmeter,
     },
 #endif
 

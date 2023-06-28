@@ -1,9 +1,10 @@
-idf_component_register(SRCS "sensor_0040_PWM_TCS230.c"
-                        INCLUDE_DIRS "."
+
+idf_component_register(SRCS "sensor_0041_ADC_FC28_soilMoisture.c" 
+                        INCLUDE_DIRS "."          
                         REQUIRES trace 
                                 ezlopi_actions 
                                 ezlopi_hal 
                                 ezlopi_timer 
                                 ezlopi_devices 
-                                ezlopi_cloud_constants  
-                                gpio_isr_service)
+                                ezlopi_cloud_constants
+                                )

@@ -54,6 +54,8 @@ idf_component_register(
         device_0038_digitalOut_RGB
         # sensor_0039_I2C_MAX30102
         sensor_0040_PWM_TCS230
+        sensor_0041_ADC_FC28_soilMoisture
+        sensor_0042_ADC_shunt_voltmeter
 )
 
 
