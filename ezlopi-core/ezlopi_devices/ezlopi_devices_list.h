@@ -63,6 +63,7 @@
 #define EZLOPI_SENSOR_0040_PWM_TCS230                                               40
 #define EZLOPI_SENSOR_0041_ADC_FC28_soilMoisture                                    41
 #define EZLOPI_SENSOR_0042_ADC_shunt_voltmeter                                      42
+#define EZLOPI_SENSOR_0043_ADC_UV_INTENSITY                                         43
 
 
 /**

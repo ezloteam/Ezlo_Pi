@@ -1,7 +1,6 @@
 
 #include "cJSON.h"
 #include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"

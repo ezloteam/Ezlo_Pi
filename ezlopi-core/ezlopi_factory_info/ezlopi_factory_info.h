@@ -397,9 +397,9 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\": 3,\
-                \"dev_name\": \"Voltmeter\",\
+                \"dev_name\": \"UV exposure\",\
                 \"id_room\": \"\",\
-                \"id_item\": 42,\
+                \"id_item\": 43,\
                 \"gpio\": 33,\
                 \"resln_bit\": 12\
           }\

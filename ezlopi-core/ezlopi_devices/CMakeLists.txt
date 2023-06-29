@@ -56,6 +56,7 @@ idf_component_register(
         sensor_0040_PWM_TCS230
         sensor_0041_ADC_FC28_soilMoisture
         sensor_0042_ADC_shunt_voltmeter
+        sensor_0043_ADC_UV_intensity
 )
 
 

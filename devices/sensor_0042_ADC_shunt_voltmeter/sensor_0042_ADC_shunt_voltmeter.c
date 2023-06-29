@@ -1,7 +1,6 @@
 
 #include "cJSON.h"
 #include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
@@ -108,7 +107,7 @@ static s_ezlopi_device_properties_t *sensor_0042_ADC_shunt_voltmeter_prepare(cJS
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_0042_adc_shunt_voltmeter_properties->interface.adc.gpio_num);
         sensor_0042_adc_shunt_voltmeter_properties->interface.adc.resln_bit = 3;
     }
-    return sensor_0042_adc_shunt_voltmeter_properties;
+    return sensor_0042_adc_shunt_voltmeter_properties; // returns void if its not created
 }
 
 static int sensor_0042_adc_shunt_voltmeter_init(s_ezlopi_device_properties_t *properties)
