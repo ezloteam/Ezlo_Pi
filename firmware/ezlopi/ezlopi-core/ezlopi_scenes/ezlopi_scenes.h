@@ -26,15 +26,66 @@ typedef enum e_scene_value_type
     SCENE_VALUE_TYPE_MAX
 } e_scene_value_type_t;
 
-typedef enum e_arg_type
+typedef enum e_method_type
 {
-    EZLOPI_SCENE_ARG_TYPE_NONE = 0,
-    EZLOPI_SCENE_ARG_TYPE_DEVICE = 1,
-    EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST = 2,
-    EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE = 3,
-    EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT = 4,
-    EZLOPI_SCENE_ARG_TYPE_MAX
-} e_arg_type_t;
+    EZLOPI_SCENE_METHOD_TYPE_NONE = 0,
+
+    /* When methods list, for details: https://api.ezlo.com/hub/scenes/when_blocks/index.html */
+    EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE,                    // isItemState
+    EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE_CHANGED,            // isItemStateChanged
+    EZLOPI_SCENE_WHEN_METHOD_IS_BUTTON_STATE,                  // isButtonState
+    EZLOPI_SCENE_WHEN_METHOD_IS_SUN_STATE,                     // isSunState
+    EZLOPI_SCENE_WHEN_METHOD_IS_DATE,                          // isDate
+    EZLOPI_SCENE_WHEN_METHOD_IS_ONCE,                          // isOnce
+    EZLOPI_SCENE_WHEN_METHOD_IS_INTERVAL,                      // isInterval
+    EZLOPI_SCENE_WHEN_METHOD_IS_DATE_RANGE,                    // isDateRange
+    EZLOPI_SCENE_WHEN_METHOD_IS_USER_LOCK_OPERATION,           // isUserLockOperation
+    EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO,         // isHouseModeChangedTo
+    EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM,       // isHouseModeChangedFrom
+    EZLOPI_SCENE_WHEN_METHOD_IS_DEVICE_STATE,                  // isDeviceState
+    EZLOPI_SCENE_WHEN_METHOD_IS_NETWORK_STATE,                 // isNetworkState
+    EZLOPI_SCENE_WHEN_METHOD_IS_SCENE_STATE,                   // isSceneState
+    EZLOPI_SCENE_WHEN_METHOD_IS_GROUP_STATE,                   // isGroupState
+    EZLOPI_SCENE_WHEN_METHOD_IS_CLOUD_STATE,                   // isCloudState
+    EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_STATE,                 // isBatteryState
+    EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_LEVEL,                 // isBatteryLevel
+    EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBERS,                  // compareNumbers
+    EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBER_RANGE,             // compareNumberRange
+    EZLOPI_SCENE_WHEN_METHOD_COMPARE_STRINGS,                  // compareStrings
+    EZLOPI_SCENE_WHEN_METHOD_STRING_OPERATION,                 // stringOperation
+    EZLOPI_SCENE_WHEN_METHOD_IN_ARRAY,                         // inArray
+    EZLOPI_SCENE_WHEN_METHOD_COMPARE_VALUES,                   // compareValues
+    EZLOPI_SCENE_WHEN_METHOD_HAS_ATLEAST_ONE_DICTIONARY_VALUE, // hasAtLeastOneDictionaryValue
+    EZLOPI_SCENE_WHEN_METHOD_IS_FIRMWARE_UPDATE_STATE,         // isFirmwareUpdateState
+    EZLOPI_SCENE_WHEN_METHOD_IS_DICTIONARY_CHANGED,            // isDictionaryChanged
+    EZLOPI_SCENE_WHEN_METHOD_IS_DETECTED_IN_HOTZONE,           // isDetectedInHotzone
+    EZLOPI_SCENE_WHEN_METHOD_AND,                              // and
+    EZLOPI_SCENE_WHEN_METHOD_NOT,                              // not
+    EZLOPI_SCENE_WHEN_METHOD_OR,                               // or
+    EZLOPI_SCENE_WHEN_METHOD_XOR,                              // xor
+    EZLOPI_SCENE_WHEN_METHOD_FUNCTION,                         // function
+
+    /* Then method list, for details: https://api.ezlo.com/hub/scenes/action_blocks/index.html#then-blocks */
+    EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE,              // setItemValue
+    EZLOPI_SCENE_THEN_METHOD_SET_DEVICE_ARMED,            // setDeviceArmed
+    EZLOPI_SCENE_THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND, // sendCloudAbstractCommand
+    EZLOPI_SCENE_THEN_METHOD_SWITCH_HOUSE_MODE,           // switchHouseMode
+    EZLOPI_SCENE_THEN_METHOD_SEND_HTTP_REQUEST,           // sendHttpRequest
+    EZLOPI_SCENE_THEN_METHOD_RUN_CUSTOM_SCRIPT,           // runCustomScript
+    EZLOPI_SCENE_THEN_METHOD_RUN_PLUGIN_SCRIPT,           // runPluginScript
+    EZLOPI_SCENE_THEN_METHOD_RUN_SCENE,                   // runScene
+    EZLOPI_SCENE_THEN_METHOD_SET_SCENE_STATE,             // setSceneState
+    EZLOPI_SCENE_THEN_RESET_LATCH,                        // resetLatch
+    EZLOPI_SCENE_THEN_RESET_SCENE_LATCHES,                // resetSceneLatches
+    EZLOPI_SCENE_THEN_REBOOT_HUB,                         // rebootHub
+    EZLOPI_SCENE_THEN_RESET_HUB,                          // resetHub
+    EZLOPI_SCENE_THEN_CLOUD_API,                          // cloudAPI
+    EZLOPI_SCENE_THEN_SET_EXPRESSION,                     // setExpression
+    EZLOPI_SCENE_THEN_SET_VARIABLE,                       // setVariable
+    EZLOPI_SCENE_THEN_TOGGLE_VALUE,                       // toggleValue
+
+    EZLOPI_SCENE_METHOD_TYPE_MAX
+} e_when_method_type_t;
 
 typedef struct s_arg_device
 {
@@ -71,8 +122,7 @@ typedef struct s_arg_lua_script
 
 typedef struct s_method
 {
-    char name[32];
-    e_arg_type_t arg_type;
+    e_when_method_type_t type;
     union
     {
         s_arg_device_t device;
