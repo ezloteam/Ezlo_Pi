@@ -1,11 +1,11 @@
 #include "ezlopi_scenes.h"
 #include "trace.h"
 
-void ezlopi_print_arg_type_device(s_arg_device_t *device_arg)
-{
-    TRACE_D("\t\t\t\t\t\t|-- item: %s", device_arg->item);
-    TRACE_D("\t\t\t\t\t\t|-- value: %s", device_arg->value);
-}
+// void ezlopi_print_arg_type_device(s_arg_device_t *device_arg)
+// {
+//     TRACE_D("\t\t\t\t\t\t|-- item: %s", device_arg->item);
+//     TRACE_D("\t\t\t\t\t\t|-- value: %s", device_arg->value);
+// }
 
 void ezlopi_print_arg_type_http_request(s_arg_http_request_t *http_request_arg)
 {
@@ -166,7 +166,7 @@ void ezlopi_print_args(s_method_t *method)
         {
             break;
         }
-
+        /* Then starts here */
         case EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE:
         {
             break;
@@ -243,7 +243,7 @@ void ezlopi_print_args(s_method_t *method)
     }
 }
 
-void ezlopi_scenes_print_method_name(void)
+void ezlopi_scenes_print_method_name(void) {}
 
 void ezlopi_print_methods(s_method_t *methods)
 {
@@ -359,5 +359,3 @@ void ezlopi_scenes_print(l_scenes_list_t *scene_link_list)
         scene_link_list = scene_link_list->next;
     }
 }
-
-

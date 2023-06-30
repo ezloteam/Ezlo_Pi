@@ -66,11 +66,11 @@ static void ezlopi_scenes_cjson_add_house_modes(cJSON *root, l_house_modes_t *ho
     }
 }
 
-static void ezlopi_scenes_cjson_add_arg_device(s_arg_device_t *device_arg, cJSON *cj_args)
-{
-    ezlopi_scenes_cjson_add_string(cj_args, "item", device_arg->item);
-    ezlopi_scenes_cjson_add_string(cj_args, "value", device_arg->value);
-}
+// static void ezlopi_scenes_cjson_add_arg_device(s_arg_device_t *device_arg, cJSON *cj_args)
+// {
+//     ezlopi_scenes_cjson_add_string(cj_args, "item", device_arg->item);
+//     ezlopi_scenes_cjson_add_string(cj_args, "value", device_arg->value);
+// }
 
 static void ezlopi_scenes_cjson_add_arg_http_request(s_arg_http_request_t *http_request_arg, cJSON *cj_args)
 {

@@ -85,13 +85,22 @@ typedef enum e_method_type
     EZLOPI_SCENE_THEN_TOGGLE_VALUE,                       // toggleValue
 
     EZLOPI_SCENE_METHOD_TYPE_MAX
-} e_when_method_type_t;
+} e_method_type_t;
 
-typedef struct s_arg_device
+typedef struct s_is_item_state_arg
 {
     char item[32];
     char value[32];
-} s_arg_device_t;
+} s_is_item_state_arg_t;
+
+typedef struct s_is_item_state_changed_arg
+{
+    char item[32];
+    char start[32];
+    char finish[32];
+} s_is_item_state_changed_arg_t;
+
+typedef s_is_item_state_arg_t s_is_button_state_arg_t;
 
 typedef struct l_arg_http_header
 {
@@ -100,32 +109,22 @@ typedef struct l_arg_http_header
     struct l_arg_http_header *next;
 } l_arg_http_header_t;
 
-typedef struct s_arg_http_request
+typedef struct s_set_item_value_arg
 {
-    char content[32];
-    char content_type[32];
-    char credential[32];
-    l_arg_http_header_t headers;
-    char skip_security[32];
-    char url[64];
-} s_arg_http_request_t;
 
-typedef struct s_arg_house_mode
-{
-    char house_mode[32];
-} s_arg_house_mode_t;
-
-typedef struct s_arg_lua_script
-{
-    char dummy[32];
-} s_arg_lua_script_t;
+} s_set_item_value_arg_t;
 
 typedef struct s_method
 {
-    e_when_method_type_t type;
+    char name[32];
+    e_method_type_t type;
     union
     {
-        s_arg_device_t device;
+        s_is_item_state_arg_t is_item_state_arg;
+        s_is_item_state_changed_arg_t is_item_state_changed_arg;
+        s_is_button_state_arg_t is_button_state_arg;
+
+
         s_arg_http_request_t http_request;
         s_arg_house_mode_t house_mode;
         s_arg_lua_script_t lua;

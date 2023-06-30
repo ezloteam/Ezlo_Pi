@@ -282,47 +282,231 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
     return tmp_user_notifications_head;
 }
 
-static e_arg_type_t __parse_arg_type(char *method_name)
+static e_method_type_t __parse_method_type(char *method_name)
 {
-    e_arg_type_t arg_type = EZLOPI_SCENE_ARG_TYPE_NONE;
+    e_method_type_t methode_type = EZLOPI_SCENE_METHOD_TYPE_NONE;
     if (method_name)
     {
-        if (0 == strncmp(method_name, "setItemValue", 12))
+        /* When block */
+        if (0 == strncmp(method_name, "isItemState", 12))
         {
-            arg_type = EZLOPI_SCENE_ARG_TYPE_DEVICE;
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE;
         }
-        else if (0 == strncmp(method_name, "sendHttpRequest", 15))
+        else if (0 == strncmp(method_name, "isItemStateChanged", 15))
         {
-            arg_type = EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST;
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE_CHANGED;
+        }
+        else if (0 == strncmp(method_name, "isButtonState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_BUTTON_STATE;
+        }
+        else if (0 == strncmp(method_name, "isSunState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_SUN_STATE;
+        }
+        else if (0 == strncmp(method_name, "isDate", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_DATE;
+        }
+        else if (0 == strncmp(method_name, "isOnce", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_ONCE;
+        }
+        else if (0 == strncmp(method_name, "isInterval", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_INTERVAL;
+        }
+        else if (0 == strncmp(method_name, "isDateRange", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_DATE_RANGE;
+        }
+        else if (0 == strncmp(method_name, "isUserLockOperation", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_USER_LOCK_OPERATION;
+        }
+        else if (0 == strncmp(method_name, "isHouseModeChangedTo", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO;
+        }
+        else if (0 == strncmp(method_name, "isHouseModeChangedFrom", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM;
+        }
+        else if (0 == strncmp(method_name, "isDeviceState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_DEVICE_STATE;
+        }
+        else if (0 == strncmp(method_name, "isNetworkState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_NETWORK_STATE;
+        }
+        else if (0 == strncmp(method_name, "isSceneState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_SCENE_STATE;
+        }
+        else if (0 == strncmp(method_name, "isGroupState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_GROUP_STATE;
+        }
+        else if (0 == strncmp(method_name, "isCloudState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_CLOUD_STATE;
+        }
+        else if (0 == strncmp(method_name, "isBatteryState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_STATE;
+        }
+        else if (0 == strncmp(method_name, "isBatteryLevel", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_LEVEL;
+        }
+        else if (0 == strncmp(method_name, "compareNumbers", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBERS;
+        }
+        else if (0 == strncmp(method_name, "compareNumberRange", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBER_RANGE;
+        }
+        else if (0 == strncmp(method_name, "compareStrings", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_COMPARE_STRINGS;
+        }
+        else if (0 == strncmp(method_name, "stringOperation", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_STRING_OPERATION;
+        }
+        else if (0 == strncmp(method_name, "inArray", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IN_ARRAY;
+        }
+        else if (0 == strncmp(method_name, "compareValues", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_COMPARE_VALUES;
+        }
+        else if (0 == strncmp(method_name, "hasAtLeastOneDictionaryValue", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_HAS_ATLEAST_ONE_DICTIONARY_VALUE;
+        }
+        else if (0 == strncmp(method_name, "isFirmwareUpdateState", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_FIRMWARE_UPDATE_STATE;
+        }
+        else if (0 == strncmp(method_name, "isDictionaryChanged", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_DICTIONARY_CHANGED;
+        }
+        else if (0 == strncmp(method_name, "isDetectedInHotzone", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_IS_DETECTED_IN_HOTZONE;
+        }
+        else if (0 == strncmp(method_name, "and", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_AND;
+        }
+        else if (0 == strncmp(method_name, "not", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_NOT;
+        }
+        else if (0 == strncmp(method_name, "or", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_OR;
+        }
+        else if (0 == strncmp(method_name, "xor", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_XOR;
+        }
+        else if (0 == strncmp(method_name, "function", 15))
+        {
+            methode_type = EZLOPI_SCENE_WHEN_METHOD_FUNCTION;
+        }
+
+        /* Then block methods */
+        else if (0 == strncmp(method_name, "setItemValue", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE;
+        }
+        else if (0 == strncmp(method_name, "setDeviceArmed", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_METHOD_SET_DEVICE_ARMED;
+        }
+        else if (0 == strncmp(method_name, "sendCloudAbstractCommand", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND;
         }
         else if (0 == strncmp(method_name, "switchHouseMode", 15))
         {
-            arg_type = EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE;
+            methode_type = EZLOPI_SCENE_THEN_METHOD_SWITCH_HOUSE_MODE;
         }
-        else if (0 == strncmp(method_name, "lua", 12)) // remains
+        else if (0 == strncmp(method_name, "sendHttpRequest", 15))
         {
-            TRACE_E("Not Imeplemented!");
-            arg_type = EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT;
+            methode_type = EZLOPI_SCENE_THEN_METHOD_SEND_HTTP_REQUEST;
+        }
+        else if (0 == strncmp(method_name, "runCustomScript", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_METHOD_RUN_CUSTOM_SCRIPT;
+        }
+        else if (0 == strncmp(method_name, "runPluginScript", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_METHOD_RUN_PLUGIN_SCRIPT;
+        }
+        else if (0 == strncmp(method_name, "runScene", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_METHOD_RUN_SCENE;
+        }
+        else if (0 == strncmp(method_name, "setSceneState", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_METHOD_SET_SCENE_STATE;
+        }
+        else if (0 == strncmp(method_name, "resetLatch", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_RESET_LATCH;
+        }
+        else if (0 == strncmp(method_name, "resetSceneLatches", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_RESET_SCENE_LATCHES;
+        }
+        else if (0 == strncmp(method_name, "rebootHub", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_REBOOT_HUB;
+        }
+        else if (0 == strncmp(method_name, "resetHub", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_RESET_HUB;
+        }
+        else if (0 == strncmp(method_name, "cloudAPI", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_CLOUD_API;
+        }
+        else if (0 == strncmp(method_name, "setExpression", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_SET_EXPRESSION;
+        }
+        else if (0 == strncmp(method_name, "setVariable", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_SET_VARIABLE;
+        }
+        else if (0 == strncmp(method_name, "toggleValue", 15))
+        {
+            methode_type = EZLOPI_SCENE_THEN_TOGGLE_VALUE;
         }
         else
         {
-            TRACE_E("Not Imeplemented!, arg_type: %d", arg_type);
+            TRACE_E("Not Imeplemented!, methode_type: %d", methode_type);
         }
     }
 
-    return arg_type;
+    return methode_type;
 }
 
-static void __new_args_create_device(s_arg_device_t *arg_device, cJSON *cj_args)
+static void __new_args_create_is_item_state(s_is_item_state_arg_t *arg, cJSON *cj_args)
 {
-    if (arg_device && cj_args)
+    if (arg && cj_args)
     {
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "item", arg_device->item);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "value", arg_device->value);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "item", arg->item);
+        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "value", arg->value);
     }
 }
-
-// static void __nwe_args_create_http_request_header(s_args)
 
 static void __new_args_create_http_request(s_arg_http_request_t *arg_http_request, cJSON *cj_args)
 {
@@ -356,33 +540,214 @@ static void __new_args_create_lua_script(s_arg_lua_script_t *arg_lua_script, cJS
 static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, "name", p_method->name);
+    p_method->type = __parse_method_type(p_method->name);
+
     cJSON *cj_args = cJSON_GetObjectItem(cj_method, "args");
     if (cj_args)
     {
-        p_method->arg_type = __parse_arg_type(p_method->name);
-        switch (p_method->arg_type)
+        switch (p_method->type)
         {
-        case EZLOPI_SCENE_ARG_TYPE_DEVICE:
+        case EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE:
         {
-            __new_args_create_device(&p_method->u_arg.device, cj_args);
-            break;
-        }
-        case EZLOPI_SCENE_ARG_TYPE_HTTP_REQUEST:
-        {
-            __new_args_create_http_request(&p_method->u_arg.http_request, cj_args);
-            break;
-        }
-        case EZLOPI_SCENE_ARG_TYPE_HOUSE_MODE:
-        {
-            __new_args_create_house_mode(&p_method->u_arg.house_mode, cj_args);
-            break;
-        }
-        case EZLOPI_SCENE_ARG_TYPE_LUA_SCRIPT:
-        {
-            __new_args_create_lua_script(&p_method->u_arg.lua, cj_args);
-            break;
-        }
 
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE_CHANGED:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_BUTTON_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_SUN_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_DATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_ONCE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_INTERVAL:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_DATE_RANGE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_USER_LOCK_OPERATION:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_DEVICE_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_NETWORK_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_SCENE_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_GROUP_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_CLOUD_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_LEVEL:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBERS:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBER_RANGE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_STRINGS:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_STRING_OPERATION:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IN_ARRAY:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_VALUES:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_HAS_ATLEAST_ONE_DICTIONARY_VALUE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_FIRMWARE_UPDATE_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_DICTIONARY_CHANGED:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_IS_DETECTED_IN_HOTZONE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_AND:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_NOT:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_OR:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_XOR:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_WHEN_METHOD_FUNCTION:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_SET_DEVICE_ARMED:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_SWITCH_HOUSE_MODE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_SEND_HTTP_REQUEST:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_RUN_CUSTOM_SCRIPT:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_RUN_PLUGIN_SCRIPT:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_RUN_SCENE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_METHOD_SET_SCENE_STATE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_RESET_LATCH:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_RESET_SCENE_LATCHES:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_REBOOT_HUB:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_RESET_HUB:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_CLOUD_API:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_SET_EXPRESSION:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_SET_VARIABLE:
+        {
+            break;
+        }
+        case EZLOPI_SCENE_THEN_TOGGLE_VALUE:
+        {
+            break;
+        }
         default:
         {
             break;
