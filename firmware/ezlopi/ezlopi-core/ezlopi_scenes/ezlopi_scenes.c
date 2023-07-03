@@ -148,8 +148,8 @@ void ezlopi_scene_add(cJSON *cj_scene)
 
 void ezlopi_scene_init(void)
 {
-    // const char *scenes_list = test_scene_create_str;
-    const char *scenes_list = ezlopi_nvs_scene_get();
+    const char *scenes_list = test_scene_create_str;
+    // const char *scenes_list = ezlopi_nvs_scene_get();
     if (scenes_list)
     {
         TRACE_D("Scene read from NVS:\r\n%s", scenes_list);
@@ -508,40 +508,41 @@ static void __new_args_create_is_item_state(s_is_item_state_arg_t *arg, cJSON *c
     }
 }
 
-static void __new_args_create_http_request(s_arg_http_request_t *arg_http_request, cJSON *cj_args)
-{
-    if (arg_http_request && cj_args)
-    {
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "content", arg_http_request->content);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "contentType", arg_http_request->content_type);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "credential", arg_http_request->credential);
-        // CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "headers", arg_http_request->headers);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "skipSecurity", arg_http_request->skip_security);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "url", arg_http_request->url);
-    }
-}
+// static void __new_args_create_http_request(s_arg_http_request_t *arg_http_request, cJSON *cj_args)
+// {
+//     if (arg_http_request && cj_args)
+//     {
+//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "content", arg_http_request->content);
+//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "contentType", arg_http_request->content_type);
+//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "credential", arg_http_request->credential);
+//         // CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "headers", arg_http_request->headers);
+//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "skipSecurity", arg_http_request->skip_security);
+//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "url", arg_http_request->url);
+//     }
+// }
 
-static void __new_args_create_house_mode(s_arg_house_mode_t *arg_house_mode, cJSON *cj_args)
-{
-    if (arg_house_mode && cj_args)
-    {
-        TRACE_E("Not Implemented!");
-    }
-}
+// static void __new_args_create_house_mode(s_arg_house_mode_t *arg_house_mode, cJSON *cj_args)
+// {
+//     if (arg_house_mode && cj_args)
+//     {
+//         TRACE_E("Not Implemented!");
+//     }
+// }
 
-static void __new_args_create_lua_script(s_arg_lua_script_t *arg_lua_script, cJSON *cj_args)
-{
-    if (arg_lua_script && cj_args)
-    {
-        TRACE_E("Not Implemented!");
-    }
-}
+// static void __new_args_create_lua_script(s_arg_lua_script_t *arg_lua_script, cJSON *cj_args)
+// {
+//     if (arg_lua_script && cj_args)
+//     {
+//         TRACE_E("Not Implemented!");
+//     }
+// }
 
 static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, "name", p_method->name);
     p_method->type = __parse_method_type(p_method->name);
 
+#if 0
     cJSON *cj_args = cJSON_GetObjectItem(cj_method, "args");
     if (cj_args)
     {
@@ -549,7 +550,7 @@ static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
         {
         case EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE:
         {
-
+            __new_args_create_is_item_state(&p_method->u_arg.is_item_state_arg, cj_args);
             break;
         }
         case EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE_CHANGED:
@@ -754,6 +755,7 @@ static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
         }
         }
     }
+#endif
 }
 
 static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options)
@@ -776,6 +778,32 @@ static void __new_action_delay(s_action_delay_t *action_delay, cJSON *cj_delay)
     }
 }
 
+static e_scene_value_type_t __new_get_value_type(cJSON *cj_field)
+{
+    e_scene_value_type_t ret = SCENE_VALUE_TYPE_UNDEFINED;
+    if (cj_field)
+    {
+        char *type_str = NULL;
+        CJSON_GET_VALUE_STRING(cj_field, "type", type_str);
+        if (type_str)
+        {
+            if (0 == strncmp(type_str, "bool", 4))
+            {
+                ret = SCENE_VALUE_TYPE_BOOL;
+            }
+            else if (0 == strncmp(type_str, "int", 3))
+            {
+                ret = SCENE_VALUE_TYPE_INT;
+            }
+            else if (0 == strncmp(type_str, "item", 3))
+            {
+                ret = SCENE_VALUE_TYPE_ITEM;
+            }
+        }
+    }
+    return ret;
+}
+
 static l_fields_t *__new_field_create(cJSON *cj_field)
 {
     l_fields_t *field = NULL;
@@ -786,7 +814,7 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
         {
             memset(field, 0, sizeof(l_fields_t));
             CJSON_GET_VALUE_STRING_BY_COPY(cj_field, "name", field->name);
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_field, "type", field->type);
+            field->value_type = __new_get_value_type(cj_field);
             cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
             if (cj_value)
             {
@@ -794,28 +822,24 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
                 {
                 case cJSON_Number:
                 {
-                    field->value_type = SCENE_VALUE_TYPE_NUMBER;
                     field->value.value_double = cj_value->valuedouble;
                     TRACE_B("value: %f", field->value.value_double);
                     break;
                 }
                 case cJSON_String:
                 {
-                    field->value_type = SCENE_VALUE_TYPE_STRING;
                     snprintf(field->value.value_string, sizeof(field->value.value_string), "%s", cj_value->valuestring);
                     TRACE_B("value: %s", field->value.value_string);
                     break;
                 }
                 case cJSON_True:
                 {
-                    field->value_type = SCENE_VALUE_TYPE_TRUE;
                     field->value.value_double = 1;
                     TRACE_B("value: 1");
                     break;
                 }
                 case cJSON_False:
                 {
-                    field->value_type = SCENE_VALUE_TYPE_FALSE;
                     field->value.value_double = 0;
                     TRACE_B("value: 0");
                     break;

@@ -19,10 +19,10 @@ typedef enum e_scenes_block_type
 typedef enum e_scene_value_type
 {
     SCENE_VALUE_TYPE_UNDEFINED = 0,
-    SCENE_VALUE_TYPE_FALSE = 1,
-    SCENE_VALUE_TYPE_TRUE = 2,
-    SCENE_VALUE_TYPE_NUMBER = 3,
-    SCENE_VALUE_TYPE_STRING = 4,
+    SCENE_VALUE_TYPE_BOOL = 1,
+    SCENE_VALUE_TYPE_INT = 2,
+    SCENE_VALUE_TYPE_ITEM = 3,
+    // SCENE_VALUE_TYPE_STRING = 4,
     SCENE_VALUE_TYPE_MAX
 } e_scene_value_type_t;
 
@@ -91,6 +91,7 @@ typedef struct s_is_item_state_arg
 {
     char item[32];
     char value[32];
+    char armed[32];
 } s_is_item_state_arg_t;
 
 typedef struct s_is_item_state_changed_arg
@@ -118,17 +119,18 @@ typedef struct s_method
 {
     char name[32];
     e_method_type_t type;
+#if 0
     union
     {
         s_is_item_state_arg_t is_item_state_arg;
         s_is_item_state_changed_arg_t is_item_state_changed_arg;
         s_is_button_state_arg_t is_button_state_arg;
 
-
-        s_arg_http_request_t http_request;
-        s_arg_house_mode_t house_mode;
-        s_arg_lua_script_t lua;
+        // s_arg_http_request_t http_request;
+        // s_arg_house_mode_t house_mode;
+        // s_arg_lua_script_t lua;
     } u_arg;
+#endif
 } s_method_t;
 
 typedef struct s_block_options
@@ -147,7 +149,7 @@ typedef struct s_action_delay
 typedef struct l_fields
 {
     char name[32];
-    char type[32];
+    // char type[32];
 
     e_scene_value_type_t value_type; // 0: double, 1: string
     union value
@@ -220,7 +222,7 @@ void ezlopi_print_user_notifications(l_user_notification_t *user_notification);
 void ezlopi_print_house_modes(l_house_modes_t *house_modes);
 void ezlopi_print_then_blocks(l_then_block_t *then_blocks);
 void ezlopi_print_fields(l_fields_t *fields);
-void ezlopi_print_block_options(s_block_options_t *block_options);
+void ezlopi_print_block_options(s_block_options_t *block_options, l_fields_t *fields);
 void ezlopi_print_methods(s_method_t *methods);
 void ezlopi_print_args(s_method_t *method);
 

@@ -72,23 +72,23 @@ static void ezlopi_scenes_cjson_add_house_modes(cJSON *root, l_house_modes_t *ho
 //     ezlopi_scenes_cjson_add_string(cj_args, "value", device_arg->value);
 // }
 
-static void ezlopi_scenes_cjson_add_arg_http_request(s_arg_http_request_t *http_request_arg, cJSON *cj_args)
-{
-    ezlopi_scenes_cjson_add_string(cj_args, "content", http_request_arg->content);
-    ezlopi_scenes_cjson_add_string(cj_args, "contentType", http_request_arg->content_type);
-    ezlopi_scenes_cjson_add_string(cj_args, "credential", http_request_arg->credential);
-    // ezlopi_scenes_cjson_add_string(cj_args, "headers", http_request_arg->headers);
-    ezlopi_scenes_cjson_add_string(cj_args, "skipSecurity", http_request_arg->skip_security);
-    ezlopi_scenes_cjson_add_string(cj_args, "url", http_request_arg->url);
-}
+// static void ezlopi_scenes_cjson_add_arg_http_request(s_arg_http_request_t *http_request_arg, cJSON *cj_args)
+// {
+//     ezlopi_scenes_cjson_add_string(cj_args, "content", http_request_arg->content);
+//     ezlopi_scenes_cjson_add_string(cj_args, "contentType", http_request_arg->content_type);
+//     ezlopi_scenes_cjson_add_string(cj_args, "credential", http_request_arg->credential);
+//     // ezlopi_scenes_cjson_add_string(cj_args, "headers", http_request_arg->headers);
+//     ezlopi_scenes_cjson_add_string(cj_args, "skipSecurity", http_request_arg->skip_security);
+//     ezlopi_scenes_cjson_add_string(cj_args, "url", http_request_arg->url);
+// }
 
-static void ezlopi_scenes_cjson_add_arg_house_modes(s_arg_house_mode_t *house_mode_arg, cJSON *cj_args)
-{
-}
+// static void ezlopi_scenes_cjson_add_arg_house_modes(s_arg_house_mode_t *house_mode_arg, cJSON *cj_args)
+// {
+// }
 
-static void ezlopi_scenes_cjson_add_arg_lua_script(s_arg_lua_script_t *lua_script_arg, cJSON *cj_args)
-{
-}
+// static void ezlopi_scenes_cjson_add_arg_lua_script(s_arg_lua_script_t *lua_script_arg, cJSON *cj_args)
+// {
+// }
 
 static void ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_block_array, l_when_block_t *when_block)
 {
@@ -285,106 +285,119 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
 {
     if (cj_block_array && then_block)
     {
+
         cJSON *cj_block_options = cJSON_AddObjectToObject(cj_block_array, "blockOptions");
         if (cj_block_options)
         {
+
             cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, "method");
             if (cj_method)
             {
+
+                switch (then_block->block_options.method.type)
+                {
+                case EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "setItemValue");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_SET_DEVICE_ARMED:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "setDeviceArmed");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "sendCloudAbstractCommand");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_SWITCH_HOUSE_MODE:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "switchHouseMode");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_SEND_HTTP_REQUEST:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "sendHttpRequest");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_RUN_CUSTOM_SCRIPT:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "runCustomScript");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_RUN_PLUGIN_SCRIPT:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "runPluginScript");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_RUN_SCENE:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "runScene");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_METHOD_SET_SCENE_STATE:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "setSceneState");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_RESET_LATCH:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "resetLatch");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_RESET_SCENE_LATCHES:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "resetSceneLatches");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_REBOOT_HUB:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "rebootHub");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_RESET_HUB:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "resetHub");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_CLOUD_API:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "cloudAPI");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_SET_EXPRESSION:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "setExpression");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_SET_VARIABLE:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "setVariable");
+                    break;
+                }
+                case EZLOPI_SCENE_THEN_TOGGLE_VALUE:
+                {
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", "toggleValue");
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+                }
+
                 cJSON *cj_args = cJSON_AddObjectToObject(cj_method, "args");
                 if (cj_args)
                 {
-                    switch (then_block->block_options.method.type)
+
+                    l_fields_t *curr_field = then_block->fields;
+                    while (curr_field)
                     {
-                    case EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "setItemValue");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_SET_DEVICE_ARMED:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "setDeviceArmed");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "sendCloudAbstractCommand");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_SWITCH_HOUSE_MODE:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "switchHouseMode");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_SEND_HTTP_REQUEST:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "sendHttpRequest");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_RUN_CUSTOM_SCRIPT:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "runCustomScript");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_RUN_PLUGIN_SCRIPT:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "runPluginScript");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_RUN_SCENE:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "runScene");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_METHOD_SET_SCENE_STATE:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "setSceneState");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_RESET_LATCH:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "resetLatch");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_RESET_SCENE_LATCHES:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "resetSceneLatches");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_REBOOT_HUB:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "rebootHub");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_RESET_HUB:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "resetHub");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_CLOUD_API:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "cloudAPI");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_SET_EXPRESSION:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "setExpression");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_SET_VARIABLE:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "setVariable");
-                        break;
-                    }
-                    case EZLOPI_SCENE_THEN_TOGGLE_VALUE:
-                    {
-                        ezlopi_scenes_cjson_add_string(cj_method, "name", "toggleValue");
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
+                        TRACE_B("curr-filed: %p", curr_field);
+                        TRACE_B("%s: %s", curr_field->name, curr_field->name);
+                        cJSON_AddStringToObject(cj_args, curr_field->name, curr_field->name);
+                        curr_field = curr_field->next;
                     }
                 }
             }
@@ -424,26 +437,31 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_t *fields)
                 if (cj_field)
                 {
                     ezlopi_scenes_cjson_add_string(cj_field, "name", curr_field->name);
-                    ezlopi_scenes_cjson_add_string(cj_field, "type", curr_field->type);
+                    // ezlopi_scenes_cjson_add_string(cj_field, "type", curr_field->type);
                     switch (curr_field->value_type)
                     {
-                    case SCENE_VALUE_TYPE_FALSE:
+                    case SCENE_VALUE_TYPE_BOOL:
                     {
-                        cJSON_AddFalseToObject(cj_field, "value");
+                        ezlopi_scenes_cjson_add_string(cj_field, "type", "bool");
+                        if (0 == curr_field->value.value_double)
+                        {
+                            cJSON_AddFalseToObject(cj_field, "value");
+                        }
+                        else
+                        {
+                            cJSON_AddTrueToObject(cj_field, "value");
+                        }
                         break;
                     }
-                    case SCENE_VALUE_TYPE_TRUE:
+                    case SCENE_VALUE_TYPE_INT:
                     {
-                        cJSON_AddTrueToObject(cj_field, "value");
-                        break;
-                    }
-                    case SCENE_VALUE_TYPE_NUMBER:
-                    {
+                        ezlopi_scenes_cjson_add_string(cj_field, "type", "int");
                         cJSON_AddNumberToObject(cj_field, "value", curr_field->value.value_double);
                         break;
                     }
-                    case SCENE_VALUE_TYPE_STRING:
+                    case SCENE_VALUE_TYPE_ITEM:
                     {
+                        ezlopi_scenes_cjson_add_string(cj_field, "type", "item");
                         ezlopi_scenes_cjson_add_string(cj_field, "value", curr_field->value.value_string);
                         break;
                     }
@@ -470,12 +488,17 @@ cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_t *then_block)
     cJSON *cj_then_block = NULL;
     if (then_block)
     {
+
         cj_then_block = cJSON_CreateObject();
         if (cj_then_block)
         {
+
             ezlopi_scenes_cjson_add_then_block_options(cj_then_block, &then_block);
+
             ezlopi_scenes_cjson_add_string(cj_then_block, "blockType", "then");
+
             ezlopi_scenes_cjson_add_action_delay(cj_then_block, &then_block->delay);
+
             ezlopi_scenes_cjson_add_fields(cj_then_block, then_block->fields);
         }
     }
@@ -490,13 +513,16 @@ void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_block
         cJSON *cj_then_block_array = cJSON_AddArrayToObject(root, "then");
         if (cj_then_block_array)
         {
+
             while (then_blocks)
             {
                 cJSON *cj_then_block = ezlopi_scenes_cjson_create_then_block(then_blocks);
                 if (cj_then_block)
                 {
+
                     if (!cJSON_AddItemToArray(cj_then_block_array, cj_then_block))
                     {
+
                         cJSON_Delete(cj_then_block);
                     }
                 }
@@ -556,6 +582,7 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene)
         cj_scene = cJSON_CreateObject();
         if (cj_scene)
         {
+
             char tmp_str[16] = {0};
             snprintf(tmp_str, sizeof(tmp_str), "%08x", scene->_id);
             // cJSON_AddNumberToObject(cj_scene, "_id", scene->_id);
@@ -565,9 +592,12 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene)
             cJSON_AddBoolToObject(cj_scene, "is_group", scene->is_group);
             ezlopi_scenes_cjson_add_string(cj_scene, "name", scene->name);
             ezlopi_scenes_cjson_add_string(cj_scene, "parent_id", scene->parent_id);
+
             ezlopi_scenes_cjson_add_user_notifications(cj_scene, scene->user_notifications);
             ezlopi_scenes_cjson_add_house_modes(cj_scene, scene->house_modes);
+
             ezlopi_scenes_cjson_add_then_blocks(cj_scene, scene->then);
+
             ezlopi_scenes_cjson_add_when_blocks(cj_scene, scene->when);
         }
     }
@@ -580,13 +610,17 @@ cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_t *scenes_list)
     cJSON *cj_scenes_array = cJSON_CreateArray();
     if (cj_scenes_array)
     {
+
         while (scenes_list)
         {
+
             cJSON *cj_scene = ezlopi_scenes_create_cjson_scene(scenes_list);
             if (cj_scene)
             {
+
                 if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
                 {
+
                     cJSON_Delete(cj_scene);
                 }
             }
@@ -605,9 +639,11 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list)
     cJSON *cj_scenes_array = ezlopi_scenes_create_cjson_scene_list(scenes_list);
     if (cj_scenes_array)
     {
+
         char *scenes_list_str = cJSON_Print(cj_scenes_array);
         if (scenes_list_str)
         {
+
             TRACE_D("scenes_list_str: \r\n%s", scenes_list_str);
             cJSON_Minify(scenes_list);
         }
