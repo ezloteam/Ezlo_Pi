@@ -44,6 +44,7 @@
 #include "sensor_0041_ADC_FC28_soilMoisture.h"
 #include "sensor_0042_ADC_shunt_voltmeter.h"
 #include "sensor_0043_ADC_UV_intensity.h"
+#include "sensor_0044_I2C_TSL2561_luminosity.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -346,6 +347,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0043_ADC_UV_INTENSITY,
         .func = sensor_0043_adc_uv_intensity,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY
+    {
+        .id = EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY,
+        .func = sensor_0044_I2C_TSL2561_luminosity,
     },
 #endif
 

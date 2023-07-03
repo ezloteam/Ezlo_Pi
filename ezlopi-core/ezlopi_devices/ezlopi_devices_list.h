@@ -64,7 +64,7 @@
 #define EZLOPI_SENSOR_0041_ADC_FC28_soilMoisture                                    41
 #define EZLOPI_SENSOR_0042_ADC_shunt_voltmeter                                      42
 #define EZLOPI_SENSOR_0043_ADC_UV_INTENSITY                                         43
-
+#define EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY                                   44
 
 /**
  * @brief defining the type of sensor call function

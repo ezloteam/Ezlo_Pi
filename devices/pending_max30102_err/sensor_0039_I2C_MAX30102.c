@@ -211,10 +211,15 @@ static s_ezlopi_device_properties_t *sensor_i2c_max30102_prepare_properties(uint
 
 static bool sensor_0039_I2C_max30102_init(s_ezlopi_device_properties_t *properties, void *user_arg)
 {
+    static bool i2c_init_flag = false;
     static bool guard = false;
     if (!guard)
     {
-        ezlopi_i2c_master_init(&properties->interface.i2c_master);
+        if (!i2c_init_flag)
+        {
+            ezlopi_i2c_master_init(&properties->interface.i2c_master);
+            i2c_init_flag = true;
+        }
         if (Check_PARTID(properties))
         {
             TRACE_I("I2C initialized to channel %d", properties->interface.i2c_master.channel);
@@ -223,8 +228,8 @@ static bool sensor_0039_I2C_max30102_init(s_ezlopi_device_properties_t *properti
         }
         else
         {
-            TRACE_E("MAX30102 not found....I2C Failed!!... Please check your I2C connection.");
-            ezlopi_i2c_master_deinit(&properties->interface.i2c_master);
+            /*NOTE : NEED TO REMOVE THIS 'i2c_deinit' code*/
+            TRACE_E("MAX30102 not found!....... Please Restart!! or Check your I2C connection...");
         }
     }
     return guard;
@@ -256,12 +261,11 @@ static int sensor_0039_I2C_max30102_get_value_cjson(s_ezlopi_device_properties_t
     {
         if (ezlopi_item_name_heart_rate == properties->ezlopi_cloud.item_name)
         {
-
             if (heartRateValid)
             {
                 data_value = (int)(heartRate);
             }
-            TRACE_I("HeartRate : {%d bpm}", data_value);
+
             cJSON_AddNumberToObject(cjson_properties, "value", data_value);
             cJSON_AddStringToObject(cjson_properties, "scale", "bpm");
         }
