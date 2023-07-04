@@ -508,35 +508,6 @@ static void __new_args_create_is_item_state(s_is_item_state_arg_t *arg, cJSON *c
     }
 }
 
-// static void __new_args_create_http_request(s_arg_http_request_t *arg_http_request, cJSON *cj_args)
-// {
-//     if (arg_http_request && cj_args)
-//     {
-//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "content", arg_http_request->content);
-//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "contentType", arg_http_request->content_type);
-//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "credential", arg_http_request->credential);
-//         // CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "headers", arg_http_request->headers);
-//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "skipSecurity", arg_http_request->skip_security);
-//         CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "url", arg_http_request->url);
-//     }
-// }
-
-// static void __new_args_create_house_mode(s_arg_house_mode_t *arg_house_mode, cJSON *cj_args)
-// {
-//     if (arg_house_mode && cj_args)
-//     {
-//         TRACE_E("Not Implemented!");
-//     }
-// }
-
-// static void __new_args_create_lua_script(s_arg_lua_script_t *arg_lua_script, cJSON *cj_args)
-// {
-//     if (arg_lua_script && cj_args)
-//     {
-//         TRACE_E("Not Implemented!");
-//     }
-// }
-
 static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, "name", p_method->name);

@@ -28,8 +28,12 @@ typedef enum e_scene_value_type
 
 typedef enum e_method_type
 {
-    EZLOPI_SCENE_METHOD_TYPE_NONE = 0,
+#define EZLOPI_SCENE(method, name, func) EZLOPI_SCENE_##method,
+#include "ezlopi_scenes_method_types.h"
+#undef EZLOPI_SCENE
 
+#if 0
+    EZLOPI_SCENE_METHOD_TYPE_NONE = 0,
     /* When methods list, for details: https://api.ezlo.com/hub/scenes/when_blocks/index.html */
     EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE,                    // isItemState
     EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE_CHANGED,            // isItemStateChanged
@@ -83,8 +87,9 @@ typedef enum e_method_type
     EZLOPI_SCENE_THEN_SET_EXPRESSION,                     // setExpression
     EZLOPI_SCENE_THEN_SET_VARIABLE,                       // setVariable
     EZLOPI_SCENE_THEN_TOGGLE_VALUE,                       // toggleValue
-
     EZLOPI_SCENE_METHOD_TYPE_MAX
+#endif
+
 } e_method_type_t;
 
 typedef struct s_is_item_state_arg

@@ -28,9 +28,9 @@ static int __execute_then_block(l_then_block_t *then_block)
 static int __check_when_block(l_when_block_t *when_block)
 {
     int ret = 0;
-#if 0
     while (when_block)
     {
+#if 0
         switch (when_block->block_options.method.arg_type)
         {
         case EZLOPI_SCENE_ARG_TYPE_DEVICE:
@@ -55,7 +55,7 @@ static int __check_when_block(l_when_block_t *when_block)
             break;
         }
         }
-
+#endif
         if (ret)
         {
             break;
@@ -63,7 +63,6 @@ static int __check_when_block(l_when_block_t *when_block)
 
         when_block = when_block->next;
     }
-#endif
     return ret;
 }
 

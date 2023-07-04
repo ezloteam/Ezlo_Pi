@@ -293,7 +293,6 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
             cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, "method");
             if (cj_method)
             {
-
                 switch (then_block->block_options.method.type)
                 {
                 case EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE:
@@ -390,7 +389,6 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
                 cJSON *cj_args = cJSON_AddObjectToObject(cj_method, "args");
                 if (cj_args)
                 {
-
                     l_fields_t *curr_field = then_block->fields;
                     while (curr_field)
                     {
@@ -488,17 +486,12 @@ cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_t *then_block)
     cJSON *cj_then_block = NULL;
     if (then_block)
     {
-
         cj_then_block = cJSON_CreateObject();
         if (cj_then_block)
         {
-
             ezlopi_scenes_cjson_add_then_block_options(cj_then_block, &then_block);
-
             ezlopi_scenes_cjson_add_string(cj_then_block, "blockType", "then");
-
             ezlopi_scenes_cjson_add_action_delay(cj_then_block, &then_block->delay);
-
             ezlopi_scenes_cjson_add_fields(cj_then_block, then_block->fields);
         }
     }
@@ -513,16 +506,13 @@ void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_t *then_block
         cJSON *cj_then_block_array = cJSON_AddArrayToObject(root, "then");
         if (cj_then_block_array)
         {
-
             while (then_blocks)
             {
                 cJSON *cj_then_block = ezlopi_scenes_cjson_create_then_block(then_blocks);
                 if (cj_then_block)
                 {
-
                     if (!cJSON_AddItemToArray(cj_then_block_array, cj_then_block))
                     {
-
                         cJSON_Delete(cj_then_block);
                     }
                 }
