@@ -1,7 +1,6 @@
 #include "trace.h"
 #include "ezlopi_scenes.h"
 
-
 void ezlopi_scene_then_set_item_value(void) {}
 void ezlopi_scene_then_set_device_armed(void) {}
 void ezlopi_scene_then_send_cloud_abstract_command(void) {}

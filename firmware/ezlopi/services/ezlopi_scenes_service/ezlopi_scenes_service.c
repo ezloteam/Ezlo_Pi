@@ -71,8 +71,7 @@ static void __scenes_process(void *pv)
     while (1)
     {
         l_scenes_list_t *scenes_list = ezlopi_scenes_get_scenes_list();
-
-        if (scenes_list)
+        while (scenes_list)
         {
             if (__check_when_block(scenes_list->when))
             {

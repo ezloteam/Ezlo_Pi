@@ -26,70 +26,18 @@ typedef enum e_scene_value_type
     SCENE_VALUE_TYPE_MAX
 } e_scene_value_type_t;
 
+typedef enum e_value_type
+{
+#define EZLOPI_VALUE_TYPE(type, name) EZLOPI_VALUE_TYPE_##type,
+#include "ezlopi_scenes_value_types.h"
+#undef EZLOPI_VALUE_TYPE
+} e_value_type_t;
+
 typedef enum e_method_type
 {
 #define EZLOPI_SCENE(method, name, func) EZLOPI_SCENE_##method,
 #include "ezlopi_scenes_method_types.h"
 #undef EZLOPI_SCENE
-
-#if 0
-    EZLOPI_SCENE_METHOD_TYPE_NONE = 0,
-    /* When methods list, for details: https://api.ezlo.com/hub/scenes/when_blocks/index.html */
-    EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE,                    // isItemState
-    EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE_CHANGED,            // isItemStateChanged
-    EZLOPI_SCENE_WHEN_METHOD_IS_BUTTON_STATE,                  // isButtonState
-    EZLOPI_SCENE_WHEN_METHOD_IS_SUN_STATE,                     // isSunState
-    EZLOPI_SCENE_WHEN_METHOD_IS_DATE,                          // isDate
-    EZLOPI_SCENE_WHEN_METHOD_IS_ONCE,                          // isOnce
-    EZLOPI_SCENE_WHEN_METHOD_IS_INTERVAL,                      // isInterval
-    EZLOPI_SCENE_WHEN_METHOD_IS_DATE_RANGE,                    // isDateRange
-    EZLOPI_SCENE_WHEN_METHOD_IS_USER_LOCK_OPERATION,           // isUserLockOperation
-    EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO,         // isHouseModeChangedTo
-    EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM,       // isHouseModeChangedFrom
-    EZLOPI_SCENE_WHEN_METHOD_IS_DEVICE_STATE,                  // isDeviceState
-    EZLOPI_SCENE_WHEN_METHOD_IS_NETWORK_STATE,                 // isNetworkState
-    EZLOPI_SCENE_WHEN_METHOD_IS_SCENE_STATE,                   // isSceneState
-    EZLOPI_SCENE_WHEN_METHOD_IS_GROUP_STATE,                   // isGroupState
-    EZLOPI_SCENE_WHEN_METHOD_IS_CLOUD_STATE,                   // isCloudState
-    EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_STATE,                 // isBatteryState
-    EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_LEVEL,                 // isBatteryLevel
-    EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBERS,                  // compareNumbers
-    EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBER_RANGE,             // compareNumberRange
-    EZLOPI_SCENE_WHEN_METHOD_COMPARE_STRINGS,                  // compareStrings
-    EZLOPI_SCENE_WHEN_METHOD_STRING_OPERATION,                 // stringOperation
-    EZLOPI_SCENE_WHEN_METHOD_IN_ARRAY,                         // inArray
-    EZLOPI_SCENE_WHEN_METHOD_COMPARE_VALUES,                   // compareValues
-    EZLOPI_SCENE_WHEN_METHOD_HAS_ATLEAST_ONE_DICTIONARY_VALUE, // hasAtLeastOneDictionaryValue
-    EZLOPI_SCENE_WHEN_METHOD_IS_FIRMWARE_UPDATE_STATE,         // isFirmwareUpdateState
-    EZLOPI_SCENE_WHEN_METHOD_IS_DICTIONARY_CHANGED,            // isDictionaryChanged
-    EZLOPI_SCENE_WHEN_METHOD_IS_DETECTED_IN_HOTZONE,           // isDetectedInHotzone
-    EZLOPI_SCENE_WHEN_METHOD_AND,                              // and
-    EZLOPI_SCENE_WHEN_METHOD_NOT,                              // not
-    EZLOPI_SCENE_WHEN_METHOD_OR,                               // or
-    EZLOPI_SCENE_WHEN_METHOD_XOR,                              // xor
-    EZLOPI_SCENE_WHEN_METHOD_FUNCTION,                         // function
-
-    /* Then method list, for details: https://api.ezlo.com/hub/scenes/action_blocks/index.html#then-blocks */
-    EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE,              // setItemValue
-    EZLOPI_SCENE_THEN_METHOD_SET_DEVICE_ARMED,            // setDeviceArmed
-    EZLOPI_SCENE_THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND, // sendCloudAbstractCommand
-    EZLOPI_SCENE_THEN_METHOD_SWITCH_HOUSE_MODE,           // switchHouseMode
-    EZLOPI_SCENE_THEN_METHOD_SEND_HTTP_REQUEST,           // sendHttpRequest
-    EZLOPI_SCENE_THEN_METHOD_RUN_CUSTOM_SCRIPT,           // runCustomScript
-    EZLOPI_SCENE_THEN_METHOD_RUN_PLUGIN_SCRIPT,           // runPluginScript
-    EZLOPI_SCENE_THEN_METHOD_RUN_SCENE,                   // runScene
-    EZLOPI_SCENE_THEN_METHOD_SET_SCENE_STATE,             // setSceneState
-    EZLOPI_SCENE_THEN_RESET_LATCH,                        // resetLatch
-    EZLOPI_SCENE_THEN_RESET_SCENE_LATCHES,                // resetSceneLatches
-    EZLOPI_SCENE_THEN_REBOOT_HUB,                         // rebootHub
-    EZLOPI_SCENE_THEN_RESET_HUB,                          // resetHub
-    EZLOPI_SCENE_THEN_CLOUD_API,                          // cloudAPI
-    EZLOPI_SCENE_THEN_SET_EXPRESSION,                     // setExpression
-    EZLOPI_SCENE_THEN_SET_VARIABLE,                       // setVariable
-    EZLOPI_SCENE_THEN_TOGGLE_VALUE,                       // toggleValue
-    EZLOPI_SCENE_METHOD_TYPE_MAX
-#endif
-
 } e_method_type_t;
 
 typedef struct s_is_item_state_arg
@@ -150,6 +98,15 @@ typedef struct s_action_delay
     uint16_t minutes;
     uint16_t seconds;
 } s_action_delay_t;
+
+// typedef union u_field_value
+// {
+//     char value_string[32];
+//     double value_double;
+//     int value_int;
+//     uint32_t value_uint;
+//     bool value_bool;
+// } u_field_value_t;
 
 typedef struct l_fields
 {
