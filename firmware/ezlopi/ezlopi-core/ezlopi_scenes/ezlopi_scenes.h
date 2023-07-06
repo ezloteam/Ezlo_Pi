@@ -6,6 +6,7 @@
 #include "string.h"
 #include "ctype.h"
 #include "stdint.h"
+#include "stdbool.h"
 #include "cJSON.h"
 
 typedef enum e_scenes_block_type
@@ -18,20 +19,10 @@ typedef enum e_scenes_block_type
 
 typedef enum e_scene_value_type
 {
-    SCENE_VALUE_TYPE_UNDEFINED = 0,
-    SCENE_VALUE_TYPE_BOOL = 1,
-    SCENE_VALUE_TYPE_INT = 2,
-    SCENE_VALUE_TYPE_ITEM = 3,
-    // SCENE_VALUE_TYPE_STRING = 4,
-    SCENE_VALUE_TYPE_MAX
-} e_scene_value_type_t;
-
-typedef enum e_value_type
-{
 #define EZLOPI_VALUE_TYPE(type, name) EZLOPI_VALUE_TYPE_##type,
 #include "ezlopi_scenes_value_types.h"
 #undef EZLOPI_VALUE_TYPE
-} e_value_type_t;
+} e_scene_value_type_t;
 
 typedef enum e_method_type
 {
@@ -39,34 +30,6 @@ typedef enum e_method_type
 #include "ezlopi_scenes_method_types.h"
 #undef EZLOPI_SCENE
 } e_method_type_t;
-
-typedef struct s_is_item_state_arg
-{
-    char item[32];
-    char value[32];
-    char armed[32];
-} s_is_item_state_arg_t;
-
-typedef struct s_is_item_state_changed_arg
-{
-    char item[32];
-    char start[32];
-    char finish[32];
-} s_is_item_state_changed_arg_t;
-
-typedef s_is_item_state_arg_t s_is_button_state_arg_t;
-
-typedef struct l_arg_http_header
-{
-    char key[32];
-    char *value; // value size may be over 512 for token
-    struct l_arg_http_header *next;
-} l_arg_http_header_t;
-
-typedef struct s_set_item_value_arg
-{
-
-} s_set_item_value_arg_t;
 
 typedef struct s_method
 {
@@ -99,20 +62,21 @@ typedef struct s_action_delay
     uint16_t seconds;
 } s_action_delay_t;
 
-// typedef union u_field_value
-// {
-//     char value_string[32];
-//     double value_double;
-//     int value_int;
-//     uint32_t value_uint;
-//     bool value_bool;
-// } u_field_value_t;
+typedef union u_field_value
+{
+    char *value_string;
+    double value_double;
+    int value_int;
+    uint32_t value_uint;
+    bool value_bool;
+} u_field_value_t;
 
 typedef struct l_fields
 {
     char name[32];
     // char type[32];
 
+    // e_value_type_t value_type;
     e_scene_value_type_t value_type; // 0: double, 1: string
     union value
     {

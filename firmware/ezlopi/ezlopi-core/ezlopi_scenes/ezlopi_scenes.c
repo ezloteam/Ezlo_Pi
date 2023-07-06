@@ -10,6 +10,11 @@
 static const char *test_scene_create_str = "[{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}]";
 
 static l_scenes_list_t *scenes_list_head = NULL;
+static const char *scenes_value_type_name[] = {
+#define EZLOPI_VALUE_TYPE(type, name) name,
+#include "ezlopi_scenes_value_types.h"
+#undef EZLOPI_VALUE_TYPE
+};
 
 static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options);
 
@@ -499,234 +504,10 @@ static e_method_type_t __parse_method_type(char *method_name)
     return methode_type;
 }
 
-static void __new_args_create_is_item_state(s_is_item_state_arg_t *arg, cJSON *cj_args)
-{
-    if (arg && cj_args)
-    {
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "item", arg->item);
-        CJSON_GET_VALUE_STRING_BY_COPY(cj_args, "value", arg->value);
-    }
-}
-
 static void __new_method_create(s_method_t *p_method, cJSON *cj_method)
 {
     CJSON_GET_VALUE_STRING_BY_COPY(cj_method, "name", p_method->name);
     p_method->type = __parse_method_type(p_method->name);
-
-#if 0
-    cJSON *cj_args = cJSON_GetObjectItem(cj_method, "args");
-    if (cj_args)
-    {
-        switch (p_method->type)
-        {
-        case EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE:
-        {
-            __new_args_create_is_item_state(&p_method->u_arg.is_item_state_arg, cj_args);
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_ITEM_STATE_CHANGED:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_BUTTON_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_SUN_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_DATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_ONCE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_INTERVAL:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_DATE_RANGE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_USER_LOCK_OPERATION:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_TO:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_HOUSE_MODE_CHANGED_FROM:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_DEVICE_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_NETWORK_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_SCENE_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_GROUP_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_CLOUD_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_BATTERY_LEVEL:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBERS:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_NUMBER_RANGE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_STRINGS:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_STRING_OPERATION:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IN_ARRAY:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_COMPARE_VALUES:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_HAS_ATLEAST_ONE_DICTIONARY_VALUE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_FIRMWARE_UPDATE_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_DICTIONARY_CHANGED:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_IS_DETECTED_IN_HOTZONE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_AND:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_NOT:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_OR:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_XOR:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_WHEN_METHOD_FUNCTION:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_SET_ITEM_VALUE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_SET_DEVICE_ARMED:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_SEND_CLOUD_ABSTRACT_COMMAND:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_SWITCH_HOUSE_MODE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_SEND_HTTP_REQUEST:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_RUN_CUSTOM_SCRIPT:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_RUN_PLUGIN_SCRIPT:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_RUN_SCENE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_METHOD_SET_SCENE_STATE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_RESET_LATCH:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_RESET_SCENE_LATCHES:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_REBOOT_HUB:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_RESET_HUB:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_CLOUD_API:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_SET_EXPRESSION:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_SET_VARIABLE:
-        {
-            break;
-        }
-        case EZLOPI_SCENE_THEN_TOGGLE_VALUE:
-        {
-            break;
-        }
-        default:
-        {
-            break;
-        }
-        }
-    }
-#endif
 }
 
 static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options)
@@ -751,13 +532,26 @@ static void __new_action_delay(s_action_delay_t *action_delay, cJSON *cj_delay)
 
 static e_scene_value_type_t __new_get_value_type(cJSON *cj_field)
 {
-    e_scene_value_type_t ret = SCENE_VALUE_TYPE_UNDEFINED;
+    e_scene_value_type_t ret = EZLOPI_VALUE_TYPE_NONE;
     if (cj_field)
     {
         char *type_str = NULL;
         CJSON_GET_VALUE_STRING(cj_field, "type", type_str);
         if (type_str)
         {
+            uint32_t type_str_len = strlen(type_str);
+            for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX;)
+            {
+                uint32_t check_str_len = strlen(scenes_value_type_name[i]);
+                uint32_t check_len = (check_str_len < type_str_len) ? type_str_len : check_str_len;
+                if (0 == strncmp(scenes_value_type_name[i], type_str, check_len))
+                {
+                    TRACE_W("Found value type: %s | %s", type_str, scenes_value_type_name[i]);
+                    ret = i;
+                    break;
+                }
+            }
+#if 0                         
             if (0 == strncmp(type_str, "bool", 4))
             {
                 ret = SCENE_VALUE_TYPE_BOOL;
@@ -770,6 +564,7 @@ static e_scene_value_type_t __new_get_value_type(cJSON *cj_field)
             {
                 ret = SCENE_VALUE_TYPE_ITEM;
             }
+#endif
         }
     }
     return ret;

@@ -23,6 +23,285 @@ void ezlopi_print_fields(l_fields_t *fields)
     {
         TRACE_D("\t\t\t|---------- field_count: %d ----------", ++field_count);
         TRACE_D("\t\t\t|-- name: %s", fields->name);
+
+        switch (fields->value_type)
+        {
+        case EZLOPI_VALUE_TYPE_NONE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_INT:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_BOOL:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_FLOAT:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_STRING:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_DICTIONARY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ARRAY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_RGB:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_USER_CODE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_TOKEN:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_BUTTON_STATE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_SOUND_INFO:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_CAMERA_HOTZONE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_HOTZONE_MATCH:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_GEOFENCE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ILLUMINANCE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_PRESSURE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_SUBSTANCE_AMOUNT:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_POWER:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_VELOCITY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ACCELERATION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_DIRECTION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_GENERAL_PURPOSE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ACIDITY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ELECTRIC_POTENTIAL:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ELECTRIC_CURRENT:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_FORCE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_IRRADIANCE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_PRECIPITATION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_LENGTH:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_MASS:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_VOLUME_FLOW:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_VOLUME:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ANGLE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_FREQUENCY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_SEISMIC_INTENSITY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_SEISMIC_MAGNITUDE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ULTRAVIOLET:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ELECTRICAL_RESISTANCE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ELECTRICAL_CONDUCTIVITY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_LOUDNESS:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_MOISTURE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_TIME:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_RADON_CONCENTRATION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_BLOOD_PRESSURE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ENERGY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_RF_SIGNAL_STRENGTH:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_TEMPERATURE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_HUMIDITY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_KILO_VOLT_AMPERE_HOUR:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_REACTIVE_POWER_INSTANT:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_DEVICE:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_ITEM:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_EXPRESSION:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_INT_ARRAY:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_INTERVAL:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
+        {
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_MAX:
+        {
+            break;
+        }
+        default:
+        {
+            TRACE_E("Value type not matched!");
+            break;
+        }
+        }
+
+#if 0
         if (SCENE_VALUE_TYPE_INT == fields->value_type)
         {
             TRACE_D("\t\t\t|-- type: int");
@@ -42,6 +321,7 @@ void ezlopi_print_fields(l_fields_t *fields)
         {
             TRACE_E("\t\t\t|- value type: %d", fields->value_type);
         }
+#endif
 
         fields = fields->next;
         if (fields)
