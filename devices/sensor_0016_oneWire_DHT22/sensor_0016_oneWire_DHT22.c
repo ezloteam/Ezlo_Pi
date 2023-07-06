@@ -13,29 +13,26 @@
 #include "dht22.h"
 #include "sensor_0016_oneWire_DHT22.h"
 
-
 static bool dht22_initialized = false;
 static int counter = 5;
 
-static int dht22_sensor_prepare(void* args);
+static int dht22_sensor_prepare(void *args);
 static int dht22_sensor_add_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *dht22_sensor_properties, void *user_arg);
 static s_ezlopi_device_properties_t *dht22_sensor_prepare_properties(uint32_t device_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device);
-static int dht22_sensor_init(s_ezlopi_device_properties_t* properties);
-static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t* properties, void* args);
+static int dht22_sensor_init(s_ezlopi_device_properties_t *properties);
+static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
 
-
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, sub_category, item_name, value_type, cjson_device)                                      \
-    {                                                                                                                                           \
-        s_ezlopi_device_properties_t *_properties = dht22_sensor_prepare_properties(device_id, category, sub_category,                          \
-                                                                                       item_name, value_type, cjson_device);                    \
-        if (NULL != _properties)                                                                                                                \
-        {                                                                                                                                       \
-            dht22_sensor_add_to_list(prep_arg, _properties, NULL);                                                                              \
-        }                                                                                                                                       \
+#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, sub_category, item_name, value_type, cjson_device)                \
+    {                                                                                                                     \
+        s_ezlopi_device_properties_t *_properties = dht22_sensor_prepare_properties(device_id, category, sub_category,    \
+                                                                                    item_name, value_type, cjson_device); \
+        if (NULL != _properties)                                                                                          \
+        {                                                                                                                 \
+            dht22_sensor_add_to_list(prep_arg, _properties, NULL);                                                        \
+        }                                                                                                                 \
     }
 
-
-int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, s_ezlopi_device_properties_t* ezlo_device, void* arg, void* user_args)
+int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_args)
 {
     int ret = 0;
     switch (action)
@@ -57,7 +54,7 @@ int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, s_ezlopi_device_propert
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if(5 == counter)
+        if (5 == counter)
         {
             ezlopi_device_value_updated_from_device(ezlo_device);
             counter = 0;
@@ -73,8 +70,7 @@ int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, s_ezlopi_device_propert
     return ret;
 }
 
-
-static int dht22_sensor_prepare(void* arg)
+static int dht22_sensor_prepare(void *arg)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
@@ -90,21 +86,20 @@ static int dht22_sensor_prepare(void* arg)
     return ret;
 }
 
-
 static s_ezlopi_device_properties_t *dht22_sensor_prepare_properties(uint32_t device_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device)
 {
-    s_ezlopi_device_properties_t* dht22_sensor_properties = NULL;
+    s_ezlopi_device_properties_t *dht22_sensor_properties = NULL;
 
-    if(NULL != cjson_device)
+    if (NULL != cjson_device)
     {
-        dht22_sensor_properties = (s_ezlopi_device_properties_t*)malloc(sizeof(s_ezlopi_device_properties_t));
-        if(dht22_sensor_properties)
+        dht22_sensor_properties = (s_ezlopi_device_properties_t *)malloc(sizeof(s_ezlopi_device_properties_t));
+        if (dht22_sensor_properties)
         {
             memset(dht22_sensor_properties, 0, sizeof(s_ezlopi_device_properties_t));
             dht22_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
             char *device_name = NULL;
-            
+
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
             ASSIGN_DEVICE_NAME(dht22_sensor_properties, device_name);
             dht22_sensor_properties->ezlopi_cloud.category = category;
@@ -123,7 +118,6 @@ static s_ezlopi_device_properties_t *dht22_sensor_prepare_properties(uint32_t de
             dht22_sensor_properties->interface.onewire_master.enable = true;
         }
     }
-
     return dht22_sensor_properties;
 }
 
@@ -144,12 +138,11 @@ static int dht22_sensor_add_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_devi
     return ret;
 }
 
-
-static int dht22_sensor_init(s_ezlopi_device_properties_t* properties)
+static int dht22_sensor_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
 
-    if(!dht22_initialized)
+    if (!dht22_initialized)
     {
         setDHTgpio(properties->interface.onewire_master.onewire_pin);
         dht22_initialized = true;
@@ -158,27 +151,29 @@ static int dht22_sensor_init(s_ezlopi_device_properties_t* properties)
     return ret;
 }
 
-static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t* properties, void* args)
+static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
 
-    cJSON* cjson_properties = (cJSON*)args;
-    char formatted_value[20];   
-    if(cjson_properties)
+    cJSON *cjson_properties = (cJSON *)args;
+    char formatted_value[20];
+    if (cjson_properties)
     {
         if (ezlopi_item_name_temp == properties->ezlopi_cloud.item_name)
         {
             readDHT();
             float temperature = getTemperature();
+            TRACE_I("temp : %.2f *C", temperature);
             snprintf(formatted_value, 20, "%0.2f", temperature);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
             cJSON_AddNumberToObject(cjson_properties, "value", temperature);
             cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
         }
-        if(ezlopi_item_name_humidity == properties->ezlopi_cloud.item_name)
+        if (ezlopi_item_name_humidity == properties->ezlopi_cloud.item_name)
         {
             readDHT();
             float humidity = getHumidity();
+            TRACE_I("humidity: %.2f percent", humidity);
             snprintf(formatted_value, 20, "%0.2f", humidity);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
             cJSON_AddNumberToObject(cjson_properties, "value", humidity);

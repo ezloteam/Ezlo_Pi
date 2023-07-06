@@ -8,7 +8,13 @@
 #include "ezlopi_cloud_subcategory_str.h"
 
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
+
+// defines
 static uint32_t Lux_intensity = 0;
+
+//----------------------------------------------------------------------------------------------------------------------------
+//                  Declarations
+//----------------------------------------------------------------------------------------------------------------------------
 static void Power_Up_tsl2561(s_ezlopi_device_properties_t *properties);
 static void Power_Down_tsl2561(s_ezlopi_device_properties_t *properties);
 
@@ -20,11 +26,9 @@ static void sensor_0044_tsl2561_configure_device(s_ezlopi_device_properties_t *p
 static int sensor_0044_i2c_tsl2561_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_0044_i2c_tsl2561_update_value(s_ezlopi_device_properties_t *properties);
 
-// static esp_err_t tsl2561_set_timing_and_gain(s_ezlopi_device_properties_t *properties);
 static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain);
-
 static uint8_t readRegister8(s_ezlopi_device_properties_t *properties, uint8_t address, uint8_t *reg);
-//----------------------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------------------
 int sensor_0044_I2C_TSL2561_luminosity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *usr_args)
 {
@@ -76,6 +80,9 @@ int sensor_0044_I2C_TSL2561_luminosity(e_ezlopi_actions_t action, s_ezlopi_devic
     return ret;
 }
 //----------------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------------
+//                 Function Definations
 //----------------------------------------------------------------------------------------------------------------------------
 
 static int sensor_0044_i2c_tsl2561_prep_and_add(void *arg)
@@ -212,17 +219,6 @@ static void sensor_0044_tsl2561_configure_device(s_ezlopi_device_properties_t *p
 
     // Power_Down_tsl2561(properties);
 }
-
-// static esp_err_t tsl2561_set_timing_and_gain(s_ezlopi_device_properties_t *properties)
-// {
-//     // this controls both intergration time and gain of ADC
-//     esp_err_t ret = ESP_OK;
-//     uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_TIMING);
-//     uint8_t setup_code = (TSL2561_HIGH_GAIN_MODE_x16 | TSL2561_STOP_MANNUAL_INTEGRATION |TSL2561_INTEGRATION_TIME_13_7_MS)
-//     uint8_t write_buffer_timing[] = {command_code, setup_code};
-//     ezlopi_i2c_master_write_to_device(&properties->interface.i2c_master, write_buffer_timing, 2);
-//     return ret;
-// }
 
 static int sensor_0044_i2c_tsl2561_update_value(s_ezlopi_device_properties_t *properties)
 {

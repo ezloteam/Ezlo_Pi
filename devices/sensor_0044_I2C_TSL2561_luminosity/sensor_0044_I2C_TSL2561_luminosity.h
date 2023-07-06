@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------
 // Definations
 //-----------------------------------------------------------------
-#define TSL2561_ADDRESS 0x39 // floating address
+#define TSL2561_ADDRESS (0x39) // floating address
 
 /* CMD_access = "COMMAND CODEs" + "REGISTER ADDRESS" > */
 

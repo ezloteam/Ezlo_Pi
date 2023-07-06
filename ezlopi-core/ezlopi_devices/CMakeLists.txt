@@ -30,6 +30,7 @@ idf_component_register(
         sensor_0010_I2C_BME680
         sensor_0012_I2C_BME280
         sensor_0014_UART_PMS5003
+        sensor_0015_oneWire_DHT11
         sensor_0016_oneWire_DHT22
         sensor_0017_ADC_potentiometer
         sensor_0018_internal_hall_effect
@@ -58,6 +59,7 @@ idf_component_register(
         sensor_0042_ADC_shunt_voltmeter
         sensor_0043_ADC_UV_intensity
         sensor_0044_I2C_TSL2561_luminosity
+        sensor_0046_ADC_ACS712_currentMeter
 )
 
 

@@ -16,7 +16,7 @@
 #include "sensor_0012_I2C_BME280.h"
 // TODO Include for 0013
 #include "sensor_0014_UART_PMS5003.h"
-// TODO Include for 0015
+#include "sensor_0015_oneWire_DHT11.h"
 #include "sensor_0016_oneWire_DHT22.h"
 #include "sensor_0017_ADC_potentiometer.h"
 #include "sensor_0018_internal_hall_effect.h"
@@ -45,6 +45,7 @@
 #include "sensor_0042_ADC_shunt_voltmeter.h"
 #include "sensor_0043_ADC_UV_intensity.h"
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
+#include "sensor_0046_ADC_ACS712_currentMeter.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -147,12 +148,12 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-// #ifdef EZLOPI_SENSOR_0015_ONE_WIRE_DHT11
-//     {
-//         .id = EZLOPI_SENSOR_0015_ONE_WIRE_DHT11,
-//         .func =
-//     },
-// #endif
+#ifdef EZLOPI_SENSOR_0015_ONE_WIRE_DHT11
+    {
+        .id = EZLOPI_SENSOR_0015_ONE_WIRE_DHT11,
+        .func = sensor_0015_oneWire_DHT11,
+    },
+#endif
 
 #ifdef EZLOPI_SENSOR_0016_ONE_WIRE_DHT22
     {
@@ -354,6 +355,15 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY,
         .func = sensor_0044_I2C_TSL2561_luminosity,
+    },
+#endif
+
+// need to include 'sensor_0045'
+
+#ifdef EZLOPI_SENSOR_0046_ADC_ACS712_CURRENTMETER
+    {
+        .id = EZLOPI_SENSOR_0046_ADC_ACS712_CURRENTMETER,
+        .func = sensor_0046_ADC_ACS712_currentMeter,
     },
 #endif
 

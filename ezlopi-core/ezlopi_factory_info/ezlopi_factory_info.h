@@ -396,14 +396,11 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 8,\
-                \"dev_name\": \"TSL2561 LUX sensor\",\
+                \"dev_type\": 3,\
+                \"dev_name\": \"ACS712 currentmeter\",\
                 \"id_room\": \"\",\
-                \"id_item\": 44,\
-                \"gpio_sda\": 21,\
-                \"gpio_scl\": 22,\
-                \"pullup_sda\": true,\
-                \"pullup_scl\": true\
+                \"id_item\": 46,\
+                \"gpio\": 33\
           }\
         ],\
     \"dev_total\": 1}";
