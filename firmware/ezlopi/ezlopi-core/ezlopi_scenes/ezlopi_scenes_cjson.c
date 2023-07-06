@@ -4,12 +4,6 @@
 #include "trace.h"
 #include "ezlopi_scenes.h"
 
-static const char *ezlopi_scenes_methods_name[] = {
-#define EZLOPI_SCENE(method_type, name, func) name,
-#include "ezlopi_scenes_method_types.h"
-#undef EZLOPI_SCENE
-};
-
 static void ezlopi_scenes_cjson_add_string(cJSON *root, char *key, char *value)
 {
     if (root && key && value)
@@ -84,8 +78,11 @@ static void ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_block_array, l_
                 if ((when_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
                     (when_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    TRACE_E("Method: %s", ezlopi_scenes_methods_name[when_block->block_options.method.type]);
-                    ezlopi_scenes_cjson_add_string(cj_method, "name", ezlopi_scenes_methods_name[when_block->block_options.method.type]);
+                    // TRACE_E("Method: %s", ezlopi_scenes_methods_name[when_block->block_options.method.type]);
+
+                    char *method_type_name = ezlopi_scene_get_scene_method_name(when_block->block_options.method.type);
+                    TRACE_E("Method: %s", method_type_name ? method_type_name : "");
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", method_type_name ? method_type_name : "");
                 }
                 else
                 {
@@ -122,8 +119,12 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
                 if ((then_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
                     (then_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    TRACE_E("Method: %s", ezlopi_scenes_methods_name[then_block->block_options.method.type]);
-                    ezlopi_scenes_cjson_add_string(cj_method, "name", ezlopi_scenes_methods_name[then_block->block_options.method.type]);
+                    // TRACE_E("Method: %s", ezlopi_scenes_methods_name[then_block->block_options.method.type]);
+                    // ezlopi_scenes_cjson_add_string(cj_method, "name", ezlopi_scenes_methods_name[then_block->block_options.method.type]);
+
+                    char *method_type_name = ezlopi_scene_get_scene_method_name(then_block->block_options.method.type);
+                    TRACE_D("Method: %s", method_type_name ? method_type_name : "");
+                    ezlopi_scenes_cjson_add_string(cj_method, "name", method_type_name ? method_type_name : "");
                 }
                 else
                 {
@@ -177,6 +178,9 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_t *fields)
                 if (cj_field)
                 {
                     ezlopi_scenes_cjson_add_string(cj_field, "name", curr_field->name);
+                    char *value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
+                    ezlopi_scenes_cjson_add_string(cj_field, "type", value_type_name ? value_type_name : "");
+
                     switch (curr_field->value_type)
                     {
                     case EZLOPI_VALUE_TYPE_NONE:
@@ -185,266 +189,103 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_t *fields)
                     }
                     case EZLOPI_VALUE_TYPE_INT:
                     {
+                        cJSON_AddNumberToObject(cj_field, "value", curr_field->value.value_double);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_BOOL:
                     {
+                        if (0 == curr_field->value.value_double)
+                        {
+                            cJSON_AddFalseToObject(cj_field, "value");
+                        }
+                        else
+                        {
+                            cJSON_AddTrueToObject(cj_field, "value");
+                        }
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_FLOAT:
                     {
+                        cJSON_AddNumberToObject(cj_field, "value", curr_field->value.value_double);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_STRING:
                     {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_DICTIONARY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ARRAY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_RGB:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_USER_CODE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_TOKEN:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_BUTTON_STATE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_SOUND_INFO:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_CAMERA_HOTZONE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_HOTZONE_MATCH:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_GEOFENCE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ILLUMINANCE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_PRESSURE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_SUBSTANCE_AMOUNT:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_POWER:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_VELOCITY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ACCELERATION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_DIRECTION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_GENERAL_PURPOSE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ACIDITY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ELECTRIC_POTENTIAL:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ELECTRIC_CURRENT:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_FORCE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_IRRADIANCE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_PRECIPITATION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_LENGTH:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_MASS:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_VOLUME_FLOW:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_VOLUME:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ANGLE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_FREQUENCY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_SEISMIC_INTENSITY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_SEISMIC_MAGNITUDE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ULTRAVIOLET:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ELECTRICAL_RESISTANCE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ELECTRICAL_CONDUCTIVITY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_LOUDNESS:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_MOISTURE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_TIME:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_RADON_CONCENTRATION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_BLOOD_PRESSURE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_ENERGY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_RF_SIGNAL_STRENGTH:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_TEMPERATURE:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_HUMIDITY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_KILO_VOLT_AMPERE_HOUR:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_REACTIVE_POWER_INSTANT:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_DEVICE:
-                    {
+                        ezlopi_scenes_cjson_add_string(cj_field, "value", curr_field->value.value_string);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_ITEM:
                     {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_EXPRESSION:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-                    {
-                        break;
-                    }
-                    case EZLOPI_VALUE_TYPE_INT_ARRAY:
-                    {
+                        ezlopi_scenes_cjson_add_string(cj_field, "value", curr_field->value.value_string);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_INTERVAL:
                     {
+                        ezlopi_scenes_cjson_add_string(cj_field, "value", curr_field->value.value_string);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_DICTIONARY:
+                    case EZLOPI_VALUE_TYPE_ARRAY:
+                    case EZLOPI_VALUE_TYPE_RGB:
+                    case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
+                    case EZLOPI_VALUE_TYPE_USER_CODE:
+                    case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
+                    case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
+                    case EZLOPI_VALUE_TYPE_TOKEN:
+                    case EZLOPI_VALUE_TYPE_BUTTON_STATE:
+                    case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
+                    case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
+                    case EZLOPI_VALUE_TYPE_SOUND_INFO:
+                    case EZLOPI_VALUE_TYPE_CAMERA_HOTZONE:
+                    case EZLOPI_VALUE_TYPE_HOTZONE_MATCH:
+                    case EZLOPI_VALUE_TYPE_GEOFENCE:
+                    case EZLOPI_VALUE_TYPE_ILLUMINANCE:
+                    case EZLOPI_VALUE_TYPE_PRESSURE:
+                    case EZLOPI_VALUE_TYPE_SUBSTANCE_AMOUNT:
+                    case EZLOPI_VALUE_TYPE_POWER:
+                    case EZLOPI_VALUE_TYPE_VELOCITY:
+                    case EZLOPI_VALUE_TYPE_ACCELERATION:
+                    case EZLOPI_VALUE_TYPE_DIRECTION:
+                    case EZLOPI_VALUE_TYPE_GENERAL_PURPOSE:
+                    case EZLOPI_VALUE_TYPE_ACIDITY:
+                    case EZLOPI_VALUE_TYPE_ELECTRIC_POTENTIAL:
+                    case EZLOPI_VALUE_TYPE_ELECTRIC_CURRENT:
+                    case EZLOPI_VALUE_TYPE_FORCE:
+                    case EZLOPI_VALUE_TYPE_IRRADIANCE:
+                    case EZLOPI_VALUE_TYPE_PRECIPITATION:
+                    case EZLOPI_VALUE_TYPE_LENGTH:
+                    case EZLOPI_VALUE_TYPE_MASS:
+                    case EZLOPI_VALUE_TYPE_VOLUME_FLOW:
+                    case EZLOPI_VALUE_TYPE_VOLUME:
+                    case EZLOPI_VALUE_TYPE_ANGLE:
+                    case EZLOPI_VALUE_TYPE_FREQUENCY:
+                    case EZLOPI_VALUE_TYPE_SEISMIC_INTENSITY:
+                    case EZLOPI_VALUE_TYPE_SEISMIC_MAGNITUDE:
+                    case EZLOPI_VALUE_TYPE_ULTRAVIOLET:
+                    case EZLOPI_VALUE_TYPE_ELECTRICAL_RESISTANCE:
+                    case EZLOPI_VALUE_TYPE_ELECTRICAL_CONDUCTIVITY:
+                    case EZLOPI_VALUE_TYPE_LOUDNESS:
+                    case EZLOPI_VALUE_TYPE_MOISTURE:
+                    case EZLOPI_VALUE_TYPE_TIME:
+                    case EZLOPI_VALUE_TYPE_RADON_CONCENTRATION:
+                    case EZLOPI_VALUE_TYPE_BLOOD_PRESSURE:
+                    case EZLOPI_VALUE_TYPE_ENERGY:
+                    case EZLOPI_VALUE_TYPE_RF_SIGNAL_STRENGTH:
+                    case EZLOPI_VALUE_TYPE_TEMPERATURE:
+                    case EZLOPI_VALUE_TYPE_HUMIDITY:
+                    case EZLOPI_VALUE_TYPE_KILO_VOLT_AMPERE_HOUR:
+                    case EZLOPI_VALUE_TYPE_REACTIVE_POWER_INSTANT:
+                    case EZLOPI_VALUE_TYPE_AMOUNT_OF_USEFUL_ENERGY:
+                    case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
+                    case EZLOPI_VALUE_TYPE_DEVICE:
+                    case EZLOPI_VALUE_TYPE_EXPRESSION:
+                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
+                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+                    case EZLOPI_VALUE_TYPE_INT_ARRAY:
                     case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
-                    {
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_MAX:
                     {
+                        TRACE_W("Value type not implemented!");
                         break;
                     }
                     default:
@@ -589,7 +430,6 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_t *scene)
         cj_scene = cJSON_CreateObject();
         if (cj_scene)
         {
-
             char tmp_str[16] = {0};
             snprintf(tmp_str, sizeof(tmp_str), "%08x", scene->_id);
             // cJSON_AddNumberToObject(cj_scene, "_id", scene->_id);
@@ -617,21 +457,16 @@ cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_t *scenes_list)
     cJSON *cj_scenes_array = cJSON_CreateArray();
     if (cj_scenes_array)
     {
-
         while (scenes_list)
         {
-
             cJSON *cj_scene = ezlopi_scenes_create_cjson_scene(scenes_list);
             if (cj_scene)
             {
-
                 if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
                 {
-
                     cJSON_Delete(cj_scene);
                 }
             }
-
             scenes_list = scenes_list->next;
         }
     }
@@ -646,15 +481,12 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list)
     cJSON *cj_scenes_array = ezlopi_scenes_create_cjson_scene_list(scenes_list);
     if (cj_scenes_array)
     {
-
         char *scenes_list_str = cJSON_Print(cj_scenes_array);
         if (scenes_list_str)
         {
-
             TRACE_D("scenes_list_str: \r\n%s", scenes_list_str);
             cJSON_Minify(scenes_list);
         }
-
         cJSON_Delete(cj_scenes_array);
     }
     return scenes_list_str;

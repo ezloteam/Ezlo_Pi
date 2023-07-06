@@ -10,10 +10,17 @@
 static const char *test_scene_create_str = "[{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}]";
 
 static l_scenes_list_t *scenes_list_head = NULL;
+
 static const char *scenes_value_type_name[] = {
 #define EZLOPI_VALUE_TYPE(type, name) name,
 #include "ezlopi_scenes_value_types.h"
 #undef EZLOPI_VALUE_TYPE
+};
+
+static const char *ezlopi_scenes_methods_name[] = {
+#define EZLOPI_SCENE(method_type, name, func) name,
+#include "ezlopi_scenes_method_types.h"
+#undef EZLOPI_SCENE
 };
 
 static void __new_block_options_create(s_block_options_t *p_block_options, cJSON *cj_block_options);
@@ -31,6 +38,26 @@ static l_user_notification_t *__new_user_notification_create(cJSON *cj_user_noti
 static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notifications);
 
 static l_scenes_list_t *__new_scene_create(cJSON *cj_scene);
+
+const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_t value_type)
+{
+    char *ret = NULL;
+    if ((value_type > EZLOPI_VALUE_TYPE_NONE) && (value_type < EZLOPI_VALUE_TYPE_MAX))
+    {
+        ret = scenes_value_type_name[value_type];
+    }
+    return ret;
+}
+
+const char *ezlopi_scene_get_scene_method_name(e_method_type_t method_type)
+{
+    char *ret = NULL;
+    if ((method_type > EZLOPI_SCENE_METHOD_TYPE_NONE) && (method_type < EZLOPI_SCENE_METHOD_TYPE_MAX))
+    {
+        ret = ezlopi_scenes_methods_name[method_type];
+    }
+    return ret;
+}
 
 l_scenes_list_t *ezlopi_scenes_pop_by_id(uint32_t _id)
 {
@@ -540,13 +567,12 @@ static e_scene_value_type_t __new_get_value_type(cJSON *cj_field)
         if (type_str)
         {
             uint32_t type_str_len = strlen(type_str);
-            for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX;)
+            for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
             {
                 uint32_t check_str_len = strlen(scenes_value_type_name[i]);
                 uint32_t check_len = (check_str_len < type_str_len) ? type_str_len : check_str_len;
                 if (0 == strncmp(scenes_value_type_name[i], type_str, check_len))
                 {
-                    TRACE_W("Found value type: %s | %s", type_str, scenes_value_type_name[i]);
                     ret = i;
                     break;
                 }
@@ -582,6 +608,7 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
             CJSON_GET_VALUE_STRING_BY_COPY(cj_field, "name", field->name);
             field->value_type = __new_get_value_type(cj_field);
             cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
+
             if (cj_value)
             {
                 switch (cj_value->type)
@@ -594,8 +621,17 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
                 }
                 case cJSON_String:
                 {
-                    snprintf(field->value.value_string, sizeof(field->value.value_string), "%s", cj_value->valuestring);
-                    TRACE_B("value: %s", field->value.value_string);
+                    uint32_t value_len = strlen(cj_value->valuestring) + 1;
+                    field->value.value_string = malloc(value_len);
+                    if (field->value.value_string)
+                    {
+                        snprintf(field->value.value_string, value_len, "%s", cj_value->valuestring);
+                        TRACE_B("value: %s", field->value.value_string);
+                    }
+                    else
+                    {
+                        TRACE_E("Malloc failed!");
+                    }
                     break;
                 }
                 case cJSON_True:

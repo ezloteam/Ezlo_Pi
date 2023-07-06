@@ -74,15 +74,9 @@ typedef union u_field_value
 typedef struct l_fields
 {
     char name[32];
-    // char type[32];
 
-    // e_value_type_t value_type;
     e_scene_value_type_t value_type; // 0: double, 1: string
-    union value
-    {
-        char value_string[32];
-        double value_double;
-    } value;
+    u_field_value_t value;
     struct l_fields *next;
 } l_fields_t;
 
@@ -162,5 +156,8 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list);
 
 void ezlopi_scenes_delete(l_scenes_list_t *scenes_list);
 void ezlopi_scenes_delete_by_id(uint32_t _id);
+
+const char *ezlopi_scene_get_scene_method_name(e_method_type_t method_type);
+const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_t value_type);
 
 #endif //  __EZLOPI_SCENES_H__

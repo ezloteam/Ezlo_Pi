@@ -23,6 +23,8 @@ void ezlopi_scene_when_is_item_state(void *a_when_block)
     }
 }
 
+void ezlopi_scene_when_is_interval(l_scenes_list_t *curr_scene) {}
+
 void ezlopi_scene_when_is_item_state_changed(l_scenes_list_t *curr_scene) {}
 
 void ezlopi_scene_when_is_button_state(l_scenes_list_t *curr_scene) {}
@@ -32,8 +34,6 @@ void ezlopi_scene_when_is_sun_state(l_scenes_list_t *curr_scene) {}
 void ezlopi_scene_when_is_date(l_scenes_list_t *curr_scene) {}
 
 void ezlopi_scene_when_is_once(l_scenes_list_t *curr_scene) {}
-
-void ezlopi_scene_when_is_interval(l_scenes_list_t *curr_scene) {}
 
 void ezlopi_scene_when_is_date_range(l_scenes_list_t *curr_scene) {}
 
