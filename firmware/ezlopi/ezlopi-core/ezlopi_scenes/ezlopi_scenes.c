@@ -150,6 +150,7 @@ void ezlopi_scene_update_nvs(void)
     char *scene_json_str = ezlopi_scenes_create_json_string(scenes_list_head);
     if (scene_json_str)
     {
+        TRACE_B("Storing updated scenes to NVS:\n%s", scene_json_str);
         ezlopi_nvs_scene_set(scene_json_str);
         free(scene_json_str);
     }
@@ -180,8 +181,8 @@ void ezlopi_scene_add(cJSON *cj_scene)
 
 void ezlopi_scene_init(void)
 {
-    const char *scenes_list = test_scene_create_str;
-    // const char *scenes_list = ezlopi_nvs_scene_get();
+    // const char *scenes_list = test_scene_create_str;
+    const char *scenes_list = ezlopi_nvs_scene_get();
     if (scenes_list)
     {
         TRACE_D("Scene read from NVS:\r\n%s", scenes_list);

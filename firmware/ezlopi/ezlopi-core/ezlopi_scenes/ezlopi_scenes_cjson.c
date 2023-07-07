@@ -78,10 +78,7 @@ static void ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_block_array, l_
                 if ((when_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
                     (when_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    // TRACE_E("Method: %s", ezlopi_scenes_methods_name[when_block->block_options.method.type]);
-
                     char *method_type_name = ezlopi_scene_get_scene_method_name(when_block->block_options.method.type);
-                    TRACE_E("Method: %s", method_type_name ? method_type_name : "");
                     ezlopi_scenes_cjson_add_string(cj_method, "name", method_type_name ? method_type_name : "");
                 }
                 else
@@ -119,11 +116,7 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
                 if ((then_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
                     (then_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    // TRACE_E("Method: %s", ezlopi_scenes_methods_name[then_block->block_options.method.type]);
-                    // ezlopi_scenes_cjson_add_string(cj_method, "name", ezlopi_scenes_methods_name[then_block->block_options.method.type]);
-
                     char *method_type_name = ezlopi_scene_get_scene_method_name(then_block->block_options.method.type);
-                    TRACE_D("Method: %s", method_type_name ? method_type_name : "");
                     ezlopi_scenes_cjson_add_string(cj_method, "name", method_type_name ? method_type_name : "");
                 }
                 else
@@ -481,7 +474,7 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list)
     cJSON *cj_scenes_array = ezlopi_scenes_create_cjson_scene_list(scenes_list);
     if (cj_scenes_array)
     {
-        char *scenes_list_str = cJSON_Print(cj_scenes_array);
+        scenes_list_str = cJSON_Print(cj_scenes_array);
         if (scenes_list_str)
         {
             TRACE_D("scenes_list_str: \r\n%s", scenes_list_str);

@@ -65,5 +65,7 @@ EZLOPI_VALUE_TYPE(24_HOURS_TIME_ARRAY, "24_hours_time_array")
 EZLOPI_VALUE_TYPE(INT_ARRAY, "int_array")
 EZLOPI_VALUE_TYPE(INTERVAL, "interval")
 EZLOPI_VALUE_TYPE(HMS_INTERVAL, "hms_interval")
+// Scene specific
+EZLOPI_VALUE_TYPE(BLOCKS, "blocks")
 //
 EZLOPI_VALUE_TYPE(MAX, "None")

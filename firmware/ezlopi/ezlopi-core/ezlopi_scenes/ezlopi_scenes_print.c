@@ -29,10 +29,6 @@ void ezlopi_print_fields(l_fields_t *fields)
 
         switch (fields->value_type)
         {
-        case EZLOPI_VALUE_TYPE_NONE:
-        {
-            break;
-        }
         case EZLOPI_VALUE_TYPE_INT:
         {
             TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
@@ -118,6 +114,7 @@ void ezlopi_print_fields(l_fields_t *fields)
         case EZLOPI_VALUE_TYPE_INT_ARRAY:
         case EZLOPI_VALUE_TYPE_INTERVAL:
         case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
+        case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
         {
             TRACE_W("Value type not Implemented!");

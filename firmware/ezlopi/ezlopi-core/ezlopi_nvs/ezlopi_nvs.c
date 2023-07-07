@@ -277,7 +277,7 @@ static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
     {
         if (1 == ezlopi_nvs_init())
         {
-            esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, nvs_name, data, len);
+            esp_err_t err = nvs_set_str(ezlopi_nvs_handle, nvs_name, data);
             if (ESP_OK == err)
             {
                 err = nvs_commit(ezlopi_nvs_handle);
@@ -335,6 +335,10 @@ static char *ezlopi_nvs_read_str(char *nvs_name)
             {
                 TRACE_E("MALLOC ERROR");
             }
+        }
+        else
+        {
+            TRACE_E("%s: buf_len_needed: %d, err: %s", nvs_name, buf_len_needed, esp_err_to_name(err));
         }
     }
 
