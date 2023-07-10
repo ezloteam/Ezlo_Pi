@@ -54,6 +54,16 @@ void ezlopi_print_fields(l_fields_t *fields)
             TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
             break;
         }
+        case EZLOPI_VALUE_TYPE_INTERVAL:
+        {
+            TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_BLOCKS:
+        {
+            ezlopi_print_when_blocks(fields->value.when_block);
+            break;
+        }
         case EZLOPI_VALUE_TYPE_DICTIONARY:
         case EZLOPI_VALUE_TYPE_ARRAY:
         case EZLOPI_VALUE_TYPE_RGB:
@@ -112,12 +122,11 @@ void ezlopi_print_fields(l_fields_t *fields)
         case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
         case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
         case EZLOPI_VALUE_TYPE_INT_ARRAY:
-        case EZLOPI_VALUE_TYPE_INTERVAL:
         case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
         {
-            TRACE_W("Value type not Implemented!");
+            TRACE_W("Value type not Implemented!, value_type: %d", fields->value_type);
             break;
         }
         default:
@@ -197,6 +206,9 @@ void ezlopi_print_then_blocks(l_then_block_t *then_blocks)
     {
         ezlopi_print_block_options(&then_blocks->block_options, then_blocks->fields);
         TRACE_D("\t\t|-- blockType: then");
+
+        TRACE_D("\t\t|-- Delay:: days: %d, hours: %d, minutes: %d, seconds: %d", then_blocks->delay.days, then_blocks->delay.hours, then_blocks->delay.minutes, then_blocks->delay.seconds);
+
         ezlopi_print_fields(then_blocks->fields);
 
         then_blocks = then_blocks->next;
@@ -213,6 +225,7 @@ void ezlopi_scenes_print(l_scenes_list_t *scene_link_list)
     while (scene_link_list)
     {
         TRACE_D("\t----------------------- scene_count: %d ------------------------", ++scene_count);
+        TRACE_D("\t|-- id: 0x%08x", scene_link_list->_id);
         TRACE_D("\t|-- enabled: %d", scene_link_list->enabled);
         TRACE_D("\t|-- is_group: %d", scene_link_list->is_group);
         TRACE_D("\t|-- group_id: %s", scene_link_list->group_id);

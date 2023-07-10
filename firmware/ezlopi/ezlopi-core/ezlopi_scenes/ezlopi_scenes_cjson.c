@@ -477,8 +477,7 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list)
         scenes_list_str = cJSON_Print(cj_scenes_array);
         if (scenes_list_str)
         {
-            TRACE_D("scenes_list_str: \r\n%s", scenes_list_str);
-            cJSON_Minify(scenes_list);
+            cJSON_Minify(scenes_list_str);
         }
         cJSON_Delete(cj_scenes_array);
     }

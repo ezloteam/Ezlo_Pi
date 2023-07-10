@@ -264,12 +264,19 @@ static int digital_io_set_value_v3(l_ezlopi_item_t *item, void *arg)
 
     if (NULL != cjson_params)
     {
+        char *cjson_params_str = cJSON_Print(cjson_params);
+        if (cjson_params)
+        {
+            TRACE_D("cjson_params: %s", cjson_params_str);
+            free(cjson_params_str);
+        }
+
         int value = 0;
         CJSON_GET_VALUE_INT(cjson_params, "value", value);
 
         TRACE_I("item_name: %s", item->cloud_properties.item_name);
         TRACE_I("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
-        TRACE_I("item_id: %d", item->cloud_properties.item_id);
+        TRACE_I("item_id: 0x%08x", item->cloud_properties.item_id);
         TRACE_I("prev value: %d", item->interface.gpio.gpio_out.value);
         TRACE_I("cur value: %d", value);
 
@@ -278,6 +285,7 @@ static int digital_io_set_value_v3(l_ezlopi_item_t *item, void *arg)
             if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
             {
                 digital_io_set_gpio_value_v3(item, value);
+                ezlopi_device_value_updated_from_device_v3(item);
             }
         }
         else

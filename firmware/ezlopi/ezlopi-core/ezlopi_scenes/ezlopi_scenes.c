@@ -6,6 +6,7 @@
 #include "ezlopi_nvs.h"
 #include "ezlopi_scenes.h"
 #include "ezlopi_devices.h"
+#include "ezlopi_scenes_methods.h"
 
 static const char *test_scene_create_str = "[{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}]";
 
@@ -19,6 +20,12 @@ static const char *scenes_value_type_name[] = {
 
 static const char *ezlopi_scenes_methods_name[] = {
 #define EZLOPI_SCENE(method_type, name, func) name,
+#include "ezlopi_scenes_method_types.h"
+#undef EZLOPI_SCENE
+};
+
+static const f_scene_method_t ezlopi_scenes_methods[] = {
+#define EZLOPI_SCENE(method_type, name, func) func,
 #include "ezlopi_scenes_method_types.h"
 #undef EZLOPI_SCENE
 };
@@ -39,6 +46,16 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
 
 static l_scenes_list_t *__new_scene_create(cJSON *cj_scene);
 
+f_scene_method_t ezlopi_scene_get_method(e_scene_method_type_t scene_method_type)
+{
+    f_scene_method_t method_ptr = NULL;
+    if ((scene_method_type > EZLOPI_SCENE_METHOD_TYPE_NONE) && (scene_method_type < EZLOPI_SCENE_METHOD_TYPE_MAX))
+    {
+        method_ptr = ezlopi_scenes_methods[scene_method_type];
+    }
+    return method_ptr;
+}
+
 const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_t value_type)
 {
     char *ret = NULL;
@@ -49,7 +66,7 @@ const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_t value_ty
     return ret;
 }
 
-const char *ezlopi_scene_get_scene_method_name(e_method_type_t method_type)
+const char *ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type)
 {
     char *ret = NULL;
     if ((method_type > EZLOPI_SCENE_METHOD_TYPE_NONE) && (method_type < EZLOPI_SCENE_METHOD_TYPE_MAX))
@@ -185,7 +202,6 @@ void ezlopi_scene_init(void)
     const char *scenes_list = ezlopi_nvs_scene_get();
     if (scenes_list)
     {
-        TRACE_D("Scene read from NVS:\r\n%s", scenes_list);
         cJSON *cj_scenes_list = cJSON_Parse(scenes_list);
 
         if (cj_scenes_list)
@@ -207,6 +223,7 @@ void ezlopi_scene_init(void)
         }
 
         ezlopi_scenes_print(scenes_list_head);
+        free(scenes_list);
     }
     else
     {
@@ -315,9 +332,9 @@ static l_user_notification_t *__user_notifications_add(cJSON *cj_user_notificati
     return tmp_user_notifications_head;
 }
 
-static e_method_type_t __parse_method_type(char *method_name)
+static e_scene_method_type_t __parse_method_type(char *method_name)
 {
-    e_method_type_t methode_type = EZLOPI_SCENE_METHOD_TYPE_NONE;
+    e_scene_method_type_t methode_type = EZLOPI_SCENE_METHOD_TYPE_NONE;
     if (method_name)
     {
         /* When block */
@@ -578,20 +595,6 @@ static e_scene_value_type_t __new_get_value_type(cJSON *cj_field)
                     break;
                 }
             }
-#if 0                         
-            if (0 == strncmp(type_str, "bool", 4))
-            {
-                ret = SCENE_VALUE_TYPE_BOOL;
-            }
-            else if (0 == strncmp(type_str, "int", 3))
-            {
-                ret = SCENE_VALUE_TYPE_INT;
-            }
-            else if (0 == strncmp(type_str, "item", 3))
-            {
-                ret = SCENE_VALUE_TYPE_ITEM;
-            }
-#endif
         }
     }
     return ret;
@@ -637,13 +640,13 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
                 }
                 case cJSON_True:
                 {
-                    field->value.value_double = 1;
+                    field->value.value_bool = true;
                     TRACE_B("value: 1");
                     break;
                 }
                 case cJSON_False:
                 {
-                    field->value.value_double = 0;
+                    field->value.value_bool = false;
                     TRACE_B("value: 0");
                     break;
                 }

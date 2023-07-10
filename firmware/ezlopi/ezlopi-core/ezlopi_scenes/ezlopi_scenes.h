@@ -24,17 +24,17 @@ typedef enum e_scene_value_type
 #undef EZLOPI_VALUE_TYPE
 } e_scene_value_type_t;
 
-typedef enum e_method_type
+typedef enum e_scene_method_type
 {
 #define EZLOPI_SCENE(method, name, func) EZLOPI_SCENE_##method,
 #include "ezlopi_scenes_method_types.h"
 #undef EZLOPI_SCENE
-} e_method_type_t;
+} e_scene_method_type_t;
 
 typedef struct s_method
 {
     char name[32];
-    e_method_type_t type;
+    e_scene_method_type_t type;
 #if 0
     union
     {
@@ -69,6 +69,7 @@ typedef union u_field_value
     int value_int;
     uint32_t value_uint;
     bool value_bool;
+    struct l_when_block *when_block;
 } u_field_value_t;
 
 typedef struct l_fields
@@ -77,6 +78,7 @@ typedef struct l_fields
 
     e_scene_value_type_t value_type; // 0: double, 1: string
     u_field_value_t value;
+    void *user_arg;
     struct l_fields *next;
 } l_fields_t;
 
@@ -127,6 +129,8 @@ typedef struct l_scenes_list
     struct l_scenes_list *next;
 } l_scenes_list_t;
 
+typedef int (*f_scene_method_t)(l_scenes_list_t *curr_scene);
+
 void ezlopi_scene_init(void);
 void ezlopi_scene_update_nvs(void);
 void ezlopi_scene_add(cJSON *cj_scene);
@@ -157,7 +161,9 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_t *scenes_list);
 void ezlopi_scenes_delete(l_scenes_list_t *scenes_list);
 void ezlopi_scenes_delete_by_id(uint32_t _id);
 
-const char *ezlopi_scene_get_scene_method_name(e_method_type_t method_type);
+const char *ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type);
 const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_t value_type);
+
+f_scene_method_t ezlopi_scene_get_method(e_scene_method_type_t scene_method_type);
 
 #endif //  __EZLOPI_SCENES_H__
