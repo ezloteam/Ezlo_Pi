@@ -129,11 +129,12 @@ typedef struct l_scenes_list
     struct l_scenes_list *next;
 } l_scenes_list_t;
 
-typedef int (*f_scene_method_t)(l_scenes_list_t *curr_scene);
+typedef int (*f_scene_method_t)(l_scenes_list_t *curr_scene, void *arg);
 
 void ezlopi_scene_init(void);
 void ezlopi_scene_update_nvs(void);
 void ezlopi_scene_add(cJSON *cj_scene);
+void ezlopi_scene_add_new_scene_cjson(cJSON *new_scene);
 void ezlopi_scene_delete(l_scenes_list_t *scenes_list);
 l_scenes_list_t *ezlopi_scenes_get_scenes_list(void);
 l_scenes_list_t *ezlopi_scenes_get_by_id(uint32_t id);

@@ -178,6 +178,32 @@ l_scenes_list_t *ezlopi_scenes_get_scenes_list(void)
     return scenes_list_head;
 }
 
+void ezlopi_scene_add_new_scene_cjson(cJSON *new_scene)
+{
+    cJSON *cj_scenes_list = ezlopi_scenes_create_cjson_scene_list(scenes_list_head);
+    if (cj_scenes_list)
+    {
+        cJSON_AddItemReferenceToArray(cj_scenes_list, new_scene);
+        char *cj_scenes_list_str = cJSON_Print(cj_scenes_list);
+        if (cj_scenes_list_str)
+        {
+            cJSON_Minify(cj_scenes_list_str);
+            ezlopi_nvs_scene_set(cj_scenes_list_str);
+            TRACE_D("New scene-list:\r\n%s", cj_scenes_list_str);
+            free(cj_scenes_list_str);
+        }
+
+        cJSON_Delete(cj_scenes_list);
+    }
+
+    char *read_scene_list = ezlopi_nvs_scene_get();
+    if (read_scene_list)
+    {
+        TRACE_D("Read scene-list:\r\n%s", read_scene_list);
+        free(read_scene_list);
+    }
+}
+
 void ezlopi_scene_add(cJSON *cj_scene)
 {
     if (scenes_list_head)
@@ -611,6 +637,7 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
             memset(field, 0, sizeof(l_fields_t));
             CJSON_GET_VALUE_STRING_BY_COPY(cj_field, "name", field->name);
             field->value_type = __new_get_value_type(cj_field);
+
             cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
 
             if (cj_value)
@@ -641,13 +668,13 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
                 case cJSON_True:
                 {
                     field->value.value_bool = true;
-                    TRACE_B("value: 1");
+                    TRACE_B("value: true");
                     break;
                 }
                 case cJSON_False:
                 {
                     field->value.value_bool = false;
-                    TRACE_B("value: 0");
+                    TRACE_B("value: false");
                     break;
                 }
                 default:

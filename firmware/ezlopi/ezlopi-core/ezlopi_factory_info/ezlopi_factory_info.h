@@ -429,6 +429,15 @@ static const char *test_device_constant_config =
                 \"pullup_op\": true,\
                 \"val_ip\": true,\
                 \"val_op\": false\
+            },\
+            {\
+	            \"dev_type\": 2,\
+	            \"dev_name\": \"PIR sensor\",\
+	            \"id_room\":\"\",\
+	            \"id_item\": 19,\
+	            \"gpio\": 4,\
+	            \"pull_up\": false,\
+	            \"logic_inv\": false\
             }\
         ],\
     \"dev_total\": 1}";

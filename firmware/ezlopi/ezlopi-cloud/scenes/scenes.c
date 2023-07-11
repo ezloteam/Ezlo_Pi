@@ -36,8 +36,9 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
     if (cj_params)
     {
-        ezlopi_scene_add(cj_params);
-        ezlopi_scene_update_nvs();
+        ezlopi_scene_add_new_scene_cjson(cj_params);
+        // ezlopi_scene_add(cj_params);
+        // ezlopi_scene_update_nvs();
     }
 }
 

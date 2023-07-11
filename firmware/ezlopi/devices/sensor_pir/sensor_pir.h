@@ -20,6 +20,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 
+int sensor_pir_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg);
 int sensor_pir(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args, void *user_arg);
 
 #endif //__SENSOR_PIR_H__

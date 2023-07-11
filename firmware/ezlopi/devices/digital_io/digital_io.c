@@ -125,13 +125,14 @@ static void digital_io_setup_device_cloud_properties(l_ezlopi_device_t *device, 
 static void digital_io_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cjson_device)
 {
     int tmp_var = 0;
-    CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_name = ezlopi_item_name_switch;
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.show = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+
+    CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
 
     CJSON_GET_VALUE_INT(cjson_device, "is_ip", item->interface.gpio.gpio_in.enable);
     CJSON_GET_VALUE_INT(cjson_device, "gpio_in", item->interface.gpio.gpio_in.gpio_num);
@@ -231,7 +232,7 @@ static int digital_io_init_v3(l_ezlopi_item_t *item)
         };
 
         gpio_config(&io_conf);
-        gpio_isr_service_register_v3(item, digital_io_gpio_interrupt_upcall, 1000);
+        gpio_isr_service_register_v3(item, digital_io_gpio_interrupt_upcall_v3, 1000);
     }
 #endif
     return ret;

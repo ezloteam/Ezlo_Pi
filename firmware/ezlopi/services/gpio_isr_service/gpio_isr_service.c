@@ -77,6 +77,8 @@ static void gpio_isr_process_v3(void *pv)
                 event_arg->__upcall(event_arg->item);
                 event_arg->time = tick_now;
             }
+
+            TRACE_W("GPIO - event received!");
         }
 
         vTaskDelay(1);
