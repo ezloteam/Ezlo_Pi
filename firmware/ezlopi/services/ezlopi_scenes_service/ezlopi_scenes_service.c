@@ -25,43 +25,49 @@ static void __scenes_process(void *arg)
 
     while (1)
     {
-        f_scene_method_t when_method = ezlopi_scene_get_method(scene->when->block_options.method.type);
-        if (when_method)
+        l_when_block_t *curr_when = scene->when;
+        while (curr_when)
         {
-            int ret = when_method(scene, (void *)scene->when);
-            if (ret)
+            f_scene_method_t when_method = ezlopi_scene_get_method(curr_when->block_options.method.type);
+            if (when_method)
             {
-                l_then_block_t *curr_then = scene->then;
-                while (curr_then)
+                int ret = when_method(scene, (void *)curr_when);
+                if (ret)
                 {
-                    uint32_t delay_ms = (curr_then->delay.days * (24 * 60 * 60) + curr_then->delay.hours * (60 * 60) + curr_then->delay.minutes * 60 + curr_then->delay.seconds) * 1000;
-                    if (delay_ms)
+                    l_then_block_t *curr_then = scene->then;
+                    while (curr_then)
                     {
-                        vTaskDelay(delay_ms / portTICK_RATE_MS);
-                    }
+                        uint32_t delay_ms = (curr_then->delay.days * (24 * 60 * 60) + curr_then->delay.hours * (60 * 60) + curr_then->delay.minutes * 60 + curr_then->delay.seconds) * 1000;
+                        if (delay_ms)
+                        {
+                            vTaskDelay(delay_ms / portTICK_RATE_MS);
+                        }
 
-                    TRACE_D("delay_ms: %d", delay_ms);
-                    char *method_name = ezlopi_scene_get_scene_method_name(curr_then->block_options.method.type);
-                    if (method_name)
-                    {
-                        TRACE_D("Calling: %s", method_name);
-                    }
-                    else
-                    {
-                        TRACE_E("Error: Method is NULL!");
-                    }
+                        TRACE_D("delay_ms: %d", delay_ms);
+                        char *method_name = ezlopi_scene_get_scene_method_name(curr_then->block_options.method.type);
+                        if (method_name)
+                        {
+                            TRACE_D("Calling: %s", method_name);
+                        }
+                        else
+                        {
+                            TRACE_E("Error: Method is NULL!");
+                        }
 
-                    f_scene_method_t then_method = ezlopi_scene_get_method(curr_then->block_options.method.type);
-                    if (then_method)
-                    {
-                        ret = then_method(scene, (void *)curr_then);
-                    }
+                        f_scene_method_t then_method = ezlopi_scene_get_method(curr_then->block_options.method.type);
+                        if (then_method)
+                        {
+                            ret = then_method(scene, (void *)curr_then);
+                        }
 
-                    curr_then = curr_then->next;
+                        curr_then = curr_then->next;
+                    }
                 }
             }
+
+            curr_when = curr_when->next;
         }
 
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 }

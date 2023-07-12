@@ -189,18 +189,11 @@ void ezlopi_scene_add_new_scene_cjson(cJSON *new_scene)
         {
             cJSON_Minify(cj_scenes_list_str);
             ezlopi_nvs_scene_set(cj_scenes_list_str);
-            TRACE_D("New scene-list:\r\n%s", cj_scenes_list_str);
+            // TRACE_D("New scene-list:\r\n%s", cj_scenes_list_str);
             free(cj_scenes_list_str);
         }
 
         cJSON_Delete(cj_scenes_list);
-    }
-
-    char *read_scene_list = ezlopi_nvs_scene_get();
-    if (read_scene_list)
-    {
-        TRACE_D("Read scene-list:\r\n%s", read_scene_list);
-        free(read_scene_list);
     }
 }
 
@@ -259,6 +252,8 @@ void ezlopi_scene_init(void)
     char *scenes_json_str = ezlopi_scenes_create_json_string(scenes_list_head);
     if (scenes_json_str)
     {
+        cJSON_Minify(scenes_json_str);
+        TRACE_B("Build json:\r\n%s", scenes_json_str);
         free(scenes_json_str);
     }
 }

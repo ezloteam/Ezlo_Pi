@@ -179,6 +179,7 @@ cJSON *ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_e
                 cJSON_AddFalseToObject(cj_result, "serviceNotification");
                 cJSON_AddFalseToObject(cj_result, "userNotification");
                 cJSON_AddNullToObject(cj_result, "notifications");
+                cJSON_AddFalseToObject(cj_result, "syncNotification");
                 cJSON_AddStringToObject(cj_result, "name", item->cloud_properties.item_name);
                 item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, cj_result, item->user_arg);
                 // registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cj_result, registered_device->user_arg);

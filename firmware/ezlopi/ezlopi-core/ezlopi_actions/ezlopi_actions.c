@@ -1,7 +1,7 @@
 #include "ezlopi_actions.h"
 
 char *ezlopi_action_names[] = {
-#define EZLOPI_ACTIONS(action, name) name,
+#define EZLOPI_ACTION(action, name) name,
 #include "ezlopi_actions_list.h"
 };
 

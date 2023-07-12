@@ -5,7 +5,7 @@
 
 typedef enum e_ezlopi_actions
 {
-#define EZLOPI_ACTIONS(action, name) EZLOPI_ACTION_##action,
+#define EZLOPI_ACTION(action, name) EZLOPI_ACTION_##action,
 #include "ezlopi_actions_list.h"
 } e_ezlopi_actions_t;
 

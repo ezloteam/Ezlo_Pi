@@ -27,10 +27,6 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
                     }
                     break;
                 }
-                else
-                {
-                    TRACE_E("Function is not defined!");
-                }
                 curr_item = curr_item->next;
             }
             curr_device = curr_device->next;

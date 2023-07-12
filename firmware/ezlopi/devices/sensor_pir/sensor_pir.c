@@ -8,6 +8,7 @@ static int sensor_pir_prepare_v3(void *arg);
 static int sensor_pir_init_v3(l_ezlopi_item_t *item);
 static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *device, cJSON *cj_device);
 static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj_device);
+static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg);
 
 int sensor_pir_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
 {
@@ -22,13 +23,12 @@ int sensor_pir_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, 
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        TRACE_B("Initialize PIR sensor ---");
         ret = sensor_pir_init_v3(item);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        // ret = sensor_pir_get_value_cjson(properties, args);
+        ret = sensor_pir_get_value_cjson_v3(item, args);
         break;
     }
 
@@ -41,8 +41,23 @@ int sensor_pir_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, 
     return ret;
 }
 
+static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *args)
+{
+    int ret = 0;
+    cJSON *cj_result = (cJSON *)args;
+    if (cj_result)
+    {
+        item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+        cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_out.value);
+        ret = 1;
+    }
+
+    return ret;
+}
+
 static void sensor_pir_value_updated_from_device_v3(l_ezlopi_item_t *item)
 {
+    TRACE_D("PIR interrupt");
     ezlopi_device_value_updated_from_device_v3(item);
 }
 
@@ -57,22 +72,21 @@ static int sensor_pir_init_v3(l_ezlopi_item_t *item)
                 .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
                 .mode = GPIO_MODE_INPUT,
                 .pull_up_en = GPIO_PULLUP_DISABLE,
-                .pull_down_en = (item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+                .pull_down_en = GPIO_PULLDOWN_DISABLE, // (item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
 
             ret = gpio_config(&io_conf);
-            if (ret)
-            {
-                TRACE_E("Error initializing PIR sensor");
-            }
-            else
+            if (ESP_OK == ret)
             {
                 TRACE_I("PIR sensor initialize successfully.");
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                gpio_isr_service_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
             }
-
-            gpio_isr_service_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
+            else
+            {
+                TRACE_E("Error initializing PIR sensor, error: %s", esp_err_to_name(ret));
+            }
         }
     }
     return ret;
@@ -94,7 +108,7 @@ static int sensor_pir_prepare_v3(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
                 if (item)
                 {
-                    item->func = prep_arg->device->func;
+                    item->func = sensor_pir_v3;
                     sensor_pir_setup_item_properties_v3(item, cj_device);
                     ret = 1;
                 }
@@ -117,7 +131,7 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *devic
         CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
 
         ASSIGN_DEVICE_NAME_V2(device, device_name);
-        device->cloud_properties.category = category_security_sensor;
+        device->cloud_properties.category = category_generic_sensor;
         device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;
         device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -137,15 +151,16 @@ static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
 
     item->interface.gpio.gpio_in.enable = true;
-    CJSON_GET_VALUE_INT(cj_device, "gpio_in", item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "ip_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cj_device, "val_ip", item->interface.gpio.gpio_in.value);
-    CJSON_GET_VALUE_INT(cj_device, "pullup_ip", tmp_var);
+    item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
+    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cj_device, "pull_up", tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if 0
 static int sensor_pir_prepare_and_add(void *args);
 static int sensor_pir_init(s_ezlopi_device_properties_t *properties);
 static s_ezlopi_device_properties_t *sensor_pir_prepare(cJSON *cjson_device);
@@ -294,3 +309,4 @@ static int sensor_pir_get_value_cjson(s_ezlopi_device_properties_t *properties, 
 
     return ret;
 }
+#endif

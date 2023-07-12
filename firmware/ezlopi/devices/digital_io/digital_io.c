@@ -26,51 +26,6 @@ static void digital_io_gpio_interrupt_upcall_v3(l_ezlopi_item_t *item);
 static void digital_io_toggle_gpio_v3(l_ezlopi_item_t *item);
 static int digital_io_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg);
 
-#if 1
-static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg);
-static int digital_io_prepare(void *arg);
-static s_ezlopi_device_properties_t *digital_io_prepare_item(cJSON *cjson_device);
-static void digital_io_write_gpio_value(s_ezlopi_device_properties_t *properties);
-static uint32_t digital_io_read_gpio_value(s_ezlopi_device_properties_t *properties);
-static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t *properties);
-static void digital_io_toggle_gpio(s_ezlopi_device_properties_t *properties);
-#endif
-
-int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
-{
-    int ret = 0;
-
-    switch (action)
-    {
-    case EZLOPI_ACTION_PREPARE:
-    {
-        // ret = digital_io_prepare_v3(arg);
-        break;
-    }
-    case EZLOPI_ACTION_INITIALIZE:
-    {
-        // ret = digital_io_init_v3(properties);
-        break;
-    }
-    case EZLOPI_ACTION_SET_VALUE:
-    {
-        ret = digital_io_set_value(properties, arg);
-        break;
-    }
-    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-    {
-        ret = digital_io_get_value_cjson(properties, arg);
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
-
-    return ret;
-}
-
 int digital_io_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
@@ -336,7 +291,49 @@ static void digital_io_toggle_gpio_v3(l_ezlopi_item_t *item)
     item->interface.gpio.gpio_out.value = write_value;
 }
 
-#if 1
+#if 0
+static int digital_io_set_value(s_ezlopi_device_properties_t *properties, void *arg);
+static int digital_io_prepare(void *arg);
+static s_ezlopi_device_properties_t *digital_io_prepare_item(cJSON *cjson_device);
+static void digital_io_write_gpio_value(s_ezlopi_device_properties_t *properties);
+static uint32_t digital_io_read_gpio_value(s_ezlopi_device_properties_t *properties);
+static void digital_io_gpio_interrupt_upcall(s_ezlopi_device_properties_t *properties);
+static void digital_io_toggle_gpio(s_ezlopi_device_properties_t *properties);
+
+int digital_io(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
+{
+    int ret = 0;
+
+    switch (action)
+    {
+    case EZLOPI_ACTION_PREPARE:
+    {
+        // ret = digital_io_prepare_v3(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        // ret = digital_io_init_v3(properties);
+        break;
+    }
+    case EZLOPI_ACTION_SET_VALUE:
+    {
+        ret = digital_io_set_value(properties, arg);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = digital_io_get_value_cjson(properties, arg);
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+
+    return ret;
+}
 static int digital_io_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
