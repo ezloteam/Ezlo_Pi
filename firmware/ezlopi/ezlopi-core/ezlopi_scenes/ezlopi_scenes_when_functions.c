@@ -7,8 +7,6 @@
 int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
 {
     int ret = 0;
-    // TRACE_W("Warning: when-method not implemented!");
-#if 1
     l_when_block_t *when_block = (l_when_block_t *)arg;
     if (when_block)
     {
@@ -38,15 +36,12 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
                 l_ezlopi_item_t *curr_item = curr_device->items;
                 while (curr_item)
                 {
-                    TRACE_W("item-id: %08x | %08x", item_id, curr_item->cloud_properties.item_id);
                     if (item_id == curr_item->cloud_properties.item_id)
                     {
                         cJSON *cj_tmp_value = cJSON_CreateObject();
                         if (cj_tmp_value)
                         {
-                            TRACE_W("function ptr: %p", curr_item->func);
                             curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL);
-
                             cJSON *cj_value = cJSON_GetObjectItem(cj_tmp_value, "value");
                             if (cj_value)
                             {
@@ -54,7 +49,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
                                 {
                                 case cJSON_True:
                                 {
-                                    if (true == curr_field->value.value_bool)
+                                    if (true == value_field->value.value_bool)
                                     {
                                         ret = 1;
                                     }
@@ -62,7 +57,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
                                 }
                                 case cJSON_False:
                                 {
-                                    if (false == curr_field->value.value_bool)
+                                    if (false == value_field->value.value_bool)
                                     {
                                         ret = 1;
                                     }
@@ -70,7 +65,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
                                 }
                                 case cJSON_Number:
                                 {
-                                    if (cj_value->valuedouble == curr_field->value.value_double)
+                                    if (cj_value->valuedouble == value_field->value.value_double)
                                     {
                                         ret = 1;
                                     }
@@ -78,8 +73,8 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
                                 }
                                 case cJSON_String:
                                 {
-                                    uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(curr_field->value.value_string)) ? strlen(cj_value->valuestring) : strlen(curr_field->value.value_string);
-                                    if (0 == strncmp(cj_value->valuestring, curr_field->value.value_string, cmp_size))
+                                    uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->value.value_string);
+                                    if (0 == strncmp(cj_value->valuestring, value_field->value.value_string, cmp_size))
                                     {
                                         ret = 1;
                                     }
@@ -92,22 +87,6 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
                                 }
                             }
 
-#if 0
-                            if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                            {
-                            }
-                            else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
-                            {
-                            }
-                            else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
-                            {
-                            }
-                            else
-                            {
-                                TRACE_E("Error: Unknwon value type!");
-                            }
-#endif
-
                             cJSON_Delete(cj_tmp_value);
                         }
                         break;
@@ -119,7 +98,6 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
             }
         }
     }
-#endif
 
     return ret;
 }

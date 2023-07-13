@@ -35,7 +35,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_t *curr_scene, void *arg)
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
                         cJSON_AddBoolToObject(cj_params, "value", curr_field->value.value_bool);
-                        TRACE_D("value: %d", curr_field->value.value_bool);
+                        TRACE_D("value: %s", curr_field->value.value_bool ? "true" : "false");
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
