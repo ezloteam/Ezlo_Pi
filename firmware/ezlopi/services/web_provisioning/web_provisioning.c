@@ -180,15 +180,13 @@ static char *cloud_server = NULL;
 static char *ca_certificate = NULL;
 static char *ssl_shared_key = NULL;
 static char *ssl_private_key = NULL;
+
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
     char *ws_endpoint = NULL;
 
     while (1)
     {
-        UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
-        TRACE_D("water_mark: %d", water_mark);
-
         // ezlopi_wait_for_wifi_to_connect();
 
         cloud_server = ezlopi_factory_info_v2_get_cloud_server();

@@ -234,7 +234,7 @@ void ezlopi_wifi_connect_from_id_bin(void)
     ezlopi_factory_info_v2_free(wifi_password);
 
     esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass_global_buffer[0], &wifi_ssid_pass_global_buffer[32]);
-    TRACE_E("wifi_error: %u", wifi_error);
+    TRACE_W("wifi_error: %u", wifi_error);
 }
 
 void ezlopi_wifi_connect_from_nvs(void)
@@ -288,14 +288,16 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
     return err;
 }
 
-void ezlopi_wait_for_wifi_to_connect(void)
+uint32_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 {
-    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, portMAX_DELAY, 0))
+    uint32_t ret = 0;
+    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms / portTICK_RATE_MS, 0))
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, portMAX_DELAY, 0);
+    ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms / portTICK_RATE_MS, 0);
+    return ret;
 }
 
 static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg)

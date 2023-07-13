@@ -308,7 +308,7 @@ static char *ezlopi_nvs_read_str(char *nvs_name)
     if (1 == ezlopi_nvs_init())
     {
         esp_err_t err = ESP_OK;
-        size_t buf_len_needed;
+        size_t buf_len_needed = 0;
         err = nvs_get_str(ezlopi_nvs_handle, nvs_name, NULL, &buf_len_needed);
 
         if (buf_len_needed && (ESP_OK == err))

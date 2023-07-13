@@ -672,6 +672,11 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
                     TRACE_B("value: false");
                     break;
                 }
+                case cJSON_Object:
+                {
+                    TRACE_B("value object");
+                    break;
+                }
                 default:
                 {
                     TRACE_E("cj_value type: %d", cj_value->type);
