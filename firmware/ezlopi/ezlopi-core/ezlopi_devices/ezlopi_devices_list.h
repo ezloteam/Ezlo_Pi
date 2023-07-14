@@ -40,7 +40,7 @@
 // #define EZLOPI_SENSOR_032_SOIL_MOISTURE 32
 
 // #define EZLOPI_SENSOR_033_Turbidity_Sensor 33
-// #define EZLOPI_SENSOR_034_Proximity_Sensor 34
+#define EZLOPI_SENSOR_034_Proximity_Sensor 34
 
 // #define EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C 35
 

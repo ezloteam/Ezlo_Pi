@@ -431,16 +431,28 @@ static const char *test_device_constant_config =
                 \"val_op\": false\
             },{\
 	            \"dev_type\": 2,\
-	            \"dev_name\": \"PIR sensor\",\
+	            \"dev_name\": \"Proximity sensor\",\
 	            \"id_room\":\"\",\
-	            \"id_item\": 19,\
+	            \"id_item\": 34,\
 	            \"gpio\": 4,\
 	            \"pull_up\": false,\
-	            \"logic_inv\": false\
+	            \"logic_inv\": true\
             }\
         ],\
     \"dev_total\": 1}";
 
+#endif
+
+#if 0
+"{\
+    \"dev_type\": 2,\
+    \"dev_name\": \"PIR sensor\",\
+    \"id_room\":\"\",\
+    \"id_item\": 19,\
+    \"gpio\": 4,\
+    \"pull_up\": false,\
+    \"logic_inv\": false\
+}"
 #endif
 
 #ifdef __cplusplus

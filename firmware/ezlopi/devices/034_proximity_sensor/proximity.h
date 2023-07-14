@@ -17,13 +17,6 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 
-int proximity_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args, void *user_arg);
-static int proximity_sensor_prepare_and_add(void *args);
-static int proximity_sensor_init(s_ezlopi_device_properties_t *properties);
-static s_ezlopi_device_properties_t *proximity_sensor_prepare(cJSON *cjson_device);
-static void proximity_sensor_value_updated_from_device(s_ezlopi_device_properties_t *properties);
-static int proximity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-
-
+int proximity_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg);
 
 #endif //_PROXIMITY_H_
