@@ -45,7 +45,8 @@
 #include "sensor_0042_ADC_shunt_voltmeter.h"
 #include "sensor_0043_ADC_UV_intensity.h"
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
-#include "sensor_0046_ADC_ACS712_currentMeter.h"
+#include "sensor_0046_ADC_ACS712TELC_05B_currentMeter.h"
+#include "sensor_0047_TWI_HX711_loadcell.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -360,10 +361,17 @@ static s_ezlopi_device_t device_array[] = {
 
 // need to include 'sensor_0045'
 
-#ifdef EZLOPI_SENSOR_0046_ADC_ACS712_CURRENTMETER
+#ifdef EZLOPI_SENSOR_0046_ADC_ACS712TELC_05B_CURRENTMETER
     {
-        .id = EZLOPI_SENSOR_0046_ADC_ACS712_CURRENTMETER,
-        .func = sensor_0046_ADC_ACS712_currentMeter,
+        .id = EZLOPI_SENSOR_0046_ADC_ACS712TELC_05B_CURRENTMETER,
+        .func = sensor_0046_ADC_ACS712TELC_05B_currentMeter,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0047_TWI_HX711_LOADCELL
+    {
+        .id = EZLOPI_SENSOR_0047_TWI_HX711_LOADCELL,
+        .func = sensor_0047_twi_hx711,
     },
 #endif
 

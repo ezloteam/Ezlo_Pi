@@ -396,11 +396,14 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"ACS712 currentmeter\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"TWI HX711 loadcell\",\
                 \"id_room\": \"\",\
-                \"id_item\": 46,\
-                \"gpio\": 33\
+                \"id_item\": 47,\
+                \"en_gpio1\": \"true\",\
+                \"gpio1\": 18,\
+                \"en_gpio2\": \"true\",\
+                \"gpio2\": 19\
           }\
         ],\
     \"dev_total\": 1}";

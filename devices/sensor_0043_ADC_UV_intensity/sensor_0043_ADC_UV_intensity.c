@@ -21,6 +21,42 @@ static int sensor_0043_adc_uv_get_value(s_ezlopi_device_properties_t *properties
 static float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
 //---------------------------------------------------------------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------------------------------------------------------------
+int sensor_0043_adc_uv_intensity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *usr_args)
+{
+    int ret = 0;
+    switch (action)
+    {
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = sensor_0043_adc_uv_prep_and_add(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = sensor_0043_adc_uv_init(ezlopi_device);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = sensor_0043_adc_uv_get_value(ezlopi_device, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        ret = ezlopi_device_value_updated_from_device(ezlopi_device);
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------
+
 static int sensor_0043_adc_uv_prep_and_add(void *arg)
 {
     int ret = 0;
@@ -60,6 +96,7 @@ static s_ezlopi_device_properties_t *sensor_0043_adc_uv_prepare(cJSON *cjson_dev
         // ezlopi_cloud...
         sensor_0043_adc_uv_properties->ezlopi_cloud.category = category_generic_sensor;
         sensor_0043_adc_uv_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
+        sensor_0043_adc_uv_properties->ezlopi_cloud.item_name = ezlopi_item_name_lux;
         sensor_0043_adc_uv_properties->ezlopi_cloud.device_type = dev_type_sensor;
         sensor_0043_adc_uv_properties->ezlopi_cloud.value_type = value_type_ultraviolet;
         sensor_0043_adc_uv_properties->ezlopi_cloud.battery_powered = false;
@@ -118,39 +155,3 @@ static int sensor_0043_adc_uv_get_value(s_ezlopi_device_properties_t *properties
     free(sensor_0043_adc_data);
     return ret;
 }
-
-//---------------------------------------------------------------------------------------------------------------------------------
-int sensor_0043_adc_uv_intensity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *usr_args)
-{
-    int ret = 0;
-    switch (action)
-    {
-    case EZLOPI_ACTION_PREPARE:
-    {
-        ret = sensor_0043_adc_uv_prep_and_add(arg);
-        break;
-    }
-    case EZLOPI_ACTION_INITIALIZE:
-    {
-        ret = sensor_0043_adc_uv_init(ezlopi_device);
-        break;
-    }
-    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-    {
-        ret = sensor_0043_adc_uv_get_value(ezlopi_device, arg);
-        break;
-    }
-    case EZLOPI_ACTION_NOTIFY_1000_MS:
-    {
-        ret = ezlopi_device_value_updated_from_device(ezlopi_device);
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return 0;
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------

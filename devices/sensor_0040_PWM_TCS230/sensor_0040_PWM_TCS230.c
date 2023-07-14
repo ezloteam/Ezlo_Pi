@@ -492,8 +492,7 @@ static s_ezlopi_device_properties_t *sensor_pwm_tcs230_prepare_properties(uint32
 static int sensor_pwm_tcs230_prepare(void *arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;\
-    //create a ' TCS230_data_t ' type dummy pointer 
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg; // create a ' TCS230_data_t ' type dummy pointer
     TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)malloc(sizeof(TCS230_data_t));
 
     if ((NULL != prep_arg) && (NULL != prep_arg->cjson_device) && (NULL != sensor_0040_PWM_TCS230_data))
@@ -548,9 +547,6 @@ static int sensor_pwm_tcs230_get_value_cjson(s_ezlopi_device_properties_t *prope
             // TRACE_I("Blue : %d", (sensor_0040_PWM_TCS230_data->blue_mapped));
             // TRACE_I("Green : %d", (sensor_0040_PWM_TCS230_data->green_mapped));
 
-            // cjson_properties = cJSON_CreateArray();
-
-            // Values = cJSON_CreateObject();
             cJSON *Color_Values = cJSON_AddObjectToObject(cjson_properties, "value");
             cJSON_AddNumberToObject(Color_Values, "red", sensor_0040_PWM_TCS230_data->red_mapped);
             cJSON_AddNumberToObject(Color_Values, "green", sensor_0040_PWM_TCS230_data->green_mapped);

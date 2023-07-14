@@ -181,7 +181,7 @@ esp_err_t dht11_read_data(float *humidity_dht11, float *temperature_dht11)
 
     if (result != ESP_OK)
     {
-        return result;
+        return result; // Break away from this function ,if result => error
     }
 
     if (data[4] != ((data[0] + data[1] + data[2] + data[3]) & 0xFF))

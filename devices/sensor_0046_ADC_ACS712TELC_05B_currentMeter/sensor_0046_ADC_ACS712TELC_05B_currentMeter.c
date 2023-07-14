@@ -9,19 +9,28 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
+#include "math.h"
+#include "esp_log.h"
 
-#include "sensor_0046_ADC_ACS712_currentMeter.h"
+#include "sensor_0046_ADC_ACS712TELC_05B_currentMeter.h"
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
+static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+static float Ampere = 0;
+#define PORT_ENTER_CRITICAL() portENTER_CRITICAL(&mux)
+#define PORT_EXIT_CRITICAL() portEXIT_CRITICAL(&mux)
 
 static s_ezlopi_device_properties_t *sensor_adc_ACS712_prepare(cJSON *cjson_device); // you can directly add the prepare args here
 static int sensor_adc_ACS712_prepare_and_add(void *arg);
 
 static int sensor_adc_ACS712_init(s_ezlopi_device_properties_t *properties);
 static int sensor_adc_ACS712_get_value(s_ezlopi_device_properties_t *properties, void *arg);
+
+static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properties);
+
 //--------------------------------------------------------------------------------------------------------------------------------------
-int sensor_0046_ADC_ACS712_currentMeter(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
+int sensor_0046_ADC_ACS712TELC_05B_currentMeter(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
 {
     int ret = 0;
     switch (action)
@@ -43,7 +52,17 @@ int sensor_0046_ADC_ACS712_currentMeter(e_ezlopi_actions_t action, s_ezlopi_devi
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        ret = ezlopi_device_value_updated_from_device(ezlopi_device);
+        static uint8_t count = 3;
+        if (3 < count)
+        {
+            ret = ezlopi_device_value_updated_from_device(ezlopi_device);
+            count = 0;
+        }
+        else
+        {
+            Calculate_AC_DC_current_value(ezlopi_device);
+        }
+        count++;
         break;
     }
     default:
@@ -130,19 +149,73 @@ static int sensor_adc_ACS712_get_value(s_ezlopi_device_properties_t *properties,
 {
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)arg;
-    s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
-    memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+
     if (cjson_properties)
     {
-        ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        float Amp_data = (((float)(ezlopi_analog_data->voltage) - 2350.0f) / 100.0f); // ( current = mv / [100mV/A] )
-        TRACE_B("Current : %.2f A", Amp_data);
-        cJSON_AddNumberToObject(cjson_properties, "value", (int)Amp_data);
+        // TRACE_B("AC Current : %.2f A", Ampere);
+        cJSON_AddNumberToObject(cjson_properties, "value", (int)Ampere);
         cJSON_AddStringToObject(cjson_properties, "scale", "Ampere");
         ret = 1;
     }
-    free(ezlopi_analog_data);
     return ret;
 }
 
+static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properties)
+{
+    // During this calculation the system is polled for 20mS
+    // first determine if the incomming current is DC or AC
+    s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
+    if (NULL != ezlopi_analog_data)
+    {
+        memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+
+        // 1wave->20ms->20000uS
+        uint32_t period_dur = (1000000 / DEFAULT_AC_FREQUENCY); // 20000uS
+        int Vnow = 0;
+        uint32_t Vsum = 0;
+        uint32_t measurements_count = 0;
+
+        // starting 't' instant
+        uint32_t t_start = (uint32_t)esp_timer_get_time();
+        // ESP_LOGW("TIME_TAG", "start_time : %d", t_start);
+
+        PORT_ENTER_CRITICAL();
+        while (((uint32_t)esp_timer_get_time() - t_start) < period_dur) // loops within 1-complete cycle
+        {
+            ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+            // getting the voltage value at this instant
+            Vnow = (ezlopi_analog_data->voltage) - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
+            Vsum += Vnow * Vnow;                                                 // sumof(I^2 + I^2 + .....)
+            measurements_count++;
+        }
+        PORT_EXIT_CRITICAL();
+
+        // TRACE_E("Measurement Count = %d ", measurements_count);
+        // ESP_LOGW("TIME_TAG", "Time_taken   : %d", (uint32_t)esp_timer_get_time() - t_start);
+        // If applied for DC;  'AC_Irms' calculation give same value as 'DC-value'
+        if (0 == measurements_count)
+        {
+            measurements_count = 1;
+        }
+        Ampere = ((float)sqrt(Vsum / measurements_count)) / 185.0f; //  -> I[rms]
+
+        TRACE_E("AC current = %0.2f A", Ampere);
+        //----------------------------------------------------------
+
+        float Amp_data = 0;
+        // call a function to measure AC/DC current here
+        ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+        Amp_data = (((float)(ezlopi_analog_data->voltage) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
+
+        float Amp_abs = ((Amp_data > 0) ? (Amp_data) : (Amp_data * -1));
+        if (Amp_abs < 0.3)
+        {
+            Amp_data = 0;
+        }
+        TRACE_E("DC current = %0.2f A", Amp_data);
+
+        // clear the allocated memory
+        free(ezlopi_analog_data);
+    }
+}
 //--------------------------------------------------------------------------------------------------------------------------------------

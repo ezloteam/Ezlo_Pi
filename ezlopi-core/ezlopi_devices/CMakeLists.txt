@@ -59,7 +59,8 @@ idf_component_register(
         sensor_0042_ADC_shunt_voltmeter
         sensor_0043_ADC_UV_intensity
         sensor_0044_I2C_TSL2561_luminosity
-        sensor_0046_ADC_ACS712_currentMeter
-)
+        sensor_0046_ADC_ACS712TELC_05B_currentMeter
+        sensor_0047_TWI_HX711_loadcell
+        )
 
 

@@ -207,10 +207,8 @@ static bool Check_PARTID(s_ezlopi_device_properties_t *properties)
 static void sensor_0044_tsl2561_configure_device(s_ezlopi_device_properties_t *properties)
 {
     Power_Up_tsl2561(properties);
-    // Set the timing and gain
-    // ESP_ERROR_CHECK_WITHOUT_ABORT(tsl2561_disable_interrupt(properties));
-    // ESP_ERROR_CHECK_WITHOUT_ABORT(tsl2561_set_timing_and_gain(properties));
     // this controls both intergration time and gain of ADC
+    // Set the timing and gain
 
     uint8_t command_code = (SELECT_CMD_REGISTER | TSL2561_REGISTER_TIMING);
     uint8_t setup_code = (TSL2561_HIGH_GAIN_MODE_x16 | TSL2561_STOP_MANNUAL_INTEGRATION | TSL2561_INTEGRATION_TIME_101_MS);

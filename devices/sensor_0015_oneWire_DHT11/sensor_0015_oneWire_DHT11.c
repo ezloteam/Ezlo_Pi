@@ -32,7 +32,7 @@ static int dht11_sensor_get_sensor_value(s_ezlopi_device_properties_t *propertie
             dht11_sensor_add_to_list(prep_arg, _properties, NULL);                                                        \
         }                                                                                                                 \
     }
-
+//-------------------------------------------------------------------------------------------------------------------------------
 int sensor_0015_oneWire_DHT11(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_args)
 {
 
@@ -71,6 +71,7 @@ int sensor_0015_oneWire_DHT11(e_ezlopi_actions_t action, s_ezlopi_device_propert
     }
     return ret;
 }
+//-------------------------------------------------------------------------------------------------------------------------------
 
 static int dht11_sensor_prepare(void *arg)
 {
@@ -109,6 +110,8 @@ static s_ezlopi_device_properties_t *dht11_sensor_prepare_properties(uint32_t de
             dht11_sensor_properties->ezlopi_cloud.item_name = item_name;
             dht11_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor;
             dht11_sensor_properties->ezlopi_cloud.value_type = value_type;
+            dht11_sensor_properties->ezlopi_cloud.has_getter = true;
+            dht11_sensor_properties->ezlopi_cloud.has_setter = false;
             dht11_sensor_properties->ezlopi_cloud.reachable = true;
             dht11_sensor_properties->ezlopi_cloud.battery_powered = false;
             dht11_sensor_properties->ezlopi_cloud.show = true;
@@ -116,8 +119,9 @@ static s_ezlopi_device_properties_t *dht11_sensor_prepare_properties(uint32_t de
             dht11_sensor_properties->ezlopi_cloud.device_id = device_id;
             dht11_sensor_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
             dht11_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
-            CJSON_GET_VALUE_INT(cjson_device, "gpio", dht11_sensor_properties->interface.onewire_master.onewire_pin);
             dht11_sensor_properties->interface.onewire_master.enable = true;
+
+            CJSON_GET_VALUE_INT(cjson_device, "gpio", dht11_sensor_properties->interface.onewire_master.onewire_pin);
         }
     }
     return dht11_sensor_properties;
@@ -160,7 +164,7 @@ static int dht11_sensor_get_sensor_value(s_ezlopi_device_properties_t *propertie
     char formatted_value[20];
     if (cjson_properties)
     {
-        dht11_read_data(&humidity_dht11,&temperature_dht11);
+        dht11_read_data(&humidity_dht11, &temperature_dht11);
         if (ezlopi_item_name_temp == properties->ezlopi_cloud.item_name)
         {
             TRACE_I("Temperature : %.2f *c", temperature_dht11);

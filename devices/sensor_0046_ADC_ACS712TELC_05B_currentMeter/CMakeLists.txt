@@ -1,5 +1,5 @@
 
-idf_component_register(SRCS "sensor_0046_ADC_ACS712_currentMeter.c" 
+idf_component_register(SRCS "sensor_0046_ADC_ACS712TELC_05B_currentMeter.c" 
                         INCLUDE_DIRS "."          
                         REQUIRES trace 
                                 ezlopi_actions 
