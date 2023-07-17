@@ -143,10 +143,8 @@ void Calculate_hx711_tare_wt(void *params)
 
     // ignore first few weight readings
     float RAW_tare = 0;
-    for (uint8_t i = 200; i > 0; i--)
+    for (uint8_t i = 180; i > 0; i--)
     {
-        // if data recieved is not timed-out [i.e. valid]
-        TRACE_I("Calibration_No : %d", i);
 
         // extract the raw_data
         RAW_tare = HX711_rawData(HX711_GAIN_64); // 100ms each read
@@ -154,17 +152,23 @@ void Calculate_hx711_tare_wt(void *params)
         if (i < 150)
         { // data below 100 iteration are considered
             HX711_tare_wt = 0.2f * HX711_tare_wt + 0.8f * (RAW_tare);
+            // HX711_tare_wt += (RAW_tare);
         }
         else
-        { // all the data above 100 iterations are replaced
+        { // all the data above 150 iterations are replaced
             HX711_tare_wt = (RAW_tare);
         }
+
+        // if data recieved is not timed-out [i.e. valid]
+        TRACE_I("Calibration_No : %d , Raw_data : %.2f", i, RAW_tare);
     }
 
+    // HX711_tare_wt /= 150.0f;
+
     // now set the offset_flag
+    TRACE_I("Calibration Stage ----------> Tare_Offset : %0.2f ", HX711_tare_wt);
     if (HX711_tare_wt > 3000)
     {
-        TRACE_I("Calibration Stage ----------> Tare_Offset : %0.2f ", HX711_tare_wt);
         HX711_initialized = true;
     }
 
@@ -316,11 +320,11 @@ static int sensor_0047_TWI_HX711_get_value(s_ezlopi_device_properties_t *propert
     {
         if (ezlopi_item_name_weight == properties->ezlopi_cloud.item_name)
         {
-            Mass = (HX711_avg_dataReading(10) - HX711_tare_wt); /// 1000.0f; // to avoid spikes
+            Mass = HX711_avg_dataReading(10); /// 1000.0f; // to avoid spikes
 
-            TRACE_I("Mass : %0.2f units ; Tare_Offset : %0.2f unit ", Mass, HX711_tare_wt);
+            TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f gm ,", Mass, HX711_tare_wt, (Mass - HX711_tare_wt) / 1000.0f);
 
-            cJSON_AddNumberToObject(cjson_properties, "value", Mass);
+            cJSON_AddNumberToObject(cjson_properties, "value", ((Mass - HX711_tare_wt) / 1000000.f));
             cJSON_AddStringToObject(cjson_properties, "scale", "Kilo_gram");
         }
     }

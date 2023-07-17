@@ -152,8 +152,7 @@ static int sensor_adc_ACS712_get_value(s_ezlopi_device_properties_t *properties,
 
     if (cjson_properties)
     {
-        // TRACE_B("AC Current : %.2f A", Ampere);
-        cJSON_AddNumberToObject(cjson_properties, "value", (int)Ampere);
+        cJSON_AddNumberToObject(cjson_properties, "value", Ampere); // Irms [A]
         cJSON_AddStringToObject(cjson_properties, "scale", "Ampere");
         ret = 1;
     }
@@ -197,22 +196,21 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
         {
             measurements_count = 1;
         }
-        Ampere = ((float)sqrt(Vsum / measurements_count)) / 185.0f; //  -> I[rms]
+        Ampere = ((float)sqrt(Vsum / measurements_count)) / 185.0f; //  -> I[rms] Ampere
 
-        TRACE_E("AC current = %0.2f A", Ampere);
+        // TRACE_E("AC current = %0.2f A", Ampere);
         //----------------------------------------------------------
 
+        /*this portion calculates an instantaneous current as soon as the AC mesurement process is done*/
         float Amp_data = 0;
-        // call a function to measure AC/DC current here
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
         Amp_data = (((float)(ezlopi_analog_data->voltage) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
 
-        float Amp_abs = ((Amp_data > 0) ? (Amp_data) : (Amp_data * -1));
-        if (Amp_abs < 0.3)
+        if (((Amp_data > 0) ? (Amp_data) : (Amp_data * -1)) < 0.3)
         {
             Amp_data = 0;
         }
-        TRACE_E("DC current = %0.2f A", Amp_data);
+        // TRACE_E("DC current = %0.2f A", Amp_data);
 
         // clear the allocated memory
         free(ezlopi_analog_data);
