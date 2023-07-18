@@ -197,8 +197,9 @@ void ezlopi_scene_add_new_scene_cjson(cJSON *new_scene)
     }
 }
 
-void ezlopi_scene_add(cJSON *cj_scene)
+l_scenes_list_t *ezlopi_scene_add(cJSON *cj_scene)
 {
+    l_scenes_list_t *new_scene_node = NULL;
     if (scenes_list_head)
     {
         l_scenes_list_t *curr_scene = scenes_list_head;
@@ -208,11 +209,15 @@ void ezlopi_scene_add(cJSON *cj_scene)
         }
 
         curr_scene->next = __new_scene_create(cj_scene);
+        new_scene_node = curr_scene->next;
     }
     else
     {
         scenes_list_head = __new_scene_create(cj_scene);
+        new_scene_node = scenes_list_head;
     }
+
+    return new_scene_node;
 }
 
 void ezlopi_scene_init(void)
@@ -227,7 +232,6 @@ void ezlopi_scene_init(void)
         {
             if (cJSON_Array == cj_scenes_list->type)
             {
-                int scenes_size = cJSON_GetArraySize(cj_scenes_list);
                 int scenes_idx = 0;
                 cJSON *cj_scene = NULL;
                 while (NULL != (cj_scene = cJSON_GetArrayItem(cj_scenes_list, scenes_idx++)))
@@ -841,9 +845,11 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
         if (new_scene)
         {
             memset(new_scene, 0, sizeof(l_scenes_list_t));
+            new_scene->status = EZLOPI_SCENE_STATUS_RUN;
 
             uint32_t tmp_success_creating_scene = 1;
 
+#if 0
             cJSON *cj_id = cJSON_GetObjectItem(cj_scene, "_id");
             if (cj_id && cj_id->valuestring)
             {
@@ -853,6 +859,9 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
             {
                 new_scene->_id = ezlopi_cloud_generate_scene_id();
             }
+#endif
+
+            new_scene->_id = ezlopi_cloud_generate_scene_id();
             CJSON_GET_VALUE_INT(cj_scene, "enabled", new_scene->enabled);
             CJSON_GET_VALUE_INT(cj_scene, "is_group", new_scene->is_group);
             // if (new_scene->is_group)

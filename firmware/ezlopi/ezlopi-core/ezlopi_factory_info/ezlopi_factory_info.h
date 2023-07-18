@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_IR_BLASTER 1
 #define EZLOPI_TEST_DEVICE 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
+#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -29,24 +29,6 @@ extern "C"
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     typedef enum e_ezlopi_factory_info_v2_offset
     {
-        // VERSION_OFFSET = 0x0000,
-        // NAME_OFFSET = 0x0002,
-        // MANUFACTURER_OFFSET = 0x0082,
-        // BRAND_OFFSET = 0x00C2,
-        // MODEL_OFFSET = 0x0102,
-        // ID_OFFSET = 0x0142,
-        // DEVICE_UUID_OFFSET = 0x014A,
-        // PROVISIONING_UUID_OFFSET = 0x0172,
-        // SSID_OFFSET = 0x019A,
-        // PASSWORD_OFFSET = 0x01DA,
-        // DEVICE_MAC_OFFSET = 0x021A,
-        // CLOUD_SERVER_OFFSET = 0x0220,
-        // DEVICE_TYPE_OFFSET = 0x02A0,
-
-        // CA_CERTIFICATE_OFFSET = 0x1000,
-        // SSL_PRIVATE_KEY_OFFSET = 0x2000,
-        // SSL_SHARED_KEY_OFFSET = 0x3000,
-        // EZLOPI_CONFIG_OFFSET = 0x4000,
         VERSION_OFFSET = 0xE000 + 0x0002,
         NAME_OFFSET = 0xE000 + 0x0084,
         MANUFACTURER_OFFSET = 0xE000 + 0x00CA,
@@ -460,15 +442,3 @@ static const char *test_device_constant_config =
 #endif
 
 #endif // __FACTORY_INFO_H__
-
-#if 0
-            "{\
-	            \"dev_type\": 2,\
-	            \"dev_name\": \"PIR sensor\",\
-	            \"id_room\":\"\",\
-	            \"id_item\": 19,\
-	            \"gpio\": 4,\
-	            \"pull_up\": false,\
-	            \"logic_inv\": false\
-            }";
-#endif

@@ -111,9 +111,19 @@ typedef struct l_house_modes
     struct l_house_modes *next;
 } l_house_modes_t;
 
+typedef enum e_scene_status
+{
+    EZLOPI_SCENE_STATUS_NONE = 0,
+    EZLOPI_SCENE_STATUS_RUN,
+    EZLOPI_SCENE_STATUS_STOP,
+    EZLOPI_SCENE_STATUS_PAUSE,
+    EZLOPI_SCENE_STATUS_MAX
+} e_scene_status_t;
+
 typedef struct l_scenes_list
 {
     // char _id[32];
+    e_scene_status_t status;
     uint32_t _id;
     uint32_t enabled;
     uint32_t is_group;
@@ -133,7 +143,7 @@ typedef int (*f_scene_method_t)(l_scenes_list_t *curr_scene, void *arg);
 
 void ezlopi_scene_init(void);
 void ezlopi_scene_update_nvs(void);
-void ezlopi_scene_add(cJSON *cj_scene);
+l_scenes_list_t * ezlopi_scene_add(cJSON *cj_scene);
 void ezlopi_scene_add_new_scene_cjson(cJSON *new_scene);
 void ezlopi_scene_delete(l_scenes_list_t *scenes_list);
 l_scenes_list_t *ezlopi_scenes_get_scenes_list(void);

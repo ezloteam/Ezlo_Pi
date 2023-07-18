@@ -16,18 +16,20 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
     if (cjson_result)
     {
+#if 0
         char *scene_list_str = ezlopi_nvs_scene_get();
         if (scene_list_str)
         {
             cJSON_AddRawToObject(cjson_result, "scenes", scene_list_str);
             free(scene_list_str);
         }
+#endif
 
-#if 0
+#if 1
         cJSON *cjson_scenes_array = ezlopi_scenes_create_cjson_scene_list(ezlopi_scenes_get_scenes_list());
         if (cjson_scenes_array)
         {
-            if (!cJSON_AddItemToObject(cjson_result, , cjson_scenes_array))
+            if (!cJSON_AddItemToObject(cjson_result, "scenes", cjson_scenes_array))
             {
                 cJSON_Delete(cjson_scenes_array);
             }
@@ -46,6 +48,7 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
     if (cj_params)
     {
         ezlopi_scene_add_new_scene_cjson(cj_params);
+        esp_restart();
         // ezlopi_scene_add(cj_params);
         // ezlopi_scene_update_nvs();
     }
