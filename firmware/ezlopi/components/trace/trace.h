@@ -35,7 +35,7 @@ extern "C"
 
 #if (1 == ENABLE_TRACE)
 
-#define F(X) (flash_attr)X
+#define F(X) (flash_attr) X
 
 #define TRACE_E trace_err
 #define TRACE_W trace_war

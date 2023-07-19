@@ -676,9 +676,27 @@ static l_fields_t *__new_field_create(cJSON *cj_field)
                     TRACE_B("value: false");
                     break;
                 }
-                case cJSON_Object:
+                case cJSON_Array:
                 {
-                    TRACE_B("value object");
+                    cJSON *cj_block = NULL;
+                    int block_idx = 0;
+
+                    while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
+                    {
+                        if (field->value.when_block)
+                        {
+                            l_when_block_t *curr_when_block = field->value.when_block;
+                            while (curr_when_block->next)
+                            {
+                                curr_when_block = curr_when_block->next;
+                            }
+                            curr_when_block->next = __new_when_block_create(cj_block);
+                        }
+                        else
+                        {
+                            field->value.when_block = __new_when_block_create(cj_block);
+                        }
+                    }
                     break;
                 }
                 default:
