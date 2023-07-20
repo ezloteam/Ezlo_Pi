@@ -84,8 +84,8 @@ static s_ezlopi_device_properties_t *sensor_adc_FC28_prepare(cJSON *cjson_device
         sensor_0041_adc_FC28_properties->ezlopi_cloud.show = true;
         sensor_0041_adc_FC28_properties->ezlopi_cloud.room_name[0] = '\0';
         sensor_0041_adc_FC28_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
-        sensor_0041_adc_FC28_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id;
-        sensor_0041_adc_FC28_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id;
+        sensor_0041_adc_FC28_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        sensor_0041_adc_FC28_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         sensor_0041_adc_FC28_properties->interface.adc.resln_bit = 3; // ADC 12-bit
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_0041_adc_FC28_properties->interface.adc.gpio_num);
@@ -135,10 +135,17 @@ static int sensor_adc_FC28_get_value(s_ezlopi_device_properties_t *properties, v
     if (cjson_properties)
     {
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        int percent_data = (int)(((float)(4095.0f - (float)(ezlopi_analog_data->value)) / 4095.0f) * 100);
+
+        // NOTE : [ (0V-2.4V)  ==>  (0-4095) ]
+
+        float adc_val = (ezlopi_analog_data->value); // The value maxes out the 2.4V
+
+        int percent_data = (int)(((float)(4095.0f - adc_val) / 4095.0f) * 100);
         TRACE_B("Percent moisture : %d", percent_data);
-        // int volt_data = (int)(4200 - ezlopi_analog_data->voltage); // max 4.2V
+
+        // int volt_data = (int)(2400 - (ezlopi_analog_data->voltage)/2.0f); // max 2.4V
         // TRACE_B("voltage : %dmV", volt_data);
+
         cJSON_AddNumberToObject(cjson_properties, "value", percent_data);
         cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         ret = 1;

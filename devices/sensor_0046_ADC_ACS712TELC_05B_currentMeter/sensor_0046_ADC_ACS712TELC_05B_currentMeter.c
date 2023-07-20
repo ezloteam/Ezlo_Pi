@@ -103,8 +103,8 @@ static s_ezlopi_device_properties_t *sensor_adc_ACS712_prepare(cJSON *cjson_devi
         sensor_0046_ADC_ACS712_properties->ezlopi_cloud.show = true;
         sensor_0046_ADC_ACS712_properties->ezlopi_cloud.room_name[0] = '\0';
         sensor_0046_ADC_ACS712_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
-        sensor_0046_ADC_ACS712_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id;
-        sensor_0046_ADC_ACS712_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id;
+        sensor_0046_ADC_ACS712_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        sensor_0046_ADC_ACS712_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         sensor_0046_ADC_ACS712_properties->interface.adc.resln_bit = 3; // ADC 12-bit
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_0046_ADC_ACS712_properties->interface.adc.gpio_num);
@@ -183,18 +183,20 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
         {
             ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
             // getting the voltage value at this instant
+#ifdef voltage_divider_added
+            Vnow = (ezlopi_analog_data->voltage) * 2 - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
+#else if
             Vnow = (ezlopi_analog_data->voltage) - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
-            Vsum += Vnow * Vnow;                                                 // sumof(I^2 + I^2 + .....)
+#endif
+            Vsum += Vnow * Vnow; // sumof(I^2 + I^2 + .....)
             measurements_count++;
         }
         PORT_EXIT_CRITICAL();
 
-        // TRACE_E("Measurement Count = %d ", measurements_count);
-        // ESP_LOGW("TIME_TAG", "Time_taken   : %d", (uint32_t)esp_timer_get_time() - t_start);
         // If applied for DC;  'AC_Irms' calculation give same value as 'DC-value'
         if (0 == measurements_count)
         {
-            measurements_count = 1;
+            measurements_count = 1; // <-- avoid dividing by zero
         }
         Ampere = ((float)sqrt(Vsum / measurements_count)) / 185.0f; //  -> I[rms] Ampere
 
@@ -204,8 +206,16 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
         /*this portion calculates an instantaneous current as soon as the AC mesurement process is done*/
         float Amp_data = 0;
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+#ifdef voltage_divider_added
+        // since the incoming voltage is halfed after voltage divider ,
+        // we will double the extracted voltage and then
+        // apply standard calibration methods to get desired results
+        Amp_data = ((((float)(ezlopi_analog_data->voltage) * 2.0f) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
+#else if
+        // the value extracted for 0A is already at 2.5V ; which is the max 2.4V analog input of esp32
+        // Wihtout
         Amp_data = (((float)(ezlopi_analog_data->voltage) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
-
+#endif
         if (((Amp_data > 0) ? (Amp_data) : (Amp_data * -1)) < 0.3)
         {
             Amp_data = 0;

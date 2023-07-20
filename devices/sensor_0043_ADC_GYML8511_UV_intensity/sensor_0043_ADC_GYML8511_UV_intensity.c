@@ -9,7 +9,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 
-#include "sensor_0043_ADC_UV_intensity.h"
+#include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 
 //********************************************************************
 //                          Declarations
@@ -22,7 +22,7 @@ static float mapfloat(float x, float in_min, float in_max, float out_min, float 
 //---------------------------------------------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------------------
-int sensor_0043_adc_uv_intensity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *usr_args)
+int sensor_0043_adc_gyml8511_uv_intensity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *usr_args)
 {
     int ret = 0;
     switch (action)
@@ -105,9 +105,9 @@ static s_ezlopi_device_properties_t *sensor_0043_adc_uv_prepare(cJSON *cjson_dev
         sensor_0043_adc_uv_properties->ezlopi_cloud.reachable = true;
         sensor_0043_adc_uv_properties->ezlopi_cloud.show = true;
         sensor_0043_adc_uv_properties->ezlopi_cloud.room_name[0] = '\0';
-        sensor_0043_adc_uv_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id;
-        sensor_0043_adc_uv_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id;
-        sensor_0043_adc_uv_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id;
+        sensor_0043_adc_uv_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        sensor_0043_adc_uv_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        sensor_0043_adc_uv_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_0043_adc_uv_properties->interface.adc.gpio_num);
         sensor_0043_adc_uv_properties->interface.adc.resln_bit = 3;

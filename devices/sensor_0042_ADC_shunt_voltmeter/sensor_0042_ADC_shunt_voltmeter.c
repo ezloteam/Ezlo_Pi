@@ -134,7 +134,12 @@ static int sensor_0042_adc_shunt_voltmeter_get_value(s_ezlopi_device_properties_
     {
         // extracting the analog value
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, sensor_0042_analog_data);
-        int voltage_data = (int)(sensor_0042_analog_data->voltage) * 5; // 0-5V
+#ifdef voltage_divider_added
+        int voltage_data = ((int)(sensor_0042_analog_data->voltage) * 2) * 5; // first we double the incoming voltage
+#else
+        int voltage_data = (int)(sensor_0042_analog_data->voltage) * 5; // if you havenot added a voltage divider at sensor's analog output for esp32
+
+#endif
         TRACE_B("Voltage : %d mV", voltage_data);
         cJSON_AddNumberToObject(cjson_propertise, "value", voltage_data);
         cJSON_AddStringToObject(cjson_propertise, "scale", "millivolt");

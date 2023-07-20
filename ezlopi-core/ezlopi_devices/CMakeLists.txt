@@ -22,9 +22,7 @@ idf_component_register(
         device_0003_digitalOut_plug
         sensor_0005_I2C_MPU6050
         sensor_0006_I2C_ADXL345
-        sensor_0007_I2C_GY271
-        sensor_0005_I2C_MPU6050
-        sensor_0006_I2C_ADXL345     
+        sensor_0007_I2C_GY271    
         sensor_0008_I2C_LTR303ALS
         device_0009_other_RMT_SK6812
         sensor_0010_I2C_BME680
@@ -57,10 +55,11 @@ idf_component_register(
         sensor_0040_PWM_TCS230
         sensor_0041_ADC_FC28_soilMoisture
         sensor_0042_ADC_shunt_voltmeter
-        sensor_0043_ADC_UV_intensity
+        sensor_0043_ADC_GYML8511_UV_intensity
         sensor_0044_I2C_TSL2561_luminosity
         sensor_0046_ADC_ACS712TELC_05B_currentMeter
         sensor_0047_TWI_HX711_loadcell
+        sensor_0048_ADC_MQ4_methane_gas_detector
         )
 
 

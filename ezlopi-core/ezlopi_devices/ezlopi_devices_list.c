@@ -43,10 +43,11 @@
 #include "sensor_0040_PWM_TCS230.h"
 #include "sensor_0041_ADC_FC28_soilMoisture.h"
 #include "sensor_0042_ADC_shunt_voltmeter.h"
-#include "sensor_0043_ADC_UV_intensity.h"
+#include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
 #include "sensor_0046_ADC_ACS712TELC_05B_currentMeter.h"
 #include "sensor_0047_TWI_HX711_loadcell.h"
+#include "sensor_0048_ADC_MQ4_methane_gas_detector.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -348,7 +349,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_SENSOR_0043_ADC_UV_INTENSITY
     {
         .id = EZLOPI_SENSOR_0043_ADC_UV_INTENSITY,
-        .func = sensor_0043_adc_uv_intensity,
+        .func = sensor_0043_adc_gyml8511_uv_intensity,
     },
 #endif
 
@@ -372,6 +373,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0047_TWI_HX711_LOADCELL,
         .func = sensor_0047_twi_hx711,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0048_ADC_MQ4_METHANE_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0048_ADC_MQ4_METHANE_GAS_DETECTOR,
+        .func = sensor_0048_ADC_MQ4_methane,
     },
 #endif
 

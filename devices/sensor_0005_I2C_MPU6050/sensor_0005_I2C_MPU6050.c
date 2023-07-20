@@ -237,8 +237,32 @@ static s_ezlopi_device_properties_t *i2c_mpu6050_sensor_prepare_properties(uint3
     if (i2c_mpu6050_properties)
     {
         memset(i2c_mpu6050_properties, 0, sizeof(s_ezlopi_device_properties_t));
-
         char *device_name = NULL;
+        if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
+        {
+            device_name = "MPU6050 Acceleration-X";
+        }
+        if (ezlopi_item_name_acceleration_y_axis == ITEM_NAME)
+        {
+            device_name = "MPU6050 Acceleration-Y";
+        }
+        if (ezlopi_item_name_acceleration_z_axis == ITEM_NAME)
+        {
+            device_name = "MPU6050 Acceleration-Z";
+        }
+        // if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
+        // {
+        //     device_name = "MPU6050 Gyroscope-X";
+        // }
+        // if (ezlopi_item_name_gyroscope_y_axis == ITEM_NAME)
+        // {
+        //     device_name = "MPU6050 Gyroscope-Y";
+        // }
+        // if (ezlopi_item_name_gyroscope_z_axis == ITEM_NAME)
+        // {
+        //     device_name = "MPU6050 Gyroscope-Z";
+        // }
+
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(i2c_mpu6050_properties, device_name);
         i2c_mpu6050_properties->ezlopi_cloud.category = CATEGORY;
