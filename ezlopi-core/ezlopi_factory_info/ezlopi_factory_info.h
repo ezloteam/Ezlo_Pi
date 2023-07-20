@@ -408,7 +408,7 @@ static const char *test_device_constant_config =
                 \"pullup_op\": true,\
                 \"val_ip\": true,\
                 \"val_op\": false\
-            },\
+            }\
         ],\
     \"dev_total\": 1}";
 

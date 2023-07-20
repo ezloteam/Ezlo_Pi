@@ -18,9 +18,6 @@ static const char *boot_count_nvs_name = "boot_count";
 static const char *provisioning_status_nvs_name = "prov_stat";
 static const char *settings_initialized_status_name = "settings_magic";
 
-static char *ezlopi_nvs_read_str(char *nvs_name);
-static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name);
-
 int ezlopi_nvs_init(void)
 {
     int ret = 0;
@@ -573,7 +570,7 @@ uint8_t ezlopi_nvs_read_bool(bool * b, const char * key_name) {
     return ret;
 }
 
-static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
+int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
 {
     int ret = 0;
 
@@ -608,7 +605,7 @@ static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
     return ret;
 }
 
-static char *ezlopi_nvs_read_str(char *nvs_name)
+char *ezlopi_nvs_read_str(char *nvs_name)
 {
     char *return_str = NULL;
 

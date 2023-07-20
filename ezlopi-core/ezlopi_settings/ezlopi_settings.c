@@ -161,7 +161,13 @@ void _ezlopi_device_settings_value_set(uint32_t id, void * args)
                     }
                     else if(strcmp(settings_current->properties->value_type, "string") == 0)
                     {
-
+                        
+                        cJSON *o_item = cJSON_GetObjectItem(cjson_params, "value");
+                        if (o_item)                                                 
+                        {                                                           
+                            settings_current->properties->value.string_value = o_item->valuestring;
+                            ezlopi_nvs_write_str(settings_current->properties->value.string_value, strlen(settings_current->properties->value.string_value), settings_current->properties->nvs_alias);
+                        } 
                     }
                     else if(strcmp(settings_current->properties->value_type, "rgb") == 0)
                     {
@@ -220,8 +226,9 @@ void _ezlopi_device_settings_reset_settings_id(uint32_t id)
 
                 }
                 else if(strcmp(configured_settings_current->properties->value_type, "string") == 0)
-                {
-
+                {   
+                    configured_settings_current->properties->value.string_value = configured_settings_current->properties->value_defaut.string_value;
+                    ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
                 }
                 else if(strcmp(configured_settings_current->properties->value_type, "rgb") == 0)
                 {
@@ -271,7 +278,8 @@ void _ezlopi_device_settings_reset_device_id(uint32_t id)
                 }
                 else if(strcmp(configured_settings_current->properties->value_type, "string") == 0)
                 {
-
+                    configured_settings_current->properties->value.string_value = configured_settings_current->properties->value_defaut.string_value;
+                    ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
                 }
                 else if(strcmp(configured_settings_current->properties->value_type, "rgb") == 0)
                 {

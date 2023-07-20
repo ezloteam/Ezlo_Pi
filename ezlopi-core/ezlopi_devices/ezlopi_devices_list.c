@@ -278,7 +278,7 @@ static s_ezlopi_device_t device_array[] = {
             .func = sensor_0029_I2C_GXHTC3,
         },
     #endif
-
+#elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #else
 #endif
 
