@@ -278,12 +278,12 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_t *fields)
                     case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
                     case EZLOPI_VALUE_TYPE_MAX:
                     {
-                        TRACE_W("Value type not implemented!");
+                        TRACE_W("Value type not implemented!, curr-type: %d", curr_field->value_type);
                         break;
                     }
                     default:
                     {
-                        TRACE_E("Value type not matched!");
+                        TRACE_E("Value type not matched!, curr-type: %d", curr_field->value_type);
                         break;
                     }
                     }

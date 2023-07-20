@@ -305,8 +305,28 @@ int ezlopi_scene_when_is_detected_in_hot_zone(l_scenes_list_t *curr_scene, void 
 
 int ezlopi_scene_when_and(l_scenes_list_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: when-method not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_t *when_block = (l_when_block_t *)arg;
+    if (when_block)
+    {
+        l_when_block_t *value_when_block = when_block->fields->value.when_block;
+        while (value_when_block)
+        {
+            f_scene_method_t scene_method = ezlopi_scene_get_method(value_when_block->block_options.method.type);
+            if (scene_method)
+            {
+                ret &= scene_method(curr_scene, (void *)value_when_block);
+                if (!ret)
+                {
+                    break;
+                }
+            }
+
+            value_when_block = value_when_block->next;
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_not(l_scenes_list_t *curr_scene, void *arg)
@@ -317,8 +337,28 @@ int ezlopi_scene_when_not(l_scenes_list_t *curr_scene, void *arg)
 
 int ezlopi_scene_when_or(l_scenes_list_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: when-method not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_t *when_block = (l_when_block_t *)arg;
+    if (when_block)
+    {
+        l_when_block_t *value_when_block = when_block->fields->value.when_block;
+        while (value_when_block)
+        {
+            f_scene_method_t scene_method = ezlopi_scene_get_method(value_when_block->block_options.method.type);
+            if (scene_method)
+            {
+                ret |= scene_method(curr_scene, (void *)value_when_block);
+                if (ret)
+                {
+                    break;
+                }
+            }
+
+            value_when_block = value_when_block->next;
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_xor(l_scenes_list_t *curr_scene, void *arg)
