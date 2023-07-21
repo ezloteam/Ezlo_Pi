@@ -397,9 +397,9 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\": 3,\
-                \"dev_name\": \"ACS712 5A meter\",\
+                \"dev_name\": \"MQ4 methane_detector\",\
                 \"id_room\": \"\",\
-                \"id_item\": 46,\
+                \"id_item\": 48,\
                 \"gpio\": 33\
           }\
         ],\

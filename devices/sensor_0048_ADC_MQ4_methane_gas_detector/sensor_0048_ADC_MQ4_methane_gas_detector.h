@@ -22,7 +22,7 @@
  *     (gnd_pin)     |      |             {1KOhm}
  *                   |      | [constant]   |
  *     => Reqv ----> RL    {1kOhm}         +------------+ 2.1V
- *     => 667 Ohm    |      |              |                ^
+ *     => ~667 Ohm   |      |              |                ^
  *                   |      |             {1KOhm}           |  esp32 analog input
  *                   V      |              |                v
  *      [0V] ---------------+--> 0V--------+------------+ 0V
@@ -31,7 +31,6 @@
  **/
 
 /**
- *
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
  *      (via black straight line of sensitivity graph in the Mq-4 datasheet)
  *
@@ -94,23 +93,11 @@
  *    _________ STAGE 2 : PPM Calculation ____________________________________________________
  *
  *    Case. 4: Calculation of _ppm using eq(3), we get:
- *                  #F.  _ppm = 10 ^ [ (log([Rs_gas / Ro]) - 1.019) / -0.3397 ]  ;
- *
- *                                  -> where ; Ro is taken from eq(4)
- *                                           ; Rs_gas = [(5 * 660) / VRL] - 660 ;
- *
- *
- *    MORE DIRECT APPROACH :-
- *
- *    Exponential regression: [_PPM =  a*ratio^b]
- *    ----------------------
- *    Gas    | a               | b
- *    LPG    | 3811.9          | -3.113
- *    CH4    | 1012.7          | -2.786
- *    CO     | 200000000000000 | -19.05
- *    Alcohol| 60000000000     | -14.01
- *    smoke  | 30000000        | -8.308
- *
+ *                  #F. Formula of _ppm is:-
+ *                        -> _ppm = 10 ^ [ (log([Rs_gas / Ro]) - 1.019) / -0.3397 ]  ;
+ *                                                  -> where ; Ro is taken from eq(4)
+ *                                                           ; Rs_gas = [(5 * 660) / VRL] - 660 ;
+ *    ________________________________________________________________________________________
  *
  */
 
@@ -125,7 +112,15 @@
 #define voltage_divider_added 1
 //------------------------------------------
 
-#define eqv_RL 660.0f         // ohm
+/**
+ * Before writing below  [eqv_RL], [m_slope_mq4], [b_coeff_mq4] shown values.
+ * Please apply voltage-divider schematics as shown above.
+ *
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ *
+ * NOTE .2 : For [m_slope_mq4] & [b_coeff_mq4] values:- follow [stage-1] above shown procedures.
+ * */
+#define eqv_RL 660.0f
 #define RatioMQ4CleanAir 4.4f // -> [RS / R0] = 4.4
 #define MQ4_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq4 -0.3397f
