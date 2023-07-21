@@ -153,7 +153,7 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
         }
         cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
         ret = 1;
-        TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
+        // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
     }
 
     return ret;

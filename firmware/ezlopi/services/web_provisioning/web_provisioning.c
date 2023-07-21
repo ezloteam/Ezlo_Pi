@@ -333,7 +333,7 @@ static void __message_upcall(const char *payload, uint32_t len)
         }
 #endif
 
-        if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, "null", 4))))
+        if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, "null", 4))))
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
@@ -354,6 +354,7 @@ static void __message_upcall(const char *payload, uint32_t len)
         }
         else
         {
+            TRACE_E("cj_error: %p, cj_error->value_string: %s", cj_error, cj_error ? (cj_error->valuestring ? cj_error->valuestring : "null") : "null");
             TRACE_E("## WS Rx <<<<<<<<<<'%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
         }
 

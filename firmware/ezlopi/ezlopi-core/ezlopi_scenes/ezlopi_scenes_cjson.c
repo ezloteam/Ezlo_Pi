@@ -217,6 +217,34 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_t *fields)
                         ezlopi_scenes_cjson_add_string(cj_field, "value", curr_field->value.value_string);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_BLOCKS:
+                    {
+                        cJSON *vlaue_block_array = cJSON_AddArrayToObject(cj_field, "value");
+                        if (vlaue_block_array)
+                        {
+                            l_when_block_t *curr_when_block = curr_field->value.when_block;
+                            while (curr_when_block)
+                            {
+                                cJSON *cj_when_block = ezlopi_scenes_cjson_create_when_block(curr_when_block);
+                                if (cj_when_block)
+                                {
+                                    if (!cJSON_AddItemToArray(vlaue_block_array, cj_when_block))
+                                    {
+                                        cJSON_Delete(cj_when_block);
+                                    }
+                                }
+                                curr_when_block = curr_when_block->next;
+                            }
+
+                            char *str_vlaue = cJSON_Print(vlaue_block_array);
+                            if (str_vlaue)
+                            {
+                                TRACE_I("value: %s", str_vlaue);
+                                free(str_vlaue);
+                            }
+                        }
+                        break;
+                    }
                     case EZLOPI_VALUE_TYPE_DICTIONARY:
                     case EZLOPI_VALUE_TYPE_ARRAY:
                     case EZLOPI_VALUE_TYPE_RGB:
@@ -283,7 +311,8 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_t *fields)
                     }
                     default:
                     {
-                        TRACE_E("Value type not matched!, curr-type: %d", curr_field->value_type);
+                        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
+                        TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : "null");
                         break;
                     }
                     }

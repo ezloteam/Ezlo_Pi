@@ -111,6 +111,7 @@ static void __scenes_process(void *arg)
                     int ret = when_method(scene, (void *)curr_when);
                     if (ret)
                     {
+                        TRACE_B("When condition is true.");
                         l_then_block_t *curr_then = scene->then;
                         while (curr_then)
                         {
