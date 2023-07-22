@@ -224,7 +224,6 @@ static bool ezlopi_ultrasonic_HC_SR04_get_from_sensor(s_ezlopi_device_properties
     vTaskDelay(1 / portTICK_PERIOD_MS);
     ESP_ERROR_CHECK(gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, 0));
     // if (xQueueReceive(ezlopi_ultrasonic_HC_SR04_queue, &data, portMAX_DELAY))
-    // TRACE_B("HERE!!");
     if (xQueueReceive(ezlopi_ultrasonic_HC_SR04_queue, &data, 1000 / portTICK_PERIOD_MS))
     {
         uint32_t edge = mcpwm_capture_signal_get_edge(MCPWM_UNIT_0, MCPWM_SELECT_CAP0);

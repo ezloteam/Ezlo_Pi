@@ -29,7 +29,7 @@ int ezlopi_nvs_init(void)
         {
             TRACE_D("NVS Init Failed once!, Error: %s", esp_err_to_name(err));
             ESP_ERROR_CHECK(nvs_flash_erase());
-                err = nvs_flash_init();
+            err = nvs_flash_init();
         }
 
         err = nvs_open(storage_name, NVS_READWRITE, &ezlopi_nvs_handle);
@@ -251,18 +251,20 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     return boot_count;
 }
 
-uint8_t ezlopi_nvs_get_settings_init_status(void) {
+uint8_t ezlopi_nvs_get_settings_init_status(void)
+{
     uint8_t ret = 0;
-    uint32_t ezlopi_settings_magic_number = 0; 
+    uint32_t ezlopi_settings_magic_number = 0;
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, settings_initialized_status_name, &ezlopi_settings_magic_number);
         if (ESP_OK == err)
         {
-            if(EZLOPI_SETTINGS_MAGIC_NUMBER == ezlopi_settings_magic_number) {
+            if (EZLOPI_SETTINGS_MAGIC_NUMBER == ezlopi_settings_magic_number)
+            {
                 ret = 1;
             }
-        } 
+        }
         else
         {
             TRACE_W("nvs_get_u32 - error: %s", esp_err_to_name(err));
@@ -271,7 +273,8 @@ uint8_t ezlopi_nvs_get_settings_init_status(void) {
     return ret;
 }
 
-uint8_t ezlopi_nvs_set_settings_init_status(void) {    
+uint8_t ezlopi_nvs_set_settings_init_status(void)
+{
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
@@ -284,60 +287,60 @@ uint8_t ezlopi_nvs_set_settings_init_status(void) {
         {
             ret = 1;
         }
-    }    
+    }
     return ret;
 }
 
-int ezlopi_settings_save_settings(const s_ezlopi_hub_settings_t * settings_list, uint16_t num_settings)
+int ezlopi_settings_save_settings(const s_ezlopi_hub_settings_t *settings_list, uint16_t num_settings)
 {
     int ret = 1;
     esp_err_t err = ESP_OK;
-    if(ezlopi_nvs_handle)
+    if (ezlopi_nvs_handle)
     {
-        for (size_t i = 0; i < num_settings; i++) 
+        for (size_t i = 0; i < num_settings; i++)
         {
             const s_ezlopi_hub_settings_t *setting = &settings_list[i];
-            if (setting->value_type == EZLOPI_SETTINGS_TYPE_TOKEN) 
+            if (setting->value_type == EZLOPI_SETTINGS_TYPE_TOKEN)
             {
                 err = nvs_set_str(ezlopi_nvs_handle, setting->name, setting->value.token_value);
-                if(ESP_OK != err)
+                if (ESP_OK != err)
                 {
                     TRACE_E("Error writing string value to NVS for key: %s, Value: %s", setting->name, setting->value.token_value);
                     ret = 0;
                 }
-                else 
+                else
                 {
                     TRACE_D("Success writing string value to NVS for key: %s, Value: %s", setting->name, setting->value.token_value);
-                }                
-            } 
-            else if (setting->value_type == EZLOPI_SETTINGS_TYPE_BOOL) 
+                }
+            }
+            else if (setting->value_type == EZLOPI_SETTINGS_TYPE_BOOL)
             {
                 err = nvs_set_u8(ezlopi_nvs_handle, setting->name, (uint8_t)setting->value.bool_value);
-                if(ESP_OK != err)
+                if (ESP_OK != err)
                 {
                     TRACE_E("Error writing u8 value to NVS for key: %s, Value: %s", setting->name, setting->value.bool_value ? "True" : "False");
                     ret = 0;
                 }
-                else 
+                else
                 {
                     TRACE_D("Success writing u8 value to NVS for key: %s, Value: %s", setting->name, setting->value.bool_value ? "True" : "False");
                 }
             }
-            else if (setting->value_type == EZLOPI_SETTINGS_TYPE_INT) 
+            else if (setting->value_type == EZLOPI_SETTINGS_TYPE_INT)
             {
                 err = nvs_set_i32(ezlopi_nvs_handle, setting->name, setting->value.int_value);
-                if(ESP_OK != err)
+                if (ESP_OK != err)
                 {
                     TRACE_E("Error writing int32 value to NVS for key: %s, Value: %d", setting->name, setting->value.int_value);
                     ret = 0;
                 }
-                else 
+                else
                 {
                     TRACE_D("Success writing int32 value to NVS for key: %s, Value: %d", setting->name, setting->value.int_value);
-                }                 
+                }
             }
         }
-    } 
+    }
     else
     {
         TRACE_E("NVS Handle invalid.");
@@ -347,100 +350,103 @@ int ezlopi_settings_save_settings(const s_ezlopi_hub_settings_t * settings_list,
     return ret;
 }
 
-int ezlopi_settings_retrive_settings(s_ezlopi_hub_settings_t * settings_list, uint16_t num_settings)
+int ezlopi_settings_retrive_settings(s_ezlopi_hub_settings_t *settings_list, uint16_t num_settings)
 {
     int ret = 1;
     esp_err_t err = ESP_OK;
-    if(ezlopi_nvs_handle) 
+    if (ezlopi_nvs_handle)
     {
-        for (size_t i = 0; i < num_settings; i++) 
+        for (size_t i = 0; i < num_settings; i++)
         {
 
             s_ezlopi_hub_settings_t *setting = &settings_list[i];
 
-            if (setting->value_type == EZLOPI_SETTINGS_TYPE_TOKEN) {
+            if (setting->value_type == EZLOPI_SETTINGS_TYPE_TOKEN)
+            {
 
-
-                char * enum_settings_value = NULL;
+                char *enum_settings_value = NULL;
                 size_t required_size;
                 nvs_get_str(ezlopi_nvs_handle, setting->name, NULL, &required_size);
-
 
                 enum_settings_value = malloc(required_size);
                 err = nvs_get_str(ezlopi_nvs_handle, setting->name, enum_settings_value, &required_size);
 
-                if(ESP_OK != err)
+                if (ESP_OK != err)
                 {
                     TRACE_E("Error reading string value from NVS for key: %s", setting->name);
                     ret = 0;
                 }
-                else 
+                else
                 {
-                    if(NULL != enum_settings_value) 
+                    if (NULL != enum_settings_value)
                     {
                         setting->value.token_value = enum_settings_value;
-                        TRACE_I("settings_name: %s, settings_value: %s, settings_value_len: %d", 
-                                setting->name, 
-                                setting->value.token_value, 
-                                strlen(setting->value.token_value));                  
-
-                    } else {
+                        TRACE_I("settings_name: %s, settings_value: %s, settings_value_len: %d",
+                                setting->name,
+                                setting->value.token_value,
+                                strlen(setting->value.token_value));
+                    }
+                    else
+                    {
                         TRACE_E("Error: Read NULL string from NVS for key: %s", setting->name);
                         ret = 0;
-                    } 
+                    }
                     TRACE_D("Success reading string value from NVS for key: %s", setting->name);
-                }                     
-
-            } else if (setting->value_type == EZLOPI_SETTINGS_TYPE_BOOL) {
+                }
+            }
+            else if (setting->value_type == EZLOPI_SETTINGS_TYPE_BOOL)
+            {
 
                 uint8_t settings_bool_val;
                 bool settings_bool_val_bool;
                 err = nvs_get_u8(ezlopi_nvs_handle, setting->name, &settings_bool_val);
 
-                if(ESP_OK != err)
+                if (ESP_OK != err)
                 {
                     TRACE_E("Error reading uint8 value from NVS for key: %s", setting->name);
                     ret = 0;
                 }
-                else 
+                else
                 {
                     settings_bool_val_bool = (settings_bool_val == 1) ? true : false;
                     setting->value.bool_value = settings_bool_val_bool;
                     TRACE_D("Success reading uint8 value from NVS for key: %s", setting->name);
-                    TRACE_I("settings_name: %s, settings_value: %s", 
-                            setting->name, 
-                            setting->value.bool_value ? "True" : "False");                      
-                }                                 
-            } else if (setting->value_type == EZLOPI_SETTINGS_TYPE_INT) {
+                    TRACE_I("settings_name: %s, settings_value: %s",
+                            setting->name,
+                            setting->value.bool_value ? "True" : "False");
+                }
+            }
+            else if (setting->value_type == EZLOPI_SETTINGS_TYPE_INT)
+            {
 
                 int32_t settings_int_val = 0;
-                err =  nvs_get_i32(ezlopi_nvs_handle, setting->name, &settings_int_val);
-                if(ESP_OK != err)
+                err = nvs_get_i32(ezlopi_nvs_handle, setting->name, &settings_int_val);
+                if (ESP_OK != err)
                 {
                     TRACE_E("Error reading int32 value from NVS for key: %s", setting->name);
                     ret = 0;
                 }
-                else 
+                else
                 {
                     setting->value.int_value = settings_int_val;
                     TRACE_D("Success reading int32 value from NVS for key: %s", setting->name);
-                    TRACE_I("settings_name: %s, settings_value: %d", 
-                            setting->name, 
-                            setting->value.int_value); 
-                }                 
+                    TRACE_I("settings_name: %s, settings_value: %d",
+                            setting->name,
+                            setting->value.int_value);
+                }
             }
-        } 
-    } 
+        }
+    }
     else
     {
-        TRACE_E("NVS Handle invalid.");        
+        TRACE_E("NVS Handle invalid.");
         ret = 0;
     }
 
     return ret;
 }
 
-uint8_t ezlopi_nvs_write_int32(int32_t i, const char * key_name)
+uint8_t ezlopi_nvs_write_int32(int32_t i, const char *key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -454,12 +460,12 @@ uint8_t ezlopi_nvs_write_int32(int32_t i, const char * key_name)
         {
             ret = 1;
         }
-    }    
-    return ret;    
-
+    }
+    return ret;
 }
 
-uint8_t ezlopi_nvs_read_int32(int32_t *i, const char * key_name) {
+uint8_t ezlopi_nvs_read_int32(int32_t *i, const char *key_name)
+{
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
@@ -467,7 +473,7 @@ uint8_t ezlopi_nvs_read_int32(int32_t *i, const char * key_name) {
         if (ESP_OK == err)
         {
             ret = 1;
-        } 
+        }
         else
         {
             TRACE_W("nvs_get_i32 - error: %s", esp_err_to_name(err));
@@ -476,14 +482,14 @@ uint8_t ezlopi_nvs_read_int32(int32_t *i, const char * key_name) {
     return ret;
 }
 
-uint8_t ezlopi_nvs_write_float32(float f, const char* key_name)
+uint8_t ezlopi_nvs_write_float32(float f, const char *key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
         uint32_t value;
         memcpy(&value, &f, sizeof(uint32_t));
-        
+
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, value);
         if (err != ESP_OK)
         {
@@ -497,13 +503,13 @@ uint8_t ezlopi_nvs_write_float32(float f, const char* key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_read_float32(float* f, const char* key_name)
+uint8_t ezlopi_nvs_read_float32(float *f, const char *key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
         uint32_t value;
-        
+
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, &value);
         if (err == ESP_OK)
         {
@@ -518,25 +524,24 @@ uint8_t ezlopi_nvs_read_float32(float* f, const char* key_name)
     return ret;
 }
 
-
-uint8_t ezlopi_nvs_write_bool(bool b, const char * key_name)
+uint8_t ezlopi_nvs_write_bool(bool b, const char *key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
         uint8_t bool_val;
 
-        if(true == b) 
+        if (true == b)
         {
             bool_val = 1;
         }
-        else 
+        else
         {
             bool_val = 0;
         }
 
         esp_err_t err = nvs_set_u8(ezlopi_nvs_handle, key_name, bool_val);
-        
+
         if (ESP_OK != err)
         {
             TRACE_W("nvs_set_u8 - error: %s", esp_err_to_name(err));
@@ -545,12 +550,12 @@ uint8_t ezlopi_nvs_write_bool(bool b, const char * key_name)
         {
             ret = 1;
         }
-    }    
-    return ret;    
-
+    }
+    return ret;
 }
 
-uint8_t ezlopi_nvs_read_bool(bool * b, const char * key_name) {
+uint8_t ezlopi_nvs_read_bool(bool *b, const char *key_name)
+{
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
@@ -558,10 +563,12 @@ uint8_t ezlopi_nvs_read_bool(bool * b, const char * key_name) {
         esp_err_t err = nvs_get_u8(ezlopi_nvs_handle, key_name, &bool_val);
         if (ESP_OK == err)
         {
-            if(bool_val)    *b = true;
-            else *b = false;
+            if (bool_val)
+                *b = true;
+            else
+                *b = false;
             ret = 1;
-        } 
+        }
         else
         {
             TRACE_W("nvs_get_u8 - error: %s", esp_err_to_name(err));
@@ -578,10 +585,7 @@ int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
     {
         if (1 == ezlopi_nvs_init())
         {
-            esp_err_t err = nvs_set_blob(ezlopi_nvs_handle, nvs_name, data, len);
-            TRACE_I("NVS Handle: %d", ezlopi_nvs_handle);
-            TRACE_I("Key Name: %s", nvs_name);
-            TRACE_I("NVS set blob status %s", esp_err_to_name(err));
+            esp_err_t err = nvs_set_str(ezlopi_nvs_handle, nvs_name, data);
             if (ESP_OK == err)
             {
                 err = nvs_commit(ezlopi_nvs_handle);
@@ -614,21 +618,19 @@ char *ezlopi_nvs_read_str(char *nvs_name)
         esp_err_t err = ESP_OK;
         size_t buf_len_needed = 0;
         err = nvs_get_str(ezlopi_nvs_handle, nvs_name, NULL, &buf_len_needed);
-        TRACE_I("NVS Handle: %d", ezlopi_nvs_handle);
-        TRACE_I("Key Name: %s", nvs_name);
-        TRACE_E("NVS get string status %s", esp_err_to_name(err));
-        
+
         if (buf_len_needed && (ESP_OK == err))
         {
             return_str = malloc(buf_len_needed + 1);
 
             if (return_str)
             {
+                memset(return_str, 0, buf_len_needed + 1);
                 err = nvs_get_str(ezlopi_nvs_handle, nvs_name, return_str, &buf_len_needed);
 
                 if (ESP_OK == err)
                 {
-                    TRACE_D("%s read success. Data[%d]: %s", nvs_name, buf_len_needed, return_str);
+                    TRACE_D("%s read success. \r\nData[%d]: \r\n%s", nvs_name, buf_len_needed, return_str);
                 }
                 else
                 {
@@ -641,6 +643,10 @@ char *ezlopi_nvs_read_str(char *nvs_name)
             {
                 TRACE_E("MALLOC ERROR");
             }
+        }
+        else
+        {
+            TRACE_E("%s: buf_len_needed: %d, err: %s", nvs_name, buf_len_needed, esp_err_to_name(err));
         }
     }
 

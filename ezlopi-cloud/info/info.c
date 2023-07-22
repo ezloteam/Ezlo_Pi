@@ -41,7 +41,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         if (cjson_build)
         {
             cJSON_AddStringToObject(cjson_build, "time", "");
-            cJSON_AddStringToObject(cjson_build, "builder", "krishna kumar sah");
+            cJSON_AddStringToObject(cjson_build, "builder", "EzloPi Team");
             cJSON_AddStringToObject(cjson_build, "branch", "development");
             cJSON_AddStringToObject(cjson_build, "commit", "**");
         }
