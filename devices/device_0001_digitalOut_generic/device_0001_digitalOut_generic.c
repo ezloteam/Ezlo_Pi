@@ -369,11 +369,11 @@ static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_broadcast_i
         ezlopi_setting_properties->nvs_alias = "brd_intrvl";
         ezlopi_setting_properties->value_defaut.int_value = 10;
 
-        // if (ezlopi_nvs_read_int32(&settings_value, ezlopi_setting_properties->nvs_alias))
-        // {
-        // ezlopi_setting_properties->value.int_value = settings_value;
-        // }
-        // else
+        if (ezlopi_nvs_read_int32(&settings_value, ezlopi_setting_properties->nvs_alias))
+        {
+            ezlopi_setting_properties->value.int_value = settings_value;
+        }
+        else
         {
             ezlopi_setting_properties->value.int_value = ezlopi_setting_properties->value_defaut.int_value;
         }
@@ -407,11 +407,11 @@ static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_sound_thres
         ezlopi_setting_properties->value_defaut.scalable_value->value = 30.0;
         ezlopi_setting_properties->value.scalable_value->scale = "decibel";
 
-        // if (ezlopi_nvs_read_float32(&settings_value, ezlopi_setting_properties->nvs_alias))
-        // {
-        // ezlopi_setting_properties->value.scalable_value->value = settings_value;
-        // }
-        // else
+        if (ezlopi_nvs_read_float32(&settings_value, ezlopi_setting_properties->nvs_alias))
+        {
+            ezlopi_setting_properties->value.scalable_value->value = settings_value;
+        }
+        else
         {
             ezlopi_setting_properties->value.scalable_value->value = ezlopi_setting_properties->value_defaut.scalable_value->value;
         }
@@ -438,11 +438,11 @@ static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_performance
 
         ezlopi_setting_properties->value_defaut.bool_value = true;
 
-        // if (ezlopi_nvs_read_bool(&settings_value, ezlopi_setting_properties->nvs_alias))
-        // {
-        // ezlopi_setting_properties->value.bool_value = settings_value;
-        // }
-        // else
+        if (ezlopi_nvs_read_bool(&settings_value, ezlopi_setting_properties->nvs_alias))
+        {
+            ezlopi_setting_properties->value.bool_value = settings_value;
+        }
+        else
         {
             ezlopi_setting_properties->value.bool_value = ezlopi_setting_properties->value_defaut.bool_value;
         }
@@ -469,13 +469,13 @@ static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_temperature
 
         ezlopi_setting_properties->value_defaut.string_value = "celsius";
 
-        // settings_value = ezlopi_nvs_read_str(ezlopi_setting_properties->nvs_alias);
+        ezlopi_setting_properties->value_defaut.string_value = malloc(20);
 
-        // if (settings_value != NULL)
-        // {
-        //     ezlopi_setting_properties->value.string_value = settings_value;
-        // }
-        // else
+        if (ezlopi_setting_properties->value_defaut.string_value)
+        {
+            ezlopi_setting_properties->value.string_value = ezlopi_nvs_read_str(ezlopi_setting_properties->nvs_alias);
+        }
+        else
         {
             ezlopi_setting_properties->value.string_value = ezlopi_setting_properties->value_defaut.string_value;
         }

@@ -121,16 +121,22 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                     {
 
                         cJSON *value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
-                        if (cJSON_IsTrue(value))
+                        if (value)
                         {
-                            settings_current->properties->value.bool_value = true;
+                            if (cJSON_IsTrue(value))
+                            {
+                                settings_current->properties->value.bool_value = true;
+                            }
+                            else
+                            {
+                                settings_current->properties->value.bool_value = false;
+                            }
+                            ezlopi_nvs_write_bool(settings_current->properties->value.bool_value, settings_current->properties->nvs_alias);
                         }
                         else
                         {
-                            settings_current->properties->value.bool_value = false;
+                            TRACE_E("Error parsing JSON, settings update failed !");
                         }
-
-                        // ezlopi_nvs_write_bool(settings_current->properties->value.bool_value, settings_current->properties->nvs_alias);
                     }
                     else if (strcmp(settings_current->properties->value_type, "int") == 0)
                     {
@@ -138,9 +144,12 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                         if (value)
                         {
                             settings_current->properties->value.int_value = value->valueint;
+                            ezlopi_nvs_write_int32(settings_current->properties->value.int_value, settings_current->properties->nvs_alias);
                         }
-
-                        // ezlopi_nvs_write_int32(settings_current->properties->value.int_value, settings_current->properties->nvs_alias);
+                        else
+                        {
+                            TRACE_E("Error parsing JSON, settings update failed !");
+                        }
                     }
                     else if (strcmp(settings_current->properties->value_type, "string") == 0)
                     {
@@ -148,13 +157,26 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                         json_dump = cJSON_Print(cjson_params);
                         TRACE_E("%s", json_dump);
                         free(json_dump);
+
                         cJSON *o_item = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
-                        if (o_item)
+                        if (o_item && o_item->valuestring)
                         {
-                            settings_current->properties->value.string_value = o_item->valuestring;
-                            TRACE_E("%s", settings_current->properties->value.string_value);
-                            TRACE_E("%s", settings_current->properties->nvs_alias);
-                            // ezlopi_nvs_write_str(settings_current->properties->value.string_value, strlen(settings_current->properties->value.string_value), settings_current->properties->nvs_alias);
+                            settings_current->properties->value.string_value = malloc(strlen(o_item->valuestring) + 1);
+                            if (settings_current->properties->value.string_value)
+                            {
+                                strncpy(settings_current->properties->value.string_value, o_item->valuestring, strlen(o_item->valuestring) + 1);
+                                TRACE_E("%s", settings_current->properties->value.string_value);
+                                TRACE_E("%s", settings_current->properties->nvs_alias);
+                                ezlopi_nvs_write_str(settings_current->properties->value.string_value, strlen(settings_current->properties->value.string_value), settings_current->properties->nvs_alias);
+                            }
+                            else
+                            {
+                                TRACE_E("Error memory allocation, settings update failed !");
+                            }
+                        }
+                        else
+                        {
+                            TRACE_E("Error parsing JSON, settings update failed !");
                         }
                     }
                     else if (strcmp(settings_current->properties->value_type, "rgb") == 0)
@@ -167,11 +189,11 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                         {
                             TRACE_D("scaled value : %f", (float)value->valuedouble);
                             settings_current->properties->value.scalable_value->value = (float)value->valuedouble;
-                            // ezlopi_nvs_write_float32(settings_current->properties->value.scalable_value->value, settings_current->properties->nvs_alias);
+                            ezlopi_nvs_write_float32(settings_current->properties->value.scalable_value->value, settings_current->properties->nvs_alias);
                         }
                         else
                         {
-                            TRACE_E("Error : Failed parsince JSON");
+                            TRACE_E("Error : Failed parsince JSON!");
                         }
                     }
                 }
@@ -200,17 +222,25 @@ void _ezlopi_device_settings_reset_settings_id(uint32_t id)
                 {
 
                     configured_settings_current->properties->value.bool_value = configured_settings_current->properties->value_defaut.bool_value;
-                    // ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias);
+                    ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias);
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "int") == 0)
                 {
                     configured_settings_current->properties->value.int_value = configured_settings_current->properties->value_defaut.int_value;
-                    // ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias);
+                    ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias);
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "string") == 0)
                 {
-                    configured_settings_current->properties->value.string_value = configured_settings_current->properties->value_defaut.string_value;
-                    // ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
+                    configured_settings_current->properties->value.string_value = malloc(strlen(configured_settings_current->properties->value_defaut.string_value) + 1);
+                    if (configured_settings_current->properties->value.string_value)
+                    {
+                        strncpy(configured_settings_current->properties->value.string_value, configured_settings_current->properties->value_defaut.string_value, strlen(configured_settings_current->properties->value_defaut.string_value) + 1);
+                        ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
+                    }
+                    else
+                    {
+                        TRACE_E("Error :  memory allocation, settings update failed !");
+                    }
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "rgb") == 0)
                 {
@@ -218,10 +248,11 @@ void _ezlopi_device_settings_reset_settings_id(uint32_t id)
                 else if (strcmp(configured_settings_current->properties->value_type, "scalable") == 0)
                 {
                     configured_settings_current->properties->value.scalable_value->value = configured_settings_current->properties->value_defaut.scalable_value->value;
-                    // ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias);
+                    ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias);
                 }
                 else
                 {
+                    TRACE_E("Error : settings update failed !");
                 }
             }
         }
@@ -245,17 +276,25 @@ void _ezlopi_device_settings_reset_device_id(uint32_t id)
                 {
 
                     configured_settings_current->properties->value.bool_value = configured_settings_current->properties->value_defaut.bool_value;
-                    // ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias);
+                    ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias);
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "int") == 0)
                 {
                     configured_settings_current->properties->value.int_value = configured_settings_current->properties->value_defaut.int_value;
-                    // ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias);
+                    ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias);
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "string") == 0)
                 {
-                    configured_settings_current->properties->value.string_value = configured_settings_current->properties->value_defaut.string_value;
-                    // ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
+                    configured_settings_current->properties->value.string_value = malloc(strlen(configured_settings_current->properties->value_defaut.string_value) + 1);
+                    if (configured_settings_current->properties->value.string_value)
+                    {
+                        strncpy(configured_settings_current->properties->value.string_value, configured_settings_current->properties->value_defaut.string_value, strlen(configured_settings_current->properties->value_defaut.string_value) + 1);
+                        ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
+                    }
+                    else
+                    {
+                        TRACE_E("Error :  memory allocation, settings update failed !");
+                    }
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "rgb") == 0)
                 {
@@ -263,10 +302,11 @@ void _ezlopi_device_settings_reset_device_id(uint32_t id)
                 else if (strcmp(configured_settings_current->properties->value_type, "scalable") == 0)
                 {
                     configured_settings_current->properties->value.scalable_value->value = configured_settings_current->properties->value_defaut.scalable_value->value;
-                    // ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias);
+                    ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias);
                 }
                 else
                 {
+                    TRACE_E("Error : settings update failed !");
                 }
             }
         }
