@@ -396,11 +396,14 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"MQ4 methane_detector\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"MQ2_LPG_detector\",\
                 \"id_room\": \"\",\
-                \"id_item\": 48,\
-                \"gpio\": 33\
+                \"id_item\": 49,\
+                \"en_gpio1\": \"true\",\
+                \"gpio_digi\": 25,\
+                \"en_gpio2\": \"true\",\
+                \"gpio_adc\": 33\
           }\
         ],\
     \"dev_total\": 1}";

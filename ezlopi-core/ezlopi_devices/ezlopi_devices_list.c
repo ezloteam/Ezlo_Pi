@@ -47,7 +47,8 @@
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
 #include "sensor_0046_ADC_ACS712TELC_05B_currentMeter.h"
 #include "sensor_0047_TWI_HX711_loadcell.h"
-#include "sensor_0048_ADC_MQ4_methane_gas_detector.h"
+#include "sensor_0048_other_MQ4_methane_gas_detector.h"
+#include "sensor_0049_other_MQ2_LPG_gas_detector.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -376,10 +377,17 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0048_ADC_MQ4_METHANE_GAS_DETECTOR
+#ifdef EZLOPI_SENSOR_0048_OTHER_MQ4_METHANE_GAS_DETECTOR
     {
-        .id = EZLOPI_SENSOR_0048_ADC_MQ4_METHANE_GAS_DETECTOR,
-        .func = sensor_0048_ADC_MQ4_methane,
+        .id = EZLOPI_SENSOR_0048_OTHER_MQ4_METHANE_GAS_DETECTOR,
+        .func = sensor_0048_MQ4_methane,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0049_OTHER_MQ2_LPG_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0049_OTHER_MQ2_LPG_GAS_DETECTOR,
+        .func = sensor_0049_MQ2_LPG,
     },
 #endif
 

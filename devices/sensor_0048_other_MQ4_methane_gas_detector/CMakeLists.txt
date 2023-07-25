@@ -1,5 +1,5 @@
 
-idf_component_register(SRCS "sensor_0048_ADC_MQ4_methane_gas_detector.c" 
+idf_component_register(SRCS "sensor_0048_other_MQ4_methane_gas_detector.c" 
                         INCLUDE_DIRS "."          
                         REQUIRES trace 
                                 ezlopi_actions 
