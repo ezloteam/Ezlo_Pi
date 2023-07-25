@@ -33,13 +33,13 @@ static s_ezlopi_device_properties_t *PMS_PM2_5_properties = NULL;
 static s_ezlopi_device_properties_t *PMS_PM10_properties = NULL;
 
 static int sensor_0014_UART_PMS5003_prepare(void *arg);
-static s_ezlopi_device_properties_t *sensor_0014_UART_PMS5003_prepare_properties(uint32_t device_id, 
-                                                                                    const char *category, 
-                                                                                    const char *subcategory, 
-                                                                                    const char *item_name, 
-                                                                                    const char *value_type, 
-                                                                                    cJSON *cjson_device, 
-                                                                                    PMS_sensor_structure_t *pms5003_sensor_structure);
+static s_ezlopi_device_properties_t *sensor_0014_UART_PMS5003_prepare_properties(uint32_t device_id,
+                                                                                 const char *category,
+                                                                                 const char *subcategory,
+                                                                                 const char *item_name,
+                                                                                 const char *value_type,
+                                                                                 cJSON *cjson_device,
+                                                                                 PMS_sensor_structure_t *pms5003_sensor_structure);
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *properties, void *user_arg);
 static int sensor_0014_UART_PMS5003_init(s_ezlopi_device_properties_t *properties);
 static int sensor_0014_UART_PMS5003_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
@@ -92,7 +92,7 @@ static int sensor_0014_UART_PMS5003_prepare(void *arg)
         if (!sensor_0014_UART_PMS5003_check_config_gpio_json(prep_arg->cjson_device))
         {
             PMS_sensor_structure_t *pms5003_sensor_structure = (PMS_sensor_structure_t *)malloc(sizeof(PMS_sensor_structure_t));
-            PM25_AQI_Data* pms_data = (PM25_AQI_Data*)malloc(sizeof(PM25_AQI_Data));
+            PM25_AQI_Data *pms_data = (PM25_AQI_Data *)malloc(sizeof(PM25_AQI_Data));
             if ((NULL != pms5003_sensor_structure) && (NULL != pms_data))
             {
                 memset(pms5003_sensor_structure, 0, sizeof(PMS_sensor_structure_t));
@@ -114,13 +114,13 @@ static int sensor_0014_UART_PMS5003_prepare(void *arg)
     return ret;
 }
 
-static s_ezlopi_device_properties_t *sensor_0014_UART_PMS5003_prepare_properties(uint32_t device_id, 
-                                                                                    const char *category, 
-                                                                                    const char *subcategory, 
-                                                                                    const char *item_name, 
-                                                                                    const char *value_type, 
-                                                                                    cJSON *cjson_device, 
-                                                                                    PMS_sensor_structure_t *pms5003_sensor_structure)
+static s_ezlopi_device_properties_t *sensor_0014_UART_PMS5003_prepare_properties(uint32_t device_id,
+                                                                                 const char *category,
+                                                                                 const char *subcategory,
+                                                                                 const char *item_name,
+                                                                                 const char *value_type,
+                                                                                 cJSON *cjson_device,
+                                                                                 PMS_sensor_structure_t *pms5003_sensor_structure)
 {
     s_ezlopi_device_properties_t *pms5003_properties = (s_ezlopi_device_properties_t *)malloc(sizeof(s_ezlopi_device_properties_t));
     if (pms5003_properties)
@@ -195,7 +195,7 @@ static int sensor_0014_UART_PMS5003_init(s_ezlopi_device_properties_t *propertie
     int ret = 0;
 
     PMS_sensor_structure_t *pms5003_sensor_structure = (PMS_sensor_structure_t *)PMS_PM1_properties->user_arg;
-    
+
     if ((NULL != pms5003_sensor_structure) && (false == pms5003_initialized))
     {
         pms_uart_setup(pms5003_sensor_structure, properties->interface.uart.tx, properties->interface.uart.rx, properties->interface.uart.baudrate);
@@ -251,10 +251,10 @@ static int sensor_0014_UART_PMS5003_get_value_cjson(s_ezlopi_device_properties_t
 static int sensor_0014_UART_PMS5003_check_new_data_available_and_update(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    
+
     PMS_sensor_structure_t *pms5003_sensor_structure = (PMS_sensor_structure_t *)properties->user_arg;
     // TRACE_B("is data available %d", pms_is_data_available(pms5003_sensor_structure->pms_data));
-    if(true == pms_is_data_available(pms5003_sensor_structure->pms_data))
+    if (true == pms_is_data_available(pms5003_sensor_structure->pms_data))
     {
         // pms_print_data(pms5003_sensor_structure->pms_data);
         pms_set_data_available_to_false(pms5003_sensor_structure->pms_data);
@@ -307,6 +307,3 @@ static int sensor_0014_UART_PMS5003_set_config_gpio(cJSON *gpio_config_cjson)
 
     return ret;
 }
-
-
-

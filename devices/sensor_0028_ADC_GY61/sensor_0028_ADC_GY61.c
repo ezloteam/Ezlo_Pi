@@ -140,7 +140,7 @@ static s_ezlopi_device_properties_t *sensor_gy61_analog_sensor_prepare_propertie
         {
             device_name = "Acceleration-Z";
         }
-        // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_gy61_analog_sensor_properties, device_name);
         sensor_gy61_analog_sensor_properties->ezlopi_cloud.category = CATEGORY;
         sensor_gy61_analog_sensor_properties->ezlopi_cloud.subcategory = SUB_CATEGORY;

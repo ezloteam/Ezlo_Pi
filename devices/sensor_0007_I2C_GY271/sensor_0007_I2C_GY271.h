@@ -2,7 +2,6 @@
 #define _0007_SENS_I2C_MAGNETOMETER_H_
 
 #include "ezlopi_actions.h"
-#include "ezlopi_i2c_master.h"
 #include "ezlopi_devices.h"
 
 #define GY271_ADDR 0x0D

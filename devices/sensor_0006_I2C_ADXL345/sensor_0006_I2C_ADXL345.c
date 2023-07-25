@@ -127,15 +127,15 @@ static s_ezlopi_device_properties_t *sensor_i2c_accelerometer_prepare_properties
             char *device_name = NULL;
             if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
             {
-                device_name = "Acceleration-X";
+                device_name = "ADXL345 Acceleration-X";
             }
             if (ezlopi_item_name_acceleration_y_axis == ITEM_NAME)
             {
-                device_name = "Acceleration-Y";
+                device_name = "ADXL345 Acceleration-Y";
             }
             if (ezlopi_item_name_acceleration_z_axis == ITEM_NAME)
             {
-                device_name = "Acceleration-Z";
+                device_name = "ADXL345 Acceleration-Z";
             }
             // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
             ASSIGN_DEVICE_NAME(sensor_i2c_accelerometer_properties, device_name);
@@ -174,7 +174,7 @@ static int sensor_i2c_accelerometer_init(s_ezlopi_device_properties_t *propertie
         guard = true;
         ezlopi_i2c_master_init(&properties->interface.i2c_master);
 
-        TRACE_I("I2C initialized to channel %d", properties->interface.i2c_master.channel);
+        // TRACE_I("I2C initialized to channel %d", properties->interface.i2c_master.channel);
         sensor_i2c_accelerometer_configure_device(properties, user_arg);
     }
     return ret;
@@ -240,7 +240,7 @@ static esp_err_t get_device_id(s_ezlopi_device_properties_t *properties)
     ezlopi_i2c_master_write_to_device(&properties->interface.i2c_master, write_buffer, 1);
     ezlopi_i2c_master_read_from_device(&properties->interface.i2c_master, &dev_id, 1);
     vTaskDelay(10);
-    TRACE_B("The device id is %d", dev_id);
+    // TRACE_B("The device id is %d", dev_id);
     return ESP_OK;
 }
 static esp_err_t data_formatting(s_ezlopi_device_properties_t *properties)
@@ -323,7 +323,7 @@ static int16_t get_adxl345_x_axis_value(s_ezlopi_device_properties_t *properties
     }
 
     int16_t x_data = (int16_t)((buffer_1 << 8) | buffer_0);
-    TRACE_B("x_data is %d", x_data);
+    // TRACE_B("x_data is %d", x_data);
     return x_data;
 }
 
@@ -355,7 +355,7 @@ static int16_t get_adxl345_y_axis_value(s_ezlopi_device_properties_t *properties
     }
 
     int16_t y_data = (int16_t)((buffer_1 << 8) | buffer_0);
-    TRACE_B("y_data is %d", y_data);
+    // TRACE_B("y_data is %d", y_data);
     return y_data;
 }
 
@@ -387,7 +387,7 @@ static int16_t get_adxl345_z_axis_value(s_ezlopi_device_properties_t *properties
     }
 
     int16_t z_data = (int16_t)((buffer_1 << 8) | buffer_0);
-    TRACE_B("z_data is %d", z_data);
+    // TRACE_B("z_data is %d", z_data);
 
     return z_data;
 }

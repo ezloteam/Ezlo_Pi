@@ -15,6 +15,7 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
 #define EZLOPI_DEVICE_TYPE_SWITCH_BOX 1
 #define EZLOPI_DEVICE_TYPE_IR_BLASTER 2
+#define EZLOPI_DEVICE_TYPE_IR_BLASTER 2
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
@@ -397,13 +398,14 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"GY61 Sensor\",\
+                \"dev_name\": \"MQ2_LPG_detector\",\
                 \"id_room\": \"\",\
-                \"id_item\": 28,\
-                \"gpio1\": 3,\
-                \"gpio2\": 4,\
-                \"gpio3\": 5\
-            }\
+                \"id_item\": 49,\
+                \"en_gpio1\": \"true\",\
+                \"gpio_digi\": 25,\
+                \"en_gpio2\": \"true\",\
+                \"gpio_adc\": 33\
+          }\
         ],\
     \"dev_total\": 1}";
 
