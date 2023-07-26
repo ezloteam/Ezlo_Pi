@@ -152,7 +152,7 @@ static int sensor_other_MQ2_prepare_and_add(void *arg) // carries cJSON
         device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_security_sensor, subcategory_gas, ezlopi_item_name_gas_alarm, value_type_token, device_prep_args->cjson_device);
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_security_sensor, subcategory_gas, ezlopi_item_name_smoke_density, value_type_substance_amount, device_prep_args->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_smoke_density, value_type_substance_amount, device_prep_args->cjson_device);
     }
     return ret;
 }

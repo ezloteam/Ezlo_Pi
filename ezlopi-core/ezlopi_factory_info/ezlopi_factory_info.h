@@ -19,7 +19,7 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -398,13 +398,10 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"MQ2_LPG_detector\",\
+                \"dev_name\": \"Water Leak Sensor\",\
                 \"id_room\": \"\",\
-                \"id_item\": 49,\
-                \"en_gpio1\": \"true\",\
-                \"gpio_digi\": 25,\
-                \"en_gpio2\": \"true\",\
-                \"gpio_adc\": 33\
+                \"id_item\": 27,\
+                \"gpio\": 1\
           }\
         ],\
     \"dev_total\": 1}";

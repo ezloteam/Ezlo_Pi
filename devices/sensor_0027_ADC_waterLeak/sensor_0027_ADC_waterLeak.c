@@ -44,7 +44,7 @@ int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, s_ezlopi_device_propert
         get_water_leak_sensor_value_to_cloud(ezlo_device, arg);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_200_MS:
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
         water_leak_sensor_get_value(ezlo_device);
         break;
