@@ -117,15 +117,16 @@ static char *device_info_jsonify(void)
         // cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
         cJSON_AddBoolToObject(root, "provisioned_status", ezlopi_factory_info_v2_get_provisioning_status());
 
-        uint8_t ble_mac[6];
-        esp_read_mac(ble_mac, ESP_MAC_BT);
+        uint8_t _mac[6];
+        ezlopi_factory_info_v2_get_ezlopi_mac(_mac);
         char mac_string[32];
         snprintf(mac_string, sizeof(mac_string), "%02x:%02x:%02x:%02x:%02x:%02x",
-                 mac_string[0], mac_string[1], mac_string[2], mac_string[3], mac_string[4], mac_string[5]);
+                 _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]);
         cJSON_AddStringToObject(root, "mac", mac_string);
-        char ezpi_uuid[50];
-        ezlopi_generate_UUID(ezpi_uuid);
-        cJSON_AddStringToObject(root, "uuid", ezpi_uuid);
+        TRACE_E("mac_string: %s", mac_string);
+        // char ezpi_uuid[50];
+        // ezlopi_generate_UUID(ezpi_uuid);
+        // cJSON_AddStringToObject(root, "uuid", ezpi_uuid);
 
         unsigned long long serial_id = ezlopi_factory_info_v2_get_id();
         cJSON_AddNumberToObject(root, "serial", serial_id);
