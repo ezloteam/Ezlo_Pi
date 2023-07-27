@@ -32,7 +32,7 @@
  *      |
  *      V
  */
-// #define voltage_divider_added 1
+#define VOLTAGE_DIVIDER_ADDED 1
 
 //------------------------------------------
 

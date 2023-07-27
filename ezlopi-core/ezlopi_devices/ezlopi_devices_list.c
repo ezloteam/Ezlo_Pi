@@ -52,7 +52,7 @@
 #include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
 #include "sensor_0046_ADC_ACS712TELC_05B_currentMeter.h"
-#include "sensor_0047_TWI_HX711_loadcell.h"
+#include "sensor_0047_other_HX711_loadcell.h"
 #include "sensor_0048_other_MQ4_methane_gas_detector.h"
 #include "sensor_0049_other_MQ2_LPG_gas_detector.h"
 
@@ -376,10 +376,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0047_TWI_HX711_LOADCELL
+#ifdef EZLOPI_sensor_0047_other_HX711_loadcell
     {
-        .id = EZLOPI_SENSOR_0047_TWI_HX711_LOADCELL,
-        .func = sensor_0047_twi_hx711,
+        .id = EZLOPI_sensor_0047_other_HX711_loadcell,
+        .func = sensor_0047_other_hx711,
     },
 #endif
 

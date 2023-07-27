@@ -1,4 +1,4 @@
-idf_component_register( SRCS "sensor_0047_TWI_HX711_loadcell.c"
+idf_component_register( SRCS "sensor_0047_other_HX711_loadcell.c"
                         INCLUDE_DIRS "."
                         REQUIRES    trace
                                     ezlopi_actions

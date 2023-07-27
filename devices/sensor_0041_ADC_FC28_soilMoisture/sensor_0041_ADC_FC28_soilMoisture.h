@@ -33,7 +33,7 @@
  *      |
  *      V
  */
-// #define voltage_divider_added 1
+// #define VOLTAGE_DIVIDER_ADDED 1
 
 //------------------------------------------
 int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);

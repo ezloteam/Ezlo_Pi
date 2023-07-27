@@ -94,11 +94,11 @@ static s_ezlopi_device_properties_t *sensor_0043_adc_uv_prepare(cJSON *cjson_dev
 
         ASSIGN_DEVICE_NAME(sensor_0043_adc_uv_properties, device_name)
         // ezlopi_cloud...
-        sensor_0043_adc_uv_properties->ezlopi_cloud.category = category_generic_sensor;
+        sensor_0043_adc_uv_properties->ezlopi_cloud.category = category_level_sensor;
         sensor_0043_adc_uv_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
         sensor_0043_adc_uv_properties->ezlopi_cloud.item_name = ezlopi_item_name_lux;
         sensor_0043_adc_uv_properties->ezlopi_cloud.device_type = dev_type_sensor;
-        sensor_0043_adc_uv_properties->ezlopi_cloud.value_type = value_type_ultraviolet;
+        sensor_0043_adc_uv_properties->ezlopi_cloud.value_type = ezlopi_item_name_ultraviolet;
         sensor_0043_adc_uv_properties->ezlopi_cloud.battery_powered = false;
         sensor_0043_adc_uv_properties->ezlopi_cloud.has_getter = true;
         sensor_0043_adc_uv_properties->ezlopi_cloud.has_setter = false;

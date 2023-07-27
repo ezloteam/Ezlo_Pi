@@ -58,7 +58,7 @@ idf_component_register(
         sensor_0043_ADC_GYML8511_UV_intensity
         sensor_0044_I2C_TSL2561_luminosity
         sensor_0046_ADC_ACS712TELC_05B_currentMeter
-        sensor_0047_TWI_HX711_loadcell
+        sensor_0047_other_HX711_loadcell
         sensor_0048_other_MQ4_methane_gas_detector
         sensor_0049_other_MQ2_LPG_gas_detector
         )

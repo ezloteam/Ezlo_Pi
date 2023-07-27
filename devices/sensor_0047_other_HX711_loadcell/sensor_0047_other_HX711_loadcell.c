@@ -8,7 +8,7 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_item_name_str.h"
 
-#include "sensor_0047_TWI_HX711_loadcell.h"
+#include "sensor_0047_other_HX711_loadcell.h"
 
 /********************************************************************************/
 /*                    global defines                                            */
@@ -24,32 +24,32 @@ static float HX711_tare_wt = 0; // this value is weight of the device itself [tr
 /********************************************************************************/
 /*                    Declarations                                              */
 /********************************************************************************/
-static int sensor_0047_TWI_HX711_prepare_and_add(void *arg);
+static int sensor_0047_other_HX711_prepare_and_add(void *arg);
 static s_ezlopi_device_properties_t *sensor_0047_hx711_prepare_properties(cJSON *cjson_device);
-static int sensor_0047_TWI_HX711_init(s_ezlopi_device_properties_t *properties);
-static int sensor_0047_TWI_HX711_get_value(s_ezlopi_device_properties_t *properties, void *args);
+static int sensor_0047_other_HX711_init(s_ezlopi_device_properties_t *properties);
+static int sensor_0047_other_HX711_get_value(s_ezlopi_device_properties_t *properties, void *args);
 static float HX711_rawData(hx711_gain_t _gain);
 static float HX711_avg_dataReading(uint8_t sample_iteration);
 static void HX711_Power_Reset(void);
 //----------------------------------------------------------------------------------------------------------
-int sensor_0047_twi_hx711(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
+int sensor_0047_other_hx711(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
 {
     int ret = 0;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        ret = sensor_0047_TWI_HX711_prepare_and_add(arg);
+        ret = sensor_0047_other_HX711_prepare_and_add(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        ret = sensor_0047_TWI_HX711_init(ezlopi_device);
+        ret = sensor_0047_other_HX711_init(ezlopi_device);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        ret = sensor_0047_TWI_HX711_get_value(ezlopi_device, arg);
+        ret = sensor_0047_other_HX711_get_value(ezlopi_device, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -74,18 +74,18 @@ int sensor_0047_twi_hx711(e_ezlopi_actions_t action, s_ezlopi_device_properties_
 }
 //----------------------------------------------------------------------------------------------------------
 
-static int sensor_0047_TWI_HX711_prepare_and_add(void *arg)
+static int sensor_0047_other_HX711_prepare_and_add(void *arg)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if ((prep_arg) && (prep_arg->cjson_device))
     {
-        s_ezlopi_device_properties_t *sensor_0047_twi_hx711_properties = sensor_0047_hx711_prepare_properties(prep_arg->cjson_device);
-        if (sensor_0047_twi_hx711_properties)
+        s_ezlopi_device_properties_t *sensor_0047_other_hx711_properties = sensor_0047_hx711_prepare_properties(prep_arg->cjson_device);
+        if (sensor_0047_other_hx711_properties)
         {
-            if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_0047_twi_hx711_properties, NULL))
+            if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_0047_other_hx711_properties, NULL))
             {
-                free(sensor_0047_twi_hx711_properties);
+                free(sensor_0047_other_hx711_properties);
             }
             else
             {
@@ -139,7 +139,7 @@ void Calculate_hx711_tare_wt(void *params)
 {
     // For Output settling time ; [10SPS] is 400ms
     // So, wait for 400ms after reset [as per datasheet]
-    vTaskDelay(40);
+    vTaskDelay(400 / portTICK_PERIOD_MS);
 
     // ignore first few weight readings
     float RAW_tare = 0;
@@ -272,7 +272,7 @@ static float HX711_rawData(hx711_gain_t _gain)
     return raw_data;
 }
 
-static int sensor_0047_TWI_HX711_init(s_ezlopi_device_properties_t *properties)
+static int sensor_0047_other_HX711_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
     // first initialize the gpio_pins
@@ -306,12 +306,12 @@ static int sensor_0047_TWI_HX711_init(s_ezlopi_device_properties_t *properties)
         HX711_Power_Reset();
 
         //  2. calibrate the load cell
-        xTaskCreate(Calculate_hx711_tare_wt, "Calculate the Tare weight", 2048, NULL, 1, NULL);
+        xTaskCreate(Calculate_hx711_tare_wt, "Calculate the Tare weight", 2*2048, NULL, 1, NULL);
     }
     return ret;
 }
 
-static int sensor_0047_TWI_HX711_get_value(s_ezlopi_device_properties_t *properties, void *args)
+static int sensor_0047_other_HX711_get_value(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
     static float Mass = 0;
@@ -325,7 +325,7 @@ static int sensor_0047_TWI_HX711_get_value(s_ezlopi_device_properties_t *propert
             TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f gm ,", Mass, HX711_tare_wt, (Mass - HX711_tare_wt) / 1000.0f);
 
             cJSON_AddNumberToObject(cjson_properties, "value", ((Mass - HX711_tare_wt) / 1000000.f));
-            cJSON_AddStringToObject(cjson_properties, "scale", "Kilo_gram");
+            cJSON_AddStringToObject(cjson_properties, "scale", "kilo_gram");
         }
     }
 

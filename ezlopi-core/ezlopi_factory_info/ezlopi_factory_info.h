@@ -398,10 +398,11 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"Water Leak Sensor\",\
+                \"dev_name\": \"MQ4\",\
                 \"id_room\": \"\",\
-                \"id_item\": 27,\
-                \"gpio\": 1\
+                \"id_item\": 48,\
+                \"gpio_digi\": 15,\
+                \"gpio_adc\": 2\
           }\
         ],\
     \"dev_total\": 1}";
