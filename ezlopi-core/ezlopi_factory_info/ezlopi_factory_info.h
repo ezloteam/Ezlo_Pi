@@ -395,16 +395,16 @@ static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\
         \"dev_detail\":\
-        [\
-            {\
-                \"dev_type\": 2,\
-                \"dev_name\": \"Touch \",\
+        [\{\
+                \"dev_name\": \"Joystick\",\
+                \"dev_type\": 10,\
+                \"id_item\": 20,\
                 \"id_room\": \"\",\
-                \"id_item\": 23,\
-                \"gpio\": 1,\
-                \"pull_up\": false,\
-                \"ip_inv\": false\
-          }\
+                \"gpio_x\": 1,\
+                \"gpio_y\": 2,\
+                \"gpio_sw\": 3,\
+                \"resln_bit\": 10\
+            }\
         ],\
     \"dev_total\": 1}";
 

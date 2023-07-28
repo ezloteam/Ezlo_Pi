@@ -9,6 +9,7 @@
 #include "ezlopi_item_name_str.h"
 
 #include "sensor_0047_other_HX711_loadcell.h"
+#include "sensor_0047_other_HX711_loadcell.h"
 
 /********************************************************************************/
 /*                    global defines                                            */
@@ -316,15 +317,18 @@ static int sensor_0047_other_HX711_get_value(s_ezlopi_device_properties_t *prope
     int ret = 0;
     static float Mass = 0;
     cJSON *cjson_properties = (cJSON *)args;
+    char valueFormatted[20];
     if (cjson_properties)
     {
         if (ezlopi_item_name_weight == properties->ezlopi_cloud.item_name)
         {
             Mass = HX711_avg_dataReading(10); /// 1000.0f; // to avoid spikes
-
-            TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f gm ,", Mass, HX711_tare_wt, (Mass - HX711_tare_wt) / 1000.0f);
-
-            cJSON_AddNumberToObject(cjson_properties, "value", ((Mass - HX711_tare_wt) / 1000000.f));
+            float weight_in_gm = (Mass - HX711_tare_wt) / 100.0f;
+            float weight_in_kg = weight_in_gm / 1000.0f;
+            TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f kg ,", Mass, HX711_tare_wt, weight_in_kg);
+            snprintf(valueFormatted, 20, "%.2f", weight_in_kg);
+            cJSON_AddStringToObject(cjson_properties, "ValueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cjson_properties, "value", weight_in_kg);
             cJSON_AddStringToObject(cjson_properties, "scale", "kilo_gram");
         }
     }

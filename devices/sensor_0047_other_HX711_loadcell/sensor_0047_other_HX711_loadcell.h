@@ -1,5 +1,5 @@
-#ifndef _0047_OTHER_HX711_LOADCELL_H_
-#define _0047_OTHER_HX711_LOADCELL_H_
+#ifndef _0047_other_HX711_LOADCELL_H_
+#define _0047_other_HX711_LOADCELL_H_
 
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
@@ -14,4 +14,4 @@ typedef enum
 //-----------------------------------
 int sensor_0047_other_hx711(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
-#endif // _0047_OTHER_HX711_LOADCELL_H_
+#endif //_0047_other_HX711_LOADCELL_H_

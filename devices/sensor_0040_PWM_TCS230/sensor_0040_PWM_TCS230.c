@@ -351,7 +351,7 @@ static void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t
     {
         if (x % 10 == 0)
         {
-            TRACE_W(".............................................................%d", x);
+            TRACE_W(".....................................................%d", x);
         }
         //--------------------------------------------------
         ESP_ERROR_CHECK(gpio_set_level(gpio_output_en, 1));
@@ -366,7 +366,7 @@ static void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t
         }
         ESP_ERROR_CHECK(gpio_set_level(gpio_output_en, 0));
         //--------------------------------------------------
-        vTaskDelay(100/portTICK_PERIOD_MS); // 100ms delay
+        vTaskDelay(50 / portTICK_PERIOD_MS); // 50ms delay
     }
     if (((*least_color_timeP) != 0) || ((*most_color_timeP) != 1000))
     {
@@ -391,7 +391,7 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     TRACE_E("Please, place the red paper in front of colour sensor..... Starting Calibration for RED in ....");
     for (uint8_t j = 5; j > 0; j--)
     {
-        TRACE_E("............................................................................... {%d} ", j);
+        TRACE_E("....................................................... {%d} ", j);
         vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
     }
     // choose  RED filter
@@ -406,7 +406,7 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     TRACE_I("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
     for (uint8_t j = 5; j > 0; j--)
     {
-        TRACE_I("............................................................................... {%d} ", j);
+        TRACE_I("....................................................... {%d} ", j);
         vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
     }
     // choose GREEN filter
@@ -421,7 +421,7 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     TRACE_B("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
     for (uint8_t j = 5; j > 0; j--)
     {
-        TRACE_B("............................................................................... {%d} ", j);
+        TRACE_B("....................................................... {%d} ", j);
         vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
     }
     // choose BLUE filter

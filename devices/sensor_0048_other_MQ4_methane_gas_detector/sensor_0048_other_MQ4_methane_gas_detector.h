@@ -113,14 +113,14 @@
 //------------------------------------------
 
 /**
- * Before writing below  [eqv_RL], [m_slope_mq4], [b_coeff_mq4] shown values.
+ * Before writing below  [mq4_eqv_RL], [m_slope_mq4], [b_coeff_mq4] shown values.
  * Please apply voltage-divider schematics as shown above.
  *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq4_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
  *
  * NOTE .2 : For [m_slope_mq4] & [b_coeff_mq4] values:- follow [stage-1] above shown procedures.
  * */
-#define mq4_eqv_RL 660.0f         // review the upper diagram clearly to know why this value is assigned
+#define mq4_eqv_RL 660.0f     // review the upper diagram clearly to know why this value is assigned
 #define RatioMQ4CleanAir 4.4f // -> [RS / R0] = 4.4
 #define MQ4_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq4 -0.3397f
