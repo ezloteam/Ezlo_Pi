@@ -152,7 +152,7 @@ static int sensor_other_MQ2_prepare_and_add(void *arg) // carries cJSON
         device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_security_sensor, subcategory_gas, ezlopi_item_name_gas_alarm, value_type_token, device_prep_args->cjson_device);
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_security_sensor, subcategory_gas, ezlopi_item_name_smoke_density, value_type_substance_amount, device_prep_args->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_smoke_density, value_type_substance_amount, device_prep_args->cjson_device);
     }
     return ret;
 }
@@ -207,7 +207,7 @@ void Calibrate_MQ2_R0_resistance(void *params)
             ezlopi_adc_get_adc_data(mq2_adc_pin, ezlopi_analog_data);
 #ifdef voltage_divider_added
             _sensor_volt += (float)((ezlopi_analog_data->voltage) * 2); // [0-2.4V] X2
-#else if
+#else
             _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
         }
@@ -287,14 +287,14 @@ static void Extract_MQ2_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
         ezlopi_adc_get_adc_data(mq2_adc_pin, ezlopi_analog_data);
 #ifdef voltage_divider_added
         *analog_sensor_volt += ((float)(ezlopi_analog_data->voltage) * 2.0f);
-#else if
+#else
         *analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
     }
     *analog_sensor_volt = *analog_sensor_volt / 10.0f;
 
     //-----------------------------------------------------------------------------------
-    // Stage_2 : [from 'sensor_0048_ADC_MQ2_methane_gas_detector.h']
+    // Stage_2 : [from 'sensor_0049_other_MQ2_LPG_gas_detector.h']
 
     // 1. Calculate 'Rs_gas' for the gas detected
     float Rs_gas = (((MQ2_VOLT_RESOLUTION_Vc * mq2_eqv_RL) / (*analog_sensor_volt / 1000.0f)) - mq2_eqv_RL);

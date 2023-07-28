@@ -32,7 +32,7 @@
 
 /**
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
- *      (via black straight line of sensitivity graph in the Mq-4 datasheet)
+ *      (via black straight line of sensitivity graph in the Mq-2 datasheet)
  *
  *  i.e. ---------------------------> [RS_calib / R0] = 9.8
  *
@@ -57,12 +57,12 @@
  *                -> m = [log(y) - log(y0)] / [log(x) - log(x0)]  => [ m = log(y/y0) / log(x/x0) ] ;
  *                -> b = [log(y) - m*log(x)] = ?
  *
- *    Case. 1: Calculation of slope 'm' Using MQ2's LPG-curve (CH4) in semi-log graph:
+ *    Case. 1: Calculation of slope 'm' Using MQ2's LPG-curve  in semi-log graph:
  *
  *                                      (x0 , y0) and (  x  , y  )
  *                                          |               |
  *                                          V               V
- *                 #A. chose the points (200,1.7) and (10000,0.27) from the 'CH4' graph-line
+ *                 #A. chose the points (200,1.7) and (10000,0.27) from the 'LPG' graph-line
  *                 ->           m = log(0.27/1.7) / log(10000/200)
  *                 ->           m =  -0.47
  *
@@ -113,10 +113,10 @@
 //------------------------------------------
 
 /**
- * Before writing below  [eqv_RL], [m_slope_mq2], [b_coeff_mq2] shown values.
+ * Before writing below  [mq2_eqv_RL], [m_slope_mq2], [b_coeff_mq2] shown values.
  * Please apply voltage-divider schematics as shown above.
  *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq2_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
  *
  * NOTE .2 : For [m_slope_mq2] & [b_coeff_mq2] values:- follow [stage-1] above shown procedures.
  * */

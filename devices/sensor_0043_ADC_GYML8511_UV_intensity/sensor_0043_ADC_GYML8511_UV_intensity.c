@@ -94,11 +94,11 @@ static s_ezlopi_device_properties_t *sensor_0043_adc_uv_prepare(cJSON *cjson_dev
 
         ASSIGN_DEVICE_NAME(sensor_0043_adc_uv_properties, device_name)
         // ezlopi_cloud...
-        sensor_0043_adc_uv_properties->ezlopi_cloud.category = category_generic_sensor;
+        sensor_0043_adc_uv_properties->ezlopi_cloud.category = category_level_sensor;
         sensor_0043_adc_uv_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-        sensor_0043_adc_uv_properties->ezlopi_cloud.item_name = ezlopi_item_name_lux;
+        sensor_0043_adc_uv_properties->ezlopi_cloud.item_name = ezlopi_item_name_ultraviolet;
         sensor_0043_adc_uv_properties->ezlopi_cloud.device_type = dev_type_sensor;
-        sensor_0043_adc_uv_properties->ezlopi_cloud.value_type = value_type_ultraviolet;
+        sensor_0043_adc_uv_properties->ezlopi_cloud.value_type = value_type_illuminance;
         sensor_0043_adc_uv_properties->ezlopi_cloud.battery_powered = false;
         sensor_0043_adc_uv_properties->ezlopi_cloud.has_getter = true;
         sensor_0043_adc_uv_properties->ezlopi_cloud.has_setter = false;
@@ -144,9 +144,9 @@ static int sensor_0043_adc_uv_get_value(s_ezlopi_device_properties_t *properties
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, sensor_0043_adc_data);
         // generating UV mW/cm2
         float uvIntensity = mapfloat(((float)(sensor_0043_adc_data->voltage) / 1000.0f), 0.97, 2.7, 0.0, 15.0);
-        TRACE_B("[200-380nm]UV  : %.2f mW/cm^2", uvIntensity);
+        TRACE_B("[200-380nm]UV  : %.2f mW/cm^2 ", uvIntensity);
         cJSON_AddNumberToObject(cjson_properties, "value", uvIntensity);
-        cJSON_AddStringToObject(cjson_properties, "scale", "uv_index");
+        cJSON_AddStringToObject(cjson_properties, "scale", "lux");
         // corresponding voltage
         int analog_data = (sensor_0043_adc_data->voltage);
         TRACE_B("Analog Output voltage : %d mV", analog_data);

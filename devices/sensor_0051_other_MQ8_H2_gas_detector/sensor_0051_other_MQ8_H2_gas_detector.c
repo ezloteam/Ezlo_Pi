@@ -11,12 +11,12 @@
 #include "ezlopi_adc.h"
 #include "math.h"
 
-#include "sensor_0048_other_MQ4_methane_gas_detector.h"
+#include "sensor_0051_other_MQ8_H2_gas_detector.h"
 
 //------------------------------------------------------------------------------
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                     \
     {                                                                                                                         \
-        s_ezlopi_device_properties_t *_properties = sensor_other_mq4_prepare_properties(device_id, category, subcategory,     \
+        s_ezlopi_device_properties_t *_properties = sensor_other_mq8_prepare_properties(device_id, category, subcategory,     \
                                                                                         item_name, value_type, cjson_device); \
         if (NULL != _properties)                                                                                              \
         {                                                                                                                     \
@@ -29,38 +29,38 @@
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
-static uint8_t mq4_digital_pin = 0;
-static uint8_t mq4_adc_pin = 0;
+static uint8_t mq8_digital_pin = 0;
+static uint8_t mq8_adc_pin = 0;
 
-static float MQ4_R0_constant = 0;         // Define variable for MQ4_R0_constant [always constant]
+static float MQ8_R0_constant = 0;         // Define variable for MQ8_R0_constant [always constant]
 static bool Calibration_complete = false; // flag to activate calibration phase
 
-static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_device_properties_t *sensor_other_mq4_properties, void *user_arg);
+static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_device_properties_t *sensor_other_mq8_properties, void *user_arg);
 
-static s_ezlopi_device_properties_t *sensor_other_mq4_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device); // you can directly add the prepare args here
-static int sensor_other_MQ4_prepare_and_add(void *arg);
-static int sensor_other_MQ4_init(s_ezlopi_device_properties_t *properties);
-static int sensor_other_MQ4_get_value(s_ezlopi_device_properties_t *properties, void *arg);
-static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties);
+static s_ezlopi_device_properties_t *sensor_other_mq8_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device); // you can directly add the prepare args here
+static int sensor_other_MQ8_prepare_and_add(void *arg);
+static int sensor_other_MQ8_init(s_ezlopi_device_properties_t *properties);
+static int sensor_other_MQ8_get_value(s_ezlopi_device_properties_t *properties, void *arg);
+static void Extract_MQ8_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties);
 //--------------------------------------------------------------------------------------------------------------------------------------
-int sensor_0048_MQ4_methane(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
+int sensor_0051_MQ8_H2(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
 {
     int ret = 0;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        ret = sensor_other_MQ4_prepare_and_add(arg);
+        ret = sensor_other_MQ8_prepare_and_add(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        ret = sensor_other_MQ4_init(ezlopi_device);
+        ret = sensor_other_MQ8_init(ezlopi_device);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        ret = sensor_other_MQ4_get_value(ezlopi_device, arg);
+        ret = sensor_other_MQ8_get_value(ezlopi_device, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -87,61 +87,61 @@ int sensor_0048_MQ4_methane(e_ezlopi_actions_t action, s_ezlopi_device_propertie
 //--------------------------------------------------------------------------------------------------------------------------------------
 
 // funtion to generate the assosiated properties of the device_id
-static s_ezlopi_device_properties_t *sensor_other_mq4_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device)
+static s_ezlopi_device_properties_t *sensor_other_mq8_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device)
 {
-    s_ezlopi_device_properties_t *sensor_0048_other_MQ4_properties = NULL;
+    s_ezlopi_device_properties_t *sensor_0051_other_MQ8_properties = NULL;
     if (NULL != cjson_device)
     {
-        sensor_0048_other_MQ4_properties = (s_ezlopi_device_properties_t *)malloc(sizeof(s_ezlopi_device_properties_t));
-        if (sensor_0048_other_MQ4_properties)
+        sensor_0051_other_MQ8_properties = (s_ezlopi_device_properties_t *)malloc(sizeof(s_ezlopi_device_properties_t));
+        if (sensor_0051_other_MQ8_properties)
         {
-            memset(sensor_0048_other_MQ4_properties, 0, sizeof(s_ezlopi_device_properties_t));
-            sensor_0048_other_MQ4_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
+            memset(sensor_0051_other_MQ8_properties, 0, sizeof(s_ezlopi_device_properties_t));
+            sensor_0051_other_MQ8_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
 
             // set the device name according to device_id
             char *device_name = NULL;
             if (ezlopi_item_name_gas_alarm == ITEM_NAME)
             {
-                device_name = "MQ4-Methane-alert";
+                device_name = "MQ8-Hydrogen-alert";
             }
             if (ezlopi_item_name_smoke_density == ITEM_NAME)
             {
-                device_name = "MQ4-Methane-level[ppm]";
+                device_name = "MQ8-Hydrogen-level[ppm]";
             }
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
 
-            ASSIGN_DEVICE_NAME(sensor_0048_other_MQ4_properties, device_name);
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.category = CATEGORY;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.subcategory = SUB_CATEGORY;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.item_name = ITEM_NAME;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.device_type = dev_type_sensor;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.value_type = VALUE_TYPE;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.has_getter = true;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.has_setter = false;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.reachable = true;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.battery_powered = false;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.show = true;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.room_name[0] = '\0';
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.device_id = DEVICE_ID;
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-            sensor_0048_other_MQ4_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
+            ASSIGN_DEVICE_NAME(sensor_0051_other_MQ8_properties, device_name);
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.category = CATEGORY;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.subcategory = SUB_CATEGORY;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.item_name = ITEM_NAME;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.device_type = dev_type_sensor;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.value_type = VALUE_TYPE;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.has_getter = true;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.has_setter = false;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.reachable = true;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.battery_powered = false;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.show = true;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.room_name[0] = '\0';
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.device_id = DEVICE_ID;
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+            sensor_0051_other_MQ8_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
             if (ezlopi_item_name_gas_alarm == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_digi", mq4_digital_pin);
-                TRACE_I("MQ4-> DIGITAL_PIN: %d ", mq4_digital_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio_digi", mq8_digital_pin);
+                TRACE_I("MQ8-> DIGITAL_PIN: %d ", mq8_digital_pin);
             }
             if (ezlopi_item_name_smoke_density == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_adc", mq4_adc_pin);
-                TRACE_I("MQ4-> ADC_PIN: %d ", mq4_adc_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio_adc", mq8_adc_pin);
+                TRACE_I("MQ8-> ADC_PIN: %d ", mq8_adc_pin);
             }
-            sensor_0048_other_MQ4_properties->interface.adc.resln_bit = 3; // ADC 12-bit
+            sensor_0051_other_MQ8_properties->interface.adc.resln_bit = 3; // ADC 12-bit
         }
     }
-    return sensor_0048_other_MQ4_properties;
+    return sensor_0051_other_MQ8_properties;
 }
 
-static int sensor_other_MQ4_prepare_and_add(void *arg) // carries cJSON
+static int sensor_other_MQ8_prepare_and_add(void *arg) // carries cJSON
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_args = (s_ezlopi_prep_arg_t *)arg;
@@ -156,14 +156,14 @@ static int sensor_other_MQ4_prepare_and_add(void *arg) // carries cJSON
     }
     return ret;
 }
-static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_device_properties_t *sensor_other_mq4_properties, void *user_arg)
+static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_device_properties_t *sensor_other_mq8_properties, void *user_arg)
 {
     int ret = 0;
-    if (sensor_other_mq4_properties)
+    if (sensor_other_mq8_properties)
     {
-        if (0 == ezlopi_devices_list_add(device_prep_args->device, sensor_other_mq4_properties, NULL))
+        if (0 == ezlopi_devices_list_add(device_prep_args->device, sensor_other_mq8_properties, NULL))
         {
-            free(sensor_other_mq4_properties);
+            free(sensor_other_mq8_properties);
         }
         else
         {
@@ -172,7 +172,7 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_de
     }
     return ret;
 }
-void Calibrate_MQ4_R0_resistance(void *params)
+void Calibrate_MQ8_R0_resistance(void *params)
 {
     float RS_calib = 0; // Define variable for sensor resistance
     s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)params;
@@ -203,7 +203,7 @@ void Calibrate_MQ4_R0_resistance(void *params)
                 TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
             }
             // extract ADC values
-            ezlopi_adc_get_adc_data(mq4_adc_pin, ezlopi_analog_data);
+            ezlopi_adc_get_adc_data(mq8_adc_pin, ezlopi_analog_data);
 #ifdef voltage_divider_added
             _sensor_volt += (float)((ezlopi_analog_data->voltage) * 2); // [0-2.4V] X2
 #else
@@ -218,7 +218,7 @@ void Calibrate_MQ4_R0_resistance(void *params)
     //-------------------------------------------------
     // Calculate the 'Rs' of heater during clean air [calibration phase]
     // Range -> [2Kohm - 20Kohm]
-    RS_calib = ((MQ4_VOLT_RESOLUTION_Vc * mq4_eqv_RL) / (_sensor_volt / 1000.0f)) - mq4_eqv_RL; // Calculate RS in fresh air
+    RS_calib = ((MQ8_VOLT_RESOLUTION_Vc * mq8_eqv_RL) / (_sensor_volt / 1000.0f)) - mq8_eqv_RL; // Calculate RS in fresh air
     TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
     if (RS_calib < 0)
     {
@@ -226,11 +226,11 @@ void Calibrate_MQ4_R0_resistance(void *params)
     }
 
     // Calculate the R0_air which is constant through-out
-    MQ4_R0_constant = (RS_calib / RatioMQ4CleanAir); // Calculate MQ4_R0_constant
-    TRACE_E("CALIB_TASK -> 'MQ4_R0_constant' = %.2f", MQ4_R0_constant);
-    if (MQ4_R0_constant < 0)
+    MQ8_R0_constant = (RS_calib / RatioMQ8CleanAir); // Calculate MQ8_R0_constant
+    TRACE_E("CALIB_TASK -> 'MQ8_R0_constant' = %.2f", MQ8_R0_constant);
+    if (MQ8_R0_constant < 0)
     {
-        MQ4_R0_constant = 0; // No negative values accepted.
+        MQ8_R0_constant = 0; // No negative values accepted.
     }
 
     // Set calibration_complete flag
@@ -238,16 +238,16 @@ void Calibrate_MQ4_R0_resistance(void *params)
     vTaskDelete(NULL);
 }
 
-static int sensor_other_MQ4_init(s_ezlopi_device_properties_t *properties)
+static int sensor_other_MQ8_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
     static bool guard_digi = false;
     static bool guard_adc = false;
 
-    if ((!guard_digi) && (0 != mq4_digital_pin) && GPIO_IS_VALID_GPIO(mq4_digital_pin))
+    if ((!guard_digi) && (0 != mq8_digital_pin) && GPIO_IS_VALID_GPIO(mq8_digital_pin))
     { // intialize digital_pin
         gpio_config_t input_conf = {};
-        input_conf.pin_bit_mask = (1ULL << (mq4_digital_pin));
+        input_conf.pin_bit_mask = (1ULL << (mq8_digital_pin));
         input_conf.intr_type = GPIO_INTR_DISABLE;
         input_conf.mode = GPIO_MODE_INPUT;
         input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
@@ -257,17 +257,17 @@ static int sensor_other_MQ4_init(s_ezlopi_device_properties_t *properties)
         guard_digi = true;
     }
 
-    if ((!guard_adc) && (0 != mq4_adc_pin) && GPIO_IS_VALID_GPIO(mq4_adc_pin))
+    if ((!guard_adc) && (0 != mq8_adc_pin) && GPIO_IS_VALID_GPIO(mq8_adc_pin))
     {
         // initialize analog_pin
-        ezlopi_adc_init(mq4_adc_pin, properties->interface.adc.resln_bit);
+        ezlopi_adc_init(mq8_adc_pin, properties->interface.adc.resln_bit);
         guard_adc = true;
 
         // calibrate if not done
         TRACE_W(".........................................CALIB_GAURD : %d", Calibration_complete);
         if (!Calibration_complete)
         {
-            xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, (void *)properties, 1, NULL);
+            xTaskCreate(Calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", 2048, (void *)properties, 1, NULL);
         }
         ret = 1;
     }
@@ -275,7 +275,7 @@ static int sensor_other_MQ4_init(s_ezlopi_device_properties_t *properties)
     return ret;
 }
 
-static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties)
+static void Extract_MQ8_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties)
 {
     // calculation process
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
@@ -284,7 +284,7 @@ static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     // extract the mean_sensor_analog_output_voltage
     for (uint8_t x = 10; x > 0; x--)
     {
-        ezlopi_adc_get_adc_data(mq4_adc_pin, ezlopi_analog_data);
+        ezlopi_adc_get_adc_data(mq8_adc_pin, ezlopi_analog_data);
 #ifdef voltage_divider_added
         *analog_sensor_volt += ((float)(ezlopi_analog_data->voltage) * 2.0f);
 #else
@@ -294,13 +294,13 @@ static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     *analog_sensor_volt = *analog_sensor_volt / 10.0f;
 
     //-----------------------------------------------------------------------------------
-    // Stage_2 : [from 'sensor_0048_ADC_MQ4_methane_gas_detector.h']
+    // Stage_2 : [from 'sensor_0051_ADC_MQ8_H2_gas_detector.h']
 
     // 1. Calculate 'Rs_gas' for the gas detected
-    float Rs_gas = (((MQ4_VOLT_RESOLUTION_Vc * mq4_eqv_RL) / (*analog_sensor_volt / 1000.0f)) - mq4_eqv_RL);
+    float Rs_gas = (((MQ8_VOLT_RESOLUTION_Vc * mq8_eqv_RL) / (*analog_sensor_volt / 1000.0f)) - mq8_eqv_RL);
 
     // 1.1 Calculate @ 'ratio' during CH4 presence
-    double _ratio = (Rs_gas / ((MQ4_R0_constant <= 0) ? (1.0f) : (MQ4_R0_constant))); // avoid dividing by zero??
+    double _ratio = (Rs_gas / ((MQ8_R0_constant <= 0) ? (1.0f) : (MQ8_R0_constant))); // avoid dividing by zero??
     if (_ratio <= 0)
     {
         _ratio = 0;
@@ -308,7 +308,7 @@ static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     //-------------------------------------------------
 
     // 1.2 Calculate _ppm
-    *_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq4) / m_slope_mq4); // ---> _ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+    *_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq8) / m_slope_mq8); // ---> _ppm = 10 ^ [ ( log(ratio) - b ) / m ]
     if (*_ppm < 0)
     {
         *_ppm = 0; // No negative values accepted or upper datasheet recomendation.
@@ -322,7 +322,7 @@ static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     free(ezlopi_analog_data);
 }
 
-static int sensor_other_MQ4_get_value(s_ezlopi_device_properties_t *properties, void *arg)
+static int sensor_other_MQ8_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     float analog_sensor_volt = 0;
@@ -336,7 +336,7 @@ static int sensor_other_MQ4_get_value(s_ezlopi_device_properties_t *properties, 
 
         if (ezlopi_item_name_gas_alarm == properties->ezlopi_cloud.item_name)
         {
-            if (0 == gpio_get_level(mq4_digital_pin)) // when D0 -> 0V,
+            if (0 == gpio_get_level(mq8_digital_pin)) // when D0 -> 0V,
             {
                 cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
             }
@@ -348,7 +348,7 @@ static int sensor_other_MQ4_get_value(s_ezlopi_device_properties_t *properties, 
         if (ezlopi_item_name_smoke_density == properties->ezlopi_cloud.item_name)
         {
             // extract the sensor_output_values
-            Extract_MQ4_sensor_ppm(&analog_sensor_volt, &_ppm, properties);
+            Extract_MQ8_sensor_ppm(&analog_sensor_volt, &_ppm, properties);
             snprintf(valueFormatted, 20, "%.2f", _ppm);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", _ppm);

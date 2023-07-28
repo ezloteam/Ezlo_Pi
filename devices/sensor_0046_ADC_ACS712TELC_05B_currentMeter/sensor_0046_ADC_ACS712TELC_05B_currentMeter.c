@@ -153,7 +153,7 @@ static int sensor_adc_ACS712_get_value(s_ezlopi_device_properties_t *properties,
     if (cjson_properties)
     {
         cJSON_AddNumberToObject(cjson_properties, "value", Ampere); // Irms [A]
-        cJSON_AddStringToObject(cjson_properties, "scale", "Ampere");
+        cJSON_AddStringToObject(cjson_properties, "scale", "ampere");
         ret = 1;
     }
     return ret;
@@ -185,7 +185,7 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
             // getting the voltage value at this instant
 #ifdef voltage_divider_added
             Vnow = (ezlopi_analog_data->voltage) * 2 - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
-#else if
+#else
             Vnow = (ezlopi_analog_data->voltage) - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
 #endif
             Vsum += Vnow * Vnow; // sumof(I^2 + I^2 + .....)
@@ -203,24 +203,24 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
         // TRACE_E("AC current = %0.2f A", Ampere);
         //----------------------------------------------------------
 
-        /*this portion calculates an instantaneous current as soon as the AC mesurement process is done*/
-        float Amp_data = 0;
-        ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-#ifdef voltage_divider_added
-        // since the incoming voltage is halfed after voltage divider ,
-        // we will double the extracted voltage and then
-        // apply standard calibration methods to get desired results
-        Amp_data = ((((float)(ezlopi_analog_data->voltage) * 2.0f) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
-#else if
-        // the value extracted for 0A is already at 2.5V ; which is the max 2.4V analog input of esp32
-        // Wihtout
-        Amp_data = (((float)(ezlopi_analog_data->voltage) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
-#endif
-        if (((Amp_data > 0) ? (Amp_data) : (Amp_data * -1)) < 0.3)
-        {
-            Amp_data = 0;
-        }
-        // TRACE_E("DC current = %0.2f A", Amp_data);
+        //         /*this portion calculates an instantaneous current as soon as the AC mesurement process is done*/
+        //         float Amp_data = 0;
+        //         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+        // #ifdef voltage_divider_added
+        //         // since the incoming voltage is halfed after voltage divider ,
+        //         // we will double the extracted voltage and then
+        //         // apply standard calibration methods to get desired results
+        //         Amp_data = ((((float)(ezlopi_analog_data->voltage) * 2.0f) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
+        // #else
+        //         // the value extracted for 0A is already at 2.5V ; which is the max 2.4V analog input of esp32
+        //         // Wihtout
+        //         Amp_data = (((float)(ezlopi_analog_data->voltage) - (float)ASC712TELC_05B_zero_point_mV) / 185.0f); // ( current = analog_output / sens [185mV/A] )
+        // #endif
+        //         if (((Amp_data > 0) ? (Amp_data) : (Amp_data * -1)) < 0.3)
+        //         {
+        //             Amp_data = 0;
+        //         }
+        //         // TRACE_E("DC current = %0.2f A", Amp_data);
 
         // clear the allocated memory
         free(ezlopi_analog_data);

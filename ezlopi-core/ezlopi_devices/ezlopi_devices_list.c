@@ -46,9 +46,12 @@
 #include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
 #include "sensor_0046_ADC_ACS712TELC_05B_currentMeter.h"
-#include "sensor_0047_TWI_HX711_loadcell.h"
+#include "sensor_0047_other_HX711_loadcell.h"
 #include "sensor_0048_other_MQ4_methane_gas_detector.h"
 #include "sensor_0049_other_MQ2_LPG_gas_detector.h"
+#include "sensor_0050_other_MQ3_Alcohol_detector.h"
+#include "sensor_0051_other_MQ8_H2_gas_detector.h"
+#include "sensor_0052_other_MQ135_NH3_gas_detector.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -370,10 +373,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0047_TWI_HX711_LOADCELL
+#ifdef EZLOPI_SENSOR_0047_OTHER_HX711_LOADCELL
     {
-        .id = EZLOPI_SENSOR_0047_TWI_HX711_LOADCELL,
-        .func = sensor_0047_twi_hx711,
+        .id = EZLOPI_SENSOR_0047_OTHER_HX711_LOADCELL,
+        .func = sensor_0047_other_hx711,
     },
 #endif
 
@@ -388,6 +391,28 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0049_OTHER_MQ2_LPG_GAS_DETECTOR,
         .func = sensor_0049_MQ2_LPG,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0050_OTHER_MQ3_ALCOHOL_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0050_OTHER_MQ3_ALCOHOL_GAS_DETECTOR,
+        .func = sensor_0050_MQ3_alcohol,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0051_OTHER_MQ8_HYDROGEN_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0051_OTHER_MQ8_HYDROGEN_GAS_DETECTOR,
+        .func = sensor_0051_MQ8_H2,
+    },
+
+#endif
+
+#ifdef EZLOPI_SENSOR_0052_OTHER_MQ135_AMONIA_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0052_OTHER_MQ135_AMONIA_GAS_DETECTOR,
+        .func = sensor_0052_MQ135_NH3,
     },
 #endif
 

@@ -338,7 +338,7 @@ static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32
         // Deleting queue after no use to avoid conflicts
         vQueueDelete(tcs230_queue);
     }
-    vTaskDelay(1); // 10ms delay
+    vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms delay
 }
 
 // function to calibrate the data for 30 seconds
@@ -351,7 +351,7 @@ static void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t
     {
         if (x % 10 == 0)
         {
-            TRACE_W("%d", x);
+            TRACE_W(".....................................................%d", x);
         }
         //--------------------------------------------------
         ESP_ERROR_CHECK(gpio_set_level(gpio_output_en, 1));
@@ -366,7 +366,7 @@ static void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t
         }
         ESP_ERROR_CHECK(gpio_set_level(gpio_output_en, 0));
         //--------------------------------------------------
-        vTaskDelay(5); // 50ms delay
+        vTaskDelay(50 / portTICK_PERIOD_MS); // 50ms delay
     }
     if (((*least_color_timeP) != 0) || ((*most_color_timeP) != 1000))
     {
@@ -380,6 +380,7 @@ static void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t
 
 static void Gather_tcs230_Calibration_data(void *params) // calibration task
 {
+    vTaskDelay(4000 / portTICK_PERIOD_MS); // 4sec
     s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)params;
 
     // extracting the 'user_args' from "properties"
@@ -390,8 +391,8 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     TRACE_E("Please, place the red paper in front of colour sensor..... Starting Calibration for RED in ....");
     for (uint8_t j = 5; j > 0; j--)
     {
-        TRACE_E(".... {%d} ", j);
-        vTaskDelay(75); // 4sec
+        TRACE_E("....................................................... {%d} ", j);
+        vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
     }
     // choose  RED filter
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_RED);
@@ -405,8 +406,8 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     TRACE_I("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
     for (uint8_t j = 5; j > 0; j--)
     {
-        TRACE_I(".... {%d} ", j);
-        vTaskDelay(75); // 4sec
+        TRACE_I("....................................................... {%d} ", j);
+        vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
     }
     // choose GREEN filter
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_GREEN);
@@ -420,8 +421,8 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     TRACE_B("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
     for (uint8_t j = 5; j > 0; j--)
     {
-        TRACE_B(".... {%d} ", j);
-        vTaskDelay(75); // 4sec
+        TRACE_B("....................................................... {%d} ", j);
+        vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
     }
     // choose BLUE filter
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_BLUE);
@@ -525,7 +526,7 @@ static int sensor_pwm_tcs230_init(s_ezlopi_device_properties_t *properties)
             TCS230_set_frequency_scaling(properties, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
 
             // activate a task to calibrate data
-            xTaskCreate(&Gather_tcs230_Calibration_data, "TCS230_Calibration_Task", 2048, properties, 1, NULL);
+            xTaskCreate(Gather_tcs230_Calibration_data, "TCS230_Calibration_Task", 2 * 2048, properties, 1, NULL);
         }
     }
     return (int)guard;

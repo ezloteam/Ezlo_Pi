@@ -397,9 +397,9 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"MQ2_LPG_detector\",\
+                \"dev_name\": \"MQ3_ALCOHOL_detector\",\
                 \"id_room\": \"\",\
-                \"id_item\": 49,\
+                \"id_item\": 50,\
                 \"en_gpio1\": \"true\",\
                 \"gpio_digi\": 25,\
                 \"en_gpio2\": \"true\",\
