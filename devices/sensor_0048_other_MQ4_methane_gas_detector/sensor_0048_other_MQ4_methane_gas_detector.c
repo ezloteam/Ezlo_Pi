@@ -267,7 +267,7 @@ static int sensor_other_MQ4_init(s_ezlopi_device_properties_t *properties)
         TRACE_W(".........................................CALIB_GAURD : %d", Calibration_complete);
         if (!Calibration_complete)
         {
-            xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, (void *)properties, 1, NULL);
+            xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2*2048, (void *)properties, 1, NULL);
         }
         ret = 1;
     }

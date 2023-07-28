@@ -397,12 +397,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"MQ4\",\
+                \"dev_type\": 2,\
+                \"dev_name\": \"Touch \",\
                 \"id_room\": \"\",\
-                \"id_item\": 48,\
-                \"gpio_digi\": 15,\
-                \"gpio_adc\": 2\
+                \"id_item\": 23,\
+                \"gpio\": 1,\
+                \"pull_up\": false,\
+                \"ip_inv\": false\
           }\
         ],\
     \"dev_total\": 1}";

@@ -160,8 +160,11 @@ static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *p
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)args;
+    char valueFormatted[20];
     if (cjson_propertise)
     {
+        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
