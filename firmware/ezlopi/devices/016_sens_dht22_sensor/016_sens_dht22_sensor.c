@@ -13,22 +13,126 @@
 #include "dht22.h"
 #include "016_sens_dht22_sensor.h"
 
+static int dht22_sensor_setup_cloud_properties_humidity(l_ezlopi_device_t *device, cJSON *cj_device);
+static int dht22_sensor_setup_cloud_properties_temperature(l_ezlopi_device_t *device, cJSON *cj_device);
 
+int dht22_sensor_v3(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_args)
+{
+    int ret = 0;
+    switch (action)
+    {
+    case EZLOPI_ACTION_PREPARE:
+    {
+        dht22_sensor_prepare_v3(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        // dht22_sensor_init(ezlo_device);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        // dht22_sensor_get_sensor_value(ezlo_device, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        // ezlopi_device_value_updated_from_device(ezlo_device);
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return ret;
+}
+
+static int dht22_sensor_prepare_v3(void *arg)
+{
+    int ret = 0;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    if (prep_arg)
+    {
+        cJSON *cjson_device = prep_arg->cjson_device;
+        if (cjson_device)
+        {
+            l_ezlopi_device_t *device_temperature = ezlopi_device_add_device();
+            if (device_temperature)
+            {
+                dht22_sensor_setup_cloud_properties_temperature(device_temperature, cjson_device);
+                
+                l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(device_humidity, NULL);
+                if (item_humidity)
+                {
+                }
+            }
+
+            l_ezlopi_device_t *device_humidity = ezlopi_device_add_device();
+            if (device_humidity)
+            {
+                dht22_sensor_setup_cloud_properties_humidity(device_humidity, cjson_device);
+                l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(device_humidity, NULL);
+                if (item_humidity)
+                {
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+static int dht22_sensor_setup_cloud_properties_temperature(l_ezlopi_device_t *device, cJSON *cj_device)
+{
+    int ret = 0;
+    if (device && cj_device)
+    {
+        char *device_name = NULL;
+        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+
+        ASSIGN_DEVICE_NAME_V2(device, device_name);
+        device->cloud_properties.category = category_temperature;
+        device->cloud_properties.subcategory = subcategory_not_defined;
+        device->cloud_properties.device_type = dev_type_sensor;
+        device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    }
+    return ret;
+}
+
+static int dht22_sensor_setup_cloud_properties_humidity(l_ezlopi_device_t *device, cJSON *cj_device)
+{
+    int ret = 0;
+    if (device && cj_device)
+    {
+        char *device_name = NULL;
+        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+
+        ASSIGN_DEVICE_NAME_V2(device, device_name);
+        device->cloud_properties.category = category_humidity;
+        device->cloud_properties.subcategory = subcategory_not_defined;
+        device->cloud_properties.device_type = dev_type_sensor;
+        device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    }
+    return ret;
+}
+
+#if 0
 static int dht22_sensor_prepare(void* args);
 static int dht22_sensor_add_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *dht22_sensor_properties, void *user_arg);
 static s_ezlopi_device_properties_t *dht22_sensor_prepare_properties(uint32_t device_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device);
 static int dht22_sensor_init(s_ezlopi_device_properties_t* properties);
 static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t* properties, void* args);
 
-
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, sub_category, item_name, value_type, cjson_device)                                      \
-    {                                                                                                                                           \
-        s_ezlopi_device_properties_t *_properties = dht22_sensor_prepare_properties(device_id, category, sub_category,                          \
-                                                                                       item_name, value_type, cjson_device);                    \
-        if (NULL != _properties)                                                                                                                \
-        {                                                                                                                                       \
-            dht22_sensor_add_to_list(prep_arg, _properties, NULL);                                                                              \
-        }                                                                                                                                       \
+#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, sub_category, item_name, value_type, cjson_device)                \
+    {                                                                                                                     \
+        s_ezlopi_device_properties_t *_properties = dht22_sensor_prepare_properties(device_id, category, sub_category,    \
+                                                                                    item_name, value_type, cjson_device); \
+        if (NULL != _properties)                                                                                          \
+        {                                                                                                                 \
+            dht22_sensor_add_to_list(prep_arg, _properties, NULL);                                                        \
+        }                                                                                                                 \
     }
 
 
@@ -174,3 +278,4 @@ static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t* propertie
 
     return ret;
 }
+#endif
