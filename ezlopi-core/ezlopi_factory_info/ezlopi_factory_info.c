@@ -267,7 +267,16 @@ void ezlopi_factory_info_v2_get_ezlopi_mac(uint8_t *mac)
         memset(mac, 0, DEVICE_MAC_LENGTH);
         if (ezlopi_factory_info_v2_init())
         {
-            esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, &mac, DEVICE_MAC_LENGTH);
+
+            esp_err_t err = esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, mac, DEVICE_MAC_LENGTH);
+            if (err != ESP_OK)
+            {
+                TRACE_E("Error reading from the partiton !");
+            }
+            else
+            {
+                TRACE_I("MAC: %x:%x:%x:%x:%x:%x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            }
         }
     }
 }
