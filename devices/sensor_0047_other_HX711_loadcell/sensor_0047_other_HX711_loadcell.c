@@ -113,7 +113,7 @@ static s_ezlopi_device_properties_t *sensor_0047_hx711_prepare_properties(cJSON 
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
             ASSIGN_DEVICE_NAME(sensor_hx711_properties, device_name);
 
-            sensor_hx711_properties->ezlopi_cloud.category = category_generic_sensor;
+            sensor_hx711_properties->ezlopi_cloud.category = category_level_sensor;
             sensor_hx711_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
             sensor_hx711_properties->ezlopi_cloud.item_name = ezlopi_item_name_weight;
             sensor_hx711_properties->ezlopi_cloud.device_type = dev_type_sensor;

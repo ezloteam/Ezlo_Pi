@@ -502,7 +502,7 @@ static int sensor_pwm_tcs230_prepare(void *arg)
     {
         memset(sensor_0040_PWM_TCS230_data, 0, sizeof(TCS230_data_t));
         uint32_t device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(rgb_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_rgbcolor, value_type_rgb, prep_arg->cjson_device, sensor_0040_PWM_TCS230_data);
+        ADD_PROPERTIES_DEVICE_LIST(rgb_properties, device_id, category_state_sensor, subcategory_light, ezlopi_item_name_rgbcolor, value_type_rgb, prep_arg->cjson_device, sensor_0040_PWM_TCS230_data);
     }
     return ret;
 }
