@@ -138,6 +138,7 @@ static int sensor_0043_adc_uv_get_value(s_ezlopi_device_properties_t *properties
 {
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)arg;
+    char valueFormatted[30];
     s_ezlopi_analog_data_t *sensor_0043_adc_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(sensor_0043_adc_data, 0, sizeof(s_ezlopi_analog_data_t));
     if ((NULL != cjson_properties) && (NULL != sensor_0043_adc_data))
@@ -146,8 +147,11 @@ static int sensor_0043_adc_uv_get_value(s_ezlopi_device_properties_t *properties
         // generating UV mW/cm2
         float uvIntensity = mapfloat(((float)(sensor_0043_adc_data->voltage) / 1000.0f), 0.97, 2.7, 0.0, 15.0);
         TRACE_B("[200-380nm]UV  : %.2f mW/cm^2 ", uvIntensity);
+	snprintf(valueFormatted, 20, "%.2f", uvIntensity);
+        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cjson_properties, "value", uvIntensity);
         cJSON_AddStringToObject(cjson_properties, "scale", "lux");
+
         // corresponding voltage
         int analog_data = (sensor_0043_adc_data->voltage);
         TRACE_B("Analog Output voltage : %d mV", analog_data);

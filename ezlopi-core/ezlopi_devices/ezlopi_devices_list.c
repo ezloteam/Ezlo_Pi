@@ -53,7 +53,6 @@
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
 #include "sensor_0046_ADC_ACS712TELC_05B_currentMeter.h"
 #include "sensor_0047_other_HX711_loadcell.h"
-#include "sensor_0047_other_HX711_loadcell.h"
 #include "sensor_0048_other_MQ4_methane_gas_detector.h"
 #include "sensor_0049_other_MQ2_LPG_gas_detector.h"
 #include "sensor_0050_other_MQ3_Alcohol_detector.h"
