@@ -52,7 +52,7 @@ idf_component_register(
         device_0036_PWM_servo_MG996R
         device_0038_digitalOut_RGB
         # sensor_0039_I2C_MAX30102  // err
-        sensor_0040_PWM_TCS230
+        sensor_0040_other_TCS230
         sensor_0041_ADC_FC28_soilMoisture
         sensor_0042_ADC_shunt_voltmeter
         sensor_0043_ADC_GYML8511_UV_intensity

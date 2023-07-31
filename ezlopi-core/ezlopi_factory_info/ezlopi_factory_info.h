@@ -397,13 +397,15 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"MQ3_ALCOHOL_detector\",\
+                \"dev_name\": \"TCS230 - color sensor\",\
                 \"id_room\": \"\",\
-                \"id_item\": 50,\
-                \"en_gpio1\": \"true\",\
-                \"gpio_digi\": 25,\
-                \"en_gpio2\": \"true\",\
-                \"gpio_adc\": 33\
+                \"id_item\": 40,\
+                \"gpio_s0\": 25,\
+                \"gpio_s1\": 26,\
+                \"gpio_s2\": 12,\
+                \"gpio_s3\": 14,\
+                \"gpio_output_en\": 13,\
+                \"gpio_pulse_output\": 15\
           }\
         ],\
     \"dev_total\": 1}";

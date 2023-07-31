@@ -1,4 +1,4 @@
-idf_component_register(SRCS "sensor_0040_PWM_TCS230.c"
+idf_component_register(SRCS "sensor_0040_other_TCS230.c" "TCS230.c"
                         INCLUDE_DIRS "."
                         REQUIRES trace 
                                 ezlopi_actions 
