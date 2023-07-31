@@ -1,24 +1,23 @@
 {
-    "configurations": [
-      {
-        "name": "ESP-IDF",
-        "cStandard": "c11",
-        "cppStandard": "c++17",
-        "includePath": [
-          "${config:idf.espIdfPath}/components/**",
-          "${config:idf.espIdfPathWin}/components/**",
-          "${workspaceFolder}/**"
+  "configurations": [
+    {
+      "name": "ESP-IDF",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "includePath": [
+        "${config:idf.espIdfPath}/components/**",
+        "${config:idf.espIdfPathWin}/components/**",
+        "${workspaceFolder}/**"
+      ],
+      "browse": {
+        "path": [
+          "${config:idf.espIdfPath}/components",
+          "${config:idf.espIdfPathWin}/components",
+          "${workspaceFolder}"
         ],
-        "browse": {
-          "path": [
-            "${config:idf.espIdfPath}/components",
-            "${config:idf.espIdfPathWin}/components",
-            "${workspaceFolder}"
-          ],
-          "limitSymbolsToIncludedHeaders": false
-        },
-        "compilerPath": "/path/to/toolchain-gcc"
+        "limitSymbolsToIncludedHeaders": false
       }
-    ],
-    "version": 4
-  }
+    }
+  ],
+  "version": 4
+}

@@ -54,6 +54,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0016_DHT22_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0016_DHT22_SENSOR,
+        .func = dht22_sensor_v3,
+    },
+#endif
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.
