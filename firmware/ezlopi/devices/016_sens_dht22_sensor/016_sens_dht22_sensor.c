@@ -28,21 +28,25 @@ int dht22_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg,
     {
     case EZLOPI_ACTION_PREPARE:
     {
+        TRACE_B("here");
         dht22_sensor_prepare_v3(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
+        TRACE_B("here");
         dht22_sensor_init_v3(item);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
+        TRACE_B("here");
         dht22_sensor_get_sensor_value_v3(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
+        TRACE_B("here");
         ezlopi_device_value_updated_from_device_v3(item);
         break;
     }

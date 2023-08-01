@@ -16,6 +16,7 @@
 
 void items_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
+    TRACE_B("here");
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 

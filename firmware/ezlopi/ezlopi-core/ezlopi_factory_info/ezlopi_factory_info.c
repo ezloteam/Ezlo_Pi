@@ -128,10 +128,14 @@ void print_factory_info_v2(void)
     char *ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     char *ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
     char *ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+#if (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    char *ezlopi_config = test_device_constant_config;
+#else
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     char *ezlopi_config = ezlopi_factory_info_v2_get_ezlopi_config();
 #elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
     char *ezlopi_config = ezlopi_nvs_read_config_data_str();
+#endif
 #endif
 
     TRACE_D("----------------- Factory Info -----------------");

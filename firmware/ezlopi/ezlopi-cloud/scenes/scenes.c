@@ -241,25 +241,9 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
                                 }
                                 }
                             }
-                            else
-                            {
-                                TRACE_E("Here");
-                            }
                         }
                     }
-                    else
-                    {
-                        TRACE_E("Here");
-                    }
                 }
-                else
-                {
-                    TRACE_E("Here");
-                }
-            }
-            else
-            {
-                TRACE_E("Here");
             }
         }
     }

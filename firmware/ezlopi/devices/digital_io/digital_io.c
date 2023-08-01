@@ -139,7 +139,6 @@ static int digital_io_prepare_v3(void *arg)
 
 static int digital_io_init_v3(l_ezlopi_item_t *item)
 {
-    TRACE_B("WE ARE HERE");
     int ret = 0;
 #if 1
     if (255 != item->interface.gpio.gpio_out.gpio_num)

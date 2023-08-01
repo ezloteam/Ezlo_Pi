@@ -21,7 +21,7 @@ static void ota_service_process(void *pv)
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
     while (1)
     {
-        int ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 30 * 1000, 1);
+        int ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, portMAX_DELAY, 1);
         TRACE_D("Configuration Selection %d", ret);
         if (-1 != ret)
         {
@@ -36,7 +36,7 @@ static void ota_service_process(void *pv)
             }
         }
         else
-        {            // firmware_send_firmware_query_to_nma_server();
+        { // firmware_send_firmware_query_to_nma_server();
             // send "cloud.firmware.info.get"
             vTaskDelay(1000 / portTICK_RATE_MS);
         }

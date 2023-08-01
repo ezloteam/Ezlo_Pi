@@ -419,13 +419,27 @@ static const char *test_device_constant_config =
 	            \"gpio\": 4,\
 	            \"pull_up\": false,\
 	            \"logic_inv\": true\
-            }\
+            },{\
+                \"dev_type\" : 7,\
+                \"dev_name\" : \"dht22 sensor\",\
+                \"id_room\" : \"\",\
+                \"id_item\" : 16,\
+                \"gpio\" : 17\
+            }\                  
         ],\
     \"dev_total\": 1}";
 
 #endif
 
 #if 0
+{
+  "dev_type": 7,
+  "dev_name": "Humidity Kitchen",
+  "id_room":"",
+  "id_item": 15,
+  "gpio": 17
+}
+
 "{\
     \"dev_type\": 2,\
     \"dev_name\": \"PIR sensor\",\
