@@ -44,9 +44,7 @@
 #include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
 #include "device_0036_PWM_servo_MG996R.h"
 #include "device_0038_digitalOut_RGB.h"
-
-// #include "sensor_0039_I2C_MAX30102.h"
-#include "sensor_0040_PWM_TCS230.h"
+#include "sensor_0040_other_TCS230.h"
 #include "sensor_0041_ADC_FC28_soilMoisture.h"
 #include "sensor_0042_ADC_shunt_voltmeter.h"
 #include "sensor_0043_ADC_GYML8511_UV_intensity.h"
@@ -335,10 +333,10 @@ static s_ezlopi_device_t device_array[] = {
 //     },
 // #endif
 
-#ifdef EZLOPI_SENSOR_0040_PWM_TCS230
+#ifdef EZLOPI_SENSOR_0040_OTHER_TCS230
     {
-        .id = EZLOPI_SENSOR_0040_PWM_TCS230,
-        .func = sensor_0040_PWM_TCS230,
+        .id = EZLOPI_SENSOR_0040_OTHER_TCS230,
+        .func = sensor_0040_other_TCS230,
     },
 #endif
 

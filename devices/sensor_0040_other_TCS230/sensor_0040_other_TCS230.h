@@ -66,6 +66,6 @@ typedef struct
 //------------------------------------------------------------------------
 //              Action
 //------------------------------------------------------------------------
-int sensor_0040_PWM_TCS230(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+int sensor_0040_other_TCS230(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
 #endif // _0040_SENSOR_PWM_TCS230_H_

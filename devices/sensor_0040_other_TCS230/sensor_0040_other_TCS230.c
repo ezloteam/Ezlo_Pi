@@ -3,7 +3,7 @@
 #include "math.h"
 #include "stdbool.h"
 #include "ezlopi_i2c_master.h"
-#include "sensor_0040_PWM_TCS230.h"
+#include "sensor_0040_other_TCS230.h"
 #include "ezlopi_timer.h"
 #include "cJSON.h"
 #include "driver/gpio.h"
@@ -25,14 +25,14 @@ static bool calibration_complete = false;
 //------------------------------------------------------------------------------
 static s_ezlopi_device_properties_t *rgb_properties = NULL;
 //------------------------------------------------------------------------------
-#define ADD_PROPERTIES_DEVICE_LIST(_properties, device_id, category, subcategory, item_name, value_type, cjson_device, sensor_0040_PWM_TCS230_data) \
-    {                                                                                                                                               \
-        _properties = sensor_pwm_tcs230_prepare_properties(device_id, category, subcategory, item_name,                                             \
-                                                           value_type, cjson_device, sensor_0040_PWM_TCS230_data);                                  \
-        if (NULL != _properties)                                                                                                                    \
-        {                                                                                                                                           \
-            add_device_to_list(prep_arg, _properties, NULL);                                                                                        \
-        }                                                                                                                                           \
+#define ADD_PROPERTIES_DEVICE_LIST(_properties, device_id, category, subcategory, item_name, value_type, cjson_device, sensor_0040_other_TCS230_data) \
+    {                                                                                                                                                 \
+        _properties = sensor_pwm_tcs230_prepare_properties(device_id, category, subcategory, item_name,                                               \
+                                                           value_type, cjson_device, sensor_0040_other_TCS230_data);                                  \
+        if (NULL != _properties)                                                                                                                      \
+        {                                                                                                                                             \
+            add_device_to_list(prep_arg, _properties, NULL);                                                                                          \
+        }                                                                                                                                             \
     }
 
 //------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ static void IRAM_ATTR gpio_isr_handler(void *args) // argument => time_us
 static int sensor_pwm_tcs230_prepare(void *arg);
 static s_ezlopi_device_properties_t *sensor_pwm_tcs230_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY,
                                                                           const char *ITEM_NAME, const char *VALUE_TYPE,
-                                                                          cJSON *cjson_device, TCS230_data_t *sensor_0040_PWM_TCS230_data);
+                                                                          cJSON *cjson_device, TCS230_data_t *sensor_0040_other_TCS230_data);
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *properties, void *user_arg);
 
 static void tcs230_setup_gpio(gpio_num_t s0_pin,
@@ -77,13 +77,13 @@ static int sensor_pwm_tcs230_get_value_cjson(s_ezlopi_device_properties_t *prope
 static int MAP_color_value(int x, int fromLow, int fromHigh, int toLow, int toHigh);
 static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_output, int32_t *period, int32_t min_time_limit, int32_t max_time_limit);
 static bool get_tcs230_sensor_value(s_ezlopi_device_properties_t *properties);
-static int sensor_0040_PWM_TCS230_update_values(s_ezlopi_device_properties_t *properties);
+static int sensor_0040_other_TCS230_update_values(s_ezlopi_device_properties_t *properties);
 
 static void Gather_tcs230_Calibration_data(void *params);
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-int sensor_0040_PWM_TCS230(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
+int sensor_0040_other_TCS230(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     switch (action)
     {
@@ -108,7 +108,7 @@ int sensor_0040_PWM_TCS230(e_ezlopi_actions_t action, s_ezlopi_device_properties
         if (calibration_complete)
         {
             // TRACE_B("..................Calibration Complete.................");
-            sensor_0040_PWM_TCS230_update_values(properties);
+            sensor_0040_other_TCS230_update_values(properties);
             if (count > 5)
             {
                 count = 0;
@@ -191,32 +191,32 @@ static void tcs230_setup_gpio(gpio_num_t s0_pin,
 
 static bool TCS230_set_filter_color(s_ezlopi_device_properties_t *properties, TCS230_color_enum_t color_code)
 {
-    TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)properties->user_arg;
+    TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
     bool ret = false;
     switch (color_code)
     {
     case COLOR_SENSOR_COLOR_RED:
         // TRACE_E("Configuring gpio for red.");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s2, 0));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s3, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3, 0));
         ret = true;
         break;
     case COLOR_SENSOR_COLOR_BLUE:
         // TRACE_E("Configuring gpio for blue.");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s2, 0));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s3, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3, 1));
         ret = true;
         break;
     case COLOR_SENSOR_COLOR_GREEN:
         // TRACE_E("Configuring gpio for green.");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s2, 1));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s3, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3, 1));
         ret = true;
         break;
     case COLOR_SENSOR_COLOR_CLEAR:
         // TRACE_E("Configuring gpio for no filter.");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s2, 1));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s3, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3, 0));
         ret = true;
         break;
     default:
@@ -228,32 +228,32 @@ static bool TCS230_set_filter_color(s_ezlopi_device_properties_t *properties, TC
 
 static bool TCS230_set_frequency_scaling(s_ezlopi_device_properties_t *properties, TCS230_freq_scaling_enum_t scale)
 {
-    TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)properties->user_arg;
+    TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
     bool ret = false;
     switch (scale)
     {
     case COLOR_SENSOR_FREQ_SCALING_POWER_DOWN:
         // TRACE_E("Configuring frequency Scaling to [Power Down]");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s0, 0));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s1, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1, 0));
         ret = true;
         break;
     case COLOR_SENSOR_FREQ_SCALING_2_PERCENT:
         // TRACE_E("Configuring frequency Scaling to [2 percent]");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s0, 0));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s1, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1, 1));
         ret = true;
         break;
     case COLOR_SENSOR_FREQ_SCALING_20_PERCENT:
         // TRACE_E("Configuring frequency Scaling to [20 percent]");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s0, 1));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s1, 0));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1, 0));
         ret = true;
         break;
     case COLOR_SENSOR_FREQ_SCALING_100_PERCENT:
         // TRACE_E("Configuring frequency Scaling to [100 percent]");
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s0, 1));
-        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s1, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0, 1));
+        ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1, 1));
         ret = true;
         break;
     default:
@@ -338,7 +338,7 @@ static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32
         // Deleting queue after no use to avoid conflicts
         vQueueDelete(tcs230_queue);
     }
-    vTaskDelay(10/portTICK_PERIOD_MS); // 10ms delay
+    vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms delay
 }
 
 // function to calibrate the data for 30 seconds
@@ -384,7 +384,7 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)params;
 
     // extracting the 'user_args' from "properties"
-    TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)properties->user_arg;
+    TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
 
     //--------------------------------------------------
     // calculate red min-max periods for each colour
@@ -396,10 +396,10 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     }
     // choose  RED filter
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_RED);
-    Calculate_max_min_color_values(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_output_en,
-                                   sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
-                                   &sensor_0040_PWM_TCS230_data->calib_data.least_red_timeP,
-                                   &sensor_0040_PWM_TCS230_data->calib_data.most_red_timeP);
+    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
+                                   sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
+                                   &sensor_0040_other_TCS230_data->calib_data.least_red_timeP,
+                                   &sensor_0040_other_TCS230_data->calib_data.most_red_timeP);
 
     //--------------------------------------------------
     // calculate green min-max periods for each colour
@@ -411,10 +411,10 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     }
     // choose GREEN filter
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_GREEN);
-    Calculate_max_min_color_values(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_output_en,
-                                   sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
-                                   &sensor_0040_PWM_TCS230_data->calib_data.least_green_timeP,
-                                   &sensor_0040_PWM_TCS230_data->calib_data.most_green_timeP);
+    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
+                                   sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
+                                   &sensor_0040_other_TCS230_data->calib_data.least_green_timeP,
+                                   &sensor_0040_other_TCS230_data->calib_data.most_green_timeP);
 
     //--------------------------------------------------
     // calculate blue min-max periods for each colour
@@ -426,17 +426,17 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     }
     // choose BLUE filter
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_BLUE);
-    Calculate_max_min_color_values(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_output_en,
-                                   sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
-                                   &sensor_0040_PWM_TCS230_data->calib_data.least_blue_timeP,
-                                   &sensor_0040_PWM_TCS230_data->calib_data.most_blue_timeP);
+    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
+                                   sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
+                                   &sensor_0040_other_TCS230_data->calib_data.least_blue_timeP,
+                                   &sensor_0040_other_TCS230_data->calib_data.most_blue_timeP);
 
     //--------------------------------------------------
     // show (LOW,HIGH) -> (max,min)
     TRACE_I("..........................................................................");
-    TRACE_E("red(Least,Most) => red(%d,%d)", sensor_0040_PWM_TCS230_data->calib_data.least_red_timeP, sensor_0040_PWM_TCS230_data->calib_data.most_red_timeP);
-    TRACE_E("green(Least,Most) => green(%d,%d)", sensor_0040_PWM_TCS230_data->calib_data.least_green_timeP, sensor_0040_PWM_TCS230_data->calib_data.most_green_timeP);
-    TRACE_E("blue(Least,Most) => blue(%d,%d)", sensor_0040_PWM_TCS230_data->calib_data.least_blue_timeP, sensor_0040_PWM_TCS230_data->calib_data.most_blue_timeP);
+    TRACE_E("red(Least,Most) => red(%d,%d)", sensor_0040_other_TCS230_data->calib_data.least_red_timeP, sensor_0040_other_TCS230_data->calib_data.most_red_timeP);
+    TRACE_E("green(Least,Most) => green(%d,%d)", sensor_0040_other_TCS230_data->calib_data.least_green_timeP, sensor_0040_other_TCS230_data->calib_data.most_green_timeP);
+    TRACE_E("blue(Least,Most) => blue(%d,%d)", sensor_0040_other_TCS230_data->calib_data.least_blue_timeP, sensor_0040_other_TCS230_data->calib_data.most_blue_timeP);
     TRACE_I("..........................................................................");
     //--------------------------------------------------
     // set the calib flag
@@ -447,7 +447,7 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
 
 //------------------------------------------------------------------------------
 
-static s_ezlopi_device_properties_t *sensor_pwm_tcs230_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device, TCS230_data_t *sensor_0040_PWM_TCS230_data)
+static s_ezlopi_device_properties_t *sensor_pwm_tcs230_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device, TCS230_data_t *sensor_0040_other_TCS230_data)
 {
     s_ezlopi_device_properties_t *sensor_PWM_TCS230_properties = NULL;
 
@@ -479,14 +479,14 @@ static s_ezlopi_device_properties_t *sensor_pwm_tcs230_prepare_properties(uint32
             sensor_PWM_TCS230_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
             sensor_PWM_TCS230_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s0", sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s0);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s1", sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s1);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s2", sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s2);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s3", sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s3);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_output_en", sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_output_en);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_pulse_output", sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_s0", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_s1", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_s2", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_s3", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_output_en", sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio_pulse_output", sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output);
 
-            sensor_PWM_TCS230_properties->user_arg = sensor_0040_PWM_TCS230_data; // structure containing calib_factors & data_val
+            sensor_PWM_TCS230_properties->user_arg = sensor_0040_other_TCS230_data; // structure containing calib_factors & data_val
         }
     }
     return sensor_PWM_TCS230_properties;
@@ -496,13 +496,13 @@ static int sensor_pwm_tcs230_prepare(void *arg)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg; // create a ' TCS230_data_t ' type dummy pointer
-    TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)malloc(sizeof(TCS230_data_t));
+    TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)malloc(sizeof(TCS230_data_t));
 
-    if ((NULL != prep_arg) && (NULL != prep_arg->cjson_device) && (NULL != sensor_0040_PWM_TCS230_data))
+    if ((NULL != prep_arg) && (NULL != prep_arg->cjson_device) && (NULL != sensor_0040_other_TCS230_data))
     {
-        memset(sensor_0040_PWM_TCS230_data, 0, sizeof(TCS230_data_t));
+        memset(sensor_0040_other_TCS230_data, 0, sizeof(TCS230_data_t));
         uint32_t device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(rgb_properties, device_id, category_state_sensor, subcategory_light, ezlopi_item_name_rgbcolor, value_type_rgb, prep_arg->cjson_device, sensor_0040_PWM_TCS230_data);
+        ADD_PROPERTIES_DEVICE_LIST(rgb_properties, device_id, category_state_sensor, subcategory_light, ezlopi_item_name_rgbcolor, value_type_rgb, prep_arg->cjson_device, sensor_0040_other_TCS230_data);
     }
     return ret;
 }
@@ -513,15 +513,15 @@ static int sensor_pwm_tcs230_init(s_ezlopi_device_properties_t *properties)
     if (!guard)
     {
         guard = true;
-        TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)properties->user_arg;
-        if (NULL != sensor_0040_PWM_TCS230_data)
+        TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
+        if (NULL != sensor_0040_other_TCS230_data)
         {
-            tcs230_setup_gpio(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s0,
-                              sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s1,
-                              sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s2,
-                              sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_s3,
-                              sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_output_en,
-                              sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output);
+            tcs230_setup_gpio(sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0,
+                              sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1,
+                              sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2,
+                              sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3,
+                              sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
+                              sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output);
             TRACE_W("Entering Calibration Phase for 30 seconds.....");
 
             // configure Freq_scale at 20%
@@ -540,20 +540,20 @@ static int sensor_pwm_tcs230_get_value_cjson(s_ezlopi_device_properties_t *prope
 {
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)args;
-    TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)properties->user_arg;
+    TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
 
-    if (cjson_properties && sensor_0040_PWM_TCS230_data)
+    if (cjson_properties && sensor_0040_other_TCS230_data)
     {
         if (ezlopi_item_name_rgbcolor == properties->ezlopi_cloud.item_name)
         {
-            // TRACE_I("Red : %d", (sensor_0040_PWM_TCS230_data->red_mapped));
-            // TRACE_I("Blue : %d", (sensor_0040_PWM_TCS230_data->blue_mapped));
-            // TRACE_I("Green : %d", (sensor_0040_PWM_TCS230_data->green_mapped));
+            // TRACE_I("Red : %d", (sensor_0040_other_TCS230_data->red_mapped));
+            // TRACE_I("Blue : %d", (sensor_0040_other_TCS230_data->blue_mapped));
+            // TRACE_I("Green : %d", (sensor_0040_other_TCS230_data->green_mapped));
 
             cJSON *Color_Values = cJSON_AddObjectToObject(cjson_properties, "value");
-            cJSON_AddNumberToObject(Color_Values, "red", sensor_0040_PWM_TCS230_data->red_mapped);
-            cJSON_AddNumberToObject(Color_Values, "green", sensor_0040_PWM_TCS230_data->green_mapped);
-            cJSON_AddNumberToObject(Color_Values, "blue", sensor_0040_PWM_TCS230_data->blue_mapped);
+            cJSON_AddNumberToObject(Color_Values, "red", sensor_0040_other_TCS230_data->red_mapped);
+            cJSON_AddNumberToObject(Color_Values, "green", sensor_0040_other_TCS230_data->green_mapped);
+            cJSON_AddNumberToObject(Color_Values, "blue", sensor_0040_other_TCS230_data->blue_mapped);
         }
         ret = 1;
     }
@@ -592,56 +592,56 @@ static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_
 static bool get_tcs230_sensor_value(s_ezlopi_device_properties_t *properties)
 {
     // 'void_type' addrress -> 'TCS230_data_t' address
-    TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)properties->user_arg;
-    ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_output_en, 1));
+    TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
+    ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en, 1));
 
     //--------------------------------------------------
     int32_t Red_period = 0;
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_RED);
-    Extract_TCS230_Pulse_Period_func(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
+    Extract_TCS230_Pulse_Period_func(sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
                                      &Red_period);
-    Get_mapped_color_value(&sensor_0040_PWM_TCS230_data->red_mapped,                  // dest_var
-                           sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output, // use this pin to populate src_var
-                           &Red_period,                                               // src_var
-                           sensor_0040_PWM_TCS230_data->calib_data.most_red_timeP,    // calib paramter
-                           sensor_0040_PWM_TCS230_data->calib_data.least_red_timeP);  // calib paramter
-    TRACE_E("RED => %d....", sensor_0040_PWM_TCS230_data->red_mapped);
+    Get_mapped_color_value(&sensor_0040_other_TCS230_data->red_mapped,                  // dest_var
+                           sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output, // use this pin to populate src_var
+                           &Red_period,                                                 // src_var
+                           sensor_0040_other_TCS230_data->calib_data.most_red_timeP,    // calib paramter
+                           sensor_0040_other_TCS230_data->calib_data.least_red_timeP);  // calib paramter
+    TRACE_E("RED => %d....", sensor_0040_other_TCS230_data->red_mapped);
     //--------------------------------------------------
 
     int32_t Green_period = 0;
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_GREEN);
-    Extract_TCS230_Pulse_Period_func(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
+    Extract_TCS230_Pulse_Period_func(sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
                                      &Green_period);
-    Get_mapped_color_value(&sensor_0040_PWM_TCS230_data->green_mapped,
-                           sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
+    Get_mapped_color_value(&sensor_0040_other_TCS230_data->green_mapped,
+                           sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
                            &Green_period,
-                           sensor_0040_PWM_TCS230_data->calib_data.most_green_timeP,
-                           sensor_0040_PWM_TCS230_data->calib_data.least_green_timeP);
-    TRACE_I("GREEN => %d....", sensor_0040_PWM_TCS230_data->green_mapped);
+                           sensor_0040_other_TCS230_data->calib_data.most_green_timeP,
+                           sensor_0040_other_TCS230_data->calib_data.least_green_timeP);
+    TRACE_I("GREEN => %d....", sensor_0040_other_TCS230_data->green_mapped);
     //--------------------------------------------------
 
     int32_t Blue_period = 0;
     TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_BLUE);
-    Extract_TCS230_Pulse_Period_func(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
+    Extract_TCS230_Pulse_Period_func(sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
                                      &Blue_period);
-    Get_mapped_color_value(&sensor_0040_PWM_TCS230_data->blue_mapped,
-                           sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_pulse_output,
+    Get_mapped_color_value(&sensor_0040_other_TCS230_data->blue_mapped,
+                           sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
                            &Blue_period,
-                           sensor_0040_PWM_TCS230_data->calib_data.most_blue_timeP,
-                           sensor_0040_PWM_TCS230_data->calib_data.least_blue_timeP);
-    TRACE_B("\t\t BLUE => %d....", sensor_0040_PWM_TCS230_data->blue_mapped);
+                           sensor_0040_other_TCS230_data->calib_data.most_blue_timeP,
+                           sensor_0040_other_TCS230_data->calib_data.least_blue_timeP);
+    TRACE_B("\t\t BLUE => %d....", sensor_0040_other_TCS230_data->blue_mapped);
     //--------------------------------------------------
 
-    ESP_ERROR_CHECK(gpio_set_level(sensor_0040_PWM_TCS230_data->TCS230_pin.gpio_output_en, 0));
+    ESP_ERROR_CHECK(gpio_set_level(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en, 0));
     TRACE_B("------------------------------------------------------");
     return true;
 }
 
-static int sensor_0040_PWM_TCS230_update_values(s_ezlopi_device_properties_t *properties)
+static int sensor_0040_other_TCS230_update_values(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
     // 'void_type' addrress -> 'TCS230_data_t' address
-    TCS230_data_t *sensor_0040_PWM_TCS230_data = (TCS230_data_t *)properties->user_arg;
+    TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
 
     if (NULL != properties)
     {
@@ -651,9 +651,9 @@ static int sensor_0040_PWM_TCS230_update_values(s_ezlopi_device_properties_t *pr
             // now using the data_stored within "USER_ARG"
 #if 0
             TRACE_I("---------------------------------------");
-            TRACE_I("Red : %d", sensor_0040_PWM_TCS230_data->red_mapped);
-            TRACE_I("Green :%d", sensor_0040_PWM_TCS230_data->green_mapped);
-            TRACE_I("Blue : %d", sensor_0040_PWM_TCS230_data->blue_mapped);
+            TRACE_I("Red : %d", sensor_0040_other_TCS230_data->red_mapped);
+            TRACE_I("Green :%d", sensor_0040_other_TCS230_data->green_mapped);
+            TRACE_I("Blue : %d", sensor_0040_other_TCS230_data->blue_mapped);
             TRACE_I("---------------------------------------");
 #endif
         }
