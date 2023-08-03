@@ -251,6 +251,51 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 
 void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
 {
+    if (cj_request && cj_response)
+    {
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+        cJSON_AddObjectToObject(cj_response, "result");
+
+        cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+        if (cj_params)
+        {
+            cJSON *temp = cj_params->child;
+
+            char *tempstr = cJSON_Print(temp);
+            printf("tempstr = %s\n", tempstr);
+
+            while (temp != NULL)
+            {
+                char *value = "";
+                switch (temp->type)
+                {
+                case cJSON_String:
+                {
+                    value = temp->valuestring;
+                    break;
+                }
+                case cJSON_True:
+                {
+                    value = "true";
+                    break;
+                }
+                case cJSON_False:
+                {
+                    value = "false";
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+                }
+
+                TRACE_B("%s: %s", temp->string, value);
+                temp = temp->next;
+            }
+        }
+    }
 }
 
 void scenes_run(cJSON *cj_request, cJSON *cj_response)

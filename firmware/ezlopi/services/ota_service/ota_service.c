@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "ezlopi_wifi.h"
 #include "ezlopi_event_group.h"
 
 #include "trace.h"
@@ -18,6 +19,7 @@ void ota_service_init(void)
 }
 static void ota_service_process(void *pv)
 {
+    ezlopi_wait_for_wifi_to_connect(portTICK_RATE_MS);
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
     while (1)
     {
