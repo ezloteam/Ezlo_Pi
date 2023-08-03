@@ -135,7 +135,7 @@ void print_factory_info_v2(void)
 #endif
 
     TRACE_D("----------------- Factory Info -----------------");
-    TRACE_W("VERSION[off: 0x%04X, size: 0x%04X]:                %d", VERSION_OFFSET, VERSION_LENGTH, version);
+    // TRACE_W("VERSION[off: 0x%04X, size: 0x%04X]:                %d", VERSION_OFFSET, VERSION_LENGTH, version);
     TRACE_W("SERIAL-ID [off: 0x%04X, size: 0x%04X]:             %llu", ID_OFFSET, ID_LENGTH, id);
     TRACE_W("MAC [off: 0x%04X, size: 0x%04X]:                   %02X:%02X:%02X:%02X:%02X:%02X", DEVICE_MAC_OFFSET, DEVICE_MAC_LENGTH, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     TRACE_W("NAME [off: 0x%04X, size: 0x%04X]:                  %s", NAME_OFFSET, NAME_LENGTH, name ? name : "null");
@@ -220,6 +220,26 @@ char *ezlopi_factory_info_v2_get_model(void)
     return ezlopi_factory_info_v2_read_string(MODEL_OFFSET, MODEL_LENGTH);
 }
 
+char *ezlopi_factory_info_get_v2_provision_token(void)
+{
+    return ezlopi_factory_info_v2_read_string(PROVISIONING_TOKEN_OFFSET, PROVISIONING_TOKEN_LENGTH);
+}
+
+uint16_t ezlopi_factory_info_v2_get_config_version(void)
+{
+    uint16_t config_version = 0;
+
+    if (ezlopi_factory_info_v2_init())
+    {
+        uint8_t tmp_config_version_arr[2];
+        memset(tmp_config_version_arr, 0, 2);
+        esp_partition_read(partition_ctx_v2, CONFIG_VERSION_OFFSET, tmp_config_version_arr, CONFIG_VERSION_LENGTH);
+        config_version = (tmp_config_version_arr[0] << 8) | tmp_config_version_arr[1];
+    }
+
+    return config_version;
+}
+
 unsigned long long ezlopi_factory_info_v2_get_id(void)
 {
     unsigned long long _id = 0ULL;
@@ -289,6 +309,19 @@ char *ezlopi_factory_info_v2_get_cloud_server(void)
         g_provisioning_status = 1;
     }
     return cloud_server;
+}
+
+char *ezlopi_factory_info_v2_get_provisioning_server(void)
+{
+    char *provisioning_server = ezlopi_factory_info_v2_read_string(PROVISIONING_SERVER_OFFSET, PROVISIONING_SERVER_LENGTH);
+    if (provisioning_server && strstr(provisioning_server, "https://"))
+    {
+        return provisioning_server;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 char *ezlopi_factory_info_v2_get_device_type(void)

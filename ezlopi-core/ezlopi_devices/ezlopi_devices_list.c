@@ -1,11 +1,14 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
+
+#if 0
 #include "device_0001_digitalOut_generic.h"
 #include "device_0002_digitalOut_relay.h"
 #include "device_0003_digitalOut_plug.h"
 // TODO add include for 004
 // TODO add include for 004
+
 #include "sensor_0005_I2C_MPU6050.h"
 #include "sensor_0006_I2C_ADXL345.h"
 #include "sensor_0007_I2C_GY271.h"
@@ -56,9 +59,9 @@
 #include "sensor_0050_other_MQ3_Alcohol_detector.h"
 #include "sensor_0051_other_MQ8_H2_gas_detector.h"
 #include "sensor_0052_other_MQ135_NH3_gas_detector.h"
-
+#endif
 static s_ezlopi_device_t device_array[] = {
-
+#if 0
 #if ((EZLOPI_DEVICE_TYPE == EZLOPI_DEVICE_TYPE_GENERIC) || (EZLOPI_DEVICE_TYPE == EZLOPI_DEVICE_TYPE_TEST_DEVICE))
 
 #ifdef EZLOPI_DEVICE_0001_DIGITAL_OUT_LED
@@ -67,7 +70,6 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_0001_digitalOut_generic,
     },
 #endif
-
 #ifdef EZLOPI_DEVICE_0002_DIGITAL_OUT_RELAY
     {
         .id = EZLOPI_DEVICE_0002_DIGITAL_OUT_RELAY,
@@ -81,7 +83,6 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_0003_digitalOut_plug,
     },
 #endif
-
 #ifdef EZLOPI_SENSOR_0004_DIGITAL_IN_SWITCH
     {
         .id = EZLOPI_SENSOR_0004_DIGITAL_IN_SWITCH,
@@ -457,7 +458,7 @@ static s_ezlopi_device_t device_array[] = {
 //     },
 // #endif
 #endif
-
+#endif
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

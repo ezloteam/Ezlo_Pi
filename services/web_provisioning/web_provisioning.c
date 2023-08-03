@@ -35,6 +35,7 @@ static void __message_upcall(const char *payload, uint32_t len);
 static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void web_provisioning_fetch_wss_endpoint(void *pv);
+static void web_provisioning_config_check(void *pv);
 
 #if 0
 typedef struct s_method_list
@@ -102,11 +103,11 @@ static const s_method_list_v2_t method_list_v2[] = {
     // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
     {.method_name = "hub.setting.value.set", .method = ezlopi_settings_value_set, .updater = ezlopi_settings_value_set_response},
     {.method_name = "hub.device.setting.value.set", .method = ezlopi_device_settings_value_set, .updater = NULL},
-    {.method_name = "hub.device.setting.reset", .method = ezlopi_device_settings_reset, .updater = NULL},    
+    {.method_name = "hub.device.setting.reset", .method = ezlopi_device_settings_reset, .updater = NULL},
     {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
 
     {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+    {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL},      // documentation missing
 };
 
 uint32_t web_provisioning_get_message_count(void)
@@ -114,7 +115,7 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
-int     web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
+int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
     if (ezlopi_websocket_client_is_connected())
@@ -162,17 +163,54 @@ int     web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t
 
 void web_provisioning_init(void)
 {
-    xTaskCreate(web_provisioning_fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, NULL);
+    xTaskCreate(web_provisioning_config_check, "web-provisioning config check", 3 * 2048, NULL, 5, NULL);
+    // xTaskCreate(web_provisioning_fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, NULL);
 }
 
 static char *cloud_server = NULL;
 static char *ca_certificate = NULL;
 static char *ssl_shared_key = NULL;
 static char *ssl_private_key = NULL;
+static char *provision_token = NULL;
+static char *provisioning_server = NULL;
+static void web_provisioning_config_check(void *pv)
+{
+    UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
+    TRACE_D("water_mark: %d", water_mark);
+
+    ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+    provision_token = ezlopi_factory_info_get_v2_provision_token();
+    provisioning_server = ezlopi_factory_info_v2_get_provisioning_server();
+    uint16_t config_version = ezlopi_factory_info_v2_get_config_version();
+    if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
+    {
+        TRACE_E("Config Version : %d", config_version);
+        char http_request[256];
+        snprintf(http_request, sizeof(http_request), "%sapi/v1/controller/sync?version=%d", provisioning_server, 1);
+        TRACE_E("%s", http_request);
+        char *data_read = (char *)malloc(1500);
+        data_read = ezlopi_http_post_request("https://req-disp-at0m.mios.com", NULL, NULL, ca_certificate, provision_token);
+        TRACE_E("Data : %s", data_read);
+    }
+    else
+    {
+    }
+    while (1)
+    {
+        /* code */
+    }
+
+    // TRACE_I("Provisioning token: %s", provision_token);
+
+    // char http_request[128];
+    // snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
+    // ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+}
+
+#if 0
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
     char *ws_endpoint = NULL;
-
     while (1)
     {
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
@@ -229,10 +267,9 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         vTaskDelay(30 * 1000 / portTICK_RATE_MS);
     }
 #endif
-
     vTaskDelete(NULL);
 }
-
+#endif
 static void __connection_upcall(bool connected)
 {
     static bool prev_status;

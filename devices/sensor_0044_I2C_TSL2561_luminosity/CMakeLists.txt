@@ -1,6 +1,7 @@
 idf_component_register(SRCS "sensor_0044_I2C_TSL2561_luminosity.c"
                         INCLUDE_DIRS "."
                         REQUIRES trace
+                                updated
                                 ezlopi_cloud_constants
                                 ezlopi_devices
                                 ezlopi_actions

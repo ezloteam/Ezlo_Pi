@@ -1,6 +1,7 @@
 idf_component_register( SRCS "sensor_0047_other_HX711_loadcell.c"
                         INCLUDE_DIRS "."
                         REQUIRES    trace
+                                    updated
                                     ezlopi_actions
                                     ezlopi_cloud_constants
                                     ezlopi_devices

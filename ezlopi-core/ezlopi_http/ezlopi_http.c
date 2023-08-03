@@ -81,6 +81,81 @@ char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_k
     return ret;
 }
 
+char *ezlopi_http_post_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate, void *args)
+{
+    char *ret = NULL;
+    s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
+    const char *provision_token = (char *)args;
+
+    if (NULL == provision_token)
+        return;
+
+    if (my_data)
+    {
+        memset(my_data, 0, sizeof(s_rx_data_t));
+
+        esp_http_client_config_t config = {
+            .url = cloud_url,
+            .path = "/api/v1/controller/sync?version=1",
+            .cert_pem = ca_certificate,
+            .event_handler = ezlopi_http_event_handler,
+            .method = HTTP_METHOD_POST,
+            .transport_type = HTTP_TRANSPORT_OVER_SSL,
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+        };
+
+        esp_http_client_handle_t client = esp_http_client_init(&config);
+        if (NULL != client)
+        {
+            esp_err_t err = ESP_OK;
+            err = esp_http_client_set_header(client, "controller-key", provision_token);
+            if (err != ESP_OK)
+            {
+                TRACE_E("ERROR: %s", esp_err_to_name(err));
+            }
+            err = esp_http_client_perform(client);
+            if (err != ESP_OK)
+            {
+                TRACE_E("ERROR: %s", esp_err_to_name(err));
+            }
+            if (err == ESP_OK)
+            {
+                while (!esp_http_client_is_complete_data_received(client))
+                {
+                    vTaskDelay(50 / portTICK_RATE_MS);
+                }
+
+                if (my_data->total_len)
+                {
+                    ret = (char *)malloc(my_data->total_len + 1);
+
+                    if (ret)
+                    {
+                        s_rx_data_t *cur_d = my_data;
+                        memset(ret, 0, my_data->total_len + 1);
+
+                        while (cur_d)
+                        {
+                            strcat(ret, cur_d->ptr);
+                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
+                            cur_d = cur_d->next;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TRACE_E("Error perform http request %s", esp_err_to_name(err));
+            }
+
+            ezlopi_http_free_rx_data(my_data);
+            esp_http_client_cleanup(client);
+        }
+    }
+
+    return ret;
+}
+
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt)
 {
     switch (evt->event_id)

@@ -11,7 +11,6 @@
 #include "version.h"
 #include "ezlopi_wifi.h"
 
-#include "mac_uuid.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_profile.h"

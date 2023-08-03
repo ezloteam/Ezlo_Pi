@@ -28,7 +28,6 @@
 #include "version.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_system_info.h"
-#include "mac_uuid.h"
 
 static const int RX_BUF_SIZE = 3096;
 
@@ -188,7 +187,7 @@ static void qt_serial_get_info()
         cJSON_AddNumberToObject(get_info, "cmd", 1);
         cJSON_AddNumberToObject(get_info, "status", 1);
         // cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
-        cJSON_AddStringToObject(get_info, "v_fmw", VERSION_STR);        
+        cJSON_AddStringToObject(get_info, "v_fmw", VERSION_STR);
         cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
         cJSON_AddNumberToObject(get_info, "build", BUILD);
         cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
@@ -203,10 +202,6 @@ static void qt_serial_get_info()
         snprintf(mac_string, sizeof(mac_string), "%02x:%02x:%02x:%02x:%02x:%02x",
                  mac_string[0], mac_string[1], mac_string[2], mac_string[3], mac_string[4], mac_string[5]);
         cJSON_AddStringToObject(get_info, "mac", mac_string);
-       
-        char ezpi_uuid[50];
-        ezlopi_generate_UUID(ezpi_uuid);
-        cJSON_AddStringToObject(get_info, "uuid_dev", ezpi_uuid);
 
         cJSON_AddStringToObject(get_info, "uuid", controller_uuid);
         cJSON_AddStringToObject(get_info, "uuid_prov", provisioning_uuid);
@@ -224,29 +219,32 @@ static void qt_serial_get_info()
         cJSON_AddStringToObject(get_info, "manf_name", device_manufacturer);
         cJSON_AddStringToObject(get_info, "model_num", device_model);
 
-        ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();        
+        ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();
 
-        if(wifi_status->wifi_connection == true) {     
-            char *ip_addr = (char * )malloc(sizeof(char) * 20);   
+        if (wifi_status->wifi_connection == true)
+        {
+            char *ip_addr = (char *)malloc(sizeof(char) * 20);
 
-            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->ip, ip_addr, 20);                     
-            
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->ip, ip_addr, 20);
+
             cJSON_AddBoolToObject(get_info, "sta_connection", true);
-            
+
             cJSON_AddStringToObject(get_info, "ip_sta", ip_addr);
 
-            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->netmask, ip_addr, 20);    
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->netmask, ip_addr, 20);
             cJSON_AddStringToObject(get_info, "ip_nmask", ip_addr);
 
-            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->gw, ip_addr, 20);    
-            cJSON_AddStringToObject(get_info, "ip_gw", ip_addr);            
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->gw, ip_addr, 20);
+            cJSON_AddStringToObject(get_info, "ip_gw", ip_addr);
 
-            free(ip_addr); 
-        } else {
+            free(ip_addr);
+        }
+        else
+        {
             cJSON_AddBoolToObject(get_info, "sta_connection", false);
             cJSON_AddStringToObject(get_info, "ip_sta", "");
         }
-        
+
         free(wifi_status);
 
         char *my_json_string = cJSON_Print(get_info);
