@@ -28,25 +28,21 @@ int dht22_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg,
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        TRACE_B("here");
         dht22_sensor_prepare_v3(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        TRACE_B("here");
         dht22_sensor_init_v3(item);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        TRACE_B("here");
         dht22_sensor_get_sensor_value_v3(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        TRACE_B("here");
         ezlopi_device_value_updated_from_device_v3(item);
         break;
     }
@@ -102,23 +98,20 @@ static int dht22_sensor_prepare_v3(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device_temperature = ezlopi_device_add_device();
-            if (device_temperature)
+            l_ezlopi_device_t *parent_device = ezlopi_device_add_device();
+            if (parent_device)
             {
-                dht22_sensor_setup_device_cloud_properties_temperature(device_temperature, cjson_device);
+                dht22_sensor_setup_device_cloud_properties_temperature(parent_device, cjson_device);
 
-                l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device_temperature, NULL);
+                l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(parent_device, NULL);
                 if (item_temperature)
                 {
+                    item_temperature->func = dht22_sensor_v3;
                     dht11_sensor_setup_item_properties_temperature(item_temperature, cjson_device);
                 }
-            }
 
-            l_ezlopi_device_t *device_humidity = ezlopi_device_add_device();
-            if (device_humidity)
-            {
-                dht22_sensor_setup_device_cloud_properties_humidity(device_humidity, cjson_device);
-                l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(device_humidity, NULL);
+                // dht22_sensor_setup_device_cloud_properties_humidity(parent_device, cjson_device);
+                l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(parent_device, NULL);
                 if (item_humidity)
                 {
                     item_humidity->func = dht22_sensor_v3;
@@ -148,23 +141,6 @@ static int dht22_sensor_setup_device_cloud_properties_temperature(l_ezlopi_devic
     return ret;
 }
 
-static int dht22_sensor_setup_device_cloud_properties_humidity(l_ezlopi_device_t *device, cJSON *cj_device)
-{
-    int ret = 0;
-    if (device && cj_device)
-    {
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-
-        ASSIGN_DEVICE_NAME_V2(device, device_name);
-        device->cloud_properties.category = category_humidity;
-        device->cloud_properties.subcategory = subcategory_not_defined;
-        device->cloud_properties.device_type = dev_type_sensor;
-        device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-    }
-    return ret;
-}
-
 static int dht11_sensor_setup_item_properties_temperature(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     int ret = 0;
@@ -174,8 +150,8 @@ static int dht11_sensor_setup_item_properties_temperature(l_ezlopi_item_t *item,
         item->cloud_properties.show = true;
         item->cloud_properties.has_getter = true;
         item->cloud_properties.has_setter = false;
-        item->cloud_properties.item_name = ezlopi_item_name_humidity;
-        item->cloud_properties.value_type = value_type_humidity;
+        item->cloud_properties.item_name = ezlopi_item_name_temp;
+        item->cloud_properties.value_type = value_type_temperature;
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);

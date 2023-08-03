@@ -95,6 +95,7 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
     {
         cJSON_AddStringToObject(cj_request, "method", "cloud.firmware.info.get");
         cJSON_AddNumberToObject(cj_request, "id", message_count);
+        cJSON_AddObjectToObject(cj_request, "sender");
         cJSON *cj_params = cJSON_AddObjectToObject(cj_request, "params");
         if (cj_params)
         {
