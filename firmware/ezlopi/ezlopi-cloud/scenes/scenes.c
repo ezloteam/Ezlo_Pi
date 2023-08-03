@@ -7,6 +7,7 @@
 #include "cJSON.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_scenes.h"
+#include "ezlopi_devices.h"
 #include "ezlopi_cloud_constants.h"
 
 void scenes_list(cJSON *cj_request, cJSON *cj_response)
@@ -249,50 +250,138 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+typedef struct s_block_data_list_collector
+{
+    char *key_string;
+    void (*func)(char *list_name, cJSON *result);
+} s_block_data_list_collector_t;
+
+static void __value_types_list(char *list_name, cJSON *cj_result);
+static void __scalable_value_types_list(char *list_name, cJSON *cj_result);
+static void __value_scales_list(char *list_name, cJSON *cj_result);
+static void __scenes_value_types_list(char *list_name, cJSON *cj_result);
+static void __value_types_families_list(char *list_name, cJSON *cj_result);
+static void __comparison_operators_list(char *list_name, cJSON *cj_result);
+static void __comparison_methods_list(char *list_name, cJSON *cj_result);
+static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result);
+
+static s_block_data_list_collector_t block_data_list_collector[] = {
+    {.key_string = "valueTypes", .func = __value_types_list},
+    {.key_string = "scalableValueTypes", .func = __scalable_value_types_list},
+    {.key_string = "valueScales", .func = __value_scales_list},
+    {.key_string = "scenesValueTypes", .func = __scenes_value_types_list},
+    {.key_string = "valueTypeFamilies", .func = __value_types_families_list},
+    {.key_string = "comparisonOperators", .func = __comparison_operators_list},
+    {.key_string = "comparisonMethods", .func = __comparison_methods_list},
+    {.key_string = "advancedScenesVersion", .func = __advanced_scenes_version_list},
+    {.key_string = NULL, .func = NULL},
+};
+
+static void __value_types_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result && list_name)
+    {
+        cJSON *cj_value_types = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_value_types)
+        {
+            cJSON *cj_value_array = cJSON_AddArrayToObject(cj_value_types, "list");
+            if (cj_value_array)
+            {
+                l_ezlopi_device_t *devices = ezlopi_device_get_head();
+                while (devices)
+                {
+                    l_ezlopi_item_t *items = devices->items;
+                    while (items)
+                    {
+                        cJSON *cj_item_value_type = cJSON_CreateString(items->cloud_properties.value_type);
+                        if (cj_item_value_type)
+                        {
+                            if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
+                            {
+                                cJSON_Delete(cj_item_value_type);
+                            }
+                        }
+                        items = items->next;
+                    }
+                    devices = devices->next;
+                }
+            }
+        }
+    }
+}
+
+static void __scalable_value_types_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result)
+    {
+    }
+}
+static void __value_scales_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result)
+    {
+    }
+}
+static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result)
+    {
+    }
+}
+static void __value_types_families_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result)
+    {
+    }
+}
+static void __comparison_operators_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result)
+    {
+    }
+}
+static void __comparison_methods_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result)
+    {
+    }
+}
+static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)
+{
+    if (cj_result)
+    {
+    }
+}
+
 void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
 {
     if (cj_request && cj_response)
     {
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-        cJSON_AddObjectToObject(cj_response, "result");
 
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
         if (cj_params)
         {
-            cJSON *temp = cj_params->child;
-
-            char *tempstr = cJSON_Print(temp);
-            printf("tempstr = %s\n", tempstr);
-
-            while (temp != NULL)
+            cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+            if (cj_result)
             {
-                char *value = "";
-                switch (temp->type)
-                {
-                case cJSON_String:
-                {
-                    value = temp->valuestring;
-                    break;
-                }
-                case cJSON_True:
-                {
-                    value = "true";
-                    break;
-                }
-                case cJSON_False:
-                {
-                    value = "false";
-                    break;
-                }
-                default:
-                {
-                    break;
-                }
-                }
+                cJSON *temp = cj_params->child;
 
-                TRACE_B("%s: %s", temp->string, value);
-                temp = temp->next;
+                while (temp != NULL)
+                {
+                    uint32_t idx = 0;
+                    while (block_data_list_collector[idx].func)
+                    {
+                        if (0 == strcmp(block_data_list_collector[idx].key_string, temp->string))
+                        {
+                            block_data_list_collector[idx].func(block_data_list_collector[idx].key_string, cj_result);
+                        }
+                        idx++;
+                    }
+
+                    temp = temp->next;
+                }
             }
         }
     }

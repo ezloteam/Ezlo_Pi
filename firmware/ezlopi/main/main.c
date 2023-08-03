@@ -76,7 +76,7 @@ static void blinky(void *pv)
 
         vTaskDelay(1000 / portTICK_RATE_MS);
 
-        if (count++ > 2)
+        if (count++ > 5)
         {
             TRACE_D("-----------------------------------------");
             ezlopi_generate_UUID(uuid);
