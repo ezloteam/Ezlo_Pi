@@ -52,6 +52,7 @@
 #include "sensor_0050_other_MQ3_Alcohol_detector.h"
 #include "sensor_0051_other_MQ8_H2_gas_detector.h"
 #include "sensor_0052_other_MQ135_NH3_gas_detector.h"
+#include "sensor_0053_UART_GYGPS6MV2.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -413,6 +414,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0052_OTHER_MQ135_AMONIA_GAS_DETECTOR,
         .func = sensor_0052_MQ135_NH3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0053_UART_GYGPS6MV2
+    {
+        .id = EZLOPI_SENSOR_0053_UART_GYGPS6MV2,
+        .func = sensor_0053_UART_GPS6MV2,
     },
 #endif
 

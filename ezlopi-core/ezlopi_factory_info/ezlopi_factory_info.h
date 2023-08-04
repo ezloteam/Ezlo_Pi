@@ -396,16 +396,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"TCS230 - color sensor\",\
+                \"dev_type\": 6,\
+                \"dev_name\": \"GY-GPS6MV2\",\
                 \"id_room\": \"\",\
-                \"id_item\": 40,\
-                \"gpio_s0\": 25,\
-                \"gpio_s1\": 26,\
-                \"gpio_s2\": 12,\
-                \"gpio_s3\": 14,\
-                \"gpio_output_en\": 13,\
-                \"gpio_pulse_output\": 15\
+                \"id_item\": 53,\
+                \"gpio_tx\": 17,\
+                \"gpio_rx\": 16,\
+                \"baud\": 9600\
           }\
         ],\
     \"dev_total\": 1}";
