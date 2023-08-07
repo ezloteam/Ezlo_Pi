@@ -5,6 +5,7 @@
 #include "string.h"
 #include "esp_err.h"
 #include "esp_log.h"
+#include "cJSON.h"
 // #include "esp_tls.h"
 #include "esp_event.h"
 #include "esp_http_client.h"
@@ -24,8 +25,7 @@ extern "C"
     } s_rx_data_t;
 
     char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate);
-    char *ezlopi_http_post_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificatem, void *args);
-    // char *http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate);
+    char *ezlopi_http_post_request(char *cloud_url, char *location, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate);
 
 #ifdef __cplusplus
 }

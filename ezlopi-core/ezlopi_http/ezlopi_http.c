@@ -81,25 +81,32 @@ char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_k
     return ret;
 }
 
-char *ezlopi_http_post_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate, void *args)
+char *ezlopi_http_post_request(char *cloud_url, char *location, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate)
 {
     char *ret = NULL;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
-    const char *provision_token = (char *)args;
-
-    if (NULL == provision_token)
-        return;
 
     if (my_data)
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
 
+        char *uri = malloc(256);
+        if (uri)
+        {
+            snprintf(uri, 256, "%s/%s", cloud_url, location);
+            TRACE_D("URL: %s", uri);
+        }
+        else
+        {
+            uri = cloud_url;
+        }
+
         esp_http_client_config_t config = {
-            .url = cloud_url,
-            .path = "/api/v1/controller/sync?version=1",
+            .url = uri,
             .cert_pem = ca_certificate,
+            .client_cert_pem = shared_key,
+            .client_key_pem = private_key,
             .event_handler = ezlopi_http_event_handler,
-            .method = HTTP_METHOD_POST,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
@@ -107,17 +114,19 @@ char *ezlopi_http_post_request(char *cloud_url, char *private_key, char *shared_
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)
         {
-            esp_err_t err = ESP_OK;
-            err = esp_http_client_set_header(client, "controller-key", provision_token);
-            if (err != ESP_OK)
+            esp_http_client_set_method(client, HTTP_METHOD_POST);
+            // esp_http_client_set_header(client, "controller-key", header->valuestring);
+#if 1
+            cJSON *header = headers->child;
+            while (header)
             {
-                TRACE_E("ERROR: %s", esp_err_to_name(err));
+                TRACE_B("%s: %s", header->string, header->valuestring);
+                esp_http_client_set_header(client, header->string, header->valuestring);
+                header = header->next;
             }
-            err = esp_http_client_perform(client);
-            if (err != ESP_OK)
-            {
-                TRACE_E("ERROR: %s", esp_err_to_name(err));
-            }
+#endif
+            esp_err_t err = esp_http_client_perform(client);
+
             if (err == ESP_OK)
             {
                 while (!esp_http_client_is_complete_data_received(client))

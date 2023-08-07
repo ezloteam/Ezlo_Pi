@@ -182,15 +182,37 @@ static void web_provisioning_config_check(void *pv)
     provision_token = ezlopi_factory_info_get_v2_provision_token();
     provisioning_server = ezlopi_factory_info_v2_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v2_get_config_version();
+    cJSON *root_header_prov_token = cJSON_CreateObject();
+    cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
+
+    int prov_url_len = strlen(provisioning_server);
+
+    if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
+    {
+        provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
+    }
+    else if (prov_url_len >= 4 && strcmp(&provisioning_server[prov_url_len - 4], ".com") == 0)
+    {
+        // Nothing to do, no trailing "/"
+    }
+    else
+    {
+        // Do nothing
+    }
+
     if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
     {
         TRACE_E("Config Version : %d", config_version);
-        char http_request[256];
-        snprintf(http_request, sizeof(http_request), "%sapi/v1/controller/sync?version=%d", provisioning_server, 1);
-        TRACE_E("%s", http_request);
-        char *data_read = (char *)malloc(1500);
-        data_read = ezlopi_http_post_request("https://req-disp-at0m.mios.com", NULL, NULL, ca_certificate, provision_token);
-        TRACE_E("Data : %s", data_read);
+        char http_request_location[200];
+        snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", 1); // add config_version instead of 1
+        char *data_read = (char *)malloc(4000);
+        if (NULL != data_read)
+        {
+            data_read = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
+            TRACE_E("Data : %s", data_read);
+        }
+
+        free(data_read);
     }
     else
     {
