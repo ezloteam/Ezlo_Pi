@@ -167,78 +167,87 @@ void web_provisioning_init(void)
     // xTaskCreate(web_provisioning_fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, NULL);
 }
 
-static char *cloud_server = NULL;
-static char *ca_certificate = NULL;
-static char *ssl_shared_key = NULL;
-static char *ssl_private_key = NULL;
-static char *provision_token = NULL;
-static char *provisioning_server = NULL;
 static void web_provisioning_config_check(void *pv)
 {
-    UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
-    TRACE_D("water_mark: %d", water_mark);
+    char *ws_endpoint = NULL;
+    s_ezlopi_http_data_t *response = malloc(sizeof(s_ezlopi_http_data_t));
+    char *ca_certificate = NULL;
+    char *provision_token = NULL;
+    char *provisioning_server = NULL;
 
     ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     provision_token = ezlopi_factory_info_get_v2_provision_token();
     provisioning_server = ezlopi_factory_info_v2_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v2_get_config_version();
-    cJSON *root_header_prov_token = cJSON_CreateObject();
-    cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
 
-    int prov_url_len = strlen(provisioning_server);
-
-    if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
-    {
-        provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
-    }
-    else if (prov_url_len >= 4 && strcmp(&provisioning_server[prov_url_len - 4], ".com") == 0)
-    {
-        // Nothing to do, no trailing "/"
-    }
-    else
-    {
-        // Do nothing
-    }
-
-    if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
-    {
-        TRACE_E("Config Version : %d", config_version);
-        char http_request_location[200];
-        snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", 1); // add config_version instead of 1
-        char *data_read = (char *)malloc(4000);
-        if (NULL != data_read)
-        {
-            data_read = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
-            TRACE_E("Data : %s", data_read);
-        }
-
-        free(data_read);
-    }
-    else
-    {
-    }
     while (1)
     {
-        /* code */
+        UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
+        TRACE_D("water_mark: %d", water_mark);
+        cJSON *root_header_prov_token = cJSON_CreateObject();
+
+        cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
+
+        int prov_url_len = strlen(provisioning_server);
+
+        if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
+        {
+            provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
+        }
+        else if (prov_url_len >= 4 && strcmp(&provisioning_server[prov_url_len - 4], ".com") == 0)
+        {
+            // Nothing to do, no trailing "/"
+        }
+        else
+        {
+            // Do nothing
+        }
+
+        if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
+        {
+            // TRACE_E("Config Version : %d", config_version);
+
+            char http_request_location[200];
+
+            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", 1); // add config_version instead of 1
+            char *data_read = (char *)malloc(4000);
+            if (NULL != data_read)
+            {
+                uint16_t http_status;
+                data_read = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
+                TRACE_E("Data : %s", data_read);
+            }
+
+            free(data_read);
+        }
+        else
+        {
+        }
     }
 
-    // TRACE_I("Provisioning token: %s", provision_token);
-
-    // char http_request[128];
-    // snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
-    // ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+    // free(cloud_server);
+    // free(ca_certificate);
+    // free(ssl_shared_key);
+    // free(ssl_private_key);
+    // free(cloud_server);
+    // vTaskDelete(NULL);
 }
 
-#if 0
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
     char *ws_endpoint = NULL;
+    s_ezlopi_http_data_t *response = malloc(sizeof(s_ezlopi_http_data_t));
+
     while (1)
     {
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
         TRACE_D("water_mark: %d", water_mark);
 
         // ezlopi_wait_for_wifi_to_connect();
+        char *cloud_server = NULL;
+        char *ca_certificate = NULL;
+        char *ssl_shared_key = NULL;
+        char *ssl_private_key = NULL;
 
         cloud_server = ezlopi_factory_info_v2_get_cloud_server();
         ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
@@ -247,51 +256,48 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
-        ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
 
-        if (ws_endpoint)
+        if (NULL != response)
         {
-            TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
-            TRACE_D("http_request: %s", http_request);
-            cJSON *root = cJSON_Parse(ws_endpoint);
-            if (root)
-            {
-                cJSON *cjson_uri = cJSON_GetObjectItem(root, "uri");
-                if (cjson_uri)
-                {
-                    TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                    ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-                    break;
-                }
-            }
 
-            free(ws_endpoint);
+            response = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
+            ws_endpoint = response->response;
+            if (ws_endpoint)
+            {
+                TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
+                TRACE_D("http_request: %s", http_request);
+                cJSON *root = cJSON_Parse(ws_endpoint);
+                if (root)
+                {
+                    cJSON *cjson_uri = cJSON_GetObjectItem(root, "uri");
+                    if (cjson_uri)
+                    {
+                        TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                        ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+                        free(cloud_server);
+                        free(ca_certificate);
+                        free(ssl_shared_key);
+                        free(ssl_private_key);
+                        free(cloud_server);
+                        break;
+                    }
+                }
+                free(ws_endpoint);
+            }
+            free(response);
+        }
+        else
+        {
+            TRACE_E("Error : Memory allocation failed ");
+            break;
         }
 
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
-#if 0
-    while (1)
-    {
-        if (-1 != ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 30 * 1000, 1))
-        {
-            TRACE_D("Sending firmware check request...");
-            cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
-            if (NULL != firmware_info_request)
-            {
-                web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
-                cJSON_Delete(firmware_info_request);
-                firmware_info_request = NULL;
-            }
-        }
-
-        vTaskDelay(30 * 1000 / portTICK_RATE_MS);
-    }
-#endif
     vTaskDelete(NULL);
 }
-#endif
+
 static void __connection_upcall(bool connected)
 {
     static bool prev_status;
