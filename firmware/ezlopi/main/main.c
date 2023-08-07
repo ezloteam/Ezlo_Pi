@@ -27,6 +27,8 @@
 #include "mac_uuid.h"
 
 #include "ezlopi_scenes_service.h"
+#include "ezlopi_http.h"
+#include "ezlopi_factory_info.h"
 
 static void blinky(void *pv);
 
@@ -85,6 +87,11 @@ static void blinky(void *pv)
             TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
             TRACE_D("-----------------------------------------");
             count = 0;
+
+            char *cloud_url = ezlopi_factory_info_v2_get_cloud_server();
+            char *controller_key = ezlopi_factory_info_v2_
+
+            ezlopi_http_post_request();
         }
     }
 }

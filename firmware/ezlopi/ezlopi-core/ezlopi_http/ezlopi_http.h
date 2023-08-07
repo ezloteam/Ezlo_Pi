@@ -25,6 +25,7 @@ extern "C"
     } s_rx_data_t;
 
     char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate);
+    char *ezlopi_http_post_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate);
     // char *http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate);
 
 #ifdef __cplusplus

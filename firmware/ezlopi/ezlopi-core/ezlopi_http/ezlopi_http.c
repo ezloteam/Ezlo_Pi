@@ -4,20 +4,83 @@
 #include "esp_http_client.h"
 #include "trace.h"
 #include "ezlopi_http.h"
+#include "cJSON.h"
 
 static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 
-#define TAG __FILE__
+char *ezlopi_http_post_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate)
+{
+    char *ret = NULL;
+    s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
 
-#define FREE_IF_NOT_NULL(ptr) \
-    {                         \
-        if (ptr)              \
-        {                     \
-            free(ptr);        \
-            ptr = NULL;       \
-        }                     \
+    if (my_data)
+    {
+        memset(my_data, 0, sizeof(s_rx_data_t));
+
+        esp_http_client_config_t config = {
+            .url = cloud_url,
+            .cert_pem = ca_certificate,
+            .client_cert_pem = shared_key,
+            .client_key_pem = private_key,
+            .event_handler = ezlopi_http_event_handler,
+            .transport_type = HTTP_TRANSPORT_OVER_SSL,
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+        };
+
+        esp_http_client_handle_t client = esp_http_client_init(&config);
+        if (NULL != client)
+        {
+            esp_http_client_set_method(client, HTTP_METHOD_POST);
+
+            cJSON *header = headers->child;
+            while (header)
+            {
+                TRACE_B("%s: %s", header->string, header->valuestring);
+                esp_http_client_set_header(client, header->string, header->valuestring);
+                // esp_http_client_set_header(client, "Content-Type", "application/json");
+                header = header->next;
+            }
+
+            esp_err_t err = esp_http_client_perform(client);
+
+            if (err == ESP_OK)
+            {
+                while (!esp_http_client_is_complete_data_received(client))
+                {
+                    vTaskDelay(50 / portTICK_RATE_MS);
+                }
+
+                if (my_data->total_len)
+                {
+                    ret = (char *)malloc(my_data->total_len + 1);
+
+                    if (ret)
+                    {
+                        s_rx_data_t *cur_d = my_data;
+                        memset(ret, 0, my_data->total_len + 1);
+
+                        while (cur_d)
+                        {
+                            strcat(ret, cur_d->ptr);
+                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
+                            cur_d = cur_d->next;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TRACE_E("Error perform http request %s", esp_err_to_name(err));
+            }
+
+            ezlopi_http_free_rx_data(my_data);
+            esp_http_client_cleanup(client);
+        }
     }
+
+    return ret;
+}
 
 char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
 {
@@ -30,6 +93,7 @@ char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_k
 
         esp_http_client_config_t config = {
             .url = cloud_url,
+            .method = HTTP_METHOD_GET,
             .cert_pem = ca_certificate,
             .client_cert_pem = shared_key,
             .client_key_pem = private_key,
