@@ -9,7 +9,7 @@
 static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 
-char *ezlopi_http_post_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate)
+char *ezlopi_http_post_request(char *cloud_url, char *location, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate)
 {
     char *ret = NULL;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
@@ -18,8 +18,18 @@ char *ezlopi_http_post_request(char *cloud_url, cJSON *headers, char *private_ke
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
 
+        char *uri = malloc(256);
+        if (uri)
+        {
+            snprintf(uri, 256, "%s/%s", cloud_url, location);
+        }
+        else
+        {
+            uri = cloud_url;
+        }
+
         esp_http_client_config_t config = {
-            .url = cloud_url,
+            .url = uri,
             .cert_pem = ca_certificate,
             .client_cert_pem = shared_key,
             .client_key_pem = private_key,

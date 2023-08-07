@@ -89,9 +89,24 @@ static void blinky(void *pv)
             count = 0;
 
             char *cloud_url = ezlopi_factory_info_v2_get_cloud_server();
-            char *controller_key = ezlopi_factory_info_v2_
 
-            ezlopi_http_post_request();
+            char *private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+            char *shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+            char *ca_cert = ezlopi_factory_info_v2_get_ca_certificate();
+
+            cJSON *headers = cJSON_CreateObject();
+            if (headers && cloud_url && private_key && shared_key && ca_cert)
+            {
+                char location[256];
+                strncpy(location, "api/v1/controller/sync?version=1", 256);
+                cJSON_AddStringToObject(headers, "controller-key", ""); // add controller key here
+                char *response = ezlopi_http_post_request(cloud_url, location, headers, private_key, shared_key, ca_cert);
+                if (response)
+                {
+                    TRACE_B("Http post request response:\r\n%s", response);
+                    free(response);
+                }
+            }
         }
     }
 }
