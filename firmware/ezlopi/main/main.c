@@ -47,6 +47,14 @@ void app_main(void)
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
+void ____check_and_free(char *to_be_freed)
+{
+    if (to_be_freed)
+    {
+        free(to_be_freed);
+    }
+}
+
 static void blinky(void *pv)
 {
     // printf("sizeof long: %u\r\n", sizeof(long));
@@ -89,7 +97,6 @@ static void blinky(void *pv)
             count = 0;
 
             char *cloud_url = ezlopi_factory_info_v2_get_cloud_server();
-
             char *private_key = ezlopi_factory_info_v2_get_ssl_private_key();
             char *shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
             char *ca_cert = ezlopi_factory_info_v2_get_ca_certificate();
@@ -107,6 +114,12 @@ static void blinky(void *pv)
                     free(response);
                 }
             }
+
+            ____check_and_free(cloud_url);
+            ____check_and_free(private_key);
+            ____check_and_free(shared_key);
+            ____check_and_free(ca_cert);
+            cJSON_Delete(headers);
         }
     }
 }
