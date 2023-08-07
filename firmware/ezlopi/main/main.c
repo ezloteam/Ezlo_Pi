@@ -96,6 +96,7 @@ static void blinky(void *pv)
             TRACE_D("-----------------------------------------");
             count = 0;
 
+            /////////////////////////// HTTP post request example ////////////////////////////////
             char *cloud_url = ezlopi_factory_info_v2_get_cloud_server();
             char *private_key = ezlopi_factory_info_v2_get_ssl_private_key();
             char *shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
@@ -120,6 +121,7 @@ static void blinky(void *pv)
             ____check_and_free(shared_key);
             ____check_and_free(ca_cert);
             cJSON_Delete(headers);
+            //////////////////////////////////////////////////////////////////////////////////////
         }
     }
 }
