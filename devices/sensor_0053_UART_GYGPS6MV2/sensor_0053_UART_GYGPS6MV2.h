@@ -18,8 +18,12 @@
 // #define GSV_MESSAGE_ENABLE
 // #define GLL_MESSAGE_ENABLE
 //-----------------------------------------------------------------------------------------
-#define MAX_GPGGA_SENTENCE_SIZE 70
+#define MAX_GPGGA_SENTENCE_SIZE 85 // 6 , 14 ,
 //-----------------------------------------------------------------------------------------
+/**
+ * circular buffer to store the complete message
+ */
+#define CIR_BUFSIZE 768
 
 /**
  * link: https://www.rfwireless-world.com/Terminology/GPS-sentences-or-NMEA-sentences.html
@@ -102,22 +106,22 @@ typedef struct GPVTG_t
 typedef struct GPGGA_t
 {
     // $GPGGA -> GGA protocol header
-    char GPGGA_sentence[70];  // this stores contents of GPGGA_data line
-    hms_t UTC_time;           // XXXXXX.XX            // 061732.00 -> hhmmss.ss
-    latitude_t Latitude;      // XXXX.XXXXX           // 2740.52768 (27 degrees, 40.52768 minutes) -> ddmm.mmmmm
-    char N_S_indicator;       // X                    // (N = North, S = South)
-    longitude_t Longitude;    // XXXXX.XXXXX          // 08518.22110 (085 degrees, 18.22110 minutes) -> dddmm.mmmmm
-    char E_W_indicator;       // X                    // (E = East or W = West)
-    char Positon_fix_quality; // X                    // 0-invalid ; 1-valid ; 2-Differential GPS ; 3_5 -not supported ; 6-Dead reckoning mode
-    char Satellites_used[3];  // XX                   // num of satelites -> Range: 0-12
-    char HDOP[5];             // XX.XX                // 3.78 // Horizontal Dilution of Precision [eg. 1.0]
-    char Mean_sea_level[7];   // XXXX.X               // 1300.8 // [Antenna altitude above/below mean_sea_level in Meters]
-    char MSL_Unit;            // X                    // eg. M -> meters
-    char Geoid_Separation[7]; // XXX.XX               // -41.3 // [in Meters]The distance from the surface of an ellipsoid to the surface of the geoid
-    char GS_Unit;             // X                    // eg. M -> meters
-    char age_from_last[3];    // XX     //empty field // – time in seconds since last DGPS update
-    char station_ID[5];       // XXXX   //empty field // – DGPS station ID number
-    char Checksum[3];         // XX                   // *48
+    char GPGGA_sentence[MAX_GPGGA_SENTENCE_SIZE]; // this stores contents of GPGGA_data line
+    hms_t UTC_time;                               // XXXXXX.XX            // 061732.00 -> hhmmss.ss
+    latitude_t Latitude;                          // XXXX.XXXXX           // 2740.52768 (27 degrees, 40.52768 minutes) -> ddmm.mmmmm
+    char N_S_indicator;                           // X                    // (N = North, S = South)
+    longitude_t Longitude;                        // XXXXX.XXXXX          // 08518.22110 (085 degrees, 18.22110 minutes) -> dddmm.mmmmm
+    char E_W_indicator;                           // X                    // (E = East or W = West)
+    char Positon_fix_quality;                     // X                    // 0-invalid ; 1-valid ; 2-Differential GPS ; 3_5 -not supported ; 6-Dead reckoning mode
+    char Satellites_used[3];                      // XX                   // num of satelites -> Range: 0-12
+    char HDOP[5];                                 // XX.XX                // 3.78 // Horizontal Dilution of Precision [eg. 1.0]
+    char Mean_sea_level[7];                       // XXXX.X               // 1300.8 // [Antenna altitude above/below mean_sea_level in Meters]
+    char MSL_Unit;                                // X                    // eg. M -> meters
+    char Geoid_Separation[7];                     // XXX.XX               // -41.3 // [in Meters]The distance from the surface of an ellipsoid to the surface of the geoid
+    char GS_Unit;                                 // X                    // eg. M -> meters
+    char age_from_last[3];                        // XX     //empty field // – time in seconds since last DGPS update
+    char station_ID[5];                           // XXXX   //empty field // – DGPS station ID number
+    char Checksum[3];                             // XX                   // *48
 } GPGGA_t;
 
 #endif

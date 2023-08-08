@@ -400,8 +400,8 @@ static const char *test_device_constant_config =
                 \"dev_name\": \"GY-GPS6MV2\",\
                 \"id_room\": \"\",\
                 \"id_item\": 53,\
-                \"gpio_tx\": 17,\
-                \"gpio_rx\": 16,\
+                \"gpio_tx\": 27,\
+                \"gpio_rx\": 26,\
                 \"baud\": 9600\
           }\
         ],\

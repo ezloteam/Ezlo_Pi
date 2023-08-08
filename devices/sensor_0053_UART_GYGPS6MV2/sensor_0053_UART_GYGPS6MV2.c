@@ -16,22 +16,27 @@
 
 #include "sensor_0053_UART_GYGPS6MV2.h"
 
+static uint32_t Latitude_item_id = 1;
+static uint32_t Longitude_item_id = 2;
+static uint32_t GPS_fix_item_id = 3;
+static uint32_t Sea_level_item_id = 4;
+static uint32_t Geoid_item_id = 5;
+
 static bool init_guard = false;
 static bool message_guard = false;
-static char sentence[100];
+static bool full_flag = false;
+static char sentence[MAX_GPGGA_SENTENCE_SIZE + 30];
+static char cir_buf[CIR_BUFSIZE];
 
-#define Latitude_item_id 1
-#define Longitude_item_id 2
-#define GPS_fix_item_id 3
-#define Sea_level_item_id 4
-#define Geoid_item_id 5
+static TaskHandle_t Notify_Handle = NULL;
 
 //------------------------------------------------------------------------------
-static s_ezlopi_device_properties_t *Latitude_properties = NULL;
-static s_ezlopi_device_properties_t *Longitude_properties = NULL;
-static s_ezlopi_device_properties_t *GPS_fix_properties = NULL;
-static s_ezlopi_device_properties_t *Mean_sea_level_properties = NULL;
-static s_ezlopi_device_properties_t *Geoid_Separation_properties = NULL;
+static s_ezlopi_device_properties_t *properties = NULL;
+// static s_ezlopi_device_properties_t *Latitude_properties = NULL;
+// static s_ezlopi_device_properties_t *Longitude_properties = NULL;
+// static s_ezlopi_device_properties_t *GPS_fix_properties = NULL;
+// static s_ezlopi_device_properties_t *Mean_sea_level_properties = NULL;
+// static s_ezlopi_device_properties_t *Geoid_Separation_properties = NULL;
 //------------------------------------------------------------------------------
 #define ADD_PROPERTIES_DEVICE_LIST(_properties, device_id, category, subcategory, item_name, item_id, value_type, cjson_device, sensor_0053_UART_gps6mv2_data) \
     {                                                                                                                                                          \
@@ -52,6 +57,7 @@ static int sensor_uart_gps6mv2_init(s_ezlopi_device_properties_t *properties);
 static void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data);
 static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *properties);
+static void Retrieve_GPGGA_sentence(void *params);
 
 static void ezlopi_uart_gps6mv2_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void *user_args);
 //------------------------------------------------------------------------------
@@ -78,29 +84,20 @@ int sensor_0053_UART_GPS6MV2(e_ezlopi_actions_t action, s_ezlopi_device_properti
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count = 1;
         if (init_guard)
         {
-            if (count > 4)
-            {
-                message_guard = false;
-                count = 1;
-                // if greater than 3sec post the values to cloud
-                ezlopi_device_value_updated_from_device(properties);
-            }
-            else if (count % 3 == 0)
+            if (1 == properties->ezlopi_cloud.item_id)
             {
                 message_guard = true;
                 sensor_uart_gps6mv2_update_values(properties);
             }
-            count++;
+            message_guard = false;
+            ezlopi_device_value_updated_from_device(properties);
         }
         break;
     }
     default:
-    {
         break;
-    }
     }
     return 0;
 }
@@ -119,22 +116,21 @@ static s_ezlopi_device_properties_t *sensor_0053_gps6mv2_prepare_properties(uint
             sensor_uart_gps6mv2_properties->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
 
             char *device_name = NULL;
-            // "dev_name" : factory_info_h
             switch (ITEM_ID)
             {
-            case Latitude_item_id:
-                device_name = "Longitude";
-                break;
-            case Longitude_item_id:
+            case 1:
                 device_name = "Latitude";
                 break;
-            case GPS_fix_item_id:
+            case 2:
+                device_name = "Longitude";
+                break;
+            case 3:
                 device_name = "GPS-Fix Valid";
                 break;
-            case Sea_level_item_id:
+            case 4:
                 device_name = "Antenna-Altitude";
                 break;
-            case Geoid_item_id:
+            case 5:
                 device_name = "Geoid Seperation";
                 break;
             default:
@@ -196,19 +192,19 @@ static int sensor_uart_gps6mv2_prepare_and_add(void *arg)
     {
         memset(sensor_0053_UART_gps6mv2_data, 0, sizeof(GPS6MV2_t));
         uint32_t device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(Latitude_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_angle_position, Latitude_item_id, value_type_angle, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
+        ADD_PROPERTIES_DEVICE_LIST(properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_angle_position, Latitude_item_id, value_type_angle, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
 
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(Longitude_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_angle_position, Longitude_item_id, value_type_angle, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
+        ADD_PROPERTIES_DEVICE_LIST(properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_angle_position, Longitude_item_id, value_type_angle, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
 
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(GPS_fix_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_basic, GPS_fix_item_id, value_type_bool, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
+        ADD_PROPERTIES_DEVICE_LIST(properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_basic, GPS_fix_item_id, value_type_bool, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
 
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(Mean_sea_level_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_distance, Sea_level_item_id, value_type_length, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
+        ADD_PROPERTIES_DEVICE_LIST(properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_distance, Sea_level_item_id, value_type_length, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
 
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(Geoid_Separation_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_distance, Geoid_item_id, value_type_length, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
+        ADD_PROPERTIES_DEVICE_LIST(properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_distance, Geoid_item_id, value_type_length, prep_arg->cjson_device, sensor_0053_UART_gps6mv2_data);
     }
     return ret;
 }
@@ -216,8 +212,10 @@ static int sensor_uart_gps6mv2_prepare_and_add(void *arg)
 static int sensor_uart_gps6mv2_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
+
     if (!init_guard)
     {
+
         if (GPIO_IS_VALID_GPIO(properties->interface.uart.tx) && GPIO_IS_VALID_GPIO(properties->interface.uart.rx))
         {
             s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(properties->interface.uart.baudrate, properties->interface.uart.tx,
@@ -225,131 +223,178 @@ static int sensor_uart_gps6mv2_init(s_ezlopi_device_properties_t *properties)
             properties->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
             ret = 1;
         }
-        init_guard = true;
+
         TRACE_W(" Initailization complete......");
+        init_guard = true;
     }
     return ret;
 }
 
-static void ezlopi_uart_gps6mv2_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void *user_args)
+static void Retrieve_GPGGA_sentence(void *params)
 {
-    // TRACE_E("\nUART_Buffer => \n%s", buffer);
-
-    // find the position of '$GSGGA' in incoming paragraph
-    char *another_buffer = (char *)malloc(256);
-    memcpy(another_buffer, buffer, 256);
-
-    /**                             2000
-     *      buffer = 'dkfhkhdf .... $GPGGA,061731.00,2740.52772,....,-41.3,M,,*40.....'
-     *                              ^
-     *                             ptr1 => $GPGGA,061731.00,2740.52772,....,-41.3,M,,*40.....
-     *
-     */
-    char *ptr1 = strstr(another_buffer, "$GPGGA"); // returns a pointer points to the first character of the found 'another_buffer' in "$GPGGA"
-                                                   // otherwise a null pointer if "$GPGGA" is not present in 'another_buffer'.
-                                                   // If "[$GPGGA]" destination string, points to an empty string, 'another_buffer' is returned
-
-    // Continue only if the 'GSGGA-message' exists
-    if (NULL != ptr1)
+    if (NULL == strstr(cir_buf, "$GPTXT"))
     {
-        /**                                                        2053
-         *      ptr1 => '$GPGGA,061731.00,2740.52772,....,-41.3,M,,*40
-         *                                                            ^
-         *                                                         *40_ <- ptr2.....
+        // TRACE_I("................Extracting GPGGA sentence ...........");
+        // find the position of '$GSGGA' in the circular buffer
+        /**                                 2000
+         *   circular_buffer = 'dkfhkhdf .... $GPGGA,061731.00,2740.52772,....,-41.3,M,,*40.....'
+         *                                    ^
+         *                             ptr1 => $GPGGA,061731.00,2740.52772,....,-41.3,M,,*40.....
          *
          */
+        char *ptr1 = strstr(cir_buf, "$GPGGA"); // returns a pointer points to the first character of the found 'another_buffer' in "$GPGGA"
+                                                // otherwise a null pointer if "$GPGGA" is not present in 'another_buffer'.
+                                                // If "[$GPGGA]" destination string, points to an empty string, 'another_buffer' is returned
 
-        char *ptr2 = strchr(ptr1, '*'); // *  <- ptr2
-                                        // check if ptr2 exists
-        if (NULL != ptr2)
-        { // NOW , separate the GSGGA-message and copy to global variable 'sentence'
-            ptr2 += 3;
-            TRACE_E("GPGGA message size = %d (< %d)", (ptr2 - ptr1), MAX_GPGGA_SENTENCE_SIZE);
-            if ((ptr2 - ptr1) > 0 && (ptr2 - ptr1) < MAX_GPGGA_SENTENCE_SIZE)
-            {
-                TRACE_W("sentence (OLD) => %s", sentence);
-                if (message_guard == false)
+        // Continue only if the 'GSGGA-message' exists
+        if (NULL != ptr1)
+        {
+
+            /**                                                        2053
+             *      ptr1 => '$GPGGA,061731.00,2740.52772,....,-41.3,M,,*40
+             *                                                            ^
+             *                                                         *40_ <- ptr2.....
+             *
+             */
+
+            char *ptr2 = strchr(ptr1, '*'); // *  <- ptr2
+                                            // check if ptr2 exists
+            if (NULL != ptr2)
+            {              // NOW , separate the GSGGA-message and copy to global variable 'sentence'
+                ptr2 += 3; // +3 because the checksum consists three character more [*XX]
+
+                // TRACE_E("GPGGA message size = %d (< %d)", (ptr2 - ptr1), MAX_GPGGA_SENTENCE_SIZE);
+                if ((ptr2 - ptr1) > 0 && (ptr2 - ptr1) < MAX_GPGGA_SENTENCE_SIZE)
                 {
-                    // TRACE_E("Message_Guard => OFF ; NEW message copied.... in 'sentence'");
-                    memset(&sentence, 0, sizeof(sentence));
-                    sentence[99] = '\0';
-                    memcpy(sentence, ptr1, (ptr2 - ptr1)); // +3 because the checksum consists three character more [*XX]
-                    TRACE_W("sentence (NEW) => %s", sentence);
+                    if (message_guard == false)
+                    {
+                        memset(&sentence, 0, sizeof(sentence));
+                        memcpy(sentence, ptr1, (ptr2 - ptr1)); // (dest_addr , from_addr , length)
+                        // TRACE_W("sentence (NEW) => %s", sentence);
+                    }
+                    else
+                    {
+                        TRACE_E(" Message_Guard => ON ; Cannot copy NEW message.... in 'sentence'");
+                    }
                 }
-                // else
-                // {
-                //     TRACE_E(" Message_Guard => ON ; Cannot copy NEW message.... in 'sentence'");
-                // }
             }
         }
+        else
+        {
+            TRACE_E("NO GPGGA message found in current circular buffer stack....");
+        }
     }
-    // else
-    // {
-    //     TRACE_E("NO GPGGA message found in recent stack....\n");
-    // }
-    free(another_buffer);
+}
+
+static void ezlopi_uart_gps6mv2_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void *user_args)
+{
+    // TRACE_E("UART_Buffer => \n%s\n", buffer);
+    char *another_buffer = (char *)malloc(256);
+    if (another_buffer)
+    {
+        memcpy(another_buffer, buffer, 256);
+        if (!full_flag)
+        {
+
+            if (strlen(cir_buf) < (CIR_BUFSIZE)-255)
+            {
+                strncpy((cir_buf + strlen(cir_buf)), another_buffer, strlen(another_buffer));
+            }
+            else
+            {
+                full_flag = true;
+            }
+        }
+        else // else if (full_flag)
+        {
+            // TRACE_E("----------- 2. CIR_BUFF - FULL -------------");
+            Retrieve_GPGGA_sentence(NULL);       // CALL a function that extracts the 'GPGGA_sentence' from cir_buf[]
+            memset(cir_buf, 0, sizeof(cir_buf)); // reset cir_buf[]
+            // TRACE_I("CIRCULAR_BUFFER  => [%d] \n%s", strlen(cir_buf), cir_buf);
+            full_flag = false;
+        }
+        free(another_buffer);
+    }
 }
 
 static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
+    int lat_angle_val = 0, long_angle_val = 0, total_sat = 0, gps_quality = 0, antenna_alti = 0, geoid = 0;
+    bool GPS_FIX = false;
     cJSON *cjson_properties = (cJSON *)args;
     GPS6MV2_t *sensor_0053_UART_gps6mv2_data = (GPS6MV2_t *)properties->user_arg;
 
     if (cjson_properties && sensor_0053_UART_gps6mv2_data)
     {
-        // longitude & latitude
-        if (Latitude_item_id == properties->ezlopi_cloud.item_id)
+        switch (properties->ezlopi_cloud.item_id)
         {
-            int lat_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_min)) / 60;
+        case 1:
+        {
+            // TRACE_E("LATITUDE : %s deg, %s min ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_degree,
+            //         sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_min);
+            lat_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_min)) / 60;
             TRACE_I("latitude : %d *deg", lat_angle_val);
             cJSON_AddNumberToObject(cjson_properties, "value", lat_angle_val);
             cJSON_AddStringToObject(cjson_properties, "scale", "north_pole_degress");
+            break;
         }
 
-        if (Longitude_item_id == properties->ezlopi_cloud.item_id)
+        case 2:
         {
-            int long_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_min)) / 60;
+            // TRACE_E("LONGITUDE : %s deg, %s min ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_degree,
+            //         sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_min);
+            long_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_min)) / 60;
             TRACE_I("Longitude : %d *deg", long_angle_val);
             cJSON_AddNumberToObject(cjson_properties, "value", long_angle_val);
             cJSON_AddStringToObject(cjson_properties, "scale", "north_pole_degress");
+            break;
         }
 
-        if (GPS_fix_item_id == properties->ezlopi_cloud.item_id)
+        case 3:
         {
-            int total_sat = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Satellites_used);
+            // TRACE_E("Satellites_used : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Satellites_used);
+            total_sat = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Satellites_used);
             TRACE_I("No. of Satellites : %d ", total_sat);
-            int gps_quality = atoi(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Positon_fix_quality);
+
+            // TRACE_E("Positon_fix_quality : %c ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Positon_fix_quality);
+            gps_quality = atoi(&sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Positon_fix_quality);
             TRACE_I("GPSFix_Quality : %d ", gps_quality);
-            bool GPS_FIX = ((total_sat > 2) && (gps_quality != 0)) ? true : false;
+            GPS_FIX = ((total_sat > 2) && (gps_quality != 0)) ? true : false;
             cJSON_AddBoolToObject(cjson_properties, "value", GPS_FIX);
+            break;
         }
 
-        if (Sea_level_item_id == properties->ezlopi_cloud.item_id)
+        case 4:
         {
-            int antenna_alti = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level);
+            // TRACE_E("Mean_sea_level : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level);
+            antenna_alti = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level);
             TRACE_I("Antenna Altitude for mean_sea_level : %d m", antenna_alti);
             cJSON_AddNumberToObject(cjson_properties, "value", antenna_alti);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter");
+            break;
         }
 
-        if (Geoid_item_id == properties->ezlopi_cloud.item_id)
+        case 5:
         {
-            int geoid = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation);
+            // TRACE_E("Geoid_Separation : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation);
+            geoid = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation);
             TRACE_I("Geoid seperation : %d m", geoid);
             cJSON_AddNumberToObject(cjson_properties, "value", geoid);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter");
+            break;
         }
-
+        }
         ret = 1;
     }
+
     return ret;
 }
 //------------------------------------------------------------------------------
 
 static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *properties)
 {
-    int ret = 0;
+    int ret = 0, len = 0;
     // 'void_type' addrress -> 'GPS6MV2_t' address
     GPS6MV2_t *sensor_0053_UART_gps6mv2_data = (GPS6MV2_t *)properties->user_arg;
 
@@ -359,17 +404,15 @@ static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *prope
         if (sentence != NULL)
         {
             // reset the GPGGA_sentence array
-            int len = sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
+            len = sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
             memset(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence, 0, sizeof(len));
             sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence[len - 1] = '\0';
             strncpy(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence, sentence, (len - 1));
-
-            // TRACE_I("UPDATE_TAG : Copying [%s] to => 'GPGGA_sentence[70]", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
         }
 
         // Check availability of Checksum in the message
         if (strchr((sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence), '*') != NULL)
-        { // split the message and store it in 'GPS6MV2_t' data structure
+        {
             parse_and_assign_GPGGA_message(sensor_0053_UART_gps6mv2_data);
         }
         message_guard = false;
@@ -378,11 +421,10 @@ static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *prope
 }
 
 //-------------------------------------------------------------------------
-
 static void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
 {
-    TRACE_I("PARSE_TAG : Parsing the message ...[%s]", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
-    uint8_t len = strlen(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
+    // TRACE_W("GPGGA_sentence => %s", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
+    uint8_t len = strlen(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence); // length => contents
     char *dummy_container = (char *)malloc((len + 1));
     if (NULL != dummy_container)
     {
@@ -628,10 +670,10 @@ static void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_d
                 }
                 break;
             case 13: // age_from_last
-                // TRACE_W("age_from_last: %s\n",XXX);
+                // TRACE_W("age_from_last:";
                 break;
             case 14: // station_ID
-                // TRACE_W("station_ID: %s\n",XXX);
+                // TRACE_W("station_ID:"");
                 break;
             case 15: // Checksum
                 if (dummy_container[start_index + 1] == ',')
@@ -655,24 +697,4 @@ static void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_d
         }
         free(dummy_container);
     }
-
-    TRACE_E("UTC_time : %s:%s:%s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.UTC_time.hour,
-            sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.UTC_time.min,
-            sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.UTC_time.sec);
-    // TRACE_E("Latitude : %s deg, %s min ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_degree,
-    //         sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_min);
-    // TRACE_E("N_S_indicator : %c ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.N_S_indicator);
-    // TRACE_E("Longitude : %s deg, %s min ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_degree,
-    //         sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_min);
-    // TRACE_E("E_W_indicator : %c ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.E_W_indicator);
-    // TRACE_E("Positon_fix_quality : %c ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Positon_fix_quality);
-    // TRACE_E("Satellites_used : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Satellites_used);
-    // TRACE_E("HDOP : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.HDOP);
-    // TRACE_E("Mean_sea_level : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level);
-    // TRACE_E("MSL_Unit : %c ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.MSL_Unit);
-    // TRACE_E("Geoid_Separation : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation);
-    // TRACE_E("GS_Unit : %c ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GS_Unit);
-    // TRACE_E("age_from_last : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.age_from_last);
-    // TRACE_E("station_ID : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.station_ID);
-    // TRACE_E("Checksum : %s ", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Checksum);
 }
