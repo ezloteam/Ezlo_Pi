@@ -85,6 +85,7 @@ static void digital_io_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.item_name = ezlopi_item_name_switch;
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.show = true;
+    item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);

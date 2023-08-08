@@ -2,12 +2,13 @@
 #include "cJSON.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_item_name_str.h"      
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_cloud_scales_str.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
 #include "dht22.h"
@@ -152,6 +153,7 @@ static int dht11_sensor_setup_item_properties_temperature(l_ezlopi_item_t *item,
         item->cloud_properties.has_setter = false;
         item->cloud_properties.item_name = ezlopi_item_name_temp;
         item->cloud_properties.value_type = value_type_temperature;
+        item->cloud_properties.scale = scales_celsius;
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
@@ -174,6 +176,7 @@ static int dht11_sensor_setup_item_properties_humidity(l_ezlopi_item_t *item, cJ
         item->cloud_properties.has_setter = false;
         item->cloud_properties.item_name = ezlopi_item_name_humidity;
         item->cloud_properties.value_type = value_type_humidity;
+        item->cloud_properties.scale = scales_percent;
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);

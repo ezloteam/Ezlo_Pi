@@ -6,6 +6,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_cloud_scales_str.h"
 
 #include "ezlopi_i2c_master.h"
 #include "trace.h"
@@ -180,6 +181,7 @@ static void wgxhtc3_sensor_prepare_temperature_item_properties(l_ezlopi_item_t *
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
+    item->cloud_properties.scale = scales_celsius;
     item->cloud_properties.show = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 

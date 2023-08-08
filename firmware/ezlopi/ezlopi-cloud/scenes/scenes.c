@@ -293,12 +293,15 @@ static void __value_types_list(char *list_name, cJSON *cj_result)
                     l_ezlopi_item_t *items = devices->items;
                     while (items)
                     {
-                        cJSON *cj_item_value_type = cJSON_CreateString(items->cloud_properties.value_type);
-                        if (cj_item_value_type)
+                        if (NULL == items->cloud_properties.scale)
                         {
-                            if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
+                            cJSON *cj_item_value_type = cJSON_CreateString(items->cloud_properties.value_type);
+                            if (cj_item_value_type)
                             {
-                                cJSON_Delete(cj_item_value_type);
+                                if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
+                                {
+                                    cJSON_Delete(cj_item_value_type);
+                                }
                             }
                         }
                         items = items->next;
@@ -312,14 +315,72 @@ static void __value_types_list(char *list_name, cJSON *cj_result)
 
 static void __scalable_value_types_list(char *list_name, cJSON *cj_result)
 {
-    if (cj_result)
+    if (cj_result && list_name)
     {
+        cJSON *cj_value_types = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_value_types)
+        {
+            cJSON *cj_value_array = cJSON_AddArrayToObject(cj_value_types, "list");
+            if (cj_value_array)
+            {
+                l_ezlopi_device_t *devices = ezlopi_device_get_head();
+                while (devices)
+                {
+                    l_ezlopi_item_t *items = devices->items;
+                    while (items)
+                    {
+                        if (items->cloud_properties.scale)
+                        {
+                            cJSON *cj_item_value_type = cJSON_CreateString(items->cloud_properties.value_type);
+                            if (cj_item_value_type)
+                            {
+                                if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
+                                {
+                                    cJSON_Delete(cj_item_value_type);
+                                }
+                            }
+                        }
+                        items = items->next;
+                    }
+                    devices = devices->next;
+                }
+            }
+        }
     }
 }
 static void __value_scales_list(char *list_name, cJSON *cj_result)
 {
-    if (cj_result)
+    if (cj_result && list_name)
     {
+        cJSON *cj_value_types = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_value_types)
+        {
+            cJSON *cj_value_array = cJSON_AddArrayToObject(cj_value_types, "list");
+            if (cj_value_array)
+            {
+                l_ezlopi_device_t *devices = ezlopi_device_get_head();
+                while (devices)
+                {
+                    l_ezlopi_item_t *items = devices->items;
+                    while (items)
+                    {
+                        if (items->cloud_properties.scale)
+                        {
+                            cJSON *cj_item_value_type = cJSON_CreateString(items->cloud_properties.scale);
+                            if (cj_item_value_type)
+                            {
+                                if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
+                                {
+                                    cJSON_Delete(cj_item_value_type);
+                                }
+                            }
+                        }
+                        items = items->next;
+                    }
+                    devices = devices->next;
+                }
+            }
+        }
     }
 }
 static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
@@ -334,10 +395,71 @@ static void __value_types_families_list(char *list_name, cJSON *cj_result)
     {
     }
 }
+
+typedef struct s_comparision_operators
+{
+    char *op;
+    char *name;
+    char *method;
+} s_comparision_operators_t;
+
+static const s_comparision_operators_t comparision_operators[] = {
+    {.op = "<", .name = "less", .method = "compareNumbers"},
+    {.op = ">", .name = "greater", .method = "compareNumbers"},
+    {.op = "<=", .name = "less equal", .method = "compareNumbers"},
+    {.op = ">=", .name = "greater equal", .method = "compareNumbers"},
+    {.op = "==", .name = "equal", .method = "compareNumbers"},
+    {.op = "!=", .name = "not equal", .method = "compareNumbers"},
+    {.op = "between", .name = "between", .method = "compareNumberRange"},
+    {.op = "not_between", .name = "not between", .method = "compareNumberRange"},
+    {.op = "any_of", .name = "any of", .method = "numbersArray"},
+    {.op = "none_of", .name = "none of", .method = "numbersArray"},
+    {.op = NULL, .name = NULL, .method = NULL},
+};
+
 static void __comparison_operators_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
+        cJSON *cj_value_types = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_value_types)
+        {
+            cJSON *cj_families_array = cJSON_AddArrayToObject(cj_value_types, "families");
+            if (cj_families_array)
+            {
+                cJSON *cj_family = cJSON_CreateObject();
+                if (cj_family)
+                {
+                    cJSON_AddStringToObject(cj_family, "family", "numeric");
+                    cJSON *cj_methods_array = cJSON_AddArrayToObject(cj_family, "methods");
+                    if (cj_methods_array)
+                    {
+                        uint32_t idx = 0;
+                        while (comparision_operators[idx].op)
+                        {
+                            cJSON *cj_method = cJSON_CreateObject();
+                            if (cj_method)
+                            {
+                                cJSON_AddStringToObject(cj_method, "op", comparision_operators[idx].op);
+                                cJSON_AddStringToObject(cj_method, "name", comparision_operators[idx].name);
+                                cJSON_AddStringToObject(cj_method, "method", comparision_operators[idx].method);
+
+                                if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
+                                {
+                                    cJSON_Delete(cj_method);
+                                }
+                            }
+                            idx++;
+                        }
+                    }
+                }
+
+                if (!cJSON_AddItemToArray(cj_families_array, cj_family))
+                {
+                    cJSON_Delete(cj_family);
+                }
+            }
+        }
     }
 }
 static void __comparison_methods_list(char *list_name, cJSON *cj_result)

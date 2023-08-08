@@ -64,6 +64,7 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
         item->cloud_properties.item_name = ezlopi_item_name_motion;
         item->cloud_properties.value_type = value_type_bool;
         item->cloud_properties.show = true;
+        item->cloud_properties.scale = NULL;
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
