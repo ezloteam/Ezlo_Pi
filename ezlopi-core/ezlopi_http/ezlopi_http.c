@@ -89,7 +89,7 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
     char *ret = NULL;
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t *http_get_data = NULL; // malloc(sizeof(s_ezlopi_http_data_t));
+    s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
 
     if (my_data)
     {
@@ -123,7 +123,7 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
             cJSON *header = headers->child;
             while (header)
             {
-                TRACE_B("%s: %s", header->string, header->valuestring);
+                // TRACE_B("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }

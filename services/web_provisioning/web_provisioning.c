@@ -247,23 +247,24 @@ static void web_provisioning_config_check(void *pv)
                 // Do nothing
             }
         }
-#if 0
+#if 1
         if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
         {
 
             char http_request_location[200];
-            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", 1); // add config_version instead of 1
+            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
 
             uint16_t http_status;
             response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
             if (NULL != response)
             {
-                TRACE_E("Data : %s", response->response);
-                TRACE_E("Statuc Code : %d", response->status_code);
                 switch (response->status_code)
                 {
+                    TRACE_E("Statuc Code : %d", response->status_code);
                 case HttpStatus_Ok:
                     // re-write all the info into the flash region
+                    TRACE_E("Data : %s", response->response);
+                    web_provisioning_config_update(response->response);
                     break;
                 case 304: // HTTP Status not modified
                     TRACE_E("Config data not changed !");
@@ -272,13 +273,12 @@ static void web_provisioning_config_check(void *pv)
                     break;
                 }
             }
-
-    }
-    else
-    {
-    }
+        }
+        else
+        {
+        }
 #endif
-        web_provisioning_config_update(prov_data);
+        // web_provisioning_config_update(prov_data);
         vTaskDelay(10000 / portTICK_RATE_MS);
     }
 

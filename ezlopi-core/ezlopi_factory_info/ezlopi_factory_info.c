@@ -520,29 +520,39 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                 {
                     if (NULL != ezlopi_config_basic->device_name)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_name, 0x0084, NAME_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_name, 0x0084, NAME_LENGTH);
+                        memset(tmp_buffer + 0x0084, 0, NAME_LENGTH);
+                        memcpy(tmp_buffer + 0x0084, ezlopi_config_basic->device_name, NAME_LENGTH);
                         TRACE_I("device_name: %s", ezlopi_config_basic->device_name);
                     }
 
                     if (NULL != ezlopi_config_basic->manufacturer)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->manufacturer, 0x00CA, MANUFACTURER_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->manufacturer, 0x00CA, MANUFACTURER_LENGTH);
+                        memset(tmp_buffer + 0x00CA, 0, MANUFACTURER_LENGTH);
+                        memcpy(tmp_buffer + 0x00CA, ezlopi_config_basic->manufacturer, MANUFACTURER_LENGTH);
                         TRACE_I("manufacturer: %s", ezlopi_config_basic->manufacturer);
                     }
 
                     if (NULL != ezlopi_config_basic->brand)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->brand, 0x010A, BRAND_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->brand, 0x010A, BRAND_LENGTH);
+                        memset(tmp_buffer + 0x010A, 0, BRAND_LENGTH);
+                        memcpy(tmp_buffer + 0x010A, ezlopi_config_basic->brand, BRAND_LENGTH);
                         TRACE_I("brand: %s", ezlopi_config_basic->brand);
                     }
                     if (NULL != ezlopi_config_basic->model_number)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->model_number, 0x014A, MODEL_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->model_number, 0x014A, MODEL_LENGTH);
+                        memset(tmp_buffer + 0x014A, 0, MODEL_LENGTH);
+                        memcpy(tmp_buffer + 0x014A, ezlopi_config_basic->model_number, MODEL_LENGTH);
                         TRACE_I("model_number: %s", ezlopi_config_basic->model_number);
                     }
                     if (NULL != ezlopi_config_basic->device_uuid)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_uuid, 0x01AA, DEVICE_UUID_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_uuid, 0x01AA, DEVICE_UUID_LENGTH);
+                        memset(tmp_buffer + 0x01AA, 0, DEVICE_UUID_LENGTH);
+                        memcpy(tmp_buffer + 0x01AA, ezlopi_config_basic->device_uuid, DEVICE_UUID_LENGTH);
                         TRACE_I("device_uuid: %s", ezlopi_config_basic->device_uuid);
                     }
 
@@ -550,17 +560,21 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                     // snprintf(tmp_buffer + 0x0044, length, "%s", ezlopi_config_basic->wifi_password);
                     if (NULL != ezlopi_config_basic->device_type)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_type, 0x018A, DEVICE_TYPE_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->device_type, 0x018A, DEVICE_TYPE_LENGTH);
+                        memset(tmp_buffer + 0x018A, 0, DEVICE_TYPE_LENGTH);
+                        memcpy(tmp_buffer + 0x018A, ezlopi_config_basic->device_type, DEVICE_TYPE_LENGTH);
                         TRACE_I("device_type: %s", ezlopi_config_basic->device_type);
                     }
 
                     if (NULL != ezlopi_config_basic->device_mac)
                     {
+                        memset(tmp_buffer + 0x00C4, 0, DEVICE_MAC_LENGTH);
                         memcpy(tmp_buffer + 0x00C4, ezlopi_config_basic->device_mac, DEVICE_MAC_LENGTH);
                     }
 
                     if (0 != ezlopi_config_basic->id)
                     {
+                        memset(tmp_buffer + 0x0004, 0, ID_LENGTH);
                         memcpy(tmp_buffer + 0x0004, &ezlopi_config_basic->id, ID_LENGTH);
                         TRACE_I("id: %lld", ezlopi_config_basic->id);
                     }
@@ -586,29 +600,41 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                 {
                     if (0 != ezlopi_config_basic->config_version)
                     {
-                        memcpy(tmp_buffer + 0x0002, &ezlopi_config_basic->config_version, CONFIG_VERSION_LENGTH);
+                        uint8_t config_version_arry[2] = {0};
+                        config_version_arry[0] = (uint8_t)((ezlopi_config_basic->config_version & 0xFF00) >> 8);
+                        config_version_arry[1] = (uint8_t)(ezlopi_config_basic->config_version & 0x00FF);
+                        memset(tmp_buffer + 0x0002, 0, CONFIG_VERSION_LENGTH);
+                        memcpy(tmp_buffer + 0x0002, config_version_arry, CONFIG_VERSION_LENGTH);
                         TRACE_I("Config Version: %d", ezlopi_config_basic->config_version);
                     }
 
                     if (NULL != ezlopi_config_basic->cloud_server)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->cloud_server, 0x0214, CLOUD_SERVER_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->cloud_server, 0x0214, CLOUD_SERVER_LENGTH);
+                        memset(tmp_buffer + 0x0214, 0, CLOUD_SERVER_LENGTH);
+                        memcpy(tmp_buffer + 0x0214, ezlopi_config_basic->cloud_server, CLOUD_SERVER_LENGTH);
                         TRACE_I("cloud_server: %s", ezlopi_config_basic->cloud_server);
                     }
                     if (NULL != ezlopi_config_basic->prov_uuid)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->prov_uuid, 0x0314, PROVISIONING_UUID_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->prov_uuid, 0x0314, PROVISIONING_UUID_LENGTH);
+                        memset(tmp_buffer + 0x314, 0, PROVISIONING_UUID_LENGTH);
+                        memcpy(tmp_buffer + 0x314, ezlopi_config_basic->prov_uuid, PROVISIONING_UUID_LENGTH);
                         TRACE_I("prov_uuid: %s", ezlopi_config_basic->prov_uuid);
                     }
                     if (NULL != ezlopi_config_basic->provision_server)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_server, 0x0014, CLOUD_SERVER_LENGTH);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_server, 0x0014, CLOUD_SERVER_LENGTH);
+                        memset(tmp_buffer + 0x0014, 0, CLOUD_SERVER_LENGTH);
+                        memcpy(tmp_buffer + 0x0014, ezlopi_config_basic->provision_server, CLOUD_SERVER_LENGTH);
                         TRACE_I("provision_server: %s", ezlopi_config_basic->provision_server);
                     }
 
                     if (NULL != ezlopi_config_basic->provision_token)
                     {
-                        UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_token, 0x0114, 256);
+                        // UPDATE_STRING_VALUE(tmp_buffer, ezlopi_config_basic->provision_token, 0x0114, PROVISIONING_TOKEN_LENGTH + 1);
+                        memset(tmp_buffer + 0x0114, 0, PROVISIONING_TOKEN_LENGTH);
+                        memcpy(tmp_buffer + 0x0114, ezlopi_config_basic->provision_token, PROVISIONING_TOKEN_LENGTH);
                         TRACE_I("provision_token: %s", ezlopi_config_basic->provision_token);
                     }
 
@@ -626,6 +652,7 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                 {
                     TRACE_E("Couldn't fetch 'string' from id-flash-region!");
                 }
+                // ESP_LOG_BUFFER_HEXDUMP("PROV", tmp_buffer, length, ESP_LOG_INFO);
                 free(tmp_buffer);
             }
 #endif

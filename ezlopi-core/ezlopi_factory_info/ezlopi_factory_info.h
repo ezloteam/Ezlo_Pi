@@ -187,15 +187,6 @@ typedef struct s_basic_factory_info
     uint16_t ezlopi_factory_info_v2_get_config_version(void);
 
     int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password);
-    int ezlopi_factory_info_v2_set_id(uint64_t id);
-    int ezlopi_factory_info_v2_set_uuid(char *data);
-    // int ezlopi_factory_info_v2_set_cloud_uuid(char *data);
-    // int ezlopi_factory_info_v2_set_order_uuid(char *data);
-    int ezlopi_factory_info_v2_set_config_version(uint16_t v);
-    // int ezlopi_factory_info_v2_set_zwave_region(uint16_t v);
-    int ezlopi_factory_info_v2_set_provision_server(char *data);
-    int ezlopi_factory_info_v2_set_cloud_server(char *data);
-    int ezlopi_factory_info_v2_set_provision_token(char *data);
 
     int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic);
     int ezlopi_factory_info_v2_set_ezlopi_config(char *data);
