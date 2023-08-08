@@ -157,6 +157,7 @@ typedef struct s_basic_factory_info
     char *provision_server;
     char *provision_token;
     char *user_id;
+    uint16_t config_version;
 } s_basic_factory_info_t;
 #endif
 
@@ -186,10 +187,21 @@ typedef struct s_basic_factory_info
     uint16_t ezlopi_factory_info_v2_get_config_version(void);
 
     int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password);
+    int ezlopi_factory_info_v2_set_id(uint64_t id);
+    int ezlopi_factory_info_v2_set_uuid(char *data);
+    // int ezlopi_factory_info_v2_set_cloud_uuid(char *data);
+    // int ezlopi_factory_info_v2_set_order_uuid(char *data);
+    int ezlopi_factory_info_v2_set_config_version(uint16_t v);
+    // int ezlopi_factory_info_v2_set_zwave_region(uint16_t v);
+    int ezlopi_factory_info_v2_set_provision_server(char *data);
+    int ezlopi_factory_info_v2_set_cloud_server(char *data);
+    int ezlopi_factory_info_v2_set_provision_token(char *data);
+
     int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic);
     int ezlopi_factory_info_v2_set_ezlopi_config(char *data);
     int ezlopi_factory_info_v2_set_ca_cert(char *data);
     int ezlopi_factory_info_v2_set_ssl_shared_key(char *data);
+    int ezlopi_factory_info_v2_set_ssl_public_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
 
     int ezlopi_factory_info_v2_factory_reset(void);

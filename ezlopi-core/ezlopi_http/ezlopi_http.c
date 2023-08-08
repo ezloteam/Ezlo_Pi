@@ -24,9 +24,9 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
     char *ret = NULL;
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
+    s_ezlopi_http_data_t *http_get_data = NULL;
 
-    if ((NULL != my_data) && (NULL != http_get_data))
+    if ((NULL != my_data))
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
 
@@ -68,6 +68,8 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
                             cur_d = cur_d->next;
                         }
                     }
+                    http_get_data->response = ret;
+                    http_get_data->status_code = status_code;
                 }
             }
             else
@@ -79,8 +81,6 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
             esp_http_client_cleanup(client);
         }
     }
-    http_get_data->response = ret;
-    http_get_data->status_code = status_code;
     return http_get_data;
 }
 
@@ -89,9 +89,9 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
     char *ret = NULL;
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
+    s_ezlopi_http_data_t *http_get_data = NULL; // malloc(sizeof(s_ezlopi_http_data_t));
 
-    if (my_data && http_get_data)
+    if (my_data)
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
 
@@ -153,19 +153,20 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
                         }
                     }
                 }
+                http_get_data->response = ret;
+                http_get_data->status_code = status_code;
             }
             else
             {
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
+                free(http_get_data);
+                http_get_data = NULL;
             }
 
             ezlopi_http_free_rx_data(my_data);
             esp_http_client_cleanup(client);
         }
     }
-
-    http_get_data->response = ret;
-    http_get_data->status_code = status_code;
     return http_get_data;
 }
 

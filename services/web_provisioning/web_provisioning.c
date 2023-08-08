@@ -36,6 +36,7 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void web_provisioning_fetch_wss_endpoint(void *pv);
 static void web_provisioning_config_check(void *pv);
+static void web_provisioning_config_update(void *arg);
 
 #if 0
 typedef struct s_method_list
@@ -71,6 +72,45 @@ static const s_method_list_t method_list[] = {
     // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
 };
 #endif
+
+// const char *prov_data = "{\"id\":100002233,\"uuid\":\"fb3c84b0-534c-11ec-b2d6-8f260f5287fa\",\"cloud_uuid\":\"ef6612c8-e087-4378-8196-ca879bda3ab6\",\"order_uuid\":\"21030e60-5345-11ec-b980-67c13f8bc620\",\"config_version\":2,\"zwave_region\":[\"US\"],\"provision_server\":\"https://req-disp-at0m.mios.com\",\"cloud_server\":\"https://cloud-qa.ezlo.com:7000\",\"provision_token\":\"111de311ce1026442160d7bd373f6fdb9b73bceb7d88c5ec86b1fae05d88935ce561a6cc295d0bfc5d4ddffb516731c80074cc208bc90660485df51ce4341238c6a22a5724063db84c2a7158988d25063e4e6d5f8d95e8f92a56215a63163e173de3a13d7c2d2dcefd157dd4e589b6e4bac3046bcb7b175ca88124ace0e24c16\",\"provision_order\":11660602,\"ssl_private_key\":\"-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgcmY2i3woCmLfLZ9SXi17\nob0aS7MoF0nMiVV/xYt4ihqhRANCAAT30a9LsnFlw9bXxzg7ik6uzvQgK+S3kBIi\ni49K8y1lxtEepbYQGtH2/hwnbTokW9WPhw6KJYr6uUi9glXodS3l\n-----END PRIVATE KEY-----\n\",\"ssl_public_key\":\"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE99GvS7JxZcPW18c4O4pOrs70ICvkt5AS\nIouPSvMtZcbRHqW2EBrR9v4cJ206JFvVj4cOiiWK+rlIvYJV6HUt5Q==\n-----END PUBLIC KEY-----\",\"ssl_shared_key\":\"\n-----BEGIN CERTIFICATE-----\nMIICDTCCAbKgAwIBAgIDAzdTMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\nMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\nBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExURCBDQTEh\nMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTIxMTIwMjA4NTEw\nNFoYDzIyOTUwOTE2MDg1MTA0WjCBjDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCk5l\ndyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xEzARBgNVBAoMCmNvbnRyb2xsZXIx\nLTArBgNVBAsMJGZiM2M4NGIwLTUzNGMtMTFlYy1iMmQ2LThmMjYwZjUyODdmYTES\nMBAGA1UEAwwJMTAwMDAyMjMzMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE99GvS7Jx\nZcPW18c4O4pOrs70ICvkt5ASIouPSvMtZcbRHqW2EBrR9v4cJ206JFvVj4cOiiWK\n+rlIvYJV6HUt5TAKBggqhkjOPQQDAgNJADBGAiEA+LnENks3Knp1jBgi9vP0g5YC\n0JsTY9K8UWMztfFTWUQCIQDpuzMAfIS90NfCU/K4DsrBZzYZDP+kM+/8wt9v41L4\nbg==\n-----END CERTIFICATE-----\n\",\"signing_ca_certificate\":\"-----BEGIN CERTIFICATE-----\r\nMIICbDCCAhGgAwIBAgIJAOByzaI7aHY9MAoGCCqGSM49BAMDMIGQMQswCQYDVQQG\r\nEwJVUzEUMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzAN\r\nBgNVBAoMBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExU\r\nRCBDQTEhMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTE5MDUz\r\nMTE3MDE0N1oYDzIxMTkwNTA3MTcwMTQ3WjCBkDELMAkGA1UEBhMCVVMxFDASBgNV\r\nBAgMCyBOZXcgSmVyc2V5MRAwDgYDVQQHDAdDbGlmdG9uMQ8wDQYDVQQKDAZJVCBP\r\ncHMxDzANBgNVBAsMBklUIE9wczEUMBIGA1UEAwwLZVpMTyBMVEQgQ0ExITAfBgkq\r\nhkiG9w0BCQEWEnN5c2FkbWluc0BlemxvLmNvbTBWMBAGByqGSM49AgEGBSuBBAAK\r\nA0IABHLQdhLDYsafIFY8pZh96aDGqVm6E4r8nW9s4CfdpXaa/R4CnjaVpDQI7UmQ\r\n9vVDGZn8mcmm7VjKx+TSCS0MIKOjUzBRMB0GA1UdDgQWBBRiTl8Ez1l94jaqcxbi\r\nyxkVC0FkBTAfBgNVHSMEGDAWgBRiTl8Ez1l94jaqcxbiyxkVC0FkBTAPBgNVHRMB\r\nAf8EBTADAQH/MAoGCCqGSM49BAMDA0kAMEYCIQD7EUs8j50jKFd/46Zo95NbrPYQ\r\nPtLTHH9YjUkMEkYD5gIhAMP4y7E1aB78nQrmd3IX8MM32k9dM8xT0MztR16OtsuV\r\n-----END CERTIFICATE-----\",\"default_wifi_ssid\":\"wifi_100002233\",\"default_wifi_password\":\"43bb92b8\",\"default_ssh_password\":\"$1$QA5QOk96$oJJPiVTSZgTNq0KPDmq/2.\"}";
+
+// const char *prov_data =
+//     "{\"id\":100002233,"
+//     "\"uuid\":\"fb3c84b0-534c-11ec-b2d6-8f260f5287fa\","
+//     "\"cloud_uuid\":\"ef6612c8-e087-4378-8196-ca879bda3ab6\","
+//     "\"order_uuid\":\"21030e60-5345-11ec-b980-67c13f8bc620\","
+//     "\"config_version\":2,"
+//     "\"zwave_region\":[\"US\"],"
+//     "\"provision_server\":\"https://req-disp-at0m.mios.com\","
+//     "\"cloud_server\":\"https://cloud-qa.ezlo.com:7000\","
+//     "\"provision_token\":\"111de311ce1026442160d7bd373f6fdb9b73bceb7d88c5ec86b1fae05d88935ce561a6cc295d0bfc5d4ddffb516731c80074cc208bc90660485df51ce4341238c6a22a5724063db84c2a7158988d25063e4e6d5f8d95e8f92a56215a63163e173de3a13d7c2d2dcefd157dd4e589b6e4bac3046bcb7b175ca88124ace0e24c16\","
+//     "\"provision_order\":11660602,"
+//     "\"ssl_private_key\":\"-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgcmY2i3woCmLfLZ9SXi17\nob0aS7MoF0nMiVV/xYt4ihqhRANCAAT30a9LsnFlw9bXxzg7ik6uzvQgK+S3kBIi\ni49K8y1lxtEepbYQGtH2/hwnbTokW9WPhw6KJYr6uUi9glXodS3l\n-----END PRIVATE KEY-----\","
+//     "\"ssl_public_key\":\"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE99GvS7JxZcPW18c4O4pOrs70ICvkt5AS\nIouPSvMtZcbRHqW2EBrR9v4cJ206JFvVj4cOiiWK+rlIvYJV6HUt5Q==\n-----END PUBLIC KEY-----\","
+//     "\"ssl_shared_key\":\"\n-----BEGIN CERTIFICATE-----\nMIICDTCCAbKgAwIBAgIDAzdTMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\nMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\nBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDw..................\"}"
+//     "\"signing_ca_certificate\":\"-----BEGIN CERTIFICATE-----\r\nMIICbDCCAhGgAwIBAgIJAOByzaI7aHY9MAoGCCqGSM49BAMDMIGQMQswCQYDVQQG\r\nEwJVUzEUMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzAN\r\nBgNVBAoMBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExU\r\nRCBDQTEhMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTE5MDUz\r\nMTE3MDE0N1oYDzIxMTkwNTA3MTcwMTQ3WjCBkDELMAkGA1UEBhMCVVMxFDASBgNV\r\nBAgMCyBOZXcgSmVyc2V5MRAwDgYDVQQHDAdDbGlmdG9uMQ8wDQYDVQQKDAZJVCBP\r\ncHMxDzANBgNVBAsMBklUIE9wczEUMBIGA1UEAwwLZVpMTyBMVEQgQ0ExITAfBgkq\r\nhkiG9w0BCQEWEnN5c2FkbWluc0BlemxvLmNvbTBWMBAGByqGSM49AgEGBSuBBAAK\r\nA0IABHLQdhLDYsafIFY8pZh96aDGqVm6E4r8nW9s4CfdpXaa/R4CnjaVpDQI7UmQ\r\n9vVDGZn8mcmm7VjKx+TSCS0MIKOjUzBRMB0GA1UdDgQWBBRiTl8Ez1l94jaqcxbi\r\nyxkVC0FkBTAfBgNVHSMEGDAWgBRiTl8Ez1l94jaqcxbiyxkVC0FkBTAPBgNVHRMB\r\nAf8EBTADAQH/MAoGCCqGSM49BAMDA0kAMEYCIQD7EUs8j50jKFd/46Zo95NbrPYQ\r\nPtLTHH9YjUkMEkYD5gIhAMP4y7E1aB78nQrmd3IX8MM32k9dM8xT0MztR16OtsuV\r\n-----END CERTIFICATE-----";
+
+const char *prov_data =
+    "{"
+    "\"id\": 100002244,"
+    "\"uuid\": \"550e8400-e29b-41d4-a716-446655440000\","
+    "\"cloud_uuid\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\","
+    "\"order_uuid\": \"7a63f46f-cbfa-4d0a-9158-16a7b97b0f8f\","
+    "\"config_version\": 5,"
+    "\"zwave_region\": [\"US\"],"
+    "\"provision_server\": \"https://abc-xyz-at0m.mios.com\","
+    "\"cloud_server\": \"https://cloud-abc.xyz.com:7000\","
+    "\"provision_token\": \"1112222223333333333444444444444555555555555aaaaaaaaaaaaaa8888888888888888888888llllllllllllll\","
+    "\"provision_order\": 11660602,"
+    "\"ssl_private_key\": \"Remember that working directly with flash memory requires careful consideration of partitioning\","
+    "\"ssl_public_key\": \"Also, please ensure that you have set up your ESP-IDF project correctly and have included the necessary headers.\","
+    "\"ssl_shared_key\": \"\n----------\nM............BEGIN CERTIFICATE......\","
+    "\"signing_ca_certificate\": \"not using the nvs write into a partition calling partition based API..................\","
+    "\"default_wifi_ssid\": \"wifi_100002233\","
+    "\"default_wifi_password\": \"43bb92b8\","
+    "\"default_ssh_password\": \"$1$QA5QOk96$oJJPiVTSZgTNq0KPDmq/2.\""
+    "}";
 
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
@@ -183,46 +223,63 @@ static void web_provisioning_config_check(void *pv)
     while (1)
     {
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
+
         TRACE_D("water_mark: %d", water_mark);
+
         cJSON *root_header_prov_token = cJSON_CreateObject();
 
         cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
 
-        int prov_url_len = strlen(provisioning_server);
+        if (NULL != provisioning_server)
+        {
+            int prov_url_len = strlen(provisioning_server);
 
-        if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
-        {
-            provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
+            if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
+            {
+                provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
+            }
+            else if (prov_url_len >= 4 && strcmp(&provisioning_server[prov_url_len - 4], ".com") == 0)
+            {
+                // Nothing to do, no trailing "/"
+            }
+            else
+            {
+                // Do nothing
+            }
         }
-        else if (prov_url_len >= 4 && strcmp(&provisioning_server[prov_url_len - 4], ".com") == 0)
-        {
-            // Nothing to do, no trailing "/"
-        }
-        else
-        {
-            // Do nothing
-        }
-
+#if 0
         if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
         {
-            // TRACE_E("Config Version : %d", config_version);
 
             char http_request_location[200];
-
             snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", 1); // add config_version instead of 1
-            char *data_read = (char *)malloc(4000);
-            if (NULL != data_read)
+
+            uint16_t http_status;
+            response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
+            if (NULL != response)
             {
-                uint16_t http_status;
-                data_read = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
-                TRACE_E("Data : %s", data_read);
+                TRACE_E("Data : %s", response->response);
+                TRACE_E("Statuc Code : %d", response->status_code);
+                switch (response->status_code)
+                {
+                case HttpStatus_Ok:
+                    // re-write all the info into the flash region
+                    break;
+                case 304: // HTTP Status not modified
+                    TRACE_E("Config data not changed !");
+                    break;
+                default:
+                    break;
+                }
             }
 
-            free(data_read);
-        }
-        else
-        {
-        }
+    }
+    else
+    {
+    }
+#endif
+        web_provisioning_config_update(prov_data);
+        vTaskDelay(10000 / portTICK_RATE_MS);
     }
 
     // free(cloud_server);
@@ -236,7 +293,7 @@ static void web_provisioning_config_check(void *pv)
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
     char *ws_endpoint = NULL;
-    s_ezlopi_http_data_t *response = malloc(sizeof(s_ezlopi_http_data_t));
+    s_ezlopi_http_data_t *response = NULL;
 
     while (1)
     {
@@ -261,29 +318,33 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         {
 
             response = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
-            ws_endpoint = response->response;
-            if (ws_endpoint)
+            if (response)
             {
-                TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
-                TRACE_D("http_request: %s", http_request);
-                cJSON *root = cJSON_Parse(ws_endpoint);
-                if (root)
+                ws_endpoint = response->response;
+                if (ws_endpoint)
                 {
-                    cJSON *cjson_uri = cJSON_GetObjectItem(root, "uri");
-                    if (cjson_uri)
+                    TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
+                    TRACE_D("http_request: %s", http_request);
+                    cJSON *root = cJSON_Parse(ws_endpoint);
+                    if (root)
                     {
-                        TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                        ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-                        free(cloud_server);
-                        free(ca_certificate);
-                        free(ssl_shared_key);
-                        free(ssl_private_key);
-                        free(cloud_server);
-                        break;
+                        cJSON *cjson_uri = cJSON_GetObjectItem(root, "uri");
+                        if (cjson_uri)
+                        {
+                            TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                            ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+                            free(cloud_server);
+                            free(ca_certificate);
+                            free(ssl_shared_key);
+                            free(ssl_private_key);
+                            free(cloud_server);
+                            break;
+                        }
                     }
+                    free(ws_endpoint);
                 }
-                free(ws_endpoint);
             }
+
             free(response);
         }
         else
@@ -297,7 +358,173 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
     vTaskDelete(NULL);
 }
+static void web_provisioning_config_update(void *arg)
+{
+    cJSON *root_prov_data = cJSON_Parse((char *)arg);
 
+    if (NULL != root_prov_data)
+    {
+
+        cJSON *cJSON_id = cJSON_GetObjectItem(root_prov_data, "id");
+        cJSON *cJSON_uuid = cJSON_GetObjectItem(root_prov_data, "uuid");
+        cJSON *cJSON_cloud_uuid = cJSON_GetObjectItem(root_prov_data, "cloud_uuid");
+        cJSON *cJSON_order_uuid = cJSON_GetObjectItem(root_prov_data, "order_uuid");
+        cJSON *cJSON_config_version = cJSON_GetObjectItem(root_prov_data, "config_version");
+        cJSON *cJSON_zwave_region_aary = cJSON_GetObjectItem(root_prov_data, "zwave_region");
+        cJSON *cJSON_provision_server = cJSON_GetObjectItem(root_prov_data, "provision_server");
+        cJSON *cJSON_cloud_server = cJSON_GetObjectItem(root_prov_data, "cloud_server");
+        cJSON *cJSON_provision_token = cJSON_GetObjectItem(root_prov_data, "provision_token");
+        cJSON *cJSON_provision_order = cJSON_GetObjectItem(root_prov_data, "provision_order");
+        cJSON *cJSON_ssl_private_key = cJSON_GetObjectItem(root_prov_data, "ssl_private_key");
+        cJSON *cJSON_ssl_public_key = NULL; // cJSON_GetObjectItem(root_prov_data, "ssl_public_key");
+        cJSON *cJSON_ssl_shared_key = cJSON_GetObjectItem(root_prov_data, "ssl_shared_key");
+        cJSON *cJSON_signing_ca_certificate = cJSON_GetObjectItem(root_prov_data, "signing_ca_certificate");
+
+        s_basic_factory_info_t *config_check_factoryInfo = malloc(sizeof(s_basic_factory_info_t));
+
+        if (NULL != cJSON_id)
+        {
+            const uint64_t id = cJSON_id->valueint;
+            TRACE_I("id: %lld", id);
+            config_check_factoryInfo->id = id;
+        }
+        else
+        {
+            config_check_factoryInfo->id = 0;
+        }
+
+        if (NULL != cJSON_uuid)
+        {
+            const char *uuid = cJSON_uuid->valuestring;
+            TRACE_I("uuid: %s", uuid);
+            config_check_factoryInfo->device_uuid = uuid;
+        }
+        else
+        {
+            config_check_factoryInfo->device_uuid = NULL;
+        }
+
+        if (NULL != cJSON_cloud_uuid)
+        {
+            const char *cloud_uuid = cJSON_cloud_uuid->valuestring;
+            TRACE_I("cloud_uuid: %s", cloud_uuid);
+        }
+        else
+        {
+        }
+        if (NULL != cJSON_order_uuid)
+        {
+            const char *order_uuid = cJSON_order_uuid->valuestring;
+            TRACE_I("order_uuid: %s", order_uuid);
+            // ezlopi_factory_info_v2_set_order_uuid(order_uuid);
+        }
+
+        if (NULL != cJSON_config_version)
+        {
+            const uint16_t config_version = cJSON_config_version->valueint;
+            TRACE_I("config_version: %d", config_version);
+            config_check_factoryInfo->config_version = config_version;
+        }
+        else
+        {
+            config_check_factoryInfo->config_version = 0;
+        }
+
+        if (NULL != cJSON_zwave_region_aary)
+        {
+            if (cJSON_IsArray(cJSON_zwave_region_aary))
+            {
+                cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
+                if (cJSON_zwave_region)
+                {
+                    const char *zwave_region = cJSON_zwave_region->valuestring;
+                }
+            }
+        }
+        if (NULL != cJSON_provision_server)
+        {
+            const char *provision_server = cJSON_provision_server->valuestring;
+            TRACE_I("provision_server: %s", provision_server);
+            config_check_factoryInfo->provision_server = provision_server;
+        }
+        else
+        {
+            config_check_factoryInfo->provision_server = NULL;
+        }
+        if (NULL != cJSON_cloud_server)
+        {
+            const char *cloud_server = cJSON_cloud_server->valuestring;
+            TRACE_I("cloud_server: %s", cloud_server);
+            config_check_factoryInfo->cloud_server = cloud_server;
+        }
+        else
+        {
+            config_check_factoryInfo->cloud_server = NULL;
+        }
+
+        if (NULL != cJSON_provision_token)
+        {
+            const char *provision_token = cJSON_provision_token->valuestring;
+            TRACE_I("provision_token: %s", provision_token);
+            config_check_factoryInfo->provision_token = provision_token;
+        }
+        else
+        {
+            config_check_factoryInfo->provision_token = NULL;
+        }
+
+        if (NULL != cJSON_provision_order)
+        {
+            const uint32_t provision_order = cJSON_provision_order->valueint;
+            TRACE_I("provision_order: %d", provision_order);
+        }
+        if (NULL != cJSON_ssl_private_key)
+        {
+            const char *ssl_private_key = cJSON_ssl_private_key->valuestring;
+            TRACE_I("ssl_private_key: %s", ssl_private_key);
+            ezlopi_factory_info_v2_set_ssl_private_key(ssl_private_key);
+        }
+
+        // if (NULL != cJSON_ssl_public_key)
+        // {
+        //     const char *ssl_public_key = cJSON_ssl_public_key->valuestring;
+        //     TRACE_I("ssl_public_key: %s", ssl_public_key);
+        //     ezlopi_factory_info_v2_set_ssl_public_key(ssl_public_key);
+        // }
+        if (NULL != cJSON_ssl_shared_key)
+        {
+            const char *ssl_shared_key = cJSON_ssl_shared_key->valuestring;
+            TRACE_I("ssl_shared_key: %s", ssl_shared_key);
+            ezlopi_factory_info_v2_set_ssl_shared_key(ssl_shared_key);
+        }
+
+        if (NULL != cJSON_signing_ca_certificate)
+        {
+            const char *signing_ca_certificate = cJSON_signing_ca_certificate->valuestring;
+            TRACE_I("signing_ca_certificate: %s", signing_ca_certificate);
+            ezlopi_factory_info_v2_set_ca_cert(signing_ca_certificate);
+        }
+
+        config_check_factoryInfo->brand = NULL;
+        config_check_factoryInfo->device_name = NULL;
+        config_check_factoryInfo->manufacturer = NULL;
+        config_check_factoryInfo->model_number = NULL;
+        config_check_factoryInfo->prov_uuid = NULL;
+
+        if (ezlopi_factory_info_v2_set_basic(config_check_factoryInfo))
+        {
+            TRACE_I("Updated provisioning config");
+        }
+        else
+        {
+            TRACE_E("Error updating provisioning config");
+        }
+    }
+    else
+    {
+        TRACE_E("Error parsing JSON.\n");
+    }
+}
 static void __connection_upcall(bool connected)
 {
     static bool prev_status;
