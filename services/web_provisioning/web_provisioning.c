@@ -258,10 +258,10 @@ static void web_provisioning_config_check(void *pv)
             {
                 switch (response->status_code)
                 {
-                    TRACE_E("Statuc Code : %d", response->status_code);
+                    TRACE_I("Statuc Code : %d", response->status_code);
                 case HttpStatus_Ok:
                     // re-write all the info into the flash region
-                    TRACE_E("Data : %s", response->response);
+                    TRACE_I("Data : %s", response->response);
                     if (0 == web_provisioning_config_update(response->response))
                     {
                         retry_count++;
@@ -272,7 +272,7 @@ static void web_provisioning_config_check(void *pv)
                     }
                     break;
                 case 304: // HTTP Status not modified
-                    TRACE_E("Config data not changed !");
+                    TRACE_I("Config data not changed !");
                     flag_break_loop = 1;
                     break;
                 default:
@@ -293,9 +293,9 @@ static void web_provisioning_config_check(void *pv)
 
         vTaskDelay(50000 / portTICK_RATE_MS);
     }
-
+    free(response->response);
     free(response);
-    free(ca_certificate);
+    // free(ca_certificate);
     free(provision_token);
     free(provisioning_server);
     vTaskDelete(NULL);
@@ -304,23 +304,29 @@ static void web_provisioning_config_check(void *pv)
 static void web_provisioning_fetch_wss_endpoint(void *pv)
 {
     char *ws_endpoint = NULL;
+    char *cloud_server = NULL;
+    char *ca_certificate = NULL;
+    char *ssl_shared_key = NULL;
+    char *ssl_private_key = NULL;
 
     while (1)
     {
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
         TRACE_D("water_mark: %d", water_mark);
 
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+
         // ezlopi_wait_for_wifi_to_connect();
-        char *cloud_server = NULL;
-        char *ca_certificate = NULL;
-        char *ssl_shared_key = NULL;
-        char *ssl_private_key = NULL;
 
         cloud_server = ezlopi_factory_info_v2_get_cloud_server();
         ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
         ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
         ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+
+        TRACE_E("cloud_server: %s", cloud_server);
+        TRACE_E("ca_certificate: %s", ca_certificate);
+        TRACE_E("ssl_shared_key: %s", ssl_shared_key);
+        TRACE_E("ssl_private_key: %s", ssl_private_key);
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
@@ -344,11 +350,6 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
                         {
                             TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                             ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-                            free(cloud_server);
-                            free(ca_certificate);
-                            free(ssl_shared_key);
-                            free(ssl_private_key);
-                            free(cloud_server);
                             break;
                         }
                     }
@@ -366,7 +367,8 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
-
+    free(cloud_server);
+    free(cloud_server);
     vTaskDelete(NULL);
 }
 static uint8_t web_provisioning_config_update(void *arg)

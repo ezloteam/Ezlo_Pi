@@ -39,7 +39,10 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
-
+        // TRACE_E("cloud_url: %s", cloud_url);
+        // TRACE_E("ca_certificate: %s", ca_certificate);
+        // TRACE_E("shared_key: %s", shared_key);
+        // TRACE_E("private_key: %s", private_key);
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)
         {
