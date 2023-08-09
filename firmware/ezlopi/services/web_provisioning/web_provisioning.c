@@ -94,6 +94,7 @@ static const s_method_list_v2_t method_list_v2[] = {
     // {.method_name = "hub.scenes.status.get", .method = scenes_status_get, .updater = NULL}, // Implementation remains
     {.method_name = "hub.scenes.blocks.list", .method = scenes_blocks_list, .updater = NULL},
     {.method_name = "hub.scenes.block.data.list", .method = scenes_block_data_list, .updater = NULL},
+    {.method_name = "hub.scenes.scripts.list", .method = scenes_scripts_list, .updater = NULL},
 
     // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
     {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},

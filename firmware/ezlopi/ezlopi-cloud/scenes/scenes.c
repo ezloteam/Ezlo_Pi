@@ -352,33 +352,48 @@ static void __value_scales_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result && list_name)
     {
-        cJSON *cj_value_types = cJSON_AddObjectToObject(cj_result, list_name);
-        if (cj_value_types)
+        cJSON *cj_value_scales = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_value_scales)
         {
-            cJSON *cj_value_array = cJSON_AddArrayToObject(cj_value_types, "list");
-            if (cj_value_array)
+            l_ezlopi_device_t *devices = ezlopi_device_get_head();
+            while (devices)
             {
-                l_ezlopi_device_t *devices = ezlopi_device_get_head();
-                while (devices)
+                l_ezlopi_item_t *items = devices->items;
+                while (items)
                 {
-                    l_ezlopi_item_t *items = devices->items;
-                    while (items)
+                    if (items->cloud_properties.scale)
                     {
-                        if (items->cloud_properties.scale)
+                        cJSON *cj_scale_array = NULL;
+                        cJSON *cj_value_type = cJSON_GetObjectItem(cj_value_scales, items->cloud_properties.value_type);
+                        if (NULL == cj_value_type)
                         {
-                            cJSON *cj_item_value_type = cJSON_CreateString(items->cloud_properties.scale);
-                            if (cj_item_value_type)
+                            cj_value_type = cJSON_AddObjectToObject(cj_value_scales, items->cloud_properties.value_type);
+                            if (cj_value_type)
                             {
-                                if (!cJSON_AddItemToArray(cj_value_array, cj_item_value_type))
+                                cj_scale_array = cJSON_AddArrayToObject(cj_value_type, "scales");
+                                cJSON_AddFalseToObject(cj_value_type, "converter");
+                            }
+                        }
+                        else
+                        {
+                            cj_scale_array = cJSON_GetObjectItem(cj_value_type, "scales");
+                        }
+
+                        if (cj_scale_array)
+                        {
+                            cJSON *cj_scale = cJSON_CreateString(items->cloud_properties.scale);
+                            if (cj_scale)
+                            {
+                                if (!cJSON_AddItemToArray(cj_scale_array, cj_scale))
                                 {
-                                    cJSON_Delete(cj_item_value_type);
+                                    cJSON_Delete(cj_scale);
                                 }
                             }
                         }
-                        items = items->next;
                     }
-                    devices = devices->next;
+                    items = items->next;
                 }
+                devices = devices->next;
             }
         }
     }
@@ -505,6 +520,20 @@ void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
                     temp = temp->next;
                 }
             }
+        }
+    }
+}
+
+void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
+{
+    if (cj_request && cj_response)
+    {
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+        if (cj_result)
+        {
         }
     }
 }

@@ -28,7 +28,7 @@ void ezlopi_ping_init(void)
 {
     esp_ping_config_t config = ESP_PING_DEFAULT_CONFIG();
 
-    config.interval_ms = 5000;
+    config.interval_ms = 10000;
     config.count = 1000;
 
     // parse IP address
