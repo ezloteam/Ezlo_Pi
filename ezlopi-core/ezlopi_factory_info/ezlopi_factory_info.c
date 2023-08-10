@@ -79,6 +79,12 @@ static char *g_ssl_private_key = NULL;
 static char *g_ssl_shared_key = NULL;
 static char *g_ezlopi_config = NULL;
 static uint32_t g_provisioning_status = 0;
+char ezlopi_device_type_str[][50] = {
+    "ezlopi_generic",
+    "ezlopi_device_switchbox",
+    "ezlopi_device_irblaster"
+    "ezlopi_sensor_sound",
+    "ezlopi_sensor_ambienttrackerpro"};
 
 static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
@@ -166,7 +172,7 @@ void print_factory_info_v2(void)
     ezlopi_factory_info_v2_free(wifi_ssid);
     ezlopi_factory_info_v2_free(wifi_password);
     ezlopi_factory_info_v2_free(cloud_server);
-    ezlopi_factory_info_v2_free(device_type);
+    // ezlopi_factory_info_v2_free(device_type);
 }
 
 /** Getter */
@@ -325,7 +331,31 @@ char *ezlopi_factory_info_v2_get_provisioning_server(void)
 
 char *ezlopi_factory_info_v2_get_device_type(void)
 {
-    return ezlopi_factory_info_v2_read_string(DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH);
+    // return ezlopi_factory_info_v2_read_string(DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH);
+    switch (EZLOPI_DEVICE_TYPE)
+    {
+    case EZLOPI_DEVICE_TYPE_TEST_DEVICE:
+        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
+        break;
+    case EZLOPI_DEVICE_TYPE_GENERIC:
+        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
+        break;
+    case EZLOPI_DEVICE_TYPE_SWITCH_BOX:
+        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_SWITCH_BOX];
+        break;
+    case EZLOPI_DEVICE_TYPE_IR_BLASTER:
+        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_IR_BLASTER];
+        break;
+    case EZLOPI_DEVICE_TYPE_SOUND_SENSOR:
+        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_SOUND_SENSOR];
+        break;
+    case EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO:
+        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO];
+        break;
+    default:
+        return "undefined";
+        break;
+    }
 }
 
 char *ezlopi_factory_info_v2_get_ca_certificate(void)
