@@ -3,7 +3,7 @@
 #define _0053_UART_GYGPS6MV2_H_
 
 #include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
+#include "ezlopi_devices.h"
 
 /* 3.3V operating voltage */
 //-----------------------------------------------------------------------------------------
@@ -18,12 +18,18 @@
 // #define GSV_MESSAGE_ENABLE
 // #define GLL_MESSAGE_ENABLE
 //-----------------------------------------------------------------------------------------
-#define MAX_GPGGA_SENTENCE_SIZE 85 // 6 , 14 ,
+#define MAX_GPGGA_SENTENCE_SIZE 85 // (:'$GPGGA') + (:',') + (:'message')
+// #define MAX_GPRMC_SENTENCE_SIZE 70 // (:'$GPRMC') + (:',') + (:'message')
+// #define MAX_GPVTG_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
+// #define MAX_GPGSA_SENTENCE_SIZE 70 // (:'$GPGGA') + (:',') + (:'message')
+// #define MAX_GPGSV_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
+// #define MAX_GPGLL_SENTENCE_SIZE 40 // (:'$GPGGA') + (:',') + (:'message')
+
 //-----------------------------------------------------------------------------------------
 /**
  * circular buffer to store the complete message
  */
-#define CIR_BUFSIZE 768
+#define CIR_BUFSIZE 768 // choose ( buf_size >= 768) to avoid faulty message
 
 /**
  * link: https://www.rfwireless-world.com/Terminology/GPS-sentences-or-NMEA-sentences.html
@@ -65,20 +71,20 @@ typedef struct longitude_t
 typedef struct GPRMC_t
 {
     // $GPRMC -> RMC protocol header
-    char GPRMC_sentence[70];        // this stores contents of GPRMC_data line
-    char UTC_time[10];              // XXXXXX.XXX       //161229.487 -> hhmmss.sss
-    char Status;                    // X                // A/V ; A = data valid or V = data not valid
-    latitude_t Latitude;            // XXXX.XXXX        // 3723.2475 -> ddmm.mmmm
-    char N_S_indicator;             // X                // N/S (N = North, S = South)
-    longitude_t Longitude;          // XXXXX.XXXX       // 12158.3416 (121 degrees, 58.3416 minutes) -> dddmm.mmmm
-    char E_W_indicator;             // X                // E/W (E = East or W = West)
-    char Speed_ovr_gnd[6];          // XX.XXX           // 0.0013-> knots per hr
-    char Course_ovr_gnd[6];         // XX.XXX           // 309.62 -> direction in degrees
-    char Date[6];                   // XXXXX            // 120598 -> ddmmyy
-    char Magnetic_variation_val[6]; // XXX.XX           //Degrees [102.01]
-    char Magnetic_variation_dir;    // X                // (E= East or W = West)
-    char mode;                      // X                //  A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
-    char Checksum[2];               // XX               // *53
+    char GPRMC_sentence[MAX_GPRMC_SENTENCE_SIZE]; // this stores contents of GPRMC_data line
+    hms_t UTC_time;                               // XXXXXX.XXX       //161229.487 -> hhmmss.sss
+    char Status;                                  // X                // A/V ; A = data valid or V = data not valid
+    latitude_t Latitude;                          // XXXX.XXXX        // 3723.2475 -> ddmm.mmmm
+    char N_S_indicator;                           // X                // N/S (N = North, S = South)
+    longitude_t Longitude;                        // XXXXX.XXXX       // 12158.3416 (121 degrees, 58.3416 minutes) -> dddmm.mmmm
+    char E_W_indicator;                           // X                // E/W (E = East or W = West)
+    char Speed_ovr_gnd[7];                        // XX.XXX           // 0.0013-> knots per hr
+    char Course_ovr_gnd[7];                       // XX.XXX           // 309.62 -> direction in degrees
+    char Date[7];                                 // XXXXXX           // 120598 -> ddmmyy
+    char Magnetic_variation_val[7];               // XXX.XX           //Degrees [102.01]
+    char Magnetic_variation_dir;                  // X                // (E= East or W = West)
+    char mode;                                    // X                //  A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
+    char Checksum[3];                             // XX               // *53
 } GPRMC_t;
 #endif
 
@@ -87,17 +93,17 @@ typedef struct GPRMC_t
 typedef struct GPVTG_t
 {
     // $GPVTG -> VTG protocol header
-    char GPVTG_sentence[70];    // this stores contents of GPVTG_data line
-    char Course_deg[6];         // XXX.XX               //309.62 [degree]
-    char Track_indicator;       // X                    // T-Track type
-    char Magnetic_variation[6]; // XX.XXX               // 24.168 [degree]
-    char Magnetic_indicatior;   // X                    // M-Magnetic type
-    char Speed_in_knots[6];     // X.XXXX               // 0.0013-> [knots] ,Measured horizontal speed
-    char Knot_Unit;             // X                    // N-Knots
-    char Speed_in_km_hr[6];     // X.XXXX               // 0.0013-> [Km/Hr], Measured horizontal speed
-    char Km_hr_Unit;            // X                    // K-Kilometers per hour
-    char mode;                  // X                    // A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
-    char Checksum[2];           // XX                   // *30
+    char GPVTG_sentence[MAX_GPVTG_SENTENCE_SIZE]; // this stores contents of GPVTG_data line
+    char Course_deg[7];                           // XXX.XX               //309.62 [degree]
+    char Track_indicator;                         // X                    // T-Track type
+    char Magnetic_variation[7];                   // XX.XXX               // 24.168 [degree]
+    char Magnetic_indicatior;                     // X                    // M-Magnetic type
+    char Speed_in_knots[7];                       // X.XXXX               // 0.0013-> [knots] ,Measured horizontal speed
+    char Knot_Unit;                               // X                    // N-Knots
+    char Speed_in_km_hr[7];                       // X.XXXX               // 0.0013-> [Km/Hr], Measured horizontal speed
+    char Km_hr_Unit;                              // X                    // K-Kilometers per hour
+    char mode;                                    // X                    // A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
+    char Checksum[3];                             // XX                   // *30
 } GPVTG_t;
 #endif
 
@@ -130,25 +136,25 @@ typedef struct GPGGA_t
 // 4. GPS receiver operating mode, satellites used in the position solution, and DOP values.
 typedef struct GPGSA_t
 {
-    char GPGSA_sentence[70]; // this stores contents of GPGSA_data line
-    char mode_A_M;           // X                      //A-Automatic 2D/3D ; M-Manual, forced to operate in 2D or 3D
-    char mode_123;           // X                      //Mode: 1 = Fix not available ; 2 = 2D ; 3 = 3D
-    char PRN_num_1[3];       // X.X                    // PRN numbers of satellites used in solution (null for unused fields),
-    char PRN_num_2[3];       // X.X                    //                   - GPS = 1 to 32
-    char PRN_num_3[3];       // X.X                    //                   - SBAS = 33 to 64 (add 87 for PRN number)
-    char PRN_num_4[3];       // X.X                    //                   - GLO = 65 to 96
-    char PRN_num_5[3];       // X.X                    //
-    char PRN_num_6[3];       // X.X                    //
-    char PRN_num_7[3];       // X.X                    //
-    char PRN_num_8[3];       // X.X                    //
-    char PRN_num_9[3];       // X.X                    //
-    char PRN_num_10[3];      // X.X                    //
-    char PRN_num_11[3];      // X.X                    //
-    char PRN_num_12[3];      // X.X                    //
-    char PDOP[3];            // X.X                    // Position dilution of precision
-    char HDOP[3];            // X.X                    // Horizontal dilution of precision
-    char VDOP[3];            // X.X                    // Vertical dilution of precision
-    char Checksum[2];        // XX                     // *30
+    char GPGSA_sentence[MAX_GPGSA_SENTENCE_SIZE]; // this stores contents of GPGSA_data line
+    char mode_A_M;                                // X                      //A-Automatic 2D/3D ; M-Manual, forced to operate in 2D or 3D
+    char mode_123;                                // X                      //Mode: 1 = Fix not available ; 2 = 2D ; 3 = 3D
+    char PRN_num_1[4];                            // X.X                    // PRN numbers of satellites used in solution (null for unused fields),
+    char PRN_num_2[4];                            // X.X                    //                   - GPS = 1 to 32
+    char PRN_num_3[4];                            // X.X                    //                   - SBAS = 33 to 64 (add 87 for PRN number)
+    char PRN_num_4[4];                            // X.X                    //                   - GLO = 65 to 96
+    char PRN_num_5[4];                            // X.X                    //
+    char PRN_num_6[4];                            // X.X                    //
+    char PRN_num_7[4];                            // X.X                    //
+    char PRN_num_8[4];                            // X.X                    //
+    char PRN_num_9[4];                            // X.X                    //
+    char PRN_num_10[4];                           // X.X                    //
+    char PRN_num_11[4];                           // X.X                    //
+    char PRN_num_12[4];                           // X.X                    //
+    char PDOP[4];                                 // X.X                    // Position dilution of precision
+    char HDOP[4];                                 // X.X                    // Horizontal dilution of precision
+    char VDOP[4];                                 // X.X                    // Vertical dilution of precision
+    char Checksum[3];                             // XX                     // *30
 } GPGSA_t;
 #endif
 
@@ -156,27 +162,27 @@ typedef struct GPGSA_t
 // 5. The number of GPS satellites in view satellite ID numbers, elevation, azimuth and SNR values
 typedef struct GPGSV_t
 {
-    char GPGSV_sentence[40];   // this stores contents of GPGSV_data line
-    char total_messages;       // X                    // Total number of messages (1-9)
-    char message_num;          // X                    //	Message number (1-9)
-    char Satellites_inView[2]; // XX                   // Total number of satellites in view
+    char GPGSV_sentence[MAX_GPGSV_SENTENCE_SIZE]; // this stores contents of GPGSV_data line
+    char total_messages;                          // X                    // Total number of messages (1-9)
+    char message_num;                             // X                    //	Message number (1-9)
+    char Satellites_inView[3];                    // XX                   // Total number of satellites in view
 
-    char Satellite_PRN[2]; // XX                   // Satellite PRN number
-    char Elevation[2];     // XX                   // Elevation, [0 - 90]
-    char Azimuth[3];       // XXX                  // Azimuth, [000 to 359]
-    char SNR[2];           // XX                   // SNR (C/No) 00-99 dB, null when not tracking
+    char Satellite_PRN[3]; // XX                   // Satellite PRN number
+    char Elevation[3];     // XX                   // Elevation, [0 - 90]
+    char Azimuth[4];       // XXX                  // Azimuth, [000 to 359]
+    char SNR[3];           // XX                   // SNR (C/No) 00-99 dB, null when not tracking
 
-    char Satellite_PRN_next[2]; // XX                   // Next Satellite PRN number
-    char Elevation_next[2];     // XX                   // Next Elevation, [0 - 90]
-    char Azimuth_next[3];       // XXX                  // Next Azimuth, [000 to 359]
-    char SNR_next[2];           // XX                   // Next SNR (C/No) 00-99 dB, null when not tracking
+    char Satellite_PRN_next[3]; // XX                   // Next Satellite PRN number
+    char Elevation_next[3];     // XX                   // Next Elevation, [0 - 90]
+    char Azimuth_next[4];       // XXX                  // Next Azimuth, [000 to 359]
+    char SNR_next[3];           // XX                   // Next SNR (C/No) 00-99 dB, null when not tracking
 
-    char Satellite_PRN_last[2]; // XX                   // Last Satellite PRN number
-    char Elevation_last[2];     // XX                   // Last Elevation, [0 - 90]
-    char Azimuth_last[3];       // XXX                  // Last Azimuth, [000 to 359]
-    char SNR_last[2];           // XX                   // Last SNR (C/No) 00-99 dB, null when not tracking
+    char Satellite_PRN_last[3]; // XX                   // Last Satellite PRN number
+    char Elevation_last[3];     // XX                   // Last Elevation, [0 - 90]
+    char Azimuth_last[4];       // XXX                  // Last Azimuth, [000 to 359]
+    char SNR_last[3];           // XX                   // Last SNR (C/No) 00-99 dB, null when not tracking
 
-    char Checksum[2]; // XX                   // *78
+    char Checksum[3]; // XX                   // *78
 } GPGSV_t;
 #endif
 
@@ -184,15 +190,15 @@ typedef struct GPGSV_t
 // 6. Geographic position, latitude, longitude
 typedef struct GPGLL_t
 {
-    char GPGLL_sentence[40]; // this stores contents of GPGLL_data line
-    latitude_t Latitude;     // XXXX.XXXX           // Latitude (ddmm.mmmm)
-    char N_S_indicator;      // X                   // Latitude direction (N = North, S = South)
-    longitude_t Longitude;   // XXXXX.XXXX          // Longitude (dddmm.mmmm)
-    char E_W_indicator;      // X                   // (E = East or W = West)
-    hms_t UTC_time[10];      // XXXXXX.XX           // 161229.487	hhmmss.sss
-    char Data_status;        // X                   // A = data valid or V = data not valid
-    char mode;               // X                   // A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
-    char Checksum[2];        // XX                  // *64
+    char GPGLL_sentence[MAX_GPGLL_SENTENCE_SIZE]; // this stores contents of GPGLL_data line
+    latitude_t Latitude;                          // XXXX.XXXX           // Latitude (ddmm.mmmm)
+    char N_S_indicator;                           // X                   // Latitude direction (N = North, S = South)
+    longitude_t Longitude;                        // XXXXX.XXXX          // Longitude (dddmm.mmmm)
+    char E_W_indicator;                           // X                   // (E = East or W = West)
+    hms_t UTC_time;                               // XXXXXX.XX           // 161229.487	hhmmss.sss
+    char Data_status;                             // X                   // A = data valid or V = data not valid
+    char mode;                                    // X                   // A-Autonomous ; D-Differential ; E-Estimated (dead reckoning) mode; M-Manual input; N-Data not valid
+    char Checksum[3];                             // XX                  // *64
 } GPGLL_t;
 #endif
 
