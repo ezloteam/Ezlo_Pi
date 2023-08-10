@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include "cJSON.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C"
