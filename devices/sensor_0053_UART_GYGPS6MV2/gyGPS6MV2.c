@@ -5,6 +5,7 @@
 //-------------------------------------------------------------------------
 // GPGGA MESSAGE PARSING FUNCTION
 //-------------------------------------------------------------------------
+
 void parse_and_assign_GPGGA_message(GPS6MV2_t *sensor_0053_UART_gps6mv2_data)
 {
     TRACE_W("GPGGA_sentence => %s", sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
