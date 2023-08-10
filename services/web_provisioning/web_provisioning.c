@@ -73,45 +73,6 @@ static const s_method_list_t method_list[] = {
 };
 #endif
 
-// const char *prov_data = "{\"id\":100002233,\"uuid\":\"fb3c84b0-534c-11ec-b2d6-8f260f5287fa\",\"cloud_uuid\":\"ef6612c8-e087-4378-8196-ca879bda3ab6\",\"order_uuid\":\"21030e60-5345-11ec-b980-67c13f8bc620\",\"config_version\":2,\"zwave_region\":[\"US\"],\"provision_server\":\"https://req-disp-at0m.mios.com\",\"cloud_server\":\"https://cloud-qa.ezlo.com:7000\",\"provision_token\":\"111de311ce1026442160d7bd373f6fdb9b73bceb7d88c5ec86b1fae05d88935ce561a6cc295d0bfc5d4ddffb516731c80074cc208bc90660485df51ce4341238c6a22a5724063db84c2a7158988d25063e4e6d5f8d95e8f92a56215a63163e173de3a13d7c2d2dcefd157dd4e589b6e4bac3046bcb7b175ca88124ace0e24c16\",\"provision_order\":11660602,\"ssl_private_key\":\"-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgcmY2i3woCmLfLZ9SXi17\nob0aS7MoF0nMiVV/xYt4ihqhRANCAAT30a9LsnFlw9bXxzg7ik6uzvQgK+S3kBIi\ni49K8y1lxtEepbYQGtH2/hwnbTokW9WPhw6KJYr6uUi9glXodS3l\n-----END PRIVATE KEY-----\n\",\"ssl_public_key\":\"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE99GvS7JxZcPW18c4O4pOrs70ICvkt5AS\nIouPSvMtZcbRHqW2EBrR9v4cJ206JFvVj4cOiiWK+rlIvYJV6HUt5Q==\n-----END PUBLIC KEY-----\",\"ssl_shared_key\":\"\n-----BEGIN CERTIFICATE-----\nMIICDTCCAbKgAwIBAgIDAzdTMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\nMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\nBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExURCBDQTEh\nMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTIxMTIwMjA4NTEw\nNFoYDzIyOTUwOTE2MDg1MTA0WjCBjDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCk5l\ndyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xEzARBgNVBAoMCmNvbnRyb2xsZXIx\nLTArBgNVBAsMJGZiM2M4NGIwLTUzNGMtMTFlYy1iMmQ2LThmMjYwZjUyODdmYTES\nMBAGA1UEAwwJMTAwMDAyMjMzMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE99GvS7Jx\nZcPW18c4O4pOrs70ICvkt5ASIouPSvMtZcbRHqW2EBrR9v4cJ206JFvVj4cOiiWK\n+rlIvYJV6HUt5TAKBggqhkjOPQQDAgNJADBGAiEA+LnENks3Knp1jBgi9vP0g5YC\n0JsTY9K8UWMztfFTWUQCIQDpuzMAfIS90NfCU/K4DsrBZzYZDP+kM+/8wt9v41L4\nbg==\n-----END CERTIFICATE-----\n\",\"signing_ca_certificate\":\"-----BEGIN CERTIFICATE-----\r\nMIICbDCCAhGgAwIBAgIJAOByzaI7aHY9MAoGCCqGSM49BAMDMIGQMQswCQYDVQQG\r\nEwJVUzEUMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzAN\r\nBgNVBAoMBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExU\r\nRCBDQTEhMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTE5MDUz\r\nMTE3MDE0N1oYDzIxMTkwNTA3MTcwMTQ3WjCBkDELMAkGA1UEBhMCVVMxFDASBgNV\r\nBAgMCyBOZXcgSmVyc2V5MRAwDgYDVQQHDAdDbGlmdG9uMQ8wDQYDVQQKDAZJVCBP\r\ncHMxDzANBgNVBAsMBklUIE9wczEUMBIGA1UEAwwLZVpMTyBMVEQgQ0ExITAfBgkq\r\nhkiG9w0BCQEWEnN5c2FkbWluc0BlemxvLmNvbTBWMBAGByqGSM49AgEGBSuBBAAK\r\nA0IABHLQdhLDYsafIFY8pZh96aDGqVm6E4r8nW9s4CfdpXaa/R4CnjaVpDQI7UmQ\r\n9vVDGZn8mcmm7VjKx+TSCS0MIKOjUzBRMB0GA1UdDgQWBBRiTl8Ez1l94jaqcxbi\r\nyxkVC0FkBTAfBgNVHSMEGDAWgBRiTl8Ez1l94jaqcxbiyxkVC0FkBTAPBgNVHRMB\r\nAf8EBTADAQH/MAoGCCqGSM49BAMDA0kAMEYCIQD7EUs8j50jKFd/46Zo95NbrPYQ\r\nPtLTHH9YjUkMEkYD5gIhAMP4y7E1aB78nQrmd3IX8MM32k9dM8xT0MztR16OtsuV\r\n-----END CERTIFICATE-----\",\"default_wifi_ssid\":\"wifi_100002233\",\"default_wifi_password\":\"43bb92b8\",\"default_ssh_password\":\"$1$QA5QOk96$oJJPiVTSZgTNq0KPDmq/2.\"}";
-
-// const char *prov_data =
-//     "{\"id\":100002233,"
-//     "\"uuid\":\"fb3c84b0-534c-11ec-b2d6-8f260f5287fa\","
-//     "\"cloud_uuid\":\"ef6612c8-e087-4378-8196-ca879bda3ab6\","
-//     "\"order_uuid\":\"21030e60-5345-11ec-b980-67c13f8bc620\","
-//     "\"config_version\":2,"
-//     "\"zwave_region\":[\"US\"],"
-//     "\"provision_server\":\"https://req-disp-at0m.mios.com\","
-//     "\"cloud_server\":\"https://cloud-qa.ezlo.com:7000\","
-//     "\"provision_token\":\"111de311ce1026442160d7bd373f6fdb9b73bceb7d88c5ec86b1fae05d88935ce561a6cc295d0bfc5d4ddffb516731c80074cc208bc90660485df51ce4341238c6a22a5724063db84c2a7158988d25063e4e6d5f8d95e8f92a56215a63163e173de3a13d7c2d2dcefd157dd4e589b6e4bac3046bcb7b175ca88124ace0e24c16\","
-//     "\"provision_order\":11660602,"
-//     "\"ssl_private_key\":\"-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgcmY2i3woCmLfLZ9SXi17\nob0aS7MoF0nMiVV/xYt4ihqhRANCAAT30a9LsnFlw9bXxzg7ik6uzvQgK+S3kBIi\ni49K8y1lxtEepbYQGtH2/hwnbTokW9WPhw6KJYr6uUi9glXodS3l\n-----END PRIVATE KEY-----\","
-//     "\"ssl_public_key\":\"-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE99GvS7JxZcPW18c4O4pOrs70ICvkt5AS\nIouPSvMtZcbRHqW2EBrR9v4cJ206JFvVj4cOiiWK+rlIvYJV6HUt5Q==\n-----END PUBLIC KEY-----\","
-//     "\"ssl_shared_key\":\"\n-----BEGIN CERTIFICATE-----\nMIICDTCCAbKgAwIBAgIDAzdTMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\nMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\nBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDw..................\"}"
-//     "\"signing_ca_certificate\":\"-----BEGIN CERTIFICATE-----\r\nMIICbDCCAhGgAwIBAgIJAOByzaI7aHY9MAoGCCqGSM49BAMDMIGQMQswCQYDVQQG\r\nEwJVUzEUMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzAN\r\nBgNVBAoMBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExU\r\nRCBDQTEhMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTE5MDUz\r\nMTE3MDE0N1oYDzIxMTkwNTA3MTcwMTQ3WjCBkDELMAkGA1UEBhMCVVMxFDASBgNV\r\nBAgMCyBOZXcgSmVyc2V5MRAwDgYDVQQHDAdDbGlmdG9uMQ8wDQYDVQQKDAZJVCBP\r\ncHMxDzANBgNVBAsMBklUIE9wczEUMBIGA1UEAwwLZVpMTyBMVEQgQ0ExITAfBgkq\r\nhkiG9w0BCQEWEnN5c2FkbWluc0BlemxvLmNvbTBWMBAGByqGSM49AgEGBSuBBAAK\r\nA0IABHLQdhLDYsafIFY8pZh96aDGqVm6E4r8nW9s4CfdpXaa/R4CnjaVpDQI7UmQ\r\n9vVDGZn8mcmm7VjKx+TSCS0MIKOjUzBRMB0GA1UdDgQWBBRiTl8Ez1l94jaqcxbi\r\nyxkVC0FkBTAfBgNVHSMEGDAWgBRiTl8Ez1l94jaqcxbiyxkVC0FkBTAPBgNVHRMB\r\nAf8EBTADAQH/MAoGCCqGSM49BAMDA0kAMEYCIQD7EUs8j50jKFd/46Zo95NbrPYQ\r\nPtLTHH9YjUkMEkYD5gIhAMP4y7E1aB78nQrmd3IX8MM32k9dM8xT0MztR16OtsuV\r\n-----END CERTIFICATE-----";
-
-const char *prov_data =
-    "{"
-    "\"id\": 100002244,"
-    "\"uuid\": \"550e8400-e29b-41d4-a716-446655440000\","
-    "\"cloud_uuid\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\","
-    "\"order_uuid\": \"7a63f46f-cbfa-4d0a-9158-16a7b97b0f8f\","
-    "\"config_version\": 5,"
-    "\"zwave_region\": [\"US\"],"
-    "\"provision_server\": \"https://abc-xyz-at0m.mios.com\","
-    "\"cloud_server\": \"https://cloud-abc.xyz.com:7000\","
-    "\"provision_token\": \"1112222223333333333444444444444555555555555aaaaaaaaaaaaaa8888888888888888888888llllllllllllll\","
-    "\"provision_order\": 11660602,"
-    "\"ssl_private_key\": \"Remember that working directly with flash memory requires careful consideration of partitioning\","
-    "\"ssl_public_key\": \"Also, please ensure that you have set up your ESP-IDF project correctly and have included the necessary headers.\","
-    "\"ssl_shared_key\": \"\n----------\nM............BEGIN CERTIFICATE......\","
-    "\"signing_ca_certificate\": \"not using the nvs write into a partition calling partition based API..................\","
-    "\"default_wifi_ssid\": \"wifi_100002233\","
-    "\"default_wifi_password\": \"43bb92b8\","
-    "\"default_ssh_password\": \"$1$QA5QOk96$oJJPiVTSZgTNq0KPDmq/2.\""
-    "}";
-
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
 {
@@ -250,10 +211,7 @@ static void web_provisioning_config_check(void *pv)
         {
 
             char http_request_location[200];
-            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", 1); // add config_version instead of 1
-
-            web_provisioning_config_update(prov_data);
-#if 0
+            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
             uint16_t http_status;
             response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
             if (NULL != response)
@@ -290,7 +248,6 @@ static void web_provisioning_config_check(void *pv)
                 xTaskNotifyGive(ezlopi_update_config_notifier);
                 break;
             }
-#endif
         }
         else
         {
