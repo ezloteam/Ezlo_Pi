@@ -555,7 +555,6 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                         memcpy(tmp_buffer + 0x01AA, ezlopi_config_basic->device_uuid, DEVICE_UUID_LENGTH);
                         TRACE_I("device_uuid: %s", ezlopi_config_basic->device_uuid);
                     }
-
                     // snprintf(tmp_buffer + 0x0024, length, "%s", ezlopi_config_basic->wifi_ssid);
                     // snprintf(tmp_buffer + 0x0044, length, "%s", ezlopi_config_basic->wifi_password);
                     if (NULL != ezlopi_config_basic->device_type)
@@ -581,10 +580,8 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
 
                     if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, flash_offset, length))
                     {
-                        TRACE_W("Here");
                         if (ESP_OK == esp_partition_write(partition_ctx_v2, flash_offset, tmp_buffer, length))
                         {
-                            TRACE_W("Here");
                             ret = 1;
                         }
                     }
@@ -640,10 +637,8 @@ int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic
 
                     if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, flash_offset, length))
                     {
-                        TRACE_W("Here");
                         if (ESP_OK == esp_partition_write(partition_ctx_v2, flash_offset, tmp_buffer, length))
                         {
-                            TRACE_W("Here");
                             ret = (ret == 1) ? 1 : 0;
                         }
                     }

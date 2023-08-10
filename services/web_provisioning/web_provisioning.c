@@ -250,8 +250,10 @@ static void web_provisioning_config_check(void *pv)
         {
 
             char http_request_location[200];
-            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
+            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", 1); // add config_version instead of 1
 
+            web_provisioning_config_update(prov_data);
+#if 0
             uint16_t http_status;
             response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
             if (NULL != response)
@@ -270,6 +272,10 @@ static void web_provisioning_config_check(void *pv)
                             flag_break_loop = 1;
                         }
                     }
+                    else
+                    {
+                        flag_break_loop = 1;
+                    }
                     break;
                 case 304: // HTTP Status not modified
                     TRACE_I("Config data not changed !");
@@ -284,6 +290,7 @@ static void web_provisioning_config_check(void *pv)
                 xTaskNotifyGive(ezlopi_update_config_notifier);
                 break;
             }
+#endif
         }
         else
         {
@@ -295,7 +302,6 @@ static void web_provisioning_config_check(void *pv)
     }
     free(response->response);
     free(response);
-    // free(ca_certificate);
     free(provision_token);
     free(provisioning_server);
     vTaskDelete(NULL);
@@ -323,10 +329,10 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
         ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
 
-        TRACE_E("cloud_server: %s", cloud_server);
-        TRACE_E("ca_certificate: %s", ca_certificate);
-        TRACE_E("ssl_shared_key: %s", ssl_shared_key);
-        TRACE_E("ssl_private_key: %s", ssl_private_key);
+        // TRACE_I("cloud_server: %s", cloud_server);
+        // TRACE_I("ca_certificate: %s", ca_certificate);
+        // TRACE_I("ssl_shared_key: %s", ssl_shared_key);
+        // TRACE_I("ssl_private_key: %s", ssl_private_key);
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
@@ -367,7 +373,6 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
 
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
-    free(cloud_server);
     free(cloud_server);
     vTaskDelete(NULL);
 }
@@ -517,11 +522,12 @@ static uint8_t web_provisioning_config_update(void *arg)
             ezlopi_factory_info_v2_set_ca_cert(signing_ca_certificate);
         }
 
-        config_check_factoryInfo->brand = NULL;
         config_check_factoryInfo->device_name = NULL;
         config_check_factoryInfo->manufacturer = NULL;
+        config_check_factoryInfo->brand = NULL;
         config_check_factoryInfo->model_number = NULL;
-        config_check_factoryInfo->prov_uuid = NULL;
+        config_check_factoryInfo->device_type = NULL;
+        config_check_factoryInfo->prov_uuid = NULL; // NULL since it is not
 
         if (ezlopi_factory_info_v2_set_basic(config_check_factoryInfo))
         {

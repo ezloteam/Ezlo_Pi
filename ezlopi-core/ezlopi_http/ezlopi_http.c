@@ -24,7 +24,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
     char *ret = NULL;
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t *http_get_data = NULL;
+    s_ezlopi_http_data_t *http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
 
     if ((NULL != my_data))
     {
