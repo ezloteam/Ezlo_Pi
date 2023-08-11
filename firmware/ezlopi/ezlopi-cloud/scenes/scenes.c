@@ -17,16 +17,6 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
     if (cjson_result)
     {
-#if 0
-        char *scene_list_str = ezlopi_nvs_scene_get();
-        if (scene_list_str)
-        {
-            cJSON_AddRawToObject(cjson_result, "scenes", scene_list_str);
-            free(scene_list_str);
-        }
-#endif
-
-#if 1
         cJSON *cjson_scenes_array = ezlopi_scenes_create_cjson_scene_list(ezlopi_scenes_get_scenes_list());
         if (cjson_scenes_array)
         {
@@ -35,7 +25,6 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
                 cJSON_Delete(cjson_scenes_array);
             }
         }
-#endif
     }
 }
 
@@ -43,15 +32,13 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    // cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
 
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
     if (cj_params)
     {
         ezlopi_scene_add_new_scene_cjson(cj_params);
         esp_restart();
-        // ezlopi_scene_add(cj_params);
-        // ezlopi_scene_update_nvs();
     }
 }
 
@@ -312,7 +299,6 @@ static void __value_types_list(char *list_name, cJSON *cj_result)
         }
     }
 }
-
 static void __scalable_value_types_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result && list_name)
@@ -398,39 +384,60 @@ static void __value_scales_list(char *list_name, cJSON *cj_result)
         }
     }
 }
+
+typedef struct s_scenes_value_types
+{
+    char *value_type;
+} s_scenes_value_types_t;
+static const s_scenes_value_types_t scenes_value_type_list[] = {
+    {.value_type = "24_hours_interval"},
+    {.value_type = "interval"},
+    {.value_type = "hms_interval"},
+    {.value_type = NULL},
+};
 static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
 {
-    if (cj_result)
+    if (cj_result && list_name)
     {
+        cJSON *cj_scenes_value_types = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_scenes_value_types)
+        {
+            cJSON *cj_value_array = cJSON_AddArrayToObject(cj_scenes_value_types, "list");
+            if (cj_value_array)
+            {
+                uint32_t idx = 0;
+                while (scenes_value_type_list[idx].value_type)
+                {
+                    cJSON *cj_string_val = cJSON_CreateString(scenes_value_type_list[idx].value_type);
+                    if (cj_string_val)
+                    {
+                        if (!cJSON_AddItemToArray(cj_value_array, cj_string_val))
+                        {
+                            cJSON_Delete(cj_string_val);
+                        }
+                    }
+                    idx++;
+                }
+            }
+        }
     }
 }
 static void __value_types_families_list(char *list_name, cJSON *cj_result)
 {
-    if (cj_result)
+    if (cj_result && list_name)
     {
+        cJSON *cj_value_type_famiies = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_value_type_famiies)
+        {
+            const static char *numeric = "[\"int\",\"float\",\"scalableValueTypes\"]";
+            const static char *strings = "[\"string\",\"token\"]";
+            cJSON_AddRawToObject(cj_value_type_famiies, "numeric", numeric);
+            cJSON_AddRawToObject(cj_value_type_famiies, "strings", strings);
+        }
     }
 }
 
-typedef struct s_comparision_operators
-{
-    char *op;
-    char *name;
-    char *method;
-} s_comparision_operators_t;
-
-static const s_comparision_operators_t comparision_operators[] = {
-    {.op = "<", .name = "less", .method = "compareNumbers"},
-    {.op = ">", .name = "greater", .method = "compareNumbers"},
-    {.op = "<=", .name = "less equal", .method = "compareNumbers"},
-    {.op = ">=", .name = "greater equal", .method = "compareNumbers"},
-    {.op = "==", .name = "equal", .method = "compareNumbers"},
-    {.op = "!=", .name = "not equal", .method = "compareNumbers"},
-    {.op = "between", .name = "between", .method = "compareNumberRange"},
-    {.op = "not_between", .name = "not between", .method = "compareNumberRange"},
-    {.op = "any_of", .name = "any of", .method = "numbersArray"},
-    {.op = "none_of", .name = "none of", .method = "numbersArray"},
-    {.op = NULL, .name = NULL, .method = NULL},
-};
+#include "ezlopi_scenes_operators.h"
 
 static void __comparison_operators_list(char *list_name, cJSON *cj_result)
 {
@@ -449,22 +456,21 @@ static void __comparison_operators_list(char *list_name, cJSON *cj_result)
                     cJSON *cj_methods_array = cJSON_AddArrayToObject(cj_family, "methods");
                     if (cj_methods_array)
                     {
-                        uint32_t idx = 0;
-                        while (comparision_operators[idx].op)
+                        e_scene_cmp_operators_t op_idx = 0;
+                        while (ezlopi_scenes_operators_get_op(++op_idx))
                         {
                             cJSON *cj_method = cJSON_CreateObject();
                             if (cj_method)
                             {
-                                cJSON_AddStringToObject(cj_method, "op", comparision_operators[idx].op);
-                                cJSON_AddStringToObject(cj_method, "name", comparision_operators[idx].name);
-                                cJSON_AddStringToObject(cj_method, "method", comparision_operators[idx].method);
+                                cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_operators_get_op(op_idx));
+                                cJSON_AddStringToObject(cj_method, "name", ezlopi_scenes_operators_get_name(op_idx));
+                                cJSON_AddStringToObject(cj_method, "method", ezlopi_scenes_operators_get_method(op_idx));
 
                                 if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                                 {
                                     cJSON_Delete(cj_method);
                                 }
                             }
-                            idx++;
                         }
                     }
                 }
@@ -481,6 +487,30 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
+        cJSON *cj_comparision_methods = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_comparision_methods)
+        {
+            const static char *info = "{\"version\":\"1.0.0\"}";
+            cJSON_AddRawToObject(cj_comparision_methods, "info", info);
+            cJSON *cj_compare_numbers = cJSON_AddObjectToObject(cj_comparision_methods, "compareNumbers");
+            if (cj_compare_numbers)
+            {
+                const static char *comparator = "{\"family\":\"numeric\",\"field\":\"comparator\",\"options\":[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"\"],\"type\":\"enum\"}";
+                const static char *data_source = "[{\"index\":0,\"types\":[\"item\",\"expression\"]},{\"index\":1,\"types\":[\"constant\",\"expression\"]}]";
+                cJSON_AddStringToObject(cj_compare_numbers, "comparator", comparator);
+                cJSON_AddStringToObject(cj_compare_numbers, "dataSource", data_source);
+            }
+            cJSON_AddRawToObject(cj_comparision_methods, "info", info);
+
+            cJSON *cj_compare_strings = cJSON_AddObjectToObject(cj_comparision_methods, "compareStrings");
+            if (cj_compare_strings)
+            {
+                const static char *comparator = "{\"family\":\"strings\",\"field\":\"comparator\",\"options\":[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"\"],\"type\":\"enum\"}";
+                const static char *data_source = "[{\"index\":0,\"types\":[\"item\",\"expression\"]},{\"index\":1,\"types\":[\"constant\",\"expression\"]}]";
+                cJSON_AddStringToObject(cj_compare_strings, "comparator", comparator);
+                cJSON_AddStringToObject(cj_compare_strings, "dataSource", data_source);
+            }
+        }
     }
 }
 static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)

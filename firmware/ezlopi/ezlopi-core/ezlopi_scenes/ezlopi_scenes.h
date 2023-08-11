@@ -35,18 +35,6 @@ typedef struct s_method
 {
     char name[32];
     e_scene_method_type_t type;
-#if 0
-    union
-    {
-        s_is_item_state_arg_t is_item_state_arg;
-        s_is_item_state_changed_arg_t is_item_state_changed_arg;
-        s_is_button_state_arg_t is_button_state_arg;
-
-        // s_arg_http_request_t http_request;
-        // s_arg_house_mode_t house_mode;
-        // s_arg_lua_script_t lua;
-    } u_arg;
-#endif
 } s_method_t;
 
 typedef struct s_block_options
@@ -78,6 +66,7 @@ typedef struct l_fields
 
     e_scene_value_type_t value_type; // 0: double, 1: string
     u_field_value_t value;
+    char *scale;
     void *user_arg;
     struct l_fields *next;
 } l_fields_t;
@@ -143,7 +132,7 @@ typedef int (*f_scene_method_t)(l_scenes_list_t *curr_scene, void *arg);
 
 void ezlopi_scene_init(void);
 void ezlopi_scene_update_nvs(void);
-l_scenes_list_t * ezlopi_scene_add(cJSON *cj_scene);
+l_scenes_list_t *ezlopi_scene_add(cJSON *cj_scene);
 void ezlopi_scene_add_new_scene_cjson(cJSON *new_scene);
 void ezlopi_scene_delete(l_scenes_list_t *scenes_list);
 l_scenes_list_t *ezlopi_scenes_get_scenes_list(void);

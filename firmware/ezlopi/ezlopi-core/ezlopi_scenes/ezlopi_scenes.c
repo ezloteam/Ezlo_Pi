@@ -7,6 +7,7 @@
 #include "ezlopi_scenes.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_methods.h"
+#include "ezlopi_scenes_operators.h"
 
 static const char *test_scene_create_str = "[{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}]";
 

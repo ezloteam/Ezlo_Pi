@@ -122,7 +122,7 @@ static void __scenes_process(void *arg)
                             }
 
                             TRACE_D("delay_ms: %d", delay_ms);
-                            char *method_name = ezlopi_scene_get_scene_method_name(curr_then->block_options.method.type);
+                            const char *method_name = ezlopi_scene_get_scene_method_name(curr_then->block_options.method.type);
                             if (method_name)
                             {
                                 TRACE_D("Calling: %s", method_name);

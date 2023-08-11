@@ -24,7 +24,7 @@ void ezlopi_print_fields(l_fields_t *fields)
         TRACE_D("\t\t\t|---------- field_count: %d ----------", ++field_count);
         TRACE_D("\t\t\t|-- name: %s", fields->name);
 
-        char *value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
+        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
         TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : "");
 
         switch (fields->value_type)

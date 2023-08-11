@@ -139,7 +139,7 @@ typedef struct l_ezlopi_item
     void *user_arg;
     int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
 
-    struct l_ezlopi_items *next;
+    struct l_ezlopi_item *next;
 } l_ezlopi_item_t;
 
 typedef struct l_ezlopi_device
