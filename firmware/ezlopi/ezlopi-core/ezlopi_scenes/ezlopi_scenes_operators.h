@@ -15,4 +15,6 @@ const char *ezlopi_scenes_operators_get_op(e_scene_cmp_operators_t operator);
 const char *ezlopi_scenes_operators_get_name(e_scene_cmp_operators_t operator);
 const char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator);
 
+e_scene_cmp_operators_t ezlopi_scenes_operators_get_enum(char *operator_str);
+
 #endif // __EZLOPI_SCENES_OPERATORS_H__

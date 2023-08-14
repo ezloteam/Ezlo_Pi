@@ -456,12 +456,22 @@ static void __comparison_operators_list(char *list_name, cJSON *cj_result)
                     cJSON *cj_methods_array = cJSON_AddArrayToObject(cj_family, "methods");
                     if (cj_methods_array)
                     {
-                        e_scene_cmp_operators_t op_idx = 0;
-                        while (ezlopi_scenes_operators_get_op(++op_idx))
+                        e_scene_cmp_operators_t op_idx = SCENES_OPERATORS_LESS;
+                        TRACE_B("op_idx: %u", op_idx);
+                        TRACE_B("op func: %p", ezlopi_scenes_operators_get_op);
+                        while (ezlopi_scenes_operators_get_op(op_idx))
                         {
                             cJSON *cj_method = cJSON_CreateObject();
                             if (cj_method)
                             {
+                                const char *op = ezlopi_scenes_operators_get_op(op_idx);
+                                const char *name = ezlopi_scenes_operators_get_name(op_idx);
+                                const char *method = ezlopi_scenes_operators_get_method(op_idx);
+                                TRACE_B("[idx: %u] :=> op: %s, name: %s, method: %s",
+                                        op_idx, op ? op : "null",
+                                        name ? name : "null",
+                                        method ? method : "null");
+
                                 cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_operators_get_op(op_idx));
                                 cJSON_AddStringToObject(cj_method, "name", ezlopi_scenes_operators_get_name(op_idx));
                                 cJSON_AddStringToObject(cj_method, "method", ezlopi_scenes_operators_get_method(op_idx));
@@ -471,6 +481,8 @@ static void __comparison_operators_list(char *list_name, cJSON *cj_result)
                                     cJSON_Delete(cj_method);
                                 }
                             }
+
+                            op_idx++;
                         }
                     }
                 }

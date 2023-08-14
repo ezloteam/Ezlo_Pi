@@ -275,7 +275,78 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_t *curr_scene, void *arg)
 
         if (item_id && value_field && comparator_field)
         {
-            ezlopi_scenes_operators_get_op(SCENES_OPERATORS_LESS);
+            cJSON *cj_item_value = cJSON_CreateObject();
+            l_ezlopi_device_t *device = ezlopi_device_get_head();
+            while (device)
+            {
+                l_ezlopi_item_t *item = device->items;
+                while (item)
+                {
+                    if (item->cloud_properties.item_id == item_id)
+                    {
+                        if (cj_item_value)
+                        {
+                            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
+                            break;
+                        }
+                    }
+                    item = item->next;
+                }
+                device = device->next;
+            }
+
+            switch (ezlopi_scenes_operators_get_enum(comparator_field->value.value_string))
+            {
+            case SCENES_OPERATORS_LESS:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_LESS_EQUAL:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_GREATER:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_GREATER_EQUAL:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_EQUAL:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_NOT_EQUAL:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_BETWEEN:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_NOT_BETWEEN:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_ANY_OF:
+            {
+                break;
+            }
+            case SCENES_OPERATORS_NONE_OF:
+            {
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+
+            if (cj_item_value)
+            {
+                cJSON_Delete(cj_item_value);
+            }
         }
     }
 
