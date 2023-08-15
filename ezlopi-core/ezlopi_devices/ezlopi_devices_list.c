@@ -56,6 +56,9 @@
 #include "sensor_0050_other_MQ3_Alcohol_detector.h"
 #include "sensor_0051_other_MQ8_H2_gas_detector.h"
 #include "sensor_0052_other_MQ135_NH3_gas_detector.h"
+// #include 0053
+// #include 0054
+#include "sensor_0055_ADC_Flex_Resistor.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -417,6 +420,15 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0052_OTHER_MQ135_AMONIA_GAS_DETECTOR,
         .func = sensor_0052_MQ135_NH3,
+    },
+#endif
+
+// ............................. 0053 & 0054
+
+#ifdef EZLOPI_SENSOR_0055_ADC_FLEX_RESISTOR
+    {
+        .id = EZLOPI_SENSOR_0055_ADC_FLEX_RESISTOR,
+        .func = sensor_0055_flex_resistor,
     },
 #endif
 
