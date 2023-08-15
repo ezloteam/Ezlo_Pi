@@ -74,6 +74,8 @@
 #define EZLOPI_SENSOR_0050_OTHER_MQ3_ALCOHOL_GAS_DETECTOR 50
 #define EZLOPI_SENSOR_0051_OTHER_MQ8_HYDROGEN_GAS_DETECTOR 51
 #define EZLOPI_SENSOR_0052_OTHER_MQ135_AMONIA_GAS_DETECTOR 52
+// add defination for GPS sensor.........53
+#define EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER 54
 
 /**
  * @brief defining the type of sensor call function
