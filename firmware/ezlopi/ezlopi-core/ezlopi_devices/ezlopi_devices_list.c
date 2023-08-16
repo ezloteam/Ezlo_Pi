@@ -66,7 +66,12 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = sensor_ldr_digital_module_v3,
     },
 #endif
-
+#ifdef EZLOPI_SENSOR_0026_LDR_ANALOGUE_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0026_LDR_ANALOGUE_SENSOR,
+        .func = sensor_ldr_analog_v3,
+    },
+#endif
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.
@@ -76,176 +81,6 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = NULL,
     },
 };
-
-#if 0
-static s_ezlopi_device_t device_array[] = {
-#ifdef EZLOPI_SENSOR_0001_LED
-    {
-        .id = EZLOPI_SENSOR_0001_LED,
-        // .func = digital_io,
-        .func = digital_io_v3,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0002_RELAY
-    {
-        .id = EZLOPI_SENSOR_0002_RELAY,
-        .func = digital_io,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0003_PLUG
-    {
-        .id = EZLOPI_SENSOR_0003_PLUG,
-        .func = digital_io,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0012_BME280_I2C
-    {
-        .id = EZLOPI_SENSOR_0012_BME280_I2C,
-        .func = sensor_bme280, // sensor_i2c_accelerometer,
-        // .is_configured = false,
-        // .properties = NULL,
-    },
-#endif
-#ifdef EZLOPI_SENSOR_033_DHT22_SENSOR
-    {
-        .id = EZLOPI_SENSOR_033_DHT22_SENSOR,
-        .func = dht22_sensor,
-    },
-#endif
-#ifdef EZLOPI_SENSOR_0017_POTENTIOMETER
-    {
-        .id = EZLOPI_SENSOR_0017_POTENTIOMETER,
-        .func = sensor_ldr_analog_sensor,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0018_DOOR
-    {
-        .id = EZLOPI_SENSOR_0018_DOOR,
-        .func = door_hall_sensor,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0019_PIR
-    {
-        .id = EZLOPI_SENSOR_0019_PIR,
-        .func = sensor_pir,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS
-    {
-        .id = EZLOPI_SENSOR_0020_JOYSTICK_2_AXIS,
-        .func = joystick_2_axis,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013
-    {
-        .id = EZLOPI_SENSOR_0021_ULTRASONIC_HRLV_MAXSENSOR_EZ_MB1013,
-        .func = ultrasonic_MB1013,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
-    {
-        .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func = IR_blaster_remote, // ezlopi_dimmable_bulb, ezlopi_servo_motor_MG_996R,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR
-    {
-        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR,
-        .func = sensor_touch_ttp_223b,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
-    {
-        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
-        .func = ultrasonic_HC_SR04,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
-    {
-        .id = EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR,
-        .func = sensor_ldr_digital_module,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0027_WATER_LEAK
-    {
-        .id = EZLOPI_SENSOR_0027_WATER_LEAK,
-        .func = water_leak_sensor,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI
-    {
-        .id = EZLOPI_SENSOR_0028_SOUND_SENSOR_SPI,
-        .func = sound_sensor,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_029_IR_BLASTER
-    {.id = EZLOPI_SENSOR_029_IR_BLASTER, .func = IR_blaster_remote},
-#endif
-
-#ifdef EZLOPI_SENSOR_033_Turbidity_Sensor
-    {
-        .id = EZLOPI_SENSOR_033_Turbidity_Sensor,
-        .func = turbidity_sensor,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_034_Proximity_Sensor
-    {
-        .id = EZLOPI_SENSOR_034_Proximity_Sensor,
-        .func = proximity_sensor,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_1024_DEVICE_HEALTH
-    {
-        .id = EZLOPI_SENSOR_1024_DEVICE_HEALTH,
-        .func = device_health,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C
-    {
-        .id = EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C,
-        .func = gxhtc3_rh_t_sensor,
-    },
-#endif
-#ifdef EZLOPI_SENSOR_030_DS18B20
-    {
-        .id = EZLOPI_SENSOR_030_DS18B20,
-        .func = ds18b20_sensor,
-    },
-#endif
-#ifdef EZLOPI_SENSOR_032_SOIL_MOISTURE
-    {
-        .id = EZLOPI_SENSOR_032_SOIL_MOISTURE,
-        .func = soil_moisture_sensor,
-    },
-#endif
-
-    /**
-     * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
-     * This is essential for terminating the loop termination of loop.
-     */
-    {
-        .id = EZLOPI_SENSOR_NONE,
-        .func = NULL,
-    },
-};
-#endif
 
 #if 1 // version 3.x.x
 s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void)
