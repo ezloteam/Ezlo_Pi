@@ -355,8 +355,8 @@ static void __message_upcall(const char *payload, uint32_t len)
         }
         else
         {
+            TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : "") : "", len, payload);
             TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : "null") : "null");
-            TRACE_E("## WS Rx <<<<<<<<<<'%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
         }
 
         cJSON_Delete(cj_request);

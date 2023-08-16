@@ -47,12 +47,6 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_t *curr_scene, void *arg)
                 curr_field = curr_field->next;
             }
 
-            char *param_str = cJSON_Print(cj_params);
-            TRACE_D("param_string: %s", param_str);
-            cJSON_Delete(cj_params);
-            cj_params = cJSON_Parse(param_str);
-            free(param_str);
-
             l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
             uint32_t found_item = 0;
             while (curr_device)

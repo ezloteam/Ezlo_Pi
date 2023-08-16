@@ -9,8 +9,6 @@
 #include "ezlopi_scenes_methods.h"
 #include "ezlopi_scenes_operators.h"
 
-static const char *test_scene_create_str = "[{\"enabled\":true,\"group_id\":null,\"is_group\":false,\"name\":\"testRule\",\"parent_id\":\"5c6ec961cc01eb07f86f9dd9\",\"user_notifications\":[\"324234234\",\"456456453\",\"678678678\"],\"house_modes\":[\"1\",\"2\",\"4\"],\"then\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"setItemValue\"}},\"blockType\":\"then\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"897607_32771_1\"},{\"name\":\"value\",\"type\":\"int\",\"value\":10}]}],\"when\":[{\"blockOptions\":{\"method\":{\"args\":{\"item\":\"item\",\"value\":\"value\"},\"name\":\"isItemState\"}},\"blockType\":\"when\",\"fields\":[{\"name\":\"item\",\"type\":\"item\",\"value\":\"5c7fea6b7f00000ab55f2e55\"},{\"name\":\"value\",\"type\":\"bool\",\"value\":true}]}]}]";
-
 static l_scenes_list_t *scenes_list_head = NULL;
 
 static const char *scenes_value_type_name[] = {
@@ -867,23 +865,10 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
             new_scene->status = EZLOPI_SCENE_STATUS_RUN;
 
             uint32_t tmp_success_creating_scene = 1;
-
-#if 0
-            cJSON *cj_id = cJSON_GetObjectItem(cj_scene, "_id");
-            if (cj_id && cj_id->valuestring)
-            {
-                new_scene->_id = strtoul(cj_id->valuestring, NULL, 16);
-            }
-            else
-            {
-                new_scene->_id = ezlopi_cloud_generate_scene_id();
-            }
-#endif
-
             new_scene->_id = ezlopi_cloud_generate_scene_id();
             CJSON_GET_VALUE_INT(cj_scene, "enabled", new_scene->enabled);
             CJSON_GET_VALUE_INT(cj_scene, "is_group", new_scene->is_group);
-            // if (new_scene->is_group)
+
             {
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "group_id", new_scene->group_id);
                 TRACE_D("group_id: %s", new_scene->group_id);

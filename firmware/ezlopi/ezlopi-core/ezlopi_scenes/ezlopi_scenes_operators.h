@@ -11,9 +11,9 @@ typedef enum e_scene_cmp_operators
 } e_scene_cmp_operators_t;
 
 // Operators
-const char *ezlopi_scenes_operators_get_op(e_scene_cmp_operators_t operator);
-const char *ezlopi_scenes_operators_get_name(e_scene_cmp_operators_t operator);
-const char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator);
+char *ezlopi_scenes_operators_get_op(e_scene_cmp_operators_t operator);
+char *ezlopi_scenes_operators_get_name(e_scene_cmp_operators_t operator);
+char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator);
 
 e_scene_cmp_operators_t ezlopi_scenes_operators_get_enum(char *operator_str);
 int ezlopi_scenes_operators_compare_value_number(uint32_t item_id, l_fields_t *value_field, l_fields_t *comparator_field);
