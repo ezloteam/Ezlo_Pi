@@ -3,7 +3,7 @@
 
 #include "ezlopi_devices_list.h"
 
-typedef void (*f_interrupt_upcall_t)(s_ezlopi_device_properties_t *);
+typedef void (*f_interrupt_upcall_t)(void *);
 
 void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms);
 

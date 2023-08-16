@@ -17,6 +17,150 @@
 
 #include "025_sens_ldr_digital_module.h"
 
+static int __prepare(void *arg);
+static int __init(l_ezlopi_item_t *item);
+static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __value_updated_from_interrupt(void *arg);
+
+int sensor_ldr_digital_module_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void **user_arg)
+{
+    int ret = 0;
+
+    switch (action)
+    {
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = __prepare(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = __init(item);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = __get_value_cjson(item, arg); // updater function missing
+        break;
+    }
+
+    default:
+    {
+        break;
+    }
+    }
+
+    return ret;
+}
+
+static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON *cj_value_obj = (cJSON *)arg;
+        int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+        item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
+        cJSON_AddBoolToObject(cj_value_obj, "value", item->interface.gpio.gpio_in.value);
+        ret = 1;
+    }
+    return ret;
+}
+
+static int __init(l_ezlopi_item_t *item)
+{
+    int ret = 0;
+    if (item)
+    {
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        {
+            const gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                .mode = GPIO_MODE_INPUT,
+                .pull_up_en = GPIO_PULLUP_DISABLE,
+                .pull_down_en = (item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+                .intr_type = GPIO_INTR_ANYEDGE,
+            };
+
+            if (ESP_OK == gpio_config(&io_conf))
+            {
+                item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+            }
+
+            gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
+        }
+    }
+    return ret;
+}
+
+static void __value_updated_from_interrupt(void *arg)
+{
+    if (arg)
+    {
+        ezlopi_device_value_updated_from_device((l_ezlopi_item_t *)arg);
+    }
+}
+
+static int __prepare(void *arg)
+{
+    int ret = 0;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    if (prep_arg)
+    {
+        cJSON *cj_device = prep_arg->cjson_device;
+        if (cj_device)
+        {
+            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            if (device)
+            {
+                __setup_device_properties(device, cj_device);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
+                if (item)
+                {
+                    item->func = sensor_ldr_digital_module_v3;
+                    __setup_item_properties(item, cj_device);
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+{
+    item->cloud_properties.show = true;
+    item->cloud_properties.has_getter = true;
+    item->cloud_properties.has_setter = false;
+    item->cloud_properties.item_name = ezlopi_item_name_switch;
+    item->cloud_properties.value_type = value_type_bool;
+    item->cloud_properties.scale = NULL;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+
+    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cj_device, "val_ip", item->interface.gpio.gpio_in.value);
+    item->interface.gpio.gpio_in.enable = true;
+    item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
+    item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
+}
+
+static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+{
+    char *device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, "device_name", device_name);
+
+    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    device->cloud_properties.category = category_switch;
+    device->cloud_properties.subcategory = subcategory_in_wall;
+    device->cloud_properties.device_type = dev_type_switch_outlet;
+    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+}
+
+#if 0
 static int sensor_ldr_digital_module_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_ldr_digital_module_prepare(cJSON *cjson_device);
 static int sensor_ldr_digital_module_init(s_ezlopi_device_properties_t *properties);
@@ -29,21 +173,21 @@ int sensor_ldr_digital_module(e_ezlopi_actions_t action, s_ezlopi_device_propert
 
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            ret = sensor_ldr_digital_module_prepare_and_add(arg);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            ret = sensor_ldr_digital_module_init(ezlo_device);
-            break;
-        }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            ret = sensor_ldr_digital_module_get_value_cjson(ezlo_device, arg); // updater function missing
-            break;
-        }
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = sensor_ldr_digital_module_prepare_and_add(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = sensor_ldr_digital_module_init(ezlo_device);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = sensor_ldr_digital_module_get_value_cjson(ezlo_device, arg); // updater function missing
+        break;
+    }
 
     default:
     {
@@ -160,3 +304,4 @@ static int sensor_ldr_digital_module_get_value_cjson(s_ezlopi_device_properties_
 
     return ret;
 }
+#endif
