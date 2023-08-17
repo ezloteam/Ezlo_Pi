@@ -8,9 +8,9 @@ extern "C"
 #define BUILD_DATE 1690548178
 #define MAJOR 2
 #define MINOR 0
-#define BATCH 10
+#define BATCH 9
 #define BUILD 169
-#define VERSION_STR "2.0.10"
+#define VERSION_STR "2.0.9"
 #ifdef __cplusplus
 }
 #endif

@@ -174,6 +174,6 @@ void __add_factory_info_to_root(cJSON *root, char *key, char *value)
         {
             cJSON_AddStringToObject(root, key, "unknown");
         }
-        free(value);
+        // free(value);
     }
 }

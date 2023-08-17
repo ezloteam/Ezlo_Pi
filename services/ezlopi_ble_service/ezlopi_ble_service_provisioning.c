@@ -211,9 +211,21 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
             cJSON *root = cJSON_ParseWithLength((const char *)param->write.value, param->write.len);
             if (root)
             {
+
                 uint32_t len = CJ_GET_NUMBER("len");
                 uint32_t tot_len = CJ_GET_NUMBER("total_len");
                 uint32_t sequence = CJ_GET_NUMBER("sequence");
+
+                char *root_str = cJSON_Print(root);
+                if (root_str)
+                {
+                    // TRACE_D("root_str: %s", root_str);
+                    char *string_data = (char *)malloc(500);
+                    CJSON_GET_VALUE_STRING(root_str, "data", string_data);
+                    TRACE_D("Data : %s", string_data);
+                    free(root_str);
+                    free(string_data);
+                }
 
                 TRACE_D("Len: %d", len);
                 TRACE_D("tot_len: %d", tot_len);
@@ -253,6 +265,13 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
                                         CJSON_GET_VALUE_STRING(cj_config, "uuid", ezlopi_config_basic->device_uuid);
                                         CJSON_GET_VALUE_STRING(cj_config, "uuid_provisioning", ezlopi_config_basic->prov_uuid);
 
+                                        char *mac = (char *)malloc(10);
+                                        CJSON_GET_VALUE_STRING(cj_config, "mac", mac);
+                                        for (int i = 0; i < 6; i++)
+                                        {
+                                            sscanf(mac + 3 * i, "%2hhx", &ezlopi_config_basic->device_mac[i]);
+                                        }
+                                        free(mac);
                                         CJSON_GET_VALUE_STRING(cj_config, "provision_server", ezlopi_config_basic->provision_server);
                                         CJSON_GET_VALUE_STRING(cj_config, "cloud_server", ezlopi_config_basic->cloud_server);
                                         CJSON_GET_VALUE_STRING(cj_config, "provision_token", ezlopi_config_basic->provision_token);

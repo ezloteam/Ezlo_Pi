@@ -164,7 +164,7 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
 
 void web_provisioning_init(void)
 {
-    xTaskCreate(web_provisioning_config_check, "web-provisioning config check", 4 * 2048, NULL, 5, NULL);
+    // xTaskCreate(web_provisioning_config_check, "web-provisioning config check", 4 * 2048, NULL, 5, NULL);
     xTaskCreate(web_provisioning_fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, &ezlopi_update_config_notifier);
 }
 
@@ -257,6 +257,7 @@ static void web_provisioning_config_check(void *pv)
 
         vTaskDelay(50000 / portTICK_RATE_MS);
     }
+
     free(response->response);
     free(response);
     free(provision_token);
