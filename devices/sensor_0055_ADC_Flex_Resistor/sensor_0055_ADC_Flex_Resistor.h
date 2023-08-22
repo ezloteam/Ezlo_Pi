@@ -22,7 +22,7 @@
  *                   ^      |              ^
  *                   |      |  [constant]  |
  *                   |      |              |
- *                 Rout = {10kOhm}        esp32 analog input [Vo]
+ *                Rout = {~10kOhm}        esp32 analog input [Vo]
  *                   |      |              |
  *                   |      |              |
  *                   V      |              v
@@ -42,8 +42,9 @@
  *      So using equation(3) and 'Vo' voltage value we get the required resistance value 'Rs'
  **/
 
-#define flex_Rout 10000 // minimum Rout = 10KOhm
-#define flex_Vin 5      // Vin = 5V  (input)
+// measure the resistor value using multimeter
+#define flex_Rout 10000.0f // minimum Rout = 10KOhm
+#define flex_Vin 5.0f      // Vin = 5V  (default) // if [3.3V] is used instead of [5.0V], Change [flex_Vin=> 5.0f to 3.3f]
 
 //-----------------------------------------------------------------------------------------------------------------------------
 int sensor_0055_flex_resistor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_args);

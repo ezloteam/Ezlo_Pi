@@ -398,11 +398,11 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\{\
                 \"dev_type\": 3,\
-                \"dev_name\": \"Flex Resistor\",\
+                \"dev_name\": \"Flexible Resistor\",\
                 \"id_room\": \"\",\
                 \"id_item\": 55,\
                 \"gpio\": 33,\
-                \"resln_bit\": 10\
+                \"resln_bit\": 12\
             }\
         ],\
     \"dev_total\": 1}";

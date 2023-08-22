@@ -40,7 +40,7 @@ int sensor_0055_flex_resistor(e_ezlopi_actions_t action, s_ezlopi_device_propert
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        ezlopi_device_value_updated_from_device(properties);
+        ret = ezlopi_device_value_updated_from_device(properties);
         break;
     }
     default:
@@ -126,9 +126,12 @@ static int sensor_0055_get_value(s_ezlopi_device_properties_t *properties, void 
     if (cjson_propertise)
     {
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        int Vout = (int)((ezlopi_analog_data->voltage) / 1000.0f); // millivolt -> voltage
-        // calculate the 'Rs' resistance value
-        int Rs = (((flex_Vin / Vout) - 1) * flex_Rout);
+        float Vout = (ezlopi_analog_data->voltage) / 1000.0f; // millivolt -> voltage
+        // TRACE_E("Voltage [mV]: %.4f", Vout);
+
+        // calculate the 'Rs' resistance value using [voltage divider rule]
+        int Rs = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
+
         // prepare the json message
         cJSON_AddNumberToObject(cjson_propertise, "value", Rs);
         cJSON_AddStringToObject(cjson_propertise, "scale", "ohm_meter");
