@@ -396,13 +396,11 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_type\": 6,\
+                \"dev_type\": 5,\
                 \"dev_name\": \"YF-S201 flowmeter\",\
                 \"id_room\": \"\",\
                 \"id_item\": 54,\
-                \"gpio_tx\": 17,\
-                \"gpio_rx\": 18,\
-                \"baud\": 9600\
+                \"gpio\": 27\
             }\
         ],\
     \"dev_total\": 1}";
