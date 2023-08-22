@@ -17,7 +17,6 @@
 #include "ezlopi_ethernet.h"
 #include "ezlopi_scenes.h"
 
-static void ezlopi_initialize_devices(void);
 static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
@@ -51,17 +50,6 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
-}
-
-static void ezlopi_initialize_devices(void)
-{
-    l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
-    while (NULL != registered_device)
-    {
-        registered_device->device->func(EZLOPI_ACTION_INITIALIZE, registered_device->properties, NULL, NULL);
-        registered_device = registered_device->next;
-        vTaskDelay(1);
-    }
 }
 
 static void ezlopi_initialize_devices_v3(void)

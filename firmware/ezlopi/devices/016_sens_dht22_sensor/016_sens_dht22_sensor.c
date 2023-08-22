@@ -24,6 +24,7 @@ static int dht22_sensor_setup_device_cloud_properties_temperature(l_ezlopi_devic
 
 int dht22_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
+    TRACE_B("Action: %s", ezlopi_actions_to_string(action));
     int ret = 0;
     switch (action)
     {
@@ -44,6 +45,7 @@ int dht22_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg,
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
+        TRACE_B("Here");
         ezlopi_device_value_updated_from_device_v3(item);
         break;
     }

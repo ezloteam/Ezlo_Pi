@@ -30,11 +30,11 @@ static const char *TAG = "ADS131M08 ---------- ";
 #define SCK_PIN 18
 #define CS_PIN 27
 
-#define ADS131M08_SPI_PORT      SPI2_HOST
-#define ADS131M08_VSPI_MISO     MISO_PIN
-#define ADS131M08_VSPI_MOSI     MOSI_PIN
-#define ADS131M08_VSPI_SCLK     SCK_PIN
-#define ADS131M08_VSPI_SS       CS_PIN
+#define ADS131M08_SPI_PORT SPI2_HOST
+#define ADS131M08_VSPI_MISO MISO_PIN
+#define ADS131M08_VSPI_MOSI MOSI_PIN
+#define ADS131M08_VSPI_SCLK SCK_PIN
+#define ADS131M08_VSPI_SS CS_PIN
 
 #define ADS131_ID 0x00
 #define ADS131_STATUS 0x01
@@ -125,9 +125,10 @@ public:
 #ifdef __cplusplus
 extern "C"
 {
+#include "driver/gpio.h"
 #endif
 
-    void ADS131_init(void);
+    void ADS131_init(gpio_num_t cs, gpio_num_t miso, gpio_num_t mosi, gpio_num_t sck);
     bool ADS131_value(void);
 #ifdef __cplusplus
 }

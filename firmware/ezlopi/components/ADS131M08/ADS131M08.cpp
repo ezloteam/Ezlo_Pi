@@ -20,7 +20,7 @@ const int sampleTime = 50;
 
 int micOut[8];
 int32_t channelArr[8];
-void findPTPAmp(ADS131M08 *adc);
+void findPTPAmp(ADS131M08 *ads);
 
 ADS131M08::ADS131M08(gpio_num_t mosi, gpio_num_t miso, gpio_num_t sck, int cs, int xtal, int drdy, int clk)
 {
@@ -321,7 +321,7 @@ void ADS131M08::spi_init()
 }
 
 // Find the Peak-to-Peak Amplitude Function
-void findPTPAmp(ADS131M08 *adc)
+void findPTPAmp(ADS131M08 *ads)
 {
     // Time variables to find the peak-to-peak amplitude
     unsigned long startTime = esp_timer_get_time() / 1000; // Start of sample window
@@ -336,7 +336,7 @@ void findPTPAmp(ADS131M08 *adc)
     // Find the max and min of the mic output within the 50 ms timeframe
     while ((esp_timer_get_time() / 1000) - startTime < sampleTime)
     {
-        adc->readAllChannels(channelArr);
+        ads->readAllChannels(channelArr);
         for (uint8_t i = 0; i < 8; i++)
         {
             micOut[i] = channelArr[i];
@@ -369,34 +369,38 @@ void findPTPAmp(ADS131M08 *adc)
     //   }
 }
 
-ADS131M08 adc((gpio_num_t)ADS131M08_VSPI_MOSI, (gpio_num_t)ADS131M08_VSPI_MISO, (gpio_num_t)ADS131M08_VSPI_SCLK, ADS131M08_VSPI_SS, XTAL_PIN, DRDY_PIN, 8192000);
+ADS131M08 ads((gpio_num_t)ADS131M08_VSPI_MOSI, (gpio_num_t)ADS131M08_VSPI_MISO, (gpio_num_t)ADS131M08_VSPI_SCLK, ADS131M08_VSPI_SS, XTAL_PIN, DRDY_PIN, 8192000);
 
-void ADS131_init(void)
+void ADS131_init(gpio_num_t cs, gpio_num_t miso, gpio_num_t mosi, gpio_num_t sck)
 {
+    ads.CS = cs;
+    ads.sck = sck;
+    ads.miso = miso;
+    ads.mosi = mosi;
 
-    adc.init();
-    adc.writeReg(ADS131_CLOCK, 0b1111111100011010); // Clock register (page 55 in datasheet)
-    adc.setGain(32);
+    ads.init();
+    ads.writeReg(ADS131_CLOCK, 0b1111111100011010); // Clock register (page 55 in datasheet)
+    ads.setGain(32);
 
     uint16_t dataR;
-    dataR = adc.readReg(ADS131_ID);
+    dataR = ads.readReg(ADS131_ID);
     ESP_LOGI("Chip ID ", " %x \n", dataR);
 
-    dataR = adc.readReg(ADS131_CLOCK);
+    dataR = ads.readReg(ADS131_CLOCK);
     ESP_LOGI("Clock ", " %x \n", dataR);
 
     dataR = 0;
-    dataR = adc.readReg(ADS131_GAIN1);
+    dataR = ads.readReg(ADS131_GAIN1);
     ESP_LOGI("Gain 1 ", " %x \n", dataR);
 
     dataR = 0;
-    dataR = adc.readReg(ADS131_GAIN2);
+    dataR = ads.readReg(ADS131_GAIN2);
     ESP_LOGI("Gain 2 ", " %x \n", dataR);
 }
 
 bool ADS131_value(void)
 {
-    findPTPAmp(&adc);
+    findPTPAmp(&ads);
     printf("Value %d,%d,%d,%d,%d,%d,%d,%d\r\n",
            channelArr[0],
            channelArr[1],

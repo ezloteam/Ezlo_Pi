@@ -145,7 +145,7 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
             if (root)
             {
                 uint32_t len = CJ_GET_NUMBER("len");
-                uint32_t tot_len = CJ_GET_NUMBER("total_len");
+                // uint32_t tot_len = CJ_GET_NUMBER("total_len");
                 uint32_t sequence = CJ_GET_NUMBER("sequence");
                 char *data = CJ_GET_STRING("data");
                 if (data)

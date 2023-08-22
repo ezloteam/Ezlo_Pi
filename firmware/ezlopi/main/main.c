@@ -38,7 +38,7 @@ void app_main(void)
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();
-    ezlopi_scenes_service_init();
+    // ezlopi_scenes_service_init();
     web_provisioning_init();
     ota_service_init();
     ezlopi_ble_service_init();

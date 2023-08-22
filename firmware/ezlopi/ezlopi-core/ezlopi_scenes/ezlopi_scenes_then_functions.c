@@ -64,7 +64,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_t *curr_scene, void *arg)
                 }
                 if (found_item)
                 {
-                    TRACE_D("\r\n\r\n fOUND DEVICE \r\n\r\n");
+                    TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
                     break;
                 }
                 curr_device = curr_device->next;

@@ -161,7 +161,7 @@ static void __scenes_process(void *arg)
             }
         }
 
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_RATE_MS);
     }
 
     scene->enabled = false;

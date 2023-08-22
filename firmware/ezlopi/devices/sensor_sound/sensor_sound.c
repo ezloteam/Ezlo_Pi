@@ -117,7 +117,7 @@ static s_ezlopi_device_properties_t *ezlopi_sound_prepare(cJSON *cjson_device)
 
 static int ezlopi_sound_init(s_ezlopi_device_properties_t *properties)
 {
-    ADS131_init();
+    // ADS131_init();
     return 0;
 }
 
