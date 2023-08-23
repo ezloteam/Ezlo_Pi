@@ -13,6 +13,45 @@
 
 #include "0029_gxhtc3_rh_t_sensor.h"
 
+static int __preapare(void *arg);
+static int __init(l_ezlopi_item_t *item);
+static int __notify(l_ezlopi_item_t *item);
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+
+int gxhtc3_rht_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+{
+    int ret = 0;
+    switch (action)
+    {
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = __preapare(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = __init(item);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        __get_cjson_value(item, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        __notify(item);
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return ret;
+}
+
+#if 1
 static void wgxhtc3_sensor_prepare(void *arg);
 static int gxhtc3_notify(s_ezlopi_device_properties_t *properties, void *args);
 static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_temperature(cJSON *cjson_device);
@@ -314,3 +353,4 @@ static void wgxhtc3_sensor_init(s_ezlopi_device_properties_t *properties, void *
 {
     ezlopi_i2c_master_init(&properties->interface.i2c_master);
 }
+#endif

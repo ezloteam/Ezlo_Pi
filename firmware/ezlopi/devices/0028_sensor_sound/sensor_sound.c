@@ -18,6 +18,9 @@ static const char *audible = "audible";
 static const char *silent = "silent";
 
 static int __preapare(void *arg);
+static int __init(l_ezlopi_item_t *item);
+static int __notify(l_ezlopi_item_t *item);
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
 int sound_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -26,18 +29,22 @@ int sound_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg,
     {
     case EZLOPI_ACTION_PREPARE:
     {
+        ret = __preapare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
+        ret = __init(item);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
+        __get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
+        __notify(item);
         break;
     }
     default:
