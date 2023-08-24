@@ -10,7 +10,6 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
 
     if (item)
     {
-
         l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
         while (curr_device)
         {

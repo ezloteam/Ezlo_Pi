@@ -21,7 +21,6 @@ static int ezlopi_i2c_check_channel(s_ezlopi_i2c_master_t *i2c_master_conf)
 int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
     int ret = 0;
-
     if (NULL != i2c_master_conf)
     {
         if (true == i2c_master_conf->enable)
@@ -43,7 +42,6 @@ int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
             }
         }
     }
-
     return ret;
 }
 

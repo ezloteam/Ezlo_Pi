@@ -23,13 +23,13 @@ typedef struct s_ezlopi_cloud_controller
 
 typedef struct s_ezlopi_cloud_item
 {
-    uint32_t item_id; // '_id' -> https://api.ezlo.com/hub/items_api/index.html,
-    bool has_getter;  // 'hasGetter' -> https://api.ezlo.com/hub/items_api/index.html,
-    bool has_setter;  // 'haSetter' -> https://api.ezlo.com/hub/items_api/index.html,
-    char *item_name;  // 'name' -> https://api.ezlo.com/hub/items_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_item_name_str.h
-    bool show;        // 'show' -> https://api.ezlo.com/hub/items_api/index.html,
-    char *value_type; // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h
-    char *scale;      // 'scale' -> https://api.ezlo.com/devices/item_value_types/index.html#scalable-types -> ezlopi-cloud/constants/ezlopi_cloud_scales_str.h
+    uint32_t item_id;       // '_id' -> https://api.ezlo.com/hub/items_api/index.html,
+    bool has_getter;        // 'hasGetter' -> https://api.ezlo.com/hub/items_api/index.html,
+    bool has_setter;        // 'haSetter' -> https://api.ezlo.com/hub/items_api/index.html,
+    const char *item_name;  // 'name' -> https://api.ezlo.com/hub/items_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_item_name_str.h
+    bool show;              // 'show' -> https://api.ezlo.com/hub/items_api/index.html,
+    const char *value_type; // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h
+    const char *scale;      // 'scale' -> https://api.ezlo.com/devices/item_value_types/index.html#scalable-types -> ezlopi-cloud/constants/ezlopi_cloud_scales_str.h
 
 } s_ezlopi_cloud_item_t;
 
