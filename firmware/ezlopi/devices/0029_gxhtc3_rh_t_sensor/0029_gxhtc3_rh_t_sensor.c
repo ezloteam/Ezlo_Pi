@@ -19,7 +19,9 @@ typedef struct s_gxhtc3_value
     float humidity;
 } s_gxhtc3_value_t;
 
-static int __preapare(void *arg);
+static const float ideal_value = 65536.0f;
+
+static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -31,7 +33,7 @@ int gxhtc3_rht_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        ret = __preapare(arg);
+        ret = __prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
@@ -84,7 +86,6 @@ static void __read_value_from_sensor(l_ezlopi_item_t *item)
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    static const float ideal_value = 65536.0f;
 
     if (item && arg)
     {
@@ -206,9 +207,10 @@ static int __prepare(void *arg)
             else
             {
                 s_gxhtc3_value_t *value_ptr = malloc(sizeof(s_gxhtc3_value_t));
-                value_ptr->humidity = UINT32_MAX;
                 if (value_ptr)
                 {
+                    value_ptr->humidity = ideal_value;
+                    value_ptr->temperature = ideal_value;
                     if (item_humdity)
                     {
                         item_humdity->user_arg = (void *)value_ptr;
