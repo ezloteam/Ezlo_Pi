@@ -1,14 +1,15 @@
-#ifndef _0054_ADC_FLEX_RESISTOR_H_
-#define _0054_ADC_FLEX_RESISTOR_H_
+#ifndef _0055_ADC_FLEX_RESISTOR_H_
+#define _0055_ADC_FLEX_RESISTOR_H_
 
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
 
 /**
- *  NOTE : MQ8_hydrogen_gas - module gives (0V - 5V) as analog output .
+ *  NOTE : FlexResistor module gives (0V - 5V) as analog output .
  *  But ESP32- only allows upto 2.4V max input.
  *
- *  Remedy:  introduce a voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output , so that esp32 adc pin recieves half voltage only.
+ *  Remedy:  introduce 10kOhm [Rout] to achieve voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output ,
+ *           so that esp32 adc pin recieves half voltage only.
  *             (Half of 5) -> 2.4V
  *
  *
