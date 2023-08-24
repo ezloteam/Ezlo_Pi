@@ -63,6 +63,8 @@ idf_component_register(
         sensor_0050_other_MQ3_Alcohol_detector
         sensor_0051_other_MQ8_H2_gas_detector
         sensor_0052_other_MQ135_NH3_gas_detector
+        #  0053,0054,0055,0056,
+        sensor_0056_ADC_Force_Sensitive_Resistor
         )
 
 
