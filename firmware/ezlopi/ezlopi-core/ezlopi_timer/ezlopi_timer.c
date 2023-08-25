@@ -144,12 +144,15 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
 
         if (0 == (count % 20)) // 1000 ms
         {
-            TRACE_B("Here")
             send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
             count = 0;
         }
 
         count++;
+    }
+    if(EZLOPI_ACTION_NOTIFY_1000_MS == _timer_conf->event_type)
+    {
+        send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
     }
 
     return high_task_awoken == pdTRUE; // return whether we need to yield at the end of ISR
@@ -220,6 +223,7 @@ static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_a
     timer_config->internal.counter_dir = TIMER_COUNT_UP;
     timer_config->internal.divider = EZLOPI_TIMER_DIVIDER;
     timer_config->internal.intr_type = TIMER_INTR_LEVEL;
+    
 }
 
 static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t *timer_conf)

@@ -57,6 +57,7 @@ static const uint8_t dscrc2x16_table[] = {
 
 
 int ds18b20_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg);
+int ds18b20_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 
 #endif // _030_SENS_DS18B20_SENSOR_H_
