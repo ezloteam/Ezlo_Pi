@@ -112,7 +112,7 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, soil_sensor);
+            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, soil_moisture_sensor_v3);
             if (item_temperature)
             {
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
