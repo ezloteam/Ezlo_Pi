@@ -16,6 +16,80 @@ static ir_protocol_builder_t *ir_protocol_builder;
 char *item_id; // always make static for the global variable [benefits: scope of variable remains within the file]
 size_t length; // always make static for the global variable [benefits: scope of variable remains within the file]
 
+static int __prepare(void *arg);
+static int __init(l_ezlopi_item_t *item);
+static int __notify(l_ezlopi_item_t *item);
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+
+int IR_blaster_remote_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+{
+    int ret = 0;
+    switch (action)
+    {
+        case EZLOPI_ACTION_PREPARE:
+        {
+            // ret = __prepare(arg);
+            break;
+        }
+        case EZLOPI_ACTION_INITIALIZE:
+        {
+            // ret = __init(item);
+            break;
+        }
+        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+        {
+            // ret = __get_cjson_value(item, arg);
+            break;
+        }
+        case EZLOPI_ACTION_NOTIFY_1000_MS:
+        {
+            // ret = __notify(item);
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+    return ret;
+}
+
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+{
+    char *device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+
+    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    device->cloud_properties.category = category_ir_tx;
+    device->cloud_properties.subcategory = subcategory_irt;
+    device->cloud_properties.device_type = dev_type_transmitter_ir;
+    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+}
+
+static int __prepare(void *arg)
+{
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    if(prep_arg && prep_arg->cjson_device)
+    {
+        l_ezlopi_device_t *device = ezlopi_device_add_device();
+        if(device)
+        {
+            __prepare_device_cloud_properties(device, prep_arg->cjson_device);
+            l_ezlopi_item_t *ir_code_sender_item = ezlopi_device_add_item_to_device(device, IR_blaster_remote_v3);
+            if(ir_code_sender_item)
+            {
+                #pragma message("Prepare IR blaster.");
+            }
+        }
+        else 
+        {
+            ezlopi_device_free_device(device);
+        }
+    }
+}
+
+#if 0
+
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)           \
     {                                                                                                               \
         s_ezlopi_device_properties_t *_properties = IR_Blaster_Remote_prepare(device_id, category, subcategory,     \
@@ -423,3 +497,6 @@ void store(rmt_item32_t *items, uint32_t len)
         j += 2;
     }
 }
+
+#endif // 0
+
