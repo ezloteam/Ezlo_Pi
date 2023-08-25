@@ -63,6 +63,8 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
     {
         cJSON *version = NULL;
         version = cJSON_GetObjectItem(params, "version");
+        if (version != NULL)
+            TRACE_I("version: %s", version->valuestring);
         TRACE_D("Upgrading to version: %s", (version && version->valuestring) ? version->valuestring : "null");
 
         cJSON *source_urls = NULL;
@@ -110,7 +112,7 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
                 {
                     cJSON_AddStringToObject(cj_params, "firmware_type", "generic");
                 }
-                free(device_type);
+                // free(device_type);
             }
             else
             {

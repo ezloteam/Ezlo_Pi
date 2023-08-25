@@ -19,12 +19,14 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
         }                     \
     }
 
-char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
+s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
 {
     char *ret = NULL;
+    int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
+    s_ezlopi_http_data_t *http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
 
-    if (my_data)
+    if ((NULL != my_data))
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
 
@@ -37,12 +39,15 @@ char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_k
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
-
+        // TRACE_E("cloud_url: %s", cloud_url);
+        // TRACE_E("ca_certificate: %s", ca_certificate);
+        // TRACE_E("shared_key: %s", shared_key);
+        // TRACE_E("private_key: %s", private_key);
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)
         {
             esp_err_t err = esp_http_client_perform(client);
-
+            status_code = esp_http_client_get_status_code(client);
             if (err == ESP_OK)
             {
                 while (!esp_http_client_is_complete_data_received(client))
@@ -66,6 +71,8 @@ char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_k
                             cur_d = cur_d->next;
                         }
                     }
+                    http_get_data->response = ret;
+                    http_get_data->status_code = status_code;
                 }
             }
             else
@@ -77,8 +84,93 @@ char *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_k
             esp_http_client_cleanup(client);
         }
     }
+    return http_get_data;
+}
 
-    return ret;
+s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate)
+{
+    char *ret = NULL;
+    int status_code = 0;
+    s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
+    s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
+
+    if (my_data)
+    {
+        memset(my_data, 0, sizeof(s_rx_data_t));
+
+        char *uri = malloc(256);
+        if (uri)
+        {
+            snprintf(uri, 256, "%s/%s", cloud_url, location);
+            TRACE_D("URL: %s", uri);
+        }
+        else
+        {
+            uri = cloud_url;
+        }
+
+        esp_http_client_config_t config = {
+            .url = uri,
+            .cert_pem = ca_certificate,
+            .client_cert_pem = shared_key,
+            .client_key_pem = private_key,
+            .event_handler = ezlopi_http_event_handler,
+            .transport_type = HTTP_TRANSPORT_OVER_SSL,
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+        };
+
+        esp_http_client_handle_t client = esp_http_client_init(&config);
+        if (NULL != client)
+        {
+            esp_http_client_set_method(client, HTTP_METHOD_POST);
+            cJSON *header = headers->child;
+            while (header)
+            {
+                // TRACE_B("%s: %s", header->string, header->valuestring);
+                esp_http_client_set_header(client, header->string, header->valuestring);
+                header = header->next;
+            }
+            esp_err_t err = esp_http_client_perform(client);
+            status_code = esp_http_client_get_status_code(client);
+            if (err == ESP_OK)
+            {
+                while (!esp_http_client_is_complete_data_received(client))
+                {
+                    vTaskDelay(50 / portTICK_RATE_MS);
+                }
+
+                if (my_data->total_len)
+                {
+                    ret = (char *)malloc(my_data->total_len + 1);
+
+                    if (ret)
+                    {
+                        s_rx_data_t *cur_d = my_data;
+                        memset(ret, 0, my_data->total_len + 1);
+
+                        while (cur_d)
+                        {
+                            strcat(ret, cur_d->ptr);
+                            // TRACE_D("%.*s", cur_d->len, cur_d->ptr);
+                            cur_d = cur_d->next;
+                        }
+                    }
+                }
+                http_get_data->response = ret;
+                http_get_data->status_code = status_code;
+            }
+            else
+            {
+                TRACE_E("Error perform http request %s", esp_err_to_name(err));
+                free(http_get_data);
+                http_get_data = NULL;
+            }
+
+            ezlopi_http_free_rx_data(my_data);
+            esp_http_client_cleanup(client);
+        }
+    }
+    return http_get_data;
 }
 
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt)

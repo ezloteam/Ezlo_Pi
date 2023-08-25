@@ -15,7 +15,6 @@
 #include "ezlopi_ethernet.h"
 #include "ezlopi_event_group.h"
 #include "ezlopi_ping.h"
-#include "mac_uuid.h"
 
 static void ezlopi_initialize_devices(void);
 
@@ -56,7 +55,6 @@ void ezlopi_init(void)
         ezlopi_wifi_connect_from_id_bin();
     }
 #endif
-
 
     ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);
