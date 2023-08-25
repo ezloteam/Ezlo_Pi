@@ -48,7 +48,7 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_properties, "valueType", curr_item->cloud_properties.value_type);
 
                         curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
-                        cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
+                        // cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
                         cJSON_AddStringToObject(cj_properties, "status", "synced");
 
                         if (!cJSON_AddItemToArray(cj_items_array, cj_properties))

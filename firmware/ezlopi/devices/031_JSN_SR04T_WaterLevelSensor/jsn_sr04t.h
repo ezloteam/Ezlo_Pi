@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include "driver/gpio.h"
-#include "esp_log.h"
 #include "driver/rmt.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_actions.h"
