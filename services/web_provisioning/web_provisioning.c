@@ -209,8 +209,6 @@ static void web_provisioning_config_check(void *pv)
         }
         if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
         {
-            TRACE_E("Here ");
-
             char http_request_location[200];
             snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
             uint16_t http_status;
