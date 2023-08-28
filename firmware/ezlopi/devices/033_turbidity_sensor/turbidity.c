@@ -59,11 +59,21 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     if (item && arg)
     {
         cJSON *cj_result = (cJSON *)arg;
-        s_ezlopi_analog_data_t tmp_data = {.value = 0, .voltage = 0};
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_data);
-        double percent_data = ((4095 - tmp_data.value) / 4095.0) * 100;
-        cJSON_AddNumberToObject(cj_result, "value", percent_data);
-        cJSON_AddStringToObject(cj_result, "scale", scales_percent);
+        const static char *_no_ezlopi_turbidity = "water_filter_ok";
+        const static char *_ezlopi_turbidity_detected = "replace_water_filter";
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+
+        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+        TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
+
+        const char *turbidity_state = _no_ezlopi_turbidity;
+        if (1000 > ezlopi_analog_data.voltage)
+        {
+            turbidity_state = _ezlopi_turbidity_detected;
+        }
+
+        cJSON_AddStringToObject(cj_result, "value", turbidity_state);
+
         ret = 1;
     }
     return ret;
@@ -87,19 +97,18 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
-    device->cloud_properties.subcategory = subcategory_moisture;
+    device->cloud_properties.subcategory = subcategory_water;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_soil_humidity;
-    item->cloud_properties.value_type = value_type_humidity;
-    item->cloud_properties.scale = scales_percent;
+    item->cloud_properties.item_name = ezlopi_item_name_water_filter_replacement_alarm;
+    item->cloud_properties.value_type = value_type_token;
+    item->cloud_properties.scale = NULL;
     item->cloud_properties.show = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
@@ -153,13 +162,6 @@ int turbidity_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *pr
         ret = ezlopi_turbidity_sensor_init(properties);
         break;
     }
-    // case EZLOPI_ACTION_NOTIFY_200_MS:
-    // case EZLOPI_ACTION_SET_VALUE:
-    // {
-    //     // TRACE_B("HEre");
-    //     ret = ezlopi_turbidity_sensor_update_value(properties, arg);
-    //     break;
-    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = ezlopi_turbidity_sensor_get_value_cjson(properties, arg);
