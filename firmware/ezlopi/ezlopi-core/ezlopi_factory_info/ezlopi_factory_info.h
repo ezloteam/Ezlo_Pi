@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_IR_BLASTER 1
 #define EZLOPI_TEST_DEVICE 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
+#define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -177,9 +177,9 @@ static const char *ir_blaster_constant_config =
             {\
                 \"dev_name\": \"IR_Blaster1\",\
                 \"dev_type\": 5,\
-                \"gpio\": 3,\
-                \"id_item\": 30,\
+                \"id_item\": 29,\
                 \"id_room\": \"\",\
+                \"gpio\": 3,\
                 \"pwm_resln\": 8,\
                 \"freq_hz\": 50,\
                 \"duty_cycle\": 30\
@@ -398,33 +398,11 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Switch 10\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 18,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            },{\
-	            \"dev_type\": 2,\
-	            \"dev_name\": \"Proximity sensor\",\
-	            \"id_room\":\"\",\
-	            \"id_item\": 34,\
-	            \"gpio\": 4,\
-	            \"pull_up\": false,\
-	            \"logic_inv\": true\
-            },{\
                 \"dev_type\" : 7,\
-                \"dev_name\" : \"dht22 sensor\",\
+                \"dev_name\" : \"DS18B20 sensor\",\
                 \"id_room\" : \"\",\
-                \"id_item\" : 16,\
-                \"gpio\" : 17\
+                \"id_item\" : 30,\
+                \"gpio\" : 22\
             }\                  
         ],\
     \"dev_total\": 1}";

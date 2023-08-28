@@ -144,7 +144,6 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
 
         if (0 == (count % 20)) // 1000 ms
         {
-            TRACE_B("Here")
             send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
             count = 0;
         }
@@ -153,7 +152,11 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
     }
 #endif
 
-    send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
+    if (EZLOPI_ACTION_NOTIFY_1000_MS == _timer_conf->event_type)
+    {
+        send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
+    }
+
     return high_task_awoken == pdTRUE; // return whether we need to yield at the end of ISR
 }
 

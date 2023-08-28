@@ -229,7 +229,6 @@ void items_list(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_properties, "valueType", registered_device->properties->ezlopi_cloud.value_type);
 
                         registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cj_properties, registered_device->user_arg);
-                        cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
                         cJSON_AddStringToObject(cj_properties, "status", "synced");
 
                         if (!cJSON_AddItemToArray(cj_items_array, cj_properties))

@@ -18,10 +18,20 @@
 #include "030_sens_ds18b20_sensor.h"
 #include "ds18b20_onewire.h"
 
+static const double ideal_value = 65536.0f;
+
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+
+static esp_err_t ds18b20_write_data(uint8_t *data, uint32_t gpio_pin);
+static esp_err_t ds18b20_read_data(uint8_t *data, uint32_t gpio_pin);
+static bool ds18b20_reset_line(uint32_t gpio_pin);
+static esp_err_t ds18b20_write_to_scratchpad(uint8_t th_val, uint8_t tl_val, uint8_t resolution, uint8_t gpio_pin);
+static bool ds18b20_recognize_device(uint32_t gpio_pin);
+static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t gpio_pin);
+static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len);
 
 int ds18b20_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -56,6 +66,44 @@ int ds18b20_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *ar
     return ret;
 }
 
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+
+    if (item && arg)
+    {
+        cJSON *cj_result = (cJSON *)arg;
+        double *temperatue_value = (double *)item->user_arg;
+        char valueFormatted[20];
+       
+        ds18b20_get_temperature_data(temperatue_value, item->interface.onewire_master.onewire_pin);
+        snprintf(valueFormatted, 20, "%.2f", *temperatue_value);
+        cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+        cJSON_AddNumberToObject(cj_result, "value", *temperatue_value);
+        cJSON_AddStringToObject(cj_result, "scale", "celsius");
+    }
+    return ret;
+}
+
+static int __init(l_ezlopi_item_t *item)
+{
+    int ret = 0;
+
+    if (item->interface.onewire_master.enable)
+    {
+        if (ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
+        {
+            if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
+            {
+                TRACE_B("Providing initial settings to DS18B20");
+                ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
+                ret = 1;
+            }
+        }
+    }
+    return ret;
+}
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
@@ -77,7 +125,9 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
+    item->interface.onewire_master.enable = true;
     CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.onewire_master.onewire_pin);
 }
 
@@ -92,10 +142,28 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, ds18b20_sensor);
+            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, ds18b20_sensor_v3);
             if (item_temperature)
             {
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
+            }
+            if (NULL == item_temperature)
+            {
+                ezlopi_device_free_device(device);
+            }
+            else
+            {
+                double *temperature_value = (double *)malloc(sizeof(double));
+                if (temperature_value)
+                {
+                    memset(temperature_value, 0, sizeof(double));
+                    *temperature_value = ideal_value;
+                    item_temperature->user_arg = (void *)temperature_value;
+                }
+                else
+                {
+                    free(temperature_value);
+                }
             }
         }
     }
@@ -103,19 +171,16 @@ static int __prepare(void *arg)
     return ret;
 }
 
-#if 1
+static int __notify(l_ezlopi_item_t *item)
+{
+    return ezlopi_device_value_updated_from_device_v3(item);
+}
+
+#if 0
 static int ds18b20_sensor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ds18b20_sensor_prepare(cJSON *cjson_device);
 static int ds18b20_sensor_init(s_ezlopi_device_properties_t *properties);
 static int get_ds18b20_sensor_value_to_cloud(s_ezlopi_device_properties_t *properties, void *args);
-
-static esp_err_t ds18b20_write_data(uint8_t *data, uint32_t gpio_pin);
-static esp_err_t ds18b20_read_data(uint8_t *data, uint32_t gpio_pin);
-static bool ds18b20_reset_line(uint32_t gpio_pin);
-static esp_err_t ds18b20_write_to_scratchpad(uint8_t th_val, uint8_t tl_val, uint8_t resolution, uint8_t gpio_pin);
-static bool ds18b20_recognize_device(uint32_t gpio_pin);
-static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t gpio_pin);
-static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len);
 
 int ds18b20_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
 {
@@ -246,6 +311,8 @@ static int get_ds18b20_sensor_value_to_cloud(s_ezlopi_device_properties_t *prope
 
     return ret;
 }
+
+#endif
 
 static esp_err_t ds18b20_write_data(uint8_t *data, uint32_t gpio_pin)
 {
@@ -378,7 +445,6 @@ static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t
         uint8_t calculated_crc = ds18b20_calculate_crc(ds18b20_scratchpad_data_array, 8);
         if (calculated_crc != ds18b20_crc)
         {
-            TRACE_B("CRC not verified!!");
             error = ESP_FAIL;
         }
         else
@@ -406,5 +472,3 @@ static uint8_t ds18b20_calculate_crc(const uint8_t *data, uint8_t len)
     }
     return crc;
 }
-
-#endif

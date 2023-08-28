@@ -137,6 +137,12 @@ static void ezlopi_device_print_interface_spi_master(l_ezlopi_item_t *item)
     TRACE_D(" |~~~|- item->interface.spi_master.flags: %d", item->interface.spi_master.flags);
 }
 
+static void ezlopi_device_print_interface_onewire_master(l_ezlopi_item_t *item)
+{
+    TRACE_D(" |~~~|- item->interface.onewire_master.enable: %d", item->interface.onewire_master.enable);
+    TRACE_D(" |~~~|- item->interface.onewire_master.onewire_pin: %d", item->interface.onewire_master.onewire_pin);
+}
+
 static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item)
 {
     switch (item->interface_type)
@@ -169,7 +175,7 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item)
     }
     case EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER:
     {
-        ezlopi_device_print_interface_uart(item);
+        ezlopi_device_print_interface_onewire_master(item);
         break;
     }
     case EZLOPI_DEVICE_INTERFACE_I2C_MASTER:
