@@ -5,21 +5,17 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "IR_Blaster_data_operation.h"
 #include "IR_Blaster_encoder_decoder.h"
+#include "IR_blaster_helpers.h"
 #include "esp_log.h"
-
-#define TIMEOUT_MS 30000 // 30 seconds in milliseconds
-
-uint32_t timing[500]; // always make static for the global variable [benefits: scope of variable remains within the file]
-static ir_protocol_parser_t ir_protocol_parser;
-static ir_protocol_builder_t *ir_protocol_builder;
-
-char *item_id; // always make static for the global variable [benefits: scope of variable remains within the file]
-size_t length; // always make static for the global variable [benefits: scope of variable remains within the file]
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __set_cjson_value(l_ezlopi_item_t *item, void *arg);
+
+// static esp_err_t blaster_mode_get_value_cjson(cJSON *params);
+// static esp_err_t learner_mode_get_value_cjson(cJSON *params);
 
 int IR_blaster_remote_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -28,22 +24,22 @@ int IR_blaster_remote_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
     {
         case EZLOPI_ACTION_PREPARE:
         {
-            // ret = __prepare(arg);
+            ret = __prepare(arg);
             break;
         }
         case EZLOPI_ACTION_INITIALIZE:
         {
-            // ret = __init(item);
+            ret = __init(item);
             break;
         }
         case EZLOPI_ACTION_GET_EZLOPI_VALUE:
         {
-            // ret = __get_cjson_value(item, arg);
+            ret = __get_cjson_value(item, arg);
             break;
         }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
+        case EZLOPI_ACTION_SET_VALUE:
         {
-            // ret = __notify(item);
+            __set_cjson_value(item, arg);
             break;
         }
         default:
@@ -51,6 +47,65 @@ int IR_blaster_remote_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
             break;
         }
     }
+    return ret;
+}
+
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+    cJSON *params = (cJSON *)arg; // confirm for  NULL
+
+    if (ezlopi_item_name_send_ir_code == item->cloud_properties.item_name)
+    {
+        blaster_mode_get_value_cjson(params);
+    }
+    else
+    {
+        learner_mode_get_value_cjson(params);
+    }
+
+    return ret;
+}
+
+static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+
+    cJSON *device_details = (cJSON*)arg;
+    if(device_details)
+    {
+        if(ezlopi_item_name_send_ir_code == item->cloud_properties.item_name)
+        {
+            char *Base64_string_value_from_Cloud = NULL;
+            CJSON_GET_VALUE_STRING(device_details, "value", Base64_string_value_from_Cloud); // Gets the string Base64
+            TRACE_E("%s", Base64_string_value_from_Cloud);
+
+            char *Hex_string = base64_to_string(Base64_string_value_from_Cloud);
+
+            if (ir_remote_blaster_learned_code(Hex_string) == ESP_OK)
+            {
+                TRACE_B("DATA BLASTED");
+            }
+            else
+            {
+                TRACE_E("NOTHING BLASTING");
+            }
+        }
+        else
+        {
+            capture();
+        }
+    }
+
+    return ret;
+}
+
+static int __init(l_ezlopi_item_t *item)
+{
+    int ret = 0;
+
+    build_decoding_table();
+
     return ret;
 }
 
@@ -66,8 +121,43 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
+static void __prepare_ir_blaster_code_sender_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+{
+    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    item->cloud_properties.has_getter = true;
+    item->cloud_properties.has_setter = true;
+    item->cloud_properties.item_name = ezlopi_item_name_send_ir_code;
+    item->cloud_properties.value_type = value_type_string;
+    item->cloud_properties.show = true;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
+
+    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, "pwm_resln", item->interface.pwm.pwm_resln);
+    CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
+}
+
+static void __prepare_ir_blaster_code_learner_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+{
+    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    item->cloud_properties.has_getter = true;
+    item->cloud_properties.has_setter = true;
+    item->cloud_properties.item_name = ezlopi_item_name_learn_ir_code;
+    item->cloud_properties.value_type = value_type_int;
+    item->cloud_properties.show = true;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
+
+    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, "pwm_resln", item->interface.pwm.pwm_resln);
+    CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
+}
+
 static int __prepare(void *arg)
 {
+    int ret = 0;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if(prep_arg && prep_arg->cjson_device)
     {
@@ -75,10 +165,19 @@ static int __prepare(void *arg)
         if(device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *ir_code_sender_item = ezlopi_device_add_item_to_device(device, IR_blaster_remote_v3);
-            if(ir_code_sender_item)
+            l_ezlopi_item_t *ir_blaster_code_sender_item = ezlopi_device_add_item_to_device(device, IR_blaster_remote_v3);
+            if(ir_blaster_code_sender_item)
             {
-                #pragma message("Prepare IR blaster.");
+                __prepare_ir_blaster_code_sender_item_properties(ir_blaster_code_sender_item, prep_arg->cjson_device);
+            }
+            l_ezlopi_item_t *ir_blaster_code_learner_item = ezlopi_device_add_item_to_device(device, IR_blaster_remote_v3);
+            if(ir_blaster_code_learner_item)
+            {
+                __prepare_ir_blaster_code_learner_item_properties(ir_blaster_code_learner_item, prep_arg->cjson_device);
+            }
+            if((NULL == ir_blaster_code_sender_item) && (NULL == ir_blaster_code_learner_item))
+            {
+                ezlopi_device_free_device(device);
             }
         }
         else 
@@ -86,7 +185,11 @@ static int __prepare(void *arg)
             ezlopi_device_free_device(device);
         }
     }
+    return ret;
 }
+
+
+
 
 #if 0
 

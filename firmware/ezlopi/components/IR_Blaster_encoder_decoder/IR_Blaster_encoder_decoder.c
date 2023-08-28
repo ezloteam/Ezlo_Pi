@@ -1,5 +1,6 @@
 #include "IR_Blaster_encoder_decoder.h"
 #include "math.h"
+#include "trace.h"
 
 static int mod_table[] = {0, 2, 1};
 static const unsigned char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

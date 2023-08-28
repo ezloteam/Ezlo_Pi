@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_IR_BLASTER 1
 #define EZLOPI_TEST_DEVICE 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
+#define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -177,9 +177,9 @@ static const char *ir_blaster_constant_config =
             {\
                 \"dev_name\": \"IR_Blaster1\",\
                 \"dev_type\": 5,\
-                \"gpio\": 3,\
-                \"id_item\": 30,\
+                \"id_item\": 29,\
                 \"id_room\": \"\",\
+                \"gpio\": 3,\
                 \"pwm_resln\": 8,\
                 \"freq_hz\": 50,\
                 \"duty_cycle\": 30\
