@@ -3,7 +3,7 @@
 #include "sensor_bme280.h"
 #include "digital_io.h"
 #include "sensor_pir.h"
-#include "sensor_door.h"
+#include "door_hall_sensor.h"
 #include "dimmable_bulb.h"
 #include "joystick_2_axis.h"
 #include "ultrasonic_MB1013.h"

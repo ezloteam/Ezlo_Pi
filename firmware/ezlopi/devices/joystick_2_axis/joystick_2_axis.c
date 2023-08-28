@@ -36,7 +36,7 @@ int joystick_2_axis_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *a
     }
     case EZLOPI_ACTION_SET_VALUE:
     {
-        ret = __set_value(item, arg);
+        ret = __get_value_cjson(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -141,7 +141,7 @@ static int __prepare(void *arg)
     return ret;
 }
 
-static int ____notify(l_ezlopi_item_t *item)
+static int __notify(l_ezlopi_item_t *item)
 {
     return ezlopi_device_value_updated_from_device_v3(item);
 }
