@@ -1,5 +1,5 @@
-#ifndef __SENSOR_BME280_H__
-#define __SENSOR_BME280_H__
+#ifndef __SENSOR_0012_BME280_SENSOR_H__
+#define __SENSOR_0012_BME280_SENSOR_H__
 
 #include "driver/i2c.h"
 #include "bme280/bme280.h"
@@ -32,7 +32,7 @@ typedef struct bme280_dev sensor_bme280_dev_t;
  */
 typedef struct bme280_data sensor_bme280_data_t;
 
-int sensor_0012_bme280_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
-// int sensor_bme280(e_ezlopi_actions_t action, void *arg) { return 0; }
+// int sensor_0012_bme280_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+int sensor_0012_bme280_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif // __SENSOR_BME290_H__
+#endif // __SENSOR_0012_BME280_SENSOR_H__

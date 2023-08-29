@@ -1,6 +1,5 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
-#include "sensor_bme280.h"
 #include "digital_io.h"
 #include "sensor_pir.h"
 #include "sensor_door.h"
@@ -24,6 +23,7 @@
 #include "030_sens_ds18b20_sensor.h"
 #include "032_sens_soil_moisture.h"
 #include "016_sens_dht22_sensor.h"
+#include "0012_bme280_sensor.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -37,6 +37,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     {
         .id = EZLOPI_SENSOR_0002_RELAY,
         .func = digital_io_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0012_BME280_I2C
+    {
+        .id = EZLOPI_SENSOR_0012_BME280_I2C,
+        .func = sensor_0012_bme280_sensor_v3,
     },
 #endif
 
