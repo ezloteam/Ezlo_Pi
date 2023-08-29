@@ -7,21 +7,15 @@
 #include "string.h"
 #include "esp_check.h"
 
-struct s_ezlopi_uart_object
-{
-    s_ezlopi_uart_t ezlopi_uart;
-    __uart_upcall upcall;
-    QueueHandle_t ezlopi_uart_queue_handle;
-};
-
 static void ezlopi_uart_channel_task(void *args);
 static ezlo_uart_channel_t get_available_channel();
 
-s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall)
+s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg)
 {
     static QueueHandle_t ezlo_uart_channel_queue;
     s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object *)malloc(sizeof(struct s_ezlopi_uart_object));
     memset(uart_object_handle, 0, sizeof(struct s_ezlopi_uart_object));
+    uart_object_handle->arg = arg;
     ezlo_uart_channel_t channel = get_available_channel();
     if (NULL == upcall)
     {
@@ -92,7 +86,7 @@ static void ezlopi_uart_channel_task(void *args)
     // s_ezlopi_uart_object_t *ezlopi_uart_object = (s_ezlopi_uart_object_t*)args;
     s_ezlopi_uart_object_handle_t ezlopi_uart_object = (s_ezlopi_uart_object_handle_t)args;
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    
+
     while (1)
     {
         // Start reveceiving UART events for first channel.
