@@ -310,7 +310,6 @@ static void ezlopi_device_parse_json_v3(char *config_string)
 
                 int id_item = 0;
                 CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
-                TRACE_B("id_item: %d", id_item);
 
                 if (0 != id_item)
                 {

@@ -239,4 +239,5 @@ static int __notify(l_ezlopi_item_t *item)
     ESP_ERROR_CHECK(gpio_set_level(item->interface.gpio.gpio_out.gpio_num, 1));
     vTaskDelay(1 / portTICK_PERIOD_MS);
     ESP_ERROR_CHECK(gpio_set_level(item->interface.gpio.gpio_out.gpio_num, 0));
+    return 1;
 }
