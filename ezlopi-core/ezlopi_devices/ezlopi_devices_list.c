@@ -32,7 +32,7 @@
 #include "sensor_0025_digitalIn_LDR.h"
 #include "sensor_0026_ADC_LDR.h"
 #include "sensor_0027_ADC_waterLeak.h"
-#include "sensor_0028_ADC_GY61.h"
+#include "sensor_0028_other_GY61.h"
 #include "sensor_0029_I2C_GXHTC3.h"
 #include "sensor_0030_oneWire_DS18B20.h"
 #include "sensor_0031_other_JSNSR04T.h"
@@ -252,10 +252,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0028_ADC_GY61
+#ifdef EZLOPI_SENSOR_0028_OTHER_GY61
     {
-        .id = EZLOPI_SENSOR_0028_ADC_GY61,
-        .func = sensor_0028_ADC_GY61,
+        .id = EZLOPI_SENSOR_0028_OTHER_GY61,
+        .func = sensor_0028_other_GY61,
     },
 #endif
 
