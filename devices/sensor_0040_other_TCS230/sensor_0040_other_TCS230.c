@@ -263,12 +263,12 @@ static s_ezlopi_device_properties_t *sensor_other_tcs230_prepare_properties(uint
             sensor_other_TCS230_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
             sensor_other_TCS230_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s0", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s1", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s2", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_s3", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_output_en", sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_pulse_output", sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio1", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s0);           // gpio_s0
+            CJSON_GET_VALUE_INT(cjson_device, "gpio2", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s1);           // gpio_s1
+            CJSON_GET_VALUE_INT(cjson_device, "gpio3", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s2);           // gpio_s2
+            CJSON_GET_VALUE_INT(cjson_device, "gpio4", sensor_0040_other_TCS230_data->TCS230_pin.gpio_s3);           // gpio_s3
+            CJSON_GET_VALUE_INT(cjson_device, "gpio5", sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en);    // gpio_output_en
+            CJSON_GET_VALUE_INT(cjson_device, "gpio6", sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
 
             sensor_other_TCS230_properties->user_arg = sensor_0040_other_TCS230_data; // structure containing calib_factors & data_val
         }

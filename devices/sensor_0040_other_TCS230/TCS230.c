@@ -248,7 +248,7 @@ bool get_tcs230_sensor_value(s_ezlopi_device_properties_t *properties)
                                      &Red_period);
     Get_mapped_color_value(&sensor_0040_other_TCS230_data->red_mapped,                  // dest_var
                            sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output, // use this pin to populate src_var
-                           &Red_period,                                               // src_var
+                           &Red_period,                                                 // src_var
                            sensor_0040_other_TCS230_data->calib_data.most_red_timeP,    // calib paramter
                            sensor_0040_other_TCS230_data->calib_data.least_red_timeP);  // calib paramter
     TRACE_E("RED => %d....", sensor_0040_other_TCS230_data->red_mapped);
