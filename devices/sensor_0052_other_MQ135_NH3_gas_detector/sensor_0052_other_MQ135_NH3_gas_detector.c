@@ -14,14 +14,14 @@
 #include "sensor_0052_other_MQ135_NH3_gas_detector.h"
 
 //------------------------------------------------------------------------------
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                     \
-    {                                                                                                                         \
+#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                       \
+    {                                                                                                                           \
         s_ezlopi_device_properties_t *_properties = sensor_other_mq135_prepare_properties(device_id, category, subcategory,     \
-                                                                                        item_name, value_type, cjson_device); \
-        if (NULL != _properties)                                                                                              \
-        {                                                                                                                     \
-            add_device_to_list(device_prep_args, _properties, NULL);                                                          \
-        }                                                                                                                     \
+                                                                                          item_name, value_type, cjson_device); \
+        if (NULL != _properties)                                                                                                \
+        {                                                                                                                       \
+            add_device_to_list(device_prep_args, _properties, NULL);                                                            \
+        }                                                                                                                       \
     }
 
 //------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 static uint8_t mq135_digital_pin = 0;
 static uint8_t mq135_adc_pin = 0;
 
-static float MQ135_R0_constant = 0;         // Define variable for MQ135_R0_constant [always constant]
+static float MQ135_R0_constant = 0;       // Define variable for MQ135_R0_constant [always constant]
 static bool Calibration_complete = false; // flag to activate calibration phase
 
 static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_device_properties_t *sensor_other_mq135_properties, void *user_arg);
@@ -127,12 +127,12 @@ static s_ezlopi_device_properties_t *sensor_other_mq135_prepare_properties(uint3
             sensor_0052_other_MQ135_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
             if (ezlopi_item_name_gas_alarm == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_digi", mq135_digital_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio1", mq135_digital_pin);
                 TRACE_I("MQ135-> DIGITAL_PIN: %d ", mq135_digital_pin);
             }
             if (ezlopi_item_name_smoke_density == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_adc", mq135_adc_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio2", mq135_adc_pin);
                 TRACE_I("MQ135-> ADC_PIN: %d ", mq135_adc_pin);
             }
             sensor_0052_other_MQ135_properties->interface.adc.resln_bit = 3; // ADC 12-bit
