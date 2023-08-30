@@ -398,13 +398,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\" : 8,\
-                \"dev_name\" : \"BME280 sensor\",\
+                \"dev_type\" : 2,\
+                \"dev_name\" : \"Touch sensor\",\
                 \"id_room\" : \"\",\
-                \"id_item\" : 12,\
-                \"slave_addr\" : 118,\
-                \"gpio_scl\" : 1,\
-                \"gpio_sda\" : 2\
+                \"id_item\" : 23,\
+                \"gpio\" : 1,\
+                \"val_ip\" : 1,\
+                \"ip_inv\" : false\
             }\                  
         ],\
     \"dev_total\": 1}";

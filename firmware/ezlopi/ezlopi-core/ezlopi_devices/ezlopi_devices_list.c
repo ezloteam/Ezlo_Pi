@@ -8,7 +8,7 @@
 #include "ultrasonic_MB1013.h"
 #include "servo_motor_MG_996R.h"
 #include "ultrasonic_HC_SR04.h"
-#include "sensor_touch_tpp_223b.h"
+#include "0023_sensor_touch_switch_tpp_223b.h"
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_leak_sensor.h"
@@ -51,6 +51,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     {
         .id = EZLOPI_SENSOR_0019_PIR,
         .func = sensor_pir_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR,
+        .func = sensor_touch_ttp_223b_v3,
     },
 #endif
 
