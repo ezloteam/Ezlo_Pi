@@ -401,9 +401,9 @@ static const char *test_device_constant_config =
                 \"dev_type\" : 2,\
                 \"dev_name\" : \"Touch sensor\",\
                 \"id_room\" : \"\",\
-                \"id_item\" : 23,\
+                \"id_item\" : 35,\
                 \"gpio\" : 1,\
-                \"val_ip\" : 1,\
+                \"val_ip\" : 0,\
                 \"ip_inv\" : false\
             }\                  
         ],\

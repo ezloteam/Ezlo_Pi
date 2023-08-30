@@ -24,6 +24,7 @@
 #include "032_sens_soil_moisture.h"
 #include "016_sens_dht22_sensor.h"
 #include "0012_bme280_sensor.h"
+#include "0035_sensor_touch_sensor_tpp_223b.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -54,9 +55,9 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR
+#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH
     {
-        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SENSOR,
+        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH,
         .func = sensor_touch_ttp_223b_v3,
     },
 #endif
@@ -65,6 +66,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     {
         .id = EZLOPI_SENSOR_034_Proximity_Sensor,
         .func = proximity_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR,
+        .func = sensor_touch_sensor_ttp_223b_v3,
     },
 #endif
 
