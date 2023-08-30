@@ -116,12 +116,12 @@ static s_ezlopi_device_properties_t *sensor_other_KY026_prepare_properties(uint3
             sensor_0057_other_KY026_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
             if (ezlopi_item_name_heat_alarm == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_digi", KY026_digital_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio1", KY026_digital_pin);
                 TRACE_I("KY026-> DIGITAL_PIN: %d ", KY026_digital_pin);
             }
             if (ezlopi_item_name_temperature_changes == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_adc", KY026_adc_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio2", KY026_adc_pin);
                 TRACE_I("KY026-> ADC_PIN: %d ", KY026_adc_pin);
             }
             sensor_0057_other_KY026_properties->interface.adc.resln_bit = 3; // ADC 12-bit
