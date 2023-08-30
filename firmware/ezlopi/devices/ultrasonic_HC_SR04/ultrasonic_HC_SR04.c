@@ -48,7 +48,7 @@ int ultrasonic_hcsr04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
         ret = __init(item);
         break;
     }
-    case EZLOPI_ACTION_SET_VALUE:
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = __get_value_cjson(item, arg);
         break;
@@ -68,7 +68,35 @@ int ultrasonic_hcsr04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
     return ret;
 }
 
-static void __interrupt_upcall(void *arg)
+static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+    if (item && arg && item->user_arg)
+    {
+        int64_t time_us = 0;
+        cJSON *cj_result = (cJSON *)arg;
+        s_value_capture_t *cap_value = (s_value_capture_t *)item->user_arg;
+        if (cap_value->end_of_sample && cap_value->start_of_sample)
+        {
+            if (cap_value->end_of_sample < cap_value->start_of_sample)
+            {
+                time_us = INT64_MAX - cap_value->start_of_sample;
+                time_us += cap_value->end_of_sample;
+            }
+            else
+            {
+                time_us = cap_value->end_of_sample - cap_value->start_of_sample;
+            }
+        }
+
+        double distance_cm = (double)time_us ? ((double)time_us / 58.0) : 0.0;
+
+        cJSON_AddNumberToObject(cj_result, "value", distance_cm);
+    }
+    return ret;
+}
+
+static void __interrupt_upcall_os(void *arg)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item && item->user_arg)
@@ -81,6 +109,7 @@ static void __interrupt_upcall(void *arg)
         else
         {
             value_cap->end_of_sample = esp_timer_get_time();
+            ezlopi_device_value_updated_from_device_v3(item);
         }
     }
 }
@@ -126,7 +155,7 @@ static int __init(l_ezlopi_item_t *item)
         };
 
         gpio_config(&io_conf);
-        gpio_isr_service_register_v3(item, __interrupt_upcall, 10);
+        gpio_isr_service_register_v3(item, __interrupt_upcall_os, 10);
     }
     return ret;
 }
@@ -150,8 +179,11 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_name = ezlopi_item_name_motion;
     item->cloud_properties.value_type = value_type_bool;
-    item->cloud_properties.scale = NULL;
+    item->cloud_properties.scale = scales_centi_meter;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+
+    // for value capture
+    item->user_arg = malloc(sizeof(s_value_capture_t));
 }
 
 static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -200,4 +232,11 @@ static int __prepare(void *arg)
         }
     }
     return ret;
+}
+
+static int __notify(l_ezlopi_item_t *item)
+{
+    ESP_ERROR_CHECK(gpio_set_level(item->interface.gpio.gpio_out.gpio_num, 1));
+    vTaskDelay(1 / portTICK_PERIOD_MS);
+    ESP_ERROR_CHECK(gpio_set_level(item->interface.gpio.gpio_out.gpio_num, 0));
 }

@@ -106,18 +106,16 @@ static int dht22_sensor_prepare_v3(void *arg)
             {
                 dht22_sensor_setup_device_cloud_properties_temperature(parent_device, cjson_device);
 
-                l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(parent_device, NULL);
+                l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(parent_device, dht22_sensor_v3);
                 if (item_temperature)
                 {
-                    item_temperature->func = dht22_sensor_v3;
                     dht11_sensor_setup_item_properties_temperature(item_temperature, cjson_device);
                 }
 
                 // dht22_sensor_setup_device_cloud_properties_humidity(parent_device, cjson_device);
-                l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(parent_device, NULL);
+                l_ezlopi_item_t *item_humidity = ezlopi_device_add_item_to_device(parent_device, dht22_sensor_v3);
                 if (item_humidity)
                 {
-                    item_humidity->func = dht22_sensor_v3;
                     dht11_sensor_setup_item_properties_humidity(item_humidity, cjson_device);
                 }
             }
