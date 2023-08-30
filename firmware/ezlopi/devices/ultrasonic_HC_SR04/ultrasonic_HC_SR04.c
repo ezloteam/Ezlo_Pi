@@ -17,6 +17,16 @@
 #include "gpio_isr_service.h"
 #include "ultrasonic_HC_SR04.h"
 
+#include "driver/mcpwm.h"
+#include "soc/rtc.h"
+
+typedef struct s_value_capture
+{
+    int64_t start_of_sample;
+    int64_t end_of_sample;
+
+} s_value_capture_t;
+
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
@@ -60,6 +70,19 @@ int ultrasonic_hcsr04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
 
 static void __interrupt_upcall(void *arg)
 {
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    if (item && item->user_arg)
+    {
+        s_value_capture_t *value_cap = (s_value_capture_t *)item->user_arg;
+        if (EZLOPI_GPIO_HIGH == gpio_get_level(item->interface.gpio.gpio_in.gpio_num))
+        {
+            value_cap->start_of_sample = esp_timer_get_time();
+        }
+        else
+        {
+            value_cap->end_of_sample = esp_timer_get_time();
+        }
+    }
 }
 
 static int __init(l_ezlopi_item_t *item)
