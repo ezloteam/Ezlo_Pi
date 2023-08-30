@@ -397,13 +397,13 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_name\": \"KY026 Flame_sensor\",\
                 \"dev_type\": 10,\
-                \"id_item\": 57,\
+                \"dev_name\": \"gy61\",\
                 \"id_room\": \"\",\
-                \"gpio_digi\": 1,\
-                \"gpio_adc\": 2,\
-                \"resln_bit\": 12\
+                \"id_item\": 28,\
+                \"gpio1\": 1,\
+                \"gpio2\": 2,\
+                \"gpio3\": 3\
             }\
         ],\
     \"dev_total\": 1}";

@@ -1,11 +1,10 @@
-#ifndef _0040_SENSOR_PWM_TCS230_H_
-#define _0040_SENSOR_PWM_TCS230_H_
+#ifndef _0040_SENSOR_OTHER_TCS230_H_
+#define _0040_SENSOR_OTHER_TCS230_H_
 
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
 #include "driver/gpio.h"
 
-#define QUEUE_SIZE 5
 typedef enum TCS230_queue_enum
 {
     TCS230_QUEUE_RESET = 0,
@@ -68,4 +67,4 @@ typedef struct
 //------------------------------------------------------------------------
 int sensor_0040_other_TCS230(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
-#endif // _0040_SENSOR_PWM_TCS230_H_
+#endif // _0040_SENSOR_OTHER_TCS230_H_
