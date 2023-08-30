@@ -60,6 +60,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = dht22_sensor_v3,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .func = sensor_0024_other_HCSR04_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
     {
         .id = EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR,

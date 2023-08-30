@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_IR_BLASTER 1
 #define EZLOPI_TEST_DEVICE 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_IR_BLASTER
+#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -399,10 +399,11 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_type\" : 7,\
-                \"dev_name\" : \"DS18B20 sensor\",\
+                \"dev_name\" : \"HCSR sensor\",\
                 \"id_room\" : \"\",\
-                \"id_item\" : 30,\
-                \"gpio\" : 22\
+                \"id_item\" : 24,\
+                \"gpio1\" : 1,\
+                \"gpio2\" : 2\
             }\                  
         ],\
     \"dev_total\": 1}";
