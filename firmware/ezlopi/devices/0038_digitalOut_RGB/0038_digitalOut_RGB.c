@@ -134,7 +134,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             TRACE_B("Brightness value is %d, %d, %d", (uint8_t)(RGB_struct->red_struct.value * RGB_struct->brightness), (uint8_t)(RGB_struct->green_struct.value * RGB_struct->brightness),
                     (uint8_t)(RGB_struct->blue_struct.value * RGB_struct->brightness));
             RGB_LED_change_color_value(RGB_struct);
-            ezlopi_device_value_updated_from_device(RGB_LED_dimmer_item);
+            ezlopi_device_value_updated_from_device_v3(RGB_LED_dimmer_item);
         }
         if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
@@ -144,7 +144,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             TRACE_B("dim_percent %d, dim_brightness_factor is %f", dim_percent, dim_brightness_factor);
             RGB_struct->brightness = dim_brightness_factor;
             RGB_LED_change_color_value(RGB_struct);
-            ezlopi_device_value_updated_from_device(RGB_LED_onoff_switch_item);
+            ezlopi_device_value_updated_from_device_v3(RGB_LED_onoff_switch_item);
         }
     }
     return ret;
