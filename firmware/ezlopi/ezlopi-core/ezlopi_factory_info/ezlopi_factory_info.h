@@ -371,26 +371,6 @@ static const char *switch_box_constant_config =
         ],\
     \"dev_total\": 12}";
 #elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
-#if 0
-static const char *test_device_constant_config =
-    "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\
-            {\
-                \"dev_name\" : \"GXHTC3-Sensor\",\
-                \"dev_type\" : 8,\
-                \"gpio_scl\" : 45,\
-                \"gpio_sda\" : 46,\
-                \"id_item\" : 35,\
-                \"id_room\" : \"\",\
-                \"pullup_scl\" : true,\
-                \"pullup_sda\" : true,\
-                \"slave_addr\" : 0\
-            }\
-        ],\
-    \"dev_total\": 1}";
-#endif
 
 static const char *test_device_constant_config =
     "{\
@@ -398,36 +378,17 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\" : 7,\
-                \"dev_name\" : \"HCSR sensor\",\
+                \"dev_type\" : 10,\
+                \"dev_name\" : \"RGM LED\",\
                 \"id_room\" : \"\",\
-                \"id_item\" : 24,\
+                \"id_item\" : 38,\
                 \"gpio1\" : 1,\
-                \"gpio2\" : 2\
+                \"gpio2\" : 2,\
+                \"gpio3\" : 3\
             }\                  
         ],\
     \"dev_total\": 1}";
 
-#endif
-
-#if 0
-{
-  "dev_type": 7,
-  "dev_name": "Humidity Kitchen",
-  "id_room":"",
-  "id_item": 15,
-  "gpio": 17
-}
-
-"{\
-    \"dev_type\": 2,\
-    \"dev_name\": \"PIR sensor\",\
-    \"id_room\":\"\",\
-    \"id_item\": 19,\
-    \"gpio\": 4,\
-    \"pull_up\": false,\
-    \"logic_inv\": false\
-}"
 #endif
 
 #ifdef __cplusplus

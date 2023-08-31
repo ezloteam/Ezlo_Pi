@@ -1,6 +1,5 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
-#include "sensor_bme280.h"
 #include "digital_io.h"
 #include "sensor_pir.h"
 #include "door_hall_sensor.h"
@@ -9,7 +8,7 @@
 #include "ultrasonic_MB1013.h"
 #include "servo_motor_MG_996R.h"
 #include "ultrasonic_HC_SR04.h"
-#include "sensor_touch_tpp_223b.h"
+#include "0023_sensor_touch_switch_tpp_223b.h"
 #include "025_sens_ldr_digital_module.h"
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_leak_sensor.h"
@@ -20,10 +19,13 @@
 #include "0029_gxhtc3_rh_t_sensor.h"
 #include "jsn_sr04t.h"
 #include "turbidity.h"
-#include "proximity.h"
+#include "034_proximity_sensor.h"
 #include "030_sens_ds18b20_sensor.h"
 #include "032_sens_soil_moisture.h"
 #include "016_sens_dht22_sensor.h"
+#include "0012_bme280_sensor.h"
+#include "0035_sensor_touch_sensor_tpp_223b.h"
+#include "0038_digitalOut_RGB.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -40,6 +42,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0012_BME280_I2C
+    {
+        .id = EZLOPI_SENSOR_0012_BME280_I2C,
+        .func = sensor_0012_bme280_sensor_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0019_PIR
     {
         .id = EZLOPI_SENSOR_0019_PIR,
@@ -47,10 +56,31 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_034_Proximity_Sensor
+#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH
     {
-        .id = EZLOPI_SENSOR_034_Proximity_Sensor,
-        .func = proximity_sensor_3,
+        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH,
+        .func = sensor_touch_ttp_223b_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_034_PROXIMITY_SENSOR
+    {
+        .id = EZLOPI_SENSOR_034_PROXIMITY_SENSOR,
+        .func = proximity_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_DEVICE_0038_RGB_LED
+    {
+        .id = EZLOPI_DEVICE_0038_RGB_LED,
+        .func = device_0038_digitalOut_RGB_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR,
+        .func = sensor_touch_sensor_ttp_223b_v3,
     },
 #endif
 
