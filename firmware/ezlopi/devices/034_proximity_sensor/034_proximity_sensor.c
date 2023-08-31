@@ -8,7 +8,7 @@ static int proximity_sensor_init(l_ezlopi_item_t *item);
 static void proximity_sensor_value_updated_from_device(l_ezlopi_item_t *item);
 static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args);
 
-int proximity_sensor_3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
+int proximity_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
 {
     int ret = 0;
 
@@ -90,10 +90,9 @@ static int proximity_sensor_prepare(void *args)
         if (device)
         {
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
+            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, proximity_sensor_v3);
             if (item)
             {
-                item->func = proximity_sensor_3;
                 proximity_sensor_setup_item_properties(item, device_prep_arg->cjson_device);
                 ret = 1;
             }

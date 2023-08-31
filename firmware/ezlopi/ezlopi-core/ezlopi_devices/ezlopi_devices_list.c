@@ -66,7 +66,7 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_034_PROXIMITY_SENSOR
     {
         .id = EZLOPI_SENSOR_034_PROXIMITY_SENSOR,
-        .func = proximity_sensor,
+        .func = proximity_sensor_v3,
     },
 #endif
 
