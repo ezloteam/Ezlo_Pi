@@ -19,12 +19,13 @@
 #include "0029_gxhtc3_rh_t_sensor.h"
 #include "jsn_sr04t.h"
 #include "turbidity.h"
-#include "proximity.h"
+#include "034_proximity_sensor.h"
 #include "030_sens_ds18b20_sensor.h"
 #include "032_sens_soil_moisture.h"
 #include "016_sens_dht22_sensor.h"
 #include "0012_bme280_sensor.h"
 #include "0035_sensor_touch_sensor_tpp_223b.h"
+#include "0038_digitalOut_RGB.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -62,10 +63,17 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_034_Proximity_Sensor
+#ifdef EZLOPI_SENSOR_034_PROXIMITY_SENSOR
     {
-        .id = EZLOPI_SENSOR_034_Proximity_Sensor,
+        .id = EZLOPI_SENSOR_034_PROXIMITY_SENSOR,
         .func = proximity_sensor,
+    },
+#endif
+
+#ifdef EZLOPI_DEVICE_0038_RGB_LED
+    {
+        .id = EZLOPI_DEVICE_0038_RGB_LED,
+        .func = device_0038_digitalOut_RGB_v3,
     },
 #endif
 

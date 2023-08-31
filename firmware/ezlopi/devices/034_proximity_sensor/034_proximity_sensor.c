@@ -1,5 +1,5 @@
 #include "ezlopi_cloud.h"
-#include "proximity.h"
+#include "034_proximity_sensor.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_cloud_value_type_str.h"
 
