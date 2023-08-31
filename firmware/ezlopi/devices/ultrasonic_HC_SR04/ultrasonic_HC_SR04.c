@@ -20,19 +20,17 @@
 #include "driver/mcpwm.h"
 #include "soc/rtc.h"
 
-typedef struct s_value_capture
-{
-    int64_t start_of_sample;
-    int64_t end_of_sample;
-
-} s_value_capture_t;
+static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *item);
+static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance);
+static esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us);
 
-int ultrasonic_hcsr04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -71,47 +69,31 @@ int ultrasonic_hcsr04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    if (item && arg && item->user_arg)
+
+    ultrasonic_sensor_t *ultrasonic_sensor = (ultrasonic_sensor_t *)item->user_arg;
+    cJSON *cj_param = (cJSON *)arg;
+    char valueFormatted[20];
+    if (cj_param && ultrasonic_sensor)
     {
-        int64_t time_us = 0;
-        cJSON *cj_result = (cJSON *)arg;
-        s_value_capture_t *cap_value = (s_value_capture_t *)item->user_arg;
-        if (cap_value->end_of_sample && cap_value->start_of_sample)
-        {
-            if (cap_value->end_of_sample < cap_value->start_of_sample)
-            {
-                time_us = INT64_MAX - cap_value->start_of_sample;
-                time_us += cap_value->end_of_sample;
-            }
-            else
-            {
-                time_us = cap_value->end_of_sample - cap_value->start_of_sample;
-            }
-        }
-
-        double distance_cm = (double)time_us ? ((double)time_us / 58.0) : 0.0;
-
-        cJSON_AddNumberToObject(cj_result, "value", distance_cm);
+        snprintf(valueFormatted, 20, "%d cm", ultrasonic_sensor->distance);
+        cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
+        cJSON_AddNumberToObject(cj_param, "value", ultrasonic_sensor->distance);
     }
+
     return ret;
 }
 
-static void __interrupt_upcall_os(void *arg)
+static int __notify(l_ezlopi_item_t *item)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
-    if (item && item->user_arg)
+    int ret = 0;
+    static int count = 0;
+    if (2 == ++count)
     {
-        s_value_capture_t *value_cap = (s_value_capture_t *)item->user_arg;
-        if (EZLOPI_GPIO_HIGH == gpio_get_level(item->interface.gpio.gpio_in.gpio_num))
-        {
-            value_cap->start_of_sample = esp_timer_get_time();
-        }
-        else
-        {
-            value_cap->end_of_sample = esp_timer_get_time();
-            ezlopi_device_value_updated_from_device_v3(item);
-        }
+        ezlopi_sensor_0024_other_HCSR04_get_from_sensor(item);
+        ezlopi_device_value_updated_from_device_v3(item);
+        count = 0;
     }
+    return ret;
 }
 
 static int __init(l_ezlopi_item_t *item)
@@ -155,7 +137,6 @@ static int __init(l_ezlopi_item_t *item)
         };
 
         gpio_config(&io_conf);
-        gpio_isr_service_register_v3(item, __interrupt_upcall_os, 10);
     }
     return ret;
 }
@@ -166,47 +147,38 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.category = category_security_sensor;
-    device->cloud_properties.subcategory = subcategory_motion;
-    device->cloud_properties.device_type = dev_type_sensor_motion;
+    device->cloud_properties.category = category_level_sensor;
+    device->cloud_properties.subcategory = subcategory_not_defined;
+    device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
-static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
-    item->cloud_properties.has_setter = true;
-    item->cloud_properties.item_name = ezlopi_item_name_motion;
-    item->cloud_properties.value_type = value_type_bool;
+    item->cloud_properties.has_setter = false;
+    item->cloud_properties.item_name = ezlopi_item_name_distance;
+    item->cloud_properties.value_type = value_type_length;
     item->cloud_properties.scale = scales_centi_meter;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    // for value capture
-    item->user_arg = malloc(sizeof(s_value_capture_t));
-}
+    CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.gpio.gpio_in.gpio_num);
 
-static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
-{
-    item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
-
-    // item->interface.gpio.gpio_out.gpio_num = 9;
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
     item->interface.gpio.gpio_out.mode = GPIO_MODE_OUTPUT;
     item->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_out.value = 0;
-    CJSON_GET_VALUE_INT(cj_device, "gpio_out", item->interface.gpio.gpio_out.gpio_num);
 
-    // item->interface.gpio.gpio_in.gpio_num = 10;
     item->interface.gpio.gpio_in.enable = true;
-    item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
+    item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_in.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
     item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.value = 0;
-    CJSON_GET_VALUE_INT(cj_device, "gpio_in", item->interface.gpio.gpio_in.gpio_num);
 }
 
 static int __prepare(void *arg)
@@ -222,11 +194,23 @@ static int __prepare(void *arg)
             if (device)
             {
                 __setup_device_cloud_properties(device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, ultrasonic_hcsr04_v3);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
-                    __setup_item_cloud_properties(item, cj_device);
-                    __setup_item_interface_properties(item, cj_device);
+                    __setup_item_properties(item, cj_device);
+                    ultrasonic_sensor_t *ultrasonic_sensor = (ultrasonic_sensor_t *)malloc(sizeof(ultrasonic_sensor_t));
+                    if (ultrasonic_sensor)
+                    {
+                        memset(ultrasonic_sensor, 0, sizeof(ultrasonic_sensor_t));
+                        ultrasonic_sensor->distance = 0;
+                        ultrasonic_sensor->trigger_pin = item->interface.gpio.gpio_out.gpio_num;
+                        ultrasonic_sensor->echo_pin = item->interface.gpio.gpio_in.gpio_num;
+                        item->user_arg = (void *)ultrasonic_sensor;
+                    }
+                }
+                else
+                {
+                    ezlopi_device_free_device(device);
                 }
             }
         }
@@ -234,10 +218,100 @@ static int __prepare(void *arg)
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *item)
 {
-    ESP_ERROR_CHECK(gpio_set_level(item->interface.gpio.gpio_out.gpio_num, 1));
+    uint32_t distance;
+
+    ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (ultrasonic_sensor_t *)item->user_arg;
+    if (ultrasonic_HCSR04_sensor)
+    {
+        esp_err_t res = ultrasonic_measure(ultrasonic_HCSR04_sensor, MAX_DISTANCE_CM, &ultrasonic_HCSR04_sensor->distance);
+
+        if (res != ESP_OK)
+        {
+            TRACE_B("Error 0x%X: ", res);
+            switch (res)
+            {
+            case ESP_ERR_ULTRASONIC_PING:
+                TRACE_B("Cannot ping (device is in invalid state)\n");
+                break;
+            case ESP_ERR_ULTRASONIC_PING_TIMEOUT:
+                TRACE_B("Ping timeout (no device found)\n");
+                break;
+            case ESP_ERR_ULTRASONIC_ECHO_TIMEOUT:
+                TRACE_B("Echo timeout (i.e. distance too big)\n");
+                break;
+            default:
+                TRACE_B("%s\n", esp_err_to_name(res));
+            }
+            ultrasonic_HCSR04_sensor->distance = 0;
+        }
+        else
+        {
+            // TRACE_B("Distance: %d cm\n", ultrasonic_HCSR04_sensor->distance);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+        }
+    }
+    return true;
+}
+
+static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance)
+{
+    CHECK_ARG(dev && distance);
+
+    uint32_t time_us;
+    CHECK(ultrasonic_measure_raw(dev, max_distance * ROUNDTRIP_CM, &time_us));
+    *distance = time_us / ROUNDTRIP_CM;
+
+    return ESP_OK;
+}
+
+static esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us)
+{
+    CHECK_ARG(dev && time_us);
+    // Wait for echo
+    while (gpio_get_level(dev->echo_pin))
+    {
+        // if (timeout_expired(start, PING_TIMEOUT))
+        //     RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING_TIMEOUT);
+
+        vTaskDelay(1 / portTICK_PERIOD_MS);
+    }
+
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
     vTaskDelay(1 / portTICK_PERIOD_MS);
-    ESP_ERROR_CHECK(gpio_set_level(item->interface.gpio.gpio_out.gpio_num, 0));
-    return 1;
+    CHECK(gpio_set_level(dev->trigger_pin, 1));
+    vTaskDelay(1 / portTICK_PERIOD_MS);
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
+
+    int64_t start = esp_timer_get_time();
+    PORT_ENTER_CRITICAL;
+
+    // Previous ping isn't ended
+    // if (gpio_get_level(dev->echo_pin))
+    // {
+    //     RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING);
+    // }
+
+    // // Wait for echo
+    while (!gpio_get_level(dev->echo_pin))
+    {
+        if (timeout_expired(start, PING_TIMEOUT))
+            RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING_TIMEOUT);
+    }
+
+    // got echo, measuring
+    int64_t echo_start = esp_timer_get_time();
+    int64_t time = echo_start;
+    while (gpio_get_level(dev->echo_pin))
+    {
+        time = esp_timer_get_time();
+        if (timeout_expired(echo_start, max_time_us))
+            RETURN_CRITICAL(ESP_ERR_ULTRASONIC_ECHO_TIMEOUT);
+    }
+    PORT_EXIT_CRITICAL;
+
+    *time_us = time - echo_start;
+
+    return ESP_OK;
 }
