@@ -27,6 +27,7 @@
 #include "0035_sensor_touch_sensor_tpp_223b.h"
 #include "0038_digitalOut_RGB.h"
 #include "0044_sensor_I2C_TSL256_luminosity.h"
+#include "0008_sensor_I2C_LTR303ALS.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -40,6 +41,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     {
         .id = EZLOPI_SENSOR_0002_RELAY,
         .func = digital_io_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0012_BME280_I2C
+    {
+        .id = EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR,
+        .func = sensor_0008_I2C_LTR303ALS_v3,
     },
 #endif
 

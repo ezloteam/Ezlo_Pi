@@ -29,7 +29,7 @@ typedef struct s_ezlopi_i2c_master
 int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf);
 void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf);
 
-void ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len);
-void ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len);
+esp_err_t ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len);
+esp_err_t ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len);
 
 #endif // __EZLOPI_HAL_H__
