@@ -26,6 +26,7 @@
 #include "0012_bme280_sensor.h"
 #include "0035_sensor_touch_sensor_tpp_223b.h"
 #include "0038_digitalOut_RGB.h"
+#include "0044_sensor_I2C_TSL256_luminosity.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -112,6 +113,12 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     {
         .id = EZLOPI_SENSOR_030_DS18B20,
         .func = ds18b20_sensor_v3,
+    },
+#endif
+#ifdef EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY
+    {
+        .id = EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY,
+        .func = sensor_TSL256_luminosity_v3,
     },
 #endif
     /**

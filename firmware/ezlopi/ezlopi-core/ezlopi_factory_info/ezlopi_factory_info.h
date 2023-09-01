@@ -378,13 +378,12 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\" : 10,\
-                \"dev_name\" : \"RGM LED\",\
+                \"dev_type\" : 8,\
+                \"dev_name\" : \"TSL256 Lux sensor\",\
                 \"id_room\" : \"\",\
-                \"id_item\" : 38,\
-                \"gpio1\" : 1,\
-                \"gpio2\" : 2,\
-                \"gpio3\" : 3\
+                \"id_item\" : 44,\
+                \"gpio_sda\" : 1,\
+                \"gpio_scl\" : 2\
             }\                  
         ],\
     \"dev_total\": 1}";

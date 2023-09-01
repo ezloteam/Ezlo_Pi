@@ -19,5 +19,8 @@ const static char *scales_kilo_volt_ampere_reactive = "kilo_volt_ampere_reactive
 
 /// @brief amount_of_useful_energy
 const static char *scales_amount_of_useful_energy = "amount_of_useful_energy";
+ 
+ /// @brief LUX
+ const static char *scales_lux = "lux";
 
 #endif // __EZLOPI_SCALES_STR_H__
