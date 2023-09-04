@@ -73,7 +73,7 @@ void ezlopi_scenes_service_reinit(void)
 
         if (curr_scene->enabled)
         {
-            xTaskCreate(__scenes_process, curr_scene->name, 2 * 2048, curr_scene, 2, NULL);
+            xTaskCreate(__scenes_process, curr_scene->name, 2 * 2048, curr_scene, 2, &curr_scene->task_handle);
         }
         curr_scene = curr_scene->next;
     }
@@ -164,6 +164,7 @@ static void __scenes_process(void *arg)
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
 
+    scene->task_handle = NULL;
     scene->enabled = false;
     scene->status = EZLOPI_SCENE_STATUS_STOP;
     vTaskDelete(NULL);

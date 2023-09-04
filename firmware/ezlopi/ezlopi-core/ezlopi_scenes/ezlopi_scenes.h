@@ -8,6 +8,8 @@
 #include "stdint.h"
 #include "stdbool.h"
 #include "cJSON.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 typedef enum e_scenes_block_type
 {
@@ -112,7 +114,10 @@ typedef enum e_scene_status
 typedef struct l_scenes_list
 {
     // char _id[32];
+
     e_scene_status_t status;
+    TaskHandle_t task_handle;
+
     uint32_t _id;
     uint32_t enabled;
     uint32_t is_group;
