@@ -1,0 +1,24 @@
+menu "Lua"
+
+config LUA_MAXSTACK
+    int "Stack size limit"
+    default 4000
+    help
+        Limits the size of the Lua stack.
+        Change it if you need a different limit. This limit is arbitrary;
+        its only purpose is to stop Lua from consuming unlimited stack
+        space (and to reserve some numbers for pseudo-indices).
+
+config LUA_ROOT
+    string "Lua libraries path"
+    default "/lua"
+    help 
+        The default path that Lua uses to look for Lua libraries.
+
+config LUA_COMPAT_5_3
+    bool "Lua 5.3 compatibility"
+    default n
+    help
+        Compatibility with previous version
+
+endmenu
