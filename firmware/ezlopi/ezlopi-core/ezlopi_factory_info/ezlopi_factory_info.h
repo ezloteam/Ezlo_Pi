@@ -378,15 +378,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Backlight Control\",\
-                \"dev_type\": 5,\
-                \"id_item\": 9,\
-                \"id_room\": \"\",\
-                \"gpio\": 47,\
-                \"pwm_resln\": 8,\
-                \"freq_hz\": 50,\
-                \"duty_cycle\": 10000\
-            }\                  
+               \"dev_name\": \"BME680\",\
+               \"dev_type\": 8,\
+               \"id_item\": 10,\
+               \"id_room\": \"\",\
+               \"gpio_scl\": 17,\
+               \"gpio_sda\": 18\
+            }\                 
         ],\
     \"dev_total\": 1}";
 

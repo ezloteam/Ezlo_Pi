@@ -47,6 +47,11 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddTrueToObject(cj_properties, "show");
                         cJSON_AddStringToObject(cj_properties, "valueType", curr_item->cloud_properties.value_type);
 
+                        if (curr_item->cloud_properties.scale)
+                        {
+                            cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
+                        }
+
                         curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
                         cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
                         cJSON_AddStringToObject(cj_properties, "status", "synced");
@@ -138,6 +143,10 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddFalseToObject(cj_result, "userNotification");
                         cJSON_AddNullToObject(cj_result, "notifications");
                         cJSON_AddStringToObject(cj_result, "name", curr_item->cloud_properties.item_name);
+                        if (curr_item->cloud_properties.scale)
+                        {
+                            cJSON_AddStringToObject(cj_result, "scale", curr_item->cloud_properties.scale);
+                        }
                         curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_result, curr_item->user_arg);
                         cJSON_AddStringToObject(cj_result, "valueType", curr_item->cloud_properties.value_type);
                     }
@@ -181,6 +190,10 @@ cJSON *ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_e
                 cJSON_AddNullToObject(cj_result, "notifications");
                 cJSON_AddFalseToObject(cj_result, "syncNotification");
                 cJSON_AddStringToObject(cj_result, "name", item->cloud_properties.item_name);
+                if (item->cloud_properties.scale)
+                {
+                    cJSON_AddStringToObject(cj_result, "scale", item->cloud_properties.scale);
+                }
                 item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, cj_result, item->user_arg);
                 // registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cj_result, registered_device->user_arg);
                 cJSON_AddStringToObject(cj_result, "valueType", item->cloud_properties.value_type);
