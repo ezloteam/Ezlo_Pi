@@ -5,7 +5,7 @@ else()
 endif()
 
 idf_component_register(
-    INCLUDE_DIRS .
-    SRCS lib8tion.c
+    INCLUDE_DIRS "include"
+    SRCS src/lib8tion.c
     REQUIRES ${req}
 )

@@ -28,6 +28,7 @@
 #include "0038_digitalOut_RGB.h"
 #include "0044_sensor_I2C_TSL256_luminosity.h"
 #include "0008_sensor_I2C_LTR303ALS.h"
+#include "0009_other_RMT_SK6812.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -44,10 +45,17 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0012_BME280_I2C
+#ifdef EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR
     {
         .id = EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR,
         .func = sensor_0008_I2C_LTR303ALS_v3,
+    },
+#endif
+
+#ifdef EZLOPI_DEVICE_0009_SK6812_LED_STRIP
+    {
+        .id = EZLOPI_DEVICE_0009_SK6812_LED_STRIP,
+        .func = device_0009_other_RMT_SK6812_v3,
     },
 #endif
 

@@ -7,7 +7,7 @@ else()
 endif()
 
 idf_component_register(
-    SRCS color.c
-    INCLUDE_DIRS .
+    SRCS src/color.c
+    INCLUDE_DIRS "include"
     REQUIRES ${req}
 )

@@ -378,12 +378,14 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\" : 8,\
-                \"dev_name\" : \"Ambient light sensor\",\
-                \"id_room\" : \"\",\
-                \"id_item\" : 8,\
-                \"gpio_sda\" : 18,\
-                \"gpio_scl\" : 17\
+                \"dev_name\": \"Backlight Control\",\
+                \"dev_type\": 5,\
+                \"id_item\": 9,\
+                \"id_room\": \"\",\
+                \"gpio\": 47,\
+                \"pwm_resln\": 8,\
+                \"freq_hz\": 50,\
+                \"duty_cycle\": 10000\
             }\                  
         ],\
     \"dev_total\": 1}";
