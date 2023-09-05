@@ -19,12 +19,6 @@ static const char *scenes_value_type_name[] = {
 #undef EZLOPI_VALUE_TYPE
 };
 
-static const char *ezlopi_scenes_methods_name[] = {
-#define EZLOPI_SCENE(method_type, name, func) name,
-#include "ezlopi_scenes_method_types.h"
-#undef EZLOPI_SCENE
-};
-
 static const f_scene_method_t ezlopi_scenes_methods[] = {
 #define EZLOPI_SCENE(method_type, name, func) func,
 #include "ezlopi_scenes_method_types.h"
@@ -63,16 +57,6 @@ const char *ezlopi_scene_get_scene_value_type_name(e_scene_value_type_t value_ty
     if ((value_type > EZLOPI_VALUE_TYPE_NONE) && (value_type < EZLOPI_VALUE_TYPE_MAX))
     {
         ret = scenes_value_type_name[value_type];
-    }
-    return ret;
-}
-
-const char *ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type)
-{
-    char *ret = NULL;
-    if ((method_type > EZLOPI_SCENE_METHOD_TYPE_NONE) && (method_type < EZLOPI_SCENE_METHOD_TYPE_MAX))
-    {
-        ret = ezlopi_scenes_methods_name[method_type];
     }
     return ret;
 }
