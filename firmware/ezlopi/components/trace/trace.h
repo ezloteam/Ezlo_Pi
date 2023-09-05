@@ -1,7 +1,7 @@
 #ifndef __TRACE_H__
 #define __TRACE_H__
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
