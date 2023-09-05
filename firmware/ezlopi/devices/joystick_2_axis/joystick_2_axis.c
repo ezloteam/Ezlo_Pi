@@ -13,40 +13,38 @@
 #include "trace.h"
 #include "ezlopi_adc.h"
 
-static int joystick_2_axis_prepare_and_add(void *args);
-static s_ezlopi_device_properties_t *joystick_2_axis_prepare(cJSON *cjson_device);
-static int joystick_2_axis_init(s_ezlopi_device_properties_t *properties);
-static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, void *args);
+static int __prepare(void *arg);
+static int __init(l_ezlopi_item_t *item);
+static int __notify(l_ezlopi_item_t *item);
+static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
-int joystick_2_axis(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_args)
+int joystick_2_axis_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
+
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        TRACE_I("%s", ezlopi_actions_to_string(action));
-        ret = joystick_2_axis_prepare_and_add(arg);
+        ret = __prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        TRACE_I("%s", ezlopi_actions_to_string(action));
-        ret = joystick_2_axis_init(ezlo_device);
+        ret = __init(item);
         break;
     }
-    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    case EZLOPI_ACTION_SET_VALUE:
     {
-        TRACE_I("%s", ezlopi_actions_to_string(action));
-        get_joystick_2_axis_value(ezlo_device, arg);
+        ret = __get_value_cjson(item, arg);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_200_MS:
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        TRACE_I("%s", ezlopi_actions_to_string(action));
-        ezlopi_device_value_updated_from_device(ezlo_device);
+        ret = __notify(item);
         break;
     }
+
     default:
     {
         break;
@@ -56,23 +54,86 @@ int joystick_2_axis(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezl
     return ret;
 }
 
-static int joystick_2_axis_prepare_and_add(void *args)
+static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
-
-    if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
+    if (arg)
     {
-        s_ezlopi_device_properties_t *joystick_2_axis_properties = joystick_2_axis_prepare(device_prep_arg->cjson_device);
-        if (joystick_2_axis_properties)
+        cJSON *cj_result = (cJSON *)arg;
+        s_ezlopi_analog_data_t ezlopi_analog_data;
+        memset(&ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+        cJSON_AddNumberToObject(cj_result, "value", ezlopi_analog_data.value);
+        ret = 1;
+    }
+    return ret;
+}
+
+static int __init(l_ezlopi_item_t *item)
+{
+    int ret = 0;
+    if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+    {
+        ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
+        ret = 1;
+    }
+    return ret;
+}
+
+static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+{
+    char *device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+
+    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    device->cloud_properties.category = category_not_defined;
+    device->cloud_properties.subcategory = subcategory_not_defined;
+    device->cloud_properties.device_type = dev_type_device;
+    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+}
+
+static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+{
+    item->cloud_properties.has_getter = true;
+    item->cloud_properties.has_setter = true;
+    item->cloud_properties.item_name = ezlopi_item_name_undefined;
+    item->cloud_properties.value_type = value_type_int;
+    item->cloud_properties.show = true;
+    item->cloud_properties.scale = NULL;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+}
+
+static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+{
+    item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
+    item->interface.adc.resln_bit = 3;
+    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+}
+
+static int __prepare(void *arg)
+{
+    int ret = 0;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    if (arg)
+    {
+        cJSON *cjson_device = prep_arg->cjson_device;
+        if (cjson_device)
         {
-            if (0 == ezlopi_devices_list_add(device_prep_arg->device, joystick_2_axis_properties, NULL))
+            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            if (device)
             {
-                free(joystick_2_axis_properties);
-            }
-            else
-            {
-                ret = 1;
+                __setup_device_cloud_properties(device, cjson_device);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, joystick_2_axis_v3);
+                if (item)
+                {
+                    __setup_item_cloud_properties(item, cjson_device);
+                    __setup_item_interface_properties(item, cjson_device);
+                    ret = 1;
+                }
+                else
+                {
+                    ezlopi_device_free_device(device);
+                }
             }
         }
     }
@@ -80,64 +141,7 @@ static int joystick_2_axis_prepare_and_add(void *args)
     return ret;
 }
 
-static s_ezlopi_device_properties_t *joystick_2_axis_prepare(cJSON *cjson_device)
+static int __notify(l_ezlopi_item_t *item)
 {
-    s_ezlopi_device_properties_t *joystick_2_axis_properties = malloc(sizeof(s_ezlopi_device_properties_t));
-
-    if (joystick_2_axis_properties)
-    {
-        memset(joystick_2_axis_properties, 0, sizeof(s_ezlopi_device_properties_t));
-        joystick_2_axis_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-        ASSIGN_DEVICE_NAME(joystick_2_axis_properties, device_name);
-        joystick_2_axis_properties->ezlopi_cloud.category = category_not_defined;
-        joystick_2_axis_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-        joystick_2_axis_properties->ezlopi_cloud.item_name = "";
-        joystick_2_axis_properties->ezlopi_cloud.device_type = dev_type_device;
-        joystick_2_axis_properties->ezlopi_cloud.value_type = value_type_int;
-        joystick_2_axis_properties->ezlopi_cloud.has_getter = true;
-        joystick_2_axis_properties->ezlopi_cloud.has_setter = false;
-        joystick_2_axis_properties->ezlopi_cloud.reachable = true;
-        joystick_2_axis_properties->ezlopi_cloud.battery_powered = false;
-        joystick_2_axis_properties->ezlopi_cloud.show = true;
-        joystick_2_axis_properties->ezlopi_cloud.room_name[0] = '\0';
-        joystick_2_axis_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
-        joystick_2_axis_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-        joystick_2_axis_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
-
-        CJSON_GET_VALUE_INT(cjson_device, "gpio", joystick_2_axis_properties->interface.adc.gpio_num);
-        // CJSON_GET_VALUE_INT(cjson_device, "resln_bit", joystick_2_axis_properties->interface.adc.resln_bit);
-        joystick_2_axis_properties->interface.adc.resln_bit = 3;
-    }
-
-    return joystick_2_axis_properties;
-}
-
-static int joystick_2_axis_init(s_ezlopi_device_properties_t *properties)
-{
-    int ret = 0;
-    if (GPIO_IS_VALID_GPIO(properties->interface.adc.gpio_num))
-    {
-        ezlopi_adc_init(properties->interface.adc.gpio_num, properties->interface.adc.resln_bit);
-        ret = 1;
-    }
-    return ret;
-}
-
-static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, void *arg)
-{
-    int ret = 0;
-    cJSON *cjson_propertise = (cJSON *)arg;
-    s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
-    memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
-    if (cjson_propertise)
-    {
-        ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        cJSON_AddNumberToObject(cjson_propertise, "value", ezlopi_analog_data->value);
-        ret = 1;
-    }
-    free(ezlopi_analog_data);
-    return ret;
+    return ezlopi_device_value_updated_from_device_v3(item);
 }

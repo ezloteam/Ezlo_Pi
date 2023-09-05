@@ -862,6 +862,7 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
         if (new_scene)
         {
             memset(new_scene, 0, sizeof(l_scenes_list_t));
+            new_scene->task_handle = NULL;
             new_scene->status = EZLOPI_SCENE_STATUS_RUN;
 
             uint32_t tmp_success_creating_scene = 1;
@@ -873,6 +874,7 @@ static l_scenes_list_t *__new_scene_create(cJSON *cj_scene)
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "group_id", new_scene->group_id);
                 TRACE_D("group_id: %s", new_scene->group_id);
             }
+            
             CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "name", new_scene->name);
             CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, "parent_id", new_scene->parent_id);
 

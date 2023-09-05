@@ -27,7 +27,6 @@ static void __setup_device_cloud_params(l_ezlopi_device_t *device, cJSON *cj_dev
 int sensor_ldr_analog_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
-    TRACE_I("sensor_ldr_analog_sensor: %s", ezlopi_actions_to_string(action));
 
     switch (action)
     {

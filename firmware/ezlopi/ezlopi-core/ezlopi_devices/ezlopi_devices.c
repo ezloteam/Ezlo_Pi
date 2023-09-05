@@ -310,16 +310,16 @@ static void ezlopi_device_parse_json_v3(char *config_string)
 
                 int id_item = 0;
                 CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
-                TRACE_B("id_item: %d", id_item);
 
                 if (0 != id_item)
                 {
 
                     s_ezlopi_device_v3_t *v3_sensor_list = ezlopi_devices_list_get_list_v3();
                     int dev_idx = 0;
+
                     while (NULL != v3_sensor_list[dev_idx].func)
                     {
-                        if (id_item == v3_sensor_list[dev_idx].id)
+                      if (id_item == v3_sensor_list[dev_idx].id)
                         {
                             s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_sensor_list[dev_idx], .cjson_device = cjson_device};
                             v3_sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);

@@ -104,6 +104,7 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
         timer_counter_value += _timer_conf->alarm_value * EZLOPI_TIMER_SCALE;
         timer_group_set_alarm_value_in_isr(_timer_conf->group, _timer_conf->index, timer_counter_value);
     }
+
 #if 0
     if (EZLOPI_ACTION_NOTIFY_1000_MS == _timer_conf->event_type)
     {
@@ -120,7 +121,6 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
         }
         count++;
     }
-#endif
 
     if (EZLOPI_ACTION_NOTIFY_50_MS == _timer_conf->event_type)
     {
@@ -150,7 +150,9 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
 
         count++;
     }
-    if(EZLOPI_ACTION_NOTIFY_1000_MS == _timer_conf->event_type)
+#endif
+
+    if (EZLOPI_ACTION_NOTIFY_1000_MS == _timer_conf->event_type)
     {
         send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
     }
@@ -223,7 +225,6 @@ static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_a
     timer_config->internal.counter_dir = TIMER_COUNT_UP;
     timer_config->internal.divider = EZLOPI_TIMER_DIVIDER;
     timer_config->internal.intr_type = TIMER_INTR_LEVEL;
-    
 }
 
 static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t *timer_conf)

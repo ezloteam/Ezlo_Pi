@@ -79,7 +79,7 @@ static void gpio_isr_process_v3(void *pv)
             }
         }
 
-        vTaskDelay(1);
+        // vTaskDelay(1);
     }
 }
 

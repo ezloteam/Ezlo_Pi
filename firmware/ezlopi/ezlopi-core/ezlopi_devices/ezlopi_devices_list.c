@@ -2,7 +2,7 @@
 #include "ezlopi_devices_list.h"
 #include "digital_io.h"
 #include "sensor_pir.h"
-#include "sensor_door.h"
+// #include "door_hall_sensor.h"
 #include "dimmable_bulb.h"
 #include "joystick_2_axis.h"
 #include "ultrasonic_MB1013.h"
@@ -99,7 +99,7 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_034_PROXIMITY_SENSOR
     {
         .id = EZLOPI_SENSOR_034_PROXIMITY_SENSOR,
-        .func = proximity_sensor,
+        .func = proximity_sensor_v3,
     },
 #endif
 
@@ -123,6 +123,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = dht22_sensor_v3,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .func = sensor_0024_other_HCSR04_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
     {
         .id = EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR,
@@ -155,6 +163,21 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = ds18b20_sensor_v3,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_032_SOIL_MOISTURE
+    {
+        .id = EZLOPI_SENSOR_032_SOIL_MOISTURE,
+        .func = soil_moisture_sensor_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_033_TURBIDITY_SENSOR
+    {
+        .id = EZLOPI_SENSOR_033_TURBIDITY_SENSOR,
+        .func = turbidity_sensor_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY
     {
         .id = EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY,

@@ -378,12 +378,12 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"DS18B20 Sensor\",\
+                \"dev_name\": \"DS18B20\",\
                 \"dev_type\": 7,\
                 \"id_item\": 30,\
                 \"id_room\": \"\",\
-                \"gpio\": 1\
-            }\                  
+                \"gpio\": 2\
+            }\               
         ],\
     \"dev_total\": 1}";
 
