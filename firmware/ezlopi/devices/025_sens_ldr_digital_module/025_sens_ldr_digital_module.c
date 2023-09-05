@@ -99,7 +99,7 @@ static void __value_updated_from_interrupt(void *arg)
 {
     if (arg)
     {
-        ezlopi_device_value_updated_from_device((l_ezlopi_item_t *)arg);
+        ezlopi_device_value_updated_from_device_v3((l_ezlopi_item_t *)arg);
     }
 }
 
@@ -151,7 +151,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "device_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_switch;

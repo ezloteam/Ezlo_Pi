@@ -82,6 +82,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
+    {
+        .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
+        .func = ezlopi_dimmable_bulb_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH
     {
         .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH,
@@ -128,6 +135,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = sensor_ldr_analog_v3,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_0027_WATER_LEAK
+    {
+        .id = EZLOPI_SENSOR_0027_WATER_LEAK,
+        .func = water_leak_sensor_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_029_IR_BLASTER
     {
         .id = EZLOPI_SENSOR_029_IR_BLASTER,
