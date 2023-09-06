@@ -139,3 +139,22 @@ v3_0_1_166  Date: Tue 18 Jul 2023 05:37:12 PM +0545
 v3_0_1_167  Date: बुधवार 06 सितम्बर 2023 06:55:46 अपराह्न +0545
 	Version 3 firmware from esp32s3
 
+	168 (बुधवार 06 सितम्बर 2023 07:46:49 अपराह्न +0545): Version 3 first release 20 sensors for with scene
+v3_0_2
+	Release Date: बुधवार 06 सितम्बर 2023 07:47:23 अपराह्न +0545
+	169: Version 3 first release 18 sensors with scenes
+
+
+
+v3_0_3
+	Release Date: बुधवार 06 सितम्बर 2023 07:49:48 अपराह्न +0545
+	170: Version 3 first release 20 sensors for with scenes
+
+
+
+v3_0_4
+	Release Date: बुधवार 06 सितम्बर 2023 07:51:30 अपराह्न +0545
+	171: Version 3 first release 20 sensors for with scenes
+
+
+
