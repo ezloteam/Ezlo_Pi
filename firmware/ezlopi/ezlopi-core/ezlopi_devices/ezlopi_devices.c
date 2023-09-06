@@ -463,7 +463,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(void)
 }
 
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
-                                                  int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item, void *arg, void *user_arg))
+                                                   int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg))
 {
     l_ezlopi_item_t *new_item = NULL;
     if (device)

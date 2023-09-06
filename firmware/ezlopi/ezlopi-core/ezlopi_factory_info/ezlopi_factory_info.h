@@ -378,14 +378,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\" : 10,\
-                \"dev_name\" : \"RGM LED\",\
-                \"id_room\" : \"\",\
-                \"id_item\" : 38,\
-                \"gpio1\" : 1,\
-                \"gpio2\" : 2,\
-                \"gpio3\" : 3\
-            }\                  
+                \"dev_name\": \"HCSR04 ultrasonic\",\
+                \"dev_type\": 10,\
+                \"id_item\": 24,\
+                \"id_room\": \"\",\
+                \"gpio1\": 18,\
+                \"gpio2\": 19\
+            }\                
         ],\
     \"dev_total\": 1}";
 

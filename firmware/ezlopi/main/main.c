@@ -84,8 +84,6 @@ static void blinky(void *pv)
         // int hall_sensor_value = 0;
         // TRACE_D("Hall Sensor value: %d\r\n", hall_sensor_value);
 
-        vTaskDelay(1000 / portTICK_RATE_MS);
-
         if (count++ > 10)
         {
             TRACE_D("-----------------------------------------");
@@ -125,5 +123,7 @@ static void blinky(void *pv)
             //////////////////////////////////////////////////////////////////////////////////////
 #endif
         }
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }

@@ -16,8 +16,8 @@
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
-static int __set_value(l_ezlopi_item_t *item, void *arg);
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static int __notify(l_ezlopi_item_t *item);
 
 int door_hall_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -71,7 +71,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 
 static int __notify(l_ezlopi_item_t *item)
 {
-    ezlopi_device_value_updated_from_device_v3(item);
+    return ezlopi_device_value_updated_from_device_v3(item);
 }
 
 static int __init(l_ezlopi_item_t *item)
