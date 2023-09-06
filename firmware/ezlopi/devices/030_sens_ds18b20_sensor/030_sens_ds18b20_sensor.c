@@ -3,11 +3,7 @@
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_adc.h"
 
 #include "esp_err.h"
@@ -75,12 +71,12 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         double *temperatue_value = (double *)item->user_arg;
         char valueFormatted[20];
-       
+
         ds18b20_get_temperature_data(temperatue_value, item->interface.onewire_master.onewire_pin);
         snprintf(valueFormatted, 20, "%.2f", *temperatue_value);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cj_result, "value", *temperatue_value);
-        cJSON_AddStringToObject(cj_result, "scale", "celsius");
+        // cJSON_AddStringToObject(cj_result, "scale", "celsius");
     }
     return ret;
 }
@@ -125,6 +121,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.scale = scales_celsius;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
