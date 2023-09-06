@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_IR_BLASTER 1
 #define EZLOPI_TEST_DEVICE 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
+#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -382,8 +382,8 @@ static const char *test_device_constant_config =
                 \"dev_type\": 7,\
                 \"id_item\": 30,\
                 \"id_room\": \"\",\
-                \"gpio\": 2\
-            }\               
+                \"gpio\": 1\
+            }\             
         ],\
     \"dev_total\": 1}";
 

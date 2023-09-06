@@ -184,7 +184,7 @@ l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
-                                                  int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item, void *arg, void *user_arg));
+                                                  int (*func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg));
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
 

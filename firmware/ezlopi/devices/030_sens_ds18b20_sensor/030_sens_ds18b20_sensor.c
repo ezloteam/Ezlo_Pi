@@ -73,14 +73,12 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     if (item && arg)
     {
         cJSON *cj_result = (cJSON *)arg;
-        // double *temperatue_value = (double *)item->user_arg;
+        double *temperatue_value = (double *)item->user_arg;
         char valueFormatted[20];
-        double temperatue_value;
-       
-        ds18b20_get_temperature_data(&temperatue_value, item->interface.onewire_master.onewire_pin);
-        snprintf(valueFormatted, 20, "%.2f", temperatue_value);
+        ds18b20_get_temperature_data(temperatue_value, item->interface.onewire_master.onewire_pin);
+        snprintf(valueFormatted, 20, "%.2f", *temperatue_value);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_result, "value", temperatue_value);
+        cJSON_AddNumberToObject(cj_result, "value", *temperatue_value);
         cJSON_AddStringToObject(cj_result, "scale", "celsius");
     }
     return ret;
@@ -174,7 +172,9 @@ static int __prepare(void *arg)
 
 static int __notify(l_ezlopi_item_t *item)
 {
-    return ezlopi_device_value_updated_from_device_v3(item);
+    int ret = 0;
+    ezlopi_device_value_updated_from_device_v3(item);
+    return ret;
 }
 
 #if 0
@@ -446,6 +446,7 @@ static esp_err_t ds18b20_get_temperature_data(double *temperature_data, uint32_t
         uint8_t calculated_crc = ds18b20_calculate_crc(ds18b20_scratchpad_data_array, 8);
         if (calculated_crc != ds18b20_crc)
         {
+            TRACE_E("CRC check failed!!");
             error = ESP_FAIL;
         }
         else

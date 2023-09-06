@@ -136,3 +136,6 @@ v3_0_1_165  Date: Tue 18 Jul 2023 05:26:29 PM +0545
 v3_0_1_166  Date: Tue 18 Jul 2023 05:37:12 PM +0545
 	disabled test in factory_info
 
+v3_0_1_167  Date: बुधवार 06 सितम्बर 2023 06:55:46 अपराह्न +0545
+	Version 3 firmware from esp32s3
+
