@@ -283,6 +283,7 @@ static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max
     uint32_t time_us;
     CHECK(ultrasonic_measure_raw(dev, max_distance * ROUNDTRIP_CM, &time_us));
     *distance = time_us / ROUNDTRIP_CM;
+    TRACE_B("time_us 2: %f cm\n", time_us / 58.0);
 
     return ESP_OK;
 }
@@ -290,31 +291,22 @@ static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max
 static esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us)
 {
     CHECK_ARG(dev && time_us);
-    // Wait for echo
-    while (gpio_get_level(dev->echo_pin))
-    {
-        // if (timeout_expired(start, PING_TIMEOUT))
-        //     RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING_TIMEOUT);
 
-        vTaskDelay(1 / portTICK_PERIOD_MS);
-    }
-
-    CHECK(gpio_set_level(dev->trigger_pin, 0));
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-    CHECK(gpio_set_level(dev->trigger_pin, 1));
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-    CHECK(gpio_set_level(dev->trigger_pin, 0));
-
-    int64_t start = esp_timer_get_time();
     PORT_ENTER_CRITICAL;
 
-    // Previous ping isn't ended
-    // if (gpio_get_level(dev->echo_pin))
-    // {
-    //     RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING);
-    // }
+    // Ping: Low for 2..4 us, then high 10 us
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
+    ets_delay_us(TRIGGER_LOW_DELAY);
+    CHECK(gpio_set_level(dev->trigger_pin, 1));
+    ets_delay_us(TRIGGER_HIGH_DELAY);
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
 
-    // // Wait for echo
+    // Previous ping isn't ended
+    if (gpio_get_level(dev->echo_pin))
+        RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING);
+
+    // Wait for echo
+    int64_t start = esp_timer_get_time();
     while (!gpio_get_level(dev->echo_pin))
     {
         if (timeout_expired(start, PING_TIMEOUT))

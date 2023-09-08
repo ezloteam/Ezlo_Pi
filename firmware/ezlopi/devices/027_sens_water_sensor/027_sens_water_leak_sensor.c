@@ -44,7 +44,7 @@ int water_leak_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void 
         __get_ezlopi_value(item, arg);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_200_MS:
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
         __notify(item);
         break;

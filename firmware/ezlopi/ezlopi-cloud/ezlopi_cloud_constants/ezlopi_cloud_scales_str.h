@@ -25,4 +25,10 @@ const static char *scales_centi_meter = "centi_meter";
 const static char *scales_meter = "meter";
 const static char *scales_feet = "feet";
 
+/// @brief LUX
+const static char *scales_lux = "lux";
+
+/// @brief pressure
+const static char *scales_kilo_pascal = "kilo_pascal";
+
 #endif // __EZLOPI_SCALES_STR_H__

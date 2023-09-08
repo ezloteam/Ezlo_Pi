@@ -2,7 +2,7 @@
 #include "ezlopi_devices_list.h"
 #include "digital_io.h"
 #include "sensor_pir.h"
-#include "door_hall_sensor.h"
+// #include "door_hall_sensor.h"
 #include "dimmable_bulb.h"
 #include "joystick_2_axis.h"
 #include "ultrasonic_MB1013.h"
@@ -26,6 +26,11 @@
 #include "0012_bme280_sensor.h"
 #include "0035_sensor_touch_sensor_tpp_223b.h"
 #include "0038_digitalOut_RGB.h"
+#include "0044_sensor_I2C_TSL256_luminosity.h"
+#include "0008_sensor_I2C_LTR303ALS.h"
+#include "0009_other_RMT_SK6812.h"
+
+#include "0010_I2C_BME680.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -42,6 +47,27 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR
+    {
+        .id = EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR,
+        .func = sensor_0008_I2C_LTR303ALS_v3,
+    },
+#endif
+
+#ifdef EZLOPI_DEVICE_0009_SK6812_LED_STRIP
+    {
+        .id = EZLOPI_DEVICE_0009_SK6812_LED_STRIP,
+        .func = device_0009_other_RMT_SK6812_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0010_BME680_I2C
+    {
+        .id = EZLOPI_SENSOR_0010_BME680_I2C,
+        .func = sensor_0010_I2C_BME680_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0012_BME280_I2C
     {
         .id = EZLOPI_SENSOR_0012_BME280_I2C,
@@ -53,6 +79,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     {
         .id = EZLOPI_SENSOR_0019_PIR,
         .func = sensor_pir_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
+    {
+        .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
+        .func = ezlopi_dimmable_bulb_v3,
     },
 #endif
 
@@ -110,6 +143,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = sensor_ldr_analog_v3,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_0027_WATER_LEAK
+    {
+        .id = EZLOPI_SENSOR_0027_WATER_LEAK,
+        .func = water_leak_sensor_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_029_IR_BLASTER
     {
         .id = EZLOPI_SENSOR_029_IR_BLASTER,
@@ -120,6 +161,27 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     {
         .id = EZLOPI_SENSOR_030_DS18B20,
         .func = ds18b20_sensor_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_032_SOIL_MOISTURE
+    {
+        .id = EZLOPI_SENSOR_032_SOIL_MOISTURE,
+        .func = soil_moisture_sensor_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_033_TURBIDITY_SENSOR
+    {
+        .id = EZLOPI_SENSOR_033_TURBIDITY_SENSOR,
+        .func = turbidity_sensor_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY
+    {
+        .id = EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY,
+        .func = sensor_TSL256_luminosity_v3,
     },
 #endif
     /**
