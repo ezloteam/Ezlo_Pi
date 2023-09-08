@@ -16,13 +16,7 @@
 #include "sdkconfig.h"
 #include "cJSON.h"
 
-static const char *TURBIDITY_TAG = "Ezlopi_turbidity sensor";
-static int ezlopi_turbidity_sensor_prepare_and_add(void *args);
-static s_ezlopi_device_properties_t *ezlopi_turbidity_sensor_prepare(cJSON *cjson_device);
-static int ezlopi_turbidity_sensor_init(s_ezlopi_device_properties_t *properties);
-static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *properties, void *arg);
-static int ezlopi_turbidity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 
-int turbidity_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+int turbidity_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _TURBIDITY_H_

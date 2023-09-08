@@ -296,24 +296,20 @@ static int __prepare(void *arg)
                 RGB_LED_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_digitalOut_RGB_v3);
                 if (RGB_LED_item)
                 {
-                    TRACE_B("HERE1");
                     __prepare_RGB_LED_item(RGB_LED_item, prep_arg->cjson_device, RGB_struct);
                 }
                 RGB_LED_onoff_switch_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_digitalOut_RGB_v3);
                 if (RGB_LED_onoff_switch_item)
                 {
-                    TRACE_B("HERE2");
                     __prepare_RGB_LED_onoff_switch_item(RGB_LED_onoff_switch_item, prep_arg->cjson_device, RGB_struct);
                 }
                 RGB_LED_dimmer_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_digitalOut_RGB_v3);
                 if (RGB_LED_dimmer_item)
                 {
-                    TRACE_B("HERE3");
                     __prepare_RGB_LED_dimmer_item(RGB_LED_dimmer_item, prep_arg->cjson_device, RGB_struct);
                 }
                 if (!RGB_LED_item && !RGB_LED_onoff_switch_item && !RGB_LED_dimmer_item)
                 {
-                    TRACE_D("HERE");
                     ezlopi_device_free_device(RGB_device);
                 }
             }

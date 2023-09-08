@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_IR_BLASTER 1
 #define EZLOPI_TEST_DEVICE 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
+#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -378,14 +378,12 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\" : 10,\
-                \"dev_name\" : \"RGM LED\",\
-                \"id_room\" : \"\",\
-                \"id_item\" : 38,\
-                \"gpio1\" : 1,\
-                \"gpio2\" : 2,\
-                \"gpio3\" : 3\
-            }\                  
+                \"dev_name\": \"DS18B20\",\
+                \"dev_type\": 7,\
+                \"id_item\": 30,\
+                \"id_room\": \"\",\
+                \"gpio\": 1\
+            }\             
         ],\
     \"dev_total\": 1}";
 

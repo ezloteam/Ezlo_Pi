@@ -56,7 +56,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_data);
         double percent_data = ((4095 - tmp_data.value) / 4095.0) * 100;
         cJSON_AddNumberToObject(cj_result, "value", percent_data);
-        cJSON_AddStringToObject(cj_result, "scale", scales_percent);
         ret = 1;
     }
     return ret;
@@ -79,7 +78,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.category = category_level_sensor;
+    device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_moisture;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();

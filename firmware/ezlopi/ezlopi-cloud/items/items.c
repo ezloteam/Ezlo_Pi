@@ -47,6 +47,11 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddTrueToObject(cj_properties, "show");
                         cJSON_AddStringToObject(cj_properties, "valueType", curr_item->cloud_properties.value_type);
 
+                        if (curr_item->cloud_properties.scale)
+                        {
+                            cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
+                        }
+
                         curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
                         // cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
                         if(curr_item->cloud_properties.scale)
@@ -142,6 +147,10 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddFalseToObject(cj_result, "userNotification");
                         cJSON_AddNullToObject(cj_result, "notifications");
                         cJSON_AddStringToObject(cj_result, "name", curr_item->cloud_properties.item_name);
+                        if (curr_item->cloud_properties.scale)
+                        {
+                            cJSON_AddStringToObject(cj_result, "scale", curr_item->cloud_properties.scale);
+                        }
                         curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_result, curr_item->user_arg);
                         cJSON_AddStringToObject(cj_result, "valueType", curr_item->cloud_properties.value_type);
                     }
