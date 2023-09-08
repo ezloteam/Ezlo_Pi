@@ -19,7 +19,7 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -408,13 +408,11 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\{\
                 \"dev_name\": \"Joystick\",\
-                \"dev_type\": 10,\
-                \"id_item\": 20,\
+                \"dev_type\": 2,\
+                \"id_item\": 60,\
                 \"id_room\": \"\",\
-                \"gpio_x\": 1,\
-                \"gpio_y\": 2,\
-                \"gpio_sw\": 3,\
-                \"resln_bit\": 10\
+                \"gpio\": 25,\
+                \"logic_inv\": false\
             }\
         ],\
     \"dev_total\": 1}";
