@@ -407,7 +407,7 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_name\": \"Joystick\",\
+                \"dev_name\": \"Vibration Detector\",\
                 \"dev_type\": 2,\
                 \"id_item\": 60,\
                 \"id_room\": \"\",\

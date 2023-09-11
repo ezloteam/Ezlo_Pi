@@ -137,8 +137,7 @@ static int sensor_0060_digitalIn_get_value_json(s_ezlopi_device_properties_t *pr
     if (cjson_propertise)
     {
         int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        // properties->interface.gpio.gpio_out.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
