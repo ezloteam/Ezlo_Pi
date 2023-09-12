@@ -37,7 +37,7 @@ static s_ezlopi_device_properties_t *sensor_other_KY026_prepare_properties(uint3
 static int sensor_other_KY026_prepare_and_add(void *arg);
 static int sensor_other_KY026_init(s_ezlopi_device_properties_t *properties);
 static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties, void *arg);
-static void Extract_KY026_sensor_value(float *analog_sensor_volt, s_ezlopi_device_properties_t *properties);
+static void Extract_KY026_sensor_value(float *analog_sensor_volt, s_ezlopi_device_properties_t *properties, float *max_reading);
 //--------------------------------------------------------------------------------------------------------------------------------------
 int sensor_0057_other_KY026(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
 {
@@ -95,9 +95,9 @@ static s_ezlopi_device_properties_t *sensor_other_KY026_prepare_properties(uint3
             }
             if (ezlopi_item_name_temperature_changes == ITEM_NAME)
             {
-                device_name = "KY026-Fire-level";
+                device_name = "KY026-Fire-Detected-level";
             }
-            CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+            // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
 
             ASSIGN_DEVICE_NAME(sensor_0057_other_KY026_properties, device_name);
             sensor_0057_other_KY026_properties->ezlopi_cloud.category = CATEGORY;
@@ -195,7 +195,7 @@ static int sensor_other_KY026_init(s_ezlopi_device_properties_t *properties)
 static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    float analog_sensor_volt = 0;
+    float analog_sensor_volt = 0, max_volt_reading = 0;
     // char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
 
@@ -207,21 +207,23 @@ static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties
         {
             if (0 == gpio_get_level(KY026_digital_pin)) // when D0 -> 0V,
             {
-                cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
+                cJSON_AddStringToObject(cjson_properties, "value", "normal");
             }
             else
             {
-                cJSON_AddStringToObject(cjson_properties, "value", "no_gas");
+                cJSON_AddStringToObject(cjson_properties, "value", "Flame_detected");
             }
         }
         if (ezlopi_item_name_temperature_changes == properties->ezlopi_cloud.item_name)
         {
             // extract the sensor_output_values
-            Extract_KY026_sensor_value(&analog_sensor_volt, properties); // extract the (mean analog voltage * 2) [0-5V]
-            int fire_percent = (analog_sensor_volt / 5.0f) * 100;
+            Extract_KY026_sensor_value(&analog_sensor_volt, properties, &max_volt_reading); // extract the (mean analog voltage * 2) [0-5V]
+            TRACE_E("MAX : %.2f , mean_Analog_voltage : %.2f  ", max_volt_reading, analog_sensor_volt);
+            float Light_percent = ((1 - (analog_sensor_volt / max_volt_reading)) * 100.0f);
+            TRACE_E("Fire_Possibility : %.2f percent", Light_percent);
             // snprintf(valueFormatted, 20, "%.2f", analog_sensor_volt);
             // cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cjson_properties, "value", fire_percent);
+            cJSON_AddNumberToObject(cjson_properties, "value", (int)Light_percent);
             cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         }
         //-----------------------------------------------------------------------------------------
@@ -233,8 +235,9 @@ static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties
 
 //--------------------------------------------------------------------------------------------------------------------------------------
 
-static void Extract_KY026_sensor_value(float *analog_sensor_volt, s_ezlopi_device_properties_t *properties)
+static void Extract_KY026_sensor_value(float *analog_sensor_volt, s_ezlopi_device_properties_t *properties, float *max_reading)
 {
+    static float max = 0;
     // calculation process
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     if (ezlopi_analog_data)
@@ -242,16 +245,25 @@ static void Extract_KY026_sensor_value(float *analog_sensor_volt, s_ezlopi_devic
         memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
         //-------------------------------------------------
         // extract the mean_sensor_analog_output_voltage
+
         for (uint8_t x = 10; x > 0; x--)
         {
             ezlopi_adc_get_adc_data(KY026_adc_pin, ezlopi_analog_data);
 #ifdef voltage_divider_added
-            *analog_sensor_volt += ((float)(ezlopi_analog_data->voltage) * 2.0f);
+            *analog_sensor_volt += ((float)((ezlopi_analog_data->voltage) / 1000.0f) * 2.0f); // V
 #else
             *analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
         }
+        // find mean
         *analog_sensor_volt = *analog_sensor_volt / 10.0f;
+
+        if (max < *analog_sensor_volt)
+        {
+            max = *analog_sensor_volt;
+        }
+        // Set max_value of the readings done
+        *max_reading = max;
         free(ezlopi_analog_data);
     }
 }
