@@ -6,16 +6,18 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_device_value_updated.h"
+#include "gpio_isr_service.h"
 
 #include "sensor_0061_digitalIn_reed_switch.h"
-
+//----------------------------------------------------------------------
 static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson_device);
 static int sensor_0061_prepare_and_add(void *arg);
 static int sensor_0061_init(s_ezlopi_device_properties_t *properties);
 static int sensor_0061_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
 static void sensor_0061_update_from_device(s_ezlopi_device_properties_t *properties);
+//----------------------------------------------------------------------
 
-int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, s_ezlopi_device_properties_t properties, void *arg, void *user_arg)
+int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -38,6 +40,7 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, s_ezlopi_device
     }
     return ret;
 }
+//----------------------------------------------------------------------
 
 static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson_device)
 {
@@ -75,9 +78,11 @@ static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson
     }
     return sensor_0061_device_properties;
 }
+//----------------------------------------------------------------------
 
 static int sensor_0061_prepare_and_add(void *arg)
 {
+    int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
@@ -94,7 +99,9 @@ static int sensor_0061_prepare_and_add(void *arg)
             }
         }
     }
+    return ret;
 }
+//----------------------------------------------------------------------
 
 static int sensor_0061_init(s_ezlopi_device_properties_t *properties)
 {
@@ -114,16 +121,17 @@ static int sensor_0061_init(s_ezlopi_device_properties_t *properties)
             properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
         }
 
-        gpio_isr_service_register(properties, sensor_ldr_digital_module_value_updated_from_device, 200);
+        gpio_isr_service_register(properties, sensor_0061_update_from_device, 200);
     }
 
     return ret;
 }
+//----------------------------------------------------------------------
 
 static int sensor_0061_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    cJSON *cjson_propertise = (cJSON *)args;
+    cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
         int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
@@ -133,6 +141,7 @@ static int sensor_0061_get_value_cjson(s_ezlopi_device_properties_t *properties,
     }
     return ret;
 }
+//----------------------------------------------------------------------
 
 static void sensor_0061_update_from_device(s_ezlopi_device_properties_t *properties)
 {
