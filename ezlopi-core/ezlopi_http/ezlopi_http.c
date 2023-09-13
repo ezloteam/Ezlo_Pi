@@ -24,8 +24,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
     char *ret = NULL;
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t *http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
-
+    s_ezlopi_http_data_t *http_get_data = NULL;
     if ((NULL != my_data))
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
@@ -58,7 +57,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
                 if (my_data->total_len)
                 {
                     ret = (char *)malloc(my_data->total_len + 1);
-
+                    TRACE_E("Response lent: %d", my_data->total_len);
                     if (ret)
                     {
                         s_rx_data_t *cur_d = my_data;
@@ -70,9 +69,14 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
                             TRACE_D("%.*s", cur_d->len, cur_d->ptr);
                             cur_d = cur_d->next;
                         }
+                        http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
+                        if (http_get_data)
+                        {
+                            memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
+                            http_get_data->response = ret;
+                            http_get_data->status_code = status_code;
+                        }
                     }
-                    http_get_data->response = ret;
-                    http_get_data->status_code = status_code;
                 }
             }
             else
