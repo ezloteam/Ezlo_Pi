@@ -127,12 +127,12 @@ static s_ezlopi_device_properties_t *sensor_other_mq3_prepare_properties(uint32_
             sensor_0050_other_MQ3_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
             if (ezlopi_item_name_gas_alarm == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_digi", mq3_digital_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio1", mq3_digital_pin);
                 TRACE_I("MQ3-> DIGITAL_PIN: %d ", mq3_digital_pin);
             }
             if (ezlopi_item_name_smoke_density == ITEM_NAME)
             {
-                CJSON_GET_VALUE_INT(cjson_device, "gpio_adc", mq3_adc_pin);
+                CJSON_GET_VALUE_INT(cjson_device, "gpio2", mq3_adc_pin);
                 TRACE_I("MQ3-> ADC_PIN: %d ", mq3_adc_pin);
             }
             sensor_0050_other_MQ3_properties->interface.adc.resln_bit = 3; // ADC 12-bit
