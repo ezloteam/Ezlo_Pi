@@ -20,6 +20,7 @@ static void sensor_0061_update_from_device(s_ezlopi_device_properties_t *propert
 int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
+    // TRACE_E("Action : %s", ezlopi_actions_to_string(action));
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -55,9 +56,9 @@ static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_0061_device_properties, device_name);
         sensor_0061_device_properties->ezlopi_cloud.category = category_switch;
-        sensor_0061_device_properties->ezlopi_cloud.subcategory = subcategory_in_wall;
+        sensor_0061_device_properties->ezlopi_cloud.subcategory = subcategory_relay;
         sensor_0061_device_properties->ezlopi_cloud.item_name = ezlopi_item_name_switch;
-        sensor_0061_device_properties->ezlopi_cloud.device_type = dev_type_switch_outlet;
+        sensor_0061_device_properties->ezlopi_cloud.device_type = dev_type_sensor;
         sensor_0061_device_properties->ezlopi_cloud.value_type = value_type_bool;
         sensor_0061_device_properties->ezlopi_cloud.has_getter = true;
         sensor_0061_device_properties->ezlopi_cloud.has_setter = false;
@@ -73,7 +74,7 @@ static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson
         CJSON_GET_VALUE_INT(cjson_device, "logic_inv", sensor_0061_device_properties->interface.gpio.gpio_in.invert);
 
         sensor_0061_device_properties->interface.gpio.gpio_in.enable = true;
-        sensor_0061_device_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
+        sensor_0061_device_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_POSEDGE;
         sensor_0061_device_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     }
     return sensor_0061_device_properties;
@@ -106,22 +107,27 @@ static int sensor_0061_prepare_and_add(void *arg)
 static int sensor_0061_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
+    static bool guard = false;
+    if (!guard)
     {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
-            .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
-            .intr_type = properties->interface.gpio.gpio_in.pull,
-        };
-
-        if (ESP_OK == gpio_config(&io_conf))
+        if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
         {
-            properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        }
+            gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
+                .mode = GPIO_MODE_INPUT,
+                .pull_up_en = GPIO_PULLUP_DISABLE,
+                .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+                .intr_type = properties->interface.gpio.gpio_in.pull,
+            };
 
-        gpio_isr_service_register(properties, sensor_0061_update_from_device, 200);
+            if (ESP_OK == gpio_config(&io_conf))
+            {
+                properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+            }
+
+            gpio_isr_service_register(properties, sensor_0061_update_from_device, 100);
+        }
+        guard = true;
     }
 
     return ret;
