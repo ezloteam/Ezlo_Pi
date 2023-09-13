@@ -73,7 +73,7 @@ static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson
         CJSON_GET_VALUE_INT(cjson_device, "logic_inv", sensor_0061_device_properties->interface.gpio.gpio_in.invert);
 
         sensor_0061_device_properties->interface.gpio.gpio_in.enable = true;
-        sensor_0061_device_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_POSEDGE;
+        sensor_0061_device_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
         sensor_0061_device_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     }
     return sensor_0061_device_properties;
