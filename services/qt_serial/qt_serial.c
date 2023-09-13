@@ -391,7 +391,7 @@ static void qt_serial_read_config(void)
             cJSON_Minify(my_json_string);
             cJSON_Delete(root); // free Json string
             const int len = strlen(my_json_string);
-            const int txBytes = qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
+	    qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
             cJSON_free(my_json_string);
         }

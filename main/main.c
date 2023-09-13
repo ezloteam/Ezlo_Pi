@@ -56,7 +56,6 @@ static void blinky(void *pv)
 
     // adc1_config_width(ADC_WIDTH_BIT_12);
     // gpio_config(&io_conf);
-    char uuid[37] = {0};
     while (1)
     {
         // state ^= 1;

@@ -15,7 +15,10 @@
 
 #include "sensor_0027_ADC_waterLeak.h"
 
-static const char *ezlopi_water_present_leak_state = NULL;
+#define NO_WATER_LEAK "no_water_leak"
+#define WATER_LEAK_DETECTED "water_leak_detected"
+
+static char *ezlopi_water_present_leak_state = NO_WATER_LEAK;
 
 static int water_leak_sensor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *water_leak_sensor_prepare(cJSON *cjson_device);
@@ -132,6 +135,7 @@ static int get_water_leak_sensor_value_to_cloud(s_ezlopi_device_properties_t *pr
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_water_present_leak_state);
         cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_leak_state);
         ret = 1;
     }
@@ -141,9 +145,7 @@ static int get_water_leak_sensor_value_to_cloud(s_ezlopi_device_properties_t *pr
 static int water_leak_sensor_get_value(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    static char *ezlopi_water_previous_leak_state;
-    const static char *_no_water_leak = "no_water_leak";
-    const static char *_water_leak_detected = "water_leak_detected";
+    static char *ezlopi_water_previous_leak_state = NO_WATER_LEAK;
     s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, &ezlopi_analog_data);
@@ -151,11 +153,11 @@ static int water_leak_sensor_get_value(s_ezlopi_device_properties_t *properties)
 
     if (1000 <= ezlopi_analog_data.voltage)
     {
-        ezlopi_water_present_leak_state = _water_leak_detected;
+        ezlopi_water_present_leak_state = WATER_LEAK_DETECTED;
     }
     else
     {
-        ezlopi_water_present_leak_state = _no_water_leak;
+        ezlopi_water_present_leak_state = NO_WATER_LEAK;
     }
 
     if (ezlopi_water_previous_leak_state != ezlopi_water_present_leak_state)

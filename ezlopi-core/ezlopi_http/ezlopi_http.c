@@ -159,6 +159,8 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
                             cur_d = cur_d->next;
                         }
                     }
+                    http_get_data->response = ret;
+                    http_get_data->status_code = status_code;
                 }
                 http_get_data->response = ret;
                 http_get_data->status_code = status_code;

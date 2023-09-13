@@ -164,7 +164,7 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
 
 void web_provisioning_init(void)
 {
-    xTaskCreate(web_provisioning_config_check, "web-provisioning config check", 4 * 2048, NULL, 5, NULL);
+    // xTaskCreate(web_provisioning_config_check, "web-provisioning config check", 4 * 2048, NULL, 5, NULL);
     xTaskCreate(web_provisioning_fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, &ezlopi_update_config_notifier);
 }
 
@@ -209,8 +209,6 @@ static void web_provisioning_config_check(void *pv)
         }
         if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
         {
-            TRACE_E("Here ");
-
             char http_request_location[200];
             snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
             uint16_t http_status;
@@ -284,7 +282,7 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
         TRACE_D("water_mark: %d", water_mark);
 
-        ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+        // ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
 
         // ezlopi_wait_for_wifi_to_connect();
 
