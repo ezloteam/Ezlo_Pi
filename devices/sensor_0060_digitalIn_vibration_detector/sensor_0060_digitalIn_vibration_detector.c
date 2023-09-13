@@ -100,7 +100,7 @@ static s_ezlopi_device_properties_t *sensor_0060_prepare(cJSON *cjson_device)
         CJSON_GET_VALUE_INT(cjson_device, "logic_inv", sensor_0060_properties->interface.gpio.gpio_in.invert);
 
         sensor_0060_properties->interface.gpio.gpio_in.enable = true;
-        sensor_0060_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_POSEDGE;
+        sensor_0060_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
     }
     return sensor_0060_properties;
 }
