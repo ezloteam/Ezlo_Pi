@@ -2,7 +2,6 @@
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
 
-#if 0
 #include "device_0001_digitalOut_generic.h"
 #include "device_0002_digitalOut_relay.h"
 #include "device_0003_digitalOut_plug.h"
@@ -35,7 +34,7 @@
 #include "sensor_0025_digitalIn_LDR.h"
 #include "sensor_0026_ADC_LDR.h"
 #include "sensor_0027_ADC_waterLeak.h"
-#include "sensor_0028_ADC_GY61.h"
+#include "sensor_0028_other_GY61.h"
 #include "sensor_0029_I2C_GXHTC3.h"
 #include "sensor_0030_oneWire_DS18B20.h"
 #include "sensor_0031_other_JSNSR04T.h"
@@ -59,9 +58,9 @@
 #include "sensor_0050_other_MQ3_Alcohol_detector.h"
 #include "sensor_0051_other_MQ8_H2_gas_detector.h"
 #include "sensor_0052_other_MQ135_NH3_gas_detector.h"
-#endif
+
 static s_ezlopi_device_t device_array[] = {
-#if 0
+
 #if ((EZLOPI_DEVICE_TYPE == EZLOPI_DEVICE_TYPE_GENERIC) || (EZLOPI_DEVICE_TYPE == EZLOPI_DEVICE_TYPE_TEST_DEVICE))
 
 #ifdef EZLOPI_DEVICE_0001_DIGITAL_OUT_LED
@@ -250,10 +249,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0028_ADC_GY61
+#ifdef EZLOPI_SENSOR_0028_OTHER_GY61
     {
-        .id = EZLOPI_SENSOR_0028_ADC_GY61,
-        .func = sensor_0028_ADC_GY61,
+        .id = EZLOPI_SENSOR_0028_OTHER_GY61,
+        .func = sensor_0028_other_GY61,
     },
 #endif
 
@@ -457,7 +456,6 @@ static s_ezlopi_device_t device_array[] = {
 //         .func =
 //     },
 // #endif
-#endif
 #endif
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.

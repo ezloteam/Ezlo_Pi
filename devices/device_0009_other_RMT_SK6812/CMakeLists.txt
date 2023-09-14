@@ -3,7 +3,6 @@
 idf_component_register(SRCS "device_0009_other_RMT_SK6812.c"
                         INCLUDE_DIRS "."
                         REQUIRES trace 
-                                 updated
                                  led_strip
                                  ezlopi_actions 
                                  ezlopi_hal 

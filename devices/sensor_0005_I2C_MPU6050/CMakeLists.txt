@@ -4,7 +4,6 @@ file(GLOB_RECURSE config_src "*.c")
 idf_component_register(SRCS "sensor_0005_I2C_MPU6050.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES trace 
-             updated
              ezlopi_actions 
              ezlopi_hal 
              ezlopi_timer 

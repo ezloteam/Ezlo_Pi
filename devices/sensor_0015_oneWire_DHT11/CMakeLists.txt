@@ -2,7 +2,6 @@ idf_component_register(SRCS "sensor_0015_oneWire_DHT11.c" "dht11.c"
                         INCLUDE_DIRS "."
                         REQUIRES trace 
                                 driver 
-                                updated
                                 ezlopi_actions 
                                 ezlopi_hal 
                                 ezlopi_timer 

@@ -6,5 +6,4 @@ idf_component_register(SRCS "gpio_isr_service.c" "${src_files}"
     REQUIRES driver 
              freertos 
              trace 
-             updated
              ezlopi_devices)

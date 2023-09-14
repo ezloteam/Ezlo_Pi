@@ -5,7 +5,6 @@ idf_component_register(SRCS "sensor_0020_ADC_2axis_joystick.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES 
                 trace 
-                updated
                 ezlopi_actions 
                 ezlopi_hal 
                 ezlopi_timer 

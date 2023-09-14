@@ -2,7 +2,6 @@
 idf_component_register(SRCS "sensor_0041_ADC_FC28_soilMoisture.c" 
                         INCLUDE_DIRS "."          
                         REQUIRES trace 
-                                updated
                                 ezlopi_actions 
                                 ezlopi_hal 
                                 ezlopi_timer 

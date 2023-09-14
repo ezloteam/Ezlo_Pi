@@ -2,7 +2,6 @@
 idf_component_register(SRCS "sensor_0049_other_MQ2_LPG_gas_detector.c" 
                         INCLUDE_DIRS "."          
                         REQUIRES trace 
-                                updated
                                 ezlopi_actions 
                                 ezlopi_hal 
                                 ezlopi_timer 
