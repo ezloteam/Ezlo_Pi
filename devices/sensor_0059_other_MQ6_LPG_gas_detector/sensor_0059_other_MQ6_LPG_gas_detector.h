@@ -125,6 +125,15 @@
 #define MQ6_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq6 -0.424f
 #define b_coeff_mq6 1.272f
+typedef enum
+{
+    MQ6_GAS_ALARM_NO_GAS,
+    MQ6_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+    MQ6_GAS_ALARM_TOXIC_GAS_DETECTED,
+    MQ6_GAS_ALARM_UNKNOWN,
+    MQ6_GAS_ALARM_MAX
+} e_mq6_gas_alarm_states_t;
+
 //------------------------------------------------------------------------------------------------------------------------------
 int sensor_0059_MQ6_LPG(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
