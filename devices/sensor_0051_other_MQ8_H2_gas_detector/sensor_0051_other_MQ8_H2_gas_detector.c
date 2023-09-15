@@ -13,6 +13,13 @@
 
 #include "sensor_0051_other_MQ8_H2_gas_detector.h"
 
+const char *mq8_sensor_gas_alarm_token[] =
+	    {
+		"no_gas",
+		"combustible_gas_detected",
+		"toxic_gas_detected",
+		"unknown"
+		};
 //------------------------------------------------------------------------------
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                     \
     {                                                                                                                         \
@@ -39,6 +46,7 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_de
 
 static s_ezlopi_device_properties_t *sensor_other_mq8_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device); // you can directly add the prepare args here
 static int sensor_other_MQ8_prepare_and_add(void *arg);
+static void sensor_other_MQ8_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_other_MQ8_init(s_ezlopi_device_properties_t *properties);
 static int sensor_other_MQ8_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 static void Extract_MQ8_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties);
@@ -58,6 +66,11 @@ int sensor_0051_MQ8_H2(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *
         ret = sensor_other_MQ8_init(ezlopi_device);
         break;
     }
+     case EZLOPI_ACTION_HUB_GET_ITEM:
+	    {
+		sensor_other_MQ8_get_item(ezlopi_device, arg);
+		break;
+	    }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_other_MQ8_get_value(ezlopi_device, arg);
@@ -321,6 +334,59 @@ static void Extract_MQ8_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
 
     free(ezlopi_analog_data);
 }
+
+static void sensor_other_MQ8_get_item(s_ezlopi_device_properties_t *properties, void *arg)
+	{
+	    int ret = 0;
+	    float analog_sensor_volt = 0;
+	    float _ppm = 0;
+	    char valueFormatted[20];
+	    cJSON *cjson_properties = (cJSON *)arg;
+
+	    if (cjson_properties)
+	    {
+		//-------------------------------------------------
+
+		if (ezlopi_item_name_gas_alarm == properties->ezlopi_cloud.item_name)
+		{
+		    cJSON *json_array_enum = cJSON_CreateArray();
+		    if (NULL != json_array_enum)
+		    {
+		        for (uint8_t i = 0; i < MQ8_GAS_ALARM_MAX; i++)
+		        {
+		            cJSON *json_value = cJSON_CreateString(mq8_sensor_gas_alarm_token[i]);
+		            if (NULL != json_value)
+		            {
+		                cJSON_AddItemToArray(json_array_enum, json_value);
+		            }
+		        }
+		        cJSON_AddItemToObject(cjson_properties, "enum", json_array_enum);
+		    }
+
+		    if (0 == gpio_get_level(mq8_digital_pin)) // when D0 -> 0V,
+		    {
+		        cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
+		    }
+		    else
+		    {
+		        cJSON_AddStringToObject(cjson_properties, "value", "no_gas");
+		    }
+		}
+		if (ezlopi_item_name_smoke_density == properties->ezlopi_cloud.item_name)
+		{
+		    // extract the sensor_output_values
+		    Extract_MQ8_sensor_ppm(&analog_sensor_volt, &_ppm, properties);
+		    snprintf(valueFormatted, 20, "%.2f", _ppm);
+		    cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+		    cJSON_AddNumberToObject(cjson_properties, "value", _ppm);
+		    cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");
+		}
+		//-----------------------------------------------------------------------------------------
+		ret = 1;
+	    }
+
+	    return ret;
+	}
 
 static int sensor_other_MQ8_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {

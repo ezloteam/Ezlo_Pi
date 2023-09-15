@@ -12,6 +12,13 @@
 
 #include "sensor_0057_other_KY026_FlameDetector.h"
 
+const char *ky206_sensor_heat_alarm_token[] =
+    {
+        "heat_ok",
+        "overheat_detected",
+        "under_heat_detected",
+        "unknown"};
+
 //------------------------------------------------------------------------------
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                       \
     {                                                                                                                           \
@@ -36,6 +43,7 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_de
 static s_ezlopi_device_properties_t *sensor_other_KY026_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device); // you can directly add the prepare args here
 static int sensor_other_KY026_prepare_and_add(void *arg);
 static int sensor_other_KY026_init(s_ezlopi_device_properties_t *properties);
+static void sensor_other_KY206_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 static void Extract_KY026_sensor_value(float *analog_sensor_volt, s_ezlopi_device_properties_t *properties, float *max_reading);
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -52,6 +60,11 @@ int sensor_0057_other_KY026(e_ezlopi_actions_t action, s_ezlopi_device_propertie
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = sensor_other_KY026_init(ezlopi_device);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        sensor_other_KY206_get_item(ezlopi_device, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -91,11 +104,11 @@ static s_ezlopi_device_properties_t *sensor_other_KY026_prepare_properties(uint3
             char *device_name = NULL;
             if (ezlopi_item_name_heat_alarm == ITEM_NAME)
             {
-                device_name = "KY026-Fire-alert";
+                device_name = "KY026-Heat-alert";
             }
             if (ezlopi_item_name_temperature_changes == ITEM_NAME)
             {
-                device_name = "KY026-Fire-Detected-level";
+                device_name = "KY026-Heat-Detected-level";
             }
             // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
 
@@ -192,6 +205,61 @@ static int sensor_other_KY026_init(s_ezlopi_device_properties_t *properties)
     return ret;
 }
 
+static void sensor_other_KY206_get_item(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    float analog_sensor_volt = 0, max_volt_reading = 0;
+    // char valueFormatted[20];
+    cJSON *cjson_properties = (cJSON *)arg;
+
+    if (cjson_properties)
+    {
+        //-------------------------------------------------
+
+        if (ezlopi_item_name_heat_alarm == properties->ezlopi_cloud.item_name)
+        {
+            cJSON *json_array_enum = cJSON_CreateArray();
+            if (NULL != json_array_enum)
+            {
+                for (uint8_t i = 0; i < KY206_HEAT_ALARM_MAX; i++)
+                {
+                    cJSON *json_value = cJSON_CreateString(ky206_sensor_heat_alarm_token[i]);
+                    if (NULL != json_value)
+                    {
+                        cJSON_AddItemToArray(json_array_enum, json_value);
+                    }
+                }
+                cJSON_AddItemToObject(cjson_properties, "enum", json_array_enum);
+            }
+
+            if (0 == gpio_get_level(KY026_digital_pin)) // when D0 -> 0V,
+            {
+                cJSON_AddStringToObject(cjson_properties, "value", "heat_ok");
+            }
+            else
+            {
+                cJSON_AddStringToObject(cjson_properties, "value", "overheat_detected");
+            }
+        }
+        if (ezlopi_item_name_temperature_changes == properties->ezlopi_cloud.item_name)
+        {
+            // extract the sensor_output_values
+            Extract_KY026_sensor_value(&analog_sensor_volt, properties, &max_volt_reading); // extract the (mean analog voltage * 2) [0-5V]
+            TRACE_E("MAX : %.2f , mean_Analog_voltage : %.2f  ", max_volt_reading, analog_sensor_volt);
+            float Light_percent = ((1 - (analog_sensor_volt / max_volt_reading)) * 100.0f);
+            TRACE_E("Heat-detected: %.2f percent", Light_percent);
+            // snprintf(valueFormatted, 20, "%.2f", analog_sensor_volt);
+            // cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cjson_properties, "value", (int)Light_percent);
+            cJSON_AddStringToObject(cjson_properties, "scale", "percent");
+        }
+        //-----------------------------------------------------------------------------------------
+        ret = 1;
+    }
+
+    return ret;
+}
+
 static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
@@ -207,11 +275,11 @@ static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties
         {
             if (0 == gpio_get_level(KY026_digital_pin)) // when D0 -> 0V,
             {
-                cJSON_AddStringToObject(cjson_properties, "value", "normal");
+                cJSON_AddStringToObject(cjson_properties, "value", "heat_ok");
             }
             else
             {
-                cJSON_AddStringToObject(cjson_properties, "value", "Flame_detected");
+                cJSON_AddStringToObject(cjson_properties, "value", "overheat_detected");
             }
         }
         if (ezlopi_item_name_temperature_changes == properties->ezlopi_cloud.item_name)
@@ -220,7 +288,7 @@ static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties
             Extract_KY026_sensor_value(&analog_sensor_volt, properties, &max_volt_reading); // extract the (mean analog voltage * 2) [0-5V]
             TRACE_E("MAX : %.2f , mean_Analog_voltage : %.2f  ", max_volt_reading, analog_sensor_volt);
             float Light_percent = ((1 - (analog_sensor_volt / max_volt_reading)) * 100.0f);
-            TRACE_E("Fire_Possibility : %.2f percent", Light_percent);
+            TRACE_E("Heat-detected: %.2f percent", Light_percent);
             // snprintf(valueFormatted, 20, "%.2f", analog_sensor_volt);
             // cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", (int)Light_percent);

@@ -37,7 +37,16 @@
  */
 #define voltage_divider_added 1
 //------------------------------------------
+typedef enum
+{
+    KY206_HEAT_ALARM_HEAT_OK,
+    KY206_HEAT_ALARM_OVERHEAT_DETECTED,
+    KY206_HEAT_ALARM_UNDERHEAT_DETECTED,
+    KY206_HEAT_ALARM_UNKNOWN,
+    KY206_HEAT_ALARM_MAX
+} e_ky206_heat_alarm_states_t;
 
+//----------------------------------------------------
 int sensor_0057_other_KY026(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
 #endif // _0057_OTHER_KY026_FLAMEDETECTOR_H_
