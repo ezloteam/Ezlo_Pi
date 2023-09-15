@@ -396,13 +396,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"gy61\",\
+                \"dev_type\": 6,\
+                \"dev_name\": \"GPS6MV2\",\
                 \"id_room\": \"\",\
-                \"id_item\": 28,\
-                \"gpio1\": 1,\
-                \"gpio2\": 2,\
-                \"gpio3\": 3\
+                \"id_item\": 53,\
+                \"gpio_tx\": 17,\
+                \"gpio_rx\": 18,\
+                \"baud\": 9600\
           }\
         ],\
     \"dev_total\": 1}";
