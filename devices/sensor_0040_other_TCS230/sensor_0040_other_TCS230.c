@@ -162,8 +162,8 @@ static void tcs230_setup_gpio(gpio_num_t s0_pin,
 }
 
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
 static void Gather_tcs230_Calibration_data(void *params) // calibration task
 {
     vTaskDelay(4000 / portTICK_PERIOD_MS); // 4sec
@@ -172,53 +172,63 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     // extracting the 'user_args' from "properties"
     TCS230_data_t *sensor_0040_other_TCS230_data = (TCS230_data_t *)properties->user_arg;
 
-    //--------------------------------------------------
-    // calculate red min-max periods for each colour
-    TRACE_E("Please, place the red paper in front of colour sensor..... Starting Calibration for RED in ....");
-    for (uint8_t j = 5; j > 0; j--)
-    {
-        TRACE_E("....................................................... {%d} ", j);
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
-    }
-    // choose  RED filter
-    TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_RED);
-    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
-                                   sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
-                                   &sensor_0040_other_TCS230_data->calib_data.least_red_timeP,
-                                   &sensor_0040_other_TCS230_data->calib_data.most_red_timeP);
+#if 0
+			    //--------------------------------------------------
+			    // calculate red min-max periods for each colour
+			    TRACE_E("Please, place the red paper in front of colour sensor..... Starting Calibration for RED in ....");
+			    for (uint8_t j = 5; j > 0; j--)
+			    {
+				TRACE_E("....................................................... {%d} ", j);
+				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
+			    }
+			    // choose  RED filter
+			    TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_RED);
+			    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
+						           sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
+						           &sensor_0040_other_TCS230_data->calib_data.least_red_timeP,
+						           &sensor_0040_other_TCS230_data->calib_data.most_red_timeP);
 
-    //--------------------------------------------------
-    // calculate green min-max periods for each colour
-    TRACE_I("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
-    for (uint8_t j = 5; j > 0; j--)
-    {
-        TRACE_I("....................................................... {%d} ", j);
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
-    }
-    // choose GREEN filter
-    TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_GREEN);
-    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
-                                   sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
-                                   &sensor_0040_other_TCS230_data->calib_data.least_green_timeP,
-                                   &sensor_0040_other_TCS230_data->calib_data.most_green_timeP);
+			    //--------------------------------------------------
+			    // calculate green min-max periods for each colour
+			    TRACE_I("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
+			    for (uint8_t j = 5; j > 0; j--)
+			    {
+				TRACE_I("....................................................... {%d} ", j);
+				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
+			    }
+			    // choose GREEN filter
+			    TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_GREEN);
+			    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
+						           sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
+						           &sensor_0040_other_TCS230_data->calib_data.least_green_timeP,
+						           &sensor_0040_other_TCS230_data->calib_data.most_green_timeP);
 
-    //--------------------------------------------------
-    // calculate blue min-max periods for each colour
-    TRACE_B("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
-    for (uint8_t j = 5; j > 0; j--)
-    {
-        TRACE_B("....................................................... {%d} ", j);
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
-    }
-    // choose BLUE filter
-    TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_BLUE);
-    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
-                                   sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
-                                   &sensor_0040_other_TCS230_data->calib_data.least_blue_timeP,
-                                   &sensor_0040_other_TCS230_data->calib_data.most_blue_timeP);
+			    //--------------------------------------------------
+			    // calculate blue min-max periods for each colour
+			    TRACE_B("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
+			    for (uint8_t j = 5; j > 0; j--)
+			    {
+				TRACE_B("....................................................... {%d} ", j);
+				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
+			    }
+			    // choose BLUE filter
+			    TCS230_set_filter_color(properties, COLOR_SENSOR_COLOR_BLUE);
+			    Calculate_max_min_color_values(sensor_0040_other_TCS230_data->TCS230_pin.gpio_output_en,
+						           sensor_0040_other_TCS230_data->TCS230_pin.gpio_pulse_output,
+						           &sensor_0040_other_TCS230_data->calib_data.least_blue_timeP,
+						           &sensor_0040_other_TCS230_data->calib_data.most_blue_timeP);
 
-    //--------------------------------------------------
-    // show (LOW,HIGH) -> (max,min)
+			    //--------------------------------------------------
+			    // show (LOW,HIGH) -> (max,min)
+#endif
+
+    sensor_0040_other_TCS230_data->calib_data.least_red_timeP = 120; /*Defaults*/
+    sensor_0040_other_TCS230_data->calib_data.most_red_timeP = 48;
+    sensor_0040_other_TCS230_data->calib_data.least_green_timeP = 109;
+    sensor_0040_other_TCS230_data->calib_data.most_green_timeP = 86;
+    sensor_0040_other_TCS230_data->calib_data.least_blue_timeP = 120;
+    sensor_0040_other_TCS230_data->calib_data.most_blue_timeP = 78;
+
     TRACE_B("red(Least,Most) => red(%d,%d)", sensor_0040_other_TCS230_data->calib_data.least_red_timeP, sensor_0040_other_TCS230_data->calib_data.most_red_timeP);
     TRACE_B("green(Least,Most) => green(%d,%d)", sensor_0040_other_TCS230_data->calib_data.least_green_timeP, sensor_0040_other_TCS230_data->calib_data.most_green_timeP);
     TRACE_B("blue(Least,Most) => blue(%d,%d)", sensor_0040_other_TCS230_data->calib_data.least_blue_timeP, sensor_0040_other_TCS230_data->calib_data.most_blue_timeP);

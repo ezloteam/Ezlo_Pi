@@ -17,14 +17,14 @@
 #include "sensor_0028_other_GY61.h"
 //---------------------------------------------------------------------
 
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                           \
-    {                                                                                                                               \
-        s_ezlopi_device_properties_t *_properties = sensor_0028_gy61_other_prepare_properties(device_id, category, subcategory,     \
-                                                                                              item_name, value_type, cjson_device); \
-        if (NULL != _properties)                                                                                                    \
-        {                                                                                                                           \
-            add_device_to_list(prep_arg, _properties, NULL);                                                                        \
-        }                                                                                                                           \
+#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                              \
+    {                                                                                                                                  \
+        s_ezlopi_device_properties_t *_properties = sensor_gy61_analog_sensor_prepare_properties(device_id, category, subcategory,     \
+                                                                                                 item_name, value_type, cjson_device); \
+        if (NULL != _properties)                                                                                                       \
+        {                                                                                                                              \
+            add_device_to_list(prep_arg, _properties, NULL);                                                                           \
+        }                                                                                                                              \
     }
 
 //---------------------------------------------------------------------
@@ -38,14 +38,14 @@
 #endif
 
 /********************************** DECLARATION ******************************************/
-static int sensor_0028_gy61_other_prepare_and_add(void *args);
-static s_ezlopi_device_properties_t *sensor_0028_gy61_other_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device);
-static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_0028_gy61_other_properties, void *user_arg);
-static int sensor_0028_gy61_other_init(s_ezlopi_device_properties_t *properties);
+static int sensor_gy61_analog_sensor_prepare_and_add(void *args);
+static s_ezlopi_device_properties_t *sensor_gy61_analog_sensor_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device);
+static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_gy61_analog_sensor_properties, void *user_arg);
+static int sensor_gy61_analog_sensor_init(s_ezlopi_device_properties_t *properties);
 static float get_gy61_x_axis_value(s_ezlopi_device_properties_t *properties);
 static float get_gy61_y_axis_value(s_ezlopi_device_properties_t *properties);
 static float get_gy61_z_axis_value(s_ezlopi_device_properties_t *properties);
-static int get_sensor_0028_gy61_other_value(s_ezlopi_device_properties_t *properties, void *args);
+static int get_sensor_gy61_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
 
 /**********************************DEFINATION ******************************************/
 
@@ -56,17 +56,17 @@ int sensor_0028_other_GY61(e_ezlopi_actions_t action, s_ezlopi_device_properties
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        ret = sensor_0028_gy61_other_prepare_and_add(arg);
+        ret = sensor_gy61_analog_sensor_prepare_and_add(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        ret = sensor_0028_gy61_other_init(properties);
+        ret = sensor_gy61_analog_sensor_init(properties);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        get_sensor_0028_gy61_other_value(properties, arg);
+        get_sensor_gy61_analog_sensor_value(properties, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -83,7 +83,7 @@ int sensor_0028_other_GY61(e_ezlopi_actions_t action, s_ezlopi_device_properties
     return ret;
 }
 
-static int sensor_0028_gy61_other_prepare_and_add(void *args)
+static int sensor_gy61_analog_sensor_prepare_and_add(void *args)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)args;
@@ -100,15 +100,15 @@ static int sensor_0028_gy61_other_prepare_and_add(void *args)
     return ret;
 }
 
-static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_0028_gy61_other_properties, void *user_arg)
+static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_gy61_analog_sensor_properties, void *user_arg)
 {
     int ret = 0;
 
-    if (sensor_0028_gy61_other_properties)
+    if (sensor_gy61_analog_sensor_properties)
     {
-        if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_0028_gy61_other_properties, NULL))
+        if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_gy61_analog_sensor_properties, NULL))
         {
-            free(sensor_0028_gy61_other_properties);
+            free(sensor_gy61_analog_sensor_properties);
         }
         else
         {
@@ -118,14 +118,14 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_pro
     return ret;
 }
 
-static s_ezlopi_device_properties_t *sensor_0028_gy61_other_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device)
+static s_ezlopi_device_properties_t *sensor_gy61_analog_sensor_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device)
 {
-    s_ezlopi_device_properties_t *sensor_0028_gy61_other_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    s_ezlopi_device_properties_t *sensor_gy61_analog_sensor_properties = malloc(sizeof(s_ezlopi_device_properties_t));
 
-    if (sensor_0028_gy61_other_properties)
+    if (sensor_gy61_analog_sensor_properties)
     {
-        memset(sensor_0028_gy61_other_properties, 0, sizeof(s_ezlopi_device_properties_t));
-        sensor_0028_gy61_other_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
+        memset(sensor_gy61_analog_sensor_properties, 0, sizeof(s_ezlopi_device_properties_t));
+        sensor_gy61_analog_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
 
         char *device_name = NULL;
         if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
@@ -141,43 +141,43 @@ static s_ezlopi_device_properties_t *sensor_0028_gy61_other_prepare_properties(u
             device_name = "Acceleration-Z";
         }
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-        ASSIGN_DEVICE_NAME(sensor_0028_gy61_other_properties, device_name);
-        sensor_0028_gy61_other_properties->ezlopi_cloud.category = CATEGORY;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.subcategory = SUB_CATEGORY;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.item_name = ITEM_NAME;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.device_type = dev_type_sensor;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.value_type = VALUE_TYPE;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.has_getter = true;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.has_setter = false;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.reachable = true;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.battery_powered = false;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.show = true;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.room_name[0] = '\0';
-        sensor_0028_gy61_other_properties->ezlopi_cloud.device_id = DEVICE_ID;
-        sensor_0028_gy61_other_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-        sensor_0028_gy61_other_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
+        ASSIGN_DEVICE_NAME(sensor_gy61_analog_sensor_properties, device_name);
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.category = CATEGORY;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.subcategory = SUB_CATEGORY;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.item_name = ITEM_NAME;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.value_type = VALUE_TYPE;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.has_getter = true;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.has_setter = false;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.reachable = true;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.battery_powered = false;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.show = true;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.room_name[0] = '\0';
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.device_id = DEVICE_ID;
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        sensor_gy61_analog_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
         {
-            CJSON_GET_VALUE_INT(cjson_device, "gpio1", sensor_0028_gy61_other_properties->interface.adc.gpio_num);
-            TRACE_I("Accel X-axis gpio1: %d ", sensor_0028_gy61_other_properties->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio1", sensor_gy61_analog_sensor_properties->interface.adc.gpio_num);
+            TRACE_I("Accel X-axis gpio1: %d ", sensor_gy61_analog_sensor_properties->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_y_axis == ITEM_NAME)
         {
-            CJSON_GET_VALUE_INT(cjson_device, "gpio2", sensor_0028_gy61_other_properties->interface.adc.gpio_num);
-            TRACE_I("Accel Y-axis gpio2: %d ", sensor_0028_gy61_other_properties->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio2", sensor_gy61_analog_sensor_properties->interface.adc.gpio_num);
+            TRACE_I("Accel Y-axis gpio2: %d ", sensor_gy61_analog_sensor_properties->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_z_axis == ITEM_NAME)
         {
-            CJSON_GET_VALUE_INT(cjson_device, "gpio3", sensor_0028_gy61_other_properties->interface.adc.gpio_num);
-            TRACE_I("Accel Z-axis gpio3: %d ", sensor_0028_gy61_other_properties->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cjson_device, "gpio3", sensor_gy61_analog_sensor_properties->interface.adc.gpio_num);
+            TRACE_I("Accel Z-axis gpio3: %d ", sensor_gy61_analog_sensor_properties->interface.adc.gpio_num);
         }
-        sensor_0028_gy61_other_properties->interface.adc.resln_bit = 3; // ADC_RES_12_BIT :
+        sensor_gy61_analog_sensor_properties->interface.adc.resln_bit = 3; // ADC_RES_12_BIT :
     }
-    return sensor_0028_gy61_other_properties;
+    return sensor_gy61_analog_sensor_properties;
 }
 
-static int sensor_0028_gy61_other_init(s_ezlopi_device_properties_t *properties)
+static int sensor_gy61_analog_sensor_init(s_ezlopi_device_properties_t *properties)
 {
 
     int ret = 0;
@@ -189,7 +189,7 @@ static int sensor_0028_gy61_other_init(s_ezlopi_device_properties_t *properties)
     return ret;
 }
 
-static int get_sensor_0028_gy61_other_value(s_ezlopi_device_properties_t *properties, void *arg)
+static int get_sensor_gy61_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)arg;
