@@ -141,6 +141,16 @@
 #define m_slope_mq3 -0.65f
 #define b_coeff_mq3 -0.259f
 
+typedef enum 
+	{
+	    MQ3_GAS_ALARM_NO_GAS,
+	    MQ3_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+	    MQ3_GAS_ALARM_TOXIC_GAS_DETECTED,
+	    MQ3_GAS_ALARM_UNKNOWN,
+	    MQ3_GAS_ALARM_MAX
+	} e_mq3_gas_alarm_states_t;
+
+//----------------------------------------------------
 int sensor_0050_MQ3_alcohol(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
 #endif // _0050_OTHER_MQ3_ALCOHOL_GAS_DETECTOR_H_

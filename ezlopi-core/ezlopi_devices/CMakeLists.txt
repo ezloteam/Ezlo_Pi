@@ -41,7 +41,7 @@ idf_component_register(
         sensor_0025_digitalIn_LDR
         sensor_0026_ADC_LDR
         sensor_0027_ADC_waterLeak   
-        sensor_0028_ADC_GY61 
+        sensor_0028_other_GY61 
         sensor_0029_I2C_GXHTC3
         sensor_0030_oneWire_DS18B20
         sensor_0031_other_JSNSR04T
