@@ -1,5 +1,3 @@
-
-
 #ifndef _0028_SENS_GY61_OTHER_H_
 #define _0028_SENS_GY61_OTHER_H_
 
