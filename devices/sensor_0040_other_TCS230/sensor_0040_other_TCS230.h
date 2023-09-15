@@ -5,6 +5,15 @@
 #include "ezlopi_devices.h"
 #include "driver/gpio.h"
 
+/**
+ * ESP32 sample connections
+ * gpio1 => gpio_s0             GPIO_NUM_25
+ * gpio2 => gpio_s1             GPIO_NUM_26
+ * gpio3 => gpio_s2             GPIO_NUM_12
+ * gpio4 => gpio_s3             GPIO_NUM_14
+ * gpio5 => gpio_output_en      GPIO_NUM_13
+ * gpio6 => gpio_pulse_output   GPIO_NUM_15
+ */
 typedef enum TCS230_queue_enum
 {
     TCS230_QUEUE_RESET = 0,

@@ -126,6 +126,15 @@
 #define m_slope_mq4 -0.3397f
 #define b_coeff_mq4 1.019f
 
+typedef enum
+{
+    MQ4_GAS_ALARM_NO_GAS,
+    MQ4_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+    MQ4_GAS_ALARM_TOXIC_GAS_DETECTED,
+    MQ4_GAS_ALARM_UNKNOWN,
+    MQ4_GAS_ALARM_MAX
+} e_mq4_gas_alarm_states_t;
+//------------------------------------------------------------------------------------------------------
 int sensor_0048_MQ4_methane(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
 #endif // _0048_OTHER_MQ4_METHANE_GAS_DETECTOR_H_

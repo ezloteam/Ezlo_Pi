@@ -127,6 +127,15 @@
 #define m_slope_mq2 -0.47f
 #define b_coeff_mq2 1.306f
 
+typedef enum
+{
+    MQ2_GAS_ALARM_NO_GAS,
+    MQ2_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+    MQ2_GAS_ALARM_TOXIC_GAS_DETECTED,
+    MQ2_GAS_ALARM_UNKNOWN,
+    MQ2_GAS_ALARM_MAX
+} e_mq2_gas_alarm_states_t;
+
 int sensor_0049_MQ2_LPG(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
 #endif // _0049_OTHER_MQ2_LPG_GAS_DETECTOR_H_
