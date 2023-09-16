@@ -1,5 +1,4 @@
 
-#include "sensor_0028_ADC_GY61.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
@@ -15,6 +14,7 @@
 #include "trace.h"
 #include "cJSON.h"
 
+#include "sensor_0028_other_GY61.h"
 //---------------------------------------------------------------------
 
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                              \
@@ -49,7 +49,7 @@ static int get_sensor_gy61_analog_sensor_value(s_ezlopi_device_properties_t *pro
 
 /**********************************DEFINATION ******************************************/
 
-int sensor_0028_ADC_GY61(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
+int sensor_0028_other_GY61(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
