@@ -126,6 +126,16 @@
 #define m_slope_mq135 -0.401f
 #define b_coeff_mq135 0.802f
 
+typedef enum 
+	{
+	    MQ135_GAS_ALARM_NO_GAS,
+	    MQ135_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+	    MQ135_GAS_ALARM_TOXIC_GAS_DETECTED,
+	    MQ135_GAS_ALARM_UNKNOWN,
+	    MQ135_GAS_ALARM_MAX
+	} e_mq135_gas_alarm_states_t;
+
+//----------------------------------------------------
 int sensor_0052_MQ135_NH3(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
 #endif // _0052_OTHER_MQ135_NH3_GAS_DETECTOR_H_

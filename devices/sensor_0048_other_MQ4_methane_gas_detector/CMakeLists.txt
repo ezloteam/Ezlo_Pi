@@ -1,7 +1,7 @@
 
 idf_component_register(SRCS "sensor_0048_other_MQ4_methane_gas_detector.c" 
                         INCLUDE_DIRS "."          
-                        REQUIRES trace
+                        REQUIRES trace 
                                 ezlopi_actions 
                                 ezlopi_hal 
                                 ezlopi_timer 
