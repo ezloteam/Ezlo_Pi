@@ -1,5 +1,5 @@
-#ifndef _0028_SENS_OTHER_GY61_H_
-#define _0028_SENS_OTHER_GY61_H_
+#ifndef _0028_SENS_GY61_OTHER_H_
+#define _0028_SENS_GY61_OTHER_H_
 
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
@@ -9,4 +9,4 @@
 
 int sensor_0028_other_GY61(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
-#endif //_0028_SENS_OTHER_GY61_H_
+#endif //_0028_SENS_GY61_OTHER_H_

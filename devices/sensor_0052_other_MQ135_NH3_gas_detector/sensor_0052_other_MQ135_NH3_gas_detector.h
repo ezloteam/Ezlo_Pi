@@ -57,12 +57,12 @@
  *                -> m = [log(y) - log(y0)] / [log(x) - log(x0)]  => [ m = log(y/y0) / log(x/x0) ] ;
  *                -> b = [log(y) - m*log(x)] = ?
  *
- *    Case. 1: Calculation of slope 'm' Using MQ135's NH3-curve (CH4) in semi-log graph:
+ *    Case. 1: Calculation of slope 'm' Using MQ135's NH3-curve (NH3) in semi-log graph:
  *
  *                                      (x0 , y0) and (  x  , y  )
  *                                          |               |
  *                                          V               V
- *                 #A. chose the points (10,2.6) and (200,0.78) from the 'CH4' graph-line
+ *                 #A. chose the points (10,2.6) and (200,0.78) from the 'NH3' graph-line
  *                 ->           m = log(0.78/2.6) / log(200/10)
  *                 ->           m = -0.401
  *
@@ -126,6 +126,16 @@
 #define m_slope_mq135 -0.401f
 #define b_coeff_mq135 0.802f
 
+typedef enum 
+	{
+	    MQ135_GAS_ALARM_NO_GAS,
+	    MQ135_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+	    MQ135_GAS_ALARM_TOXIC_GAS_DETECTED,
+	    MQ135_GAS_ALARM_UNKNOWN,
+	    MQ135_GAS_ALARM_MAX
+	} e_mq135_gas_alarm_states_t;
+
+//----------------------------------------------------
 int sensor_0052_MQ135_NH3(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
 #endif // _0052_OTHER_MQ135_NH3_GAS_DETECTOR_H_

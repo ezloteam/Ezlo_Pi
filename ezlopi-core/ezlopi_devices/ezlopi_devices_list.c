@@ -58,6 +58,7 @@
 #include "sensor_0050_other_MQ3_Alcohol_detector.h"
 #include "sensor_0051_other_MQ8_H2_gas_detector.h"
 #include "sensor_0052_other_MQ135_NH3_gas_detector.h"
+#include "sensor_0063_other_MQ9_LPG_CH4_flamable_detector.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -417,6 +418,13 @@ static s_ezlopi_device_t device_array[] = {
     {
         .id = EZLOPI_SENSOR_0052_OTHER_MQ135_AMONIA_GAS_DETECTOR,
         .func = sensor_0052_MQ135_NH3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_CH4_FLAMEABLE_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_CH4_FLAMEABLE_GAS_DETECTOR,
+        .func = sensor_0063_MQ9_LPG_CH4,
     },
 #endif
 
