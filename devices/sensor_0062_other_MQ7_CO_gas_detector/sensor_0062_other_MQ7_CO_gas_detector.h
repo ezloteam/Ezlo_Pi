@@ -34,7 +34,7 @@
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
  *      (via black straight line of sensitivity graph in the Mq7_datasheet)
  *
- *  i.e. ---------------------------> [RS_calib / R0] =  27.0f
+ *  i.e. ---------------------------> [RS_calib / R0] =  27.5f
  *
  * To calculate R0 we will need to find the value of the RS in fresh air.
  *  This will be done by taking the analog average readings from the sensor and converting it to voltage.
@@ -121,7 +121,7 @@
  * NOTE .2 : For [m_slope_mq7] & [b_coeff_mq7] values:- follow [stage-1] above shown procedures.
  * */
 #define mq7_eqv_RL 1000.0f	   // review the upper diagram clearly to know why this value is assigned
-#define RatioMQ7CleanAir 27.0f // -> [RS / R0] = 27.0f
+#define RatioMQ7CleanAir 27.5f // -> [RS / R0] = 27.5f
 #define MQ7_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq7 -0.6706f
 #define b_coeff_mq7 1.3412f
