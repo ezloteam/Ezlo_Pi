@@ -62,8 +62,8 @@
  *                                      (x0 , y0) and (  x  , y  )
  *                                          |               |
  *                                          V               V
- *                 #A. chose the points (50,1.7) and (980,0.22) from the 'CO' graph-line
- *                 ->           m = log(0.22/1.7) / log(980/50)
+ *                 #A. chose the points (50,1.7) and (1000,0.22) from the 'CO' graph-line
+ *                 ->           m = log(0.22/1.7) / log(1000/50)
  *                 ->           m = -0.6825
  *
  *                 #B. We chose (100,1)
@@ -80,10 +80,10 @@
  *
  *    Case. 3: Here 'ratio' = [Rs/Ro] is still left to be calculated so,
  *                  #D. Using Rs formula :  Rs_calib = [(VC x RL) / VRL] - RL ; where Vc = 5V,
- *                                                                                    RL = 980 ohm ,
+ *                                                                                    RL = 1000 ohm ,
  *                                                                                    VRL = sensor_analog_output
  *                  NOTE : use multimeter and measure the Equivalent resistance (RL)
- *                  ->     Rs_calib = [(5 * 980) / VRL] - 980 ;
+ *                  ->     Rs_calib = [(5 * 1000) / VRL] - 1000 ;
  *
  *                  #E. Now [Ro constant value] , we get :
  *                        ->   Ro = ratio/Rs_calib
@@ -96,7 +96,7 @@
  *                  #F. Formula of _ppm is:-
  *                        -> _ppm = 10 ^ [ (log([Rs_gas / Ro]) - 1.365) / -0.6825 ]  ;
  *                                                  -> where ; Ro is taken from eq(4)
- *                                                           ; Rs_gas = [(5 * 980) / VRL] - 980 ;
+ *                                                           ; Rs_gas = [(5 * 1000) / VRL] - 1000 ;
  *    ________________________________________________________________________________________
  *
  */
@@ -120,7 +120,7 @@
  *
  * NOTE .2 : For [m_slope_mq7] & [b_coeff_mq7] values:- follow [stage-1] above shown procedures.
  * */
-#define mq7_eqv_RL 980.0f	   // review the upper diagram clearly to know why this value is assigned
+#define mq7_eqv_RL 1000.0f	   // review the upper diagram clearly to know why this value is assigned
 #define RatioMQ7CleanAir 27.5f // -> [RS / R0] = 27.5f
 #define MQ7_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq7 -0.6825f
