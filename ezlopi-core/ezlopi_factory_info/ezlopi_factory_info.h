@@ -407,7 +407,7 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_name\": \"MQ9_LPG_CH4\",\
+                \"dev_name\": \"MQ9_LPG\",\
                 \"dev_type\": 10,\
                 \"id_item\": 63,\
                 \"id_room\": \"\",\
