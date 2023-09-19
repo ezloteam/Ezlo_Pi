@@ -62,18 +62,18 @@
  *                                      (x0 , y0) and (  x  , y  )
  *                                          |               |
  *                                          V               V
- *                 #A. chose the points (50,1.7) and (4000,0.09) from the 'CO' graph-line
- *                 ->           m = log(0.09/1.7) / log(4000/50)
- *                 ->           m = -0.6706
+ *                 #A. chose the points (50,1.7) and (1000,0.22) from the 'CO' graph-line
+ *                 ->           m = log(0.22/1.7) / log(1000/50)
+ *                 ->           m = -0.6825
  *
  *                 #B. We chose (100,1)
- *                 ->           b = log(1) - ( -0.6706 )*log(100)
- *                 ->           b = 1.3412
+ *                 ->           b = log(1) - ( -0.6825 )*log(100)
+ *                 ->           b = 1.365
  *
  *    Case. 2: Calculation of _ppm. First change, {Y to [ratio = RS/R0]} in y-axis  and {X to [_PPM]} in x-axis
  *                  #C. From eq(2),
  *                  ->          x = 10 ^ { [log(y) - b] / m }
- *                  ->       _ppm = 10 ^ [ (log([ratio]) -   1.3412 ) / -0.6706   ] ----------------------------(3)
+ *                  ->       _ppm = 10 ^ [ (log([ratio]) -   1.365 ) / -0.6825   ] ----------------------------(3)
  *
  *
  *    _________ STAGE 1 : CALIBRATION ____________________________________________________
@@ -94,7 +94,7 @@
  *
  *    Case. 4: Calculation of _ppm using eq(3), we get:
  *                  #F. Formula of _ppm is:-
- *                        -> _ppm = 10 ^ [ (log([Rs_gas / Ro]) - 1.3412) / -0.6706 ]  ;
+ *                        -> _ppm = 10 ^ [ (log([Rs_gas / Ro]) - 1.365) / -0.6825 ]  ;
  *                                                  -> where ; Ro is taken from eq(4)
  *                                                           ; Rs_gas = [(5 * 1000) / VRL] - 1000 ;
  *    ________________________________________________________________________________________
@@ -123,8 +123,8 @@
 #define mq7_eqv_RL 1000.0f	   // review the upper diagram clearly to know why this value is assigned
 #define RatioMQ7CleanAir 27.5f // -> [RS / R0] = 27.5f
 #define MQ7_VOLT_RESOLUTION_Vc 5.0f
-#define m_slope_mq7 -0.6706f
-#define b_coeff_mq7 1.3412f
+#define m_slope_mq7 -0.6825f
+#define b_coeff_mq7 1.365f
 
 typedef enum
 {
