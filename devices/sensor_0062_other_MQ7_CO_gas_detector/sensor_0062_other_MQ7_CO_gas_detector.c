@@ -311,7 +311,7 @@ static void Extract_MQ7_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     // 1. Calculate 'Rs_gas' for the gas detected
     float Rs_gas = (((MQ7_VOLT_RESOLUTION_Vc * mq7_eqv_RL) / (*analog_sensor_volt / 1000.0f)) - mq7_eqv_RL);
 
-    // 1.1 Calculate @ 'ratio' during CH4 presence
+    // 1.1 Calculate @ 'ratio' during CO presence
     double _ratio = (Rs_gas / ((MQ7_R0_constant <= 0) ? (1.0f) : (MQ7_R0_constant))); // avoid dividing by zero??
     if (_ratio <= 0)
     {
@@ -327,7 +327,7 @@ static void Extract_MQ7_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     }
     else
     {
-        TRACE_E("_ppm [CH4] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", *_ppm, (float)_ratio, *analog_sensor_volt);
+        TRACE_E("_ppm [CO] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", *_ppm, (float)_ratio, *analog_sensor_volt);
     }
     //-------------------------------------------------
 
