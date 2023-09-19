@@ -66,7 +66,7 @@ idf_component_register(
         sensor_0051_other_MQ8_H2_gas_detector
         sensor_0052_other_MQ135_NH3_gas_detector
         # 53...
-        sensor_0063_other_MQ9_LPG_CH4_flamable_detector
+        sensor_0063_other_MQ9_LPG_flameable_gas_detector
         )
 
 

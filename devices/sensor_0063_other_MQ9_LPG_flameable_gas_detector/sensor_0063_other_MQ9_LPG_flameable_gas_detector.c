@@ -11,7 +11,7 @@
 #include "ezlopi_adc.h"
 #include "math.h"
 
-#include "sensor_0063_other_MQ9_LPG_CH4_flamable_detector.h"
+#include "sensor_0063_other_MQ9_LPG_flameable_gas_detector.h"
 
 const char *mq9_sensor_gas_alarm_token[] =
     {
@@ -50,7 +50,7 @@ static void sensor_other_MQ9_get_item(s_ezlopi_device_properties_t *properties, 
 static int sensor_other_MQ9_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 static void Extract_MQ9_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties);
 //--------------------------------------------------------------------------------------------------------------------------------------
-int sensor_0063_MQ9_LPG_CH4(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
+int sensor_0063_MQ9_LPG_flameable(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args)
 {
     int ret = 0;
     switch (action)

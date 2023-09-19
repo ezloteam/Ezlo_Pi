@@ -1,5 +1,5 @@
-#ifndef _0063_OTHER_MQ9_LPG_CH4_GAS_DETECTOR_H_
-#define _0063_OTHER_MQ9_LPG_CH4_GAS_DETECTOR_H_
+#ifndef _0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR_H_
+#define _0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR_H_
 
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
@@ -34,7 +34,7 @@
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
  *      (via black straight line of sensitivity graph in the Mq-9 datasheet)
  *
- *  i.e. ---------------------------> [RS_calib / R0] =  9.9f
+ *  i.e. ---------------------------> [RS_calib / R0] =  9.6f
  *
  * To calculate R0 we will need to find the value of the RS in fresh air.
  *  This will be done by taking the analog average readings from the sensor and converting it to voltage.
@@ -64,16 +64,16 @@
  *                                          V               V
  *                 #A. chose the points (200,2.1) and (10000,0.34) from the 'LPG_CH4' graph-line
  *                 ->           m = log(0.34/2.1) / log(10000/200)
- *                 ->           m = -0.465
+ *                 ->           m = -0.4654
  *
  *                 #B. We chose (1000,1)
- *                 ->           b = log(1) - ( -0.465 )*log(1000)
- *                 ->           b = 1.395
+ *                 ->           b = log(1) - ( -0.4654 )*log(1000)
+ *                 ->           b = 1.3962
  *
  *    Case. 2: Calculation of _ppm. First change, {Y to [ratio = RS/R0]} in y-axis  and {X to [_PPM]} in x-axis
  *                  #C. From eq(2),
  *                  ->          x = 10 ^ { [log(y) - b] / m }
- *                  ->       _ppm = 10 ^ [ (log([ratio]) -   1.395 ) / -0.465   ] ----------------------------(3)
+ *                  ->       _ppm = 10 ^ [ (log([ratio]) -   1.3962 ) / -0.4654   ] ----------------------------(3)
  *
  *
  *    _________ STAGE 1 : CALIBRATION ____________________________________________________
@@ -121,12 +121,12 @@
  * NOTE .2 : For [m_slope_mq9] & [b_coeff_mq9] values:- follow [stage-1] above shown procedures.
  * */
 
-#define mq9_eqv_RL 660.0f	  // review the upper diagram clearly to know why this value is assigned
+#define mq9_eqv_RL 660.0f // review the upper diagram clearly to know why this value is assigned
 
-#define RatioMQ9CleanAir 9.9f // -> [RS / R0] = 9.9f
+#define RatioMQ9CleanAir 9.6f // -> [RS / R0] = 9.6f
 #define MQ9_VOLT_RESOLUTION_Vc 5.0f
-#define m_slope_mq9 -0.465f
-#define b_coeff_mq9 1.395f
+#define m_slope_mq9 -0.4654f
+#define b_coeff_mq9 1.3962f
 
 typedef enum
 {
@@ -138,6 +138,6 @@ typedef enum
 } e_mq9_gas_alarm_states_t;
 
 //----------------------------------------------------
-int sensor_0063_MQ9_LPG_CH4(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
+int sensor_0063_MQ9_LPG_flameable(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
-#endif // _0063_OTHER_MQ9_LPG_CH4_GAS_DETECTOR_H_
+#endif // _0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR_H_
