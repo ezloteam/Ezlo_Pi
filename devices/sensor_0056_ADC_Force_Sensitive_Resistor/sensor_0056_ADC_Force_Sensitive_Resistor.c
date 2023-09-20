@@ -17,7 +17,9 @@
 static int sensor_0056_force_sensitive_resistor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_0056_prepare(cJSON *cjson_device);
 static int sensor_0056_force_sensitive_resistor_init(s_ezlopi_device_properties_t *properties);
+static void sensor_0056_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_0056_get_value(s_ezlopi_device_properties_t *properties, void *args);
+static float Calculate_GramForce(float Vout);
 //-----------------------------------------------------------------------------------------------------------------------------
 int sensor_0056_force_sensitive_resistor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_args)
 {
@@ -32,6 +34,11 @@ int sensor_0056_force_sensitive_resistor(e_ezlopi_actions_t action, s_ezlopi_dev
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = sensor_0056_force_sensitive_resistor_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        sensor_0056_get_item(properties, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -124,57 +131,99 @@ static int sensor_0056_force_sensitive_resistor_init(s_ezlopi_device_properties_
     return ret;
 }
 
-static int sensor_0056_get_value(s_ezlopi_device_properties_t *properties, void *arg)
+static void sensor_0056_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
-    int ret = 0;
-    float Vout = 0, Rs = 0, gramForce = 0;
+    float Vout = 0, gramForce = 0;
     char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
     if (cjson_properties)
     {
-        ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        Vout = (ezlopi_analog_data->voltage) / 1000.0f; // millivolt -> voltage
-        // TRACE_E("Voltage [V]: %.4f", Vout);
-        if ((Vout - 0.142f) > 0.1f)
+        if (ezlopi_item_name_applied_force_on_sensor == properties->ezlopi_cloud.item_name)
         {
-            // calculate the 'Rs[kOhm]' corresponding to 'Vout' using equation(A):
-            Rs = (((FSR_Vin / Vout) - 1) * FSR_Rout) / (1000.0f); // Ohm -> KOhm
+            ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+            Vout = (ezlopi_analog_data->voltage) / 1000.0f; // millivolt -> voltage
+
+            // Calculate_GramForce
+            gramForce = Calculate_GramForce(Vout);
+            // actual Force[N] is :
+            float force = 0.0098 * gramForce;
+            TRACE_E("GramForce[gN]: %.4f  => Force[N]: %.4f", gramForce, force);
+
+            // prepare the json message
+            snprintf(valueFormatted, 20, "%.2f", force);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cjson_properties, "value", force);
+            cJSON_AddStringToObject(cjson_properties, "scale", "newton");
         }
-        else
+    }
+    free(ezlopi_analog_data);
+}
+
+static int sensor_0056_get_value(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    float Vout = 0, gramForce = 0;
+    char valueFormatted[20];
+    cJSON *cjson_properties = (cJSON *)arg;
+    s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
+    memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+    if (cjson_properties)
+    {
+        if (ezlopi_item_name_applied_force_on_sensor == properties->ezlopi_cloud.item_name)
         {
-            Rs = 750; // kOhm
-        }
-        TRACE_E("FSR value [Rs Kohm]: %.4f", Rs);
+            ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
+            Vout = (ezlopi_analog_data->voltage) / 1000.0f; // millivolt -> voltage
 
-        // calculating the Force(g)
-        if (Rs < 250)
-        {
-            // We choose Rs threshold below 250KOhm because:
-            // The senor activation causes, imidiate resistance drop below 200KOhm
-            // So, filter the 'Rs' range(250k to 2K)
-            Rs = (Rs < 2) ? 2 : Rs;
-            gramForce = (float)pow(10, (((float)log10(Rs)) - b_coeff_FSR) / m_slope_FSR);
-        }
-        else
-        { //
-            gramForce = 0;
-        }
-        // according to testing ; correct gramForce(G) is :
-        gramForce = gramForce * FSR_correction_factor;
+            // Calculate_GramForce
+            gramForce = Calculate_GramForce(Vout);
+            // actual Force[N] is :
+            float force = 0.0098 * gramForce;
+            TRACE_E("GramForce[gN]: %.4f  => Force[N]: %.4f", gramForce, force);
 
-        // actual Force[N] is :
-        float force = 0.0098 * gramForce;
-        TRACE_E("GramForce[gN]: %.4f  => Force[N]: %.4f", gramForce, force);
-
-        // prepare the json message
-        snprintf(valueFormatted, 20, "%.2f", force);
-        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cjson_properties, "value", force);
-        cJSON_AddStringToObject(cjson_properties, "scale", "newton");
+            // prepare the json message
+            snprintf(valueFormatted, 20, "%.2f", force);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cjson_properties, "value", force);
+            cJSON_AddStringToObject(cjson_properties, "scale", "newton");
+        }
         ret = 1;
     }
     free(ezlopi_analog_data);
     return ret;
+}
+//-------------------------------------------------------------------------------------------
+static float Calculate_GramForce(float Vout)
+{
+    float Rs = 0, gramForce = 0;
+    // TRACE_E("Voltage [V]: %.4f", Vout);
+    if ((Vout - 0.142f) > 0.1f)
+    {
+        // calculate the 'Rs[kOhm]' corresponding to 'Vout' using equation(A):
+        Rs = (((FSR_Vin / Vout) - 1) * FSR_Rout) / (1000.0f); // Ohm -> KOhm
+    }
+    else
+    {
+        Rs = 750; // kOhm
+    }
+    TRACE_E("FSR value [Rs Kohm]: %.4f", Rs);
+
+    // calculating the Force(g)
+    if (Rs < 250)
+    {
+        // We choose Rs threshold below 250KOhm because:
+        // The senor activation causes, imidiate resistance drop below 200KOhm
+        // So, filter the 'Rs' range(250k to 2K)
+        Rs = (Rs < 2) ? 2 : Rs;
+        gramForce = (float)pow(10, (((float)log10(Rs)) - b_coeff_FSR) / m_slope_FSR);
+    }
+    else
+    { //
+        gramForce = 0;
+    }
+    // according to testing ; correct gramForce(G) is :
+    gramForce = gramForce * FSR_correction_factor;
+
+    return gramForce;
 }
