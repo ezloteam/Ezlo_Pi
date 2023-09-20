@@ -60,11 +60,11 @@ void ezlopi_init(void)
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
-    #if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32    
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
     ezlopi_timer_start_50ms();
-    #else
+#else
     ezlopi_timer_start_1000ms();
-    #endif
+#endif
 
     ezlopi_ping_init();
 }

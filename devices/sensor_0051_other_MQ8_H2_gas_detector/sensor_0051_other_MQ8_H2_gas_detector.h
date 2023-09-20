@@ -116,7 +116,7 @@
  * Before writing below  [mq8_eqv_RL], [m_slope_mq8], [b_coeff_mq8] shown values.
  * Please apply voltage-divider schematics as shown above.
  *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq8_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq8_eqv_RL], between [A0_pin vs GND] of 'MQ-8 sensor'
  *
  * NOTE .2 : For [m_slope_mq8] & [b_coeff_mq8] values:- follow [stage-1] above shown procedures.
  * */
