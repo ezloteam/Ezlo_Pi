@@ -408,9 +408,9 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\{\
                 \"dev_type\": 2,\
-                \"dev_name\": \"Vibration\",\
+                \"dev_name\": \"Reed\",\
                 \"id_room\": \"\",\
-                \"id_item\": 60,\
+                \"id_item\": 61,\
                 \"gpio\": 25,\
                 \"logic_inv\": false\
             }\
