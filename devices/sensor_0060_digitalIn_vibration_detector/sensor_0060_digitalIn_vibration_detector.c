@@ -19,6 +19,7 @@
 static s_ezlopi_device_properties_t *sensor_0060_prepare(cJSON *cjson_device);
 static int sensor_0060_digitalIn_prepare_add(void *args);
 static int sensor_0060_digitalIn_init(s_ezlopi_device_properties_t *properties);
+static void sensor_0060_digitalIn_get_item(s_ezlopi_device_properties_t *properties, void *args);
 static int sensor_0060_digitalIn_get_value_json(s_ezlopi_device_properties_t *properties, void *args);
 static void sensor_0060_update_from_device(s_ezlopi_device_properties_t *properties);
 //------------------------------------------------------------------------------
@@ -35,6 +36,11 @@ int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, s_ezlopi
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = sensor_0060_digitalIn_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        sensor_0060_digitalIn_get_item(properties, args);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -129,6 +135,17 @@ static int sensor_0060_digitalIn_init(s_ezlopi_device_properties_t *properties)
 static void sensor_0060_update_from_device(s_ezlopi_device_properties_t *properties)
 {
     ezlopi_device_value_updated_from_device(properties);
+}
+
+static void sensor_0060_digitalIn_get_item(s_ezlopi_device_properties_t *properties, void *args)
+{
+    cJSON *cjson_propertise = (cJSON *)args;
+    if (cjson_propertise)
+    {
+        int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+    }
 }
 static int sensor_0060_digitalIn_get_value_json(s_ezlopi_device_properties_t *properties, void *args)
 {

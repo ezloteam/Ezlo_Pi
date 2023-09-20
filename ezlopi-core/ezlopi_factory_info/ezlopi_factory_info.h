@@ -407,11 +407,12 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_type\": 3,\
-                \"dev_name\": \"FSR\",\
+                \"dev_type\": 2,\
+                \"dev_name\": \"Vibration\",\
                 \"id_room\": \"\",\
-                \"id_item\": 56,\
-                \"gpio\": 33\
+                \"id_item\": 60,\
+                \"gpio\": 25,\
+                \"logic_inv\": false\
             }\
         ],\
     \"dev_total\": 1}";
