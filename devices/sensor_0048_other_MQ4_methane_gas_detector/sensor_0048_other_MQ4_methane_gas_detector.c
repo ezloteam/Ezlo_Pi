@@ -14,12 +14,11 @@
 #include "sensor_0048_other_MQ4_methane_gas_detector.h"
 
 const char *mq4_sensor_gas_alarm_token[] =
-	    {
-		"no_gas",
-		"combustible_gas_detected",
-		"toxic_gas_detected",
-		"unknown"
-		};
+    {
+        "no_gas",
+        "combustible_gas_detected",
+        "toxic_gas_detected",
+        "unknown"};
 //------------------------------------------------------------------------------
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                     \
     {                                                                                                                         \
@@ -67,10 +66,10 @@ int sensor_0048_MQ4_methane(e_ezlopi_actions_t action, s_ezlopi_device_propertie
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
-	    {
-		sensor_other_MQ4_get_item(ezlopi_device, arg);
-		break;
-	    }
+    {
+        sensor_other_MQ4_get_item(ezlopi_device, arg);
+        break;
+    }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_other_MQ4_get_value(ezlopi_device, arg);
@@ -336,57 +335,57 @@ static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
 }
 
 static void sensor_other_MQ4_get_item(s_ezlopi_device_properties_t *properties, void *arg)
-	{
-	    int ret = 0;
-	    float analog_sensor_volt = 0;
-	    float _ppm = 0;
-	    char valueFormatted[20];
-	    cJSON *cjson_properties = (cJSON *)arg;
+{
+    int ret = 0;
+    float analog_sensor_volt = 0;
+    float _ppm = 0;
+    char valueFormatted[20];
+    cJSON *cjson_properties = (cJSON *)arg;
 
-	    if (cjson_properties)
-	    {
-		//-------------------------------------------------
+    if (cjson_properties)
+    {
+        //-------------------------------------------------
 
-		if (ezlopi_item_name_gas_alarm == properties->ezlopi_cloud.item_name)
-		{
-		    cJSON *json_array_enum = cJSON_CreateArray();
-		    if (NULL != json_array_enum)
-		    {
-		        for (uint8_t i = 0; i < MQ4_GAS_ALARM_MAX; i++)
-		        {
-		            cJSON *json_value = cJSON_CreateString(mq4_sensor_gas_alarm_token[i]);
-		            if (NULL != json_value)
-		            {
-		                cJSON_AddItemToArray(json_array_enum, json_value);
-		            }
-		        }
-		        cJSON_AddItemToObject(cjson_properties, "enum", json_array_enum);
-		    }
+        if (ezlopi_item_name_gas_alarm == properties->ezlopi_cloud.item_name)
+        {
+            cJSON *json_array_enum = cJSON_CreateArray();
+            if (NULL != json_array_enum)
+            {
+                for (uint8_t i = 0; i < MQ4_GAS_ALARM_MAX; i++)
+                {
+                    cJSON *json_value = cJSON_CreateString(mq4_sensor_gas_alarm_token[i]);
+                    if (NULL != json_value)
+                    {
+                        cJSON_AddItemToArray(json_array_enum, json_value);
+                    }
+                }
+                cJSON_AddItemToObject(cjson_properties, "enum", json_array_enum);
+            }
 
-		    if (0 == gpio_get_level(mq4_digital_pin)) // when D0 -> 0V,
-		    {
-		        cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
-		    }
-		    else
-		    {
-		        cJSON_AddStringToObject(cjson_properties, "value", "no_gas");
-		    }
-		}
-		if (ezlopi_item_name_smoke_density == properties->ezlopi_cloud.item_name)
-		{
-		    // extract the sensor_output_values
-		    Extract_MQ4_sensor_ppm(&analog_sensor_volt, &_ppm, properties);
-		    snprintf(valueFormatted, 20, "%.2f", _ppm);
-		    cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
-		    cJSON_AddNumberToObject(cjson_properties, "value", _ppm);
-		    cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");
-		}
-		//-----------------------------------------------------------------------------------------
-		ret = 1;
-	    }
+            if (0 == gpio_get_level(mq4_digital_pin)) // when D0 -> 0V,
+            {
+                cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
+            }
+            else
+            {
+                cJSON_AddStringToObject(cjson_properties, "value", "no_gas");
+            }
+        }
+        if (ezlopi_item_name_smoke_density == properties->ezlopi_cloud.item_name)
+        {
+            // extract the sensor_output_values
+            Extract_MQ4_sensor_ppm(&analog_sensor_volt, &_ppm, properties);
+            snprintf(valueFormatted, 20, "%.2f", _ppm);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cjson_properties, "value", _ppm);
+            cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");
+        }
+        //-----------------------------------------------------------------------------------------
+        ret = 1;
+    }
 
-	    return ret;
-	}
+    return ret;
+}
 
 static int sensor_other_MQ4_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {

@@ -32,7 +32,7 @@
 
 /**
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
- *      (via black straight line of sensitivity graph in the Mq-4 datasheet)
+ *      (via black straight line of sensitivity graph in the Mq-135 datasheet)
  *
  *  i.e. ---------------------------> [RS_calib / R0] =  3.6f
  *
@@ -57,12 +57,12 @@
  *                -> m = [log(y) - log(y0)] / [log(x) - log(x0)]  => [ m = log(y/y0) / log(x/x0) ] ;
  *                -> b = [log(y) - m*log(x)] = ?
  *
- *    Case. 1: Calculation of slope 'm' Using MQ135's NH3-curve (CH4) in semi-log graph:
+ *    Case. 1: Calculation of slope 'm' Using MQ135's NH3-curve (NH3) in semi-log graph:
  *
  *                                      (x0 , y0) and (  x  , y  )
  *                                          |               |
  *                                          V               V
- *                 #A. chose the points (10,2.6) and (200,0.78) from the 'CH4' graph-line
+ *                 #A. chose the points (10,2.6) and (200,0.78) from the 'NH3' graph-line
  *                 ->           m = log(0.78/2.6) / log(200/10)
  *                 ->           m = -0.401
  *
@@ -116,7 +116,7 @@
  * Before writing below  [mq135_eqv_RL], [m_slope_mq135], [b_coeff_mq135] shown values.
  * Please apply voltage-divider schematics as shown above.
  *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq135_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq135_eqv_RL], between [A0_pin vs GND] of 'MQ-135 sensor'
  *
  * NOTE .2 : For [m_slope_mq135] & [b_coeff_mq135] values:- follow [stage-1] above shown procedures.
  * */

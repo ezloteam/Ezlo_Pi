@@ -134,7 +134,7 @@ static int prepare_sensor(void *arg)
                 device_id = ezlopi_cloud_generate_device_id();
                 ADD_PROPERTIES_DEVICE_LIST(device_id, category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, prep_arg->cjson_device);
                 device_id = ezlopi_cloud_generate_device_id();
-                ADD_PROPERTIES_DEVICE_LIST(device_id, category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, prep_arg->cjson_device);
+                ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, prep_arg->cjson_device);
             }
             else
             {
@@ -174,7 +174,19 @@ static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t d
             sensor_ble280_properties->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
 
             char *device_name = NULL;
-            CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+            if (ezlopi_item_name_temp == item_name)
+            {
+                device_name = "BME280-Temp";
+            }
+            if (ezlopi_item_name_humidity == item_name)
+            {
+                device_name = "BME280-Humi";
+            }
+            if (ezlopi_item_name_atmospheric_pressure == item_name)
+            {
+                device_name = "BME280-Atm_pressure";
+            }
+            // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
             ASSIGN_DEVICE_NAME(sensor_ble280_properties, device_name);
             sensor_ble280_properties->ezlopi_cloud.category = category;
             sensor_ble280_properties->ezlopi_cloud.subcategory = sub_category;
@@ -241,6 +253,7 @@ static int sensor_bme280_init(s_ezlopi_device_properties_t *properties, void *us
 static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
+    char valueFormatted[20];
     sensor_bme280_data_t sensor_data;
     memset(&sensor_data, 0, sizeof(sensor_bme280_data_t));
     sensor_bme280_read_value_from_sensor(properties, &sensor_data);
@@ -260,10 +273,12 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *propertie
             cJSON_AddNumberToObject(cjson_properties, "value", sensor_data.humidity);
             cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         }
-        if (category_not_defined == properties->ezlopi_cloud.category)
+        if (category_level_sensor == properties->ezlopi_cloud.category)
         {
             TRACE_E("Pressure is: %f", sensor_data.pressure);
-            double pressure = 0.01 * sensor_data.pressure;
+            float pressure = 0.01f * (float)(sensor_data.pressure);
+            // snprintf(valueFormatted, 20, "%.2f", pressure);
+            // cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", pressure);
             cJSON_AddStringToObject(cjson_properties, "scale", "kilo_pascal");
         }
@@ -288,7 +303,7 @@ static int8_t sensor_bme280_read_value_from_sensor(s_ezlopi_device_properties_t 
     }
     else
     {
-        TRACE_I("Sensor mode set successfully!!");
+        // TRACE_I("Sensor mode set successfully!!");
     }
 
     ret = bme280_get_sensor_data(BME280_ALL, data_ptr, &device);
@@ -298,7 +313,7 @@ static int8_t sensor_bme280_read_value_from_sensor(s_ezlopi_device_properties_t 
     }
     else
     {
-        TRACE_I("Sensor mode obtained successfully!!");
+        // TRACE_I("Sensor mode obtained successfully!!");
     }
 
     return ret;
