@@ -3,4 +3,12 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "bme680_bsec.c" "sensor_0010_I2C_BME680.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES trace ezlopi_actions ezlopi_hal ezlopi_timer ezlopi_devices ezlopi_cloud_constants gpio_isr_service ezlopi_cloud Bosch_BSEC2)
+    REQUIRES trace        
+             gpio_isr_service 
+             Bosch_BSEC2 
+             ezlopi_actions 
+             ezlopi_hal 
+             ezlopi_timer 
+             ezlopi_devices 
+             ezlopi_cloud_constants 
+             ezlopi_cloud )

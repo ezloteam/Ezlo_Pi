@@ -1,11 +1,13 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
+
 #include "device_0001_digitalOut_generic.h"
 #include "device_0002_digitalOut_relay.h"
 #include "device_0003_digitalOut_plug.h"
 // TODO add include for 004
 // TODO add include for 004
+
 #include "sensor_0005_I2C_MPU6050.h"
 #include "sensor_0006_I2C_ADXL345.h"
 #include "sensor_0007_I2C_GY271.h"
@@ -56,9 +58,11 @@
 #include "sensor_0050_other_MQ3_Alcohol_detector.h"
 #include "sensor_0051_other_MQ8_H2_gas_detector.h"
 #include "sensor_0052_other_MQ135_NH3_gas_detector.h"
-// #include 0053
-// #include 0054
 #include "sensor_0055_ADC_Flex_Resistor.h"
+#include "sensor_0063_other_MQ9_LPG_flameable_gas_detector.h"
+#include "sensor_0061_digitalIn_reed_switch.h"
+#include "sensor_0062_other_MQ7_CO_gas_detector.h"
+#include "sensor_0060_digitalIn_vibration_detector.h"
 
 static s_ezlopi_device_t device_array[] = {
 
@@ -70,7 +74,6 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_0001_digitalOut_generic,
     },
 #endif
-
 #ifdef EZLOPI_DEVICE_0002_DIGITAL_OUT_RELAY
     {
         .id = EZLOPI_DEVICE_0002_DIGITAL_OUT_RELAY,
@@ -84,7 +87,6 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_0003_digitalOut_plug,
     },
 #endif
-
 #ifdef EZLOPI_SENSOR_0004_DIGITAL_IN_SWITCH
     {
         .id = EZLOPI_SENSOR_0004_DIGITAL_IN_SWITCH,
@@ -423,7 +425,33 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-// ............................. 0053 & 0054
+#ifdef EZLOPI_SENSOR_0061_DIGITAL_IN_REED_SWITCH
+    {
+        .id = EZLOPI_SENSOR_0061_DIGITAL_IN_REED_SWITCH,
+        .func = sensor_0061_digitalIn_reed_switch,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR,
+        .func = sensor_0063_MQ9_LPG_flameable,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0062_OTHER_MQ7_CARBONMONOXIDE_GAS_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0062_OTHER_MQ7_CARBONMONOXIDE_GAS_DETECTOR,
+        .func = sensor_0062_MQ7_CO,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR,
+        .func = sensor_0060_digitalIn_vibration_detector,
+    },
+#endif
 
 #ifdef EZLOPI_SENSOR_0055_ADC_FLEX_RESISTOR
     {
@@ -469,7 +497,6 @@ static s_ezlopi_device_t device_array[] = {
 //     },
 // #endif
 #endif
-
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

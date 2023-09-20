@@ -6,17 +6,19 @@ file(GLOB_RECURSE config_src "*.c")
 idf_component_register(
     SRCS
         "ezlopi_devices.c"
-        "ezlopi_device_value_updated.c"
         "ezlopi_devices_list.c"
+        "ezlopi_device_value_updated.c"
         "${config_src}"
     INCLUDE_DIRS
         "."
     REQUIRES
         trace
         json
+        items
         ezlopi_nvs
         ezlopi_hal
         ezlopi_cloud
+        ezlopi_actions
         device_0001_digitalOut_generic
         device_0002_digitalOut_relay
         device_0003_digitalOut_plug
@@ -62,9 +64,11 @@ idf_component_register(
         sensor_0049_other_MQ2_LPG_gas_detector
         sensor_0050_other_MQ3_Alcohol_detector
         sensor_0051_other_MQ8_H2_gas_detector
-        sensor_0052_other_MQ135_NH3_gas_detector
-        # 0053
-        # 0054
+        sensor_0052_other_MQ135_NH3_gas_detector        
+        sensor_0060_digitalIn_vibration_detector
+        sensor_0061_digitalIn_reed_switch
+        sensor_0062_other_MQ7_CO_gas_detector
+        sensor_0063_other_MQ9_LPG_flameable_gas_detector
         sensor_0055_ADC_Flex_Resistor
         )
 
