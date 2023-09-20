@@ -53,7 +53,7 @@ static s_ezlopi_device_properties_t *sensor_0053_gps6mv2_prepare_properties(uint
                                                                             const char *ITEM_NAME, uint32_t ITEM_ID, const char *VALUE_TYPE,
                                                                             cJSON *cjson_device, GPS6MV2_t *sensor_0053_UART_gps6mv2_data);
 static int sensor_uart_gps6mv2_init(s_ezlopi_device_properties_t *properties);
-static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
+static void sensor_uart_gps6mv2_get_item(s_ezlopi_device_properties_t *properties, void *args) static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *properties);
 static void Retrieve_GPGGA_sentence();
 static void ezlopi_uart_gps6mv2_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void *user_args);
@@ -72,6 +72,11 @@ int sensor_0053_UART_GPS6MV2(e_ezlopi_actions_t action, s_ezlopi_device_properti
     case EZLOPI_ACTION_INITIALIZE:
     {
         sensor_uart_gps6mv2_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        sensor_uart_gps6mv2_get_item(ezlopi_device, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -300,6 +305,69 @@ static void ezlopi_uart_gps6mv2_upcall(uint8_t *buffer, s_ezlopi_uart_object_han
         }
 
         free(another_buffer);
+    }
+}
+
+static void sensor_uart_gps6mv2_get_item(s_ezlopi_device_properties_t *properties, void *args)
+{
+    int lat_angle_val = 0, long_angle_val = 0, total_sat = 0, gps_quality = 0, antenna_alti = 0, geoid = 0;
+    bool GPS_FIX = false;
+    cJSON *cjson_properties = (cJSON *)args;
+    GPS6MV2_t *sensor_0053_UART_gps6mv2_data = (GPS6MV2_t *)properties->user_arg;
+
+    if (cjson_properties && sensor_0053_UART_gps6mv2_data)
+    {
+        switch (properties->ezlopi_cloud.item_id)
+        {
+        case 1:
+        {
+            lat_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_min)) / 60;
+            // TRACE_I("latitude : %d *deg", lat_angle_val);
+            cJSON_AddNumberToObject(cjson_properties, "value", lat_angle_val);
+            cJSON_AddStringToObject(cjson_properties, "scale", "north_pole_degress");
+            break;
+        }
+
+        case 2:
+        {
+            long_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_min)) / 60;
+            // TRACE_I("Longitude : %d *deg", long_angle_val);
+            cJSON_AddNumberToObject(cjson_properties, "value", long_angle_val);
+            cJSON_AddStringToObject(cjson_properties, "scale", "north_pole_degress");
+            break;
+        }
+
+        case 3:
+        {
+            total_sat = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Satellites_used);
+            // TRACE_I("No. of Satellites : %d ", total_sat);
+
+            gps_quality = ((int)(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Positon_fix_quality) - 48); // converting character into 'integer'
+            gps_quality = (gps_quality < 0) ? 0 : ((gps_quality > 9) ? 9 : gps_quality);
+            // TRACE_I("GPSFix_Quality : %d ", gps_quality);
+            GPS_FIX = ((total_sat > 2) && (gps_quality != 0)) ? true : false;
+            cJSON_AddBoolToObject(cjson_properties, "value", GPS_FIX);
+            break;
+        }
+
+        case 4:
+        {
+            antenna_alti = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level);
+            // TRACE_I("Antenna Altitude for mean_sea_level : %d m", antenna_alti);
+            cJSON_AddNumberToObject(cjson_properties, "value", antenna_alti);
+            cJSON_AddStringToObject(cjson_properties, "scale", "meter");
+            break;
+        }
+
+        case 5:
+        {
+            geoid = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation);
+            // TRACE_I("Geoid seperation : %d m", geoid);
+            cJSON_AddNumberToObject(cjson_properties, "value", geoid);
+            cJSON_AddStringToObject(cjson_properties, "scale", "meter");
+            break;
+        }
+        }
     }
 }
 
