@@ -1,10 +1,4 @@
 
-
-#include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
-#include "gpio_isr_service.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-
 #include "ezlopi_cloud.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
@@ -16,6 +10,12 @@
 #include "items.h"
 #include "trace.h"
 #include "cJSON.h"
+
+#include "gpio_isr_service.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_device_value_updated.h"
+
+#include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
 
 static int sensor_touch_tpp_223b_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_prepare(cJSON *cjson_device);
@@ -111,7 +111,6 @@ static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_prepare(cJSON *cjson_
         int val_ip = 0;
         CJSON_GET_VALUE_INT(cjson_device, "val_ip", val_ip);
 
-
         sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.value = 0;
         sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.enable = true;
         sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
@@ -150,7 +149,7 @@ static int sensor_touch_tpp_223b_init(s_ezlopi_device_properties_t *properties)
 
 static void sensor_touch_tpp_223b_value_updated_from_device(s_ezlopi_device_properties_t *properties)
 {
-    
+
     int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
     properties->interface.gpio.gpio_in.value = (false == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
     ezlopi_device_value_updated_from_device(properties);

@@ -412,7 +412,7 @@ static const char *test_device_constant_config =
                 \"id_item\": 61,\
                 \"id_room\": \"\",\
                 \"gpio\": 25,\
-                \"logic_inv\": false\
+                \"logic_inv\": true\
             }\
         ],\
     \"dev_total\": 1}";

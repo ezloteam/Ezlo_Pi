@@ -1,11 +1,13 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
+
 #include "device_0001_digitalOut_generic.h"
 #include "device_0002_digitalOut_relay.h"
 #include "device_0003_digitalOut_plug.h"
 // TODO add include for 004
 // TODO add include for 004
+
 #include "sensor_0005_I2C_MPU6050.h"
 #include "sensor_0006_I2C_ADXL345.h"
 #include "sensor_0007_I2C_GY271.h"
@@ -32,7 +34,7 @@
 #include "sensor_0025_digitalIn_LDR.h"
 #include "sensor_0026_ADC_LDR.h"
 #include "sensor_0027_ADC_waterLeak.h"
-#include "sensor_0028_ADC_GY61.h"
+#include "sensor_0028_other_GY61.h"
 #include "sensor_0029_I2C_GXHTC3.h"
 #include "sensor_0030_oneWire_DS18B20.h"
 #include "sensor_0031_other_JSNSR04T.h"
@@ -68,7 +70,6 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_0001_digitalOut_generic,
     },
 #endif
-
 #ifdef EZLOPI_DEVICE_0002_DIGITAL_OUT_RELAY
     {
         .id = EZLOPI_DEVICE_0002_DIGITAL_OUT_RELAY,
@@ -82,7 +83,6 @@ static s_ezlopi_device_t device_array[] = {
         .func = device_0003_digitalOut_plug,
     },
 #endif
-
 #ifdef EZLOPI_SENSOR_0004_DIGITAL_IN_SWITCH
     {
         .id = EZLOPI_SENSOR_0004_DIGITAL_IN_SWITCH,
@@ -250,10 +250,10 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0028_ADC_GY61
+#ifdef EZLOPI_SENSOR_0028_OTHER_GY61
     {
-        .id = EZLOPI_SENSOR_0028_ADC_GY61,
-        .func = sensor_0028_ADC_GY61,
+        .id = EZLOPI_SENSOR_0028_OTHER_GY61,
+        .func = sensor_0028_other_GY61,
     },
 #endif
 
@@ -466,7 +466,6 @@ static s_ezlopi_device_t device_array[] = {
 //     },
 // #endif
 #endif
-
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

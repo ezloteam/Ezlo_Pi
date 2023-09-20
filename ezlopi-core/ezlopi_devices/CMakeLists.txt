@@ -6,17 +6,19 @@ file(GLOB_RECURSE config_src "*.c")
 idf_component_register(
     SRCS
         "ezlopi_devices.c"
-        "ezlopi_device_value_updated.c"
         "ezlopi_devices_list.c"
+        "ezlopi_device_value_updated.c"
         "${config_src}"
     INCLUDE_DIRS
         "."
     REQUIRES
         trace
         json
+        items
         ezlopi_nvs
         ezlopi_hal
         ezlopi_cloud
+        ezlopi_actions
         device_0001_digitalOut_generic
         device_0002_digitalOut_relay
         device_0003_digitalOut_plug
@@ -41,7 +43,7 @@ idf_component_register(
         sensor_0025_digitalIn_LDR
         sensor_0026_ADC_LDR
         sensor_0027_ADC_waterLeak   
-        sensor_0028_ADC_GY61 
+        sensor_0028_other_GY61 
         sensor_0029_I2C_GXHTC3
         sensor_0030_oneWire_DS18B20
         sensor_0031_other_JSNSR04T
