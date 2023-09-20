@@ -89,7 +89,6 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, s_ezlopi_device_properties_
             if (calibration_complete)
             {
                 TRACE_B("..................Calibration Complete.................");
-
                 sensor_0007_I2C_GY271_update_values(properties);
             }
             else

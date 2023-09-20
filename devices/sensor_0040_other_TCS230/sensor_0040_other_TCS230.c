@@ -162,8 +162,8 @@ static void tcs230_setup_gpio(gpio_num_t s0_pin,
 }
 
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
 static void Gather_tcs230_Calibration_data(void *params) // calibration task
 {
     vTaskDelay(4000 / portTICK_PERIOD_MS); // 4sec
@@ -238,7 +238,6 @@ static void Gather_tcs230_Calibration_data(void *params) // calibration task
     // delete this task
     vTaskDelete(NULL);
 }
-
 //------------------------------------------------------------------------------
 
 static s_ezlopi_device_properties_t *sensor_other_tcs230_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device, TCS230_data_t *sensor_0040_other_TCS230_data)

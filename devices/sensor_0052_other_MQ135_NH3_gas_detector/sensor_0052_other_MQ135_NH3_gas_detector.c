@@ -47,6 +47,7 @@ static s_ezlopi_device_properties_t *sensor_other_mq135_prepare_properties(uint3
 static int sensor_other_MQ135_prepare_and_add(void *arg);
 static void sensor_other_MQ135_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_other_MQ135_init(s_ezlopi_device_properties_t *properties);
+static void sensor_other_MQ135_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_other_MQ135_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 static void Extract_MQ135_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties);
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -311,7 +312,7 @@ static void Extract_MQ135_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_e
     // 1. Calculate 'Rs_gas' for the gas detected
     float Rs_gas = (((MQ135_VOLT_RESOLUTION_Vc * mq135_eqv_RL) / (*analog_sensor_volt / 1000.0f)) - mq135_eqv_RL);
 
-    // 1.1 Calculate @ 'ratio' during CH4 presence
+    // 1.1 Calculate @ 'ratio' during NH3 presence
     double _ratio = (Rs_gas / ((MQ135_R0_constant <= 0) ? (1.0f) : (MQ135_R0_constant))); // avoid dividing by zero??
     if (_ratio <= 0)
     {
@@ -327,12 +328,13 @@ static void Extract_MQ135_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_e
     }
     else
     {
-        TRACE_E("_ppm [CH4] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", *_ppm, (float)_ratio, *analog_sensor_volt);
+        TRACE_E("_ppm [NH3] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", *_ppm, (float)_ratio, *analog_sensor_volt);
     }
     //-------------------------------------------------
 
     free(ezlopi_analog_data);
 }
+
 static void sensor_other_MQ135_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
@@ -385,6 +387,7 @@ static void sensor_other_MQ135_get_item(s_ezlopi_device_properties_t *properties
 
     return ret;
 }
+
 static int sensor_other_MQ135_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;

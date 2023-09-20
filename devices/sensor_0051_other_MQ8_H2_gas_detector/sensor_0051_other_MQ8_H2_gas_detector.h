@@ -116,11 +116,11 @@
  * Before writing below  [mq8_eqv_RL], [m_slope_mq8], [b_coeff_mq8] shown values.
  * Please apply voltage-divider schematics as shown above.
  *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq8_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq8_eqv_RL], between [A0_pin vs GND] of 'MQ-8 sensor'
  *
  * NOTE .2 : For [m_slope_mq8] & [b_coeff_mq8] values:- follow [stage-1] above shown procedures.
  * */
-#define mq8_eqv_RL 660.0f      // review the upper diagram clearly to know why this value is assigned
+#define mq8_eqv_RL 660.0f	   // review the upper diagram clearly to know why this value is assigned
 #define RatioMQ8CleanAir 70.0f // -> [RS / R0] = 70
 #define MQ8_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq8 -1.443f
@@ -128,11 +128,11 @@
 
 typedef enum
 {
-    MQ8_GAS_ALARM_NO_GAS,
-    MQ8_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-    MQ8_GAS_ALARM_TOXIC_GAS_DETECTED,
-    MQ8_GAS_ALARM_UNKNOWN,
-    MQ8_GAS_ALARM_MAX
+	MQ8_GAS_ALARM_NO_GAS,
+	MQ8_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+	MQ8_GAS_ALARM_TOXIC_GAS_DETECTED,
+	MQ8_GAS_ALARM_UNKNOWN,
+	MQ8_GAS_ALARM_MAX
 } e_mq8_gas_alarm_states_t;
 
 //----------------------------------------------------

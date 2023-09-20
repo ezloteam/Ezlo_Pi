@@ -34,7 +34,7 @@
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
  *      (via black straight line of sensitivity graph in the Mq-4 datasheet)
  *
- *  i.e. ---------------------------> [RS_calib / R0] = 4.4
+ *  i.e. ---------------------------> [RS_calib / R0] = 4.4f
  *
  * To calculate R0 we will need to find the value of the RS in fresh air.
  *  This will be done by taking the analog average readings from the sensor and converting it to voltage.
@@ -87,7 +87,7 @@
  *
  *                  #E. Now [Ro constant value] , we get :
  *                        ->   Ro = ratio/Rs_calib
- *                        ->   Ro = 4.4 / Rs_calib  --------------- (4)
+ *                        ->   Ro = 4.4f / Rs_calib  --------------- (4)
  *
  *
  *    _________ STAGE 2 : PPM Calculation ____________________________________________________
@@ -109,7 +109,7 @@
  *      |
  *      V
  */
-#define VOLTAGE_DIVIDER_ADDED 1
+#define voltage_divider_added 1
 //------------------------------------------
 
 /**
@@ -121,11 +121,10 @@
  * NOTE .2 : For [m_slope_mq4] & [b_coeff_mq4] values:- follow [stage-1] above shown procedures.
  * */
 #define mq4_eqv_RL 660.0f     // review the upper diagram clearly to know why this value is assigned
-#define RatioMQ4CleanAir 4.4f // -> [RS / R0] = 4.4
+#define RatioMQ4CleanAir 4.4f // -> [RS / R0] = 4.4f
 #define MQ4_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq4 -0.3397f
 #define b_coeff_mq4 1.019f
-
 typedef enum
 {
     MQ4_GAS_ALARM_NO_GAS,
@@ -134,7 +133,8 @@ typedef enum
     MQ4_GAS_ALARM_UNKNOWN,
     MQ4_GAS_ALARM_MAX
 } e_mq4_gas_alarm_states_t;
-//------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------
 int sensor_0048_MQ4_methane(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);
 
 #endif // _0048_OTHER_MQ4_METHANE_GAS_DETECTOR_H_

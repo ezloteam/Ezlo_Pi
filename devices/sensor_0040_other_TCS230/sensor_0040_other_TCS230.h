@@ -14,6 +14,7 @@
  * gpio5 => gpio_output_en      GPIO_NUM_13
  * gpio6 => gpio_pulse_output   GPIO_NUM_15
  */
+
 typedef enum TCS230_queue_enum
 {
     TCS230_QUEUE_RESET = 0,
