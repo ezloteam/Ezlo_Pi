@@ -15,7 +15,6 @@
 #include "ezlopi_ethernet.h"
 #include "ezlopi_event_group.h"
 #include "ezlopi_ping.h"
-#include "mac_uuid.h"
 
 static void ezlopi_initialize_devices(void);
 
@@ -57,16 +56,15 @@ void ezlopi_init(void)
     }
 #endif
 
-
     ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
-    #if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32    
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
     ezlopi_timer_start_50ms();
-    #else
+#else
     ezlopi_timer_start_1000ms();
-    #endif
+#endif
 
     ezlopi_ping_init();
 }

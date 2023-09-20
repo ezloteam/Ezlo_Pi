@@ -130,7 +130,7 @@
  * Before writing below  [mq3_eqv_RL], [m_slope_mq3], [b_coeff_mq3] shown values.
  * Please apply voltage-divider schematics as shown above.
  *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq3_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq3_eqv_RL], between [A0_pin vs GND] of 'MQ-3 sensor'
  *
  * NOTE .2 : For [m_slope_mq3] & [b_coeff_mq3] values:- follow [stage-1] above shown procedures.
  * */

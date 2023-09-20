@@ -34,7 +34,7 @@
  *  From the graph, we can see that the resistance ratio in fresh air is a constant:
  *      (via black straight line of sensitivity graph in the Mq-2 datasheet)
  *
- *  i.e. ---------------------------> [RS_calib / R0] = 9.8
+ *  i.e. ---------------------------> [RS_calib / R0] = 9.83
  *
  * To calculate R0 we will need to find the value of the RS in fresh air.
  *  This will be done by taking the analog average readings from the sensor and converting it to voltage.
@@ -87,7 +87,7 @@
  *
  *                  #E. Now [Ro constant value] , we get :
  *                        ->   Ro = ratio/Rs_calib
- *                        ->   Ro = 9.8 / Rs_calib  --------------- (4)
+ *                        ->   Ro = 9.83 / Rs_calib  --------------- (4)
  *
  *
  *    _________ STAGE 2 : PPM Calculation ____________________________________________________
@@ -109,32 +109,32 @@
  *      |
  *      V
  */
-#define VOLTAGE_DIVIDER_ADDED 1
+#define voltage_divider_added 1
 //------------------------------------------
 
 /**
  * Before writing below  [mq2_eqv_RL], [m_slope_mq2], [b_coeff_mq2] shown values.
  * Please apply voltage-divider schematics as shown above.
  *
- * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq2_eqv_RL], between [A0_pin vs GND] of 'MQ-4 sensor'
+ * NOTE .1 : Mannually use multimeter and measure : eqv-resistance [mq2_eqv_RL], between [A0_pin vs GND] of 'MQ-2 sensor'
  *
  * NOTE .2 : For [m_slope_mq2] & [b_coeff_mq2] values:- follow [stage-1] above shown procedures.
  * */
 
-#define mq2_eqv_RL 980.0f     // review the upper diagram clearly to know why this value is assigned
-#define RatioMQ2CleanAir 9.8f // -> [RS / R0] = 9.8
+#define mq2_eqv_RL 980.0f	   // review the upper diagram clearly to know why this value is assigned
+#define RatioMQ2CleanAir 9.83f // -> [RS / R0] = 9.83
 #define MQ2_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq2 -0.47f
 #define b_coeff_mq2 1.306f
 
-typedef enum 
-	{
-	    MQ2_GAS_ALARM_NO_GAS,
-	    MQ2_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-	    MQ2_GAS_ALARM_TOXIC_GAS_DETECTED,
-	    MQ2_GAS_ALARM_UNKNOWN,
-	    MQ2_GAS_ALARM_MAX
-	} e_mq2_gas_alarm_states_t;
+typedef enum
+{
+	MQ2_GAS_ALARM_NO_GAS,
+	MQ2_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+	MQ2_GAS_ALARM_TOXIC_GAS_DETECTED,
+	MQ2_GAS_ALARM_UNKNOWN,
+	MQ2_GAS_ALARM_MAX
+} e_mq2_gas_alarm_states_t;
 
 //----------------------------------------------------
 int sensor_0049_MQ2_LPG(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);

@@ -12,13 +12,13 @@ struct s_ezlopi_uart_object
     s_ezlopi_uart_t ezlopi_uart;
     __uart_upcall upcall;
     QueueHandle_t ezlopi_uart_queue_handle;
-    void* user_args;
+    void *user_args;
 };
 
 static void ezlopi_uart_channel_task(void *args);
 static ezlo_uart_channel_t get_available_channel();
 
-s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* args)
+s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *args)
 {
     static QueueHandle_t ezlo_uart_channel_queue;
     s_ezlopi_uart_object_handle_t uart_object_handle = (struct s_ezlopi_uart_object *)malloc(sizeof(struct s_ezlopi_uart_object));
@@ -94,18 +94,37 @@ static void ezlopi_uart_channel_task(void *args)
     // s_ezlopi_uart_object_t *ezlopi_uart_object = (s_ezlopi_uart_object_t*)args;
     s_ezlopi_uart_object_handle_t ezlopi_uart_object = (s_ezlopi_uart_object_handle_t)args;
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    
+
     while (1)
     {
         // Start reveceiving UART events for first channel.
         if (xQueueReceive(ezlopi_uart_object->ezlopi_uart_queue_handle, (void *)&event, portMAX_DELAY))
         {
             memset(buffer, 0, 256);
+            // TRACE_E("Uart_size: %d", event.size);
             switch (event.type)
             {
             case UART_DATA:
             {
                 uart_read_bytes(ezlopi_uart_object->ezlopi_uart.channel, buffer, event.size, 100 / portTICK_PERIOD_MS);
+                break;
+            }
+            case UART_BREAK:
+            {
+                TRACE_E("UART_BREAK. event -> %d", event.type);
+                uart_flush_input(ezlopi_uart_object->ezlopi_uart.channel);
+                break;
+            }
+            case UART_BUFFER_FULL:
+            {
+                TRACE_E("UART_BUFFER_FULL. event -> %d", event.type);
+                uart_flush_input(ezlopi_uart_object->ezlopi_uart.channel);
+                break;
+            }
+            case UART_FIFO_OVF:
+            {
+                TRACE_E("UART_FIFO_OVF. event -> %d", event.type);
+                uart_flush_input(ezlopi_uart_object->ezlopi_uart.channel);
                 break;
             }
             default:
