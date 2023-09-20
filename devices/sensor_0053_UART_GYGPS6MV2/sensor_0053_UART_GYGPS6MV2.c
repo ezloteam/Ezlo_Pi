@@ -53,7 +53,8 @@ static s_ezlopi_device_properties_t *sensor_0053_gps6mv2_prepare_properties(uint
                                                                             const char *ITEM_NAME, uint32_t ITEM_ID, const char *VALUE_TYPE,
                                                                             cJSON *cjson_device, GPS6MV2_t *sensor_0053_UART_gps6mv2_data);
 static int sensor_uart_gps6mv2_init(s_ezlopi_device_properties_t *properties);
-static void sensor_uart_gps6mv2_get_item(s_ezlopi_device_properties_t *properties, void *args) static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
+static void sensor_uart_gps6mv2_get_item(s_ezlopi_device_properties_t *properties, void *args);
+static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *properties);
 static void Retrieve_GPGGA_sentence();
 static void ezlopi_uart_gps6mv2_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void *user_args);
@@ -76,7 +77,7 @@ int sensor_0053_UART_GPS6MV2(e_ezlopi_actions_t action, s_ezlopi_device_properti
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        sensor_uart_gps6mv2_get_item(ezlopi_device, arg);
+        sensor_uart_gps6mv2_get_item(properties, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
