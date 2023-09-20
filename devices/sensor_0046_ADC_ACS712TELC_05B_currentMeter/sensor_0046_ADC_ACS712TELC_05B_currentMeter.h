@@ -41,7 +41,7 @@
  *      |
  *      V
  */
-#define voltage_divider_added 1
+#define VOLTAGE_DIVIDER_ADDED 1
 
 //------------------------------------------
 #define ASC712TELC_05B_zero_point_mV 2350 // adc_value at the output ; when no current in input side

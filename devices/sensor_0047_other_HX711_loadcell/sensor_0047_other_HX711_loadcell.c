@@ -9,6 +9,7 @@
 #include "ezlopi_item_name_str.h"
 
 #include "sensor_0047_other_HX711_loadcell.h"
+#include "sensor_0047_other_HX711_loadcell.h"
 
 /********************************************************************************/
 /*                    global defines                                            */
@@ -113,7 +114,7 @@ static s_ezlopi_device_properties_t *sensor_0047_hx711_prepare_properties(cJSON 
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
             ASSIGN_DEVICE_NAME(sensor_hx711_properties, device_name);
 
-            sensor_hx711_properties->ezlopi_cloud.category = category_generic_sensor;
+            sensor_hx711_properties->ezlopi_cloud.category = category_level_sensor;
             sensor_hx711_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
             sensor_hx711_properties->ezlopi_cloud.item_name = ezlopi_item_name_weight;
             sensor_hx711_properties->ezlopi_cloud.device_type = dev_type_sensor;
@@ -139,7 +140,7 @@ void Calculate_hx711_tare_wt(void *params)
 {
     // For Output settling time ; [10SPS] is 400ms
     // So, wait for 400ms after reset [as per datasheet]
-    vTaskDelay(40);
+    vTaskDelay(400 / portTICK_PERIOD_MS);
 
     // ignore first few weight readings
     float RAW_tare = 0;
@@ -306,7 +307,7 @@ static int sensor_0047_other_HX711_init(s_ezlopi_device_properties_t *properties
         HX711_Power_Reset();
 
         //  2. calibrate the load cell
-        xTaskCreate(Calculate_hx711_tare_wt, "Calculate the Tare weight", 2048, NULL, 1, NULL);
+        xTaskCreate(Calculate_hx711_tare_wt, "Calculate the Tare weight", 2*2048, NULL, 1, NULL);
     }
     return ret;
 }

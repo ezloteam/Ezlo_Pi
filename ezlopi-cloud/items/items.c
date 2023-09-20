@@ -73,7 +73,7 @@ void items_set_value(cJSON *cj_request, cJSON *cj_response)
         char *item_id_str = 0;
         CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, item_id_str);
         int item_id = strtol(item_id_str, NULL, 16);
-        TRACE_I("item_id: %X", item_id);
+        // TRACE_I("item_id: %X", item_id);
 
         l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
         while (NULL != registered_device)

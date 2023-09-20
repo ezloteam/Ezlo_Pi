@@ -17,14 +17,14 @@
 #include "sensor_0028_other_GY61.h"
 //---------------------------------------------------------------------
 
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                              \
-    {                                                                                                                                  \
+#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                           \
+    {                                                                                                                               \
         s_ezlopi_device_properties_t *_properties = sensor_0028_gy61_other_prepare_properties(device_id, category, subcategory,     \
-                                                                                                 item_name, value_type, cjson_device); \
-        if (NULL != _properties)                                                                                                       \
-        {                                                                                                                              \
-            add_device_to_list(prep_arg, _properties, NULL);                                                                           \
-        }                                                                                                                              \
+                                                                                              item_name, value_type, cjson_device); \
+        if (NULL != _properties)                                                                                                    \
+        {                                                                                                                           \
+            add_device_to_list(prep_arg, _properties, NULL);                                                                        \
+        }                                                                                                                           \
     }
 
 //---------------------------------------------------------------------
@@ -263,7 +263,7 @@ static float get_gy61_x_axis_value(s_ezlopi_device_properties_t *properties)
 
     free(ezlopi_analog_data);
 
-    TRACE_B("X_Vol_data : {%d mV} ;  X_G_data : {%.2fG}", temp_vol, X_G_data);
+    // TRACE_B("X_Vol_data : {%d mV} ;  X_G_data : {%.2fG}", temp_vol, X_G_data);
     return X_G_data;
 }
 
@@ -305,12 +305,12 @@ static float get_gy61_y_axis_value(s_ezlopi_device_properties_t *properties)
 #endif
     free(ezlopi_analog_data);
 
-    TRACE_B("Y_Vol_data : {%d mV} ;  Y_G_data : {%.2fG}", temp_vol, Y_G_data);
+    // TRACE_B("Y_Vol_data : {%d mV} ;  Y_G_data : {%.2fG}", temp_vol, Y_G_data);
     return Y_G_data;
 }
+
 static float get_gy61_z_axis_value(s_ezlopi_device_properties_t *properties)
 {
-
     float Z_G_data = 0;
     int temp_vol = 0;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
@@ -346,6 +346,6 @@ static float get_gy61_z_axis_value(s_ezlopi_device_properties_t *properties)
     }
 #endif
     free(ezlopi_analog_data);
-    TRACE_B("Z_Vol_data : {%d mV} ;  Z_G_data : {%0.2fG}", temp_vol, Z_G_data);
+    // TRACE_B("Z_Vol_data : {%d mV} ;  Z_G_data : {%0.2fG}", temp_vol, Z_G_data);
     return Z_G_data;
 }

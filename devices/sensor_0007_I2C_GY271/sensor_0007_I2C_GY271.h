@@ -4,6 +4,8 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
 
+// this chipset uses [QMC5883L chip]
+
 #define GY271_ADDR 0x0D
 /*******************************************************************/
 // REGISTER ADDRESS

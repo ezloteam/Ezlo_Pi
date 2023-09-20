@@ -89,9 +89,9 @@ static s_ezlopi_device_properties_t *sensor_0042_ADC_shunt_voltmeter_prepare(cJS
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_0042_adc_shunt_voltmeter_properties, device_name);
-        sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.category = category_generic_sensor;
-        sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-        sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.item_name = ezlopi_item_name_moisture;
+        sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.category = category_level_sensor;
+        sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.subcategory = subcategory_electricity;
+        sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.item_name = ezlopi_item_name_voltage;
         sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.device_type = dev_type_sensor;
         sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.value_type = value_type_electric_potential;
         sensor_0042_adc_shunt_voltmeter_properties->ezlopi_cloud.has_getter = true;
@@ -130,18 +130,21 @@ static int sensor_0042_adc_shunt_voltmeter_get_value(s_ezlopi_device_properties_
     cJSON *cjson_propertise = (cJSON *)arg;
     s_ezlopi_analog_data_t *sensor_0042_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(sensor_0042_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
+    char valueFormatted[20];
     if (cjson_propertise && sensor_0042_analog_data)
     {
         // extracting the analog value
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, sensor_0042_analog_data);
-#ifdef voltage_divider_added
+#ifdef VOLTAGE_DIVIDER_ADDED
         int voltage_data = ((int)(sensor_0042_analog_data->voltage) * 2) * 5; // first we double the incoming voltage
 #else
         int voltage_data = (int)(sensor_0042_analog_data->voltage) * 5; // if you havenot added a voltage divider at sensor's analog output for esp32
 
 #endif
         TRACE_B("Voltage : %d mV", voltage_data);
+        snprintf(valueFormatted, 20, "%d", voltage_data);
         cJSON_AddNumberToObject(cjson_propertise, "value", voltage_data);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddStringToObject(cjson_propertise, "scale", "millivolt");
         ret = 1;
     }

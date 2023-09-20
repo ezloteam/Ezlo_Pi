@@ -1,5 +1,4 @@
 
-
 #include "cJSON.h"
 #include "trace.h"
 #include "ezlopi_actions.h"

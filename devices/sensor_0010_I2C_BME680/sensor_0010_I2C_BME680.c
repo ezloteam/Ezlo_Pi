@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include "sdkconfig.h"
 
@@ -303,5 +302,3 @@ static int sensor_0010_I2C_BME680_get_value_cjson(s_ezlopi_device_properties_t *
     }
     return ret;
 }
-
-

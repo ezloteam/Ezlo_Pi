@@ -305,14 +305,11 @@ static int sensor_0044_i2c_tsl2561_get_value_cjson(s_ezlopi_device_properties_t 
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)arg;
     char valueFormatted[20];
-
     if (NULL != cjson_properties)
     {
         if (ezlopi_item_name_lux == properties->ezlopi_cloud.item_name)
         {
-
             snprintf(valueFormatted, 20, "%d", Lux_intensity);
-            TRACE_I("LuxIntensity : %s", valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "values", Lux_intensity);
             cJSON_AddStringToObject(cjson_properties, "scale", "lux");

@@ -2,6 +2,7 @@
 #define _0006_SENS_I2C_ADXL345_H_
 
 #include "ezlopi_actions.h"
+#include "ezlopi_i2c_master.h"
 #include "ezlopi_devices.h"
 
 // Datasheet can be found at:

@@ -6,17 +6,19 @@ file(GLOB_RECURSE config_src "*.c")
 idf_component_register(
     SRCS
         "ezlopi_devices.c"
-        "ezlopi_device_value_updated.c"
         "ezlopi_devices_list.c"
+        "ezlopi_device_value_updated.c"
         "${config_src}"
     INCLUDE_DIRS
         "."
     REQUIRES
         trace
         json
+        items
         ezlopi_nvs
         ezlopi_hal
         ezlopi_cloud
+        ezlopi_actions
         device_0001_digitalOut_generic
         device_0002_digitalOut_relay
         device_0003_digitalOut_plug
@@ -51,7 +53,6 @@ idf_component_register(
         sensor_0035_digitalIn_touch_sensor_TPP223B
         device_0036_PWM_servo_MG996R
         device_0038_digitalOut_RGB
-        # sensor_0039_I2C_MAX30102  // err
         sensor_0040_other_TCS230
         sensor_0041_ADC_FC28_soilMoisture
         sensor_0042_ADC_shunt_voltmeter
@@ -63,7 +64,14 @@ idf_component_register(
         sensor_0049_other_MQ2_LPG_gas_detector
         sensor_0050_other_MQ3_Alcohol_detector
         sensor_0051_other_MQ8_H2_gas_detector
-        sensor_0052_other_MQ135_NH3_gas_detector
+        sensor_0052_other_MQ135_NH3_gas_detector        
+        sensor_0060_digitalIn_vibration_detector
+        sensor_0061_digitalIn_reed_switch
+        sensor_0062_other_MQ7_CO_gas_detector
+        sensor_0063_other_MQ9_LPG_flameable_gas_detector
+        sensor_0055_ADC_Flex_Resistor
+        sensor_0054_PWM_YFS201_flowmeter
+        sensor_0059_other_MQ6_LPG_gas_detector
         sensor_0053_UART_GYGPS6MV2
         )
 

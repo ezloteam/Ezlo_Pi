@@ -141,8 +141,7 @@ static s_ezlopi_device_properties_t *ezlopi_dimmable_bulb_prepare_properties(uin
             CJSON_GET_VALUE_INT(cjson_device, "gpio", ezlopi_dimmable_bulb_properties->interface.pwm.gpio_num);
             CJSON_GET_VALUE_INT(cjson_device, "duty_cycle", ezlopi_dimmable_bulb_properties->interface.pwm.duty_cycle);
             CJSON_GET_VALUE_INT(cjson_device, "freq_hz", ezlopi_dimmable_bulb_properties->interface.pwm.freq_hz);
-            CJSON_GET_VALUE_INT(cjson_device, "pwm_resln", ezlopi_dimmable_bulb_properties->interface.pwm.pwm_resln);
-            // ezlopi_dimmable_bulb_properties->interface.pwm.pwm_resln = 12;
+            ezlopi_dimmable_bulb_properties->interface.pwm.pwm_resln = 12;
         }
     }
 

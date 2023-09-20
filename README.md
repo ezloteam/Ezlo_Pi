@@ -13,7 +13,6 @@ Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 * __Digital Input__
 * __PWM__
 * __UART__
-* __I2C__
 * __One Wire__
 * __I2C__
 * __SPI__
