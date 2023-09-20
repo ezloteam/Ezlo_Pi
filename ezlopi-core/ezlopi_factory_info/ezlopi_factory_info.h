@@ -407,12 +407,11 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_type\": 2,\
-                \"dev_name\": \"Reed\",\
+                \"dev_type\": 5,\
+                \"dev_name\": \"flowmeter\",\
                 \"id_room\": \"\",\
-                \"id_item\": 61,\
-                \"gpio\": 25,\
-                \"logic_inv\": false\
+                \"id_item\": 54,\
+                \"gpio\": 25\
             }\
         ],\
     \"dev_total\": 1}";

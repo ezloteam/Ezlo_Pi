@@ -24,10 +24,11 @@ static YFS201_queue_enum_t yfs201_QueueFlag = YFS201_QUEUE_RESET;
 static int sensor_pwm_yfs201_prepare_and_add(void *arg);
 static int sensor_pwm_yfs201_init(s_ezlopi_device_properties_t *properties);
 static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin);
-static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties, void *args);
+static void sensor_pwm_yfs201_get_item(s_ezlopi_device_properties_t *properties, void *arg);
+static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 //------------------------------------------------------------------------------
 
-static void IRAM_ATTR gpio_isr_handler(void *args) // argument => time_us
+static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
 {
     _pulses++;
 }
@@ -46,6 +47,11 @@ int sensor_0054_pwm_yfs201(e_ezlopi_actions_t action, s_ezlopi_device_properties
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = sensor_pwm_yfs201_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        sensor_pwm_yfs201_get_item(properties, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -154,11 +160,36 @@ static int sensor_pwm_yfs201_init(s_ezlopi_device_properties_t *properties)
     return ret;
 }
 
-static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties, void *args)
+static void sensor_pwm_yfs201_get_item(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    char valueFormatted[20];
+    cJSON *cjson_properties = (cJSON *)arg;
+
+    if (cjson_properties)
+    {
+        float freq = 0, Lt_per_hr = 0;
+
+        // converting pulse_counta into frequency (uSec -> Hz)
+        freq = dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
+
+        // liter per hr
+        Lt_per_hr = freq * 7.3f;
+        Lt_per_hr = (Lt_per_hr < 1) ? 0 : Lt_per_hr;
+        Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
+        // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
+
+        snprintf(valueFormatted, 20, "%.2f", Lt_per_hr);
+        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+        cJSON_AddNumberToObject(cjson_properties, "value", Lt_per_hr);
+        cJSON_AddStringToObject(cjson_properties, "scale", "liter_per_hour");
+    }
+}
+
+static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     char valueFormatted[20];
-    cJSON *cjson_properties = (cJSON *)args;
+    cJSON *cjson_properties = (cJSON *)arg;
 
     if (cjson_properties)
     {
