@@ -47,6 +47,7 @@ static s_ezlopi_device_properties_t *sensor_other_mq4_prepare_properties(uint32_
 static int sensor_other_MQ4_prepare_and_add(void *arg);
 static int sensor_other_MQ4_init(s_ezlopi_device_properties_t *properties);
 static void sensor_other_MQ4_get_item(s_ezlopi_device_properties_t *properties, void *arg);
+static void sensor_other_MQ4_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_other_MQ4_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 static void Extract_MQ4_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezlopi_device_properties_t *properties);
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -279,6 +280,7 @@ static int sensor_other_MQ4_init(s_ezlopi_device_properties_t *properties)
         TRACE_W(".........................................CALIB_GAURD : %d", Calibration_complete);
         if (!Calibration_complete)
         {
+            xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, (void *)properties, 1, NULL);
             xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, (void *)properties, 1, NULL);
         }
         ret = 1;
