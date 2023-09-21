@@ -187,7 +187,7 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_de
 void Calibrate_MQ9_R0_resistance(void *params)
 {
     float RS_calib = 0; // Define variable for sensor resistance
-    s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)params;
+    // s_ezlopi_device_properties_t *properties = (s_ezlopi_device_properties_t *)params;
 
     // if (properties == NULL)
     // {
@@ -336,7 +336,6 @@ static void Extract_MQ9_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
 
 static void sensor_other_MQ9_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
-    int ret = 0;
     float analog_sensor_volt = 0;
     float _ppm = 0;
     char valueFormatted[20];
@@ -381,10 +380,7 @@ static void sensor_other_MQ9_get_item(s_ezlopi_device_properties_t *properties, 
             cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");
         }
         //-----------------------------------------------------------------------------------------
-        ret = 1;
     }
-
-    return ret;
 }
 
 static int sensor_other_MQ9_get_value(s_ezlopi_device_properties_t *properties, void *arg)
