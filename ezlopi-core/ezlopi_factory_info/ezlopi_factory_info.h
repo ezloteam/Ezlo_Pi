@@ -407,13 +407,12 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_type\": 6,\
-                \"dev_name\": \"GPS\",\
+                \"dev_type\": 2,\
+                \"dev_name\": \"Reed\",\
                 \"id_room\": \"\",\
-                \"id_item\": 53,\
-                \"gpio_tx\": 18,\
-                \"gpio_rx\": 19,\
-                \"baud\": 9600\
+                \"id_item\": 61,\
+                \"gpio\": 18,\
+                \"logic_inv\": false\
             }\
         ],\
     \"dev_total\": 1}";

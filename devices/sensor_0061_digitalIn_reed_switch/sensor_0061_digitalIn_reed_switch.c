@@ -11,7 +11,7 @@
 #include "sensor_0061_digitalIn_reed_switch.h"
 
 //----------------------------------------------------------------------
-static int gpio_level;
+
 static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson_device);
 static int sensor_0061_prepare_and_add(void *arg);
 static int sensor_0061_init(s_ezlopi_device_properties_t *properties);
@@ -147,8 +147,8 @@ static void sensor_0061_get_item(s_ezlopi_device_properties_t *properties, void 
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
+        // int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        // properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
     }
 }
@@ -168,7 +168,7 @@ static int sensor_0061_get_value_cjson(s_ezlopi_device_properties_t *properties,
 
 static void sensor_0061_update_from_device(s_ezlopi_device_properties_t *properties)
 {
-    gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+    int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
     properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
     ezlopi_device_value_updated_from_device(properties);
 }
