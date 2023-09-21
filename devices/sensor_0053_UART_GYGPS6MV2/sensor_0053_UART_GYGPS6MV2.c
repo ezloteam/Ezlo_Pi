@@ -24,10 +24,10 @@ static const uint32_t GPS_fix_item_id = 3;
 static const uint32_t Sea_level_item_id = 4;
 static const uint32_t Geoid_item_id = 5;
 
-static bool init_guard = false;
-static bool message_guard = false;
-static char sentence[MAX_GPGGA_SENTENCE_SIZE + 30];
-static char cir_buf[CIR_BUFSIZE];
+static bool gps_init_guard = false;
+static bool gps_message_guard = false;
+static char gps_sentence[MAX_GPGGA_SENTENCE_SIZE + 30];
+static char gps_cir_buf[CIR_BUFSIZE];
 
 //------------------------------------------------------------------------------
 static s_ezlopi_device_properties_t *properties = NULL;
@@ -87,14 +87,14 @@ int sensor_0053_UART_GPS6MV2(e_ezlopi_actions_t action, s_ezlopi_device_properti
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (init_guard)
+        if (gps_init_guard)
         {
             if (1 == properties->ezlopi_cloud.item_id)
             {
-                message_guard = true;
+                gps_message_guard = true;
                 sensor_uart_gps6mv2_update_values(properties);
             }
-            message_guard = false;
+            gps_message_guard = false;
             ezlopi_device_value_updated_from_device(properties);
         }
         break;
@@ -215,7 +215,7 @@ static int sensor_uart_gps6mv2_prepare_and_add(void *arg)
 static int sensor_uart_gps6mv2_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    if (!init_guard)
+    if (!gps_init_guard)
     {
         if (GPIO_IS_VALID_GPIO(properties->interface.uart.tx) && GPIO_IS_VALID_GPIO(properties->interface.uart.rx))
         {
@@ -225,16 +225,16 @@ static int sensor_uart_gps6mv2_init(s_ezlopi_device_properties_t *properties)
             ret = 1;
         }
         // TRACE_W(" Initailization complete......");
-        init_guard = true;
+        gps_init_guard = true;
     }
     return ret;
 }
 
 static void Retrieve_GPGGA_sentence()
 {
-    if (NULL == strstr(cir_buf, "$GPTXT"))
+    if (NULL == strstr(gps_cir_buf, "$GPTXT"))
     {
-        // TRACE_I("................Extracting GPGGA sentence ...........");
+        // TRACE_I("................Extracting GPGGA gps_sentence ...........");
         // find the position of '$GSGGA' in the circular buffer
         /**                                 2000
          *   circular_buffer = 'dkfhkhdf .... $GPGGA,061731.00,2740.52772,....,-41.3,M,,*40.....'
@@ -242,7 +242,7 @@ static void Retrieve_GPGGA_sentence()
          *                             ptr1 => $GPGGA,061731.00,2740.52772,....,-41.3,M,,*40.....
          *
          */
-        char *ptr1 = strstr(cir_buf, "$GPGGA"); // returns a pointer points to the first character of the found 'another_buffer' in "$GPGGA"
+        char *ptr1 = strstr(gps_cir_buf, "$GPGGA"); // returns a pointer points to the first character of the found 'another_buffer' in "$GPGGA"
                                                 // otherwise a null pointer if "$GPGGA" is not present in 'another_buffer'.
                                                 // If "[$GPGGA]" destination string, points to an empty string, 'another_buffer' is returned
 
@@ -260,21 +260,21 @@ static void Retrieve_GPGGA_sentence()
             char *ptr2 = strchr(ptr1, '*'); // *  <- ptr2
                                             // check if ptr2 exists
             if (NULL != ptr2)
-            {              // NOW , separate the GSGGA-message and copy to global variable 'sentence'
+            {              // NOW , separate the GSGGA-message and copy to global variable 'gps_sentence'
                 ptr2 += 3; // +3 because the checksum consists three character more [*XX]
 
                 // TRACE_E("GPGGA message size = %d (< %d)", (ptr2 - ptr1), MAX_GPGGA_SENTENCE_SIZE);
                 if ((ptr2 - ptr1) > 0 && (ptr2 - ptr1) < MAX_GPGGA_SENTENCE_SIZE)
                 {
-                    if (message_guard == false)
+                    if (gps_message_guard == false)
                     {
-                        memset(&sentence, 0, sizeof(sentence));
-                        memcpy(sentence, ptr1, (ptr2 - ptr1)); // (dest_addr , from_addr , length)
-                        // TRACE_W("sentence (NEW) => %s", sentence);
+                        memset(&gps_sentence, 0, sizeof(gps_sentence));
+                        memcpy(gps_sentence, ptr1, (ptr2 - ptr1)); // (dest_addr , from_addr , length)
+                        // TRACE_W("gps_sentence (NEW) => %s", gps_sentence);
                     }
                     else
                     {
-                        TRACE_E(" Message_Guard => ON ; Cannot copy NEW message.... in 'sentence'");
+                        TRACE_E(" gps_Message_Guard => ON ; Cannot copy NEW message.... in 'gps_sentence'");
                     }
                 }
             }
@@ -293,16 +293,16 @@ static void ezlopi_uart_gps6mv2_upcall(uint8_t *buffer, s_ezlopi_uart_object_han
     if (another_buffer)
     {
         memcpy(another_buffer, buffer, 256);
-        if (strlen(cir_buf) < (CIR_BUFSIZE)-255)
+        if (strlen(gps_cir_buf) < (CIR_BUFSIZE)-255)
         {
-            strncpy((cir_buf + strlen(cir_buf)), another_buffer, strlen(another_buffer));
+            strncpy((gps_cir_buf + strlen(gps_cir_buf)), another_buffer, strlen(another_buffer));
         }
         else
         {
             // TRACE_E("----------- 2. CIR_BUFF - FULL -------------");
-            // TRACE_I("CIRCULAR_BUFFER  => [%d] \n%s", strlen(cir_buf), cir_buf);
-            Retrieve_GPGGA_sentence();           // CALL a function that extracts the 'GPGGA_sentence' from cir_buf[]
-            memset(cir_buf, 0, sizeof(cir_buf)); // reset cir_buf[]
+            // TRACE_I("CIRCULAR_BUFFER  => [%d] \n%s", strlen(gps_cir_buf), gps_cir_buf);
+            Retrieve_GPGGA_sentence();           // CALL a function that extracts the 'GPGGA_sentence' from gps_cir_buf[]
+            memset(gps_cir_buf, 0, sizeof(gps_cir_buf)); // reset gps_cir_buf[]
         }
 
         free(another_buffer);
@@ -448,14 +448,14 @@ static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *prope
 
     if (NULL != properties)
     {
-        // replace the sentence of GPGGA structure
-        if (sentence != NULL)
+        // replace the gps_sentence of GPGGA structure
+        if (gps_sentence != NULL)
         {
             // reset the GPGGA_sentence array
             len = sizeof(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence);
             memset(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence, 0, sizeof(len));
             sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence[len - 1] = '\0';
-            strncpy(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence, sentence, (len - 1));
+            strncpy(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.GPGGA_sentence, gps_sentence, (len - 1));
         }
 
         // Check availability of Checksum in the message
@@ -466,7 +466,7 @@ static int sensor_uart_gps6mv2_update_values(s_ezlopi_device_properties_t *prope
             //-------------------------------------------------------------------------
             parse_and_assign_GPGGA_message(sensor_0053_UART_gps6mv2_data);
         }
-        message_guard = false;
+        gps_message_guard = false;
     }
     return ret;
 }

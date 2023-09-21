@@ -65,18 +65,16 @@ idf_component_register(
         sensor_0050_other_MQ3_Alcohol_detector
         sensor_0051_other_MQ8_H2_gas_detector
         sensor_0052_other_MQ135_NH3_gas_detector        
+        sensor_0053_UART_GYGPS6MV2
+        sensor_0054_PWM_YFS201_flowmeter
+        sensor_0055_ADC_Flex_Resistor
+        sensor_0056_ADC_Force_Sensitive_Resistor
+        sensor_0057_other_KY026_FlameDetector
+        sensor_0059_other_MQ6_LPG_gas_detector
         sensor_0060_digitalIn_vibration_detector
         sensor_0061_digitalIn_reed_switch
         sensor_0062_other_MQ7_CO_gas_detector
         sensor_0063_other_MQ9_LPG_flameable_gas_detector
-        sensor_0055_ADC_Flex_Resistor
-        sensor_0054_PWM_YFS201_flowmeter
-        sensor_0059_other_MQ6_LPG_gas_detector
-        sensor_0053_UART_GYGPS6MV2
-        # 0053,54,55,56
-        sensor_0057_other_KY026_FlameDetector
-        #  0053,0054,0055,0056,
-        sensor_0056_ADC_Force_Sensitive_Resistor
         )
 
 

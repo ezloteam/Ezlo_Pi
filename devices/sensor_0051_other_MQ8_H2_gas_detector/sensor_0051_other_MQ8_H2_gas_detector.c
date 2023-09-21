@@ -45,7 +45,6 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *device_prep_args, s_ezlopi_de
 
 static s_ezlopi_device_properties_t *sensor_other_mq8_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device); // you can directly add the prepare args here
 static int sensor_other_MQ8_prepare_and_add(void *arg);
-static void sensor_other_MQ8_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_other_MQ8_init(s_ezlopi_device_properties_t *properties);
 static void sensor_other_MQ8_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_other_MQ8_get_value(s_ezlopi_device_properties_t *properties, void *arg);
@@ -217,7 +216,7 @@ void Calibrate_MQ8_R0_resistance(void *params)
             }
             // extract ADC values
             ezlopi_adc_get_adc_data(mq8_adc_pin, ezlopi_analog_data);
-#ifdef voltage_divider_added
+#ifdef VOLTAGE_DIVIDER_ADDED
             _sensor_volt += (float)((ezlopi_analog_data->voltage) * 2); // [0-2.4V] X2
 #else
             _sensor_volt += (float)(ezlopi_analog_data->voltage);
@@ -298,7 +297,7 @@ static void Extract_MQ8_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     for (uint8_t x = 10; x > 0; x--)
     {
         ezlopi_adc_get_adc_data(mq8_adc_pin, ezlopi_analog_data);
-#ifdef voltage_divider_added
+#ifdef VOLTAGE_DIVIDER_ADDED
         *analog_sensor_volt += ((float)(ezlopi_analog_data->voltage) * 2.0f);
 #else
         *analog_sensor_volt += (float)(ezlopi_analog_data->voltage);

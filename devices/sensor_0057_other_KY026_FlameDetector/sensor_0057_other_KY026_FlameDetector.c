@@ -317,7 +317,7 @@ static void Extract_KY026_sensor_value(float *analog_sensor_volt, s_ezlopi_devic
         for (uint8_t x = 10; x > 0; x--)
         {
             ezlopi_adc_get_adc_data(KY026_adc_pin, ezlopi_analog_data);
-#ifdef voltage_divider_added
+#ifdef VOLTAGE_DIVIDER_ADDED
             *analog_sensor_volt += ((float)((ezlopi_analog_data->voltage) / 1000.0f) * 2.0f); // V
 #else
             *analog_sensor_volt += (float)(ezlopi_analog_data->voltage);

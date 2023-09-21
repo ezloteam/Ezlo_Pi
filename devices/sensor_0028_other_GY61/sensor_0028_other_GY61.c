@@ -31,7 +31,7 @@
 
 // conversion for acd to G
 
-#ifdef CONFIG_IDF_TARGET_ESP32
+#if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)
 #define esp32_convert_mV_to_G(temp_vol) (((6.0f * (temp_vol - 1300)) / 750.0f) - 3.0f)
 #elif CONFIG_IDF_TARGET_ESP32S3
 #define esp32S3_convert_mV_to_G(temp_vol) (((6.0f / 3000.0f) * (temp_vol - 100)) - 3.0f)
@@ -233,7 +233,7 @@ static float get_gy61_x_axis_value(s_ezlopi_device_properties_t *properties)
     // TRACE_E("gpio-num is %d", properties->interface.adc.gpio_num);
 
     temp_vol = (int)ezlopi_analog_data->voltage;
-#ifdef CONFIG_IDF_TARGET_ESP32
+#if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)
     if (temp_vol <= 1300)
     {
         X_G_data = 0;
@@ -276,7 +276,7 @@ static float get_gy61_y_axis_value(s_ezlopi_device_properties_t *properties)
     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data); // returns channel
     temp_vol = (int)ezlopi_analog_data->voltage;
 
-#ifdef CONFIG_IDF_TARGET_ESP32
+#if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)
     if (temp_vol <= 1300)
     {
         Y_G_data = 0;
@@ -318,7 +318,7 @@ static float get_gy61_z_axis_value(s_ezlopi_device_properties_t *properties)
     ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data); // returns channel
 
     temp_vol = (int)ezlopi_analog_data->voltage;
-#ifdef CONFIG_IDF_TARGET_ESP32
+#if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)
     if (temp_vol <= 1300)
     {
         Z_G_data = 0;

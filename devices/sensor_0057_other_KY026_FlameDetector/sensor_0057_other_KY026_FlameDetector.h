@@ -33,9 +33,9 @@
  * -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
  *      |
  *      |
- *  #define voltage_divider_added 1
+ *  #define VOLTAGE_DIVIDER_ADDED 1
  */
-#define voltage_divider_added 1
+#define VOLTAGE_DIVIDER_ADDED 1
 //------------------------------------------
 typedef enum
 {

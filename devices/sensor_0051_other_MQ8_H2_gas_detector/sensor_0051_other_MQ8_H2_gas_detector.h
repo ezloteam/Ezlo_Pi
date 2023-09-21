@@ -109,7 +109,7 @@
  *      |
  *      V
  */
-#define voltage_divider_added 1
+#define VOLTAGE_DIVIDER_ADDED 1
 //------------------------------------------
 
 /**
@@ -125,15 +125,16 @@
 #define MQ8_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq8 -1.443f
 #define b_coeff_mq8 4.329f
-
 typedef enum
 {
-	MQ8_GAS_ALARM_NO_GAS,
-	MQ8_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-	MQ8_GAS_ALARM_TOXIC_GAS_DETECTED,
-	MQ8_GAS_ALARM_UNKNOWN,
-	MQ8_GAS_ALARM_MAX
+    MQ8_GAS_ALARM_NO_GAS,
+    MQ8_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+    MQ8_GAS_ALARM_TOXIC_GAS_DETECTED,
+    MQ8_GAS_ALARM_UNKNOWN,
+    MQ8_GAS_ALARM_MAX
 } e_mq8_gas_alarm_states_t;
+
+
 
 //----------------------------------------------------
 int sensor_0051_MQ8_H2(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);

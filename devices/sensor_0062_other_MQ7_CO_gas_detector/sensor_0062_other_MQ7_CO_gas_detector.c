@@ -216,7 +216,7 @@ void Calibrate_MQ7_R0_resistance(void *params)
             }
             // extract ADC values
             ezlopi_adc_get_adc_data(mq7_adc_pin, ezlopi_analog_data);
-#ifdef voltage_divider_added
+#ifdef VOLTAGE_DIVIDER_ADDED
             _sensor_volt += (float)((ezlopi_analog_data->voltage) * 2); // [0-2.4V] X2
 #else
             _sensor_volt += (float)(ezlopi_analog_data->voltage);
@@ -297,7 +297,7 @@ static void Extract_MQ7_sensor_ppm(float *analog_sensor_volt, float *_ppm, s_ezl
     for (uint8_t x = 10; x > 0; x--)
     {
         ezlopi_adc_get_adc_data(mq7_adc_pin, ezlopi_analog_data);
-#ifdef voltage_divider_added
+#ifdef VOLTAGE_DIVIDER_ADDED
         *analog_sensor_volt += ((float)(ezlopi_analog_data->voltage) * 2.0f);
 #else
         *analog_sensor_volt += (float)(ezlopi_analog_data->voltage);

@@ -431,73 +431,74 @@ static s_ezlopi_device_t device_array[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0061_DIGITAL_IN_REED_SWITCH
+#ifdef EZLOPI_SENSOR_0053_UART_GYGPS6MV2
     {
-        .id = EZLOPI_SENSOR_0061_DIGITAL_IN_REED_SWITCH,
-        .func = sensor_0061_digitalIn_reed_switch,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR
-    {
-        .id = EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR,
-        .func = sensor_0063_MQ9_LPG_flameable,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0062_OTHER_MQ7_CARBONMONOXIDE_GAS_DETECTOR
-    {
-        .id = EZLOPI_SENSOR_0062_OTHER_MQ7_CARBONMONOXIDE_GAS_DETECTOR,
-        .func = sensor_0062_MQ7_CO,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR
-    {
-        .id = EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR,
-        .func = sensor_0060_digitalIn_vibration_detector,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0055_ADC_FLEX_RESISTOR
-    {
-        .id = EZLOPI_SENSOR_0055_ADC_FLEX_RESISTOR,
-        .func = sensor_0055_flex_resistor,
+    .id = EZLOPI_SENSOR_0053_UART_GYGPS6MV2,
+    .func = sensor_0053_UART_GPS6MV2,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER
     {
-        .id = EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER,
-        .func = sensor_0054_pwm_yfs201,
+    .id = EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER,
+    .func = sensor_0054_pwm_yfs201,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_GAS_DETECTOR
-    {
-        .id = EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_GAS_DETECTOR,
-        .func = sensor_0059_MQ6_LPG,
-    },
-#endif
 
-#ifdef EZLOPI_SENSOR_0053_UART_GYGPS6MV2
+#ifdef EZLOPI_SENSOR_0055_ADC_FLEX_RESISTOR
     {
-        .id = EZLOPI_SENSOR_0053_UART_GYGPS6MV2,
-        .func = sensor_0053_UART_GPS6MV2,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0057_OTHER_KY026_FLAMEDETECTOR
-    {
-        .id = EZLOPI_SENSOR_0057_OTHER_KY026_FLAMEDETECTOR,
-        .func = sensor_0057_other_KY026,
+    .id = EZLOPI_SENSOR_0055_ADC_FLEX_RESISTOR,
+    .func = sensor_0055_flex_resistor,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR
     {
-        .id = EZLOPI_SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR,
-        .func = sensor_0056_force_sensitive_resistor,
+    .id = EZLOPI_SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR,
+    .func = sensor_0056_force_sensitive_resistor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0057_OTHER_KY026_FLAMEDETECTOR
+    {
+    .id = EZLOPI_SENSOR_0057_OTHER_KY026_FLAMEDETECTOR,
+    .func = sensor_0057_other_KY026,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_GAS_DETECTOR
+    {
+    .id = EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_GAS_DETECTOR,
+    .func = sensor_0059_MQ6_LPG,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR
+    {
+    .id = EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR,
+    .func = sensor_0060_digitalIn_vibration_detector,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0061_DIGITAL_IN_REED_SWITCH
+    {
+    .id = EZLOPI_SENSOR_0061_DIGITAL_IN_REED_SWITCH,
+    .func = sensor_0061_digitalIn_reed_switch,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0062_OTHER_MQ7_CARBONMONOXIDE_GAS_DETECTOR
+    {
+    .id = EZLOPI_SENSOR_0062_OTHER_MQ7_CARBONMONOXIDE_GAS_DETECTOR,
+    .func = sensor_0062_MQ7_CO,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR
+    {
+    .id = EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_GAS_DETECTOR,
+    .func = sensor_0063_MQ9_LPG_flameable,
     },
 #endif
 
