@@ -201,7 +201,7 @@ s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void)
 }
 #endif
 
-#if 1 // version 1.x.x to 2.x.x
+#if 0 // version 1.x.x to 2.x.x
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void)
 {
     return NULL;

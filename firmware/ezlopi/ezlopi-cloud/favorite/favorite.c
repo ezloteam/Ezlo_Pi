@@ -84,6 +84,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+#if 0 // v2.x
 void favorite_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
@@ -121,3 +122,4 @@ void favorite_list(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+#endif

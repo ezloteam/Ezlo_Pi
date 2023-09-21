@@ -68,6 +68,7 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+#if 0 // v2.x
 void devices_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
@@ -129,7 +130,6 @@ void devices_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-#if 0
 char *devices_name_set(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     uint32_t buf_len = 300;

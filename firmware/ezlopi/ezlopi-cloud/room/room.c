@@ -14,6 +14,34 @@ void room_list(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result_array = cJSON_AddArrayToObject(cj_response, ezlopi_result);
     if (cjson_result_array)
     {
+        l_ezlopi_device_t *devices = ezlopi_device_get_head();
+        while (NULL != devices)
+        {
+            cJSON *cjson_room_info = cJSON_CreateObject();
+            if (cjson_room_info)
+            {
+                cJSON_AddStringToObject(cjson_room_info, "_id", "");
+                cJSON_AddStringToObject(cjson_room_info, "name", "");
+
+                if (!cJSON_AddItemToArray(cjson_result_array, cjson_room_info))
+                {
+                    cJSON_Delete(cjson_room_info);
+                }
+            }
+
+            devices = devices->next;
+        }
+    }
+}
+
+#if 0 // v2.x
+void room_list(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_result_array = cJSON_AddArrayToObject(cj_response, ezlopi_result);
+    if (cjson_result_array)
+    {
         l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
         while (NULL != registered_device)
         {
@@ -36,3 +64,4 @@ void room_list(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+#endif

@@ -149,7 +149,7 @@ typedef struct l_ezlopi_device
     struct l_ezlopi_device *next;
 } l_ezlopi_device_t;
 
-#if 1 // v1.x.x to v2.x.x
+#if 0 // v1.x.x to v2.x.x
 typedef struct s_ezlopi_device_properties
 {
     // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
@@ -178,7 +178,9 @@ void ezlopi_device_prepare(void);
 // uint32_t ezlopi_device_generate_room_id(void);
 // uint32_t ezlopi_device_generate_gateway_id(void);
 
+#if 0 // v2.x
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
+#endif
 
 l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);

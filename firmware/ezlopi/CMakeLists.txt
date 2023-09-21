@@ -48,4 +48,4 @@ set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS}) # add the list of directories 'SUBDI
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENTS_DIRS}\r\n")
 
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
-project(Ezlo_Pi_v2x)
+project(Ezlo_Pi_v3x)

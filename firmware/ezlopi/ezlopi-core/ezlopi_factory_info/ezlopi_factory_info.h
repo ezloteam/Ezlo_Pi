@@ -151,7 +151,7 @@ typedef struct s_basic_factory_info
     char *ezlopi_factory_info_v2_get_password(void);
     void ezlopi_factory_info_v2_get_ezlopi_mac(uint8_t *mac);
     char *ezlopi_factory_info_v2_get_cloud_server(void);
-    char *ezlopi_factory_info_v2_get_device_type(void);
+    const char *ezlopi_factory_info_v2_get_device_type(void);
     char *ezlopi_factory_info_v2_get_ca_certificate(void);
     char *ezlopi_factory_info_v2_get_ssl_private_key(void);
     char *ezlopi_factory_info_v2_get_ssl_shared_key(void);
@@ -167,8 +167,9 @@ typedef struct s_basic_factory_info
     int ezlopi_factory_info_v2_factory_reset(void);
 
 #if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
-
+#define EZLOPI_DEVICE_TYPE_NAME "generic"
 #elif (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
+#define EZLOPI_DEVICE_TYPE_NAME "ezlopi_device_irblaster"
 static const char *ir_blaster_constant_config =
     "{\
         \"cmd\": 3,\
@@ -187,6 +188,7 @@ static const char *ir_blaster_constant_config =
         ],\
     \"dev_total\": 1}";
 #elif (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
+#define EZLOPI_DEVICE_TYPE_NAME "ezlopi_device_switchbox"
 static const char *switch_box_constant_config =
     "{\
         \"cmd\": 3,\
@@ -371,7 +373,7 @@ static const char *switch_box_constant_config =
         ],\
     \"dev_total\": 12}";
 #elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
-
+#define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\

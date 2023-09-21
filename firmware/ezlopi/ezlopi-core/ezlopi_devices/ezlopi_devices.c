@@ -195,6 +195,7 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t *item)
     }
 }
 
+#if 0 // v2.x
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
 {
     if (device)
@@ -289,6 +290,7 @@ void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device)
     }
     vTaskDelay(1);
 }
+#endif
 
 static void ezlopi_device_parse_json_v3(char *config_string)
 {
@@ -319,7 +321,7 @@ static void ezlopi_device_parse_json_v3(char *config_string)
 
                     while (NULL != v3_sensor_list[dev_idx].func)
                     {
-                      if (id_item == v3_sensor_list[dev_idx].id)
+                        if (id_item == v3_sensor_list[dev_idx].id)
                         {
                             s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_sensor_list[dev_idx], .cjson_device = cjson_device};
                             v3_sensor_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
@@ -464,7 +466,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(void)
 }
 
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
-                                                  int (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void *arg, void *user_arg))
+                                                  int (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
 {
     l_ezlopi_item_t *new_item = NULL;
     if (device)

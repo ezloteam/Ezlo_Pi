@@ -13,6 +13,7 @@
 #include "timer_service.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_event_queue.h"
+#include "core_sntp.h"
 
 #include "trace.h"
 #include "ezlopi.h"
@@ -43,6 +44,7 @@ void app_main(void)
     ota_service_init();
     ezlopi_ble_service_init();
     timer_service_init();
+    core_sntp_init();
     TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }

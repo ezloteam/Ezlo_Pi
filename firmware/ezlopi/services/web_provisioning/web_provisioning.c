@@ -36,41 +36,6 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void web_provisioning_fetch_wss_endpoint(void *pv);
 
-#if 0
-typedef struct s_method_list
-{
-    char *method_name;
-    cJSON *(*method)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-    cJSON *(*updater)(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count);
-} s_method_list_t;
-
-static const s_method_list_t method_list[] = {
-    /** Getter functions **/
-    {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
-    {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
-    {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
-    // {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
-    // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
-    // {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
-    // {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
-    // {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
-    // {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
-    // {.method_name = "hub.network.get", .method = network_get, .updater = NULL}, //, .updater = NULL},
-    // // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
-    // // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
-    // {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
-
-    // // // /** Setter functions **/
-    // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
-    // // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
-    // // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
-    // {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
-
-    // // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    // // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-};
-#endif
-
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
 {
@@ -98,7 +63,7 @@ static const s_method_list_v2_t method_list_v2[] = {
 
     // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
     {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},
-    {.method_name = "hub.favorite.list", .method = favorite_list, .updater = NULL},
+    {.method_name = "hub.favorite.list", .method = favorite_list_v3, .updater = NULL},
     {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
     {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
     {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
