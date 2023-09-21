@@ -7,7 +7,6 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_device_value_updated.h"
 #include "gpio_isr_service.h"
-
 #include "sensor_0061_digitalIn_reed_switch.h"
 
 //----------------------------------------------------------------------
@@ -28,11 +27,9 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, s_ezlopi_device
     {
     case EZLOPI_ACTION_PREPARE:
         ret = sensor_0061_prepare_and_add(arg);
-        /* code */
         break;
     case EZLOPI_ACTION_INITIALIZE:
         ret = sensor_0061_init(properties);
-        /* code */
         break;
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
@@ -41,9 +38,7 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, s_ezlopi_device
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
         ret = sensor_0061_get_value_cjson(properties, arg);
-        /* code */
         break;
-
     default:
         break;
     }
@@ -115,27 +110,25 @@ static int sensor_0061_prepare_and_add(void *arg)
 static int sensor_0061_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    static bool guard = false;
-    if (!guard)
+    if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
     {
-        if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
+        gpio_config_t io_conf = {
+            .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
+            .mode = GPIO_MODE_INPUT,
+            .pull_up_en = GPIO_PULLUP_DISABLE,
+            .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+            .intr_type = properties->interface.gpio.gpio_in.pull,
+        };
+        ret = gpio_config(&io_conf);
+        if (ret)
         {
-            gpio_config_t io_conf = {
-                .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
-                .mode = GPIO_MODE_INPUT,
-                .pull_up_en = GPIO_PULLUP_DISABLE,
-                .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
-                .intr_type = properties->interface.gpio.gpio_in.pull,
-            };
-
-            if (ESP_OK == gpio_config(&io_conf))
-            {
-                properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-            }
-
-            gpio_isr_service_register(properties, sensor_0061_update_from_device, 200);
+            TRACE_E("Error initializing Reed switch");
         }
-        guard = true;
+        else
+        {
+            properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        }
+        gpio_isr_service_register(properties, sensor_0061_update_from_device, 200);
     }
 
     return ret;
@@ -147,8 +140,6 @@ static void sensor_0061_get_item(s_ezlopi_device_properties_t *properties, void 
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        // int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        // properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
     }
 }
