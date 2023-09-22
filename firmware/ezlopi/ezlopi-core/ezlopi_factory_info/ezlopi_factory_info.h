@@ -380,12 +380,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"DS18B20\",\
-                \"dev_type\": 7,\
-                \"id_item\": 30,\
+                \"dev_name\": \"HCSR04 ultrasonic\",\
+                \"dev_type\": 10,\
+                \"id_item\": 24,\
                 \"id_room\": \"\",\
-                \"gpio\": 1\
-            }\             
+                \"gpio1\": 18,\
+                \"gpio2\": 19\
+            }\                
         ],\
     \"dev_total\": 1}";
 

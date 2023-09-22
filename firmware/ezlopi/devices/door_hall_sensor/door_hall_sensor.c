@@ -16,7 +16,6 @@
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
-static int __set_value(l_ezlopi_item_t *item, void *arg);
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 static int __notify(l_ezlopi_item_t *item);
 
@@ -72,9 +71,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 
 static int __notify(l_ezlopi_item_t *item)
 {
-    int ret = 0;
-    ezlopi_device_value_updated_from_device_v3(item);
-    return ret;
+    return ezlopi_device_value_updated_from_device_v3(item);
 }
 
 static int __init(l_ezlopi_item_t *item)
