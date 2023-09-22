@@ -269,7 +269,7 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     return boot_count;
 }
 
-static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
+int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
 {
     int ret = 0;
 
@@ -301,7 +301,7 @@ static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
     return ret;
 }
 
-static char *ezlopi_nvs_read_str(char *nvs_name)
+char *ezlopi_nvs_read_str(char *nvs_name)
 {
     char *return_str = NULL;
 
