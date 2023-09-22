@@ -31,4 +31,12 @@ const static char *scales_lux = "lux";
 /// @brief pressure
 const static char *scales_kilo_pascal = "kilo_pascal";
 
+/// @brief substance_amount
+const static char *scales_micro_gram_per_cubic_meter = "micro_gram_per_cubic_meter";
+const static char *scales_mole_per_cubic_meter = "mole_per_cubic_meter";
+const static char *scales_parts_per_million = "parts_per_million";
+const static char *scales_milli_gram_per_liter = "milli_gram_per_liter";
+
+
+
 #endif // __EZLOPI_SCALES_STR_H__
