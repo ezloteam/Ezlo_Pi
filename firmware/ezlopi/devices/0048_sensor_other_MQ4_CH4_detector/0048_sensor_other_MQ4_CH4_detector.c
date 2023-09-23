@@ -30,7 +30,7 @@ static bool Calibration_complete = false; // flag to activate calibration phase
 static int __0048_prepare(void *arg);
 static int __0048_init(l_ezlopi_item_t *item);
 static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __notify(l_ezlopi_item_t *item);
+static int __0048_notify(l_ezlopi_item_t *item);
 static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin);
 void Calibrate_MQ4_R0_resistance(void *params);
 //--------------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ int sensor_MQ4_CH4_detector_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item,
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        __0048_notify(item);
         break;
     }
     default:
@@ -251,7 +251,7 @@ static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static int __0048_notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
     if (item)
