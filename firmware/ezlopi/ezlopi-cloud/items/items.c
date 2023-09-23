@@ -166,7 +166,7 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-cJSON *ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_item_t *item)
+cJSON * ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_item_t *item)
 {
     cJSON *cjson_response = cJSON_CreateObject();
     if (cjson_response)

@@ -20,17 +20,19 @@
 //*************************************************************************
 static float MQ4_R0_constant = 0;         // Define variable for MQ4_R0_constant [always constant]
 static bool Calibration_complete = false; // flag to activate calibration phase
-const char *mq4_sensor_gas_alarm_token[] =
-    {
-        "no_gas",
-        "combustible_gas_detected",
-        "toxic_gas_detected",
-        "unknown"};
+// const char *mq4_sensor_gas_alarm_token[] =
+//     {
+//         "no_gas",
+//         "combustible_gas_detected",
+//         "toxic_gas_detected",
+//         "unknown"};
 //--------------------------------------------------------------------------------------------------------
 static int __0048_prepare(void *arg);
 static int __0048_init(l_ezlopi_item_t *item);
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __notify(l_ezlopi_item_t *item);
+static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin);
+void Calibrate_MQ4_R0_resistance(void *params);
 //--------------------------------------------------------------------------------------------------------
 
 int sensor_MQ4_CH4_detector_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -50,7 +52,7 @@ int sensor_MQ4_CH4_detector_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item,
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __get_cjson_value(item, arg);
+        __0048_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -137,12 +139,11 @@ static int __0048_init(l_ezlopi_item_t *item)
         {
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-
             // calibrate if not done
             // TRACE_W(".........................................CALIB_GAURD : %d", Calibration_complete);
             if (!Calibration_complete)
             {
-                xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, NULL, 1, NULL);
+                xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, (void *)&(item->interface.adc.gpio_num), 1, NULL);
             }
             ret = 2;
         }
@@ -204,10 +205,137 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 }
+
 //------------------------------------------------------------------------------------------------------
+static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+{
+
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
+        {
+            if (ezlopi_item_name_gas_alarm == item->ezlopi_cloud.item_name)
+            {
+                //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
+                // if (NULL != json_array_enum)
+                // {
+                //     for (uint8_t i = 0; i < MQ4_GAS_ALARM_MAX; i++)
+                //     {
+                //         cJSON *json_value = cJSON_CreateString(mq4_sensor_gas_alarm_token[i]);
+                //         if (NULL != json_value)
+                //         {
+                //             cJSON_AddItemToArray(json_array_enum, json_value);
+                //         }
+                //     }
+                //     cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
+                // }
+                //--------------------------------------------------------------------------------------
+                if () // when D0 -> 0V,
+                {
+                    cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : _no_water_leak);
+                }
+            }
+            if (ezlopi_item_name_smoke_density == item->ezlopi_cloud.item_name)
+            {
+                char valueFormatted[20];
+                snprintf(valueFormatted, 20, "%.2f", (float *)item->user_arg);
+                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                cJSON_AddNumberToObject(cj_result, "value", (float *)item->user_arg);
+            }
+            //-----------------------------------------------------------------------------------------
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+static int __notify(l_ezlopi_item_t *item)
+{
+    int ret = 0;
+    if (item)
+    {
+        if (ezlopi_item_name_gas_alarm == item->ezlopi_cloud.item_name)
+        {
+            char *curret_value = NULL;
+            if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
+            {
+                curret_value = "combustible_gas_detected";
+            }
+            else
+            {
+                curret_value = "no_gas";
+            }
+            if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
+            {
+                item->user_arg = (void *)curret_value;
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
+        }
+        if (ezlopi_item_name_smoke_density == item->ezlopi_cloud.item_name)
+        {
+            float _ppm = 0;
+            // extract the sensor_output_values
+            Extract_MQ4_sensor_ppm(&_ppm, item->interface.adc.gpio_num);
+            item->user_arg = (void *)_ppm;
+            ezlopi_device_value_updated_from_device_v3(item);
+        }
+
+        ret = 1;
+    }
+    return ret;
+}
+//------------------------------------------------------------------------------------------------------
+static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin)
+{
+    // calculation process
+    //-------------------------------------------------
+    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+    // extract the mean_sensor_analog_output_voltage
+    float analog_sensor_volt = 0;
+    for (uint8_t x = 10; x > 0; x--)
+    {
+        ezlopi_adc_get_adc_data(mq4_adc_pin, &ezlopi_analog_data);
+        TRACE_W("ADC_Value : %d, ADC_voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
+#ifdef VOLTAGE_DIVIDER_ADDED
+        analog_sensor_volt += ((float)(ezlopi_analog_data->voltage) * 2.0f);
+#else
+        analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
+#endif
+    }
+    analog_sensor_volt = analog_sensor_volt / 10.0f;
+
+    //-----------------------------------------------------------------------------------
+    // Stage_2 : [from 'sensor_0048_ADC_MQ4_methane_gas_detector.h']
+
+    // 1. Calculate 'Rs_gas' for the gas detected
+    float Rs_gas = (((MQ4_VOLT_RESOLUTION_Vc * mq4_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq4_eqv_RL);
+
+    // 1.1 Calculate @ 'ratio' during CH4 presence
+    double _ratio = (Rs_gas / ((MQ4_R0_constant <= 0) ? (1.0f) : (MQ4_R0_constant))); // avoid dividing by zero??
+    if (_ratio <= 0)
+    {
+        _ratio = 0;
+    }
+    //-------------------------------------------------
+
+    // 1.2 Calculate _ppm
+    *_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq4) / m_slope_mq4); // ---> _ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+    if (*_ppm < 0)
+    {
+        *_ppm = 0; // No negative values accepted or upper datasheet recomendation.
+    }
+    else
+    {
+        TRACE_E("_ppm [CH4] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", *_ppm, (float)_ratio, analog_sensor_volt);
+    }
+    //-------------------------------------------------
+}
+
 void Calibrate_MQ4_R0_resistance(void *params)
 {
-    float RS_calib = 0; // Define variable for sensor resistance
+    uint32_t mq4_adc_pin = *((uint32_t *)params);
     //-------------------------------------------------
     // let the sensor to heat for 20seconds
     for (uint8_t j = 20; j > 0; j--)
@@ -218,32 +346,28 @@ void Calibrate_MQ4_R0_resistance(void *params)
     //-------------------------------------------------
     // extract the mean_sensor_analog_output_voltage
     float _sensor_volt = 0;
-    s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
-    if (ezlopi_analog_data)
+    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+    for (uint8_t i = 200; i > 0; i--)
     {
-        memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
-        for (uint8_t i = 200; i > 0; i--)
+        ezlopi_adc_get_adc_data(mq4_adc_pin, &ezlopi_analog_data);
+        if (i % 20 == 0)
         {
-            if (i % 20 == 0)
-            {
-                TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
-            }
-            // extract ADC values
-            ezlopi_adc_get_adc_data(mq4_adc_pin, ezlopi_analog_data);
-#ifdef VOLTAGE_DIVIDER_ADDED
-            _sensor_volt += (float)((ezlopi_analog_data->voltage) * 2); // [0-2.4V] X2
-#else
-            _sensor_volt += (float)(ezlopi_analog_data->voltage);
-#endif
+            TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
+            TRACE_W("ADC_Value : %d, ADC_voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
         }
-        _sensor_volt = _sensor_volt / 200.0f;
-
-        // free data pointer
-        free(ezlopi_analog_data);
+        // extract ADC values
+#ifdef VOLTAGE_DIVIDER_ADDED
+        _sensor_volt += (float)((ezlopi_analog_data->voltage) * 2); // [0-2.4V] X2
+#else
+        _sensor_volt += (float)(ezlopi_analog_data->voltage);
+#endif
     }
+    _sensor_volt = _sensor_volt / 200.0f;
+
     //-------------------------------------------------
     // Calculate the 'Rs' of heater during clean air [calibration phase]
     // Range -> [2Kohm - 20Kohm]
+    float RS_calib = 0;                                                                         // Define variable for sensor resistance
     RS_calib = ((MQ4_VOLT_RESOLUTION_Vc * mq4_eqv_RL) / (_sensor_volt / 1000.0f)) - mq4_eqv_RL; // Calculate RS in fresh air
     TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
     if (RS_calib < 0)
