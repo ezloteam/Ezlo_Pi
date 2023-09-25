@@ -80,7 +80,7 @@ static char *g_ssl_shared_key = NULL;
 static char *g_ezlopi_config = NULL;
 static uint32_t g_provisioning_status = 0;
 char ezlopi_device_type_str[][50] = {
-    "generic",
+    "ezlopi_generic",
     "ezlopi_device_switchbox",
     "ezlopi_device_irblaster"
     "ezlopi_sensor_sound",

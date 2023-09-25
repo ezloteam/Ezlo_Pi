@@ -43,6 +43,10 @@ get_version_variables() {
     fi
 }
 
+BUIDER_EMAIL=`git config --get user.email`
+BUILD_TIME=`date +"%c"`
+COMMIT_HASH=`git rev-parse HEAD`
+
 version_create () {
     echo -e "#ifndef __VERSION_H__" > $versionFile
     echo -e "#define __VERSION_H__" >> $versionFile
@@ -65,6 +69,12 @@ version_create () {
     else
         echo -e "#define VERSION_STR \"${V_MAJOR}.${V_MINOR}.${V_BATCH}\"" >> $versionFile
     fi
+    
+    echo -e "#define DEVELOPER \"${BUIDER_EMAIL}\"" >> $versionFile
+    echo -e "#define COMPILE_TIME \"${BUILD_TIME}\"" >> $versionFile
+    echo -e "#define CURRENT_BRANCH \"Nepal Digital System Pvt. Ltd.\"" >> $versionFile
+    echo -e "#define COMMIT_HASH \"${COMMIT_HASH}\"" >> $versionFile
+
     echo -e "#ifdef __cplusplus" >> $versionFile
     echo -e "}" >> $versionFile
     echo -e "#endif" >> $versionFile
@@ -152,6 +162,7 @@ retVal=$?
 mkdir -p "firmware"
 if [ $retVal -ne 1 ]; then
     get_version_variables
+    echo -e "V_BUILD: ${V_BUILD}"
     V_BUILD=$((V_BUILD+1))
 
     if [[ 0 == release ]];then
