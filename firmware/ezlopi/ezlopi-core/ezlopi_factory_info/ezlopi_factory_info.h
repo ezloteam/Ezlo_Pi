@@ -379,9 +379,9 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"MQ4_CH4\",\
+                \"dev_name\": \"MQ2_LPG\",\
                 \"dev_type\": 10,\
-                \"id_item\": 48,\
+                \"id_item\": 49,\
                 \"id_room\": \"\",\
                 \"gpio1\": 25,\
                 \"gpio2\": 33\

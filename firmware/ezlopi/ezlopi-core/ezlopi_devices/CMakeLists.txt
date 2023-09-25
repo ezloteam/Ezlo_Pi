@@ -34,6 +34,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 0038_digitalOut_RGB 
                                 0044_sensor_I2C_TSL256_luminosity
                                 0048_sensor_other_MQ4_CH4_detector
+                                0049_sensor_other_MQ2_LPG_detector
                                 )
 
 

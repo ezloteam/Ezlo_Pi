@@ -57,6 +57,8 @@
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
 
 #define EZLOPI_SENSOR_0048_OTHER_MQ4_CH4_DETECTOR 48
+#define EZLOPI_SENSOR_0048_OTHER_MQ2_LPG_DETECTOR 49
+
 
 /**
  * @brief defining the type of sensor call function
