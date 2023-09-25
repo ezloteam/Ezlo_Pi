@@ -4,6 +4,7 @@
 #include "ezlopi_timer.h"
 #include "items.h"
 #include "math.h"
+#include "stdbool.h"
 
 #include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
@@ -19,20 +20,22 @@
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
-static float MQ4_R0_constant = 0;         // Define variable for MQ4_R0_constant [always constant]
-static bool Calibration_complete = false; // flag to activate calibration phase
-// const char *mq4_sensor_gas_alarm_token[] =
-//     {
-//         "no_gas",
-//         "combustible_gas_detected",
-//         "toxic_gas_detected",
-//         "unknown"};
+
+static float _ppm = 0, MQ4_R0_constant = 0; // Define variable for MQ4_R0_constant [always constant]
+static bool Calibration_complete = false;   // flag to activate calibration phase
+const char *mq4_sensor_gas_alarm_token[] =
+    {
+        "no_gas",
+        "combustible_gas_detected",
+        "toxic_gas_detected",
+        "unknown"};
 //--------------------------------------------------------------------------------------------------------
 static int __0048_prepare(void *arg);
 static int __0048_init(l_ezlopi_item_t *item);
+static int __0048_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0048_notify(l_ezlopi_item_t *item);
-static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin);
+static void Extract_MQ4_sensor_ppm(uint32_t mq4_adc_pin);
 void Calibrate_MQ4_R0_resistance(void *params);
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
@@ -55,6 +58,11 @@ int sensor_MQ4_CH4_detector_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item,
         __0048_init(item);
         break;
     }
+    // case EZLOPI_ACTION_HUB_GET_ITEM:
+    // {
+    //     __0048_get_item(item, arg);
+    //     break;
+    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         __0048_get_cjson_value(item, arg);
@@ -62,7 +70,10 @@ int sensor_MQ4_CH4_detector_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item,
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0048_notify(item);
+        if (Calibration_complete)
+        {
+            __0048_notify(item);
+        }
         break;
     }
     default:
@@ -147,10 +158,9 @@ static int __0048_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             // calibrate if not done
-            // TRACE_W(".........................................CALIB_GAURD : %d", Calibration_complete);
             if (!Calibration_complete)
             {
-                xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, (void *)&(item->interface.adc.gpio_num), 1, NULL);
+                xTaskCreate(Calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, &(item->interface.adc.gpio_num), 1, NULL);
             }
             ret = 2;
         }
@@ -182,14 +192,15 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
 
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "en_gpio1", item->interface.gpio.gpio_in.enable); // we can enable/disable DIGI_GPIO
+    TRACE_I("MQ4-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
+    // CJSON_GET_VALUE_INT(cj_device, "en_gpio1", item->interface.gpio.gpio_in.enable); // we can enable/disable DIGI_GPIO
 }
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "MQ4-CH4-level[ppm]";
+    device_name = "MQ4-CH4-level [PPM]";
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -209,12 +220,12 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.adc.gpio_num);
-
+    TRACE_I("MQ4-> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 }
 
 //------------------------------------------------------------------------------------------------------
-static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0048_get_item(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
     if (item && arg)
@@ -225,29 +236,54 @@ static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
                 //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
-                // if (NULL != json_array_enum)
-                // {
-                //     for (uint8_t i = 0; i < MQ4_GAS_ALARM_MAX; i++)
-                //     {
-                //         cJSON *json_value = cJSON_CreateString(mq4_sensor_gas_alarm_token[i]);
-                //         if (NULL != json_value)
-                //         {
-                //             cJSON_AddItemToArray(json_array_enum, json_value);
-                //         }
-                //     }
-                //     cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
-                // }
+                cJSON *json_array_enum = cJSON_CreateArray();
+                if (NULL != json_array_enum)
+                {
+                    for (uint8_t i = 0; i < MQ4_GAS_ALARM_MAX; i++)
+                    {
+                        cJSON *json_value = cJSON_CreateString(mq4_sensor_gas_alarm_token[i]);
+                        if (NULL != json_value)
+                        {
+                            cJSON_AddItemToArray(json_array_enum, json_value);
+                        }
+                    }
+                    cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
+                }
                 //--------------------------------------------------------------------------------------
                 cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_gas");
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+                snprintf(valueFormatted, 20, "%.2f", _ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+                cJSON_AddNumberToObject(cj_result, "value", _ppm);
             }
-            //-----------------------------------------------------------------------------------------
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
+        {
+            if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
+            {
+                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_gas");
+            }
+            if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+            {
+                char valueFormatted[20];
+                snprintf(valueFormatted, 20, "%.2f", _ppm);
+                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                cJSON_AddNumberToObject(cj_result, "value", _ppm);
+            }
             ret = 1;
         }
     }
@@ -278,18 +314,20 @@ static int __0048_notify(l_ezlopi_item_t *item)
         }
         if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
-            float _ppm = 0;
             // extract the sensor_output_values
-            Extract_MQ4_sensor_ppm(&_ppm, item->interface.adc.gpio_num);
-            item->user_arg = (void *)(&_ppm);
-            ezlopi_device_value_updated_from_device_v3(item);
+            float prev_ppm = _ppm;
+            Extract_MQ4_sensor_ppm(item->interface.adc.gpio_num);
+            if (prev_ppm != _ppm)
+            {
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
         ret = 1;
     }
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin)
+static void Extract_MQ4_sensor_ppm(uint32_t mq4_adc_pin)
 {
     // calculation process
     //-------------------------------------------------
@@ -299,12 +337,12 @@ static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin)
     for (uint8_t x = 10; x > 0; x--)
     {
         ezlopi_adc_get_adc_data(mq4_adc_pin, &ezlopi_analog_data);
-        TRACE_W("ADC_Value : %d, ADC_voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
 #ifdef VOLTAGE_DIVIDER_ADDED
         analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
         analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
+        vTaskDelay(1);
     }
     analog_sensor_volt = analog_sensor_volt / 10.0f;
 
@@ -323,15 +361,13 @@ static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin)
     //-------------------------------------------------
 
     // 1.2 Calculate _ppm
-    *_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq4) / m_slope_mq4); // ---> _ppm = 10 ^ [ ( log(ratio) - b ) / m ]
-    if (*_ppm < 0)
+    _ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq4) / m_slope_mq4); // ---> _ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+    if (_ppm < 0)
     {
-        *_ppm = 0; // No negative values accepted or upper datasheet recomendation.
+        _ppm = 0; // No negative values accepted or upper datasheet recomendation.
     }
-    else
-    {
-        TRACE_E("_ppm [CH4] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", *_ppm, (float)_ratio, analog_sensor_volt);
-    }
+    TRACE_E("_ppm [CH4] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _ppm, (float)_ratio, analog_sensor_volt);
+
     //-------------------------------------------------
 }
 
@@ -343,28 +379,28 @@ void Calibrate_MQ4_R0_resistance(void *params)
     for (uint8_t j = 20; j > 0; j--)
     {
         TRACE_E("Heating sensor.........time left: %d sec", j);
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
+        vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
     }
     //-------------------------------------------------
     // extract the mean_sensor_analog_output_voltage
     float _sensor_volt = 0;
     s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-    for (uint8_t i = 200; i > 0; i--)
+    for (uint8_t i = 100; i > 0; i--)
     {
-        ezlopi_adc_get_adc_data(mq4_adc_pin, &ezlopi_analog_data);
         if (i % 20 == 0)
         {
             TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
-            TRACE_W("ADC_Value : %d, ADC_voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
         }
         // extract ADC values
+        ezlopi_adc_get_adc_data(mq4_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-        _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2); // [0-2.4V] X2
+        _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
 #else
         _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
+        vTaskDelay(1); // 10ms
     }
-    _sensor_volt = _sensor_volt / 200.0f;
+    _sensor_volt = _sensor_volt / 100.0f;
 
     //-------------------------------------------------
     // Calculate the 'Rs' of heater during clean air [calibration phase]
@@ -376,7 +412,6 @@ void Calibrate_MQ4_R0_resistance(void *params)
     {
         RS_calib = 0; // No negative values accepted.
     }
-
     // Calculate the R0_air which is constant through-out
     MQ4_R0_constant = (RS_calib / RatioMQ4CleanAir); // Calculate MQ4_R0_constant
     TRACE_E("CALIB_TASK -> 'MQ4_R0_constant' = %.2f", MQ4_R0_constant);
@@ -384,7 +419,6 @@ void Calibrate_MQ4_R0_resistance(void *params)
     {
         MQ4_R0_constant = 0; // No negative values accepted.
     }
-
     // Set calibration_complete flag
     Calibration_complete = true;
     vTaskDelete(NULL);

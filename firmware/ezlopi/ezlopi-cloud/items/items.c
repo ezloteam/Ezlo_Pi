@@ -51,10 +51,10 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                         {
                             cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
                         }
-
+                        // curr_item->func(EZLOPI_ACTION_HUB_GET_ITEM, curr_item, cj_properties, curr_item->user_arg);
                         curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
                         // cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
-                        if(curr_item->cloud_properties.scale)
+                        if (curr_item->cloud_properties.scale)
                         {
                             cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
                         }
@@ -166,7 +166,7 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-cJSON * ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_item_t *item)
+cJSON *ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_item_t *item)
 {
     cJSON *cjson_response = cJSON_CreateObject();
     if (cjson_response)
@@ -194,7 +194,7 @@ cJSON * ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_
                 cJSON_AddNullToObject(cj_result, "notifications");
                 cJSON_AddFalseToObject(cj_result, "syncNotification");
                 cJSON_AddStringToObject(cj_result, "name", item->cloud_properties.item_name);
-                if(item->cloud_properties.scale)
+                if (item->cloud_properties.scale)
                 {
                     cJSON_AddStringToObject(cj_result, "scale", item->cloud_properties.scale);
                 }

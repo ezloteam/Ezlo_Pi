@@ -125,14 +125,14 @@
 #define MQ4_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq4 -0.3397f
 #define b_coeff_mq4 1.019f
-// typedef enum
-// {
-//     MQ4_GAS_ALARM_NO_GAS,
-//     MQ4_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
-//     MQ4_GAS_ALARM_TOXIC_GAS_DETECTED,
-//     MQ4_GAS_ALARM_UNKNOWN,
-//     MQ4_GAS_ALARM_MAX
-// } e_mq4_gas_alarm_states_t;
+typedef enum
+{
+    MQ4_GAS_ALARM_NO_GAS,
+    MQ4_GAS_ALARM_COMBUSTIBLE_GAS_DETECTED,
+    MQ4_GAS_ALARM_TOXIC_GAS_DETECTED,
+    MQ4_GAS_ALARM_UNKNOWN,
+    MQ4_GAS_ALARM_MAX
+} e_mq4_gas_alarm_states_t;
 
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION
