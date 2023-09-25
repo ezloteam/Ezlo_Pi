@@ -36,6 +36,11 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 0048_sensor_other_MQ4_CH4_detector
                                 0049_sensor_other_MQ2_LPG_detector
                                 0050_sensor_other_MQ3_alcohol_detector
+                                0051_sensor_other_MQ8_H2_detector
+                                0052_sensor_other_MQ135_NH3_detector
+                                0059_sensor_other_MQ6_LPG_detector
+                                0062_sensor_other_MQ7_CO_detector
+                                0063_sensor_other_MQ9_LPG_flameable_detector
                                 )
 
 

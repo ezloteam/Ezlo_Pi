@@ -34,6 +34,11 @@
 #include "0048_sensor_other_MQ4_CH4_detector.h"
 #include "0049_sensor_other_MQ2_LPG_detector.h"
 #include "0050_sensor_other_MQ3_alcohol_detector.h"
+#include "0051_sensor_other_MQ8_H2_detector.h"
+#include "0052_sensor_other_MQ135_NH3_detector.h"
+#include "0059_sensor_other_MQ6_LPG_detector.h"
+#include "0062_sensor_other_MQ7_CO_detector.h"
+#include "0063_sensor_other_MQ9_LPG_flameable_detector.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -207,8 +212,43 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .id = EZLOPI_SENSOR_0050_OTHER_MQ3_ALCOHOL_DETECTOR,
         .func = sensor_MQ3_ALCO_detector_v3,
     },
-
 #endif
+
+#ifdef EZLOPI_SENSOR_0051_OTHER_MQ8_H2_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0051_OTHER_MQ8_H2_DETECTOR,
+        .func = sensor_MQ8_H2_detector_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0052_OTHER_MQ135_NH3_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0052_OTHER_MQ135_NH3_DETECTOR,
+        .func = sensor_MQ135_NH3_detector_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_DETECTOR,
+        .func = sensor_MQ6_LPG_detector_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0062_OTHER_MQ7_CO_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0062_OTHER_MQ7_CO_DETECTOR,
+        .func = sensor_MQ7_CO_detector_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR,
+        .func = sensor_MQ9_LPG_flameable_detector_v3,
+    },
+#endif
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.
