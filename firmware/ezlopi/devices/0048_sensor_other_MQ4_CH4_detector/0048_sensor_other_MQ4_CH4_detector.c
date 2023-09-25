@@ -3,6 +3,7 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_timer.h"
 #include "items.h"
+#include "math.h"
 
 #include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
@@ -12,7 +13,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
-
+#include "ezlopi_cloud_scales_str.h"
 #include "0048_sensor_other_MQ4_CH4_detector.h"
 
 //*************************************************************************
@@ -33,6 +34,10 @@ static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0048_notify(l_ezlopi_item_t *item);
 static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin);
 void Calibrate_MQ4_R0_resistance(void *params);
+static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 //--------------------------------------------------------------------------------------------------------
 
 int sensor_MQ4_CH4_detector_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -83,7 +88,7 @@ static int __0048_prepare(void *arg)
             l_ezlopi_item_t *MQ4_item_digi = ezlopi_device_add_item_to_device(MQ4_device_digi, sensor_MQ4_CH4_detector_v3);
             if (MQ4_item_digi)
             {
-                _prepare_item_digi_cloud_properties(MQ4_item_digi, device_prep_arg->cjson_device);
+                __prepare_item_digi_cloud_properties(MQ4_item_digi, device_prep_arg->cjson_device);
             }
             else
             {
@@ -104,7 +109,7 @@ static int __0048_prepare(void *arg)
             l_ezlopi_item_t *MQ4_item_adc = ezlopi_device_add_item_to_device(MQ4_device_adc, sensor_MQ4_CH4_detector_v3);
             if (MQ4_item_adc)
             {
-                _prepare_item_adc_cloud_properties(MQ4_item_adc, device_prep_arg->cjson_device);
+                __prepare_item_adc_cloud_properties(MQ4_item_adc, device_prep_arg->cjson_device);
             }
             else
             {
@@ -115,7 +120,9 @@ static int __0048_prepare(void *arg)
         {
             ezlopi_device_free_device(MQ4_device_adc);
         }
+        ret = 1;
     }
+    return ret;
 }
 
 static int __0048_init(l_ezlopi_item_t *item)
@@ -209,14 +216,13 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 //------------------------------------------------------------------------------------------------------
 static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
-
     int ret = 0;
     if (item && arg)
     {
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            if (ezlopi_item_name_gas_alarm == item->ezlopi_cloud.item_name)
+            if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
                 //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
                 // if (NULL != json_array_enum)
@@ -232,17 +238,14 @@ static int __0048_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 //     cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
                 // }
                 //--------------------------------------------------------------------------------------
-                if () // when D0 -> 0V,
-                {
-                    cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : _no_water_leak);
-                }
+                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_gas");
             }
-            if (ezlopi_item_name_smoke_density == item->ezlopi_cloud.item_name)
+            if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", (float *)item->user_arg);
+                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", (float *)item->user_arg);
+                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
             }
             //-----------------------------------------------------------------------------------------
             ret = 1;
@@ -256,7 +259,7 @@ static int __0048_notify(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (ezlopi_item_name_gas_alarm == item->ezlopi_cloud.item_name)
+        if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
         {
             char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
@@ -273,15 +276,14 @@ static int __0048_notify(l_ezlopi_item_t *item)
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
-        if (ezlopi_item_name_smoke_density == item->ezlopi_cloud.item_name)
+        if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
             float _ppm = 0;
             // extract the sensor_output_values
             Extract_MQ4_sensor_ppm(&_ppm, item->interface.adc.gpio_num);
-            item->user_arg = (void *)_ppm;
+            item->user_arg = (void *)(&_ppm);
             ezlopi_device_value_updated_from_device_v3(item);
         }
-
         ret = 1;
     }
     return ret;
@@ -299,7 +301,7 @@ static void Extract_MQ4_sensor_ppm(float *_ppm, uint32_t mq4_adc_pin)
         ezlopi_adc_get_adc_data(mq4_adc_pin, &ezlopi_analog_data);
         TRACE_W("ADC_Value : %d, ADC_voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
 #ifdef VOLTAGE_DIVIDER_ADDED
-        analog_sensor_volt += ((float)(ezlopi_analog_data->voltage) * 2.0f);
+        analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
         analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
@@ -357,7 +359,7 @@ void Calibrate_MQ4_R0_resistance(void *params)
         }
         // extract ADC values
 #ifdef VOLTAGE_DIVIDER_ADDED
-        _sensor_volt += (float)((ezlopi_analog_data->voltage) * 2); // [0-2.4V] X2
+        _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2); // [0-2.4V] X2
 #else
         _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
