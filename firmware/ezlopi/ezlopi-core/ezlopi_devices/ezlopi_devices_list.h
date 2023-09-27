@@ -56,6 +56,8 @@
 
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
 
+#define EZLOPI_SENSOR_0061_DIGITALIN_REED_SWITCH 61
+
 /**
  * @brief defining the type of sensor call function
  *
