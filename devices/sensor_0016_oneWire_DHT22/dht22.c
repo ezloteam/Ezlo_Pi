@@ -1,5 +1,3 @@
-
-
 /*------------------------------------------------------------------------------
 
     DHT22 temperature & humidity sensor AM2302 (DHT22) driver for ESP32
@@ -21,26 +19,24 @@
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
+#include "esp_log.h"
 #include "driver/gpio.h"
 
 #include "dht22.h"
-#include "trace.h"
 
 // == global defines =============================================
 
 static const char *TAG = "DHT";
-int uSec = 0;
 
-int DHTgpio = GPIO_NUM_4;
-// GPIO_NUM_4; // my default DHT pin = 4
-float humidity = 0.;
-float temperature = 0.;
+static int DHTgpio = GPIO_NUM_4; // my default DHT pin = 4
+static float humidity = 0.;
+static float temperature = 0.;
 
 // == set the DHT used pin=========================================
 
 void setDHTgpio(int gpio)
 {
-    // DHTgpio = gpio;
+    DHTgpio = gpio;
 }
 
 // == get temp & hum =============================================
@@ -56,18 +52,18 @@ void errorHandler(int response)
     {
 
     case DHT_TIMEOUT_ERROR:
-        TRACE_I("Sensor Timeout\n");
+        ESP_LOGE(TAG, "Sensor Timeout\n");
         break;
 
     case DHT_CHECKSUM_ERROR:
-        TRACE_I("CheckSum error\n");
+        ESP_LOGE(TAG, "CheckSum error\n");
         break;
 
     case DHT_OK:
         break;
 
     default:
-        TRACE_I("Unknown error\n");
+        ESP_LOGE(TAG, "Unknown error\n");
     }
 }
 
@@ -82,12 +78,13 @@ void errorHandler(int response)
 
 int getSignalLevel(int usTimeOut, bool state)
 {
+
+    int uSec = 0;
     while (gpio_get_level(DHTgpio) == state)
     {
+
         if (uSec > usTimeOut)
-        {
-            return (-1 * usTimeOut);
-        }
+            return -1;
 
         ++uSec;
         esp_rom_delay_us(1); // uSec delay
@@ -165,17 +162,15 @@ int readDHT()
 
     // == DHT will keep the line low for 80 us and then high for 80us ====
 
-    // getSignalLevel(2000, 1);
-
-    uSec = getSignalLevel(100, 0);
-    // TRACE_I("Response_down = %d", uSec);
+    uSec = getSignalLevel(85, 0);
+    // ESP_LOGI(TAG, "Response = %d", uSec);
     if (uSec < 0)
         return DHT_TIMEOUT_ERROR;
 
     // -- 80us up ------------------------
 
-    uSec = getSignalLevel(100, 1);
-    TRACE_I("Response_up = %d", uSec);
+    uSec = getSignalLevel(85, 1);
+    // ESP_LOGI(TAG, "Response = %d", uSec);
     if (uSec < 0)
         return DHT_TIMEOUT_ERROR;
 
@@ -185,6 +180,7 @@ int readDHT()
     {
 
         // -- starts new data transmission with >50us low signal
+
         uSec = getSignalLevel(56, 0);
         if (uSec < 0)
             return DHT_TIMEOUT_ERROR;
