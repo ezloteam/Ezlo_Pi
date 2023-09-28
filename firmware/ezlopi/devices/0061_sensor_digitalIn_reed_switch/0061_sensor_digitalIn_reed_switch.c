@@ -119,7 +119,6 @@ static int __0061_prepare(void *arg)
                 ezlopi_device_free_device(reed_device);
             }
         }
-
         ret = 1;
     }
     return ret;
@@ -135,7 +134,7 @@ static int __0061_init(l_ezlopi_item_t *item)
             // intialize digital_pin
             gpio_config_t input_conf = {
                 .pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num)),
-                .mode = GPIO_MODE_INPUT,
+                .mode = item->interface.gpio.gpio_in.mode,
                 .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
                                  (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
                                     ? GPIO_PULLDOWN_ENABLE
@@ -144,7 +143,7 @@ static int __0061_init(l_ezlopi_item_t *item)
                                (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
                                   ? GPIO_PULLUP_ENABLE
                                   : GPIO_PULLUP_DISABLE,
-                .intr_type = item->interface.gpio.gpio_in.pull,
+                .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
             ret = gpio_config(&input_conf);
             if (ret)
