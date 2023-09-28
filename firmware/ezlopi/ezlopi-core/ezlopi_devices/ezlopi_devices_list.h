@@ -56,6 +56,8 @@
 
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
 
+#define EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR 60
+
 /**
  * @brief defining the type of sensor call function
  *
