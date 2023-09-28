@@ -63,8 +63,7 @@ int sensor_reed_switch_v3(e_ezlopi_actions_t action, l_ezlopi_device_t *item, vo
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "REED Switch";
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_relay;
