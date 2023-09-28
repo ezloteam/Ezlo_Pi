@@ -145,6 +145,7 @@ static int dht22_sensor_init(s_ezlopi_device_properties_t *properties)
     if (!dht22_initialized)
     {
         setDHTgpio(properties->interface.onewire_master.onewire_pin);
+        TRACE_E("\n\n\nDHTgpio: %u\n\n\n", properties->interface.onewire_master.onewire_pin);
         dht22_initialized = true;
     }
 
@@ -173,7 +174,7 @@ static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t *propertie
         {
             readDHT();
             float humidity = getHumidity();
-            TRACE_I("humidity: %.2f percent", humidity);
+            TRACE_I("humidity: %.2f %%", humidity);
             snprintf(formatted_value, 20, "%0.2f", humidity);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
             cJSON_AddNumberToObject(cjson_properties, "value", humidity);
