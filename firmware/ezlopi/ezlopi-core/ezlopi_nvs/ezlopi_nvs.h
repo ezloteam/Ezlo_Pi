@@ -39,6 +39,9 @@ extern "C"
     char *ezlopi_nvs_scene_get(void);
     int ezlopi_nvs_scene_set(char *scene);
 
+    char *ezlopi_nvs_read_scenes_scripts(void);
+    int ezlopi_nvs_write_scenes_scripts(char *data);
+
 #ifdef __cplusplus
 }
 #endif

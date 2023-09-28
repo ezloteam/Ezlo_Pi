@@ -25,18 +25,19 @@
 #include "ezlopi_system_info.h"
 #include "029_IR_blaster_remote.h"
 
-#include "mac_uuid.h"
 #include "uuid.h"
+#include "mac_uuid.h"
 
-#include "ezlopi_scenes_service.h"
 #include "ezlopi_http.h"
+#include "ezlopi_scenes_scripts.h"
+#include "ezlopi_scenes_service.h"
 #include "ezlopi_factory_info.h"
 
 static void blinky(void *pv);
 
 void app_main(void)
 {
-    // uuid();
+    ezlopi_scenes_scripts_init();
 #if 0
     gpio_install_isr_service(0);
     qt_serial_init();

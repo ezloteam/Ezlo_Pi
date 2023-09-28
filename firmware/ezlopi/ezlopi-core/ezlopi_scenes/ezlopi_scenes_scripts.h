@@ -7,14 +7,17 @@
 
 typedef struct s_ezlopi_script
 {
-    uint32_t id;
-    char *script;
 } s_ezlopi_script_t;
 
 typedef struct s_ezlopi_lua_script
 {
+    uint32_t id;
     char *name;
-    s_ezlopi_script_t script;
+    char *script;
+
+    struct s_ezlopi_lua_script *next;
 } s_ezlopi_lua_script_t;
+
+void ezlopi_scenes_scripts_init(void);
 
 #endif // __EZLOPI_LUA_H__
