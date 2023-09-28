@@ -26,6 +26,7 @@
 #include "029_IR_blaster_remote.h"
 
 #include "mac_uuid.h"
+#include "uuid.h"
 
 #include "ezlopi_scenes_service.h"
 #include "ezlopi_http.h"
@@ -35,6 +36,8 @@ static void blinky(void *pv);
 
 void app_main(void)
 {
+    // uuid();
+#if 0
     gpio_install_isr_service(0);
     qt_serial_init();
     gpio_isr_service_init();
@@ -47,6 +50,7 @@ void app_main(void)
     core_sntp_init();
     TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+#endif
 }
 
 void ____check_and_free(char *to_be_freed)
