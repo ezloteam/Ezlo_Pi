@@ -66,7 +66,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_motion;
-    device->cloud_properties.device_type = dev_type_sensor_motion;
+    device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -164,6 +164,7 @@ static int __0060_get_item(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (true == (item->interface.gpio.gpio_in.value) ? "true" : "false"));
             cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
             ret = 1;
         }
@@ -179,6 +180,7 @@ static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (true == (item->interface.gpio.gpio_in.value) ? "true" : "false"));
             cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
             ret = 1;
         }
