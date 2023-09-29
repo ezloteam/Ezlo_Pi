@@ -17,6 +17,13 @@
 
 #include "0065_sensor_digitalIn_float_switch.h"
 //-----------------------------------------------------------------------
+const char *water_level_alarm_token[] =
+    {
+        "water_level_ok",
+        "water_level_below_low_threshold",
+        "water_level_above_high_threshold",
+        "unknown"};
+//-----------------------------------------------------------------------
 static int __0065_prepare(void *arg);
 static int __0065_init(l_ezlopi_item_t *item);
 static int __0065_get_item(l_ezlopi_item_t *item, void *arg);
@@ -65,8 +72,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.category = category_switch;
-    device->cloud_properties.subcategory = subcategory_relay;
+    device->cloud_properties.category = category_level_sensor;
+    device->cloud_properties.subcategory = subcategory_water;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
@@ -75,8 +82,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_switch;
-    item->cloud_properties.value_type = value_type_bool;
+    item->cloud_properties.item_name = ezlopi_item_name_water_flow_alarm;
+    item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
@@ -166,7 +173,23 @@ static int __0065_get_item(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
+            //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
+            cJSON *json_array_enum = cJSON_CreateArray();
+            if (NULL != json_array_enum)
+            {
+                for (uint8_t i = 0; i < WATER_LEVEL_ALARM_MAX; i++)
+                {
+                    cJSON *json_value = cJSON_CreateString(water_level_alarm_token[i]);
+                    if (NULL != json_value)
+                    {
+                        cJSON_AddItemToArray(json_array_enum, json_value);
+                    }
+                }
+                cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
+            }
+            //--------------------------------------------------------------------------------------
+
+            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
             ret = 1;
         }
     }
@@ -181,7 +204,7 @@ static int __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
+            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
             ret = 1;
         }
     }
@@ -193,8 +216,19 @@ static void _0065_update_from_device(l_ezlopi_item_t *item)
 {
     if (item)
     {
-        int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        ezlopi_device_value_updated_from_device_v3(item);
+        char *curret_value = NULL;
+        if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
+        {
+            curret_value = "water_flow_below_low_threshold";
+        }
+        else
+        {
+            curret_value = "water_flow_above_high_threshold";
+        }
+        if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
+        {
+            item->user_arg = (void *)curret_value;
+            ezlopi_device_value_updated_from_device_v3(item);
+        }
     }
 }

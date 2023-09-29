@@ -379,11 +379,11 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Float Switch\",\
+                \"dev_name\": \"Float_Switch\",\
                 \"dev_type\": 2,\
                 \"id_item\": 65,\
                 \"id_room\": \"\",\
-                \"gpio\": 1,\
+                \"gpio\": 19,\
                 \"logic_inv\": false\
             }\             
         ],\
