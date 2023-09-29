@@ -378,11 +378,11 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Reed\",\
+                \"dev_name\": \"reed\",\
                 \"dev_type\": 2,\
                 \"id_item\": 61,\
                 \"id_room\": \"\",\
-                \"gpio\": 26,\
+                \"gpio\": 19,\
                 \"logic_inv\": false\
             }\             
         ],\

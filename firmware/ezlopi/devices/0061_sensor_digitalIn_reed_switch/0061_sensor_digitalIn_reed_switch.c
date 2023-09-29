@@ -26,7 +26,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 static void _0061_update_from_device(l_ezlopi_item_t *item);
 //-----------------------------------------------------------------------
 
-int sensor_reed_switch_v3(e_ezlopi_actions_t action, l_ezlopi_device_t *item, void *arg, void *user_arg)
+int sensor_reed_switch_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -166,6 +166,7 @@ static int __0061_get_item(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (true == (item->interface.gpio.gpio_in.value) ? "true" : "false"));
             cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
             ret = 1;
         }
@@ -181,6 +182,7 @@ static int __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (true == (item->interface.gpio.gpio_in.value) ? "true" : "false"));
             cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
             ret = 1;
         }
