@@ -5,6 +5,7 @@
 #include "items.h"
 #include "math.h"
 #include "stdbool.h"
+#include "string.h"
 
 #include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
@@ -21,8 +22,8 @@
 //                          Declaration
 //*************************************************************************
 
-static float _CO_ppm = 0, MQ7_R0_constant = 0; // Define variable for MQ7_R0_constant [always constant]
-static bool Calibration_complete_CO = false;   // flag to activate calibration phase
+static float MQ7_R0_constant = 0;            // Define variable for MQ7_R0_constant [always constant]
+static bool Calibration_complete_CO = false; // flag to activate calibration phase
 const char *mq7_sensor_gas_alarm_token[] =
     {
         "no_gas",
@@ -35,7 +36,7 @@ static int __0062_init(l_ezlopi_item_t *item);
 static int __0062_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0062_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0062_notify(l_ezlopi_item_t *item);
-static void Extract_MQ7_sensor_ppm(uint32_t mq7_adc_pin);
+static float Extract_MQ7_sensor_ppm(uint32_t mq7_adc_pin);
 void Calibrate_MQ7_R0_resistance(void *params);
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
@@ -172,8 +173,9 @@ static int __0062_init(l_ezlopi_item_t *item)
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "MQ7-CO-alert";
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char *_addition = "-CO-alert";
+    device_name = strcat(device_name, _addition);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
@@ -199,8 +201,9 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "MQ7-CO-level [PPM]";
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char *_addition = "-CO-level [PPM]";
+    device_name = strcat(device_name, _addition);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -255,9 +258,9 @@ static int __0062_get_item(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _CO_ppm);
+                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", _CO_ppm);
+                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
             }
             ret = 1;
         }
@@ -280,9 +283,9 @@ static int __0062_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _CO_ppm);
+                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", _CO_ppm);
+                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
             }
             ret = 1;
         }
@@ -292,6 +295,7 @@ static int __0062_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __0062_notify(l_ezlopi_item_t *item)
 {
+    static float _CO_ppm = 0;
     int ret = 0;
     if (item)
     {
@@ -316,10 +320,12 @@ static int __0062_notify(l_ezlopi_item_t *item)
         {
             // extract the sensor_output_values
             float prev_ppm = _CO_ppm;
-            Extract_MQ7_sensor_ppm(item->interface.adc.gpio_num);
+            _CO_ppm = Extract_MQ7_sensor_ppm(item->interface.adc.gpio_num);
             if (prev_ppm != _CO_ppm)
             {
+                item->user_arg = ((void *)(&_CO_ppm));
                 ezlopi_device_value_updated_from_device_v3(item);
+                item->user_arg = NULL;
             }
         }
         ret = 1;
@@ -327,7 +333,7 @@ static int __0062_notify(l_ezlopi_item_t *item)
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static void Extract_MQ7_sensor_ppm(uint32_t mq7_adc_pin)
+static float Extract_MQ7_sensor_ppm(uint32_t mq7_adc_pin)
 {
     // calculation process
     //-------------------------------------------------
@@ -340,7 +346,7 @@ static void Extract_MQ7_sensor_ppm(uint32_t mq7_adc_pin)
 #ifdef VOLTAGE_DIVIDER_ADDED
         analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-        analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
+        analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
         vTaskDelay(1);
     }
@@ -361,7 +367,7 @@ static void Extract_MQ7_sensor_ppm(uint32_t mq7_adc_pin)
     //-------------------------------------------------
 
     // 1.2 Calculate _CO_ppm
-    _CO_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq7) / m_slope_mq7); // ---> _CO_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+    float _CO_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq7) / m_slope_mq7); // ---> _CO_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
     if (_CO_ppm < 0)
     {
         _CO_ppm = 0; // No negative values accepted or upper datasheet recomendation.
@@ -369,6 +375,7 @@ static void Extract_MQ7_sensor_ppm(uint32_t mq7_adc_pin)
     TRACE_E("_CO_ppm [CO] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _CO_ppm, (float)_ratio, analog_sensor_volt);
 
     //-------------------------------------------------
+    return _CO_ppm;
 }
 
 void Calibrate_MQ7_R0_resistance(void *params)
@@ -396,7 +403,7 @@ void Calibrate_MQ7_R0_resistance(void *params)
 #ifdef VOLTAGE_DIVIDER_ADDED
         _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
 #else
-        _sensor_volt += (float)(ezlopi_analog_data->voltage);
+        _sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
         vTaskDelay(1); // 10ms
     }

@@ -5,6 +5,7 @@
 #include "items.h"
 #include "math.h"
 #include "stdbool.h"
+#include "string.h"
 
 #include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
@@ -16,13 +17,12 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
 #include "0052_sensor_other_MQ135_NH3_detector.h"
-
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
 
-static float _NH3_ppm = 0, MQ135_R0_constant = 0; // Define variable for MQ135_R0_constant [always constant]
-static bool Calibration_complete_NH3 = false;   // flag to activate calibration phase
+static float MQ135_R0_constant = 0;           // Define variable for MQ135_R0_constant [always constant]
+static bool Calibration_complete_NH3 = false; // flag to activate calibration phase
 const char *mq135_sensor_gas_alarm_token[] =
     {
         "no_gas",
@@ -35,7 +35,7 @@ static int __0052_init(l_ezlopi_item_t *item);
 static int __0052_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0052_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0052_notify(l_ezlopi_item_t *item);
-static void Extract_MQ135_sensor_ppm(uint32_t mq135_adc_pin);
+static float Extract_MQ135_sensor_ppm(uint32_t mq135_adc_pin);
 void Calibrate_MQ135_R0_resistance(void *params);
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
@@ -172,8 +172,9 @@ static int __0052_init(l_ezlopi_item_t *item)
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "MQ135-NH3-alert";
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char *_addition = "-NH3-alert";
+    device_name = strcat(device_name, _addition);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
@@ -199,8 +200,9 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "MQ135-NH3-level [PPM]";
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char *_addition = "-NH3-level [PPM]";
+    device_name = strcat(device_name, _addition);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -255,9 +257,9 @@ static int __0052_get_item(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _NH3_ppm);
+                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", _NH3_ppm);
+                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
             }
             ret = 1;
         }
@@ -280,9 +282,9 @@ static int __0052_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _NH3_ppm);
+                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", _NH3_ppm);
+                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
             }
             ret = 1;
         }
@@ -292,6 +294,7 @@ static int __0052_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __0052_notify(l_ezlopi_item_t *item)
 {
+    static float _NH3_ppm = 0;
     int ret = 0;
     if (item)
     {
@@ -316,10 +319,12 @@ static int __0052_notify(l_ezlopi_item_t *item)
         {
             // extract the sensor_output_values
             float prev_ppm = _NH3_ppm;
-            Extract_MQ135_sensor_ppm(item->interface.adc.gpio_num);
+            _NH3_ppm = Extract_MQ135_sensor_ppm(item->interface.adc.gpio_num);
             if (prev_ppm != _NH3_ppm)
             {
+                item->user_arg = ((void *)(&_NH3_ppm));
                 ezlopi_device_value_updated_from_device_v3(item);
+                item->user_arg = NULL;
             }
         }
         ret = 1;
@@ -327,7 +332,7 @@ static int __0052_notify(l_ezlopi_item_t *item)
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static void Extract_MQ135_sensor_ppm(uint32_t mq135_adc_pin)
+static float Extract_MQ135_sensor_ppm(uint32_t mq135_adc_pin)
 {
     // calculation process
     //-------------------------------------------------
@@ -340,7 +345,7 @@ static void Extract_MQ135_sensor_ppm(uint32_t mq135_adc_pin)
 #ifdef VOLTAGE_DIVIDER_ADDED
         analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-        analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
+        analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
         vTaskDelay(1);
     }
@@ -361,7 +366,7 @@ static void Extract_MQ135_sensor_ppm(uint32_t mq135_adc_pin)
     //-------------------------------------------------
 
     // 1.2 Calculate _NH3_ppm
-    _NH3_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq135) / m_slope_mq135); // ---> _NH3_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+    float _NH3_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq135) / m_slope_mq135); // ---> _NH3_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
     if (_NH3_ppm < 0)
     {
         _NH3_ppm = 0; // No negative values accepted or upper datasheet recomendation.
@@ -369,6 +374,7 @@ static void Extract_MQ135_sensor_ppm(uint32_t mq135_adc_pin)
     TRACE_E("_NH3_ppm [NH3] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _NH3_ppm, (float)_ratio, analog_sensor_volt);
 
     //-------------------------------------------------
+    return _NH3_ppm;
 }
 
 void Calibrate_MQ135_R0_resistance(void *params)
@@ -405,7 +411,7 @@ void Calibrate_MQ135_R0_resistance(void *params)
     //-------------------------------------------------
     // Calculate the 'Rs' of heater during clean air [calibration phase]
     // Range -> [2Kohm - 20Kohm]
-    float RS_calib = 0;                                                                         // Define variable for sensor resistance
+    float RS_calib = 0;                                                                               // Define variable for sensor resistance
     RS_calib = ((MQ135_VOLT_RESOLUTION_Vc * mq135_eqv_RL) / (_sensor_volt / 1000.0f)) - mq135_eqv_RL; // Calculate RS in fresh air
     TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
     if (RS_calib < 0)

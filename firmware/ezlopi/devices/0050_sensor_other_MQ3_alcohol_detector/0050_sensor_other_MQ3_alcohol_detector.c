@@ -5,6 +5,7 @@
 #include "items.h"
 #include "math.h"
 #include "stdbool.h"
+#include "string.h"
 
 #include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
@@ -16,13 +17,12 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
 #include "0050_sensor_other_MQ3_alcohol_detector.h"
-
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
 
-static float _ALCO_ppm = 0, MQ3_R0_constant = 0; // Define variable for MQ3_R0_constant [always constant]
-static bool Calibration_complete_ALCO = false;   // flag to activate calibration phase
+static float MQ3_R0_constant = 0;                 // Define variable for MQ3_R0_constant [always constant]
+static bool Calibration_complete_alcohol = false; // flag to activate calibration phase
 const char *mq3_sensor_gas_alarm_token[] =
     {
         "no_gas",
@@ -35,7 +35,7 @@ static int __0050_init(l_ezlopi_item_t *item);
 static int __0050_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0050_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0050_notify(l_ezlopi_item_t *item);
-static void Extract_MQ3_sensor_ppm(uint32_t mq3_adc_pin);
+static float Extract_MQ3_sensor_ppm(uint32_t mq3_adc_pin);
 void Calibrate_MQ3_R0_resistance(void *params);
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
@@ -70,7 +70,7 @@ int sensor_MQ3_ALCO_detector_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (Calibration_complete_ALCO)
+        if (Calibration_complete_alcohol)
         {
             __0050_notify(item);
         }
@@ -158,7 +158,7 @@ static int __0050_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             // calibrate if not done
-            if (!Calibration_complete_ALCO)
+            if (!Calibration_complete_alcohol)
             {
                 xTaskCreate(Calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", 2048, &(item->interface.adc.gpio_num), 1, NULL);
             }
@@ -172,8 +172,9 @@ static int __0050_init(l_ezlopi_item_t *item)
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "MQ3-ALCO-alert";
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char *_addition = "-alcohol-alert";
+    device_name = strcat(device_name, _addition);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
@@ -199,8 +200,9 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    device_name = "MQ3-ALCO-level [PPM]";
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char *_addition = "-alcohol-level [PPM]";
+    device_name = strcat(device_name, _addition);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -255,9 +257,9 @@ static int __0050_get_item(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _ALCO_ppm);
+                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", _ALCO_ppm);
+                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
             }
             ret = 1;
         }
@@ -280,9 +282,9 @@ static int __0050_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _ALCO_ppm);
+                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", _ALCO_ppm);
+                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
             }
             ret = 1;
         }
@@ -292,6 +294,7 @@ static int __0050_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __0050_notify(l_ezlopi_item_t *item)
 {
+    static float _alcohol_ppm = 0;
     int ret = 0;
     if (item)
     {
@@ -315,11 +318,13 @@ static int __0050_notify(l_ezlopi_item_t *item)
         if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
             // extract the sensor_output_values
-            float prev_ppm = _ALCO_ppm;
-            Extract_MQ3_sensor_ppm(item->interface.adc.gpio_num);
-            if (prev_ppm != _ALCO_ppm)
+            float prev_ppm = _alcohol_ppm;
+            _alcohol_ppm = Extract_MQ3_sensor_ppm(item->interface.adc.gpio_num);
+            if (prev_ppm != _alcohol_ppm)
             {
+                item->user_arg = ((void *)(&_alcohol_ppm));
                 ezlopi_device_value_updated_from_device_v3(item);
+                item->user_arg = NULL;
             }
         }
         ret = 1;
@@ -327,7 +332,7 @@ static int __0050_notify(l_ezlopi_item_t *item)
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static void Extract_MQ3_sensor_ppm(uint32_t mq3_adc_pin)
+static float Extract_MQ3_sensor_ppm(uint32_t mq3_adc_pin)
 {
     // calculation process
     //-------------------------------------------------
@@ -340,7 +345,7 @@ static void Extract_MQ3_sensor_ppm(uint32_t mq3_adc_pin)
 #ifdef VOLTAGE_DIVIDER_ADDED
         analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-        analog_sensor_volt += (float)(ezlopi_analog_data->voltage);
+        analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
         vTaskDelay(1);
     }
@@ -352,7 +357,7 @@ static void Extract_MQ3_sensor_ppm(uint32_t mq3_adc_pin)
     // 1. Calculate 'Rs_gas' for the gas detected
     float Rs_gas = (((MQ3_VOLT_RESOLUTION_Vc * mq3_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq3_eqv_RL);
 
-    // 1.1 Calculate @ 'ratio' during ALCO presence
+    // 1.1 Calculate @ 'ratio' during alcohol presence
     double _ratio = (Rs_gas / ((MQ3_R0_constant <= 0) ? (1.0f) : (MQ3_R0_constant))); // avoid dividing by zero??
     if (_ratio <= 0)
     {
@@ -360,15 +365,16 @@ static void Extract_MQ3_sensor_ppm(uint32_t mq3_adc_pin)
     }
     //-------------------------------------------------
 
-    // 1.2 Calculate _ALCO_ppm
-    _ALCO_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq3) / m_slope_mq3); // ---> _ALCO_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
-    if (_ALCO_ppm < 0)
+    // 1.2 Calculate _alcohol_ppm
+    float _alcohol_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq3) / m_slope_mq3); // ---> _alcohol_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+    if (_alcohol_ppm < 0)
     {
-        _ALCO_ppm = 0; // No negative values accepted or upper datasheet recomendation.
+        _alcohol_ppm = 0; // No negative values accepted or upper datasheet recomendation.
     }
-    TRACE_E("_ALCO_ppm [ALCO] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _ALCO_ppm, (float)_ratio, analog_sensor_volt);
+    TRACE_E("_alcohol_ppm [alcohol] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _alcohol_ppm, (float)_ratio, analog_sensor_volt);
 
     //-------------------------------------------------
+    return _alcohol_ppm;
 }
 
 void Calibrate_MQ3_R0_resistance(void *params)
@@ -419,7 +425,7 @@ void Calibrate_MQ3_R0_resistance(void *params)
     {
         MQ3_R0_constant = 0; // No negative values accepted.
     }
-    // Set calibration_complete_ALCO flag
-    Calibration_complete_ALCO = true;
+    // Set calibration_complete_alcohol flag
+    Calibration_complete_alcohol = true;
     vTaskDelete(NULL);
 }
