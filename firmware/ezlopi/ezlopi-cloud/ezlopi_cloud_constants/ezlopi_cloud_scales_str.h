@@ -31,4 +31,7 @@ const static char *scales_lux = "lux";
 /// @brief pressure
 const static char *scales_kilo_pascal = "kilo_pascal";
 
+/// @brief force
+const static char *scales_newton = "newton";
+
 #endif // __EZLOPI_SCALES_STR_H__
