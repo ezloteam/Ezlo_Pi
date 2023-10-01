@@ -140,6 +140,24 @@ static int __0056_init(l_ezlopi_item_t *item)
     return ret;
 }
 
+static int __0056_get_item(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
+        {
+            char valueFormatted[20];
+            snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
 static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
