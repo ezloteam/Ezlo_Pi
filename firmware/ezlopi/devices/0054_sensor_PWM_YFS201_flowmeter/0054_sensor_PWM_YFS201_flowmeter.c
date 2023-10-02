@@ -1,7 +1,6 @@
 #include "trace.h"
 #include "cJSON.h"
 #include "items.h"
-#include "stdbool.h"
 #include "driver/gpio.h"
 
 #include "ezlopi_pwm.h"
@@ -17,7 +16,6 @@
 #include "ezlopi_cloud_scales_str.h"
 
 #include "0054_sensor_PWM_YFS201_flowmeter.h"
-
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
@@ -246,7 +244,7 @@ static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin)
 
         while (yfs201_QueueFlag < YFS201_QUEUE_FULL)
         {
-            _pulses_yfs201 = 0;                                             // reset variable to store fresh counts within [200ms]
+            _pulses_yfs201 = 0;                                      // reset variable to store fresh counts within [200ms]
             gpio_isr_handler_add(pulse_pin, gpio_isr_handler, NULL); // add -> gpio_isr_handle(pin_num)
             start_time = (int32_t)esp_timer_get_time();
             while (((int32_t)esp_timer_get_time() - start_time) < (1000000 / YFS201_QUEUE_SIZE)) // 200ms -> 200000uS
