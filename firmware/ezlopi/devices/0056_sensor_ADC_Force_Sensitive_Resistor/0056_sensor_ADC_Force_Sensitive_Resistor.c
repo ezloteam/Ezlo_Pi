@@ -20,6 +20,7 @@
 
 //------------------------------------------------------------------------------------------------------------------------------
 
+static float FSR_value = 0;
 static int __0056_prepare(void *arg);
 static int __0056_init(l_ezlopi_item_t *item);
 static int __0056_get_item(l_ezlopi_item_t *item, void *arg);
@@ -56,8 +57,12 @@ int sensor_0056_force_sensitive_resistor(e_ezlopi_actions_t action, l_ezlopi_ite
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-
-        __0056_notify(item);
+        static uint8_t count;
+        if (count++ > 1)
+        {
+            __0056_notify(item);
+            count = 0;
+        }
         break;
     }
     default:
@@ -167,9 +172,9 @@ static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             char valueFormatted[20];
-            snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+            snprintf(valueFormatted, 20, "%.2f", FSR_value);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+            cJSON_AddNumberToObject(cj_result, "value", FSR_value);
             ret = 1;
         }
     }
@@ -178,7 +183,6 @@ static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __0056_notify(l_ezlopi_item_t *item)
 {
-    static float FSR_value = 0;
     int ret = 0;
     if (item)
     {
@@ -192,9 +196,7 @@ static int __0056_notify(l_ezlopi_item_t *item)
         TRACE_E(" Force[N]: %.4f", FSR_value);
         if (FSR_value != prev_force)
         {
-            item->user_arg = ((void *)&FSR_value);
             ezlopi_device_value_updated_from_device_v3(item);
-            item->user_arg = NULL;
         }
         ret = 1;
     }
@@ -214,7 +216,7 @@ static float Calculate_GramForce(float Vout)
     {
         Rs = 750; // kOhm
     }
-    TRACE_E("FSR value [Rs Kohm]: %.4f", Rs);
+    // TRACE_E("FSR value [Rs Kohm]: %.4f", Rs);
 
     // calculating the Force(g)
     if (Rs < 250)
@@ -231,6 +233,6 @@ static float Calculate_GramForce(float Vout)
     }
     // according to testing ; correct gramForce(G) is :
     gramForce = gramForce * FSR_correction_factor;
-    TRACE_E("GramForce[gN]: %.4f  ", gramForce);
+    // TRACE_E("GramForce[gN]: %.4f  ", gramForce);
     return gramForce;
 }
