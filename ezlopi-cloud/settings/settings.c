@@ -40,52 +40,15 @@ void ezlopi_device_settings_list(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_properties, "description", registered_settings->properties->description);
                         cJSON_AddStringToObject(cj_properties, "status", "synced");
                         cJSON_AddStringToObject(cj_properties, "valueType", registered_settings->properties->value_type);
-                        if (strcmp(registered_settings->properties->value_type, "action") == 0)
-                        {
-                        }
-                        else if (strcmp(registered_settings->properties->value_type, "bool") == 0)
-                        {
-                            if (registered_settings->properties->value.bool_value)
-                            {
-                                cJSON_AddTrueToObject(cj_properties, "value");
-                            }
-                            else
-                            {
-                                cJSON_AddFalseToObject(cj_properties, "value");
-                            }
-                        }
-                        else if (strcmp(registered_settings->properties->value_type, "int") == 0)
-                        {
-                            cJSON_AddNumberToObject(cj_properties, "value", registered_settings->properties->value.int_value);
-                        }
-                        else if (strcmp(registered_settings->properties->value_type, "string") == 0)
-                        {
-                            cJSON_AddStringToObject(cj_properties, "value", registered_settings->properties->value.string_value);
-                        }
-                        else if (strcmp(registered_settings->properties->value_type, "rgb") == 0)
-                        {
-                        }
-                        else if (strcmp(registered_settings->properties->value_type, "scalable") == 0)
-                        {
-                            cJSON *cj_value = cJSON_CreateObject();
 
-                            if (cj_value)
-                            {
-                                cJSON_AddStringToObject(cj_value, "scale", registered_settings->properties->value.scalable_value->scale);
-                                cJSON_AddNumberToObject(cj_value, "value", registered_settings->properties->value.scalable_value->value);
-                                cJSON_AddItemToObject(cj_properties, "value", cj_value);
-                            }
-                        }
-                        else
-                        {
-                        }
-
+                        registered_settings->properties->__settings_call(EZLOPI_SETTINGS_ACTION_GET_SETTING, registered_settings->properties, cj_properties, NULL);
                         if (!cJSON_AddItemToArray(cj_settings_array, cj_properties))
                         {
                             cJSON_Delete(cj_properties);
                         }
                     }
                 }
+
                 registered_settings = registered_settings->next;
             }
         }
@@ -104,9 +67,9 @@ void ezlopi_device_settings_value_set(cJSON *cj_request, cJSON *cj_response)
         char *settings_id_str = 0;
         CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, settings_id_str);
         uint32_t settings_id = strtoul(settings_id_str, NULL, 16);
-        TRACE_I("settings_id_str: %X", settings_id);
 
         l_ezlopi_device_settings_t *registered_settings = ezlopi_devices_settings_get_list();
+
         while (NULL != registered_settings)
         {
             if (registered_settings->properties)
@@ -116,7 +79,6 @@ void ezlopi_device_settings_value_set(cJSON *cj_request, cJSON *cj_response)
                     _ezlopi_device_settings_value_set(settings_id, cj_params);
                 }
             }
-
             registered_settings = registered_settings->next;
         }
     }
@@ -144,7 +106,7 @@ void ezlopi_device_settings_reset(cJSON *cj_request, cJSON *cj_response)
                     char *settings_id_str = 0;
                     CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, settings_id_str);
                     int settings_id = strtol(settings_id_str, NULL, 16);
-                    TRACE_I("settings_id_str: %X", settings_id);
+                    // TRACE_I("settings_id_str: %X", settings_id);
 
                     if (settings_id == registered_settings->properties->id)
                     {
@@ -156,7 +118,7 @@ void ezlopi_device_settings_reset(cJSON *cj_request, cJSON *cj_response)
                     char *device_id_str = 0;
                     CJSON_GET_VALUE_STRING(cj_params, ezlopi_deviceId_str, device_id_str);
                     int device_id = strtol(device_id_str, NULL, 16);
-                    TRACE_I("device_id_str: %X", device_id);
+                    // TRACE_I("device_id_str: %X", device_id);
 
                     if (device_id == registered_settings->properties->device_id)
                     {

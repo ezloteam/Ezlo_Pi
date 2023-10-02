@@ -131,7 +131,21 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                             {
                                 settings_current->properties->value.bool_value = false;
                             }
-                            ezlopi_nvs_write_bool(settings_current->properties->value.bool_value, settings_current->properties->nvs_alias);
+                            if (settings_current->properties->value_nonvolatile == true)
+                            {
+                                if (1 == ezlopi_nvs_write_bool(settings_current->properties->value.bool_value, settings_current->properties->nvs_alias))
+                                {
+                                    settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                }
+                                else
+                                {
+                                    TRACE_E("Error writing settings to NVS");
+                                }
+                            }
+                            else
+                            {
+                                settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                            }
                         }
                         else
                         {
@@ -144,7 +158,56 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                         if (value)
                         {
                             settings_current->properties->value.int_value = value->valueint;
-                            ezlopi_nvs_write_int32(settings_current->properties->value.int_value, settings_current->properties->nvs_alias);
+                            if (settings_current->properties->value_nonvolatile == true)
+                            {
+                                if (1 == ezlopi_nvs_write_int32(settings_current->properties->value.int_value, settings_current->properties->nvs_alias))
+                                {
+                                    settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                }
+                                else
+                                {
+                                    TRACE_E("Error writing settings to NVS");
+                                }
+                            }
+                            else
+                            {
+                                settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                            }
+                        }
+                        else
+                        {
+                            TRACE_E("Error parsing JSON, settings update failed !");
+                        }
+                    }
+                    else if (strcmp(settings_current->properties->value_type, "token") == 0)
+                    {
+                        cJSON *o_item = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+                        if (o_item && o_item->valuestring)
+                        {
+                            settings_current->properties->value.token_value = malloc(strlen(o_item->valuestring) + 1);
+                            if (settings_current->properties->value.token_value)
+                            {
+                                strncpy(settings_current->properties->value.token_value, o_item->valuestring, strlen(o_item->valuestring) + 1);
+                                if (settings_current->properties->value_nonvolatile == true)
+                                {
+                                    if (1 == ezlopi_nvs_write_str(settings_current->properties->value.token_value, strlen(settings_current->properties->value.token_value), settings_current->properties->nvs_alias))
+                                    {
+                                        settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                    }
+                                    else
+                                    {
+                                        TRACE_E("Error writing settings to NVS");
+                                    }
+                                }
+                                else
+                                {
+                                    settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                }
+                            }
+                            else
+                            {
+                                TRACE_E("Error memory allocation, settings update failed !");
+                            }
                         }
                         else
                         {
@@ -153,11 +216,6 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                     }
                     else if (strcmp(settings_current->properties->value_type, "string") == 0)
                     {
-                        char *json_dump = NULL;
-                        json_dump = cJSON_Print(cjson_params);
-                        TRACE_E("%s", json_dump);
-                        free(json_dump);
-
                         cJSON *o_item = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
                         if (o_item && o_item->valuestring)
                         {
@@ -165,9 +223,21 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                             if (settings_current->properties->value.string_value)
                             {
                                 strncpy(settings_current->properties->value.string_value, o_item->valuestring, strlen(o_item->valuestring) + 1);
-                                TRACE_E("%s", settings_current->properties->value.string_value);
-                                TRACE_E("%s", settings_current->properties->nvs_alias);
-                                ezlopi_nvs_write_str(settings_current->properties->value.string_value, strlen(settings_current->properties->value.string_value), settings_current->properties->nvs_alias);
+                                if (settings_current->properties->value_nonvolatile == true)
+                                {
+                                    if (1 == ezlopi_nvs_write_str(settings_current->properties->value.string_value, strlen(settings_current->properties->value.string_value), settings_current->properties->nvs_alias))
+                                    {
+                                        settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                    }
+                                    else
+                                    {
+                                        TRACE_E("Error writing settings to NVS");
+                                    }
+                                }
+                                else
+                                {
+                                    settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                }
                             }
                             else
                             {
@@ -184,12 +254,34 @@ void _ezlopi_device_settings_value_set(uint32_t id, void *args)
                     }
                     else if (strcmp(settings_current->properties->value_type, "scalable") == 0)
                     {
-                        cJSON *value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
-                        if (value)
+                        cJSON *cJSON_value_root = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+                        if (cJSON_value_root)
                         {
-                            TRACE_D("scaled value : %f", (float)value->valuedouble);
-                            settings_current->properties->value.scalable_value->value = (float)value->valuedouble;
-                            ezlopi_nvs_write_float32(settings_current->properties->value.scalable_value->value, settings_current->properties->nvs_alias);
+                            cJSON *cJSON_value = cJSON_GetObjectItem(cJSON_value_root, ezlopi_value_str);
+                            if (cJSON_value)
+                            {
+                                TRACE_D("scaled value : %f", (float)cJSON_value->valuedouble);
+                                if (settings_current->properties->value.scalable_value)
+                                {
+                                    settings_current->properties->value.scalable_value->value = (float)cJSON_value->valuedouble;
+                                }
+
+                                if (settings_current->properties->value_nonvolatile == true)
+                                {
+                                    if (1 == ezlopi_nvs_write_float32(settings_current->properties->value.scalable_value->value, settings_current->properties->nvs_alias))
+                                    {
+                                        settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                    }
+                                    else
+                                    {
+                                        TRACE_E("Error writing settings to NVS");
+                                    }
+                                }
+                                else
+                                {
+                                    settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, settings_current->properties, NULL, NULL);
+                                }
+                            }
                         }
                         else
                         {
@@ -222,12 +314,40 @@ void _ezlopi_device_settings_reset_settings_id(uint32_t id)
                 {
 
                     configured_settings_current->properties->value.bool_value = configured_settings_current->properties->value_defaut.bool_value;
-                    ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias);
+                    if (configured_settings_current->properties->value_nonvolatile == true)
+                    {
+                        if (1 == ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias))
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                        else
+                        {
+                            TRACE_E("Error writing settings to NVS");
+                        }
+                    }
+                    else
+                    {
+                        configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                    }
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "int") == 0)
                 {
                     configured_settings_current->properties->value.int_value = configured_settings_current->properties->value_defaut.int_value;
-                    ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias);
+                    if (configured_settings_current->properties->value_nonvolatile == true)
+                    {
+                        if (1 == ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias))
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                        else
+                        {
+                            TRACE_E("Error writing settings to NVS");
+                        }
+                    }
+                    else
+                    {
+                        configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                    }
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "string") == 0)
                 {
@@ -235,7 +355,48 @@ void _ezlopi_device_settings_reset_settings_id(uint32_t id)
                     if (configured_settings_current->properties->value.string_value)
                     {
                         strncpy(configured_settings_current->properties->value.string_value, configured_settings_current->properties->value_defaut.string_value, strlen(configured_settings_current->properties->value_defaut.string_value) + 1);
-                        ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
+                        if (configured_settings_current->properties->value_nonvolatile == true)
+                        {
+                            if (1 == ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias))
+                            {
+                                configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                            }
+                            else
+                            {
+                                TRACE_E("Error writing settings to NVS");
+                            }
+                        }
+                        else
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                    }
+                    else
+                    {
+                        TRACE_E("Error :  memory allocation, settings update failed !");
+                    }
+                }
+                else if (strcmp(configured_settings_current->properties->value_type, "token") == 0)
+                {
+                    configured_settings_current->properties->value.token_value = malloc(strlen(configured_settings_current->properties->value_defaut.token_value) + 1);
+                    if (configured_settings_current->properties->value.token_value)
+                    {
+                        strncpy(configured_settings_current->properties->value.token_value, configured_settings_current->properties->value_defaut.token_value, strlen(configured_settings_current->properties->value_defaut.token_value) + 1);
+                        if (configured_settings_current->properties->value_nonvolatile == true)
+                        {
+                            if (1 == ezlopi_nvs_write_str(configured_settings_current->properties->value.token_value, strlen(configured_settings_current->properties->value.token_value), configured_settings_current->properties->nvs_alias))
+                            {
+                                configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                            }
+                            else
+                            {
+                                TRACE_E("Error writing settings to NVS");
+                            }
+                        }
+                        else
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
                     }
                     else
                     {
@@ -248,7 +409,21 @@ void _ezlopi_device_settings_reset_settings_id(uint32_t id)
                 else if (strcmp(configured_settings_current->properties->value_type, "scalable") == 0)
                 {
                     configured_settings_current->properties->value.scalable_value->value = configured_settings_current->properties->value_defaut.scalable_value->value;
-                    ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias);
+                    if (configured_settings_current->properties->value_nonvolatile == true)
+                    {
+                        if (1 == ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias))
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                        else
+                        {
+                            TRACE_E("Error writing settings to NVS");
+                        }
+                    }
+                    else
+                    {
+                        configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                    }
                 }
                 else
                 {
@@ -276,12 +451,40 @@ void _ezlopi_device_settings_reset_device_id(uint32_t id)
                 {
 
                     configured_settings_current->properties->value.bool_value = configured_settings_current->properties->value_defaut.bool_value;
-                    ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias);
+                    if (configured_settings_current->properties->value_nonvolatile == true)
+                    {
+                        if (1 == ezlopi_nvs_write_bool(configured_settings_current->properties->value.bool_value, configured_settings_current->properties->nvs_alias))
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                        else
+                        {
+                            TRACE_E("Error writing settings to NVS");
+                        }
+                    }
+                    else
+                    {
+                        configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                    }
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "int") == 0)
                 {
                     configured_settings_current->properties->value.int_value = configured_settings_current->properties->value_defaut.int_value;
-                    ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias);
+                    if (configured_settings_current->properties->value_nonvolatile == true)
+                    {
+                        if (1 == ezlopi_nvs_write_int32(configured_settings_current->properties->value.int_value, configured_settings_current->properties->nvs_alias))
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                        else
+                        {
+                            TRACE_E("Error writing settings to NVS");
+                        }
+                    }
+                    else
+                    {
+                        configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                    }
                 }
                 else if (strcmp(configured_settings_current->properties->value_type, "string") == 0)
                 {
@@ -289,7 +492,48 @@ void _ezlopi_device_settings_reset_device_id(uint32_t id)
                     if (configured_settings_current->properties->value.string_value)
                     {
                         strncpy(configured_settings_current->properties->value.string_value, configured_settings_current->properties->value_defaut.string_value, strlen(configured_settings_current->properties->value_defaut.string_value) + 1);
-                        ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias);
+                        if (configured_settings_current->properties->value_nonvolatile == true)
+                        {
+                            if (1 == ezlopi_nvs_write_str(configured_settings_current->properties->value.string_value, strlen(configured_settings_current->properties->value.string_value), configured_settings_current->properties->nvs_alias))
+                            {
+                                configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                            }
+                            else
+                            {
+                                TRACE_E("Error writing settings to NVS");
+                            }
+                        }
+                        else
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                    }
+                    else
+                    {
+                        TRACE_E("Error :  memory allocation, settings update failed !");
+                    }
+                }
+                else if (strcmp(configured_settings_current->properties->value_type, "token") == 0)
+                {
+                    configured_settings_current->properties->value.token_value = malloc(strlen(configured_settings_current->properties->value_defaut.token_value) + 1);
+                    if (configured_settings_current->properties->value.token_value)
+                    {
+                        strncpy(configured_settings_current->properties->value.token_value, configured_settings_current->properties->value_defaut.token_value, strlen(configured_settings_current->properties->value_defaut.token_value) + 1);
+                        if (configured_settings_current->properties->value_nonvolatile == true)
+                        {
+                            if (1 == ezlopi_nvs_write_str(configured_settings_current->properties->value.token_value, strlen(configured_settings_current->properties->value.token_value), configured_settings_current->properties->nvs_alias))
+                            {
+                                configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                            }
+                            else
+                            {
+                                TRACE_E("Error writing settings to NVS");
+                            }
+                        }
+                        else
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
                     }
                     else
                     {
@@ -302,7 +546,21 @@ void _ezlopi_device_settings_reset_device_id(uint32_t id)
                 else if (strcmp(configured_settings_current->properties->value_type, "scalable") == 0)
                 {
                     configured_settings_current->properties->value.scalable_value->value = configured_settings_current->properties->value_defaut.scalable_value->value;
-                    ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias);
+                    if (configured_settings_current->properties->value_nonvolatile == true)
+                    {
+                        if (1 == ezlopi_nvs_write_float32(configured_settings_current->properties->value.scalable_value->value, configured_settings_current->properties->nvs_alias))
+                        {
+                            configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                        }
+                        else
+                        {
+                            TRACE_E("Error writing settings to NVS");
+                        }
+                    }
+                    else
+                    {
+                        configured_settings_current->properties->__settings_call(EZLOPI_SETTINGS_ACTION_SET_SETTING, configured_settings_current->properties, NULL, NULL);
+                    }
                 }
                 else
                 {
@@ -316,6 +574,7 @@ void _ezlopi_device_settings_reset_device_id(uint32_t id)
 
 void ezlopi_device_settings_print_settings(l_ezlopi_device_settings_t *head)
 {
+#if 0
     l_ezlopi_device_settings_t *current = head;
 
     if (current == NULL)
@@ -328,39 +587,48 @@ void ezlopi_device_settings_print_settings(l_ezlopi_device_settings_t *head)
     {
         s_ezlopi_device_settings_properties_t *properties = current->properties;
 
-        TRACE_I("ID: %u\n", properties->id);
-        TRACE_I("Device ID: %u\n", properties->device_id);
+        TRACE_I("ID: %u", properties->id);
+        TRACE_I("Device ID: %u", properties->device_id);
         if (properties->label)
-            TRACE_I("Label: %s\n", properties->label);
+            TRACE_I("Label: %s", properties->label);
         if (properties->description)
-            TRACE_I("Description: %s\n", properties->description);
+            TRACE_I("Description: %s", properties->description);
         if (properties->status)
-            TRACE_I("Status: %s\n", properties->status);
+            TRACE_I("Status: %s", properties->status);
         if (properties->value_type)
-            TRACE_I("Value Type: %s\n", properties->value_type);
+            TRACE_I("Value Type: %s", properties->value_type);
         if (properties->nvs_alias)
-            TRACE_I("NVS Alias: %s\n", properties->nvs_alias);
+            TRACE_I("NVS Alias: %s", properties->nvs_alias);
 
         // Print value based on value type
         if (strcmp(properties->value_type, "string") == 0)
         {
-            TRACE_I("String Value: %s\n", properties->value.string_value);
+            TRACE_I("String Value: %s", properties->value.string_value);
+        }
+        else if (strcmp(properties->value_type, "token") == 0)
+        {
+            TRACE_I("String Value: %s", properties->value.token_value);
         }
         else if (strcmp(properties->value_type, "int") == 0)
         {
-            TRACE_I("Integer Value: %d\n", properties->value.int_value);
+            TRACE_I("Integer Value: %d", properties->value.int_value);
         }
         else if (strcmp(properties->value_type, "bool") == 0)
         {
-            TRACE_I("Boolean Value: %s\n", properties->value.bool_value ? "true" : "false");
+            TRACE_I("Boolean Value: %s", properties->value.bool_value ? "true" : "false");
+        }
+        else if (strcmp(properties->value_type, "scalable") == 0)
+        {
+            TRACE_I("Scallable Value: %f", properties->value.scalable_value->value);
         }
         else
         {
-            TRACE_I("Unknown value type\n");
+            TRACE_I("Unknown value type");
         }
 
         current = current->next;
     }
+#endif
 }
 
 static void modify_setting(const char *name, const void *value)
