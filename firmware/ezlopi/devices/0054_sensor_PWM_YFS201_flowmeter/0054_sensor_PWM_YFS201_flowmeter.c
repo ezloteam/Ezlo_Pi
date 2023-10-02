@@ -22,14 +22,14 @@
 //                          Declaration
 //*************************************************************************
 
-static uint32_t _pulses, dominant_pulse_count;
+static uint32_t _pulses_yfs201, yfs201_dominant_pulse_count;
 static QueueHandle_t yfs201_queue = NULL;
 static YFS201_queue_enum_t yfs201_QueueFlag = YFS201_QUEUE_RESET;
 
 //------------------------------------------------------------------------------
 static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
 {
-    _pulses++;
+    _pulses_yfs201++;
 }
 //------------------------------------------------------------------------------
 static int __0054_prepare(void *arg);
@@ -168,7 +168,7 @@ static int __0054_get_item(l_ezlopi_item_t *item, void *arg)
             char valueFormatted[20];
             float freq = 0, Lt_per_hr = 0;
             // converting pulse_counta into frequency (uSec -> Hz)
-            freq = dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
+            freq = yfs201_dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
 
             // liter per hr
             Lt_per_hr = freq * 7.3f;
@@ -197,7 +197,7 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char valueFormatted[20];
             float freq = 0, Lt_per_hr = 0;
             // converting pulse_counta into frequency (uSec -> Hz)
-            freq = dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
+            freq = yfs201_dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
 
             // liter per hr
             Lt_per_hr = freq * 7.3f;
@@ -221,9 +221,9 @@ static int __0054_notify(l_ezlopi_item_t *item)
     if (item)
     {
         // extract new pulse count
-        uint32_t prev_dominant_pulse_count = dominant_pulse_count;
+        uint32_t prev_yfs201_dominant_pulse_count = yfs201_dominant_pulse_count;
         Extract_YFS201_Pulse_Count_func(item->interface.pwm.gpio_num);
-        if (prev_dominant_pulse_count != dominant_pulse_count)
+        if (prev_yfs201_dominant_pulse_count != yfs201_dominant_pulse_count)
         {
             ezlopi_device_value_updated_from_device_v3(item);
         }
@@ -246,7 +246,7 @@ static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin)
 
         while (yfs201_QueueFlag < YFS201_QUEUE_FULL)
         {
-            _pulses = 0;                                             // reset variable to store fresh counts within [200ms]
+            _pulses_yfs201 = 0;                                             // reset variable to store fresh counts within [200ms]
             gpio_isr_handler_add(pulse_pin, gpio_isr_handler, NULL); // add -> gpio_isr_handle(pin_num)
             start_time = (int32_t)esp_timer_get_time();
             while (((int32_t)esp_timer_get_time() - start_time) < (1000000 / YFS201_QUEUE_SIZE)) // 200ms -> 200000uS
@@ -255,10 +255,10 @@ static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin)
             }
             // check queue_full => 1
 
-            if (xQueueSend(yfs201_queue, &_pulses, NULL))
+            if (xQueueSend(yfs201_queue, &_pulses_yfs201, NULL))
             {
                 yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
-                // TRACE_E("Pulse_count : %d", _pulses);
+                // TRACE_E("Pulse_count : %d", _pulses_yfs201);
             }
             else
             {
@@ -318,7 +318,7 @@ static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin)
         yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
 
         // write the dominant pulse count
-        dominant_pulse_count = P_count[max_freq_index];
+        yfs201_dominant_pulse_count = P_count[max_freq_index];
     }
 
     // Deleting queue after no use to avoid conflicts
