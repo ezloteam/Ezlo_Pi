@@ -42,7 +42,7 @@ void ezlopi_ping_init(void)
     if (getaddrinfo("1.1.1.1", NULL, &hint, &res) != 0)
     {
         TRACE_D("ping_handle: unknown host '1.1.1.1'.");
-        return 1;
+        // return 1;
     }
     if (res->ai_family == AF_INET)
     {
@@ -67,7 +67,7 @@ void ezlopi_ping_init(void)
     esp_ping_new_session(&config, &cbs, &ping_handle);
     esp_ping_start(ping_handle);
 
-    return 0;
+    // return 0;
 }
 
 void ezlopi_ping_stop(void)

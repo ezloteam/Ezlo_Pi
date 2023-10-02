@@ -44,9 +44,8 @@ void items_list(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_properties, "name", registered_device->properties->ezlopi_cloud.item_name);
                         cJSON_AddTrueToObject(cj_properties, "show");
                         cJSON_AddStringToObject(cj_properties, "valueType", registered_device->properties->ezlopi_cloud.value_type);
-
-                        registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cj_properties, registered_device->user_arg);
-                        cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
+                        registered_device->device->func(EZLOPI_ACTION_HUB_GET_ITEM, registered_device->properties, cj_properties, registered_device->user_arg);
+                        // registered_device->device->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, registered_device->properties, cj_properties, registered_device->user_arg);
                         cJSON_AddStringToObject(cj_properties, "status", "synced");
 
                         if (!cJSON_AddItemToArray(cj_items_array, cj_properties))
@@ -74,7 +73,7 @@ void items_set_value(cJSON *cj_request, cJSON *cj_response)
         char *item_id_str = 0;
         CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, item_id_str);
         int item_id = strtol(item_id_str, NULL, 16);
-        TRACE_I("item_id: %X", item_id);
+        // TRACE_I("item_id: %X", item_id);
 
         l_ezlopi_configured_devices_t *registered_device = ezlopi_devices_list_get_configured_items();
         while (NULL != registered_device)

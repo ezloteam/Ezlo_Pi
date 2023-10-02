@@ -31,23 +31,19 @@ typedef struct
  */
 void check_bsec_status();
 
-/**
- * @brief : This function is called by the BSEC library when a new output is available
- * @param[in] input     : BME68X sensor data before processing
- * @param[in] outputs   : Processed BSEC BSEC output data
- * @param[in] bsec      : Instance of BSEC2 calling the callback
- */
-void bme680_data_callback(const bme68x_data data, const bsec_outputs outputs);
+
 
 /**
 * @brief : This function initializes the BSEC and BME680 Sensor
 * @param[in] initialize_i2c  :  true : initialize i2c,
                                 false : skips i2c initialization
 */
-void bme680_setup(bool initialize_i2c);
+void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c);
 
 bool bme680_get_data(bme680_data_t* data);
 
 bool bme680_print_data(bme680_data_t* data);
 
 float bme680_read_altitude(float pressure, float seaLevel);
+
+bool get_data_status();

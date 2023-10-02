@@ -11,13 +11,15 @@ extern "C"
 
 #define ID_BIN_VERSION ID_BIN_VERSION_1
 
-#define EZLOPI_GENERIC 0
-#define EZLOPI_SWITCH_BOX 1
-#define EZLOPI_IR_BLASTER 2
-#define EZLOPI_TEST_DEVICE -1
+#define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
+#define EZLOPI_DEVICE_TYPE_GENERIC 0
+#define EZLOPI_DEVICE_TYPE_SWITCH_BOX 1
+#define EZLOPI_DEVICE_TYPE_IR_BLASTER 2
+#define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
+#define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
-// #define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -103,8 +105,10 @@ typedef enum e_ezlopi_factory_info_v2_offset
     DEVICE_TYPE_OFFSET = 0xE000 + 0x018A,
 
     CLOUD_SERVER_OFFSET = 0x0000 + 0x0214,
-    PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314, /// fggggggggggg
-
+    PROVISIONING_SERVER_OFFSET = 0X000 + 0X14,
+    PROVISIONING_TOKEN_OFFSET = 0X000 + 0X114,
+    PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314,
+    CONFIG_VERSION_OFFSET = 0X000 + 0x02,
     CA_CERTIFICATE_OFFSET = 0x0000 + 0x3000,
     SSL_PRIVATE_KEY_OFFSET = 0x0000 + 0x4000,
     SSL_SHARED_KEY_OFFSET = 0x0000 + 0x5000,
@@ -114,6 +118,7 @@ typedef enum e_ezlopi_factory_info_v2_offset
 typedef enum e_ezlopi_factory_info_v2_length
 {
     VERSION_LENGTH = 0x0002,
+    CONFIG_VERSION_LENGTH = 0x0002,
     NAME_LENGTH = 0x0040,
     MANUFACTURER_LENGTH = 0x0040,
     BRAND_LENGTH = 0x0040,
@@ -130,6 +135,8 @@ typedef enum e_ezlopi_factory_info_v2_length
     SSL_PRIVATE_KEY_LENGTH = 0x1000,
     SSL_SHARED_KEY_LENGTH = 0x2000,
     EZLOPI_CONFIG_LENGTH = 0x1000,
+    PROVISIONING_TOKEN_LENGTH = 0x100,
+    PROVISIONING_SERVER_LENGTH = 0x100
 } e_ezlopi_factory_info_v2_length_t;
 
 typedef struct s_basic_factory_info
@@ -150,6 +157,7 @@ typedef struct s_basic_factory_info
     char *provision_server;
     char *provision_token;
     char *user_id;
+    uint16_t config_version;
 } s_basic_factory_info_t;
 #endif
 
@@ -174,19 +182,24 @@ typedef struct s_basic_factory_info
     char *ezlopi_factory_info_v2_get_ssl_private_key(void);
     char *ezlopi_factory_info_v2_get_ssl_shared_key(void);
     char *ezlopi_factory_info_v2_get_ezlopi_config(void);
+    char *ezlopi_factory_info_get_v2_provision_token(void);
+    char *ezlopi_factory_info_v2_get_provisioning_server(void);
+    uint16_t ezlopi_factory_info_v2_get_config_version(void);
 
     int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password);
+
     int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic);
     int ezlopi_factory_info_v2_set_ezlopi_config(char *data);
     int ezlopi_factory_info_v2_set_ca_cert(char *data);
     int ezlopi_factory_info_v2_set_ssl_shared_key(char *data);
+    int ezlopi_factory_info_v2_set_ssl_public_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
 
     int ezlopi_factory_info_v2_factory_reset(void);
 
-#if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
+#if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
-#elif (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
+#elif (EZLOPI_DEVICE_TYPE_IR_BLASTER == EZLOPI_DEVICE_TYPE)
 static const char *ir_blaster_constant_config =
     "{\
         \"cmd\": 3,\
@@ -204,7 +217,7 @@ static const char *ir_blaster_constant_config =
             }\
         ],\
     \"dev_total\": 1}";
-#elif (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
+#elif (EZLOPI_DEVICE_TYPE_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
 static const char *switch_box_constant_config =
     "{\
         \"cmd\": 3,\
@@ -388,26 +401,18 @@ static const char *switch_box_constant_config =
             }\
         ],\
     \"dev_total\": 1}";
-#elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+#elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\
         \"dev_detail\":\
-        [\
-           {\
-                \"dev_name\": \"Switch 1\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 2,\
-                \"id_item\": 1,\
+        [\{\
+                \"dev_type\": 2,\
+                \"dev_name\": \"Reed\",\
                 \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
+                \"id_item\": 61,\
+                \"gpio\": 18,\
+                \"logic_inv\": false\
             }\
         ],\
     \"dev_total\": 1}";

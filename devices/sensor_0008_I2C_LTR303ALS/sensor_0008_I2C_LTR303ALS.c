@@ -30,7 +30,6 @@ static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *p
 int sensor_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
-
     switch(action)
     {
         case EZLOPI_ACTION_PREPARE:
@@ -143,8 +142,7 @@ static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t* properties)
 {
     int ret = 0;
 
-    // BME680 is initialized first so false is sent as parameter, if used standalone, it should be set to true.
-    ltr303_setup(false);
+    ltr303_setup(properties->interface.i2c_master.sda, properties->interface.i2c_master.scl, true);
 
     return ret;
 }
@@ -177,7 +175,7 @@ static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *p
     if(cjson_properties && ltr303_lux_val)
     {
         char formatted_value[10];
-        snprintf(formatted_value, sizeof(ltr303_lux_val->lux), "%.2f", ltr303_lux_val->lux);
+        snprintf(formatted_value, 10, "%.2f", ltr303_lux_val->lux);
         cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
         cJSON_AddNumberToObject(cjson_properties, "value", ltr303_lux_val->lux);
         cJSON_AddStringToObject(cjson_properties, "scale", "lux");

@@ -146,7 +146,9 @@ bool bsec2_run(void)
         /* Provides the information about the current sensor configuration that is
            necessary to fulfill the input requirements, eg: operation mode, timestamp
            at which the sensor data shall be fetched etc */
+        // printf("curr_time_ns %lld\n", curr_time_ns);
         status = bsec_sensor_control_m(bsec_instance ,curr_time_ns, &bme_conf);
+        // printf("Status is %d\n", status);
         if (status != BSEC_OK)
             return false;
 
@@ -260,6 +262,7 @@ bool bsec2_set_config(const uint8_t *config)
 int64_t bsec2_get_time_ms(void)
 {
     int64_t timeMs = millis();
+    // printf("last_millis is %d and timeMS is %lld\n", last_millis, timeMs);
 
     if (last_millis > timeMs) /* An overflow occurred */
     { 

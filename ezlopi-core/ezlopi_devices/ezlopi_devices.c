@@ -147,6 +147,7 @@ static void ezlopi_device_parse_json(char *config_string)
                 {
                     s_ezlopi_device_t *sensor_list = ezlopi_devices_list_get_list();
                     int dev_idx = 0;
+
                     while (NULL != sensor_list[dev_idx].func)
                     {
                         if (id_item == sensor_list[dev_idx].id)

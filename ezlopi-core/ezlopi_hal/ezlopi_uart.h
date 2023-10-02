@@ -28,10 +28,10 @@ typedef struct s_ezlopi_uart
 
 
 typedef struct s_ezlopi_uart_object *s_ezlopi_uart_object_handle_t;
-typedef void (*__uart_upcall)(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
+typedef void (*__uart_upcall)(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void* user_args);
 
 
-s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall);
+s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void* args);
 ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle);
 
 

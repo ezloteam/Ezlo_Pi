@@ -15,7 +15,6 @@
 #include "ezlopi_ethernet.h"
 #include "ezlopi_event_group.h"
 #include "ezlopi_ping.h"
-#include "mac_uuid.h"
 
 static void ezlopi_initialize_devices(void);
 
@@ -37,12 +36,12 @@ void ezlopi_init(void)
     ezlopi_initialize_devices();
     vTaskDelay(10);
 
-    ezlopi_initialize_settings();
-    vTaskDelay(10);
+    // ezlopi_initialize_settings();
+    // vTaskDelay(10);
 
     ezlopi_wifi_initialize();
     vTaskDelay(10);
-#if CONFIG_IDF_TARGET_ESP32S3
+#if (EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO == EZLOPI_DEVICE_TYPE)
     ezlopi_ethernet_init();
 #endif
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
@@ -57,16 +56,16 @@ void ezlopi_init(void)
     }
 #endif
 
-
     ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
-    #if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32    
-    ezlopi_timer_start_50ms();
-    #else
+    // #if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
+    //     ezlopi_timer_start_50ms();
+    // #else
+    // ezlopi_timer_start_1000ms();
+    // #endif
     ezlopi_timer_start_1000ms();
-    #endif
 
     ezlopi_ping_init();
 }

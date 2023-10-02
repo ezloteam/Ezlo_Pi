@@ -1,3 +1,4 @@
+#if 0
 #pragma once 
 
 #include <stdio.h>
@@ -56,19 +57,21 @@ typedef struct PMSAQIdata {
   uint8_t available;
 } PM25_AQI_Data;
 
-void pms_init(PM25_AQI_Data* data);
-void pms_uart_setup(PM25_AQI_Data* data);
+void pms_init(PM25_AQI_Data* data, uint32_t set_pin, uint32_t reset_pin);
+void pms_uart_setup(PM25_AQI_Data* data, uint32_t tx, uint32_t rx, uint32_t baudrate);
 esp_err_t pms_setup_control_gpio(gpio_num_t set_pin, gpio_num_t reset_pin);
 esp_err_t pms_gpio_config_output(gpio_num_t pin);
-void pms_startup();
+void pms_startup(gpio_num_t set_pin, gpio_num_t reset_pin);
 esp_err_t pms_read_upcall(uint8_t* buffer, PM25_AQI_Data* data);
 esp_err_t pms_read(PM25_AQI_Data *data);
 void pms_print_data(PM25_AQI_Data* data);
 void pms_sleep_mode(gpio_num_t set_pin);
 void pms_active_mode(gpio_num_t set_pin);
 void pms_create_sleep_timer(PM25_AQI_Data* data);
-bool pms_is_data_available(void* user_arg);
-void pms_set_data_available_to_false(void* user_arg);
+bool pms_is_data_available(PM25_AQI_Data *data);
+void pms_set_data_available_to_false(PM25_AQI_Data *data);
 static void pms_timer_callback(void* arg);
 
 static void ezlopi_pms5003_upcall(uint8_t* buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void* user_args);
+
+#endif // #if 0

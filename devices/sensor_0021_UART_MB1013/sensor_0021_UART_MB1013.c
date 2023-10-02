@@ -20,7 +20,7 @@ static int ezlopi_ultrasonic_MB1013_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjson_device);
 static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *properties);
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
+static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void* user_args);
 static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t *properties);
 
 int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
@@ -57,7 +57,7 @@ int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_propertie
     return ret;
 }
 
-static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void* user_args)
 {
     // TRACE_E("Buffer is %s", buffer);
     char *another_buffer = (char *)malloc(256);
@@ -143,7 +143,7 @@ static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *propertie
     if (GPIO_IS_VALID_GPIO(properties->interface.uart.tx) && GPIO_IS_VALID_GPIO(properties->interface.uart.rx))
     {
         s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(properties->interface.uart.baudrate, properties->interface.uart.tx,
-                                                                                   properties->interface.uart.rx, ezlopi_ultrasonic_MB1013_upcall);
+                                                                                   properties->interface.uart.rx, ezlopi_ultrasonic_MB1013_upcall, NULL);
         properties->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
         ret = 0;
     }

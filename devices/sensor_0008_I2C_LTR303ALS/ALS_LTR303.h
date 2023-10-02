@@ -17,7 +17,7 @@ typedef struct
 * @param[in] initialize_i2c  :  true : initialize i2c,
                                 false : skips i2c initialization
 */
-esp_err_t ltr303_setup(bool initialize_i2c); 
+esp_err_t ltr303_setup(uint32_t sda, uint32_t scl, bool initialize_i2c); 
 
 esp_err_t ltr303_loop(void); 
 esp_err_t ltr303_get_val(ltr303_data_t* ltr303_data); 

@@ -1,7 +1,4 @@
 
-#include "sdkconfig.h"
-
-#if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3)
 
 #include "sensor_0024_other_HCSR04.h"
 #include "cJSON.h"
@@ -15,21 +12,18 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 #include "stdlib.h"
-#include "gpio_isr_service.h"
 
-#include "driver/mcpwm.h"
-#include "soc/rtc.h"
+static int ezlopi_sensor_0024_other_HCSR04_prepare_and_add(void *args);
+static s_ezlopi_device_properties_t *ezlopi_sensor_0024_other_HCSR04_prepare(cJSON *cjson_device);
+static int ezlopi_sensor_0024_other_HCSR04_init(s_ezlopi_device_properties_t *properties);
+static int ezlopi_sensor_0024_other_HCSR04_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
+static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(s_ezlopi_device_properties_t *properties);
 
-static xQueueHandle ezlopi_ultrasonic_HC_SR04_queue = NULL;
-static bool current_val = false;
-static bool previous_val = false;
+static esp_err_t ultrasonic_init(const ultrasonic_sensor_t *dev);
+static esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us);
+static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance);
 
-static int ezlopi_ultrasonic_HC_SR04_prepare_and_add(void *args);
-static s_ezlopi_device_properties_t *ezlopi_ultrasonic_HC_SR04_prepare(cJSON *cjson_device);
-static int ezlopi_ultrasonic_HC_SR04_init(s_ezlopi_device_properties_t *properties);
-static int ezlopi_ultrasonic_HC_SR04_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-static bool ezlopi_ultrasonic_HC_SR04_upcall(mcpwm_unit_t unit, mcpwm_capture_channel_id_t channel, const cap_event_data_t *data, void *user_data);
-static bool ezlopi_ultrasonic_HC_SR04_get_from_sensor(s_ezlopi_device_properties_t *properties);
+static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 int sensor_0024_other_HCSR04(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
@@ -38,22 +32,24 @@ int sensor_0024_other_HCSR04(e_ezlopi_actions_t action, s_ezlopi_device_properti
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        ret = ezlopi_ultrasonic_HC_SR04_prepare_and_add(arg);
+        ret = ezlopi_sensor_0024_other_HCSR04_prepare_and_add(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        ret = ezlopi_ultrasonic_HC_SR04_init(properties);
+        ret = ezlopi_sensor_0024_other_HCSR04_init(properties);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        ezlopi_ultrasonic_HC_SR04_get_value_cjson(properties, arg);
+        ezlopi_sensor_0024_other_HCSR04_get_value_cjson(properties, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        ret = ezlopi_ultrasonic_HC_SR04_get_from_sensor(properties);
+        ret = ezlopi_sensor_0024_other_HCSR04_get_from_sensor(properties);
+        ezlopi_device_value_updated_from_device(properties);
+
         break;
     }
     default:
@@ -65,19 +61,19 @@ int sensor_0024_other_HCSR04(e_ezlopi_actions_t action, s_ezlopi_device_properti
     return ret;
 }
 
-static int ezlopi_ultrasonic_HC_SR04_prepare_and_add(void *args)
+static int ezlopi_sensor_0024_other_HCSR04_prepare_and_add(void *args)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        s_ezlopi_device_properties_t *ezlopi_ultrasonic_HC_SR04_properties = ezlopi_ultrasonic_HC_SR04_prepare(device_prep_arg->cjson_device);
-        if (ezlopi_ultrasonic_HC_SR04_properties)
+        s_ezlopi_device_properties_t *ezlopi_sensor_0024_other_HCSR04_properties = ezlopi_sensor_0024_other_HCSR04_prepare(device_prep_arg->cjson_device);
+        if (ezlopi_sensor_0024_other_HCSR04_properties)
         {
-            if (0 == ezlopi_devices_list_add(device_prep_arg->device, ezlopi_ultrasonic_HC_SR04_properties, NULL))
+            if (0 == ezlopi_devices_list_add(device_prep_arg->device, ezlopi_sensor_0024_other_HCSR04_properties, NULL))
             {
-                free(ezlopi_ultrasonic_HC_SR04_properties);
+                free(ezlopi_sensor_0024_other_HCSR04_properties);
             }
             else
             {
@@ -89,177 +85,199 @@ static int ezlopi_ultrasonic_HC_SR04_prepare_and_add(void *args)
     return ret;
 }
 
-static s_ezlopi_device_properties_t *ezlopi_ultrasonic_HC_SR04_prepare(cJSON *cjson_device)
+static s_ezlopi_device_properties_t *ezlopi_sensor_0024_other_HCSR04_prepare(cJSON *cjson_device)
 {
-    s_ezlopi_device_properties_t *ezlopi_ultrasonic_HC_SR04_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    s_ezlopi_device_properties_t *ezlopi_sensor_0024_other_HCSR04_properties = malloc(sizeof(s_ezlopi_device_properties_t));
+    ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (ultrasonic_sensor_t *)malloc(sizeof(ultrasonic_sensor_t));
 
-    if (ezlopi_ultrasonic_HC_SR04_properties)
+    if (ezlopi_sensor_0024_other_HCSR04_properties && ultrasonic_HCSR04_sensor)
     {
-        memset(ezlopi_ultrasonic_HC_SR04_properties, 0, sizeof(s_ezlopi_device_properties_t));
-        ezlopi_ultrasonic_HC_SR04_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
+        memset(ezlopi_sensor_0024_other_HCSR04_properties, 0, sizeof(s_ezlopi_device_properties_t));
+        memset(ultrasonic_HCSR04_sensor, 0, sizeof(ultrasonic_sensor_t));
+        ezlopi_sensor_0024_other_HCSR04_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
 
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-        ASSIGN_DEVICE_NAME(ezlopi_ultrasonic_HC_SR04_properties, device_name);
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.category = category_security_sensor;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.subcategory = subcategory_motion;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.item_name = ezlopi_item_name_motion;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.value_type = value_type_bool;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.has_getter = true;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.has_setter = false;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.reachable = true;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.battery_powered = false;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.show = true;
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.room_name[0] = '\0';
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-        ezlopi_ultrasonic_HC_SR04_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
+        ASSIGN_DEVICE_NAME(ezlopi_sensor_0024_other_HCSR04_properties, device_name);
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.category = category_generic_sensor;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.item_name = ezlopi_item_name_distance;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.device_type = dev_type_sensor;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.value_type = value_type_length;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.has_getter = true;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.has_setter = false;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.reachable = true;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.battery_powered = false;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.show = true;
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.room_name[0] = '\0';
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
+        ezlopi_sensor_0024_other_HCSR04_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        CJSON_GET_VALUE_INT(cjson_device, "gpio1", ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.gpio_num);
-        CJSON_GET_VALUE_INT(cjson_device, "gpio2", ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "gpio1", ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, "gpio2", ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.gpio_num);
 
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.enable = true;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.mode = GPIO_MODE_OUTPUT;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_out.value = 0;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.enable = true;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.mode = GPIO_MODE_OUTPUT;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.value = 0;
 
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.enable = true;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
-        ezlopi_ultrasonic_HC_SR04_properties->interface.gpio.gpio_in.value = 0;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.enable = true;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
+        ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.value = 0;
+
+        ultrasonic_HCSR04_sensor->echo_pin = ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_in.gpio_num;
+        ultrasonic_HCSR04_sensor->trigger_pin = ezlopi_sensor_0024_other_HCSR04_properties->interface.gpio.gpio_out.gpio_num;
+        ultrasonic_HCSR04_sensor->distance = 0;
+
+        ezlopi_sensor_0024_other_HCSR04_properties->user_arg = ultrasonic_HCSR04_sensor;
     }
-    return ezlopi_ultrasonic_HC_SR04_properties;
+    return ezlopi_sensor_0024_other_HCSR04_properties;
 }
 
-static int ezlopi_ultrasonic_HC_SR04_init(s_ezlopi_device_properties_t *properties)
+static int ezlopi_sensor_0024_other_HCSR04_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = -1;
-    if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_out.gpio_num))
-    {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_out.gpio_num),
-            .mode = GPIO_MODE_OUTPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = GPIO_PULLDOWN_ENABLE,
-            .intr_type = GPIO_INTR_DISABLE,
-        };
 
-        gpio_config(&io_conf);
-        gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, 0);
+    ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (ultrasonic_sensor_t *)properties->user_arg;
+    if (ultrasonic_HCSR04_sensor)
+    {
+        ultrasonic_init(ultrasonic_HCSR04_sensor);
     }
-    if (GPIO_IS_VALID_GPIO(properties->interface.gpio.gpio_in.gpio_num))
+
+    return ret;
+}
+
+static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(s_ezlopi_device_properties_t *properties)
+{
+    uint32_t distance;
+
+    ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (ultrasonic_sensor_t *)properties->user_arg;
+    if (ultrasonic_HCSR04_sensor)
     {
+        esp_err_t res = ultrasonic_measure(ultrasonic_HCSR04_sensor, MAX_DISTANCE_CM, &ultrasonic_HCSR04_sensor->distance);
 
-        ezlopi_ultrasonic_HC_SR04_queue = xQueueCreate(1, sizeof(uint32_t));
-        mcpwm_unit_t unit = MCPWM_UNIT_0;
-        mcpwm_io_signals_t io_signal = MCPWM_CAP_0;
-        int ultrasonic_gpio = properties->interface.gpio.gpio_in.gpio_num;
-        mcpwm_capture_channel_id_t channel_id = MCPWM_SELECT_CAP0;
-
-        const mcpwm_capture_config_t capture_conf = {
-            .cap_edge = MCPWM_BOTH_EDGE,
-            .cap_prescale = 1,
-            .capture_cb = ezlopi_ultrasonic_HC_SR04_upcall,
-            .user_data = NULL,
-        };
-
-        esp_err_t error = mcpwm_gpio_init(unit, io_signal, ultrasonic_gpio);
-        if (error)
+        if (res != ESP_OK)
         {
-            TRACE_E("Error initializing gpio.(%s)", esp_err_to_name(error));
+            TRACE_B("Error 0x%X: ", res);
+            switch (res)
+            {
+            case ESP_ERR_ULTRASONIC_PING:
+                TRACE_B("Cannot ping (device is in invalid state)\n");
+                break;
+            case ESP_ERR_ULTRASONIC_PING_TIMEOUT:
+                TRACE_B("Ping timeout (no device found)\n");
+                break;
+            case ESP_ERR_ULTRASONIC_ECHO_TIMEOUT:
+                TRACE_B("Echo timeout (i.e. distance too big)\n");
+                break;
+            default:
+                TRACE_B("%s\n", esp_err_to_name(res));
+            }
+            ultrasonic_HCSR04_sensor->distance = 0;
         }
         else
         {
-            TRACE_I("GPIO was initialized successfully.");
-        }
-
-        error = mcpwm_capture_enable_channel(unit, channel_id, &capture_conf);
-        if (error)
-        {
-            TRACE_E("Error enabling capture channel.(%s)", esp_err_to_name(error));
-        }
-        else
-        {
-            TRACE_I("Capture channel was enabled successfully.");
+            // TRACE_B("Distance: %d cm\n", ultrasonic_HCSR04_sensor->distance);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
     }
-    return ret;
+    return true;
 }
 
-static bool ezlopi_ultrasonic_HC_SR04_upcall(mcpwm_unit_t unit, mcpwm_capture_channel_id_t channel, const cap_event_data_t *data, void *user_data)
-{
-    BaseType_t ret = xQueueSendFromISR(ezlopi_ultrasonic_HC_SR04_queue, data, NULL);
-    // static uint32_t start_of_sample = 0;
-    // static uint32_t end_of_sample = 0;
-
-    // if (MCPWM_POS_EDGE == data->cap_edge)
-    // {
-    //     start_of_sample = data->cap_value;
-    //     xQueueSendFromISR(ezlopi_ultrasonic_HC_SR04_queue, data, NULL);
-    // }
-    // else if (MCPWM_NEG_EDGE == data->cap_edge)
-    // {
-    //     end_of_sample = data->cap_value;
-    //     uint32_t pulse_count = end_of_sample - start_of_sample;
-    //     xQueueSendFromISR(ezlopi_ultrasonic_HC_SR04_queue, data, NULL);
-    // }
-    return ret;
-}
-
-static bool ezlopi_ultrasonic_HC_SR04_get_from_sensor(s_ezlopi_device_properties_t *properties)
-{
-    // uint32_t pulse_count;
-    cap_event_data_t data;
-    float distance;
-    bool ret = false;
-    
-    ESP_ERROR_CHECK(gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, 0));
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-    ESP_ERROR_CHECK(gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, 1));
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-    ESP_ERROR_CHECK(gpio_set_level(properties->interface.gpio.gpio_out.gpio_num, 0));
-    // if (xQueueReceive(ezlopi_ultrasonic_HC_SR04_queue, &data, portMAX_DELAY))
-    if (xQueueReceive(ezlopi_ultrasonic_HC_SR04_queue, &data, 1000 / portTICK_PERIOD_MS))
-    {
-        uint32_t edge = mcpwm_capture_signal_get_edge(MCPWM_UNIT_0, MCPWM_SELECT_CAP0);
-        TRACE_B("data.cap_edge is %d and edge is %d", data.cap_edge, edge);
-        // uint32_t pulse_width = pulse_count * (1000000.0 / rtc_clk_apb_freq_get());
-        // distance = (float)(pulse_width / 58);
-        // TRACE_B("Distance width is %f", distance);
-        // if (distance < 60)
-        // {
-        //     current_val = true;
-        // }
-        // else
-        // {
-        //     current_val = false;
-        // }
-        // if (current_val != previous_val)
-        // {
-        //     ezlopi_device_value_updated_from_device(properties);
-        //     previous_val = current_val;
-        // }
-    }
-    
-    return ret;
-}
-
-static int ezlopi_ultrasonic_HC_SR04_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
+static int ezlopi_sensor_0024_other_HCSR04_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-
+    bool current_val = true;
     cJSON *cjson_propertise = (cJSON *)args;
-    if (cjson_propertise)
+
+    ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (ultrasonic_sensor_t *)properties->user_arg;
+
+    if (cjson_propertise && ultrasonic_HCSR04_sensor)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", current_val);
+        cJSON_AddNumberToObject(cjson_propertise, "value", (ultrasonic_HCSR04_sensor->distance / 100.0));
+        cJSON_AddStringToObject(cjson_propertise, "scale", "meter");
         ret = 1;
     }
     return ret;
 }
 
-#endif // CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3
+static esp_err_t ultrasonic_init(const ultrasonic_sensor_t *dev)
+{
+    CHECK_ARG(dev);
+
+    gpio_config_t trigger_config = {
+        .pin_bit_mask = (1ULL << dev->trigger_pin),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_down_en = GPIO_PULLDOWN_ENABLE,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+    };
+    gpio_config_t echo_config = {
+        .pin_bit_mask = (1ULL << dev->echo_pin),
+        .mode = GPIO_MODE_INPUT,
+        .pull_down_en = GPIO_PULLDOWN_ENABLE,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+    };
+    ESP_ERROR_CHECK_WITHOUT_ABORT(gpio_config(&trigger_config));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(gpio_config(&echo_config));
+
+    return gpio_set_level(dev->trigger_pin, 0);
+}
+
+static esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us)
+{
+    CHECK_ARG(dev && time_us);
+
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
+    vTaskDelay(1 / portTICK_PERIOD_MS);
+    CHECK(gpio_set_level(dev->trigger_pin, 1));
+    vTaskDelay(1 / portTICK_PERIOD_MS);
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
+
+    PORT_ENTER_CRITICAL;
+
+    // Previous ping isn't ended
+    if (gpio_get_level(dev->echo_pin))
+    {
+        RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING);
+    }
+
+    // Wait for echo
+    int64_t start = esp_timer_get_time();
+    while (!gpio_get_level(dev->echo_pin))
+    {
+        if (timeout_expired(start, PING_TIMEOUT))
+            RETURN_CRITICAL(ESP_ERR_ULTRASONIC_PING_TIMEOUT);
+    }
+
+    // got echo, measuring
+    int64_t echo_start = esp_timer_get_time();
+    int64_t time = echo_start;
+    while (gpio_get_level(dev->echo_pin))
+    {
+        time = esp_timer_get_time();
+        if (timeout_expired(echo_start, max_time_us))
+            RETURN_CRITICAL(ESP_ERR_ULTRASONIC_ECHO_TIMEOUT);
+    }
+    PORT_EXIT_CRITICAL;
+
+    *time_us = time - echo_start;
+
+    return ESP_OK;
+}
+
+static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance)
+{
+    CHECK_ARG(dev && distance);
+
+    uint32_t time_us;
+    CHECK(ultrasonic_measure_raw(dev, max_distance * ROUNDTRIP_CM, &time_us));
+    *distance = time_us / ROUNDTRIP_CM;
+
+    return ESP_OK;
+}

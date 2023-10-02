@@ -110,7 +110,7 @@ static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjs
         sensor_ldr_analog_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_ldr_analog_sensor_properties->interface.adc.gpio_num);
-        sensor_ldr_analog_sensor_properties->interface.adc.resln_bit = 3;
+        sensor_ldr_analog_sensor_properties->interface.adc.resln_bit = 3; // ADC_RES_12_BIT => 3
     }
 
     return sensor_ldr_analog_sensor_properties;

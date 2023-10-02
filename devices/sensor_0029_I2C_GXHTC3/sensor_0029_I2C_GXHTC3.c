@@ -201,5 +201,10 @@ static s_ezlopi_device_properties_t *wgxhtc3_sensor_prepare_relative_humidity(cJ
 
 static void wgxhtc3_sensor_init(s_ezlopi_device_properties_t *properties, void *user_arg)
 {
-    ezlopi_i2c_master_init(&properties->interface.i2c_master);
+    static bool gaurd = false;
+    if (!gaurd)
+    {
+        gaurd = true;
+        ezlopi_i2c_master_init(&properties->interface.i2c_master);
+    }
 }

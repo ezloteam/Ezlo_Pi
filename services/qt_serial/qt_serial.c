@@ -187,20 +187,22 @@ static void qt_serial_get_info()
         cJSON_AddNumberToObject(get_info, "cmd", 1);
         cJSON_AddNumberToObject(get_info, "status", 1);
         // cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
-        cJSON_AddStringToObject(get_info, "v_fmw", VERSION_STR);        
+        cJSON_AddStringToObject(get_info, "v_fmw", VERSION_STR);
         cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
         cJSON_AddNumberToObject(get_info, "build", BUILD);
         cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
-        cJSON_AddNumberToObject(get_info, "v_idf", ESP_IDF_VERSION);
+        cJSON_AddStringToObject(get_info, "v_idf", esp_get_idf_version());
         cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount());
         cJSON_AddNumberToObject(get_info, "build_date", BUILD_DATE);
         cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddNumberToObject(get_info, "boot_reason", esp_reset_reason());
         uint8_t base_mac[6];
-        esp_read_mac(base_mac, ESP_MAC_WIFI_STA);
-        dump("mac", base_mac, 0, 6);
-        uint64_t long_mac = 0xFFFFFFFFFFFFULL & ((base_mac[0] & 0xFFULL) | ((base_mac[1] & 0xFFULL) << 8) | ((base_mac[2] & 0xFFULL) << 16) | ((base_mac[3] & 0xFFULL) << 24) | ((base_mac[4] & 0xFFULL) << 32) | ((base_mac[5] & 0xFFULL) << 40));
-        cJSON_AddNumberToObject(get_info, "mac", long_mac);
+        esp_read_mac(base_mac, ESP_MAC_BT);
+        char mac_string[32];
+        snprintf(mac_string, sizeof(mac_string), "%02x:%02x:%02x:%02x:%02x:%02x",
+                 mac_string[0], mac_string[1], mac_string[2], mac_string[3], mac_string[4], mac_string[5]);
+        cJSON_AddStringToObject(get_info, "mac", mac_string);
+
         cJSON_AddStringToObject(get_info, "uuid", controller_uuid);
         cJSON_AddStringToObject(get_info, "uuid_prov", provisioning_uuid);
         cJSON_AddNumberToObject(get_info, "serial", serial_id);
@@ -217,29 +219,32 @@ static void qt_serial_get_info()
         cJSON_AddStringToObject(get_info, "manf_name", device_manufacturer);
         cJSON_AddStringToObject(get_info, "model_num", device_model);
 
-        ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();        
+        ezlopi_wifi_status_t *wifi_status = ezlopi_wifi_status();
 
-        if(wifi_status->wifi_connection == true) {     
-            char *ip_addr = (char * )malloc(sizeof(char) * 20);   
+        if (wifi_status->wifi_connection == true)
+        {
+            char *ip_addr = (char *)malloc(sizeof(char) * 20);
 
-            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->ip, ip_addr, 20);                     
-            
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->ip, ip_addr, 20);
+
             cJSON_AddBoolToObject(get_info, "sta_connection", true);
-            
+
             cJSON_AddStringToObject(get_info, "ip_sta", ip_addr);
 
-            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->netmask, ip_addr, 20);    
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->netmask, ip_addr, 20);
             cJSON_AddStringToObject(get_info, "ip_nmask", ip_addr);
 
-            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->gw, ip_addr, 20);    
-            cJSON_AddStringToObject(get_info, "ip_gw", ip_addr);            
+            ip_addr = esp_ip4addr_ntoa(&wifi_status->ip_info->gw, ip_addr, 20);
+            cJSON_AddStringToObject(get_info, "ip_gw", ip_addr);
 
-            free(ip_addr); 
-        } else {
+            free(ip_addr);
+        }
+        else
+        {
             cJSON_AddBoolToObject(get_info, "sta_connection", false);
             cJSON_AddStringToObject(get_info, "ip_sta", "");
         }
-        
+
         free(wifi_status);
 
         char *my_json_string = cJSON_Print(get_info);
@@ -251,7 +256,7 @@ static void qt_serial_get_info()
         ezlopi_factory_info_v2_free(device_brand);
         ezlopi_factory_info_v2_free(device_manufacturer);
         ezlopi_factory_info_v2_free(device_name);
-        ezlopi_factory_info_v2_free(device_type);
+        // ezlopi_factory_info_v2_free(device_type);
 
         if (my_json_string)
         {
@@ -386,7 +391,7 @@ static void qt_serial_read_config(void)
             cJSON_Minify(my_json_string);
             cJSON_Delete(root); // free Json string
             const int len = strlen(my_json_string);
-            const int txBytes = qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
+	    qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
             cJSON_free(my_json_string);
         }

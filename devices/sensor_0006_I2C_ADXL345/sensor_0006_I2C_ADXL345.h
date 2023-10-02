@@ -1,5 +1,5 @@
-#ifndef _028_SENS_I2C_ACCELEROMETER_H_
-#define _028_SENS_I2C_ACCELEROMETER_H_
+#ifndef _0006_SENS_I2C_ADXL345_H_
+#define _0006_SENS_I2C_ADXL345_H_
 
 #include "ezlopi_actions.h"
 #include "ezlopi_i2c_master.h"
@@ -11,7 +11,7 @@
 // For reference following github repository can be consulted.
 // https://github.com/Embetronicx/incubator-nuttx-apps/tree/master/examples/etx_i2c
 
-#define SLAVE_ADDR 0x53 // if (AD0->Vcc) then; [i2c_address->0x1D]
+#define ADXL345_ADDR 0x53 // if (AD0->Vcc) then; [i2c_address->0x1D]
 
 /*******************************************************************/
 // REGISTER ADDRESS
@@ -61,8 +61,9 @@
 #define ADXL345_CONVERTER_FACTOR_MG_TO_G 0.004
 
 // 1g = 9.80665 m/s^2
-#define STANDARD_G_TO_ACCEL_CONVERSION_VALUE 9.80665
+#define ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE 9.80665
 
+// Action function
 int sensor_0006_I2C_ADXL345(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
-#endif // _028_SENS_I2C_ACCELEROMETER_H_
+#endif // _0006_SENS_I2C_ADXL345_H_

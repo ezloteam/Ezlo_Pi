@@ -1,9 +1,9 @@
 
-#ifndef _000_sens_i2c_mpu6050_accel_gyro_temp_H_
-#define _000_sens_i2c_mpu6050_accel_gyro_temp_H_
+#ifndef _0005_sens_i2c_mpu6050_accel_gyro_temp_H_
+#define _0005_sens_i2c_mpu6050_accel_gyro_temp_H_
 
 // Offsets and conversion values : 1g = 9.80665 m/s^2
-#define STANDARD_G_TO_ACCEL_CONVERSION_VALUE (9.80665f)
+#define MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE (9.80665f)
 #define GYRO_X_OFFSET (1.6f)  // if +ve avg offset, use -neg value and vice versa
 #define GYRO_Y_OFFSET (0.10f) // if +ve avg offset, use -neg value and vice versa
 #define GYRO_Z_OFFSET (1.5f)  // if +ve avg offset, use -neg value and vice versa
