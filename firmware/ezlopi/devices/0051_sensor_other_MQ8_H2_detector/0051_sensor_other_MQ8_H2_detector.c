@@ -173,8 +173,8 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
 {
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    char *_addition = "-H2-alert";
-    device_name = strcat(device_name, _addition);
+    char *_addition = " H2-alert";
+    device_name = strncat(device_name, _addition, strlen(_addition)+1);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
@@ -201,8 +201,8 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
 {
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    char *_addition = "-H2-level [PPM]";
-    device_name = strcat(device_name, _addition);
+    char *_addition = " H2-level [PPM]";
+    device_name = strncat(device_name, _addition, strlen(_addition)+1);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
