@@ -55,6 +55,7 @@
 // #define EZLOPI_SENSOR_0029_GXHTC3_RH_T_I2C 35
 
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
+#define EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER 54
 
 /**
  * @brief defining the type of sensor call function

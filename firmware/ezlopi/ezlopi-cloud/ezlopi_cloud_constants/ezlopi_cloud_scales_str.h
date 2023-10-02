@@ -31,4 +31,9 @@ const static char *scales_lux = "lux";
 /// @brief pressure
 const static char *scales_kilo_pascal = "kilo_pascal";
 
+/// @brief volume_flow
+const static char *scales_cubic_meter_per_hour = "cubic_meter_per_hour";
+const static char *scales_cubic_feet_per_minute = "cubic_feet_per_minute";
+const static char *scales_liter_per_hour = "liter_per_hour";
+
 #endif // __EZLOPI_SCALES_STR_H__
