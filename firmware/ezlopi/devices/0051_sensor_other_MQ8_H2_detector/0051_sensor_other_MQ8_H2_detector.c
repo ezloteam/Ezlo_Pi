@@ -21,8 +21,8 @@
 //                          Declaration
 //*************************************************************************
 
-static float MQ8_R0_constant = 0;             // Define variable for MQ8_R0_constant [always constant]
-static bool Calibration_complete_H2 = false; // flag to activate calibration phase
+static float _H2_ppm = 0, MQ8_R0_constant = 0; // Define variable for MQ8_R0_constant [always constant]
+static bool Calibration_complete_H2 = false;   // flag to activate calibration phase
 const char *mq8_sensor_gas_alarm_token[] =
     {
         "no_gas",
@@ -173,8 +173,8 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
 {
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    char *_addition = " H2-alert";
-    device_name = strncat(device_name, _addition, strlen(_addition)+1);
+    // char *_addition = " H2-alert";
+    // device_name = strncat(device_name, _addition, strlen(_addition) + 1);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
@@ -201,8 +201,8 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
 {
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    char *_addition = " H2-level [PPM]";
-    device_name = strncat(device_name, _addition, strlen(_addition)+1);
+    // char *_addition = " H2-level [PPM]";
+    // device_name = strncat(device_name, _addition, strlen(_addition) + 1);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -257,9 +257,9 @@ static int __0051_get_item(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+                snprintf(valueFormatted, 20, "%.2f", _H2_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+                cJSON_AddNumberToObject(cj_result, "value", _H2_ppm);
             }
             ret = 1;
         }
@@ -282,9 +282,9 @@ static int __0051_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+                snprintf(valueFormatted, 20, "%.2f", _H2_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+                cJSON_AddNumberToObject(cj_result, "value", _H2_ppm);
             }
             ret = 1;
         }
@@ -294,7 +294,6 @@ static int __0051_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __0051_notify(l_ezlopi_item_t *item)
 {
-    static float _H2_ppm = 0;
     int ret = 0;
     if (item)
     {
@@ -303,11 +302,13 @@ static int __0051_notify(l_ezlopi_item_t *item)
             char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = "combustible_gas_detected";
+                // curret_value = "combustible_gas_detected";
+                curret_value = mq8_sensor_gas_alarm_token[1];
             }
             else
             {
-                curret_value = "no_gas";
+                // curret_value = "no_gas";
+                curret_value = mq8_sensor_gas_alarm_token[0];
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
@@ -322,9 +323,7 @@ static int __0051_notify(l_ezlopi_item_t *item)
             _H2_ppm = Extract_MQ8_sensor_ppm(item->interface.adc.gpio_num);
             if (prev_ppm != _H2_ppm)
             {
-                item->user_arg = ((void *)(&_H2_ppm));
                 ezlopi_device_value_updated_from_device_v3(item);
-                item->user_arg = NULL;
             }
         }
         ret = 1;

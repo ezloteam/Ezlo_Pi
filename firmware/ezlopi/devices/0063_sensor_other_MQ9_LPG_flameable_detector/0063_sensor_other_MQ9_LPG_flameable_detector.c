@@ -22,8 +22,8 @@
 //                          Declaration
 //*************************************************************************
 
-static float MQ9_R0_constant = 0;                       // Define variable for MQ9_R0_constant [always constant]
-static bool Calibration_complete_LPG_flameable = false; // flag to activate calibration phase
+static float _LPG_flameable_ppm = 0, MQ9_R0_constant = 0; // Define variable for MQ9_R0_constant [always constant]
+static bool Calibration_complete_LPG_flameable = false;   // flag to activate calibration phase
 const char *mq9_sensor_gas_alarm_token[] =
     {
         "no_gas",
@@ -145,12 +145,13 @@ static int __0063_init(l_ezlopi_item_t *item)
         if ((ezlopi_item_name_gas_alarm == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
         {
             // intialize digital_pin
-            gpio_config_t input_conf = {};
-            input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
-            input_conf.intr_type = GPIO_INTR_DISABLE;
-            input_conf.mode = GPIO_MODE_INPUT;
-            input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-            input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+            const gpio_config_t input_conf = {
+                .pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num)),
+                .intr_type = GPIO_INTR_DISABLE,
+                .mode = GPIO_MODE_INPUT,
+                .pull_down_en = GPIO_PULLDOWN_DISABLE,
+                .pull_up_en = GPIO_PULLUP_ENABLE,
+            };
             gpio_config(&input_conf);
             ret = 1;
         }
@@ -174,8 +175,8 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
 {
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    char *_addition = " LPG_flameable-alert";
-    device_name = strncat(device_name, _addition, strlen(_addition)+1);
+    // char *_addition = " LPG_flameable-alert";
+    // device_name = strncat(device_name, _addition, strlen(_addition) + 1);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
@@ -202,8 +203,6 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
 {
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    char *_addition = " LPG_flameable-level [PPM]";
-    device_name = strncat(device_name, _addition, strlen(_addition)+1);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -258,9 +257,9 @@ static int __0063_get_item(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+                snprintf(valueFormatted, 20, "%.2f", _LPG_flameable_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+                cJSON_AddNumberToObject(cj_result, "value", _LPG_flameable_ppm);
             }
             ret = 1;
         }
@@ -283,9 +282,9 @@ static int __0063_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+                snprintf(valueFormatted, 20, "%.2f", _LPG_flameable_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+                cJSON_AddNumberToObject(cj_result, "value", _LPG_flameable_ppm);
             }
             ret = 1;
         }
@@ -295,7 +294,6 @@ static int __0063_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __0063_notify(l_ezlopi_item_t *item)
 {
-    static float _LPG_flameable_ppm = 0;
     int ret = 0;
     if (item)
     {
@@ -304,11 +302,13 @@ static int __0063_notify(l_ezlopi_item_t *item)
             char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = "combustible_gas_detected";
+                // curret_value = "combustible_gas_detected";
+                curret_value = mq9_sensor_gas_alarm_token[1];
             }
             else
             {
-                curret_value = "no_gas";
+                // curret_value = "no_gas";
+                 curret_value = mq9_sensor_gas_alarm_token[0];
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
@@ -323,9 +323,7 @@ static int __0063_notify(l_ezlopi_item_t *item)
             _LPG_flameable_ppm = Extract_MQ9_sensor_ppm(item->interface.adc.gpio_num);
             if (prev_ppm != _LPG_flameable_ppm)
             {
-                item->user_arg = ((void *)(&_LPG_flameable_ppm));
                 ezlopi_device_value_updated_from_device_v3(item);
-                item->user_arg = NULL;
             }
         }
         ret = 1;

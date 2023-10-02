@@ -379,11 +379,12 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"MQ9\",\
+                \"dev_name\": \"MQ135\",\
                 \"dev_type\": 10,\
-                \"id_item\": 63,\
+                \"id_item\": 52,\
                 \"id_room\": \"\",\
-                \"gpio\": 25\
+                \"gpio1\": 25,\
+                \"gpio2\": 33\                
             }\             
         ],\
     \"dev_total\": 1}";
