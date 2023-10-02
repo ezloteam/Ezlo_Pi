@@ -72,7 +72,7 @@ version_create () {
     
     echo -e "#define DEVELOPER \"${BUIDER_EMAIL}\"" >> $versionFile
     echo -e "#define COMPILE_TIME \"${BUILD_TIME}\"" >> $versionFile
-    echo -e "#define CURRENT_BRANCH \"Nepal Digital System Pvt. Ltd.\"" >> $versionFile
+    echo -e "#define CURRENT_BRANCH \"development\"" >> $versionFile
     echo -e "#define COMMIT_HASH \"${COMMIT_HASH}\"" >> $versionFile
 
     echo -e "#ifdef __cplusplus" >> $versionFile

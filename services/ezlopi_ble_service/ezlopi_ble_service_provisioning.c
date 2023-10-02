@@ -216,16 +216,16 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
                 uint32_t tot_len = CJ_GET_NUMBER("total_len");
                 uint32_t sequence = CJ_GET_NUMBER("sequence");
 
-                char *root_str = cJSON_Print(root);
-                if (root_str)
-                {
-                    // TRACE_D("root_str: %s", root_str);
-                    char *string_data = (char *)malloc(500);
-                    CJSON_GET_VALUE_STRING(root_str, "data", string_data);
-                    TRACE_D("Data : %s", string_data);
-                    free(root_str);
-                    free(string_data);
-                }
+                // char *root_str = cJSON_Print(root);
+                // if (root_str)
+                // {
+                //     // TRACE_D("root_str: %s", root_str);
+                //     char *string_data = (char *)malloc(500);
+                //     CJSON_GET_VALUE_STRING(root_str, "data", string_data);
+                //     TRACE_D("Data : %s", string_data);
+                //     free(root_str);
+                //     free(string_data);
+                // }
 
                 TRACE_D("Len: %d", len);
                 TRACE_D("tot_len: %d", tot_len);
