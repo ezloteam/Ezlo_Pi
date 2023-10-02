@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_IR_BLASTER 1
 #define EZLOPI_TEST_DEVICE 2
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
 
 #include "esp_partition.h"
 #include "frozen.h"
@@ -380,15 +380,31 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"HCSR04 ultrasonic\",\
-                \"dev_type\": 10,\
-                \"id_item\": 24,\
-                \"id_room\": \"\",\
-                \"gpio1\": 18,\
-                \"gpio2\": 19\
-            }\                
+                \" dev_type \" : 1,\
+                \" dev_name \" : \" Dining Room Main Lamp \",\
+                \" id_room \" : \"\",\
+                \" id_item \" : 2,\
+                \" val_ip \" : true,\
+                \" val_op \" : false,\
+                \" gpio_in \" : 21,\
+                \" gpio_out \" : 13,\
+                \" is_ip \" : false,\
+                \" ip_inv \" : true,\
+                \" pullup_ip \" : true,\
+                \" pullup_op \" : true,\
+                \" op_inv \" : false\
+            }\
         ],\
     \"dev_total\": 1}";
+
+// {
+//     \"dev_name\": \"HCSR04 ultrasonic\",
+//                 \"dev_type\": 10,
+//                 \"id_item\": 24,
+//                 \"id_room\": \"\",
+//                 \"gpio1\": 18,
+//                 \"gpio2\": 19
+//             }
 
 #endif
 

@@ -12,7 +12,6 @@
 #include "ezlopi_devices_list.h"
 #include "ezlopi_event_queue.h"
 
-static void event_process(void *pv);
 static void event_process_v3(void *pv);
 
 void timer_service_init(void)

@@ -19,7 +19,7 @@
 #include "feature.h"
 #include "network.h"
 #include "firmware.h"
-#include "ezlopi_websocket_client.h"
+#include "scenes_scripts.h"
 
 #include "ezlopi_wifi.h"
 #include "ezlopi_http.h"
@@ -27,6 +27,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "web_provisioning.h"
+#include "ezlopi_websocket_client.h"
 
 static uint32_t message_counter = 0;
 
@@ -46,7 +47,7 @@ typedef struct s_method_list_v2
 
 static const s_method_list_v2_t method_list_v2[] = {
     /** Getter functions **/
-    {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
+    // {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
     {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
     // {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
     {.method_name = "hub.items.list", .method = items_list_v3, .updater = NULL},
@@ -59,7 +60,9 @@ static const s_method_list_v2_t method_list_v2[] = {
     // {.method_name = "hub.scenes.status.get", .method = scenes_status_get, .updater = NULL}, // Implementation remains
     {.method_name = "hub.scenes.blocks.list", .method = scenes_blocks_list, .updater = NULL},
     {.method_name = "hub.scenes.block.data.list", .method = scenes_block_data_list, .updater = NULL},
+
     {.method_name = "hub.scenes.scripts.list", .method = scenes_scripts_list, .updater = NULL},
+    {.method_name = "hub.scenes.scripts.add", .method = scenes_scripts_add, .updater = NULL},
 
     // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
     {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},

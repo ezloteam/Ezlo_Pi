@@ -37,8 +37,7 @@ static void blinky(void *pv);
 
 void app_main(void)
 {
-    ezlopi_scenes_scripts_init();
-#if 0
+#if 1
     gpio_install_isr_service(0);
     qt_serial_init();
     gpio_isr_service_init();

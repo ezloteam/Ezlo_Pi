@@ -556,6 +556,7 @@ void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
         if (cj_result)
         {
+            
         }
     }
 }

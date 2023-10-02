@@ -3,21 +3,16 @@
 
 #include "inttypes.h"
 
-#define EZLOPI_LUA_SCRIPTS_NAMES "lua_scripts_names"
-
-typedef struct s_ezlopi_script
-{
-} s_ezlopi_script_t;
-
-typedef struct s_ezlopi_lua_script
+typedef struct l_ezlopi_scenes_script
 {
     uint32_t id;
     char *name;
-    char *script;
+    char *code;
 
-    struct s_ezlopi_lua_script *next;
-} s_ezlopi_lua_script_t;
+    struct l_ezlopi_scenes_script *next;
+} l_ezlopi_scenes_script_t;
 
 void ezlopi_scenes_scripts_init(void);
+uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script);
 
 #endif // __EZLOPI_LUA_H__

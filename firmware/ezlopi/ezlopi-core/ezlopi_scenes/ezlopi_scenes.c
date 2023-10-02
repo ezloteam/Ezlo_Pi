@@ -7,6 +7,7 @@
 #include "ezlopi_scenes.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_methods.h"
+#include "ezlopi_scenes_scripts.h"
 #include "ezlopi_scenes_operators.h"
 #include "ezlopi_scenes_when_methods.h"
 #include "ezlopi_scenes_then_methods.h"
@@ -208,7 +209,8 @@ l_scenes_list_t *ezlopi_scene_add(cJSON *cj_scene)
 void ezlopi_scene_init(void)
 {
     // const char *scenes_list = test_scene_create_str;
-    const char *scenes_list = ezlopi_nvs_scene_get();
+    ezlopi_scenes_scripts_init();
+    char *scenes_list = ezlopi_nvs_scene_get();
     if (scenes_list)
     {
         cJSON *cj_scenes_list = cJSON_Parse(scenes_list);
