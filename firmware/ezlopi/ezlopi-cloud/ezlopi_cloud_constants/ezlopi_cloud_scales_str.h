@@ -31,4 +31,8 @@ const static char *scales_lux = "lux";
 /// @brief pressure
 const static char *scales_kilo_pascal = "kilo_pascal";
 
+/// @brief electrical_resistance
+const static char *scales_ohm_meter = "ohm_meter";
+
+
 #endif // __EZLOPI_SCALES_STR_H__
