@@ -31,6 +31,7 @@
 #include "0009_other_RMT_SK6812.h"
 
 #include "0010_I2C_BME680.h"
+#include "0057_sensor_other_KY026_FlameDetector.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -184,6 +185,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = sensor_TSL256_luminosity_v3,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR,
+        .func = sensor_0057_flame_detector_v3,
+    },
+#endif
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.

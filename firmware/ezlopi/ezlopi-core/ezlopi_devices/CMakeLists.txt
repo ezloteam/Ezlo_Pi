@@ -38,6 +38,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                 034_proximity_sensor 
                 0038_digitalOut_RGB 
                 0044_sensor_I2C_TSL256_luminosity
+                0057_sensor_other_KY026_FlameDetector
                 )
 
 

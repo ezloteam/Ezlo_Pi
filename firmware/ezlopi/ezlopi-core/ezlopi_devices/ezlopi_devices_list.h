@@ -56,6 +56,7 @@
 
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
 
+#define EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR 57
 /**
  * @brief defining the type of sensor call function
  *
