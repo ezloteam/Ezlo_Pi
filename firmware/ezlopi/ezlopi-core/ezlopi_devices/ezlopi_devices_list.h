@@ -56,6 +56,8 @@
 
 // #define EZLOPI_SENSOR_1024_DEVICE_HEALTH 1024
 
+#define EZLOPI_SENSOR_0053_UART_GYGPS6MV2 53
+
 /**
  * @brief defining the type of sensor call function
  *
