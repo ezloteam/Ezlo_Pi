@@ -154,9 +154,9 @@ static int __0056_get_item(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             char valueFormatted[20];
-            snprintf(valueFormatted, 20, "%.2f", *((float *)item->user_arg));
+            snprintf(valueFormatted, 20, "%.2f", FSR_value);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", *((float *)item->user_arg));
+            cJSON_AddNumberToObject(cj_result, "value", FSR_value);
             ret = 1;
         }
     }
