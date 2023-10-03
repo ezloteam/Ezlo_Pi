@@ -91,6 +91,6 @@
 
 #define FSR_correction_factor 2.5f
 //-----------------------------------------------------------------------------------------------------------------------------
-int sensor_0056_force_sensitive_resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+int sensor_0056_fsr_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif

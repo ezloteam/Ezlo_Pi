@@ -188,7 +188,7 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0056_ADC_FSR
     {
         .id = EZLOPI_SENSOR_0056_ADC_FSR,
-        .func = sensor_0056_force_sensitive_resistor,
+        .func = sensor_0056_fsr_v3,
     },
 #endif
 

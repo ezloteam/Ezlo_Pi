@@ -30,7 +30,7 @@ static float Calculate_GramForce(float Vout);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 //------------------------------------------------------------------------------------------------------------------------------
-int sensor_0056_force_sensitive_resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0056_fsr_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -111,7 +111,7 @@ static int __0056_prepare(void *arg)
         if (FSR_device)
         {
             __prepare_device_cloud_properties(FSR_device, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_force_sensitive_resistor);
+            l_ezlopi_item_t *FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_fsr_v3);
             if (FSR_item)
             {
                 __prepare_item_cloud_properties(FSR_item, device_prep_arg->cjson_device);
