@@ -47,6 +47,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0003_PLUG
+    {
+        .id = EZLOPI_SENSOR_0003_PLUG,
+        .func = digital_io_v3,
+    },
+#endif
+
 #ifdef EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR
     {
         .id = EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR,

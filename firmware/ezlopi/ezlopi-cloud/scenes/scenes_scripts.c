@@ -4,6 +4,20 @@
 #include "scenes_scripts.h"
 #include "ezlopi_scenes_scripts.h"
 
+void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
+{
+    if (cj_request && cj_response)
+    {
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+        if (cj_result)
+        {
+                }
+    }
+}
+
 void scenes_scripts_add(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));

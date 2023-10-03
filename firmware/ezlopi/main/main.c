@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "nvs.h"
-#include "nvs_flash.h"
+// #include "nvs.h"
+// #include "nvs_flash.h"
 #include "esp_system.h"
 #include "driver/adc.h"
 #include "driver/i2c.h"

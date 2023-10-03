@@ -380,19 +380,19 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \" dev_type \" : 1,\
-                \" dev_name \" : \" Dining Room Main Lamp \",\
-                \" id_room \" : \"\",\
-                \" id_item \" : 2,\
-                \" val_ip \" : true,\
-                \" val_op \" : false,\
-                \" gpio_in \" : 21,\
-                \" gpio_out \" : 13,\
-                \" is_ip \" : false,\
-                \" ip_inv \" : true,\
-                \" pullup_ip \" : true,\
-                \" pullup_op \" : true,\
-                \" op_inv \" : false\
+                \"dev_type\" : 1,\
+                \"dev_name\" : \"Dining Room Main Lamp\",\
+                \"id_room\" : \"\",\
+                \"id_item\" : 2,\
+                \"val_ip\" : true,\
+                \"val_op\" : false,\
+                \"gpio_in\" : 21,\
+                \"gpio_out\" : 13,\
+                \"is_ip\" : false,\
+                \"ip_inv\" : true,\
+                \"pullup_ip\" : true,\
+                \"pullup_op\" : true,\
+                \"op_inv\" : false\
             }\
         ],\
     \"dev_total\": 1}";
