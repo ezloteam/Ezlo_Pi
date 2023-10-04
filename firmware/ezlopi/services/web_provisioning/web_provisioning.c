@@ -63,6 +63,8 @@ static const s_method_list_v2_t method_list_v2[] = {
 
     {.method_name = "hub.scenes.scripts.list", .method = scenes_scripts_list, .updater = NULL},
     {.method_name = "hub.scenes.scripts.add", .method = scenes_scripts_add, .updater = NULL},
+    {.method_name = "hub.scenes.scripts.get", .method = scenes_scripts_get, .updater = NULL},
+    {.method_name = "hub.scenes.scripts.delete", .method = scenes_scripts_delete, .updater = NULL},
 
     // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
     {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},

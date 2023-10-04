@@ -7,29 +7,139 @@
 #include "ezlopi_cloud.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_scenes_scripts.h"
+#include "lua.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;
 
 static void ezlopi_scenes_scripts_nvs_parse(void);
 static l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
-cJSON *test(void)
+l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_get_head(void)
 {
-    TRACE_E("Here");
-    cJSON *cj_new_scipt = cJSON_CreateObject();
-    if (cj_new_scipt)
-    {
-        TRACE_E("Here");
-        cJSON_AddStringToObject(cj_new_scipt, "name", "script-1");
-        cJSON_AddStringToObject(cj_new_scipt, "code", "print(\"Hello World!\")");
-    }
+    return script_head;
+}
 
-    return cj_new_scipt;
+void ezlopi_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node)
+{
+    if (script_node && script_node->script_handle)
+    {
+        lua_sethook(script_node->script_handle, __exit_script_hook, LUA_MASKCOUNT, 1);
+    }
+}
+
+void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
+{
+    if (script_head->id == script_id)
+    {
+        script_head = script_head->next;
+    }
+    else
+    {
+        l_ezlopi_scenes_script_t *curr_script = script_head;
+        while (curr_script->next)
+        {
+            if (curr_script->next->id == script_id)
+            {
+                l_ezlopi_scenes_script_t *script_to_free = curr_script->next;
+                curr_script->next = curr_script->next->next;
+
+                ezlopi_scenes_scripts_stop(script_to_free);
+                if (script_to_free->code)
+                {
+                    free(script_to_free);
+                }
+                if (script_to_free->name)
+                {
+                    
+                }
+            }
+        }
+    }
+}
+
+void ezlopi_scenes_scripts_delete(l_ezlopi_scenes_script_t *script_node)
+{
 }
 
 void ezlopi_scenes_scripts_init(void)
 {
     ezlopi_scenes_scripts_nvs_parse();
+    ezlopi_scenes_process_scripts();
+}
+
+static char *__script_report(lua_State *lua_state, int status)
+{
+    if (status == LUA_OK)
+    {
+        return;
+    }
+
+    const char *msg = lua_tostring(lua_state, -1);
+    lua_pop(lua_state, 1);
+    return msg;
+}
+
+static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar)
+{
+    lua_sethook(lua_state, __exit_script_hook, LUA_MASKLINE, 0);
+    luaL_error(lua_state, "Exited from software call");
+}
+
+static void __script_process(void *arg)
+{
+    l_ezlopi_scenes_script_t *script_node = (l_ezlopi_scenes_script_t *)arg;
+    lua_State *lua_state = luaL_newstate();
+    if (lua_state)
+    {
+        luaL_openlibs(lua_state);
+        load_custom_libs(lua_state);
+
+        script_node->state = SCRIPT_STATE_RUNNING;
+
+        int tmp_ret = luaL_loadstring(lua_state, script_node->code);
+        if (tmp_ret)
+        {
+            char *script_report = __script_report(lua_state, tmp_ret);
+            if (script_report)
+            {
+                TRACE_E("Error for script '%s'\r\n%s", script_node->name, script_report);
+            }
+        }
+
+        tmp_ret = lua_pcall(lua_state, 0, 0, 0);
+        if (tmp_ret)
+        {
+            char *script_report = __script_report(lua_state, tmp_ret);
+            if (script_report)
+            {
+                TRACE_E("Error for script '%s'\r\n%s", script_node->name, script_report);
+            }
+        }
+
+        script_node->state = SCRIPT_STATE_NOT_RUNNING;
+        script_node->script_handle = NULL;
+        lua_close(lua_state);
+    }
+    else
+    {
+        TRACE_E("Couldn't create lua state for '%s'", script_node->name);
+    }
+
+    vTaskDelete(NULL);
+}
+
+static void ezlopi_scenens_process_scripts(void)
+{
+    l_ezlopi_scenes_script_t *script_node = script_head;
+    while (script_node)
+    {
+        if (script_node->code)
+        {
+            xTaskCreate(__script_process, script_node->name, 2048 * 2, NULL, 3, NULL);
+        }
+
+        script_node = script_node->next;
+    }
 }
 
 uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
@@ -196,7 +306,10 @@ static l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_create_node(uint32_t scri
             if (new_script)
             {
                 TRACE_E("Here");
+                memset(new_script, 0, sizeof(l_ezlopi_scenes_script_t));
                 new_script->id = script_id;
+                new_script->script_handle = NULL;
+                new_script->state = SCRIPT_STATE_NONE;
 
                 uint32_t script_name_size = strlen(cj_script_name->valuestring) + 1;
                 new_script->name = (char *)malloc(script_name_size);
