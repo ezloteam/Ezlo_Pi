@@ -380,7 +380,7 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_name\": \"Flowmeter\",\
-                \"dev_type\": 4,\
+                \"dev_type\": 5,\
                 \"id_item\": 54,\
                 \"id_room\": \"\",\
                 \"gpio\": 19\
