@@ -383,8 +383,8 @@ static const char *test_device_constant_config =
                 \"dev_type\": 6,\
                 \"id_item\": 53,\
                 \"id_room\": \"\",\
-                \"gpio_tx\": 17,\
-                \"gpio_rx\": 18,\
+                \"gpio_tx\": 18,\
+                \"gpio_rx\": 19,\
                 \"baud\": 9600\
             }\             
         ],\
