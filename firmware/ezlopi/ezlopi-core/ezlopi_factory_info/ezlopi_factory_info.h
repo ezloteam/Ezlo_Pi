@@ -380,7 +380,7 @@ static const char *test_device_constant_config =
         [\
             {\
                 \"dev_name\": \"FSR\",\
-                \"dev_type\": 7,\
+                \"dev_type\": 3,\
                 \"id_item\": 56,\
                 \"id_room\": \"\",\
                 \"gpio\": 33\
