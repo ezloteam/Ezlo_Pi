@@ -126,6 +126,7 @@ void scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response)
             if (cj_script_id && cj_script_id->valuestring)
             {
                 script_id_num = strtoul(cj_script_id->valuestring, NULL, 16);
+                ezlopi_scenes_scripts_stop_by_id(script_id_num);
                 ezlopi_scenes_scripts_delete_by_id(script_id_num);
             }
         }

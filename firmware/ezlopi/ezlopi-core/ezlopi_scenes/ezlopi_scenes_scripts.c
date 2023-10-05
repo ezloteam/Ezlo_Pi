@@ -2,15 +2,22 @@
 #include "string.h"
 #include "stdlib.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 #include "trace.h"
 
 #include "ezlopi_cloud.h"
 #include "ezlopi_nvs.h"
 #include "ezlopi_scenes_scripts.h"
-#include "lua.h"
+#include "lua/lua.h"
+#include "lua/lauxlib.h"
+#include "lua/lualib.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;
 
+static void ezlopi_scenes_process_scripts(void);
+static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar);
 static void ezlopi_scenes_scripts_nvs_parse(void);
 static l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
@@ -24,6 +31,20 @@ void ezlopi_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node)
     if (script_node && script_node->script_handle)
     {
         lua_sethook(script_node->script_handle, __exit_script_hook, LUA_MASKCOUNT, 1);
+    }
+}
+
+void ezlopi_scenes_scripts_stop_by_id(uint32_t script_id)
+{
+    l_ezlopi_scenes_script_t *script_node = script_head;
+    while (script_node)
+    {
+        if (script_node->id == script_id)
+        {
+            ezlopi_scenes_scripts_stop(script_node);
+            break;
+        }
+        script_node = script_node->next;
     }
 }
 
@@ -50,15 +71,12 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
                 }
                 if (script_to_free->name)
                 {
-                    
+                    free(script_to_free->name);
                 }
+                free(script_to_free);
             }
         }
     }
-}
-
-void ezlopi_scenes_scripts_delete(l_ezlopi_scenes_script_t *script_node)
-{
 }
 
 void ezlopi_scenes_scripts_init(void)
@@ -85,6 +103,30 @@ static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar)
     luaL_error(lua_state, "Exited from software call");
 }
 
+typedef struct s_lua_scripts_modules
+{
+    char *name;
+    lua_CFunction func;
+} s_lua_scripts_modules_t;
+
+static s_lua_scripts_modules_t lua_scripts_modules[] = {
+#define SCRIPTS_CUSTOM_LIB(module_name, module_func) {.name = module_name, .func = module_func},
+#include "ezlopi_scenes_scripts_custom_libs.h"
+#undef SCRIPTS_CUSTOM_LIB
+    {.name = NULL, .func = NULL},
+};
+
+static void __load_custom_libs(lua_State *lua_state)
+{
+    uint32_t idx = 0;
+    while (lua_scripts_modules[idx].name && lua_scripts_modules[idx].func)
+    {
+        luaL_requiref(lua_state, lua_scripts_modules[idx].name, lua_scripts_modules[idx].func, 1);
+        lua_pop(lua_state, 1);
+        idx++;
+    }
+}
+
 static void __script_process(void *arg)
 {
     l_ezlopi_scenes_script_t *script_node = (l_ezlopi_scenes_script_t *)arg;
@@ -92,7 +134,7 @@ static void __script_process(void *arg)
     if (lua_state)
     {
         luaL_openlibs(lua_state);
-        load_custom_libs(lua_state);
+        __load_custom_libs(lua_state);
 
         script_node->state = SCRIPT_STATE_RUNNING;
 
@@ -102,7 +144,7 @@ static void __script_process(void *arg)
             char *script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
-                TRACE_E("Error for script '%s'\r\n%s", script_node->name, script_report);
+                TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
             }
         }
 
@@ -112,7 +154,7 @@ static void __script_process(void *arg)
             char *script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
-                TRACE_E("Error for script '%s'\r\n%s", script_node->name, script_report);
+                TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
             }
         }
 
@@ -125,17 +167,18 @@ static void __script_process(void *arg)
         TRACE_E("Couldn't create lua state for '%s'", script_node->name);
     }
 
+    TRACE_W("%s -> {state: %d}", script_node->name, script_node->state);
     vTaskDelete(NULL);
 }
 
-static void ezlopi_scenens_process_scripts(void)
+static void ezlopi_scenes_process_scripts(void)
 {
     l_ezlopi_scenes_script_t *script_node = script_head;
     while (script_node)
     {
         if (script_node->code)
         {
-            xTaskCreate(__script_process, script_node->name, 2048 * 2, NULL, 3, NULL);
+            xTaskCreate(__script_process, script_node->name, 2048 * 2, script_node, 3, NULL);
         }
 
         script_node = script_node->next;
