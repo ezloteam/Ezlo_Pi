@@ -82,7 +82,7 @@ static uint32_t g_provisioning_status = 0;
 char ezlopi_device_type_str[][50] = {
     "ezlopi_generic",
     "ezlopi_device_switchbox",
-    "ezlopi_device_irblaster"
+    "ezlopi_device_irblaster",
     "ezlopi_sensor_sound",
     "ezlopi_sensor_ambienttrackerpro"};
 
