@@ -6,20 +6,23 @@
 #include "freertos/task.h"
 
 #include "trace.h"
-
 #include "ezlopi_cloud.h"
 #include "ezlopi_nvs.h"
-#include "ezlopi_scenes_scripts.h"
+
 #include "lua/lua.h"
-#include "lua/lauxlib.h"
 #include "lua/lualib.h"
+#include "lua/lauxlib.h"
+#include "ezlopi_scenes_scripts.h"
+#include "ezlopi_scenes_scripts_custom_libs_includes.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;
-
-static void ezlopi_scenes_process_scripts(void);
+static void __scripts_nvs_parse(void);
+static void __scripts_process_runner(void);
+static void __load_custom_libs(lua_State *lua_state);
+static void __scripts_remove_id_and_update_list(uint32_t script_id);
+static char *__script_report(lua_State *lua_state, int status);
 static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar);
-static void ezlopi_scenes_scripts_nvs_parse(void);
-static l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_create_node(uint32_t script_id, cJSON *cj_script);
+static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
 l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_get_head(void)
 {
@@ -65,6 +68,9 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
                 curr_script->next = curr_script->next->next;
 
                 ezlopi_scenes_scripts_stop(script_to_free);
+                ezlopi_nvs_delete_stored_data(script_to_free->name); // deleting script from nvs
+                __scripts_remove_id_and_update_list(script_to_free->id);
+
                 if (script_to_free->code)
                 {
                     free(script_to_free);
@@ -79,52 +85,33 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     }
 }
 
+uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
+{
+    uint32_t new_script_id = 0;
+    if (script_head)
+    {
+        l_ezlopi_scenes_script_t *curr_script = script_head;
+        while (curr_script->next)
+        {
+            curr_script = curr_script->next;
+        }
+
+        curr_script->next = __scripts_create_node(script_id, cj_script);
+        new_script_id = curr_script->next->id;
+    }
+    else
+    {
+        script_head = __scripts_create_node(script_id, cj_script);
+        new_script_id = script_head->id;
+    }
+
+    return new_script_id;
+}
+
 void ezlopi_scenes_scripts_init(void)
 {
-    ezlopi_scenes_scripts_nvs_parse();
-    ezlopi_scenes_process_scripts();
-}
-
-static char *__script_report(lua_State *lua_state, int status)
-{
-    if (status == LUA_OK)
-    {
-        return;
-    }
-
-    const char *msg = lua_tostring(lua_state, -1);
-    lua_pop(lua_state, 1);
-    return msg;
-}
-
-static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar)
-{
-    lua_sethook(lua_state, __exit_script_hook, LUA_MASKLINE, 0);
-    luaL_error(lua_state, "Exited from software call");
-}
-
-typedef struct s_lua_scripts_modules
-{
-    char *name;
-    lua_CFunction func;
-} s_lua_scripts_modules_t;
-
-static s_lua_scripts_modules_t lua_scripts_modules[] = {
-#define SCRIPTS_CUSTOM_LIB(module_name, module_func) {.name = module_name, .func = module_func},
-#include "ezlopi_scenes_scripts_custom_libs.h"
-#undef SCRIPTS_CUSTOM_LIB
-    {.name = NULL, .func = NULL},
-};
-
-static void __load_custom_libs(lua_State *lua_state)
-{
-    uint32_t idx = 0;
-    while (lua_scripts_modules[idx].name && lua_scripts_modules[idx].func)
-    {
-        luaL_requiref(lua_state, lua_scripts_modules[idx].name, lua_scripts_modules[idx].func, 1);
-        lua_pop(lua_state, 1);
-        idx++;
-    }
+    __scripts_nvs_parse();
+    __scripts_process_runner();
 }
 
 static void __script_process(void *arg)
@@ -167,11 +154,11 @@ static void __script_process(void *arg)
         TRACE_E("Couldn't create lua state for '%s'", script_node->name);
     }
 
-    TRACE_W("%s -> {state: %d}", script_node->name, script_node->state);
+    TRACE_W("%s -> {state: %d} -> Stopped", script_node->name, script_node->state);
     vTaskDelete(NULL);
 }
 
-static void ezlopi_scenes_process_scripts(void)
+static void __scripts_process_runner(void)
 {
     l_ezlopi_scenes_script_t *script_node = script_head;
     while (script_node)
@@ -185,93 +172,98 @@ static void ezlopi_scenes_process_scripts(void)
     }
 }
 
-uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
+static void __scripts_add_script_id(uint32_t script_id)
 {
-    uint32_t new_script_id = 0;
-    if (script_head)
-    {
-        TRACE_E("Here");
-        l_ezlopi_scenes_script_t *curr_script = script_head;
-        while (curr_script->next)
-        {
-            TRACE_E("Here");
-            curr_script = curr_script->next;
-        }
-
-        curr_script->next = ezlopi_scenes_scripts_create_node(script_id, cj_script);
-        new_script_id = curr_script->next->id;
-    }
-    else
-    {
-        TRACE_E("Here");
-        script_head = ezlopi_scenes_scripts_create_node(script_id, cj_script);
-        new_script_id = script_head->id;
-    }
-
-    return new_script_id;
-}
-
-static void ezlopi_scenes_scripts_add_script_id(uint32_t script_id)
-{
-    bool free_str = true;
+    uint32_t script_ids_str_free = true;
     char *script_ids_str = ezlopi_nvs_read_scenes_scripts();
-    if (!script_ids_str)
+    if (NULL == script_ids_str)
     {
-        TRACE_E("Here");
-        free_str = false;
-        script_ids_str = "[]";
+        script_ids_str = "[]"; // don't free in this case
+        script_ids_str_free = false;
     }
-
-    TRACE_E("script_ids_str: %s", script_ids_str);
 
     cJSON *cj_script_ids = cJSON_Parse(script_ids_str);
     if (cj_script_ids)
     {
-        TRACE_E("Here");
         cJSON *cj_script_id = cJSON_CreateNumber(script_id);
         if (cj_script_id)
         {
-            TRACE_E("Here");
             if (cJSON_AddItemToArray(cj_script_ids, cj_script_id))
             {
-                TRACE_E("Here");
                 char *script_ids_str_updated = cJSON_Print(cj_script_ids);
                 if (script_ids_str_updated)
                 {
-                    TRACE_E("Here");
                     ezlopi_nvs_write_scenes_scripts(script_ids_str_updated);
+                    free(script_ids_str_updated);
                 }
             }
             else
             {
-                TRACE_E("Here");
                 cJSON_Delete(cj_script_id);
             }
         }
+
+        cJSON_Delete(cj_script_ids);
     }
 
-    if (free_str)
+    if (script_ids_str_free) // only free in case of read from nvs otehrwise do not free
     {
-        TRACE_E("Here");
         free(script_ids_str);
     }
 }
 
-static void ezlopi_scenes_scripts_nvs_parse(void)
+static void __scripts_remove_id_and_update_list(uint32_t script_id)
+{
+    char *scripts_ids_str = ezlopi_nvs_read_scenes_scripts();
+    if (scripts_ids_str)
+    {
+        cJSON *cj_scripts_ids = cJSON_Parse(scripts_ids_str);
+        if (cj_scripts_ids)
+        {
+            int array_size = cJSON_GetArraySize(cj_scripts_ids);
+            for (int i = 0; i < array_size; i++)
+            {
+                cJSON *cj_script_id = cJSON_GetArrayItem(cj_scripts_ids, i);
+                if (cj_script_id && cj_script_id->valuedouble)
+                {
+                    TRACE_D("Removing (%d: %08x) script from list!", i, script_id);
+                    if (script_id == cj_script_id->valuedouble)
+                    {
+                        cJSON_DeleteItemFromArray(cj_scripts_ids, i);
+
+                        char *scripts_ids_str_updated = cJSON_Print(cj_scripts_ids);
+                        if (scripts_ids_str_updated)
+                        {
+                            cJSON_Minify(scripts_ids_str_updated);
+                            ezlopi_nvs_write_scenes_scripts(scripts_ids_str_updated);
+
+                            free(scripts_ids_str_updated);
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            cJSON_Delete(cj_scripts_ids);
+        }
+
+        free(scripts_ids_str);
+    }
+}
+
+static void __scripts_nvs_parse(void)
 {
     char *script_ids = ezlopi_nvs_read_scenes_scripts();
 
     if (script_ids)
     {
-        TRACE_E("Here");
         cJSON *cj_script_ids = cJSON_Parse(script_ids);
         if (cj_script_ids)
         {
-            TRACE_E("Here");
             int array_size = cJSON_GetArraySize(cj_script_ids);
             for (int i = 0; i < array_size; i++)
             {
-                TRACE_E("Here");
                 cJSON *cj_script_id = cJSON_GetArrayItem(cj_script_ids, i);
                 if (cj_script_id && cj_script_id->valuedouble)
                 {
@@ -281,16 +273,16 @@ static void ezlopi_scenes_scripts_nvs_parse(void)
                     char script_id_str[32];
                     snprintf(script_id_str, sizeof(script_id_str), "%08x", script_id);
 
-                    char *script = ezlopi_nvs_read_str(script_id_str);
-                    if (script)
+                    char *script_str = ezlopi_nvs_read_str(script_id_str);
+                    if (script_str)
                     {
-                        TRACE_D("script: %s", script);
-                        cJSON *cj_script = cJSON_Parse(script);
+                        cJSON *cj_script = cJSON_Parse(script_str);
                         if (cj_script)
                         {
-                            TRACE_E("Here");
                             ezlopi_scenes_scripts_add_to_head(script_id, cj_script);
                         }
+
+                        free(script_str);
                     }
                     else
                     {
@@ -301,6 +293,8 @@ static void ezlopi_scenes_scripts_nvs_parse(void)
 
             cJSON_Delete(cj_script_ids);
         }
+
+        free(script_ids);
     }
     else
     {
@@ -308,47 +302,38 @@ static void ezlopi_scenes_scripts_nvs_parse(void)
     }
 }
 
-static l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_create_node(uint32_t script_id, cJSON *cj_script)
+static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script)
 {
     l_ezlopi_scenes_script_t *new_script = NULL;
 
     if (cj_script)
     {
-        TRACE_E("Here");
         cJSON *cj_script_name = cJSON_GetObjectItem(cj_script, "name");
         cJSON *cj_script_code = cJSON_GetObjectItem(cj_script, "code");
 
         if (cj_script_name && cj_script_name->valuestring && cj_script_code && cj_script_code->string)
         {
-            TRACE_E("Here");
-            uint32_t is_new_script = 0;
             if (script_id)
             {
-                TRACE_E("Here");
                 ezlopi_cloud_update_script_id(script_id);
             }
             else
             {
-                TRACE_E("Here");
                 script_id = ezlopi_cloud_generate_script_id();
                 char *script_str = cJSON_Print(cj_script);
                 if (script_str)
                 {
-                    TRACE_E("Here");
                     char scrpt_id_str[32];
                     snprintf(scrpt_id_str, sizeof(scrpt_id_str), "%08x", script_id);
                     ezlopi_nvs_write_str(script_str, strlen(script_str), scrpt_id_str);
                     free(script_str);
-                    TRACE_E("Here");
-                    ezlopi_scenes_scripts_add_script_id(script_id);
-                    TRACE_E("Here");
+                    __scripts_add_script_id(script_id);
                 }
             }
 
             new_script = (l_ezlopi_scenes_script_t *)malloc(sizeof(l_ezlopi_scenes_script_t));
             if (new_script)
             {
-                TRACE_E("Here");
                 memset(new_script, 0, sizeof(l_ezlopi_scenes_script_t));
                 new_script->id = script_id;
                 new_script->script_handle = NULL;
@@ -360,7 +345,6 @@ static l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_create_node(uint32_t scri
                 {
                     snprintf(new_script->name, script_name_size, "%s", cj_script_name->valuestring);
                 }
-                TRACE_E("Here");
 
                 uint32_t script_code_size = strlen(cj_script_code->valuestring) + 1;
                 new_script->code = (char *)malloc(script_code_size);
@@ -370,14 +354,51 @@ static l_ezlopi_scenes_script_t *ezlopi_scenes_scripts_create_node(uint32_t scri
                 }
 
                 new_script->next = NULL;
-                TRACE_E("Here");
             }
-        }
-        else
-        {
-            TRACE_E("Error");
         }
     }
 
     return new_script;
+}
+
+static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar)
+{
+    lua_sethook(lua_state, __exit_script_hook, LUA_MASKLINE, 0);
+    luaL_error(lua_state, "Exited from software call");
+}
+
+static char *__script_report(lua_State *lua_state, int status)
+{
+    if (status == LUA_OK)
+    {
+        return;
+    }
+
+    const char *msg = lua_tostring(lua_state, -1);
+    lua_pop(lua_state, 1);
+    return msg;
+}
+typedef struct s_lua_scripts_modules
+{
+    char *name;
+    lua_CFunction func;
+} s_lua_scripts_modules_t;
+
+static s_lua_scripts_modules_t lua_scripts_modules[] = {
+#define SCRIPTS_CUSTOM_LIB(module_name, module_func) {.name = module_name, .func = module_func},
+#include "ezlopi_scenes_scripts_custom_libs.h"
+#undef SCRIPTS_CUSTOM_LIB
+    {.name = NULL, .func = NULL},
+};
+
+static void __load_custom_libs(lua_State *lua_state)
+{
+    uint32_t idx = 0;
+    while (lua_scripts_modules[idx].name && lua_scripts_modules[idx].func)
+    {
+        TRACE_D("loading custom lib -> %s : %p", lua_scripts_modules[idx].name, lua_scripts_modules[idx].func);
+        luaL_requiref(lua_state, lua_scripts_modules[idx].name, lua_scripts_modules[idx].func, 1);
+        lua_pop(lua_state, 1);
+        idx++;
+    }
 }

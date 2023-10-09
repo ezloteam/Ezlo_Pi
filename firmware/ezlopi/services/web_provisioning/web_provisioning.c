@@ -31,11 +31,16 @@
 
 static uint32_t message_counter = 0;
 
+static char *cloud_server = NULL;
+static char *ca_certificate = NULL;
+static char *ssl_shared_key = NULL;
+static char *ssl_private_key = NULL;
+
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
 static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
-static void web_provisioning_fetch_wss_endpoint(void *pv);
+static void __fetch_wss_endpoint(void *pv);
 
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
@@ -46,49 +51,10 @@ typedef struct s_method_list_v2
 } s_method_list_v2_t;
 
 static const s_method_list_v2_t method_list_v2[] = {
-    /** Getter functions **/
-    // {.method_name = "hub.data.list", .method = data_list, .updater = NULL},
-    {.method_name = "hub.room.list", .method = room_list, .updater = NULL},
-    // {.method_name = "hub.items.list", .method = items_list, .updater = NULL},
-    {.method_name = "hub.items.list", .method = items_list_v3, .updater = NULL},
-
-    {.method_name = "hub.scenes.list", .method = scenes_list, .updater = NULL},
-    {.method_name = "hub.scenes.create", .method = scenes_create, .updater = NULL},
-    {.method_name = "hub.scenes.get", .method = scenes_get, .updater = NULL},
-    {.method_name = "hub.scenes.edit", .method = scenes_edit, .updater = NULL},
-    {.method_name = "hub.scenes.delete", .method = scenes_delete, .updater = NULL},
-    // {.method_name = "hub.scenes.status.get", .method = scenes_status_get, .updater = NULL}, // Implementation remains
-    {.method_name = "hub.scenes.blocks.list", .method = scenes_blocks_list, .updater = NULL},
-    {.method_name = "hub.scenes.block.data.list", .method = scenes_block_data_list, .updater = NULL},
-
-    {.method_name = "hub.scenes.scripts.list", .method = scenes_scripts_list, .updater = NULL},
-    {.method_name = "hub.scenes.scripts.add", .method = scenes_scripts_add, .updater = NULL},
-    {.method_name = "hub.scenes.scripts.get", .method = scenes_scripts_get, .updater = NULL},
-    {.method_name = "hub.scenes.scripts.delete", .method = scenes_scripts_delete, .updater = NULL},
-
-    // {.method_name = "hub.devices.list", .method = devices_list, .updater = NULL},
-    {.method_name = "hub.devices.list", .method = devices_list_v3, .updater = NULL},
-    {.method_name = "hub.favorite.list", .method = favorite_list_v3, .updater = NULL},
-    {.method_name = "hub.gateways.list", .method = gateways_list, .updater = NULL},
-    {.method_name = "hub.info.get", .method = info_get, .updater = NULL},
-    {.method_name = "hub.modes.get", .method = modes_get, .updater = NULL},
-    {.method_name = "hub.network.get", .method = network_get, .updater = NULL},
-    {.method_name = "hub.firmware.update.start", .method = firmware_update_start, .updater = NULL},
-    {.method_name = "cloud.firmware.info.get", .method = firmware_info_get, .updater = NULL},
-    {.method_name = "hub.nma.register.repeat", .method = register_repeat, .updater = NULL},
-    // {.method_name = "hub.settings.list", .method = settings_list, .updater = NULL},
-    // {.method_name = "hub.device.settings.list", .method = devices_settings_list, .updater = NULL},
-    {.method_name = "hub.reboot", .method = __hub_reboot, .updater = NULL},
-
-    // // /** Setter functions **/
-    // {.method_name = "hub.item.value.set", .method = items_set_value, .updater = items_update},
-    {.method_name = "hub.item.value.set", .method = items_set_value_v3, .updater = items_update_v3},
-    // {.method_name = "hub.device.name.set", .method = devices_name_set, .updater = NULL},
-    // {.method_name = "hub.device.setting.value.set", .method = __rpc_method_notfound, .updater = NULL},
-    {.method_name = "registered", .method = registered, .updater = NULL}, // called only once so its in last
-
-    // {.method_name = "hub.feature.status.set", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
-    // {.method_name = "hub.features.list", .method = __rpc_method_notfound, .updater = NULL}, // documentation missing
+#define CLOUD_METHOD(name, func, updater_func) {.method_name = name, .method = func, .updater = updater_func},
+#include "web_provisioning_macro.h"
+#undef CLOUD_METHOD
+    {.method_name = NULL, .method = NULL, .updater = NULL},
 };
 
 uint32_t web_provisioning_get_message_count(void)
@@ -144,21 +110,16 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
 
 void web_provisioning_init(void)
 {
-    xTaskCreate(web_provisioning_fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, NULL);
+    xTaskCreate(__fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, NULL);
 }
 
-static char *cloud_server = NULL;
-static char *ca_certificate = NULL;
-static char *ssl_shared_key = NULL;
-static char *ssl_private_key = NULL;
-
-static void web_provisioning_fetch_wss_endpoint(void *pv)
+static void __fetch_wss_endpoint(void *pv)
 {
     char *ws_endpoint = NULL;
 
     while (1)
     {
-        // ezlopi_wait_for_wifi_to_connect();
+        ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
 
         cloud_server = ezlopi_factory_info_v2_get_cloud_server();
         ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
@@ -191,25 +152,6 @@ static void web_provisioning_fetch_wss_endpoint(void *pv)
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
-#if 0
-    while (1)
-    {
-        if (-1 != ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 30 * 1000, 1))
-        {
-            TRACE_D("Sending firmware check request...");
-            cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
-            if (NULL != firmware_info_request)
-            {
-                web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
-                cJSON_Delete(firmware_info_request);
-                firmware_info_request = NULL;
-            }
-        }
-
-        vTaskDelay(30 * 1000 / portTICK_RATE_MS);
-    }
-#endif
-
     vTaskDelete(NULL);
 }
 
@@ -236,9 +178,9 @@ static void __connection_upcall(bool connected)
 static uint32_t __search_method_in_list(cJSON *method)
 {
     uint32_t found_method = 0;
-    uint32_t idx = sizeof(method_list_v2) / sizeof(s_method_list_v2_t);
+    uint32_t idx = 0;
 
-    while (idx--)
+    while (method_list_v2[idx].method_name)
     {
         uint32_t request_method_name_len = strlen(method->valuestring);
         uint32_t list_method_name_len = strlen(method_list_v2[idx].method_name);
@@ -248,12 +190,13 @@ static uint32_t __search_method_in_list(cJSON *method)
             found_method = 1;
             break;
         }
+        idx++;
     }
 
     return (found_method ? idx : UINT32_MAX);
 }
 
-static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
+static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
 {
     if (method_func)
     {
@@ -287,7 +230,6 @@ static void __call_method_func_and_send_response(cJSON *cj_request, cJSON *cj_me
 
 static void __message_upcall(const char *payload, uint32_t len)
 {
-    // TRACE_W("__message_upcall: \r\n%.*s", len, payload);
     cJSON *cj_request = cJSON_ParseWithLength(payload, len);
 
     if (cj_request)
@@ -295,31 +237,23 @@ static void __message_upcall(const char *payload, uint32_t len)
         cJSON *cj_error = cJSON_GetObjectItem(cj_request, "error");
         cJSON *cj_method = cJSON_GetObjectItem(cj_request, "method");
 
-#if 0
-        TRACE_B("cj_error: %p", cj_error);
-        if (cj_error)
-        {
-            TRACE_W("cj_error->type: %d", cj_error->type);
-            TRACE_W("cj_error->valuestring: %p", cj_error->valuestring);
-        }
-#endif
-
         if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, "null", 4))))
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
                 TRACE_D("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
+
                 uint32_t method_idx = __search_method_in_list(cj_method);
-                // TRACE_D("Method: %s", method_list_v2[method_idx].method_name);
-                TRACE_D("Method[%d]: %s", method_idx, method_list_v2[method_idx].method_name);
+
                 if (UINT32_MAX != method_idx)
                 {
-                    __call_method_func_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_B);
-                    __call_method_func_and_send_response(cj_request, cj_method, method_list_v2[method_idx].updater, TRACE_TYPE_B);
+                    TRACE_D("Method[%d]: %s", method_idx, method_list_v2[method_idx].method_name);
+                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_B);
+                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].updater, TRACE_TYPE_B);
                 }
                 else
                 {
-                    __call_method_func_and_send_response(cj_request, cj_method, __rpc_method_notfound, TRACE_TYPE_E);
+                    __call_method_and_send_response(cj_request, cj_method, __rpc_method_notfound, TRACE_TYPE_E);
                 }
             }
         }

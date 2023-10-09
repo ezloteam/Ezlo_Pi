@@ -1,6 +1,7 @@
 #include "string.h"
 #include "time.h"
 
+#include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -358,4 +359,16 @@ char *ezlopi_nvs_read_str(char *nvs_name)
     }
 
     return return_str;
+}
+
+void ezlopi_nvs_delete_stored_data(char *nvs_name)
+{
+    esp_err_t err = ESP_OK;
+    if (1 == ezlopi_nvs_init())
+    {
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", nvs_name, esp_err_to_name(err));
+        }
+    }
 }
