@@ -26,4 +26,5 @@ idf_component_register(SRCS "device_0001_digitalOut_generic.c" "${config_src}"
                 ezlopi_actions  
                 ezlopi_timer 
                 ezlopi_devices 
-                ezlopi_cloud_constants )
+                ezlopi_cloud_constants 
+                ezlopi_valueformater)

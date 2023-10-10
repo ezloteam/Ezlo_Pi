@@ -6,7 +6,7 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_timer.h"
 #include "items.h"
-
+#include "ezlopi_valueformater.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_gpio.h"
 #include "ezlopi_cloud.h"
@@ -17,7 +17,6 @@
 static int device_0003_digitalOut_plug_prepare(void *arg);
 static int device_0003_digitalOut_plug_init(s_ezlopi_device_properties_t *properties);
 static int device_0003_digitalOut_plug_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
-static int device_0003_digitalOut_plug_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int device_0003_digitalOut_plug_set_value(s_ezlopi_device_properties_t *properties, void *arg);
 static s_ezlopi_device_properties_t *device_0003_digitalOut_plug_prepare_item(cJSON *cjson_device);
 static void device_0003_digitalOut_plug_write_gpio_value(s_ezlopi_device_properties_t *properties);
@@ -41,16 +40,12 @@ int device_0003_digitalOut_plug(e_ezlopi_actions_t action, s_ezlopi_device_prope
         ret = device_0003_digitalOut_plug_init(properties);
         break;
     }
-    case EZLOPI_ACTION_HUB_GET_ITEM:
-    {
-        ret = device_0003_digitalOut_plug_get_item(properties, arg);
-        break;
-    }
     case EZLOPI_ACTION_SET_VALUE:
     {
         ret = device_0003_digitalOut_plug_set_value(properties, arg);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = device_0003_digitalOut_plug_get_value_cjson(properties, arg);
@@ -72,23 +67,14 @@ static int device_0003_digitalOut_plug_get_value_cjson(s_ezlopi_device_propertie
     if (cjson_propertise)
     {
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_valueformatter_bool(properties->interface.gpio.gpio_out.value ? true : false));
+
         ret = 1;
     }
 
     return ret;
 }
 
-static int device_0003_digitalOut_plug_get_item(s_ezlopi_device_properties_t *properties, void *arg)
-{
-    int ret = 0;
-    cJSON *cjson_propertise = (cJSON *)arg;
-    if (cjson_propertise)
-    {
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
-        cJSON_AddBoolToObject(cjson_propertise, "valueFormatted", properties->interface.gpio.gpio_out.value);
-    }
-    return ret;
-}
 static void ___set_gpio_value(s_ezlopi_device_properties_t *properties, int value)
 {
     int temp_value = (0 == properties->interface.gpio.gpio_out.invert) ? value : !(value);

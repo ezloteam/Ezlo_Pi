@@ -404,6 +404,7 @@ static const char *switch_box_constant_config =
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 
 #if 0
+// LED
 static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\
@@ -427,6 +428,7 @@ static const char *test_device_constant_config =
         ],\
     \"dev_total\": 1}";
 
+// Relay
 static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\
@@ -449,7 +451,7 @@ static const char *test_device_constant_config =
             }\
         ],\
     \"dev_total\": 1}";
-#endif
+// Plug
 static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\
@@ -473,6 +475,30 @@ static const char *test_device_constant_config =
         ],\
     \"dev_total\": 1}";
 
+static const char *test_device_constant_config =
+    "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\            
+            {\
+                \"dev_name\": \"Plug \",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 18,\
+                \"id_item\": 3,\
+                \"id_room\": \"\",\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
+            }\
+        ],\
+    \"dev_total\": 1}";
+#endif
+static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
 #endif
 
 #ifdef __cplusplus
