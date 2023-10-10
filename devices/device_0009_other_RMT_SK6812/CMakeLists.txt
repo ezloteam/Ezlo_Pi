@@ -10,5 +10,5 @@ idf_component_register(SRCS "device_0009_other_RMT_SK6812.c"
                                  ezlopi_timer 
                                  ezlopi_devices 
                                  ezlopi_cloud_constants
-                                 ezlopi_valueformater)
+                                 ezlopi_valueformatter)
 

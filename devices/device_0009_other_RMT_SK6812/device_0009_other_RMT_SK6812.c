@@ -16,7 +16,7 @@
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
 #include "device_0009_other_RMT_SK6812.h"
-#include "ezlopi_valueformater.h"
+#include "ezlopi_valueformatter.h"
 #include "led_strip.h"
 #include "driver/gpio.h"
 #include "color_codes.h"

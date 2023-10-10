@@ -11,7 +11,7 @@
 #include "ezlopi_gpio.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_valueformater.h"
+#include "ezlopi_valueformatter.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 

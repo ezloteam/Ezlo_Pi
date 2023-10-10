@@ -6,7 +6,7 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_timer.h"
 #include "items.h"
-#include "ezlopi_valueformater.h"
+#include "ezlopi_valueformatter.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_gpio.h"
 #include "ezlopi_cloud.h"

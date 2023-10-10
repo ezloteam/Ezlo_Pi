@@ -12,4 +12,4 @@ idf_component_register(SRCS "device_0002_digitalOut_relay.c" "${config_src}"
                 ezlopi_timer 
                 ezlopi_devices 
                 ezlopi_cloud_constants 
-                ezlopi_valueformater )
+                ezlopi_valueformatter )
