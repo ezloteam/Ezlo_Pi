@@ -18,8 +18,8 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
-    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
+    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -402,17 +402,26 @@ static const char *switch_box_constant_config =
         ],\
     \"dev_total\": 1}";
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+
 static const char *test_device_constant_config =
     "{\
         \"cmd\": 3,\
         \"dev_detail\":\
-        [\{\
-                \"dev_type\": 2,\
-                \"dev_name\": \"Reed\",\
+        [\            
+        {\
+                \"dev_name\": \"Switch\",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 2,\
+                \"id_item\": 1,\
                 \"id_room\": \"\",\
-                \"id_item\": 61,\
-                \"gpio\": 18,\
-                \"logic_inv\": false\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
             }\
         ],\
     \"dev_total\": 1}";

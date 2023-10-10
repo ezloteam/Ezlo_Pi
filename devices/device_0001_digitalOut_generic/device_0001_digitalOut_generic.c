@@ -19,12 +19,9 @@
 static int device_0001_digitalOut_generic_prepare(void *arg);
 static int device_0001_digitalOut_generic_init(s_ezlopi_device_properties_t *properties);
 static int device_0001_digitalOut_generic_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
+static int device_0001_digitalOut_generic_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int device_0001_digitalOut_generic_set_value(s_ezlopi_device_properties_t *properties, void *arg);
 static s_ezlopi_device_properties_t *device_0001_digitalOut_generic_item(cJSON *cjson_device);
-
-// static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_broadcast_interval_prepare_properties();
-// static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_sound_threshold_prepare_properties();
-// static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_performance_flag_prepare_properties();
 
 static void device_0001_digitalOut_generic_write_gpio_value(s_ezlopi_device_properties_t *properties);
 static uint32_t device_0001_digitalOut_generic_read_gpio_value(s_ezlopi_device_properties_t *properties);
@@ -45,6 +42,11 @@ int device_0001_digitalOut_generic(e_ezlopi_actions_t action, s_ezlopi_device_pr
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = device_0001_digitalOut_generic_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        ret = device_0001_digitalOut_generic_get_item(properties, arg);
         break;
     }
     case EZLOPI_ACTION_SET_VALUE:
@@ -79,6 +81,17 @@ static int device_0001_digitalOut_generic_get_value_cjson(s_ezlopi_device_proper
     return ret;
 }
 
+static int device_0001_digitalOut_generic_get_item(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        cJSON_AddBoolToObject(cjson_propertise, "valueFormatted", properties->interface.gpio.gpio_out.value);
+    }
+    return ret;
+}
 static void ___set_gpio_value(s_ezlopi_device_properties_t *properties, int value)
 {
     int temp_value = (0 == properties->interface.gpio.gpio_out.invert) ? value : !(value);
@@ -166,92 +179,6 @@ static int device_0001_digitalOut_generic_prepare(void *arg)
 
     return ret;
 }
-
-#if 0
-static int device_0001_digitalOut_generic_prepare(void *arg)
-{
-    int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
-    cJSON *cjson_device = prep_arg->cjson_device;
-
-    s_ezlopi_device_properties_t *device_0001_digitalOut_generic_device_properties = NULL;
-
-#if 0
-    s_ezlopi_device_settings_properties_t * device_settings_0001_digitalOut_generic_device_properties = NULL;
-    s_ezlopi_device_settings_properties_t * device_settings_0001_digitalOut_sound_device_properties = NULL;
-    s_ezlopi_device_settings_properties_t * device_settings_0001_digitalOut_perfrm_device_properties = NULL;
-#endif 
-
-    if ((NULL == device_0001_digitalOut_generic_device_properties) && (NULL != cjson_device))
-    {
-        device_0001_digitalOut_generic_device_properties = device_0001_digitalOut_generic_item(cjson_device);
-
-        if (device_0001_digitalOut_generic_device_properties)
-        {
-            // TODO Need to implement status
-
-            if (0 == ezlopi_devices_list_add(prep_arg->device, device_0001_digitalOut_generic_device_properties, NULL))
-            {
-                free(device_0001_digitalOut_generic_device_properties);
-            }
-            else
-            {
-#if 0
-
-                device_settings_0001_digitalOut_generic_device_properties = ezlopi_device_settings_broadcast_interval_prepare_properties();
-                device_settings_0001_digitalOut_sound_device_properties = ezlopi_device_settings_sound_threshold_prepare_properties();
-                device_settings_0001_digitalOut_perfrm_device_properties = ezlopi_device_settings_performance_flag_prepare_properties();
-                device_settings_001_temperature_unit_prepare_properties = ezlopi_device_settings_temperature_unit_prepare_properties();
-
-                if (device_settings_0001_digitalOut_generic_device_properties &&
-                    device_settings_0001_digitalOut_sound_device_properties &&
-                    device_settings_0001_digitalOut_perfrm_device_properties &&
-                    device_settings_001_temperature_unit_prepare_properties)
-                {
-                    device_settings_0001_digitalOut_generic_device_properties->device_id = device_0001_digitalOut_generic_device_properties->ezlopi_cloud.device_id;
-                    device_settings_0001_digitalOut_sound_device_properties->device_id = device_0001_digitalOut_generic_device_properties->ezlopi_cloud.device_id;
-                    device_settings_0001_digitalOut_perfrm_device_properties->device_id = device_0001_digitalOut_generic_device_properties->ezlopi_cloud.device_id;
-                    device_settings_001_temperature_unit_prepare_properties->device_id = device_0001_digitalOut_generic_device_properties->ezlopi_cloud.device_id;
-
-                    if (0 == ezlopi_device_setting_add(device_settings_0001_digitalOut_generic_device_properties, NULL))
-                    {
-                        free(device_settings_0001_digitalOut_generic_device_properties);
-                        ret = 0;
-                    }
-                    else
-                    {
-                        ret = 1;
-                    }
-
-                    if (0 == ezlopi_device_setting_add(device_settings_0001_digitalOut_sound_device_properties, NULL))
-                    {
-                        free(device_settings_0001_digitalOut_sound_device_properties);
-                        ret = 0;
-                    }
-                    else
-                    {
-                        ret = 1;
-                    }
-                    if (0 == ezlopi_device_setting_add(device_settings_0001_digitalOut_perfrm_device_properties, NULL))
-                    {
-                        free(device_settings_0001_digitalOut_perfrm_device_properties);
-                        ret = 0;
-                    }
-                    else
-                    {
-                        ret = 1;
-                    } 
-                }
-#endif
-                ret = 1;
-            }
-        }
-    }
-
-    return ret;
-}
-
-#endif
 
 static int device_0001_digitalOut_generic_init(s_ezlopi_device_properties_t *properties)
 {
@@ -378,103 +305,4 @@ static s_ezlopi_device_properties_t *device_0001_digitalOut_generic_item(cJSON *
     }
 
     return device_0001_digitalOut_generic_device_properties;
-}
-
-static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_broadcast_interval_prepare_properties(void)
-{
-    s_ezlopi_device_settings_properties_t *ezlopi_setting_properties = (s_ezlopi_device_settings_properties_t *)malloc(sizeof(s_ezlopi_device_settings_properties_t));
-
-    if (ezlopi_setting_properties)
-    {
-
-        int settings_value;
-
-        memset(ezlopi_setting_properties, 0, sizeof(s_ezlopi_device_settings_properties_t));
-
-        ezlopi_setting_properties->id = ezlopi_cloud_generate_settings_id();
-        ezlopi_setting_properties->label = "broadcast_interval";
-        ezlopi_setting_properties->description = "Sound Level parameter broadcast properties";
-        ezlopi_setting_properties->value_type = "int";
-        ezlopi_setting_properties->nvs_alias = "brd_intrvl";
-        ezlopi_setting_properties->value_defaut.int_value = 10;
-
-        if (ezlopi_nvs_read_int32(&settings_value, ezlopi_setting_properties->nvs_alias))
-        {
-            ezlopi_setting_properties->value.int_value = settings_value;
-        }
-        else
-        {
-            ezlopi_setting_properties->value.int_value = ezlopi_setting_properties->value_defaut.int_value;
-        }
-    }
-    return ezlopi_setting_properties;
-}
-
-static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_sound_threshold_prepare_properties(void)
-{
-    s_ezlopi_device_settings_properties_t *ezlopi_setting_properties = (s_ezlopi_device_settings_properties_t *)malloc(sizeof(s_ezlopi_device_settings_properties_t));
-
-    if (ezlopi_setting_properties)
-    {
-
-        float settings_value;
-
-        memset(ezlopi_setting_properties, 0, sizeof(s_ezlopi_device_settings_properties_t));
-
-        ezlopi_setting_properties->id = ezlopi_cloud_generate_settings_id();
-        ezlopi_setting_properties->label = "sound threshold";
-        ezlopi_setting_properties->description = "Sound Level threshold in decible";
-        ezlopi_setting_properties->value_type = "scalable";
-        ezlopi_setting_properties->nvs_alias = "db_thrshl";
-
-        ezlopi_setting_properties->value_defaut.scalable_value = (s_ezlopi_settings_device_settings_type_scalable_value_t *)malloc(sizeof(s_ezlopi_settings_device_settings_type_scalable_value_t));
-        memset(ezlopi_setting_properties->value_defaut.scalable_value, 0, sizeof(s_ezlopi_settings_device_settings_type_scalable_value_t));
-
-        ezlopi_setting_properties->value.scalable_value = (s_ezlopi_settings_device_settings_type_scalable_value_t *)malloc(sizeof(s_ezlopi_settings_device_settings_type_scalable_value_t));
-        memset(ezlopi_setting_properties->value.scalable_value, 0, sizeof(s_ezlopi_settings_device_settings_type_scalable_value_t));
-
-        ezlopi_setting_properties->value_defaut.scalable_value->value = 30.0;
-        ezlopi_setting_properties->value.scalable_value->scale = "decibel";
-
-        if (ezlopi_nvs_read_float32(&settings_value, ezlopi_setting_properties->nvs_alias))
-        {
-            ezlopi_setting_properties->value.scalable_value->value = settings_value;
-        }
-        else
-        {
-            ezlopi_setting_properties->value.scalable_value->value = ezlopi_setting_properties->value_defaut.scalable_value->value;
-        }
-    }
-    return ezlopi_setting_properties;
-}
-
-static s_ezlopi_device_settings_properties_t *ezlopi_device_settings_performance_flag_prepare_properties(void)
-{
-    s_ezlopi_device_settings_properties_t *ezlopi_setting_properties = (s_ezlopi_device_settings_properties_t *)malloc(sizeof(s_ezlopi_device_settings_properties_t));
-
-    if (ezlopi_setting_properties)
-    {
-
-        bool settings_value;
-
-        memset(ezlopi_setting_properties, 0, sizeof(s_ezlopi_device_settings_properties_t));
-
-        ezlopi_setting_properties->id = ezlopi_cloud_generate_settings_id();
-        ezlopi_setting_properties->label = "Performance flag";
-        ezlopi_setting_properties->description = "Performance flag";
-        ezlopi_setting_properties->value_type = "bool";
-        ezlopi_setting_properties->nvs_alias = "perfrm";
-
-        ezlopi_setting_properties->value_defaut.bool_value = true;
-
-        if (ezlopi_nvs_read_bool(&settings_value, ezlopi_setting_properties->nvs_alias))
-        {
-            ezlopi_setting_properties->value.bool_value = settings_value;
-        }
-        else
-        {
-            ezlopi_setting_properties->value.bool_value = ezlopi_setting_properties->value_defaut.bool_value;
-        }
-    }
-    return ezlopi_setting_properties;
 }
