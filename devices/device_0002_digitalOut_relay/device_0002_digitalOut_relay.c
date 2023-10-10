@@ -17,6 +17,7 @@
 static int device_0002_digitalOut_relay_prepare(void *arg);
 static int device_0002_digitalOut_relay_init(s_ezlopi_device_properties_t *properties);
 static int device_0002_digitalOut_relay_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
+static int device_0001_digitalOut_relay_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int device_0002_digitalOut_relay_set_value(s_ezlopi_device_properties_t *properties, void *arg);
 static s_ezlopi_device_properties_t *device_0002_digitalOut_relay_prepare_item(cJSON *cjson_device);
 static void device_0002_digitalOut_relay_write_gpio_value(s_ezlopi_device_properties_t *properties);
@@ -38,6 +39,11 @@ int device_0002_digitalOut_relay(e_ezlopi_actions_t action, s_ezlopi_device_prop
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = device_0002_digitalOut_relay_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        ret = device_0001_digitalOut_relay_get_item(properties, arg);
         break;
     }
     case EZLOPI_ACTION_SET_VALUE:
@@ -69,6 +75,18 @@ static int device_0002_digitalOut_relay_get_value_cjson(s_ezlopi_device_properti
         ret = 1;
     }
 
+    return ret;
+}
+
+static int device_0001_digitalOut_relay_get_item(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        cJSON_AddBoolToObject(cjson_propertise, "valueFormatted", properties->interface.gpio.gpio_out.value);
+    }
     return ret;
 }
 
