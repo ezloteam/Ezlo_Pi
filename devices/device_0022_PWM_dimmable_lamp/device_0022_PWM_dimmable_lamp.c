@@ -9,6 +9,7 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 #include "device_0022_PWM_dimmable_lamp.h"
+#include "ezlopi_valueformatter.h"
 #include "math.h"
 
 #define ADD_PROPERTIES_DEVICE_LIST(_properties, device_id, category, sub_category, item_name, value_type, cjson_device, dimmable_bulb_state)                \
@@ -23,7 +24,7 @@
 static int ezlopi_dimmable_bulb_prepare(void *args);
 static s_ezlopi_device_properties_t *ezlopi_dimmable_bulb_prepare_properties(uint32_t device_id, const char *category,
                                                                              const char *sub_category, const char *item_name,
-                                                                             const char *value_type, cJSON *cjson_device, ezlopi_dimmable_bulb_state_struct_t* dimmable_bulb);
+                                                                             const char *value_type, cJSON *cjson_device, ezlopi_dimmable_bulb_state_struct_t *dimmable_bulb);
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *properties, void *user_args);
 static int ezlopi_dimmable_bulb_init(s_ezlopi_device_properties_t *properties);
 static int ezlopi_dimmable_bulb_set_value(s_ezlopi_device_properties_t *properties, void *arg);
@@ -58,6 +59,7 @@ int device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, s_ezlopi_device_pro
         ret = ezlopi_dimmable_bulb_set_value(properties, arg);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ezlopi_dimmable_bulb_get_value_cjson(properties, arg);
@@ -170,7 +172,7 @@ static int ezlopi_dimmable_bulb_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = -1;
 
-    ezlopi_dimmable_bulb_state_struct_t* dimmable_bulb_state = (ezlopi_dimmable_bulb_state_struct_t*)properties->user_arg;
+    ezlopi_dimmable_bulb_state_struct_t *dimmable_bulb_state = (ezlopi_dimmable_bulb_state_struct_t *)properties->user_arg;
     if ((!dimmable_bulb_initialized) && (NULL != dimmable_bulb_state))
     {
 
@@ -194,14 +196,14 @@ static int ezlopi_dimmable_bulb_set_value(s_ezlopi_device_properties_t *properti
 {
     int ret = 0;
     cJSON *cjson_params = (cJSON *)arg;
-    ezlopi_dimmable_bulb_state_struct_t* dimmable_bulb_state = (ezlopi_dimmable_bulb_state_struct_t*)properties->user_arg;
+    ezlopi_dimmable_bulb_state_struct_t *dimmable_bulb_state = (ezlopi_dimmable_bulb_state_struct_t *)properties->user_arg;
 
     if ((NULL != cjson_params) && (NULL != dimmable_bulb_state))
     {
-        
+
         if (ezlopi_item_name_dimmer == properties->ezlopi_cloud.item_name)
         {
-            
+
             int value = 0;
             CJSON_GET_VALUE_INT(cjson_params, "value", value);
             // TRACE_I("item_name: %s", properties->ezlopi_cloud.item_name);
@@ -243,7 +245,7 @@ static int ezlopi_dimmable_bulb_get_value_cjson(s_ezlopi_device_properties_t *pr
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)args;
-    ezlopi_dimmable_bulb_state_struct_t* dimmable_bulb_state = (ezlopi_dimmable_bulb_state_struct_t*)properties->user_arg;
+    ezlopi_dimmable_bulb_state_struct_t *dimmable_bulb_state = (ezlopi_dimmable_bulb_state_struct_t *)properties->user_arg;
     if ((cjson_propertise) && (NULL != dimmable_bulb_state))
     {
         if (ezlopi_item_name_dimmer == properties->ezlopi_cloud.item_name)
@@ -251,12 +253,16 @@ static int ezlopi_dimmable_bulb_get_value_cjson(s_ezlopi_device_properties_t *pr
             int dimmable_value_percentage = (int)floor(((dimmable_bulb_state->current_brightness_value * 100.0) / 4095.0));
             TRACE_B("target_value is %d", dimmable_value_percentage);
             cJSON_AddNumberToObject(cjson_propertise, "value", dimmable_value_percentage);
+            char *formatted_val = ezlopi_valueformatter_int(dimmable_value_percentage);
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", formatted_val);
+            free(formatted_val);
         }
         else if (ezlopi_item_name_switch == properties->ezlopi_cloud.item_name)
         {
             bool switch_state = (0 == dimmable_bulb_state->current_brightness_value) ? false : true;
             TRACE_B("Switch state is %d", switch_state);
             cJSON_AddBoolToObject(cjson_propertise, "value", switch_state);
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_valueformatter_bool(switch_state));
         }
         ret = 1;
     }
