@@ -43,9 +43,9 @@ void ezlopi_ble_service_provisioning_init(void)
 
     uuid.uuid.uuid16 = BLE_PROVISIONING_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
-    permission = ESP_GATT_PERM_WRITE;
-    properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
-    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, NULL, provisioning_info_write_func, provisioning_info_exec_func);
+    permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
+    properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ;
+    ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, provisioning_info_read_func, provisioning_info_write_func, provisioning_info_exec_func);
 
     uuid.uuid.uuid16 = BLE_PROVISIONING_STATUS_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
@@ -298,9 +298,78 @@ static void provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_
     }
 }
 
+static void __send_provisioning_data_task(void *pv)
+{
+    vTaskDelay(1000 / portTICK_RATE_MS);
+    TRACE_B("Starting transmission .. ");
+
+    static const char *prov_status_jstr = "ewogICAgInVzZXJfaWQiOiAibG9tYXNzdWJlZGkiLAogICAgImRldmljZV9uYW1lIjogIk15IERldmljZSIsCiAgICAiYnJhbmQiOiAiTkRTIFRoZXJtb3N0YXQiLAogICAgIm1hbnVmYWN0dXJlcl9uYW1lIjogIk5lcGFsIERpZ2l0YWwgU3lzdGVtcyIsCiAgICAibW9kZWxfbnVtYmVyIjogIjA2M0RFWDUyNCIsCiAgICAidXVpZCI6ICI2NTI2MWQ3Ni1lNTg0LTRkMzUtYWZmMS1kODRiZDA0MyIsCiAgICAidXVpZF9wcm92aXNpb25pbmciOiAiNWZlNmI0OTgtOTdiNi00NjdhLTk1OTgtYWJmMmViM2IxOTVmIiwKICAgICJzZXJpYWwiOiAxMDAwMDQwMzIsCiAgICAiY2xvdWRfc2VydmVyIjogImh0dHBzOi8vY2xvdWQuZXpsby5jb206NzAwMCIsCiAgICAic3NsX3ByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS0tLVxuTUlHRUFnRUFNQkFHQnlxR1NNNDlBZ0VHQlN1QkJBQUtCRzB3YXdJQkFRUWdsc2RGM0srU0tUdGExSEhIMERueVxuNitoT3kxT29ab1J3c1pZY2RjeGRRYWloUkFOQ0FBUnUzRExuWnZRMXQ0aG1oZVVyUThLSm5abWRKWEUzdGw2RVxuWGk0eXpxMW9kYjI5ZFNLaU5DQmovTUo2bXVtL2RxVEhVTjY1OHZkSE5xanJXbnlXenZPNFxuLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLVxuIiwKICAgICJzc2xfcHVibGljX2tleSI6ICItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUZZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUFvRFFnQUVidHd5NTJiME5iZUlab1hsSzBQQ2laMlpuU1Z4TjdaZVxuaEY0dU1zNnRhSFc5dlhVaW9qUWdZL3pDZXBycHYzYWt4MURldWZMM1J6YW82MXA4bHM3enVBPT1cbi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLSIsCiAgICAiY2FfY2VydCI6ICItLS0tLUJFR0lOIHhhQ0VSVElGSUNBVEUtLS0tLVxyXG5NSUlDYkRDQ0FoR2dBd0lCQWdJSkFPQnl6YUk3YUhZOU1Bb0dDQ3FHU000OUJBTURNSUdRTVFzd0NRWURWUVFHXHJcbkV3SlZVekVVTUJJR0ExVUVDQXdMSUU1bGR5QktaWEp6WlhreEVEQU9CZ05WQkFjTUIwTnNhV1owYjI0eER6QU5cclxuQmdOVkJBb01Ca2xVSUU5d2N6RVBNQTBHQTFVRUN3d0dTVlFnVDNCek1SUXdFZ1lEVlFRRERBdGxXa3hQSUV4VVxyXG5SQ0JEUVRFaE1COEdDU3FHU0liM0RRRUpBUllTYzNsellXUnRhVzV6UUdWNmJHOHVZMjl0TUNBWERURTVNRFV6XHJcbk1URTNNREUwTjFvWUR6SXhNVGt3TlRBM01UY3dNVFEzV2pDQmtERUxNQWtHQTFVRUJoTUNWVk14RkRBU0JnTlZcclxuQkFnTUN5Qk9aWGNnU21WeWMyVjVNUkF3RGdZRFZRUUhEQWREYkdsbWRHOXVNUTh3RFFZRFZRUUtEQVpKVkNCUFxyXG5jSE14RHpBTkJnTlZCQXNNQmtsVUlFOXdjekVVTUJJR0ExVUVBd3dMWlZwTVR5Qk1WRVFnUTBFeElUQWZCZ2txXHJcbmhraUc5dzBCQ1FFV0VuTjVjMkZrYldsdWMwQmxlbXh2TG1OdmJUQldNQkFHQnlxR1NNNDlBZ0VHQlN1QkJBQUtcclxuQTBJQUJITFFkaExEWXNhZklGWThwWmg5NmFER3FWbTZFNHI4blc5czRDZmRwWGFhL1I0Q25qYVZwRFFJN1VtUVxyXG45dlZER1puOG1jbW03VmpLeCtUU0NTME1JS09qVXpCUk1CMEdBMVVkRGdRV0JCUmlUbDhFejFsOTRqYXFjeGJpXHJcbnl4a1ZDMEZrQlRBZkJnTlZIU01FR0RBV2dCUmlUbDhFejFsOTRqYXFjeGJpeXhrVkMwRmtCVEFQQmdOVkhSTUJcclxuQWY4RUJUQURBUUgvTUFvR0NDcUdTTTQ5QkFNREEwa0FNRVlDSVFEN0VVczhqNTBqS0ZkLzQ2Wm85NU5iclBZUVxyXG5QdExUSEg5WWpVa01Fa1lENWdJaEFNUDR5N0UxYUI3OG5Rcm1kM0lYOE1NMzJrOWRNOHhUME16dFIxNk90c3VWXHJcbi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0iLAogICAgImRldmljZV90eXBlX2V6bG9waSI6ICJnZW5lcmljIgp9";
+
+    while (1)
+    {
+        // esp_ble_gatts_send_indicate();
+        break;
+    }
+
+    vTaskDelete(NULL);
+}
+
 static void provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
     TRACE_D("Read function called!");
+
+    if (value)
+    {
+#if 0
+        if (NULL == prov_status_jstr)
+        {
+            prov_status_jstr = __provisioning_status_jsonify();
+        }
+
+        if (NULL != prov_status_jstr)
+        {
+            uint32_t total_data_len = strlen(prov_status_jstr);
+            uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
+            uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
+
+            TRACE_B("total_data_len: %d", total_data_len);
+            TRACE_B("max_data_buffer_size: %d", max_data_buffer_size);
+            TRACE_B("param->read.offset: %d", param->read.offset);
+            TRACE_B("copy_size: %d", copy_size);
+
+            if ((0 != total_data_len) && (total_data_len > param->read.offset))
+            {
+                strncpy((char *)value->value, prov_status_jstr + param->read.offset, copy_size);
+                value->len = copy_size;
+                TRACE_B("data: %.*s", copy_size, (char *)value->value);
+            }
+            else
+            {
+                value->len = 1;
+                value->value[0] = 0; // Read 0 if the device not provisioned yet.
+            }
+
+            // if ((param->read.offset + copy_size) >= total_data_len)
+            // {
+            //     free(prov_status_jstr);
+            //     prov_status_jstr = NULL;
+            // }
+        }
+        else
+        {
+            TRACE_E("Unable to create json string");
+            value->len = 1;
+            value->value[0] = 0; // Read 0 if the device not provisioned yet.
+        }
+#endif
+        value->len = 1;
+        value->value[0] = 0; // Read 0 if the device not provisioned yet.
+        xTaskCreate(__send_provisioning_data_task, "prov-notify", 2048, NULL, 4, NULL);
+    }
+    else
+    {
+        TRACE_E("VALUE IS NULL");
+    }
 }
 
 static void provisioning_info_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
@@ -362,4 +431,4 @@ static void ezlopi_process_provisioning_info(uint8_t *value, uint32_t len)
     }
 }
 
-// ewogICAgInVzZXJfaWQiOiAibG9tYXNzdWJlZGkiLAogICAgImRldmljZV9uYW1lIjogIk15IERldmljZSIsCiAgICAiYnJhbmQiOiAiTkRTIFRoZXJtb3N0YXQiLAogICAgIm1hbnVmYWN0dXJlcl9uYW1lIjogIk5lcGFsIERpZ2l0YWwgU3lzdGVtcyIsCiAgICAibW9kZWxfbnVtYmVyIjogIjA2M0RFWDUyNCIsCiAgICAidXVpZCI6ICI2NTI2MWQ3Ni1lNTg0LTRkMzUtYWZmMS1kODRiZDA0MyIsCiAgICAidXVpZF9wcm92aXNpb25pbmciOiAiNWZlNmI0OTgtOTdiNi00NjdhLTk1OTgtYWJmMmViM2IxOTVmIiwKICAgICJzZXJpYWwiOiAxMDAwMDQwMzIsCiAgICAiY2xvdWRfc2VydmVyIjogImh0dHBzOi8vY2xvdWQuZXpsby5jb206NzAwMCIsCiAgICAic3NsX3ByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS0tLVxuTUlHRUFnRUFNQkFHQnlxR1NNNDlBZ0VHQlN1QkJBQUtCRzB3YXdJQkFRUWdsc2RGM0srU0tUdGExSEhIMERueVxuNitoT3kxT29ab1J3c1pZY2RjeGRRYWloUkFOQ0FBUnUzRExuWnZRMXQ0aG1oZVVyUThLSm5abWRKWEUzdGw2RVxuWGk0eXpxMW9kYjI5ZFNLaU5DQmovTUo2bXVtL2RxVEhVTjY1OHZkSE5xanJXbnlXenZPNFxuLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLVxuIiwKICAgICJzc2xfcHVibGljX2tleSI6ICItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUZZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUFvRFFnQUVidHd5NTJiME5iZUlab1hsSzBQQ2laMlpuU1Z4TjdaZVxuaEY0dU1zNnRhSFc5dlhVaW9qUWdZL3pDZXBycHYzYWt4MURldWZMM1J6YW82MXA4bHM3enVBPT1cbi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLSIsCiAgICAiY2FfY2VydCI6ICItLS0tLUJFR0lOIHhhQ0VSVElGSUNBVEUtLS0tLVxyXG5NSUlDYkRDQ0FoR2dBd0lCQWdJSkFPQnl6YUk3YUhZOU1Bb0dDQ3FHU000OUJBTURNSUdRTVFzd0NRWURWUVFHXHJcbkV3SlZVekVVTUJJR0ExVUVDQXdMSUU1bGR5QktaWEp6WlhreEVEQU9CZ05WQkFjTUIwTnNhV1owYjI0eER6QU5cclxuQmdOVkJBb01Ca2xVSUU5d2N6RVBNQTBHQTFVRUN3d0dTVlFnVDNCek1SUXdFZ1lEVlFRRERBdGxXa3hQSUV4VVxyXG5SQ0JEUVRFaE1COEdDU3FHU0liM0RRRUpBUllTYzNsellXUnRhVzV6UUdWNmJHOHVZMjl0TUNBWERURTVNRFV6XHJcbk1URTNNREUwTjFvWUR6SXhNVGt3TlRBM01UY3dNVFEzV2pDQmtERUxNQWtHQTFVRUJoTUNWVk14RkRBU0JnTlZcclxuQkFnTUN5Qk9aWGNnU21WeWMyVjVNUkF3RGdZRFZRUUhEQWREYkdsbWRHOXVNUTh3RFFZRFZRUUtEQVpKVkNCUFxyXG5jSE14RHpBTkJnTlZCQXNNQmtsVUlFOXdjekVVTUJJR0ExVUVBd3dMWlZwTVR5Qk1WRVFnUTBFeElUQWZCZ2txXHJcbmhraUc5dzBCQ1FFV0VuTjVjMkZrYldsdWMwQmxlbXh2TG1OdmJUQldNQkFHQnlxR1NNNDlBZ0VHQlN1QkJBQUtcclxuQTBJQUJITFFkaExEWXNhZklGWThwWmg5NmFER3FWbTZFNHI4blc5czRDZmRwWGFhL1I0Q25qYVZwRFFJN1VtUVxyXG45dlZER1puOG1jbW03VmpLeCtUU0NTME1JS09qVXpCUk1CMEdBMVVkRGdRV0JCUmlUbDhFejFsOTRqYXFjeGJpXHJcbnl4a1ZDMEZrQlRBZkJnTlZIU01FR0RBV2dCUmlUbDhFejFsOTRqYXFjeGJpeXhrVkMwRmtCVEFQQmdOVkhSTUJcclxuQWY4RUJUQURBUUgvTUFvR0NDcUdTTTQ5QkFNREEwa0FNRVlDSVFEN0VVczhqNTBqS0ZkLzQ2Wm85NU5iclBZUVxyXG5QdExUSEg5WWpVa01Fa1lENWdJaEFNUDR5N0UxYUI3OG5Rcm1kM0lYOE1NMzJrOWRNOHhUME16dFIxNk90c3VWXHJcbi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0iLAogICAgImRldmljZV90eXBlX2V6bG9waSI6ICJnZW5lcmljIgp9
+//

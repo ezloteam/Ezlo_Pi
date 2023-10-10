@@ -12,31 +12,27 @@ void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+        cJSON *cj_result = cJSON_AddArrayToObject(cj_response, "result");
         if (cj_result)
         {
-            cJSON *cj_script_array = cJSON_AddArrayToObject(cj_result, "scripts");
-            if (cj_script_array)
+            l_ezlopi_scenes_script_t *script_nodes = ezlopi_scenes_scripts_get_head();
+            while (script_nodes)
             {
-                l_ezlopi_scenes_script_t *script_nodes = ezlopi_scenes_scripts_get_head();
-                while (script_nodes)
+                cJSON *cj_script = cJSON_CreateObject();
+                if (cj_script)
                 {
-                    cJSON *cj_script = cJSON_CreateObject();
-                    if (cj_script)
+                    char script_id_str[32];
+                    snprintf(script_id_str, sizeof(script_id_str), "%08x", script_nodes->id);
+                    cJSON_AddStringToObject(cj_script, ezlopi__id_str, script_id_str);
+                    cJSON_AddStringToObject(cj_script, "name", script_nodes->name);
+
+                    if (!cJSON_AddItemToArray(cj_result, cj_script))
                     {
-                        char script_id_str[32];
-                        snprintf(script_id_str, sizeof(script_id_str), "%08x", script_nodes->id);
-                        cJSON_AddStringToObject(cj_script, ezlopi__id_str, script_id_str);
-                        cJSON_AddStringToObject(cj_script, "name", script_nodes->name);
-
-                        if (!cJSON_AddItemToArray(cj_script_array, cj_script))
-                        {
-                            cJSON_Delete(cj_script);
-                        }
+                        cJSON_Delete(cj_script);
                     }
-
-                    script_nodes = script_nodes->next;
                 }
+
+                script_nodes = script_nodes->next;
             }
         }
     }
@@ -131,4 +127,9 @@ void scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response)
             }
         }
     }
+}
+
+void scenes_scripts_set(cJSON *cj_request, cJSON *cj_response)
+{
+    
 }

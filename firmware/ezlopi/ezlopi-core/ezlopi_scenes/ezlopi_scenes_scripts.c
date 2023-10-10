@@ -53,8 +53,10 @@ void ezlopi_scenes_scripts_stop_by_id(uint32_t script_id)
 
 void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
 {
+    l_ezlopi_scenes_script_t *script_to_delete = NULL;
     if (script_head->id == script_id)
     {
+        script_to_delete = script_head;
         script_head = script_head->next;
     }
     else
@@ -64,24 +66,29 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
         {
             if (curr_script->next->id == script_id)
             {
-                l_ezlopi_scenes_script_t *script_to_free = curr_script->next;
+                script_to_delete = curr_script->next;
                 curr_script->next = curr_script->next->next;
-
-                ezlopi_scenes_scripts_stop(script_to_free);
-                ezlopi_nvs_delete_stored_data(script_to_free->name); // deleting script from nvs
-                __scripts_remove_id_and_update_list(script_to_free->id);
-
-                if (script_to_free->code)
-                {
-                    free(script_to_free);
-                }
-                if (script_to_free->name)
-                {
-                    free(script_to_free->name);
-                }
-                free(script_to_free);
+                break;
             }
+            curr_script = curr_script->next;
         }
+    }
+
+    if (script_to_delete)
+    {
+        ezlopi_scenes_scripts_stop(script_to_delete);
+        ezlopi_nvs_delete_stored_data(script_to_delete->name); // deleting script from nvs
+        __scripts_remove_id_and_update_list(script_to_delete->id);
+
+        if (script_to_delete->code)
+        {
+            free(script_to_delete);
+        }
+        if (script_to_delete->name)
+        {
+            free(script_to_delete->name);
+        }
+        free(script_to_delete);
     }
 }
 
@@ -226,9 +233,9 @@ static void __scripts_remove_id_and_update_list(uint32_t script_id)
                 cJSON *cj_script_id = cJSON_GetArrayItem(cj_scripts_ids, i);
                 if (cj_script_id && cj_script_id->valuedouble)
                 {
-                    TRACE_D("Removing (%d: %08x) script from list!", i, script_id);
                     if (script_id == cj_script_id->valuedouble)
                     {
+                        TRACE_D("Removing (%d: %08x) script from list!", i, script_id);
                         cJSON_DeleteItemFromArray(cj_scripts_ids, i);
 
                         char *scripts_ids_str_updated = cJSON_Print(cj_scripts_ids);
