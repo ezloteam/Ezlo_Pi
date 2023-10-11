@@ -122,6 +122,17 @@ typedef enum
     MPU6050_ERR_MAX
 } mpu6050_err_t;
 
+typedef enum
+{
+    SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_X,
+    SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Y,
+    SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Z,
+    SENSOR_0005_I2C_MPU6050_ITEM_TEMPERATURE,
+    SENSOR_0005_I2C_MPU6050_ITEM_GYRO_X,
+    SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Y,
+    SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Z,
+    SENSOR_0005_I2C_MPU6050_ITEM_MAX
+} e_sensor_0005_i2c_mpu6050_item_ids_t;
 // Action function declaration
 int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 

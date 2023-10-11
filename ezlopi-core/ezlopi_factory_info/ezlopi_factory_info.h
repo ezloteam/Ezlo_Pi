@@ -503,10 +503,35 @@ static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"
 // PWM Dimmable Lamp
 static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":5,\"dev_name\":\"Dimmer\",\"id_room\":\"\",\"id_item\":22,\"gpio\":3,\"pwm_resln\":8,\"freq_hz\":50,\"duty_cycle\":0}],\"dev_total\":1}";
 // Servo
-static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":5,\"dev_name\":\"Servo\",\"id_room\":\"\",\"id_item\":36,\"gpio\":3,\"pwm_resln\":8,\"freq_hz\":50,\"duty_cycle\":0}],\"dev_total\":1}";
-#endif
+static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":5,\"dev_name\":\"Servo\",\"id_room\":\"\",\"id_item\":36,\"gpio\":3,\"pwm_resln\":8,\"freq_hz\":50,\"duty_cycle\":0}],\"dev_total\":1}"
 // Other RGB
+
 static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
+#endif
+
+#if 1
+// I2C MPU6050
+// static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":8,\"dev_name\":\"MPU 6050\",\"id_room\":\"\",\"id_item\":5,\"gpio_sda\":21,\"gpio_scl\":22,\"pullup_scl\":true,\"pullup_sda\":true,\"slave_addr\":105}],\"dev_total\":1}";
+
+static const char *test_device_constant_config =
+    "{\
+    \"cmd\": 3,\
+    \"dev_detail\":\
+    [\
+        {\
+            \"dev_type\": 8,\
+            \"dev_name\": \"MPU 6050\",\
+            \"id_room\": \"\",\
+            \"id_item\": 5,\
+            \"gpio_sda\": 22,\
+            \"gpio_scl\": 23,\
+            \"pullup_scl\": true,\
+            \"pullup_sda\": true,\
+            \"slave_addr\": 105\
+        }\
+    ],\
+    \"dev_total\": 1}";
+#endif
 #endif
 
 #ifdef __cplusplus

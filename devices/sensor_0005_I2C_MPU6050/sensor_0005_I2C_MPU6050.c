@@ -6,6 +6,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 
 #include "ezlopi_i2c_master.h"
 #include "trace.h"
@@ -19,6 +20,7 @@
 #define REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
 static float acc_sen_calib_val = 0;
 static float gyro_sen_calib_val = 0;
+static uint32_t sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_MAX];
 
 // Table mapping mpu6050_err_t enumerals to strings
 static const char *mpu6050_err_str[MPU6050_ERR_MAX] = {
@@ -32,14 +34,14 @@ static const char *mpu6050_err_str[MPU6050_ERR_MAX] = {
     [MPU6050_ERR_UNKNOWN] = "Unknown error",
 };
 
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                       \
-    {                                                                                                                           \
-        s_ezlopi_device_properties_t *_properties = i2c_mpu6050_sensor_prepare_properties(device_id, category, subcategory,     \
-                                                                                          item_name, value_type, cjson_device); \
-        if (NULL != _properties)                                                                                                \
-        {                                                                                                                       \
-            add_device_to_list(prep_arg, _properties, NULL);                                                                    \
-        }                                                                                                                       \
+#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_id, item_name, value_type, cjson_device)                       \
+    {                                                                                                                                    \
+        s_ezlopi_device_properties_t *_properties = i2c_mpu6050_sensor_prepare_properties(device_id, category, subcategory,              \
+                                                                                          item_id, item_name, value_type, cjson_device); \
+        if (NULL != _properties)                                                                                                         \
+        {                                                                                                                                \
+            add_device_to_list(prep_arg, _properties, NULL);                                                                             \
+        }                                                                                                                                \
     }
 
 /*************************************************************************************************/
@@ -62,7 +64,7 @@ static void i2c_mpu6050_sensor_read_sensor_data(s_ezlopi_device_properties_t *pr
 
 // 1) prepare
 static void i2c_mpu6050_sensor_prepare(void *arg);
-static s_ezlopi_device_properties_t *i2c_mpu6050_sensor_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device);
+static s_ezlopi_device_properties_t *i2c_mpu6050_sensor_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const uint32_t item_id, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device);
 
 // 2) initialize
 static mpu6050_err_t mpu6050_configure_power(s_ezlopi_device_properties_t *properties);
@@ -107,6 +109,7 @@ int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, s_ezlopi_device_propertie
         i2c_mpu6050_sensor_init(properties, NULL);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         i2c_mpu6050_sensor_notify(properties, arg);
@@ -231,40 +234,44 @@ static void i2c_mpu6050_sensor_read_sensor_data(s_ezlopi_device_properties_t *pr
 //----------------------------------------------------------------------------------
 // (1) PREPARATION FUNCTIONS
 //----------------------------------------------------------------------------------
-static s_ezlopi_device_properties_t *i2c_mpu6050_sensor_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device)
+static s_ezlopi_device_properties_t *i2c_mpu6050_sensor_prepare_properties(uint32_t DEVICE_ID, const char *CATEGORY, const char *SUB_CATEGORY, const uint32_t item_id, const char *ITEM_NAME, const char *VALUE_TYPE, cJSON *cjson_device)
 {
     s_ezlopi_device_properties_t *i2c_mpu6050_properties = malloc(sizeof(s_ezlopi_device_properties_t));
     if (i2c_mpu6050_properties)
     {
         memset(i2c_mpu6050_properties, 0, sizeof(s_ezlopi_device_properties_t));
         char *device_name = NULL;
-        if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
+        if (item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_X])
         {
             device_name = "MPU6050 Acceleration-X";
         }
-        if (ezlopi_item_name_acceleration_y_axis == ITEM_NAME)
+        else if (item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Y])
         {
             device_name = "MPU6050 Acceleration-Y";
         }
-        if (ezlopi_item_name_acceleration_z_axis == ITEM_NAME)
+        else if (item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Z])
         {
             device_name = "MPU6050 Acceleration-Z";
         }
-        if(ezlopi_item_name_temp == ITEM_NAME)
+        else if (item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_TEMPERATURE])
         {
             device_name = "MPU6050 temperature";
         }
-        if (ezlopi_item_name_gyroscope_x_axis == ITEM_NAME)
+        else if (item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_X])
         {
             device_name = "MPU6050 Gyroscope-X";
         }
-        if (ezlopi_item_name_gyroscope_y_axis == ITEM_NAME)
+        else if (item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Y])
         {
             device_name = "MPU6050 Gyroscope-Y";
         }
-        if (ezlopi_item_name_gyroscope_z_axis == ITEM_NAME)
+        else if (item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Z])
         {
             device_name = "MPU6050 Gyroscope-Z";
+        }
+        else
+        {
+            device_name = "";
         }
 
         // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
@@ -282,7 +289,7 @@ static s_ezlopi_device_properties_t *i2c_mpu6050_sensor_prepare_properties(uint3
         i2c_mpu6050_properties->ezlopi_cloud.room_name[0] = '\0';
         i2c_mpu6050_properties->ezlopi_cloud.device_id = DEVICE_ID;
         i2c_mpu6050_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-        i2c_mpu6050_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
+        i2c_mpu6050_properties->ezlopi_cloud.item_id = item_id;
 
         i2c_mpu6050_properties->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
         i2c_mpu6050_properties->interface.i2c_master.enable = 1;
@@ -316,25 +323,30 @@ static void i2c_mpu6050_sensor_prepare(void *arg)
 {
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
 
+    for (uint8_t i = 0; i < SENSOR_0005_I2C_MPU6050_ITEM_MAX; i++)
+    {
+        sensor_0005_i2c_mpu6050_item_ids[i] = ezlopi_cloud_generate_item_id();
+    }
+
     if ((NULL != prep_arg) && (NULL != (prep_arg->cjson_device)))
     {
         uint32_t device_id = 0;
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_x_axis, value_type_int, prep_arg->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_X], ezlopi_item_name_acceleration_x_axis, value_type_acceleration, prep_arg->cjson_device);
         // device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_y_axis, value_type_int, prep_arg->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Y], ezlopi_item_name_acceleration_y_axis, value_type_acceleration, prep_arg->cjson_device);
         // device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_z_axis, value_type_int, prep_arg->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Z], ezlopi_item_name_acceleration_z_axis, value_type_acceleration, prep_arg->cjson_device);
 
-        // device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
+        device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_TEMPERATURE], ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
 
+        device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_velocity, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_X], ezlopi_item_name_velocity, value_type_float, prep_arg->cjson_device);
         // device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_gyroscope_x_axis, value_type_int, prep_arg->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_velocity, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Y], ezlopi_item_name_velocity, value_type_float, prep_arg->cjson_device);
         // device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_gyroscope_y_axis, value_type_int, prep_arg->cjson_device);
-        // device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_gyroscope_z_axis, value_type_int, prep_arg->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_velocity, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Z], ezlopi_item_name_velocity, value_type_float, prep_arg->cjson_device);
     }
 }
 //----------------------------------------------------------------------------------
@@ -513,7 +525,6 @@ static void i2c_mpu6050_sensor_notify(s_ezlopi_device_properties_t *properties, 
     float temperature_value = 0;
     float gyroscope_value = 0;
     mpu6050_data_t data_val = {0};
-    char valueFormatted[20];
 
     // read data from sensor
     i2c_mpu6050_sensor_read_sensor_data(properties, &data_val);
@@ -522,69 +533,80 @@ static void i2c_mpu6050_sensor_notify(s_ezlopi_device_properties_t *properties, 
     cJSON *cjson_properties = (cJSON *)args;
     if (cjson_properties)
     {
-        if (ezlopi_item_name_acceleration_x_axis == properties->ezlopi_cloud.item_name)
+        if (properties->ezlopi_cloud.item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_X])
         {
             acceleration_value = (data_val.ax);
             // TRACE_I("This is data from Register: ax =  %.2f m/s^2", acceleration_value);
-            snprintf(valueFormatted, 20, "%.2f", acceleration_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
+            char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
-        if (ezlopi_item_name_acceleration_y_axis == properties->ezlopi_cloud.item_name)
+        else if (properties->ezlopi_cloud.item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Y])
         {
             acceleration_value = (data_val.ay);
             // TRACE_I("This is data from Register: ay =  %.2f m/s^2", acceleration_value);
-            snprintf(valueFormatted, 20, "%.2f", acceleration_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
+            char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
-        if (ezlopi_item_name_acceleration_z_axis == properties->ezlopi_cloud.item_name)
+        else if (properties->ezlopi_cloud.item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Z])
         {
             acceleration_value = (data_val.az);
             // TRACE_I("This is data from Register: az =  %.2f m/s^2", acceleration_value);
-            snprintf(valueFormatted, 20, "%.2f", acceleration_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
+            char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
-        if (category_temperature == properties->ezlopi_cloud.category)
+        else if (properties->ezlopi_cloud.item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_TEMPERATURE])
         {
             temperature_value = (data_val.temp_mpu);
             // TRACE_I("Temperature is: %.2f *C", temperature_value);
-            snprintf(valueFormatted, 20, "%.2f", temperature_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", temperature_value);
+            char *valueFormatted = ezlopi_valueformatter_float(temperature_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
         }
 
-        if (ezlopi_item_name_gyroscope_x_axis == properties->ezlopi_cloud.item_name)
+        else if (properties->ezlopi_cloud.item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_X])
         {
             gyroscope_value = (data_val.gx);
             // TRACE_I("This is data from Register: gx =  %.2f m/s^2", gyroscope_value);
-            snprintf(valueFormatted, 20, "%.2f", gyroscope_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", gyroscope_value);
+            char *valueFormatted = ezlopi_valueformatter_float(gyroscope_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "degree_per_second");
         }
-        if (ezlopi_item_name_gyroscope_y_axis == properties->ezlopi_cloud.item_name)
+        else if (properties->ezlopi_cloud.item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Y])
         {
             gyroscope_value = (data_val.gy);
             // TRACE_I("This is data from Register: gy =  %.2f m/s^2", gyroscope_value);
-            snprintf(valueFormatted, 20, "%.2f", gyroscope_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", gyroscope_value);
+            char *valueFormatted = ezlopi_valueformatter_float(gyroscope_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "degree_per_second");
         }
-        if (ezlopi_item_name_gyroscope_z_axis == properties->ezlopi_cloud.item_name)
+        else if (properties->ezlopi_cloud.item_id == sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Z])
         {
             gyroscope_value = (data_val.gz);
             // TRACE_I("This is data from Register: gz =  %.2f m/s^2", gyroscope_value);
-            snprintf(valueFormatted, 20, "%.2f", gyroscope_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", gyroscope_value);
+            char *valueFormatted = ezlopi_valueformatter_float(gyroscope_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "degree_per_second");
+        }
+        else
+        {
+            TRACE_E("Invalid Item !!");
         }
     }
 }
