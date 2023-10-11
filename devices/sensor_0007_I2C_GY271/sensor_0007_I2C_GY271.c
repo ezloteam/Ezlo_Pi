@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
+#include "ezlopi_valueformatter.h"
 /*************************************************************************************************/
 /*                              DEFINES                                                     */
 /*************************************************************************************************/
@@ -75,6 +76,7 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, s_ezlopi_device_properties_
         sensor_i2c_gy271_init(properties);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         sensor_i2c_gy271_get_value_cjson(properties, arg);
@@ -374,11 +376,11 @@ static int sensor_i2c_gy271_prepare(void *arg)
         memset(sensor_0007_I2C_GY271_data, 0, sizeof(gy271_data_t));
 
         uint32_t device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(X_field_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_x_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
-        device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(Y_field_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_y_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
-        device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(Z_field_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_z_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
+        ADD_PROPERTIES_DEVICE_LIST(X_field_properties, device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_x_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
+        // device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(Y_field_properties, device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_y_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
+        // device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(Z_field_properties, device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_z_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
 
         device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(Azimuth_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_angle_position, value_type_angle, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
@@ -454,25 +456,34 @@ static int sensor_i2c_gy271_get_value_cjson(s_ezlopi_device_properties_t *proper
         {
             TRACE_I("X-axis field Strength : %.2fG", (sensor_0007_I2C_GY271_data->X));
             cJSON_AddNumberToObject(cjson_properties, "value", sensor_0007_I2C_GY271_data->X);
-            cJSON_AddStringToObject(cjson_properties, "scale", "...");
+            char *valueFormatted = ezlopi_valueformatter_float(sensor_0007_I2C_GY271_data->X);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
         }
         if (ezlopi_item_name_acceleration_y_axis == properties->ezlopi_cloud.item_name)
         {
             TRACE_I("Y-axis field Strength : %.2fG", sensor_0007_I2C_GY271_data->Y);
             cJSON_AddNumberToObject(cjson_properties, "value", sensor_0007_I2C_GY271_data->Y);
-            cJSON_AddStringToObject(cjson_properties, "scale", "...");
+            char *valueFormatted = ezlopi_valueformatter_float(sensor_0007_I2C_GY271_data->Y);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
         }
         if (ezlopi_item_name_acceleration_z_axis == properties->ezlopi_cloud.item_name)
         {
             TRACE_I("Z-axis field Strength : %.2fG", sensor_0007_I2C_GY271_data->Z);
             cJSON_AddNumberToObject(cjson_properties, "value", sensor_0007_I2C_GY271_data->Z);
-            cJSON_AddStringToObject(cjson_properties, "scale", "...");
+            char *valueFormatted = ezlopi_valueformatter_float(sensor_0007_I2C_GY271_data->Z);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
         }
         if (ezlopi_item_name_angle_position == properties->ezlopi_cloud.item_name)
         {
 
             TRACE_I("Azimuth : %d *deg", sensor_0007_I2C_GY271_data->azimuth);
             cJSON_AddNumberToObject(cjson_properties, "value", (sensor_0007_I2C_GY271_data->azimuth));
+            char *valueFormatted = ezlopi_valueformatter_int(sensor_0007_I2C_GY271_data->azimuth);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "north_pole_degress");
         }
 
@@ -480,6 +491,9 @@ static int sensor_i2c_gy271_get_value_cjson(s_ezlopi_device_properties_t *proper
         {
             TRACE_I("temperature : %.2f*C", sensor_0007_I2C_GY271_data->T);
             cJSON_AddNumberToObject(cjson_properties, "value", sensor_0007_I2C_GY271_data->T);
+            char *valueFormatted = ezlopi_valueformatter_float(sensor_0007_I2C_GY271_data->T);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
         }
 

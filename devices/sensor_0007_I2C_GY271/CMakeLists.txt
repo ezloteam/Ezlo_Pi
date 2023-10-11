@@ -4,4 +4,5 @@ idf_component_register(SRCS "sensor_0007_I2C_GY271.c"
              items 
              freertos    
              ezlopi_actions 
-             ezlopi_timer )
+             ezlopi_timer
+             ezlopi_valueformatter)
