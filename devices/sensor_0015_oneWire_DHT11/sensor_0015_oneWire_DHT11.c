@@ -105,19 +105,26 @@ static s_ezlopi_device_properties_t *dht11_sensor_prepare_properties(uint32_t de
             dht11_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
             char *device_name = NULL;
+            char *device_name_full = malloc(50);
+            memset(device_name_full, 0, 50);
+
+            CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+
+            strcpy(device_name_full, device_name);
+
             if (0 == strcmp(ezlopi_item_name_temp, item_name))
             {
-                device_name = "DHT 11 Temperature";
+                strcat(device_name_full, " Temperature");
             }
             else if (0 == strcmp(ezlopi_item_name_humidity, item_name))
             {
-                device_name = "DHT 11 Humidity";
+                strcat(device_name_full, " Humidity");
             }
             else
             {
             }
             // CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-            ASSIGN_DEVICE_NAME(dht11_sensor_properties, device_name);
+            ASSIGN_DEVICE_NAME(dht11_sensor_properties, device_name_full);
             dht11_sensor_properties->ezlopi_cloud.category = category;
             dht11_sensor_properties->ezlopi_cloud.subcategory = sub_category;
             dht11_sensor_properties->ezlopi_cloud.item_name = item_name;
@@ -135,6 +142,7 @@ static s_ezlopi_device_properties_t *dht11_sensor_prepare_properties(uint32_t de
             dht11_sensor_properties->interface.onewire_master.enable = true;
 
             CJSON_GET_VALUE_INT(cjson_device, "gpio", dht11_sensor_properties->interface.onewire_master.onewire_pin);
+            free(device_name_full);
         }
     }
     return dht11_sensor_properties;
