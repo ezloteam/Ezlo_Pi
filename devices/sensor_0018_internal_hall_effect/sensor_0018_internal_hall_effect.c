@@ -18,10 +18,17 @@
 #include "ezlopi_device_value_updated.h"
 #include "gpio_isr_service.h"
 
+const char *door_window_states[] =
+    {
+        "dw_is_opened",
+        "dw_is_closed",
+        "unknown"};
+
 static int sensor_door_init(s_ezlopi_device_properties_t *properties);
 static int get_door_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
 static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args);
 static int sensor_door_prepare(void *args);
+static int get_door_sensor_item(s_ezlopi_device_properties_t *properties, void *args);
 
 int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args, void *user_arg)
 {
@@ -36,6 +43,11 @@ int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *pr
     case EZLOPI_ACTION_INITIALIZE:
     {
         sensor_door_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        get_door_sensor_item(properties, args);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -118,7 +130,43 @@ static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args)
     }
     return sensor_door_properties;
 }
+static int get_door_sensor_item(s_ezlopi_device_properties_t *properties, void *args)
+{
+    int ret = 0;
+#ifdef CONFIG_IDF_TARGET_ESP32
+    int sensor_data = hall_sensor_read();
+#else
+    int sensor_data = 0;
+#endif
+    TRACE_E("Reading value from the door sensor.");
+    char *door_is = ((sensor_data >= 60) || (sensor_data <= 20)) ? "dw_is_closed" : "dw_is_opened";
+    // TRACE_I("The door is %s", door_is);
+    cJSON *cjson_propertise = (cJSON *)args;
+    if (cjson_propertise)
+    {
+        cJSON *json_array_enum = cJSON_CreateArray();
+        if (NULL != json_array_enum)
+        {
+            for (uint8_t i = 0; i < DOOR_WINDOW_MAX; i++)
+            {
+                cJSON *json_value = cJSON_CreateString(door_window_states[i]);
+                if (NULL != json_value)
+                {
+                    cJSON_AddItemToArray(json_array_enum, json_value);
+                }
+            }
+            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+        }
 
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", door_is);
+        if (cJSON_AddStringToObject(cjson_propertise, "value", door_is))
+        {
+            ret = 1;
+        }
+    }
+
+    return ret;
+}
 static int get_door_sensor_value(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
@@ -133,6 +181,7 @@ static int get_door_sensor_value(s_ezlopi_device_properties_t *properties, void 
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", door_is);
         if (cJSON_AddStringToObject(cjson_propertise, "value", door_is))
         {
             ret = 1;

@@ -16,7 +16,7 @@
 static int sensor_0055_flex_resistor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_0055_prepare(cJSON *cjson_device);
 static int sensor_0055_flex_resistor_init(s_ezlopi_device_properties_t *properties);
-static void sensor_0055_get_item(s_ezlopi_device_properties_t *properties, void *arg);
+// static void sensor_0055_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_0055_get_value(s_ezlopi_device_properties_t *properties, void *args);
 //-----------------------------------------------------------------------------------------------------------------------------
 int sensor_0055_flex_resistor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_args)
@@ -35,10 +35,10 @@ int sensor_0055_flex_resistor(e_ezlopi_actions_t action, s_ezlopi_device_propert
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
-    {
-        sensor_0055_get_item(properties, arg);
-        break;
-    }
+    // {
+    //     sensor_0055_get_item(properties, arg);
+    //     break;
+    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0055_get_value(properties, arg);
@@ -122,7 +122,7 @@ static int sensor_0055_flex_resistor_init(s_ezlopi_device_properties_t *properti
     }
     return ret;
 }
-
+#if 0
 static void sensor_0055_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
     cJSON *cjson_propertise = (cJSON *)arg;
@@ -146,10 +146,11 @@ static void sensor_0055_get_item(s_ezlopi_device_properties_t *properties, void 
     }
     free(ezlopi_analog_data);
 }
-
+#endif
 static int sensor_0055_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
@@ -165,7 +166,9 @@ static int sensor_0055_get_value(s_ezlopi_device_properties_t *properties, void 
             int Rs = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
 
             // prepare the json message
+            snprintf(valueFormatted, 20, "%d", Rs);
             cJSON_AddNumberToObject(cjson_propertise, "value", Rs);
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
             cJSON_AddStringToObject(cjson_propertise, "scale", "ohm_meter");
             ret = 1;
         }

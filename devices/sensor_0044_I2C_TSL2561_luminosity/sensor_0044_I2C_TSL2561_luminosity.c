@@ -47,6 +47,7 @@ int sensor_0044_I2C_TSL2561_luminosity(e_ezlopi_actions_t action, s_ezlopi_devic
         ret = (int)init_guard;
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0044_i2c_tsl2561_get_value_cjson(ezlopi_device, arg);
@@ -309,9 +310,9 @@ static int sensor_0044_i2c_tsl2561_get_value_cjson(s_ezlopi_device_properties_t 
     {
         if (ezlopi_item_name_lux == properties->ezlopi_cloud.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", Lux_intensity);
+            snprintf(valueFormatted, 20, "%d", ((int)Lux_intensity));
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cjson_properties, "values", Lux_intensity);
+            cJSON_AddNumberToObject(cjson_properties, "values", ((int)Lux_intensity));
             cJSON_AddStringToObject(cjson_properties, "scale", "lux");
         }
         ret = 1;

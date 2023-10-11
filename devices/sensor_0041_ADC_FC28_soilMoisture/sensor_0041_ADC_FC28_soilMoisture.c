@@ -17,7 +17,6 @@
 
 static s_ezlopi_device_properties_t *sensor_adc_FC28_prepare(cJSON *cjson_device); // you can directly add the prepare args here
 static int sensor_adc_FC28_prepare_and_add(void *arg);
-
 static int sensor_adc_FC28_init(s_ezlopi_device_properties_t *properties);
 static int sensor_adc_FC28_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -36,6 +35,7 @@ int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, s_ezlopi_device
         ret = sensor_adc_FC28_init(ezlopi_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_adc_FC28_get_value(ezlopi_device, arg);
@@ -129,15 +129,14 @@ static int sensor_adc_FC28_init(s_ezlopi_device_properties_t *properties)
 static int sensor_adc_FC28_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
     if (cjson_properties)
     {
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-
         // NOTE : [ (0V-2.4V)  ==>  (0-4095) ]
-
         float adc_val = (ezlopi_analog_data->value); // The value maxes out the 2.4V
 
         int percent_data = (int)(((float)(4095.0f - adc_val) / 4095.0f) * 100);
@@ -145,8 +144,9 @@ static int sensor_adc_FC28_get_value(s_ezlopi_device_properties_t *properties, v
 
         // int volt_data = (int)(2400 - (ezlopi_analog_data->voltage)/2.0f); // max 2.4V
         // TRACE_B("voltage : %dmV", volt_data);
-
+        snprintf(valueFormatted, 20, "%d", percent_data);
         cJSON_AddNumberToObject(cjson_properties, "value", percent_data);
+        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
         cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         ret = 1;
     }

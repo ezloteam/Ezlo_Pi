@@ -37,6 +37,7 @@ int sensor_0043_adc_gyml8511_uv_intensity(e_ezlopi_actions_t action, s_ezlopi_de
         ret = sensor_0043_adc_uv_init(ezlopi_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0043_adc_uv_get_value(ezlopi_device, arg);
@@ -147,7 +148,7 @@ static int sensor_0043_adc_uv_get_value(s_ezlopi_device_properties_t *properties
         // generating UV mW/cm2
         float uvIntensity = mapfloat(((float)(sensor_0043_adc_data->voltage) / 1000.0f), 0.97, 2.7, 0.0, 15.0);
         TRACE_B("[200-380nm]UV  : %.2f mW/cm^2 ", uvIntensity);
-	snprintf(valueFormatted, 20, "%.2f", uvIntensity);
+        snprintf(valueFormatted, 20, "%.2f", uvIntensity);
         cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cjson_properties, "value", uvIntensity);
         cJSON_AddStringToObject(cjson_properties, "scale", "lux");

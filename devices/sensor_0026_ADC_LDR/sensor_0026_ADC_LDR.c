@@ -18,9 +18,16 @@
 static char *present_light_status = "no_light";
 static char *previous_light_status = "no_light";
 
+const char *light_alarm_states[] =
+    {
+        "no_light",
+        "light_detected",
+        "unknown"};
+
 static int sensor_ldr_analog_sensor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_ldr_analog_sensor_prepare(cJSON *cjson_device);
 static int sensor_ldr_analog_sensor_init(s_ezlopi_device_properties_t *properties);
+static int get_sensor_ldr_analog_sensor_item(s_ezlopi_device_properties_t *properties, void *args);
 static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *args);
 static int sensor_ldr_set_detection(s_ezlopi_device_properties_t *properties);
 
@@ -37,6 +44,11 @@ int sensor_0026_ADC_LDR(e_ezlopi_actions_t action, s_ezlopi_device_properties_t 
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = sensor_ldr_analog_sensor_init(ezlo_device);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        get_sensor_ldr_analog_sensor_item(ezlo_device, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -149,13 +161,39 @@ static int sensor_ldr_set_detection(s_ezlopi_device_properties_t *properties)
     free(ezlopi_analog_data);
     return ret;
 }
+static int get_sensor_ldr_analog_sensor_item(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        cJSON *json_array_enum = cJSON_CreateArray();
+        if (NULL != json_array_enum)
+        {
+            for (uint8_t i = 0; i < LIGHT_ALARM_MAX; i++)
+            {
+                cJSON *json_value = cJSON_CreateString(light_alarm_states[i]);
+                if (NULL != json_value)
+                {
+                    cJSON_AddItemToArray(json_array_enum, json_value);
+                }
+            }
+            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+        }
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", present_light_status);
+        cJSON_AddStringToObject(cjson_propertise, "value", present_light_status);
+        ret = 1;
+    }
 
+    return ret;
+}
 static int get_sensor_ldr_analog_sensor_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", present_light_status);
         cJSON_AddStringToObject(cjson_propertise, "value", present_light_status);
         ret = 1;
     }

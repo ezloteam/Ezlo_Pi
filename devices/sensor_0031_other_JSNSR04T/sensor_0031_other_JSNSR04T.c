@@ -40,6 +40,7 @@ int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, s_ezlopi_device_proper
         ret = ezlopi_sensor_0031_other_JSNSR04T_init(properties);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ezlopi_sensor_0031_other_JSNSR04T_get_value_cjson(properties, arg);
@@ -197,14 +198,18 @@ static bool ezlopi_sensor_0031_other_JSNSR04T_get_from_sensor(s_ezlopi_device_pr
 static int ezlopi_sensor_0031_other_JSNSR04T_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-    bool current_val = true;
+    char valueFormatted[20];
+    // bool current_val = true;
     cJSON *cjson_propertise = (cJSON *)args;
 
     ultrasonic_JSNSR04T_sensor_t *ultrasonic_JSNSR04T_sensor = (ultrasonic_JSNSR04T_sensor_t *)properties->user_arg;
 
     if (cjson_propertise && ultrasonic_JSNSR04T_sensor)
     {
-        cJSON_AddNumberToObject(cjson_propertise, "value", (ultrasonic_JSNSR04T_sensor->distance / 100.0));
+        float distance = (ultrasonic_JSNSR04T_sensor->distance / 100.0f);
+        snprintf(valueFormatted, 20, "%.2f", distance);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        cJSON_AddNumberToObject(cjson_propertise, "value", distance);
         cJSON_AddStringToObject(cjson_propertise, "scale", "meter");
         ret = 1;
     }

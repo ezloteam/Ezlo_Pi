@@ -64,6 +64,7 @@ int sensor_0028_other_GY61(e_ezlopi_actions_t action, s_ezlopi_device_properties
         ret = sensor_0028_gy61_other_init(properties);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         get_sensor_0028_gy61_other_value(properties, arg);
@@ -192,6 +193,7 @@ static int sensor_0028_gy61_other_init(s_ezlopi_device_properties_t *properties)
 static int get_sensor_0028_gy61_other_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
     int acceleration_value;
     if (cjson_properties)
@@ -200,6 +202,8 @@ static int get_sensor_0028_gy61_other_value(s_ezlopi_device_properties_t *proper
         {
             acceleration_value = (int)(get_gy61_x_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
             TRACE_I("X-axis : %d m/s^2", acceleration_value);
+            snprintf(valueFormatted, 20, "%d", acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
@@ -207,6 +211,8 @@ static int get_sensor_0028_gy61_other_value(s_ezlopi_device_properties_t *proper
         {
             acceleration_value = (int)(get_gy61_y_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
             TRACE_I("Y-axis : %d m/s^2", acceleration_value);
+            snprintf(valueFormatted, 20, "%d", acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
@@ -214,6 +220,8 @@ static int get_sensor_0028_gy61_other_value(s_ezlopi_device_properties_t *proper
         {
             acceleration_value = (int)(get_gy61_z_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
             TRACE_I("Z-axis : %d  m/s^2", acceleration_value);
+            snprintf(valueFormatted, 20, "%d", acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }

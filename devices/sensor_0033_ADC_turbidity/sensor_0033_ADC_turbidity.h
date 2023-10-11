@@ -22,6 +22,16 @@ static s_ezlopi_device_properties_t *ezlopi_turbidity_sensor_prepare(cJSON *cjso
 static int ezlopi_turbidity_sensor_init(s_ezlopi_device_properties_t *properties);
 static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *properties, void *arg);
 static int ezlopi_turbidity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
+static int ezlopi_turbidity_sensor_get_item(s_ezlopi_device_properties_t *properties, void *arg);
+
+
+typedef enum
+{
+	TURBIDITY_WATER_FILTER_OK,
+	TURBIDITY_REPLACE_WATER_FILTER,
+	TURBIDITY__UNKNOWN,
+	TURBIDITY__MAX
+} e_water_filter_replacement_alarm_states_t;
 
 int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 

@@ -48,6 +48,7 @@ int sensor_0020_ADC_2axis_joystick(e_ezlopi_actions_t action, s_ezlopi_device_pr
         ret = joystick_2_axis_init(ezlo_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         get_joystick_2_axis_value(ezlo_device, arg);

@@ -17,7 +17,7 @@
 static int sensor_0056_force_sensitive_resistor_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_0056_prepare(cJSON *cjson_device);
 static int sensor_0056_force_sensitive_resistor_init(s_ezlopi_device_properties_t *properties);
-static void sensor_0056_get_item(s_ezlopi_device_properties_t *properties, void *arg);
+// static void sensor_0056_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_0056_get_value(s_ezlopi_device_properties_t *properties, void *args);
 static float Calculate_GramForce(float Vout);
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -37,10 +37,10 @@ int sensor_0056_force_sensitive_resistor(e_ezlopi_actions_t action, s_ezlopi_dev
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
-    {
-        sensor_0056_get_item(properties, arg);
-        break;
-    }
+    // {
+    //     sensor_0056_get_item(properties, arg);
+    //     break;
+    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0056_get_value(properties, arg);
@@ -130,7 +130,7 @@ static int sensor_0056_force_sensitive_resistor_init(s_ezlopi_device_properties_
     }
     return ret;
 }
-
+#if 0
 static void sensor_0056_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
     float Vout = 0, gramForce = 0;
@@ -160,7 +160,7 @@ static void sensor_0056_get_item(s_ezlopi_device_properties_t *properties, void 
     }
     free(ezlopi_analog_data);
 }
-
+#endif
 static int sensor_0056_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;

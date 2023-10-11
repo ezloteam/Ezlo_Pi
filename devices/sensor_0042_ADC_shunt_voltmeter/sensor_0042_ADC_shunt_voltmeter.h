@@ -34,6 +34,8 @@
  */
 #define VOLTAGE_DIVIDER_ADDED 1
 
+#define SENSOR_MODULE_COMPENSATION 5 //!< The module provides 1/5 of actual reading . So we need to multiply by 5
+
 //------------------------------------------
 
 int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlopi_device, void *arg, void *user_args);

@@ -3,33 +3,33 @@
 #include "gpio_isr_service.h"
 #include "ezlopi_cloud_value_type_str.h"
 
-
 int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args, void *user_arg)
 {
     int ret = 0;
 
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
-        {
-            ret = proximity_sensor_prepare_and_add(args);
-            break;
-        }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            ret = proximity_sensor_init(properties);
-            break;
-        }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            ret = proximity_sensor_get_value_cjson(properties, args);
-            break;
-        }
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = proximity_sensor_prepare_and_add(args);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = proximity_sensor_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = proximity_sensor_get_value_cjson(properties, args);
+        break;
+    }
 
-        default:
-        {
-            break;
-        }
+    default:
+    {
+        break;
+    }
     }
 
     return ret;
@@ -130,17 +130,21 @@ static int proximity_sensor_init(s_ezlopi_device_properties_t *properties)
 
 static void proximity_sensor_value_updated_from_device(s_ezlopi_device_properties_t *properties)
 {
+    int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+    properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
     ezlopi_device_value_updated_from_device(properties);
 }
 
 static int proximity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        properties->interface.gpio.gpio_out.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
 

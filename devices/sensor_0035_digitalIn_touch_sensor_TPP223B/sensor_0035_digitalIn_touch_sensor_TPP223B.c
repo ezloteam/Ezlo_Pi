@@ -39,6 +39,7 @@ int sensor_0035_digitalIn_touch_sensor_TPP223B(e_ezlopi_actions_t action, s_ezlo
         ret = sensor_touch_tpp_223b_init(ezlo_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_touch_tpp_223b_get_value_cjson(ezlo_device, arg);

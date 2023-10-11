@@ -35,6 +35,7 @@ int sensor_0029_I2C_GXHTC3(e_ezlopi_actions_t action, s_ezlopi_device_properties
         wgxhtc3_sensor_init(properties, NULL);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         gxhtc3_notify(properties, arg);
@@ -81,6 +82,7 @@ static void wgxhtc3_sensor_read_sensor_data(s_ezlopi_device_properties_t *proper
 
 static int gxhtc3_notify(s_ezlopi_device_properties_t *properties, void *args)
 {
+    char valueFormatted[20];
     wgxhtc3_sensor_read_sensor_data(properties);
     cJSON *cjson_properties = (cJSON *)args;
 
@@ -89,12 +91,16 @@ static int gxhtc3_notify(s_ezlopi_device_properties_t *properties, void *args)
         if (category_temperature == properties->ezlopi_cloud.category)
         {
             TRACE_D("Temperature is: %f *C", temperature_gxhtc3);
+            snprintf(valueFormatted, 20, "%.2f", temperature_gxhtc3);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", temperature_gxhtc3);
             cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
         }
         if (category_humidity == properties->ezlopi_cloud.category)
         {
             TRACE_D("Humidity is: %f %%", relative_humidity);
+            snprintf(valueFormatted, 20, "%.2f", relative_humidity);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", relative_humidity);
             cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         }

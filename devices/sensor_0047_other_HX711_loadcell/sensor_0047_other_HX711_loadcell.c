@@ -48,6 +48,7 @@ int sensor_0047_other_hx711(e_ezlopi_actions_t action, s_ezlopi_device_propertie
         ret = sensor_0047_other_HX711_init(ezlopi_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0047_other_HX711_get_value(ezlopi_device, arg);

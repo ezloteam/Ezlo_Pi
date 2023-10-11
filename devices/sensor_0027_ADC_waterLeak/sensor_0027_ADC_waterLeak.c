@@ -18,6 +18,12 @@
 #define NO_WATER_LEAK "no_water_leak"
 #define WATER_LEAK_DETECTED "water_leak_detected"
 
+const char *water_leak_alarm_states[] =
+    {
+        "no_water_leak",
+        "water_leak_detected",
+        "unknown"};
+
 static char *ezlopi_water_present_leak_state = NO_WATER_LEAK;
 
 static int water_leak_sensor_prepare_and_add(void *args);
@@ -25,6 +31,7 @@ static s_ezlopi_device_properties_t *water_leak_sensor_prepare(cJSON *cjson_devi
 static int water_leak_sensor_init(s_ezlopi_device_properties_t *properties);
 static int get_water_leak_sensor_value_to_cloud(s_ezlopi_device_properties_t *properties, void *args);
 static int water_leak_sensor_get_value(s_ezlopi_device_properties_t *properties);
+static int get_water_leak_sensor_item_to_cloud(s_ezlopi_device_properties_t *properties, void *arg);
 
 int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
 {
@@ -40,6 +47,11 @@ int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, s_ezlopi_device_propert
     case EZLOPI_ACTION_INITIALIZE:
     {
         ret = water_leak_sensor_init(ezlo_device);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        get_water_leak_sensor_item_to_cloud(ezlo_device, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
@@ -141,7 +153,32 @@ static int get_water_leak_sensor_value_to_cloud(s_ezlopi_device_properties_t *pr
     }
     return ret;
 }
+static int get_water_leak_sensor_item_to_cloud(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        cJSON *json_array_enum = cJSON_CreateArray();
+        if (NULL != json_array_enum)
+        {
+            for (uint8_t i = 0; i < WATERLEAK_MAX; i++)
+            {
+                cJSON *json_value = cJSON_CreateString(water_leak_alarm_states[i]);
+                if (NULL != json_value)
+                {
+                    cJSON_AddItemToArray(json_array_enum, json_value);
+                }
+            }
+            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+        }
 
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_water_present_leak_state);
+        cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_leak_state);
+        ret = 1;
+    }
+    return ret;
+}
 static int water_leak_sensor_get_value(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
