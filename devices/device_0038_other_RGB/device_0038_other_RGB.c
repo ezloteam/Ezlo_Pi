@@ -8,8 +8,9 @@
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_valueformatter.h"
 #include "ezlopi_pwm.h"
-#include "device_0038_digitalOut_RGB.h"
+#include "device_0038_other_RGB.h"
 
 #define ADD_PROPERTIES_DEVICE_LIST(_properties, device_id, category, sub_category, item_name, value_type, cjson_device, RGB_struct)                      \
     {                                                                                                                                                    \
@@ -37,7 +38,7 @@ static int device_0038_digitalOut_RGB_get_value(s_ezlopi_device_properties_t *pr
 
 static int device_0038_digitalOut_RGB_change_color_value(device_0038_digitalOut_RGB_struct_t *RGB_struct);
 
-int device_0038_digitalOut_RGB(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
+int device_0038_other_RGB(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -52,6 +53,7 @@ int device_0038_digitalOut_RGB(e_ezlopi_actions_t action, s_ezlopi_device_proper
         device_0038_digitalOut_RGB_initialize(properties);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         device_0038_digitalOut_RGB_get_value(properties, arg);
@@ -170,7 +172,7 @@ static s_ezlopi_device_properties_t *device_0038_digitalOut_RGB_prepare_properti
             device_0038_digitalOut_RGB_properties->interface.gpio.gpio_in.value = false;
             device_0038_digitalOut_RGB_properties->interface.gpio.gpio_out.enable = false;
         }
-        if(ezlopi_item_name_dimmer == item_name)
+        if (ezlopi_item_name_dimmer == item_name)
         {
             device_0038_digitalOut_RGB_properties->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
             device_0038_digitalOut_RGB_properties->interface.pwm.gpio_num = 0;
@@ -232,7 +234,7 @@ static int device_0038_digitalOut_RGB_initialize(s_ezlopi_device_properties_t *p
         free(RGB_LED_red_channel_speed);
         free(RGB_LED_green_channel_speed);
         free(RGB_LED_blue_channel_speed);
-        
+
         device_0038_digitalOut_RGB_change_color_value(RGB_struct);
 
         RGB_LED_initialized = true;
@@ -273,7 +275,7 @@ static int device_0038_digitalOut_RGB_set_value(s_ezlopi_device_properties_t *pr
             device_0038_digitalOut_RGB_change_color_value(RGB_struct);
             ezlopi_device_value_updated_from_device(RGB_LED_dimmer_properties);
         }
-        if(ezlopi_item_name_dimmer == properties->ezlopi_cloud.item_name)
+        if (ezlopi_item_name_dimmer == properties->ezlopi_cloud.item_name)
         {
             int dim_percent = 0;
             CJSON_GET_VALUE_INT(cjson_params, "value", dim_percent);
@@ -304,17 +306,24 @@ static int device_0038_digitalOut_RGB_get_value(s_ezlopi_device_properties_t *pr
                 cJSON_AddNumberToObject(color_values, "red", RGB_struct->red_struct.value);
                 cJSON_AddNumberToObject(color_values, "green", RGB_struct->green_struct.value);
                 cJSON_AddNumberToObject(color_values, "blue", RGB_struct->blue_struct.value);
+                char *formatted_val = ezlopi_valueformatter_rgb(RGB_struct->red_struct.value, RGB_struct->green_struct.value, RGB_struct->blue_struct.value);
+                cJSON_AddStringToObject(cjson_params, "valueFormatted", formatted_val);
+                free(formatted_val);
             }
         }
         if (ezlopi_item_name_switch == properties->ezlopi_cloud.item_name)
         {
             int state = ((0 == RGB_struct->brightness) ? 0 : 1);
             cJSON_AddBoolToObject(cjson_params, "value", state);
+            cJSON_AddStringToObject(cjson_params, "valueFormatted", ezlopi_valueformatter_bool(state ? true : false));
         }
-        if(ezlopi_item_name_dimmer == properties->ezlopi_cloud.item_name)
+        if (ezlopi_item_name_dimmer == properties->ezlopi_cloud.item_name)
         {
             int dim_percentage = (int)(RGB_struct->brightness * 100);
             cJSON_AddNumberToObject(cjson_params, "value", dim_percentage);
+            char *formatted_val = ezlopi_valueformatter_int(dim_percentage);
+            cJSON_AddStringToObject(cjson_params, "valueFormatted", formatted_val);
+            free(formatted_val);
         }
     }
     return ret;
@@ -325,7 +334,7 @@ static int device_0038_digitalOut_RGB_change_color_value(device_0038_digitalOut_
     int ret = 0;
 
     TRACE_B("Brightness value is %d, %d, %d", (uint8_t)(RGB_struct->red_struct.value * RGB_struct->brightness), (uint8_t)(RGB_struct->green_struct.value * RGB_struct->brightness),
-                (uint8_t)(RGB_struct->blue_struct.value * RGB_struct->brightness));
+            (uint8_t)(RGB_struct->blue_struct.value * RGB_struct->brightness));
 
     ezlopi_pwm_change_duty(RGB_struct->red_struct.channel, RGB_struct->red_struct.speed_mode, (uint8_t)(RGB_struct->red_struct.value * RGB_struct->brightness));
     ezlopi_pwm_change_duty(RGB_struct->green_struct.channel, RGB_struct->green_struct.speed_mode, (uint8_t)(RGB_struct->green_struct.value * RGB_struct->brightness));

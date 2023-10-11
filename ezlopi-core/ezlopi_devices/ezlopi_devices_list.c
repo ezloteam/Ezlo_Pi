@@ -45,7 +45,7 @@
 #include "sensor_0034_digitalIn_proximity.h"
 #include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
 #include "device_0036_PWM_servo_MG996R.h"
-#include "device_0038_digitalOut_RGB.h"
+#include "device_0038_other_RGB.h"
 #include "sensor_0040_other_TCS230.h"
 #include "sensor_0041_ADC_FC28_soilMoisture.h"
 #include "sensor_0042_ADC_shunt_voltmeter.h"
@@ -333,7 +333,7 @@ static s_ezlopi_device_t device_array[] = {
 #ifdef EZLOPI_DEVICE_0038_DIGITAL_OUTPUT_RGB_LED
     {
         .id = EZLOPI_DEVICE_0038_DIGITAL_OUTPUT_RGB_LED,
-        .func = device_0038_digitalOut_RGB,
+        .func = device_0038_other_RGB,
     },
 #endif
 

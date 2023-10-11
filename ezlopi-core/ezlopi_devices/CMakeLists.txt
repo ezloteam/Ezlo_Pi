@@ -52,7 +52,7 @@ idf_component_register(
         sensor_0034_digitalIn_proximity
         sensor_0035_digitalIn_touch_sensor_TPP223B
         device_0036_PWM_servo_MG996R
-        device_0038_digitalOut_RGB
+        device_0038_other_RGB
         sensor_0040_other_TCS230
         sensor_0041_ADC_FC28_soilMoisture
         sensor_0042_ADC_shunt_voltmeter
