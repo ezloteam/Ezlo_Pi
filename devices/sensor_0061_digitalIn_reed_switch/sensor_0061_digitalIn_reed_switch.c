@@ -78,7 +78,7 @@ static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson
 
         sensor_0061_device_properties->interface.gpio.gpio_in.enable = true;
         sensor_0061_device_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
-        sensor_0061_device_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
+        sensor_0061_device_properties->interface.gpio.gpio_in.pull = GPIO_PULLUP_PULLDOWN;
     }
     return sensor_0061_device_properties;
 }
@@ -115,8 +115,8 @@ static int sensor_0061_init(s_ezlopi_device_properties_t *properties)
         gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
             .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+            .pull_up_en = ((properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN) || (properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY)) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE,
+            .pull_down_en = ((properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN) || (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY)) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
             .intr_type = properties->interface.gpio.gpio_in.pull,
         };
         ret = gpio_config(&io_conf);

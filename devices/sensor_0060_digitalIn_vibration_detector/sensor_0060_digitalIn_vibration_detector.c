@@ -107,6 +107,7 @@ static s_ezlopi_device_properties_t *sensor_0060_prepare(cJSON *cjson_device)
 
         sensor_0060_properties->interface.gpio.gpio_in.enable = true;
         sensor_0060_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
+        sensor_0060_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     }
     return sensor_0060_properties;
 }
@@ -119,7 +120,7 @@ static int sensor_0060_digitalIn_init(s_ezlopi_device_properties_t *properties)
             .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
             .mode = GPIO_MODE_INPUT,
             .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = GPIO_PULLDOWN_ENABLE,
+            .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
             .intr_type = properties->interface.gpio.gpio_in.interrupt,
         };
 
