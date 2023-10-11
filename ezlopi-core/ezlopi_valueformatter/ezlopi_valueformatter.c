@@ -15,6 +15,13 @@ char *ezlopi_valueformatter_float(float val)
     return formatted_val_str;
 }
 
+char *ezlopi_valueformatter_double(double val)
+{
+    char *formatted_val_str = (char *)malloc(15);
+    snprintf(formatted_val_str, 15, "%.2lf", val);
+    return formatted_val_str;
+}
+
 char *ezlopi_valueformatter_int(int val)
 {
     char *formatted_val_str = (char *)malloc(15);

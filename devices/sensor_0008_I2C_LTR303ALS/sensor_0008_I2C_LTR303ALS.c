@@ -14,62 +14,61 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0008_I2C_LTR303ALS.h"
 #include "ALS_LTR303.h"
 
 static int count = 5;
 
-static int ltr303_prepare_sensor(void* arg);
-static s_ezlopi_device_properties_t* ltr303_ambient_sensor_prepare_properties(cJSON* cjson_device);
-static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t* properties);
-static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t* properties);
+static int ltr303_prepare_sensor(void *arg);
+static s_ezlopi_device_properties_t *ltr303_ambient_sensor_prepare_properties(cJSON *cjson_device);
+static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t *properties);
+static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t *properties);
 static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
-
 
 int sensor_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
     int ret = 0;
-    switch(action)
+    switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ltr303_prepare_sensor(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ltr303_ambient_sensor_init(properties);
+        break;
+    }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ltr303_ambient_sensor_get_value_cjson(properties, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        if (5 == count)
         {
-            ltr303_prepare_sensor(arg);
-            break;
+            ltr303_ambient_sensor_update_values(properties);
+            ezlopi_device_value_updated_from_device(properties);
+            count = 0;
         }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            ltr303_ambient_sensor_init(properties);
-            break;
-        }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            ltr303_ambient_sensor_get_value_cjson(properties, arg);
-            break;
-        }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
-        {
-            if(5 == count)
-            {
-                ltr303_ambient_sensor_update_values(properties);
-                ezlopi_device_value_updated_from_device(properties);
-                count = 0;
-            }
-            count++;
-            break;
-        }
-        default:
-        {
-            break;
-        }
+        count++;
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
 
     return ret;
 }
 
-
-
-static int ltr303_prepare_sensor(void* arg)
+static int ltr303_prepare_sensor(void *arg)
 {
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
@@ -93,12 +92,11 @@ static int ltr303_prepare_sensor(void* arg)
     return ret;
 }
 
-
-static s_ezlopi_device_properties_t* ltr303_ambient_sensor_prepare_properties(cJSON* cjson_device)
+static s_ezlopi_device_properties_t *ltr303_ambient_sensor_prepare_properties(cJSON *cjson_device)
 {
     s_ezlopi_device_properties_t *ltr303_ambient_sensor_properties = malloc(sizeof(s_ezlopi_device_properties_t));
 
-    ltr303_data_t* ltr303_lux_val = (ltr303_data_t*)malloc(sizeof(ltr303_data_t));
+    ltr303_data_t *ltr303_lux_val = (ltr303_data_t *)malloc(sizeof(ltr303_data_t));
 
     if (ltr303_ambient_sensor_properties && ltr303_lux_val)
     {
@@ -137,8 +135,7 @@ static s_ezlopi_device_properties_t* ltr303_ambient_sensor_prepare_properties(cJ
     return ltr303_ambient_sensor_properties;
 }
 
-
-static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t* properties)
+static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
 
@@ -147,41 +144,36 @@ static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t* properties)
     return ret;
 }
 
-
-static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t* properties)
+static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    ltr303_data_t* ltr303_lux_val = (ltr303_data_t*)properties->user_arg;
+    ltr303_data_t *ltr303_lux_val = (ltr303_data_t *)properties->user_arg;
 
-    if(ltr303_lux_val)
+    if (ltr303_lux_val)
     {
-        if(ltr303_get_val(ltr303_lux_val) == ESP_OK)
-        { 
-            TRACE_D(" lux: %f\n",ltr303_lux_val->lux);
+        if (ltr303_get_val(ltr303_lux_val) == ESP_OK)
+        {
+            TRACE_D(" lux: %f\n", ltr303_lux_val->lux);
         }
     }
     return ret;
 }
-
-
 
 static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
 
     cJSON *cjson_properties = (cJSON *)arg;
-    ltr303_data_t* ltr303_lux_val = (ltr303_data_t*)properties->user_arg;
+    ltr303_data_t *ltr303_lux_val = (ltr303_data_t *)properties->user_arg;
 
-    if(cjson_properties && ltr303_lux_val)
+    if (cjson_properties && ltr303_lux_val)
     {
-        char formatted_value[10];
-        snprintf(formatted_value, 10, "%.2f", ltr303_lux_val->lux);
-        cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
         cJSON_AddNumberToObject(cjson_properties, "value", ltr303_lux_val->lux);
+        char *valueFormatted = ezlopi_valueformatter_double(ltr303_lux_val->lux);
+        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+        free(valueFormatted);
         cJSON_AddStringToObject(cjson_properties, "scale", "lux");
     }
 
     return ret;
 }
-
-

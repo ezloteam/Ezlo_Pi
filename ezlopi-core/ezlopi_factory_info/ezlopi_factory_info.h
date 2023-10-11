@@ -550,7 +550,7 @@ static const char *test_device_constant_config =
         }\
     ],\
     \"dev_total\": 1}";
-#endif
+
 // GY271
 static const char *test_device_constant_config =
     "{\
@@ -562,6 +562,26 @@ static const char *test_device_constant_config =
             \"dev_name\": \"GY271\",\
             \"id_room\": \"\",\
             \"id_item\": 7,\
+            \"gpio_sda\": 22,\
+            \"gpio_scl\": 23,\
+            \"pullup_scl\": true,\
+            \"pullup_sda\": true,\
+            \"slave_addr\": 105\
+        }\
+    ],\
+    \"dev_total\": 1}";
+#endif
+// LTR 303ALS
+static const char *test_device_constant_config =
+    "{\
+    \"cmd\": 3,\
+    \"dev_detail\":\
+    [\
+        {\
+            \"dev_type\": 8,\
+            \"dev_name\": \"LTR303 ALS\",\
+            \"id_room\": \"\",\
+            \"id_item\": 8,\
             \"gpio_sda\": 22,\
             \"gpio_scl\": 23,\
             \"pullup_scl\": true,\
