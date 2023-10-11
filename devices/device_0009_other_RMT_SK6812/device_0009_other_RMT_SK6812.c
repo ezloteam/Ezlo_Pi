@@ -98,9 +98,9 @@ static int ezlopi_sk6812_prepare(void *arg)
 
             ADD_PROPERTIES_DEVICE_LIST(rgb_color_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_rgbcolor, value_type_rgb, prep_arg->cjson_device, sk6812_strip);
             ADD_PROPERTIES_DEVICE_LIST(dimmer_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_dimmer, value_type_int, prep_arg->cjson_device, sk6812_strip);
-            // ADD_PROPERTIES_DEVICE_LIST(dimmer_up_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_dimmer_up, value_type_int, prep_arg->cjson_device, sk6812_strip);
-            // ADD_PROPERTIES_DEVICE_LIST(dimmer_down_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_dimmer_down, value_type_int, prep_arg->cjson_device, sk6812_strip);
-            // ADD_PROPERTIES_DEVICE_LIST(dimmer_stop_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_dimmer_stop, value_type_int, prep_arg->cjson_device, sk6812_strip);
+            ADD_PROPERTIES_DEVICE_LIST(dimmer_up_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_dimmer_up, value_type_int, prep_arg->cjson_device, sk6812_strip);
+            ADD_PROPERTIES_DEVICE_LIST(dimmer_down_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_dimmer_down, value_type_int, prep_arg->cjson_device, sk6812_strip);
+            ADD_PROPERTIES_DEVICE_LIST(dimmer_stop_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_dimmer_stop, value_type_int, prep_arg->cjson_device, sk6812_strip);
             ADD_PROPERTIES_DEVICE_LIST(switch_properties, device_id, category_dimmable_light, subcategory_dimmable_colored, ezlopi_item_name_switch, value_type_bool, prep_arg->cjson_device, sk6812_strip);
         }
     }

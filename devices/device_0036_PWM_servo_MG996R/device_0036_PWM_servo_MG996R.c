@@ -12,7 +12,7 @@
 #include "math.h"
 #include "driver/mcpwm.h"
 #include "soc/mcpwm_periph.h"
-
+#include "ezlopi_valueformatter.h"
 #include "device_0036_PWM_servo_MG996R.h"
 
 static int ezlopi_servo_motor_MG_996R_prepare_and_add(void *args);
@@ -41,6 +41,7 @@ int device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, s_ezlopi_device_prop
         ret = ezlopi_servo_motor_MG_996R_set_value(ezlo_device, arg);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = ezlopi_servo_motor_MG_996R_get_value_cjson(ezlo_device, arg);
@@ -110,21 +111,20 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         CJSON_GET_VALUE_INT(cjson_device, "duty_cycle", ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle);
         CJSON_GET_VALUE_INT(cjson_device, "freq_hz", ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz);
         CJSON_GET_VALUE_INT(cjson_device, "pwm_resln", ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln);
-        
-        TRACE_B("HERE!!");
-        TRACE_B("gpio = %d, duty_cycle = %d, freq_hz = %d, pwm_resln = %d", ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num, 
-                                                                            ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle,
-                                                                            ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz,
-                                                                            ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln);
 
+        TRACE_B("HERE!!");
+        TRACE_B("gpio = %d, duty_cycle = %d, freq_hz = %d, pwm_resln = %d", ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num,
+                ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle,
+                ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz,
+                ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln);
 
         // ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle = 13;
         // ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz = 50;
-// #if CONFIG_IDF_TARGET_ESP32C3
-//         ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln = 9;
-// #else
-//         ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln = 8;
-// #endif
+        // #if CONFIG_IDF_TARGET_ESP32C3
+        //         ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln = 9;
+        // #else
+        //         ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln = 8;
+        // #endif
     }
     return ezlopi_servo_motor_MG_996R_properties;
 }
@@ -141,7 +141,7 @@ static int ezlopi_servo_motor_MG_996R_init(s_ezlopi_device_properties_t *propert
     //     properties->interface.pwm.speed_mode = ezlopi_servo_motor_MG_996R_speed->speed_mode;
     //     ret = 0;
     // }
-    
+
     // Configure MCPWM
     ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, properties->interface.pwm.gpio_num));
     mcpwm_config_t pwm_config = {
@@ -149,10 +149,9 @@ static int ezlopi_servo_motor_MG_996R_init(s_ezlopi_device_properties_t *propert
         .cmpr_a = 0,
         .cmpr_b = 0,
         .counter_mode = MCPWM_UP_COUNTER,
-        .duty_mode = MCPWM_DUTY_MODE_0
-    };
+        .duty_mode = MCPWM_DUTY_MODE_0};
     ESP_ERROR_CHECK(mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config));
-    
+
     ESP_ERROR_CHECK(mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0));
 
     return ret;
@@ -167,7 +166,7 @@ static int ezlopi_servo_motor_MG_996R_set_value(s_ezlopi_device_properties_t *pr
     {
         int value = 0;
         CJSON_GET_VALUE_INT(cjson_params, "value", properties->interface.pwm.duty_cycle);
-    
+
         TRACE_I("cur value: %d", properties->interface.pwm.duty_cycle);
 
         if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.pwm.gpio_num))
@@ -192,6 +191,9 @@ static int ezlopi_servo_motor_MG_996R_get_value_cjson(s_ezlopi_device_properties
         // int target_duty = (int)(((duty - 13) * 100) / 17);
         TRACE_B("targer duty is %d", properties->interface.pwm.duty_cycle);
         cJSON_AddNumberToObject(cjson_propertise, "value", properties->interface.pwm.duty_cycle);
+        char *formatted_val = ezlopi_valueformatter_int(properties->interface.pwm.duty_cycle);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", formatted_val);
+        free(formatted_val);
         ret = 1;
     }
     return ret;

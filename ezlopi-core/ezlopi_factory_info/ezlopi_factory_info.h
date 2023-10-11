@@ -498,10 +498,13 @@ static const char *test_device_constant_config =
         ],\
     \"dev_total\": 1}";
 
+// SK6812
 static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
-#endif
-
+// PWM Dimmable Lamp
 static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":5,\"dev_name\":\"Dimmer\",\"id_room\":\"\",\"id_item\":22,\"gpio\":3,\"pwm_resln\":8,\"freq_hz\":50,\"duty_cycle\":0}],\"dev_total\":1}";
+
+#endif
+static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":5,\"dev_name\":\"Servo\",\"id_room\":\"\",\"id_item\":36,\"gpio\":3,\"pwm_resln\":8,\"freq_hz\":50,\"duty_cycle\":0}],\"dev_total\":1}";
 #endif
 
 #ifdef __cplusplus
