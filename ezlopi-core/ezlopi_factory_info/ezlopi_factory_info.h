@@ -507,9 +507,7 @@ static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"
 // Other RGB
 
 static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
-#endif
 
-#if 1
 // I2C MPU6050
 // static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":8,\"dev_name\":\"MPU 6050\",\"id_room\":\"\",\"id_item\":5,\"gpio_sda\":21,\"gpio_scl\":22,\"pullup_scl\":true,\"pullup_sda\":true,\"slave_addr\":105}],\"dev_total\":1}";
 
@@ -531,7 +529,28 @@ static const char *test_device_constant_config =
         }\
     ],\
     \"dev_total\": 1}";
+
 #endif
+// ADXL345
+static const char *test_device_constant_config =
+    "{\
+    \"cmd\": 3,\
+    \"dev_detail\":\
+    [\
+        {\
+            \"dev_type\": 8,\
+            \"dev_name\": \"ADXL 345\",\
+            \"id_room\": \"\",\
+            \"id_item\": 6,\
+            \"gpio_sda\": 22,\
+            \"gpio_scl\": 23,\
+            \"pullup_scl\": true,\
+            \"pullup_sda\": true,\
+            \"slave_addr\": 105\
+        }\
+    ],\
+    \"dev_total\": 1}";
+
 #endif
 
 #ifdef __cplusplus
