@@ -12,6 +12,7 @@
 #include "ezlopi_adc.h"
 #include "dht22.h"
 #include "sensor_0016_oneWire_DHT22.h"
+#include "ezlopi_valueformatter.h"
 
 static bool dht22_initialized = false;
 static int counter = 5;
@@ -47,6 +48,7 @@ int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, s_ezlopi_device_propert
         dht22_sensor_init(ezlo_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         dht22_sensor_get_sensor_value(ezlo_device, arg);
@@ -80,6 +82,7 @@ static int dht22_sensor_prepare(void *arg)
         uint32_t device_id = ezlopi_cloud_generate_device_id();
         // temperature
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
+        device_id = ezlopi_cloud_generate_device_id();
         // humidity
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, prep_arg->cjson_device);
     }
@@ -99,9 +102,24 @@ static s_ezlopi_device_properties_t *dht22_sensor_prepare_properties(uint32_t de
             dht22_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
             char *device_name = NULL;
+            char *device_name_full = malloc(50);
 
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-            ASSIGN_DEVICE_NAME(dht22_sensor_properties, device_name);
+            strcpy(device_name_full, device_name);
+
+            if (0 == strcmp(ezlopi_item_name_temp, item_name))
+            {
+                strcat(device_name_full, " Temperature");
+            }
+            else if (0 == strcmp(ezlopi_item_name_humidity, item_name))
+            {
+                strcat(device_name_full, " Humidity");
+            }
+            else
+            {
+            }
+
+            ASSIGN_DEVICE_NAME(dht22_sensor_properties, device_name_full);
             dht22_sensor_properties->ezlopi_cloud.category = category;
             dht22_sensor_properties->ezlopi_cloud.subcategory = sub_category;
             dht22_sensor_properties->ezlopi_cloud.item_name = item_name;
@@ -116,6 +134,7 @@ static s_ezlopi_device_properties_t *dht22_sensor_prepare_properties(uint32_t de
             dht22_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
             CJSON_GET_VALUE_INT(cjson_device, "gpio", dht22_sensor_properties->interface.onewire_master.onewire_pin);
             dht22_sensor_properties->interface.onewire_master.enable = true;
+            free(device_name_full);
         }
     }
     return dht22_sensor_properties;
@@ -155,9 +174,8 @@ static int dht22_sensor_init(s_ezlopi_device_properties_t *properties)
 static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-
+    static float temperature, humidity;
     cJSON *cjson_properties = (cJSON *)args;
-    char formatted_value[20];
     if (cjson_properties)
     {
         if (ezlopi_item_name_temp == properties->ezlopi_cloud.item_name)
@@ -165,9 +183,10 @@ static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t *propertie
             readDHT();
             float temperature = getTemperature();
             TRACE_I("temp : %.2f *C", temperature);
-            snprintf(formatted_value, 20, "%0.2f", temperature);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
             cJSON_AddNumberToObject(cjson_properties, "value", temperature);
+            char *valueFormatted = ezlopi_valueformatter_float(temperature);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
         }
         if (ezlopi_item_name_humidity == properties->ezlopi_cloud.item_name)
@@ -175,9 +194,10 @@ static int dht22_sensor_get_sensor_value(s_ezlopi_device_properties_t *propertie
             readDHT();
             float humidity = getHumidity();
             TRACE_I("humidity: %.2f %%", humidity);
-            snprintf(formatted_value, 20, "%0.2f", humidity);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
             cJSON_AddNumberToObject(cjson_properties, "value", humidity);
+            char *valueFormatted = ezlopi_valueformatter_float(humidity);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         }
     }

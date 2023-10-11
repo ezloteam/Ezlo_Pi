@@ -610,7 +610,7 @@ static const char *test_device_constant_config =
         }\
     ],\
     \"dev_total\": 1}";
-#endif
+
 // DHT 11
 static const char *test_device_constant_config =
     "{\
@@ -622,6 +622,23 @@ static const char *test_device_constant_config =
       \"dev_name\": \"DHT 11\",\
       \"id_room\": \"\",\
       \"id_item\": 15,\
+      \"gpio\": 17\
+    }\
+  ],\
+  \"dev_total\": 1}";
+
+#endif
+// DHT 22
+static const char *test_device_constant_config =
+    "{\
+  \"cmd\": 3,\
+  \"dev_detail\":\
+  [\
+    {\
+      \"dev_type\": 7,\
+      \"dev_name\": \"DHT 22\",\
+      \"id_room\": \"\",\
+      \"id_item\": 16,\
       \"gpio\": 17\
     }\
   ],\
