@@ -9,4 +9,5 @@ idf_component_register(SRCS "sensor_0012_I2C_BME280.c" "${config_src}"
              bme280 
              items  
              ezlopi_actions 
-             ezlopi_timer )
+             ezlopi_timer
+             ezlopi_valueformatter)

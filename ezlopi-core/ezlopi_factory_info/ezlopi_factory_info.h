@@ -570,7 +570,7 @@ static const char *test_device_constant_config =
         }\
     ],\
     \"dev_total\": 1}";
-#endif
+
 // LTR 303ALS
 static const char *test_device_constant_config =
     "{\
@@ -591,6 +591,26 @@ static const char *test_device_constant_config =
     ],\
     \"dev_total\": 1}";
 
+#endif
+// LTR BME280
+static const char *test_device_constant_config =
+    "{\
+    \"cmd\": 3,\
+    \"dev_detail\":\
+    [\
+        {\
+            \"dev_type\": 8,\
+            \"dev_name\": \"BME 280\",\
+            \"id_room\": \"\",\
+            \"id_item\": 12,\
+            \"gpio_sda\": 21,\
+            \"gpio_scl\": 22,\
+            \"pullup_scl\": true,\
+            \"pullup_sda\": true,\
+            \"slave_addr\": 105\
+        }\
+    ],\
+    \"dev_total\": 1}";
 #endif
 
 #ifdef __cplusplus

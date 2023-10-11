@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
+#include "ezlopi_valueformatter.h"
 
 static void user_delay_us(uint32_t period, void *intf_ptr);
 static int8_t user_i2c_read(uint8_t reg_addr, uint8_t *sensor_data, uint32_t len, void *intf_ptr);
@@ -69,6 +70,7 @@ int sensor_0012_I2C_BME280(e_ezlopi_actions_t action, s_ezlopi_device_properties
         sensor_bme280_init(properties, user_arg);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         sensor_bme280_get_value_cjson(properties, arg);
@@ -256,7 +258,7 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *propertie
     char valueFormatted[20];
     sensor_bme280_data_t sensor_data;
     memset(&sensor_data, 0, sizeof(sensor_bme280_data_t));
-    sensor_bme280_read_value_from_sensor(properties, &sensor_data);
+    // sensor_bme280_read_value_from_sensor(properties, &sensor_data);
     cJSON *cjson_properties = (cJSON *)args;
 
     if (cjson_properties)
@@ -265,12 +267,18 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *propertie
         {
             TRACE_E("Temperature is: %f", sensor_data.temperature);
             cJSON_AddNumberToObject(cjson_properties, "value", sensor_data.temperature);
+            char *valueFormatted = ezlopi_valueformatter_double(sensor_data.temperature);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
         }
         if (category_humidity == properties->ezlopi_cloud.category)
         {
             TRACE_E("Humidity is: %f", sensor_data.humidity);
             cJSON_AddNumberToObject(cjson_properties, "value", sensor_data.humidity);
+            char *valueFormatted = ezlopi_valueformatter_double(sensor_data.humidity);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         }
         if (category_level_sensor == properties->ezlopi_cloud.category)
@@ -280,6 +288,9 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *propertie
             // snprintf(valueFormatted, 20, "%.2f", pressure);
             // cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", pressure);
+            char *valueFormatted = ezlopi_valueformatter_double(pressure);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "kilo_pascal");
         }
 

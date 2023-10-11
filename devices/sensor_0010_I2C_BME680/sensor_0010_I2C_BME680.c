@@ -17,14 +17,14 @@
 #include "sensor_0010_I2C_BME680.h"
 #include "bme680_bsec.h"
 
-#define ADD_PROPERTIES_DEVICE_LIST(_properties, device_id, category, sub_category, item_name, value_type, cjson_device, sensor_0010_I2C_BME680_data)                 \
-    {                                                                                                                                          \
-        _properties = sensor_0010_I2C_BME680_sensor_prepare_properties(device_id, category, sub_category,                        \
-                                                                                     item_name, value_type, cjson_device, sensor_0010_I2C_BME680_data); \
-        if (NULL != _properties)                                                                                                               \
-        {                                                                                                                                      \
-            add_device_to_list(prep_arg, _properties, NULL);                                                                                   \
-        }                                                                                                                                      \
+#define ADD_PROPERTIES_DEVICE_LIST(_properties, device_id, category, sub_category, item_name, value_type, cjson_device, sensor_0010_I2C_BME680_data) \
+    {                                                                                                                                                \
+        _properties = sensor_0010_I2C_BME680_sensor_prepare_properties(device_id, category, sub_category,                                            \
+                                                                       item_name, value_type, cjson_device, sensor_0010_I2C_BME680_data);            \
+        if (NULL != _properties)                                                                                                                     \
+        {                                                                                                                                            \
+            add_device_to_list(prep_arg, _properties, NULL);                                                                                         \
+        }                                                                                                                                            \
     }
 
 static s_ezlopi_device_properties_t *AQI_properties = NULL;
@@ -39,8 +39,8 @@ static int count = 5;
 
 static int sensor_0010_I2C_BME680_sensor_prepare(void *arg);
 static s_ezlopi_device_properties_t *sensor_0010_I2C_BME680_sensor_prepare_properties(uint32_t device_id, const char *category,
-                                                                      const char *sub_category, const char *item_name,
-                                                                      const char *value_type, cJSON *cjson_device, bme680_data_t *sensor_0010_I2C_BME680_data);
+                                                                                      const char *sub_category, const char *item_name,
+                                                                                      const char *value_type, cJSON *cjson_device, bme680_data_t *sensor_0010_I2C_BME680_data);
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *properties, void *user_args);
 static int sensor_0010_I2C_BME680_init(s_ezlopi_device_properties_t *properties);
 static int sensor_0010_I2C_BME680_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
@@ -62,6 +62,7 @@ int sensor_0010_I2C_BME680(e_ezlopi_actions_t action, s_ezlopi_device_properties
         sensor_0010_I2C_BME680_init(properties);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         sensor_0010_I2C_BME680_get_value_cjson(properties, arg);
@@ -101,14 +102,14 @@ static int sensor_0010_I2C_BME680_sensor_prepare(void *arg)
         device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(altitude_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_distance, value_type_length, prep_arg->cjson_device, sensor_0010_I2C_BME680_data);
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(CO2_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_co2_level, value_type_substance_amount, prep_arg->cjson_device, sensor_0010_I2C_BME680_data);        
+        ADD_PROPERTIES_DEVICE_LIST(CO2_properties, device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_co2_level, value_type_substance_amount, prep_arg->cjson_device, sensor_0010_I2C_BME680_data);
     }
     return ret;
 }
 
 static s_ezlopi_device_properties_t *sensor_0010_I2C_BME680_sensor_prepare_properties(uint32_t device_id, const char *category,
-                                                                      const char *sub_category, const char *item_name,
-                                                                      const char *value_type, cJSON *cjson_device, bme680_data_t *sensor_0010_I2C_BME680_data)
+                                                                                      const char *sub_category, const char *item_name,
+                                                                                      const char *value_type, cJSON *cjson_device, bme680_data_t *sensor_0010_I2C_BME680_data)
 {
     s_ezlopi_device_properties_t *bme680_properties = NULL;
 
@@ -147,7 +148,7 @@ static s_ezlopi_device_properties_t *sensor_0010_I2C_BME680_sensor_prepare_prope
             if (ezlopi_item_name_co2_level == item_name)
             {
                 device_name = "Equivalent CO2";
-            }            
+            }
             ASSIGN_DEVICE_NAME(bme680_properties, device_name);
             bme680_properties->ezlopi_cloud.category = category;
             bme680_properties->ezlopi_cloud.subcategory = sub_category;
@@ -166,7 +167,7 @@ static s_ezlopi_device_properties_t *sensor_0010_I2C_BME680_sensor_prepare_prope
 
             CJSON_GET_VALUE_INT(cjson_device, "gpio_scl", bme680_properties->interface.i2c_master.scl);
             CJSON_GET_VALUE_INT(cjson_device, "gpio_sda", bme680_properties->interface.i2c_master.sda);
-            
+
             bme680_properties->interface.i2c_master.clock_speed = 100000;
             bme680_properties->interface.i2c_master.address = 0x77;
             bme680_properties->interface.i2c_master.enable = true;
@@ -214,7 +215,7 @@ static int sensor_0010_I2C_BME680_update_values(s_ezlopi_device_properties_t *pr
     if (NULL != sensor_0010_I2C_BME680_data)
     {
         bool val = bme680_get_data(sensor_0010_I2C_BME680_data);
-        if(val)
+        if (val)
         {
             // TRACE_B("Value is %d", val);
             TRACE_B("---------------------------------------");
@@ -231,7 +232,6 @@ static int sensor_0010_I2C_BME680_update_values(s_ezlopi_device_properties_t *pr
             TRACE_B("run in status : %s", sensor_0010_I2C_BME680_data->run_in_status ? "TRUE" : "FALSE");
             TRACE_B("---------------------------------------");
 
-
             ezlopi_device_value_updated_from_device(temperature_properties);
             ezlopi_device_value_updated_from_device(humidity_properties);
             ezlopi_device_value_updated_from_device(pressure_properties);
@@ -239,7 +239,6 @@ static int sensor_0010_I2C_BME680_update_values(s_ezlopi_device_properties_t *pr
             ezlopi_device_value_updated_from_device(CO2_properties);
             ezlopi_device_value_updated_from_device(altitude_properties);
         }
-        
     }
     return ret;
 }
@@ -247,7 +246,7 @@ static int sensor_0010_I2C_BME680_update_values(s_ezlopi_device_properties_t *pr
 static int sensor_0010_I2C_BME680_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
- 
+
     cJSON *cjson_properties = (cJSON *)args;
     char formatted_value[20];
     bme680_data_t *sensor_0010_I2C_BME680_data = (bme680_data_t *)properties->user_arg;
@@ -281,24 +280,24 @@ static int sensor_0010_I2C_BME680_get_value_cjson(s_ezlopi_device_properties_t *
             snprintf(formatted_value, 20, "%.2f", sensor_0010_I2C_BME680_data->iaq);
             TRACE_I("ezlopi_item_name_volatile_organic_compound_level: %s", formatted_value);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
-            // cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");        
-            cJSON_AddNumberToObject(cjson_properties, "value", (uint16_t)sensor_0010_I2C_BME680_data->iaq); 
-        }     
-         if (ezlopi_item_name_distance == properties->ezlopi_cloud.item_name)
+            // cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");
+            cJSON_AddNumberToObject(cjson_properties, "value", (uint16_t)sensor_0010_I2C_BME680_data->iaq);
+        }
+        if (ezlopi_item_name_distance == properties->ezlopi_cloud.item_name)
         {
             snprintf(formatted_value, 20, "%.2f", sensor_0010_I2C_BME680_data->altitude);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
             cJSON_AddNumberToObject(cjson_properties, "value", (int)sensor_0010_I2C_BME680_data->altitude);
-            cJSON_AddStringToObject(cjson_properties, "scale", "meter");     
-        } 
+            cJSON_AddStringToObject(cjson_properties, "scale", "meter");
+        }
 
         if (ezlopi_item_name_co2_level == properties->ezlopi_cloud.item_name)
         {
             snprintf(formatted_value, 20, "%.2f", sensor_0010_I2C_BME680_data->co2_equivalent);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
             cJSON_AddNumberToObject(cjson_properties, "value", (uint16_t)sensor_0010_I2C_BME680_data->co2_equivalent);
-            // cJSON_AddStringToObject(cjson_properties, "scale", "");    
-        }             
+            // cJSON_AddStringToObject(cjson_properties, "scale", "");
+        }
     }
     return ret;
 }
