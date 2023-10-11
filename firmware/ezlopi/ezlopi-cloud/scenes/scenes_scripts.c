@@ -1,9 +1,9 @@
 #include "cJSON.h"
 #include <stdlib.h>
 
-#include "ezlopi_cloud_constants.h"
 #include "scenes_scripts.h"
 #include "ezlopi_scenes_scripts.h"
+#include "ezlopi_cloud_constants.h"
 
 void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
 {
@@ -12,7 +12,7 @@ void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-        cJSON *cj_result = cJSON_AddArrayToObject(cj_response, "result");
+        cJSON *cj_result = cJSON_AddArrayToObject(cj_response, ezlopi_result_str);
         if (cj_result)
         {
             l_ezlopi_scenes_script_t *script_nodes = ezlopi_scenes_scripts_get_head();
@@ -45,12 +45,12 @@ void scenes_scripts_get(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
         if (cj_result)
         {
             uint32_t script_id_num = 0;
             cJSON *cj_script_id = NULL;
-            cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params);
+            cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
             if (cj_params)
             {
                 cj_script_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
@@ -86,12 +86,12 @@ void scenes_scripts_add(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params);
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         uint32_t script_id = ezlopi_scenes_scripts_add_to_head(0, cj_params);
 
-        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
         if (cj_result)
         {
             if (script_id)
@@ -110,12 +110,12 @@ void scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response)
     {
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-        cJSON_AddObjectToObject(cj_response, "result");
+        cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
         uint32_t script_id_num = 0;
         cJSON *cj_script_id = NULL;
 
-        cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params);
+        cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
         {
             cj_script_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
@@ -131,5 +131,34 @@ void scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response)
 
 void scenes_scripts_set(cJSON *cj_request, cJSON *cj_response)
 {
-    
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        ezlopi_scenes_scripts_update(cj_params);
+    }
+}
+
+void scenes_scripts_run(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_script_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
+        if (cj_script_id && cj_script_id->valuestring)
+        {
+            uint32_t script_id = strtoul(cj_script_id->valuestring, NULL, 16);
+            if (script_id)
+            {
+                ezlopi_scenes_scripts_run_by_id(script_id);
+            }
+        }
+    }
 }

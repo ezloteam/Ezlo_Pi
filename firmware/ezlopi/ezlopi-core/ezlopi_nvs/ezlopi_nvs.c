@@ -84,7 +84,7 @@ int ezlopi_nvs_write_scenes_scripts(char *data)
 {
     int ret = 0;
 
-    if (1 == ezlopi_nvs_write_str(data, strlen(data), ezlopi_scripts_nvs_ids))
+    if (1 == ezlopi_nvs_write_str(data, strlen(data), (char *)ezlopi_scripts_nvs_ids))
     {
         ret = 1;
     }
@@ -361,14 +361,16 @@ char *ezlopi_nvs_read_str(char *nvs_name)
     return return_str;
 }
 
-void ezlopi_nvs_delete_stored_data(char *nvs_name)
+void ezlopi_nvs_delete_stored_script(uint32_t script_id)
 {
     esp_err_t err = ESP_OK;
     if (1 == ezlopi_nvs_init())
     {
-        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, nvs_name)))
+        char script_id_str[32];
+        snprintf(script_id_str, sizeof(script_id_str), "%08x", script_id);
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, script_id_str)))
         {
-            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", nvs_name, esp_err_to_name(err));
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", script_id_str, esp_err_to_name(err));
         }
     }
 }

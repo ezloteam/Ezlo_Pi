@@ -18,7 +18,7 @@ extern "C"
     char *ezlopi_nvs_read_str(char *nvs_name);
     int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name);
 
-    void ezlopi_nvs_delete_stored_data(char *nvs_name);
+    // void ezlopi_nvs_delete_stored_data(char *nvs_name);
 
     int ezlopi_nvs_write_config_data_str(char *data);
     char *ezlopi_nvs_read_config_data_str(void);
@@ -43,6 +43,7 @@ extern "C"
 
     char *ezlopi_nvs_read_scenes_scripts(void);
     int ezlopi_nvs_write_scenes_scripts(char *data);
+    void ezlopi_nvs_delete_stored_script(uint32_t script_id);
 
 #ifdef __cplusplus
 }

@@ -279,7 +279,7 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddStringToObject(cjson_error, "message", "Unknown method");
     }
 
-    cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 }
 
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)

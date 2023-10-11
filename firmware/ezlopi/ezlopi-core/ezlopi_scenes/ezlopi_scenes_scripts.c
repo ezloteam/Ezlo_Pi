@@ -6,8 +6,9 @@
 #include "freertos/task.h"
 
 #include "trace.h"
-#include "ezlopi_cloud.h"
 #include "ezlopi_nvs.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "lua/lua.h"
 #include "lua/lualib.h"
@@ -16,9 +17,12 @@
 #include "ezlopi_scenes_scripts_custom_libs_includes.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;
+
 static void __scripts_nvs_parse(void);
+static void __script_process(void *arg);
 static void __scripts_process_runner(void);
 static void __load_custom_libs(lua_State *lua_state);
+static void __run_script(l_ezlopi_scenes_script_t *script_node);
 static void __scripts_remove_id_and_update_list(uint32_t script_id);
 static char *__script_report(lua_State *lua_state, int status);
 static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar);
@@ -77,12 +81,12 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     if (script_to_delete)
     {
         ezlopi_scenes_scripts_stop(script_to_delete);
-        ezlopi_nvs_delete_stored_data(script_to_delete->name); // deleting script from nvs
+        ezlopi_nvs_delete_stored_script(script_to_delete->id); // deleting script from nvs
         __scripts_remove_id_and_update_list(script_to_delete->id);
 
         if (script_to_delete->code)
         {
-            free(script_to_delete);
+            free(script_to_delete->code);
         }
         if (script_to_delete->name)
         {
@@ -115,10 +119,107 @@ uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
     return new_script_id;
 }
 
+void ezlopi_scenes_scripts_run_by_id(uint32_t script_id)
+{
+    l_ezlopi_scenes_script_t *curr_script = script_head;
+    while (curr_script)
+    {
+        if (script_id == curr_script->id)
+        {
+            if (SCRIPT_STATE_RUNNING != curr_script->state)
+            {
+                __run_script(curr_script);
+            }
+            break;
+        }
+        curr_script = curr_script->next;
+    }
+}
+
+void ezlopi_scenes_scripts_update(cJSON *cj_script)
+{
+    cJSON *cj_script_id = cJSON_DetachItemFromObject(cj_script, ezlopi__id_str);
+
+    if (cj_script_id)
+    {
+        if (cj_script_id->valuestring)
+        {
+            uint32_t script_id = strtoul(cj_script_id->valuestring, NULL, 16);
+
+            l_ezlopi_scenes_script_t *script_node = script_head;
+            while (script_node)
+            {
+                if (script_id == script_node->id)
+                {
+                    if (script_node->code)
+                    {
+                        free(script_node->code);
+                    }
+
+                    if (script_node->name)
+                    {
+                        free(script_node->name);
+                    }
+
+                    {
+                        cJSON *cj_name = cJSON_GetObjectItem(cj_script, "name");
+                        if (cj_name && cj_name->valuestring)
+                        {
+                            uint32_t len = strlen(cj_name->valuestring) + 1;
+                            script_node->name = malloc(len);
+                            snprintf(script_node->name, len, "%s", cj_name->valuestring);
+                        }
+                    }
+
+                    {
+                        cJSON *cj_code = cJSON_GetObjectItem(cj_script, "code");
+                        if (cj_code && cj_code->valuestring)
+                        {
+                            uint32_t len = strlen(cj_code->valuestring) + 1;
+                            script_node->code = malloc(len);
+                            snprintf(script_node->code, len, "%s", cj_code->valuestring);
+                        }
+                    }
+
+                    char *script_to_update = cJSON_Print(cj_script);
+                    if (script_to_update)
+                    {
+                        ezlopi_nvs_write_str(script_to_update, strlen(script_to_update), cj_script_id->valuestring);
+                    }
+
+                    break;
+                }
+
+                script_node = script_node->next;
+            }
+        }
+
+        cJSON_Delete(cj_script_id);
+    }
+}
+
 void ezlopi_scenes_scripts_init(void)
 {
     __scripts_nvs_parse();
     __scripts_process_runner();
+}
+
+static void __run_script(l_ezlopi_scenes_script_t *script_node)
+{
+    if (script_node->code)
+    {
+        xTaskCreate(__script_process, script_node->name, 2048 * 2, script_node, 3, NULL);
+    }
+}
+
+static void __scripts_process_runner(void)
+{
+    l_ezlopi_scenes_script_t *script_node = script_head;
+    while (script_node)
+    {
+        __run_script(script_node);
+        script_node = script_node->next;
+    }
 }
 
 static void __script_process(void *arg)
@@ -163,20 +264,6 @@ static void __script_process(void *arg)
 
     TRACE_W("%s -> {state: %d} -> Stopped", script_node->name, script_node->state);
     vTaskDelete(NULL);
-}
-
-static void __scripts_process_runner(void)
-{
-    l_ezlopi_scenes_script_t *script_node = script_head;
-    while (script_node)
-    {
-        if (script_node->code)
-        {
-            xTaskCreate(__script_process, script_node->name, 2048 * 2, script_node, 3, NULL);
-        }
-
-        script_node = script_node->next;
-    }
 }
 
 static void __scripts_add_script_id(uint32_t script_id)

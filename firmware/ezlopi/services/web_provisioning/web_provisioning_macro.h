@@ -31,6 +31,7 @@ CLOUD_METHOD("hub.scenes.scripts.add", scenes_scripts_add, NULL)
 CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
 CLOUD_METHOD("hub.scenes.scripts.delete", scenes_scripts_delete, NULL)
 CLOUD_METHOD("hub.scenes.scripts.set", scenes_scripts_set, NULL)
+CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 

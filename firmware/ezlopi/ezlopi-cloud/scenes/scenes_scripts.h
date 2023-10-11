@@ -8,5 +8,6 @@ void scenes_scripts_get(cJSON *cj_request, cJSON *cj_response);
 void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response);
 void scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response);
 void scenes_scripts_set(cJSON *cj_request, cJSON *cj_response);
+void scenes_scripts_run(cJSON *cj_request, cJSON *cj_response);
 
 #endif // __SCENES_SCRIPTS_H__

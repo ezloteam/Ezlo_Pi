@@ -21,7 +21,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
         char *tmp_model = ezlopi_factory_info_v2_get_model();
