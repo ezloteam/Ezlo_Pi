@@ -258,7 +258,7 @@ static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *propertie
     char valueFormatted[20];
     sensor_bme280_data_t sensor_data;
     memset(&sensor_data, 0, sizeof(sensor_bme280_data_t));
-    // sensor_bme280_read_value_from_sensor(properties, &sensor_data);
+    sensor_bme280_read_value_from_sensor(properties, &sensor_data);
     cJSON *cjson_properties = (cJSON *)args;
 
     if (cjson_properties)
