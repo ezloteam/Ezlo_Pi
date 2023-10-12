@@ -14,6 +14,13 @@
 
 #include "sensor_0060_digitalIn_vibration_detector.h"
 
+const char *Sw420_vibration_activity_state_token[] =
+    {
+        "no_activity",
+        "shake",
+        "tilt",
+        "drop"};
+
 //------------------------------------------------------------------------------
 //          STATIC DECLARATION
 //------------------------------------------------------------------------------
@@ -40,10 +47,10 @@ int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, s_ezlopi
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
-    // {
-    //     sensor_0060_digitalIn_get_item(properties, args);
-    //     break;
-    // }
+    {
+        sensor_0060_digitalIn_get_item(properties, args);
+        break;
+    }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0060_digitalIn_get_value_json(properties, args);
@@ -106,9 +113,9 @@ static s_ezlopi_device_properties_t *sensor_0060_prepare(cJSON *cjson_device)
         ASSIGN_DEVICE_NAME(sensor_0060_properties, device_name);
         sensor_0060_properties->ezlopi_cloud.category = category_security_sensor;
         sensor_0060_properties->ezlopi_cloud.subcategory = subcategory_motion;
-        sensor_0060_properties->ezlopi_cloud.item_name = ezlopi_item_name_motion;
-        sensor_0060_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
-        sensor_0060_properties->ezlopi_cloud.value_type = value_type_bool;
+        sensor_0060_properties->ezlopi_cloud.item_name = ezlopi_item_name_activity;
+        sensor_0060_properties->ezlopi_cloud.device_type = dev_type_sensor;
+        sensor_0060_properties->ezlopi_cloud.value_type = value_type_token;
         sensor_0060_properties->ezlopi_cloud.has_getter = true;
         sensor_0060_properties->ezlopi_cloud.has_setter = false;
         sensor_0060_properties->ezlopi_cloud.reachable = true;
@@ -156,28 +163,61 @@ static void sensor_0060_update_from_device(s_ezlopi_device_properties_t *propert
     properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
     ezlopi_device_value_updated_from_device(properties);
 }
-
+#endif
 static void sensor_0060_digitalIn_get_item(s_ezlopi_device_properties_t *properties, void *args)
 {
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
+        cJSON *json_array_enum = cJSON_CreateArray();
+        if (NULL != json_array_enum)
+        {
+            for (uint8_t i = 0; i < SW420_VIBRATION_ACTIVITY_MAX; i++)
+            {
+                cJSON *json_value = cJSON_CreateString(Sw420_vibration_activity_state_token[i]);
+                if (NULL != json_value)
+                {
+                    cJSON_AddItemToArray(json_array_enum, json_value);
+                }
+            }
+            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+        }
         int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
         properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+
+        if (0 == (properties->interface.gpio.gpio_in.value)) // when D0 -> 0V,
+        {
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", "no_activity");
+            cJSON_AddStringToObject(cjson_propertise, "value", "no_activity");
+        }
+        else
+        {
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", "shake");
+            cJSON_AddStringToObject(cjson_propertise, "value", "shake");
+        }
     }
 }
-#endif
+
 static int sensor_0060_digitalIn_get_value_json(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", ((0 == properties->interface.gpio.gpio_in.value) ? false : true));
-        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
-        ret = 1;
+        int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
+
+        if (0 == (properties->interface.gpio.gpio_in.value)) // when D0 -> 0V,
+        {
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", "no_activity");
+            cJSON_AddStringToObject(cjson_propertise, "value", "no_activity");
+        }
+        else
+        {
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", "shake");
+            cJSON_AddStringToObject(cjson_propertise, "value", "shake");
+        }
     }
     return ret;
 }
