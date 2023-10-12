@@ -24,10 +24,11 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 
             while (NULL != curr_device)
             {
-                cJSON *cj_properties = cJSON_CreateObject();
+                cJSON *cj_properties = ezlopi_device_create_device_table_from_prop(curr_device);
                 if (cj_properties)
                 {
-                    char tmp_string[64];
+#if 0
+                     tmp_string[64];
                     snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_device->cloud_properties.device_id);
                     cJSON_AddStringToObject(cj_properties, "_id", tmp_string);
                     cJSON_AddStringToObject(cj_properties, "deviceTypeId", "ezlopi");
@@ -47,7 +48,7 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
                     cJSON_AddBoolToObject(cj_properties, "ready", true);
                     cJSON_AddStringToObject(cj_properties, "status", "synced");
                     cJSON_AddObjectToObject(cj_properties, "info");
-
+#endif
                     if (!cJSON_AddItemToArray(cjson_devices_array, cj_properties))
                     {
                         cJSON_Delete(cj_properties);

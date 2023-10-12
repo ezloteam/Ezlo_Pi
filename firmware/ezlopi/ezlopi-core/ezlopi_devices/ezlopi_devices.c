@@ -293,36 +293,6 @@ static void ezlopi_device_parse_json_v3(char *config_string)
 #endif
 }
 
-#if 0
-// uint32_t ezlopi_device_generate_device_id(void)
-// {
-//     device_id = (0 == device_id) ? 0x30000001 : device_id + 1;
-//     // TRACE_D("device_id: %u\r\n", device_id);
-//     return device_id;
-// }
-
-// uint32_t ezlopi_device_generate_item_id(void)
-// {
-//     item_id = (0 == item_id) ? 0x20000001 : item_id + 1;
-//     // TRACE_D("item_id: %u\r\n", item_id);
-//     return item_id;
-// }
-
-// uint32_t ezlopi_device_generate_room_id(void)
-// {
-//     room_id = (0 == room_id) ? 0x10000001 : room_id + 1;
-//     // TRACE_D("room_id: %u\r\n", room_id);
-//     return room_id;
-// }
-
-// uint32_t ezlopi_device_generate_gateway_id(void)
-// {
-//     gateway_id = (0 == gateway_id) ? 0x40000001 : gateway_id + 1;
-//     // TRACE_D("gateway_id: %u\r\n", gateway_id);
-//     return gateway_id;
-// }
-#endif
-
 l_ezlopi_device_t *ezlopi_device_get_head(void)
 {
     return l_device_head;
@@ -437,4 +407,38 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device)
             }
         }
     }
+}
+
+cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop)
+{
+    cJSON *cj_device = NULL;
+    if (device_prop)
+    {
+        cj_device = cJSON_CreateObject();
+        if (cj_device)
+        {
+            char tmp_string[64];
+            snprintf(tmp_string, sizeof(tmp_string), "%08x", device_prop->cloud_properties.device_id);
+            cJSON_AddStringToObject(cj_device, "_id", tmp_string);
+            cJSON_AddStringToObject(cj_device, "deviceTypeId", "ezlopi");
+            cJSON_AddStringToObject(cj_device, "parentDeviceId", "");
+            cJSON_AddStringToObject(cj_device, "category", device_prop->cloud_properties.category);
+            cJSON_AddStringToObject(cj_device, "subcategory", device_prop->cloud_properties.subcategory);
+            cJSON_AddStringToObject(cj_device, "gatewayId", "");
+            cJSON_AddBoolToObject(cj_device, "batteryPowered", false);
+            cJSON_AddStringToObject(cj_device, "name", device_prop->cloud_properties.device_name);
+            cJSON_AddStringToObject(cj_device, "type", device_prop->cloud_properties.device_type);
+            cJSON_AddBoolToObject(cj_device, "reachable", true);
+            cJSON_AddBoolToObject(cj_device, "persistent", true);
+            cJSON_AddBoolToObject(cj_device, "serviceNotification", false);
+            cJSON_AddBoolToObject(cj_device, "armed", false);
+            cJSON_AddStringToObject(cj_device, "roomId", "");
+            cJSON_AddStringToObject(cj_device, "security", "");
+            cJSON_AddBoolToObject(cj_device, "ready", true);
+            cJSON_AddStringToObject(cj_device, "status", "synced");
+            cJSON_AddObjectToObject(cj_device, "info");
+        }
+    }
+
+    return cj_device;
 }

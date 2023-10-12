@@ -1,6 +1,8 @@
 #ifndef __EZLOPI_DEVICES_H__
 #define __EZLOPI_DEVICES_H__
 
+#include <cJSON.h>
+
 #include "ezlopi_gpio.h"
 #include "ezlopi_uart.h"
 #include "ezlopi_i2c_master.h"
@@ -189,5 +191,6 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
                                                   int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
+cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);
 
 #endif // __EZLOPI_DEVICE_H__
