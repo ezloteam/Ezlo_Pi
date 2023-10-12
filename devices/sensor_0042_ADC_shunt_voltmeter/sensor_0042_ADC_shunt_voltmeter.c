@@ -7,6 +7,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
 
@@ -136,7 +137,6 @@ static int sensor_0042_adc_shunt_voltmeter_get_value(s_ezlopi_device_properties_
     cJSON *cjson_propertise = (cJSON *)arg;
     s_ezlopi_analog_data_t *sensor_0042_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(sensor_0042_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
-    char valueFormatted[20];
     if (cjson_propertise && sensor_0042_analog_data)
     {
         // extracting the analog value
@@ -148,9 +148,10 @@ static int sensor_0042_adc_shunt_voltmeter_get_value(s_ezlopi_device_properties_
 
 #endif
         TRACE_B("Voltage : %d mV", voltage_data);
-        snprintf(valueFormatted, 20, "%d", voltage_data);
         cJSON_AddNumberToObject(cjson_propertise, "value", voltage_data);
+        char *valueFormatted = ezlopi_valueformatter_int(voltage_data);
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        free(valueFormatted);
         cJSON_AddStringToObject(cjson_propertise, "scale", "millivolt");
         ret = 1;
     }

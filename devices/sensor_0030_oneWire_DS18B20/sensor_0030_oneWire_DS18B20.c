@@ -17,6 +17,7 @@
 
 #include "sensor_0030_oneWire_DS18B20.h"
 #include "ds18b20_onewire.h"
+#include "ezlopi_valueformatter.h"
 
 static int sensor_0030_oneWire_DS18B20_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_0030_oneWire_DS18B20_prepare(cJSON *cjson_device);
@@ -148,16 +149,17 @@ static int sensor_0030_oneWire_DS18B20_init(s_ezlopi_device_properties_t *proper
 static int get_sensor_0030_oneWire_DS18B20_value_to_cloud(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-    char valueFormatted[20];
     double temperature = 0;
     cJSON *cjson_properties = (cJSON *)args;
     if (cjson_properties)
     {
         ds18b20_get_temperature_data(&temperature, properties->interface.gpio.gpio_in.gpio_num);
         TRACE_B("Temperature is: %f degree censius", temperature);
-        snprintf(valueFormatted, 20, "%.2lf", temperature);
-        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+
         cJSON_AddNumberToObject(cjson_properties, "value", temperature);
+        char *valueFormatted = ezlopi_valueformatter_double(temperature);
+        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+        free(valueFormatted);
         cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
     }
 

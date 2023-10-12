@@ -7,6 +7,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
 #include "math.h"
@@ -165,7 +166,6 @@ static int sensor_0056_get_value(s_ezlopi_device_properties_t *properties, void 
 {
     int ret = 0;
     float Vout = 0, gramForce = 0;
-    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
@@ -183,9 +183,10 @@ static int sensor_0056_get_value(s_ezlopi_device_properties_t *properties, void 
             TRACE_E("GramForce[gN]: %.4f  => Force[N]: %.4f", gramForce, force);
 
             // prepare the json message
-            snprintf(valueFormatted, 20, "%.2f", force);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", force);
+            char *valueFormatted = ezlopi_valueformatter_float(force);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "newton");
         }
         ret = 1;

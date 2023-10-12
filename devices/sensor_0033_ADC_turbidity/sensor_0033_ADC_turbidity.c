@@ -165,7 +165,6 @@ static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *pr
 static int ezlopi_turbidity_sensor_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
@@ -182,9 +181,7 @@ static int ezlopi_turbidity_sensor_get_item(s_ezlopi_device_properties_t *proper
             }
             cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
         }
-
-        snprintf(valueFormatted, 20, "%s", ezlopi_water_present_turbidity_state);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_water_present_turbidity_state);
         cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_turbidity_state);
         ret = 1;
     }
@@ -193,12 +190,10 @@ static int ezlopi_turbidity_sensor_get_item(s_ezlopi_device_properties_t *proper
 static int ezlopi_turbidity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        snprintf(valueFormatted, 20, "%s", ezlopi_water_present_turbidity_state);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_water_present_turbidity_state);
         cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_turbidity_state);
         ret = 1;
     }

@@ -7,6 +7,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
 
@@ -150,7 +151,6 @@ static void sensor_0055_get_item(s_ezlopi_device_properties_t *properties, void 
 static int sensor_0055_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
@@ -166,9 +166,10 @@ static int sensor_0055_get_value(s_ezlopi_device_properties_t *properties, void 
             int Rs = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
 
             // prepare the json message
-            snprintf(valueFormatted, 20, "%d", Rs);
             cJSON_AddNumberToObject(cjson_propertise, "value", Rs);
+            char *valueFormatted = ezlopi_valueformatter_int(Rs);
             cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_propertise, "scale", "ohm_meter");
             ret = 1;
         }

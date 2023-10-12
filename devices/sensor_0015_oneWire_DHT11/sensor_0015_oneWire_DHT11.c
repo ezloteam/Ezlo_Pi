@@ -105,12 +105,12 @@ static s_ezlopi_device_properties_t *dht11_sensor_prepare_properties(uint32_t de
             dht11_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
             char *device_name = NULL;
-            char *device_name_full = malloc(50);
+            char *device_name_full = malloc(50 + 1);
             memset(device_name_full, 0, 50);
 
             CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
 
-            strcpy(device_name_full, device_name);
+            strncpy(device_name_full, device_name, 50);
 
             if (0 == strcmp(ezlopi_item_name_temp, item_name))
             {

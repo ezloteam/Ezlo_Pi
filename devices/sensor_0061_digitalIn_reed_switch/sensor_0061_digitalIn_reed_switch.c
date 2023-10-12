@@ -6,6 +6,7 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_device_value_updated.h"
+#include "ezlopi_valueformatter.h"
 #include "gpio_isr_service.h"
 #include "sensor_0061_digitalIn_reed_switch.h"
 
@@ -147,13 +148,12 @@ static void sensor_0061_get_item(s_ezlopi_device_properties_t *properties, void 
 static int sensor_0061_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         ret = 1;
     }
     return ret;

@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
+#include "ezlopi_valueformatter.h"
 
 #include "gyGPS6MV2.h"
 #include "sensor_0053_UART_GYGPS6MV2.h"
@@ -376,7 +377,6 @@ static void sensor_uart_gps6mv2_get_item(s_ezlopi_device_properties_t *propertie
 static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-    char valueFormatted[20];
     int lat_angle_val = 0, long_angle_val = 0, total_sat = 0, gps_quality = 0, antenna_alti = 0, geoid = 0;
     bool GPS_FIX = false;
     cJSON *cjson_properties = (cJSON *)args;
@@ -390,9 +390,10 @@ static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *pro
         {
             lat_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Latitude.lat_min)) / 60;
             // TRACE_I("latitude : %d *deg", lat_angle_val);
-            snprintf(valueFormatted, 20, "%d", lat_angle_val);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", lat_angle_val);
+            char *valueFormatted = ezlopi_valueformatter_int(lat_angle_val);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "north_pole_degress");
             break;
         }
@@ -401,9 +402,10 @@ static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *pro
         {
             long_angle_val = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_degree) + (atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Longitude.long_min)) / 60;
             // TRACE_I("Longitude : %d *deg", long_angle_val);
-            snprintf(valueFormatted, 20, "%d", long_angle_val);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", long_angle_val);
+            char *valueFormatted = ezlopi_valueformatter_int(long_angle_val);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "north_pole_degress");
             break;
         }
@@ -417,9 +419,10 @@ static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *pro
             gps_quality = (gps_quality < 0) ? 0 : ((gps_quality > 9) ? 9 : gps_quality);
             // TRACE_I("GPSFix_Quality : %d ", gps_quality);
             GPS_FIX = ((total_sat > 2) && (gps_quality != 0)) ? true : false;
-            snprintf(valueFormatted, 20, "%s", ((false == GPS_FIX) ? "false" : "true"));
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddBoolToObject(cjson_properties, "value", GPS_FIX);
+            char *valueFormatted = ezlopi_valueformatter_bool(GPS_FIX);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+
             break;
         }
 
@@ -427,9 +430,10 @@ static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *pro
         {
             antenna_alti = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Mean_sea_level);
             // TRACE_I("Antenna Altitude for mean_sea_level : %d m", antenna_alti);
-            snprintf(valueFormatted, 20, "%d", antenna_alti);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", antenna_alti);
+            char *valueFormatted = ezlopi_valueformatter_int(antenna_alti);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter");
             break;
         }
@@ -438,9 +442,10 @@ static int sensor_uart_gps6mv2_get_value_cjson(s_ezlopi_device_properties_t *pro
         {
             geoid = atoi(sensor_0053_UART_gps6mv2_data->GPGGA_data_structure.Geoid_Separation);
             // TRACE_I("Geoid seperation : %d m", geoid);
-            snprintf(valueFormatted, 20, "%d", geoid);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", geoid);
+            char *valueFormatted = ezlopi_valueformatter_int(geoid);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter");
             break;
         }

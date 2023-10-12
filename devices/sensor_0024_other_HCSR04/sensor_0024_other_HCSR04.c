@@ -12,6 +12,7 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 #include "stdlib.h"
+#include "ezlopi_valueformatter.h"
 
 static int ezlopi_sensor_0024_other_HCSR04_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ezlopi_sensor_0024_other_HCSR04_prepare(cJSON *cjson_device);
@@ -194,7 +195,7 @@ static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(s_ezlopi_device_prop
 static int ezlopi_sensor_0024_other_HCSR04_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-    char valueFormatted[20];
+
     bool current_val = true;
     cJSON *cjson_propertise = (cJSON *)args;
 
@@ -203,9 +204,10 @@ static int ezlopi_sensor_0024_other_HCSR04_get_value_cjson(s_ezlopi_device_prope
     if (cjson_propertise && ultrasonic_HCSR04_sensor)
     {
         int distance = (int)(ultrasonic_HCSR04_sensor->distance / 100);
-        snprintf(valueFormatted, 20, "%d", distance);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cjson_propertise, "value", distance);
+        char *valueFormatted = ezlopi_valueformatter_int(distance);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        free(valueFormatted);
         cJSON_AddStringToObject(cjson_propertise, "scale", "meter");
         ret = 1;
     }

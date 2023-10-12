@@ -5,5 +5,5 @@ idf_component_register( SRCS "sensor_0047_other_HX711_loadcell.c"
                                     ezlopi_cloud_constants
                                     ezlopi_devices
                                     ezlopi_hal
-                                    ezlopi_timer    
-                        )
+                                    ezlopi_timer  
+                                    ezlopi_valueformatter )

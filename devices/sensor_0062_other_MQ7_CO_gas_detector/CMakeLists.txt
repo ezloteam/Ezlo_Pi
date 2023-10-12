@@ -7,4 +7,5 @@ idf_component_register(SRCS "sensor_0062_other_MQ7_CO_gas_detector.c"
                                 ezlopi_timer 
                                 ezlopi_devices 
                                 ezlopi_cloud_constants
+                                ezlopi_valueformatter
                                 )

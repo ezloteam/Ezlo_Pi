@@ -7,6 +7,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
 #include "math.h"
@@ -341,7 +342,6 @@ static void sensor_other_MQ3_get_item(s_ezlopi_device_properties_t *properties, 
     int ret = 0;
     float analog_sensor_volt = 0;
     float _ppm = 0;
-    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
 
     if (cjson_properties)
@@ -379,9 +379,10 @@ static void sensor_other_MQ3_get_item(s_ezlopi_device_properties_t *properties, 
         {
             // extract the sensor_output_values
             Extract_MQ3_sensor_ppm(&analog_sensor_volt, &_ppm, properties);
-            snprintf(valueFormatted, 20, "%.2f", _ppm);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", _ppm);
+            char *valueFormatted = ezlopi_valueformatter_float(_ppm);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");
         }
         //-----------------------------------------------------------------------------------------
@@ -396,7 +397,6 @@ static int sensor_other_MQ3_get_value(s_ezlopi_device_properties_t *properties, 
     int ret = 0;
     float analog_sensor_volt = 0;
     float _ppm = 0;
-    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
 
     if (cjson_properties)
@@ -420,7 +420,6 @@ static int sensor_other_MQ3_get_value(s_ezlopi_device_properties_t *properties, 
         {
             // extract the sensor_output_values
             Extract_MQ3_sensor_ppm(&analog_sensor_volt, &_ppm, properties);
-            snprintf(valueFormatted, 20, "%.2f", _ppm);
             /**
              * NOTE :the detector's sensitivity for Alcohol concentration in air is [0.4mg/L ~= approx. 200ppm]
              *
@@ -429,8 +428,10 @@ static int sensor_other_MQ3_get_value(s_ezlopi_device_properties_t *properties, 
              *
              * Result : in air we get (~ 0.6ppm) [i.e. 0.0012]
              * */
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cjson_properties, "value", _ppm);
+            char *valueFormatted = ezlopi_valueformatter_float(_ppm);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "parts_per_million");
         }
         //-----------------------------------------------------------------------------------------

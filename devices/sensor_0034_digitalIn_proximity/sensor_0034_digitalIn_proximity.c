@@ -2,6 +2,7 @@
 #include "sensor_0034_digitalIn_proximity.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 
 int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *args, void *user_arg)
 {
@@ -138,13 +139,12 @@ static void proximity_sensor_value_updated_from_device(s_ezlopi_device_propertie
 static int proximity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         ret = 1;
     }
 

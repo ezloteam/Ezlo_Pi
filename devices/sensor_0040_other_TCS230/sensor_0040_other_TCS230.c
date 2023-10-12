@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0040_other_TCS230.h"
 #include "TCS230.h"

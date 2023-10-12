@@ -16,6 +16,7 @@
 #include "items.h"
 #include "trace.h"
 #include "cJSON.h"
+#include "ezlopi_valueformatter.h"
 
 static int sensor_touch_tpp_223b_switch_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_switch_prepare(cJSON *cjson_device);
@@ -155,12 +156,11 @@ static int sensor_touch_tpp_223b_switch_get_value_cjson(s_ezlopi_device_properti
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)args;
-    char valueFormatted[20];
     if (cjson_propertise)
     {
-        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         ret = 1;
     }
 

@@ -6,6 +6,7 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0044_I2C_TSL2561_luminosity.h"
 
@@ -309,14 +310,14 @@ static int sensor_0044_i2c_tsl2561_get_value_cjson(s_ezlopi_device_properties_t 
 {
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)arg;
-    char valueFormatted[20];
     if (NULL != cjson_properties)
     {
         if (ezlopi_item_name_lux == properties->ezlopi_cloud.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", ((int)Lux_intensity));
+            cJSON_AddNumberToObject(cjson_properties, "values", Lux_intensity);
+            char *valueFormatted = ezlopi_valueformatter_uint32(Lux_intensity);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cjson_properties, "values", ((int)Lux_intensity));
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "lux");
         }
         ret = 1;

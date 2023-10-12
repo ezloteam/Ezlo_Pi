@@ -8,4 +8,5 @@ idf_component_register(SRCS "sensor_0035_digitalIn_touch_sensor_TPP223B.c" "${co
         ezlopi_timer 
         ezlopi_devices 
         ezlopi_cloud_constants 
-        gpio_isr_service)
+        gpio_isr_service
+        ezlopi_valueformatter)

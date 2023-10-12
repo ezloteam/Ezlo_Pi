@@ -7,6 +7,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
 #include "math.h"
@@ -151,12 +152,13 @@ static int sensor_adc_ACS712_get_value(s_ezlopi_device_properties_t *properties,
 {
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)arg;
-    char valueFormatted[20];
     if (cjson_properties)
     {
-        snprintf(valueFormatted, 20, "%.2f", Ampere);
+
         cJSON_AddNumberToObject(cjson_properties, "value", Ampere); // Irms [A]
+        char *valueFormatted = ezlopi_valueformatter_float(Ampere);
         cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+        free(valueFormatted);
         cJSON_AddStringToObject(cjson_properties, "scale", "ampere");
         ret = 1;
     }

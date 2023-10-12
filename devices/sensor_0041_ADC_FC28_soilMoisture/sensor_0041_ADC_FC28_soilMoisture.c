@@ -7,6 +7,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 #include "trace.h"
 #include "ezlopi_adc.h"
 
@@ -134,7 +135,6 @@ static int sensor_adc_FC28_init(s_ezlopi_device_properties_t *properties)
 static int sensor_adc_FC28_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
@@ -149,9 +149,10 @@ static int sensor_adc_FC28_get_value(s_ezlopi_device_properties_t *properties, v
 
         // int volt_data = (int)(2400 - (ezlopi_analog_data->voltage)/2.0f); // max 2.4V
         // TRACE_B("voltage : %dmV", volt_data);
-        snprintf(valueFormatted, 20, "%d", percent_data);
         cJSON_AddNumberToObject(cjson_properties, "value", percent_data);
+        char *valueFormatted = ezlopi_valueformatter_int(percent_data);
         cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+        free(valueFormatted);
         cJSON_AddStringToObject(cjson_properties, "scale", "percent");
         ret = 1;
     }

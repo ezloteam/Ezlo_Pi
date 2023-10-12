@@ -16,6 +16,7 @@
 #include "cJSON.h"
 
 #include "sensor_0025_digitalIn_LDR.h"
+#include "ezlopi_valueformatter.h"
 
 static int sensor_ldr_digital_module_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *sensor_ldr_digital_module_prepare(cJSON *cjson_device);
@@ -150,15 +151,15 @@ static void sensor_ldr_digital_module_value_updated_from_device(s_ezlopi_device_
 static int sensor_ldr_digital_module_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
-    char valueFormatted[20];
+
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
         int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
         properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         ret = 1;
     }
 

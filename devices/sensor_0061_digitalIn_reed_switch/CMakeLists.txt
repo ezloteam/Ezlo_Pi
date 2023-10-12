@@ -6,4 +6,5 @@ idf_component_register(SRCS "sensor_0061_digitalIn_reed_switch.c"
                                 ezlopi_timer 
                                 ezlopi_devices 
                                 ezlopi_cloud_constants
+                                ezlopi_valueformatter
                                 )

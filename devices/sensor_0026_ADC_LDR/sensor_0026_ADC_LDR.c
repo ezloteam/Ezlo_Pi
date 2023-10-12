@@ -14,6 +14,7 @@
 #include "cJSON.h"
 
 #include "sensor_0026_ADC_LDR.h"
+#include "ezlopi_valueformatter.h"
 
 static char *present_light_status = "no_light";
 static char *previous_light_status = "no_light";

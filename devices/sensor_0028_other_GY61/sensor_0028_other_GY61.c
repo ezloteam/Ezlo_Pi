@@ -15,6 +15,7 @@
 #include "cJSON.h"
 
 #include "sensor_0028_other_GY61.h"
+#include "ezlopi_valueformatter.h"
 //---------------------------------------------------------------------
 
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                           \
@@ -92,11 +93,11 @@ static int sensor_0028_gy61_other_prepare_and_add(void *args)
     {
         uint32_t device_id = 0;
         device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_x_axis, value_type_int, prep_arg->cjson_device);
-        device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_y_axis, value_type_int, prep_arg->cjson_device);
-        device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_z_axis, value_type_int, prep_arg->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_x_axis, value_type_acceleration, prep_arg->cjson_device);
+        // device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_y_axis, value_type_acceleration, prep_arg->cjson_device);
+        // device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_z_axis, value_type_acceleration, prep_arg->cjson_device);
     }
     return ret;
 }
@@ -129,6 +130,7 @@ static s_ezlopi_device_properties_t *sensor_0028_gy61_other_prepare_properties(u
         sensor_0028_gy61_other_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
 
         char *device_name = NULL;
+
         if (ezlopi_item_name_acceleration_x_axis == ITEM_NAME)
         {
             device_name = "Acceleration-X";
@@ -193,36 +195,38 @@ static int sensor_0028_gy61_other_init(s_ezlopi_device_properties_t *properties)
 static int get_sensor_0028_gy61_other_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
-    int acceleration_value;
+    float acceleration_value;
     if (cjson_properties)
     {
         if (ezlopi_item_name_acceleration_x_axis == properties->ezlopi_cloud.item_name)
         {
-            acceleration_value = (int)(get_gy61_x_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-            TRACE_I("X-axis : %d m/s^2", acceleration_value);
-            snprintf(valueFormatted, 20, "%d", acceleration_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            acceleration_value = (get_gy61_x_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
+            TRACE_I("X-axis : %f m/s^2", acceleration_value);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
+            char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
         if (ezlopi_item_name_acceleration_y_axis == properties->ezlopi_cloud.item_name)
         {
-            acceleration_value = (int)(get_gy61_y_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-            TRACE_I("Y-axis : %d m/s^2", acceleration_value);
-            snprintf(valueFormatted, 20, "%d", acceleration_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            acceleration_value = (get_gy61_y_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
+            TRACE_I("Y-axis : %f m/s^2", acceleration_value);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
+            char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
         if (ezlopi_item_name_acceleration_z_axis == properties->ezlopi_cloud.item_name)
         {
-            acceleration_value = (int)(get_gy61_z_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-            TRACE_I("Z-axis : %d  m/s^2", acceleration_value);
-            snprintf(valueFormatted, 20, "%d", acceleration_value);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            acceleration_value = (get_gy61_z_axis_value(properties) * GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
+            TRACE_I("Z-axis : %f  m/s^2", acceleration_value);
             cJSON_AddNumberToObject(cjson_properties, "value", acceleration_value);
+            char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             cJSON_AddStringToObject(cjson_properties, "scale", "meter_per_square_second");
         }
         ret = 1;

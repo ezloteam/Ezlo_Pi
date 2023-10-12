@@ -10,6 +10,7 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0054_PWM_YFS201_flowmeter.h"
 
@@ -188,7 +189,6 @@ static void sensor_pwm_yfs201_get_item(s_ezlopi_device_properties_t *properties,
 static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
     cJSON *cjson_properties = (cJSON *)arg;
 
     if (cjson_properties)
@@ -204,9 +204,10 @@ static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties,
         Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
         // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
-        snprintf(valueFormatted, 20, "%.2f", Lt_per_hr);
-        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cjson_properties, "value", Lt_per_hr);
+        char *valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
+        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+        free(valueFormatted);
         cJSON_AddStringToObject(cjson_properties, "scale", "liter_per_hour");
 
         ret = 1;
