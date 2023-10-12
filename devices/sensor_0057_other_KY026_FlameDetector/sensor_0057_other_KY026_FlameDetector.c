@@ -234,10 +234,12 @@ static void sensor_other_KY206_get_item(s_ezlopi_device_properties_t *properties
 
             if (0 == gpio_get_level(KY026_digital_pin)) // when D0 -> 0V,
             {
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "heat_ok");
                 cJSON_AddStringToObject(cjson_properties, "value", "heat_ok");
             }
             else
             {
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "overheat_detected");
                 cJSON_AddStringToObject(cjson_properties, "value", "overheat_detected");
             }
         }
@@ -275,10 +277,12 @@ static int sensor_other_KY026_get_value(s_ezlopi_device_properties_t *properties
         {
             if (0 == gpio_get_level(KY026_digital_pin)) // when D0 -> 0V,
             {
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "heat_ok");
                 cJSON_AddStringToObject(cjson_properties, "value", "heat_ok");
             }
             else
             {
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "overheat_detected");
                 cJSON_AddStringToObject(cjson_properties, "value", "overheat_detected");
             }
         }

@@ -35,9 +35,10 @@ int sensor_0032_ADC_soilMoisture(e_ezlopi_actions_t action, s_ezlopi_device_prop
         ret = soil_moisture_sensor_init(ezlo_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        get_soil_moisture_sensor_value(ezlo_device, arg);
+        ret = get_soil_moisture_sensor_value(ezlo_device, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -127,13 +128,16 @@ static int soil_moisture_sensor_init(s_ezlopi_device_properties_t *properties)
 static int get_soil_moisture_sensor_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
     if (cjson_propertise)
     {
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-        int percent_data = (int)(((4095 - ezlopi_analog_data->value) / 4095.0) * 100);
+        int percent_data = (int)(((4095 - ezlopi_analog_data->value) / 4095.0f) * 100);
+        snprintf(valueFormatted, 20, "%d", percent_data);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cjson_propertise, "value", percent_data);
         cJSON_AddStringToObject(cjson_propertise, "scale", "percent");
         ret = 1;

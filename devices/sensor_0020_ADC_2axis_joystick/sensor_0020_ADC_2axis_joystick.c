@@ -13,6 +13,7 @@
 #include "trace.h"
 #include "ezlopi_adc.h"
 #include "gpio_isr_service.h"
+#include "ezlopi_valueformatter.h"
 
 #define ADD_PROPERTIES_DEVICE_LIST(device_id, category, sub_category, item_name, value_type, cjson_device)        \
     {                                                                                                             \
@@ -48,6 +49,7 @@ int sensor_0020_ADC_2axis_joystick(e_ezlopi_actions_t action, s_ezlopi_device_pr
         ret = joystick_2_axis_init(ezlo_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         get_joystick_2_axis_value(ezlo_device, arg);
@@ -216,7 +218,6 @@ static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, v
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)arg;
-    char valueFormatted[20];
     s_ezlopi_analog_data_t *ezlopi_analog_data = (s_ezlopi_analog_data_t *)malloc(sizeof(s_ezlopi_analog_data_t));
     if (cjson_propertise)
     {
@@ -224,24 +225,29 @@ static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, v
         if ((0 == strcmp(properties->ezlopi_cloud.item_name, "joystick-x")))
         {
             ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-            snprintf(valueFormatted, 20, "%d", ezlopi_analog_data->voltage);
             cJSON_AddNumberToObject(cjson_propertise, "value", ezlopi_analog_data->voltage);
             cJSON_AddStringToObject(cjson_propertise, "scale", "milli_volt");
+            char *valueFormatted = ezlopi_valueformatter_uint32(ezlopi_analog_data->voltage);
             cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+            free(valueFormatted);
             TRACE_B("X-axis value is %d and voltage is %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
         }
         if ((0 == strcmp(properties->ezlopi_cloud.item_name, "joystick-y")))
         {
             ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
-            snprintf(valueFormatted, 20, "%d", ezlopi_analog_data->voltage);
+
             cJSON_AddNumberToObject(cjson_propertise, "value", ezlopi_analog_data->voltage);
-            cJSON_AddStringToObject(cjson_propertise, "scale", "milli_volt");
+            char *valueFormatted = ezlopi_valueformatter_uint32(ezlopi_analog_data->voltage);
             cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+            free(valueFormatted);
+            cJSON_AddStringToObject(cjson_propertise, "scale", "milli_volt");
             TRACE_B("Y-axis value is %d and voltage is %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
         }
         if (0 == strcmp(properties->ezlopi_cloud.item_name, ezlopi_item_name_switch))
         {
             cJSON_AddBoolToObject(cjson_propertise, "value", ((0 == properties->interface.gpio.gpio_in.value) ? true : false));
+            char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         }
         ret = 1;
     }

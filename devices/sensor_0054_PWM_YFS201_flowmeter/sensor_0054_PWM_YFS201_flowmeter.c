@@ -24,7 +24,7 @@ static YFS201_queue_enum_t yfs201_QueueFlag = YFS201_QUEUE_RESET;
 static int sensor_pwm_yfs201_prepare_and_add(void *arg);
 static int sensor_pwm_yfs201_init(s_ezlopi_device_properties_t *properties);
 static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin);
-static void sensor_pwm_yfs201_get_item(s_ezlopi_device_properties_t *properties, void *arg);
+// static void sensor_pwm_yfs201_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties, void *arg);
 //------------------------------------------------------------------------------
 
@@ -50,10 +50,10 @@ int sensor_0054_pwm_yfs201(e_ezlopi_actions_t action, s_ezlopi_device_properties
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
-    {
-        sensor_pwm_yfs201_get_item(properties, arg);
-        break;
-    }
+    // {
+    //     sensor_pwm_yfs201_get_item(properties, arg);
+    //     break;
+    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_pwm_yfs201_get_value(properties, arg);
@@ -159,7 +159,7 @@ static int sensor_pwm_yfs201_init(s_ezlopi_device_properties_t *properties)
     }
     return ret;
 }
-
+#if 0
 static void sensor_pwm_yfs201_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
     char valueFormatted[20];
@@ -184,7 +184,7 @@ static void sensor_pwm_yfs201_get_item(s_ezlopi_device_properties_t *properties,
         cJSON_AddStringToObject(cjson_properties, "scale", "liter_per_hour");
     }
 }
-
+#endif
 static int sensor_pwm_yfs201_get_value(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;

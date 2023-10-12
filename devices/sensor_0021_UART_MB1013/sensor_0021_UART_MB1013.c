@@ -12,6 +12,7 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 #include "stdlib.h"
+#include "ezlopi_valueformatter.h"
 
 static bool previous_motion = false;
 static bool is_motion_detected = false;
@@ -20,7 +21,7 @@ static int ezlopi_ultrasonic_MB1013_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjson_device);
 static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *properties);
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void* user_args);
+static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void *user_args);
 static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t *properties);
 
 int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
@@ -44,6 +45,7 @@ int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_propertie
     //     ret = ezlopi_send_motion_detected_data(properties);
     //     break;
     // }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ezlopi_ultrasonic_MB1013_get_value_cjson(properties, arg);
@@ -57,7 +59,7 @@ int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_propertie
     return ret;
 }
 
-static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void* user_args)
+static void ezlopi_ultrasonic_MB1013_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle, void *user_args)
 {
     // TRACE_E("Buffer is %s", buffer);
     char *another_buffer = (char *)malloc(256);
@@ -168,6 +170,9 @@ static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t
     if (cjson_propertise)
     {
         cJSON_AddBoolToObject(cjson_propertise, "value", is_motion_detected);
+        char *valueFormatted = ezlopi_valueformatter_bool(is_motion_detected);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+
         ret = 1;
     }
     return ret;

@@ -39,14 +39,30 @@ int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, s_ezlopi
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
-    {
-        sensor_0060_digitalIn_get_item(properties, args);
-        break;
-    }
+    // {
+    //     sensor_0060_digitalIn_get_item(properties, args);
+    //     break;
+    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0060_digitalIn_get_value_json(properties, args);
         break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        // static uint8_t count = 0;
+        // if (count++ > 1)
+        // {
+        int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
+        if ((properties->interface.gpio.gpio_in.value) != ((int *)properties->user_arg))
+        {
+            (properties->user_arg) = (void *)(properties->interface.gpio.gpio_in.value);
+            ezlopi_device_value_updated_from_device(properties);
+        }
+        //     count = 0;
+        // }
+        ret = 0;
     }
     default:
         break;
@@ -106,7 +122,8 @@ static s_ezlopi_device_properties_t *sensor_0060_prepare(cJSON *cjson_device)
         CJSON_GET_VALUE_INT(cjson_device, "logic_inv", sensor_0060_properties->interface.gpio.gpio_in.invert);
 
         sensor_0060_properties->interface.gpio.gpio_in.enable = true;
-        sensor_0060_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
+        // sensor_0060_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_NEGEDGE;
+        sensor_0060_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     }
     return sensor_0060_properties;
 }
@@ -118,22 +135,24 @@ static int sensor_0060_digitalIn_init(s_ezlopi_device_properties_t *properties)
         const gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
             .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = GPIO_PULLDOWN_ENABLE,
-            .intr_type = properties->interface.gpio.gpio_in.interrupt,
+            .pull_up_en = ((properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN) || (properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY)) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE,
+            .pull_down_en = ((properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN) || (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY)) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+            // .intr_type = properties->interface.gpio.gpio_in.interrupt,
         };
 
         if (gpio_config(&io_conf))
         {
             properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
         }
-
-        gpio_isr_service_register(properties, sensor_0060_update_from_device, 200);
+        // gpio_isr_service_register(properties, sensor_0060_update_from_device, 500);
     }
     return ret;
 }
+#if 0
 static void sensor_0060_update_from_device(s_ezlopi_device_properties_t *properties)
 {
+    int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+    properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
     ezlopi_device_value_updated_from_device(properties);
 }
 
@@ -147,17 +166,18 @@ static void sensor_0060_digitalIn_get_item(s_ezlopi_device_properties_t *propert
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
     }
 }
+#endif
 static int sensor_0060_digitalIn_get_value_json(s_ezlopi_device_properties_t *properties, void *args)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        cJSON_AddBoolToObject(cjson_propertise, "value", ((0 == properties->interface.gpio.gpio_in.value) ? false : true));
         ret = 1;
     }
-
     return ret;
 }

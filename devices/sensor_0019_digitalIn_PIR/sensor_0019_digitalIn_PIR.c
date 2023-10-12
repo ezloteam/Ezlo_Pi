@@ -3,6 +3,7 @@
 #include "ezlopi_cloud.h"
 #include "sensor_0019_digitalIn_PIR.h"
 #include "gpio_isr_service.h"
+#include "ezlopi_valueformatter.h"
 
 static int sensor_pir_prepare_and_add(void *args);
 static int sensor_pir_init(s_ezlopi_device_properties_t *properties);
@@ -26,6 +27,7 @@ int sensor_0019_digitalIn_PIR(e_ezlopi_actions_t action, s_ezlopi_device_propert
         ret = sensor_pir_init(properties);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_pir_get_value_cjson(properties, args);
@@ -143,10 +145,13 @@ static int sensor_pir_get_value_cjson(s_ezlopi_device_properties_t *properties, 
 {
     int ret = 0;
     cJSON *cjson_propertise = (cJSON *)args;
+
     if (cjson_propertise)
     {
-        properties->interface.gpio.gpio_out.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_out.value);
+        properties->interface.gpio.gpio_in.value = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
 

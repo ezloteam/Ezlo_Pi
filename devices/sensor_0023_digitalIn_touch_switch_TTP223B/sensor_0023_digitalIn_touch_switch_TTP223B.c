@@ -39,6 +39,7 @@ int sensor_0023_digitalIn_touch_switch_TTP223B(e_ezlopi_actions_t action, s_ezlo
         ret = sensor_touch_tpp_223b_switch_init(ezlo_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_touch_tpp_223b_switch_get_value_cjson(ezlo_device, arg);
@@ -110,7 +111,6 @@ static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_switch_prepare(cJSON 
 
         int val_ip = 0;
         CJSON_GET_VALUE_INT(cjson_device, "val_ip", val_ip);
-
 
         sensor_touch_tpp_223b_switch_properties->interface.gpio.gpio_in.value = (true == sensor_touch_tpp_223b_switch_properties->interface.gpio.gpio_in.invert) ? !val_ip : val_ip;
         sensor_touch_tpp_223b_switch_properties->interface.gpio.gpio_in.enable = true;

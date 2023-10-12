@@ -19,7 +19,7 @@
  *  Remedy:  introduce a voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output , so that esp32 adc pin recieves half voltage only.
  *             ( Half of 4.2) -> 2.1V
  *
- *            > 5V------,
+ *  currentMeter > 5V---+
  *                      |
  *                     {1KOhm}
  *                      |

@@ -14,7 +14,7 @@
 static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson_device);
 static int sensor_0061_prepare_and_add(void *arg);
 static int sensor_0061_init(s_ezlopi_device_properties_t *properties);
-static void sensor_0061_get_item(s_ezlopi_device_properties_t *properties, void *arg);
+// static void sensor_0061_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 static int sensor_0061_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
 static void sensor_0061_update_from_device(s_ezlopi_device_properties_t *properties);
 //----------------------------------------------------------------------
@@ -32,10 +32,10 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, s_ezlopi_device
         ret = sensor_0061_init(properties);
         break;
     case EZLOPI_ACTION_HUB_GET_ITEM:
-    {
-        sensor_0061_get_item(properties, arg);
-        break;
-    }
+    // {
+    //     sensor_0061_get_item(properties, arg);
+    //     break;
+    // }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
         ret = sensor_0061_get_value_cjson(properties, arg);
         break;
@@ -78,7 +78,7 @@ static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson
 
         sensor_0061_device_properties->interface.gpio.gpio_in.enable = true;
         sensor_0061_device_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
-        sensor_0061_device_properties->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
+        sensor_0061_device_properties->interface.gpio.gpio_in.pull = GPIO_PULLUP_PULLDOWN;
     }
     return sensor_0061_device_properties;
 }
@@ -115,8 +115,8 @@ static int sensor_0061_init(s_ezlopi_device_properties_t *properties)
         gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << properties->interface.gpio.gpio_in.gpio_num),
             .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+            .pull_up_en = ((properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN) || (properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY)) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE,
+            .pull_down_en = ((properties->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN) || (properties->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY)) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
             .intr_type = properties->interface.gpio.gpio_in.pull,
         };
         ret = gpio_config(&io_conf);
@@ -134,7 +134,7 @@ static int sensor_0061_init(s_ezlopi_device_properties_t *properties)
     return ret;
 }
 //----------------------------------------------------------------------
-
+#if 0
 static void sensor_0061_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
     cJSON *cjson_propertise = (cJSON *)arg;
@@ -143,13 +143,16 @@ static void sensor_0061_get_item(s_ezlopi_device_properties_t *properties, void 
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
     }
 }
-
+#endif
 static int sensor_0061_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
+        snprintf(valueFormatted, 20, "%s", ((0 == properties->interface.gpio.gpio_in.value) ? "false" : "true"));
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
         ret = 1;
     }

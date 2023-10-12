@@ -38,6 +38,7 @@ int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, s_ezlopi_device_p
         ret = sensor_0042_adc_shunt_voltmeter_init(ezlopi_device);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = sensor_0042_adc_shunt_voltmeter_get_value(ezlopi_device, arg);
@@ -45,7 +46,12 @@ int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, s_ezlopi_device_p
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        ret = ezlopi_device_value_updated_from_device(ezlopi_device);
+        static uint8_t count = 0;
+        if (count++ > 1)
+        {
+            ret = ezlopi_device_value_updated_from_device(ezlopi_device);
+            count = 0;
+        }
         break;
     }
 
@@ -136,7 +142,7 @@ static int sensor_0042_adc_shunt_voltmeter_get_value(s_ezlopi_device_properties_
         // extracting the analog value
         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, sensor_0042_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-        int voltage_data = ((int)(sensor_0042_analog_data->voltage) * 2) * 5; // first we double the incoming voltage
+        int voltage_data = ((int)(sensor_0042_analog_data->voltage) * 2) * SENSOR_MODULE_COMPENSATION; // first we double the incoming voltage and multiply by 5 for
 #else
         int voltage_data = (int)(sensor_0042_analog_data->voltage) * 5; // if you havenot added a voltage divider at sensor's analog output for esp32
 

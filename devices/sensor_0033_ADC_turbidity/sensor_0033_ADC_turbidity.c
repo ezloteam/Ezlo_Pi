@@ -3,8 +3,14 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_adc.h"
+
 static const char *ezlopi_water_present_turbidity_state = NULL;
-int count = 0;
+
+const char *water_filter_replacement_alarm_states[] =
+    {
+        "water_filter_ok",
+        "replace_water_filter",
+        "unknown"};
 
 int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
 {
@@ -12,43 +18,49 @@ int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, s_ezlopi_device_propert
 
     switch (action)
     {
-        case EZLOPI_ACTION_PREPARE:
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = ezlopi_turbidity_sensor_prepare_and_add(arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = ezlopi_turbidity_sensor_init(properties);
+        break;
+    }
+    // case EZLOPI_ACTION_NOTIFY_200_MS:
+    // case EZLOPI_ACTION_SET_VALUE:
+    // {
+    //     // TRACE_B("HEre");
+    //     ret = ezlopi_turbidity_sensor_update_value(properties, arg);
+    //     break;
+    // }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        ret = ezlopi_turbidity_sensor_get_item(properties, arg);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = ezlopi_turbidity_sensor_get_value_cjson(properties, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        static int count = 0;
+        count++;
+        if (5 == count)
         {
-            ret = ezlopi_turbidity_sensor_prepare_and_add(arg);
-            break;
+            ret = ezlopi_turbidity_sensor_update_value(properties, arg);
+            count = 0;
         }
-        case EZLOPI_ACTION_INITIALIZE:
-        {
-            ret = ezlopi_turbidity_sensor_init(properties);
-            break;
-        }
-        // case EZLOPI_ACTION_NOTIFY_200_MS:
-        // case EZLOPI_ACTION_SET_VALUE:
-        // {
-        //     // TRACE_B("HEre");
-        //     ret = ezlopi_turbidity_sensor_update_value(properties, arg);
-        //     break;
-        // }
-        case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        {
-            ret = ezlopi_turbidity_sensor_get_value_cjson(properties, arg);
-            break;
-        }
-        case EZLOPI_ACTION_NOTIFY_1000_MS:
-        {
-            count++;
-            if(5 == count)
-            {
-                ret = ezlopi_turbidity_sensor_update_value(properties, arg);
-                count = 0;
-            }
-            break;
-        }
-        default:
-        {
-            break;
-        }
-        }
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
 
     return ret;
 }
@@ -144,23 +156,51 @@ static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *pr
 
     // if (ezlopi_water_previous_turbidity_state != ezlopi_water_present_turbidity_state)
     // {
-        ezlopi_device_value_updated_from_device(properties);
+    ezlopi_device_value_updated_from_device(properties);
     //     ezlopi_water_previous_turbidity_state = ezlopi_water_present_turbidity_state;
     // }
 
     return ret;
 }
-
-
-static int ezlopi_turbidity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
+static int ezlopi_turbidity_sensor_get_item(s_ezlopi_device_properties_t *properties, void *arg)
 {
     int ret = 0;
+    char valueFormatted[20];
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
+        cJSON *json_array_enum = cJSON_CreateArray();
+        if (NULL != json_array_enum)
+        {
+            for (uint8_t i = 0; i < TURBIDITY__MAX; i++)
+            {
+                cJSON *json_value = cJSON_CreateString(water_filter_replacement_alarm_states[i]);
+                if (NULL != json_value)
+                {
+                    cJSON_AddItemToArray(json_array_enum, json_value);
+                }
+            }
+            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+        }
+
+        snprintf(valueFormatted, 20, "%s", ezlopi_water_present_turbidity_state);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_turbidity_state);
         ret = 1;
     }
     return ret;
 }
-
+static int ezlopi_turbidity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
+{
+    int ret = 0;
+    char valueFormatted[20];
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        snprintf(valueFormatted, 20, "%s", ezlopi_water_present_turbidity_state);
+        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_turbidity_state);
+        ret = 1;
+    }
+    return ret;
+}

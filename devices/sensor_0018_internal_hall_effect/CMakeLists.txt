@@ -7,4 +7,5 @@ idf_component_register(SRCS "sensor_0018_internal_hall_effect.c"
                                  gpio_isr_service
                                  ezlopi_devices 
                                  ezlopi_actions 
-                                 ezlopi_timer)
+                                 ezlopi_timer
+                                 ezlopi_valueformatter)
