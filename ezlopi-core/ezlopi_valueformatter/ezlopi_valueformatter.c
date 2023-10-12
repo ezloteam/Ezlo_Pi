@@ -36,6 +36,13 @@ char *ezlopi_valueformatter_int32(int32_t val)
     return formatted_val_str;
 }
 
+char *ezlopi_valueformatter_uint32(uint32_t val)
+{
+    char *formatted_val_str = (char *)malloc(15);
+    snprintf(formatted_val_str, 15, "%d", val);
+    return formatted_val_str;
+}
+
 char *ezlopi_valueformatter_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
     char *formatted_val_str = (char *)malloc(10);

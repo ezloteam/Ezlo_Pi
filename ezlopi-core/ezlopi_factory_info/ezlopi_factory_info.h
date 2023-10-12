@@ -611,8 +611,6 @@ static const char *test_device_constant_config =
     ],\
     \"dev_total\": 1}";
 
-#endif
-
 // DHT 11
 static const char *test_device_constant_config =
     "{\
@@ -629,9 +627,7 @@ static const char *test_device_constant_config =
   ],\
   \"dev_total\": 1}";
 
-#endif
 // DHT 22
-#if 0
 static const char *test_device_constant_config =
     "{\
   \"cmd\": 3,\
@@ -648,7 +644,23 @@ static const char *test_device_constant_config =
   \"dev_total\": 1}";
 
 #endif
-
+// ADC POT
+static const char *test_device_constant_config =
+    "{\
+  \"cmd\": 3,\
+  \"dev_total\": 1,\
+  \"dev_detail\": [\
+    {\
+      \"dev_type\": 3,\
+      \"dev_name\": \"POT\",\
+      \"id_room\": \"\",\
+      \"id_item\": 17,\
+      \"gpio\": 5,\
+      \"resln_bit\": 10\
+    }\
+  ]\
+}";
+#endif
 #ifdef __cplusplus
 }
 #endif
