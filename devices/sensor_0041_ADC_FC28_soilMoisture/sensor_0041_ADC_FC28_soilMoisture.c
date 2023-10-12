@@ -43,7 +43,12 @@ int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, s_ezlopi_device
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        ret = ezlopi_device_value_updated_from_device(ezlopi_device);
+        static uint8_t count = 0;
+        if (count++ > 1)
+        {
+            ret = ezlopi_device_value_updated_from_device(ezlopi_device);
+            count = 0;
+        }
         break;
     }
     default:

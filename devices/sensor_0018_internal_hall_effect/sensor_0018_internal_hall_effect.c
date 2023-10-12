@@ -55,7 +55,7 @@ int door_hall_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *pr
         get_door_sensor_value(properties, args);
         break;
     }
-    case EZLOPI_ACTION_NOTIFY_200_MS:
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
         ezlopi_device_value_updated_from_device(properties);
         break;

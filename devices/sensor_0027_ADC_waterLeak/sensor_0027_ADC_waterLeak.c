@@ -172,7 +172,6 @@ static int get_water_leak_sensor_item_to_cloud(s_ezlopi_device_properties_t *pro
             }
             cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
         }
-
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_water_present_leak_state);
         cJSON_AddStringToObject(cjson_propertise, "value", ezlopi_water_present_leak_state);
         ret = 1;

@@ -407,12 +407,15 @@ static const char *test_device_constant_config =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\{\
-                \"dev_type\": 2,\
-                \"dev_name\": \"Reed\",\
+                 \"dev_type\": 10,\
+                \"dev_name\": \"2Axis_Joystick\",\
                 \"id_room\": \"\",\
-                \"id_item\": 61,\
-                \"gpio\": 18,\
-                \"logic_inv\": false\
+                \"id_item\": 28,\
+                \"gpio_x\": 33,\
+                \"gpio_y\": 32,\
+                \"gpio_z\": 35,\
+                \"gpio_sw\": 15,\
+                \"resln_bit\": 3\
             }\
         ],\
     \"dev_total\": 1}";

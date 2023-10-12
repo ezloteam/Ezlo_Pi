@@ -58,7 +58,7 @@ int sensor_0044_I2C_TSL2561_luminosity(e_ezlopi_actions_t action, s_ezlopi_devic
         static uint8_t count = 0;
         if (init_guard) // allow to send new data only if init is finished
         {
-            if (count++ > 3)
+            if (count++ > 1)
             {
                 ret = ezlopi_device_value_updated_from_device(ezlopi_device);
                 count = 0;
@@ -141,10 +141,14 @@ static s_ezlopi_device_properties_t *sensor_0044_TSL2561_prepare(cJSON *cjson_de
 
         CJSON_GET_VALUE_INT(cjson_device, "gpio_sda", sensor_tsl2561_properties->interface.i2c_master.sda);
         CJSON_GET_VALUE_INT(cjson_device, "gpio_scl", sensor_tsl2561_properties->interface.i2c_master.scl);
+        CJSON_GET_VALUE_INT(cjson_device, "slave_addr", sensor_tsl2561_properties->interface.i2c_master.address);
 
         sensor_tsl2561_properties->interface.i2c_master.enable = true;
         sensor_tsl2561_properties->interface.i2c_master.clock_speed = 100000;
-        sensor_tsl2561_properties->interface.i2c_master.address = TSL2561_ADDRESS;
+        if (NULL == (sensor_tsl2561_properties->interface.i2c_master.address))
+        {
+            sensor_tsl2561_properties->interface.i2c_master.address = TSL2561_ADDRESS;
+        }
     }
     return sensor_tsl2561_properties;
 }

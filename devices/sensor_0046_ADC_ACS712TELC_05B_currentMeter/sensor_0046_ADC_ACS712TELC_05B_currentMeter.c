@@ -54,8 +54,8 @@ int sensor_0046_ADC_ACS712TELC_05B_currentMeter(e_ezlopi_actions_t action, s_ezl
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count = 3;
-        if (3 < count)
+        static uint8_t count = 0;
+        if (count == 1)
         {
             ret = ezlopi_device_value_updated_from_device(ezlopi_device);
             count = 0;
@@ -187,11 +187,18 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
         {
             ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
             // getting the voltage value at this instant
+            if ((ezlopi_analog_data->voltage) > 700) // the reading voltage less than 700mV is noise
+            {
 #ifdef VOLTAGE_DIVIDER_ADDED
-            Vnow = (ezlopi_analog_data->voltage) * 2 - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
+                Vnow = (ezlopi_analog_data->voltage) * 2 - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
 #else
-            Vnow = (ezlopi_analog_data->voltage) - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
+                Vnow = (ezlopi_analog_data->voltage) - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
 #endif
+            }
+            else
+            {
+                Vnow = 0;
+            }
             Vsum += Vnow * Vnow; // sumof(I^2 + I^2 + .....)
             measurements_count++;
         }
@@ -206,7 +213,7 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
 
         // TRACE_E("AC current = %0.2f A", Ampere);
         //----------------------------------------------------------
-
+#if 0
         //         /*this portion calculates an instantaneous current as soon as the AC mesurement process is done*/
         //         float Amp_data = 0;
         //         ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
@@ -225,7 +232,7 @@ static void Calculate_AC_DC_current_value(s_ezlopi_device_properties_t *properti
         //             Amp_data = 0;
         //         }
         // TRACE_E("DC current = %0.2f A", Amp_data);
-
+#endif
         // clear the allocated memory
         free(ezlopi_analog_data);
     }

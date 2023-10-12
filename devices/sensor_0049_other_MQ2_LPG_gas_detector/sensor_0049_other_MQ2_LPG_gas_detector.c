@@ -363,10 +363,12 @@ static void sensor_other_MQ2_get_item(s_ezlopi_device_properties_t *properties, 
 
             if (0 == gpio_get_level(mq2_digital_pin)) // when D0 -> 0V,
             {
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "combustible_gas_detected");
                 cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
             }
             else
             {
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "no_gas");
                 cJSON_AddStringToObject(cjson_properties, "value", "no_gas");
             }
         }
@@ -400,13 +402,15 @@ static int sensor_other_MQ2_get_value(s_ezlopi_device_properties_t *properties, 
 
         if (ezlopi_item_name_gas_alarm == properties->ezlopi_cloud.item_name)
         {
-            if (gpio_get_level(mq2_digital_pin)) // when D0 -> logic high,
+            if (0 == gpio_get_level(mq2_digital_pin)) // when D0 -> logic high,
             {
-                cJSON_AddStringToObject(cjson_properties, "value", "no_gas ");
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "combustible_gas_detected");
+                cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
             }
             else
             {
-                cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "no_gas");
+                cJSON_AddStringToObject(cjson_properties, "value", "no_gas ");
             }
         }
         if (ezlopi_item_name_smoke_density == properties->ezlopi_cloud.item_name)
