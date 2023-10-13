@@ -5,16 +5,16 @@ extern "C"
 {
 #endif
 #define V_TYPE 2
-#define BUILD_DATE 1695620216
+#define BUILD_DATE 1697205314
 #define MAJOR 2
 #define MINOR 0
-#define BATCH 4
-#define BUILD 176
-#define VERSION_STR "2.0.4"
+#define BATCH 13
+#define BUILD 178
+#define VERSION_STR "2.0.11"
 #define DEVELOPER "lomas.subedi@ezlo.com"
-#define COMPILE_TIME "Mon 25 Sep 2023 11:21:56 AM +0545"
-#define CURRENT_BRANCH "Nepal Digital System Pvt. Ltd."
-#define COMMIT_HASH "9f18baf35c2cc94cfd2ccbc59fcd12de5be3c6d1"
+#define COMPILE_TIME "Fri 13 Oct 2023 07:40:13 PM +0545"
+#define CURRENT_BRANCH "fix_missing_item_list"
+#define COMMIT_HASH "dc25961f1dbcf0550b002f5738a14f9b28c2d0b6"
 #ifdef __cplusplus
 }
 #endif
