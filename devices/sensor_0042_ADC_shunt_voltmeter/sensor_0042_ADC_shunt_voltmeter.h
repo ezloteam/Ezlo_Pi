@@ -32,9 +32,6 @@
  *      |
  *      V
  */
-#define VOLTAGE_DIVIDER_ADDED 1
-
-#define SENSOR_MODULE_COMPENSATION 5 //!< The module provides 1/5 of actual reading . So we need to multiply by 5
 
 //------------------------------------------
 

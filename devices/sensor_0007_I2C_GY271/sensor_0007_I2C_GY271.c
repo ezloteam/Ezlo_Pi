@@ -377,9 +377,9 @@ static int sensor_i2c_gy271_prepare(void *arg)
 
         uint32_t device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(X_field_properties, device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_x_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
-        // device_id = ezlopi_cloud_generate_device_id();
+        device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(Y_field_properties, device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_y_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
-        // device_id = ezlopi_cloud_generate_device_id();
+        device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(Z_field_properties, device_id, category_level_sensor, subcategory_not_defined, ezlopi_item_name_acceleration_z_axis, value_type_int, prep_arg->cjson_device, sensor_0007_I2C_GY271_data);
 
         device_id = ezlopi_cloud_generate_device_id();

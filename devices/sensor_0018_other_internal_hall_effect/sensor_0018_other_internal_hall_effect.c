@@ -2,7 +2,7 @@
 
 #ifdef CONFIG_IDF_TARGET_ESP32
 #include "trace.h"
-#include "sensor_0018_internal_hall_effect.h"
+#include "sensor_0018_other_internal_hall_effect.h"
 #include "esp_err.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_timer.h"

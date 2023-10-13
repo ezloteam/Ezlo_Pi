@@ -333,9 +333,9 @@ static void i2c_mpu6050_sensor_prepare(void *arg)
         uint32_t device_id = 0;
         device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_X], ezlopi_item_name_acceleration_x_axis, value_type_acceleration, prep_arg->cjson_device);
-        // device_id = ezlopi_cloud_generate_device_id();
+        device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Y], ezlopi_item_name_acceleration_y_axis, value_type_acceleration, prep_arg->cjson_device);
-        // device_id = ezlopi_cloud_generate_device_id();
+        device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_not_defined, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_ACCELERATION_Z], ezlopi_item_name_acceleration_z_axis, value_type_acceleration, prep_arg->cjson_device);
 
         device_id = ezlopi_cloud_generate_device_id();
@@ -343,9 +343,9 @@ static void i2c_mpu6050_sensor_prepare(void *arg)
 
         device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_velocity, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_X], ezlopi_item_name_velocity, value_type_float, prep_arg->cjson_device);
-        // device_id = ezlopi_cloud_generate_device_id();
+        device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_velocity, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Y], ezlopi_item_name_velocity, value_type_float, prep_arg->cjson_device);
-        // device_id = ezlopi_cloud_generate_device_id();
+        device_id = ezlopi_cloud_generate_device_id();
         ADD_PROPERTIES_DEVICE_LIST(device_id, category_generic_sensor, subcategory_velocity, sensor_0005_i2c_mpu6050_item_ids[SENSOR_0005_I2C_MPU6050_ITEM_GYRO_Z], ezlopi_item_name_velocity, value_type_float, prep_arg->cjson_device);
     }
 }

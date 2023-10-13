@@ -245,7 +245,7 @@ static esp_err_t get_device_id(s_ezlopi_device_properties_t *properties)
     ezlopi_i2c_master_write_to_device(&properties->interface.i2c_master, write_buffer, 1);
     ezlopi_i2c_master_read_from_device(&properties->interface.i2c_master, &dev_id, 1);
     vTaskDelay(10);
-    // TRACE_B("The device id is %d", dev_id);
+    TRACE_B("The device id is %d", dev_id);
     return ESP_OK;
 }
 static esp_err_t data_formatting(s_ezlopi_device_properties_t *properties)

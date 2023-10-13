@@ -18,8 +18,8 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -500,183 +500,35 @@ static const char *test_device_constant_config =
 
 // SK6812
 static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
-// PWM Dimmable Lamp
-static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":5,\"dev_name\":\"Dimmer\",\"id_room\":\"\",\"id_item\":22,\"gpio\":3,\"pwm_resln\":8,\"freq_hz\":50,\"duty_cycle\":0}],\"dev_total\":1}";
 // Servo
-static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":5,\"dev_name\":\"Servo\",\"id_room\":\"\",\"id_item\":36,\"gpio\":3,\"pwm_resln\":8,\"freq_hz\":50,\"duty_cycle\":0}],\"dev_total\":1}"
 // Other RGB
 
 static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
 
-// I2C MPU6050
-// static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":8,\"dev_name\":\"MPU 6050\",\"id_room\":\"\",\"id_item\":5,\"gpio_sda\":21,\"gpio_scl\":22,\"pullup_scl\":true,\"pullup_sda\":true,\"slave_addr\":105}],\"dev_total\":1}";
-
-static const char *test_device_constant_config =
-    "{\
-    \"cmd\": 3,\
-    \"dev_detail\":\
-    [\
-        {\
-            \"dev_type\": 8,\
-            \"dev_name\": \"MPU 6050\",\
-            \"id_room\": \"\",\
-            \"id_item\": 5,\
-            \"gpio_sda\": 22,\
-            \"gpio_scl\": 23,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 105\
-        }\
-    ],\
-    \"dev_total\": 1}";
-
-
-// ADXL345
-static const char *test_device_constant_config =
-    "{\
-    \"cmd\": 3,\
-    \"dev_detail\":\
-    [\
-        {\
-            \"dev_type\": 8,\
-            \"dev_name\": \"ADXL 345\",\
-            \"id_room\": \"\",\
-            \"id_item\": 6,\
-            \"gpio_sda\": 22,\
-            \"gpio_scl\": 23,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 105\
-        }\
-    ],\
-    \"dev_total\": 1}";
-
-// GY271
-static const char *test_device_constant_config =
-    "{\
-    \"cmd\": 3,\
-    \"dev_detail\":\
-    [\
-        {\
-            \"dev_type\": 8,\
-            \"dev_name\": \"GY271\",\
-            \"id_room\": \"\",\
-            \"id_item\": 7,\
-            \"gpio_sda\": 22,\
-            \"gpio_scl\": 23,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 105\
-        }\
-    ],\
-    \"dev_total\": 1}";
-
-// LTR 303ALS
-static const char *test_device_constant_config =
-    "{\
-    \"cmd\": 3,\
-    \"dev_detail\":\
-    [\
-        {\
-            \"dev_type\": 8,\
-            \"dev_name\": \"LTR303 ALS\",\
-            \"id_room\": \"\",\
-            \"id_item\": 8,\
-            \"gpio_sda\": 22,\
-            \"gpio_scl\": 23,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 105\
-        }\
-    ],\
-    \"dev_total\": 1}";
-
-// LTR BME280
-static const char *test_device_constant_config =
-    "{\
-    \"cmd\": 3,\
-    \"dev_detail\":\
-    [\
-        {\
-            \"dev_type\": 8,\
-            \"dev_name\": \"BME 280\",\
-            \"id_room\": \"\",\
-            \"id_item\": 12,\
-            \"gpio_sda\": 21,\
-            \"gpio_scl\": 22,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 105\
-        }\
-    ],\
-    \"dev_total\": 1}";
-
-// DHT 11
-static const char *test_device_constant_config =
-    "{\
-  \"cmd\": 3,\
-  \"dev_detail\":\
-  [\
-    {\
-      \"dev_type\": 7,\
-      \"dev_name\": \"DHT 11\",\
-      \"id_room\": \"\",\
-      \"id_item\": 15,\
-      \"gpio\": 17\
-    }\
-  ],\
-  \"dev_total\": 1}";
-
-// DHT 22
-static const char *test_device_constant_config =
-    "{\
-  \"cmd\": 3,\
-  \"dev_detail\":\
-  [\
-    {\
-      \"dev_type\": 7,\
-      \"dev_name\": \"DHT 22\",\
-      \"id_room\": \"\",\
-      \"id_item\": 16,\
-      \"gpio\": 17\
-    }\
-  ],\
-  \"dev_total\": 1}";
-
-
-// ADC POT
-static const char *test_device_constant_config =
-    "{\
-  \"cmd\": 3,\
-  \"dev_total\": 1,\
-  \"dev_detail\": [\
-    {\
-      \"dev_type\": 3,\
-      \"dev_name\": \"POT\",\
-      \"id_room\": \"\",\
-      \"id_item\": 17,\
-      \"gpio\": 5,\
-      \"resln_bit\": 10\
-    }\
-  ]\
-}";
 #endif
 static const char *test_device_constant_config =
+
     "{\
-  \"cmd\": 3,\
-  \"dev_total\": 1,\
-  \"dev_detail\": [{\
-                 \"dev_type\": 10,\
-                \"dev_name\": \"2Axis_Joystick\",\
+    \"cmd\":3,\
+    \"dev_detail\":[{\
+                \"dev_name\": \"Plug \",\
+                \"dev_type\": 1,\
+                \"gpio_in\": -1,\
+                \"gpio_out\": 2,\
+                \"id_item\": 2,\
                 \"id_room\": \"\",\
-                \"id_item\": 20,\
-                \"gpio_x\": 33,\
-                \"gpio_y\": 34,\
-                \"gpio_sw\": 25,\
-                \"resln_bit\": 3\
+                \"ip_inv\": true,\
+                \"is_ip\": false,\
+                \"op_inv\": false,\
+                \"pullup_ip\": true,\
+                \"pullup_op\": true,\
+                \"val_ip\": true,\
+                \"val_op\": false\
             }\
-  ]\
-}";
+    ],\
+    \"dev_total\":1\
+    }";
+
 #endif
 #ifdef __cplusplus
 }

@@ -40,11 +40,11 @@ int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, s_ezlopi_device_propertie
         ret = ezlopi_ultrasonic_MB1013_init(properties);
         break;
     }
-    // case EZLOPI_ACTION_NOTIFY_200_MS:
-    // {
-    //     ret = ezlopi_send_motion_detected_data(properties);
-    //     break;
-    // }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        ret = ezlopi_send_motion_detected_data(properties);
+        break;
+    }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
@@ -131,10 +131,6 @@ static s_ezlopi_device_properties_t *ezlopi_ultrasonic_MB1013_prepare(cJSON *cjs
         CJSON_GET_VALUE_INT(cjson_device, "baud_rate", ezlopi_ultrasonic_MB1013_properties->interface.uart.baudrate);
         CJSON_GET_VALUE_INT(cjson_device, "gpio_tx", ezlopi_ultrasonic_MB1013_properties->interface.uart.tx);
         CJSON_GET_VALUE_INT(cjson_device, "gpio_rx", ezlopi_ultrasonic_MB1013_properties->interface.uart.rx);
-
-        // ezlopi_ultrasonic_MB1013_properties->interface.uart.baudrate = 9600;
-        // ezlopi_ultrasonic_MB1013_properties->interface.uart.tx = 0;
-        // ezlopi_ultrasonic_MB1013_properties->interface.uart.rx = 18;
     }
     return ezlopi_ultrasonic_MB1013_properties;
 }
@@ -152,16 +148,16 @@ static int ezlopi_ultrasonic_MB1013_init(s_ezlopi_device_properties_t *propertie
     return ret;
 }
 
-// static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t *properties)
-// {
-//     int ret = 0;
-//     if (is_motion_detected != previous_motion)
-//     {
-//         ret = ezlopi_device_value_updated_from_device(properties);
-//         previous_motion = is_motion_detected;
-//     }
-//     return ret;
-// }
+static int ezlopi_send_motion_detected_data(s_ezlopi_device_properties_t *properties)
+{
+    int ret = 0;
+    if (is_motion_detected != previous_motion)
+    {
+        ret = ezlopi_device_value_updated_from_device(properties);
+        previous_motion = is_motion_detected;
+    }
+    return ret;
+}
 
 static int ezlopi_ultrasonic_MB1013_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
 {
