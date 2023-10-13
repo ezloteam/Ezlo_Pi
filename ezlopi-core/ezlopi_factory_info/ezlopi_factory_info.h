@@ -643,7 +643,7 @@ static const char *test_device_constant_config =
   ],\
   \"dev_total\": 1}";
 
-#endif
+
 // ADC POT
 static const char *test_device_constant_config =
     "{\
@@ -658,6 +658,21 @@ static const char *test_device_constant_config =
       \"gpio\": 5,\
       \"resln_bit\": 10\
     }\
+  ]\
+}";
+#endif
+static const char *test_device_constant_config =
+    "{\
+  \"cmd\": 3,\
+  \"dev_total\": 1,\
+  \"dev_detail\": [{\
+    \"dev_name\": \"MQ 4 \",\
+                \"dev_type\": 10,\
+                \"id_item\": 48,\
+                \"id_room\": \"\",\
+                \"gpio1\": 25,\
+                \"gpio2\": 33\
+            }\
   ]\
 }";
 #endif

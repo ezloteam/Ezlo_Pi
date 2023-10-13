@@ -364,8 +364,8 @@ static void sensor_other_MQ7_get_item(s_ezlopi_device_properties_t *properties, 
 
             if (0 == gpio_get_level(mq7_digital_pin)) // when D0 -> 0V,
             {
-                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "combustible_gas_detected");
-                cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "toxic_gas_detected");
+                cJSON_AddStringToObject(cjson_properties, "value", "toxic_gas_detected");
             }
             else
             {
@@ -405,8 +405,8 @@ static int sensor_other_MQ7_get_value(s_ezlopi_device_properties_t *properties, 
         {
             if (0 == gpio_get_level(mq7_digital_pin)) // when D0 -> 0V,
             {
-                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "combustible_gas_detected");
-                cJSON_AddStringToObject(cjson_properties, "value", "combustible_gas_detected");
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", "toxic_gas_detected");
+                cJSON_AddStringToObject(cjson_properties, "value", "toxic_gas_detected");
             }
             else
             {
