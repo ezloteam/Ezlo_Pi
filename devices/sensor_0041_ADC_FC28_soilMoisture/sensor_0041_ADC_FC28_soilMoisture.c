@@ -78,11 +78,11 @@ static s_ezlopi_device_properties_t *sensor_adc_FC28_prepare(cJSON *cjson_device
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_0041_adc_FC28_properties, device_name);
 
-        sensor_0041_adc_FC28_properties->ezlopi_cloud.category = category_generic_sensor;
+        sensor_0041_adc_FC28_properties->ezlopi_cloud.category = category_humidity;
         sensor_0041_adc_FC28_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
         sensor_0041_adc_FC28_properties->ezlopi_cloud.item_name = ezlopi_item_name_moisture;
         sensor_0041_adc_FC28_properties->ezlopi_cloud.device_type = dev_type_sensor;
-        sensor_0041_adc_FC28_properties->ezlopi_cloud.value_type = value_type_int;
+        sensor_0041_adc_FC28_properties->ezlopi_cloud.value_type = value_type_moisture;
         sensor_0041_adc_FC28_properties->ezlopi_cloud.has_getter = true;
         sensor_0041_adc_FC28_properties->ezlopi_cloud.has_setter = false;
         sensor_0041_adc_FC28_properties->ezlopi_cloud.reachable = true;
@@ -144,13 +144,13 @@ static int sensor_adc_FC28_get_value(s_ezlopi_device_properties_t *properties, v
         // NOTE : [ (0V-2.4V)  ==>  (0-4095) ]
         float adc_val = (ezlopi_analog_data->value); // The value maxes out the 2.4V
 
-        int percent_data = (int)(((float)(4095.0f - adc_val) / 4095.0f) * 100);
-        TRACE_B("Percent moisture : %d", percent_data);
+        float percent_data = (((float)(4095.0f - adc_val) / 4095.0f) * 100);
+        TRACE_B("Percent moisture : %.2f", percent_data);
 
         // int volt_data = (int)(2400 - (ezlopi_analog_data->voltage)/2.0f); // max 2.4V
         // TRACE_B("voltage : %dmV", volt_data);
         cJSON_AddNumberToObject(cjson_properties, "value", percent_data);
-        char *valueFormatted = ezlopi_valueformatter_int(percent_data);
+        char *valueFormatted = ezlopi_valueformatter_float(percent_data);
         cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
         free(valueFormatted);
         cJSON_AddStringToObject(cjson_properties, "scale", "percent");

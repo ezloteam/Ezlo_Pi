@@ -666,12 +666,14 @@ static const char *test_device_constant_config =
   \"cmd\": 3,\
   \"dev_total\": 1,\
   \"dev_detail\": [{\
-    \"dev_name\": \"MQ 4 \",\
-                \"dev_type\": 10,\
-                \"id_item\": 48,\
+                 \"dev_type\": 10,\
+                \"dev_name\": \"2Axis_Joystick\",\
                 \"id_room\": \"\",\
-                \"gpio1\": 25,\
-                \"gpio2\": 33\
+                \"id_item\": 20,\
+                \"gpio_x\": 33,\
+                \"gpio_y\": 34,\
+                \"gpio_sw\": 25,\
+                \"resln_bit\": 3\
             }\
   ]\
 }";

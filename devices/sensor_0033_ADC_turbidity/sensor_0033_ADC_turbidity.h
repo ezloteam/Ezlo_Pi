@@ -24,7 +24,6 @@ static int ezlopi_turbidity_sensor_update_value(s_ezlopi_device_properties_t *pr
 static int ezlopi_turbidity_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static int ezlopi_turbidity_sensor_get_item(s_ezlopi_device_properties_t *properties, void *arg);
 
-
 typedef enum
 {
 	TURBIDITY_WATER_FILTER_OK,

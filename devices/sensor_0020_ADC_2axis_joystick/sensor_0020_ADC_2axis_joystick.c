@@ -15,25 +15,26 @@
 #include "gpio_isr_service.h"
 #include "ezlopi_valueformatter.h"
 
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, sub_category, item_name, value_type, cjson_device)        \
-    {                                                                                                             \
-        s_ezlopi_device_properties_t *_properties = joystick_2_axis_prepare(device_id, category, sub_category,    \
-                                                                            item_name, value_type, cjson_device); \
-        if (NULL != _properties)                                                                                  \
-        {                                                                                                         \
-            add_device_to_list(device_prep_arg, _properties, NULL);                                               \
-        }                                                                                                         \
+#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, sub_category, item_id, item_name, value_type, cjson_device)        \
+    {                                                                                                                      \
+        s_ezlopi_device_properties_t *_properties = joystick_2_axis_prepare(device_id, category, sub_category,             \
+                                                                            item_id, item_name, value_type, cjson_device); \
+        if (NULL != _properties)                                                                                           \
+        {                                                                                                                  \
+            add_device_to_list(device_prep_arg, _properties, NULL);                                                        \
+        }                                                                                                                  \
     }
 
 static int joystick_2_axis_prepare_and_add(void *args);
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *properties, void *user_args);
 static s_ezlopi_device_properties_t *joystick_2_axis_prepare(uint32_t device_id, const char *category,
-                                                             const char *sub_category, const char *item_name,
+                                                             const char *sub_category, uint32_t item_id, const char *item_name,
                                                              const char *value_type, cJSON *cjson_device);
 static int joystick_2_axis_init(s_ezlopi_device_properties_t *properties);
 static void joystick_2_axis_switch_update_from_device(void *params);
 static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, void *args);
 
+static uint32_t sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_MAX];
 int sensor_0020_ADC_2axis_joystick(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_args)
 {
     int ret = 0;
@@ -77,18 +78,25 @@ static int joystick_2_axis_prepare_and_add(void *args)
     int ret = 0;
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
 
+    for (uint8_t i = 0; i < SENSOR_0020_ADC_2AXIS_JOYSTICK_MAX; i++)
+    {
+        sensor_0020_ADC_2axis_joystick_item_ids[i] = ezlopi_cloud_generate_item_id();
+    }
+
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
         uint32_t device_id = ezlopi_cloud_generate_device_id();
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_electricity, ezlopi_item_name_voltage, value_type_electric_potential, device_prep_arg->cjson_device);
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_electricity, ezlopi_item_name_voltage, value_type_electric_potential, device_prep_arg->cjson_device);
-        ADD_PROPERTIES_DEVICE_LIST(device_id, category_switch, subcategory_in_wall, ezlopi_item_name_switch, value_type_bool, device_prep_arg->cjson_device);
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_electricity, sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_X], ezlopi_item_name_voltage, value_type_electric_potential, device_prep_arg->cjson_device);
+        device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_level_sensor, subcategory_electricity, sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_Y], ezlopi_item_name_voltage, value_type_electric_potential, device_prep_arg->cjson_device);
+        device_id = ezlopi_cloud_generate_device_id();
+        ADD_PROPERTIES_DEVICE_LIST(device_id, category_switch, subcategory_in_wall, sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_SWITCH], ezlopi_item_name_switch, value_type_bool, device_prep_arg->cjson_device);
     }
     return ret;
 }
 
 static s_ezlopi_device_properties_t *joystick_2_axis_prepare(uint32_t device_id, const char *category,
-                                                             const char *sub_category, const char *item_name,
+                                                             const char *sub_category, uint32_t item_id, const char *item_name,
                                                              const char *value_type, cJSON *cjson_device)
 {
     s_ezlopi_device_properties_t *joystick_2_axis_properties = malloc(sizeof(s_ezlopi_device_properties_t));
@@ -108,12 +116,12 @@ static s_ezlopi_device_properties_t *joystick_2_axis_prepare(uint32_t device_id,
         joystick_2_axis_properties->ezlopi_cloud.battery_powered = false;
         joystick_2_axis_properties->ezlopi_cloud.show = true;
         joystick_2_axis_properties->ezlopi_cloud.room_name[0] = '\0';
-        joystick_2_axis_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+        joystick_2_axis_properties->ezlopi_cloud.device_id = device_id;
         joystick_2_axis_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-        joystick_2_axis_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
+        joystick_2_axis_properties->ezlopi_cloud.item_id = item_id;
 
         char *device_name = NULL;
-        if (strcmp(item_name, "joystick-x") == 0)
+        if (sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_X] == item_id)
         {
             joystick_2_axis_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
             device_name = "Joystick-X";
@@ -121,7 +129,7 @@ static s_ezlopi_device_properties_t *joystick_2_axis_prepare(uint32_t device_id,
             CJSON_GET_VALUE_INT(cjson_device, "resln_bit", joystick_2_axis_properties->interface.adc.resln_bit);
             joystick_2_axis_properties->interface.adc.resln_bit = 3;
         }
-        if (strcmp(item_name, "joystick-y") == 0)
+        if (sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_Y] == item_id)
         {
             joystick_2_axis_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
             device_name = "Joystick-Y";
@@ -129,7 +137,7 @@ static s_ezlopi_device_properties_t *joystick_2_axis_prepare(uint32_t device_id,
             CJSON_GET_VALUE_INT(cjson_device, "resln_bit", joystick_2_axis_properties->interface.adc.resln_bit);
             joystick_2_axis_properties->interface.adc.resln_bit = 3;
         }
-        if (ezlopi_item_name_switch == item_name)
+        if (sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_SWITCH] == item_id)
         {
             joystick_2_axis_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT;
             device_name = "Joystick switch";
@@ -167,13 +175,13 @@ static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_pro
 static int joystick_2_axis_init(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
-    if ((0 == strcmp(properties->ezlopi_cloud.item_name, "joystick-x")) || (0 == strcmp(properties->ezlopi_cloud.item_name, "joystick-y")))
+    if ((properties->ezlopi_cloud.item_id == sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_X]) || (properties->ezlopi_cloud.item_id == sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_Y]))
     {
         TRACE_E("HERE!!, GPIO_NUM is %d", properties->interface.adc.gpio_num);
         ezlopi_adc_init(properties->interface.adc.gpio_num, properties->interface.adc.resln_bit);
         ret = 1;
     }
-    if (0 == strcmp(properties->ezlopi_cloud.item_name, ezlopi_item_name_switch))
+    if (properties->ezlopi_cloud.item_id == sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_SWITCH])
     {
         TRACE_B("HERE!!, gpio num is %d", properties->interface.gpio.gpio_in.gpio_num);
         TRACE_B("interrupt type is %d", properties->interface.gpio.gpio_in.interrupt);
@@ -197,7 +205,7 @@ static int joystick_2_axis_init(s_ezlopi_device_properties_t *properties)
             TRACE_B("Value is %d", properties->interface.gpio.gpio_in.value);
         }
         // gpio_isr_service_register(properties, joystick_2_axis_switch_update_from_device, 100);
-        xTaskCreate(joystick_2_axis_switch_update_from_device, "joystick_2_axis_switch_update_from_device", 2048, properties, 0, NULL);
+        xTaskCreate(joystick_2_axis_switch_update_from_device, "joystick_2_axis_switch_update_from_device", 2048 * 4, properties, 0, NULL);
     }
     return ret;
 }
@@ -222,7 +230,7 @@ static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, v
     if (cjson_propertise)
     {
         memset(ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
-        if ((0 == strcmp(properties->ezlopi_cloud.item_name, "joystick-x")))
+        if (sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_X] == properties->ezlopi_cloud.item_id)
         {
             ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
             cJSON_AddNumberToObject(cjson_propertise, "value", ezlopi_analog_data->voltage);
@@ -232,7 +240,7 @@ static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, v
             free(valueFormatted);
             TRACE_B("X-axis value is %d and voltage is %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
         }
-        if ((0 == strcmp(properties->ezlopi_cloud.item_name, "joystick-y")))
+        else if (sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_Y] == properties->ezlopi_cloud.item_id)
         {
             ezlopi_adc_get_adc_data(properties->interface.adc.gpio_num, ezlopi_analog_data);
 
@@ -243,11 +251,15 @@ static int get_joystick_2_axis_value(s_ezlopi_device_properties_t *properties, v
             cJSON_AddStringToObject(cjson_propertise, "scale", "milli_volt");
             TRACE_B("Y-axis value is %d and voltage is %d", ezlopi_analog_data->value, ezlopi_analog_data->voltage);
         }
-        if (0 == strcmp(properties->ezlopi_cloud.item_name, ezlopi_item_name_switch))
+        else if (sensor_0020_ADC_2axis_joystick_item_ids[SENSOR_0020_ADC_2AXIS_JOYSTICK_SWITCH] == properties->ezlopi_cloud.item_id)
         {
             cJSON_AddBoolToObject(cjson_propertise, "value", ((0 == properties->interface.gpio.gpio_in.value) ? true : false));
-            char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+            char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? false : true);
             cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
+        }
+        else
+        {
+            ret = 0;
         }
         ret = 1;
     }

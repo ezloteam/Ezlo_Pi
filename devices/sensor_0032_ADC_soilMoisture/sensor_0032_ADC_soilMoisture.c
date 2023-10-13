@@ -92,11 +92,11 @@ static s_ezlopi_device_properties_t *soil_moisture_sensor_prepare(cJSON *cjson_d
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(soil_moisture_sensor_properties, device_name);
-        soil_moisture_sensor_properties->ezlopi_cloud.category = category_generic_sensor;
+        soil_moisture_sensor_properties->ezlopi_cloud.category = category_humidity;
         soil_moisture_sensor_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
         soil_moisture_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_soil_humidity;
         soil_moisture_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor;
-        soil_moisture_sensor_properties->ezlopi_cloud.value_type = value_type_int;
+        soil_moisture_sensor_properties->ezlopi_cloud.value_type = value_type_humidity;
         soil_moisture_sensor_properties->ezlopi_cloud.has_getter = true;
         soil_moisture_sensor_properties->ezlopi_cloud.has_setter = false;
         soil_moisture_sensor_properties->ezlopi_cloud.reachable = true;

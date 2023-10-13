@@ -60,7 +60,7 @@ static s_ezlopi_device_properties_t *sensor_0061_prepare_properties(cJSON *cjson
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_0061_device_properties, device_name);
         sensor_0061_device_properties->ezlopi_cloud.category = category_switch;
-        sensor_0061_device_properties->ezlopi_cloud.subcategory = subcategory_relay;
+        sensor_0061_device_properties->ezlopi_cloud.subcategory = subcategory_valve;
         sensor_0061_device_properties->ezlopi_cloud.item_name = ezlopi_item_name_switch;
         sensor_0061_device_properties->ezlopi_cloud.device_type = dev_type_sensor;
         sensor_0061_device_properties->ezlopi_cloud.value_type = value_type_bool;

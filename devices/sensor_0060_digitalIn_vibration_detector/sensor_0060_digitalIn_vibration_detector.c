@@ -58,18 +58,18 @@ int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, s_ezlopi
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        // static uint8_t count = 0;
-        // if (count++ > 1)
-        // {
-        int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
-        properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
-        if ((properties->interface.gpio.gpio_in.value) != ((int *)properties->user_arg))
+        static uint8_t count = 0;
+        if (count++ > 2)
         {
-            (properties->user_arg) = (void *)(properties->interface.gpio.gpio_in.value);
+            int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
+            properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level; // (if you want to activate after detecting vibration once and not stop) write --> 1 : 0;
+                                                                                                                                    // if ((properties->interface.gpio.gpio_in.value) != ((int *)properties->user_arg))
+                                                                                                                                    // {
+            // (properties->user_arg) = (void *)(properties->interface.gpio.gpio_in.value);
             ezlopi_device_value_updated_from_device(properties);
+            // }
+            count = 0;
         }
-        //     count = 0;
-        // }
         ret = 0;
     }
     default:
@@ -111,8 +111,8 @@ static s_ezlopi_device_properties_t *sensor_0060_prepare(cJSON *cjson_device)
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(sensor_0060_properties, device_name);
-        sensor_0060_properties->ezlopi_cloud.category = category_security_sensor;
-        sensor_0060_properties->ezlopi_cloud.subcategory = subcategory_motion;
+        sensor_0060_properties->ezlopi_cloud.category = category_state_sensor;
+        sensor_0060_properties->ezlopi_cloud.subcategory = subcategory_activity;
         sensor_0060_properties->ezlopi_cloud.item_name = ezlopi_item_name_activity;
         sensor_0060_properties->ezlopi_cloud.device_type = dev_type_sensor;
         sensor_0060_properties->ezlopi_cloud.value_type = value_type_token;

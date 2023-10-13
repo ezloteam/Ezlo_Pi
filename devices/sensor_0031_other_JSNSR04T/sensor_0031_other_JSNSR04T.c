@@ -106,7 +106,7 @@ static s_ezlopi_device_properties_t *ezlopi_sensor_0031_other_JSNSR04T_prepare(c
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(ezlopi_sensor_0031_other_JSNSR04T_properties, device_name);
-        ezlopi_sensor_0031_other_JSNSR04T_properties->ezlopi_cloud.category = category_generic_sensor;
+        ezlopi_sensor_0031_other_JSNSR04T_properties->ezlopi_cloud.category = category_level_sensor;
         ezlopi_sensor_0031_other_JSNSR04T_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
         ezlopi_sensor_0031_other_JSNSR04T_properties->ezlopi_cloud.item_name = ezlopi_item_name_distance;
         ezlopi_sensor_0031_other_JSNSR04T_properties->ezlopi_cloud.device_type = dev_type_sensor;

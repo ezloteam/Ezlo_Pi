@@ -101,7 +101,7 @@ static s_ezlopi_device_properties_t *ezlopi_turbidity_sensor_prepare(cJSON *cjso
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(ezlopi_turbidity_sensor_properties, device_name);
-        ezlopi_turbidity_sensor_properties->ezlopi_cloud.category = category_level_sensor;
+        ezlopi_turbidity_sensor_properties->ezlopi_cloud.category = category_generic_sensor;
         ezlopi_turbidity_sensor_properties->ezlopi_cloud.subcategory = subcategory_water;
         ezlopi_turbidity_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_water_filter_replacement_alarm;
         ezlopi_turbidity_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor;

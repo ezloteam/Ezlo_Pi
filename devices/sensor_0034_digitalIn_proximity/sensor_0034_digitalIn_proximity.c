@@ -72,10 +72,10 @@ static s_ezlopi_device_properties_t *proximity_sensor_prepare(cJSON *cjson_devic
         char *device_name = NULL;
         CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME(proximity_sensor_properties, device_name);
-        proximity_sensor_properties->ezlopi_cloud.category = category_security_sensor;
-        proximity_sensor_properties->ezlopi_cloud.subcategory = subcategory_motion;
-        proximity_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_motion;
-        proximity_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
+        proximity_sensor_properties->ezlopi_cloud.category = category_switch;
+        proximity_sensor_properties->ezlopi_cloud.subcategory = subcategory_in_wall;
+        proximity_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_switch;
+        proximity_sensor_properties->ezlopi_cloud.device_type = dev_type_switch_outlet;
         proximity_sensor_properties->ezlopi_cloud.value_type = value_type_bool;
         proximity_sensor_properties->ezlopi_cloud.has_getter = true;
         proximity_sensor_properties->ezlopi_cloud.has_setter = false;
@@ -142,8 +142,8 @@ static int proximity_sensor_get_value_cjson(s_ezlopi_device_properties_t *proper
     cJSON *cjson_propertise = (cJSON *)args;
     if (cjson_propertise)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
-        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddBoolToObject(cjson_propertise, "value", (properties->interface.gpio.gpio_in.value ? 0 : 1));
+        char *valueFormatted = ezlopi_valueformatter_bool(properties->interface.gpio.gpio_in.value ? false : true);
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", valueFormatted);
         ret = 1;
     }
