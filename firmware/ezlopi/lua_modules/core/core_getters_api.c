@@ -29,78 +29,48 @@ int lcore_get_product_name(lua_State *lua_state)
 int lcore_get_gateways(lua_State *lua_state) { return 0; }
 int lcore_get_gateway(lua_State *lua_state) { return 0; }
 
+typedef struct Point
+{
+    int x, y;
+} Point;
+
 static void __create_device_lua_table(lua_State *lua_state, l_ezlopi_device_t *device_prop)
 {
-
     lua_newtable(lua_state);
-    int top = lua_gettop(lua_state);
+    // lua_settop(lua_state, 0);
 
-    lua_pushstring(lua_state, "id");
-    char frmt_str[32];
-    snprintf(frmt_str, sizeof(frmt_str), "%08x", device_prop->cloud_properties.device_id);
-    lua_pushstring(lua_state, frmt_str);
-
-    // lua_pushstring(lua_state, "gateway_id");
-    // lua_pushstring(lua_state, "");
-
-    lua_pushstring(lua_state, "name");
     lua_pushstring(lua_state, device_prop->cloud_properties.device_name);
+    lua_setfield(lua_state, -1, "name");
+    lua_rawset(lua_state, -3);
 
-    lua_pushstring(lua_state, "category");
-    lua_pushstring(lua_state, device_prop->cloud_properties.category);
+    int top = lua_gettop(lua_state);
+    TRACE_D("top: %d", top);
+    for (int i = 1; i <= top; i++)
+    {
+        printf("%d\t%s\t", i, luaL_typename(lua_state, i));
+        switch (lua_type(lua_state, i))
+        {
+        case LUA_TNUMBER:
+            printf("%g\n", lua_tonumber(lua_state, i));
+            break;
+        case LUA_TSTRING:
+            printf("%s\n", lua_tostring(lua_state, i));
+            break;
+        case LUA_TBOOLEAN:
+            printf("%s\n", (lua_toboolean(lua_state, i) ? "true" : "false"));
+            break;
+        case LUA_TNIL:
+            printf("%s\n", "nil");
+            break;
+        default:
+            printf("%p\n", lua_topointer(lua_state, i));
+            break;
+        }
+    }
 
-    lua_pushstring(lua_state, "subcategory");
-    lua_pushstring(lua_state, device_prop->cloud_properties.subcategory);
-
-    lua_pushstring(lua_state, "type");
-    lua_pushstring(lua_state, device_prop->cloud_properties.device_type);
-
-    // lua_pushstring(lua_state, "device_type_id");
-    // lua_pushstring(lua_state, device_prop->cloud_properties.);
-
-    // lua_pushstring(lua_state, "room_id");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "parent_device_id");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "info");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "firmware");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "battery_powered");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "reachable");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "persistent");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "security");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "ready");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "status");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "house_modes_options");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "parent_room");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "manufacturer");
-    // lua_pushstring(lua_state, "");
-
-    // lua_pushstring(lua_state, "hardware");
-    // lua_pushstring(lua_state, "");
-
-    lua_settable(lua_state, top);
+    // // lua_settable(lua_state, -3);
+    // TRACE_D("table index: %d", top);
+    // lua_settable(lua_state, -1);
 }
 
 int lcore_get_device(lua_State *lua_state)
