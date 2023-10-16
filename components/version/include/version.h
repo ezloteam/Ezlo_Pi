@@ -10,7 +10,7 @@ extern "C"
 #define MINOR 0
 #define BATCH 13
 #define BUILD 178
-#define VERSION_STR "2.0.11"
+#define VERSION_STR "2.0.13"
 #define DEVELOPER "lomas.subedi@ezlo.com"
 #define COMPILE_TIME "Fri 13 Oct 2023 07:40:13 PM +0545"
 #define CURRENT_BRANCH "fix_missing_item_list"
