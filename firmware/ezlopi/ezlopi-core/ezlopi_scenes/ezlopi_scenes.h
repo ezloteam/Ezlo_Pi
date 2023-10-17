@@ -10,6 +10,7 @@
 #include "cJSON.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "ezlopi_scenes_methods.h"
 
 typedef enum e_scenes_block_type
 {
@@ -25,13 +26,6 @@ typedef enum e_scene_value_type
 #include "ezlopi_scenes_value_types.h"
 #undef EZLOPI_VALUE_TYPE
 } e_scene_value_type_t;
-
-typedef enum e_scene_method_type
-{
-#define EZLOPI_SCENE(method, name, func) EZLOPI_SCENE_##method,
-#include "ezlopi_scenes_method_types.h"
-#undef EZLOPI_SCENE
-} e_scene_method_type_t;
 
 typedef struct s_method
 {

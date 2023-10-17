@@ -33,6 +33,10 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 034_proximity_sensor 
                                 0038_digitalOut_RGB 
                                 0044_sensor_I2C_TSL256_luminosity
+                                0057_sensor_other_KY026_FlameDetector
+                                0053_sensor_UART_GYGPS6MV2
+                                0054_sensor_PWM_YFS201_flowmeter
+                                0056_sensor_ADC_Force_Sensitive_Resistor                                
                                 0048_sensor_other_MQ4_CH4_detector
                                 0049_sensor_other_MQ2_LPG_detector
                                 0050_sensor_other_MQ3_alcohol_detector

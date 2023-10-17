@@ -29,7 +29,6 @@
 #include "0044_sensor_I2C_TSL256_luminosity.h"
 #include "0008_sensor_I2C_LTR303ALS.h"
 #include "0009_other_RMT_SK6812.h"
-
 #include "0010_I2C_BME680.h"
 #include "0048_sensor_other_MQ4_CH4_detector.h"
 #include "0049_sensor_other_MQ2_LPG_detector.h"
@@ -39,6 +38,10 @@
 #include "0059_sensor_other_MQ6_LPG_detector.h"
 #include "0062_sensor_other_MQ7_CO_detector.h"
 #include "0063_sensor_other_MQ9_LPG_flameable_detector.h"
+#include "0057_sensor_other_KY026_FlameDetector.h"
+#include "0053_sensor_UART_GYGPS6MV2.h"
+#include "0054_sensor_PWM_YFS201_flowmeter.h"
+#include "0056_sensor_ADC_Force_Sensitive_Resistor.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -51,6 +54,13 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0002_RELAY
     {
         .id = EZLOPI_SENSOR_0002_RELAY,
+        .func = digital_io_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0003_PLUG
+    {
+        .id = EZLOPI_SENSOR_0003_PLUG,
         .func = digital_io_v3,
     },
 #endif
@@ -249,6 +259,34 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
+#ifdef EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR
+    {
+        .id = EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR,
+        .func = sensor_0057_flame_detector_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0053_UART_GYGPS6MV2
+    {
+        .id = EZLOPI_SENSOR_0053_UART_GYGPS6MV2,
+        .func = sensor_0053_uart_gps_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER
+    {
+        .id = EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER,
+        .func = sensor_0054_pwm_flowmeter_v3,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0056_ADC_FSR
+    {
+        .id = EZLOPI_SENSOR_0056_ADC_FSR,
+        .func = sensor_0056_fsr_v3,
+    },
+#endif
+
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.
      * This is essential for terminating the loop termination of loop.
@@ -266,7 +304,7 @@ s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void)
 }
 #endif
 
-#if 1 // version 1.x.x to 2.x.x
+#if 0 // version 1.x.x to 2.x.x
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void)
 {
     return NULL;

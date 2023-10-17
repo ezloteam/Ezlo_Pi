@@ -1,7 +1,7 @@
 #ifndef __TRACE_H__
 #define __TRACE_H__
 
-#include "sdkconfig.h"
+#include "../../build/config/sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
@@ -22,10 +22,10 @@ extern "C"
     {                                                            \
         printf("%s (%d): " X "\r\n", __FILE__, __LINE__, ##reg); \
     }
-#define trace_dbg(X, ...) ESP_LOGD(__FILE__, "(%d): " X, __LINE__, ##__VA_ARGS__)
-#define trace_imp(X, ...) ESP_LOGI(__FILE__, "(%d): " X, __LINE__, ##__VA_ARGS__)
-#define trace_err(X, ...) ESP_LOGE(__FILE__, "(%d): " X, __LINE__, ##__VA_ARGS__)
-#define trace_war(X, ...) ESP_LOGW(__FILE__, "(%d): " X, __LINE__, ##__VA_ARGS__)
+#define trace_dbg(X, ...) ESP_LOGD(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
+#define trace_imp(X, ...) ESP_LOGI(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
+#define trace_err(X, ...) ESP_LOGE(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
+#define trace_war(X, ...) ESP_LOGW(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
 #define trace_info(X, ...)                              \
     {                                                   \
         printf("\x1B[34m %s[%d]:", __FILE__, __LINE__); \

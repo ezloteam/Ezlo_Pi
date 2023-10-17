@@ -32,7 +32,9 @@ typedef struct bme280_dev sensor_bme280_dev_t;
  */
 typedef struct bme280_data sensor_bme280_data_t;
 
+#if 0 // v2.x
 int sensor_bme280(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+#endif
 // int sensor_bme280(e_ezlopi_actions_t action, void *arg) { return 0; }
 
 #endif // __SENSOR_BME290_H__

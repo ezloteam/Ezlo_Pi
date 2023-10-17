@@ -10,8 +10,8 @@
 
 #define EZLOPI_SENSOR_NONE 0
 #define EZLOPI_SENSOR_0001_LED 1
-// #define EZLOPI_SENSOR_0002_RELAY 2
-// #define EZLOPI_SENSOR_0003_PLUG 3
+#define EZLOPI_SENSOR_0002_RELAY 2
+#define EZLOPI_SENSOR_0003_PLUG 3
 #define EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR 8
 #define EZLOPI_DEVICE_0009_SK6812_LED_STRIP 9
 
@@ -65,20 +65,29 @@
 #define EZLOPI_SENSOR_0062_OTHER_MQ7_CO_DETECTOR 62
 #define EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR 63
 
+#define EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER 54
+#define EZLOPI_SENSOR_0056_ADC_FSR 56
 
+#define EZLOPI_SENSOR_0053_UART_GYGPS6MV2 53
+
+#define EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR 57
 /**
  * @brief defining the type of sensor call function
  *
  */
 // int sensor_bme280(e_ezlopi_actions_t action, void *arg);
+#if 0 // v2.x
 typedef int (*f_sensor_call_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
+#endif
 typedef int (*f_sensor_call_v3_t)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
+#if 0 // v2.x
 typedef struct s_ezlopi_device
 {
     uint32_t id;
     f_sensor_call_t func;
 } s_ezlopi_device_t;
+#endif
 
 typedef struct s_ezlopi_device_v3
 {
@@ -86,8 +95,7 @@ typedef struct s_ezlopi_device_v3
     f_sensor_call_v3_t func;
 } s_ezlopi_device_v3_t;
 
-// #if 1
-
+#if 0 // v2.x
 typedef struct l_ezlopi_configured_devices
 {
     void *user_arg;
@@ -96,12 +104,12 @@ typedef struct l_ezlopi_configured_devices
     struct l_ezlopi_configured_devices *next;
 
 } l_ezlopi_configured_devices_t;
+#endif
 
 typedef struct s_ezlopi_prep_arg
 {
     cJSON *cjson_device;
-    s_ezlopi_device_t *device;
-
+    s_ezlopi_device_v3_t *device;
 } s_ezlopi_prep_arg_t;
 
 s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void);
@@ -111,6 +119,7 @@ s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void);
  *
  * @return f_sensor_call_t*
  */
+#if 0 // v2.x
 s_ezlopi_device_t *ezlopi_devices_list_get_list(void);
 
 // void ezlopi_devices_list_add(s_ezlopi_device_t *device);
@@ -118,6 +127,7 @@ s_ezlopi_device_t *ezlopi_devices_list_get_list(void);
 // int ezlopi_devices_list_add(s_ezlopi_device_t *device, s_ezlopi_device_properties_t *properties);
 int ezlopi_devices_list_add(s_ezlopi_device_t *device, s_ezlopi_device_properties_t *properties, void *user_arg);
 l_ezlopi_configured_devices_t *ezlopi_devices_list_get_configured_items(void);
+#endif
 
 #if 0
 /**
