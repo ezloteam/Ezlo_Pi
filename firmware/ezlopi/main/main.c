@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "nvs.h"
-#include "nvs_flash.h"
+// #include "nvs.h"
+// #include "nvs_flash.h"
 #include "esp_system.h"
 #include "driver/adc.h"
 #include "driver/i2c.h"
@@ -24,16 +24,19 @@
 #include "ezlopi_system_info.h"
 #include "029_IR_blaster_remote.h"
 
+#include "uuid.h"
 #include "mac_uuid.h"
 
-#include "ezlopi_scenes_service.h"
 #include "ezlopi_http.h"
+#include "ezlopi_scenes_scripts.h"
+#include "ezlopi_scenes_service.h"
 #include "ezlopi_factory_info.h"
 
 static void blinky(void *pv);
 
 void app_main(void)
 {
+#if 1
     gpio_install_isr_service(0);
     qt_serial_init();
     gpio_isr_service_init();
@@ -45,6 +48,7 @@ void app_main(void)
     timer_service_init();
     TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+#endif
 }
 
 void ____check_and_free(char *to_be_freed)
@@ -83,8 +87,6 @@ static void blinky(void *pv)
         // int hall_sensor_value = hall_sensor_read();
         // int hall_sensor_value = 0;
         // TRACE_D("Hall Sensor value: %d\r\n", hall_sensor_value);
-
-        vTaskDelay(1000 / portTICK_RATE_MS);
 
         if (count++ > 10)
         {
@@ -125,5 +127,7 @@ static void blinky(void *pv)
             //////////////////////////////////////////////////////////////////////////////////////
 #endif
         }
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }

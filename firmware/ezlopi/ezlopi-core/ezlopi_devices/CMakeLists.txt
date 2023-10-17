@@ -39,6 +39,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                 0038_digitalOut_RGB 
                 0044_sensor_I2C_TSL256_luminosity
                 0054_sensor_PWM_YFS201_flowmeter
+                0056_sensor_ADC_Force_Sensitive_Resistor
                 )
 
 

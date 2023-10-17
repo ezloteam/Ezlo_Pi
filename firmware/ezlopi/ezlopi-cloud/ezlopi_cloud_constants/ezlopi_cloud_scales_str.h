@@ -36,4 +36,7 @@ const static char *scales_cubic_meter_per_hour = "cubic_meter_per_hour";
 const static char *scales_cubic_feet_per_minute = "cubic_feet_per_minute";
 const static char *scales_liter_per_hour = "liter_per_hour";
 
+/// @brief force
+const static char *scales_newton = "newton";
+
 #endif // __EZLOPI_SCALES_STR_H__
