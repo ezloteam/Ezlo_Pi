@@ -18,7 +18,6 @@ extern "C"
     void scenes_status_get(cJSON *cj_request, cJSON *cj_response);
     void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response);
     void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response);
-    void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

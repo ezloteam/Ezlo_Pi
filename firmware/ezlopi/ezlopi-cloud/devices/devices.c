@@ -14,7 +14,7 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
         cJSON *cjson_devices_array = cJSON_AddArrayToObject(cjson_result, "devices");
@@ -24,10 +24,11 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
 
             while (NULL != curr_device)
             {
-                cJSON *cj_properties = cJSON_CreateObject();
+                cJSON *cj_properties = ezlopi_device_create_device_table_from_prop(curr_device);
                 if (cj_properties)
                 {
-                    char tmp_string[64];
+#if 0
+                     tmp_string[64];
                     snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_device->cloud_properties.device_id);
                     cJSON_AddStringToObject(cj_properties, "_id", tmp_string);
                     cJSON_AddStringToObject(cj_properties, "deviceTypeId", "ezlopi");
@@ -47,7 +48,7 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
                     cJSON_AddBoolToObject(cj_properties, "ready", true);
                     cJSON_AddStringToObject(cj_properties, "status", "synced");
                     cJSON_AddObjectToObject(cj_properties, "info");
-
+#endif
                     if (!cJSON_AddItemToArray(cjson_devices_array, cj_properties))
                     {
                         cJSON_Delete(cj_properties);
@@ -68,11 +69,12 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+#if 0 // v2.x
 void devices_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
         cJSON *cjson_devices_array = cJSON_AddArrayToObject(cjson_result, "devices");
@@ -129,7 +131,6 @@ void devices_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-#if 0
 char *devices_name_set(const char *payload, uint32_t len, struct json_token *method, uint32_t msg_count)
 {
     uint32_t buf_len = 300;

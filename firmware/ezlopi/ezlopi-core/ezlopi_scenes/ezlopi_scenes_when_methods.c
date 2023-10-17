@@ -4,6 +4,7 @@
 #include "ezlopi_scenes.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_operators.h"
+#include "ezlopi_scenes_when_methods.h"
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
 {

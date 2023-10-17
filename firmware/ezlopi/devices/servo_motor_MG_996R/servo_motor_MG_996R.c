@@ -14,6 +14,7 @@
 
 #include "servo_motor_MG_996R.h"
 
+#if 0 // v2.x
 static int ezlopi_servo_motor_MG_996R_prepare_and_add(void *args);
 static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *cjson_device);
 static int ezlopi_servo_motor_MG_996R_init(s_ezlopi_device_properties_t *properties);
@@ -175,3 +176,4 @@ static int ezlopi_servo_motor_MG_996R_get_value_cjson(s_ezlopi_device_properties
     }
     return ret;
 }
+#endif

@@ -29,7 +29,7 @@ MACRO(SUBDIRLIST result curdir)
     SET(${result} ${dirlist}) # copy the components of 'dirlist' into 'result'(return variable)
 ENDMACRO()
 
-set(external_components_list sensors devices_old devices protocols interface ezlopi-cloud ezlopi-core services) # list of external components
+set(external_components_list sensors devices_old devices protocols interface ezlopi-cloud ezlopi-core services lua_modules) # list of external components
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'
 set(ALL_COMPONENTS "") # clearing 'ALL_COMPONENTS' variable
@@ -48,4 +48,4 @@ set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS}) # add the list of directories 'SUBDI
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENTS_DIRS}\r\n")
 
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
-project(Ezlo_Pi_v2x)
+project(Ezlo_Pi_v3x)
