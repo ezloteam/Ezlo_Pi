@@ -1,6 +1,8 @@
 #ifndef __EZLOPI_DEVICES_H__
 #define __EZLOPI_DEVICES_H__
 
+#include <cJSON.h>
+
 #include "ezlopi_gpio.h"
 #include "ezlopi_uart.h"
 #include "ezlopi_i2c_master.h"
@@ -149,7 +151,7 @@ typedef struct l_ezlopi_device
     struct l_ezlopi_device *next;
 } l_ezlopi_device_t;
 
-#if 1 // v1.x.x to v2.x.x
+#if 0 // v1.x.x to v2.x.x
 typedef struct s_ezlopi_device_properties
 {
     // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
@@ -178,14 +180,17 @@ void ezlopi_device_prepare(void);
 // uint32_t ezlopi_device_generate_room_id(void);
 // uint32_t ezlopi_device_generate_gateway_id(void);
 
+#if 0 // v2.x
 void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
+#endif
 
 l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
-                                                  int (*func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg));
+                                                  int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
+cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);
 
 #endif // __EZLOPI_DEVICE_H__

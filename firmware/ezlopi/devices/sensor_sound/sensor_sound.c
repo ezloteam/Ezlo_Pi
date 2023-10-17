@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "stdlib.h"
 
+#if 0 // v2.x
 static bool is_motion_detected = false;
 
 static int ezlopi_sound_prepare_and_add(void *args);
@@ -132,3 +133,4 @@ static int ezlopi_sound_get_value_cjson(s_ezlopi_device_properties_t *properties
     }
     return ret;
 }
+#endif

@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 
+#if 0 // v2.x
 static int device_health_prepare(void *arg);
 static int device_health_init(s_ezlopi_device_properties_t *properties);
 static int device_health_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
@@ -87,3 +88,4 @@ static int device_health_get_value_cjson(s_ezlopi_device_properties_t *propertie
 
     return ret;
 }
+#endif

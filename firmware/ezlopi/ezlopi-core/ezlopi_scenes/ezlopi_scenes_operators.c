@@ -45,7 +45,7 @@ char *ezlopi_scenes_operators_get_op(e_scene_cmp_operators_t operator)
     char *ret = NULL;
     if ((operator> SCENES_OPERATORS_NONE) && (operator<SCENES_OPERATORS_MAX))
     {
-        TRACE_D("op: %s", ezlopi_scenes_operators_op[operator]);
+        // TRACE_D("op: %s", ezlopi_scenes_operators_op[operator]);
         ret = ezlopi_scenes_operators_op[operator];
     }
     return ret;
@@ -56,7 +56,7 @@ char *ezlopi_scenes_operators_get_name(e_scene_cmp_operators_t operator)
     const char *ret = NULL;
     if ((operator> SCENES_OPERATORS_NONE) && (operator<SCENES_OPERATORS_MAX))
     {
-        TRACE_D("Name: %s", ezlopi_scenes_operators_name[operator]);
+        // TRACE_D("Name: %s", ezlopi_scenes_operators_name[operator]);
         ret = ezlopi_scenes_operators_name[operator];
     }
     return ret;
@@ -67,7 +67,7 @@ char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator)
     const char *ret = NULL;
     if ((operator> SCENES_OPERATORS_NONE) && (operator<SCENES_OPERATORS_MAX))
     {
-        TRACE_D("Method: %s", ezlopi_scenes_operators_method[operator]);
+        // TRACE_D("Method: %s", ezlopi_scenes_operators_method[operator]);
         ret = ezlopi_scenes_operators_method[operator];
     }
     return ret;

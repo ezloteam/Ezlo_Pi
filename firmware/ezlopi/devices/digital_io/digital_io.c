@@ -274,7 +274,7 @@ static void __write_gpio_value(l_ezlopi_item_t *item)
 static void __interrupt_upcall(l_ezlopi_item_t *item)
 {
     __toggle_gpio(item);
-    ezlopi_device_value_updated_from_device(item);
+    ezlopi_device_value_updated_from_device_v3(item);
 }
 
 static void __toggle_gpio(l_ezlopi_item_t *item)
