@@ -73,4 +73,7 @@ uint32_t ezlopi_cloud_generate_gateway_id(void);
 uint32_t ezlopi_cloud_get_gateway_id(void);
 uint32_t ezlopi_cloud_generate_scene_id(void);
 
+uint32_t ezlopi_cloud_generate_script_id(void);
+void ezlopi_cloud_update_script_id(uint32_t a_script_id);
+
 #endif // __EZLOPI_CLOUD_H__
