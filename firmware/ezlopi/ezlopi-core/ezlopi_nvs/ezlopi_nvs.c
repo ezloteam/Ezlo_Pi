@@ -1,6 +1,7 @@
 #include "string.h"
 #include "time.h"
 
+#include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -17,9 +18,7 @@ static const char *wifi_info_nvs_name = "wifi_info";
 static const char *boot_count_nvs_name = "boot_count";
 static const char *provisioning_status_nvs_name = "prov_stat";
 static const char *ezlopi_scenes_nvs_name = "ezlopi_scenes";
-
-static char *ezlopi_nvs_read_str(char *nvs_name);
-static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name);
+static const char *ezlopi_scripts_nvs_ids = "ezlopi_scripts";
 
 int ezlopi_nvs_init(void)
 {
@@ -79,6 +78,23 @@ int ezlopi_nvs_factory_reset(void)
     }
 
     return ret;
+}
+
+int ezlopi_nvs_write_scenes_scripts(char *data)
+{
+    int ret = 0;
+
+    if (1 == ezlopi_nvs_write_str(data, strlen(data), (char *)ezlopi_scripts_nvs_ids))
+    {
+        ret = 1;
+    }
+
+    return ret;
+}
+
+char *ezlopi_nvs_read_scenes_scripts(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_scripts_nvs_ids);
 }
 
 int ezlopi_nvs_write_config_data_str(char *data)
@@ -269,7 +285,7 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     return boot_count;
 }
 
-static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
+int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
 {
     int ret = 0;
 
@@ -301,7 +317,7 @@ static int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
     return ret;
 }
 
-static char *ezlopi_nvs_read_str(char *nvs_name)
+char *ezlopi_nvs_read_str(char *nvs_name)
 {
     char *return_str = NULL;
 
@@ -343,4 +359,18 @@ static char *ezlopi_nvs_read_str(char *nvs_name)
     }
 
     return return_str;
+}
+
+void ezlopi_nvs_delete_stored_script(uint32_t script_id)
+{
+    esp_err_t err = ESP_OK;
+    if (1 == ezlopi_nvs_init())
+    {
+        char script_id_str[32];
+        snprintf(script_id_str, sizeof(script_id_str), "%08x", script_id);
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, script_id_str)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", script_id_str, esp_err_to_name(err));
+        }
+    }
 }
