@@ -80,6 +80,14 @@ static char *g_ssl_shared_key = NULL;
 static char *g_ezlopi_config = NULL;
 static uint32_t g_provisioning_status = 0;
 
+const char *ezlopi_device_type_str[] = {
+    "generic",
+    "ezlopi_device_switchbox",
+    "ezlopi_device_irblaster"
+    "ezlopi_sensor_sound",
+    "ezlopi_sensor_ambienttrackerpro",
+};
+
 static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
 
@@ -171,7 +179,7 @@ void print_factory_info_v2(void)
     ezlopi_factory_info_v2_free(wifi_ssid);
     ezlopi_factory_info_v2_free(wifi_password);
     ezlopi_factory_info_v2_free(cloud_server);
-    ezlopi_factory_info_v2_free(device_type);
+    // ezlopi_factory_info_v2_free(device_type);
 }
 
 /** Getter */
@@ -286,9 +294,13 @@ char *ezlopi_factory_info_v2_get_cloud_server(void)
     return cloud_server;
 }
 
-char *ezlopi_factory_info_v2_get_device_type(void)
+const char *ezlopi_factory_info_v2_get_device_type(void)
 {
-    return ezlopi_factory_info_v2_read_string(DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH);
+// return ezlopi_factory_info_v2_read_string(DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH);
+#ifndef EZLOPI_DEVICE_TYPE_NAME
+#define EZLOPI_DEVICE_TYPE_NAME "not defined"
+#endif
+    return EZLOPI_DEVICE_TYPE_NAME;
 }
 
 char *ezlopi_factory_info_v2_get_ca_certificate(void)

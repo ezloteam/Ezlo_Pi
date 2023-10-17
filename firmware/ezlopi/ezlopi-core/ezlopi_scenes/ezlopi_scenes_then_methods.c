@@ -2,6 +2,7 @@
 #include "ezlopi_scenes.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_scenes_then_methods.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_t *curr_scene, void *arg)
 {

@@ -33,13 +33,13 @@ extern "C"
 #define user_init app_main
 #define uart_set_baud(p, r) uart_set_baudrate(p, r)
 
-#ifdef CONFIG_FREERTOS_ASSERT_ON_UNTESTED_FUNCTION
-#define vTaskDelayUntil(t, d) \
-    {                         \
-        *t = *t;              \
-        vTaskDelay(d);        \
-    }
-#endif
+    // #ifdef CONFIG_FREERTOS_ASSERT_ON_UNTESTED_FUNCTION
+    // #define vTaskDelayUntil(t, d)
+    //     {
+    //         *t = *t;
+    //         vTaskDelay(d);
+    //     }
+    // #endif
 
 #define IRAM IRAM_ATTR
 

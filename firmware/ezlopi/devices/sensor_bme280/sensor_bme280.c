@@ -42,11 +42,13 @@ static sensor_bme280_dev_t device = {
 };
 
 static int prepare_sensor(void *arg);
+#if 0 // v2.x
 static int sensor_bme280_init(s_ezlopi_device_properties_t *properties, void *user_arg);
 static int8_t sensor_bme280_read_value_from_sensor(s_ezlopi_device_properties_t *properties, sensor_bme280_data_t *data_ptr);
 static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
 static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_bme_device_properties, void *user_arg);
 static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t dev_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device);
+
 
 /**
  * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
@@ -320,3 +322,4 @@ static int8_t user_i2c_write(uint8_t register_addr, const uint8_t *data, uint32_
     i2c_master_write_read_device(I2C_NUM_0, CHIP_ID, &register_addr, 1, data, len, 1000 / portTICK_RATE_MS);
     return 0;
 }
+#endif
