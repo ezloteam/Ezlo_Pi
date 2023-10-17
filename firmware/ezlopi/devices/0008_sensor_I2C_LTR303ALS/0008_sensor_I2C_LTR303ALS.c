@@ -19,6 +19,7 @@
 #include "ALS_LTR303.h"
 #include "stdlib.h"
 
+#if 0 // v2.x
 static int count = 5;
 
 static int ltr303_prepare_sensor(void *arg);
@@ -26,6 +27,7 @@ static s_ezlopi_device_properties_t *ltr303_ambient_sensor_prepare_properties(cJ
 static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t *properties);
 static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t *properties);
 static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
+#endif
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -179,6 +181,7 @@ static int __prepare(void *arg)
     return ret;
 }
 
+#if 0 // v2.x
 static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t *properties)
 {
     int ret = 0;
@@ -212,3 +215,4 @@ static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *p
 
     return ret;
 }
+#endif

@@ -140,7 +140,7 @@ static int __notify(l_ezlopi_item_t *item)
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.value);
+        TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
 
         if (1000 <= ezlopi_analog_data.voltage)
         {

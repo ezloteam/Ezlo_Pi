@@ -12,7 +12,6 @@
 #include "ezlopi_devices_list.h"
 #include "ezlopi_event_queue.h"
 
-static void event_process(void *pv);
 static void event_process_v3(void *pv);
 
 void timer_service_init(void)
@@ -60,6 +59,7 @@ static void event_process_v3(void *pv)
     }
 }
 
+#if 0 // v2.x
 static void event_process(void *pv)
 {
     TickType_t old_tick = xTaskGetTickCount();
@@ -88,3 +88,4 @@ static void event_process(void *pv)
         }
     }
 }
+#endif

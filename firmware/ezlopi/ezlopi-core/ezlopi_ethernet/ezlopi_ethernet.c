@@ -40,7 +40,6 @@ static s_ezlopi_spi_master_t spi_config = {
 static void ezlopi_ethernet_reset(void);
 static void ezlopi_ethernet_gpio_setup(void);
 static void ezlopi_ethernet_setup_basic(void);
-static s_ezlopi_spi_master_t *ezlopi_ethernet_spi_setup(void);
 static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
 static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
 

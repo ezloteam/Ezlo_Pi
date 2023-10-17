@@ -121,6 +121,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.value_type = value_type_illuminance;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = scales_lux;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
     CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
