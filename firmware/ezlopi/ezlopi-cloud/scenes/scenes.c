@@ -14,7 +14,7 @@ void scenes_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
         cJSON *cjson_scenes_array = ezlopi_scenes_create_cjson_scene_list(ezlopi_scenes_get_scenes_list());
@@ -32,9 +32,9 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    // cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    // cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         ezlopi_scene_add_new_scene_cjson(cj_params);
@@ -49,7 +49,7 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
 
     uint32_t tmp_added_result = 0;
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         cJSON *cj_ids = cJSON_GetObjectItem(cj_params, "_id");
@@ -65,7 +65,7 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
                     cJSON *cj_scene = ezlopi_scenes_create_cjson_scene(scenes_list);
                     if (cj_scene)
                     {
-                        if (cJSON_AddItemToObject(cj_response, ezlopi_result, cj_scene))
+                        if (cJSON_AddItemToObject(cj_response, ezlopi_result_str, cj_scene))
                         {
                             tmp_added_result = 1;
                         }
@@ -82,7 +82,7 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
 
     if (0 == tmp_added_result)
     {
-        cJSON_AddObjectToObject(cj_response, ezlopi_result);
+        cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     }
 }
 
@@ -91,7 +91,7 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
@@ -111,9 +111,9 @@ void scenes_delete(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON_AddObjectToObject(cj_response, "result");
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
@@ -129,12 +129,12 @@ void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON_AddObjectToObject(cj_response, "result");
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     TRACE_E("Not implemented!");
 #warning "Incomplete"
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");
@@ -150,10 +150,10 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi__id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON *cj_paramas = cJSON_GetObjectItem(cj_request, "params");
+        cJSON *cj_paramas = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_paramas)
         {
             cJSON *cj_block_type = cJSON_GetObjectItem(cj_paramas, "blockType");
@@ -519,10 +519,10 @@ void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-        cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+        cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
+            cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
             if (cj_result)
             {
                 cJSON *temp = cj_params->child;
@@ -546,27 +546,13 @@ void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
-{
-    if (cj_request && cj_response)
-    {
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-
-        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, "result");
-        if (cj_result)
-        {
-        }
-    }
-}
-
 void scenes_run(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result);
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");

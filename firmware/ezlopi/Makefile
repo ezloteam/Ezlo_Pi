@@ -3,6 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := Ezlo_Pi_v2x
+PROJECT_NAME := Ezlo_Pi_v3x
 
 include $(IDF_PATH)/make/project.mk
