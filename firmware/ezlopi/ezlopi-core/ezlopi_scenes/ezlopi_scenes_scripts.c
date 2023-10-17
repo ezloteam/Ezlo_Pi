@@ -243,7 +243,7 @@ static void __script_process(void *arg)
             }
         }
 
-        tmp_ret = lua_pcall(lua_state, 0, 0, 0);
+        tmp_ret = lua_pcall(lua_state, 0, 1, 0);
         if (tmp_ret)
         {
             char *script_report = __script_report(lua_state, tmp_ret);

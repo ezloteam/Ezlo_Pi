@@ -34,43 +34,19 @@ typedef struct Point
     int x, y;
 } Point;
 
-static void __create_device_lua_table(lua_State *lua_state, l_ezlopi_device_t *device_prop)
+static int __create_device_lua_table(lua_State *lua_state, l_ezlopi_device_t *device_prop)
 {
     lua_newtable(lua_state);
-    // lua_settop(lua_state, 0);
 
-    lua_pushstring(lua_state, device_prop->cloud_properties.device_name);
-    lua_setfield(lua_state, -1, "name");
-    lua_rawset(lua_state, -3);
+    lua_pushstring(lua_state, "name");
+    lua_pushstring(lua_state, "John");
+    lua_settable(lua_state, -3);
 
-    int top = lua_gettop(lua_state);
-    TRACE_D("top: %d", top);
-    for (int i = 1; i <= top; i++)
-    {
-        printf("%d\t%s\t", i, luaL_typename(lua_state, i));
-        switch (lua_type(lua_state, i))
-        {
-        case LUA_TNUMBER:
-            printf("%g\n", lua_tonumber(lua_state, i));
-            break;
-        case LUA_TSTRING:
-            printf("%s\n", lua_tostring(lua_state, i));
-            break;
-        case LUA_TBOOLEAN:
-            printf("%s\n", (lua_toboolean(lua_state, i) ? "true" : "false"));
-            break;
-        case LUA_TNIL:
-            printf("%s\n", "nil");
-            break;
-        default:
-            printf("%p\n", lua_topointer(lua_state, i));
-            break;
-        }
-    }
+    lua_pushstring(lua_state, "surname");
+    lua_pushstring(lua_state, "Sina");
+    lua_settable(lua_state, -3);
 
-    // // lua_settable(lua_state, -3);
-    // TRACE_D("table index: %d", top);
-    // lua_settable(lua_state, -1);
+    return 1;
 }
 
 int lcore_get_device(lua_State *lua_state)
@@ -87,7 +63,7 @@ int lcore_get_device(lua_State *lua_state)
             if (device_id == device_node->cloud_properties.device_id)
             {
                 TRACE_E("Found device-id: %08x", device_id);
-                __create_device_lua_table(lua_state, device_node);
+                ret = __create_device_lua_table(lua_state, device_node);
 
 #if 0
                 cJSON *cj_device_prop = ezlopi_device_create_device_table_from_prop(device_node);
