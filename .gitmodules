@@ -1,9 +1,0 @@
-[submodule "firmware/ezlopi/sensors/bme280"]
-	path = firmware/ezlopi/sensors/bme280
-	url = git@github.com:BoschSensortec/BME280_driver.git
-[submodule "firmware/ezlopi/library/bme280"]
-	path = firmware/ezlopi/library/bme280
-	url = git@github.com:BoschSensortec/BME280_driver.git
-[submodule "ui-qt/esptool"]
-	path = ui-qt/esptool
-	url = git@github.com:espressif/esptool.git
