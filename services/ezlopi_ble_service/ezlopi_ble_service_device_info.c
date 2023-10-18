@@ -1,4 +1,5 @@
 #include "string.h"
+#include "ctype.h"
 
 #include "cJSON.h"
 #include "lwip/ip_addr.h"
@@ -61,10 +62,11 @@ static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
             uint32_t total_data_len = strlen(json_str_device_info);
             uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
             uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
+            TRACE_D("ble - chunk size: %d", copy_size);
 
             if ((0 != total_data_len) && (total_data_len > param->read.offset))
             {
-                TRACE_D("Sending: %.*s", copy_size, json_str_device_info + param->read.offset);
+                TRACE_D("Sending: [len = %d]\r\n%.*s", copy_size, copy_size, json_str_device_info + param->read.offset);
                 strncpy((char *)value->value, json_str_device_info + param->read.offset, copy_size);
                 value->len = copy_size;
             }
@@ -106,37 +108,46 @@ static char *device_info_jsonify(void)
         cJSON_AddStringToObject(root, "firmware_version", VERSION_STR);
         cJSON_AddNumberToObject(root, "firmware_build", BUILD);
         cJSON_AddStringToObject(root, "chip", CONFIG_IDF_TARGET);
-        cJSON_AddStringToObject(root, "flash_size", CONFIG_ESPTOOLPY_FLASHSIZE);
-        cJSON_AddStringToObject(root, "version_idf", esp_get_idf_version());
+        // cJSON_AddStringToObject(root, "flash_size", CONFIG_ESPTOOLPY_FLASHSIZE);
+        // cJSON_AddStringToObject(root, "version_idf", esp_get_idf_version());
         cJSON_AddNumberToObject(root, "uptime", uptime_sec);
         cJSON_AddNumberToObject(root, "build_date", BUILD_DATE);
-        cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
-        cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
+        // cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
+        // cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
         cJSON_AddBoolToObject(root, "provisioned_status", ezlopi_factory_info_v2_get_provisioning_status());
 
-        uint8_t ble_mac[6];
-        esp_read_mac(ble_mac, ESP_MAC_BT);
+        uint8_t _mac[6];
+        ezlopi_factory_info_v2_get_ezlopi_mac(_mac);
         char mac_string[32];
         snprintf(mac_string, sizeof(mac_string), "%02x:%02x:%02x:%02x:%02x:%02x",
-                 mac_string[0], mac_string[1], mac_string[2], mac_string[3], mac_string[4], mac_string[5]);
+                 _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]);
         cJSON_AddStringToObject(root, "mac", mac_string);
+        TRACE_E("mac_string: %s", mac_string);
+        // char ezpi_uuid[50];
+        // ezlopi_generate_UUID(ezpi_uuid);
+        // cJSON_AddStringToObject(root, "uuid", ezpi_uuid);
 
+        unsigned long long serial_id = ezlopi_factory_info_v2_get_id();
+        cJSON_AddNumberToObject(root, "serial", serial_id);
         __add_factory_info_to_root(root, "ezlopi_device_type", ezlopi_factory_info_v2_get_device_type());
-        __add_factory_info_to_root(root, "model", ezlopi_factory_info_v2_get_model());
-        __add_factory_info_to_root(root, "device_name", ezlopi_factory_info_v2_get_name());
-        __add_factory_info_to_root(root, "brand", ezlopi_factory_info_v2_get_brand());
-        __add_factory_info_to_root(root, "manufacturer", ezlopi_factory_info_v2_get_manufacturer());
+        // __add_factory_info_to_root(root, "model", ezlopi_factory_info_v2_get_model());
+        // __add_factory_info_to_root(root, "device_name", ezlopi_factory_info_v2_get_name());
+        // __add_factory_info_to_root(root, "brand", ezlopi_factory_info_v2_get_brand());
+        // __add_factory_info_to_root(root, "manufacturer", ezlopi_factory_info_v2_get_manufacturer());
 
         char *ssid = ezlopi_factory_info_v2_get_ssid();
-        cJSON_AddStringToObject(root, "wifi_ssid", ssid ? ssid : "");
+        if (ssid)
+        {
+            cJSON_AddStringToObject(root, "wifi_ssid", (isprint(ssid[0])) ? ssid : "");
+        }
         esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
-        cJSON_AddStringToObject(root, "wifi-ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
-        cJSON_AddStringToObject(root, "wifi-gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
-        cJSON_AddStringToObject(root, "wifi-netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
+        // cJSON_AddStringToObject(root, "wifi-ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
+        // cJSON_AddStringToObject(root, "wifi-gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
+        // cJSON_AddStringToObject(root, "wifi-netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
         cJSON_AddNumberToObject(root, "wifi-connection_status", ezlopi_wifi_got_ip());
-        cJSON_AddStringToObject(root, "wifi-error", ezlopi_wifi_get_last_disconnect_reason());
-        const char *internet_status_str = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? "Internet available" : "Internet not available";
-        cJSON_AddStringToObject(root, "internet_status", internet_status_str);
+        // cJSON_AddStringToObject(root, "wifi-error", ezlopi_wifi_get_last_disconnect_reason());
+        uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? 1 : 0;
+        cJSON_AddNumberToObject(root, "internet_status", flag_internet_status);
 
         device_info = cJSON_Print(root);
         if (device_info)
@@ -163,6 +174,6 @@ void __add_factory_info_to_root(cJSON *root, char *key, char *value)
         {
             cJSON_AddStringToObject(root, key, "unknown");
         }
-        free(value);
+        // free(value);
     }
 }

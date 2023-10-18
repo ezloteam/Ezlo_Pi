@@ -19,9 +19,9 @@ uint16_t ezlopi_ble_gatt_get_max_data_size(void)
     return g_mtu_size;
 }
 
-void ezlopi_ble_gatts_characteristic_notify(s_gatt_service_t *service, s_gatt_char_t *characteristics, uint8_t *value, uint32_t len)
+void ezlopi_ble_gatts_characteristic_notify(s_gatt_service_t *service, s_gatt_char_t *characteristics, esp_gatt_value_t *value)
 {
-    esp_ble_gatts_send_indicate(service->gatts_if, service->conn_id, characteristics->handle, len, value, false);
+    esp_ble_gatts_send_indicate(service->gatts_if, service->conn_id, characteristics->handle, value->len, value->value, false);
 }
 
 void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
@@ -239,18 +239,22 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
                 {
                 case ESP_GATTS_READ_EVT:
                 {
+                    TRACE_I("Is a characteristic 'read'.");
                     return characteristic->read_upcall;
                 }
                 case ESP_GATTS_WRITE_EVT:
                 {
+                    TRACE_I("Is a characteristic 'write'.");
                     return characteristic->write_upcall;
                 }
                 case ESP_GATTS_EXEC_WRITE_EVT:
                 {
+                    TRACE_I("Is a characteristic 'write_exce'.");
                     return characteristic->write_exce_upcall;
                 }
                 default:
                 {
+                    TRACE_I("Characteristic upcall not found!");
                     return NULL;
                 }
                 }
@@ -261,23 +265,28 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
             {
                 if (handle == descriptor->handle)
                 {
+                    TRACE_I("Is a descriptor %s.", event ? "read" : "write");
+                    // ezlopi_ble_gatt_print_descriptor(descriptor);
                     switch (event)
                     {
                     case ESP_GATTS_READ_EVT:
                     {
+                        TRACE_I("Is a descriptor 'read'.");
                         return descriptor->read_upcall;
                     }
                     case ESP_GATTS_WRITE_EVT:
                     {
+                        TRACE_I("Is a descriptor 'write'.");
                         return descriptor->write_upcall;
                     }
                     case ESP_GATTS_EXEC_WRITE_EVT:
                     {
+                        TRACE_I("Is a descriptor 'write_exce'.");
                         return descriptor->write_exce_upcall;
                     }
                     default:
                     {
-                        TRACE_W("Descriptor upcall not found!");
+                        TRACE_I("Descriptor upcall not found!");
                         return NULL;
                     }
                     }

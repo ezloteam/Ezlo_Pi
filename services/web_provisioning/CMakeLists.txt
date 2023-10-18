@@ -2,27 +2,27 @@
 file(GLOB_RECURSE provisioning_src "*.c*")
 idf_component_register(SRCS "web_provisioning.c" "${provisioning_src}"
     INCLUDE_DIRS "."
-    REQUIRES    
-                trace
-                json
+    REQUIRES    data
+                devices
                 favorite
+                firmware
                 gateways
                 info
+                json
                 modes
-                items
-                room
-                data
-                devices
-                scenes
-                registration                
                 network
-                firmware
-                esp_common 
-                esp_http_client 
-                esp-tls 
+                registration
+                room
+                scenes
+                trace  
+                items             
+                esp_common
                 esp_hw_support
-                ezlopi_factory_info 
-                ezlopi_wifi 
-                ezlopi_websocket_client 
-                ezlopi_http                             
+                esp_http_client
+                esp-tls
+                ezlopi_factory_info
+                ezlopi_http
+                ezlopi_websocket_client
+                ezlopi_wifi                
+
 )
