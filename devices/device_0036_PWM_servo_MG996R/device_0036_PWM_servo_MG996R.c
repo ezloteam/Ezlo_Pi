@@ -12,7 +12,7 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 
-#include "servo_motor_MG_996R.h"
+#include "device_0036_PWM_servo_MG996R.h"
 
 #if 0 // v2.x
 static int ezlopi_servo_motor_MG_996R_prepare_and_add(void *args);

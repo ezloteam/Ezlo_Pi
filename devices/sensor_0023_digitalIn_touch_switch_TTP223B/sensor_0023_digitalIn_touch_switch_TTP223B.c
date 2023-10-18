@@ -1,6 +1,5 @@
 
 
-#include "0023_sensor_touch_switch_tpp_223b.h"
 #include "gpio_isr_service.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"
@@ -11,11 +10,15 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
+
 #include "esp_err.h"
 #include "driver/gpio.h"
 #include "items.h"
 #include "trace.h"
 #include "cJSON.h"
+
+#include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 
 static bool sensor_bme280_initialized = false;
 
@@ -33,7 +36,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
  * @param arg Other arguments if needed
  * @return int
  */
-int sensor_touch_ttp_223b_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0023_digitalIn_touch_switch_TTP223B(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     switch (action)
     {
@@ -47,6 +50,7 @@ int sensor_touch_ttp_223b_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, v
         __init(item);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         __get_cjson_value(item, arg);
@@ -64,11 +68,12 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
 
-    cJSON *param = (cJSON*)arg;
-    if(param)
+    cJSON *param = (cJSON *)arg;
+    if (param)
     {
-        cJSON_AddStringToObject(param, "valueFormatted", (true == (item->interface.gpio.gpio_in.value) ? "true" : "false"));
         cJSON_AddBoolToObject(param, "value", item->interface.gpio.gpio_in.value);
+        char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddStringToObject(param, "valueFormatted", valueFormatted);
     }
 
     return ret;
@@ -94,7 +99,7 @@ static int __init(l_ezlopi_item_t *item)
 
 static void touch_switch_callback(void *arg)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t*)arg;
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;
     ezlopi_device_value_updated_from_device_v3(item);
 }
@@ -110,7 +115,7 @@ static int __prepare(void *arg)
         if (touch_device)
         {
             __prepare_touch_switch_device_cloud_properties(touch_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *touch_switch_item = ezlopi_device_add_item_to_device(touch_device, sensor_touch_ttp_223b_v3);
+            l_ezlopi_item_t *touch_switch_item = ezlopi_device_add_item_to_device(touch_device, sensor_0023_digitalIn_touch_switch_TTP223B);
             if (touch_switch_item)
             {
                 __prepare_touch_switch_properties(touch_switch_item, prep_arg->cjson_device);
@@ -137,7 +142,7 @@ static void __prepare_touch_switch_device_cloud_properties(l_ezlopi_device_t *de
 
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
-    device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.device_type = dev_type_switch_outlet;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 

@@ -1,6 +1,6 @@
 
 
-idf_component_register(SRCS "0009_other_RMT_SK6812.c"
+idf_component_register(SRCS "device_0009_other_RMT_SK6812.c"
                         INCLUDE_DIRS "."
                         REQUIRES trace 
                         led_strip

@@ -6,32 +6,37 @@
 #include "device_0003_digitalOut_plug.h"
 #include "device_0004_digitalIn_generic.h"
 
+#include "sensor_0008_I2C_LTR303ALS.h"
+#include "device_0009_other_RMT_SK6812.h"
+
+#include "sensor_0016_oneWire_DHT22.h"
+
+#include "device_0022_PWM_dimmable_lamp.h"
+#include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
+#include "sensor_0025_digitalIn_LDR.h"
+#include "device_0036_PWM_servo_MG996R.h"
+
 #include "sensor_pir.h"
 // #include "door_hall_sensor.h"
-#include "dimmable_bulb.h"
 #include "joystick_2_axis.h"
 #include "ultrasonic_MB1013.h"
-#include "servo_motor_MG_996R.h"
+
 #include "ultrasonic_HC_SR04.h"
-#include "0023_sensor_touch_switch_tpp_223b.h"
-#include "025_sens_ldr_digital_module.h"
+
 #include "026_sens_ldr_analog_sensor.h"
 #include "027_sens_water_leak_sensor.h"
 // #include "028_sens_i2c_accelerometer.h"
-#include "1024_device_health.h"
 #include "0029_gxhtc3_rh_t_sensor.h"
 #include "jsn_sr04t.h"
 #include "turbidity.h"
 #include "034_proximity_sensor.h"
 #include "030_sens_ds18b20_sensor.h"
 #include "032_sens_soil_moisture.h"
-#include "016_sens_dht22_sensor.h"
 #include "0012_bme280_sensor.h"
 #include "0035_sensor_touch_sensor_tpp_223b.h"
 #include "0038_digitalOut_RGB.h"
 #include "0044_sensor_I2C_TSL256_luminosity.h"
-#include "0008_sensor_I2C_LTR303ALS.h"
-#include "0009_other_RMT_SK6812.h"
+
 // #include "0010_I2C_BME680.h"
 #include "0065_sensor_digitalIn_float_switch.h"
 #include "0061_sensor_digitalIn_reed_switch.h"
@@ -82,14 +87,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR
     {
         .id = EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR,
-        .func = sensor_0008_I2C_LTR303ALS_v3,
+        .func = sensor_0008_I2C_LTR303ALS,
     },
 #endif
 
 #ifdef EZLOPI_DEVICE_0009_SK6812_LED_STRIP
     {
         .id = EZLOPI_DEVICE_0009_SK6812_LED_STRIP,
-        .func = device_0009_other_RMT_SK6812_v3,
+        .func = device_0009_other_RMT_SK6812,
     },
 #endif
 
@@ -117,14 +122,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
     {
         .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
-        .func = ezlopi_dimmable_bulb_v3,
+        .func = device_0022_PWM_dimmable_lamp,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH
     {
         .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH,
-        .func = sensor_touch_ttp_223b_v3,
+        .func = sensor_0023_digitalIn_touch_switch_TTP223B,
     },
 #endif
 
@@ -152,7 +157,7 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0016_DHT22_SENSOR
     {
         .id = EZLOPI_SENSOR_0016_DHT22_SENSOR,
-        .func = dht22_sensor_v3,
+        .func = sensor_0016_oneWire_DHT22,
     },
 #endif
 
@@ -166,7 +171,7 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
     {
         .id = EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR,
-        .func = sensor_ldr_digital_module_v3,
+        .func = sensor_0025_digitalIn_LDR,
     },
 #endif
 #ifdef EZLOPI_SENSOR_0026_LDR_ANALOGUE_SENSOR

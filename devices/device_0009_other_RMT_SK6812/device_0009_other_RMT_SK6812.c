@@ -15,10 +15,14 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
-#include "0009_other_RMT_SK6812.h"
+
+#include "ezlopi_valueformatter.h"
+
 #include "led_strip.h"
 #include "driver/gpio.h"
 #include "color_codes.h"
+
+#include "device_0009_other_RMT_SK6812.h"
 
 static bool sk6812_led_strip_initialized = false;
 
@@ -34,7 +38,7 @@ static int __init(l_ezlopi_item_t *item);
 static int __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-int device_0009_other_RMT_SK6812_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int device_0009_other_RMT_SK6812(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -55,6 +59,7 @@ int device_0009_other_RMT_SK6812_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *
         ret = __set_cjson_value(item, arg);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = __get_cjson_value(item, arg);
@@ -89,17 +94,25 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddNumberToObject(color_json, "green", green);
                 cJSON_AddNumberToObject(color_json, "blue", blue);
                 cJSON_AddNumberToObject(color_json, "cwhite", ((red << 16) | (green << 8) | (blue)));
+                char *formatted_val = ezlopi_valueformatter_rgb(red, green, blue);
+                cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_val);
+                free(formatted_val);
             }
         }
         else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             item->interface.pwm.duty_cycle = (int)ceil(((sk6812_strip->brightness * 100.0) / 255.0));
             cJSON_AddNumberToObject(cjson_properties, "value", item->interface.pwm.duty_cycle);
+            char *formatted_val = ezlopi_valueformatter_int32(item->interface.pwm.duty_cycle);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_val);
+            free(formatted_val);
         }
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
             item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
             cJSON_AddBoolToObject(cjson_properties, "value", item->interface.gpio.gpio_in.value);
+            char *formatted_val = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_val);
         }
     }
     return ret;
@@ -311,12 +324,12 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_properties(device, prep_arg->cjson_device);
-            rgb_color_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812_v3);
-            dimmer_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812_v3);
-            dimmer_up_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812_v3);
-            dimmer_down_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812_v3);
-            dimmer_stop_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812_v3);
-            switch_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812_v3);
+            rgb_color_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+            dimmer_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+            dimmer_up_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+            dimmer_down_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+            dimmer_stop_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+            switch_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
             if (switch_item && dimmer_item && dimmer_up_item && dimmer_down_item && dimmer_stop_item && rgb_color_item)
             {
                 __prepare_SK6812_RGB_color_item(rgb_color_item, prep_arg->cjson_device);

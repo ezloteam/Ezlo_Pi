@@ -12,8 +12,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 ezlopi_cloud 
                                 ezlopi_actions 
                                 sensor_pir 
-                                sensor_bme280 
-                                dimmable_bulb 
+                                sensor_bme280                                  
                                 joystick_2_axis 
                                 ultrasonic_HC_SR04 
                                 
@@ -21,22 +20,29 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 device_0002_digitalOut_relay
                                 device_0003_digitalOut_plug
                                 device_0004_digitalIn_generic
+                                
+                                sensor_0008_I2C_LTR303ALS
+                                device_0009_other_RMT_SK6812
 
-                                0008_sensor_I2C_LTR303ALS 
-                                0009_other_RMT_SK6812 
+                                sensor_0016_oneWire_DHT22
+                                
+                                device_0022_PWM_dimmable_lamp
+                                sensor_0023_digitalIn_touch_switch_TTP223B
+                                sensor_0025_digitalIn_LDR
+                                device_0036_PWM_servo_MG996R
+                                
                                 # 0010_I2C_BME680
-                                0023_sensor_touch_switch_tpp_223b 
+                        
                                 ultrasonic_MB1013 
-                                servo_motor_MG_996R 
-                                025_sens_ldr_digital_module 
+                                device_0036_PWM_servo_MG996R 
+
                                 026_sens_ldr_analog_sensor 
                                 027_sens_water_sensor
-                                1024_device_health 
                                 0029_gxhtc3_rh_t_sensor 
                                 030_sens_ds18b20_sensor 
                                 032_sens_soil_moisture 
                                 0035_sensor_touch_sensor_tpp_223b 
-                                016_sens_dht22_sensor
+                                
                                 031_JSN_SR04T_WaterLevelSensor 
                                 033_turbidity_sensor 
                                 034_proximity_sensor 

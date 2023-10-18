@@ -14,27 +14,18 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
+#include "ezlopi_valueformatter.h"
 
-#include "0008_sensor_I2C_LTR303ALS.h"
+#include "sensor_0008_I2C_LTR303ALS.h"
 #include "ALS_LTR303.h"
 #include "stdlib.h"
-
-#if 0 // v2.x
-static int count = 5;
-
-static int ltr303_prepare_sensor(void *arg);
-static s_ezlopi_device_properties_t *ltr303_ambient_sensor_prepare_properties(cJSON *cjson_device);
-static int ltr303_ambient_sensor_init(s_ezlopi_device_properties_t *properties);
-static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t *properties);
-static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg);
-#endif
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
-int sensor_0008_I2C_LTR303ALS_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -49,6 +40,7 @@ int sensor_0008_I2C_LTR303ALS_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
         __init(item);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         __get_value_cjson(item, arg);
@@ -74,12 +66,12 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 
     cJSON *cj_param = (cJSON *)arg;
     ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
-    char valueFormatted[20];
     if (cj_param && als_ltr303_data)
     {
-        snprintf(valueFormatted, 20, "%.3f", als_ltr303_data->lux);
-        cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cj_param, "value", als_ltr303_data->lux);
+        char *valueFormatted = ezlopi_valueformatter_double(als_ltr303_data->lux);
+        cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
+        free(valueFormatted);
     }
 
     return ret;
@@ -162,7 +154,7 @@ static int __prepare(void *arg)
         if (als_ltr303_device)
         {
             __prepare_device_cloud_properties(als_ltr303_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS_v3);
+            l_ezlopi_item_t *als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
             if (als_ltr303_item)
             {
                 __prepare_item_cloud_properties(als_ltr303_item, prep_arg->cjson_device);
@@ -180,39 +172,3 @@ static int __prepare(void *arg)
 
     return ret;
 }
-
-#if 0 // v2.x
-static int ltr303_ambient_sensor_update_values(s_ezlopi_device_properties_t *properties)
-{
-    int ret = 0;
-    ltr303_data_t *ltr303_lux_val = (ltr303_data_t *)properties->user_arg;
-
-    if (ltr303_lux_val)
-    {
-        if (ltr303_get_val(ltr303_lux_val) == ESP_OK)
-        {
-            TRACE_D(" lux: %f\n", ltr303_lux_val->lux);
-        }
-    }
-    return ret;
-}
-
-static int ltr303_ambient_sensor_get_value_cjson(s_ezlopi_device_properties_t *properties, void *arg)
-{
-    int ret = 0;
-
-    cJSON *cjson_properties = (cJSON *)arg;
-    ltr303_data_t *ltr303_lux_val = (ltr303_data_t *)properties->user_arg;
-
-    if (cjson_properties && ltr303_lux_val)
-    {
-        char formatted_value[10];
-        snprintf(formatted_value, 10, "%.2f", ltr303_lux_val->lux);
-        cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_value);
-        cJSON_AddNumberToObject(cjson_properties, "value", ltr303_lux_val->lux);
-        cJSON_AddStringToObject(cjson_properties, "scale", "lux");
-    }
-
-    return ret;
-}
-#endif

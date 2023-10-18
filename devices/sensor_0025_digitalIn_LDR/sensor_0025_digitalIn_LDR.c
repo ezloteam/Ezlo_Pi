@@ -9,13 +9,13 @@
 #include "ezlopi_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_valueformatter.h"
+
 #include "esp_err.h"
 #include "driver/gpio.h"
 #include "items.h"
 #include "trace.h"
 #include "cJSON.h"
-
-#include "025_sens_ldr_digital_module.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -24,7 +24,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __value_updated_from_interrupt(void *arg);
 
-int sensor_ldr_digital_module_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void **user_arg)
+int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void **user_arg)
 {
     int ret = 0;
 
@@ -40,6 +40,7 @@ int sensor_ldr_digital_module_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
         ret = __init(item);
         break;
     }
+    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = __get_value_cjson(item, arg); // updater function missing
@@ -64,6 +65,8 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
         cJSON_AddBoolToObject(cj_value_obj, "value", item->interface.gpio.gpio_in.value);
+        char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
+        cJSON_AddStringToObject(cj_value_obj, "valueFormatted", valueFormatted);
         ret = 1;
     }
     return ret;
@@ -119,7 +122,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
                 if (item)
                 {
-                    item->func = sensor_ldr_digital_module_v3;
+                    item->func = sensor_0025_digitalIn_LDR;
                     __setup_item_properties(item, cj_device);
                 }
             }
