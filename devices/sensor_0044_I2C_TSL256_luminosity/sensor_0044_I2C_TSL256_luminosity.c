@@ -24,6 +24,7 @@ static int __notify(l_ezlopi_item_t *item);
 
 int sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
+    TRACE_B("Action: %s", ezlopi_actions_to_string(action));
     int ret = 0;
     switch (action)
     {

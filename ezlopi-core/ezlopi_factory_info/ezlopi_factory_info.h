@@ -380,12 +380,13 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                 \"dev_name\": \"Reed switch\",\
-                \"dev_type\": 2,\
-                \"id_item\": 61,\
+                  \"dev_type\": 8,\
+                \"dev_name\": \"TSL2561_lumibosity\",\
                 \"id_room\": \"\",\
-                \"gpio\": 25,\
-                \"logic_inv\": false\
+                \"id_item\": 44,\
+               \"gpio_sda\": 18,\
+               \"gpio_scl\": 19,\
+              \"slave_addr\": 57\
             }\
         ],\
     \"dev_total\": 1}";
