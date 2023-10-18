@@ -14,5 +14,6 @@ const static char *ezlopi_msg_subclass_str = "msg_subclass";
 const static char *ezlopi_ui_broadcast_str = "ui_broadcast";
 const static char *ezlopi_result_str = "result";
 const static char *ezlopi_params_str = "params";
+const static char *ezlopi_gateway_id_str = "gateway_id";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

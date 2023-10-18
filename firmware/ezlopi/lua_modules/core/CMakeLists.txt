@@ -1,4 +1,4 @@
 file(GLOB_RECURSE src_files "*.c*")
 idf_component_register(SRCS "core_external_gateway_api.c" "core_others_api.c" "core_updaters_api.c" "core_removers_api.c" "core_adders_api.c" "core_getters_api.c" "corelib.c" "${src_files}"
     INCLUDE_DIRS "."
-    REQUIRES lua trace ezlopi_factory_info ezlopi_devices)
+    REQUIRES lua trace ezlopi_factory_info ezlopi_devices ezlopi_gateway version helper_functions )

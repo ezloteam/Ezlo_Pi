@@ -192,5 +192,6 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
 cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);
+s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void);
 
 #endif // __EZLOPI_DEVICE_H__
