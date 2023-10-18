@@ -35,25 +35,25 @@
 #include "0012_bme280_sensor.h"
 #include "0035_sensor_touch_sensor_tpp_223b.h"
 #include "0038_digitalOut_RGB.h"
-#include "0044_sensor_I2C_TSL256_luminosity.h"
+#include "sensor_0044_I2C_TSL256_luminosity.h"
 
 // #include "0010_I2C_BME680.h"
-#include "0065_sensor_digitalIn_float_switch.h"
-#include "0061_sensor_digitalIn_reed_switch.h"
-#include "0060_sensor_digitalIn_vibration_detector.h"
-#include "0055_sensor_ADC_FlexResistor.h"
-#include "0048_sensor_other_MQ4_CH4_detector.h"
-#include "0049_sensor_other_MQ2_LPG_detector.h"
-#include "0050_sensor_other_MQ3_alcohol_detector.h"
-#include "0051_sensor_other_MQ8_H2_detector.h"
-#include "0052_sensor_other_MQ135_NH3_detector.h"
-#include "0059_sensor_other_MQ6_LPG_detector.h"
-#include "0062_sensor_other_MQ7_CO_detector.h"
-#include "0063_sensor_other_MQ9_LPG_flameable_detector.h"
-#include "0057_sensor_other_KY026_FlameDetector.h"
-#include "0053_sensor_UART_GYGPS6MV2.h"
-#include "0054_sensor_PWM_YFS201_flowmeter.h"
-#include "0056_sensor_ADC_Force_Sensitive_Resistor.h"
+#include "sensor_0065_digitalIn_float_switch.h"
+#include "sensor_0061_digitalIn_reed_switch.h"
+#include "sensor_0060_digitalIn_vibration_detector.h"
+#include "sensor_0055_ADC_FlexResistor.h"
+#include "sensor_0048_other_MQ4_CH4_detector.h"
+#include "sensor_0049_other_MQ2_LPG_detector.h"
+#include "sensor_0050_other_MQ3_alcohol_detector.h"
+#include "sensor_0051_other_MQ8_H2_detector.h"
+#include "sensor_0052_other_MQ135_NH3_detector.h"
+#include "sensor_0059_other_MQ6_LPG_detector.h"
+#include "sensor_0062_other_MQ7_CO_detector.h"
+#include "sensor_0063_other_MQ9_LPG_flameable_detector.h"
+#include "sensor_0057_other_KY026_FlameDetector.h"
+#include "sensor_0053_UART_GYGPS6MV2.h"
+#include "sensor_0054_PWM_YFS201_flowmeter.h"
+#include "sensor_0056_ADC_Force_Sensitive_Resistor.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0001_LED
@@ -218,119 +218,119 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY
     {
         .id = EZLOPI_SENSOR_0044_I2C_TSL2561_LUMINOSITY,
-        .func = sensor_TSL256_luminosity_v3,
-    },
-#endif
-
-#ifdef EZLOPI_SENSOR_0065_DIGITALIN_FLOAT_SWITCH
-    {
-        .id = EZLOPI_SENSOR_0065_DIGITALIN_FLOAT_SWITCH,
-        .func = sensor_float_switch_v3,
+        .func = sensor_0044_I2C_TSL256_luminosity,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0061_DIGITALIN_REED_SWITCH
     {
         .id = EZLOPI_SENSOR_0061_DIGITALIN_REED_SWITCH,
-        .func = sensor_reed_switch_v3,
+        .func = sensor_0061_digitalIn_reed_switch,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR
     {
         .id = EZLOPI_SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR,
-        .func = sensor_vibration_detector_v3,
+        .func = sensor_0060_digitalIn_vibration_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0055_ADC_FLEXRESISTOR
     {
         .id = EZLOPI_SENSOR_0055_ADC_FLEXRESISTOR,
-        .func = sensor_0055_flexResistor_v3,
+        .func = sensor_0055_ADC_FlexResistor,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0048_OTHER_MQ4_CH4_DETECTOR
     {
         .id = EZLOPI_SENSOR_0048_OTHER_MQ4_CH4_DETECTOR,
-        .func = sensor_MQ4_CH4_detector_v3,
+        .func = sensor_0048_other_MQ4_CH4_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0049_OTHER_MQ2_LPG_DETECTOR
     {
         .id = EZLOPI_SENSOR_0049_OTHER_MQ2_LPG_DETECTOR,
-        .func = sensor_MQ2_LPG_detector_v3,
+        .func = sensor_0049_other_MQ2_LPG_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0050_OTHER_MQ3_ALCOHOL_DETECTOR
     {
         .id = EZLOPI_SENSOR_0050_OTHER_MQ3_ALCOHOL_DETECTOR,
-        .func = sensor_MQ3_ALCO_detector_v3,
+        .func = sensor_0050_other_MQ3_alcohol_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0051_OTHER_MQ8_H2_DETECTOR
     {
         .id = EZLOPI_SENSOR_0051_OTHER_MQ8_H2_DETECTOR,
-        .func = sensor_MQ8_H2_detector_v3,
+        .func = sensor_0051_other_MQ8_H2_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0052_OTHER_MQ135_NH3_DETECTOR
     {
         .id = EZLOPI_SENSOR_0052_OTHER_MQ135_NH3_DETECTOR,
-        .func = sensor_MQ135_NH3_detector_v3,
+        .func = sensor_0052_other_MQ135_NH3_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_DETECTOR
     {
         .id = EZLOPI_SENSOR_0059_OTHER_MQ6_LPG_DETECTOR,
-        .func = sensor_MQ6_LPG_detector_v3,
+        .func = sensor_0059_other_MQ6_LPG_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0062_OTHER_MQ7_CO_DETECTOR
     {
         .id = EZLOPI_SENSOR_0062_OTHER_MQ7_CO_DETECTOR,
-        .func = sensor_MQ7_CO_detector_v3,
+        .func = sensor_0062_other_MQ7_CO_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR
     {
         .id = EZLOPI_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR,
-        .func = sensor_MQ9_LPG_flameable_detector_v3,
+        .func = sensor_0063_other_MQ9_LPG_flameable_detector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR
     {
         .id = EZLOPI_SENSOR_0057_OTHER_FLAME_DETECTOR,
-        .func = sensor_0057_flame_detector_v3,
+        .func = sensor_0057_other_KY026_FlameDetector,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0053_UART_GYGPS6MV2
     {
         .id = EZLOPI_SENSOR_0053_UART_GYGPS6MV2,
-        .func = sensor_0053_uart_gps_v3,
+        .func = sensor_0053_UART_GYGPS6MV2,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER
     {
         .id = EZLOPI_SENSOR_0054_PWM_YFS201_FLOWMETER,
-        .func = sensor_0054_pwm_flowmeter_v3,
+        .func = sensor_0054_PWM_YFS201_flowmeter,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0056_ADC_FSR
     {
         .id = EZLOPI_SENSOR_0056_ADC_FSR,
-        .func = sensor_0056_fsr_v3,
+        .func = sensor_0056_ADC_Force_Sensitive_Resistor,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0065_DIGITALIN_FLOAT_SWITCH
+    {
+        .id = EZLOPI_SENSOR_0065_DIGITALIN_FLOAT_SWITCH,
+        .func = sensor_0065_digitalIn_float_switch,
     },
 #endif
 

@@ -21,7 +21,6 @@ extern "C"
 
 #include "esp_partition.h"
 
-
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0xF000 // 20480 // 20KB
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE 0x40
@@ -381,14 +380,14 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"Float_Switch\",\
-                \"dev_type\": 2,\
-                \"id_item\": 65,\
+                \"dev_name\": \"MQ9\",\
+                \"dev_type\": 10,\
+                \"id_item\": 63,\
                 \"id_room\": \"\",\
-                \"gpio\": 19,\
-                \"logic_inv\": false\
-            }\             
-        ]\
+                \"gpio1\": 25,\
+                \"gpio2\": 33\
+            }\
+        ],\
     \"dev_total\": 1}";
 
 #endif
