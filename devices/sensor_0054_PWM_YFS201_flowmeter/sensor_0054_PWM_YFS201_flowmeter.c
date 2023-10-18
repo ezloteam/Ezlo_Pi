@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0054_PWM_YFS201_flowmeter.h"
 //*************************************************************************
@@ -159,7 +160,6 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            char valueFormatted[20];
             float freq = 0, Lt_per_hr = 0;
             // converting pulse_counta into frequency (uSec -> Hz)
             freq = yfs201_dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
@@ -170,9 +170,10 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
             // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
-            snprintf(valueFormatted, 20, "%.2f", Lt_per_hr);
+            char *valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", Lt_per_hr);
+            free(valueFormatted);
 
             ret = 1;
         }

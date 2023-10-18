@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0055_ADC_FlexResistor.h"
 
@@ -146,10 +147,10 @@ static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            char valueFormatted[20];
-            snprintf(valueFormatted, 20, "%i", RS_0055);
+            char *valueFormatted = ezlopi_valueformatter_float(RS_0055);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", RS_0055);
+            free(valueFormatted);
             ret = 1;
         }
     }

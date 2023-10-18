@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
 #include "ezlopi_gpio.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0060_digitalIn_vibration_detector.h"
 //---------------------------------------------------------------------------------------------------------
@@ -159,7 +160,8 @@ static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, "valueFormatted", (true == (item->interface.gpio.gpio_in.value) ? "true" : "false"));
+            char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
+            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
             ret = 1;
         }

@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0057_other_KY026_FlameDetector.h"
 
@@ -249,10 +250,10 @@ static int __0057_get_item(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
-                char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _absorbed_percent);
+                char *valueFormatted = ezlopi_valueformatter_float(_absorbed_percent);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", _absorbed_percent);
+                free(valueFormatted);
             }
             ret = 1;
         }
@@ -275,10 +276,10 @@ static int __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
-                char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _absorbed_percent);
+                char *valueFormatted = ezlopi_valueformatter_float(_absorbed_percent);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", _absorbed_percent);
+                free(valueFormatted);
             }
             ret = 1;
         }

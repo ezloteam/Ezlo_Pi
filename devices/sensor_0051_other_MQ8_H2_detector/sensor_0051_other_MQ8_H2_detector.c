@@ -16,6 +16,8 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
+#include "ezlopi_valueformatter.h"
+
 #include "sensor_0051_other_MQ8_H2_detector.h"
 //*************************************************************************
 //                          Declaration
@@ -257,10 +259,10 @@ static int __0051_get_item(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _H2_ppm);
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                char *valueFormatted = ezlopi_valueformatter_float(_H2_ppm);
+                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", _H2_ppm);
+                free(valueFormatted);
             }
             ret = 1;
         }
@@ -283,10 +285,10 @@ static int __0051_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _H2_ppm);
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                char *valueFormatted = ezlopi_valueformatter_float(_H2_ppm);
+                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", _H2_ppm);
+                free(valueFormatted);
             }
             ret = 1;
         }

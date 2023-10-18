@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
 #include "ezlopi_gpio.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0065_digitalIn_float_switch.h"
 //-----------------------------------------------------------------------
@@ -189,6 +190,7 @@ static int __0065_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
             cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
             ret = 1;
         }

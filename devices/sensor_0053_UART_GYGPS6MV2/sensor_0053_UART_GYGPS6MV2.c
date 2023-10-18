@@ -16,6 +16,8 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
+#include "ezlopi_valueformatter.h"
+
 
 #include "gyGPS6MV2.h"
 #include "sensor_0053_UART_GYGPS6MV2.h"
@@ -253,41 +255,45 @@ static int __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg)
     int ret = 0;
     if (item && arg)
     {
-        char valueFormatted[20];
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
             if (Latitude_item_id == item->cloud_properties.item_id)
             {
-                snprintf(valueFormatted, 20, "%.2f", prev_lat_angle_val);
+                char *valueFormatted = ezlopi_valueformatter_float(prev_lat_angle_val);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", prev_lat_angle_val);
+                free(valueFormatted);
             }
             if (Longitude_item_id == item->cloud_properties.item_id)
             {
-                snprintf(valueFormatted, 20, "%.2f", prev_long_angle_val);
+                char *valueFormatted = ezlopi_valueformatter_float(prev_long_angle_val);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", prev_long_angle_val);
+                free(valueFormatted);
             }
 
             if (Fix_item_id == item->cloud_properties.item_id)
             {
-                cJSON_AddStringToObject(cj_result, "valueFormatted", (prev_GPS_FIX) ? "true" : "false");
+                char *valueFormatted = ezlopi_valueformatter_bool(prev_GPS_FIX);
+                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddBoolToObject(cj_result, "value", prev_GPS_FIX);
             }
 
             if (Sea_level_item_id == item->cloud_properties.item_id)
             {
-                snprintf(valueFormatted, 20, "%.2f", prev_antenna_alti);
+                char *valueFormatted = ezlopi_valueformatter_float(prev_antenna_alti);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", prev_antenna_alti);
+                free(valueFormatted);
             }
 
             if (Geoid_item_id == item->cloud_properties.item_id)
             {
-                snprintf(valueFormatted, 20, "%.2f", prev_geoid);
+                char *valueFormatted = ezlopi_valueformatter_float(prev_geoid);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", prev_geoid);
+                free(valueFormatted);
             }
             ret = 1;
         }

@@ -15,6 +15,7 @@
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
+#include "ezlopi_valueformatter.h"
 
 #include "sensor_0056_ADC_Force_Sensitive_Resistor.h"
 
@@ -148,10 +149,10 @@ static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            char valueFormatted[20];
-            snprintf(valueFormatted, 20, "%.2f", FSR_value);
+            char *valueFormatted = ezlopi_valueformatter_float(FSR_value);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", FSR_value);
+            free(valueFormatted);
             ret = 1;
         }
     }

@@ -380,12 +380,12 @@ static const char *test_device_constant_config =
         \"dev_detail\":\
         [\
             {\
-                \"dev_name\": \"MQ9\",\
-                \"dev_type\": 10,\
-                \"id_item\": 63,\
+                 \"dev_name\": \"Reed switch\",\
+                \"dev_type\": 2,\
+                \"id_item\": 61,\
                 \"id_room\": \"\",\
-                \"gpio1\": 25,\
-                \"gpio2\": 33\
+                \"gpio\": 25,\
+                \"logic_inv\": false\
             }\
         ],\
     \"dev_total\": 1}";

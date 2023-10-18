@@ -17,6 +17,7 @@
 #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_scales_str.h"
 #include "sensor_0063_other_MQ9_LPG_flameable_detector.h"
+#include "ezlopi_valueformatter.h"
 
 //*************************************************************************
 //                          Declaration
@@ -257,10 +258,10 @@ static int __0063_get_item(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _LPG_flameable_ppm);
+                char *valueFormatted = ezlopi_valueformatter_float(_LPG_flameable_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", _LPG_flameable_ppm);
+                free(valueFormatted);
             }
             ret = 1;
         }
@@ -283,10 +284,10 @@ static int __0063_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                char valueFormatted[20];
-                snprintf(valueFormatted, 20, "%.2f", _LPG_flameable_ppm);
+                char *valueFormatted = ezlopi_valueformatter_float(_LPG_flameable_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", _LPG_flameable_ppm);
+                free(valueFormatted);
             }
             ret = 1;
         }

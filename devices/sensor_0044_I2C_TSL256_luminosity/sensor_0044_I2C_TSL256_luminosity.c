@@ -9,11 +9,13 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
-#include "sensor_0044_I2C_TSL256_luminosity.h"
+#include "ezlopi_valueformatter.h"
 
-extern bool Check_PARTID(s_ezlopi_i2c_master_t *i2c_master);
-extern void sensor_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master);
-extern uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master);
+#include "sensor_0044_I2C_TSL256_luminosity.h"
+//-----------------------------------------------------------------------
+// extern bool Check_PARTID(s_ezlopi_i2c_master_t *i2c_master);
+// extern void sensor_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master);
+// extern uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master);
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -72,13 +74,13 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
     cJSON *cjson_properties = (cJSON *)arg;
-    char valueFormatted[20];
     if (cjson_properties)
     {
         uint32_t illuminance_value = tsl2561_get_intensity_value(&item->interface.i2c_master);
-        snprintf(valueFormatted, 20, "%d", illuminance_value);
+        char *valueFormatted = ezlopi_valueformatter_int((int)illuminance_value);
         cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cjson_properties, "values", illuminance_value);
+        free(valueFormatted);
         ret = 1;
     }
     return ret;
