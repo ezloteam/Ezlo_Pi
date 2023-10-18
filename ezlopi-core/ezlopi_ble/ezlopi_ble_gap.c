@@ -14,6 +14,7 @@ static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
 
+static uint8_t manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
 static uint8_t *all_service_uuid = NULL;
 static uint32_t all_service_uuid_len = 0;
 
@@ -309,9 +310,46 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: // 22
     {
         ezlopi_ble_setup_adv_config();
+#if 0
+        if (param->local_privacy_cmpl.status != ESP_BT_STATUS_SUCCESS)
+        {
+            TRACE_E("config local privacy failed, error status = %x", param->local_privacy_cmpl.status);
+            break;
+        }
+
+        if (NULL == all_service_uuid)
+        {
+            ezlopi_ble_setup_service_uuid();
+        }
+        adv_data.p_service_uuid = all_service_uuid;
+        adv_data.service_uuid_len = all_service_uuid_len;
+
+        esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
+        if (ret)
+        {
+            TRACE_E("config adv data failed, error code = %x", ret);
+        }
+        else
+        {
+            adv_config_done |= ADV_CONFIG_FLAG;
+        }
+
+        scan_rsp_data.p_service_uuid = all_service_uuid;
+        scan_rsp_data.service_uuid_len = all_service_uuid_len;
+        ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
+        if (ret)
+        {
+            TRACE_E("config adv data failed, error code = %x", ret);
+        }
+        else
+        {
+            adv_config_done |= SCAN_RSP_CONFIG_FLAG;
+        }
+#endif
         break;
     }
 #endif
+
     default:
     {
         TRACE_W("BLE GAP Event: %s Not Implemented!", ezlopi_ble_gap_event_to_str(event));
@@ -654,33 +692,30 @@ static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
     }
 
 #endif // #if (BLE_50_FEATURE_SUPPORT == TRUE)
-    case ESP_GAP_BLE_EVT_MAX:
-    {
-        ret = "ESP_GAP_BLE_EVT_MAX";
-        break;
-    }
-#if 0
-    case ESP_GAP_BLE_SC_OOB_REQ_EVT:
-    {
-        ret = "ESP_GAP_BLE_SC_OOB_REQ_EVT";
-        break;
-    }
-    case ESP_GAP_BLE_SC_CR_LOC_OOB_EVT:
-    {
-        ret = "ESP_GAP_BLE_SC_CR_LOC_OOB_EVT";
-        break;
-    }
-    case ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT:
-    {
-        ret = "ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT";
-        break;
-    }
-#endif
+    // case ESP_GAP_BLE_SC_OOB_REQ_EVT:
+    // {
+    //     ret = "ESP_GAP_BLE_SC_OOB_REQ_EVT";
+    //     break;
+    // }
+    // case ESP_GAP_BLE_EVT_MAX:
+    // {
+    //     ret = "ESP_GAP_BLE_EVT_MAX";
+    //     break;
+    // }
+    // case ESP_GAP_BLE_SC_CR_LOC_OOB_EVT:
+    // {
+    //     ret = "ESP_GAP_BLE_SC_CR_LOC_OOB_EVT";
+    //     break;
+    // }
+    // case ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT:
+    // {
+    //     ret = "ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT";
+    //     break;
+    // }
+
     default:
-    {
-        ret = "ESP_GAP_BLE_EVT_MAX";
         break;
-    }
+
     }
 
     return ret;
@@ -808,5 +843,5 @@ static void ezlopi_ble_setup_service_uuid(void)
         }
     }
 
-    dump("complete-uuid", (all_service_uuid ? all_service_uuid : (uint8_t *)""), 0, all_service_uuid_len);
+    dump("complete-uuid", (all_service_uuid ? all_service_uuid : ""), 0, all_service_uuid_len);
 }

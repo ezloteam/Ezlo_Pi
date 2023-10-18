@@ -9,35 +9,29 @@
 #include "sensor_0008_I2C_LTR303ALS.h"
 #include "device_0009_other_RMT_SK6812.h"
 
+#include "sensor_0012_I2C_BME280.h"
+
 #include "sensor_0016_oneWire_DHT22.h"
 
+#include "sensor_0019_digitalIn_PIR.h"
+#include "sensor_0021_UART_MB1013.h"
 #include "device_0022_PWM_dimmable_lamp.h"
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
+#include "sensor_0024_other_HCSR04.h"
 #include "sensor_0025_digitalIn_LDR.h"
+#include "sensor_0026_ADC_LDR.h"
+#include "sensor_0027_ADC_waterLeak.h"
+#include "sensor_0029_I2C_GXHTC3.h"
+#include "sensor_0030_oneWire_DS18B20.h"
+#include "sensor_0031_other_JSNSR04T.h"
+#include "sensor_0032_ADC_soilMoisture.h"
+#include "sensor_0033_ADC_turbidity.h"
+#include "sensor_0034_digitalIn_proximity.h"
+#include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
 #include "device_0036_PWM_servo_MG996R.h"
+#include "device_0038_other_RGB.h"
 
-#include "sensor_pir.h"
-// #include "door_hall_sensor.h"
-#include "joystick_2_axis.h"
-#include "ultrasonic_MB1013.h"
-
-#include "ultrasonic_HC_SR04.h"
-
-#include "026_sens_ldr_analog_sensor.h"
-#include "027_sens_water_leak_sensor.h"
-// #include "028_sens_i2c_accelerometer.h"
-#include "0029_gxhtc3_rh_t_sensor.h"
-#include "jsn_sr04t.h"
-#include "turbidity.h"
-#include "034_proximity_sensor.h"
-#include "030_sens_ds18b20_sensor.h"
-#include "032_sens_soil_moisture.h"
-#include "0012_bme280_sensor.h"
-#include "0035_sensor_touch_sensor_tpp_223b.h"
-#include "0038_digitalOut_RGB.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
-
-// #include "0010_I2C_BME680.h"
 #include "sensor_0065_digitalIn_float_switch.h"
 #include "sensor_0061_digitalIn_reed_switch.h"
 #include "sensor_0060_digitalIn_vibration_detector.h"
@@ -108,14 +102,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0012_BME280_I2C
     {
         .id = EZLOPI_SENSOR_0012_BME280_I2C,
-        .func = sensor_0012_bme280_sensor_v3,
+        .func = sensor_0012_I2C_BME280,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0019_PIR
     {
         .id = EZLOPI_SENSOR_0019_PIR,
-        .func = sensor_pir_v3,
+        .func = sensor_0019_digitalIn_PIR,
     },
 #endif
 
@@ -136,21 +130,21 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_034_PROXIMITY_SENSOR
     {
         .id = EZLOPI_SENSOR_034_PROXIMITY_SENSOR,
-        .func = proximity_sensor_v3,
+        .func = sensor_0034_digitalIn_proximity,
     },
 #endif
 
 #ifdef EZLOPI_DEVICE_0038_RGB_LED
     {
         .id = EZLOPI_DEVICE_0038_RGB_LED,
-        .func = device_0038_digitalOut_RGB_v3,
+        .func = device_0038_other_RGB,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR
     {
         .id = EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR,
-        .func = sensor_touch_sensor_ttp_223b_v3,
+        .func = sensor_0035_digitalIn_touch_sensor_TPP223B,
     },
 #endif
 
@@ -164,7 +158,7 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
     {
         .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
-        .func = sensor_0024_other_HCSR04_v3,
+        .func = sensor_0024_other_HCSR04,
     },
 #endif
 
@@ -177,41 +171,41 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0026_LDR_ANALOGUE_SENSOR
     {
         .id = EZLOPI_SENSOR_0026_LDR_ANALOGUE_SENSOR,
-        .func = sensor_ldr_analog_v3,
+        .func = sensor_0026_ADC_LDR,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_0027_WATER_LEAK
     {
         .id = EZLOPI_SENSOR_0027_WATER_LEAK,
-        .func = water_leak_sensor_v3,
+        .func = sensor_0027_ADC_waterLeak,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_029_IR_BLASTER
     {
         .id = EZLOPI_SENSOR_029_IR_BLASTER,
-        // .func = IR_blaster_remote_v3,
+        .func = sensor_0029_I2C_GXHTC3,
     },
 #endif
 #ifdef EZLOPI_SENSOR_030_DS18B20
     {
         .id = EZLOPI_SENSOR_030_DS18B20,
-        .func = ds18b20_sensor_v3,
+        .func = sensor_0030_oneWire_DS18B20,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_032_SOIL_MOISTURE
     {
         .id = EZLOPI_SENSOR_032_SOIL_MOISTURE,
-        .func = soil_moisture_sensor_v3,
+        .func = sensor_0032_ADC_soilMoisture,
     },
 #endif
 
 #ifdef EZLOPI_SENSOR_033_TURBIDITY_SENSOR
     {
         .id = EZLOPI_SENSOR_033_TURBIDITY_SENSOR,
-        .func = turbidity_sensor_v3,
+        .func = sensor_0033_ADC_turbidity,
     },
 #endif
 

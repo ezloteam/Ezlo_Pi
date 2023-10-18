@@ -115,7 +115,7 @@ static void ezlopi_ble_basic_init(void)
     char *device_type = ezlopi_factory_info_v2_get_device_type();
     if ((NULL != device_type) && (isprint(device_type[0])))
     {
-        snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%s_%llu", device_type, ezlopi_factory_info_v2_get_id());
+        snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v2_get_id());
     }
     else
     {

@@ -1,6 +1,0 @@
-file(GLOB_RECURSE config_src "*.c")
-# set(config_src "sensor_bme280.c")
-
-idf_component_register(SRCS "${config_src}"
-    INCLUDE_DIRS "."
-    REQUIRES trace ezlopi_actions ezlopi_timer library items)
