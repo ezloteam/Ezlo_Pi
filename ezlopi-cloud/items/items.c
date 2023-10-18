@@ -51,9 +51,8 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                         {
                             cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
                         }
-                        // curr_item->func(EZLOPI_ACTION_HUB_GET_ITEM, curr_item, cj_properties, curr_item->user_arg);
-                        curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
-                        // cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
+                        curr_item->func(EZLOPI_ACTION_HUB_GET_ITEM, curr_item, cj_properties, curr_item->user_arg);
+                        // curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
                         if (curr_item->cloud_properties.scale)
                         {
                             cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
