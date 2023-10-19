@@ -124,6 +124,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_par
     CJSON_GET_VALUE_INT(cj_param, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_lux;
     item->cloud_properties.value_type = value_type_illuminance;
     item->cloud_properties.show = true;
