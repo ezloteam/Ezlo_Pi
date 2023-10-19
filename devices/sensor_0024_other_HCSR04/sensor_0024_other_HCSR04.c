@@ -37,26 +37,26 @@ int sensor_0024_other_HCSR04(e_ezlopi_actions_t action, l_ezlopi_item_t *item, v
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        TRACE_B("sensor_0024_other_HCSR04 -> __prepare");
+        // TRACE_B("sensor_0024_other_HCSR04 -> __prepare");
         ret = __prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        TRACE_B("sensor_0024_other_HCSR04 -> __init");
+        // TRACE_B("sensor_0024_other_HCSR04 -> __init");
         ret = __init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        TRACE_B("sensor_0024_other_HCSR04 -> __get_value_cjson");
+        // TRACE_B("sensor_0024_other_HCSR04 -> __get_value_cjson");
         ret = __get_value_cjson(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        TRACE_B("sensor_0024_other_HCSR04 -> __notify");
+        // TRACE_B("sensor_0024_other_HCSR04 -> __notify");
         ret = __notify(item);
         break;
     }

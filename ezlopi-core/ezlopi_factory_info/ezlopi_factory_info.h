@@ -506,7 +506,7 @@ static const char *test_device_constant_config =
     \"cmd\":3,\
     \"dev_detail\":[{\
                 \"dev_type\": 8,\
-                \"dev_name\": \"TSL2561_lumibosity\",\
+                \"dev_name\": \"TSL2561_luminosity\",\
                 \"id_room\": \"\",\
                 \"id_item\": 44,\
                \"gpio_sda\": 18,\

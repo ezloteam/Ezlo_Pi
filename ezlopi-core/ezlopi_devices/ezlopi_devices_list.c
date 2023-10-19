@@ -50,44 +50,44 @@
 #include "sensor_0056_ADC_Force_Sensitive_Resistor.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
-#ifdef EZLOPI_SENSOR_0001_LED
+#ifdef EZLOPI_DEVICE_0001_DIGITALOUT_GENERIC
     {
-        .id = EZLOPI_SENSOR_0001_LED,
+        .id = EZLOPI_DEVICE_0001_DIGITALOUT_GENERIC,
         .func = device_0001_digitalOut_generic,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0002_RELAY
+#ifdef EZLOPI_DEVICE_0002_DIGITALOUT_RELAY
     {
-        .id = EZLOPI_SENSOR_0002_RELAY,
+        .id = EZLOPI_DEVICE_0002_DIGITALOUT_RELAY,
         .func = device_0002_digitalOut_relay,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0003_PLUG
+#ifdef EZLOPI_DEVICE_0003_DIGTALOUT_PLUG
     {
-        .id = EZLOPI_SENSOR_0003_PLUG,
+        .id = EZLOPI_DEVICE_0003_DIGTALOUT_PLUG,
         .func = device_0003_digitalOut_plug,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0004_DIGITALIN_GENERIC
+#ifdef EZLOPI_DEVICE_0004_DIGITALIN_GENERIC
     {
-        .id = EZLOPI_SENSOR_0004_DIGITALIN_GENERIC,
+        .id = EZLOPI_DEVICE_0004_DIGITALIN_GENERIC,
         .func = device_0004_digitalIn_generic,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR
+#ifdef EZLOPI_SENSOR_0008_I2C_LTR303ALS
     {
-        .id = EZLOPI_SENSOR_0008_ALS_LTR303_I2C_SENSOR,
+        .id = EZLOPI_SENSOR_0008_I2C_LTR303ALS,
         .func = sensor_0008_I2C_LTR303ALS,
     },
 #endif
 
-#ifdef EZLOPI_DEVICE_0009_SK6812_LED_STRIP
+#ifdef EZLOPI_DEVICE_0009_OTHER_RMT_SK6812
     {
-        .id = EZLOPI_DEVICE_0009_SK6812_LED_STRIP,
+        .id = EZLOPI_DEVICE_0009_OTHER_RMT_SK6812,
         .func = device_0009_other_RMT_SK6812,
     },
 #endif
@@ -99,112 +99,125 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0012_BME280_I2C
+#ifdef EZLOPI_SENSOR_0012_I2C_BME280
     {
-        .id = EZLOPI_SENSOR_0012_BME280_I2C,
+        .id = EZLOPI_SENSOR_0012_I2C_BME280,
         .func = sensor_0012_I2C_BME280,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0019_PIR
+#ifdef EZLOPI_SENSOR_0019_DIGITALIN_PIR
     {
-        .id = EZLOPI_SENSOR_0019_PIR,
+        .id = EZLOPI_SENSOR_0019_DIGITALIN_PIR,
         .func = sensor_0019_digitalIn_PIR,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0022_DIMMABLE_BULB
+#ifdef EZLOPI_SENSOR_0021_UART_MB1013
     {
-        .id = EZLOPI_SENSOR_0022_DIMMABLE_BULB,
+        .id = EZLOPI_SENSOR_0021_UART_MB1013,
+        .func = sensor_0021_UART_MB1013,
+    },
+#endif
+
+#ifdef EZLOPI_DEVICE_0022_PWM_DIMMABLE_BULB
+    {
+        .id = EZLOPI_DEVICE_0022_PWM_DIMMABLE_BULB,
         .func = device_0022_PWM_dimmable_lamp,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH
+#ifdef EZLOPI_SENSOR_0023_DIGITALIN_TOUCH_SWITCH_TTP223B
     {
-        .id = EZLOPI_SENSOR_0023_TTP_223B_TOUCH_SWITCH,
+        .id = EZLOPI_SENSOR_0023_DIGITALIN_TOUCH_SWITCH_TTP223B,
         .func = sensor_0023_digitalIn_touch_switch_TTP223B,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_034_PROXIMITY_SENSOR
+#ifdef EZLOPI_SENSOR_0034_DIGITALIN_PROXIMITY
     {
-        .id = EZLOPI_SENSOR_034_PROXIMITY_SENSOR,
+        .id = EZLOPI_SENSOR_0034_DIGITALIN_PROXIMITY,
         .func = sensor_0034_digitalIn_proximity,
     },
 #endif
 
-#ifdef EZLOPI_DEVICE_0038_RGB_LED
+#ifdef EZLOPI_DEVICE_0038_OTHER_RGB
     {
-        .id = EZLOPI_DEVICE_0038_RGB_LED,
+        .id = EZLOPI_DEVICE_0038_OTHER_RGB,
         .func = device_0038_other_RGB,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR
+#ifdef EZLOPI_SENSOR_0035_DIGITALIN_TOUCH_SENSOR_TPP223B
     {
-        .id = EZLOPI_SENSOR_0035_TPP_32B_TOUCH_SENSOR,
+        .id = EZLOPI_SENSOR_0035_DIGITALIN_TOUCH_SENSOR_TPP223B,
         .func = sensor_0035_digitalIn_touch_sensor_TPP223B,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0016_DHT22_SENSOR
+#ifdef EZLOPI_SENSOR_0016_ONEWIRE_DHT22
     {
-        .id = EZLOPI_SENSOR_0016_DHT22_SENSOR,
+        .id = EZLOPI_SENSOR_0016_ONEWIRE_DHT22,
         .func = sensor_0016_oneWire_DHT22,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR
+#ifdef EZLOPI_SENSOR_0024_OTHER_HCSR04
     {
-        .id = EZLOPI_SENSOR_0024_ULTRASONIC_HC_SR04_SENSOR,
+        .id = EZLOPI_SENSOR_0024_OTHER_HCSR04,
         .func = sensor_0024_other_HCSR04,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR
+#ifdef EZLOPI_SENSOR_0025_DIGITALIN_LDR
     {
-        .id = EZLOPI_SENSOR_0025_LDR_DIGITAL_MODULE_SENSOR,
+        .id = EZLOPI_SENSOR_0025_DIGITALIN_LDR,
         .func = sensor_0025_digitalIn_LDR,
     },
 #endif
-#ifdef EZLOPI_SENSOR_0026_LDR_ANALOGUE_SENSOR
+#ifdef EZLOPI_SENSOR_0026_ADC_LDR
     {
-        .id = EZLOPI_SENSOR_0026_LDR_ANALOGUE_SENSOR,
+        .id = EZLOPI_SENSOR_0026_ADC_LDR,
         .func = sensor_0026_ADC_LDR,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_0027_WATER_LEAK
+#ifdef EZLOPI_SENSOR_0027_ADC_WATER_LEAK
     {
-        .id = EZLOPI_SENSOR_0027_WATER_LEAK,
+        .id = EZLOPI_SENSOR_0027_ADC_WATER_LEAK,
         .func = sensor_0027_ADC_waterLeak,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_029_IR_BLASTER
+#ifdef EZLOPI_SENSOR_0029_I2C_GXHTC3
     {
-        .id = EZLOPI_SENSOR_029_IR_BLASTER,
+        .id = EZLOPI_SENSOR_0029_I2C_GXHTC3,
         .func = sensor_0029_I2C_GXHTC3,
     },
 #endif
-#ifdef EZLOPI_SENSOR_030_DS18B20
+#ifdef EZLOPI_SENSOR_0030_ONEWIRE_DS18B20
     {
-        .id = EZLOPI_SENSOR_030_DS18B20,
+        .id = EZLOPI_SENSOR_0030_ONEWIRE_DS18B20,
         .func = sensor_0030_oneWire_DS18B20,
     },
 #endif
-
-#ifdef EZLOPI_SENSOR_032_SOIL_MOISTURE
+#ifdef EZLOPI_SENSOR_0031_OTHER_JSNSR04T
     {
-        .id = EZLOPI_SENSOR_032_SOIL_MOISTURE,
+        .id = EZLOPI_SENSOR_0031_OTHER_JSNSR04T,
+        .func = sensor_0031_other_JSNSR04T,
+    },
+#endif
+
+#ifdef EZLOPI_SENSOR_0032_ADC_SOILMOISTURE
+    {
+        .id = EZLOPI_SENSOR_0032_ADC_SOILMOISTURE,
         .func = sensor_0032_ADC_soilMoisture,
     },
 #endif
 
-#ifdef EZLOPI_SENSOR_033_TURBIDITY_SENSOR
+#ifdef EZLOPI_SENSOR_0033_ADC_TURBIDITY
     {
-        .id = EZLOPI_SENSOR_033_TURBIDITY_SENSOR,
+        .id = EZLOPI_SENSOR_0033_ADC_TURBIDITY,
         .func = sensor_0033_ADC_turbidity,
     },
 #endif
