@@ -6,6 +6,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_adc.h"
 #include "ezlopi_valueformatter.h"
+#include "math.h"
 
 #include "esp_err.h"
 #include "items.h"
@@ -63,6 +64,25 @@ int sensor_0030_oneWire_DS18B20(e_ezlopi_actions_t action, l_ezlopi_item_t *item
     return ret;
 }
 
+static int __notify(l_ezlopi_item_t *item)
+{
+    int ret = 0;
+    double *temperature_prev_value = (double *)item->user_arg;
+    double temperature_current_value = 0.00;
+    esp_err_t error = ds18b20_get_temperature_data(&temperature_current_value, item->interface.onewire_master.onewire_pin);
+    if (ESP_OK == error)
+    {
+        // TRACE_B("Current %f, prev %f", temperature_current_value, *temperature_prev_value);
+        // TRACE_B("Diff is %f", fabs(*temperature_prev_value - temperature_current_value));
+        if (fabs(*temperature_prev_value - temperature_current_value) > 0.0001)
+        {
+            *temperature_prev_value = temperature_current_value;
+            ezlopi_device_value_updated_from_device_v3(item);
+        }
+    }
+    return ret;
+}
+
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
@@ -71,7 +91,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         cJSON *cj_result = (cJSON *)arg;
         double *temperatue_value = (double *)item->user_arg;
-        ds18b20_get_temperature_data(temperatue_value, item->interface.onewire_master.onewire_pin);
         cJSON_AddNumberToObject(cj_result, "value", *temperatue_value);
         char *valueFormatted = ezlopi_valueformatter_double(*temperatue_value);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -91,8 +110,10 @@ static int __init(l_ezlopi_item_t *item)
         {
             if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
             {
+                double *temperature_prev_value = (double *)item->user_arg;
                 TRACE_B("Providing initial settings to DS18B20");
                 ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
+                ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = 1;
             }
         }
@@ -165,13 +186,6 @@ static int __prepare(void *arg)
         }
     }
 
-    return ret;
-}
-
-static int __notify(l_ezlopi_item_t *item)
-{
-    int ret = 0;
-    ezlopi_device_value_updated_from_device_v3(item);
     return ret;
 }
 

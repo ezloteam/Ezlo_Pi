@@ -165,7 +165,7 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_SENSOR_0024_OTHER_HCSR04
     {
         .id = EZLOPI_SENSOR_0024_OTHER_HCSR04,
-        .func = sensor_0024_other_HCSR04,
+        .func = sensor_0024_other_HCSR04_v3,
     },
 #endif
 

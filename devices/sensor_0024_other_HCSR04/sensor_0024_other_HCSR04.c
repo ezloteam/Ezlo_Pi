@@ -3,7 +3,6 @@
 
 #include "cJSON.h"
 #include "trace.h"
-
 #include "items.h"
 
 #include "ezlopi_timer.h"
@@ -13,11 +12,9 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_gpio.h"
-#include "ezlopi_valueformatter.h"
 
 #include "gpio_isr_service.h"
 #include "sensor_0024_other_HCSR04.h"
-
 #include "driver/mcpwm.h"
 #include "soc/rtc.h"
 
@@ -28,8 +25,10 @@ static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *item);
+static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance);
+static esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us);
 
-int sensor_0024_other_HCSR04(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -37,26 +36,21 @@ int sensor_0024_other_HCSR04(e_ezlopi_actions_t action, l_ezlopi_item_t *item, v
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        // TRACE_B("sensor_0024_other_HCSR04 -> __prepare");
         ret = __prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        // TRACE_B("sensor_0024_other_HCSR04 -> __init");
         ret = __init(item);
         break;
     }
-    case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        // TRACE_B("sensor_0024_other_HCSR04 -> __get_value_cjson");
         ret = __get_value_cjson(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        // TRACE_B("sensor_0024_other_HCSR04 -> __notify");
         ret = __notify(item);
         break;
     }
@@ -73,7 +67,7 @@ int sensor_0024_other_HCSR04(e_ezlopi_actions_t action, l_ezlopi_item_t *item, v
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-#if 0
+
     ultrasonic_sensor_t *ultrasonic_sensor = (ultrasonic_sensor_t *)item->user_arg;
     cJSON *cj_param = (cJSON *)arg;
     char valueFormatted[20];
@@ -83,7 +77,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cj_param, "value", ultrasonic_sensor->distance);
     }
-#endif
+
     return ret;
 }
 
@@ -100,26 +94,22 @@ static int __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-#include "hc_sr04_lib.h"
-
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    ultrasonic_sensor_t sens_config = {
-        .echo_pin = item->interface.gpio.gpio_in.gpio_num,
-        .trigger_pin = item->interface.gpio.gpio_out.gpio_num,
-    };
-    ultrasonic_init(&sens_config);
-
-#if 0
     if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
     {
-        TRACE_D("Is valid output - %d", item->interface.gpio.gpio_out.gpio_num);
         const gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
             .mode = GPIO_MODE_OUTPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = GPIO_PULLDOWN_DISABLE,
+            .pull_up_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
+                           (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                              ? GPIO_PULLUP_ENABLE
+                              : GPIO_PULLUP_DISABLE,
+            .pull_down_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
+                             (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                ? GPIO_PULLDOWN_ENABLE
+                                : GPIO_PULLDOWN_DISABLE,
             .intr_type = GPIO_INTR_DISABLE,
         };
 
@@ -128,18 +118,24 @@ static int __init(l_ezlopi_item_t *item)
 
     if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
     {
-        TRACE_D("Is valid input - %d", item->interface.gpio.gpio_in.gpio_num);
         const gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
             .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_DISABLE,
+            .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
+                           (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                              ? GPIO_PULLUP_ENABLE
+                              : GPIO_PULLUP_DISABLE,
+            .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
+                             (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                ? GPIO_PULLDOWN_ENABLE
+                                : GPIO_PULLDOWN_DISABLE,
+            .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
+                             ? GPIO_INTR_POSEDGE
+                             : GPIO_INTR_NEGEDGE,
         };
 
         gpio_config(&io_conf);
     }
-#endif
     return ret;
 }
 
@@ -196,7 +192,7 @@ static int __prepare(void *arg)
             if (device)
             {
                 __setup_device_cloud_properties(device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
                     __setup_item_properties(item, cj_device);
@@ -204,9 +200,9 @@ static int __prepare(void *arg)
                     if (ultrasonic_sensor)
                     {
                         memset(ultrasonic_sensor, 0, sizeof(ultrasonic_sensor_t));
-                        // ultrasonic_sensor->distance = 0;
-                        // ultrasonic_sensor->trigger_pin = item->interface.gpio.gpio_out.gpio_num;
-                        // ultrasonic_sensor->echo_pin = item->interface.gpio.gpio_in.gpio_num;
+                        ultrasonic_sensor->distance = 0;
+                        ultrasonic_sensor->trigger_pin = item->interface.gpio.gpio_out.gpio_num;
+                        ultrasonic_sensor->echo_pin = item->interface.gpio.gpio_in.gpio_num;
                         item->user_arg = (void *)ultrasonic_sensor;
                     }
                 }
@@ -222,60 +218,41 @@ static int __prepare(void *arg)
 
 static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *item)
 {
-    ultrasonic_sensor_t sens_config = {
-        .echo_pin = item->interface.gpio.gpio_in.gpio_num,
-        .trigger_pin = item->interface.gpio.gpio_out.gpio_num,
-    };
+    uint32_t distance;
 
-    uint32_t distance = 0;
-    ultrasonic_measure_cm(&sens_config, 400, &distance);
-    TRACE_B("distance: %d", distance);
-#if 0
     ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (ultrasonic_sensor_t *)item->user_arg;
     if (ultrasonic_HCSR04_sensor)
     {
         esp_err_t res = ultrasonic_measure(ultrasonic_HCSR04_sensor, MAX_DISTANCE_CM, &ultrasonic_HCSR04_sensor->distance);
 
+        TRACE_B("Error 0x%X: ", res);
         if (res != ESP_OK)
         {
-            TRACE_B("Error 0x%X: ", res);
             switch (res)
             {
             case ESP_ERR_ULTRASONIC_PING:
-            {
                 TRACE_B("Cannot ping (device is in invalid state)\n");
                 break;
-            }
             case ESP_ERR_ULTRASONIC_PING_TIMEOUT:
-            {
                 TRACE_B("Ping timeout (no device found)\n");
                 break;
-            }
             case ESP_ERR_ULTRASONIC_ECHO_TIMEOUT:
-            {
                 TRACE_B("Echo timeout (i.e. distance too big)\n");
                 break;
-            }
             default:
-            {
                 TRACE_B("%s\n", esp_err_to_name(res));
-                break;
             }
-            }
-
             ultrasonic_HCSR04_sensor->distance = 0;
         }
         else
         {
             TRACE_B("Distance: %d cm\n", ultrasonic_HCSR04_sensor->distance);
-            // vTaskDelay(500 / portTICK_PERIOD_MS);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
     }
-#endif
     return true;
 }
 
-#if 0
 static esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance)
 {
     CHECK_ARG(dev && distance);
@@ -328,4 +305,3 @@ static esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t
 
     return ESP_OK;
 }
-#endif

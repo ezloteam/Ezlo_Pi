@@ -505,13 +505,11 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_name\": \"TTP223B_touch_switch\",\
-                \"dev_type\": 2,\
-                \"id_item\": 35,\
+                 \"dev_type\": 3,\
+                \"dev_name\": \"Soil Moisture\",\
                 \"id_room\": \"\",\
-                \"gpio\": 6,\
-                \"val_ip\": 0,\
-                \"ip_inv\": false\
+                \"id_item\": 32,\
+                \"gpio\": 1\
             }\
     ],\
     \"dev_total\":1\
