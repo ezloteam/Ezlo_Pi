@@ -218,13 +218,15 @@ static void _0061_update_from_device(l_ezlopi_item_t *item)
     if (item)
     {
         char *curret_value = NULL;
-        if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
+        item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+        item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
+        if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = "dw_is_opened";
+            curret_value = reed_door_window_states[0]; //"dw_is_opened";
         }
         else
         {
-            curret_value = "dw_is_closed";
+            curret_value = reed_door_window_states[1]; //"dw_is_closed";
         }
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
         {

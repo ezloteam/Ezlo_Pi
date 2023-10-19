@@ -90,6 +90,11 @@
 #define b_coeff_FSR 2.308f
 
 #define FSR_correction_factor 2.5f
+
+typedef struct fsr_t
+{
+    float FSR_value;
+} fsr_t;
 //-----------------------------------------------------------------------------------------------------------------------------
 int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 

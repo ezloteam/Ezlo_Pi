@@ -505,12 +505,12 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                      \"dev_name\": \"Float switch\",\
-                \"dev_type\": 2,\
-                \"id_item\": 65,\
+                \"dev_type\": 10,\
+                \"dev_name\": \"KY026_flame_detector\",\
                 \"id_room\": \"\",\
-                \"gpio\": 25,\
-                \"logic_inv\": false\
+                \"id_item\": 57,\
+                \"gpio1\": 25,\
+                \"gpio2\": 33\
             }\
     ],\
     \"dev_total\":1\

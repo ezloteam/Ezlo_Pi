@@ -116,6 +116,10 @@ typedef enum
     TSL2561_GAIN_x16,
 } gain_t;
 
+typedef struct TSL256_lum_t
+{
+    uint32_t lux_val;
+}TSL256_lum_t;
 //------------------------------------------------------------------------------
 bool Check_PARTID(s_ezlopi_i2c_master_t *i2c_master);
 void sensor_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master);

@@ -220,7 +220,9 @@ static void _0065_update_from_device(l_ezlopi_item_t *item)
     if (item)
     {
         char *curret_value = NULL;
-        if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
+        item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+        item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
+        if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
             curret_value = water_level_alarm_token[0]; //"water_level_ok";
         }

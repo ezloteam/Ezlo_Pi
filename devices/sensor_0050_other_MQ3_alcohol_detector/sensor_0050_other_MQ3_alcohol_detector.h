@@ -149,6 +149,11 @@ typedef enum
     MQ3_GAS_ALARM_MAX
 } e_mq3_gas_alarm_states_t;
 
+typedef struct mq3_value_t
+{
+    float _alcohol_ppm;
+    float MQ3_R0_constant;
+} mq3_value_t;
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------

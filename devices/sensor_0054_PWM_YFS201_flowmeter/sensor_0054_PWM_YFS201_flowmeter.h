@@ -28,6 +28,10 @@ typedef enum YFS201_queue_enum
     YFS201_QUEUE_FULL,
 } YFS201_queue_enum_t;
 
+typedef struct yfs201_t
+{
+    uint32_t yfs201_dominant_pulse_count;
+} yfs201_t;
 //-----------------------------------------------------------------------------------------------
 int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 

@@ -136,6 +136,11 @@ typedef enum
 	MQ9_GAS_ALARM_MAX
 } e_mq9_gas_alarm_states_t;
 
+typedef struct mq9_value_t
+{
+    float _LPG_flameable_ppm;
+    float MQ9_R0_constant;  
+}mq9_value_t;
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_timer.h"
 #include "items.h"
+#include "math.h"
 
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
@@ -13,14 +14,13 @@
 
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 //-----------------------------------------------------------------------
-// extern bool Check_PARTID(s_ezlopi_i2c_master_t *i2c_master);
-// extern void sensor_0044_tsl2561_configure_device(s_ezlopi_i2c_master_t *i2c_master);
-// extern uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master);
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __notify(l_ezlopi_item_t *item);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 
 int sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -63,7 +63,14 @@ static int __notify(l_ezlopi_item_t *item)
 
     if (3 == ++count)
     {
-        ezlopi_device_value_updated_from_device_v3(item);
+        // Allow only significant changes in values to be posted
+        double new_value = (double)tsl2561_get_intensity_value(&item->interface.i2c_master);
+        TSL256_lum_t *TSL2561_lux_data = (TSL256_lum_t *)item->user_arg;
+        if (fabs((double)(TSL2561_lux_data->lux_val) - new_value) > 0.0001)
+        {
+            ezlopi_device_value_updated_from_device_v3(item);
+            TSL2561_lux_data->lux_val = (uint32_t)new_value;
+        }
         count = 0;
     }
 
@@ -76,10 +83,10 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     cJSON *cjson_properties = (cJSON *)arg;
     if (cjson_properties)
     {
-        uint32_t illuminance_value = tsl2561_get_intensity_value(&item->interface.i2c_master);
-        char *valueFormatted = ezlopi_valueformatter_int((int)illuminance_value);
+        TSL256_lum_t *illuminance_value = ((TSL256_lum_t *)item->user_arg);
+        char *valueFormatted = ezlopi_valueformatter_int((int)(illuminance_value->lux_val));
         cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cjson_properties, "values", illuminance_value);
+        cJSON_AddNumberToObject(cjson_properties, "values", (int)illuminance_value->lux_val);
         free(valueFormatted);
         ret = 1;
     }
@@ -115,7 +122,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -136,6 +143,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     {
         item->interface.i2c_master.address = TSL2561_ADDRESS;
     }
+    // passing the custom data_structure
+    item->user_arg = user_data;
 }
 
 static int __prepare(void *arg)
@@ -145,23 +154,32 @@ static int __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device();
-        if (tsl256_device)
+        TSL256_lum_t *TSL2561_lux_data = (TSL256_lum_t *)malloc(sizeof(TSL256_lum_t));
+        if (NULL != TSL2561_lux_data)
         {
-            __prepare_device_cloud_properties(tsl256_device, prep_arg->cjson_device);
-            l_ezlopi_item_t *tsl256_item = ezlopi_device_add_item_to_device(tsl256_device, sensor_0044_I2C_TSL256_luminosity);
-            if (tsl256_item)
+            memset(TSL2561_lux_data, 0, sizeof(TSL256_lum_t));
+            l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device();
+            if (tsl256_device)
             {
-                __prepare_item_cloud_properties(tsl256_item, prep_arg->cjson_device);
+                __prepare_device_cloud_properties(tsl256_device, prep_arg->cjson_device);
+
+                l_ezlopi_item_t *tsl256_item = ezlopi_device_add_item_to_device(tsl256_device, sensor_0044_I2C_TSL256_luminosity);
+                if (tsl256_item)
+                {
+                    __prepare_item_cloud_properties(tsl256_item, prep_arg->cjson_device, TSL2561_lux_data);
+                }
+                else
+                {
+                    ezlopi_device_free_device(tsl256_device);
+                    free(TSL2561_lux_data);
+                }
             }
             else
             {
                 ezlopi_device_free_device(tsl256_device);
+                free(TSL2561_lux_data);
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(tsl256_device);
+            ret = 1;
         }
     }
 
