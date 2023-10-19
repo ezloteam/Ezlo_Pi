@@ -505,14 +505,12 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_type\": 2,\
-                \"dev_name\": \"Proximity\",\
-                \"id_room\": \"\",\
-                \"id_item\": 34,\
-               \"gpio\": 1,\
-               \"val_ip\": 1,\
-               \"logic_inv\": false\
-}\
+      \"dev_type\": 7,\
+      \"dev_name\": \"DHT 22\",\
+      \"id_room\": \"\",\
+      \"id_item\": 16,\
+      \"gpio\": 5\
+    }\
     ],\
     \"dev_total\":1\
     }";
