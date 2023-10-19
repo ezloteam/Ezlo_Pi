@@ -213,14 +213,14 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
 
     if (NULL != cjson_params)
     {
-        char *cjson_params_str = cJSON_Print(cjson_params);
-        if (cjson_params)
+        int value = 0;
+        char *param_str = cJSON_Print(cjson_params);
+        if (param_str)
         {
-            TRACE_D("cjson_params: %s", cjson_params_str);
-            free(cjson_params_str);
+            TRACE_D("param_str: %s", param_str);
+            free(param_str);
         }
 
-        int value = 0;
         CJSON_GET_VALUE_INT(cjson_params, "value", value);
 
         TRACE_I("item_name: %s", item->cloud_properties.item_name);
@@ -239,22 +239,13 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
         }
         else
         {
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
-            while (curr_device)
+
+            if ((EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == item->interface_type) && (255 != item->interface.gpio.gpio_out.gpio_num))
             {
-                l_ezlopi_item_t *curr_item = curr_device->items;
-                while (curr_item)
-                {
-                    if ((EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type) && (255 != curr_item->interface.gpio.gpio_out.gpio_num))
-                    {
-                        TRACE_D("GPIO-pin: %d", curr_item->interface.gpio.gpio_out.gpio_num);
-                        TRACE_D("value: %d", value);
-                        __set_gpio_value(curr_item, value);
-                        ezlopi_device_value_updated_from_device_v3(curr_item);
-                    }
-                    curr_item = curr_item->next;
-                }
-                curr_device = curr_device->next;
+                TRACE_D("GPIO-pin: %d", item->interface.gpio.gpio_out.gpio_num);
+                TRACE_D("value: %d", value);
+                __set_gpio_value(item, value);
+                ezlopi_device_value_updated_from_device_v3(item);
             }
 
             item->interface.gpio.gpio_out.value = value;

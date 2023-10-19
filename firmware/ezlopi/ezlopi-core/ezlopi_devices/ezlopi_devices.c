@@ -9,16 +9,10 @@
 #include "web_provisioning.h"
 #include "ezlopi_factory_info.h"
 
-#if 0
-static uint32_t device_id = 0;
-static uint32_t item_id = 0;
-static uint32_t room_id = 0;
-static uint32_t gateway_id = 0;
-#endif
-
 static l_ezlopi_device_t *l_device_head = NULL;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
+static void ezlopi_device_free(l_ezlopi_device_t *device);
 static void ezlopi_device_parse_json_v3(char *config_string);
 static void ezlopi_device_print_controller_cloud_information_v3(void);
 
@@ -30,6 +24,22 @@ s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void)
 l_ezlopi_device_t *ezlopi_device_get_head(void)
 {
     return l_device_head;
+}
+
+l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id)
+{
+    l_ezlopi_device_t *device_node = l_device_head;
+
+    while (device_node)
+    {
+        if (device_id == device_node->cloud_properties.device_id)
+        {
+            break;
+        }
+        device_node = device_node->next;
+    }
+
+    return device_node;
 }
 
 l_ezlopi_device_t *ezlopi_device_add_device(void)
@@ -55,6 +65,70 @@ l_ezlopi_device_t *ezlopi_device_add_device(void)
     }
 
     return new_device;
+}
+
+void ezlopi_device_free_device(l_ezlopi_device_t *device)
+{
+    if (device)
+    {
+        if (l_device_head)
+        {
+            if (l_device_head == device)
+            {
+                ezlopi_device_free(l_device_head);
+                l_device_head = NULL;
+            }
+            else
+            {
+                l_ezlopi_device_t *curr_device = l_device_head;
+                while (curr_device->next)
+                {
+                    if (curr_device->next == device)
+                    {
+                        break;
+                    }
+
+                    curr_device = curr_device->next;
+                }
+
+                if (curr_device->next)
+                {
+                    l_ezlopi_device_t *free_device = curr_device->next;
+                    curr_device->next = curr_device->next->next;
+                    ezlopi_device_free(free_device);
+                }
+            }
+        }
+    }
+}
+
+l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id)
+{
+    l_ezlopi_item_t *item_to_return = NULL;
+    l_ezlopi_device_t *device_node = l_device_head;
+
+    while (device_node)
+    {
+        l_ezlopi_item_t *item_node = device_node->items;
+        while (item_node)
+        {
+            if (item_id == item_node->cloud_properties.item_id)
+            {
+                item_to_return = item_node;
+                break;
+            }
+            item_node = item_node->next;
+        }
+
+        if (item_to_return)
+        {
+            break;
+        }
+
+        device_node = device_node->next;
+    }
+
+    return item_to_return;
 }
 
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, int (*item_func)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg))
@@ -404,39 +478,4 @@ static void ezlopi_device_free(l_ezlopi_device_t *device)
         ezlopi_device_free_item(device->items);
     }
     free(device);
-}
-
-void ezlopi_device_free_device(l_ezlopi_device_t *device)
-{
-    if (device)
-    {
-        if (l_device_head)
-        {
-            if (l_device_head == device)
-            {
-                ezlopi_device_free(l_device_head);
-                l_device_head = NULL;
-            }
-            else
-            {
-                l_ezlopi_device_t *curr_device = l_device_head;
-                while (curr_device->next)
-                {
-                    if (curr_device->next == device)
-                    {
-                        break;
-                    }
-
-                    curr_device = curr_device->next;
-                }
-
-                if (curr_device->next)
-                {
-                    l_ezlopi_device_t *free_device = curr_device->next;
-                    curr_device->next = curr_device->next->next;
-                    ezlopi_device_free(free_device);
-                }
-            }
-        }
-    }
 }

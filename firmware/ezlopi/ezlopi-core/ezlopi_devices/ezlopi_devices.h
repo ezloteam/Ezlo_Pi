@@ -137,7 +137,6 @@ typedef struct l_ezlopi_item
         s_ezlopi_adc_t adc;
     } interface;
 
-    // f_item_func_t func;
     void *user_arg;
     int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
 
@@ -151,41 +150,14 @@ typedef struct l_ezlopi_device
     struct l_ezlopi_device *next;
 } l_ezlopi_device_t;
 
-#if 0 // v1.x.x to v2.x.x
-typedef struct s_ezlopi_device_properties
-{
-    // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
-    e_ezlopi_device_interface_type_t interface_type;
-    // hardware interface
-    union
-    {
-        s_ezlopi_uart_t uart; //
-        s_ezlopi_i2c_master_t i2c_master;
-        s_ezlopi_spi_master_t spi_master;
-        s_ezlopi_onewire_t onewire_master;
-        s_ezlopi_gpios_t gpio;
-        s_ezlopi_pwm_t pwm; // dev_type: 5
-        s_ezlopi_adc_t adc;
-    } interface;
-
-    void *user_arg;
-    s_ezlopi_cloud_info_t ezlopi_cloud;
-
-} s_ezlopi_device_properties_t;
-#endif
-
 void ezlopi_device_prepare(void);
-// uint32_t ezlopi_device_generate_device_id(void);
-// uint32_t ezlopi_device_generate_item_id(void);
-// uint32_t ezlopi_device_generate_room_id(void);
-// uint32_t ezlopi_device_generate_gateway_id(void);
-
-#if 0 // v2.x
-void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
-#endif
 
 l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);
+
+l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id);
+l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
+
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
                                                   int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
