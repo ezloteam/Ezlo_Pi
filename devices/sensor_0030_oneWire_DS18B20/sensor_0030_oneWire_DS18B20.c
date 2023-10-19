@@ -74,7 +74,7 @@ static int __notify(l_ezlopi_item_t *item)
     {
         // TRACE_B("Current %f, prev %f", temperature_current_value, *temperature_prev_value);
         // TRACE_B("Diff is %f", fabs(*temperature_prev_value - temperature_current_value));
-        if (fabs(*temperature_prev_value - temperature_current_value) > 0.0001)
+        if (fabs(*temperature_prev_value - temperature_current_value) > 0.2)
         {
             *temperature_prev_value = temperature_current_value;
             ezlopi_device_value_updated_from_device_v3(item);
