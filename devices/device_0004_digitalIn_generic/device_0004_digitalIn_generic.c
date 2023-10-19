@@ -21,7 +21,6 @@ static int __init(l_ezlopi_item_t *item);
 static int __set_value(l_ezlopi_item_t *item, void *arg);
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
-static void __toggle_gpio(l_ezlopi_item_t *item);
 static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __interrupt_upcall(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
@@ -86,6 +85,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
+    item->interface.gpio.gpio_in.enable = true;
     CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
     CJSON_GET_VALUE_INT(cjson_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cjson_device, "logic_inv", item->interface.gpio.gpio_in.invert);
@@ -170,6 +170,6 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 
 static void __interrupt_upcall(l_ezlopi_item_t *item)
 {
-    // __toggle_gpio(item);
+    item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;
     ezlopi_device_value_updated_from_device_v3(item);
 }
