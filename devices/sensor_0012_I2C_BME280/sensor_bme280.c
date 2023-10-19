@@ -1,325 +1,376 @@
-#include <string.h>
-#include "cJSON.h"
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 sheinz <https://github.com/sheinz>
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-#include "trace.h"
+/**
+ * @file bmp280.c
+ *
+ * ESP-IDF driver for BMP280/BME280 digital pressure sensor
+ *
+ * Ported from esp-open-rtos
+ *
+ * Copyright (c) 2016 sheinz <https://github.com/sheinz>\n
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * MIT Licensed as described in the file LICENSE
+ */
+
 #include "sensor_bme280.h"
-#include "ezlopi_cloud.h"
-#include "ezlopi_timer.h"
-#include "ezlopi_actions.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_device_value_updated.h"
+#include <inttypes.h>
+#include "esp_err.h"
+#include "esp_log.h"
+#include "ezlopi_i2c_master.h"
 
-static void user_delay_us(uint32_t period, void *intf_ptr);
-static int8_t user_i2c_read(uint8_t reg_addr, uint8_t *sensor_data, uint32_t len, void *intf_ptr);
-static int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *sensor_data, uint32_t len, void *intf_ptr);
+#define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 
-typedef struct s_bme280_hal_arg
-{
-    uint32_t addr;
-    uint32_t channel;
-} s_bme280_hal_arg_t;
-
-bme280_identifier_t identifier = {
-    .dev_addr = 0x76,
-};
-
-static sensor_bme280_dev_t device = {
-    .intf = BME280_I2C_INTF,
-    .read = user_i2c_read,
-    .write = user_i2c_write,
-    .delay_us = user_delay_us,
-    .settings = {
-        .osr_h = BME280_OVERSAMPLING_1X,
-        .osr_p = BME280_OVERSAMPLING_1X,
-        .osr_t = BME280_OVERSAMPLING_1X,
-        .filter = BME280_FILTER_COEFF_16,
-    },
-    .intf_ptr = &identifier,
-};
-
-static int prepare_sensor(void *arg);
-#if 0 // v2.x
-static int sensor_bme280_init(s_ezlopi_device_properties_t *properties, void *user_arg);
-static int8_t sensor_bme280_read_value_from_sensor(s_ezlopi_device_properties_t *properties, sensor_bme280_data_t *data_ptr);
-static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args);
-static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_bme_device_properties, void *user_arg);
-static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t dev_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device);
-
+static const char *TAG = "bmp280";
 
 /**
- * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
- *
- * @param action e_ezlopi_actions_t
- * @param arg Other arguments if needed
- * @return int
+ * BMP280 registers
  */
-int sensor_bme280(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg)
+#define BMP280_REG_TEMP_XLSB 0xFC /* bits: 7-4 */
+#define BMP280_REG_TEMP_LSB 0xFB
+#define BMP280_REG_TEMP_MSB 0xFA
+#define BMP280_REG_TEMP (BMP280_REG_TEMP_MSB)
+#define BMP280_REG_PRESS_XLSB 0xF9 /* bits: 7-4 */
+#define BMP280_REG_PRESS_LSB 0xF8
+#define BMP280_REG_PRESS_MSB 0xF7
+#define BMP280_REG_PRESSURE (BMP280_REG_PRESS_MSB)
+#define BMP280_REG_CONFIG 0xF5   /* bits: 7-5 t_sb; 4-2 filter; 0 spi3w_en */
+#define BMP280_REG_CTRL 0xF4     /* bits: 7-5 osrs_t; 4-2 osrs_p; 1-0 mode */
+#define BMP280_REG_STATUS 0xF3   /* bits: 3 measuring; 0 im_update */
+#define BMP280_REG_CTRL_HUM 0xF2 /* bits: 2-0 osrs_h; */
+#define BMP280_REG_RESET 0xE0
+#define BMP280_REG_ID 0xD0
+#define BMP280_REG_CALIB 0x88
+#define BMP280_REG_HUM_CALIB 0x88
+
+#define BMP280_RESET_VALUE 0xB6
+
+#define CHECK(x)                \
+    do                          \
+    {                           \
+        esp_err_t __;           \
+        if ((__ = x) != ESP_OK) \
+            return __;          \
+    } while (0)
+#define CHECK_ARG(VAL)                  \
+    do                                  \
+    {                                   \
+        if (!(VAL))                     \
+            return ESP_ERR_INVALID_ARG; \
+    } while (0)
+#define CHECK_LOGE(dev, x, msg, ...)           \
+    do                                         \
+    {                                          \
+        esp_err_t __;                          \
+        if ((__ = x) != ESP_OK)                \
+        {                                      \
+            ESP_LOGE(TAG, msg, ##__VA_ARGS__); \
+            return __;                         \
+        }                                      \
+    } while (0)
+
+
+inline static esp_err_t read_register_8(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint8_t *r)
 {
-    switch (action)
-    {
-    case EZLOPI_ACTION_PREPARE:
-    {
-        prepare_sensor(arg);
-        break;
-    }
-    case EZLOPI_ACTION_INITIALIZE:
-    {
-        sensor_bme280_init(properties, user_arg);
-        break;
-    }
-    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-    {
-        sensor_bme280_get_value_cjson(properties, arg);
-        break;
-    }
-    case EZLOPI_ACTION_NOTIFY_1000_MS:
-    {
-        ezlopi_device_value_updated_from_device(properties);
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
+    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
+    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, r, 1));
     return 0;
 }
 
-static int add_device_to_list(s_ezlopi_prep_arg_t *prep_arg, s_ezlopi_device_properties_t *sensor_bme_device_properties, void *user_arg)
+static esp_err_t read_register16(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t reg, uint16_t *r)
 {
-    int ret = 0;
-    if (sensor_bme_device_properties)
-    {
-        if (0 == ezlopi_devices_list_add(prep_arg->device, sensor_bme_device_properties, user_arg))
-        {
-            free(sensor_bme_device_properties);
-        }
-        else
-        {
-            ret = 1;
-        }
-    }
-    return ret;
+    uint8_t d[] = {0, 0};
+
+    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &reg, 1));
+    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, d, 2));
+    *r = d[0] | (d[1] << 8);
+
+    return ESP_OK;
 }
 
-#define ADD_PROPERTIES_DEVICE_LIST(device_id, category, subcategory, item_name, value_type, cjson_device)                  \
-    {                                                                                                                      \
-        s_ezlopi_device_properties_t *_properties = sensor_bme280_prepare_properties(device_id, category, subcategory,     \
-                                                                                     item_name, value_type, cjson_device); \
-        if (NULL != _properties)                                                                                           \
-        {                                                                                                                  \
-            add_device_to_list(prep_arg, _properties, sensor_config);                                                      \
-        }                                                                                                                  \
+static esp_err_t read_calibration_data(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *dev)
+{
+    CHECK(read_register16(i2c_master_conf, 0x88, &dev->dig_T1));
+    CHECK(read_register16(i2c_master_conf, 0x8a, (uint16_t *)&dev->dig_T2));
+    CHECK(read_register16(i2c_master_conf, 0x8c, (uint16_t *)&dev->dig_T3));
+    CHECK(read_register16(i2c_master_conf, 0x8e, &dev->dig_P1));
+    CHECK(read_register16(i2c_master_conf, 0x90, (uint16_t *)&dev->dig_P2));
+    CHECK(read_register16(i2c_master_conf, 0x92, (uint16_t *)&dev->dig_P3));
+    CHECK(read_register16(i2c_master_conf, 0x94, (uint16_t *)&dev->dig_P4));
+    CHECK(read_register16(i2c_master_conf, 0x96, (uint16_t *)&dev->dig_P5));
+    CHECK(read_register16(i2c_master_conf, 0x98, (uint16_t *)&dev->dig_P6));
+    CHECK(read_register16(i2c_master_conf, 0x9a, (uint16_t *)&dev->dig_P7));
+    CHECK(read_register16(i2c_master_conf, 0x9c, (uint16_t *)&dev->dig_P8));
+    CHECK(read_register16(i2c_master_conf, 0x9e, (uint16_t *)&dev->dig_P9));
+
+    ESP_LOGD(TAG, "Calibration data received:");
+    ESP_LOGD(TAG, "dig_T1=%d", dev->dig_T1);
+    ESP_LOGD(TAG, "dig_T2=%d", dev->dig_T2);
+    ESP_LOGD(TAG, "dig_T3=%d", dev->dig_T3);
+    ESP_LOGD(TAG, "dig_P1=%d", dev->dig_P1);
+    ESP_LOGD(TAG, "dig_P2=%d", dev->dig_P2);
+    ESP_LOGD(TAG, "dig_P3=%d", dev->dig_P3);
+    ESP_LOGD(TAG, "dig_P4=%d", dev->dig_P4);
+    ESP_LOGD(TAG, "dig_P5=%d", dev->dig_P5);
+    ESP_LOGD(TAG, "dig_P6=%d", dev->dig_P6);
+    ESP_LOGD(TAG, "dig_P7=%d", dev->dig_P7);
+    ESP_LOGD(TAG, "dig_P8=%d", dev->dig_P8);
+    ESP_LOGD(TAG, "dig_P9=%d", dev->dig_P9);
+
+    return ESP_OK;
+}
+
+static esp_err_t read_hum_calibration_data(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *dev)
+{
+    uint16_t h4, h5;
+
+
+    uint8_t register_addr = 0xa1;
+    ESP_ERROR_CHECK(read_register_8(i2c_master_conf, register_addr, &dev->dig_H1));
+    CHECK(read_register16(i2c_master_conf, 0xe1, (uint16_t *)&dev->dig_H2));
+
+    register_addr = 0xe3;
+    ESP_ERROR_CHECK(read_register_8(i2c_master_conf, register_addr, &dev->dig_H3));
+    CHECK(read_register16(i2c_master_conf, 0xe4, &h4));
+    CHECK(read_register16(i2c_master_conf, 0xe5, &h5));
+
+    register_addr = 0xe7;
+    ESP_ERROR_CHECK(read_register_8(i2c_master_conf, register_addr, (uint8_t*)&dev->dig_H6));
+
+    dev->dig_H4 = (h4 & 0x00ff) << 4 | (h4 & 0x0f00) >> 8;
+    dev->dig_H5 = h5 >> 4;
+    ESP_LOGD(TAG, "Calibration data received:");
+    ESP_LOGD(TAG, "dig_H1=%d", dev->dig_H1);
+    ESP_LOGD(TAG, "dig_H2=%d", dev->dig_H2);
+    ESP_LOGD(TAG, "dig_H3=%d", dev->dig_H3);
+    ESP_LOGD(TAG, "dig_H4=%d", dev->dig_H4);
+    ESP_LOGD(TAG, "dig_H5=%d", dev->dig_H5);
+    ESP_LOGD(TAG, "dig_H6=%d", dev->dig_H6);
+
+    return ESP_OK;
+}
+
+
+
+esp_err_t bmp280_init_default_params(bmp280_params_t *params)
+{
+    CHECK_ARG(params);
+
+    params->mode = BMP280_MODE_NORMAL;
+    params->filter = BMP280_FILTER_OFF;
+    params->oversampling_pressure = BMP280_STANDARD;
+    params->oversampling_temperature = BMP280_STANDARD;
+    params->oversampling_humidity = BMP280_STANDARD;
+    params->standby = BMP280_STANDBY_250;
+
+    return ESP_OK;
+}
+
+esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params, s_ezlopi_i2c_master_t *i2c_master_conf)
+{
+    CHECK_ARG(dev && params && i2c_master_conf);
+
+    uint8_t write_buffer = BMP280_REG_ID;
+
+    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &write_buffer, 1));
+    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, &dev->id, 1));
+
+    if (dev->id != BMP280_CHIP_ID && dev->id != BME280_CHIP_ID)
+    {
+        CHECK_LOGE(dev, ESP_ERR_INVALID_VERSION, "Invalid chip ID: expected: 0x%x (BME280) or 0x%x (BMP280) got: 0x%x",
+                   BME280_CHIP_ID, BMP280_CHIP_ID, dev->id);
     }
 
-static void __prepare_sensor_config(sensor_bme280_dev_t *sensor_config, cJSON *cjson_device, s_bme280_hal_arg_t *bme280_hal_arg);
-static int prepare_sensor(void *arg)
-{
-    int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    // Soft reset.
+    uint8_t reset_data[2] = {BMP280_REG_RESET, BMP280_RESET_VALUE};
+    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, reset_data, 2));
 
-    if ((NULL != prep_arg) && (NULL != prep_arg->cjson_device))
+    // Wait until finished copying over the NVP data.
+    uint8_t status;
+    write_buffer = BMP280_REG_STATUS;
+    while (1)
     {
-        sensor_bme280_dev_t *sensor_config = malloc(sizeof(sensor_bme280_dev_t));
-        if (sensor_config)
+        ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &write_buffer, 1));
+        ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, &status, 1));
+        if ((status & 1) == 0)
         {
-            s_bme280_hal_arg_t *bme280_hal_arg = malloc(sizeof(s_bme280_hal_arg_t));
-            if (NULL != bme280_hal_arg)
-            {
-                __prepare_sensor_config(sensor_config, prep_arg->cjson_device, bme280_hal_arg);
-                uint32_t device_id = ezlopi_cloud_generate_device_id();
-                ADD_PROPERTIES_DEVICE_LIST(device_id, category_temperature, subcategory_not_defined, ezlopi_item_name_temp, value_type_temperature, prep_arg->cjson_device);
-                device_id = ezlopi_cloud_generate_device_id();
-                ADD_PROPERTIES_DEVICE_LIST(device_id, category_humidity, subcategory_not_defined, ezlopi_item_name_humidity, value_type_humidity, prep_arg->cjson_device);
-                device_id = ezlopi_cloud_generate_device_id();
-                ADD_PROPERTIES_DEVICE_LIST(device_id, category_weather, subcategory_not_defined, ezlopi_item_name_atmospheric_pressure, value_type_pressure, prep_arg->cjson_device);
-            }
-            else
-            {
-                free(sensor_config);
-            }
+            break;
         }
     }
 
-    return ret;
-}
+    CHECK_LOGE(dev, read_calibration_data(i2c_master_conf, dev), "Failed to read calibration data");
 
-static void __prepare_sensor_config(sensor_bme280_dev_t *sensor_config, cJSON *cjson_device, s_bme280_hal_arg_t *bme280_hal_arg)
-{
-    sensor_config->read = user_i2c_read;
-    sensor_config->write = user_i2c_write;
-    sensor_config->delay_us = user_delay_us;
-    sensor_config->intf = BME280_I2C_INTF;
-    sensor_config->settings.osr_h = BME280_OVERSAMPLING_1X;
-    sensor_config->settings.osr_p = BME280_OVERSAMPLING_1X;
-    sensor_config->settings.osr_t = BME280_OVERSAMPLING_1X;
-    sensor_config->settings.filter = BME280_FILTER_COEFF_16;
-    sensor_config->intf_ptr = (void *)bme280_hal_arg;
-    CJSON_GET_VALUE_INT(cjson_device, "slave_addr", sensor_config->chip_id);
-}
-
-static s_ezlopi_device_properties_t *sensor_bme280_prepare_properties(uint32_t device_id, const char *category, const char *sub_category, const char *item_name, const char *value_type, cJSON *cjson_device)
-{
-    s_ezlopi_device_properties_t *sensor_ble280_properties = NULL;
-
-    if ((NULL != cjson_device))
+    if (dev->id == BME280_CHIP_ID)
     {
-        sensor_ble280_properties = malloc(sizeof(s_ezlopi_device_properties_t));
-        if (sensor_ble280_properties)
-        {
-            int tmp_var = 0;
-            memset(sensor_ble280_properties, 0, sizeof(s_ezlopi_device_properties_t));
-            sensor_ble280_properties->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
-
-            char *device_name = NULL;
-            CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-            ASSIGN_DEVICE_NAME(sensor_ble280_properties, device_name);
-            sensor_ble280_properties->ezlopi_cloud.category = category;
-            sensor_ble280_properties->ezlopi_cloud.subcategory = sub_category;
-            sensor_ble280_properties->ezlopi_cloud.item_name = item_name;
-            sensor_ble280_properties->ezlopi_cloud.device_type = dev_type_sensor_motion;
-            sensor_ble280_properties->ezlopi_cloud.value_type = value_type;
-            sensor_ble280_properties->ezlopi_cloud.has_getter = true;
-            sensor_ble280_properties->ezlopi_cloud.has_setter = false;
-            sensor_ble280_properties->ezlopi_cloud.reachable = true;
-            sensor_ble280_properties->ezlopi_cloud.battery_powered = false;
-            sensor_ble280_properties->ezlopi_cloud.show = true;
-            sensor_ble280_properties->ezlopi_cloud.room_name[0] = '\0';
-            sensor_ble280_properties->ezlopi_cloud.device_id = device_id;
-            sensor_ble280_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-            sensor_ble280_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
-
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_scl", sensor_ble280_properties->interface.i2c_master.scl);
-            CJSON_GET_VALUE_INT(cjson_device, "gpio_sda", sensor_ble280_properties->interface.i2c_master.sda);
-
-            sensor_ble280_properties->interface.i2c_master.enable = true;
-            sensor_ble280_properties->interface.i2c_master.clock_speed = 100000;
-        }
+        CHECK_LOGE(dev, read_hum_calibration_data(i2c_master_conf, dev), "Failed to read humidity calibration data");
     }
 
-    return sensor_ble280_properties;
+    uint8_t config = (params->standby << 5) | (params->filter << 2);
+    ESP_LOGD(TAG, "Writing config reg=%x", config);
+
+    uint8_t config_data[2] = {BMP280_REG_CONFIG, config};
+    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, config_data, 2));
+
+    if (params->mode == BMP280_MODE_FORCED)
+    {
+        params->mode = BMP280_MODE_SLEEP; // initial mode for forced is sleep
+    }
+
+    if (dev->id == BME280_CHIP_ID)
+    {
+        // Write crtl hum reg first, only active after write to BMP280_REG_CTRL.
+        uint8_t ctrl_hum = params->oversampling_humidity;
+        ESP_LOGD(TAG, "Writing ctrl hum reg=%x", ctrl_hum);
+        uint8_t humid_crtl_data[2] = {BMP280_REG_CTRL_HUM, ctrl_hum};
+        ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, humid_crtl_data, 2));
+    }
+
+    uint8_t ctrl = (params->oversampling_temperature << 5) | (params->oversampling_pressure << 2) | (params->mode);
+    ESP_LOGD(TAG, "Writing ctrl reg=%x", ctrl);
+    uint8_t crtl_data[2] = {BMP280_REG_CTRL, ctrl};
+    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, crtl_data, 2));
+
+
+    return ESP_OK;
 }
 
 /**
- * @brief Static function to initialize the bme280 sensor.
+ * Compensation algorithm is taken from BMP280 datasheet.
  *
- * @return returns 0 for successful initialization.
+ * Return value is in degrees Celsius.
  */
-static int sensor_bme280_init(s_ezlopi_device_properties_t *properties, void *user_arg)
+static inline int32_t compensate_temperature(bmp280_t *dev, int32_t adc_temp, int32_t *fine_temp)
 {
-    int ret = 0;
-    sensor_bme280_dev_t *sensor_config = (sensor_bme280_dev_t *)user_arg;
-    ezlopi_i2c_master_init(&properties->interface.i2c_master);
+    int32_t var1, var2;
 
-    TRACE_I("I2C master init successfully.");
-    uint8_t sampling_settting = BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL;
+    var1 = ((((adc_temp >> 3) - ((int32_t)dev->dig_T1 << 1))) * (int32_t)dev->dig_T2) >> 11;
+    var2 = (((((adc_temp >> 4) - (int32_t)dev->dig_T1) * ((adc_temp >> 4) - (int32_t)dev->dig_T1)) >> 12) * (int32_t)dev->dig_T3) >> 14;
 
-    ret = bme280_init(&device);
-    if (ret != BME280_OK)
-    {
-        TRACE_E("Failed to initialize bme280 (code %+d).", ret);
-    }
-    else
-    {
-        TRACE_I("Sensor bme280 was successfully initialized.");
-    }
-
-    ret = bme280_set_sensor_settings(sampling_settting, &device);
-    if (ret != BME280_OK)
-    {
-        TRACE_E("Failed to set sensor settings (code %+d).", ret);
-    }
-    else
-    {
-        TRACE_I("Sensor setting was successfully set.");
-    }
-    return ret;
-}
-
-static int sensor_bme280_get_value_cjson(s_ezlopi_device_properties_t *properties, void *args)
-{
-    int ret = 0;
-    sensor_bme280_data_t sensor_data;
-    memset(&sensor_data, 0, sizeof(sensor_bme280_data_t));
-    sensor_bme280_read_value_from_sensor(properties, &sensor_data);
-    cJSON *cjson_properties = (cJSON *)args;
-
-    if (cjson_properties)
-    {
-        if (category_temperature == properties->ezlopi_cloud.category)
-        {
-            TRACE_E("Temperature is: %f", sensor_data.temperature);
-            cJSON_AddNumberToObject(cjson_properties, "value", sensor_data.temperature);
-            cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
-        }
-        if (category_humidity == properties->ezlopi_cloud.category)
-        {
-            TRACE_E("Humidity is: %f", sensor_data.humidity);
-            cJSON_AddNumberToObject(cjson_properties, "value", sensor_data.humidity);
-            cJSON_AddStringToObject(cjson_properties, "scale", "percent");
-        }
-        if (category_not_defined == properties->ezlopi_cloud.category)
-        {
-            TRACE_E("Pressure is: %f", sensor_data.pressure);
-            double pressure = 0.01 * sensor_data.pressure;
-            cJSON_AddNumberToObject(cjson_properties, "value", pressure);
-            cJSON_AddStringToObject(cjson_properties, "scale", "kilo_pascal");
-        }
-
-        ret = 1;
-    }
-
-    return ret;
+    *fine_temp = var1 + var2;
+    return (*fine_temp * 5 + 128) >> 8;
 }
 
 /**
- * @brief static function to read data from the sensor.
+ * Compensation algorithm is taken from BMP280 datasheet.
  *
- * @return return `0` if everything is successfuly done.
+ * Return value is in Pa, 24 integer bits and 8 fractional bits.
  */
-static int8_t sensor_bme280_read_value_from_sensor(s_ezlopi_device_properties_t *properties, sensor_bme280_data_t *data_ptr)
+static inline uint32_t compensate_pressure(bmp280_t *dev, int32_t adc_press, int32_t fine_temp)
 {
-    int8_t ret = bme280_set_sensor_mode(BME280_FORCED_MODE, &device);
-    if (ret != BME280_OK)
-    {
-        TRACE_E("Failed to set sensor mode (code %+d).", ret);
-    }
-    else
-    {
-        TRACE_I("Sensor mode set successfully!!");
-    }
+    int64_t var1, var2, p;
 
-    ret = bme280_get_sensor_data(BME280_ALL, data_ptr, &device);
-    if (ret != BME280_OK)
+    var1 = (int64_t)fine_temp - 128000;
+    var2 = var1 * var1 * (int64_t)dev->dig_P6;
+    var2 = var2 + ((var1 * (int64_t)dev->dig_P5) << 17);
+    var2 = var2 + (((int64_t)dev->dig_P4) << 35);
+    var1 = ((var1 * var1 * (int64_t)dev->dig_P3) >> 8) + ((var1 * (int64_t)dev->dig_P2) << 12);
+    var1 = (((int64_t)1 << 47) + var1) * ((int64_t)dev->dig_P1) >> 33;
+
+    if (var1 == 0)
     {
-        TRACE_E("Failed to get sensor data (code %+d).", ret);
-    }
-    else
-    {
-        TRACE_I("Sensor mode obtained successfully!!");
+        return 0; // avoid exception caused by division by zero
     }
 
-    return ret;
+    p = 1048576 - adc_press;
+    p = (((p << 31) - var2) * 3125) / var1;
+    var1 = ((int64_t)dev->dig_P9 * (p >> 13) * (p >> 13)) >> 25;
+    var2 = ((int64_t)dev->dig_P8 * p) >> 19;
+
+    p = ((p + var1 + var2) >> 8) + ((int64_t)dev->dig_P7 << 4);
+    return p;
 }
 
-static int8_t user_i2c_read(uint8_t register_addr, uint8_t *data, uint32_t len, void *intf_ptr)
+/**
+ * Compensation algorithm is taken from BME280 datasheet.
+ *
+ * Return value is in Pa, 24 integer bits and 8 fractional bits.
+ */
+static inline uint32_t compensate_humidity(bmp280_t *dev, int32_t adc_hum, int32_t fine_temp)
 {
-    i2c_master_write_read_device(I2C_NUM_0, CHIP_ID, &register_addr, 1, data, len, 1000 / portTICK_RATE_MS);
-    return 0;
+    int32_t v_x1_u32r;
+
+    v_x1_u32r = fine_temp - (int32_t)76800;
+    v_x1_u32r = ((((adc_hum << 14) - ((int32_t)dev->dig_H4 << 20) - ((int32_t)dev->dig_H5 * v_x1_u32r)) + (int32_t)16384) >> 15) * (((((((v_x1_u32r * (int32_t)dev->dig_H6) >> 10) * (((v_x1_u32r * (int32_t)dev->dig_H3) >> 11) + (int32_t)32768)) >> 10) + (int32_t)2097152) * (int32_t)dev->dig_H2 + 8192) >> 14);
+    v_x1_u32r = v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * (int32_t)dev->dig_H1) >> 4);
+    v_x1_u32r = v_x1_u32r < 0 ? 0 : v_x1_u32r;
+    v_x1_u32r = v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r;
+    return v_x1_u32r >> 12;
 }
 
-static void user_delay_us(uint32_t period, void *intf_ptr)
+esp_err_t bmp280_read_fixed(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *dev, int32_t *temperature, uint32_t *pressure, uint32_t *humidity)
 {
-    vTaskDelay(period / portTICK_PERIOD_MS);
+    CHECK_ARG(i2c_master_conf && dev && temperature && pressure && humidity);
+
+    int32_t adc_pressure;
+    int32_t adc_temp;
+    uint8_t data[8];
+
+    // Only the BME280 supports reading the humidity.
+    if (dev->id != BME280_CHIP_ID)
+    {
+        if (humidity)
+            *humidity = 0;
+        humidity = NULL;
+    }
+
+
+    // Need to read in one sequence to ensure they match.
+    size_t size = humidity ? 8 : 6;
+    uint8_t register_addr = 0xf7;
+    ESP_ERROR_CHECK(ezlopi_i2c_master_write_to_device(i2c_master_conf, &register_addr, 1));
+    ESP_ERROR_CHECK(ezlopi_i2c_master_read_from_device(i2c_master_conf, data, size));
+
+    adc_pressure = data[0] << 12 | data[1] << 4 | data[2] >> 4;
+    adc_temp = data[3] << 12 | data[4] << 4 | data[5] >> 4;
+    ESP_LOGD(TAG, "ADC temperature: %" PRIi32, adc_temp);
+    ESP_LOGD(TAG, "ADC pressure: %" PRIi32, adc_pressure);
+
+    int32_t fine_temp;
+    *temperature = compensate_temperature(dev, adc_temp, &fine_temp);
+    *pressure = compensate_pressure(dev, adc_pressure, fine_temp);
+
+    if (humidity)
+    {
+        int32_t adc_humidity = data[6] << 8 | data[7];
+        ESP_LOGD(TAG, "ADC humidity: %" PRIi32, adc_humidity);
+        *humidity = compensate_humidity(dev, adc_humidity, fine_temp);
+    }
+
+    return ESP_OK;
 }
 
-static int8_t user_i2c_write(uint8_t register_addr, const uint8_t *data, uint32_t len, void *intf_ptr)
+esp_err_t bmp280_read_float(s_ezlopi_i2c_master_t *i2c_master_conf, bmp280_t *dev, float *temperature, float *pressure, float *humidity)
 {
-    i2c_master_write_read_device(I2C_NUM_0, CHIP_ID, &register_addr, 1, data, len, 1000 / portTICK_RATE_MS);
-    return 0;
+    int32_t fixed_temperature;
+    uint32_t fixed_pressure;
+    uint32_t fixed_humidity;
+    CHECK(bmp280_read_fixed(i2c_master_conf, dev, &fixed_temperature, &fixed_pressure, humidity ? &fixed_humidity : NULL));
+    *temperature = (float)fixed_temperature / 100;
+    *pressure = (float)fixed_pressure / 256;
+    if (humidity)
+        *humidity = (float)fixed_humidity / 1024;
+
+    return ESP_OK;
 }
-#endif
