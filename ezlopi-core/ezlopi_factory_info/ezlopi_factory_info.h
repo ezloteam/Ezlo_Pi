@@ -505,12 +505,13 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_name\":\"Luminosity\",\
-                \"dev_type\": 8,\
-                \"id_item\": 8,\
+                \"dev_name\": \"TTP223B_touch_switch\",\
+                \"dev_type\": 2,\
+                \"id_item\": 35,\
                 \"id_room\": \"\",\
-                \"gpio_scl\": 17,\
-                \"gpio_sda\": 18\
+                \"gpio\": 6,\
+                \"val_ip\": 0,\
+                \"ip_inv\": false\
             }\
     ],\
     \"dev_total\":1\

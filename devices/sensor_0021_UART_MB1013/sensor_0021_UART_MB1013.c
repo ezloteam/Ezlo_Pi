@@ -16,6 +16,8 @@
 
 #include "sensor_0021_UART_MB1013.h"
 
+static float mb1013_value = 0;
+
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
@@ -61,11 +63,12 @@ int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, l_ezlopi_item_t *item, vo
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
+    char valueFormatted[20];
     if (item && arg)
     {
         cJSON *cj_result = (cJSON *)arg;
-        cJSON_AddBoolToObject(cj_result, "value", (bool)item->user_arg);
-        char *valueFormatted = ezlopi_valueformatter_bool((bool)item->user_arg);
+        cJSON_AddNumberToObject(cj_result, "value", mb1013_value);
+        snprintf(valueFormatted, 20, "%.2f", mb1013_value);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         ret = 1;
     }
@@ -84,15 +87,7 @@ static void __uart_data_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t ua
             memcpy(tmp_buffer, buffer + 1, 4);
 
 #warning "use ring buffer"
-            int val = atoi(tmp_buffer);
-            if (val <= 500)
-            {
-                item->user_arg = (void *)true;
-            }
-            else
-            {
-                item->user_arg = (void *)false;
-            }
+            mb1013_value = atoi(tmp_buffer) / 10.0;
             free(tmp_buffer);
         }
     }
@@ -119,9 +114,9 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.category = category_security_sensor;
-    device->cloud_properties.subcategory = subcategory_motion;
-    device->cloud_properties.device_type = dev_type_sensor_motion;
+    device->cloud_properties.category = category_level_sensor;
+    device->cloud_properties.subcategory = subcategory_not_defined;
+    device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -130,9 +125,9 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
-    item->cloud_properties.item_name = ezlopi_item_name_motion;
-    item->cloud_properties.value_type = value_type_bool;
-    item->cloud_properties.scale = NULL;
+    item->cloud_properties.item_name = ezlopi_item_name_distance;
+    item->cloud_properties.value_type = value_type_length;
+    item->cloud_properties.scale = scales_centi_meter;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 }
 
