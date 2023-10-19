@@ -25,7 +25,8 @@ const char *water_filter_replacement_alarm_states[] =
     {
         "water_filter_ok",
         "replace_water_filter",
-        "unknown"};
+        "unknown",
+};
 
 static char *ezlopi_water_present_turbidity_state = NULL;
 
@@ -115,29 +116,46 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
+
+static int __notify(l_ezlopi_item_t *item)
+{
+    int ret = 0;
+
+    char *tmp_sensor_state = NULL;
+    char *turbidity_sensor_state = (char *)item->user_arg;
+    if (turbidity_sensor_state)
+    {
+        s_ezlopi_analog_data_t tmp_analog_data = {.value = 0, .voltage = 0};
+        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_analog_data);
+        if (1000 > tmp_analog_data.voltage)
+        {
+            tmp_sensor_state = water_filter_replacement_alarm_states[TURBIDITY_REPLACE_WATER_FILTER];
+        }
+        else
+        {
+            tmp_sensor_state = water_filter_replacement_alarm_states[TURBIDITY_WATER_FILTER_OK];
+        }
+        if (strcmp(turbidity_sensor_state, tmp_sensor_state) != 0)
+        {
+            memcpy(turbidity_sensor_state, tmp_sensor_state, (40 * sizeof(char)));
+            ezlopi_device_value_updated_from_device_v3(item);
+        }
+    }
+    return ret;
+}
+
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
     if (item && arg)
     {
         cJSON *cj_result = (cJSON *)arg;
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-
-        if (1000 > ezlopi_analog_data.voltage)
+        char *turbidity_sensor_state = (char *)item->user_arg;
+        if (turbidity_sensor_state)
         {
-            ezlopi_water_present_turbidity_state = water_filter_replacement_alarm_states[TURBIDITY_REPLACE_WATER_FILTER];
+            cJSON_AddStringToObject(cj_result, "value", turbidity_sensor_state);
+            cJSON_AddStringToObject(cj_result, "valueFormatted", turbidity_sensor_state);
         }
-        else
-        {
-            ezlopi_water_present_turbidity_state = water_filter_replacement_alarm_states[TURBIDITY_WATER_FILTER_OK];
-        }
-
-        cJSON_AddStringToObject(cj_result, "value", ezlopi_water_present_turbidity_state);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", ezlopi_water_present_turbidity_state);
-
         ret = 1;
     }
     return ret;
@@ -166,7 +184,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
-static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -179,6 +197,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
     CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+    item->user_arg = user_arg;
 }
 
 static int __prepare(void *arg)
@@ -195,14 +214,14 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
             if (item_temperature)
             {
-                __prepare_item_properties(item_temperature, prep_arg->cjson_device);
+                char *turbidity_sensor_states = (char *)malloc(40 * sizeof(char));
+                if (turbidity_sensor_states)
+                {
+                    memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));
+                    __prepare_item_properties(item_temperature, prep_arg->cjson_device, (void *)turbidity_sensor_states);
+                }
             }
         }
     }
     return ret;
-}
-
-static int __notify(l_ezlopi_item_t *item)
-{
-    return ezlopi_device_value_updated_from_device_v3(item);
 }
