@@ -425,7 +425,7 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             cJSON_AddStringToObject(cj_device, "category", device_prop->cloud_properties.category);
             cJSON_AddStringToObject(cj_device, "subcategory", device_prop->cloud_properties.subcategory);
             snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_cloud_generate_gateway_id());
-            cJSON_AddStringToObject(cj_properties, "gatewayId", tmp_string);
+            cJSON_AddStringToObject(cj_device, "gatewayId", tmp_string);
             cJSON_AddBoolToObject(cj_device, "batteryPowered", false);
             cJSON_AddStringToObject(cj_device, "name", device_prop->cloud_properties.device_name);
             cJSON_AddStringToObject(cj_device, "type", device_prop->cloud_properties.device_type);
