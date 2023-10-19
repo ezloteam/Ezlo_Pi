@@ -19,13 +19,12 @@
 #include "sensor_0055_ADC_FlexResistor.h"
 
 //--------------------------------------------------------------------------------------------------------
-static int RS_0055 = 0;
 static int __0055_prepare(void *arg);
 static int __0055_init(l_ezlopi_item_t *item);
 static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0055_notify(l_ezlopi_item_t *item);
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 //--------------------------------------------------------------------------------------------------------
 
 int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -78,7 +77,7 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
-static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
 
     item->cloud_properties.has_getter = true;
@@ -92,6 +91,9 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
+
+    // passing the custom data_structure
+    item->user_arg = user_data;
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -102,25 +104,33 @@ static int __0055_prepare(void *arg)
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        l_ezlopi_device_t *device_adc = ezlopi_device_add_device();
-        if (device_adc)
+        flex_t *FLEX_value = (flex_t *)malloc(sizeof(flex_t));
+        if (NULL != FLEX_value)
         {
-            __prepare_device_adc_cloud_properties(device_adc, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
-            if (item_adc)
+            memset(FLEX_value, 0, sizeof(flex_t));
+
+            l_ezlopi_device_t *device_adc = ezlopi_device_add_device();
+            if (device_adc)
             {
-                __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device);
+                __prepare_device_adc_cloud_properties(device_adc, device_prep_arg->cjson_device);
+                l_ezlopi_item_t *item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
+                if (item_adc)
+                {
+                    __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device, FLEX_value);
+                }
+                else
+                {
+                    ezlopi_device_free_device(device_adc);
+                    free(FLEX_value);
+                }
             }
             else
             {
                 ezlopi_device_free_device(device_adc);
+                free(FLEX_value);
             }
+            ret = 1;
         }
-        else
-        {
-            ezlopi_device_free_device(device_adc);
-        }
-        ret = 1;
     }
     return ret;
 }
@@ -147,9 +157,10 @@ static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            char *valueFormatted = ezlopi_valueformatter_float(RS_0055);
+            flex_t *FLEX_value = (flex_t *)item->user_arg;
+            char *valueFormatted = ezlopi_valueformatter_int(FLEX_value->RS_0055);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", RS_0055);
+            cJSON_AddNumberToObject(cj_result, "value", FLEX_value->RS_0055);
             free(valueFormatted);
             ret = 1;
         }
@@ -161,18 +172,19 @@ static int __0055_notify(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
+        flex_t *FLEX_value = (flex_t *)item->user_arg;
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0,
                                                      .voltage = 0};
         // extract the sensor_output_values
-        int prev_RS_0055 = RS_0055;
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 
         // calculate the 'RS_0055' resistance value using [voltage divider rule]
-        RS_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
-        if (prev_RS_0055 != RS_0055)
+        int new_RS_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
+        if (new_RS_0055 != FLEX_value->RS_0055)
         {
             ezlopi_device_value_updated_from_device_v3(item);
+            FLEX_value->RS_0055 = new_RS_0055;
         }
         ret = 1;
     }

@@ -21,10 +21,9 @@
 //                          Declaration
 //*************************************************************************
 
-static uint32_t _pulses_yfs201, yfs201_dominant_pulse_count;
+static uint32_t _pulses_yfs201;
 static QueueHandle_t yfs201_queue = NULL;
 static YFS201_queue_enum_t yfs201_QueueFlag = YFS201_QUEUE_RESET;
-
 //------------------------------------------------------------------------------
 static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
 {
@@ -36,8 +35,8 @@ static int __0054_init(l_ezlopi_item_t *item);
 static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0054_notify(l_ezlopi_item_t *item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
+static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item);
 //------------------------------------------------------------------------------
 int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -89,7 +88,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -101,6 +100,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+
+    // passing the custom data_structure
+    item->user_arg = user_data;
 }
 //------------------------------------------------------------------------------------------------------
 static int __0054_prepare(void *arg)
@@ -110,26 +112,34 @@ static int __0054_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device();
-        if (flowmeter_device)
+
+        yfs201_t *yfs201_data = (yfs201_t *)malloc(sizeof(yfs201_t));
+        if (NULL != yfs201_data)
         {
-            __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
-            if (flowmeter_item)
+            memset(yfs201_data, 0, sizeof(yfs201_t));
+            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device();
+            if (flowmeter_device)
             {
-                __prepare_item_cloud_properties(flowmeter_item, device_prep_arg->cjson_device);
+                __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);
+                l_ezlopi_item_t *flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
+                if (flowmeter_item)
+                {
+                    __prepare_item_cloud_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
+                }
+                else
+                {
+                    ezlopi_device_free_device(flowmeter_device);
+                    free(yfs201_data);
+                }
             }
             else
             {
                 ezlopi_device_free_device(flowmeter_device);
+                free(yfs201_data);
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(flowmeter_device);
-        }
 
-        ret = 1;
+            ret = 1;
+        }
     }
     return ret;
 }
@@ -160,9 +170,10 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
+            yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
             float freq = 0, Lt_per_hr = 0;
             // converting pulse_counta into frequency (uSec -> Hz)
-            freq = yfs201_dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
+            freq = yfs201_data->yfs201_dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
 
             // liter per hr
             Lt_per_hr = freq * 7.3f;
@@ -174,7 +185,6 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", Lt_per_hr);
             free(valueFormatted);
-
             ret = 1;
         }
     }
@@ -186,10 +196,11 @@ static int __0054_notify(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
+        yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
         // extract new pulse count
-        uint32_t prev_yfs201_dominant_pulse_count = yfs201_dominant_pulse_count;
-        Extract_YFS201_Pulse_Count_func(item->interface.pwm.gpio_num);
-        if (prev_yfs201_dominant_pulse_count != yfs201_dominant_pulse_count)
+        uint32_t prev_yfs201_dominant_pulse_count = yfs201_data->yfs201_dominant_pulse_count;
+        Extract_YFS201_Pulse_Count_func(item);
+        if (prev_yfs201_dominant_pulse_count != yfs201_data->yfs201_dominant_pulse_count)
         {
             ezlopi_device_value_updated_from_device_v3(item);
         }
@@ -200,95 +211,101 @@ static int __0054_notify(l_ezlopi_item_t *item)
 
 //------------------------------------------------------------------------------
 // This function is used to get the time_period of incoming pulses . [NOTE: call 'gpio_install_isr_service()' before using this function]
-static void Extract_YFS201_Pulse_Count_func(gpio_num_t pulse_pin)
+static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
 {
-    // creating queue here
-    yfs201_queue = xQueueCreate(YFS201_QUEUE_SIZE, sizeof(int32_t)); // takes max -> 1mSec
-    if (yfs201_queue)
+    if (NULL != item)
     {
-        int32_t start_time = 0;
-        // extract data for untill all queue is filled
-        // TRACE_E("--------- Queue Empty --------");
+        yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
 
-        while (yfs201_QueueFlag < YFS201_QUEUE_FULL)
+        gpio_num_t pulse_pin = item->interface.pwm.gpio_num;
+        // creating queue here
+        yfs201_queue = xQueueCreate(YFS201_QUEUE_SIZE, sizeof(int32_t)); // takes max -> 1mSec
+        if (yfs201_queue)
         {
-            _pulses_yfs201 = 0;                                      // reset variable to store fresh counts within [200ms]
-            gpio_isr_handler_add(pulse_pin, gpio_isr_handler, NULL); // add -> gpio_isr_handle(pin_num)
-            start_time = (int32_t)esp_timer_get_time();
-            while (((int32_t)esp_timer_get_time() - start_time) < (1000000 / YFS201_QUEUE_SIZE)) // 200ms -> 200000uS
-            {
-                // polls for '(1000000 / YFS201_QUEUE_SIZE)' -> eg. 200ms
-            }
-            // check queue_full => 1
+            int32_t start_time = 0;
+            // extract data for untill all queue is filled
+            // TRACE_E("--------- Queue Empty --------");
 
-            if (xQueueSend(yfs201_queue, &_pulses_yfs201, NULL))
+            while (yfs201_QueueFlag < YFS201_QUEUE_FULL)
             {
-                yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
-                // TRACE_E("Pulse_count : %d", _pulses_yfs201);
-            }
-            else
-            {
-                // TRACE_E("--------- Queue Full --------");
-                yfs201_QueueFlag = YFS201_QUEUE_FULL;
-            }
-            // disable -> gpio_isr_handle_remove(pin_num)
-            gpio_isr_handler_remove(pulse_pin);
-        }
-    }
-
-    if (yfs201_QueueFlag == YFS201_QUEUE_FULL)
-    {
-        // loop through all the queue[0-5] values -> pulse counts
-        int32_t P_count[YFS201_QUEUE_SIZE] = {0};
-        int val = 0;
-        for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
-        {
-            if (xQueueReceive(yfs201_queue, &val, portMAX_DELAY))
-            {
-                if (val)
+                _pulses_yfs201 = 0;                                      // reset variable to store fresh counts within [200ms]
+                gpio_isr_handler_add(pulse_pin, gpio_isr_handler, NULL); // add -> gpio_isr_handle(pin_num)
+                start_time = (int32_t)esp_timer_get_time();
+                while (((int32_t)esp_timer_get_time() - start_time) < (1000000 / YFS201_QUEUE_SIZE)) // 200ms -> 200000uS
                 {
-                    P_count[i] = val; // [0 - YFS201_QUEUE_SIZE]
+                    // polls for '(1000000 / YFS201_QUEUE_SIZE)' -> eg. 200ms
                 }
+                // check queue_full => 1
+
+                if (xQueueSend(yfs201_queue, &_pulses_yfs201, NULL))
+                {
+                    yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
+                    // TRACE_E("Pulse_count : %d", _pulses_yfs201);
+                }
+                else
+                {
+                    // TRACE_E("--------- Queue Full --------");
+                    yfs201_QueueFlag = YFS201_QUEUE_FULL;
+                }
+                // disable -> gpio_isr_handle_remove(pin_num)
+                gpio_isr_handler_remove(pulse_pin);
             }
         }
 
-        // generate frequency of occurance table from "P_count[]" array values
-        uint8_t freq[YFS201_QUEUE_SIZE] = {0};
-        float error = 0;
-        for (uint8_t x = 0; x < YFS201_QUEUE_SIZE; x++)
+        if (yfs201_QueueFlag == YFS201_QUEUE_FULL)
         {
+            // loop through all the queue[0-5] values -> pulse counts
+            int32_t P_count[YFS201_QUEUE_SIZE] = {0};
+            int val = 0;
             for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
             {
-                error = P_count[x] - P_count[i];
-                error = ((error >= 0) ? error : error * -1); // finding difference between two readings
-                if (error < P_count[x] * 0.1)                // [error less than +-10%]
+                if (xQueueReceive(yfs201_queue, &val, portMAX_DELAY))
                 {
-                    freq[x] += 1; // increment dominace count
+                    if (val)
+                    {
+                        P_count[i] = val; // [0 - YFS201_QUEUE_SIZE]
+                    }
                 }
             }
-        }
-        // find the dominant period
-        uint8_t max_freq_index = 0;
-        int32_t dominant_val = 0;
-        for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
-        {
-            if (freq[i] > dominant_val)
+
+            // generate frequency of occurance table from "P_count[]" array values
+            uint8_t freq[YFS201_QUEUE_SIZE] = {0};
+            float error = 0;
+            for (uint8_t x = 0; x < YFS201_QUEUE_SIZE; x++)
             {
-                dominant_val = freq[i];
-                max_freq_index = i;
+                for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
+                {
+                    error = P_count[x] - P_count[i];
+                    error = ((error >= 0) ? error : error * -1); // finding difference between two readings
+                    if (error < P_count[x] * 0.1)                // [error less than +-10%]
+                    {
+                        freq[x] += 1; // increment dominace count
+                    }
+                }
             }
+            // find the dominant period
+            uint8_t max_freq_index = 0;
+            int32_t dominant_val = 0;
+            for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
+            {
+                if (freq[i] > dominant_val)
+                {
+                    dominant_val = freq[i];
+                    max_freq_index = i;
+                }
+            }
+            // TRACE_I("......................Dominant count ......{%d} ", P_count[max_freq_index]);
+
+            // reset Queue_flag
+            yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
+
+            // write the dominant pulse count
+            yfs201_data->yfs201_dominant_pulse_count = P_count[max_freq_index];
         }
-        // TRACE_I("......................Dominant count ......{%d} ", P_count[max_freq_index]);
 
-        // reset Queue_flag
-        yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
-
-        // write the dominant pulse count
-        yfs201_dominant_pulse_count = P_count[max_freq_index];
+        // Deleting queue after no use to avoid conflicts
+        vQueueDelete(yfs201_queue);
     }
-
-    // Deleting queue after no use to avoid conflicts
-    vQueueDelete(yfs201_queue);
 }
 
 //------------------------------------------------------------------------------

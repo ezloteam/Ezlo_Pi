@@ -124,6 +124,7 @@
 #define MQ6_VOLT_RESOLUTION_Vc 5.0f
 #define m_slope_mq6 -0.424f
 #define b_coeff_mq6 1.272f
+
 typedef enum
 {
     MQ6_GAS_ALARM_NO_GAS,
@@ -133,6 +134,11 @@ typedef enum
     MQ6_GAS_ALARM_MAX
 } e_mq6_gas_alarm_states_t;
 
+typedef struct mq6_value_t
+{
+    float _LPG_ppm;
+    float MQ6_R0_constant;  
+}mq6_value_t;
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------

@@ -47,6 +47,10 @@
 #define flex_Rout 10000.0f // minimum Rout = 10KOhm
 #define flex_Vin 5.0f      // Vin = 5V  (default) // if [3.3V] is used instead of [5.0V], Change [flex_Vin=> 5.0f to 3.3f]
 
+typedef struct flex_t
+{
+    int RS_0055;
+} flex_t;
 //-----------------------------------------------------------------------------------------------------------------------------
 int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 

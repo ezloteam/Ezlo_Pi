@@ -18,12 +18,19 @@
 
 #include "sensor_0060_digitalIn_vibration_detector.h"
 //---------------------------------------------------------------------------------------------------------
+const char *Sw420_vibration_activity_state_token[] =
+    {
+        "no_activity",
+        "shake",
+        "tilt",
+        "drop"};
 static int __0060_prepare(void *arg);
 static int __0060_init(l_ezlopi_item_t *item);
+static int __0060_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __0060_notify(l_ezlopi_item_t *item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static void _0060_update_from_device(l_ezlopi_item_t *item);
 //---------------------------------------------------------------------------------------------------------
 int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -41,9 +48,18 @@ int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        __0060_get_item(item, arg);
+        break;
+    }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         __0060_get_cjson_value(item, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        __0060_notify(item);
         break;
     }
     default:
@@ -70,8 +86,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_motion;
-    item->cloud_properties.value_type = value_type_bool;
+    item->cloud_properties.item_name = ezlopi_item_name_activity;
+    item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
@@ -111,8 +127,8 @@ static int __0060_prepare(void *arg)
             {
                 ezlopi_device_free_device(vibration_device);
             }
-            ret = 1;
         }
+        ret = 1;
     }
     return ret;
 }
@@ -145,13 +161,42 @@ static int __0060_init(l_ezlopi_item_t *item)
             else
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                gpio_isr_service_register_v3(item, _0060_update_from_device, 200);
             }
         }
     }
     return ret;
 }
+static int __0060_get_item(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
+        {
+            //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
+            cJSON *json_array_enum = cJSON_CreateArray();
+            if (NULL != json_array_enum)
+            {
+                for (uint8_t i = 0; i < SW420_VIBRATION_ACTIVITY_MAX; i++)
+                {
+                    cJSON *json_value = cJSON_CreateString(Sw420_vibration_activity_state_token[i]);
+                    if (NULL != json_value)
+                    {
+                        cJSON_AddItemToArray(json_array_enum, json_value);
+                    }
+                }
+                cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
+            }
+            //--------------------------------------------------------------------------------------
 
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_activity");
+            ret = 1;
+        }
+    }
+    return ret;
+}
 static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
@@ -160,21 +205,36 @@ static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_activity");
             ret = 1;
         }
     }
     return ret;
 }
 //------------------------------------------------------------------------------------------------------------
-static void _0060_update_from_device(l_ezlopi_item_t *item)
+static int __0060_notify(l_ezlopi_item_t *item)
 {
-    if (item)
+    int ret = 0;
+
+    char *curret_value = NULL;
+    item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+    item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
+    if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
     {
-        int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        ezlopi_device_value_updated_from_device_v3(item);
+        curret_value = Sw420_vibration_activity_state_token[0]; //"no_activity";
     }
+    else
+    {
+        curret_value = Sw420_vibration_activity_state_token[1]; //"shake";
+    }
+
+    if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
+    {
+        item->user_arg = (void *)curret_value;
+        ezlopi_device_value_updated_from_device_v3(item);
+        ret = 1;
+    }
+
+    return ret;
 }
