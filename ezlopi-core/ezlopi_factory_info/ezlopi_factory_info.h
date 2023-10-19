@@ -505,13 +505,12 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_name\": \"DIGI in generic \",\
+                      \"dev_name\": \"Float switch\",\
                 \"dev_type\": 2,\
-                \"gpio\": 6,\
-                \"id_item\": 4,\
+                \"id_item\": 65,\
                 \"id_room\": \"\",\
-                \"logic_inv\": true,\
-                \"pull_up\": true\
+                \"gpio\": 25,\
+                \"logic_inv\": false\
             }\
     ],\
     \"dev_total\":1\

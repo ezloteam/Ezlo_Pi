@@ -83,7 +83,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_water_flow_alarm;
+    item->cloud_properties.item_name = ezlopi_item_name_water_level_alarm;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
@@ -190,8 +190,8 @@ static int __0065_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
-            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "water_level_ok");
+            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "water_level_ok");
             ret = 1;
         }
     }
@@ -206,8 +206,8 @@ static int __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
-            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "water_flow_below_low_threshold");
+            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "water_level_ok");
+            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "water_level_ok");
             ret = 1;
         }
     }
@@ -222,11 +222,11 @@ static void _0065_update_from_device(l_ezlopi_item_t *item)
         char *curret_value = NULL;
         if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
         {
-            curret_value = "water_flow_below_low_threshold";
+            curret_value = water_level_alarm_token[0]; //"water_level_ok";
         }
         else
         {
-            curret_value = "water_flow_above_high_threshold";
+            curret_value = water_level_alarm_token[2]; //"water_level_above_high_threshold";
         }
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
         {
