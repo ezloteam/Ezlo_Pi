@@ -1,5 +1,5 @@
-#ifndef __DEVICE_0001_DIGITALOUT_PLUG_H__
-#define __DEVICE_0001_DIGITALOUT_PLUG_H__
+#ifndef __DEVICE_0003_DIGITALOUT_PLUG_H__
+#define __DEVICE_0003_DIGITALOUT_PLUG_H__
 
 #include "ezlopi_actions.h"
 #include "driver/gpio.h"

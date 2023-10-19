@@ -1,5 +1,5 @@
-#ifndef _SERVO_MOTOR_MG_996R_H_
-#define _SERVO_MOTOR_MG_996R_H_
+#ifndef _DEVICE_0036_PWM_SERVO_MG996R_H_
+#define _DEVICE_0036_PWM_SERVO_MG996R_H_
 
 #include "ezlopi_pwm.h"
 #include "ezlopi_actions.h"
@@ -10,4 +10,4 @@ int ezlopi_servo_motor_MG_996R(e_ezlopi_actions_t action, s_ezlopi_device_proper
 
 #endif
 
-#endif //_SERVO_MOTOR_MG_996R_H_
+#endif //_DEVICE_0036_PWM_SERVO_MG996R_H_

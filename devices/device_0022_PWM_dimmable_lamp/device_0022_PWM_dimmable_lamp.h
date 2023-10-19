@@ -1,5 +1,5 @@
-#ifndef __DIMMABLE_BULB_H__
-#define __DIMMABLE_BULB_H__
+#ifndef _DEVICE_0022_PWM_DIMMABLE_BULB_H_
+#define _DEVICE_0022_PWM_DIMMABLE_BULB_H_
 
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"

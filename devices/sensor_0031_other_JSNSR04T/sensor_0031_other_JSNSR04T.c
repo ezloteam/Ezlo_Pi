@@ -64,7 +64,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             ret = measurement(tmp_config, &jsn_sr04t_data);
             if (ESP_OK == ret)
             {
-                jsn_sr04t_print_data(jsn_sr04t_data);
+                // jsn_sr04t_print_data(jsn_sr04t_data);
 
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
                 cJSON_AddNumberToObject(cj_result, "value", distance);

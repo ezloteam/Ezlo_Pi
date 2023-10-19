@@ -71,7 +71,7 @@ typedef struct
         .distance_cm = 0.0,      \
     }
 
-void jsn_sr04t_print_data(jsn_sr04t_data_t jsn_sr04t_data);
+// void jsn_sr04t_print_data(jsn_sr04t_data_t jsn_sr04t_data);
 esp_err_t init_JSN_SR04T(jsn_sr04t_config_t *jsn_sr04t_config);
 esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_data_t *jsn_sr04t_raw_data);
 esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *jsn_sr04t_data);
