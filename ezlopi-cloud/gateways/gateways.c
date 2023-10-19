@@ -20,7 +20,9 @@ void gateways_list(cJSON *cj_request, cJSON *cj_response)
             cJSON *cjson_gateway = cJSON_CreateObject();
             if (cjson_gateway)
             {
-                cJSON_AddNumberToObject(cjson_gateway, "_id", ezlopi_cloud_generate_gateway_id());
+                char tmp_string[64];
+                snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_cloud_generate_gateway_id());
+                cJSON_AddStringToObject(cjson_gateway, "_id", tmp_string);
                 cJSON_AddStringToObject(cjson_gateway, "addItemDictionaryValueCommand", "HUB:test_plugin/scripts/add_item_dictionary_value");
                 cJSON_AddStringToObject(cjson_gateway, "checkDeviceCommand", "");
                 cJSON_AddStringToObject(cjson_gateway, "clearItemDictionaryCommand", "");
