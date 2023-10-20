@@ -20,10 +20,34 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valuedouble;                   \
-            TRACE_B("%s: %f", item_name, (double)item_val);   \
         }                                                     \
         else                                                  \
         {                                                     \
+            item_val = 0;                                     \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
+    }
+
+// TRACE_B("%s: %f", item_name, (double)item_val);
+
+#define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            if (o_item->type == cJSON_False)                  \
+            {                                                 \
+                item_val = 0;                                 \
+            }                                                 \
+            else                                              \
+            {                                                 \
+                item_val = 1;                                 \
+            }                                                 \
+            item_val = o_item->valueint;                      \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = 0;                                     \
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
@@ -34,27 +58,29 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valueint;                      \
-            TRACE_B("%s: %d", item_name, item_val);           \
         }                                                     \
         else                                                  \
         {                                                     \
+            item_val = 0;                                     \
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
+// TRACE_B("%s: %d", item_name, item_val);
 
-#define CJSON_GET_VALUE_STRING(root, item_name, item_val)           \
-    {                                                               \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name);       \
-        if (o_item && o_item->valuestring)                          \
-        {                                                           \
-            item_val = o_item->valuestring;                         \
-            TRACE_B("%s: %s", item_name, item_val ? item_val : ""); \
-        }                                                           \
-        else                                                        \
-        {                                                           \
-            TRACE_E("%s: NULL", item_name);                         \
-        }                                                           \
+#define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item && o_item->valuestring)                    \
+        {                                                     \
+            item_val = o_item->valuestring;                   \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = NULL;                                  \
+            TRACE_E("%s: NULL", item_name);                   \
+        }                                                     \
     }
+// TRACE_B("%s: %s", item_name, item_val ? item_val : "");
 
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \
     {                                                                 \

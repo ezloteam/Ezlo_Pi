@@ -41,6 +41,9 @@ extern "C"
     char *ezlopi_nvs_scene_get(void);
     int ezlopi_nvs_scene_set(char *scene);
 
+    char *ezlopi_nvs_scene_get_v2(void);
+    int ezlopi_nvs_scene_set_v2(char *scene);
+
     char *ezlopi_nvs_read_scenes_scripts(void);
     int ezlopi_nvs_write_scenes_scripts(char *data);
     void ezlopi_nvs_delete_stored_script(uint32_t script_id);

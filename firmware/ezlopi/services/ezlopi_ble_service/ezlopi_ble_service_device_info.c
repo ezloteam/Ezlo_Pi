@@ -121,7 +121,7 @@ static char *device_info_jsonify(void)
                  mac_string[0], mac_string[1], mac_string[2], mac_string[3], mac_string[4], mac_string[5]);
         cJSON_AddStringToObject(root, "mac", mac_string);
 
-        __add_factory_info_to_root(root, "ezlopi_device_type", ezlopi_factory_info_v2_get_device_type());
+        cJSON_AddStringToObject(root, "ezlopi_device_type", ezlopi_factory_info_v2_get_device_type());
         __add_factory_info_to_root(root, "model", ezlopi_factory_info_v2_get_model());
         __add_factory_info_to_root(root, "device_name", ezlopi_factory_info_v2_get_name());
         __add_factory_info_to_root(root, "brand", ezlopi_factory_info_v2_get_brand());

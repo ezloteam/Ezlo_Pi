@@ -375,10 +375,16 @@ static const char *switch_box_constant_config =
 #elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
+
     "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\
+    \"cmd\":3,\
+    \"dev_detail\":[{\
+                \"dev_type\": 7,\
+                \"dev_name\": \"DHT 22\",\
+                \"id_room\": \"\",\
+                \"id_item\": 16,\
+                \"gpio\": 18\
+            },\
             {\
                 \"dev_type\" : 1,\
                 \"dev_name\" : \"Dining Room Main Lamp\",\
@@ -387,15 +393,16 @@ static const char *test_device_constant_config =
                 \"val_ip\" : true,\
                 \"val_op\" : false,\
                 \"gpio_in\" : 21,\
-                \"gpio_out\" : 13,\
+                \"gpio_out\" : 2,\
                 \"is_ip\" : false,\
                 \"ip_inv\" : true,\
                 \"pullup_ip\" : true,\
                 \"pullup_op\" : true,\
                 \"op_inv\" : false\
             }\
-        ],\
-    \"dev_total\": 1}";
+    ],\
+    \"dev_total\":1\
+    }";
 
 // {
 //     \"dev_name\": \"HCSR04 ultrasonic\",

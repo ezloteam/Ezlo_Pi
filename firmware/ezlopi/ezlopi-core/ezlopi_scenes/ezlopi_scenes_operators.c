@@ -1,8 +1,10 @@
 #include <string.h>
+#include <cJSON.h>
+
 #include "trace.h"
-#include "cJSON.h"
-#include "ezlopi_scenes.h"
+
 #include "ezlopi_devices.h"
+#include "ezlopi_scenes_v2.h"
 #include "ezlopi_scenes_operators.h"
 
 static const char *const ezlopi_scenes_operators_op[] = {
@@ -62,7 +64,7 @@ char *ezlopi_scenes_operators_get_name(e_scene_cmp_operators_t operator)
     return ret;
 }
 
-char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator)
+const char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator)
 {
     const char *ret = NULL;
     if ((operator> SCENES_OPERATORS_NONE) && (operator<SCENES_OPERATORS_MAX))
@@ -73,7 +75,7 @@ char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator)
     return ret;
 }
 
-int ezlopi_scenes_operators_compare_value_number(uint32_t item_id, l_fields_t *value_field, l_fields_t *comparator_field)
+int ezlopi_scenes_operators_compare_value_number(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
     if (item_id && value_field && comparator_field)

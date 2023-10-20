@@ -1,7 +1,9 @@
 #include "trace.h"
-#include "ezlopi_scenes.h"
+#include "ezlopi_scenes_v2.h"
 
-void ezlopi_print_block_options(s_block_options_t *block_options, l_fields_t *fields)
+void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks);
+
+void ezlopi_print_block_options(s_block_options_v2_t *block_options, l_fields_v2_t *fields)
 {
     TRACE_D("\t\t|-- blockOptions:");
     TRACE_D("\t\t\t|-- method");
@@ -15,7 +17,7 @@ void ezlopi_print_block_options(s_block_options_t *block_options, l_fields_t *fi
     }
 }
 
-void ezlopi_print_fields(l_fields_t *fields)
+void ezlopi_print_fields(l_fields_v2_t *fields)
 {
     TRACE_D("\t\t|-- fields: ");
     int field_count = 0;
@@ -24,7 +26,7 @@ void ezlopi_print_fields(l_fields_t *fields)
         TRACE_D("\t\t\t|---------- field_count: %d ----------", ++field_count);
         TRACE_D("\t\t\t|-- name: %s", fields->name);
 
-        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
+        const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(fields->value_type);
         TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : "");
 
         switch (fields->value_type)
@@ -136,28 +138,6 @@ void ezlopi_print_fields(l_fields_t *fields)
         }
         }
 
-#if 0
-        if (SCENE_VALUE_TYPE_INT == fields->value_type)
-        {
-            TRACE_D("\t\t\t|-- type: int");
-            TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
-        }
-        else if (SCENE_VALUE_TYPE_ITEM == fields->value_type)
-        {
-            TRACE_D("\t\t\t|-- type: item");
-            TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
-        }
-        else if (SCENE_VALUE_TYPE_BOOL == fields->value_type)
-        {
-            TRACE_D("\t\t\t|-- type: bool");
-            TRACE_D("\t\t\t|-- value: %s", (0 == fields->value.value_double) ? "false" : "true");
-        }
-        else
-        {
-            TRACE_E("\t\t\t|- value type: %d", fields->value_type);
-        }
-#endif
-
         fields = fields->next;
         if (fields)
         {
@@ -167,7 +147,7 @@ void ezlopi_print_fields(l_fields_t *fields)
     TRACE_D("\t\t\t|------------------------------------");
 }
 
-void ezlopi_print_house_modes(l_house_modes_t *house_modes)
+void ezlopi_print_house_modes(l_house_modes_v2_t *house_modes)
 {
     TRACE_D("\t|-- house_modes: ");
     while (house_modes)
@@ -177,7 +157,7 @@ void ezlopi_print_house_modes(l_house_modes_t *house_modes)
     }
 }
 
-void ezlopi_print_user_notifications(l_user_notification_t *user_notification)
+void ezlopi_print_user_notifications(l_user_notification_v2_t *user_notification)
 {
     TRACE_D("\t|-- user_notifications: ");
     while (user_notification)
@@ -187,7 +167,7 @@ void ezlopi_print_user_notifications(l_user_notification_t *user_notification)
     }
 }
 
-void ezlopi_print_when_blocks(l_when_block_t *when_blocks)
+void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks)
 {
     TRACE_D("\t|-- when: ");
     while (when_blocks)
@@ -199,7 +179,7 @@ void ezlopi_print_when_blocks(l_when_block_t *when_blocks)
     }
 }
 
-void ezlopi_print_then_blocks(l_then_block_t *then_blocks)
+void ezlopi_print_then_blocks(l_then_block_v2_t *then_blocks)
 {
     TRACE_D("\t|-- then: ");
     while (then_blocks)
@@ -219,7 +199,7 @@ void ezlopi_print_then_blocks(l_then_block_t *then_blocks)
     }
 }
 
-void ezlopi_scenes_print(l_scenes_list_t *scene_link_list)
+void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
 {
     int scene_count = 0;
     while (scene_link_list)

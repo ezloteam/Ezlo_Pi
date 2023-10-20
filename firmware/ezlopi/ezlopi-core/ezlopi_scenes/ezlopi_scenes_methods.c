@@ -1,6 +1,7 @@
 #include "trace.h"
+
+#include "ezlopi_scenes_v2.h"
 #include "ezlopi_scenes_methods.h"
-#include "ezlopi_scenes.h"
 
 static const char *ezlopi_scenes_methods_name[] = {
 #define EZLOPI_SCENE(method_type, name, func) name,
