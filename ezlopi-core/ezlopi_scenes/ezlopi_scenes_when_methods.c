@@ -1,22 +1,22 @@
-#include "string.h"
+#include <string.h>
 
 #include "trace.h"
-#include "ezlopi_scenes.h"
 #include "ezlopi_devices.h"
+#include "ezlopi_scenes_v2.h"
 #include "ezlopi_scenes_operators.h"
 #include "ezlopi_scenes_when_methods.h"
 
-int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    l_when_block_t *when_block = (l_when_block_t *)arg;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block)
     {
         uint32_t item_id = 0;
-        l_fields_t *value_field = NULL;
+        l_fields_v2_t *value_field = NULL;
 #warning "Warning: armed check remains"
 
-        l_fields_t *curr_field = when_block->fields;
+        l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
         {
             if (0 == strncmp(curr_field->name, "item", 4))
@@ -104,14 +104,14 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_t *curr_scene, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_is_interval(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_interval(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
 
-    if (curr_scene)
+    if (scene_node)
     {
         char *end_prt = NULL;
-        uint32_t interval = strtoul(curr_scene->when->fields->value.value_string, &end_prt, 10);
+        uint32_t interval = strtoul(scene_node->when->fields->value.value_string, &end_prt, 10);
         if (end_prt)
         {
             if (0 == strncmp(end_prt, "m", 1))
@@ -129,134 +129,134 @@ int ezlopi_scene_when_is_interval(l_scenes_list_t *curr_scene, void *arg)
         }
 
         uint32_t last_update = 0;
-        if (curr_scene->when->fields->user_arg)
+        if (scene_node->when->fields->user_arg)
         {
-            last_update = (uint32_t)curr_scene->when->fields->user_arg;
+            last_update = (uint32_t)scene_node->when->fields->user_arg;
 
             if (((xTaskGetTickCount() - last_update) / 1000) > interval)
             {
-                curr_scene->when->fields->user_arg = xTaskGetTickCount();
+                scene_node->when->fields->user_arg = xTaskGetTickCount();
                 ret = 1;
             }
         }
         else
         {
             ret = 1;
-            curr_scene->when->fields->user_arg = xTaskGetTickCount();
+            scene_node->when->fields->user_arg = xTaskGetTickCount();
         }
     }
 
     return ret;
 }
 
-int ezlopi_scene_when_is_item_state_changed(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_item_state_changed' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_button_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_button_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_sun_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_sun_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_date(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_date' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_once(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_once' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_date_range(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_date_range' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_user_lock_operation' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_house_mode_changed_to' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_house_mode_changed_from' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_device_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_device_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_network_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_network_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_scene_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_scene_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_group_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_cloud_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_cloud_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_battery_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_battery_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_battery_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_battery_level(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_battery_level(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_battery_level' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_compare_numbers(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    l_when_block_t *when_block = (l_when_block_t *)arg;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
 
-    if (when_block && curr_scene)
+    if (when_block && scene_node)
     {
         uint32_t item_id = 0;
-        l_fields_t *value_field = NULL;
-        l_fields_t *comparator_field = NULL;
+        l_fields_v2_t *value_field = NULL;
+        l_fields_v2_t *comparator_field = NULL;
 
-        l_fields_t *curr_field = when_block->fields;
+        l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
         {
             if (0 == strncmp(curr_field->name, "item", 4))
@@ -283,73 +283,73 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_t *curr_scene, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_compare_number_range(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'number_range' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_compare_strings(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'compare_strings' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_string_operation(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'string_operation' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_in_array(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_in_array(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'in_array' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_compare_values(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'compare_values' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'has_atleast_one_dictionary_value' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_firmware_update_state' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_dictionary_changed' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_is_detected_in_hot_zone(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_is_detected_in_hot_zone(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_detected_in_hot_zone' not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_and(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_and(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    l_when_block_t *when_block = (l_when_block_t *)arg;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block)
     {
-        l_when_block_t *value_when_block = when_block->fields->value.when_block;
+        l_when_block_v2_t *value_when_block = when_block->fields->value.when_block;
         while (value_when_block)
         {
-            f_scene_method_t scene_method = ezlopi_scene_get_method(value_when_block->block_options.method.type);
+            f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
             if (scene_method)
             {
-                ret &= scene_method(curr_scene, (void *)value_when_block);
+                ret &= scene_method(scene_node, (void *)value_when_block);
                 if (!ret)
                 {
                     break;
@@ -363,25 +363,25 @@ int ezlopi_scene_when_and(l_scenes_list_t *curr_scene, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_not(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_not(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_or(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_or(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    l_when_block_t *when_block = (l_when_block_t *)arg;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block)
     {
-        l_when_block_t *value_when_block = when_block->fields->value.when_block;
+        l_when_block_v2_t *value_when_block = when_block->fields->value.when_block;
         while (value_when_block)
         {
-            f_scene_method_t scene_method = ezlopi_scene_get_method(value_when_block->block_options.method.type);
+            f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
             if (scene_method)
             {
-                ret |= scene_method(curr_scene, (void *)value_when_block);
+                ret |= scene_method(scene_node, (void *)value_when_block);
                 if (ret)
                 {
                     break;
@@ -395,13 +395,13 @@ int ezlopi_scene_when_or(l_scenes_list_t *curr_scene, void *arg)
     return ret;
 }
 
-int ezlopi_scene_when_xor(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_xor(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method not implemented!");
     return 0;
 }
 
-int ezlopi_scene_when_function(l_scenes_list_t *curr_scene, void *arg)
+int ezlopi_scene_when_function(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method not implemented!");
     return 0;

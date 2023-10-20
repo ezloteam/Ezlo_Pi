@@ -2,6 +2,5 @@
 #define __EZLOPI_SCENES_SCRIPTS_CUSTOM_LIBS_INCLUDE_H__
 
 #include "corelib.h"
-// #include "lua_rtos.h"
 
 #endif // __EZLOPI_SCENES_SCRIPTS_CUSTOM_LIBS_INCLUDE_H__

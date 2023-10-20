@@ -1,7 +1,7 @@
 #ifndef __EZLOPI_LUA_H__
 #define __EZLOPI_LUA_H__
 
-#include "inttypes.h"
+#include <inttypes.h>
 
 typedef enum e_script_state
 {

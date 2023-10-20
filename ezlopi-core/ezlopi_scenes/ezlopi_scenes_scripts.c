@@ -1,9 +1,9 @@
-#include "cJSON.h"
-#include "string.h"
-#include "stdlib.h"
+#include <cJSON.h>
+#include <string.h>
+#include <stdlib.h>
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #include "trace.h"
 #include "ezlopi_nvs.h"
@@ -17,6 +17,12 @@
 #include "ezlopi_scenes_scripts_custom_libs_includes.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;
+
+typedef struct s_lua_scripts_modules
+{
+    char *name;
+    lua_CFunction func;
+} s_lua_scripts_modules_t;
 
 static void __scripts_nvs_parse(void);
 static void __script_process(void *arg);
@@ -243,7 +249,7 @@ static void __script_process(void *arg)
             }
         }
 
-        tmp_ret = lua_pcall(lua_state, 0, 0, 0);
+        tmp_ret = lua_pcall(lua_state, 0, 1, 0);
         if (tmp_ret)
         {
             char *script_report = __script_report(lua_state, tmp_ret);
@@ -472,11 +478,6 @@ static char *__script_report(lua_State *lua_state, int status)
     lua_pop(lua_state, 1);
     return msg;
 }
-typedef struct s_lua_scripts_modules
-{
-    char *name;
-    lua_CFunction func;
-} s_lua_scripts_modules_t;
 
 static s_lua_scripts_modules_t lua_scripts_modules[] = {
 #define SCRIPTS_CUSTOM_LIB(module_name, module_func) {.name = module_name, .func = module_func},

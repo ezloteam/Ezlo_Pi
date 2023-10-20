@@ -1,7 +1,7 @@
 #ifndef __EZLOPI_SCENES_METHODS_H__
 #define __EZLOPI_SCENES_METHODS_H__
 
-#include "string.h"
+#include <string.h>
 
 typedef enum e_scene_method_type
 {

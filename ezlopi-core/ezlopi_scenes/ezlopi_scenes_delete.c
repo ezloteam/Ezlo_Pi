@@ -1,8 +1,8 @@
-#include "string.h"
+#include <string.h>
 
-#include "ezlopi_scenes.h"
+#include "ezlopi_scenes_v2.h"
 
-void ezlopi_scenes_delete_user_notifications(l_user_notification_t *user_notifications)
+void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications)
 {
     if (user_notifications)
     {
@@ -13,7 +13,7 @@ void ezlopi_scenes_delete_user_notifications(l_user_notification_t *user_notific
     }
 }
 
-void ezlopi_scenes_delete_house_modes(l_house_modes_t *house_modes)
+void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t *house_modes)
 {
     if (house_modes)
     {
@@ -23,7 +23,7 @@ void ezlopi_scenes_delete_house_modes(l_house_modes_t *house_modes)
     }
 }
 
-void ezlopi_scenes_delete_fields(l_fields_t *fields)
+void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
 {
     if (fields)
     {
@@ -33,7 +33,7 @@ void ezlopi_scenes_delete_fields(l_fields_t *fields)
     }
 }
 
-void ezlopi_scenes_delete_then_blocks(l_then_block_t *then_blocks)
+void ezlopi_scenes_delete_then_blocks(l_then_block_v2_t *then_blocks)
 {
     if (then_blocks)
     {
@@ -44,7 +44,7 @@ void ezlopi_scenes_delete_then_blocks(l_then_block_t *then_blocks)
     }
 }
 
-void ezlopi_scenes_delete_when_blocks(l_when_block_t *when_blocks)
+void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
 {
     if (when_blocks)
     {
@@ -55,7 +55,7 @@ void ezlopi_scenes_delete_when_blocks(l_when_block_t *when_blocks)
     }
 }
 
-void ezlopi_scenes_delete(l_scenes_list_t *scenes_list)
+void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list)
 {
     if (scenes_list)
     {
@@ -69,7 +69,7 @@ void ezlopi_scenes_delete(l_scenes_list_t *scenes_list)
     }
 }
 
-void ezlopi_scenes_delete_by_id(uint32_t _id)
-{
-    ezlopi_scenes_delete(ezlopi_scenes_pop_by_id(_id));
-}
+// void ezlopi_scenes_delete_by_id(uint32_t _id)
+// {
+//     ezlopi_scenes_delete(ezlopi_scenes_pop_by_id(_id));
+// }

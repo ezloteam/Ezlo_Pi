@@ -15,7 +15,7 @@
 #include "ezlopi_ping.h"
 #include "ezlopi_event_group.h"
 #include "ezlopi_ethernet.h"
-#include "ezlopi_scenes.h"
+#include "ezlopi_scenes_v2.h"
 
 static void ezlopi_initialize_devices_v3(void);
 
@@ -38,7 +38,7 @@ void ezlopi_init(void)
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
-    ezlopi_scene_init();
+    ezlopi_scenes_v2_init();
 
     // ezlopi_ethernet_init();
 
