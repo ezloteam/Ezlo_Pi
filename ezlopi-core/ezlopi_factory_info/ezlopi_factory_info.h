@@ -505,11 +505,13 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-      \"dev_type\": 7,\
-      \"dev_name\": \"DHT 22\",\
-      \"id_room\": \"\",\
-      \"id_item\": 16,\
-      \"gpio\": 5\
+                \"dev_type\": 6,\
+                \"dev_name\": \"GY_GPS6MV2\",\
+                \"id_room\": \"\",\
+                \"id_item\": 53,\
+                \"gpio_tx\": 18,\
+                \"gpio_rx\": 19,\
+                \"baud\": 9600\
     }\
     ],\
     \"dev_total\":1\

@@ -20,14 +20,11 @@
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
-
-static uint32_t _pulses_yfs201;
 static QueueHandle_t yfs201_queue = NULL;
-static YFS201_queue_enum_t yfs201_QueueFlag = YFS201_QUEUE_RESET;
 //------------------------------------------------------------------------------
 static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
 {
-    _pulses_yfs201++;
+    *((uint32_t *)arg) = *((uint32_t *)arg) + 1;
 }
 //------------------------------------------------------------------------------
 static int __0054_prepare(void *arg);
@@ -216,7 +213,6 @@ static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
-
         gpio_num_t pulse_pin = item->interface.pwm.gpio_num;
         // creating queue here
         yfs201_queue = xQueueCreate(YFS201_QUEUE_SIZE, sizeof(int32_t)); // takes max -> 1mSec
@@ -226,10 +222,10 @@ static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
             // extract data for untill all queue is filled
             // TRACE_E("--------- Queue Empty --------");
 
-            while (yfs201_QueueFlag < YFS201_QUEUE_FULL)
+            while ((yfs201_data->yfs201_QueueFlag) < YFS201_QUEUE_FULL)
             {
-                _pulses_yfs201 = 0;                                      // reset variable to store fresh counts within [200ms]
-                gpio_isr_handler_add(pulse_pin, gpio_isr_handler, NULL); // add -> gpio_isr_handle(pin_num)
+                (yfs201_data->_pulses_yfs201) = 0;                                                 // reset variable to store fresh counts within [200ms]
+                gpio_isr_handler_add(pulse_pin, gpio_isr_handler, &(yfs201_data->_pulses_yfs201)); // add -> gpio_isr_handle(pin_num)
                 start_time = (int32_t)esp_timer_get_time();
                 while (((int32_t)esp_timer_get_time() - start_time) < (1000000 / YFS201_QUEUE_SIZE)) // 200ms -> 200000uS
                 {
@@ -237,22 +233,22 @@ static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
                 }
                 // check queue_full => 1
 
-                if (xQueueSend(yfs201_queue, &_pulses_yfs201, NULL))
+                if (xQueueSend(yfs201_queue, &(yfs201_data->_pulses_yfs201), NULL))
                 {
-                    yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
-                    // TRACE_E("Pulse_count : %d", _pulses_yfs201);
+                    (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;
+                    // TRACE_E("Pulse_count : %d", (yfs201_data->_pulses_yfs201));
                 }
                 else
                 {
                     // TRACE_E("--------- Queue Full --------");
-                    yfs201_QueueFlag = YFS201_QUEUE_FULL;
+                    (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_FULL;
                 }
                 // disable -> gpio_isr_handle_remove(pin_num)
                 gpio_isr_handler_remove(pulse_pin);
             }
         }
 
-        if (yfs201_QueueFlag == YFS201_QUEUE_FULL)
+        if ((yfs201_data->yfs201_QueueFlag) == YFS201_QUEUE_FULL)
         {
             // loop through all the queue[0-5] values -> pulse counts
             int32_t P_count[YFS201_QUEUE_SIZE] = {0};
@@ -297,7 +293,7 @@ static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
             // TRACE_I("......................Dominant count ......{%d} ", P_count[max_freq_index]);
 
             // reset Queue_flag
-            yfs201_QueueFlag = YFS201_QUEUE_AVAILABLE;
+            (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;
 
             // write the dominant pulse count
             yfs201_data->yfs201_dominant_pulse_count = P_count[max_freq_index];
