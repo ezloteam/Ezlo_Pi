@@ -402,117 +402,33 @@ static const char *switch_box_constant_config =
         ],\
     \"dev_total\": 1}";
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
-
-#if 0
-// LED
-static const char *test_device_constant_config =
-    "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\            
-            {\
-                \"dev_name\": \"Switch \",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 18,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            }\
-        ],\
-    \"dev_total\": 1}";
-
-// Relay
-static const char *test_device_constant_config =
-    "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\            
-            {\
-                \"dev_name\": \"Relay \",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 18,\
-                \"id_item\": 2,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            }\
-        ],\
-    \"dev_total\": 1}";
-// Plug
-static const char *test_device_constant_config =
-    "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\            
-            {\
-                \"dev_name\": \"Plug \",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 18,\
-                \"id_item\": 3,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
-            }\
-        ],\
-    \"dev_total\": 1}";
-
-static const char *test_device_constant_config =
-    "{\
-        \"cmd\": 3,\
-        \"dev_detail\":\
-        [\            
-            {\
-                  \"dev_type\": 8,\
-                \"dev_name\": \"TSL2561_lumibosity\",\
-                \"id_room\": \"\",\
-                \"id_item\": 44,\
-               \"gpio_sda\": 18,\
-               \"gpio_scl\": 19,\
-              \"slave_addr\": 57\
-            }\
-        ],\
-    \"dev_total\": 1}";
-
-// SK6812
-static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
-// Servo
-// Other RGB
-
-static const char *test_device_constant_config = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":10,\"dev_name\":\"RGB LED\",\"id_room\":\"\",\"id_item\":9,\"en_gpio1\":true,\"gpio1\":2,\"en_gpio2\":true,\"gpio2\":3,\"en_gpio3\":true,\"gpio3\":15}],\"dev_total\":1}";
-
-#endif
+#define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
 
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_type\": 6,\
-                \"dev_name\": \"GY_GPS6MV2\",\
+                \"dev_type\": 7,\
+                \"dev_name\": \"DHT 22\",\
                 \"id_room\": \"\",\
-                \"id_item\": 53,\
-                \"gpio_tx\": 18,\
-                \"gpio_rx\": 19,\
-                \"baud\": 9600\
-    }\
+                \"id_item\": 16,\
+                \"gpio\": 18\
+            },\
+            {\
+                \"dev_type\" : 1,\
+                \"dev_name\" : \"Dining Room Main Lamp\",\
+                \"id_room\" : \"\",\
+                \"id_item\" : 3,\
+                \"val_ip\" : true,\
+                \"val_op\" : false,\
+                \"gpio_in\" : 21,\
+                \"gpio_out\" : 2,\
+                \"is_ip\" : false,\
+                \"ip_inv\" : true,\
+                \"pullup_ip\" : true,\
+                \"pullup_op\" : true,\
+                \"op_inv\" : false\
+            }\
     ],\
     \"dev_total\":1\
     }";

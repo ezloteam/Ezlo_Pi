@@ -224,7 +224,25 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
         }
 
         int value = 0;
-        CJSON_GET_VALUE_INT(cjson_params, "value", value);
+        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, "value");
+        if (cj_value)
+        {
+            switch (cj_value->type)
+            {
+            case cJSON_False:
+                value = 0;
+                break;
+            case cJSON_True:
+                value = 1;
+                break;
+            case cJSON_Number:
+                value = cj_value->valueint;
+                break;
+
+            default:
+                break;
+            }
+        }
 
         TRACE_I("item_name: %s", item->cloud_properties.item_name);
         TRACE_I("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
@@ -242,6 +260,7 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
         }
         else
         {
+            // in case of master switch
             l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
             while (curr_device)
             {
