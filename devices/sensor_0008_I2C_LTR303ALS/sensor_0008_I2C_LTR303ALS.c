@@ -81,17 +81,17 @@ static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
 
-    static int count = 0;
-    if (3 == ++count)
+    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
+    if (als_ltr303_data)
     {
-        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
-        if (als_ltr303_data)
+        ltr303_data_t temp_data;
+        if (ESP_OK == ltr303_get_val(&temp_data))
         {
-            if (ESP_OK == ltr303_get_val(als_ltr303_data))
+            if (temp_data.lux != als_ltr303_data->lux)
             {
+                als_ltr303_data->lux = temp_data.lux;
                 ezlopi_device_value_updated_from_device_v3(item);
             }
-            count = 0;
         }
     }
 
