@@ -59,19 +59,14 @@ int sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t
 static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    static int count = 0;
 
-    if (3 == ++count)
+    // Allow only significant changes in values to be posted
+    double new_value = (double)tsl2561_get_intensity_value(&item->interface.i2c_master);
+    TSL256_lum_t *TSL2561_lux_data = (TSL256_lum_t *)item->user_arg;
+    if (fabs((double)(TSL2561_lux_data->lux_val) - new_value) > 0.0001)
     {
-        // Allow only significant changes in values to be posted
-        double new_value = (double)tsl2561_get_intensity_value(&item->interface.i2c_master);
-        TSL256_lum_t *TSL2561_lux_data = (TSL256_lum_t *)item->user_arg;
-        if (fabs((double)(TSL2561_lux_data->lux_val) - new_value) > 0.0001)
-        {
-            ezlopi_device_value_updated_from_device_v3(item);
-            TSL2561_lux_data->lux_val = (uint32_t)new_value;
-        }
-        count = 0;
+        TSL2561_lux_data->lux_val = (uint32_t)new_value;
+        ezlopi_device_value_updated_from_device_v3(item);
     }
 
     return ret;
