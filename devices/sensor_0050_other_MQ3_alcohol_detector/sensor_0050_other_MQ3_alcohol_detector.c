@@ -331,8 +331,8 @@ static int __0050_notify(l_ezlopi_item_t *item)
             mq3_value_t *MQ3_value = (mq3_value_t *)item->user_arg;
             if (fabs((double)(MQ3_value->_alcohol_ppm) - new_value) > 0.0001)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
                 MQ3_value->_alcohol_ppm = (float)new_value;
+                ezlopi_device_value_updated_from_device_v3(item);
             }
         }
         ret = 1;

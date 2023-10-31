@@ -331,8 +331,8 @@ static int __0063_notify(l_ezlopi_item_t *item)
             mq9_value_t *MQ9_value = (mq9_value_t *)item->user_arg;
             if (fabs((double)(MQ9_value->_LPG_flameable_ppm) - new_value) > 0.0001)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
                 MQ9_value->_LPG_flameable_ppm = (float)new_value;
+                ezlopi_device_value_updated_from_device_v3(item);
             }
         }
         ret = 1;

@@ -331,8 +331,8 @@ static int __0049_notify(l_ezlopi_item_t *item)
             mq2_value_t *MQ2_value = (mq2_value_t *)item->user_arg;
             if (fabs((double)(MQ2_value->_LPG_ppm) - new_value) > 0.0001)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
                 MQ2_value->_LPG_ppm = (float)new_value;
+                ezlopi_device_value_updated_from_device_v3(item);
             }
         }
         ret = 1;

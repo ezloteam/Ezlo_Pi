@@ -50,12 +50,7 @@ int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count;
-        if (count++ > 1)
-        {
-            __0055_notify(item);
-            count = 0;
-        }
+        __0055_notify(item);
         break;
     }
     default:
@@ -170,9 +165,9 @@ static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __0055_notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    flex_t *FLEX_value = (flex_t *)item->user_arg;
+    if (FLEX_value)
     {
-        flex_t *FLEX_value = (flex_t *)item->user_arg;
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0,
                                                      .voltage = 0};
         // extract the sensor_output_values

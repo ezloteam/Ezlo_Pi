@@ -58,12 +58,7 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t 
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count;
-        if (count++ > 1)
-        {
-            __0054_notify(item);
-            count = 0;
-        }
+        __0054_notify(item);
         break;
     }
     default:
@@ -191,9 +186,9 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __0054_notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
+    if (yfs201_data)
     {
-        yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
         // extract new pulse count
         uint32_t prev_yfs201_dominant_pulse_count = yfs201_data->yfs201_dominant_pulse_count;
         Extract_YFS201_Pulse_Count_func(item);

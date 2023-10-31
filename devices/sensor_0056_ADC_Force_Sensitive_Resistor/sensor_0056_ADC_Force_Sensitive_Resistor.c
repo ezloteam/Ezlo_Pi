@@ -51,12 +51,7 @@ int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count;
-        if (count++ > 1)
-        {
-            __0056_notify(item);
-            count = 0;
-        }
+        __0056_notify(item);
         break;
     }
     default:
@@ -183,8 +178,8 @@ static int __0056_notify(l_ezlopi_item_t *item)
         // TRACE_E(" Force[N]: %.4f", FSR_struct->FSR_value);
         if (new_force != FSR_struct->FSR_value)
         {
-            ezlopi_device_value_updated_from_device_v3(item);
             FSR_struct->FSR_value = new_force;
+            ezlopi_device_value_updated_from_device_v3(item);
         }
         ret = 1;
     }

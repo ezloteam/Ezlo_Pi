@@ -64,12 +64,7 @@ int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_it
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count;
-        if (count++ > 1)
-        {
-            __0057_notify(item);
-            count = 0;
-        }
+        __0057_notify(item);
         break;
     }
     default:
@@ -100,7 +95,7 @@ static int __0057_prepare(void *arg)
             else
             {
                 ezlopi_device_free_device(flame_device_digi);
-                        }
+            }
         }
         else
         {
