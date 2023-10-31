@@ -238,6 +238,7 @@ static void __prepare_RGB_LED_item(l_ezlopi_item_t *item, cJSON *cj_device, void
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_rgbcolor,
     item->cloud_properties.show = true;
+    item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_rgb;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
     item->interface.pwm.gpio_num = 0;
@@ -256,6 +257,7 @@ static void __prepare_RGB_LED_onoff_switch_item(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_switch,
     item->cloud_properties.show = true;
+    item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_bool;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
     item->interface.gpio.gpio_out.enable = true;
@@ -276,6 +278,7 @@ static void __prepare_RGB_LED_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_dimmer,
     item->cloud_properties.show = true;
+    item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_int;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
     item->interface.pwm.gpio_num = 0;
