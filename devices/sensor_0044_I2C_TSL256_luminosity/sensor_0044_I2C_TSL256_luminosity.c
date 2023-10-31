@@ -92,16 +92,19 @@ static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
 
-    ezlopi_i2c_master_init(&item->interface.i2c_master);
-    TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
-    if (Check_PARTID(&item->interface.i2c_master))
+    if (item->interface.i2c_master.enable)
     {
-        TRACE_B("TSL561 initialization finished.........");
-        sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
-    }
-    else
-    {
-        TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
+        ezlopi_i2c_master_init(&item->interface.i2c_master);
+        TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
+        if (Check_PARTID(&item->interface.i2c_master))
+        {
+            TRACE_B("TSL561 initialization finished.........");
+            sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
+        }
+        else
+        {
+            TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
+        }
     }
     return ret;
 }
