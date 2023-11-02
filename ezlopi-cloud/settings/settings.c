@@ -132,6 +132,7 @@ void ezlopi_device_settings_reset(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
+#if 0 // Hub settings is disable as it is not used, instead hub.device.settings is used.
 void ezlopi_settings_list(cJSON *cj_request, cJSON *cj_response)
 {
 
@@ -247,3 +248,4 @@ void ezlopi_settings_value_set_response(cJSON *cj_request, cJSON *cj_response)
 
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 }
+#endif

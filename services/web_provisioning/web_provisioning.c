@@ -18,6 +18,7 @@
 #include "room.h"
 #include "network.h"
 #include "firmware.h"
+#include "settings.h"
 #include "scenes_scripts.h"
 
 #include "ezlopi_wifi.h"

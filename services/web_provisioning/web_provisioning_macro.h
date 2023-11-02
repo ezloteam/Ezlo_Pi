@@ -19,6 +19,10 @@ CLOUD_METHOD("hub.network.get", network_get, NULL)
 CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)
 CLOUD_METHOD("hub.firmware.update.start", firmware_update_start, NULL)
 
+CLOUD_METHOD("hub.device.settings.list", ezlopi_device_settings_list, NULL)
+CLOUD_METHOD("hub.device.setting.value.set", ezlopi_device_settings_value_set, NULL)
+CLOUD_METHOD("hub.device.setting.reset", ezlopi_device_settings_reset, NULL)
+
 CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, NULL)
 CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)

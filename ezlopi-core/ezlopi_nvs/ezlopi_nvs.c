@@ -342,6 +342,7 @@ uint8_t ezlopi_nvs_set_settings_init_status(void)
     return ret;
 }
 
+#if 0
 int ezlopi_settings_save_settings(const s_ezlopi_hub_settings_t *settings_list, uint16_t num_settings)
 {
     int ret = 1;
@@ -496,6 +497,8 @@ int ezlopi_settings_retrive_settings(s_ezlopi_hub_settings_t *settings_list, uin
 
     return ret;
 }
+
+#endif
 
 uint8_t ezlopi_nvs_write_int32(int32_t i, const char *key_name)
 {

@@ -39,19 +39,6 @@ typedef struct ezlopi_settings_device_settings_type_scalable_value
     char *scale;
 } s_ezlopi_settings_device_settings_type_scalable_value_t;
 
-typedef struct s_ezlopi_settings
-{
-    const char *enum_values[EZLOPI_SETTINGS_MAX_ENUM_VALUES];
-    const char *name;
-    union
-    {
-        const char *token_value;
-        bool bool_value;
-        int int_value;
-    } value;
-    e_ezlopi_settings_value_type_t value_type;
-} s_ezlopi_hub_settings_t;
-
 typedef uint8_t (*f_settings_call_t)(e_ezlopi_settings_action_t action, void *properties, void *arg, void *user_arg);
 
 typedef struct s_ezlopi_device_settings_properties
@@ -64,6 +51,7 @@ typedef struct s_ezlopi_device_settings_properties
     char *value_type;
     char *nvs_alias;
     bool value_nonvolatile;
+    void *user_arg;
 
     union
     {
@@ -107,9 +95,5 @@ void _ezlopi_device_settings_reset_settings_id(uint32_t id);
 void _ezlopi_device_settings_reset_device_id(uint32_t id);
 
 l_ezlopi_device_settings_t *ezlopi_devices_settings_get_list(void);
-uint16_t ezlopi_settings_get_settings_count(void);
-s_ezlopi_hub_settings_t *ezlopi_settings_get_settings_list(void);
-uint8_t ezlopi_settings_modify_setting(const char *name, const void *value);
-uint8_t ezlopi_settings_read_setting(const char *name, void *value);
 
 #endif // EZLOPI_SETTINGS_H

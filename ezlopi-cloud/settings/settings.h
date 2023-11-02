@@ -13,12 +13,13 @@ extern "C"
     void ezlopi_device_settings_value_set(cJSON *cj_request, cJSON *cj_response);
     void ezlopi_device_settings_reset(cJSON *cj_request, cJSON *cj_response);
 
+#if 0
     uint8_t ezlopi_settings_modify_setting(const char *name, const void *value);
-
     void ezlopi_settings_list(cJSON *cj_request, cJSON *cj_response);
     void ezlopi_settings_value_set(cJSON *cj_request, cJSON *cj_response);
     void ezlopi_settings_value_set_response(cJSON *cj_request, cJSON *cj_response);
     void ezlopi_settings_updated(cJSON *cj_request, cJSON *cj_response);
+#endif
 
 #ifdef __cplusplus
 }
