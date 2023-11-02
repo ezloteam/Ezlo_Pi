@@ -231,7 +231,6 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
             {
             case cJSON_False:
                 value = 0;
-                break;
             case cJSON_True:
                 value = 1;
                 break;

@@ -29,8 +29,6 @@ int device_0002_digitalOut_relay(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
 {
     int ret = 0;
 
-    TRACE_D("relay-action: %s", ezlopi_actions_to_string(action));
-
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:

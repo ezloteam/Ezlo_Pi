@@ -13,9 +13,9 @@ extern "C"
     typedef enum e_trace_type
     {
         TRACE_TYPE_NONE = 0,
-        TRACE_TYPE_B,
-        TRACE_TYPE_I,
-        TRACE_TYPE_E
+        TRACE_TYPE_D, // debug (White)
+        TRACE_TYPE_I, // Info (Blue)
+        TRACE_TYPE_E  // Error (Red)
     } e_trace_type_t;
 
     void web_provisioning_init(void);

@@ -11,6 +11,7 @@
 #include "ezlopi_meshbot_service.h"
 #include "ezlopi_scenes_when_methods.h"
 #include "ezlopi_scenes_then_methods.h"
+#include "ezlopi_scenes_status_changed.h"
 
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
 
@@ -56,7 +57,6 @@ uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
     uint32_t new_scene_id = 0;
     if (cj_new_scene)
     {
-        TRACE_E("Here");
         new_scene_id = ezlopi_cloud_generate_scene_id();
         char tmp_buffer[32];
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", new_scene_id);
@@ -64,15 +64,12 @@ uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
         char *new_scnee_str = cJSON_Print(cj_new_scene);
         if (new_scnee_str)
         {
-            TRACE_E("Here");
             if (ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, tmp_buffer))
             {
-                TRACE_E("Here");
                 bool free_scene_list_str = 1;
                 char *scenes_list_str = ezlopi_nvs_scene_get_v2();
                 if (NULL == scenes_list_str)
                 {
-                    TRACE_E("Here");
                     scenes_list_str = "[]";
                     free_scene_list_str = 0;
                 }
@@ -80,18 +77,15 @@ uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
                 cJSON *cj_scenes_list = cJSON_Parse(scenes_list_str);
                 if (cj_scenes_list)
                 {
-                    TRACE_E("Here");
                     cJSON *cj_new_scene_id = cJSON_CreateNumber(new_scene_id);
                     if (!cJSON_AddItemToArray(cj_scenes_list, cj_new_scene_id))
                     {
-                        TRACE_E("Here");
                         cJSON_Delete(cj_new_scene_id);
                         ezlopi_nvs_delete_stored_script(new_scene_id);
                         new_scene_id = 0;
                     }
                     else
                     {
-                        TRACE_E("Here");
                         char *updated_scenes_list = cJSON_Print(cj_scenes_list);
                         if (updated_scenes_list)
                         {
@@ -108,13 +102,11 @@ uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
 
                 if (free_scene_list_str)
                 {
-                    TRACE_E("Here");
                     free(scenes_list_str);
                 }
             }
             else
             {
-                TRACE_E("Here");
                 new_scene_id = 0;
             }
 
@@ -122,7 +114,6 @@ uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
         }
         else
         {
-            TRACE_E("Here");
             new_scene_id = 0;
         }
     }
@@ -224,9 +215,17 @@ l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id)
     return ret_scene;
 }
 
+l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32_t scene_id)
+{
+    return __scenes_populate(cj_new_scene, scene_id);
+}
+
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
 {
-    ezlopi_scenes_meshbot_delete_by_id(_id);
+    if (1 == ezlopi_meshbot_service_stop_for_scene_id(_id))
+    {
+        ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
+    }
 }
 
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)

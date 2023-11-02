@@ -32,7 +32,7 @@ static void ota_service_process(void *pv)
             cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
             if (NULL != firmware_info_request)
             {
-                web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
+                web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_D);
                 cJSON_Delete(firmware_info_request);
                 firmware_info_request = NULL;
             }

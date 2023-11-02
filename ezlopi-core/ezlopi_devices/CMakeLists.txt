@@ -1,6 +1,6 @@
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_device_value_updated.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES trace json ezlopi_nvs ezlopi_hal ezlopi_cloud ezlopi_actions items
     device_0001_digitalOut_generic 

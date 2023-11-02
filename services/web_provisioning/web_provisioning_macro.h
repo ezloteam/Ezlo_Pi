@@ -21,6 +21,7 @@ CLOUD_METHOD("hub.firmware.update.start", firmware_update_start, NULL)
 
 CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, NULL)
+CLOUD_METHOD("hub.scenes.run", scenes_run, NULL)
 CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)
 CLOUD_METHOD("hub.scenes.edit", scenes_edit, NULL)
 CLOUD_METHOD("hub.scenes.delete", scenes_delete, NULL)
@@ -32,6 +33,7 @@ CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
 CLOUD_METHOD("hub.scenes.scripts.delete", scenes_scripts_delete, NULL)
 CLOUD_METHOD("hub.scenes.scripts.set", scenes_scripts_set, NULL)
 CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
+// CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 

@@ -75,17 +75,16 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
                 cJSON_Minify(cjson_str_data);
                 switch (print_type)
                 {
-                case TRACE_TYPE_B:
+                case TRACE_TYPE_D:
                 {
-                    TRACE_B("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
                     break;
                 }
                 case TRACE_TYPE_E:
                 {
-                    TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
+                    TRACE_E("## WSS-SENDING  >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
                     break;
                 }
-
                 case TRACE_TYPE_I:
                 {
                     TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
@@ -248,8 +247,8 @@ static void __message_upcall(const char *payload, uint32_t len)
                 if (UINT32_MAX != method_idx)
                 {
                     TRACE_D("Method[%d]: %s", method_idx, method_list_v2[method_idx].method_name);
-                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_B);
-                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].updater, TRACE_TYPE_B);
+                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_D);
+                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].updater, TRACE_TYPE_D);
                 }
                 else
                 {

@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "version.h"
 #include "trace.h"
 #include "registration.h"
 #include "web_provisioning.h"
@@ -44,9 +45,9 @@ static void registration_process(void *pv)
 
     snprintf(reg_str, sizeof(reg_str),
              "{\"id\":\"%u\",\"method\":\"register\",\"params\":"
-             "{\"firmware\":\"v2.0.8\",\"timeOffset\":18000, \"media\":\"radio\","
-             "\"hubType\":\"32.1\",\"mac_address\":\"%s\",\"maxFrameSize\":4096}}",
-             esp_random(), "a2:97:1e:74:0b:52");
+             "{\"firmware\":\"%s\",\"timeOffset\":18000, \"media\":\"radio\","
+             "\"hubType\":\"32.1\",\"mac_address\":\"%s\",\"maxFrameSize\":8192}}",
+             esp_random(), VERSION_STR, mac_str);
 
     cJSON *cjson_data = cJSON_Parse(reg_str);
 
@@ -57,7 +58,7 @@ static void registration_process(void *pv)
 
     while (0 == is_registered)
     {
-        web_provisioning_send_to_nma_websocket(cjson_data, TRACE_TYPE_B);
+        web_provisioning_send_to_nma_websocket(cjson_data, TRACE_TYPE_D);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 

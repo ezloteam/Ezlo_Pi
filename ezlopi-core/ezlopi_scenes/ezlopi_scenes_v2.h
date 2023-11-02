@@ -19,6 +19,16 @@ typedef enum e_scenes_block_type_v2
     SCENE_BLOCK_TYPE_MAX,
 } e_scenes_block_type_v2_t;
 
+typedef enum e_scene_status_v2
+{
+    EZLOPI_SCENE_STATUS_NONE = 0,
+    EZLOPI_SCENE_STATUS_RUN,
+    EZLOPI_SCENE_STATUS_RUNNING,
+    EZLOPI_SCENE_STATUS_STOP,
+    EZLOPI_SCENE_STATUS_STOPPED,
+    EZLOPI_SCENE_STATUS_MAX
+} e_scene_status_v2_t;
+
 typedef enum e_scene_value_type_v2
 {
 #define EZLOPI_VALUE_TYPE(type, name) EZLOPI_VALUE_TYPE_##type,
@@ -95,19 +105,6 @@ typedef struct l_house_modes_v2
     struct l_house_modes_v2 *next;
 } l_house_modes_v2_t;
 
-typedef enum e_scene_status_v2
-{
-    EZLOPI_SCENE_STATUS_NONE = 0,
-    EZLOPI_SCENE_STATUS_RUN,
-    EZLOPI_SCENE_STATUS_RUNNING,
-    EZLOPI_SCENE_STATUS_STOP,
-    EZLOPI_SCENE_STATUS_DELETE,
-    EZLOPI_SCENE_STATUS_STOPPED,
-    EZLOPI_SCENE_STATUS_PAUSE,
-    EZLOPI_SCENE_STATUS_PAUSED,
-    EZLOPI_SCENE_STATUS_MAX
-} e_scene_status_v2_t;
-
 typedef struct l_scenes_list_v2
 {
     // char _id[32];
@@ -147,6 +144,7 @@ f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_metho
 const char *ezlopi_scene_get_scene_value_type_name_v2(e_scene_value_type_v2_t value_type);
 
 l_scenes_list_v2_t *ezlopi_scenes_get_by_id_v2(uint32_t _id);
+l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32_t scene_id);
 
 cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_v2_t *then_block);
 cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);

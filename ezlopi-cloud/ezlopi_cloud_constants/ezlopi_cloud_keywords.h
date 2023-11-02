@@ -15,5 +15,12 @@ const static char *ezlopi_ui_broadcast_str = "ui_broadcast";
 const static char *ezlopi_result_str = "result";
 const static char *ezlopi_params_str = "params";
 const static char *ezlopi_gateway_id_str = "gateway_id";
+const static char *ezlopi_scene_id_str = "scene_id";
+const static char *ezlopi_scene_name_str = "scene_name";
+const static char *ezlopi_status_str = "status";
+const static char *ezlopi_userNotification_str = "userNotification";
+const static char *ezlopi_notifications_str = "notifications";
+const static char *ezlopi_room_id_str = "room_id";
+const static char *ezlopi_room_name_str = "room_name";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
