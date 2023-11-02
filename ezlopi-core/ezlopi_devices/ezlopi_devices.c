@@ -355,6 +355,37 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
     return new_item;
 }
 
+l_ezlopi_device_settings_v3_t *ezlopi_device_add_settings_to_device_v3(l_ezlopi_device_t *device, int (*setting_func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg))
+{
+    l_ezlopi_device_settings_v3_t *new_setting = NULL;
+    if (device)
+    {
+        new_setting = malloc(sizeof(l_ezlopi_device_settings_v3_t));
+        if (new_setting)
+        {
+            memset(new_setting, 0, sizeof(l_ezlopi_device_settings_v3_t));
+            new_setting->func = setting_func;
+
+            if (NULL == device->settings)
+            {
+                device->settings = new_setting;
+            }
+            else
+            {
+                l_ezlopi_device_settings_v3_t *curr_setting = device->settings;
+                while (curr_setting->next)
+                {
+                    curr_setting = curr_setting->next;
+                }
+
+                curr_setting->next = new_setting;
+            }
+        }
+    }
+
+    return new_setting;
+}
+
 static void ezlopi_device_free_item(l_ezlopi_item_t *items)
 {
     if (items->next)
@@ -364,6 +395,16 @@ static void ezlopi_device_free_item(l_ezlopi_item_t *items)
 
     free(items);
 }
+
+// static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3 *settings)
+// {
+//     if (settings->next)
+//     {
+//         ezlopi_device_free_item(settings->next);
+//     }
+
+//     free(settings);
+// }
 
 static void ezlopi_device_free(l_ezlopi_device_t *device)
 {

@@ -33,6 +33,14 @@ typedef struct s_ezlopi_cloud_item
 
 } s_ezlopi_cloud_item_t;
 
+typedef struct s_ezlopi_cloud_device_settings
+{
+    uint32_t setting_id; // _id -> https://log.ezlo.com/new/hub/settings_api/
+    uint32_t device_id;  // deviceId -> https://log.ezlo.com/new/hub/settings_api/
+    char *label;         // label -> https://log.ezlo.com/new/hub/settings_api/
+    char *description;   // description -> https://log.ezlo.com/new/hub/settings_api/
+} s_ezlopi_cloud_device_settings_t;
+
 typedef struct s_ezlopi_cloud_device
 {
     uint32_t device_id;      // '_id' -> https://api.ezlo.com/hub/devices_api/index.html

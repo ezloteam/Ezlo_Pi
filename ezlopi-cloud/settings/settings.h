@@ -4,6 +4,7 @@
 #include <string.h>
 #include "cJSON.h"
 #include "ezlopi_settings.h"
+#include "ezlopi_devices.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -12,6 +13,11 @@ extern "C"
     void ezlopi_device_settings_list(cJSON *cj_request, cJSON *cj_response);
     void ezlopi_device_settings_value_set(cJSON *cj_request, cJSON *cj_response);
     void ezlopi_device_settings_reset(cJSON *cj_request, cJSON *cj_response);
+
+    void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response);
+    void ezlopi_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response);
+    void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response);
+    cJSON *ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting);
 
 #if 0
     uint8_t ezlopi_settings_modify_setting(const char *name, const void *value);

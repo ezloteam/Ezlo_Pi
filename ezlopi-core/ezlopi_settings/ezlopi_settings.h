@@ -9,18 +9,19 @@
 
 typedef enum
 {
+    EZLOPI_SETTINGS_ACTION_GET_SETTING,
+    EZLOPI_SETTINGS_ACTION_SET_SETTING,
+    EZLOPI_SETTINGS_ACTION_RESET_SETTING,
+    EZLOPI_SETTINGS_ACTION_MAX
+} e_ezlopi_settings_action_t;
+
+typedef enum
+{
     EZLOPI_SETTINGS_TYPE_TOKEN = 0,
     EZLOPI_SETTINGS_TYPE_BOOL,
     EZLOPI_SETTINGS_TYPE_INT,
     EZLOPI_SETTINGS_TYPE_MAX
 } e_ezlopi_settings_value_type_t;
-
-typedef enum
-{
-    EZLOPI_SETTINGS_ACTION_GET_SETTING,
-    EZLOPI_SETTINGS_ACTION_SET_SETTING,
-    EZLOPI_SETTINGS_ACTION_MAX
-} e_ezlopi_settings_action_t;
 
 typedef struct ezlopi_settings_device_settings_type_action_value
 {

@@ -44,6 +44,7 @@ const static char *method_hub_devices_list = "hub.devices.list";
 // const static char *method_hub_device_settings_list = "hub.device.settings.list";
 // const static char *method_hub_setting_value_set_request = "hub.setting.value.set";
 // const static char *method_hub_setting_value_reset_request = "hub.setting.value.reset";
+const static char *method_hub_device_setting_updated = "hub.device.setting.updated";
 // const static char *method_hub_extensions_plugin_info_installed = "hub.extensions.plugin.info.installed";
 // const static char *method_hub_extensions_plugin_install_execute = "hub.extensions.plugin.install.execute";
 // const static char *method_hub_software_update_execute = "hub.software.update.execute";
