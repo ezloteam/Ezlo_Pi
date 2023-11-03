@@ -16,6 +16,7 @@ typedef enum e_scenes_block_type_v2
     SCENE_BLOCK_TYPE_NONE = 0,
     SCENE_BLOCK_TYPE_WHEN = 1,
     SCENE_BLOCK_TYPE_THEN = 2,
+    SCENE_BLOCK_TYPE_ELSE = 3,
     SCENE_BLOCK_TYPE_MAX,
 } e_scenes_block_type_v2_t;
 
@@ -62,7 +63,7 @@ typedef union u_field_value_v2
     int value_int;
     uint32_t value_uint;
     bool value_bool;
-    struct l_when_block *when_block;
+    struct l_when_block_v2 *when_block;
 } u_field_value_v2_t;
 
 typedef struct l_fields_v2
@@ -76,14 +77,15 @@ typedef struct l_fields_v2
     struct l_fields_v2 *next;
 } l_fields_v2_t;
 
-typedef struct l_then_block_v2
+typedef struct l_action_block_v2
 {
+    char _tempId[40];
     e_scenes_block_type_v2_t block_type;
     s_block_options_v2_t block_options;
     s_action_delay_v2_t delay;
     l_fields_v2_t *fields;
-    struct l_then_block_v2 *next;
-} l_then_block_v2_t;
+    struct l_action_block_v2 *next;
+} l_action_block_v2_t;
 
 typedef struct l_when_block_v2
 {
@@ -92,6 +94,16 @@ typedef struct l_when_block_v2
     l_fields_v2_t *fields;
     struct l_when_block_v2 *next;
 } l_when_block_v2_t;
+
+// typedef struct l_else_block_v2
+// {
+//     char _tempId[40];
+//     e_scenes_block_type_v2_t block_type;
+//     s_block_options_v2_t block_options;
+//     s_action_delay_v2_t delay;
+//     l_fields_v2_t *fields;
+//     struct l_else_block_v2 *next;
+// } l_else_block_v2_t;
 
 typedef struct l_user_notification_v2
 {
@@ -121,8 +133,9 @@ typedef struct l_scenes_list_v2
 
     l_user_notification_v2_t *user_notifications;
     l_house_modes_v2_t *house_modes;
-    l_then_block_v2_t *then;
-    l_when_block_v2_t *when;
+    l_action_block_v2_t *then_block;
+    l_when_block_v2_t *when_block;
+    l_action_block_v2_t *else_block;
 
     struct l_scenes_list_v2 *next;
 } l_scenes_list_v2_t;
@@ -146,9 +159,9 @@ const char *ezlopi_scene_get_scene_value_type_name_v2(e_scene_value_type_v2_t va
 l_scenes_list_v2_t *ezlopi_scenes_get_by_id_v2(uint32_t _id);
 l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32_t scene_id);
 
-cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_v2_t *then_block);
+cJSON *ezlopi_scenes_cjson_create_then_block(l_action_block_v2_t *then_block);
 cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);
-void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_v2_t *then_blocks);
+void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_action_block_v2_t *then_blocks);
 void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_when_block_v2_t *when_blocks);
 cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene);
 cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_v2_t *scenes_list);

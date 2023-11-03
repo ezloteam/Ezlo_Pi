@@ -240,7 +240,7 @@ static void __message_upcall(const char *payload, uint32_t len)
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
-                TRACE_D("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
+                TRACE_I("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
 
                 uint32_t method_idx = __search_method_in_list(cj_method);
 

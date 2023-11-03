@@ -33,14 +33,14 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
     }
 }
 
-void ezlopi_scenes_delete_then_blocks(l_then_block_v2_t *then_blocks)
+void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks)
 {
-    if (then_blocks)
+    if (action_blocks)
     {
-        ezlopi_scenes_delete_fields(then_blocks->fields);
-        ezlopi_scenes_delete_then_blocks(then_blocks->next);
-        then_blocks->next = NULL;
-        free(then_blocks);
+        ezlopi_scenes_delete_fields(action_blocks->fields);
+        ezlopi_scenes_delete_action_blocks(action_blocks->next);
+        action_blocks->next = NULL;
+        free(action_blocks);
     }
 }
 
@@ -61,7 +61,9 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list)
     {
         ezlopi_scenes_delete_user_notifications(scenes_list->user_notifications);
         ezlopi_scenes_delete_house_modes(scenes_list->house_modes);
-        ezlopi_scenes_delete_then_blocks(scenes_list->then);
+        ezlopi_scenes_delete_action_blocks(scenes_list->then_block);
+        ezlopi_scenes_delete_action_blocks(scenes_list->else_block);
+        ezlopi_scenes_delete_when_blocks(scenes_list->when_block);
 
         ezlopi_scenes_delete(scenes_list->next);
         scenes_list->next = NULL;

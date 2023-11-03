@@ -205,11 +205,11 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
                                 {
                                 case SCENE_BLOCK_TYPE_WHEN:
                                 {
-                                    l_when_block_v2_t *curr_when_block = req_scene->when;
+                                    l_when_block_v2_t *curr_when_block = req_scene->when_block;
                                     while (curr_when_block)
                                     {
                                         cJSON *cj_when_block = NULL;
-                                        // ezlopi_scenes_cjson_create_when_block(req_scene->when);
+                                        // ezlopi_scenes_cjson_create_when_block(req_scene->when_block);
                                         if (cj_when_block)
                                         {
                                             if (!cJSON_AddItemToArray(cj_block_array, cj_when_block))
@@ -222,13 +222,14 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 
                                     break;
                                 }
+#warning "Check if else block is required or not"
                                 case SCENE_BLOCK_TYPE_THEN:
                                 {
-                                    l_then_block_v2_t *curr_then_block = req_scene->then;
+                                    l_action_block_v2_t *curr_then_block = req_scene->then_block;
                                     while (curr_then_block)
                                     {
                                         cJSON *cj_then_block = NULL;
-                                        // ezlopi_scenes_cjson_create_then_block(req_scene->then);
+                                        // ezlopi_scenes_cjson_create_then_block(req_scene->then_block);
                                         if (cj_then_block)
                                         {
                                             if (!cJSON_AddItemToArray(cj_block_array, cj_then_block))

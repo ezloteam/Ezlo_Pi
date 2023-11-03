@@ -3,7 +3,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_status_changed.h"
 
-void ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, char *status_str)
+void ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
 {
     if (scene_node)
     {

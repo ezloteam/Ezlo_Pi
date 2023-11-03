@@ -8,6 +8,8 @@
 #include "ezlopi_scenes_status_changed.h"
 
 static void __scenes_process(void *arg);
+static int __execute_then_condition(l_scenes_list_v2_t *scene_node);
+static int __execute_else_condition(l_scenes_list_v2_t *scene_node);
 
 uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
 {
@@ -58,32 +60,28 @@ uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
 
     if (scene_node)
     {
-        if (scene_node->then)
+        if (scene_node->then_block)
         {
             ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
-            l_then_block_v2_t *then_node = scene_node->then;
-            while (then_node)
+            if (1 == __execute_then_condition(scene_node))
             {
-                f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_node->block_options.method.type);
-                if (then_method)
-                {
-                    const char *method_name = ezlopi_scene_get_scene_method_name(then_node->block_options.method.type);
-                    if (method_name)
-                    {
-                        TRACE_D("Calling: %s", method_name);
-                    }
-                    else
-                    {
-                        TRACE_E("Error: Method is NULL!");
-                    }
-
-                    then_method(scene_node, (void *)then_node);
-                }
-
-                then_node = then_node->next;
+                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
             }
-
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+            else
+            {
+                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+            }
+        }
+        else if (scene_node->else_block)
+        {
+            if (1 == __execute_else_condition(scene_node))
+            {
+                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+            }
+            else
+            {
+                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+            }
         }
         else
         {
@@ -93,21 +91,6 @@ uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
 
     return ret;
 }
-
-// void ezlopi_scenes_service_reinit(void)
-// {
-//     l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_list();
-//     while (scene_node)
-//     {
-//         scene_node->status = EZLOPI_SCENE_STATUS_STOP;
-//         vTaskDelay(20);
-//         if (scene_node->enabled)
-//         {
-//             xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, &scene_node->task_handle);
-//         }
-//         scene_node = scene_node->next;
-//     }
-// }
 
 void ezlopi_scenes_meshbot_init(void)
 {
@@ -137,9 +120,9 @@ static void __scenes_process(void *arg)
             scene_node->status = EZLOPI_SCENE_STATUS_RUNNING;
 
             uint32_t when_condition_returned = 0;
-            l_when_block_v2_t *when_condition_node = scene_node->when;
+            l_when_block_v2_t *when_condition_node = scene_node->when_block;
 
-            while (when_condition_node)
+            if (when_condition_node)
             {
                 f_scene_method_v2_t when_method = ezlopi_scene_get_method_v2(when_condition_node->block_options.method.type);
                 if (when_method)
@@ -163,47 +146,20 @@ static void __scenes_process(void *arg)
                             ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
                         }
 
-                        l_then_block_v2_t *curr_then = scene_node->then;
-                        while (curr_then)
+                        if (1 == __execute_then_condition(scene_node))
                         {
-                            uint32_t delay_ms = (curr_then->delay.days * (24 * 60 * 60) + curr_then->delay.hours * (60 * 60) + curr_then->delay.minutes * 60 + curr_then->delay.seconds) * 1000;
-                            if (delay_ms)
-                            {
-                                vTaskDelay(delay_ms / portTICK_RATE_MS);
-                            }
-
-                            TRACE_D("delay_ms: %d", delay_ms);
-                            const char *method_name = ezlopi_scene_get_scene_method_name(curr_then->block_options.method.type);
-                            if (method_name)
-                            {
-                                TRACE_D("Calling: %s", method_name);
-                            }
-                            else
-                            {
-                                TRACE_E("Error: Method is NULL!");
-                            }
-
-                            f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(curr_then->block_options.method.type);
-                            TRACE_D("then-method: %p", then_method);
-                            if (then_method)
-                            {
-                                then_method(scene_node, (void *)curr_then);
-                            }
-
-                            if (curr_then->next)
-                            {
-                                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
-                            }
-
-                            curr_then = curr_then->next;
+                            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
                         }
-
-                        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                        else
+                        {
+                            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                        }
                     }
                     else
                     {
                         if (fire_stopped_condition)
                         {
+                            __execute_else_condition(scene_node);
                             ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
                         }
 
@@ -228,4 +184,83 @@ static void __scenes_process(void *arg)
     scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
 
     vTaskDelete(NULL);
+}
+
+static int __execute_then_condition(l_scenes_list_v2_t *scene_node)
+{
+    int ret = 0;
+    l_action_block_v2_t *then_node = scene_node->then_block;
+    while (then_node)
+    {
+        uint32_t delay_ms = (then_node->delay.days * (24 * 60 * 60) + then_node->delay.hours * (60 * 60) + then_node->delay.minutes * 60 + then_node->delay.seconds) * 1000;
+        TRACE_D("scene-delay_ms: %d", delay_ms);
+        if (delay_ms)
+        {
+            vTaskDelay(delay_ms / portTICK_RATE_MS);
+        }
+
+        const char *method_name = ezlopi_scene_get_scene_method_name(then_node->block_options.method.type);
+        if (method_name)
+        {
+            TRACE_D("Calling: %s", method_name);
+        }
+        else
+        {
+            TRACE_E("Error: Method is NULL!");
+        }
+
+        f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_node->block_options.method.type);
+        TRACE_D("then-method: %p", then_method);
+        if (then_method)
+        {
+            ret = 1;
+            then_method(scene_node, (void *)then_node);
+        }
+
+        if (then_node->next)
+        {
+            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
+        }
+
+        then_node = then_node->next;
+    }
+
+    return ret;
+}
+
+static int __execute_else_condition(l_scenes_list_v2_t *scene_node)
+{
+    int ret = 0;
+    l_action_block_v2_t *else_node = scene_node->else_block;
+    while (else_node)
+    {
+        uint32_t delay_ms = (else_node->delay.days * (24 * 60 * 60) + else_node->delay.hours * (60 * 60) + else_node->delay.minutes * 60 + else_node->delay.seconds) * 1000;
+        TRACE_D("scene-delay_ms: %d", delay_ms);
+        if (delay_ms)
+        {
+            vTaskDelay(delay_ms / portTICK_RATE_MS);
+        }
+
+        const char *method_name = ezlopi_scene_get_scene_method_name(else_node->block_options.method.type);
+        if (method_name)
+        {
+            TRACE_D("Calling: %s", method_name);
+        }
+        else
+        {
+            TRACE_E("Error: Method is NULL!");
+        }
+
+        f_scene_method_v2_t else_method = ezlopi_scene_get_method_v2(else_node->block_options.method.type);
+        TRACE_D("else-method: %p", else_method);
+        if (else_method)
+        {
+            ret = 1;
+            else_method(scene_node, (void *)else_node);
+        }
+
+        else_node = else_node->next;
+    }
+
+    return ret;
 }

@@ -4,10 +4,11 @@
 #include "trace.h"
 #include "ezlopi_scenes_v2.h"
 
-// cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);
-// cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_v2_t *then_block);
+static void ezlopi_scenes_cjson_add_action_block_options(cJSON *cj_block_array, l_action_block_v2_t *then_block);
+static void ezlopi_scenes_cjson_add_action_delay(cJSON *cj_then_block, s_action_delay_v2_t *action_delay);
+static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields);
 
-static void ezlopi_scenes_cjson_add_string(cJSON *root, char *key, char *value)
+static void ezlopi_scenes_cjson_add_string(cJSON *root, char *key, const char *value)
 {
     if (root && key && value)
     {
@@ -81,7 +82,7 @@ static void ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_block_array, l_
                 if ((when_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
                     (when_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    char *method_type_name = ezlopi_scene_get_scene_method_name(when_block->block_options.method.type);
+                    const char *method_type_name = ezlopi_scene_get_scene_method_name(when_block->block_options.method.type);
                     ezlopi_scenes_cjson_add_string(cj_method, "name", method_type_name ? method_type_name : "");
                 }
                 else
@@ -104,9 +105,9 @@ static void ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_block_array, l_
     }
 }
 
-static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_then_block_v2_t *then_block)
+static void ezlopi_scenes_cjson_add_action_block_options(cJSON *cj_block_array, l_action_block_v2_t *action_block)
 {
-    if (cj_block_array && then_block)
+    if (cj_block_array && action_block)
     {
 
         cJSON *cj_block_options = cJSON_AddObjectToObject(cj_block_array, "blockOptions");
@@ -116,10 +117,10 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
             cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, "method");
             if (cj_method)
             {
-                if ((then_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
-                    (then_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
+                if ((action_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
+                    (action_block->block_options.method.type < EZLOPI_SCENE_METHOD_TYPE_MAX))
                 {
-                    char *method_type_name = ezlopi_scene_get_scene_method_name(then_block->block_options.method.type);
+                    const char *method_type_name = ezlopi_scene_get_scene_method_name(action_block->block_options.method.type);
                     ezlopi_scenes_cjson_add_string(cj_method, "name", method_type_name ? method_type_name : "");
                 }
                 else
@@ -130,7 +131,7 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
                 cJSON *cj_args = cJSON_AddObjectToObject(cj_method, "args");
                 if (cj_args)
                 {
-                    l_fields_v2_t *curr_field = then_block->fields;
+                    l_fields_v2_t *curr_field = action_block->fields;
                     while (curr_field)
                     {
                         cJSON_AddStringToObject(cj_args, curr_field->name, curr_field->name);
@@ -142,13 +143,13 @@ static void ezlopi_scenes_cjson_add_then_block_options(cJSON *cj_block_array, l_
     }
 }
 
-static void ezlopi_scenes_cjson_add_action_delay(cJSON *cj_then_block, s_action_delay_v2_t *action_delay)
+static void ezlopi_scenes_cjson_add_action_delay(cJSON *cj_action_block, s_action_delay_v2_t *action_delay)
 {
-    if (cj_then_block && action_delay)
+    if (cj_action_block && action_delay)
     {
         if (action_delay->days || action_delay->hours || action_delay->minutes || action_delay->seconds)
         {
-            cJSON *cj_action_delay = cJSON_AddObjectToObject(cj_then_block, "delay");
+            cJSON *cj_action_delay = cJSON_AddObjectToObject(cj_action_block, "delay");
             if (cj_action_delay)
             {
                 cJSON_AddNumberToObject(cj_action_delay, "days", action_delay->days);
@@ -174,7 +175,7 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_v2_t *field
                 if (cj_field)
                 {
                     ezlopi_scenes_cjson_add_string(cj_field, "name", curr_field->name);
-                    char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(curr_field->value_type);
+                    const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(curr_field->value_type);
                     ezlopi_scenes_cjson_add_string(cj_field, "type", value_type_name ? value_type_name : "");
 
                     switch (curr_field->value_type)
@@ -365,35 +366,36 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_v2_t *field
     }
 }
 
-cJSON *ezlopi_scenes_cjson_create_then_block(l_then_block_v2_t *then_block)
+cJSON *ezlopi_scenes_cjson_create_action_block(l_action_block_v2_t *action_block, char *block_type_str)
 {
-    cJSON *cj_then_block = NULL;
-    if (then_block)
+    cJSON *cj_action_block = NULL;
+    if (action_block)
     {
-        cj_then_block = cJSON_CreateObject();
-        if (cj_then_block)
+        cj_action_block = cJSON_CreateObject();
+        if (cj_action_block)
         {
-            ezlopi_scenes_cjson_add_then_block_options(cj_then_block, then_block);
-            ezlopi_scenes_cjson_add_string(cj_then_block, "blockType", "then");
-            ezlopi_scenes_cjson_add_action_delay(cj_then_block, &then_block->delay);
-            ezlopi_scenes_cjson_add_fields(cj_then_block, then_block->fields);
+            ezlopi_scenes_cjson_add_action_block_options(cj_action_block, action_block);
+            ezlopi_scenes_cjson_add_string(cj_action_block, "blockType", block_type_str);
+            ezlopi_scenes_cjson_add_action_delay(cj_action_block, &action_block->delay);
+            ezlopi_scenes_cjson_add_fields(cj_action_block, action_block->fields);
         }
     }
 
-    return cj_then_block;
+    return cj_action_block;
 }
 
-void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_v2_t *then_blocks)
+void ezlopi_scenes_cjson_add_action_blocks(cJSON *root, l_action_block_v2_t *action_blocks, char *block_type_str)
 {
-    if (root && then_blocks)
+    if (root && action_blocks)
     {
-        cJSON *cj_then_block_array = cJSON_AddArrayToObject(root, "then");
+        cJSON *cj_then_block_array = cJSON_AddArrayToObject(root, block_type_str);
+
         if (cj_then_block_array)
         {
-            while (then_blocks)
+            while (action_blocks)
             {
                 cJSON *cj_then_block = NULL;
-                // ezlopi_scenes_cjson_create_then_block(then_blocks);
+                ezlopi_scenes_cjson_create_action_block(action_blocks, block_type_str);
                 if (cj_then_block)
                 {
                     if (!cJSON_AddItemToArray(cj_then_block_array, cj_then_block))
@@ -402,7 +404,7 @@ void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_then_block_v2_t *then_bl
                     }
                 }
 
-                then_blocks = then_blocks->next;
+                action_blocks = action_blocks->next;
             }
         }
     }
@@ -471,9 +473,9 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene)
             ezlopi_scenes_cjson_add_user_notifications(cj_scene, scene->user_notifications);
             ezlopi_scenes_cjson_add_house_modes(cj_scene, scene->house_modes);
 
-            ezlopi_scenes_cjson_add_then_blocks(cj_scene, scene->then);
-
-            ezlopi_scenes_cjson_add_when_blocks(cj_scene, scene->when);
+            ezlopi_scenes_cjson_add_action_blocks(cj_scene, scene->then_block, "then");
+            ezlopi_scenes_cjson_add_when_blocks(cj_scene, scene->when_block);
+            ezlopi_scenes_cjson_add_action_blocks(cj_scene, scene->else_block, "else");
         }
     }
 

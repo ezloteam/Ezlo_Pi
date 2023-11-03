@@ -46,7 +46,7 @@ static void registration_process(void *pv)
     snprintf(reg_str, sizeof(reg_str),
              "{\"id\":\"%u\",\"method\":\"register\",\"params\":"
              "{\"firmware\":\"%s\",\"timeOffset\":18000, \"media\":\"radio\","
-             "\"hubType\":\"32.1\",\"mac_address\":\"%s\",\"maxFrameSize\":8192}}",
+             "\"hubType\":\"32.1\",\"mac_address\":\"%s\",\"maxFrameSize\":4096}}",
              esp_random(), VERSION_STR, mac_str);
 
     cJSON *cjson_data = cJSON_Parse(reg_str);
