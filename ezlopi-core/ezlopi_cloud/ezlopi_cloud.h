@@ -37,8 +37,6 @@ typedef struct s_ezlopi_cloud_device_settings
 {
     uint32_t setting_id; // _id -> https://log.ezlo.com/new/hub/settings_api/
     uint32_t device_id;  // deviceId -> https://log.ezlo.com/new/hub/settings_api/
-    char *label;         // label -> https://log.ezlo.com/new/hub/settings_api/
-    char *description;   // description -> https://log.ezlo.com/new/hub/settings_api/
 } s_ezlopi_cloud_device_settings_t;
 
 typedef struct s_ezlopi_cloud_device
@@ -78,6 +76,7 @@ uint32_t ezlopi_cloud_generate_device_id(void);
 uint32_t ezlopi_cloud_generate_item_id(void);
 uint32_t ezlopi_cloud_generate_room_id(void);
 uint32_t ezlopi_cloud_generate_gateway_id(void);
+uint32_t ezlopi_cloud_generate_settings_id(void);
 
 uint32_t ezlopi_cloud_generate_scene_id(void);
 void ezlopi_cloud_update_scene_id(uint32_t a_scene_id);

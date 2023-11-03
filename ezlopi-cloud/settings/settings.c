@@ -32,7 +32,7 @@ void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
                         char tmp_string[64];
                         snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_setting->cloud_properties.setting_id);
                         cJSON_AddStringToObject(cj_properties, "_id", tmp_string);
-                        snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_setting->cloud_properties.device_id);
+                        snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_device->cloud_properties.device_id);
                         cJSON_AddStringToObject(cj_properties, "deviceId", tmp_string);
                         cJSON_AddStringToObject(cj_properties, "status", "synced");
                         curr_setting->func(EZLOPI_SETTINGS_ACTION_GET_SETTING, curr_setting, cj_properties, curr_setting->user_arg);
@@ -154,7 +154,7 @@ cJSON *ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, 
                 char tmp_string[64];
                 snprintf(tmp_string, sizeof(tmp_string), "%08x", setting->cloud_properties.setting_id);
                 cJSON_AddStringToObject(cj_result, "_id", tmp_string);
-                setting->func(EZLOPI_SETTINGS_ACTION_GET_SETTING, setting, cj_result, setting->user_arg);
+                setting->func(EZLOPI_SETTINGS_ACTION_UPDATE_SETTING, setting, cj_result, setting->user_arg);
             }
         }
         else
