@@ -17,6 +17,8 @@
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_nvs.h"
 
+#include "device_0001_digitalOut_generic.h"
+
 static const char *nvs_key_backlight_brightness = "bklt";
 
 static int __prepare(void *arg);
@@ -87,11 +89,13 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     case EZLOPI_SETTINGS_ACTION_SET_SETTING:
     {
         __settings_set(arg, setting);
+        ezlopi_setting_value_updated_from_device_v3(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_RESET_SETTING:
     {
         __settings_reset(arg, setting);
+        ezlopi_setting_value_updated_from_device_v3(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_UPDATE_SETTING:
@@ -158,8 +162,9 @@ static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
             cJSON_AddItemToObject(cjson_propertise, "description", description);
             cJSON_AddStringToObject(cjson_propertise, "valueType", "int");
 
-            int32_t *value = (int32_t *)setting->user_arg;
-            cJSON_AddNumberToObject(cjson_propertise, "value", *value);
+            s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+
+            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
             cJSON_AddNumberToObject(cjson_propertise, "valueMin", 0);
             cJSON_AddNumberToObject(cjson_propertise, "valueMax", 100);
             cJSON_AddNumberToObject(cjson_propertise, "valueDefault", 50);
@@ -184,11 +189,14 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
             int32_t value = 0;
             CJSON_GET_VALUE_INT(cjson_propertise, "value", value);
             TRACE_D("Setting Value : %d", value);
-            setting->user_arg = (int32_t *)&value;
-            if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
-            {
-                TRACE_E("Error Updating settings values to NVS");
-            }
+
+            s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+            settings_data->settings_int_data = value;
+            // ezlopi_setting_value_updated_from_device_v3(setting);
+            // if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
+            // {
+            //     TRACE_E("Error Updating settings values to NVS");
+            // }
         }
 
         ret = 1;
@@ -203,12 +211,15 @@ static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
     }
     else if (setting->cloud_properties.setting_id == settings_ids[1])
     {
-        int32_t value = 50;
-        setting->user_arg = (int32_t *)&value;
-        if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
-        {
-            TRACE_E("Error Updating settings values to NVS");
-        }
+        s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+        settings_data->settings_int_data = 50; // 50 being default value
+
+        // if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
+        // {
+        //     TRACE_E("Error Updating settings values to NVS");
+        // }
+
+        // ezlopi_setting_value_updated_from_device_v3(setting);
     }
     return ret;
 }
@@ -216,18 +227,28 @@ static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
 static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
-    // if (setting->cloud_properties.setting_id == settings_ids[0])
-    // {
-    // }
-    // else if (setting->cloud_properties.setting_id == settings_ids[1])
-    // {
-    //     int32_t value = 50;
-    //     setting->user_arg = (int32_t *)&value;
-    //     if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
-    //     {
-    //         TRACE_E("Error Updating settings values to NVS");
-    //     }
-    // }
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        if (setting->cloud_properties.setting_id == settings_ids[0])
+        {
+        }
+        else if (setting->cloud_properties.setting_id == settings_ids[1])
+        {
+            s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
+            // ezlopi_setting_value_updated_from_device_v3(setting);
+
+            // if (ezlopi_nvs_read_int32(&value, nvs_key_backlight_brightness))
+            // {
+            //     cJSON_AddNumberToObject(cjson_propertise, "value", value);
+            // }
+            // else
+            // {
+            //     TRACE_E("Error reading settings values from NVS");
+            // }
+        }
+    }
     return ret;
 }
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
@@ -303,10 +324,13 @@ static int __prepare(void *arg)
                 if (setting_brightness)
                 {
                     setting_brightness->cloud_properties.setting_id = settings_ids[1];
-                    int32_t setting_value = 35;
+                    // int32_t setting_value = 50;
+
+                    s_digio_settings_t *settings_value = (s_digio_settings_t *)malloc(sizeof(s_digio_settings_t));
+                    // memset(settings_value, 0, sizeof(s_digio_settings_t));
+#if 0               
                     if (ezlopi_nvs_read_int32(&setting_value, nvs_key_backlight_brightness))
                     {
-                        setting_brightness->user_arg = (int *)&setting_value;
                     }
                     else
                     {
@@ -315,6 +339,25 @@ static int __prepare(void *arg)
                             TRACE_E("Error Updating settings values to NVS");
                         }
                     }
+#endif
+
+                    // TRACE_E("Ptr setting_brightness->user_arg : %p", setting_brightness->user_arg);
+                    // TRACE_E("ptr setting_value : %p", &setting_value);
+
+                    settings_value->settings_int_data = 50;
+                    setting_brightness->user_arg = (void *)settings_value;
+
+                    TRACE_E("settings_data: %p", settings_value);
+                    TRACE_E("setting->user_arg: %p", setting_brightness->user_arg);
+                    // TRACE_E("Here: %p", setting_brightness->user_arg);
+
+                    // setting_brightness->user_arg = (int32_t *)&setting_value;
+
+                    // TRACE_E("Ptr setting_brightness->user_arg : %p", setting_brightness->user_arg);
+                    // TRACE_E("ptr setting_value : %p", &setting_value);
+                    // int32_t *val = setting_brightness->user_arg;
+                    // TRACE_E("setting_brightness->user_arg : %d", (int32_t)*val);
+                    // TRACE_E("Setting_value : %d", setting_value);
                     ret = 1;
                 }
                 // else

@@ -36,7 +36,7 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
     return ret;
 }
 
-int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_t *setting)
+int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
 
@@ -45,7 +45,7 @@ int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_t *sett
         l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
         while (curr_device)
         {
-            l_ezlopi_device_settings_t *curr_setting = curr_device->settings;
+            l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
             while (curr_setting)
             {
                 if (setting == curr_setting)
