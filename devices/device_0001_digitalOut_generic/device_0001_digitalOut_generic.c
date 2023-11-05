@@ -192,7 +192,7 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
 
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
             settings_data->settings_int_data = value;
-            // ezlopi_setting_value_updated_from_device_v3(setting);
+
             // if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
             // {
             //     TRACE_E("Error Updating settings values to NVS");

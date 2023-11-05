@@ -102,7 +102,7 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
                 char *device_id_str = 0;
                 CJSON_GET_VALUE_STRING(cj_params, ezlopi_device_id_str, device_id_str);
                 int device_id = strtol(device_id_str, NULL, 16);
-                // TRACE_I("device_id_str: %X", device_id);
+                TRACE_E("device_id: %X", device_id);
                 if (device_id == curr_device->cloud_properties.device_id)
                 {
                     l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
@@ -119,7 +119,7 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
                 char *setting_id_str = 0;
                 CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, setting_id_str);
                 uint32_t setting_id = strtol(setting_id_str, NULL, 16);
-                // TRACE_I("settings_id_str: %X", setting_id_str);
+                TRACE_E("setting_id: %X", setting_id);
                 l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
                 while (curr_setting)
                 {
@@ -132,6 +132,7 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
             }
             else
             {
+                TRACE_E("ID not found !");
             }
             curr_device = curr_device->next;
         }
