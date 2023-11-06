@@ -19,7 +19,7 @@
 
 #include "device_0001_digitalOut_generic.h"
 
-static const char *nvs_key_backlight_brightness = "bklt";
+// #define DEV_TEST_SETTINGS_EN
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -31,13 +31,17 @@ static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __interrupt_upcall(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
 
+#ifdef DEV_TEST_SETTINGS_EN
 static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
 static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
 
+static const char *nvs_key_backlight_brightness = "bklt";
+
 uint32_t settings_ids[2];
+#endif // DEV_TEST_SETTINGS_EN
 
 int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -76,6 +80,7 @@ int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *i
     return ret;
 }
 
+#ifdef DEV_TEST_SETTINGS_EN
 static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg)
 {
     int ret = 1;
@@ -239,6 +244,9 @@ static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
     }
     return ret;
 }
+
+#endif // DEV_TEST_SETTINGS_EN
+
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     char *device_name = NULL;
@@ -284,8 +292,12 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 static int __prepare(void *arg)
 {
     int ret = 0;
+
+#ifdef DEV_TEST_SETTINGS_EN
     settings_ids[0] = ezlopi_cloud_generate_settings_id();
     settings_ids[1] = ezlopi_cloud_generate_settings_id();
+#endif
+
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (arg)
     {
@@ -302,6 +314,8 @@ static int __prepare(void *arg)
                     __setup_item_properties(item, cjson_device);
                     ret = 1;
                 }
+
+#ifdef DEV_TEST_SETTINGS_EN
                 l_ezlopi_device_settings_v3_t *setting_user_defined = ezlopi_device_add_settings_to_device_v3(device, __settings_callback);
                 if (setting_user_defined)
                 {
@@ -336,10 +350,12 @@ static int __prepare(void *arg)
 
                     ret = 1;
                 }
-                // else
-                // {
-                //     ezlopi_device_free_device(device);
-                // }
+#else
+                else
+                {
+                    ezlopi_device_free_device(device);
+                }
+#endif // DEV_TEST_SETTINGS_EN
             }
         }
     }
