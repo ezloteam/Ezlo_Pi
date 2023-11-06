@@ -37,13 +37,6 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
 
-static void settings_update(void *pv);
-// static TaskHandle_t ezlopi_update_settings_notifier = NULL;
-
-static bool flag_setting_reset_set_done = false;
-
-l_ezlopi_device_settings_v3_t *__setting = NULL;
-
 uint32_t settings_ids[2];
 
 int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -96,17 +89,13 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     case EZLOPI_SETTINGS_ACTION_SET_SETTING:
     {
         __settings_set(arg, setting);
-        __setting = setting;
-        flag_setting_reset_set_done = true;
-        // ezlopi_setting_value_updated_from_device_v3(setting);
+        ezlopi_setting_value_updated_from_device_v3(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_RESET_SETTING:
     {
         __settings_reset(arg, setting);
-        flag_setting_reset_set_done = true;
-        __setting = setting;
-        // ezlopi_setting_value_updated_from_device_v3(setting);
+        ezlopi_setting_value_updated_from_device_v3(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_UPDATE_SETTING:
@@ -204,10 +193,10 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
             settings_data->settings_int_data = value;
 
-            // if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
-            // {
-            //     TRACE_E("Error Updating settings values to NVS");
-            // }
+            if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
+            {
+                TRACE_E("Error Updating settings values to NVS");
+            }
         }
 
         ret = 1;
@@ -225,12 +214,10 @@ static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
         s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
         settings_data->settings_int_data = 50; // 50 being default value
 
-        // if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
-        // {
-        //     TRACE_E("Error Updating settings values to NVS");
-        // }
-
-        // ezlopi_setting_value_updated_from_device_v3(setting);
+        if (!ezlopi_nvs_write_int32(settings_data->settings_int_data, nvs_key_backlight_brightness))
+        {
+            TRACE_E("Error Updating settings values to NVS");
+        }
     }
     return ret;
 }
@@ -248,16 +235,6 @@ static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
         {
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
             cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
-            // ezlopi_setting_value_updated_from_device_v3(setting);
-
-            // if (ezlopi_nvs_read_int32(&value, nvs_key_backlight_brightness))
-            // {
-            //     cJSON_AddNumberToObject(cjson_propertise, "value", value);
-            // }
-            // else
-            // {
-            //     TRACE_E("Error reading settings values from NVS");
-            // }
         }
     }
     return ret;
@@ -336,48 +313,33 @@ static int __prepare(void *arg)
                 {
 
                     setting_brightness->cloud_properties.setting_id = settings_ids[1];
-                    // int32_t setting_value = 50;
 
                     s_digio_settings_t *settings_value = (s_digio_settings_t *)malloc(sizeof(s_digio_settings_t));
-                    // memset(settings_value, 0, sizeof(s_digio_settings_t));
-#if 0               
-                    if (ezlopi_nvs_read_int32(&setting_value, nvs_key_backlight_brightness))
+                    memset(settings_value, 0, sizeof(s_digio_settings_t));
+
+                    if (ezlopi_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
                     {
                     }
                     else
                     {
-                        if (!ezlopi_nvs_write_int32(setting_value, nvs_key_backlight_brightness))
+                        settings_value->settings_int_data = 50;
+                        if (!ezlopi_nvs_write_int32(settings_value->settings_int_data, nvs_key_backlight_brightness))
                         {
                             TRACE_E("Error Updating settings values to NVS");
                         }
                     }
-#endif
 
-                    // TRACE_E("Ptr setting_brightness->user_arg : %p", setting_brightness->user_arg);
-                    // TRACE_E("ptr setting_value : %p", &setting_value);
-
-                    settings_value->settings_int_data = 50;
                     setting_brightness->user_arg = (void *)settings_value;
 
                     TRACE_E("settings_data: %p", settings_value);
                     TRACE_E("setting->user_arg: %p", setting_brightness->user_arg);
-                    // TRACE_E("Here: %p", setting_brightness->user_arg);
 
-                    // setting_brightness->user_arg = (int32_t *)&setting_value;
-
-                    // TRACE_E("Ptr setting_brightness->user_arg : %p", setting_brightness->user_arg);
-                    // TRACE_E("ptr setting_value : %p", &setting_value);
-                    // int32_t *val = setting_brightness->user_arg;
-                    // TRACE_E("setting_brightness->user_arg : %d", (int32_t)*val);
-                    // TRACE_E("Setting_value : %d", setting_value);
                     ret = 1;
                 }
                 // else
                 // {
                 //     ezlopi_device_free_device(device);
                 // }
-
-                xTaskCreate(settings_update, "settings_update", 4 * 2048, NULL, 5, NULL);
             }
         }
     }
@@ -385,21 +347,6 @@ static int __prepare(void *arg)
     return ret;
 }
 
-static void settings_update(void *pv)
-{
-    while (1)
-    {
-        if (flag_setting_reset_set_done == true)
-        {
-            flag_setting_reset_set_done = false;
-            if (__setting)
-            {
-                ezlopi_setting_value_updated_from_device_v3(__setting);
-            }
-        }
-        vTaskDelay(10);
-    }
-}
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
