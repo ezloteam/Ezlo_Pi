@@ -37,6 +37,13 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
 static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
 
+static void settings_update(void *pv);
+// static TaskHandle_t ezlopi_update_settings_notifier = NULL;
+
+static bool flag_setting_reset_set_done = false;
+
+l_ezlopi_device_settings_v3_t *__setting = NULL;
+
 uint32_t settings_ids[2];
 
 int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -89,13 +96,17 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     case EZLOPI_SETTINGS_ACTION_SET_SETTING:
     {
         __settings_set(arg, setting);
-        ezlopi_setting_value_updated_from_device_v3(setting);
+        __setting = setting;
+        flag_setting_reset_set_done = true;
+        // ezlopi_setting_value_updated_from_device_v3(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_RESET_SETTING:
     {
         __settings_reset(arg, setting);
-        ezlopi_setting_value_updated_from_device_v3(setting);
+        flag_setting_reset_set_done = true;
+        __setting = setting;
+        // ezlopi_setting_value_updated_from_device_v3(setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_UPDATE_SETTING:
@@ -323,6 +334,7 @@ static int __prepare(void *arg)
                 l_ezlopi_device_settings_v3_t *setting_brightness = ezlopi_device_add_settings_to_device_v3(device, __settings_callback);
                 if (setting_brightness)
                 {
+
                     setting_brightness->cloud_properties.setting_id = settings_ids[1];
                     // int32_t setting_value = 50;
 
@@ -364,6 +376,8 @@ static int __prepare(void *arg)
                 // {
                 //     ezlopi_device_free_device(device);
                 // }
+
+                xTaskCreate(settings_update, "settings_update", 4 * 2048, NULL, 5, NULL);
             }
         }
     }
@@ -371,6 +385,21 @@ static int __prepare(void *arg)
     return ret;
 }
 
+static void settings_update(void *pv)
+{
+    while (1)
+    {
+        if (flag_setting_reset_set_done == true)
+        {
+            flag_setting_reset_set_done = false;
+            if (__setting)
+            {
+                ezlopi_setting_value_updated_from_device_v3(__setting);
+            }
+        }
+        vTaskDelay(10);
+    }
+}
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
