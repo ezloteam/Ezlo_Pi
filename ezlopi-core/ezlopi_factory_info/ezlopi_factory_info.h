@@ -136,9 +136,10 @@ typedef struct s_basic_factory_info
 #endif
 
     void print_factory_info_v2(void);
-    uint32_t ezlopi_factory_info_v2_get_provisioning_status(void);
     const esp_partition_t *ezlopi_factory_info_v2_init(void);
-    void ezlopi_factory_info_v2_free(void *arg);
+
+    uint32_t ezlopi_factory_info_v2_get_provisioning_status(void);
+
     uint16_t ezlopi_factory_info_v2_get_version(void);
     char *ezlopi_factory_info_v2_get_name(void);
     char *ezlopi_factory_info_v2_get_manufacturer(void);
@@ -164,6 +165,7 @@ typedef struct s_basic_factory_info
     int ezlopi_factory_info_v2_set_ssl_shared_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
 
+    void ezlopi_factory_info_v2_free(void *arg);
     int ezlopi_factory_info_v2_factory_reset(void);
 
 #if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
