@@ -193,7 +193,7 @@ static void qt_serial_get_info()
         cJSON_AddNumberToObject(get_info, "build", BUILD);
         cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
         cJSON_AddNumberToObject(get_info, "v_idf", ESP_IDF_VERSION);
-        cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount());
+        cJSON_AddNumberToObject(get_info, "uptime", (xTaskGetTickCount() / portTICK_PERIOD_MS));
         cJSON_AddNumberToObject(get_info, "build_date", BUILD_DATE);
         cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddNumberToObject(get_info, "boot_reason", esp_reset_reason());
