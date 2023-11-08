@@ -616,6 +616,15 @@ static void Fingerprint_Operation_task(void *params)
                             // ezlopi_device_value_updated_from_device_v3(item); // sends one item
                             // ezlopi_device_value_updated_from_device_v3(item); // goes for next item
                             // ezlopi_device_value_updated_from_device_v3(item); // goes for next item
+
+                            /* Delete timer task and Return back to MatchMode */
+                            if (NULL != (user_data->timerHandle))
+                            {
+                                TRACE_B("                       >> DELETING Timer :- 'Mode_Change_Callback_Task' <<");
+                                vTaskDelete(user_data->timerHandle);
+                                (user_data->timerHandle) = NULL;
+                            }
+                            user_data->opmode = FINGERPRINT_MATCH_MODE;
                         }
                         else
                         {
