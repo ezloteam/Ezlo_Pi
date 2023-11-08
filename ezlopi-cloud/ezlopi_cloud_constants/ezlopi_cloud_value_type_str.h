@@ -13,7 +13,7 @@ const static char *value_type_rgb = "rgb";
 // const static char *value_type_weeklyintervalarray = "array.weekly_interval";
 const static char *value_type_string = "string";
 // const static char *value_type_table = "table";
-// const static char *value_type_array = "array";
+const static char *value_type_array = "array";
 const static char *value_type_token = "token";
 // const static char *value_type_camerastream = "cameraStream";
 const static char *value_type_illuminance = "illuminance";
@@ -53,7 +53,7 @@ const static char *value_type_temperature = "temperature";
 // const static char *value_type_button_state = "button_state";
 // const static char *value_type_action = "action";
 // const static char *value_type_user_lock_operation = "user_lock_operation";
-// const static char *value_type_dictionary = "dictionary";
+const static char *value_type_dictionary = "dictionary";
 // const static char *value_type_amount_of_useful_energy = "amount_of_useful_energy";
 // const static char *value_type_kilo_volt_ampere_hour = "kilo_volt_ampere_hour";
 // const static char *value_type_reactive_power_instant = "reactive_power_instant";
@@ -67,5 +67,7 @@ const static char *value_type_temperature = "temperature";
 // const static char *value_keypad_lock_operation = "keypad_lock_operation";
 // const static char *value_keypad_unlock_operation = "keypad_unlock_operation";
 // const static char *value_manual_not_fully_locked_operation = "manual_not_fully_locked_operation";
+
+const static char *value_type_fingerprint_action = "fingerprint_action";
 
 #endif // __EZLOPI_VLAUES_STR_H__

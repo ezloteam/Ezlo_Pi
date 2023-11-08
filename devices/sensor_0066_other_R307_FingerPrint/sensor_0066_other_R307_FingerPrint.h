@@ -282,10 +282,12 @@ typedef enum e_FINGERPRINT_OP_MODE_t
 typedef struct server_packet_t
 {
     fp_interface_t fp_interface;
-    e_FINGERPRINT_OP_MODE_t opmode;                    /*Hold current operation mode*/
-    uint16_t id_counts;                                /*This is used as an information for list and erase operations*/
-    uint16_t user_id;                                  /*Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode'] */
-    uint16_t confidence_level;                         /*0~100*/
+    e_FINGERPRINT_OP_MODE_t opmode; /*Hold current operation mode*/
+    uint16_t id_counts;             /*This is used as an information for list and erase operations*/
+    uint16_t user_id;               /*Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode'] */
+    uint16_t confidence_level;      /*0~100*/
+    uint16_t matched_id;
+    uint16_t matched_confidence_level;
     uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];    /*This array store incomming uart message*/
     bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
     bool __busy_guard;                                 /*Gaurd_flag used during notification actions*/
@@ -293,6 +295,13 @@ typedef struct server_packet_t
     TaskHandle_t timerHandle;
 } server_packet_t;
 
+typedef enum
+{
+    SENSOR_FP_ITEM_ID_ENROLL,
+    SENSOR_FP_ITEM_ID_ACTION,
+    SENSOR_FP_ITEM_ID_FP_IDS,
+    SENSOR_FP_ITEM_ID_MAX,
+} e_sensor_fp_items_t;
 //---------- FUNCTIONS Defination for Fingerprint Library ------------------------------------------------------------------------------------------------------
 #if 0
 // bool UpImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
