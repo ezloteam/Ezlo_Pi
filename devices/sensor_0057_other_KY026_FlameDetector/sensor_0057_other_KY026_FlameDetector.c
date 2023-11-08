@@ -13,23 +13,24 @@
 #include "sensor_0057_other_KY026_FlameDetector.h"
 
 //------------------------------------------------------------------------------
-const char *ky206_sensor_heat_alarm_token[] =
-    {
-        "heat_ok",
-        "overheat_detected",
-        "under_heat_detected",
-        "unknown"};
+const char *ky206_sensor_heat_alarm_token[] = {
+    "heat_ok",
+    "overheat_detected",
+    "under_heat_detected",
+    "unknown",
+};
 //------------------------------------------------------------------------------
 static int __0057_prepare(void *arg);
 static int __0057_init(l_ezlopi_item_t *item);
 static int __0057_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0057_notify(l_ezlopi_item_t *item);
+
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
-static void Extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_sensor_volt, float *max_reading);
+static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_sensor_volt, float *max_reading);
 //----------------------------------------------------------------------------------------------------------------
 
 int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -59,12 +60,7 @@ int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_it
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count;
-        if (count++ > 1)
-        {
-            __0057_notify(item);
-            count = 0;
-        }
+        __0057_notify(item);
         break;
     }
     default:
@@ -313,7 +309,7 @@ static int __0057_notify(l_ezlopi_item_t *item)
             flame_t *FLAME_struct = (flame_t *)item->user_arg;
             float analog_sensor_volt = 0, max_volt_reading = 0;
             // extract the sensor_output_values
-            Extract_KY026_sensor_value(item->interface.adc.gpio_num, &analog_sensor_volt, &max_volt_reading);
+            __extract_KY026_sensor_value(item->interface.adc.gpio_num, &analog_sensor_volt, &max_volt_reading);
             float new_percent = ((1 - (analog_sensor_volt / max_volt_reading)) * 100.0f);
             // TRACE_E("Heat-detected: %.2f percent", _absorbed_percent);
             if (new_percent != FLAME_struct->_absorbed_percent)
@@ -327,7 +323,7 @@ static int __0057_notify(l_ezlopi_item_t *item)
     return ret;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-static void Extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_sensor_volt, float *max_reading)
+static void __extract_KY026_sensor_value(uint32_t flame_adc_pin, float *analog_sensor_volt, float *max_reading)
 {
     static float max = 0;
     // calculation process

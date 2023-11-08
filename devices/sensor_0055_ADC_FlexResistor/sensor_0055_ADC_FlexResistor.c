@@ -45,12 +45,7 @@ int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t count;
-        if (count++ > 1)
-        {
-            __0055_notify(item);
-            count = 0;
-        }
+        __0055_notify(item);
         break;
     }
     default:
@@ -168,20 +163,23 @@ static int __0055_notify(l_ezlopi_item_t *item)
     if (item)
     {
         flex_t *FLEX_value = (flex_t *)item->user_arg;
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0,
-                                                     .voltage = 0};
-        // extract the sensor_output_values
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
-
-        // calculate the 'RS_0055' resistance value using [voltage divider rule]
-        int new_RS_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
-        if (new_RS_0055 != FLEX_value->RS_0055)
+        if (FLEX_value)
         {
-            ezlopi_device_value_updated_from_device_v3(item);
-            FLEX_value->RS_0055 = new_RS_0055;
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0,
+                                                         .voltage = 0};
+            // extract the sensor_output_values
+            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+            float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
+
+            // calculate the 'RS_0055' resistance value using [voltage divider rule]
+            int new_RS_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
+            if (new_RS_0055 != FLEX_value->RS_0055)
+            {
+                ezlopi_device_value_updated_from_device_v3(item);
+                FLEX_value->RS_0055 = new_RS_0055;
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }

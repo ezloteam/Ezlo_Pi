@@ -1,7 +1,7 @@
 #ifndef __HUB_INFO_H__
 #define __HUB_INFO_H__
 #include "string.h"
-#include "frozen.h"
+
 #include "cJSON.h"
 
 #ifdef __cplusplus

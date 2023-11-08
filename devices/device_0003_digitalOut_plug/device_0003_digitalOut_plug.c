@@ -26,6 +26,7 @@ static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __interrupt_upcall(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
 
+
 int device_0003_digitalOut_plug(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;

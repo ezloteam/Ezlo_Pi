@@ -26,6 +26,7 @@ static int __0060_init(l_ezlopi_item_t *item);
 static int __0060_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0060_notify(l_ezlopi_item_t *item);
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 //---------------------------------------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 #include "feature.h"
 #include "network.h"
 #include "firmware.h"
+#include "settings.h"
 #include "scenes_scripts.h"
 
 #include "ezlopi_wifi.h"
@@ -114,7 +115,7 @@ void web_provisioning_init(void)
 
 static void __fetch_wss_endpoint(void *pv)
 {
-    char *ws_endpoint = NULL;
+    s_ezlopi_http_data_t *ws_endpoint = NULL;
 
     while (1)
     {
@@ -127,22 +128,27 @@ static void __fetch_wss_endpoint(void *pv)
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
+        TRACE_D("http_request: %s", http_request);
         ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate);
 
         if (ws_endpoint)
         {
-            TRACE_D("ws_endpoint: %s", ws_endpoint); // {"uri": "wss://endpoint:port"}
-            TRACE_D("http_request: %s", http_request);
-            cJSON *root = cJSON_Parse(ws_endpoint);
-            if (root)
+            if (ws_endpoint->response)
             {
-                cJSON *cjson_uri = cJSON_GetObjectItem(root, "uri");
-                if (cjson_uri)
+                TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
+                cJSON *root = cJSON_Parse(ws_endpoint->response);
+                if (root)
                 {
-                    TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
-                    ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-                    break;
+                    cJSON *cjson_uri = cJSON_GetObjectItem(root, "uri");
+                    if (cjson_uri)
+                    {
+                        TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+                        ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+                        break;
+                    }
                 }
+
+                free(ws_endpoint->response);
             }
 
             free(ws_endpoint);

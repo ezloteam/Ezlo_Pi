@@ -8,14 +8,38 @@
 #include "ezlopi_factory_info.h"
 #include "info.h"
 #include "trace.h"
-#include "frozen.h"
+
 #include "version.h"
-#include "core_sntp.h"
 
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_factory_info.h"
+
+static char *tick_to_time(uint32_t ms)
+{
+    uint32_t seconds = ms / 1000;
+    uint32_t minutes = seconds / 60;
+    uint32_t hours = minutes / 60;
+    uint32_t days = hours / 24;
+
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+
+    char *time_str = malloc(50);
+    if (time_str)
+    {
+        memset(time_str, 0, 50);
+        snprintf(time_str, 50, "%dd %dh %dm %ds", days, hours, minutes, seconds);
+    }
+    else
+    {
+        time_str = NULL;
+    }
+
+    return time_str;
+}
 
 void info_get(cJSON *cj_request, cJSON *cj_response)
 {
@@ -66,22 +90,30 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
             cJSON_AddStringToObject(cjson_battery, "status", "");
         }
 
-        time_t now;
-        char strftime_buf[64];
-        struct tm timeinfo;
+        // time_t now;
+        // char strftime_buf[64];
+        // struct tm timeinfo;
 
-        time(&now);
-        setenv("TZ", "UTC-5:45", 1);
-        tzset();
-        localtime_r(&now, &timeinfo);
-        strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+        // time(&now);
+        // setenv("TZ", "UTC-5:45", 1);
+        // tzset();
+        // localtime_r(&now, &timeinfo);
+        // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
 
-        cJSON_AddStringToObject(cjson_result, "localtime", strftime_buf);
+        cJSON_AddStringToObject(cjson_result, "localtime", "");
 
-        now = sntp_core_get_up_time();
-        localtime_r(&now, &timeinfo);
-        strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-
-        cJSON_AddStringToObject(cjson_result, "uptime", "");
+        // now = sntp_core_get_up_time();
+        // localtime_r(&now, &timeinfo);
+        // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+        char *time_string = tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
+        if (time_string)
+        {
+            cJSON_AddStringToObject(cjson_result, "uptime", time_string);
+            free(time_string);
+        }
+        else
+        {
+            cJSON_AddStringToObject(cjson_result, "uptime", "");
+        }
     }
 }

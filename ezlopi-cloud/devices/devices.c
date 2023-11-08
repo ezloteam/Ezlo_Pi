@@ -2,7 +2,7 @@
 
 #include "devices.h"
 #include "trace.h"
-#include "frozen.h"
+
 #include "ezlopi_factory_info.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_devices_list.h"
@@ -96,7 +96,8 @@ void devices_list(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_properties, "parentDeviceId", "");
                         cJSON_AddStringToObject(cj_properties, "category", registered_devices->properties->ezlopi_cloud.category);
                         cJSON_AddStringToObject(cj_properties, "subcategory", registered_devices->properties->ezlopi_cloud.subcategory);
-                        cJSON_AddStringToObject(cj_properties, "gatewayId", "");
+                        snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_cloud_generate_gateway_id());
+                        cJSON_AddStringToObject(cj_properties, "gatewayId", tmp_string);
                         cJSON_AddBoolToObject(cj_properties, "batteryPowered", registered_devices->properties->ezlopi_cloud.battery_powered);
                         cJSON_AddStringToObject(cj_properties, "name", registered_devices->properties->ezlopi_cloud.device_name);
                         cJSON_AddStringToObject(cj_properties, "type", registered_devices->properties->ezlopi_cloud.device_type);

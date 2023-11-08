@@ -2,7 +2,7 @@
 #define __WEB_PROVISIONING_H__
 
 #include <string.h>
-#include "frozen.h"
+
 #include "cJSON.h"
 
 #ifdef __cplusplus
@@ -13,6 +13,7 @@ extern "C"
     typedef enum e_trace_type
     {
         TRACE_TYPE_NONE = 0,
+        TRACE_TYPE_B,
         TRACE_TYPE_D, // debug (White)
         TRACE_TYPE_I, // Info (Blue)
         TRACE_TYPE_E  // Error (Red)

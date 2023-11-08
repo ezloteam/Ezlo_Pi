@@ -5,7 +5,7 @@
 #include "sdkconfig.h"
 #include "items.h"
 #include "trace.h"
-#include "frozen.h"
+
 // #include "web_provisioning.h"
 
 #include "cJSON.h"
@@ -51,9 +51,8 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                         {
                             cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
                         }
-
-                        curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
-                        // cJSON_AddStringToObject(cj_properties, "valueFormatted", "false");
+                        curr_item->func(EZLOPI_ACTION_HUB_GET_ITEM, curr_item, cj_properties, curr_item->user_arg);
+                        // curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
                         if (curr_item->cloud_properties.scale)
                         {
                             cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
@@ -144,7 +143,7 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_result, "deviceSubcategory", curr_device->cloud_properties.subcategory);
                         cJSON_AddStringToObject(cj_result, "roomName", "");
                         cJSON_AddFalseToObject(cj_result, "serviceNotification");
-                        cJSON_AddFalseToObject(cj_result, "userNotification");
+                        cJSON_AddTrueToObject(cj_result, "userNotification");
                         cJSON_AddNullToObject(cj_result, "notifications");
                         cJSON_AddStringToObject(cj_result, "name", curr_item->cloud_properties.item_name);
                         if (curr_item->cloud_properties.scale)

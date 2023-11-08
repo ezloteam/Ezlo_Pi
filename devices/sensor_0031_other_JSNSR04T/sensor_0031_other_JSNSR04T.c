@@ -5,6 +5,9 @@
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
+#include "ezlopi_valueformatter.h"
+
+#include "sensor_0031_other_JSNSR04T.h"
 
 #include "sensor_0031_other_JSNSR04T.h"
 

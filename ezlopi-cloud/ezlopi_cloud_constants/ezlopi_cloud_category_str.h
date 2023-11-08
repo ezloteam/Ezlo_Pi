@@ -1,6 +1,7 @@
 #ifndef __EZLOPI_CATEGORY_H__
 #define __EZLOPI_CATEGORY_H__
 
+#pragma once
 /// @brief https://api.ezlo.com/devices/categories/index.html
 const static char *category_not_defined = "";
 const static char *category_interface = "interface";

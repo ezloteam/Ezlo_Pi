@@ -26,9 +26,10 @@ static int __0054_prepare(void *arg);
 static int __0054_init(l_ezlopi_item_t *item);
 static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0054_notify(l_ezlopi_item_t *item);
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
-static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item);
+static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item);
 //------------------------------------------------------------------------------
 int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -174,9 +175,12 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
             char *valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                free(valueFormatted);
+            }
             cJSON_AddNumberToObject(cj_result, "value", Lt_per_hr);
-            free(valueFormatted);
             ret = 1;
         }
     }
@@ -189,21 +193,24 @@ static int __0054_notify(l_ezlopi_item_t *item)
     if (item)
     {
         yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
-        // extract new pulse count
-        uint32_t prev_yfs201_dominant_pulse_count = yfs201_data->yfs201_dominant_pulse_count;
-        Extract_YFS201_Pulse_Count_func(item);
-        if (prev_yfs201_dominant_pulse_count != yfs201_data->yfs201_dominant_pulse_count)
+        if (yfs201_data)
         {
-            ezlopi_device_value_updated_from_device_v3(item);
+            // extract new pulse count
+            uint32_t prev_yfs201_dominant_pulse_count = yfs201_data->yfs201_dominant_pulse_count;
+            __extract_YFS201_Pulse_Count_func(item);
+            if (prev_yfs201_dominant_pulse_count != yfs201_data->yfs201_dominant_pulse_count)
+            {
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }
 
 //------------------------------------------------------------------------------
 // This function is used to get the time_period of incoming pulses . [NOTE: call 'gpio_install_isr_service()' before using this function]
-static void Extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
+static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
 {
     if (NULL != item)
     {

@@ -6,14 +6,15 @@
 #include <freertos/task.h>
 
 #include "trace.h"
-#include "ezlopi_nvs.h"
-#include "ezlopi_cloud.h"
-#include "ezlopi_cloud_constants.h"
 
 #include "lua/lua.h"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
+
+#include "ezlopi_nvs.h"
+#include "ezlopi_cloud.h"
 #include "ezlopi_scenes_scripts.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_scripts_custom_libs_includes.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;

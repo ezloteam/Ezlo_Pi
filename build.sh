@@ -46,6 +46,8 @@ get_version_variables() {
 BUIDER_EMAIL=`git config --get user.email`
 BUILD_TIME=`date +"%c"`
 COMMIT_HASH=`git rev-parse HEAD`
+branch_info=$(git branch)
+BRANCH=$(echo "$branch_info" | grep -E '^\* ' | sed 's/^\* //')
 
 version_create () {
     echo -e "#ifndef __VERSION_H__" > $versionFile
@@ -72,7 +74,7 @@ version_create () {
     
     echo -e "#define DEVELOPER \"${BUIDER_EMAIL}\"" >> $versionFile
     echo -e "#define COMPILE_TIME \"${BUILD_TIME}\"" >> $versionFile
-    echo -e "#define CURRENT_BRANCH \"Nepal Digital System Pvt. Ltd.\"" >> $versionFile
+    echo -e "#define CURRENT_BRANCH \"${BRANCH}\"" >> $versionFile
     echo -e "#define COMMIT_HASH \"${COMMIT_HASH}\"" >> $versionFile
 
     echo -e "#ifdef __cplusplus" >> $versionFile

@@ -2,7 +2,7 @@
 #define __HUB_ITEMS_LIST_H__
 
 #include "string.h"
-#include "frozen.h"
+
 #include "cJSON.h"
 // #include "ezlopi_devices.h"
 #include "ezlopi_devices_list.h"

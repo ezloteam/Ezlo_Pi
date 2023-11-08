@@ -14,6 +14,7 @@
 
 #include "device_0022_PWM_dimmable_lamp.h"
 
+#warning "use of static variable
 static bool dimmable_bulb_initialized = false;
 
 static l_ezlopi_item_t *dimmable_bulb_dimmer_item = NULL;
@@ -226,7 +227,7 @@ static void __prepare_dimmer_switch_item_properties(l_ezlopi_item_t *item, cJSON
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
     item->cloud_properties.item_name = ezlopi_item_name_switch;
-    item->cloud_properties.value_type = value_type_int;
+    item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 

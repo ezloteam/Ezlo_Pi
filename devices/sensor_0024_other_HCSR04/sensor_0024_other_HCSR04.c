@@ -18,6 +18,7 @@
 
 #include "sensor_0024_other_HCSR04.h"
 
+#warning "use of static variable"
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 static int __prepare(void *arg);

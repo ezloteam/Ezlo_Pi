@@ -11,15 +11,17 @@ extern "C"
 
 #define ID_BIN_VERSION ID_BIN_VERSION_1
 
-#define EZLOPI_GENERIC 0
-#define EZLOPI_SWITCH_BOX 1
-#define EZLOPI_IR_BLASTER 2
-#define EZLOPI_TEST_DEVICE 128
+#define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
+#define EZLOPI_DEVICE_TYPE_GENERIC 0
+#define EZLOPI_DEVICE_TYPE_SWITCH_BOX 1
+#define EZLOPI_DEVICE_TYPE_IR_BLASTER 2
+#define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
+#define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_TEST_DEVICE
+    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
-#include "frozen.h"
 
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0xF000 // 20480 // 20KB
@@ -29,6 +31,24 @@ extern "C"
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     typedef enum e_ezlopi_factory_info_v2_offset
     {
+        // VERSION_OFFSET = 0x0000,
+        // NAME_OFFSET = 0x0002,
+        // MANUFACTURER_OFFSET = 0x0082,
+        // BRAND_OFFSET = 0x00C2,
+        // MODEL_OFFSET = 0x0102,
+        // ID_OFFSET = 0x0142,
+        // DEVICE_UUID_OFFSET = 0x014A,
+        // PROVISIONING_UUID_OFFSET = 0x0172,
+        // SSID_OFFSET = 0x019A,
+        // PASSWORD_OFFSET = 0x01DA,
+        // DEVICE_MAC_OFFSET = 0x021A,
+        // CLOUD_SERVER_OFFSET = 0x0220,
+        // DEVICE_TYPE_OFFSET = 0x02A0,
+
+        // CA_CERTIFICATE_OFFSET = 0x1000,
+        // SSL_PRIVATE_KEY_OFFSET = 0x2000,
+        // SSL_SHARED_KEY_OFFSET = 0x3000,
+        // EZLOPI_CONFIG_OFFSET = 0x4000,
         VERSION_OFFSET = 0xE000 + 0x0002,
         NAME_OFFSET = 0xE000 + 0x0084,
         MANUFACTURER_OFFSET = 0xE000 + 0x00CA,
@@ -85,8 +105,10 @@ typedef enum e_ezlopi_factory_info_v2_offset
     DEVICE_TYPE_OFFSET = 0xE000 + 0x018A,
 
     CLOUD_SERVER_OFFSET = 0x0000 + 0x0214,
-    PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314, /// fggggggggggg
-
+    PROVISIONING_SERVER_OFFSET = 0X000 + 0X14,
+    PROVISIONING_TOKEN_OFFSET = 0X000 + 0X114,
+    PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314,
+    CONFIG_VERSION_OFFSET = 0X000 + 0x02,
     CA_CERTIFICATE_OFFSET = 0x0000 + 0x3000,
     SSL_PRIVATE_KEY_OFFSET = 0x0000 + 0x4000,
     SSL_SHARED_KEY_OFFSET = 0x0000 + 0x5000,
@@ -96,6 +118,7 @@ typedef enum e_ezlopi_factory_info_v2_offset
 typedef enum e_ezlopi_factory_info_v2_length
 {
     VERSION_LENGTH = 0x0002,
+    CONFIG_VERSION_LENGTH = 0x0002,
     NAME_LENGTH = 0x0040,
     MANUFACTURER_LENGTH = 0x0040,
     BRAND_LENGTH = 0x0040,
@@ -112,6 +135,8 @@ typedef enum e_ezlopi_factory_info_v2_length
     SSL_PRIVATE_KEY_LENGTH = 0x1000,
     SSL_SHARED_KEY_LENGTH = 0x2000,
     EZLOPI_CONFIG_LENGTH = 0x1000,
+    PROVISIONING_TOKEN_LENGTH = 0x100,
+    PROVISIONING_SERVER_LENGTH = 0x100
 } e_ezlopi_factory_info_v2_length_t;
 
 typedef struct s_basic_factory_info
@@ -132,6 +157,7 @@ typedef struct s_basic_factory_info
     char *provision_server;
     char *provision_token;
     char *user_id;
+    uint16_t config_version;
 } s_basic_factory_info_t;
 #endif
 
@@ -152,26 +178,30 @@ typedef struct s_basic_factory_info
     char *ezlopi_factory_info_v2_get_password(void);
     void ezlopi_factory_info_v2_get_ezlopi_mac(uint8_t *mac);
     char *ezlopi_factory_info_v2_get_cloud_server(void);
-    const char *ezlopi_factory_info_v2_get_device_type(void);
+    char *ezlopi_factory_info_v2_get_device_type(void);
     char *ezlopi_factory_info_v2_get_ca_certificate(void);
     char *ezlopi_factory_info_v2_get_ssl_private_key(void);
     char *ezlopi_factory_info_v2_get_ssl_shared_key(void);
     char *ezlopi_factory_info_v2_get_ezlopi_config(void);
+    char *ezlopi_factory_info_get_v2_provision_token(void);
+    char *ezlopi_factory_info_v2_get_provisioning_server(void);
+    uint16_t ezlopi_factory_info_v2_get_config_version(void);
 
     int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password);
+
     int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic);
     int ezlopi_factory_info_v2_set_ezlopi_config(char *data);
     int ezlopi_factory_info_v2_set_ca_cert(char *data);
     int ezlopi_factory_info_v2_set_ssl_shared_key(char *data);
+    int ezlopi_factory_info_v2_set_ssl_public_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
 
     void ezlopi_factory_info_v2_free(void *arg);
     int ezlopi_factory_info_v2_factory_reset(void);
 
-#if (EZLOPI_GENERIC == EZLOPI_DEVICE_TYPE)
-#define EZLOPI_DEVICE_TYPE_NAME "generic"
-#elif (EZLOPI_IR_BLASTER == EZLOPI_DEVICE_TYPE)
-#define EZLOPI_DEVICE_TYPE_NAME "ezlopi_device_irblaster"
+#if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
+
+#elif (EZLOPI_DEVICE_TYPE_IR_BLASTER == EZLOPI_DEVICE_TYPE)
 static const char *ir_blaster_constant_config =
     "{\
         \"cmd\": 3,\
@@ -180,17 +210,16 @@ static const char *ir_blaster_constant_config =
             {\
                 \"dev_name\": \"IR_Blaster1\",\
                 \"dev_type\": 5,\
-                \"id_item\": 29,\
-                \"id_room\": \"\",\
                 \"gpio\": 3,\
+                \"id_item\": 30,\
+                \"id_room\": \"\",\
                 \"pwm_resln\": 8,\
                 \"freq_hz\": 50,\
                 \"duty_cycle\": 30\
             }\
         ],\
     \"dev_total\": 1}";
-#elif (EZLOPI_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
-#define EZLOPI_DEVICE_TYPE_NAME "ezlopi_device_switchbox"
+#elif (EZLOPI_DEVICE_TYPE_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
 static const char *switch_box_constant_config =
     "{\
         \"cmd\": 3,\
@@ -201,7 +230,7 @@ static const char *switch_box_constant_config =
                 \"dev_type\" : 8,\
                 \"gpio_scl\" : 45,\
                 \"gpio_sda\" : 46,\
-                \"id_item\" : 35,\
+                \"id_item\" : 29,\
                 \"id_room\" : \"\",\
                 \"pullup_scl\" : true,\
                 \"pullup_sda\" : true,\
@@ -373,8 +402,8 @@ static const char *switch_box_constant_config =
                 \"val_op\": false\
             }\
         ],\
-    \"dev_total\": 12}";
-#elif (EZLOPI_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    \"dev_total\": 1}";
+#elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
 
@@ -406,17 +435,7 @@ static const char *test_device_constant_config =
     \"dev_total\":1\
     }";
 
-// {
-//     \"dev_name\": \"HCSR04 ultrasonic\",
-//                 \"dev_type\": 10,
-//                 \"id_item\": 24,
-//                 \"id_room\": \"\",
-//                 \"gpio1\": 18,
-//                 \"gpio2\": 19
-//             }
-
 #endif
-
 #ifdef __cplusplus
 }
 #endif

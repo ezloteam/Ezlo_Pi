@@ -100,6 +100,14 @@ static void ezlopi_uart_channel_task(void *args)
                 uart_read_bytes(ezlopi_uart_object->ezlopi_uart.channel, buffer, event.size, 100 / portTICK_PERIOD_MS);
                 break;
             }
+            case UART_BREAK:
+            case UART_BUFFER_FULL:
+            case UART_FIFO_OVF:
+            {
+                TRACE_E("UART_FIFO_. event -> %d", event.type);
+                uart_flush_input(ezlopi_uart_object->ezlopi_uart.channel);
+                break;
+            }
             default:
             {
                 TRACE_E("Default event encountered. %d", event.type);

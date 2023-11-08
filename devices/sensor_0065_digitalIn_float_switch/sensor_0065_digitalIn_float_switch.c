@@ -14,20 +14,21 @@
 
 #include "sensor_0065_digitalIn_float_switch.h"
 //-----------------------------------------------------------------------
-const char *water_level_alarm_token[] =
-    {
-        "water_level_ok",
-        "water_level_below_low_threshold",
-        "water_level_above_high_threshold",
-        "unknown"};
+const char *water_level_alarm_token[] = {
+    "water_level_ok",
+    "water_level_below_low_threshold",
+    "water_level_above_high_threshold",
+    "unknown",
+};
 //-----------------------------------------------------------------------
 static int __0065_prepare(void *arg);
 static int __0065_init(l_ezlopi_item_t *item);
 static int __0065_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg);
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static void _0065_update_from_device(l_ezlopi_item_t *item);
+static void __0065_update_from_device(l_ezlopi_item_t *item);
 //-----------------------------------------------------------------------
 
 int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -156,7 +157,7 @@ static int __0065_init(l_ezlopi_item_t *item)
             else
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                gpio_isr_service_register_v3(item, _0065_update_from_device, 200);
+                gpio_isr_service_register_v3(item, __0065_update_from_device, 200);
             }
         }
     }
@@ -211,7 +212,7 @@ static int __0065_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 }
 
 //------------------------------------------------------------------------------------------------------------
-static void _0065_update_from_device(l_ezlopi_item_t *item)
+static void __0065_update_from_device(l_ezlopi_item_t *item)
 {
     if (item)
     {

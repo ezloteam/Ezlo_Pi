@@ -3,5 +3,6 @@
 #include "ezlopi_devices_list.h"
 
 int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item);
+int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_v3_t *setting);
 
 #endif // __EZLOPI_DEVICE_VALUE_UPDATED_H__

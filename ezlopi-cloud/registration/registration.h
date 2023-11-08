@@ -2,7 +2,7 @@
 #define __HUB_REGISTERATION_H__
 
 #include <string.h>
-#include "frozen.h"
+
 #include "cJSON.h"
 
 #ifdef __cplusplus

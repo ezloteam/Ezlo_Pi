@@ -20,6 +20,7 @@ static const char *provisioning_status_nvs_name = "prov_stat";
 static const char *ezlopi_scenes_nvs_name = "ezlopi_scenes";
 static const char *ezlopi_scenes_v2_nvs_name = "ez_scenes_v2";
 static const char *ezlopi_scripts_nvs_ids = "ezlopi_scripts";
+static const char *settings_initialized_status_name = "settings_magic";
 
 int ezlopi_nvs_init(void)
 {
@@ -299,6 +300,137 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     }
 
     return boot_count;
+}
+
+uint8_t ezlopi_nvs_write_int32(int32_t i, const char *key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        esp_err_t err = nvs_set_i32(ezlopi_nvs_handle, key_name, i);
+        if (ESP_OK != err)
+        {
+            TRACE_W("nvs_set_i32 - error: %s", esp_err_to_name(err));
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+uint8_t ezlopi_nvs_read_int32(int32_t *i, const char *key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        esp_err_t err = nvs_get_i32(ezlopi_nvs_handle, key_name, i);
+        if (ESP_OK == err)
+        {
+            ret = 1;
+        }
+        else
+        {
+            TRACE_W("nvs_get_i32 - error: %s", esp_err_to_name(err));
+        }
+    }
+    return ret;
+}
+
+uint8_t ezlopi_nvs_write_float32(float f, const char *key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        uint32_t value;
+        memcpy(&value, &f, sizeof(uint32_t));
+
+        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, value);
+        if (err != ESP_OK)
+        {
+            TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+uint8_t ezlopi_nvs_read_float32(float *f, const char *key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        uint32_t value;
+
+        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, &value);
+        if (err == ESP_OK)
+        {
+            memcpy(f, &value, sizeof(float));
+            ret = 1;
+        }
+        else
+        {
+            TRACE_W("nvs_get_u32 - error: %s", esp_err_to_name(err));
+        }
+    }
+    return ret;
+}
+
+uint8_t ezlopi_nvs_write_bool(bool b, const char *key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        uint8_t bool_val;
+
+        if (true == b)
+        {
+            bool_val = 1;
+        }
+        else
+        {
+            bool_val = 0;
+        }
+
+        esp_err_t err = nvs_set_u8(ezlopi_nvs_handle, key_name, bool_val);
+
+        if (ESP_OK != err)
+        {
+            TRACE_W("nvs_set_u8 - error: %s", esp_err_to_name(err));
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+uint8_t ezlopi_nvs_read_bool(bool *b, const char *key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        uint8_t bool_val = 0;
+        esp_err_t err = nvs_get_u8(ezlopi_nvs_handle, key_name, &bool_val);
+        if (ESP_OK == err)
+        {
+            if (bool_val)
+                *b = true;
+            else
+                *b = false;
+            ret = 1;
+        }
+        else
+        {
+            TRACE_W("nvs_get_u8 - error: %s", esp_err_to_name(err));
+        }
+    }
+    return ret;
 }
 
 int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)

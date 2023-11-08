@@ -60,9 +60,11 @@ int sensor_0044_I2C_TSL256_luminosity(e_ezlopi_actions_t action, l_ezlopi_item_t
 static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    static int count = 0;
 
-    if (3 == ++count)
+    // Allow only significant changes in values to be posted
+    double new_value = (double)tsl2561_get_intensity_value(&item->interface.i2c_master);
+    TSL256_lum_t *TSL2561_lux_data = (TSL256_lum_t *)item->user_arg;
+    if (fabs((double)(TSL2561_lux_data->lux_val) - new_value) > 0.0001)
     {
         // Allow only significant changes in values to be posted
         double new_value = (double)tsl2561_get_intensity_value(&item->interface.i2c_master);
@@ -72,7 +74,6 @@ static int __notify(l_ezlopi_item_t *item)
             ezlopi_device_value_updated_from_device_v3(item);
             TSL2561_lux_data->lux_val = (uint32_t)new_value;
         }
-        count = 0;
     }
 
     return ret;
@@ -86,9 +87,13 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         TSL256_lum_t *illuminance_value = ((TSL256_lum_t *)item->user_arg);
         char *valueFormatted = ezlopi_valueformatter_int((int)(illuminance_value->lux_val));
-        cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+        if (valueFormatted)
+        {
+            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            free(valueFormatted);
+        }
         cJSON_AddNumberToObject(cjson_properties, "values", (int)illuminance_value->lux_val);
-        free(valueFormatted);
+        cJSON_AddStringToObject(cjson_properties, "scales", item->cloud_properties.scale);
         ret = 1;
     }
     return ret;
@@ -98,16 +103,19 @@ static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
 
-    ezlopi_i2c_master_init(&item->interface.i2c_master);
-    TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
-    if (Check_PARTID(&item->interface.i2c_master))
+    if (item->interface.i2c_master.enable)
     {
-        TRACE_B("TSL561 initialization finished.........");
-        sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
-    }
-    else
-    {
-        TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
+        ezlopi_i2c_master_init(&item->interface.i2c_master);
+        TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
+        if (Check_PARTID(&item->interface.i2c_master))
+        {
+            TRACE_B("TSL561 initialization finished.........");
+            sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
+        }
+        else
+        {
+            TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
+        }
     }
     return ret;
 }

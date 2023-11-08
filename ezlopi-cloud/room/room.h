@@ -1,7 +1,7 @@
 #ifndef __HUB_ROOM_H__
 #define __HUB_ROOM_H__
 #include <string.h>
-#include "frozen.h"
+
 #include "cJSON.h"
 
 #ifdef __cplusplus

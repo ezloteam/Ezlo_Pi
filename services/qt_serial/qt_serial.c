@@ -255,7 +255,7 @@ static void qt_serial_get_info()
         ezlopi_factory_info_v2_free((void *)device_brand);
         ezlopi_factory_info_v2_free((void *)device_manufacturer);
         ezlopi_factory_info_v2_free((void *)device_name);
-        ezlopi_factory_info_v2_free((void *)device_type);
+        // ezlopi_factory_info_v2_free((void *)device_type);
 
         if (my_json_string)
         {

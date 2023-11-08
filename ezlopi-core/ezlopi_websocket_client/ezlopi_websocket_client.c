@@ -23,7 +23,6 @@
 #include "cJSON.h"
 
 #include "esp_websocket_client.h"
-#include "protocol_examples_common.h"
 
 #include "ezlopi_factory_info.h"
 #include "ezlopi_websocket_client.h"

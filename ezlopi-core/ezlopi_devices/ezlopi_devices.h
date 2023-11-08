@@ -13,6 +13,7 @@
 #include "ezlopi_adc.h"
 #include "ezlopi_uart.h"
 #include "ezlopi_actions.h"
+#include "ezlopi_settings.h"
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
     {                                                         \
@@ -169,9 +170,18 @@ typedef struct l_ezlopi_item
     struct l_ezlopi_item *next;
 } l_ezlopi_item_t;
 
+typedef struct l_ezlopi_device_settings_v3
+{
+    s_ezlopi_cloud_device_settings_t cloud_properties;
+    void *user_arg;
+    int (*func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
+    struct l_ezlopi_device_settings_v3 *next;
+
+} l_ezlopi_device_settings_v3_t;
 typedef struct l_ezlopi_device
 {
     l_ezlopi_item_t *items;
+    l_ezlopi_device_settings_v3_t *settings;
     s_ezlopi_cloud_device_t cloud_properties;
     struct l_ezlopi_device *next;
 } l_ezlopi_device_t;
@@ -187,6 +197,9 @@ l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
                                                   int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
+
+l_ezlopi_device_settings_v3_t *ezlopi_device_add_settings_to_device_v3(l_ezlopi_device_t *device,
+                                                                       int (*setting_func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg));
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
 cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);

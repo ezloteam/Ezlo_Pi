@@ -1,6 +1,7 @@
 #include "stdlib.h"
 #include <string.h>
 #include "sdkconfig.h"
+#include "math.h"
 
 #include "cJSON.h"
 #include "trace.h"
@@ -80,17 +81,17 @@ static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
 
-    static int count = 0;
-    if (3 == ++count)
+    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
+    if (als_ltr303_data)
     {
-        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
-        if (als_ltr303_data)
+        ltr303_data_t temp_data;
+        if (ESP_OK == ltr303_get_val(&temp_data))
         {
-            if (ESP_OK == ltr303_get_val(als_ltr303_data))
+            if (fabs(als_ltr303_data->lux - temp_data.lux) > 0.2)
             {
+                als_ltr303_data->lux = temp_data.lux;
                 ezlopi_device_value_updated_from_device_v3(item);
             }
-            count = 0;
         }
     }
 
@@ -101,7 +102,13 @@ static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
 
-    ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
+
+    if ((item->interface.i2c_master.enable) && (NULL != als_ltr303_data))
+    {
+        ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+        ltr303_get_val(als_ltr303_data);
+    }
 
     return ret;
 }

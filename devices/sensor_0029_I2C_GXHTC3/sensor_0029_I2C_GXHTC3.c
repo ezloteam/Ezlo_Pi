@@ -1,3 +1,5 @@
+
+#include "math.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_devices_list.h"
@@ -88,37 +90,35 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         cJSON *cj_result = (cJSON *)arg;
         s_gxhtc3_value_t *value_ptr = (s_gxhtc3_value_t *)item->user_arg;
+        char *valueFormatted = NULL;
 
         if (value_type_temperature == item->cloud_properties.value_type)
         {
-            if (ideal_value == value_ptr->temperature)
-            {
-                __read_value_from_sensor(item);
-            }
-
             cJSON_AddNumberToObject(cj_result, "value", value_ptr->temperature);
             char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                free(valueFormatted);
+            }
             cJSON_AddStringToObject(cj_result, "scale", "celsius");
 
             value_ptr->temperature = ideal_value;
         }
         else if (value_type_humidity == item->cloud_properties.value_type)
         {
-            if (ideal_value == value_ptr->humidity)
-            {
-                __read_value_from_sensor(item);
-            }
-
             cJSON_AddNumberToObject(cj_result, "value", value_ptr->humidity);
             char *valueFormatted = ezlopi_valueformatter_float(value_ptr->humidity);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                free(valueFormatted);
+            }
             cJSON_AddStringToObject(cj_result, "scale", "percent");
 
             value_ptr->humidity = ideal_value;
         }
+        free(valueFormatted);
     }
 
     return ret;
@@ -126,7 +126,14 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __init(l_ezlopi_item_t *item)
 {
-    return ezlopi_i2c_master_init(&item->interface.i2c_master);
+    int ret = 0;
+
+    if (item->interface.i2c_master.enable)
+    {
+        ezlopi_i2c_master_init(&item->interface.i2c_master);
+    }
+
+    return ret;
 }
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
@@ -153,7 +160,7 @@ static void __prepare_temperature_item_properties(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
-    item->interface.i2c_master.enable = 1;
+    item->interface.i2c_master.enable = true;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
@@ -170,9 +177,10 @@ static void __prepare_humidity_item_properties(l_ezlopi_item_t *item, cJSON *cj_
     item->cloud_properties.value_type = value_type_humidity;
     item->cloud_properties.show = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.scale = scales_percent;
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
-    item->interface.i2c_master.enable = 1;
+    item->interface.i2c_master.enable = false;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
@@ -229,7 +237,40 @@ static int __prepare(void *arg)
     return ret;
 }
 
+static int __check_and_update(float val_1, float val_2, l_ezlopi_item_t *item)
+{
+    int ret = 0;
+    if (fabs(val_1 - val_2) > 0.5)
+    {
+        val_1 = val_2;
+        ret = ezlopi_device_value_updated_from_device_v3(item);
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
+}
+
 static int __notify(l_ezlopi_item_t *item)
 {
-    return ezlopi_device_value_updated_from_device_v3(item);
+    int ret = 0;
+    s_gxhtc3_value_t *value_ptr = (s_gxhtc3_value_t *)item->user_arg;
+    s_gxhtc3_value_t *temp_ptr = (s_gxhtc3_value_t *)malloc(sizeof(s_gxhtc3_value_t));
+    if (value_ptr && temp_ptr)
+    {
+        memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
+        memcpy(temp_ptr, value_ptr, sizeof(s_gxhtc3_value_t));
+        __read_value_from_sensor(item);
+
+        if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+        {
+            __check_and_update(value_ptr->temperature, temp_ptr->temperature, item);
+        }
+        if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
+        {
+            __check_and_update(value_ptr->humidity, value_ptr->humidity, item);
+        }
+    }
+    return ret;
 }

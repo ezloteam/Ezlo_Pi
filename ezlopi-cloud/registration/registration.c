@@ -5,6 +5,7 @@
 
 #include "version.h"
 #include "trace.h"
+#include "version.h"
 #include "registration.h"
 #include "web_provisioning.h"
 #include "ezlopi_cloud_constants.h"

@@ -249,6 +249,7 @@ static void __prepare_temperature_properties(l_ezlopi_item_t *item, cJSON *cj_de
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
+    item->cloud_properties.scale = scales_celsius;
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
@@ -267,6 +268,7 @@ static void __prepare_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
+    item->cloud_properties.scale = scales_percent;
     item->cloud_properties.item_name = ezlopi_item_name_humidity;
     item->cloud_properties.value_type = value_type_humidity;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
@@ -285,6 +287,7 @@ static void __prepare_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
+    item->cloud_properties.scale = scales_kilo_pascal;
     item->cloud_properties.item_name = ezlopi_item_name_atmospheric_pressure;
     item->cloud_properties.value_type = value_type_pressure;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();

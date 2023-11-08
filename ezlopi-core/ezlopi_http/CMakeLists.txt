@@ -4,4 +4,8 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "ezlopi_http.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES trace esp_http_client common_components esp-tls json)
+    REQUIRES trace 
+             json
+             esp-tls
+             esp_http_client 
+             )

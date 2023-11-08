@@ -14,6 +14,9 @@
 
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 
+#include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
+
+#warning "Use of static variable"
 static bool sensor_bme280_initialized = false;
 
 static int __prepare(void *arg);

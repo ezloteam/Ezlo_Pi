@@ -1,73 +1,88 @@
+# Wi-Fi Scan Example
 
-[![N|Ezlo-Pi](https://www.ezlopi.com/wp-content/uploads/2022/07/Logo.svg)](https://www.ezlopi.com/)
+(See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network) [![GitHub stars](https://img.shields.io/github/stars/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/stargazers) [![License](https://img.shields.io/github/license/ezloteam/Ezlo_Pi/)](https://github.com/ezloteam/Ezlo_Pi/blob/master/LICENCE.txt)
+This example shows how to scan for available set of APs.
 
-# ezlopi
-EzloPi is an open-source project contributed by Ezlo Innovation to extend the capabilities of ESP32 chipset-based devices and platforms. It provides unparalleled capabilities to configure and control your ESP-based devices and bring any of your automation ideas to life.
+## How to use example
 
-Checkout our [website](https://www.ezlopi.com/) for further guide and examples
+Before project configuration and build, be sure to set the correct chip target using `idf.py set-target <chip_name>`.
 
-## supported features
-* __GPIO__
-* __Analog Input__
-* __Digital Input__
-* __I2C__
-* __One Wire__
+### Hardware Required
 
-# 1. Getting started
-EzloPi has a windows based configurator application to configure the ESP32 for any of the feature mentioned above at supported features. The desktop application can be used to configure the ESP32 device for interfacing Relay, and analog input, digital input, an I2C based sensor etc in no time. After the device has been configured using the desktop app, anyone can use our cloud and mobile app serviece to get control of device from anywhere in real-time.
+* A development board with ESP32/ESP32-S2/ESP32-C3 SoC (e.g., ESP32-DevKitC, ESP-WROVER-KIT, etc.).
+* A USB cable for Power supply and programming.
 
-![EzloPi Desktop UI](https://github.com/ezloteam/Ezlo_Pi/blob/master/ezlopi_screenshot.png)
+### Configure the project
 
-# 2. Customizing and building EzloPi firmware in your local setup
-It is required to have [ESP-IDF](https://www.espressif.com/en/products/sdks/esp-idf) installed in your machine.
-Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/get-started/index.html). IDF version in this project : 4.4.1.
+Open the project configuration menu (`idf.py menuconfig`). 
 
-#### 1. Clone Ezlo-Pi repository from github
-Open terminal or bash-shell and run the below commands
-```bash
-git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
-cd ezlopi/firmware/ezlopi
+In the `Example Configuration` menu:
+
+* Set the Example configuration.
+    * Use `Max size of scan list` to set the maximum nunber of access points in the list.
+
+### Build and Flash
+
+Build the project and flash it to the board, then run the monitor tool to view the serial output:
+
+Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
+
+(To exit the serial monitor, type ``Ctrl-]``.)
+
+See the Getting Started Guide for all the steps to configure and use the ESP-IDF to build projects.
+
+* [ESP-IDF Getting Started Guide on ESP32](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html)
+* [ESP-IDF Getting Started Guide on ESP32-S2](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/get-started/index.html)
+* [ESP-IDF Getting Started Guide on ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/get-started/index.html)
+
+## Example Output
+
+As you run the example, you will see the following log:
+
 ```
-#### 2. Build
-using ```idf.py```
-```bash
-idf.py build
-```
-Using custom command
-###### a. To generate test release firmware:
-Generates .bin files in firmware/[version] folder. The below command also increases the build number.
-```bash
-./build.sh test
-```
-###### b. To only build:
-Does not generate any .bin files in firmware/[version] folder. This command will only increase the build number in version.
-```bash
-./build.sh build
-```
-###### c. Build for release firmware:
-Generates .bin files in firmware/[version] folder. The below command also creates the .bin files in firmware/[version] folder
-```bash
-./build.sh release
-```
-#### 3. flash the firmware
-using usb port and baudrate
-```bash
-idf.py -p <COM Port Name> -b <baud> flash
-```
-Monitor
-```bash
-idf.py -p <COM Port Name> monitor
+I (443) wifi:wifi firmware version: 6bff005
+I (443) wifi:wifi certification version: v7.0
+I (443) wifi:config NVS flash: enabled
+I (443) wifi:config nano formating: disabled
+I (453) wifi:Init data frame dynamic rx buffer num: 32
+I (453) wifi:Init management frame dynamic rx buffer num: 32
+I (463) wifi:Init management short buffer num: 32
+I (463) wifi:Init dynamic tx buffer num: 32
+I (473) wifi:Init static tx FG buffer num: 2
+I (473) wifi:Init static rx buffer size: 1600
+I (473) wifi:Init static rx buffer num: 10
+I (483) wifi:Init dynamic rx buffer num: 32
+I (483) wifi_init: rx ba win: 6
+I (493) wifi_init: tcpip mbox: 32
+I (493) wifi_init: udp mbox: 6
+I (493) wifi_init: tcp mbox: 6
+I (503) wifi_init: tcp tx win: 5744
+I (503) wifi_init: tcp rx win: 5744
+I (513) wifi_init: tcp mss: 1440
+I (513) wifi_init: WiFi IRAM OP enabled
+I (513) wifi_init: WiFi RX IRAM OP enabled
+I (533) phy_init: phy_version 300,6e46ba7,Jan 25 2021
+I (683) wifi:set rx active PTI: 0, rx ack PTI: 0, and default PTI: 0
+I (683) wifi:mode : sta (7c:df:a1:40:23:84)
+I (683) wifi:enable tsf
+I (2783) scan: Total APs scanned = 17
+I (2783) scan: SSID 		IoTNetwork
+I (2783) scan: RSSI 		-50
+I (2783) scan: Authmode 	WIFI_AUTH_WPA2_PSK
+I (2783) scan: Pairwise Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2793) scan: Group Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2793) scan: Channel 		5
+
+I (2883) scan: SSID 		TP-Link_6872
+I (2883) scan: RSSI 		-70
+I (2883) scan: Authmode 	WIFI_AUTH_WPA_WPA2_PSK
+I (2893) scan: Pairwise Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2893) scan: Group Cipher 	WIFI_CIPHER_TYPE_CCMP
+I (2903) scan: Channel 		11
+...
 ```
 
-# 3. Customizing Desktop app:
-The desktop application has been build under QT V 5.15. QT creator with necessary compiler should be set in your local machine. 
-The installer script is under _deploy_ directory.
+## Troubleshooting
 
-# 4. Working with examples
-
-[Fllow from the examples](https://www.ezlopi.com/examples/)
-1. [EzloPi AC Lamp setup with Relay interfacing​](https://www.ezlopi.com/examples/relay-circuitry-and-lamp-circuit-setup/)
-2. [EzloPi AC lamp setup with relay and a momentary switch](https://www.ezlopi.com/examples/ezlopi-ac-lamp-setup-with-relay-and-a-momentary-switch/)
-3. [EzloPi I2C MPU6050 Example](https://www.ezlopi.com/examples/ezlopi-i2c-mpu6050-example/)
+For any technical queries, please open an [issue](https://github.com/espressif/esp-idf/issues) on GitHub. We will get back to you soon.
