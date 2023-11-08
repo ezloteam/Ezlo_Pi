@@ -91,7 +91,7 @@
 //---------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------
-#define MODE_DEFAULT FINGERPRINT_MATCH_MODE
+#define MODE_DEFAULT FINGERPRINT_ENROLLMENT_MODE
 #define USERID_DEFAULT 1
 #define IDCOUNT_DEFAULT 10
 
@@ -290,7 +290,7 @@ typedef struct server_packet_t
     bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
     bool __busy_guard;                                 /*Gaurd_flag used during notification actions*/
     TaskHandle_t notifyHandler;
-    TaskHandle_t timerHandle;
+    time_t timeout_start_time;
 } server_packet_t;
 
 //---------- FUNCTIONS Defination for Fingerprint Library ------------------------------------------------------------------------------------------------------
