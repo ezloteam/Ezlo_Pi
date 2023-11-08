@@ -192,6 +192,8 @@ static int dht22_sensor_setup_device_cloud_properties_temperature(l_ezlopi_devic
         device->cloud_properties.category = category_temperature;
         device->cloud_properties.subcategory = subcategory_not_defined;
         device->cloud_properties.device_type = dev_type_sensor;
+        device->cloud_properties.info = NULL;
+        device->cloud_properties.device_type_id = NULL;
         device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     }
     return ret;

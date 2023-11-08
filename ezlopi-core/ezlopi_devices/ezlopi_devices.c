@@ -461,7 +461,14 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             char tmp_string[64];
             snprintf(tmp_string, sizeof(tmp_string), "%08x", device_prop->cloud_properties.device_id);
             cJSON_AddStringToObject(cj_device, "_id", tmp_string);
-            cJSON_AddStringToObject(cj_device, "deviceTypeId", "ezlopi");
+            if (device_prop->cloud_properties.device_type_id)
+            {
+                cJSON_AddStringToObject(cj_device, "deviceTypeId", device_prop->cloud_properties.device_type_id);
+            }
+            else
+            {
+                cJSON_AddStringToObject(cj_device, "deviceTypeId", "ezlopi");
+            }
             cJSON_AddStringToObject(cj_device, "parentDeviceId", "");
             cJSON_AddStringToObject(cj_device, "category", device_prop->cloud_properties.category);
             cJSON_AddStringToObject(cj_device, "subcategory", device_prop->cloud_properties.subcategory);
@@ -478,7 +485,10 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             cJSON_AddStringToObject(cj_device, "security", "");
             cJSON_AddBoolToObject(cj_device, "ready", true);
             cJSON_AddStringToObject(cj_device, "status", "synced");
-            // cJSON_AddObjectToObject(cj_device, "info");
+            if (NULL != device_prop->cloud_properties.info)
+            {
+                cJSON_AddItemReferenceToObject(cj_device, "info", device_prop->cloud_properties.info);
+            }
         }
     }
 

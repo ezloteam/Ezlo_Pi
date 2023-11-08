@@ -209,6 +209,8 @@ static void __prepare_device_properties(l_ezlopi_device_t *device, cJSON *cj_dev
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 

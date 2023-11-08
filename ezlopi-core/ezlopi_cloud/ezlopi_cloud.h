@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-
+#include "cJSON.h"
 typedef struct s_ezlopi_cloud_controller
 {
     char parent_device_id[40]; // 'parentDeviceId' -> https://api.ezlo.com/hub/devices_api/index.html
@@ -44,9 +44,11 @@ typedef struct s_ezlopi_cloud_device
 {
     uint32_t device_id;      // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
     char device_name[32];    // 'name' -> https://api.ezlo.com/hub/devices_api/index.html
+    char *device_type_id;    // deviceTypeId -> https://log.ezlo.com/new/hub/devices_api/
     const char *category;    // 'category' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/category_str.h
     const char *subcategory; // 'subcategory' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/subcategory_str.h
     const char *device_type; // 'type' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/device_types_str.h
+    cJSON *info;             // info -> https://log.ezlo.com/new/hub/devices_api/
 
 } s_ezlopi_cloud_device_t;
 

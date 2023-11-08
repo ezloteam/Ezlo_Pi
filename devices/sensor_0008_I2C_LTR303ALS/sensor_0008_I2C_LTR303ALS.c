@@ -123,6 +123,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_light_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 

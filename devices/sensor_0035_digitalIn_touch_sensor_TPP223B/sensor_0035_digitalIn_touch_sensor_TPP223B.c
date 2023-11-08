@@ -140,6 +140,8 @@ static void __prepare_touch_sensor_device_cloud_properties(l_ezlopi_device_t *de
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 

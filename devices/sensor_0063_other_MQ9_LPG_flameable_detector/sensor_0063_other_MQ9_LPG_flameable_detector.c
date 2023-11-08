@@ -186,6 +186,8 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -217,6 +219,8 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
