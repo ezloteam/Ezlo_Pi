@@ -120,7 +120,7 @@ static int __0054_prepare(void *arg)
                 if (flowmeter_item)
                 {
                     flowmeter_item->cloud_properties.device_id = flowmeter_device->cloud_properties.device_id;
-                    __prepare_item_cloud_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
+                    __prepare_item_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
                 }
                 else
                 {

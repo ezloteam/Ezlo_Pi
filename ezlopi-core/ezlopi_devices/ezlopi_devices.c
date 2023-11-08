@@ -162,40 +162,6 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, int
     return new_item;
 }
 
-cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop)
-{
-    cJSON *cj_device = NULL;
-    if (device_prop)
-    {
-        cj_device = cJSON_CreateObject();
-        if (cj_device)
-        {
-            char tmp_string[64];
-            snprintf(tmp_string, sizeof(tmp_string), "%08x", device_prop->cloud_properties.device_id);
-            cJSON_AddStringToObject(cj_device, "_id", tmp_string);
-            cJSON_AddStringToObject(cj_device, "deviceTypeId", s_controller_information.device_type_id);
-            cJSON_AddStringToObject(cj_device, "parentDeviceId", "");
-            cJSON_AddStringToObject(cj_device, "category", device_prop->cloud_properties.category);
-            cJSON_AddStringToObject(cj_device, "subcategory", device_prop->cloud_properties.subcategory);
-            cJSON_AddStringToObject(cj_device, "gatewayId", "");
-            cJSON_AddBoolToObject(cj_device, "batteryPowered", false);
-            cJSON_AddStringToObject(cj_device, "name", device_prop->cloud_properties.device_name);
-            cJSON_AddStringToObject(cj_device, "type", device_prop->cloud_properties.device_type);
-            cJSON_AddBoolToObject(cj_device, "reachable", true);
-            cJSON_AddBoolToObject(cj_device, "persistent", true);
-            cJSON_AddBoolToObject(cj_device, "serviceNotification", false);
-            cJSON_AddBoolToObject(cj_device, "armed", false);
-            cJSON_AddStringToObject(cj_device, "roomId", "");
-            cJSON_AddStringToObject(cj_device, "security", "");
-            cJSON_AddBoolToObject(cj_device, "ready", true);
-            cJSON_AddStringToObject(cj_device, "status", "synced");
-            cJSON_AddObjectToObject(cj_device, "info");
-        }
-    }
-
-    return cj_device;
-}
-
 void ezlopi_device_prepare(void)
 {
     s_controller_information.armed = false;
@@ -518,9 +484,13 @@ l_ezlopi_device_settings_v3_t *ezlopi_device_add_settings_to_device_v3(l_ezlopi_
         }
     }
 
+    return new_setting;
+}
+
 cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop)
 {
     cJSON *cj_device = NULL;
+
     if (device_prop)
     {
         cj_device = cJSON_CreateObject();
