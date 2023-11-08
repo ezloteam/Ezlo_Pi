@@ -57,35 +57,8 @@ static void generate_packet(fingerprint_packet_t *txPacket, uint8_t PID, uint16_
 static int send_uart_packets(int uart_channel_num, fingerprint_packet_t *txPacket)
 {
     int ret = 0;
-    //------------------------------------------------------------------------------------------
-    // !< Internal esp_hal uart command
-    /**
-     * int uart_write_bytes(uart_port_t uart_num, const void *src, size_t size)
-     *  {
-     *      ESP_RETURN_ON_FALSE((uart_num < UART_NUM_MAX), (-1), UART_TAG, "uart_num error");
-     *      ESP_RETURN_ON_FALSE((p_uart_obj[uart_num] != NULL), (-1), UART_TAG, "uart driver error");
-     *      ESP_RETURN_ON_FALSE(src, (-1), UART_TAG, "buffer null");
-     *      return uart_tx_all(uart_num, src, size, 0, 0);
-     *  }
-     */
-    //------------------------------------------------------------------------------------------
-    // Display the packet contents before sending
-
     int len = ((int)((txPacket->Packet_len[0] << 8) + (txPacket->Packet_len[1] & 0xFF)) - 2);
 
-#if 0
-    // TRACE_I("Header ->%#x,%#x", txPacket->header_code[0], txPacket->header_code[1]);
-    // TRACE_I("device_address x4 ->%#x ", txPacket->device_address[0]);
-    // TRACE_I("PID ->%#x ", txPacket->PID);
-    // TRACE_I("Packet_len ->%#x,%#x", txPacket->Packet_len[0], txPacket->Packet_len[1]);
-   // for (uint8_t i = 0; i < len; i++)
-    // {
-    //     TRACE_I("data[%d] ->%#x", i, (txPacket->data[i]));
-    // }
-    // TRACE_I("chk_sum ->%#x,%#x", txPacket->chk_sum[0], txPacket->chk_sum[1]);
-#endif
-
-    // sending uart message
     // 1. Header seciton
     ret = uart_write_bytes(uart_channel_num, txPacket->header_code, 2);
     // TRACE_D("written_uart_Bytes : %d", ret);
@@ -168,13 +141,6 @@ static FINGERPRINT_STATUS_t __Response_function(uint8_t *recieved_buffer, uint32
          * ...
          * recieved_buffer[N] = Checksum  (2byte)
          */
-
-        // int p_len = (int)(((uint16_t)recieved_buffer[1] << 8) + ((uint16_t)recieved_buffer[2] & 0xFF));
-        // TRACE_I("Total Extracted Bytes: [MSB,LSB] => [%#x + %#x] => total:%d", recieved_buffer[1], recieved_buffer[2], p_len);
-        // for (int x = 0; x <= p_len; x++)
-        // {
-        //     TRACE_D("Extracted Packets [%d] : %#x ", x, recieved_buffer[x]); // goes upto one extra index . Thus terminating with zero .
-        // }
 
         /*check confirmation code*/
         // TRACE_W(" [3] :- Confirmation_code : {%#x} ....indicates... ", recieved_buffer[3]);
@@ -1576,11 +1542,6 @@ bool Match_ID(l_ezlopi_item_t *item)
                 break;
             }
         }
-
-        // else if ((p == FINGERPRINT_OK) && (dummy_timer - start_time) < 2000)
-        // {
-        //     TRACE_B("                   >  Matched ID: [%d] ; Confidence : [%d]", (user_data->user_id), (user_data->confidence_level));
-        // }
         TRACE_D("--------------------------- EXIT: .[MODE:-0]. ----------------------------");
     }
     return ret;
@@ -1703,7 +1664,6 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
             }
         }
         vTaskDelay(100 / portTICK_PERIOD_MS);
-        /*might need to add some code incase of system busy*/
 
         // generate character file from the original finger image in ImageBuffer and store the file in CharBuffer1
         p = Img2Tz(uart_channel_num, 1, (user_data->recieved_buffer), 1000);
@@ -1717,7 +1677,6 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
             TRACE_W("Character Image generation [1] failed .. try again... after 3 seconds");
             return (0);
         }
-        /*might need to add some code incase of system busy*/
         // 1. OK success!
         vTaskDelay(500 / portTICK_PERIOD_MS);
 
@@ -1741,7 +1700,6 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
             }
         }
         vTaskDelay(100 / portTICK_PERIOD_MS);
-        /*might need to add some code incase of system busy*/
 
         // generate character file from the original finger image in ImageBuffer and store the file in CharBuffer2
         p = Img2Tz(uart_channel_num, 2, (user_data->recieved_buffer), 1000);
@@ -1756,7 +1714,6 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
             return (0);
         }
         vTaskDelay(500 / portTICK_PERIOD_MS);
-        /*might need to add some code incase of system busy*/
         // 2. OK success!
 
         //--------------------- 3. Generate the template after combining ChBuffer-1&2 , and store the result in both ChBuffer-1&2 ------------------
@@ -1779,7 +1736,6 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
             }
         }
         vTaskDelay(500 / portTICK_PERIOD_MS);
-        /*might need to add some code incase of system busy*/
         // 3. OK converted!
 
         //-------------------- 4. Search for all the library and store only if no duplicates found ------------------------------------------------
@@ -1831,7 +1787,6 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
             }
         }
         vTaskDelay(500 / portTICK_PERIOD_MS);
-        /*might need to add some code incase of system busy*/
         // 4. OK Searching Succesful!
 
         //-------------------- 5. Store the template from specified buffer at designated location (PageID) of flash library -------------------------
@@ -1872,7 +1827,6 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
                 }
             }
         }
-        /*might need to add some code incase of system busy*/
         // 5. OK Stored!
         res_ID = custom_USER_ID;
         TRACE_D("--------------------------- EXIT: .[MODE:-1]. ----------------------------");
@@ -1891,66 +1845,52 @@ FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item)
         int uart_channel_num = item->interface.uart.channel;
         // waiting for extra 200ms
         vTaskDelay(200 / portTICK_PERIOD_MS);
-        // check the system status and wait_till the system is free
-        // TRACE_I("------------ PortControl -------------------");
         if (PortControl(uart_channel_num, UART_PORT_ON, (user_data->recieved_buffer), 1000))
         {
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
-        // TRACE_I("------------ VerifyPwd -------------------");
         if (VerifyPwd(uart_channel_num, (0), (user_data->recieved_buffer), 1000))
         {
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
-        // TRACE_I("------------ BaudRate -------------------");
-        // First set the baudrate
-        if (SetSysPara(uart_channel_num, FINGERPRINT_BAUDRATE_CONTROL, FINGERPRINT_BAUDRATE_57600, (user_data->recieved_buffer), 1000)) // timeout = 2000ms = 2sec
+        if (SetSysPara(uart_channel_num, FINGERPRINT_BAUDRATE_CONTROL, FINGERPRINT_BAUDRATE_57600, (user_data->recieved_buffer), 1000))
         {
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
-        // TRACE_I("------------ Security Level -------------------");
-        // Second set the security level
-        if (SetSysPara(uart_channel_num, FINGERPRINT_SECURITY_LEVEL, FINGERPRINT_SECURITY_4, (user_data->recieved_buffer), 1000)) // timeout = 2000ms = 2sec
+        if (SetSysPara(uart_channel_num, FINGERPRINT_SECURITY_LEVEL, FINGERPRINT_SECURITY_4, (user_data->recieved_buffer), 1000))
         {
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
-        // TRACE_I("------------ Data Packet Length -------------------");
-        // Third set the max data package length
-        if (SetSysPara(uart_channel_num, FINGERPRINT_DATA_PACKAGE_LENGTH, FINGERPRINT_DATA_LENGTH_32, (user_data->recieved_buffer), 1000)) // timeout = 2000ms = 2sec
+        if (SetSysPara(uart_channel_num, FINGERPRINT_DATA_PACKAGE_LENGTH, FINGERPRINT_DATA_LENGTH_32, (user_data->recieved_buffer), 1000))
         {
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
-        /* TESTING */
         TRACE_D("------------ Read Total Templates Available -------------------");
-        uint16_t *temp = (uint16_t *)malloc(sizeof(uint16_t));
-        if (temp)
+        uint16_t temp;
+        if (ReadTempNum(uart_channel_num, &temp, (user_data->recieved_buffer), 1000))
         {
-            memset(temp, 0, sizeof(uint16_t));
-            if (ReadTempNum(uart_channel_num, temp, (user_data->recieved_buffer), 1000)) // timeout = 2000ms = 2sec
+            TRACE_W("Temp_count : %d", temp);
+            for (uint8_t x = 0; x < 2; x++)
             {
-                TRACE_W("Temp_count : %d", *temp);
-                for (uint8_t x = 0; x < 2; x++)
+                if (LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200))
                 {
-                    if (LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200))
-                    {
-                        TRACE_D("           >> LED OFF <<");
-                        vTaskDelay(500 / portTICK_PERIOD_MS);
-                    }
-                    if (LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200))
-                    {
-                        TRACE_D("           >> LED ON <<");
-                        vTaskDelay(500 / portTICK_PERIOD_MS);
-                    }
+                    TRACE_D("           >> LED OFF <<");
+                    vTaskDelay(500 / portTICK_PERIOD_MS);
                 }
-                TRACE_D("       >> STARTING THE SYSTEM <<");
+                if (LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200))
+                {
+                    TRACE_D("           >> LED ON <<");
+                    vTaskDelay(500 / portTICK_PERIOD_MS);
+                }
             }
-            free(temp);
+            TRACE_D("       >> STARTING THE SYSTEM <<");
         }
+
         F_res = FINGERPRINT_OK;
     }
     return F_res;
