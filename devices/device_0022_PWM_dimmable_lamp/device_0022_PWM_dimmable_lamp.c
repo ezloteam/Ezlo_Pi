@@ -17,11 +17,11 @@
 #warning "use of static variable
 static bool dimmable_bulb_initialized = false;
 
-static l_ezlopi_item_t *dimmable_bulb_dimmer_item = NULL;
-static l_ezlopi_item_t *dimmable_bulb_dimmer_up_item = NULL;
-static l_ezlopi_item_t *dimmable_bulb_dimmer_down_item = NULL;
-static l_ezlopi_item_t *dimmable_bulb_dimmer_stop_item = NULL;
-static l_ezlopi_item_t *dimmable_bulb_switch_item = NULL;
+// static l_ezlopi_item_t *dimmable_bulb_dimmer_item = NULL;
+// static l_ezlopi_item_t *dimmable_bulb_dimmer_up_item = NULL;
+// static l_ezlopi_item_t *dimmable_bulb_dimmer_down_item = NULL;
+// static l_ezlopi_item_t *dimmable_bulb_dimmer_stop_item = NULL;
+// static l_ezlopi_item_t *dimmable_bulb_switch_item = NULL;
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -254,31 +254,33 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            dimmable_bulb_dimmer_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+            
+            l_ezlopi_item_t *dimmable_bulb_dimmer_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_item)
             {
                 dimmable_bulb_dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_item_properties(dimmable_bulb_dimmer_item, prep_arg->cjson_device);
             }
-            dimmable_bulb_dimmer_up_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+
+            l_ezlopi_item_t *dimmable_bulb_dimmer_up_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_up_item)
             {
                 dimmable_bulb_dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_up_item_properties(dimmable_bulb_dimmer_up_item, prep_arg->cjson_device);
             }
-            dimmable_bulb_dimmer_down_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+            l_ezlopi_item_t *dimmable_bulb_dimmer_down_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_down_item)
             {
                 dimmable_bulb_dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_down_item_properties(dimmable_bulb_dimmer_down_item, prep_arg->cjson_device);
             }
-            dimmable_bulb_dimmer_stop_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+            l_ezlopi_item_t *dimmable_bulb_dimmer_stop_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_stop_item)
             {
                 dimmable_bulb_dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_stop_item_properties(dimmable_bulb_dimmer_stop_item, prep_arg->cjson_device);
             }
-            dimmable_bulb_switch_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
+            l_ezlopi_item_t *dimmable_bulb_switch_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_switch_item)
             {
                 dimmable_bulb_switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
