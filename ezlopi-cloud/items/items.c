@@ -90,7 +90,6 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                                                 cJSON *cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
                                                 if (cj_item_properties)
                                                 {
-
                                                     if (!cJSON_AddItemToArray(cj_items_array, cj_item_properties))
                                                     {
                                                         cJSON_Delete(cj_item_properties);
