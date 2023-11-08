@@ -2,7 +2,7 @@
 #include "time.h"
 
 #include "cJSON.h"
-#include "lwip/ip_addr.h"
+#include "lwip/ip_addr.h"T
 #include "esp_event_base.h"
 #include "mbedtls/base64.h"
 
@@ -31,11 +31,11 @@ static char *__provisioning_info_base64(void);
 static char *__base64_decode_provisioning_info(uint32_t total_size);
 static void __process_provisioning_info(uint8_t *value, uint32_t len);
 
-static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-
 static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void __provisioning_info_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+
+static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
 static uint32_t g_provisioning_sequence_no = 0;
 static time_t g_provisioning_last_read_time = 0;
