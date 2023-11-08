@@ -601,10 +601,12 @@ static void Fingerprint_Operation_task(void *params)
             case FINGERPRINT_ENROLLMENT_MODE:
             {
                 LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
-                // Buffer variable to indicate in which page/user_id, (only used in match and enroll)
-                current_id = user_data->user_id;
-                // Checking if requested ID is empty (or not_valid) ; Then call a function to enroll if that PAGE_ID/user_id is empty
-                if (true == Check_PAGEID_Empty(item))
+
+                // user_data->user_id is updated here to new_vaccant_ID
+                current_id = (Find_immediate_vaccant_ID(item));
+
+                // Finding the immediate Vaccant_ID and storing into 'current_id' 
+                if ((current_id) > 0)
                 {
                     current_id = Enroll_Fingerprint(item); /*This return id of currently stored 'USER/PAGE ID' ; If a duplicate fingerprint is already present, then : this returns ID of duplicate instead of new */
                     if (0 != current_id)

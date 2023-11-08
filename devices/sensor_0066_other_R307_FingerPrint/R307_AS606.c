@@ -1477,6 +1477,33 @@ bool Check_PAGEID_Empty(l_ezlopi_item_t *item)
     // Result: OK - Internal Empty!
     return (ret);
 }
+
+//---------------------------------- Function returns immediate vaccant ID -----------------------------------------
+/**
+ * @brief #### This function finds immediate vaccant ID.
+ *
+ * @return {0 => vaccant IDs not found}
+ */
+uint16_t Find_immediate_vaccant_ID(l_ezlopi_item_t *item)
+{
+    if (NULL != item)
+    {
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        // Temporay variable
+        for (uint16_t ids = 1; ids <= FINGERPRINT_MAX_CAPACITY_LIMIT; ids++)
+        {
+            // First update the ID occupancy status in item->user_arg
+            user_data->user_id = ids; // place the new ID to check
+            if (Check_PAGEID_Empty(item))
+            {                 // when  empty
+                return (ids); // return index
+            }
+            vTaskDelay(50 / portTICK_PERIOD_MS);
+        }
+    }
+    return 0; // if not found
+}
+
 //---------------------------------- Function that updates validity status of internal PAGEID to append the new -----------------------------------------
 /**
  * @brief #### This function Scans and update validity status of [1~500(max defined)] PAGE_IDs.
@@ -1502,7 +1529,7 @@ bool Update_ID_status_list(l_ezlopi_item_t *item)
             {
                 user_data->validity[ids] = 1; // when occupied
             }
-            vTaskDelay(200 / portTICK_PERIOD_MS);
+            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         // return the original user_id
         user_data->user_id = Temp_ID;

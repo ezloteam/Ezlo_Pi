@@ -332,6 +332,7 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
 //---------- FUNCTIONS Defination for Operation modes ------------------------------------------------------------------------------------------------------
 
 bool Wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
+uint16_t Find_immediate_vaccant_ID(l_ezlopi_item_t *item);
 bool Check_PAGEID_Empty(l_ezlopi_item_t *item);
 bool Update_ID_status_list(l_ezlopi_item_t *item);
 bool Match_ID(l_ezlopi_item_t *item);
