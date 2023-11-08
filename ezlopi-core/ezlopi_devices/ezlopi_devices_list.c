@@ -48,6 +48,7 @@
 #include "sensor_0053_UART_GYGPS6MV2.h"
 #include "sensor_0054_PWM_YFS201_flowmeter.h"
 #include "sensor_0056_ADC_Force_Sensitive_Resistor.h"
+#include "sensor_0066_other_R307_FingerPrint.h"
 
 static s_ezlopi_device_v3_t device_array_v3[] = {
 #ifdef EZLOPI_DEVICE_0001_DIGITALOUT_GENERIC
@@ -340,6 +341,14 @@ static s_ezlopi_device_v3_t device_array_v3[] = {
         .func = sensor_0065_digitalIn_float_switch,
     },
 #endif
+
+#ifdef EZLOPI_SENSOR_0066_OTHER_R307_FINGERPRINT
+    {
+        .id = EZLOPI_SENSOR_0066_OTHER_R307_FINGERPRINT,
+        .func = sensor_0066_other_R307_FingerPrint,
+    },
+#endif
+
 
     /**
      * @brief 'EZLOPI_SENSOR_NONE' must not be removed from this array.

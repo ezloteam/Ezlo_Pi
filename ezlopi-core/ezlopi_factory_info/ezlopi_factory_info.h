@@ -408,26 +408,13 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_type\": 7,\
-                \"dev_name\": \"DHT 22\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"fingerprint\",\
                 \"id_room\": \"\",\
-                \"id_item\": 16,\
-                \"gpio\": 18\
-            },\
-            {\
-                \"dev_type\" : 1,\
-                \"dev_name\" : \"Dining Room Main Lamp\",\
-                \"id_room\" : \"\",\
-                \"id_item\" : 3,\
-                \"val_ip\" : true,\
-                \"val_op\" : false,\
-                \"gpio_in\" : 21,\
-                \"gpio_out\" : 2,\
-                \"is_ip\" : false,\
-                \"ip_inv\" : true,\
-                \"pullup_ip\" : true,\
-                \"pullup_op\" : true,\
-                \"op_inv\" : false\
+                \"id_item\": 66,\
+                \"gpio1\": 17,\
+                \"gpio2\": 16,\
+                \"gpio3\": 25\
             }\
     ],\
     \"dev_total\":1\

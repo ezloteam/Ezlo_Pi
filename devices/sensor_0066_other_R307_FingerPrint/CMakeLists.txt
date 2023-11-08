@@ -1,5 +1,5 @@
 
-idf_component_register(SRCS "sensor_0066_UART_R307_FingerPrint.c" "R307_AS606.c"
+idf_component_register(SRCS "sensor_0066_other_R307_FingerPrint.c" "R307_AS606.c"
     INCLUDE_DIRS "."
     REQUIRES    trace 
                 driver
