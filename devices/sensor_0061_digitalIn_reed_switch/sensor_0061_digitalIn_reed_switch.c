@@ -111,6 +111,7 @@ static int __0061_prepare(void *arg)
                 l_ezlopi_item_t *reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
+                    reed_item->cloud_properties.device_id = reed_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
                     // if you want to add a custom data_structure , add here
                 }

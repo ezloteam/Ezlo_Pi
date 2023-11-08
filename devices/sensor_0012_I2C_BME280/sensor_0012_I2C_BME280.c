@@ -194,17 +194,20 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *temperature_item = ezlopi_device_add_item_to_device(temp_humid_device, sensor_0012_I2C_BME280);
             if (temperature_item)
             {
+                temperature_item->cloud_properties.device_id = temp_humid_device->cloud_properties.device_id;
                 __prepare_temperature_properties(temperature_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
             }
             l_ezlopi_item_t *humidity_item = ezlopi_device_add_item_to_device(temp_humid_device, sensor_0012_I2C_BME280);
             if (humidity_item)
             {
+                humidity_item->cloud_properties.device_id = temp_humid_device->cloud_properties.device_id;
                 __prepare_humidity_properties(humidity_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
             }
             __prepare_pressure_device_cloud_properties(pressure_deivce, prep_arg->cjson_device);
             l_ezlopi_item_t *pressure_item = ezlopi_device_add_item_to_device(pressure_deivce, sensor_0012_I2C_BME280);
             if (pressure_item)
             {
+                pressure_item->cloud_properties.device_id = pressure_deivce->cloud_properties.device_id;
                 __prepare_pressure_properties(pressure_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
             }
             if ((NULL == temperature_item) && (NULL == humidity_item))

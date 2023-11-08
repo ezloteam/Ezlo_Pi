@@ -116,6 +116,7 @@ static int __0054_prepare(void *arg)
                 l_ezlopi_item_t *flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
                 if (flowmeter_item)
                 {
+                    flowmeter_item->cloud_properties.device_id = flowmeter_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
                 }
                 else

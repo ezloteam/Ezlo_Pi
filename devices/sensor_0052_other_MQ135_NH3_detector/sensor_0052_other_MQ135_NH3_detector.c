@@ -100,6 +100,7 @@ static int __0052_prepare(void *arg)
             l_ezlopi_item_t *MQ135_item_digi = ezlopi_device_add_item_to_device(MQ135_device_digi, sensor_0052_other_MQ135_NH3_detector);
             if (MQ135_item_digi)
             {
+                MQ135_item_digi->cloud_properties.device_id = MQ135_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ135_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -124,6 +125,7 @@ static int __0052_prepare(void *arg)
                 l_ezlopi_item_t *MQ135_item_adc = ezlopi_device_add_item_to_device(MQ135_device_adc, sensor_0052_other_MQ135_NH3_detector);
                 if (MQ135_item_adc)
                 {
+                    MQ135_item_adc->cloud_properties.device_id = MQ135_item_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ135_item_adc, device_prep_arg->cjson_device, MQ135_value);
                 }
                 else

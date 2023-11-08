@@ -155,6 +155,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
                 if (item)
                 {
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
                     ret = 1;

@@ -100,6 +100,7 @@ static int __0049_prepare(void *arg)
             l_ezlopi_item_t *MQ2_item_digi = ezlopi_device_add_item_to_device(MQ2_device_digi, sensor_0049_other_MQ2_LPG_detector);
             if (MQ2_item_digi)
             {
+                MQ2_item_digi->cloud_properties.device_id = MQ2_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ2_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -124,6 +125,7 @@ static int __0049_prepare(void *arg)
                 l_ezlopi_item_t *MQ2_item_adc = ezlopi_device_add_item_to_device(MQ2_device_adc, sensor_0049_other_MQ2_LPG_detector);
                 if (MQ2_item_adc)
                 {
+                    MQ2_item_adc->cloud_properties.device_id = MQ2_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ2_item_adc, device_prep_arg->cjson_device, MQ2_value);
                 }
                 else

@@ -8,6 +8,7 @@ const static char *ezlopi_id_str = "id";
 const static char *ezlopi_ids_str = "ids";
 const static char *ezlopi__id_str = "_id";
 const static char *ezlopi_device_id_str = "deviceId";
+const static char *ezlopi_device_ids_str = "deviceIds";
 const static char *ezlopi_sender_str = "sender";
 const static char *ezlopi_name_str = "name";
 const static char *ezlopi_value_str = "value";

@@ -473,12 +473,12 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             cJSON_AddBoolToObject(cj_device, "reachable", true);
             cJSON_AddBoolToObject(cj_device, "persistent", true);
             cJSON_AddBoolToObject(cj_device, "serviceNotification", false);
-            cJSON_AddBoolToObject(cj_device, "armed", false);
+            // cJSON_AddBoolToObject(cj_device, "armed", false);
             cJSON_AddStringToObject(cj_device, "roomId", "");
             cJSON_AddStringToObject(cj_device, "security", "");
             cJSON_AddBoolToObject(cj_device, "ready", true);
             cJSON_AddStringToObject(cj_device, "status", "synced");
-            cJSON_AddObjectToObject(cj_device, "info");
+            // cJSON_AddObjectToObject(cj_device, "info");
         }
     }
 

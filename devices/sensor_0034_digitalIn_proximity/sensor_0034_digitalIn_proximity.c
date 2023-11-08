@@ -96,6 +96,7 @@ static int proximity_sensor_prepare(void *args)
             l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
             if (item)
             {
+                item->cloud_properties.device_id = device->cloud_properties.device_id;
                 proximity_sensor_setup_item_properties(item, device_prep_arg->cjson_device);
                 ret = 1;
             }

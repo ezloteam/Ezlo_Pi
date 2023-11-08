@@ -111,6 +111,7 @@ static int __0055_prepare(void *arg)
                 l_ezlopi_item_t *item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
                 if (item_adc)
                 {
+                    item_adc->cloud_properties.device_id = device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device, FLEX_value);
                 }
                 else

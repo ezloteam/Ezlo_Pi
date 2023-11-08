@@ -118,6 +118,7 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *touch_switch_item = ezlopi_device_add_item_to_device(touch_device, sensor_0023_digitalIn_touch_switch_TTP223B);
             if (touch_switch_item)
             {
+                touch_switch_item->cloud_properties.device_id = touch_device->cloud_properties.device_id;
                 __prepare_touch_switch_properties(touch_switch_item, prep_arg->cjson_device);
             }
             else

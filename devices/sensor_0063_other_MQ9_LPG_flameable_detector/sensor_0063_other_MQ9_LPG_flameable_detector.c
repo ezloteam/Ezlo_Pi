@@ -100,6 +100,7 @@ static int __0063_prepare(void *arg)
             l_ezlopi_item_t *MQ9_item_digi = ezlopi_device_add_item_to_device(MQ9_device_digi, sensor_0063_other_MQ9_LPG_flameable_detector);
             if (MQ9_item_digi)
             {
+                MQ9_item_digi->cloud_properties.device_id = MQ9_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ9_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -124,6 +125,7 @@ static int __0063_prepare(void *arg)
                 l_ezlopi_item_t *MQ9_item_adc = ezlopi_device_add_item_to_device(MQ9_device_adc, sensor_0063_other_MQ9_LPG_flameable_detector);
                 if (MQ9_item_adc)
                 {
+                    MQ9_item_adc->cloud_properties.device_id = MQ9_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ9_item_adc, device_prep_arg->cjson_device, MQ9_value);
                 }
                 else
@@ -199,12 +201,12 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_in.gpio_num);
     TRACE_I("MQ9-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
-    char *user_arg = (char*)malloc(40);
-    if(user_arg)
+    char *user_arg = (char *)malloc(40);
+    if (user_arg)
     {
         memset(user_arg, 0, 40);
     }
-    item->user_arg = (void*)user_arg;
+    item->user_arg = (void *)user_arg;
 }
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
@@ -326,7 +328,7 @@ static int __0063_notify(l_ezlopi_item_t *item)
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
-                char *gas_alarm_state = (char*)item->user_arg;
+                char *gas_alarm_state = (char *)item->user_arg;
                 snprintf(gas_alarm_state, 40, "%s", curret_value);
                 ezlopi_device_value_updated_from_device_v3(item);
             }

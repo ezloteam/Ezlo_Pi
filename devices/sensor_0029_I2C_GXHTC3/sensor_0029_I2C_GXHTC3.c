@@ -193,12 +193,14 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0029_I2C_GXHTC3);
             if (item_temperature)
             {
+                item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_temperature_item_properties(item_temperature, prep_arg->cjson_device);
             }
 
             l_ezlopi_item_t *item_humdity = ezlopi_device_add_item_to_device(device, sensor_0029_I2C_GXHTC3);
             if (item_humdity)
             {
+                item_humdity->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_humidity_item_properties(item_humdity, prep_arg->cjson_device);
             }
 

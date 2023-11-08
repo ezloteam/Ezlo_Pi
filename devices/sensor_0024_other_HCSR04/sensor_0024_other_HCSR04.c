@@ -195,6 +195,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cj_device);
                     ultrasonic_sensor_t *ultrasonic_sensor = (ultrasonic_sensor_t *)malloc(sizeof(ultrasonic_sensor_t));
                     if (ultrasonic_sensor)

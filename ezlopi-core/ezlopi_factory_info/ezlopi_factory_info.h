@@ -405,26 +405,40 @@ static const char *switch_box_constant_config =
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
 
-    "{\
-    \"cmd\":3,\
-    \"dev_detail\":[{\
-                \"dev_type\" : 1,\
-                \"dev_name\" : \"LED Test\",\
-                \"id_room\" : \"\",\
-                \"id_item\" : 1,\
-                \"val_ip\" : true,\
-                \"val_op\" : false,\
-                \"gpio_in\" : 21,\
-                \"gpio_out\" : 2,\
-                \"is_ip\" : false,\
-                \"ip_inv\" : true,\
-                \"pullup_ip\" : true,\
-                \"pullup_op\" : true,\
-                \"op_inv\" : false\
-            }\
-    ],\
-    \"dev_total\":1\
-    }";
+    "{"
+    "    \"cmd\": 3,"
+    "    \"status\": 1,"
+    "    \"dev_total\": 3,"
+    "    \"dev_detail\": ["
+    "        {"
+    "            \"dev_type\": 3,"
+    "            \"dev_name\": \"Analog Input 1\","
+    "            \"id_item\": 32,"
+    "            \"id_room\": \"\","
+    "            \"resln_bit\": 10,"
+    "            \"gpio\": 1,"
+    "            \"devType\": \"Analog Input\""
+    "        },"
+    "        {"
+    "            \"dev_type\": 3,"
+    "            \"dev_name\": \"Analog Input 2\","
+    "            \"id_item\": 32,"
+    "            \"id_room\": \"\","
+    "            \"resln_bit\": 10,"
+    "            \"gpio\": 2,"
+    "            \"devType\": \"Analog Input\""
+    "        },"
+    "        {"
+    "            \"dev_type\": 3,"
+    "            \"dev_name\": \"Analog Input 3\","
+    "            \"id_item\": 32,"
+    "            \"id_room\": \"\","
+    "            \"resln_bit\": 10,"
+    "            \"gpio\": 3,"
+    "            \"devType\": \"Analog Input\""
+    "        }"
+    "    ]"
+    "}";
 
 #endif
 #ifdef __cplusplus

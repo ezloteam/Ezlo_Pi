@@ -90,6 +90,7 @@ static int __0057_prepare(void *arg)
             l_ezlopi_item_t *flame_item_digi = ezlopi_device_add_item_to_device(flame_device_digi, sensor_0057_other_KY026_FlameDetector);
             if (flame_item_digi)
             {
+                flame_item_digi->cloud_properties.device_id = flame_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(flame_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -114,6 +115,7 @@ static int __0057_prepare(void *arg)
                 l_ezlopi_item_t *flame_item_adc = ezlopi_device_add_item_to_device(flame_device_adc, sensor_0057_other_KY026_FlameDetector);
                 if (flame_item_adc)
                 {
+                    flame_item_adc->cloud_properties.device_id = flame_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, FLAME_struct);
                 }
                 else

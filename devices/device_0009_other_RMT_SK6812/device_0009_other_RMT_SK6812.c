@@ -338,6 +338,12 @@ static int __prepare(void *arg)
             switch_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
             if (switch_item && dimmer_item && dimmer_up_item && dimmer_down_item && dimmer_stop_item && rgb_color_item)
             {
+                rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_SK6812_RGB_color_item(rgb_color_item, prep_arg->cjson_device);
                 __prepare_SK6812_RGB_dimmer_item(dimmer_item, prep_arg->cjson_device);
                 __prepare_SK6812_RGB_dimmer_up_item(dimmer_up_item, prep_arg->cjson_device);

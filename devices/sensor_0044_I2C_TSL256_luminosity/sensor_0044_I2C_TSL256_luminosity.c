@@ -164,6 +164,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *tsl256_item = ezlopi_device_add_item_to_device(tsl256_device, sensor_0044_I2C_TSL256_luminosity);
                 if (tsl256_item)
                 {
+                    tsl256_item->cloud_properties.device_id = tsl256_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(tsl256_item, prep_arg->cjson_device, TSL2561_lux_data);
                 }
                 else

@@ -309,16 +309,19 @@ static int __prepare(void *arg)
                 RGB_LED_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (RGB_LED_item)
                 {
+                    RGB_LED_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_item(RGB_LED_item, prep_arg->cjson_device, RGB_struct);
                 }
                 RGB_LED_onoff_switch_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (RGB_LED_onoff_switch_item)
                 {
+                    RGB_LED_onoff_switch_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_onoff_switch_item(RGB_LED_onoff_switch_item, prep_arg->cjson_device, RGB_struct);
                 }
                 RGB_LED_dimmer_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (RGB_LED_dimmer_item)
                 {
+                    RGB_LED_dimmer_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_dimmer_item(RGB_LED_dimmer_item, prep_arg->cjson_device, RGB_struct);
                 }
                 if (!RGB_LED_item && !RGB_LED_onoff_switch_item && !RGB_LED_dimmer_item)

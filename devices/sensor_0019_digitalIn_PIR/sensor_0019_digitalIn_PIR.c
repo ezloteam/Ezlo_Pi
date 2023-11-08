@@ -112,7 +112,9 @@ static int sensor_pir_prepare_v3(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
                 if (item)
                 {
+
                     item->func = sensor_0019_digitalIn_PIR;
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     sensor_pir_setup_item_properties_v3(item, cj_device);
                     ret = 1;
                 }

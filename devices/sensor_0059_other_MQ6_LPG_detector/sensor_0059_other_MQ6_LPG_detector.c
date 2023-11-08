@@ -101,6 +101,7 @@ static int __0059_prepare(void *arg)
             l_ezlopi_item_t *MQ6_item_digi = ezlopi_device_add_item_to_device(MQ6_device_digi, sensor_0059_other_MQ6_LPG_detector);
             if (MQ6_item_digi)
             {
+                MQ6_item_digi->cloud_properties.device_id = MQ6_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ6_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -125,6 +126,7 @@ static int __0059_prepare(void *arg)
                 l_ezlopi_item_t *MQ6_item_adc = ezlopi_device_add_item_to_device(MQ6_device_adc, sensor_0059_other_MQ6_LPG_detector);
                 if (MQ6_item_adc)
                 {
+                    MQ6_item_adc->cloud_properties.device_id = MQ6_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ6_item_adc, device_prep_arg->cjson_device, MQ6_value);
                 }
                 else
@@ -427,7 +429,7 @@ void Calibrate_MQ6_R0_resistance(void *params)
         //-------------------------------------------------
         // Calculate the 'Rs' of heater during clean air [calibration phase]
         // Range -> [2Kohm - 20Kohm]
-        float RS_calib = 0;                                                                               // Define variable for sensor resistance
+        float RS_calib = 0;                                                                         // Define variable for sensor resistance
         RS_calib = ((MQ6_VOLT_RESOLUTION_Vc * mq6_eqv_RL) / (_sensor_volt / 1000.0f)) - mq6_eqv_RL; // Calculate RS in fresh air
         TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
         if (RS_calib < 0)

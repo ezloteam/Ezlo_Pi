@@ -100,6 +100,7 @@ static int __0050_prepare(void *arg)
             l_ezlopi_item_t *MQ3_item_digi = ezlopi_device_add_item_to_device(MQ3_device_digi, sensor_0050_other_MQ3_alcohol_detector);
             if (MQ3_item_digi)
             {
+                MQ3_item_digi->cloud_properties.device_id = MQ3_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ3_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -124,6 +125,7 @@ static int __0050_prepare(void *arg)
                 l_ezlopi_item_t *MQ3_item_adc = ezlopi_device_add_item_to_device(MQ3_device_adc, sensor_0050_other_MQ3_alcohol_detector);
                 if (MQ3_item_adc)
                 {
+                    MQ3_item_adc->cloud_properties.device_id = MQ3_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ3_item_adc, device_prep_arg->cjson_device, MQ3_value);
                 }
                 else
@@ -434,11 +436,11 @@ void Calibrate_MQ3_R0_resistance(void *params)
             RS_calib = 0; // No negative values accepted.
         }
         // Calculate the R0_air which is constant through-out
-         MQ3_value->MQ3_R0_constant = (RS_calib / RatioMQ3CleanAir); // Calculate MQ3_R0_constant
-        TRACE_E("CALIB_TASK -> 'MQ3_R0_constant' = %.2f",  MQ3_value->MQ3_R0_constant);
-        if ( MQ3_value->MQ3_R0_constant < 0)
+        MQ3_value->MQ3_R0_constant = (RS_calib / RatioMQ3CleanAir); // Calculate MQ3_R0_constant
+        TRACE_E("CALIB_TASK -> 'MQ3_R0_constant' = %.2f", MQ3_value->MQ3_R0_constant);
+        if (MQ3_value->MQ3_R0_constant < 0)
         {
-             MQ3_value->MQ3_R0_constant = 0; // No negative values accepted.
+            MQ3_value->MQ3_R0_constant = 0; // No negative values accepted.
         }
         // Set calibration_complete_alcohol flag
         Calibration_complete_alcohol = true;

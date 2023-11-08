@@ -110,6 +110,7 @@ static int __0056_prepare(void *arg)
                 l_ezlopi_item_t *FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_ADC_Force_Sensitive_Resistor);
                 if (FSR_item)
                 {
+                    FSR_item->cloud_properties.device_id = FSR_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(FSR_item, device_prep_arg->cjson_device, FSR_struct);
                 }
                 else

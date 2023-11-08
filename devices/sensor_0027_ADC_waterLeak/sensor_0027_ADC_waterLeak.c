@@ -117,6 +117,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0027_ADC_waterLeak);
                 if (item)
                 {
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     prepare_item_cloud_properties(item, cj_device);
                     prepare_item_interface_properties(item, cj_device);
                 }

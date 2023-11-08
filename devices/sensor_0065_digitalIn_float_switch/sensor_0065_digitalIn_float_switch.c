@@ -113,6 +113,7 @@ static int __0065_prepare(void *arg)
                 l_ezlopi_item_t *float_item = ezlopi_device_add_item_to_device(float_device, sensor_0065_digitalIn_float_switch);
                 if (float_item)
                 {
+                    float_item->cloud_properties.device_id = float_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(float_item, device_prep_arg->cjson_device);
                     // if you want to add a custom data_structure , add here
                 }

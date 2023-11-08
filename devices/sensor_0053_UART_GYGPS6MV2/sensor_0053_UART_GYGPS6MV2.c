@@ -189,30 +189,35 @@ static int __0053_prepare(void *arg)
                     l_ezlopi_item_t *lat_item = ezlopi_device_add_item_to_device(gps_device, sensor_0053_UART_GYGPS6MV2);
                     if (lat_item)
                     {
+                        lat_item->cloud_properties.device_id = gps_device->cloud_properties.device_id;
                         __prepare_lat_item_cloud_properties(lat_item, cjson_device, sensor_0053_UART_gps6mv2_data);
                         __prepare_item_interface_properties(lat_item, cjson_device);
                     }
                     l_ezlopi_item_t *long_item = ezlopi_device_add_item_to_device(gps_device, sensor_0053_UART_GYGPS6MV2);
                     if (long_item)
                     {
+                        long_item->cloud_properties.device_id = gps_device->cloud_properties.device_id;
                         __prepare_long_item_cloud_properties(long_item, cjson_device, sensor_0053_UART_gps6mv2_data);
                         __prepare_item_interface_properties(long_item, cjson_device);
                     }
                     l_ezlopi_item_t *fix_item = ezlopi_device_add_item_to_device(gps_device, sensor_0053_UART_GYGPS6MV2);
                     if (fix_item)
                     {
+                        fix_item->cloud_properties.device_id = gps_device->cloud_properties.device_id;
                         __prepare_fix_item_cloud_properties(fix_item, cjson_device, sensor_0053_UART_gps6mv2_data);
                         __prepare_item_interface_properties(fix_item, cjson_device);
                     }
                     l_ezlopi_item_t *sea_level_item = ezlopi_device_add_item_to_device(gps_device, sensor_0053_UART_GYGPS6MV2);
                     if (sea_level_item)
                     {
+                        sea_level_item->cloud_properties.device_id = gps_device->cloud_properties.device_id;
                         __prepare_sea_level_item_cloud_properties(sea_level_item, cjson_device, sensor_0053_UART_gps6mv2_data);
                         __prepare_item_interface_properties(sea_level_item, cjson_device);
                     }
                     l_ezlopi_item_t *geiod_item = ezlopi_device_add_item_to_device(gps_device, sensor_0053_UART_GYGPS6MV2);
                     if (geiod_item)
                     {
+                        geiod_item->cloud_properties.device_id = gps_device->cloud_properties.device_id;
                         __prepare_geiod_item_cloud_properties(geiod_item, cjson_device, sensor_0053_UART_gps6mv2_data);
                         __prepare_item_interface_properties(geiod_item, cjson_device);
                     }

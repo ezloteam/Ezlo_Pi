@@ -211,14 +211,16 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
-            if (item_temperature)
+            l_ezlopi_item_t *item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
+            if (item_turbidity)
             {
+                item_turbidity->cloud_properties.device_id = device->cloud_properties.device_id;
                 char *turbidity_sensor_states = (char *)malloc(40 * sizeof(char));
                 if (turbidity_sensor_states)
                 {
+
                     memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));
-                    __prepare_item_properties(item_temperature, prep_arg->cjson_device, (void *)turbidity_sensor_states);
+                    __prepare_item_properties(item_turbidity, prep_arg->cjson_device, (void *)turbidity_sensor_states);
                 }
             }
         }

@@ -116,6 +116,7 @@ static int __0060_prepare(void *arg)
                 l_ezlopi_item_t *vibration_item = ezlopi_device_add_item_to_device(vibration_device, sensor_0060_digitalIn_vibration_detector);
                 if (vibration_item)
                 {
+                    vibration_item->cloud_properties.device_id = vibration_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(vibration_item, dev_prep_arg->cjson_device);
                 }
                 else

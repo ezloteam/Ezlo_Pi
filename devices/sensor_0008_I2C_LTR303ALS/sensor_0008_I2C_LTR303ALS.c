@@ -165,6 +165,7 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
             if (als_ltr303_item)
             {
+                als_ltr303_item->cloud_properties.device_id = als_ltr303_device->cloud_properties.device_id;
                 __prepare_item_cloud_properties(als_ltr303_item, prep_arg->cjson_device);
             }
             else

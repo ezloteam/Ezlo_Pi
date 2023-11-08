@@ -24,6 +24,7 @@ typedef struct s_ezlopi_cloud_controller
 typedef struct s_ezlopi_cloud_item
 {
     uint32_t item_id;       // '_id' -> https://api.ezlo.com/hub/items_api/index.html,
+    uint32_t device_id;     // deviceID -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_getter;        // 'hasGetter' -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_setter;        // 'haSetter' -> https://api.ezlo.com/hub/items_api/index.html,
     const char *item_name;  // 'name' -> https://api.ezlo.com/hub/items_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_item_name_str.h
