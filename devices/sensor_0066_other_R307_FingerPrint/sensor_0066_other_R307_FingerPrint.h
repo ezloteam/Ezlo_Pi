@@ -91,7 +91,7 @@
 //---------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------
-#define MODE_DEFAULT FINGERPRINT_ERASE_WITH_IDS_MODE
+#define MODE_DEFAULT FINGERPRINT_MATCH_MODE
 #define USERID_DEFAULT 1
 #define IDCOUNT_DEFAULT 10
 

@@ -376,8 +376,11 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                         }
                         if (1 == idx) /*start_id or user_id*/
                         {
-                            user_data->user_id = (((cj_value->valueint) <= FINGERPRINT_MAX_CAPACITY_LIMIT) ? (((cj_value->valueint) > 0) ? (cj_value->valueint) : (FINGERPRINT_STARTING_USER_PAGE_ID))
-                                                                                                           : FINGERPRINT_MAX_CAPACITY_LIMIT);
+                            if (fingerprint_mode != FINGERPRINT_ENROLLMENT_MODE)
+                            {
+                                user_data->user_id = (((cj_value->valueint) <= FINGERPRINT_MAX_CAPACITY_LIMIT) ? (((cj_value->valueint) > 0) ? (cj_value->valueint) : (FINGERPRINT_STARTING_USER_PAGE_ID))
+                                                                                                               : FINGERPRINT_MAX_CAPACITY_LIMIT);
+                            }
                         }
                         if (2 == idx) /*ID_count(N)*/
                         {
@@ -605,7 +608,7 @@ static void Fingerprint_Operation_task(void *params)
                 // user_data->user_id is updated here to new_vaccant_ID
                 current_id = (Find_immediate_vaccant_ID(item));
 
-                // Finding the immediate Vaccant_ID and storing into 'current_id' 
+                // Finding the immediate Vaccant_ID and storing into 'current_id'
                 if ((current_id) > 0)
                 {
                     current_id = Enroll_Fingerprint(item); /*This return id of currently stored 'USER/PAGE ID' ; If a duplicate fingerprint is already present, then : this returns ID of duplicate instead of new */
