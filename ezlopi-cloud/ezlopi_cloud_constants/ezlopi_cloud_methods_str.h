@@ -116,5 +116,6 @@ const static char *method_hub_reboot = "hub.reboot";
 // const static char *method_hub_network_enabled_set = "hub.network.enabled.set";
 // const static char *method_hub_detection_devices_scan_start = "hub.detection.devices.scan.start";
 // const static char *method_hub_detection_devices_scans_top = "hub.detection.devices.scan.stop";
+const static char *method_hub_scene_run_progress = "hub.scene.run.progress";
 
 #endif // __EZLOPI_METHODS_STR_H__

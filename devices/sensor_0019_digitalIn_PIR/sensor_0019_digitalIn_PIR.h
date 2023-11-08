@@ -16,7 +16,7 @@
 
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
+#include "ezlopi_cloud_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
 

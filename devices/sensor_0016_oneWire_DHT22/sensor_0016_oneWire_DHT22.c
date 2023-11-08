@@ -1,21 +1,18 @@
 
 #include <math.h>
 #include "cJSON.h"
-#include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_cloud_scales_str.h"
-#include "ezlopi_valueformatter.h"
 
 #include "trace.h"
-#include "ezlopi_adc.h"
-#include "dht22.h"
 
+#include "ezlopi_adc.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_cloud_item_name_str.h"
+#include "ezlopi_device_value_updated.h"
+
+#include "dht22.h"
 #include "sensor_0016_oneWire_DHT22.h"
 
 static int dht22_sensor_prepare_v3(void *arg);
@@ -31,7 +28,6 @@ static int __notify(l_ezlopi_item_t *item);
 
 int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    TRACE_B("Action: %s", ezlopi_actions_to_string(action));
     int ret = 0;
     switch (action)
     {
@@ -103,9 +99,6 @@ static int __notify(l_ezlopi_item_t *item)
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            else
-            {
-            }
         }
     }
     return ret;
@@ -126,7 +119,7 @@ static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args)
             char *valueFormatted = ezlopi_valueformatter_float(dht22_data->temperature);
             cJSON_AddStringToObject(cj_properties, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            cJSON_AddStringToObject(cj_properties, "scale", "celsius");
+            cJSON_AddStringToObject(cj_properties, "scale", item->cloud_properties.scale);
         }
 
         if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
@@ -135,7 +128,7 @@ static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args)
             char *valueFormatted = ezlopi_valueformatter_float(dht22_data->humidity);
             cJSON_AddStringToObject(cj_properties, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            cJSON_AddStringToObject(cj_properties, "scale", "percent");
+            cJSON_AddStringToObject(cj_properties, "scale", item->cloud_properties.scale);
         }
     }
     return ret;

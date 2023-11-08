@@ -1,13 +1,13 @@
 
 
+#include "ezlopi_adc.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_adc.h"
 #include "ezlopi_valueformatter.h"
-#include "math.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
+#include "math.h"
 #include "esp_err.h"
 #include "items.h"
 #include "trace.h"

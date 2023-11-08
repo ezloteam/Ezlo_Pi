@@ -21,10 +21,34 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valuedouble;                   \
-            TRACE_B("%s: %f", item_name, (double)item_val);   \
         }                                                     \
         else                                                  \
         {                                                     \
+            item_val = 0;                                     \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
+    }
+
+// TRACE_B("%s: %f", item_name, (double)item_val);
+
+#define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            if (o_item->type == cJSON_False)                  \
+            {                                                 \
+                item_val = 0;                                 \
+            }                                                 \
+            else                                              \
+            {                                                 \
+                item_val = 1;                                 \
+            }                                                 \
+            item_val = o_item->valueint;                      \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = 0;                                     \
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
@@ -35,27 +59,29 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valueint;                      \
-            TRACE_B("%s: %d", item_name, item_val);           \
         }                                                     \
         else                                                  \
         {                                                     \
+            item_val = 0;                                     \
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
+// TRACE_B("%s: %d", item_name, item_val);
 
-#define CJSON_GET_VALUE_STRING(root, item_name, item_val)           \
-    {                                                               \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name);       \
-        if (o_item && o_item->valuestring)                          \
-        {                                                           \
-            item_val = o_item->valuestring;                         \
-            TRACE_B("%s: %s", item_name, item_val ? item_val : ""); \
-        }                                                           \
-        else                                                        \
-        {                                                           \
-            TRACE_E("%s: NULL", item_name);                         \
-        }                                                           \
+#define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item && o_item->valuestring)                    \
+        {                                                     \
+            item_val = o_item->valuestring;                   \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = NULL;                                  \
+            TRACE_E("%s: NULL", item_name);                   \
+        }                                                     \
     }
+// TRACE_B("%s: %s", item_name, item_val ? item_val : "");
 
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \
     {                                                                 \
@@ -138,7 +164,6 @@ typedef struct l_ezlopi_item
         s_ezlopi_adc_t adc;
     } interface;
 
-    // f_item_func_t func;
     void *user_arg;
     int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
 
@@ -161,41 +186,14 @@ typedef struct l_ezlopi_device
     struct l_ezlopi_device *next;
 } l_ezlopi_device_t;
 
-#if 0 // v1.x.x to v2.x.x
-typedef struct s_ezlopi_device_properties
-{
-    // uint16_t device_subtype; // id_item : from qt-app or ezlogic app
-    e_ezlopi_device_interface_type_t interface_type;
-    // hardware interface
-    union
-    {
-        s_ezlopi_uart_t uart; //
-        s_ezlopi_i2c_master_t i2c_master;
-        s_ezlopi_spi_master_t spi_master;
-        s_ezlopi_onewire_t onewire_master;
-        s_ezlopi_gpios_t gpio;
-        s_ezlopi_pwm_t pwm; // dev_type: 5
-        s_ezlopi_adc_t adc;
-    } interface;
-
-    void *user_arg;
-    s_ezlopi_cloud_info_t ezlopi_cloud;
-
-} s_ezlopi_device_properties_t;
-#endif
-
 void ezlopi_device_prepare(void);
-// uint32_t ezlopi_device_generate_device_id(void);
-// uint32_t ezlopi_device_generate_item_id(void);
-// uint32_t ezlopi_device_generate_room_id(void);
-// uint32_t ezlopi_device_generate_gateway_id(void);
-
-#if 0 // v2.x
-void ezlopi_device_print_properties(s_ezlopi_device_properties_t *device);
-#endif
 
 l_ezlopi_device_t *ezlopi_device_get_head(void);
 l_ezlopi_device_t *ezlopi_device_add_device(void);
+
+l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id);
+l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
+
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
                                                   int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
@@ -205,5 +203,6 @@ l_ezlopi_device_settings_v3_t *ezlopi_device_add_settings_to_device_v3(l_ezlopi_
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device);
 cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);
+s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void);
 
 #endif // __EZLOPI_DEVICE_H__

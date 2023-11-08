@@ -9,38 +9,36 @@
 
 #include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_cloud_scales_str.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "sensor_0050_other_MQ3_alcohol_detector.h"
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
 
+#warning "use of static variable"
 static bool Calibration_complete_alcohol = false; // flag to activate calibration phase
-const char *mq3_sensor_gas_alarm_token[] =
-    {
-        "no_gas",
-        "combustible_gas_detected",
-        "toxic_gas_detected",
-        "unknown"};
+
+const char *mq3_sensor_gas_alarm_token[] = {
+    "no_gas",
+    "combustible_gas_detected",
+    "toxic_gas_detected",
+    "unknown",
+};
 //--------------------------------------------------------------------------------------------------------
 static int __0050_prepare(void *arg);
 static int __0050_init(l_ezlopi_item_t *item);
 static int __0050_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0050_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0050_notify(l_ezlopi_item_t *item);
-static float Extract_MQ3_sensor_ppm(l_ezlopi_item_t *item);
-void Calibrate_MQ3_R0_resistance(void *params);
-static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+
+static void __calibrate_MQ3_R0_resistance(void *params);
+static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t *item);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
 //--------------------------------------------------------------------------------------------------------
 
@@ -169,7 +167,7 @@ static int __0050_init(l_ezlopi_item_t *item)
             // calibrate if not done
             if (!Calibration_complete_alcohol)
             {
-                xTaskCreate(Calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                xTaskCreate(__calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
             }
             ret = 2;
         }
@@ -333,7 +331,7 @@ static int __0050_notify(l_ezlopi_item_t *item)
         if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
             // extract the sensor_output_values
-            double new_value = (double)Extract_MQ3_sensor_ppm(item);
+            double new_value = (double)__extract_MQ3_sensor_ppm(item);
             mq3_value_t *MQ3_value = (mq3_value_t *)item->user_arg;
             if (fabs((double)(MQ3_value->_alcohol_ppm) - new_value) > 0.0001)
             {
@@ -346,7 +344,7 @@ static int __0050_notify(l_ezlopi_item_t *item)
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static float Extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
+static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
 {
     uint32_t mq3_adc_pin = item->interface.adc.gpio_num;
     mq3_value_t *MQ3_value = (mq3_value_t *)item->user_arg;
@@ -393,7 +391,7 @@ static float Extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
     return _alcohol_ppm;
 }
 
-void Calibrate_MQ3_R0_resistance(void *params)
+static void __calibrate_MQ3_R0_resistance(void *params)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)

@@ -1,27 +1,23 @@
+#include "cJSON.h"
+
 #include "trace.h"
 #include "items.h"
-#include "cJSON.h"
 #include "gpio_isr_service.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_cloud_scales_str.h"
 #include "ezlopi_gpio.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "sensor_0061_digitalIn_reed_switch.h"
 //-----------------------------------------------------------------------
-const char *reed_door_window_states[] =
-    {
-        "dw_is_opened",
-        "dw_is_closed",
-        "unknown"};
+const char *reed_door_window_states[] = {
+    "dw_is_opened",
+    "dw_is_closed",
+    "unknown",
+};
 
 static int __0061_prepare(void *arg);
 static int __0061_init(l_ezlopi_item_t *item);

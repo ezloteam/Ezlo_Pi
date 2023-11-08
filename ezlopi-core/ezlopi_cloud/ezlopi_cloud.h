@@ -27,7 +27,7 @@ typedef struct s_ezlopi_cloud_item
     uint32_t device_id;     // deviceID -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_getter;        // 'hasGetter' -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_setter;        // 'haSetter' -> https://api.ezlo.com/hub/items_api/index.html,
-    const char *item_name;  // 'name' -> https://api.ezlo.com/hub/items_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_item_name_str.h
+    const char *item_name;  // 'name' -> https://api.ezlo.com/hub/items_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_item_name_str.h
     bool show;              // 'show' -> https://api.ezlo.com/hub/items_api/index.html,
     const char *value_type; // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h
     const char *scale;      // 'scale' -> https://api.ezlo.com/devices/item_value_types/index.html#scalable-types -> ezlopi-cloud/constants/ezlopi_cloud_scales_str.h
@@ -79,6 +79,7 @@ uint32_t ezlopi_cloud_generate_device_id(void);
 uint32_t ezlopi_cloud_generate_item_id(void);
 uint32_t ezlopi_cloud_generate_room_id(void);
 uint32_t ezlopi_cloud_generate_gateway_id(void);
+uint32_t ezlopi_cloud_get_gateway_id(void);
 uint32_t ezlopi_cloud_generate_settings_id(void);
 
 uint32_t ezlopi_cloud_generate_scene_id(void);

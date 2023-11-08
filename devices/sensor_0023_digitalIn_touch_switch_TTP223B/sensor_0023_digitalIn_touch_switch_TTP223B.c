@@ -1,25 +1,22 @@
-
-
-#include "gpio_isr_service.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
+#include "esp_err.h"
+#include "cJSON.h"
+#include "driver/gpio.h"
 
 #include "ezlopi_cloud.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
-#include "esp_err.h"
-#include "driver/gpio.h"
 #include "items.h"
 #include "trace.h"
-#include "cJSON.h"
+#include "gpio_isr_service.h"
 
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 
+#include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
+
+#warning "Use of static variable"
 static bool sensor_bme280_initialized = false;
 
 static int __prepare(void *arg);

@@ -1,25 +1,24 @@
-
+#include "stdlib.h"
 #include <string.h>
 #include "sdkconfig.h"
 #include "math.h"
 
 #include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_timer.h"
 #include "items.h"
 
+#include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
 #include "ezlopi_devices.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
-#include "sensor_0008_I2C_LTR303ALS.h"
 #include "ALS_LTR303.h"
-#include "stdlib.h"
+#include "sensor_0008_I2C_LTR303ALS.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);

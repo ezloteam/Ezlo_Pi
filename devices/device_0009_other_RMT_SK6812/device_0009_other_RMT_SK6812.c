@@ -1,27 +1,24 @@
-
+#include "math.h"
+#include "cJSON.h"
 #include <string.h>
 #include "sdkconfig.h"
+#include "driver/gpio.h"
 
-#include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_timer.h"
 #include "items.h"
-#include "math.h"
 
+#include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
 #include "ezlopi_devices.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
-
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "led_strip.h"
-#include "driver/gpio.h"
 #include "color_codes.h"
-
 #include "device_0009_other_RMT_SK6812.h"
 
 static bool sk6812_led_strip_initialized = false;

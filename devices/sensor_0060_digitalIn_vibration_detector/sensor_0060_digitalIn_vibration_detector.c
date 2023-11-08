@@ -1,34 +1,32 @@
+#include "cJSON.h"
+
 #include "trace.h"
 #include "items.h"
-#include "cJSON.h"
 #include "gpio_isr_service.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_cloud_scales_str.h"
 #include "ezlopi_gpio.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "sensor_0060_digitalIn_vibration_detector.h"
 //---------------------------------------------------------------------------------------------------------
-const char *Sw420_vibration_activity_state_token[] =
-    {
-        "no_activity",
-        "shake",
-        "tilt",
-        "drop"};
+const char *Sw420_vibration_activity_state_token[] = {
+    "no_activity",
+    "shake",
+    "tilt",
+    "drop",
+};
+
 static int __0060_prepare(void *arg);
 static int __0060_init(l_ezlopi_item_t *item);
 static int __0060_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0060_notify(l_ezlopi_item_t *item);
+
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 //---------------------------------------------------------------------------------------------------------

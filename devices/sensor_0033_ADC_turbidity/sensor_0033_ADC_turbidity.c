@@ -1,17 +1,12 @@
+#include "cJSON.h"
+
 #include "trace.h"
-#include "ezlopi_device_value_updated.h"
 
 #include "ezlopi_adc.h"
-#include "ezlopi_cloud_constants.h"
-
-#include "cJSON.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
-
-#include "trace.h"
-#include "ezlopi_adc.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "sensor_0033_ADC_turbidity.h"
 
@@ -21,11 +16,10 @@ static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __get_item_list(l_ezlopi_item_t *item, void *arg);
 
-const char *water_filter_replacement_alarm_states[] =
-    {
-        "water_filter_ok",
-        "replace_water_filter",
-        "unknown",
+const char *water_filter_replacement_alarm_states[] = {
+    "water_filter_ok",
+    "replace_water_filter",
+    "unknown",
 };
 
 static char *ezlopi_water_present_turbidity_state = NULL;

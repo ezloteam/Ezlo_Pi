@@ -1,20 +1,16 @@
+#include "math.h"
+#include "stdlib.h"
 #include <string.h>
 #include "cJSON.h"
 
 #include "trace.h"
+
 #include "ezlopi_cloud.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_actions.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_device_value_updated.h"
 #include "ezlopi_valueformatter.h"
-#include "ezlopi_cloud_scales_str.h"
-#include "math.h"
-#include "stdlib.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "sensor_0012_I2C_BME280.h"
 
@@ -140,18 +136,21 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             snprintf(valueFormatted, 20, "%0.3f", bmp280_sensor_params->temperature);
             cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_device, "value", bmp280_sensor_params->temperature);
+            cJSON_AddStringToObject(cj_device, "scale", "celsius");
         }
         if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
             snprintf(valueFormatted, 20, "%0.3f", bmp280_sensor_params->humidity);
             cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_device, "value", bmp280_sensor_params->humidity);
+            cJSON_AddStringToObject(cj_device, "scale", "percent");
         }
         if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
         {
             snprintf(valueFormatted, 20, "%0.3f", (bmp280_sensor_params->pressure / 1000.0));
             cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_device, "value", (bmp280_sensor_params->pressure / 1000.0));
+            cJSON_AddStringToObject(cj_device, "scale", "kilo_pascal");
         }
     }
 

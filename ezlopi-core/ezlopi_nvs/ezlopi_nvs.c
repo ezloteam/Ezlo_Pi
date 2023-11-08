@@ -486,7 +486,7 @@ char *ezlopi_nvs_read_str(char *nvs_name)
 
                 if (ESP_OK == err)
                 {
-                    TRACE_D("%s read success. \r\nData[%d]: \r\n%s", nvs_name, buf_len_needed, return_str);
+                    // TRACE_D("%s read success. \r\nData[%d]: \r\n%s", nvs_name, buf_len_needed, return_str);
                 }
                 else
                 {

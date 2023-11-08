@@ -1,18 +1,19 @@
 #include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
 #include "items.h"
 
-#include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_pwm.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_actions.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "device_0038_other_RGB.h"
 
+#warning "use of static variable"
 static bool RGB_LED_initialized = false;
 
 static l_ezlopi_item_t *RGB_LED_item = NULL;

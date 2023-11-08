@@ -1,23 +1,24 @@
-#include "stdlib.h"
-#include "driver/gpio.h"
-
 #include "cJSON.h"
+#include "stdlib.h"
+#include "soc/rtc.h"
+#include "driver/gpio.h"
+#include "driver/mcpwm.h"
+
 #include "trace.h"
 #include "items.h"
+#include "gpio_isr_service.h"
 
+#include "ezlopi_gpio.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
-#include "ezlopi_gpio.h"
 
-#include "gpio_isr_service.h"
 #include "sensor_0024_other_HCSR04.h"
-#include "driver/mcpwm.h"
-#include "soc/rtc.h"
 
+#warning "use of static variable"
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 static int __prepare(void *arg);

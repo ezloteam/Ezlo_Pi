@@ -162,9 +162,10 @@ typedef struct s_basic_factory_info
 #endif
 
     void print_factory_info_v2(void);
-    uint32_t ezlopi_factory_info_v2_get_provisioning_status(void);
     const esp_partition_t *ezlopi_factory_info_v2_init(void);
-    void ezlopi_factory_info_v2_free(void *arg);
+
+    uint32_t ezlopi_factory_info_v2_get_provisioning_status(void);
+
     uint16_t ezlopi_factory_info_v2_get_version(void);
     char *ezlopi_factory_info_v2_get_name(void);
     char *ezlopi_factory_info_v2_get_manufacturer(void);
@@ -195,6 +196,7 @@ typedef struct s_basic_factory_info
     int ezlopi_factory_info_v2_set_ssl_public_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
 
+    void ezlopi_factory_info_v2_free(void *arg);
     int ezlopi_factory_info_v2_factory_reset(void);
 
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
@@ -403,42 +405,34 @@ static const char *switch_box_constant_config =
     \"dev_total\": 1}";
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
-static const char *test_device_constant_config = "{\"cmd\":3,\"status\":1,\"dev_total\":3,\"dev_detail\":[{\"dev_type\":7,\"dev_name\":\"DHT 22\",\"id_room\":\"\",\"id_item\":16,\"gpio\":18}]}";
-
-//     "{"
-//     "    \"cmd\": 3,"
-//     "    \"status\": 1,"
-//     "    \"dev_total\": 3,"
-//     "    \"dev_detail\": ["
-//     "        {"
-//     "            \"dev_type\": 3,"
-//     "            \"dev_name\": \"Analog Input 1\","
-//     "            \"id_item\": 32,"
-//     "            \"id_room\": \"\","
-//     "            \"resln_bit\": 10,"
-//     "            \"gpio\": 1,"
-//     "            \"devType\": \"Analog Input\""
-//     "        },"
-//     "        {"
-//     "            \"dev_type\": 3,"
-//     "            \"dev_name\": \"Analog Input 2\","
-//     "            \"id_item\": 32,"
-//     "            \"id_room\": \"\","
-//     "            \"resln_bit\": 10,"
-//     "            \"gpio\": 2,"
-//     "            \"devType\": \"Analog Input\""
-//     "        },"
-//     "        {"
-//     "            \"dev_type\": 3,"
-//     "            \"dev_name\": \"Analog Input 3\","
-//     "            \"id_item\": 32,"
-//     "            \"id_room\": \"\","
-//     "            \"resln_bit\": 10,"
-//     "            \"gpio\": 3,"
-//     "            \"devType\": \"Analog Input\""
-//     "        }"
-//     "    ]"
-//     "}";
+static const char *test_device_constant_config =
+    "{\
+    \"cmd\":3,\
+    \"dev_detail\":[{\
+                \"dev_type\": 7,\
+                \"dev_name\": \"DHT 22\",\
+                \"id_room\": \"\",\
+                \"id_item\": 16,\
+                \"gpio\": 18\
+            },\
+            {\
+                \"dev_type\" : 1,\
+                \"dev_name\" : \"Dining Room Main Lamp\",\
+                \"id_room\" : \"\",\
+                \"id_item\" : 2,\
+                \"val_ip\" : true,\
+                \"val_op\" : false,\
+                \"gpio_in\" : 21,\
+                \"gpio_out\" : 2,\
+                \"is_ip\" : false,\
+                \"ip_inv\" : true,\
+                \"pullup_ip\" : true,\
+                \"pullup_op\" : true,\
+                \"op_inv\" : false\
+            }\
+    ],\
+    \"dev_total\":2\
+    }";
 
 #endif
 #ifdef __cplusplus

@@ -1,21 +1,16 @@
-
-#include "gpio_isr_service.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-
-#include "ezlopi_cloud.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_valueformatter.h"
-
 #include "esp_err.h"
 #include "driver/gpio.h"
+#include "cJSON.h"
+
+#include "ezlopi_cloud.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
+
 #include "items.h"
 #include "trace.h"
-#include "cJSON.h"
+#include "gpio_isr_service.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);

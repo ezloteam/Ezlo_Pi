@@ -1,20 +1,20 @@
+#include "cJSON.h"
 #include <string.h>
 #include "sdkconfig.h"
 
-#include "cJSON.h"
 #include "trace.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
 #include "items.h"
-
 #include "gpio_isr_service.h"
+
 #include "ezlopi_gpio.h"
+#include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
+#include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -25,6 +25,7 @@ static void __toggle_gpio(l_ezlopi_item_t *item);
 static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __interrupt_upcall(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
+
 
 int device_0003_digitalOut_plug(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {

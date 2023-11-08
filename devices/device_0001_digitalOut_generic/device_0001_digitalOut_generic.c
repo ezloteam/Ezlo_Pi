@@ -4,9 +4,17 @@
 #include "cJSON.h"
 #include "trace.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
 #include "items.h"
+#include "gpio_isr_service.h"
+
+#include "ezlopi_gpio.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "gpio_isr_service.h"
 #include "ezlopi_gpio.h"
@@ -520,7 +528,7 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
 static void __write_gpio_value(l_ezlopi_item_t *item)
 {
     uint32_t write_value = (0 == item->interface.gpio.gpio_out.invert) ? item->interface.gpio.gpio_out.value : (item->interface.gpio.gpio_out.value ? 0 : 1);
-    esp_err_t error = gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
+    gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
 }
 
 static void __interrupt_upcall(l_ezlopi_item_t *item)
@@ -532,6 +540,6 @@ static void __interrupt_upcall(l_ezlopi_item_t *item)
 static void __toggle_gpio(l_ezlopi_item_t *item)
 {
     uint32_t write_value = !(item->interface.gpio.gpio_out.value);
-    esp_err_t error = gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
+    gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
     item->interface.gpio.gpio_out.value = write_value;
 }

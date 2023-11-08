@@ -8,16 +8,27 @@
 #include "ezlopi_scenes_v2.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_scenes_operators.h"
+#include "ezlopi_meshbot_service.h"
+
+static void __value_types_list(char *list_name, cJSON *cj_result);
+static void __scalable_value_types_list(char *list_name, cJSON *cj_result);
+static void __value_scales_list(char *list_name, cJSON *cj_result);
+static void __scenes_value_types_list(char *list_name, cJSON *cj_result);
+static void __value_types_families_list(char *list_name, cJSON *cj_result);
+static void __comparison_operators_list(char *list_name, cJSON *cj_result);
+static void __comparison_methods_list(char *list_name, cJSON *cj_result);
+static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result);
 
 void scenes_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
-    if (cjson_result)
+    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
     {
-        cJSON *cj_scene_array = cJSON_AddArrayToObject(cjson_result, "scenes");
-        ezlopi_scenes_get_list(cj_scene_array);
+        cJSON *cj_scene_array = cJSON_AddArrayToObject(cj_result, "scenes");
+        ezlopi_scenes_get_list_v2(cj_scene_array);
     }
 }
 
@@ -29,7 +40,11 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        ezlopi_store_new_scene(cj_params);
+        uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
+        if (new_scene_id)
+        {
+            ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
+        }
     }
 }
 
@@ -58,6 +73,27 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
                 }
 
                 free(scene_str);
+            }
+        }
+    }
+}
+
+void scenes_edit(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
+        if (cj_id && cj_id->valuestring)
+        {
+            uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
+            cJSON *cj_eo = cJSON_GetObjectItem(cj_params, "eo");
+            if (cj_eo)
+            {
+                // ezlopi_scenes_update_by_id(u_id, cj_eo);
             }
         }
     }
@@ -98,31 +134,51 @@ void scenes_delete(cJSON *cj_request, cJSON *cj_response)
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
             ezlopi_nvs_delete_stored_script(u_id);
-            ezlopi_scenes_depopulate_by_ids(u_id);
-            ezlopi_scenes_remove_id_from_list(u_id);
+            ezlopi_scenes_depopulate_by_id_v2(u_id);
+            ezlopi_scenes_remove_id_from_list_v2(u_id);
         }
     }
 }
 
-// void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
-// {
-//     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-//     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-//     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
-//
-//     TRACE_E("Not implemented!");
-// #warning "Incomplete"
-//
-//     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
-//     if (cj_params)
-//     {
-//         cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");
-//         if (cj_scene_id && cj_scene_id->valuestring)
-//         {
-//             uint32_t u_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-//         }
-//     }
-// }
+void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");
+        if (cj_scene_id && cj_scene_id->valuestring)
+        {
+            uint32_t u_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+            l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(u_id);
+            if (scene_node)
+            {
+                // scene_node->status;
+            }
+        }
+    }
+}
+
+void scenes_run(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");
+        if (cj_scene_id && cj_scene_id->valuestring)
+        {
+            uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
+            ezlopi_scenes_service_run_by_id(u32_scene_id);
+        }
+    }
+}
 
 void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 {
@@ -169,11 +225,11 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
                                 {
                                 case SCENE_BLOCK_TYPE_WHEN:
                                 {
-                                    l_when_block_v2_t *curr_when_block = req_scene->when;
+                                    l_when_block_v2_t *curr_when_block = req_scene->when_block;
                                     while (curr_when_block)
                                     {
                                         cJSON *cj_when_block = NULL;
-                                        // ezlopi_scenes_cjson_create_when_block(req_scene->when);
+                                        // ezlopi_scenes_cjson_create_when_block(req_scene->when_block);
                                         if (cj_when_block)
                                         {
                                             if (!cJSON_AddItemToArray(cj_block_array, cj_when_block))
@@ -186,13 +242,14 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 
                                     break;
                                 }
+#warning "Check if else block is required or not"
                                 case SCENE_BLOCK_TYPE_THEN:
                                 {
-                                    l_then_block_v2_t *curr_then_block = req_scene->then;
+                                    l_action_block_v2_t *curr_then_block = req_scene->then_block;
                                     while (curr_then_block)
                                     {
                                         cJSON *cj_then_block = NULL;
-                                        // ezlopi_scenes_cjson_create_then_block(req_scene->then);
+                                        // ezlopi_scenes_cjson_create_then_block(req_scene->then_block);
                                         if (cj_then_block)
                                         {
                                             if (!cJSON_AddItemToArray(cj_block_array, cj_then_block))
@@ -218,32 +275,57 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-typedef struct s_block_data_list_collector
+void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
 {
-    char *key_string;
-    void (*func)(char *list_name, cJSON *result);
-} s_block_data_list_collector_t;
+    typedef struct s_block_data_list_collector
+    {
+        char *key_string;
+        void (*func)(char *list_name, cJSON *result);
+    } s_block_data_list_collector_t;
 
-static void __value_types_list(char *list_name, cJSON *cj_result);
-static void __scalable_value_types_list(char *list_name, cJSON *cj_result);
-static void __value_scales_list(char *list_name, cJSON *cj_result);
-static void __scenes_value_types_list(char *list_name, cJSON *cj_result);
-static void __value_types_families_list(char *list_name, cJSON *cj_result);
-static void __comparison_operators_list(char *list_name, cJSON *cj_result);
-static void __comparison_methods_list(char *list_name, cJSON *cj_result);
-static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result);
+    static const s_block_data_list_collector_t block_data_list_collector[] = {
+        {.key_string = "valueTypes", .func = __value_types_list},
+        {.key_string = "scalableValueTypes", .func = __scalable_value_types_list},
+        {.key_string = "valueScales", .func = __value_scales_list},
+        {.key_string = "scenesValueTypes", .func = __scenes_value_types_list},
+        {.key_string = "valueTypeFamilies", .func = __value_types_families_list},
+        {.key_string = "comparisonOperators", .func = __comparison_operators_list},
+        {.key_string = "comparisonMethods", .func = __comparison_methods_list},
+        {.key_string = "advancedScenesVersion", .func = __advanced_scenes_version_list},
+        {.key_string = NULL, .func = NULL},
+    };
 
-static s_block_data_list_collector_t block_data_list_collector[] = {
-    {.key_string = "valueTypes", .func = __value_types_list},
-    {.key_string = "scalableValueTypes", .func = __scalable_value_types_list},
-    {.key_string = "valueScales", .func = __value_scales_list},
-    {.key_string = "scenesValueTypes", .func = __scenes_value_types_list},
-    {.key_string = "valueTypeFamilies", .func = __value_types_families_list},
-    {.key_string = "comparisonOperators", .func = __comparison_operators_list},
-    {.key_string = "comparisonMethods", .func = __comparison_methods_list},
-    {.key_string = "advancedScenesVersion", .func = __advanced_scenes_version_list},
-    {.key_string = NULL, .func = NULL},
-};
+    if (cj_request && cj_response)
+    {
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+        cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+            if (cj_result)
+            {
+                cJSON *temp = cj_params->child;
+
+                while (temp != NULL)
+                {
+                    uint32_t idx = 0;
+                    while (block_data_list_collector[idx].func)
+                    {
+                        if (0 == strcmp(block_data_list_collector[idx].key_string, temp->string))
+                        {
+                            block_data_list_collector[idx].func(block_data_list_collector[idx].key_string, cj_result);
+                        }
+                        idx++;
+                    }
+
+                    temp = temp->next;
+                }
+            }
+        }
+    }
+}
 
 static void __value_types_list(char *list_name, cJSON *cj_result)
 {
@@ -411,8 +493,6 @@ static void __value_types_families_list(char *list_name, cJSON *cj_result)
     }
 }
 
-#include "ezlopi_scenes_operators.h"
-
 static void __comparison_operators_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
@@ -496,59 +576,3 @@ static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)
     {
     }
 }
-
-void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
-{
-    if (cj_request && cj_response)
-    {
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-
-        cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
-        if (cj_params)
-        {
-            cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
-            if (cj_result)
-            {
-                cJSON *temp = cj_params->child;
-
-                while (temp != NULL)
-                {
-                    uint32_t idx = 0;
-                    while (block_data_list_collector[idx].func)
-                    {
-                        if (0 == strcmp(block_data_list_collector[idx].key_string, temp->string))
-                        {
-                            block_data_list_collector[idx].func(block_data_list_collector[idx].key_string, cj_result);
-                        }
-                        idx++;
-                    }
-
-                    temp = temp->next;
-                }
-            }
-        }
-    }
-}
-
-// void scenes_run(cJSON *cj_request, cJSON *cj_response)
-// {
-//     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-//     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-//     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
-
-//     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
-//     if (cj_params)
-//     {
-//         cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, "sceneId");
-//         if (cj_scene_id && cj_scene_id->valuestring)
-//         {
-//             uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-//             l_scenes_list_t *scene_object = ezlopi_scenes_get_by_id(u32_scene_id);
-//             if (scene_object)
-//             {
-// #warning "Need to call Secene logic execute here."
-//             }
-//         }
-//     }
-// }

@@ -1,12 +1,14 @@
 #include "cJSON.h"
-#include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_valueformatter.h"
 
 #include "trace.h"
+
 #include "ezlopi_adc.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
+
 #include "sensor_0032_ADC_soilMoisture.h"
 
 static int __prepare(void *arg);

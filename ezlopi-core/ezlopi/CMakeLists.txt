@@ -2,16 +2,13 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "ezlopi.c" "${config_src}"
+idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    trace 
                 ezlopi_devices 
-                ezlopi_factory_info
-                ezlopi_nvs 
-                ezlopi_wifi
-                ezlopi_ethernet 
+                ezlopi_factory_info 
+                ezlopi_nvs ezlopi_wifi
+                ezlopi_ethernet
                 ezlopi_event_queue 
                 ezlopi_ping 
-                ezlopi_actions
-                ezlopi_timer 
-                )
+                core_sntp)

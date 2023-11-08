@@ -1,6 +1,6 @@
 #ifndef __EZLOPI_VALUES_STR_H__
 #define __EZLIPI_VALUES_STR_H__
-
+#pragma once
 /// @brief https://api.ezlo.com/devices/item_value_types/index.html
 const static char *value_type_int = "int";
 // const static char *value_type_int64 = "int64";

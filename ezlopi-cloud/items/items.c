@@ -206,7 +206,7 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_result, "deviceSubcategory", curr_device->cloud_properties.subcategory);
                         cJSON_AddStringToObject(cj_result, "roomName", "");
                         cJSON_AddFalseToObject(cj_result, "serviceNotification");
-                        cJSON_AddFalseToObject(cj_result, "userNotification");
+                        cJSON_AddTrueToObject(cj_result, "userNotification");
                         cJSON_AddNullToObject(cj_result, "notifications");
                         cJSON_AddStringToObject(cj_result, "name", curr_item->cloud_properties.item_name);
                         if (curr_item->cloud_properties.scale)

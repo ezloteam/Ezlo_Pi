@@ -22,7 +22,7 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
                     cJSON *cj_response = ezlopi_cloud_items_updated_from_devices_v3(curr_device, item);
                     if (cj_response)
                     {
-                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
+                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_D);
                         cJSON_Delete(cj_response);
                     }
                     break;
@@ -84,7 +84,7 @@ int ezlopi_device_value_updated_from_device(s_ezlopi_device_properties_t *device
                     cJSON *cj_response = ezlopi_cloud_items_updated_from_devices(registered_devices);
                     if (cj_response)
                     {
-                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
+                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_D);
                         cJSON_Delete(cj_response);
                     }
                 }

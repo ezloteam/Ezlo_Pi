@@ -183,7 +183,7 @@ static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_a
 void ezlopi_timer_start_1000ms(void)
 {
     TRACE_D("initializing timer for 1000 ms interrupt...");
-    ezlopi_timer_init_timer_event(0, 5000, EZLOPI_ACTION_NOTIFY_1000_MS);
+    ezlopi_timer_init_timer_event(0, 2000, EZLOPI_ACTION_NOTIFY_1000_MS);
 }
 #else
 void ezlopi_timer_start_1000ms(void)

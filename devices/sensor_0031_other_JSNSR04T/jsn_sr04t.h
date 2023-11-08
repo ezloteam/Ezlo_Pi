@@ -12,7 +12,7 @@
 #include "ezlopi_cloud_subcategory_str.h"
 // #include "ezlopi_cloud_value_type_str.h"
 #include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_item_name_str.h"
+#include "ezlopi_cloud_item_name_str.h"
 #include "sdkconfig.h"
 #include "cJSON.h"
 

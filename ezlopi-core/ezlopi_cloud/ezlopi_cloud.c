@@ -18,9 +18,9 @@ static uint64_t settings_id = 0;
 static uint32_t scene_id = 0;
 static uint32_t script_id = 0;
 
-static uint16_t ezlopi_get_mac_crc(void)
+static uint32_t ezlopi_get_mac_crc(void)
 {
-    uint16_t crc = 0;
+    uint32_t crc = 0;
     uint8_t mac_base[6] = {0};
     esp_efuse_mac_get_default((uint8_t *)mac_base);
 
@@ -38,7 +38,7 @@ static uint16_t ezlopi_get_mac_crc(void)
         }
     }
 
-    return crc;
+    return (crc << 8) & 0x00FFFF00;
 }
 
 uint32_t ezlopi_cloud_generate_device_id(void)
@@ -114,7 +114,7 @@ void ezlopi_cloud_update_scene_id(uint32_t a_scene_id)
 }
 uint32_t ezlopi_cloud_generate_scene_id(void)
 {
-    scene_id = (0 == scene_id) ? SCENE_ID_START : scene_id + ezlopi_get_mac_crc() + 1;
+    scene_id = (0 == scene_id) ? (SCENE_ID_START + ezlopi_get_mac_crc()) : (scene_id + 1);
     return scene_id;
 }
 
@@ -124,6 +124,6 @@ void ezlopi_cloud_update_script_id(uint32_t a_script_id)
 }
 uint32_t ezlopi_cloud_generate_script_id(void)
 {
-    script_id = (0 == script_id) ? SCRIPT_ID_START : script_id + ezlopi_get_mac_crc() + 1;
+    script_id = (0 == script_id) ? (SCRIPT_ID_START + ezlopi_get_mac_crc()) : (script_id + 1);
     return script_id;
 }
