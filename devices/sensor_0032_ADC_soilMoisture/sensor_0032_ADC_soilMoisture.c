@@ -104,13 +104,13 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_moisture;
     device->cloud_properties.device_type = dev_type_sensor;
-    cJSON *cj_info = cJSON_CreateObject();
-    cJSON_AddStringToObject(cj_info, "manufacturer", "EzloPi");
-    cJSON_AddStringToObject(cj_info, "model", "EzloPi Generic");
-    cJSON_AddStringToObject(cj_info, "protocol", "WiFi");
-    cJSON_AddStringToObject(cj_info, "firmware.stack", "3.0.4");
-    cJSON_AddStringToObject(cj_info, "hardware", "ESP32");
-    device->cloud_properties.info = cj_info;
+    // cJSON *cj_info = cJSON_CreateObject();
+    // cJSON_AddStringToObject(cj_info, "manufacturer", "EzloPi");
+    // cJSON_AddStringToObject(cj_info, "model", "EzloPi Generic");
+    // cJSON_AddStringToObject(cj_info, "protocol", "WiFi");
+    // cJSON_AddStringToObject(cj_info, "firmware.stack", "3.0.4");
+    // cJSON_AddStringToObject(cj_info, "hardware", "ESP32");
+    device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
