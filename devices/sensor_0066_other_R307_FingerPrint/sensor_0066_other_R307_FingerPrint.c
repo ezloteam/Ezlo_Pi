@@ -711,9 +711,17 @@ static void Fingerprint_Operation_task(void *params)
                 break;
             }
             default:
+            {
                 TRACE_E("Invalid OPMODE is set..... {%d}. Reverting Back to default: 'MATCH_MODE-[0]'", user_data->opmode);
+                if (NULL != (user_data->timerHandle))
+                {
+                    TRACE_B("                       >> DELETING Timer :- 'Mode_Change_Callback_Task' <<");
+                    vTaskDelete(user_data->timerHandle);
+                    (user_data->timerHandle) = NULL;
+                }
                 user_data->opmode = FINGERPRINT_MATCH_MODE;
                 break;
+            }
             }
 
             // set the guard_flag to stop incomming notifications
