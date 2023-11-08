@@ -639,7 +639,7 @@ static void Fingerprint_Operation_task(void *params)
                 }
                 else
                 {
-                    TRACE_E("ERROR : user_id[%d] => occupied ; ... Try again with different_ID  or  Change to [default]: 'MATCH_MODE' ", user_data->user_id);
+                    TRACE_E("ERROR : ALL user_id => occupied ; ... Try again with different_ID  or  Change to [default]: 'MATCH_MODE' ");
                 }
                 LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
                 break;
