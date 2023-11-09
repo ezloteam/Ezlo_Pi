@@ -507,7 +507,16 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             {
                 cJSON_AddStringToObject(cj_device, "deviceTypeId", "ezlopi");
             }
-            cJSON_AddStringToObject(cj_device, "parentDeviceId", "");
+
+            if (device_prop->parent_device_id)
+            {
+                snprintf(tmp_string, sizeof(tmp_string), "%08x", device_prop->parent_device_id);
+            }
+            else
+            {
+                tmp_string[0] = '\0';
+            }
+            cJSON_AddStringToObject(cj_device, "parentDeviceId", tmp_string);
             cJSON_AddStringToObject(cj_device, "category", device_prop->cloud_properties.category);
             cJSON_AddStringToObject(cj_device, "subcategory", device_prop->cloud_properties.subcategory);
             snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_cloud_generate_gateway_id());

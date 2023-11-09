@@ -5,7 +5,6 @@
 #include "trace.h"
 #include "items.h"
 
-
 #include "ezlopi_cloud.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_actions.h"
@@ -15,6 +14,8 @@
 
 #warning "Implementation required"
 #include "device_0036_PWM_servo_MG996R.h"
+
+#warning "Implementation remaining"
 
 #if 0 // v2.x
 static int ezlopi_servo_motor_MG_996R_prepare_and_add(void *args);

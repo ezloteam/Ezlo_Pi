@@ -180,6 +180,7 @@ typedef struct l_ezlopi_device_settings_v3
 } l_ezlopi_device_settings_v3_t;
 typedef struct l_ezlopi_device
 {
+    uint32_t parent_device_id;
     l_ezlopi_item_t *items;
     l_ezlopi_device_settings_v3_t *settings;
     s_ezlopi_cloud_device_t cloud_properties;

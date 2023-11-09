@@ -408,30 +408,52 @@ static const char *switch_box_constant_config =
 static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[{\
-                \"dev_type\": 7,\
-                \"dev_name\": \"DHT 22\",\
-                \"id_room\": \"\",\
-                \"id_item\": 16,\
-                \"gpio\": 18\
-            },\
-            {\
-                \"dev_type\" : 1,\
-                \"dev_name\" : \"Dining Room Main Lamp\",\
-                \"id_room\" : \"\",\
-                \"id_item\" : 2,\
-                \"val_ip\" : true,\
-                \"val_op\" : false,\
-                \"gpio_in\" : 21,\
-                \"gpio_out\" : 2,\
-                \"is_ip\" : false,\
-                \"ip_inv\" : true,\
-                \"pullup_ip\" : true,\
-                \"pullup_op\" : true,\
-                \"op_inv\" : false\
-            }\
+    \"dev_detail\":\
+    [\
+        {\
+            \"dev_type\": 7,\
+            \"dev_name\": \"DHT 22\",\
+            \"id_room\": \"\",\
+            \"id_item\": 16,\
+            \"gpio\": 18\
+        },\
+        {\
+            \"dev_type\" : 1,\
+            \"dev_name\" : \"Dining Room Main Lamp\",\
+            \"id_room\" : \"\",\
+            \"id_item\" : 2,\
+            \"val_ip\" : true,\
+            \"val_op\" : false,\
+            \"gpio_in\" : 21,\
+            \"gpio_out\" : 2,\
+            \"is_ip\" : false,\
+            \"ip_inv\" : true,\
+            \"pullup_ip\" : true,\
+            \"pullup_op\" : true,\
+            \"op_inv\" : false\
+        },\
+        {\
+            \"dev_type\":5,\
+            \"dev_name\":\"Dimmer\",\
+            \"id_room\":\"\",\
+            \"id_item\":22,\
+            \"gpio\":42,\
+            \"pwm_resln\":3,\
+            \"freq_hz\":50,\
+            \"duty_cycle\":0\
+        },\
+        {\
+            \"dev_name\": \"Backlight Control\",\
+            \"dev_type\": 5,\
+            \"gpio\": 48,\
+            \"id_item\": 9,\
+            \"id_room\": \"\",\
+            \"pwm_resln\": 3,\
+            \"freq_hz\": 50,\
+            \"duty_cycle\": 10\
+        }\
     ],\
-    \"dev_total\":2\
+    \"dev_total\":3\
     }";
 
 #endif

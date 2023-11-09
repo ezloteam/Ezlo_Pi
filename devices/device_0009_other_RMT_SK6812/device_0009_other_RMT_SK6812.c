@@ -20,15 +20,29 @@
 #include "led_strip.h"
 #include "color_codes.h"
 #include "device_0009_other_RMT_SK6812.h"
+#include "../../components/led_strip/include/led_strip.h"
 
-static bool sk6812_led_strip_initialized = false;
+// static bool sk6812_led_strip_initialized = false;
 
-static l_ezlopi_item_t *switch_item = NULL;
-static l_ezlopi_item_t *dimmer_item = NULL;
-static l_ezlopi_item_t *dimmer_up_item = NULL;
-static l_ezlopi_item_t *dimmer_down_item = NULL;
-static l_ezlopi_item_t *dimmer_stop_item = NULL;
-static l_ezlopi_item_t *rgb_color_item = NULL;
+// static l_ezlopi_item_t *switch_item = NULL;
+// static l_ezlopi_item_t *dimmer_item = NULL;
+// static l_ezlopi_item_t *dimmer_up_item = NULL;
+// static l_ezlopi_item_t *dimmer_down_item = NULL;
+// static l_ezlopi_item_t *dimmer_stop_item = NULL;
+// static l_ezlopi_item_t *rgb_color_item = NULL;
+
+typedef struct s_dimmer_args
+{
+    led_strip_t sk6812_strip;
+    l_ezlopi_item_t *switch_item;
+    l_ezlopi_item_t *dimmer_item;
+    l_ezlopi_item_t *dimmer_up_item;
+    l_ezlopi_item_t *dimmer_down_item;
+    l_ezlopi_item_t *dimmer_stop_item;
+    l_ezlopi_item_t *rgb_color_item;
+    uint8_t previous_brightness;
+    bool sk6812_led_strip_initialized;
+} s_dimmer_args_t;
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -118,82 +132,93 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    static uint8_t previous_brightness = 0;
 
-    led_strip_t *sk6812_strip = (led_strip_t *)item->user_arg;
-    cJSON *cjson_params = (cJSON *)arg;
-
-    if ((NULL != cjson_params) && (NULL != sk6812_strip))
+    if (arg && item)
     {
-        if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
-        {
-            cJSON *cjson_params_color_values = cJSON_GetObjectItem(cjson_params, "value");
+        cJSON *cjson_params = (cJSON *)arg;
+        s_dimmer_args_t *dimmer_args = (s_dimmer_args_t *)item->user_arg;
 
-            rgb_t color = {
-                .red = 0,
-                .green = 0,
-                .blue = 0,
-            };
+        if (NULL != dimmer_args)
+        {
+            if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
+            {
+                cJSON *cjson_params_color_values = cJSON_GetObjectItem(cjson_params, "value");
 
-            CJSON_GET_VALUE_INT(cjson_params_color_values, "red", color.red);
-            CJSON_GET_VALUE_INT(cjson_params_color_values, "green", color.green);
-            CJSON_GET_VALUE_INT(cjson_params_color_values, "blue", color.blue);
+                rgb_t color = {
+                    .red = 0,
+                    .green = 0,
+                    .blue = 0,
+                };
 
-            led_strip_fill(sk6812_strip, 0, sk6812_strip->length, color);
-            led_strip_flush(sk6812_strip);
-            ezlopi_device_value_updated_from_device_v3(dimmer_item);
-        }
-        else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
-        {
-            int dimmable_value_percentage = 0;
-            CJSON_GET_VALUE_INT(cjson_params, "value", dimmable_value_percentage);
-            int dimmable_value = (int)((dimmable_value_percentage * 255) / 100);
-            led_strip_set_brightness(sk6812_strip, dimmable_value);
-            led_strip_flush(sk6812_strip);
-            ezlopi_device_value_updated_from_device_v3(switch_item);
-        }
-        else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
-        {
-            int led_state = 0;
-            CJSON_GET_VALUE_INT(cjson_params, "value", led_state);
-            previous_brightness = (false == led_state) ? sk6812_strip->brightness : previous_brightness;
-            int brightness_value = (false == led_state) ? 0 : ((0 == previous_brightness) ? 255 : previous_brightness);
-            led_strip_set_brightness(sk6812_strip, brightness_value);
-            led_strip_flush(sk6812_strip);
-            ezlopi_device_value_updated_from_device_v3(dimmer_item);
-        }
-        else
-        {
-            TRACE_B("item->cloud_properties.item_name => %s", item->cloud_properties.item_name);
+                CJSON_GET_VALUE_INT(cjson_params_color_values, "red", color.red);
+                CJSON_GET_VALUE_INT(cjson_params_color_values, "green", color.green);
+                CJSON_GET_VALUE_INT(cjson_params_color_values, "blue", color.blue);
+
+                led_strip_fill(&dimmer_args->sk6812_strip, 0, dimmer_args->sk6812_strip.length, color);
+                led_strip_flush(&dimmer_args->sk6812_strip);
+
+                ezlopi_device_value_updated_from_device_v3(dimmer_args->dimmer_item);
+            }
+            else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
+            {
+                int dimmable_value_percentage = 0;
+                CJSON_GET_VALUE_INT(cjson_params, "value", dimmable_value_percentage);
+                int dimmable_value = (int)((dimmable_value_percentage * 255) / 100);
+                led_strip_set_brightness(&dimmer_args->sk6812_strip, dimmable_value);
+                led_strip_flush(&dimmer_args->sk6812_strip);
+
+                ezlopi_device_value_updated_from_device_v3(dimmer_args->switch_item);
+            }
+            else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
+            {
+                int led_state = 0;
+                CJSON_GET_VALUE_INT(cjson_params, "value", led_state);
+                dimmer_args->previous_brightness = (false == led_state) ? dimmer_args->sk6812_strip.brightness : dimmer_args->previous_brightness;
+                int brightness_value = (false == led_state) ? 0 : ((0 == dimmer_args->previous_brightness) ? 255 : dimmer_args->previous_brightness);
+                led_strip_set_brightness(&dimmer_args->sk6812_strip, brightness_value);
+                led_strip_flush(&dimmer_args->sk6812_strip);
+
+                ezlopi_device_value_updated_from_device_v3(dimmer_args->dimmer_item);
+            }
+            else
+            {
+                TRACE_B("item->cloud_properties.item_name => %s", item->cloud_properties.item_name);
+            }
         }
     }
+
     return ret;
 }
 
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    led_strip_t *sk6812_strip = (led_strip_t *)item->user_arg;
-    if ((!sk6812_led_strip_initialized) && (NULL != sk6812_strip))
+    if (item)
     {
-        sk6812_strip->type = LED_STRIP_SK6812;
-        sk6812_strip->length = 1;
-        sk6812_strip->gpio = item->interface.pwm.gpio_num;
-        sk6812_strip->buf = NULL;
-        sk6812_strip->brightness = 255;
-        sk6812_strip->channel = RMT_CHANNEL_0;
+        s_dimmer_args_t *dimmer_args = (s_dimmer_args_t *)item->user_arg;
 
-        led_strip_install();
-        ESP_ERROR_CHECK(led_strip_init(sk6812_strip));
-        rgb_t color = {
-            .red = 255,
-            .green = 255,
-            .blue = 255,
-        };
-        led_strip_fill(sk6812_strip, 0, sk6812_strip->length, color);
-        led_strip_set_brightness(sk6812_strip, 255);
-        ESP_ERROR_CHECK(led_strip_flush(sk6812_strip));
-        sk6812_led_strip_initialized = true;
+        if (0 == dimmer_args->sk6812_led_strip_initialized)
+        {
+            dimmer_args->sk6812_strip.type = LED_STRIP_SK6812;
+            dimmer_args->sk6812_strip.length = 1;
+            dimmer_args->sk6812_strip.gpio = item->interface.pwm.gpio_num;
+            dimmer_args->sk6812_strip.buf = NULL;
+            dimmer_args->sk6812_strip.brightness = 255;
+            dimmer_args->sk6812_strip.channel = RMT_CHANNEL_0;
+
+            led_strip_install();
+            ESP_ERROR_CHECK(led_strip_init(&dimmer_args->sk6812_strip));
+            rgb_t color = {
+                .red = 255,
+                .green = 255,
+                .blue = 255,
+            };
+            led_strip_fill(&dimmer_args->sk6812_strip, 0, &dimmer_args->sk6812_strip.length, color);
+            led_strip_set_brightness(&dimmer_args->sk6812_strip, 255);
+            ESP_ERROR_CHECK(led_strip_flush(&dimmer_args->sk6812_strip));
+
+            dimmer_args->sk6812_led_strip_initialized = true;
+        }
     }
     return ret;
 }
@@ -329,46 +354,52 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_properties(device, prep_arg->cjson_device);
-            rgb_color_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-            dimmer_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-            dimmer_up_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-            dimmer_down_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-            dimmer_stop_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-            switch_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
-            if (switch_item && dimmer_item && dimmer_up_item && dimmer_down_item && dimmer_stop_item && rgb_color_item)
+
+            s_dimmer_args_t *dimmer_args = malloc(sizeof(s_dimmer_args_t));
+            if (dimmer_args)
             {
-                rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                __prepare_SK6812_RGB_color_item(rgb_color_item, prep_arg->cjson_device);
-                __prepare_SK6812_RGB_dimmer_item(dimmer_item, prep_arg->cjson_device);
-                __prepare_SK6812_RGB_dimmer_up_item(dimmer_up_item, prep_arg->cjson_device);
-                __prepare_SK6812_RGB_dimmer_down_item(dimmer_down_item, prep_arg->cjson_device);
-                __prepare_SK6812_RGB_dimmer_stop_item(dimmer_stop_item, prep_arg->cjson_device);
-                __prepare_SK6812_LED_onoff_switch_item(switch_item, prep_arg->cjson_device);
-                led_strip_t *sk6812_strip = (led_strip_t *)malloc(sizeof(led_strip_t));
-                if (sk6812_strip)
+                memset(dimmer_args, 0, sizeof(s_dimmer_args_t));
+
+                dimmer_args->rgb_color_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+                dimmer_args->dimmer_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+                dimmer_args->dimmer_up_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+                dimmer_args->dimmer_down_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+                dimmer_args->dimmer_stop_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+                dimmer_args->switch_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
+
+                if (dimmer_args->switch_item && dimmer_args->dimmer_item && dimmer_args->dimmer_up_item && dimmer_args->dimmer_down_item && dimmer_args->dimmer_stop_item && dimmer_args->rgb_color_item)
                 {
-                    memset(sk6812_strip, 0, sizeof(led_strip_t));
-                    switch_item->user_arg = sk6812_strip;
-                    dimmer_item->user_arg = sk6812_strip;
-                    dimmer_up_item->user_arg = sk6812_strip;
-                    dimmer_down_item->user_arg = sk6812_strip;
-                    dimmer_stop_item->user_arg = sk6812_strip;
-                    rgb_color_item->user_arg = sk6812_strip;
+                    dimmer_args->rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    dimmer_args->dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    dimmer_args->dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    dimmer_args->dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    dimmer_args->dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    dimmer_args->switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
+
+                    dimmer_args->rgb_color_item->user_arg = dimmer_args;
+                    dimmer_args->dimmer_item->user_arg = dimmer_args;
+                    dimmer_args->dimmer_up_item->user_arg = dimmer_args;
+                    dimmer_args->dimmer_down_item->user_arg = dimmer_args;
+                    dimmer_args->dimmer_stop_item->user_arg = dimmer_args;
+                    dimmer_args->switch_item->user_arg = dimmer_args;
+
+                    __prepare_SK6812_RGB_color_item(dimmer_args->rgb_color_item, prep_arg->cjson_device);
+                    __prepare_SK6812_RGB_dimmer_item(dimmer_args->dimmer_item, prep_arg->cjson_device);
+                    __prepare_SK6812_RGB_dimmer_up_item(dimmer_args->dimmer_up_item, prep_arg->cjson_device);
+                    __prepare_SK6812_RGB_dimmer_down_item(dimmer_args->dimmer_down_item, prep_arg->cjson_device);
+                    __prepare_SK6812_RGB_dimmer_stop_item(dimmer_args->dimmer_stop_item, prep_arg->cjson_device);
+                    __prepare_SK6812_LED_onoff_switch_item(dimmer_args->switch_item, prep_arg->cjson_device);
+                }
+                else
+                {
+                    free(dimmer_args);
+                    ezlopi_device_free_device(device);
                 }
             }
             else
             {
                 ezlopi_device_free_device(device);
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(device);
         }
     }
 
