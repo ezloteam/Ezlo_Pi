@@ -45,8 +45,8 @@
 
 //----------------------------------------------------------------------------------------------
 // #define MODE_DEFAULT FINGERPRINT_MATCH_MODE
-#define USERID_DEFAULT 1
-#define IDCOUNT_DEFAULT 10
+// #define USERID_DEFAULT 1
+// #define IDCOUNT_DEFAULT 10
 
 #define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
 #define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >

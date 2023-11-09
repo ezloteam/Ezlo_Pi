@@ -253,7 +253,7 @@ static int __0066_init(l_ezlopi_item_t *item)
                     // user_data->user_id = USERID_DEFAULT;
                     // user_data->id_counts = IDCOUNT_DEFAULT;
                     Update_ID_status_list(item);
-                    xTaskCreate(Fingerprint_Operation_task, "Fingerprint_activation", 2048, item, 1, &(user_data->notifyHandler));
+                    xTaskCreate(Fingerprint_Operation_task, "Fingerprint_activation", 2048 * 2, item, 1, &(user_data->notifyHandler));
 
                     // Now set a intr callback that triggers above 'Fingerprint_Operation_task', (according to the opmode)
                     if (gpio_isr_handler_add(intr_pin, gpio_notify_isr, item)) // add -> gpio_isr_handle(pin_num)
@@ -350,6 +350,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
             cJSON *cj_value_cmd = cJSON_GetObjectItem(cjson_params, "value");
             if (cj_value_cmd)
             {
+                TRACE_E("HERE!! enroll");
                 if (cJSON_IsTrue(cj_value_cmd)) // true conditon
                 {
                     time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
@@ -367,7 +368,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
             cJSON *cj_value_ids = cJSON_GetObjectItem(cjson_params, "value");
             if ((cj_value_ids != NULL) && cJSON_IsArray(cj_value_ids))
             {
-                TRACE_E("HERE!!");
+                TRACE_E("HERE!! erase id");
                 time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
                 uint16_t value_array_size = cJSON_GetArraySize(cj_value_ids);
                 if (value_array_size > 0)
@@ -385,7 +386,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                                 p = Delete(
                                     item->interface.uart.channel, /*user_channel*/
                                     j,                            /*Starting_point*/
-                                    1,                            /*Quantity*/
+                                    (uint16_t)1,                  /*Quantity*/
                                     (user_data->recieved_buffer), /*Uart_buffer address*/
                                     800);
                                 if (p != FINGERPRINT_OK)
@@ -406,25 +407,21 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                 }
                 else
                 {
-//                    vTaskDelay(1000 / portTICK_RATE_MS);
+                    TRACE_E("HERE!! erase all");
                     LedControl(item->interface.uart.channel, 0, (user_data->recieved_buffer), 200);
                     if (Erase_all_ID(item))
                     {
-                        // update all tiles
-                        //  ezlopi_device_value_updated_from_device_v3(item); // sends one item
-                        //  ezlopi_device_value_updated_from_device_v3(item); // goes for next item
-                        //  ezlopi_device_value_updated_from_device_v3(item); // goes for next item
                         user_data->opmode = FINGERPRINT_MATCH_MODE;
                     }
                     LedControl(item->interface.uart.channel, 1, (user_data->recieved_buffer), 200);
 
-//                    if (Erase_all_ID(item))
-//                    {
-//                        for (uint16_t i = 1; i <= FINGERPRINT_MAX_CAPACITY_LIMIT; i++)
-//                        {
-//                            user_data->validity[i] = false;
-//                        }
-//                    }
+                    //                    if (Erase_all_ID(item))
+                    //                    {
+                    //                        for (uint16_t i = 1; i <= FINGERPRINT_MAX_CAPACITY_LIMIT; i++)
+                    //                        {
+                    //                            user_data->validity[i] = false;
+                    //                        }
+                    //                    }
                 }
                 ezlopi_device_value_updated_from_device_v3(item);
             }
@@ -450,7 +447,6 @@ static void uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_h
             uint16_t package_len = 0;
             uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = {0};
             memcpy(another_buffer, temp_buf, MAX_PACKET_LENGTH_VAL);
-
             // Programmed only for ACK_operation [0x07h] with 256byte results.
             if (another_buffer[6] == FINGERPRINT_PID_ACKPACKET)
             {

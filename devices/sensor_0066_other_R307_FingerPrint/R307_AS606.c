@@ -1065,19 +1065,19 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
         uint8_t Combined_data[1] = {
             FINGERPRINT_EMPTY, /*INS CODE [1Byte]*/
         };
-         uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-         if (Combined_Data_Ptr)
-         {
+        //  uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
+        //  if (Combined_Data_Ptr)
+        //  {
         //         TRACE_B("                          -------- Empty ---------");
-            memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
-            bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
+        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
+        bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
                                (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-                               Combined_Data_Ptr);                //Combined_data    /* Inst_code + Data_content*/
-            //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
-            if (res)
-            {
+                               Combined_data);                    /* Inst_code + Data_content*/
+        //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
+        if (res)
+        {
             TRACE_W("--------------- 'Empty' Response ----------------");
             F_res = __Response_function(recieved_buffer, timeout);
             if (FINGERPRINT_OK == F_res)
@@ -1086,10 +1086,10 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
                 TRACE_D("Empty =>Checksum [4]: %#x", Checksum);
             }
             // TRACE_W("---------------------------------------------------");
-            }
-            free(Combined_Data_Ptr);
-            //         TRACE_B("                          -------- XXXX --------");
-         }
+        }
+        // free(Combined_Data_Ptr);
+        //         TRACE_B("                          -------- XXXX --------");
+        //  }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -1778,16 +1778,18 @@ FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item)
         }
 
         TRACE_D("------------  >> STARTING THE SYSTEM << -------------------");
-
-        if (LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200))
+        for (uint8_t i = 0; i < 2; i++)
         {
-            TRACE_D("           >> LED OFF <<");
-            vTaskDelay(500 / portTICK_PERIOD_MS);
-        }
-        if (LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200))
-        {
-            TRACE_D("           >> LED ON <<");
-            vTaskDelay(500 / portTICK_PERIOD_MS);
+            if (LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200))
+            {
+                TRACE_D("           >> LED OFF <<");
+                vTaskDelay(200 / portTICK_PERIOD_MS);
+            }
+            if (LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200))
+            {
+                TRACE_D("           >> LED ON <<");
+                vTaskDelay(200 / portTICK_PERIOD_MS);
+            }
         }
 
         F_res = FINGERPRINT_OK;
