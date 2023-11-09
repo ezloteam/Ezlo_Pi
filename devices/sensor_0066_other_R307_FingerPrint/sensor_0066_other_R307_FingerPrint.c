@@ -415,7 +415,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                                 user_data->opmode = FINGERPRINT_ERASE_WITH_IDS_MODE;
                                 user_data->user_id = j;
                                 xTaskNotifyGive(user_data->notifyHandler);
-                                vTaskDelay(100 / portTICK_PERIOD_MS);
+                                vTaskDelay(1000 / portTICK_PERIOD_MS);
                             }
                         }
                         user_data->user_id = 1;
@@ -672,7 +672,7 @@ static void Fingerprint_Operation_task(void *params)
             gpio_isr_handler_add(user_data->intr_pin, gpio_notify_isr, item);
 
             TRACE_B("           >> Remove finger  &  Wait => [2sec] ; To activate next Task_notify<<");
-            // vTaskDelay(1000 / portTICK_PERIOD_MS);
+             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
     }
 
