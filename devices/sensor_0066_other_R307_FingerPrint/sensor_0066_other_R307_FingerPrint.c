@@ -418,7 +418,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
             user_data->opmode = fingerprint_mode;
             TRACE_I("......Fingerprint Mode: -> New[%d]", user_data->opmode);
 
-            time(&user_data->timeout_start_time); // start timeout
+            time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
         }
         else
         {
@@ -541,6 +541,7 @@ static void Fingerprint_Operation_task(void *params)
         int uart_channel_num = item->interface.uart.channel;
         static const time_t timeout_seconds = 30;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
 
         for (;;)
         {
