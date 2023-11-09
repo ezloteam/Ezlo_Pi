@@ -406,14 +406,25 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                 }
                 else
                 {
-
-                    if (Empty(item->interface.uart.channel, user_data->recieved_buffer, 1000))
+//                    vTaskDelay(1000 / portTICK_RATE_MS);
+                    LedControl(item->interface.uart.channel, 0, (user_data->recieved_buffer), 200);
+                    if (Erase_all_ID(item))
                     {
-                        for (uint16_t i = 1; i <= FINGERPRINT_MAX_CAPACITY_LIMIT; i++)
-                        {
-                            user_data->validity[i] = false;
-                        }
+                        // update all tiles
+                        //  ezlopi_device_value_updated_from_device_v3(item); // sends one item
+                        //  ezlopi_device_value_updated_from_device_v3(item); // goes for next item
+                        //  ezlopi_device_value_updated_from_device_v3(item); // goes for next item
+                        user_data->opmode = FINGERPRINT_MATCH_MODE;
                     }
+                    LedControl(item->interface.uart.channel, 1, (user_data->recieved_buffer), 200);
+
+//                    if (Erase_all_ID(item))
+//                    {
+//                        for (uint16_t i = 1; i <= FINGERPRINT_MAX_CAPACITY_LIMIT; i++)
+//                        {
+//                            user_data->validity[i] = false;
+//                        }
+//                    }
                 }
                 ezlopi_device_value_updated_from_device_v3(item);
             }
