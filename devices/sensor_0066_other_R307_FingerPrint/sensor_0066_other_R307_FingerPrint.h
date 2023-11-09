@@ -213,7 +213,7 @@ typedef struct server_packet_t
     uint32_t intr_pin;                                 /* Stores custom interrupt pin num*/
     time_t timeout_start_time;                         /* Variable to store immediate time value */
     TaskHandle_t notifyHandler;
-    TaskHandle_t timerHandle;
+    // TaskHandle_t timerHandle;
 } server_packet_t;
 
 typedef enum

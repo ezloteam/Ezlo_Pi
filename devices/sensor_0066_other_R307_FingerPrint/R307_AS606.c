@@ -1489,15 +1489,15 @@ bool Erase_Specified_ID(l_ezlopi_item_t *item)
         FINGERPRINT_STATUS_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1000))
         {
             p = Delete(item->interface.uart.channel, /*user_channel*/
                        (user_data->user_id),         /*Starting_point*/
                        (user_data->id_counts),       /*Quantity*/
                        (user_data->recieved_buffer), /*Uart_buffer address*/
-                       800);
+                       300);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 2000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 1000)
             {
                 TRACE_W(" Failed to Delete (Specified ID-Range) from internal Library . Try again ...........");
                 ret = false;
