@@ -161,7 +161,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         {
             CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.uart.tx);
             CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.uart.rx);
-            CJSON_GET_VALUE_INT(cj_device, "gpio3", user_data->fp_interface.intr_pin);
+            CJSON_GET_VALUE_INT(cj_device, "gpio3", user_data->intr_pin);
             item->interface.uart.baudrate = FINGERPRINT_UART_BAUDRATE;
             item->interface.uart.enable = true;
         }
@@ -240,9 +240,9 @@ static int __0066_init(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO(user_data->fp_interface.intr_pin) && GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
+        if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO(user_data->intr_pin) && GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
         {
-            gpio_num_t intr_pin = user_data->fp_interface.intr_pin;
+            gpio_num_t intr_pin = user_data->intr_pin;
             TRACE_W("tx:%d ; rx%d ; intr:%d", item->interface.uart.tx, item->interface.uart.rx, intr_pin);
 
             s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, uart_0066_fingerprint_upcall, item);
@@ -552,7 +552,7 @@ static void Fingerprint_Operation_task(void *params)
                 user_data->opmode = FINGERPRINT_MATCH_MODE;
             }
 
-            gpio_isr_handler_remove(user_data->fp_interface.intr_pin);
+            gpio_isr_handler_remove(user_data->intr_pin);
             user_data->__busy_guard = true;
 
             switch (user_data->opmode)
@@ -675,7 +675,7 @@ static void Fingerprint_Operation_task(void *params)
             }
 
             user_data->__busy_guard = false;
-            gpio_isr_handler_add(user_data->fp_interface.intr_pin, gpio_notify_isr, item);
+            gpio_isr_handler_add(user_data->intr_pin, gpio_notify_isr, item);
 
             TRACE_B("           >> Remove finger  &  Wait => [2sec] ; To activate next Task_notify<<");
             vTaskDelay(1000 / portTICK_PERIOD_MS);
