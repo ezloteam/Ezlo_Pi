@@ -44,69 +44,16 @@
  */
 
 //----------------------------------------------------------------------------------------------
-/**
- * @brief The structure of data packets sent to R307 FingerPrint sensor
- */
-//                    original                          functions
-//          +--------+---------+------------+---------+-----------------------------+----------+
-//          | Header  0xffffff      PID        P-Len     a.INS/b.Data/c.Para            CHK    |
-//          +--------+---------+------------+---------+-----------------------------+----------+
-//          |                                                                                  |
-//          |                                         1._a._0x13H [VfyPwd]                     |
-//          |                                         1._a._0x12H [SetPwd]                     |
-//          |                                         1._a._0x15H [SetAdder]                   |
-//          |                                         1._a._0x0EH [SetSysPara]                 |=
-//          |                                         1._a._0x17H [Port Control]               |=
-//          |                                         1._a._0x0FH [ReadSysPara]                |=
-//          |                                         1._a._0x1DH [TempleteNum]                |=
-//          |                                                                                  |
-//          |                                         1._a._0x01H [GenImg]                     |
-//          |                                         1._a._0x0AH [UpImage]                    |
-//          |                                         1._a._0x0BH [DownImage]                  |
-//          |                                         1._a._0x02H [Img2Tz]                     |
-//          |                    1.cmd  - 01H         1._a._0x05H [RegModel]                   |
-//          |  0xEF01     XX     2.data - 02H   0x__                                  sum      |
-//          |                    3.end  - 08H         1._a._0x08H [UpChar]                     |
-//          |                                         1._a._0x09H [DownChar]                   |
-//          |                                         1._a._0x06H [Store]                      |
-//          |                                         1._a._0x07H [LoadChar]                   |
-//          |                                         1._a._0x0CH [DeletChar]                  |
-//          |                                         1._a._0x0DH [Empty]                      |
-//          |                                         1._a._0x03H [Match]                      |
-//          |                                         1._a._0x04H [Search]                     |
-//          +--------+---------+------------+---------+-----------------------------+----------+
-//
-//----------------------------------------------------------------------------------------------
-/**
- * @brief The structure of data packets sent to R307 FingerPrint sensor
- */
-//          +--------+---------+------------+-------+-------------------+-----+
-//            Header  0xffffff      PID       P-Len   confirmation code   CHK
-//          +--------+---------+------------+-------+-------------------+-----+
-//            0xEF01     XX      1.Ack-07H
-//          +--------+---------+------------+-------+-------------------+-----+
-//
-//
-//          +--------+---------+-----+------+---------------+-----+
-//---------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------
-#define MODE_DEFAULT FINGERPRINT_ERASE_WITH_IDS_MODE
+#define MODE_DEFAULT FINGERPRINT_ENROLLMENT_MODE
 #define USERID_DEFAULT 1
 #define IDCOUNT_DEFAULT 10
 
-// !< Setting the max quantity of fingerprints allowed to be stored >
-#define FINGERPRINT_MAX_CAPACITY_LIMIT 100
-// !< Setting the starting USER/PAGE ID >
-#define FINGERPRINT_STARTING_USER_PAGE_ID 1
-// !< Setting the max length of the transferring data package >
-#define MAX_PACKET_LENGTH_VAL 64
-// !< Setting Baudrate for transferring data via uart >
-#define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600)
+#define FINGERPRINT_MAX_CAPACITY_LIMIT 100                                 // !< Setting the max quantity of fingerprints allowed to be stored >
+#define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >
+#define MAX_PACKET_LENGTH_VAL 64                                           // !< Setting the max length of the transferring data package >
+#define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600) // !< Setting Baudrate for transferring data via uart >
 
 //----------------------------------------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------
 // Step 1: List the instructions cmds
 #define FINGERPRINT_GETIMAGE 0x01       //!< Collect finger image
 #define FINGERPRINT_IMAGE2TZ 0x02       //!< Generate character file from image
@@ -130,13 +77,11 @@
 #define FINGERPRINT_HISPEEDSEARCH 0x1B  //!< Asks the sensor to search [fastly] for a matching fingerprint template to the last model generated
 #define FINGERPRINT_TEMPLATENUM 0x1D    //!< Read finger template numbers
 #define FINGERPRINT_GR_IDENTIFY 0x34    //!< Automatic collect fingerprint, match captured fingerprint with fingerprint library
-
 /*Fingerprint_LED CONFIGURATIONS*/
 #define FINGERPRINT_AURALEDCONFIG 0x35 //!< Aura LED control
-#define FINGERPRINT_LED_BREATHING 0x01 //!< Breathing light
+#define FINGERPRINT_LED_BREATHING 0x01 //!< Turns On ;Breathing light
 #define FINGERPRINT_LED_BLUE 0x02      //!< Blue LED
-#define FINGERPRINT_LED_OFF 0x04       //!< Always off
-//---------------------------------------------------------------------
+#define FINGERPRINT_LED_OFF 0x04       //!< Turns OFF ; LED
 //---------------------------------------------------------------------
 // Step 2: Ack CMDS
 #define ACK_OK 0x00               //: commad execution complete;
@@ -160,7 +105,7 @@
 #define ACK_ERR_STORE 0x18        //: error when writing/storing template into flash library;
 #define ACK_ERR_WRNG_REGS 0x1A    //: wrong resgister number;
 #define ACK_ERR_OP_FAIL 0x1D      //: fail to operate the communication port;
-
+#if 0
 // 0x1B //: incorrect configuration of register;
 // 0x1C //: wrong notepad page number;
 // 0x41 //: No finger on sensor when add fingerprint on second time.
@@ -168,16 +113,13 @@
 // 0x43 //: fail to generate character file due to lackness of character point or over-smallness of fingerprint image for second fingerprint add
 // 0x44 //: fail to generate character file due to the over-disorderly fingerprint image for second fingerprint add;
 // 0x45 //: Duplicate fingerprint
+#endif
 //---------------------------------------------------------------------
-
-//---------------------------------------------------------------------
-// # BAUDRATE control register
+// !< BAUDRATE Baudrate_control_register
 #define FINGERPRINT_BAUDRATE_CONTROL 0x04 //!< Targets the baudrate control register
-
-// # BAUDRATE configuration cmd
-// #define FINGERPRINT_BAUDRATE_9600 0x01 //!< UART baud 9600
-#define FINGERPRINT_BAUDRATE_57600 0x06 //!< UART baud 57600
+#define FINGERPRINT_BAUDRATE_57600 0x06   //!< UART baud 57600
 #if 0
+// #define FINGERPRINT_BAUDRATE_9600 0x01 //!< UART baud 9600
 // #define FINGERPRINT_BAUDRATE_19200 0x02 //!< UART baud 19200
 // #define FINGERPRINT_BAUDRATE_28800 0x03  //!< UART baud 28800
 // #define FINGERPRINT_BAUDRATE_38400 0x04  //!< UART baud 38400
@@ -189,47 +131,35 @@
 // #define FINGERPRINT_BAUDRATE_105600 0x0B //!< UART baud 105600
 // #define FINGERPRINT_BAUDRATE_115200 0x0C //!< UART baud 115200
 #endif
-//----------------------------------------------------------------------------------------------------------------
-// # BAUDRATE control register
+// !< BAUDRATE Security_control_register
 #define FINGERPRINT_SECURITY_LEVEL 0x05 //!< Targets the security level register
-
-// # SECURITY_LEVEL configuration cmd
-#define FINGERPRINT_SECURITY_1 0x01 //!< Searching and matching security level 1
-#define FINGERPRINT_SECURITY_2 0x02 //!< Searching and matching security level 2
-#define FINGERPRINT_SECURITY_3 0x03 //!< Searching and matching security level 3
-#define FINGERPRINT_SECURITY_4 0x04 //!< Searching and matching security level 4
-#define FINGERPRINT_SECURITY_5 0x05 //!< Searching and matching security level 5
-//----------------------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------
-// # BAUDRATE control register
+#define FINGERPRINT_SECURITY_1 0x01     //!< Searching and matching security level 1
+#define FINGERPRINT_SECURITY_2 0x02     //!< Searching and matching security level 2
+#define FINGERPRINT_SECURITY_3 0x03     //!< Searching and matching security level 3
+#define FINGERPRINT_SECURITY_4 0x04     //!< Searching and matching security level 4
+#define FINGERPRINT_SECURITY_5 0x05     //!< Searching and matching security level 5
+// !< BAUDRATE Datalength_control register
 #define FINGERPRINT_DATA_PACKAGE_LENGTH 0x06 //!< Targets the Package length register
-
-// # DATA_PACKET_LENGTH configuration cmd
-#define FINGERPRINT_DATA_LENGTH_32 0x00  //!< Max length of the transmitted data package = 32 bytes
-#define FINGERPRINT_DATA_LENGTH_64 0x01  //!< Max length of the transmitted data package = 64 bytes
-#define FINGERPRINT_DATA_LENGTH_128 0x02 //!< Max length of the transmitted data package = 128 bytes
-// #define FINGERPRINT_DATA_LENGTH_256 0x03 //!< Max length of the transmitted data package = 256 bytes
-
+#define FINGERPRINT_DATA_LENGTH_32 0x00      //!< Max length of the transmitted data package = 32 bytes
+#define FINGERPRINT_DATA_LENGTH_64 0x01      //!< Max length of the transmitted data package = 64 bytes
+#define FINGERPRINT_DATA_LENGTH_128 0x02     //!< Max length of the transmitted data package = 128 bytes
+#define FINGERPRINT_DATA_LENGTH_256 0x03     //!< Max length of the transmitted data package = 256 bytes
 //----------------------------------------------------------------------------------------------------------------
 // !< PACKET FORMAT
-//---------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------
 // !< Packet Header Value >
 #define FINGERPRINT_HEADER_MSB 0xEF //!< Fixed falue of EF01H; High byte transferred first
 #define FINGERPRINT_HEADER_LSB 0x01 //!< Fixed falue of EF01H; High byte transferred first
-//---------------------------------------------------------------------
 // !< Packet Scanner Module Address [Default Value] >
 #define FINGERPRINT_DEVICE_ADDR_BIT 0xFF //!< Fixed falue of 0xFFH; High byte transferred first
-//---------------------------------------------------------------------
 // !< PACKET TYPES:- [Packet Identifier codes] >
 #define FINGERPRINT_PID_COMMANDPACKET 0x01 //!< Command packet
 #define FINGERPRINT_PID_DATAPACKET 0x02    //!< Data packet, must follow command packet or acknowledge packet
 #define FINGERPRINT_PID_ACKPACKET 0x07     //!< Acknowledge packet
 #define FINGERPRINT_PID_ENDDATAPACKET 0x08 //!< End of data packet
 //----------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------
 // !< SYSTEM STATUS/CONDITIONS
-//---------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------
 #define SYSTEM_FREE (uint16_t)(0 << 0)             //!< system is free
 #define SYSTEM_BUSY (uint16_t)(1 << 0)             //!< system is busy
 #define SYSTEM_FINGERPRINT_PASS (uint16_t)(1 << 1) //!< matching fingerprint found
@@ -239,33 +169,12 @@
 #define UART_PORT_ON (uint8_t)1  //!< Uart port is ON
 #define UART_PORT_OFF (uint8_t)0 //!< Uart port is OFF
 //----------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------
-// !< Custom tx-packet >
-typedef struct fingerprint_packet_t
-{
-    uint8_t header_code[2];
-    uint8_t device_address[4];
-    uint8_t PID;                         /* Identifier : cmd, data, ack or end*/
-    uint8_t Packet_len[2];               /* [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
-    uint8_t data[MAX_PACKET_LENGTH_VAL]; /*memcpy the (packet_len-2) num of bytes which should be <256 */
-    uint8_t chk_sum[2];
-} fingerprint_packet_t;
-//----------------------------------------------------------------------------------------------------------------
 // !< Custom enum for status response after executing a command >
 typedef enum FINGERPRINT_STATUS_t
 {
     FINGERPRINT_FAIL = 0,
     FINGERPRINT_OK,
-} FINGERPRINT_STATUS_t; // FINGERPRINT_TIMEOUT = -1,
-//----------------------------------------------------------------------------------------------------------------
-// !< Custom intr_pin addition>
-typedef struct fp_interface_t
-{
-    uint32_t intr_pin;
-    bool fp_enable;
-} fp_interface_t;
-
+} FINGERPRINT_STATUS_t;
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom enum indicating the current operation phase >
 typedef enum e_FINGERPRINT_OP_MODE_t
@@ -278,19 +187,31 @@ typedef enum e_FINGERPRINT_OP_MODE_t
     FINGERPRINT_MODE_MAX
 } e_FINGERPRINT_OP_MODE_t;
 //----------------------------------------------------------------------------------------------------------------
+// !< Custom tx-packet >
+typedef struct fingerprint_packet_t
+{
+    uint8_t header_code[2];              /* HeaderCode [0xEF01]*/
+    uint8_t device_address[4];           /* 0xFF; 0xFF; 0xFF; 0xFF*/
+    uint8_t PID;                         /* Identifier : cmd, data, ack or end*/
+    uint8_t Packet_len[2];               /* [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
+    uint8_t data[MAX_PACKET_LENGTH_VAL]; /* Inst_code + Data_content */
+    uint8_t chk_sum[2];
+} fingerprint_packet_t;
+//----------------------------------------------------------------------------------------------------------------
 // !< Custom structure to send as a reply to server (@ MATCH phase) >
 typedef struct server_packet_t
 {
-    fp_interface_t fp_interface;
     e_FINGERPRINT_OP_MODE_t opmode; /*Hold current operation mode*/
     uint16_t id_counts;             /*This is used as an information for list and erase operations*/
     uint16_t user_id;               /*Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode'] */
     uint16_t confidence_level;      /*0~100*/
-    uint16_t matched_id;
-    uint16_t matched_confidence_level;
+    // uint16_t matched_id;
+    // uint16_t matched_confidence_level;
     uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];    /*This array store incomming uart message*/
     bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
     bool __busy_guard;                                 /*Gaurd_flag used during notification actions*/
+    uint32_t intr_pin;                                 /* Stores custom interrupt pin num*/
+    time_t timeout_start_time;                         /* Variable to store immediate time value */
     TaskHandle_t notifyHandler;
     TaskHandle_t timerHandle;
 } server_packet_t;
@@ -306,50 +227,41 @@ typedef enum
 #if 0
 // bool UpImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 // bool DownImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
-
 // bool SetPwd(int uart_channel_num, uint32_t new_password, uint8_t *recieved_buffer, uint32_t timeout);
-
 // bool UpChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
 // bool DownChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
 #endif
-
 bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
-
 bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, uint32_t timeout);
-
 bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
-bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout);
-
 bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buffer, uint32_t timeout);
-bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout);
-bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout);
-
 bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout);
 bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_buffer, uint32_t timeout);
-
-bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout);
+bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout);
+bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout);
+bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout);
 bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout);
-
 bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *recieved_buffer, uint32_t timeout);
+bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout);
 bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout);
-
 bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t *recieved_buffer, uint32_t timeout);
 bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout);
 
-//---------- FUNCTIONS Defination for Operation modes ------------------------------------------------------------------------------------------------------
-
-bool Wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
-bool Check_PAGEID_Empty(l_ezlopi_item_t *item);
-bool Update_ID_status_list(l_ezlopi_item_t *item);
+//-------------------------------------------------------------------------------------------------------------------
+// FUNCTIONS Defination for Operation modes
+//-------------------------------------------------------------------------------------------------------------------
 bool Match_ID(l_ezlopi_item_t *item);
 bool Erase_all_ID(l_ezlopi_item_t *item);
 bool Erase_Specified_ID(l_ezlopi_item_t *item);
+bool Check_PAGEID_Empty(l_ezlopi_item_t *item);
+bool Update_ID_status_list(l_ezlopi_item_t *item);
 uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item);
+uint16_t Find_immediate_vaccant_ID(l_ezlopi_item_t *item);
 FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item);
-
-//----------------------------------------------------------------------------------------------------------------
+bool Wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
+//-------------------------------------------------------------------------------------------------------------------
 int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif
