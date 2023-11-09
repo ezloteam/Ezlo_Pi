@@ -1656,7 +1656,7 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
         TRACE_D("[Phase:-4] ... Search Duplicates of user_ID: [#%d]; (i.e. inside fingerprint Lib)", custom_USER_ID);
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1100))
         {
             p = Search(uart_channel_num,
                        1,                                 /*ChrBuffer = 1*/
@@ -1667,7 +1667,7 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
                        (user_data->recieved_buffer),
                        1000);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 2000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 1100)
             {
                 if (user_data->confidence_level == 0)
                 {

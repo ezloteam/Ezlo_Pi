@@ -383,7 +383,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                                 user_data->opmode = FINGERPRINT_ERASE_WITH_IDS_MODE;
                                 user_data->user_id = j;
                                 xTaskNotifyGive(user_data->notifyHandler);
-                                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                                vTaskDelay(100 / portTICK_PERIOD_MS);
 
                                 // LedControl(item->interface.uart.channel, 0, (user_data->recieved_buffer), 200);
                                 // FINGERPRINT_STATUS_t p = FINGERPRINT_FAIL;
