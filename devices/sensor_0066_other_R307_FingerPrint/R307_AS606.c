@@ -117,7 +117,7 @@ static FINGERPRINT_STATUS_t __Response_function(uint8_t *recieved_buffer, uint32
             break; // break away from while() , if we have the correct buffer values
         }
         dummy_timer = (esp_timer_get_time() / 1000) - start_time;
-        vTaskDelay(200 / portTICK_PERIOD_MS); // 200ms
+        vTaskDelay(10 / portTICK_PERIOD_MS); // 200ms
     }
     //------------ Check 'Confirmation code' of the ack packet: And give response --------------------------------------------------------------------------------
     if (!(dummy_timer > timeout) && (FINGERPRINT_PID_ACKPACKET == recieved_buffer[0]))
@@ -1065,19 +1065,19 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
         uint8_t Combined_data[1] = {
             FINGERPRINT_EMPTY, /*INS CODE [1Byte]*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
-        // TRACE_B("                          -------- Empty ---------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
-        bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
+         uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
+         if (Combined_Data_Ptr)
+         {
+        //         TRACE_B("                          -------- Empty ---------");
+            memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
+            bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
                                (uint16_t)(sizeof(Combined_data)), /* length <= combined_data*/
-                               Combined_data);                    /* Inst_code + Data_content*/
-        //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
-        if (res)
-        {
+                               Combined_Data_Ptr);                //Combined_data    /* Inst_code + Data_content*/
+            //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
+            if (res)
+            {
             TRACE_W("--------------- 'Empty' Response ----------------");
             F_res = __Response_function(recieved_buffer, timeout);
             if (FINGERPRINT_OK == F_res)
@@ -1086,10 +1086,10 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
                 TRACE_D("Empty =>Checksum [4]: %#x", Checksum);
             }
             // TRACE_W("---------------------------------------------------");
-        }
-        // free(Combined_Data_Ptr);
-        // TRACE_B("                          -------- XXXX --------");
-        // }
+            }
+            free(Combined_Data_Ptr);
+            //         TRACE_B("                          -------- XXXX --------");
+         }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -1360,13 +1360,13 @@ bool Check_PAGEID_Empty(l_ezlopi_item_t *item)
         p = Load(item->interface.uart.channel, 1, (user_data->user_id), (user_data->recieved_buffer), 200);
         if ((p == FINGERPRINT_OK))
         {
-            TRACE_W("...........Valid USER_ID already present in ID->[%d]", user_data->user_id);
+            TRACE_W(" Valid USER_ID already present in ID->[%d]", user_data->user_id);
             ret = false;
         }
         else
         {
             // Result: OK - Internal Occupied!
-            TRACE_W("...........USER_ID [%d] is empty", user_data->user_id);
+            TRACE_W(" USER_ID [%d] is empty", user_data->user_id);
             ret = true;
         }
         // TRACE_D("                       <<< XXXX >>>");
@@ -1424,7 +1424,7 @@ bool Update_ID_status_list(l_ezlopi_item_t *item)
             {
                 user_data->validity[ids] = 1; // when occupied
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
+            vTaskDelay(5 / portTICK_PERIOD_MS);
         }
         user_data->user_id = Temp_ID;
         ret = true;
@@ -1777,25 +1777,17 @@ FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item)
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
-        TRACE_D("------------ Read Total Templates Available -------------------");
-        uint16_t temp;
-        if (ReadTempNum(uart_channel_num, &temp, (user_data->recieved_buffer), 1000))
+        TRACE_D("------------  >> STARTING THE SYSTEM << -------------------");
+
+        if (LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200))
         {
-            TRACE_W("Temp_count : %d", temp);
-            for (uint8_t x = 0; x < 2; x++)
-            {
-                if (LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200))
-                {
-                    TRACE_D("           >> LED OFF <<");
-                    vTaskDelay(500 / portTICK_PERIOD_MS);
-                }
-                if (LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200))
-                {
-                    TRACE_D("           >> LED ON <<");
-                    vTaskDelay(500 / portTICK_PERIOD_MS);
-                }
-            }
-            TRACE_D("       >> STARTING THE SYSTEM <<");
+            TRACE_D("           >> LED OFF <<");
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+        }
+        if (LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200))
+        {
+            TRACE_D("           >> LED ON <<");
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
         F_res = FINGERPRINT_OK;

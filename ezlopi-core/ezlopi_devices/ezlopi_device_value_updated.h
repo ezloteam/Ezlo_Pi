@@ -6,5 +6,6 @@
 int ezlopi_device_value_updated_from_device(s_ezlopi_device_properties_t *properties);
 #endif
 int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item);
+int ezlopi_device_value_updated_from_device_item_id_v3(uint32_t item_id);
 
 #endif // __EZLOPI_DEVICE_VALUE_UPDATED_H__

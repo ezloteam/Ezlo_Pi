@@ -44,11 +44,11 @@
  */
 
 //----------------------------------------------------------------------------------------------
-#define MODE_DEFAULT FINGERPRINT_ENROLLMENT_MODE
+// #define MODE_DEFAULT FINGERPRINT_MATCH_MODE
 #define USERID_DEFAULT 1
 #define IDCOUNT_DEFAULT 10
 
-#define FINGERPRINT_MAX_CAPACITY_LIMIT 100                                 // !< Setting the max quantity of fingerprints allowed to be stored >
+#define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
 #define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >
 #define MAX_PACKET_LENGTH_VAL 64                                           // !< Setting the max length of the transferring data package >
 #define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600) // !< Setting Baudrate for transferring data via uart >
