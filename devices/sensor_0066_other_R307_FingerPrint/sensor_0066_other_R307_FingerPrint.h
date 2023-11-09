@@ -205,8 +205,8 @@ typedef struct server_packet_t
     uint16_t id_counts;             /*This is used as an information for list and erase operations*/
     uint16_t user_id;               /*Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode'] */
     uint16_t confidence_level;      /*0~100*/
-    // uint16_t matched_id;
-    // uint16_t matched_confidence_level;
+    uint16_t matched_id;                               /* Used to store most recently matched ID*/
+    uint16_t matched_confidence_level;                 /* Used to store most recently matched confidence*/
     uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];    /*This array store incomming uart message*/
     bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
     bool __busy_guard;                                 /*Gaurd_flag used during notification actions*/
@@ -231,36 +231,62 @@ typedef enum
 // bool UpChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
 // bool DownChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
 #endif
+
 bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t *recieved_buffer, uint32_t timeout);
+
 bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout);
 
 //-------------------------------------------------------------------------------------------------------------------
 // FUNCTIONS Defination for Operation modes
 //-------------------------------------------------------------------------------------------------------------------
 bool Match_ID(l_ezlopi_item_t *item);
+
 bool Erase_all_ID(l_ezlopi_item_t *item);
+
 bool Erase_Specified_ID(l_ezlopi_item_t *item);
+
 bool Check_PAGEID_Empty(l_ezlopi_item_t *item);
+
 bool Update_ID_status_list(l_ezlopi_item_t *item);
+
 uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item);
+
 uint16_t Find_immediate_vaccant_ID(l_ezlopi_item_t *item);
+
 FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item);
+
 bool Wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
+
 //-------------------------------------------------------------------------------------------------------------------
 int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
