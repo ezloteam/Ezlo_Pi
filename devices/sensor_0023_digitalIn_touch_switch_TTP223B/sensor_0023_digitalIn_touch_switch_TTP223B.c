@@ -1,25 +1,22 @@
-
-
-#include "gpio_isr_service.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
+#include "esp_err.h"
+#include "cJSON.h"
+#include "driver/gpio.h"
 
 #include "ezlopi_cloud.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
-#include "esp_err.h"
-#include "driver/gpio.h"
 #include "items.h"
 #include "trace.h"
-#include "cJSON.h"
+#include "gpio_isr_service.h"
 
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 
+#include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
+
+#warning "Use of static variable"
 static bool sensor_bme280_initialized = false;
 
 static int __prepare(void *arg);
@@ -118,6 +115,7 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *touch_switch_item = ezlopi_device_add_item_to_device(touch_device, sensor_0023_digitalIn_touch_switch_TTP223B);
             if (touch_switch_item)
             {
+                touch_switch_item->cloud_properties.device_id = touch_device->cloud_properties.device_id;
                 __prepare_touch_switch_properties(touch_switch_item, prep_arg->cjson_device);
             }
             else
@@ -143,6 +141,8 @@ static void __prepare_touch_switch_device_cloud_properties(l_ezlopi_device_t *de
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_outlet;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 

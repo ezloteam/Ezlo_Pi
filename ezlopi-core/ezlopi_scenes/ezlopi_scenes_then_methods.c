@@ -14,7 +14,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 
     if (cj_params)
     {
-        l_then_block_v2_t *curr_then = (l_then_block_v2_t *)arg;
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
         if (curr_then)
         {
             l_fields_v2_t *curr_field = curr_then->fields;

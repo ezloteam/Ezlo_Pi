@@ -183,7 +183,7 @@ static void qt_serial_get_info()
         char *device_brand = ezlopi_factory_info_v2_get_brand();
         char *device_manufacturer = ezlopi_factory_info_v2_get_manufacturer();
         char *device_name = ezlopi_factory_info_v2_get_name();
-        char *device_type = ezlopi_factory_info_v2_get_device_type();
+        const char *device_type = ezlopi_factory_info_v2_get_device_type();
 
         cJSON_AddNumberToObject(get_info, "cmd", 1);
         cJSON_AddNumberToObject(get_info, "status", 1);
@@ -193,7 +193,7 @@ static void qt_serial_get_info()
         cJSON_AddNumberToObject(get_info, "build", BUILD);
         cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
         cJSON_AddNumberToObject(get_info, "v_idf", ESP_IDF_VERSION);
-        cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount());
+        cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount() / portTICK_RATE_MS);
         cJSON_AddNumberToObject(get_info, "build_date", BUILD_DATE);
         cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddNumberToObject(get_info, "boot_reason", esp_reset_reason());
@@ -249,13 +249,13 @@ static void qt_serial_get_info()
         char *my_json_string = cJSON_Print(get_info);
         cJSON_Delete(get_info); // free Json object
 
-        ezlopi_factory_info_v2_free(controller_uuid);
-        ezlopi_factory_info_v2_free(provisioning_uuid);
-        ezlopi_factory_info_v2_free(device_model);
-        ezlopi_factory_info_v2_free(device_brand);
-        ezlopi_factory_info_v2_free(device_manufacturer);
-        ezlopi_factory_info_v2_free(device_name);
-        // ezlopi_factory_info_v2_free(device_type);
+        ezlopi_factory_info_v2_free((void *)controller_uuid);
+        ezlopi_factory_info_v2_free((void *)provisioning_uuid);
+        ezlopi_factory_info_v2_free((void *)device_model);
+        ezlopi_factory_info_v2_free((void *)device_brand);
+        ezlopi_factory_info_v2_free((void *)device_manufacturer);
+        ezlopi_factory_info_v2_free((void *)device_name);
+        // ezlopi_factory_info_v2_free((void *)device_type);
 
         if (my_json_string)
         {
@@ -390,7 +390,7 @@ static void qt_serial_read_config(void)
             cJSON_Minify(my_json_string);
             cJSON_Delete(root); // free Json string
             const int len = strlen(my_json_string);
-            const int txBytes = qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
+            qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
             cJSON_free(my_json_string);
         }

@@ -3,6 +3,7 @@
 
 #include "trace.h"
 
+#include "core_sntp.h"
 #include "ezlopi.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_devices.h"
@@ -16,19 +17,22 @@
 #include "ezlopi_event_group.h"
 #include "ezlopi_ethernet.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_scenes_scripts.h"
 
 static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
 {
+
     // Init memories
     ezlopi_nvs_init();
+    TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
+
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    vTaskDelay(10);
+
     ezlopi_factory_info_v2_init();
     print_factory_info_v2();
-    vTaskDelay(10);
 
     // Init devices
     ezlopi_event_group_create();
@@ -38,7 +42,9 @@ void ezlopi_init(void)
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
-    ezlopi_scenes_v2_init();
+
+    ezlopi_scenes_scripts_init();
+    ezlopi_scenes_init_v2();
 
     // ezlopi_ethernet_init();
 
@@ -50,6 +56,7 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
+    // core_sntp_init();
 }
 
 static void ezlopi_initialize_devices_v3(void)

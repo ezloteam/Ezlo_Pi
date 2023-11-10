@@ -1,23 +1,24 @@
-#include "stdlib.h"
-#include "driver/gpio.h"
-
 #include "cJSON.h"
+#include "stdlib.h"
+#include "soc/rtc.h"
+#include "driver/gpio.h"
+#include "driver/mcpwm.h"
+
 #include "trace.h"
 #include "items.h"
+#include "gpio_isr_service.h"
 
+#include "ezlopi_gpio.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
-#include "ezlopi_gpio.h"
 
-#include "gpio_isr_service.h"
 #include "sensor_0024_other_HCSR04.h"
-#include "driver/mcpwm.h"
-#include "soc/rtc.h"
 
+#warning "use of static variable"
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 static int __prepare(void *arg);
@@ -148,6 +149,8 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -195,6 +198,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cj_device);
                     ultrasonic_sensor_t *ultrasonic_sensor = (ultrasonic_sensor_t *)malloc(sizeof(ultrasonic_sensor_t));
                     if (ultrasonic_sensor)

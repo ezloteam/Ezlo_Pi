@@ -111,7 +111,7 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t *scene_node, void *arg)
     if (scene_node)
     {
         char *end_prt = NULL;
-        uint32_t interval = strtoul(scene_node->when->fields->value.value_string, &end_prt, 10);
+        uint32_t interval = strtoul(scene_node->when_block->fields->value.value_string, &end_prt, 10);
         if (end_prt)
         {
             if (0 == strncmp(end_prt, "m", 1))
@@ -129,20 +129,20 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t *scene_node, void *arg)
         }
 
         uint32_t last_update = 0;
-        if (scene_node->when->fields->user_arg)
+        if (scene_node->when_block->fields->user_arg)
         {
-            last_update = (uint32_t)scene_node->when->fields->user_arg;
+            last_update = (uint32_t)scene_node->when_block->fields->user_arg;
 
             if (((xTaskGetTickCount() - last_update) / 1000) > interval)
             {
-                scene_node->when->fields->user_arg = xTaskGetTickCount();
+                scene_node->when_block->fields->user_arg = xTaskGetTickCount();
                 ret = 1;
             }
         }
         else
         {
             ret = 1;
-            scene_node->when->fields->user_arg = xTaskGetTickCount();
+            scene_node->when_block->fields->user_arg = xTaskGetTickCount();
         }
     }
 

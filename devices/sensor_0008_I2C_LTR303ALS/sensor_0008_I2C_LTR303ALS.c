@@ -1,25 +1,24 @@
-
+#include "stdlib.h"
 #include <string.h>
 #include "sdkconfig.h"
 #include "math.h"
 
 #include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_timer.h"
 #include "items.h"
 
+#include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
 #include "ezlopi_devices.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
-#include "sensor_0008_I2C_LTR303ALS.h"
 #include "ALS_LTR303.h"
-#include "stdlib.h"
+#include "sensor_0008_I2C_LTR303ALS.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -123,6 +122,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_light_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -165,6 +166,7 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
             if (als_ltr303_item)
             {
+                als_ltr303_item->cloud_properties.device_id = als_ltr303_device->cloud_properties.device_id;
                 __prepare_item_cloud_properties(als_ltr303_item, prep_arg->cjson_device);
             }
             else

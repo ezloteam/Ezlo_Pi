@@ -1,43 +1,43 @@
-#include "trace.h"
 #include "cJSON.h"
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
-#include "items.h"
 #include "math.h"
 #include "stdbool.h"
 #include "string.h"
 
+#include "trace.h"
+#include "items.h"
+
 #include "ezlopi_adc.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_item_name_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_cloud_scales_str.h"
-#include "sensor_0063_other_MQ9_LPG_flameable_detector.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
+
+#include "sensor_0063_other_MQ9_LPG_flameable_detector.h"
 
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
 
+#warning "use of static variable"
 static bool Calibration_complete_LPG_flameable = false; // flag to activate calibration phase
-const char *mq9_sensor_gas_alarm_token[] =
-    {
-        "no_gas",
-        "combustible_gas_detected",
-        "toxic_gas_detected",
-        "unknown"};
+const char *mq9_sensor_gas_alarm_token[] = {
+    "no_gas",
+    "combustible_gas_detected",
+    "toxic_gas_detected",
+    "unknown",
+};
 //--------------------------------------------------------------------------------------------------------
+
 static int __0063_prepare(void *arg);
 static int __0063_init(l_ezlopi_item_t *item);
 static int __0063_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0063_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __0063_notify(l_ezlopi_item_t *item);
-static float Extract_MQ9_sensor_ppm(l_ezlopi_item_t *item);
-void Calibrate_MQ9_R0_resistance(void *params);
+
+static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t *item);
+static void __calibrate_MQ9_R0_resistance(void *params);
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
@@ -100,6 +100,7 @@ static int __0063_prepare(void *arg)
             l_ezlopi_item_t *MQ9_item_digi = ezlopi_device_add_item_to_device(MQ9_device_digi, sensor_0063_other_MQ9_LPG_flameable_detector);
             if (MQ9_item_digi)
             {
+                MQ9_item_digi->cloud_properties.device_id = MQ9_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ9_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -124,6 +125,7 @@ static int __0063_prepare(void *arg)
                 l_ezlopi_item_t *MQ9_item_adc = ezlopi_device_add_item_to_device(MQ9_device_adc, sensor_0063_other_MQ9_LPG_flameable_detector);
                 if (MQ9_item_adc)
                 {
+                    MQ9_item_adc->cloud_properties.device_id = MQ9_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ9_item_adc, device_prep_arg->cjson_device, MQ9_value);
                 }
                 else
@@ -167,7 +169,7 @@ static int __0063_init(l_ezlopi_item_t *item)
             // calibrate if not done
             if (!Calibration_complete_LPG_flameable)
             {
-                xTaskCreate(Calibrate_MQ9_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                xTaskCreate(__calibrate_MQ9_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
             }
             ret = 2;
         }
@@ -184,6 +186,8 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -199,12 +203,12 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_in.gpio_num);
     TRACE_I("MQ9-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
-    char *user_arg = (char*)malloc(40);
-    if(user_arg)
+    char *user_arg = (char *)malloc(40);
+    if (user_arg)
     {
         memset(user_arg, 0, 40);
     }
-    item->user_arg = (void*)user_arg;
+    item->user_arg = (void *)user_arg;
 }
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
@@ -215,6 +219,8 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
@@ -326,7 +332,7 @@ static int __0063_notify(l_ezlopi_item_t *item)
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
-                char *gas_alarm_state = (char*)item->user_arg;
+                char *gas_alarm_state = (char *)item->user_arg;
                 snprintf(gas_alarm_state, 40, "%s", curret_value);
                 ezlopi_device_value_updated_from_device_v3(item);
             }
@@ -334,7 +340,7 @@ static int __0063_notify(l_ezlopi_item_t *item)
         if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
             // extract the sensor_output_values
-            double new_value = (double)Extract_MQ9_sensor_ppm(item);
+            double new_value = (double)__extract_MQ9_sensor_ppm(item);
             mq9_value_t *MQ9_value = (mq9_value_t *)item->user_arg;
             if (fabs((double)(MQ9_value->_LPG_flameable_ppm) - new_value) > 0.0001)
             {
@@ -347,7 +353,7 @@ static int __0063_notify(l_ezlopi_item_t *item)
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static float Extract_MQ9_sensor_ppm(l_ezlopi_item_t *item)
+static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t *item)
 {
     uint32_t mq9_adc_pin = item->interface.adc.gpio_num;
     mq9_value_t *MQ9_value = (mq9_value_t *)item->user_arg;
@@ -394,7 +400,7 @@ static float Extract_MQ9_sensor_ppm(l_ezlopi_item_t *item)
     return _LPG_flameable_ppm;
 }
 
-void Calibrate_MQ9_R0_resistance(void *params)
+static void __calibrate_MQ9_R0_resistance(void *params)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)

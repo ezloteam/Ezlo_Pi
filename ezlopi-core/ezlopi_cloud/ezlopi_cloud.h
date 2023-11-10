@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-
+#include "cJSON.h"
 typedef struct s_ezlopi_cloud_controller
 {
     char parent_device_id[40]; // 'parentDeviceId' -> https://api.ezlo.com/hub/devices_api/index.html
@@ -24,22 +24,31 @@ typedef struct s_ezlopi_cloud_controller
 typedef struct s_ezlopi_cloud_item
 {
     uint32_t item_id;       // '_id' -> https://api.ezlo.com/hub/items_api/index.html,
+    uint32_t device_id;     // deviceID -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_getter;        // 'hasGetter' -> https://api.ezlo.com/hub/items_api/index.html,
     bool has_setter;        // 'haSetter' -> https://api.ezlo.com/hub/items_api/index.html,
-    const char *item_name;  // 'name' -> https://api.ezlo.com/hub/items_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_item_name_str.h
+    const char *item_name;  // 'name' -> https://api.ezlo.com/hub/items_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_item_name_str.h
     bool show;              // 'show' -> https://api.ezlo.com/hub/items_api/index.html,
     const char *value_type; // 'valueType' -> https://api.ezlo.com/hub/items_api/index.html, // ezlopi-cloud/constants/values_str.h
     const char *scale;      // 'scale' -> https://api.ezlo.com/devices/item_value_types/index.html#scalable-types -> ezlopi-cloud/constants/ezlopi_cloud_scales_str.h
 
 } s_ezlopi_cloud_item_t;
 
+typedef struct s_ezlopi_cloud_device_settings
+{
+    uint32_t setting_id; // _id -> https://log.ezlo.com/new/hub/settings_api/
+    uint32_t device_id;  // deviceId -> https://log.ezlo.com/new/hub/settings_api/
+} s_ezlopi_cloud_device_settings_t;
+
 typedef struct s_ezlopi_cloud_device
 {
     uint32_t device_id;      // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
     char device_name[32];    // 'name' -> https://api.ezlo.com/hub/devices_api/index.html
+    char *device_type_id;    // deviceTypeId -> https://log.ezlo.com/new/hub/devices_api/
     const char *category;    // 'category' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/category_str.h
     const char *subcategory; // 'subcategory' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/subcategory_str.h
     const char *device_type; // 'type' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/device_types_str.h
+    cJSON *info;             // info -> https://log.ezlo.com/new/hub/devices_api/
 
 } s_ezlopi_cloud_device_t;
 
@@ -70,6 +79,8 @@ uint32_t ezlopi_cloud_generate_device_id(void);
 uint32_t ezlopi_cloud_generate_item_id(void);
 uint32_t ezlopi_cloud_generate_room_id(void);
 uint32_t ezlopi_cloud_generate_gateway_id(void);
+uint32_t ezlopi_cloud_get_gateway_id(void);
+uint32_t ezlopi_cloud_generate_settings_id(void);
 
 uint32_t ezlopi_cloud_generate_scene_id(void);
 void ezlopi_cloud_update_scene_id(uint32_t a_scene_id);

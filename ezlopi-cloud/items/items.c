@@ -14,6 +14,39 @@
 #include "ezlopi_devices_list.h"
 #include "web_provisioning.h"
 
+static cJSON *ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t *item_properties)
+{
+    cJSON *cj_item_properties = cJSON_CreateObject();
+    if (cj_item_properties)
+    {
+        char tmp_string[64];
+        snprintf(tmp_string, sizeof(tmp_string), "%08x", item_properties->cloud_properties.item_id);
+        cJSON_AddStringToObject(cj_item_properties, "_id", tmp_string);
+        snprintf(tmp_string, sizeof(tmp_string), "%08x", item_properties->cloud_properties.device_id);
+        cJSON_AddStringToObject(cj_item_properties, "deviceId", tmp_string);
+        // cJSON_AddStringToObject(cj_item_properties, "deviceName", curr_device->cloud_properties.device_name);
+        // cJSON_AddTrueToObject(cj_item_properties, "deviceArmed");
+        cJSON_AddBoolToObject(cj_item_properties, "hasGetter", item_properties->cloud_properties.has_getter);
+        cJSON_AddBoolToObject(cj_item_properties, "hasSetter", item_properties->cloud_properties.has_setter);
+        cJSON_AddStringToObject(cj_item_properties, "name", item_properties->cloud_properties.item_name);
+        cJSON_AddTrueToObject(cj_item_properties, "show");
+        cJSON_AddStringToObject(cj_item_properties, "valueType", item_properties->cloud_properties.value_type);
+
+        if (item_properties->cloud_properties.scale)
+        {
+            cJSON_AddStringToObject(cj_item_properties, "scale", item_properties->cloud_properties.scale);
+        }
+        item_properties->func(EZLOPI_ACTION_HUB_GET_ITEM, item_properties, cj_item_properties, item_properties->user_arg);
+        if (item_properties->cloud_properties.scale)
+        {
+            cJSON_AddStringToObject(cj_item_properties, "scale", item_properties->cloud_properties.scale);
+        }
+        cJSON_AddStringToObject(cj_item_properties, "status", "synced");
+    }
+
+    return cj_item_properties;
+}
+
 void items_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
@@ -23,52 +56,81 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
     if (cj_result)
     {
         cJSON *cj_items_array = cJSON_AddArrayToObject(cj_result, "items");
+
         if (cj_items_array)
         {
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
-            while (curr_device)
+
+            cJSON *params = cJSON_GetObjectItem(cj_request, "params");
+            if (params != NULL)
             {
-                l_ezlopi_item_t *curr_item = curr_device->items;
-                while (curr_item)
+                cJSON *device_ids_array = cJSON_GetObjectItem(params, ezlopi_device_ids_str);
+
+                if (device_ids_array != NULL)
                 {
-                    cJSON *cj_properties = cJSON_CreateObject();
-                    if (cj_properties)
+                    if (cJSON_IsArray(device_ids_array))
                     {
-                        char tmp_string[64];
-                        snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_item->cloud_properties.item_id);
-                        cJSON_AddStringToObject(cj_properties, "_id", tmp_string);
-                        snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_device->cloud_properties.device_id);
-                        cJSON_AddStringToObject(cj_properties, "deviceId", tmp_string);
-                        cJSON_AddStringToObject(cj_properties, "deviceName", curr_device->cloud_properties.device_name);
-                        cJSON_AddTrueToObject(cj_properties, "deviceArmed");
-                        cJSON_AddBoolToObject(cj_properties, "hasGetter", curr_item->cloud_properties.has_getter);
-                        cJSON_AddBoolToObject(cj_properties, "hasSetter", curr_item->cloud_properties.has_setter);
-                        cJSON_AddStringToObject(cj_properties, "name", curr_item->cloud_properties.item_name);
-                        cJSON_AddTrueToObject(cj_properties, "show");
-                        cJSON_AddStringToObject(cj_properties, "valueType", curr_item->cloud_properties.value_type);
+                        if (cJSON_GetArraySize(device_ids_array) > 0)
+                        {
+                            cJSON *device_id;
+                            cJSON_ArrayForEach(device_id, device_ids_array)
+                            {
+                                if (cJSON_IsString(device_id))
+                                {
+                                    char *device_id_str = device_id->valuestring;
+                                    uint32_t device_id = strtol(device_id_str, NULL, 16);
 
-                        if (curr_item->cloud_properties.scale)
-                        {
-                            cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
-                        }
-                        curr_item->func(EZLOPI_ACTION_HUB_GET_ITEM, curr_item, cj_properties, curr_item->user_arg);
-                        // curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, cj_properties, curr_item->user_arg);
-                        if (curr_item->cloud_properties.scale)
-                        {
-                            cJSON_AddStringToObject(cj_properties, "scale", curr_item->cloud_properties.scale);
-                        }
-                        cJSON_AddStringToObject(cj_properties, "status", "synced");
+                                    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+                                    while (curr_device)
+                                    {
+                                        if (curr_device->cloud_properties.device_id == device_id)
+                                        {
+                                            l_ezlopi_item_t *curr_item = curr_device->items;
+                                            while (curr_item)
+                                            {
+                                                cJSON *cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
+                                                if (cj_item_properties)
+                                                {
+                                                    if (!cJSON_AddItemToArray(cj_items_array, cj_item_properties))
+                                                    {
+                                                        cJSON_Delete(cj_item_properties);
+                                                    }
+                                                }
 
-                        if (!cJSON_AddItemToArray(cj_items_array, cj_properties))
-                        {
-                            cJSON_Delete(cj_properties);
+                                                curr_item = curr_item->next;
+                                            }
+                                        }
+
+                                        curr_device = curr_device->next;
+                                    }
+                                }
+                            }
                         }
                     }
-
-                    curr_item = curr_item->next;
                 }
+                else
+                {
+                    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+                    while (curr_device)
+                    {
+                        l_ezlopi_item_t *curr_item = curr_device->items;
+                        while (curr_item)
+                        {
+                            cJSON *cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
+                            if (cj_item_properties)
+                            {
 
-                curr_device = curr_device->next;
+                                if (!cJSON_AddItemToArray(cj_items_array, cj_item_properties))
+                                {
+                                    cJSON_Delete(cj_item_properties);
+                                }
+                            }
+
+                            curr_item = curr_item->next;
+                        }
+
+                        curr_device = curr_device->next;
+                    }
+                }
             }
         }
     }
@@ -143,7 +205,7 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
                         cJSON_AddStringToObject(cj_result, "deviceSubcategory", curr_device->cloud_properties.subcategory);
                         cJSON_AddStringToObject(cj_result, "roomName", "");
                         cJSON_AddFalseToObject(cj_result, "serviceNotification");
-                        cJSON_AddFalseToObject(cj_result, "userNotification");
+                        cJSON_AddTrueToObject(cj_result, "userNotification");
                         cJSON_AddNullToObject(cj_result, "notifications");
                         cJSON_AddStringToObject(cj_result, "name", curr_item->cloud_properties.item_name);
                         if (curr_item->cloud_properties.scale)

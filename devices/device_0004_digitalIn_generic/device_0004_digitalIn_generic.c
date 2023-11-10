@@ -4,17 +4,17 @@
 #include "cJSON.h"
 #include "trace.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
 #include "items.h"
 
-#include "gpio_isr_service.h"
 #include "ezlopi_gpio.h"
+#include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
+#include "ezlopi_actions.h"
+#include "gpio_isr_service.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -71,6 +71,8 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_inwall;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -110,6 +112,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, device_0004_digitalIn_generic);
                 if (item)
                 {
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cjson_device);
                     ret = 1;
                 }

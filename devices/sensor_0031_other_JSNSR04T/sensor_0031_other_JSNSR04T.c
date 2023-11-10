@@ -1,8 +1,13 @@
 #include "jsn_sr04t.h"
+
 #include "trace.h"
-#include "ezlopi_cloud_value_type_str.h"
+
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_valueformatter.h"
+
+#include "sensor_0031_other_JSNSR04T.h"
 
 #include "sensor_0031_other_JSNSR04T.h"
 
@@ -147,6 +152,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -194,11 +201,12 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
-            if (item_temperature)
+            l_ezlopi_item_t *item_distance = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
+            if (item_distance)
             {
-                __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
-                __prepare_item_interface_properties(item_temperature, prep_arg->cjson_device);
+                item_distance->cloud_properties.device_id = device->cloud_properties.device_id;
+                __prepare_item_cloud_properties(item_distance, prep_arg->cjson_device);
+                __prepare_item_interface_properties(item_distance, prep_arg->cjson_device);
             }
         }
     }

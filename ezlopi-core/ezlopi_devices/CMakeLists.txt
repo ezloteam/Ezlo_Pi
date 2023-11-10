@@ -1,5 +1,3 @@
-# set(config_src "config.cpp")
-
 file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "ezlopi_devices_list.c" "${config_src}"

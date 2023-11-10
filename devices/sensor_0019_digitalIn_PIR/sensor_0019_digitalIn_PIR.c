@@ -112,7 +112,9 @@ static int sensor_pir_prepare_v3(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
                 if (item)
                 {
+
                     item->func = sensor_0019_digitalIn_PIR;
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     sensor_pir_setup_item_properties_v3(item, cj_device);
                     ret = 1;
                 }
@@ -138,6 +140,8 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *devic
         device->cloud_properties.category = category_security_sensor;
         device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;
+        device->cloud_properties.info = NULL;
+        device->cloud_properties.device_type_id = NULL;
         device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     }
 }

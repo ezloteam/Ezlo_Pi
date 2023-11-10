@@ -1,17 +1,12 @@
+#include "cJSON.h"
+
 #include "trace.h"
-#include "ezlopi_device_value_updated.h"
 
 #include "ezlopi_adc.h"
-#include "ezlopi_cloud_constants.h"
-
-#include "cJSON.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
-
-#include "trace.h"
-#include "ezlopi_adc.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "sensor_0033_ADC_turbidity.h"
 
@@ -21,11 +16,10 @@ static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __get_item_list(l_ezlopi_item_t *item, void *arg);
 
-const char *water_filter_replacement_alarm_states[] =
-    {
-        "water_filter_ok",
-        "replace_water_filter",
-        "unknown",
+const char *water_filter_replacement_alarm_states[] = {
+    "water_filter_ok",
+    "replace_water_filter",
+    "unknown",
 };
 
 static char *ezlopi_water_present_turbidity_state = NULL;
@@ -181,6 +175,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_water;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -211,14 +207,16 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
-            if (item_temperature)
+            l_ezlopi_item_t *item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
+            if (item_turbidity)
             {
+                item_turbidity->cloud_properties.device_id = device->cloud_properties.device_id;
                 char *turbidity_sensor_states = (char *)malloc(40 * sizeof(char));
                 if (turbidity_sensor_states)
                 {
+
                     memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));
-                    __prepare_item_properties(item_temperature, prep_arg->cjson_device, (void *)turbidity_sensor_states);
+                    __prepare_item_properties(item_turbidity, prep_arg->cjson_device, (void *)turbidity_sensor_states);
                 }
             }
         }

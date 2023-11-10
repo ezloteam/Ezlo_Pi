@@ -4,9 +4,17 @@
 #include "cJSON.h"
 #include "trace.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
 #include "items.h"
+#include "gpio_isr_service.h"
+
+#include "ezlopi_gpio.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "gpio_isr_service.h"
 #include "ezlopi_gpio.h"
@@ -15,6 +23,11 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_nvs.h"
+
+#include "device_0001_digitalOut_generic.h"
+
+// #define DEV_TEST_SETTINGS_EN
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -25,6 +38,18 @@ static void __toggle_gpio(l_ezlopi_item_t *item);
 static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __interrupt_upcall(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
+
+#ifdef DEV_TEST_SETTINGS_EN
+static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
+static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting);
+static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting);
+
+static const char *nvs_key_backlight_brightness = "bklt";
+
+uint32_t settings_ids[2];
+#endif // DEV_TEST_SETTINGS_EN
 
 int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -63,6 +88,173 @@ int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *i
     return ret;
 }
 
+#ifdef DEV_TEST_SETTINGS_EN
+static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg)
+{
+    int ret = 1;
+    switch (action)
+    {
+    case EZLOPI_SETTINGS_ACTION_GET_SETTING:
+    {
+        __settings_get(arg, setting);
+        break;
+    }
+    case EZLOPI_SETTINGS_ACTION_SET_SETTING:
+    {
+        __settings_set(arg, setting);
+        ezlopi_setting_value_updated_from_device_v3(setting);
+        break;
+    }
+    case EZLOPI_SETTINGS_ACTION_RESET_SETTING:
+    {
+        __settings_reset(arg, setting);
+        ezlopi_setting_value_updated_from_device_v3(setting);
+        break;
+    }
+    case EZLOPI_SETTINGS_ACTION_UPDATE_SETTING:
+    {
+        __settings_update(arg, setting);
+        break;
+    }
+    default:
+        break;
+    }
+    return ret;
+}
+
+static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        if (setting->cloud_properties.setting_id == settings_ids[0])
+        {
+
+            cJSON *label = cJSON_CreateObject();
+            cJSON *description = cJSON_CreateObject();
+            cJSON *value = cJSON_CreateObject();
+            cJSON *value_default = cJSON_CreateObject();
+
+            cJSON_AddStringToObject(label, "text", "User defined mode");
+            cJSON_AddStringToObject(label, "lang_tag", "ezlopi_presence_user_defined_mode_label");
+
+            cJSON_AddStringToObject(description, "text", "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
+            cJSON_AddStringToObject(description, "lang_tag", "ezlopi_presence_user_defined_mode_description");
+
+            cJSON_AddItemToObject(cjson_propertise, "label", label);
+            cJSON_AddItemToObject(cjson_propertise, "description", description);
+            cJSON_AddStringToObject(cjson_propertise, "valueType", "presence_operation_mode");
+
+            cJSON_AddNumberToObject(value, "min_move_distance", 0.75);
+            cJSON_AddNumberToObject(value, "max_move_distance", 1.5);
+            cJSON_AddNumberToObject(value, "min_still_distance", 0.75);
+            cJSON_AddNumberToObject(value, "max_still_distance", 1.5);
+            cJSON_AddTrueToObject(value, "is_active");
+            cJSON_AddItemToObject(cjson_propertise, "value", value);
+
+            cJSON_AddNumberToObject(value_default, "min_move_distance", 0.75);
+            cJSON_AddNumberToObject(value_default, "max_move_distance", 6.0);
+            cJSON_AddNumberToObject(value_default, "min_still_distance", 0.75);
+            cJSON_AddNumberToObject(value_default, "max_still_distance", 6.0);
+            cJSON_AddFalseToObject(value_default, "is_active");
+            cJSON_AddItemToObject(cjson_propertise, "valueDefault", value_default);
+        }
+        else if (setting->cloud_properties.setting_id == settings_ids[1])
+        {
+            cJSON *label = cJSON_CreateObject();
+            cJSON *description = cJSON_CreateObject();
+
+            cJSON_AddStringToObject(label, "text", "Backlight Brightness");
+            cJSON_AddStringToObject(label, "lang_tag", "ezlopi_digitalio_pwm_setting_label");
+
+            cJSON_AddStringToObject(description, "text", "This is PWM setting value for setting the backlight brightness");
+            cJSON_AddStringToObject(description, "lang_tag", "ezlopi_digitalio_pwm_setting_description");
+
+            cJSON_AddItemToObject(cjson_propertise, "label", label);
+            cJSON_AddItemToObject(cjson_propertise, "description", description);
+            cJSON_AddStringToObject(cjson_propertise, "valueType", "int");
+
+            s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+
+            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
+            cJSON_AddNumberToObject(cjson_propertise, "valueMin", 0);
+            cJSON_AddNumberToObject(cjson_propertise, "valueMax", 100);
+            cJSON_AddNumberToObject(cjson_propertise, "valueDefault", 50);
+        }
+
+        ret = 1;
+    }
+
+    return ret;
+}
+static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        if (setting->cloud_properties.setting_id == settings_ids[0])
+        {
+        }
+        else if (setting->cloud_properties.setting_id == settings_ids[1])
+        {
+            int32_t value = 0;
+            CJSON_GET_VALUE_INT(cjson_propertise, "value", value);
+            TRACE_D("Setting Value : %d", value);
+
+            s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+            settings_data->settings_int_data = value;
+
+            if (!ezlopi_nvs_write_int32(value, nvs_key_backlight_brightness))
+            {
+                TRACE_E("Error Updating settings values to NVS");
+            }
+        }
+
+        ret = 1;
+    }
+    return ret;
+}
+static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
+{
+    int ret = 0;
+    if (setting->cloud_properties.setting_id == settings_ids[0])
+    {
+    }
+    else if (setting->cloud_properties.setting_id == settings_ids[1])
+    {
+        s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+        settings_data->settings_int_data = 50; // 50 being default value
+
+        if (!ezlopi_nvs_write_int32(settings_data->settings_int_data, nvs_key_backlight_brightness))
+        {
+            TRACE_E("Error Updating settings values to NVS");
+        }
+    }
+    return ret;
+}
+
+static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
+{
+    int ret = 0;
+    cJSON *cjson_propertise = (cJSON *)arg;
+    if (cjson_propertise)
+    {
+        if (setting->cloud_properties.setting_id == settings_ids[0])
+        {
+        }
+        else if (setting->cloud_properties.setting_id == settings_ids[1])
+        {
+            s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
+            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
+        }
+    }
+    return ret;
+}
+
+#endif // DEV_TEST_SETTINGS_EN
+
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     char *device_name = NULL;
@@ -72,6 +264,8 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_inwall;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -108,6 +302,12 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 static int __prepare(void *arg)
 {
     int ret = 0;
+
+#ifdef DEV_TEST_SETTINGS_EN
+    settings_ids[0] = ezlopi_cloud_generate_settings_id();
+    settings_ids[1] = ezlopi_cloud_generate_settings_id();
+#endif
+
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (arg)
     {
@@ -121,13 +321,52 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, device_0001_digitalOut_generic);
                 if (item)
                 {
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cjson_device);
                     ret = 1;
                 }
+
+#ifdef DEV_TEST_SETTINGS_EN
+                l_ezlopi_device_settings_v3_t *setting_user_defined = ezlopi_device_add_settings_to_device_v3(device, __settings_callback);
+                if (setting_user_defined)
+                {
+                    setting_user_defined->cloud_properties.setting_id = settings_ids[0];
+                    ret = 1;
+                }
+                l_ezlopi_device_settings_v3_t *setting_brightness = ezlopi_device_add_settings_to_device_v3(device, __settings_callback);
+                if (setting_brightness)
+                {
+
+                    setting_brightness->cloud_properties.setting_id = settings_ids[1];
+
+                    s_digio_settings_t *settings_value = (s_digio_settings_t *)malloc(sizeof(s_digio_settings_t));
+                    memset(settings_value, 0, sizeof(s_digio_settings_t));
+
+                    if (ezlopi_nvs_read_int32(&settings_value->settings_int_data, nvs_key_backlight_brightness))
+                    {
+                    }
+                    else
+                    {
+                        settings_value->settings_int_data = 50;
+                        if (!ezlopi_nvs_write_int32(settings_value->settings_int_data, nvs_key_backlight_brightness))
+                        {
+                            TRACE_E("Error Updating settings values to NVS");
+                        }
+                    }
+
+                    setting_brightness->user_arg = (void *)settings_value;
+
+                    TRACE_E("settings_data: %p", settings_value);
+                    TRACE_E("setting->user_arg: %p", setting_brightness->user_arg);
+
+                    ret = 1;
+                }
+#else
                 else
                 {
                     ezlopi_device_free_device(device);
                 }
+#endif // DEV_TEST_SETTINGS_EN
             }
         }
     }
@@ -289,7 +528,7 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
 static void __write_gpio_value(l_ezlopi_item_t *item)
 {
     uint32_t write_value = (0 == item->interface.gpio.gpio_out.invert) ? item->interface.gpio.gpio_out.value : (item->interface.gpio.gpio_out.value ? 0 : 1);
-    esp_err_t error = gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
+    gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
 }
 
 static void __interrupt_upcall(l_ezlopi_item_t *item)
@@ -301,6 +540,6 @@ static void __interrupt_upcall(l_ezlopi_item_t *item)
 static void __toggle_gpio(l_ezlopi_item_t *item)
 {
     uint32_t write_value = !(item->interface.gpio.gpio_out.value);
-    esp_err_t error = gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
+    gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
     item->interface.gpio.gpio_out.value = write_value;
 }

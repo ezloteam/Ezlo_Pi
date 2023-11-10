@@ -1,19 +1,20 @@
+#include "math.h"
 #include "cJSON.h"
 #include "trace.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
 #include "items.h"
-#include "math.h"
 
 #include "ezlopi_cloud.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "device_0022_PWM_dimmable_lamp.h"
 
+#warning "use of static variable
 static bool dimmable_bulb_initialized = false;
 
 static l_ezlopi_item_t *dimmable_bulb_dimmer_item = NULL;
@@ -148,6 +149,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_bulb;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -254,26 +257,31 @@ static int __prepare(void *arg)
             dimmable_bulb_dimmer_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_item)
             {
+                dimmable_bulb_dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_item_properties(dimmable_bulb_dimmer_item, prep_arg->cjson_device);
             }
             dimmable_bulb_dimmer_up_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_up_item)
             {
+                dimmable_bulb_dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_up_item_properties(dimmable_bulb_dimmer_up_item, prep_arg->cjson_device);
             }
             dimmable_bulb_dimmer_down_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_down_item)
             {
+                dimmable_bulb_dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_down_item_properties(dimmable_bulb_dimmer_down_item, prep_arg->cjson_device);
             }
             dimmable_bulb_dimmer_stop_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_dimmer_stop_item)
             {
+                dimmable_bulb_dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_stop_item_properties(dimmable_bulb_dimmer_stop_item, prep_arg->cjson_device);
             }
             dimmable_bulb_switch_item = ezlopi_device_add_item_to_device(device, device_0022_PWM_dimmable_lamp);
             if (dimmable_bulb_switch_item)
             {
+                dimmable_bulb_switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_dimmer_switch_item_properties(dimmable_bulb_switch_item, prep_arg->cjson_device);
             }
             if ((NULL == dimmable_bulb_dimmer_item) && (NULL == dimmable_bulb_dimmer_up_item) && (NULL == dimmable_bulb_dimmer_down_item) && (NULL == dimmable_bulb_dimmer_stop_item) && (NULL == dimmable_bulb_switch_item))

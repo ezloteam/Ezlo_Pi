@@ -1,21 +1,21 @@
 
 #include <stdlib.h>
-
 #include "cJSON.h"
-#include "trace.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
+#include "trace.h"
 #include "items.h"
 
+#include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
+#include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "sensor_0021_UART_MB1013.h"
 
+#warning "Static should be removed"
 static float mb1013_value = 0;
 
 static int __prepare(void *arg);
@@ -117,6 +117,8 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -155,6 +157,7 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
                 if (item)
                 {
+                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
                     ret = 1;

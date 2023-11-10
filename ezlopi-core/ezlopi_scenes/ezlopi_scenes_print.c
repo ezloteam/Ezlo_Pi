@@ -63,7 +63,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         }
         case EZLOPI_VALUE_TYPE_BLOCKS:
         {
-            ezlopi_print_when_blocks(fields->value.when_block);
+            ezlopi_print_when_blocks((l_when_block_v2_t *)fields->value.when_block);
             break;
         }
         case EZLOPI_VALUE_TYPE_DICTIONARY:
@@ -179,20 +179,21 @@ void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks)
     }
 }
 
-void ezlopi_print_then_blocks(l_then_block_v2_t *then_blocks)
+void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
 {
     TRACE_D("\t|-- then: ");
-    while (then_blocks)
+    while (action_block)
     {
-        ezlopi_print_block_options(&then_blocks->block_options, then_blocks->fields);
+        ezlopi_print_block_options(&action_block->block_options, action_block->fields);
         TRACE_D("\t\t|-- blockType: then");
+        TRACE_D("\t\t|-- _tempId: %.*s", sizeof(action_block->_tempId), action_block->_tempId);
 
-        TRACE_D("\t\t|-- Delay:: days: %d, hours: %d, minutes: %d, seconds: %d", then_blocks->delay.days, then_blocks->delay.hours, then_blocks->delay.minutes, then_blocks->delay.seconds);
+        TRACE_D("\t\t|-- Delay:: days: %d, hours: %d, minutes: %d, seconds: %d", action_block->delay.days, action_block->delay.hours, action_block->delay.minutes, action_block->delay.seconds);
 
-        ezlopi_print_fields(then_blocks->fields);
+        ezlopi_print_fields(action_block->fields);
 
-        then_blocks = then_blocks->next;
-        if (then_blocks)
+        action_block = action_block->next;
+        if (action_block)
         {
             TRACE_D("\t\t|--");
         }
@@ -213,8 +214,9 @@ void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
         TRACE_D("\t|-- parent_id: %s", scene_link_list->parent_id);
         ezlopi_print_user_notifications(scene_link_list->user_notifications);
         ezlopi_print_house_modes(scene_link_list->house_modes);
-        ezlopi_print_then_blocks(scene_link_list->then);
-        ezlopi_print_when_blocks(scene_link_list->when);
+        ezlopi_print_action_blocks(scene_link_list->then_block);
+        ezlopi_print_when_blocks(scene_link_list->when_block);
+        ezlopi_print_action_blocks(scene_link_list->else_block);
         TRACE_D("\t---------------------------------------------------------------");
 
         scene_link_list = scene_link_list->next;

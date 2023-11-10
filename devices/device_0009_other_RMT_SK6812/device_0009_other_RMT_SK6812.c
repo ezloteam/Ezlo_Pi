@@ -1,27 +1,24 @@
-
+#include "math.h"
+#include "cJSON.h"
 #include <string.h>
 #include "sdkconfig.h"
+#include "driver/gpio.h"
 
-#include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_timer.h"
 #include "items.h"
-#include "math.h"
 
+#include "ezlopi_timer.h"
 #include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
 #include "ezlopi_devices.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
-
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
 #include "led_strip.h"
-#include "driver/gpio.h"
 #include "color_codes.h"
-
 #include "device_0009_other_RMT_SK6812.h"
 
 static bool sk6812_led_strip_initialized = false;
@@ -209,6 +206,8 @@ static void __prepare_device_properties(l_ezlopi_device_t *device, cJSON *cj_dev
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -338,6 +337,12 @@ static int __prepare(void *arg)
             switch_item = ezlopi_device_add_item_to_device(device, device_0009_other_RMT_SK6812);
             if (switch_item && dimmer_item && dimmer_up_item && dimmer_down_item && dimmer_stop_item && rgb_color_item)
             {
+                rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_SK6812_RGB_color_item(rgb_color_item, prep_arg->cjson_device);
                 __prepare_SK6812_RGB_dimmer_item(dimmer_item, prep_arg->cjson_device);
                 __prepare_SK6812_RGB_dimmer_up_item(dimmer_up_item, prep_arg->cjson_device);

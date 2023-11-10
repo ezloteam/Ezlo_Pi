@@ -16,6 +16,31 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_factory_info.h"
 
+static char *tick_to_time(uint32_t ms)
+{
+    uint32_t seconds = ms / 1000;
+    uint32_t minutes = seconds / 60;
+    uint32_t hours = minutes / 60;
+    uint32_t days = hours / 24;
+
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+
+    char *time_str = malloc(50);
+    if (time_str)
+    {
+        memset(time_str, 0, 50);
+        snprintf(time_str, 50, "%dd %dh %dm %ds", days, hours, minutes, seconds);
+    }
+    else
+    {
+        time_str = NULL;
+    }
+
+    return time_str;
+}
+
 void info_get(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
@@ -80,7 +105,15 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         // now = sntp_core_get_up_time();
         // localtime_r(&now, &timeinfo);
         // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-
-        cJSON_AddStringToObject(cjson_result, "uptime", "");
+        char *time_string = tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
+        if (time_string)
+        {
+            cJSON_AddStringToObject(cjson_result, "uptime", time_string);
+            free(time_string);
+        }
+        else
+        {
+            cJSON_AddStringToObject(cjson_result, "uptime", "");
+        }
     }
 }

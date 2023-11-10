@@ -1,13 +1,13 @@
 
 
+#include "ezlopi_adc.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_adc.h"
 #include "ezlopi_valueformatter.h"
-#include "math.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
 
+#include "math.h"
 #include "esp_err.h"
 #include "items.h"
 #include "trace.h"
@@ -130,6 +130,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_temperature;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -163,6 +165,7 @@ static int __prepare(void *arg)
             l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
             if (item_temperature)
             {
+                item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
             }
             if (NULL == item_temperature)

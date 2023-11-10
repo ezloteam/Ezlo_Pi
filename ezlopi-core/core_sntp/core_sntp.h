@@ -1,0 +1,10 @@
+#ifndef __CORE_SNTP_H__
+#define __CORE_SNTP_H__
+
+#if 0
+void core_sntp_init(void);
+time_t sntp_core_get_up_time(void);
+
+#endif
+
+#endif // __CORE_SNTP_H__
