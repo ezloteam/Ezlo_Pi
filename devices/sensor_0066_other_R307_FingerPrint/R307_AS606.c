@@ -103,9 +103,9 @@ static bool SEND_PACKET(int uart_channel_num, fingerprint_packet_t *txPacket, ui
  *
  * @return [FINGERPRINT_OK : Successful] // [FINGERPRINT_FAIL : Error]
  */
-static FINGERPRINT_STATUS_t __Response_function(uint8_t *recieved_buffer, uint32_t timeout)
+static fingerprint_status_t __Response_function(uint8_t *recieved_buffer, uint32_t timeout)
 {
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
     uint32_t start_time = esp_timer_get_time() / 1000;
     uint32_t dummy_timer = 0;
     while (dummy_timer <= timeout)
@@ -230,7 +230,7 @@ bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_bu
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -247,11 +247,8 @@ bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_bu
             (uint8_t)(the_password >> 8),   /*MSB sent first*/
             (uint8_t)(the_password & 0xFF), /*LSB sent last*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- VerifyPwd -------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -269,9 +266,7 @@ bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_bu
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     } //----------------------------------------------------------------------------------------------------------------------
     return (bool)F_res;
@@ -292,7 +287,7 @@ bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buff
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -309,11 +304,8 @@ bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buff
             (uint8_t)(new_address >> 8),   /*MSB sent first*/
             (uint8_t)(new_address & 0xFF), /*LSB sent last*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- SetAdder --------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -331,9 +323,7 @@ bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buff
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -356,7 +346,7 @@ bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Paramete
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -371,11 +361,8 @@ bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Paramete
             Parameter_Number,        /* Paramter Number */
             Parameter_content,       /* Paramter Content */
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- SetSysPara -------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -393,9 +380,7 @@ bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Paramete
             }
             // TRACE_W("------------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -417,7 +402,7 @@ bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_b
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -431,11 +416,8 @@ bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_b
             FINGERPRINT_PORTCONTROL, /*INS CODE [1Byte]*/
             Control_code,            /* ON / OFF */
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- PortControl ------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -453,9 +435,7 @@ bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_b
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX -------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -478,7 +458,7 @@ bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -491,11 +471,7 @@ bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_
         uint8_t Combined_data[1] = {
             FINGERPRINT_READSYSPARAM, /*INS CODE [1Byte]*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
-        TRACE_B(" > -------- ReadSysPara");
+
         //------------ Fill the packet container and send it via uart  --------------------------------------------------------------------------------
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
@@ -510,29 +486,23 @@ bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_
             if (FINGERPRINT_OK == F_res)
             {
                 Status_register = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF);
-                // uint16_t System_identifier_code = ((uint16_t)recieved_buffer[6] << 8) + ((uint16_t)recieved_buffer[7] & 0xFF); // 0x0009
-                // uint16_t Finger_library_size = ((uint16_t)recieved_buffer[8] << 8) + ((uint16_t)recieved_buffer[9] & 0xFF); // (0~999)
-                uint16_t Security_level = ((uint16_t)recieved_buffer[10] << 8) + ((uint16_t)recieved_buffer[11] & 0xFF); // (1~5)
-                // uint32_t Device_address = (((uint32_t)recieved_buffer[12] << 14) +
-                //                            ((uint32_t)recieved_buffer[13] << 16) +
-                //                            ((uint32_t)recieved_buffer[14] << 8) +
-                //                            ((uint32_t)recieved_buffer[15] & 0xFF));
-                uint16_t Data_packet_size = ((uint16_t)recieved_buffer[16] << 8) + ((uint16_t)recieved_buffer[17] & 0xFF); // (0~3)
-                uint16_t Baud_setting = ((uint16_t)recieved_buffer[18] << 8) + ((uint16_t)recieved_buffer[19] & 0xFF);     //(1~12)
-                uint16_t Checksum = ((uint16_t)recieved_buffer[20] << 8) + ((uint16_t)recieved_buffer[21] & 0xFF);         //(1~12)
+                uint16_t System_identifier_code = ((uint16_t)recieved_buffer[6] << 8) + ((uint16_t)recieved_buffer[7] & 0xFF); // 0x0009
+                uint16_t Finger_library_size = ((uint16_t)recieved_buffer[8] << 8) + ((uint16_t)recieved_buffer[9] & 0xFF);    // (0~999)
+                uint16_t Security_level = ((uint16_t)recieved_buffer[10] << 8) + ((uint16_t)recieved_buffer[11] & 0xFF);       // (1~5)
+                uint16_t Data_packet_size = ((uint16_t)recieved_buffer[16] << 8) + ((uint16_t)recieved_buffer[17] & 0xFF);     // (0~3)
+                uint16_t Baud_setting = ((uint16_t)recieved_buffer[18] << 8) + ((uint16_t)recieved_buffer[19] & 0xFF);         //(1~12)
+                uint16_t Checksum = ((uint16_t)recieved_buffer[20] << 8) + ((uint16_t)recieved_buffer[21] & 0xFF);             //(1~12)
 
                 TRACE_D("Status_register [4]: %#x", Status_register);
-                // TRACE_D("System_identifier_code [6]: %#x", System_identifier_code);
-                // TRACE_D("Finger_library_size [8]: %d", (int)Finger_library_size);
+                TRACE_D("System_identifier_code [6]: %#x", System_identifier_code);
+                TRACE_D("Finger_library_size [8]: %d", (int)Finger_library_size);
                 TRACE_D("Security_level [10]: %#x", Security_level);
                 TRACE_D("Data_packet_size [16]: %#x", Data_packet_size);
                 TRACE_D("Baud_setting [18]: %#x", Baud_setting);
                 TRACE_D("ReadSysPara =>Checksum [20]: %#x", Checksum);
             }
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B(" < -------- XXXX");
-        // }
         free(txPacket);
     }
     *Status_bits = Status_register;
@@ -556,7 +526,7 @@ bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buff
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -569,11 +539,8 @@ bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buff
         uint8_t Combined_data[1] = {
             FINGERPRINT_TEMPLATENUM, /*INS CODE [1Byte]*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- ReadTempNum --------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -593,9 +560,7 @@ bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buff
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     *TempNum = TempleteNum;
@@ -621,7 +586,7 @@ bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScor
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -634,11 +599,8 @@ bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScor
         uint8_t Combined_data[1] = {
             FINGERPRINT_GR_IDENTIFY, /*INS CODE [1Byte]*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- GR_Identify --------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -660,9 +622,7 @@ bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScor
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     *PageID_ptr = Page_num;
@@ -685,7 +645,7 @@ bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -698,11 +658,8 @@ bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
         uint8_t Combined_data[1] = {
             FINGERPRINT_GETIMAGE, /*INS CODE [1Byte]*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- GenImg --------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -720,9 +677,7 @@ bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -744,7 +699,7 @@ bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -758,11 +713,8 @@ bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer
             FINGERPRINT_IMAGE2TZ, /*INS CODE [1Byte]*/
             CharBufferID,         /*BufferId = CharBuf1 or CharBuf2*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- Img2Tz --------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -780,9 +732,7 @@ bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -803,7 +753,7 @@ bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -816,11 +766,8 @@ bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
         uint8_t Combined_data[1] = {
             FINGERPRINT_REGMODEL, /*INS CODE [1Byte]*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- RegModel -------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -838,9 +785,7 @@ bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -863,7 +808,7 @@ bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t 
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -879,11 +824,8 @@ bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t 
             (uint8_t)(PageID >> 8),   /*MSB sent first*/
             (uint8_t)(PageID & 0xFF), /*LSB sent last*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- Store --------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -901,9 +843,7 @@ bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t 
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -926,7 +866,7 @@ bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -942,11 +882,8 @@ bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *
             (uint8_t)(PageID >> 8),   /*MSB sent first*/
             (uint8_t)(PageID & 0xFF), /*LSB sent last*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- Load -------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -964,9 +901,7 @@ bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -989,7 +924,7 @@ bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -1006,11 +941,8 @@ bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *
             (uint8_t)(TempCount >> 8),   /*MSB sent first*/
             (uint8_t)(TempCount & 0xFF), /*LSB sent last*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- Delete ---------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         // -- -- -- -- -- --Fill the packet container and send it via uart-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
@@ -1029,9 +961,7 @@ bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -1052,7 +982,7 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -1065,11 +995,8 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
         uint8_t Combined_data[1] = {
             FINGERPRINT_EMPTY, /*INS CODE [1Byte]*/
         };
-        //  uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        //  if (Combined_Data_Ptr)
-        //  {
+
         //         TRACE_B("                          -------- Empty ---------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -1087,9 +1014,7 @@ bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout)
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         //         TRACE_B("                          -------- XXXX --------");
-        //  }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -1110,7 +1035,7 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, 
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -1127,11 +1052,8 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, 
             FINGERPRINT_LED_BLUE,                              /*coloridx*/
             0,                                                 /*count*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- LedControl ---------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -1149,9 +1071,7 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, 
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -1174,7 +1094,7 @@ bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_bu
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -1187,11 +1107,8 @@ bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_bu
         uint8_t Combined_data[1] = {
             FINGERPRINT_MATCH, /*INS CODE [1Byte]*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          -------- Match --------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         // -- -- -- -- -- --Fill the packet container and send it via uart-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
@@ -1212,9 +1129,7 @@ bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_bu
             }
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     *InspectionScore = Score;
@@ -1244,7 +1159,7 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
     // Reset the recieving buffer before new data is to be extracted.
     memset(recieved_buffer, 0, MAX_PACKET_LENGTH_VAL);
     // create the packet here
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
 
     fingerprint_packet_t *txPacket = (fingerprint_packet_t *)malloc(sizeof(fingerprint_packet_t));
     if (txPacket)
@@ -1262,11 +1177,8 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
             (uint8_t)(PageNum >> 8),     /*MSB sent first*/
             (uint8_t)(PageNum & 0xFF),   /*LSB sent last*/
         };
-        // uint8_t *Combined_Data_Ptr = (uint8_t *)malloc(sizeof(Combined_data));
-        // if (Combined_Data_Ptr)
-        // {
+
         // TRACE_B("                          --------- Search ---------");
-        // memcpy(Combined_Data_Ptr, Combined_data, sizeof(Combined_data));
         bool res = SEND_PACKET(uart_channel_num,                  /* UART CHANNEL NUMBER */
                                txPacket,                          /* Address of packet container */
                                FINGERPRINT_PID_COMMANDPACKET,     /* Packet Identifier CMD*/
@@ -1295,9 +1207,7 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
             *MatchScore_ptr = Match_score;
             // TRACE_W("---------------------------------------------------");
         }
-        // free(Combined_Data_Ptr);
         // TRACE_B("                          -------- XXXX --------");
-        // }
         free(txPacket);
     }
     //----------------------------------------------------------------------------------------------------------------------
@@ -1319,7 +1229,7 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
  */
 bool Wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout_ms) // wait_
 {
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
     if (NULL != item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
@@ -1354,9 +1264,7 @@ bool Check_PAGEID_Empty(l_ezlopi_item_t *item)
     {
         // TRACE_D("                  <<< Check_PAGEID_Empty >>> ");
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        FINGERPRINT_STATUS_t p = FINGERPRINT_FAIL; // status checker
-
-        // TRACE_W("Checking : PAGE_ID-> [#%d].. is occupied", (user_data->user_id));
+        fingerprint_status_t p = FINGERPRINT_FAIL; // status checker
         p = Load(item->interface.uart.channel, 1, (user_data->user_id), (user_data->recieved_buffer), 200);
         if ((p == FINGERPRINT_OK))
         {
@@ -1365,7 +1273,6 @@ bool Check_PAGEID_Empty(l_ezlopi_item_t *item)
         }
         else
         {
-            // Result: OK - Internal Occupied!
             TRACE_W(" USER_ID [%d] is empty", user_data->user_id);
             ret = true;
         }
@@ -1409,7 +1316,7 @@ bool Update_ID_status_list(l_ezlopi_item_t *item)
     bool ret = false;
     if (NULL != item)
     {
-        TRACE_D("---------------------- ENTER: .[MODE:-2]. Update_ID_list ------------------------");
+        // TRACE_D("---------------------- ENTER: .[MODE:-2]. Update_ID_list ------------------------");
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t Temp_ID = user_data->user_id;
         for (uint16_t ids = 1; ids <= FINGERPRINT_MAX_CAPACITY_LIMIT; ids++)
@@ -1418,17 +1325,17 @@ bool Update_ID_status_list(l_ezlopi_item_t *item)
             user_data->user_id = ids;
             if (Check_PAGEID_Empty(item))
             {
-                user_data->validity[ids] = 0; // when empty
+                user_data->validity[ids] = false; // when empty
             }
             else
             {
-                user_data->validity[ids] = 1; // when occupied
+                user_data->validity[ids] = true; // when occupied
             }
             vTaskDelay(5 / portTICK_PERIOD_MS);
         }
         user_data->user_id = Temp_ID;
         ret = true;
-        TRACE_D("--------------------------- EXIT: .[MODE:-2]. ----------------------------");
+        // TRACE_D("--------------------------- EXIT: .[MODE:-2]. ----------------------------");
     }
     return ret;
 }
@@ -1446,21 +1353,21 @@ bool Match_ID(l_ezlopi_item_t *item)
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         uint16_t custom_USER_ID = user_data->user_id;
         //-------------------- 4. Search for all the library and store only if no duplicates found -----------------------
-        FINGERPRINT_STATUS_t p = FINGERPRINT_FAIL;
+        fingerprint_status_t p = FINGERPRINT_FAIL;
         int uart_channel_num = item->interface.uart.channel;
         start_time = esp_timer_get_time() / 1000;  //  !< ms
         dummy_timer = esp_timer_get_time() / 1000; //  !< ms
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1000))
         {
             LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
             p = GR_Identify(item->interface.uart.channel,   /*user_channel*/
                             &(user_data->user_id),          /*same_ID => */
                             &(user_data->confidence_level), /*[value=!0]=> */
                             (user_data->recieved_buffer),   /*Uart_buffer address*/
-                            1000);
+                            500);
             LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 2000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 1000)
             {
                 TRACE_E(" Failed Match Operation ........... The Fingerpint, Doesnot match with : USER_ID[#%d]", custom_USER_ID);
                 user_data->user_id = custom_USER_ID;
@@ -1486,7 +1393,7 @@ bool Erase_Specified_ID(l_ezlopi_item_t *item)
         uint32_t start_time = 0, dummy_timer = 0;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         //-------------------- 4. Search for all the library and store only if no duplicates found ------------------------------------------------
-        FINGERPRINT_STATUS_t p = FINGERPRINT_FAIL;
+        fingerprint_status_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
         while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1000))
@@ -1495,7 +1402,7 @@ bool Erase_Specified_ID(l_ezlopi_item_t *item)
                        (user_data->user_id),         /*Starting_point*/
                        (user_data->id_counts),       /*Quantity*/
                        (user_data->recieved_buffer), /*Uart_buffer address*/
-                       300);
+                       500);
             dummy_timer = esp_timer_get_time() / 1000;
             if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 1000)
             {
@@ -1504,7 +1411,7 @@ bool Erase_Specified_ID(l_ezlopi_item_t *item)
                 break;
             }
         }
-        TRACE_D("DELETED from id:[#%d] to id:[#%d]", (user_data->user_id), ((user_data->user_id) + (user_data->id_counts)))
+        TRACE_D("DELETED from id:[#%d]", (user_data->user_id));
         TRACE_D("--------------------------- EXIT: .[MODE:-3]. ----------------------------");
     }
     return ret;
@@ -1524,16 +1431,16 @@ bool Erase_all_ID(l_ezlopi_item_t *item)
         uint32_t start_time = 0, dummy_timer = 0;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         //-------------------- 4. Search for all the library and store only if no duplicates found ------------------------------------------------
-        FINGERPRINT_STATUS_t p = FINGERPRINT_FAIL;
+        fingerprint_status_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1000))
         {
             p = Empty(item->interface.uart.channel, /*user_channel*/
                       (user_data->recieved_buffer), /*Uart_buffer address*/
                       800);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 2000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 1000)
             {
                 TRACE_W(" Failed to Erase all the IDs from internal fingerprint library  . Try again ...........");
                 ret = false;
@@ -1564,19 +1471,19 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
         uint32_t start_time = 0, dummy_timer = 0;
 
         //----------------------- 1. Collecting First fingerprint -----------------------------------------------
-        FINGERPRINT_STATUS_t p = FINGERPRINT_FAIL; // status checker
+        fingerprint_status_t p = FINGERPRINT_FAIL; // status checker
         TRACE_I(" [Phase:-1]...ENROLL..Place a finger ......");
 
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 6000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
         {
             LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
             TRACE_D("GenImg generation [1]");
-            p = GenImg(uart_channel_num, (user_data->recieved_buffer), 2000);
+            p = GenImg(uart_channel_num, (user_data->recieved_buffer), 1000);
             LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 6000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 2000)
             {
                 TRACE_D("Image generation [1].... failed .. Retry by placing the finger again... after 3 seconds");
             }
@@ -1602,14 +1509,14 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
         TRACE_I("[Phase:-2] ...ENROLL ... Place same finger again......");
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 6000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
         {
             LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
             TRACE_D("GenImg generation [2]");
-            p = GenImg(uart_channel_num, (user_data->recieved_buffer), 2000);
+            p = GenImg(uart_channel_num, (user_data->recieved_buffer), 1000);
             LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 6000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 2000)
             {
                 TRACE_D("Image generation [2].... failed .. Retry by placing the finger again... after 3 seconds");
             }
@@ -1637,14 +1544,14 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
         TRACE_I("[Phase:-3] ... Create Model form ChrBuffer-1&2 .........");
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 6000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
         {
-            p = RegModel(uart_channel_num, (user_data->recieved_buffer), 2000);
+            p = RegModel(uart_channel_num, (user_data->recieved_buffer), 1000);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 6000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 2000)
             {
                 TRACE_W(" Template Generation failed .......... Retry Again... after 3 seconds");
-                vTaskDelay(2000 / portTICK_PERIOD_MS);
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
                 return (0);
             }
         }
@@ -1675,7 +1582,7 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
                     break;
                 }
             }
-            else if ((p == FINGERPRINT_OK) && (dummy_timer - start_time) <= 2000)
+            else if ((p == FINGERPRINT_OK) && (dummy_timer - start_time) <= 1000)
             {
                 if ((user_data->confidence_level) > 20)
                 {
@@ -1720,7 +1627,7 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
             // Loop until Second fingerprint collection is successful
             start_time = esp_timer_get_time() / 1000; //  !< ms
             dummy_timer = esp_timer_get_time() / 1000;
-            while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 6000))
+            while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
             {
                 p = Store(uart_channel_num,
                           1,                                  /*ChrBuffer = 1*/
@@ -1728,7 +1635,7 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
                           (user_data->recieved_buffer), 800); /*need to change Page_id [default = 1]*/
 
                 dummy_timer = esp_timer_get_time() / 1000;
-                if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 6000)
+                if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) > 2000)
                 {
                     TRACE_W(" Template Storage failed .. Retry by placing the finger again... after 3 seconds");
                     return (0);
@@ -1743,9 +1650,9 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item)
 }
 
 //--------------------------------- Function to configure fingerprint sensor ------------------------------------------------------
-FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item)
+fingerprint_status_t fingerprint_config(l_ezlopi_item_t *item)
 {
-    FINGERPRINT_STATUS_t F_res = FINGERPRINT_FAIL;
+    fingerprint_status_t F_res = FINGERPRINT_FAIL;
     if (NULL != item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;

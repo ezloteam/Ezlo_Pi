@@ -170,14 +170,14 @@
 #define UART_PORT_OFF (uint8_t)0 //!< Uart port is OFF
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom enum for status response after executing a command >
-typedef enum FINGERPRINT_STATUS_t
+typedef enum
 {
     FINGERPRINT_FAIL = 0,
     FINGERPRINT_OK,
-} FINGERPRINT_STATUS_t;
+} fingerprint_status_t;
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom enum indicating the current operation phase >
-typedef enum e_FINGERPRINT_OP_MODE_t
+typedef enum
 {
     FINGERPRINT_MATCH_MODE = 0,
     FINGERPRINT_ENROLLMENT_MODE,
@@ -185,7 +185,7 @@ typedef enum e_FINGERPRINT_OP_MODE_t
     FINGERPRINT_ERASE_WITH_IDS_MODE,
     FINGERPRINT_ERASE_ALL_MODE,
     FINGERPRINT_MODE_MAX
-} e_FINGERPRINT_OP_MODE_t;
+} e_fingerprint_op_mode_t;
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom tx-packet >
 typedef struct fingerprint_packet_t
@@ -201,19 +201,19 @@ typedef struct fingerprint_packet_t
 // !< Custom structure to send as a reply to server (@ MATCH phase) >
 typedef struct server_packet_t
 {
-    e_FINGERPRINT_OP_MODE_t opmode; /*Hold current operation mode*/
-    uint16_t id_counts;             /*This is used as an information for list and erase operations*/
-    uint16_t user_id;               /*Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode'] */
-    uint16_t confidence_level;      /*0~100*/
-    uint16_t matched_id;                               /* Used to store most recently matched ID*/
-    uint16_t matched_confidence_level;                 /* Used to store most recently matched confidence*/
-    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];    /*This array store incomming uart message*/
-    bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
-    bool __busy_guard;                                 /*Gaurd_flag used during notification actions*/
-    uint32_t intr_pin;                                 /* Stores custom interrupt pin num*/
-    time_t timeout_start_time;                         /* Variable to store immediate time value */
-    TaskHandle_t notifyHandler;
-    // TaskHandle_t timerHandle;
+    e_fingerprint_op_mode_t opmode;                      /* Hold current operation mode*/
+    uint32_t intr_pin;                                   /* Stores custom interrupt pin num*/
+    uint16_t id_counts;                                  /* This is used as an information for list and erase operations*/
+    uint16_t user_id;                                    /* Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode']*/
+    uint16_t confidence_level;                           /* 0~100*/
+    uint16_t matched_id;                                 /* Used to store most recently matched ID*/
+    uint16_t matched_confidence_level;                   /* Used to store most recently matched confidence*/
+    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];      /* This array store incomming uart message*/
+    uint8_t protect[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /* Array that indicate which index to clear [ 1-> protect ]*/
+    bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1];   /* status of each ID {1~500} ; [ true -> occupied]*/
+    bool __busy_guard;                                   /* Gaurd_flag used during notification actions*/
+    time_t timeout_start_time;                           /* Variable to store immediate time value*/
+    TaskHandle_t notifyHandler;                          /* Notify handler*/
 } server_packet_t;
 
 typedef enum
@@ -223,7 +223,11 @@ typedef enum
     SENSOR_FP_ITEM_ID_FP_IDS,
     SENSOR_FP_ITEM_ID_MAX,
 } e_sensor_fp_items_t;
-//---------- FUNCTIONS Defination for Fingerprint Library ------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------
+//  FUNCTIONS Defination for Fingerprint Library
+//-------------------------------------------------------------------------------------------------------------------
+
 #if 0
 // bool UpImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 // bool DownImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
@@ -269,6 +273,7 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
 //-------------------------------------------------------------------------------------------------------------------
 // FUNCTIONS Defination for Operation modes
 //-------------------------------------------------------------------------------------------------------------------
+
 bool Match_ID(l_ezlopi_item_t *item);
 
 bool Erase_all_ID(l_ezlopi_item_t *item);
@@ -283,7 +288,7 @@ uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item);
 
 uint16_t Find_immediate_vaccant_ID(l_ezlopi_item_t *item);
 
-FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item);
+fingerprint_status_t fingerprint_config(l_ezlopi_item_t *item);
 
 bool Wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
 
