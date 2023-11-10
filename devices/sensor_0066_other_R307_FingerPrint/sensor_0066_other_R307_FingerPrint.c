@@ -295,9 +295,8 @@ static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg)
         else if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION] == item->cloud_properties.item_id)
         {
             cJSON *cj_value = cJSON_CreateObject();
-
-            cJSON_AddNumberToObject(cj_value, "id", user_data->matched_id);
-            cJSON_AddNumberToObject(cj_value, "confidence_level", user_data->matched_confidence_level);
+            cJSON_AddNumberToObject(cj_value, "id", user_data->user_id);                        // don't use matched here
+            cJSON_AddNumberToObject(cj_value, "confidence_level", user_data->confidence_level); // don't use matched here ; we need to be able to see recent failed values
             cJSON_AddItemToObject(cj_result, "value", cj_value);
             cJSON_AddStringToObject(cj_result, "valueFormatted", "");
         }
@@ -333,11 +332,11 @@ static void fingerprint_enroll_timeout_check(void *pv)
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         for (uint32_t i = 0; i < 30; i++)
         {
-            TRACE_E("Here: %d", i);
+            TRACE_E("Here timer: %d sec", i);
             if (user_data->opmode == FINGERPRINT_MATCH_MODE)
             {
                 flag_break = true;
-                TRACE_E("Here");
+                TRACE_E("Breaking out 'For_loop'");
                 break;
             }
             vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -627,8 +626,10 @@ static void Fingerprint_Operation_task(void *params)
                     {
                         if (true == user_data->validity[i]) // second check if the id is occupied
                         {
+                            TRACE_E("DELETING ID[#%d]", i);
                             if (Delete(item->interface.uart.channel, i, 1, (user_data->recieved_buffer), 500)) // then delete and update 'validity[]' status
                             {
+                                TRACE_E(" success... delete ID[#%d]", i);
                                 user_data->validity[user_data->user_id] = false;
                             }
                         }
@@ -680,7 +681,7 @@ static void Fingerprint_Operation_task(void *params)
             user_data->__busy_guard = false;
             gpio_isr_handler_add(user_data->intr_pin, gpio_notify_isr, item);
 
-            TRACE_B("           >> Remove finger  &  Wait => [1sec] ; To activate next Task_notify<<");
+            TRACE_W("----------------------------->> Remove finger  &  Wait => [1sec] ; To activate next Task_notify <<-----------------------------");
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
     }
