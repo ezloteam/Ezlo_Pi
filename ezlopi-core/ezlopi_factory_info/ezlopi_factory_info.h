@@ -451,9 +451,30 @@ static const char *test_device_constant_config =
             \"pwm_resln\": 3,\
             \"freq_hz\": 50,\
             \"duty_cycle\": 10\
+        },\
+        {\
+            \"dev_type\":10,\
+            \"dev_name\":\"RGB LED\",\
+            \"id_room\":\"\",\
+            \"id_item\":38,\
+            \"en_gpio1\":true,\
+            \"gpio1\":11,\
+            \"en_gpio2\":true,\
+            \"gpio2\":10,\
+            \"en_gpio3\":true,\
+            \"gpio3\":13\
+        },\
+        {\
+            \"dev_type\": 6,\
+            \"dev_name\": \"UART_MB1013\",\
+            \"id_item\": 21,\
+            \"id_room\": \"\",\
+            \"gpio_tx\": 3,\
+            \"gpio_rx\": 8,\
+            \"baud_rate\": 9600\
         }\
     ],\
-    \"dev_total\":3\
+    \"dev_total\":5\
     }";
 
 #endif

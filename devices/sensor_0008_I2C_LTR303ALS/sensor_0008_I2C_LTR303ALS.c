@@ -127,7 +127,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_param)
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_param)
 {
     CJSON_GET_VALUE_INT(cj_param, "dev_type", item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -167,7 +167,7 @@ static int __prepare(void *arg)
             if (als_ltr303_item)
             {
                 als_ltr303_item->cloud_properties.device_id = als_ltr303_device->cloud_properties.device_id;
-                __prepare_item_cloud_properties(als_ltr303_item, prep_arg->cjson_device);
+                __prepare_item_properties(als_ltr303_item, prep_arg->cjson_device);
             }
             else
             {

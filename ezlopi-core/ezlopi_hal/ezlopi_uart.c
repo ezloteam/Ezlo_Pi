@@ -89,6 +89,7 @@ static void ezlopi_uart_channel_task(void *args)
 
     while (1)
     {
+        int data_len = 0;
         // Start reveceiving UART events for first channel.
         if (xQueueReceive(ezlopi_uart_object->ezlopi_uart_queue_handle, (void *)&event, portMAX_DELAY))
         {
@@ -97,7 +98,7 @@ static void ezlopi_uart_channel_task(void *args)
             {
             case UART_DATA:
             {
-                uart_read_bytes(ezlopi_uart_object->ezlopi_uart.channel, buffer, event.size, 100 / portTICK_PERIOD_MS);
+                data_len = uart_read_bytes(ezlopi_uart_object->ezlopi_uart.channel, buffer, event.size, 100 / portTICK_PERIOD_MS);
                 break;
             }
             case UART_BREAK:
@@ -115,7 +116,9 @@ static void ezlopi_uart_channel_task(void *args)
             }
             }
         }
-        ezlopi_uart_object->upcall(buffer, ezlopi_uart_object);
+
+        ezlopi_uart_object->upcall(buffer, data_len, ezlopi_uart_object);
+        data_len = 0;
     }
 }
 

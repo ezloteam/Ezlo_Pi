@@ -95,16 +95,23 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
                     break;
                 }
 
-                int ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
-                if (ret > 0)
+                int retries = 3;
+                while (--retries)
                 {
-                    message_counter++;
+                    ret = ezlopi_websocket_client_send(cjson_str_data, strlen(cjson_str_data));
+                    if (ret > 0)
+                    {
+                        ret = 1;
+                        message_counter++;
+                        break;
+                    }
                 }
 
                 free(cjson_str_data);
             }
         }
     }
+
     return ret;
 }
 

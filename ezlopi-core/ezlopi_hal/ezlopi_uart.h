@@ -16,7 +16,7 @@
 
 typedef int ezlo_uart_channel_t;
 typedef struct s_ezlopi_uart_object *s_ezlopi_uart_object_handle_t;
-typedef void (*__uart_upcall)(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
+typedef void (*__uart_upcall)(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
 
 typedef struct s_ezlopi_uart
 {

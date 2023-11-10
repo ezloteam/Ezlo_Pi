@@ -8,9 +8,10 @@
 
 static int sensor_pir_prepare_v3(void *arg);
 static int sensor_pir_init_v3(l_ezlopi_item_t *item);
-static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *device, cJSON *cj_device);
-static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj_device);
 static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg);
+static void sensor_pir_value_updated_from_device_v3(l_ezlopi_item_t *item);
+static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj_device);
+static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *device, cJSON *cj_device);
 
 int sensor_0019_digitalIn_PIR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
 {

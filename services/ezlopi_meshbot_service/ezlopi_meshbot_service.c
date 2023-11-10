@@ -110,8 +110,8 @@ static void __scenes_process(void *arg)
     l_scenes_list_v2_t *scene_node = (l_scenes_list_v2_t *)arg;
     scene_node->status = EZLOPI_SCENE_STATUS_RUN;
     TRACE_B("task - '%s': Running", scene_node->name);
-    uint32_t fire_stopped_condition = 0;
-    uint32_t fire_started_condition = 1;
+    uint32_t stopped_condition_count = 0;
+    uint32_t started_condition_fired_count = 0;
 
     while (1)
     {
@@ -130,23 +130,38 @@ static void __scenes_process(void *arg)
                     when_condition_returned = when_method(scene_node, (void *)when_condition_node);
                     if (when_condition_returned)
                     {
-                        if (fire_started_condition < 3)
+                        if (started_condition_fired_count < 2)
                         {
-                            fire_started_condition += 1;
-                            fire_stopped_condition = 1;
+                            stopped_condition_count = 0;
 
-                            if (fire_started_condition)
+                            int write_status = 1;
+
+                            if (started_condition_fired_count)
                             {
-                                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
+                                if (0 == ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str))
+                                {
+                                    write_status = 0;
+                                }
                             }
 
                             if (1 == __execute_then_condition(scene_node))
                             {
-                                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                                if (0 == ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str))
+                                {
+                                    write_status = 0;
+                                }
                             }
                             else
                             {
-                                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+                                if (0 == ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str))
+                                {
+                                    write_status = 0;
+                                }
+                            }
+
+                            if (write_status)
+                            {
+                                started_condition_fired_count += 1;
                             }
                         }
                         else
@@ -154,13 +169,15 @@ static void __scenes_process(void *arg)
                             TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
                         }
                     }
-                    else if (fire_stopped_condition < 3)
+                    else if (stopped_condition_count < 2)
                     {
                         __execute_else_condition(scene_node);
-                        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+                        if (ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str))
+                        {
+                            stopped_condition_count += 1;
+                        }
 
-                        fire_started_condition = 1;
-                        fire_stopped_condition += 1;
+                        started_condition_fired_count = 0;
                     }
                     else
                     {

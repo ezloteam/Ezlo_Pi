@@ -15,8 +15,11 @@
 
 #include "sensor_0021_UART_MB1013.h"
 
-#warning "Static should be removed"
-static float mb1013_value = 0;
+typedef struct s_mb1013_args
+{
+    float current_value;
+    float previous_value;
+} s_mb1013_args_t;
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -64,31 +67,45 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
     char valueFormatted[20];
-    if (item && arg)
+    if (item && arg && item->user_arg)
     {
+        s_mb1013_args_t *mb1013_args = item->user_arg;
+
         cJSON *cj_result = (cJSON *)arg;
-        cJSON_AddNumberToObject(cj_result, "value", mb1013_value);
-        snprintf(valueFormatted, 20, "%.2f", mb1013_value);
+        cJSON_AddNumberToObject(cj_result, "value", mb1013_args->current_value);
+        snprintf(valueFormatted, 20, "%.2f", mb1013_args->current_value);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         ret = 1;
     }
     return ret;
 }
 
-static void __uart_data_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
-    if (uart_object_handle->arg)
+    if (buffer && output_len)
     {
-        l_ezlopi_item_t *item = (l_ezlopi_item_t *)uart_object_handle->arg;
-        // TRACE_E("Buffer is %s", buffer);
-        char *tmp_buffer = (char *)malloc(256);
-        if (tmp_buffer)
+        if (uart_object_handle)
         {
-            memcpy(tmp_buffer, buffer + 1, 4);
+            l_ezlopi_item_t *item = (l_ezlopi_item_t *)uart_object_handle->arg;
+            if (item && item->user_arg)
+            {
+                s_mb1013_args_t *s_mb1013_args = (s_mb1013_args_t *)item->user_arg;
+                int idx = 0;
+                TRACE_D("BUFFER-DATA-LEN: %d", output_len);
+                while (idx < output_len)
+                {
+                    dump("rx-buffer", buffer, idx, 6);
+                    if ('R' == buffer[idx] && '\r' == buffer[idx + 5])
+                    {
+                        s_mb1013_args->current_value = atoi((const char *)&buffer[idx + 1]) / 10.0;
+                        TRACE_B("range: %f", s_mb1013_args->current_value);
+                        break;
+                    }
+                    idx++;
+                }
 
 #warning "use ring buffer"
-            mb1013_value = atoi(tmp_buffer) / 10.0;
-            free(tmp_buffer);
+            }
         }
     }
 }
@@ -161,6 +178,14 @@ static int __prepare(void *arg)
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
                     ret = 1;
+
+                    s_mb1013_args_t *mb1030_args = malloc(sizeof(s_mb1013_args_t));
+                    if (mb1030_args)
+                    {
+                        mb1030_args->current_value = 0.0;
+                        mb1030_args->previous_value = 0.0;
+                        item->user_arg = mb1030_args;
+                    }
                 }
                 else
                 {
@@ -175,5 +200,16 @@ static int __prepare(void *arg)
 
 static int __notify(l_ezlopi_item_t *item)
 {
-    return ezlopi_device_value_updated_from_device_v3(item);
+    int ret = 0;
+    if (item && item->user_arg)
+    {
+        s_mb1013_args_t *mb1013_args = (s_mb1013_args_t *)item->user_arg;
+        if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
+        {
+            ezlopi_device_value_updated_from_device_v3(item);
+            mb1013_args->previous_value = mb1013_args->current_value;
+        }
+    }
+
+    return ret;
 }

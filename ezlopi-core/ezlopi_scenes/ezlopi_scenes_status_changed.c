@@ -3,8 +3,9 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_status_changed.h"
 
-void ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
+int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
 {
+    int ret = 0;
     if (scene_node)
     {
         cJSON *cj_response = cJSON_CreateObject();
@@ -46,10 +47,12 @@ void ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const
                 cJSON_AddStringToObject(cj_result, ezlopi_room_name_str, "");
             }
 
-            web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
+            ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
             cJSON_Delete(cj_response);
         }
     }
+
+    return ret;
 }
 
 const char *ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
