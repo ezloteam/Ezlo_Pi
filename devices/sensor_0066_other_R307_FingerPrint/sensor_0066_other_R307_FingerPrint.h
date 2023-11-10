@@ -208,7 +208,7 @@ typedef struct server_packet_t
     uint16_t matched_id;                               /* Used to store most recently matched ID*/
     uint16_t matched_confidence_level;                 /* Used to store most recently matched confidence*/
     uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];    /*This array store incomming uart message*/
-    bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
+    volatile bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
     bool __busy_guard;                                 /*Gaurd_flag used during notification actions*/
     uint32_t intr_pin;                                 /* Stores custom interrupt pin num*/
     time_t timeout_start_time;                         /* Variable to store immediate time value */
