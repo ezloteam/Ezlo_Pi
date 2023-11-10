@@ -201,19 +201,19 @@ typedef struct fingerprint_packet_t
 // !< Custom structure to send as a reply to server (@ MATCH phase) >
 typedef struct server_packet_t
 {
-    e_fingerprint_op_mode_t opmode;                      /* Hold current operation mode*/
-    uint32_t intr_pin;                                   /* Stores custom interrupt pin num*/
-    uint16_t id_counts;                                  /* This is used as an information for list and erase operations*/
-    uint16_t user_id;                                    /* Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode']*/
-    uint16_t confidence_level;                           /* 0~100*/
-    uint16_t matched_id;                                 /* Used to store most recently matched ID*/
-    uint16_t matched_confidence_level;                   /* Used to store most recently matched confidence*/
-    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];      /* This array store incomming uart message*/
-    uint8_t protect[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /* Array that indicate which index to clear [ 1-> protect ]*/
-    bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1];   /* status of each ID {1~500} ; [ true -> occupied]*/
-    bool __busy_guard;                                   /* Gaurd_flag used during notification actions*/
-    time_t timeout_start_time;                           /* Variable to store immediate time value*/
-    TaskHandle_t notifyHandler;                          /* Notify handler*/
+    e_fingerprint_op_mode_t opmode;                               /* Hold current operation mode*/
+    uint32_t intr_pin;                                            /* Stores custom interrupt pin num*/
+    uint16_t id_counts;                                           /* This is used as an information for list and erase operations*/
+    uint16_t user_id;                                             /* Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode']*/
+    uint16_t confidence_level;                                    /* 0~100*/
+    uint16_t matched_id;                                          /* Used to store most recently matched ID*/
+    uint16_t matched_confidence_level;                            /* Used to store most recently matched confidence*/
+    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];               /* This array store incomming uart message*/
+    volatile uint8_t protect[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /* Array that indicate which index to clear [ 1-> protect ]*/
+    volatile bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1];   /* status of each ID {1~500} ; [ true -> occupied]*/
+    volatile bool __busy_guard;                                   /* Gaurd_flag used during notification actions*/
+    time_t timeout_start_time;                                    /* Variable to store immediate time value*/
+    TaskHandle_t notifyHandler;                                   /* Notify handler*/
 } server_packet_t;
 
 typedef enum

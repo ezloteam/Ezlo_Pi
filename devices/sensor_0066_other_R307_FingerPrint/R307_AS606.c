@@ -158,7 +158,7 @@ static fingerprint_status_t __Response_function(uint8_t *recieved_buffer, uint32
             TRACE_E(".... ERR: Templates from both Charbuffers(1 & 2) arenot matching ... ");
             break;
         case ACK_ERR_NO_LIB_MATCH:
-            TRACE_E(".... ERR: Not matching with the library (both the PageID and matching score are 0) ... ");
+            // TRACE_E(".... ERR: Not matching with the library (both the PageID and matching score are 0) ... ");
             break;
         case ACK_ERR_CMB_CHRFILE:
             TRACE_E(".... ERR: Failed to combine the character files (character files donot belong to same finger) ... ");
@@ -1187,7 +1187,7 @@ bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint
         //------------ Check of the appropriate responce  --------------------------------------------------------------------------------
         if (res)
         {
-            TRACE_W("--------------- 'Search' Response ----------------");
+            TRACE_W(" >> 'Search' Response <<");
             F_res = __Response_function(recieved_buffer, timeout);
             if (FINGERPRINT_OK == F_res)
             {
@@ -1265,10 +1265,17 @@ bool Check_PAGEID_Empty(l_ezlopi_item_t *item)
         // TRACE_D("                  <<< Check_PAGEID_Empty >>> ");
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         fingerprint_status_t p = FINGERPRINT_FAIL; // status checker
-        p = Load(item->interface.uart.channel, 1, (user_data->user_id), (user_data->recieved_buffer), 200);
+        uint32_t start_time = 0, dummy_timer = 0;
+        start_time = esp_timer_get_time() / 1000;  //  !< ms
+        dummy_timer = esp_timer_get_time() / 1000; //  !< ms
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 600))
+        {
+            p = Load(item->interface.uart.channel, 1, (user_data->user_id), (user_data->recieved_buffer), 300);
+            dummy_timer = esp_timer_get_time() / 1000;
+        }
         if ((p == FINGERPRINT_OK))
         {
-            TRACE_W(" Valid USER_ID already present in ID->[%d]", user_data->user_id);
+            TRACE_W(" Valid USER_ID present in ID->[%d]", user_data->user_id);
             ret = false;
         }
         else
@@ -1357,17 +1364,17 @@ bool Match_ID(l_ezlopi_item_t *item)
         int uart_channel_num = item->interface.uart.channel;
         start_time = esp_timer_get_time() / 1000;  //  !< ms
         dummy_timer = esp_timer_get_time() / 1000; //  !< ms
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
         {
             LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
             p = GR_Identify(item->interface.uart.channel,   /*user_channel*/
                             &(user_data->user_id),          /*same_ID => */
                             &(user_data->confidence_level), /*[value=!0]=> */
                             (user_data->recieved_buffer),   /*Uart_buffer address*/
-                            500);
+                            1000);
             LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 1000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 2000)
             {
                 TRACE_E(" Failed Match Operation ........... The Fingerpint, Doesnot match with : USER_ID[#%d]", custom_USER_ID);
                 user_data->user_id = custom_USER_ID;
@@ -1396,15 +1403,15 @@ bool Erase_Specified_ID(l_ezlopi_item_t *item)
         fingerprint_status_t p = FINGERPRINT_FAIL;
         start_time = esp_timer_get_time() / 1000; //  !< ms
         dummy_timer = esp_timer_get_time() / 1000;
-        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 1000))
+        while ((p != FINGERPRINT_OK) && ((dummy_timer - start_time) < 2000))
         {
             p = Delete(item->interface.uart.channel, /*user_channel*/
                        (user_data->user_id),         /*Starting_point*/
-                       (user_data->id_counts),       /*Quantity*/
+                       1,                            //    (user_data->id_counts),       /*Quantity*/
                        (user_data->recieved_buffer), /*Uart_buffer address*/
-                       500);
+                       1000);
             dummy_timer = esp_timer_get_time() / 1000;
-            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 1000)
+            if ((p != FINGERPRINT_OK) && (dummy_timer - start_time) >= 2000)
             {
                 TRACE_W(" Failed to Delete (Specified ID-Range) from internal Library . Try again ...........");
                 ret = false;
@@ -1679,7 +1686,7 @@ fingerprint_status_t fingerprint_config(l_ezlopi_item_t *item)
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
-        if (SetSysPara(uart_channel_num, FINGERPRINT_DATA_PACKAGE_LENGTH, FINGERPRINT_DATA_LENGTH_32, (user_data->recieved_buffer), 1000))
+        if (SetSysPara(uart_channel_num, FINGERPRINT_DATA_PACKAGE_LENGTH, FINGERPRINT_DATA_LENGTH_64, (user_data->recieved_buffer), 1000))
         {
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
