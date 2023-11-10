@@ -16,7 +16,6 @@
 #include "modes.h"
 #include "items.h"
 #include "room.h"
-#include "feature.h"
 #include "network.h"
 #include "firmware.h"
 #include "settings.h"
