@@ -10,81 +10,21 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"
 
-#if 0
-static s_ezlopi_factory_info_t *factory_info = NULL;
-static const esp_partition_t *partition_ctx = NULL;
 
-static unsigned long long ezlopi_factory_info_get_id(void);
-static char *ezlopi_factory_info_get_controller_uuid(void);
-static char *ezlopi_factory_info_get_zwave_region(void);
-static char *ezlopi_factory_info_get_default_wifi_ssid(void);
-static char *ezlopi_factory_info_get_default_wifi_password(void);
-static char *ezlopi_factory_info_get_name(void);
-static void ezlopi_factory_info_get_ezlopi_mac(uint8_t *mac_buf);
-static char *ezlopi_factory_info_manufacturer(void);
-static char *ezlopi_factory_info_get_brand(void);
-static char *ezlopi_factory_info_get_model(void);
-static char *ezlopi_factory_info_get_ezlopi_device_type(void);
-
-static char *ezlopi_factory_info_get_provisioning_uuid(void);
-static char *ezlopi_factory_info_get_provisioning_server(void);
-static char *ezlopi_factory_info_get_provisioning_token(void);
-static char *ezlopi_factory_info_get_cloud_server(void);
-static char *ezlopi_factory_info_get_ca_certificate(void);
-static char *ezlopi_factory_info_get_ssl_private_key(void);
-static char *ezlopi_factory_info_get_ssl_shared_key(void);
-
-static void ezlopi_factory_info_set_default(void);
-static char *ezlopi_factory_info_read_string_from_flash(int offset, uint32_t length);
-static int ezlopi_factory_info_write_string_to_flash(int offset, uint8_t *data, uint32_t len);
-static int ezlopi_factory_info_erase_range_of_flash(uint32_t offset, uint32_t len);
-#define free_and_assign_new(buff, new_data) \
-    {                                       \
-        if (buff)                           \
-        {                                   \
-            free(buff);                     \
-        }                                   \
-        buff = (char *)new_data;            \
-    }
-
-#define PRINT_FACTORY_INFO(name, offset, info)                                      \
-    {                                                                               \
-        if (NULL != info)                                                           \
-        {                                                                           \
-            TRACE_D("%s [off: %d, len: %d]: %s", name, offset, strlen(info), info); \
-        }                                                                           \
-        else                                                                        \
-        {                                                                           \
-            TRACE_W("%s [off: %d, len: 0]: NULL", name, offset);                    \
-        }                                                                           \
-    }
-
-static const char *default_uuid = "53f5bdc0-5347-11ec-b2d6-8f260f5287fa";
-static const char *default_zwave_region = "US";
-static const char *default_wifi_ssid_1 = "nepadldigisys";
-static const char *default_wifi_password_1 = "NDS_0ffice";
-static const char *default_name = "ezlopi-100004005";
-static const char *default_provisioning_server = "https://req-disp-at0m.mios.com";
-static const char *default_provisioning_token = "7ed0d422e075fda2d05f2b46acbb9d503f3505577055542f97a195268b3fe8a769eae18bbfe25abba8f98d0866d86a1a3336ecc68eed8a294c0f3bb9c521a176750b20ceb37354caed130a15ea29eb882d84e71476c6fcd1fa59b1bbd49487c8aa965a16706b68e4d08112a58cfe28d2b10b7cad40ddcab6a2d9ebd81c1d0eea";
-static const char *default_cloud_server = "https://cloud.ezlo.com:7000";
-static const char *default_ca_certificate = "-----BEGIN CERTIFICATE-----\r\nMIICbDCCAhGgAwIBAgIJAOByzaI7aHY9MAoGCCqGSM49BAMDMIGQMQswCQYDVQQG\r\nEwJVUzEUMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzAN\r\nBgNVBAoMBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExU\r\nRCBDQTEhMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTE5MDUz\r\nMTE3MDE0N1oYDzIxMTkwNTA3MTcwMTQ3WjCBkDELMAkGA1UEBhMCVVMxFDASBgNV\r\nBAgMCyBOZXcgSmVyc2V5MRAwDgYDVQQHDAdDbGlmdG9uMQ8wDQYDVQQKDAZJVCBP\r\ncHMxDzANBgNVBAsMBklUIE9wczEUMBIGA1UEAwwLZVpMTyBMVEQgQ0ExITAfBgkq\r\nhkiG9w0BCQEWEnN5c2FkbWluc0BlemxvLmNvbTBWMBAGByqGSM49AgEGBSuBBAAK\r\nA0IABHLQdhLDYsafIFY8pZh96aDGqVm6E4r8nW9s4CfdpXaa/R4CnjaVpDQI7UmQ\r\n9vVDGZn8mcmm7VjKx+TSCS0MIKOjUzBRMB0GA1UdDgQWBBRiTl8Ez1l94jaqcxbi\r\nyxkVC0FkBTAfBgNVHSMEGDAWgBRiTl8Ez1l94jaqcxbiyxkVC0FkBTAPBgNVHRMB\r\nAf8EBTADAQH/MAoGCCqGSM49BAMDA0kAMEYCIQD7EUs8j50jKFd/46Zo95NbrPYQ\r\nPtLTHH9YjUkMEkYD5gIhAMP4y7E1aB78nQrmd3IX8MM32k9dM8xT0MztR16OtsuV\r\n-----END CERTIFICATE-----";
-static const char *default_ssl_private_key = "-----BEGIN PRIVATE KEY-----\r\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQg/2cQ79U/nLXvov+J4Kpi\r\nlO4qO88X0HbRmHhvRNKMiJ+hRANCAATYtFGFMTEqaO18wxhqnBBJy1ckbgDAaBGV\r\nSVBju06op4irOXNv7xcnjPqBryAvk862yDnwsUsIwEjtKVZC11sU\r\n-----END PRIVATE KEY-----";
-static const char *default_ssl_shared_key = "-----BEGIN CERTIFICATE-----\r\nMIICDDCCAbKgAwIBAgIDAy6fMAoGCCqGSM49BAMCMIGQMQswCQYDVQQGEwJVUzEU\r\nMBIGA1UECAwLIE5ldyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xDzANBgNVBAoM\r\nBklUIE9wczEPMA0GA1UECwwGSVQgT3BzMRQwEgYDVQQDDAtlWkxPIExURCBDQTEh\r\nMB8GCSqGSIb3DQEJARYSc3lzYWRtaW5zQGV6bG8uY29tMCAXDTIxMTIwMjA4MTEw\r\nMVoYDzIyOTUwOTE2MDgxMTAxWjCBjDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCk5l\r\ndyBKZXJzZXkxEDAOBgNVBAcMB0NsaWZ0b24xEzARBgNVBAoMCmNvbnRyb2xsZXIx\r\nLTArBgNVBAsMJDYzNTFjNzUwLTUzNDctMTFlYy1iMmQ2LThmMjYwZjUyODdmYTES\r\nMBAGA1UEAwwJMTAwMDA0MDA1MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE2LRRhTEx\r\nKmjtfMMYapwQSctXJG4AwGgRlUlQY7tOqKeIqzlzb+8XJ4z6ga8gL5POtsg58LFL\r\nCMBI7SlWQtdbFDAKBggqhkjOPQQDAgNIADBFAiEApGxLFOsnD7rbUmvY2sJvmlKp\r\nIxl5rgMrOQH6uKoQxa0CIFfN69EKILiT6R7HnEw76DZwkSwdmX/xpkjvN2bXJiuA\r\n-----END CERTIFICATE-----";
-#endif
-
-//////////////////////// V2 starts from here ///////////////////
 static const esp_partition_t *partition_ctx_v2 = NULL;
 static char *g_ca_certificate = NULL;
 static char *g_ssl_private_key = NULL;
 static char *g_ssl_shared_key = NULL;
 static char *g_ezlopi_config = NULL;
 static uint32_t g_provisioning_status = 0;
-char ezlopi_device_type_str[][50] = {
+
+const char *ezlopi_device_type_str[] = {
     "ezlopi_generic",
     "ezlopi_device_switchbox",
     "ezlopi_device_irblaster",
     "ezlopi_sensor_sound",
-    "ezlopi_sensor_ambienttrackerpro"};
+    "ezlopi_sensor_ambienttrackerpro",
+};
 
 static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
@@ -331,31 +271,30 @@ char *ezlopi_factory_info_v2_get_provisioning_server(void)
 
 char *ezlopi_factory_info_v2_get_device_type(void)
 {
+    const static char *undefined = "undefined";
+    char *ret = undefined;
     // return ezlopi_factory_info_v2_read_string(DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH);
     switch (EZLOPI_DEVICE_TYPE)
     {
     case EZLOPI_DEVICE_TYPE_TEST_DEVICE:
+    {
         return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
-        break;
-    case EZLOPI_DEVICE_TYPE_GENERIC:
-        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
-        break;
-    case EZLOPI_DEVICE_TYPE_SWITCH_BOX:
-        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_SWITCH_BOX];
-        break;
-    case EZLOPI_DEVICE_TYPE_IR_BLASTER:
-        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_IR_BLASTER];
-        break;
-    case EZLOPI_DEVICE_TYPE_SOUND_SENSOR:
-        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_SOUND_SENSOR];
-        break;
-    case EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO:
-        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO];
-        break;
-    default:
-        return "undefined";
-        break;
     }
+    case EZLOPI_DEVICE_TYPE_GENERIC:
+    case EZLOPI_DEVICE_TYPE_SWITCH_BOX:
+    case EZLOPI_DEVICE_TYPE_IR_BLASTER:
+    case EZLOPI_DEVICE_TYPE_SOUND_SENSOR:
+    case EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO:
+    {
+        ret = ezlopi_device_type_str[EZLOPI_DEVICE_TYPE];
+    }
+    default:
+    {
+        ret = undefined;
+    }
+    }
+
+    return ret;
 }
 
 char *ezlopi_factory_info_v2_get_ca_certificate(void)

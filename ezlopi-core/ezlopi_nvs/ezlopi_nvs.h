@@ -14,6 +14,12 @@ extern "C"
     int ezlopi_nvs_init(void);
     void ezlopi_nvs_deinit(void);
 
+    uint32_t ezlopi_nvs_config_info_update_time_get(void);
+    uint32_t ezlopi_nvs_config_info_version_number_get(void);
+
+    void ezlopi_nvs_config_info_update_time_set(uint32_t value);
+    void ezlopi_nvs_config_info_version_number_set(uint32_t value);
+
     int ezlopi_nvs_factory_reset(void);
 
     char *ezlopi_nvs_read_str(char *nvs_name);

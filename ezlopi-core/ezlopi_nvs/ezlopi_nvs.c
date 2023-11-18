@@ -21,6 +21,8 @@ static const char *ezlopi_scenes_nvs_name = "ezlopi_scenes";
 static const char *ezlopi_scenes_v2_nvs_name = "ez_scenes_v2";
 static const char *ezlopi_scripts_nvs_ids = "ezlopi_scripts";
 static const char *settings_initialized_status_name = "settings_magic";
+static const char *config_info_update_time_name = "conf_update_time";
+static const char *config_info_version_number = "conf_ver_no";
 
 int ezlopi_nvs_init(void)
 {
@@ -54,6 +56,57 @@ int ezlopi_nvs_init(void)
     }
 
     return ret;
+}
+
+uint32_t ezlopi_nvs_config_info_update_time_get(void)
+{
+    uint32_t ret = 0;
+    if (ezlopi_nvs_init())
+    {
+        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_update_time_name, &ret);
+        TRACE_I("config-update-time-get: %d", ret);
+        TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
+        if (ESP_OK != err)
+        {
+            ret = 0;
+            TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        }
+    }
+    return ret;
+}
+
+uint32_t ezlopi_nvs_config_info_version_number_get(void)
+{
+    uint32_t ret = 0;
+    if (ezlopi_nvs_init())
+    {
+        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_version_number, &ret);
+        TRACE_I("config-version-number-get: %d", ret);
+        TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
+        if (ESP_OK != err)
+        {
+            ret = 0;
+            TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        }
+    }
+    return ret;
+}
+
+void ezlopi_nvs_config_info_update_time_set(uint32_t value)
+{
+    if (ezlopi_nvs_init())
+    {
+        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, config_info_update_time_name, value);
+        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+    }
+}
+void ezlopi_nvs_config_info_version_number_set(uint32_t value)
+{
+    if (ezlopi_nvs_init())
+    {
+        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, config_info_version_number, value);
+        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
+    }
 }
 
 int ezlopi_nvs_scene_set_v2(char *scene)
@@ -277,7 +330,7 @@ uint32_t ezlopi_nvs_get_provisioning_status(void)
 
 void ezlopi_nvs_set_boot_count(uint32_t boot_count)
 {
-    if (ezlopi_nvs_handle)
+    if (ezlopi_nvs_init())
     {
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, boot_count_nvs_name, boot_count);
         TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
@@ -287,7 +340,7 @@ void ezlopi_nvs_set_boot_count(uint32_t boot_count)
 uint32_t ezlopi_nvs_get_boot_count(void)
 {
     uint32_t boot_count = 1;
-    if (ezlopi_nvs_handle)
+    if (ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, boot_count_nvs_name, &boot_count);
         TRACE_I("Boot count: %d", boot_count);
