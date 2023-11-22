@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "cJSON.h"
+
 typedef struct s_ezlopi_cloud_controller
 {
     char parent_device_id[40]; // 'parentDeviceId' -> https://api.ezlo.com/hub/devices_api/index.html
