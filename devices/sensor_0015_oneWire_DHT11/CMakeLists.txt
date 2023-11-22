@@ -1,4 +1,6 @@
-idf_component_register(SRCS "sensor_0015_oneWire_DHT11.c" "dht11.c"
+file(GLOB_RECURSE config_src "*.c")
+
+idf_component_register(SRCS "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES trace 
                                 driver 

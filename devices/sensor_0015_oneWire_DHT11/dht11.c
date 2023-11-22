@@ -1,14 +1,3 @@
-
-
-#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-
-#include "esp_log.h"
-#include "esp_err.h"
-#include "driver/gpio.h"
-#include "driver/timer.h"
-#include "freertos/FreeRTOS.h"
-#include "dht11.h"
-
 /*
  *  Note:
  *  A suitable pull-up resistor should be connected to the selected GPIO line
@@ -39,8 +28,14 @@
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
-#include "esp_log.h"
+// #include "esp_log.h"
 #include "driver/gpio.h"
+
+#if CONFIG_IDF_TARGET_ESP32S3
+#include "esp32s3/rom/ets_sys.h"
+#elif CONFIG_IDF_TARGET_ESP32
+#include "esp32/rom/ets_sys.h"
+#endif
 
 #include "dht11.h"
 
@@ -106,7 +101,7 @@ int dht11_getSignalLevel(int usTimeOut, bool state)
             return -1;
 
         ++uSec;
-        esp_rom_delay_us(1); // uSec delay
+        ets_delay_us(1); // uSec delay
     }
 
     return uSec;
@@ -133,11 +128,11 @@ int readDHT11()
 
     // pull down for 20 ms for a smooth and nice wake up
     gpio_set_level(DHT11gpio, 0);
-    esp_rom_delay_us(20000);
+    ets_delay_us(20000);
 
     // pull up for 25 us for a gentile asking for data
     gpio_set_level(DHT11gpio, 1);
-    esp_rom_delay_us(25);
+    ets_delay_us(25);
 
     gpio_set_direction(DHT11gpio, GPIO_MODE_INPUT); // change to input mode
 

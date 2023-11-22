@@ -21,8 +21,13 @@
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
-#include "esp_log.h"
+// #include "esp_log.h"
 #include "driver/gpio.h"
+#if CONFIG_IDF_TARGET_ESP32S3
+#include "esp32s3/rom/ets_sys.h"
+#elif CONFIG_IDF_TARGET_ESP32
+#include "esp32/rom/ets_sys.h"
+#endif
 
 #include "dht22.h"
 
@@ -89,7 +94,7 @@ int dht22_getSignalLevel(int usTimeOut, bool state)
             return -1;
 
         ++uSec;
-        esp_rom_delay_us(1); // uSec delay
+        ets_delay_us(1); // uSec delay
     }
 
     return uSec;
@@ -154,11 +159,11 @@ int readDHT22()
 
     // pull down for 3 ms for a smooth and nice wake up
     gpio_set_level(DHT22gpio, 0);
-    esp_rom_delay_us(3000);
+    ets_delay_us(3000);
 
     // pull up for 25 us for a gentile asking for data
     gpio_set_level(DHT22gpio, 1);
-    esp_rom_delay_us(25);
+    ets_delay_us(25);
 
     gpio_set_direction(DHT22gpio, GPIO_MODE_INPUT); // change to input mode
 

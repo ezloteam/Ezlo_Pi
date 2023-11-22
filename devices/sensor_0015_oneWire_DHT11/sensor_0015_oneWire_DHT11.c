@@ -10,6 +10,12 @@
 #include "dht11.h"
 #include "sensor_0015_oneWire_DHT11.h"
 
+typedef struct s_ezlopi_dht11_data
+{
+    float temperature;
+    float humidity;
+} s_ezlopi_dht11_data_t;
+
 static int __0015_prepare(void *arg);
 static int __0015_init(l_ezlopi_item_t *item);
 static int __0015_get_value(l_ezlopi_item_t *item, void *args);

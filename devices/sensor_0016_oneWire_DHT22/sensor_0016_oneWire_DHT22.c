@@ -13,6 +13,12 @@
 #include "dht22.h"
 #include "sensor_0016_oneWire_DHT22.h"
 
+typedef struct s_ezlopi_dht22_data
+{
+    float temperature;
+    float humidity;
+} s_ezlopi_dht22_data_t;
+
 static int dht22_sensor_prepare_v3(void *arg);
 static int dht22_sensor_init_v3(l_ezlopi_item_t *item);
 static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args);
@@ -62,7 +68,7 @@ static int dht22_sensor_init_v3(l_ezlopi_item_t *item)
 {
     int ret = 0;
 
-    setDHTgpio(item->interface.onewire_master.onewire_pin);
+    setDHT22gpio(item->interface.onewire_master.onewire_pin);
 
     return ret;
 }
