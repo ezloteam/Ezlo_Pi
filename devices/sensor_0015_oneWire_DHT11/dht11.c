@@ -193,7 +193,12 @@ int readDHT11()
 
     // == get temp from Data[2] and Data[3]
 
-    temperature_dht11 = dhtData[2] + (dhtData[3] * 0.1);
+    temperature_dht11 = dhtData[2];
+    if (dhtData[3] & 0x80) // negative temp, brrr it's freezing
+    {
+        temperature_dht11 *= -1;
+    }
+    temperature_dht11 += ((dhtData[3] & 0x0F) * 0.1);
 
     // == verify if checksum is ok ===========================================
     // Checksum is the sum of Data 8 bits masked out 0xFF

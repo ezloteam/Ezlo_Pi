@@ -419,7 +419,7 @@ static const char *test_device_constant_config =
                 \"gpio3\": 25\
             }\
     ],\
-    \"dev_total\":2\
+    \"dev_total\":1\
     }";
 #endif
     "{\
@@ -432,7 +432,7 @@ static const char *test_device_constant_config =
                 \"gpio\": 18\
             }\
     ],\
-    \"dev_total\":2\
+    \"dev_total\":1\
     }";
 
 #endif
