@@ -11,6 +11,7 @@
 
 #include "sensor_0012_I2C_BME280.h"
 
+#include "sensor_0015_oneWire_DHT11.h"
 #include "sensor_0016_oneWire_DHT22.h"
 
 #include "sensor_0019_digitalIn_PIR.h"

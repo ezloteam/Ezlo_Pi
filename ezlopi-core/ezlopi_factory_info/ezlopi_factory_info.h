@@ -18,8 +18,8 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
-    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
+    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -424,27 +424,12 @@ static const char *test_device_constant_config =
 #endif
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[    {\
-      \"dev_type\": 7,\
-      \"dev_name\": \"DHT 22 Office \",\
-      \"id_room\": \"\",\
-      \"id_item\": 16,\
-      \"gpio\": 18\
-    },\
-                {\
-                \"dev_name\": \"LED Office\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 2,\
-                \"id_item\": 1,\
+    \"dev_detail\":[{\
+                \"dev_type\": 7,\
+                \"dev_name\": \"DHT 11\",\
                 \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
+                \"id_item\": 15,\
+                \"gpio\": 18\
             }\
     ],\
     \"dev_total\":2\

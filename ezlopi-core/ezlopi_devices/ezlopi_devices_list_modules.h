@@ -8,6 +8,8 @@ EZLOPI_DEVICE_LIST("device-rgp_strip-RMT_SK6812", 9, device_0009_other_RMT_SK681
 
 EZLOPI_DEVICE_LIST("sensor-bme280-i2c-temp-humid", 12, sensor_0012_I2C_BME280)
 
+EZLOPI_DEVICE_LIST("sensor-DHT11-1-wire-temp-humid", 15, sensor_0015_oneWire_DHT11)
+
 EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid", 16, sensor_0016_oneWire_DHT22)
 
 EZLOPI_DEVICE_LIST("sensor-PIR-digital-proximity", 19, sensor_0019_digitalIn_PIR)
