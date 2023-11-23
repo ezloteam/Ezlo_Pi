@@ -51,4 +51,8 @@ const static char *scales_liter_per_hour = "liter_per_hour";
 /// @brief force
 const static char *scales_newton = "newton";
 
+/// @brief electric_current
+const static char *scales_ampere = "ampere";
+const static char *scales_milli_ampere = "milli_ampere";
+
 #endif // __EZLOPI_SCALES_STR_H__
