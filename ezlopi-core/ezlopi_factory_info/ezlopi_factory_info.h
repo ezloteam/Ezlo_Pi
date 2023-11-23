@@ -407,22 +407,7 @@ static const char *switch_box_constant_config =
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
 #if 0
-    "{\
-    \"cmd\":3,\
-    \"dev_detail\":[{\
-                \"dev_type\": 10,\
-                \"dev_name\": \"fingerprint\",\
-                \"id_room\": \"\",\
-                \"id_item\": 66,\
-                \"gpio1\": 17,\
-                \"gpio2\": 16,\
-                \"gpio3\": 25\
-            }\
-    ],\
-    \"dev_total\":2\
-    }";
-#endif
-    "{\
+  "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
             \"dev_type\": 10,\
@@ -431,6 +416,19 @@ static const char *test_device_constant_config =
             \"id_item\": 47,\
             \"gpio1\": 18,\
             \"gpio2\": 19\
+            }\
+    ],\
+    \"dev_total\":1\
+    }";
+#endif
+    "{\
+    \"cmd\":3,\
+    \"dev_detail\":[{\
+            \"dev_type\": 3,\
+            \"dev_name\": \"shuntVolt\",\
+            \"id_room\": \"\",\
+            \"id_item\": 42,\
+            \"gpio\": 19\
             }\
     ],\
     \"dev_total\":1\

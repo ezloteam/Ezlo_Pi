@@ -28,6 +28,7 @@ EZLOPI_DEVICE_LIST("sensor-turbidity-ADC", 33, sensor_0033_ADC_turbidity)
 EZLOPI_DEVICE_LIST("sensor-proximity-digital", 34, sensor_0034_digitalIn_proximity)
 EZLOPI_DEVICE_LIST("sensor-TPP223B-digital-touch", 35, sensor_0035_digitalIn_touch_sensor_TPP223B)
 
+EZLOPI_DEVICE_LIST("sensor-shunt-voltmeter-ADC", 42, sensor_0042_ADC_shunt_voltmeter)
 EZLOPI_DEVICE_LIST("sensor-TSL256-I2C-luminosity", 44, sensor_0044_I2C_TSL256_luminosity)
 EZLOPI_DEVICE_LIST("sensor-HX711-loadcell", 47, sensor_0047_other_HX711_loadcell)
 

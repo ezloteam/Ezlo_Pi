@@ -33,7 +33,7 @@
 // #include "device_0036_PWM_servo_MG996R.h"
 
 #include "device_0038_other_RGB.h"
-
+#include "sensor_0042_ADC_shunt_voltmeter.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 #include "sensor_0047_other_HX711_loadcell.h"
 
