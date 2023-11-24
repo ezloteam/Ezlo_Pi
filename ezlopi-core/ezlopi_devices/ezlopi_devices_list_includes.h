@@ -34,6 +34,7 @@
 
 #include "device_0038_other_RGB.h"
 
+#include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 
 #include "sensor_0048_other_MQ4_CH4_detector.h"
