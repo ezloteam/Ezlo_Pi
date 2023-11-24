@@ -133,7 +133,6 @@ static int __0047_prepare(void *arg)
                 l_ezlopi_item_t *hx711_item = ezlopi_device_add_item_to_device(hx711_device, sensor_0047_other_HX711_loadcell);
                 if (hx711_item)
                 {
-                    hx711_item->cloud_properties.device_id = hx711_device->cloud_properties.device_id;
                     __prepare_item_digi_cloud_properties(hx711_item, device_prep_arg->cjson_device, hx711_data);
                 }
                 else

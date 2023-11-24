@@ -106,7 +106,6 @@ static int __0042_prepare(void *arg)
                 l_ezlopi_item_t *voltmeter_item = ezlopi_device_add_item_to_device(voltmeter_device, sensor_0042_ADC_shunt_voltmeter);
                 if (voltmeter_item)
                 {
-                    voltmeter_item->cloud_properties.device_id = voltmeter_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(voltmeter_item, device_prep_arg->cjson_device, user_data);
                 }
                 else
