@@ -61,20 +61,22 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     char *dev_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
+    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
+    device->cloud_properties.device_type_id = NULL;
+    device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
-    item->cloud_properties.show = true;
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.scale = scales_lux;
-    item->cloud_properties.value_type = value_type_ultraviolet;
     item->cloud_properties.item_name = ezlopi_item_name_ultraviolet;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.show = true;
+    item->cloud_properties.value_type = value_type_ultraviolet;
+    item->cloud_properties.scale = scales_lux;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
