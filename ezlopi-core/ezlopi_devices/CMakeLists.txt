@@ -40,7 +40,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 device_0036_PWM_servo_MG996R
                                 device_0038_other_RGB
                                         
-                                                        
+                                sensor_0041_ADC_FC28_soilMoisture  
                                 sensor_0044_I2C_TSL256_luminosity
                                 sensor_0053_UART_GYGPS6MV2
                                 sensor_0054_PWM_YFS201_flowmeter
