@@ -18,8 +18,8 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_SOUND_SENSOR 3
 #define EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO 4
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
-    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
+    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -406,45 +406,20 @@ static const char *switch_box_constant_config =
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
-#if 0
+
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_type\": 10,\
-                \"dev_name\": \"fingerprint\",\
+                  \"dev_type\": 10,\
+                \"dev_name\": \"TCS230\",\
                 \"id_room\": \"\",\
-                \"id_item\": 66,\
-                \"gpio1\": 17,\
-                \"gpio2\": 16,\
-                \"gpio3\": 25\
-            }\
-    ],\
-    \"dev_total\":2\
-    }";
-#endif
-    "{\
-    \"cmd\":3,\
-    \"dev_detail\":[    {\
-      \"dev_type\": 7,\
-      \"dev_name\": \"DHT 22 Office \",\
-      \"id_room\": \"\",\
-      \"id_item\": 16,\
-      \"gpio\": 18\
-    },\
-                {\
-                \"dev_name\": \"LED Office\",\
-                \"dev_type\": 1,\
-                \"gpio_in\": -1,\
-                \"gpio_out\": 2,\
-                \"id_item\": 1,\
-                \"id_room\": \"\",\
-                \"ip_inv\": true,\
-                \"is_ip\": false,\
-                \"op_inv\": false,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"val_ip\": true,\
-                \"val_op\": false\
+                \"id_item\": 40,\
+               \"gpio1\": 25\
+               \"gpio2\": 26\
+               \"gpio3\": 12\
+               \"gpio4\": 14\
+               \"gpio5\": 13\
+               \"gpio6\": 15\
             }\
     ],\
     \"dev_total\":2\
