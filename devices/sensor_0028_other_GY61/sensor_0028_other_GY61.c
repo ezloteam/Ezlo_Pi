@@ -77,8 +77,8 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
 {
     item->cloud_properties.show = true;
-    item->cloud_properties.has_getter = false;
-    item->cloud_properties.has_setter = true;
+    item->cloud_properties.has_getter = true;
+    item->cloud_properties.has_setter = false;
     item->cloud_properties.value_type = value_type_acceleration;
     item->cloud_properties.scale = scales_meter_per_square_second;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
