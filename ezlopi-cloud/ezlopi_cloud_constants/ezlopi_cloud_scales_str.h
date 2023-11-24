@@ -55,4 +55,7 @@ const static char *scales_newton = "newton";
 const static char *scales_milli_volt = "milli_volt";
 const static char *scales_volt = "volt";
 
+/// @brief mass
+const static char *scales_kilo_gram = "kilo_gram";
+const static char *scales_pounds = "pounds";
 #endif // __EZLOPI_SCALES_STR_H__

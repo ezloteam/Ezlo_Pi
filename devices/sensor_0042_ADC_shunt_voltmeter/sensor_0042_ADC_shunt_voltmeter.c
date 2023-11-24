@@ -62,22 +62,22 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
+    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_electricity;
-    device->cloud_properties.device_type = dev_type_sensor;
-    device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type = dev_type_sensor;
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
+    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_voltage;
-    item->cloud_properties.value_type = value_type_electric_potential;
     item->cloud_properties.show = true;
+    item->cloud_properties.value_type = value_type_electric_potential;
     item->cloud_properties.scale = scales_volt;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
