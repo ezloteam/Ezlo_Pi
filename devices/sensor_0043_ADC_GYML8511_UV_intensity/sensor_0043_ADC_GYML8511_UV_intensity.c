@@ -15,12 +15,6 @@ typedef struct s_gyml8511_data
     float uv_data;
 } s_gyml8511_data_t;
 
-#if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)
-#define esp32_convert_mV_to_G(temp_vol) (((6.0f * (temp_vol - 1300)) / 750.0f) - 3.0f)
-#elif CONFIG_IDF_TARGET_ESP32S3
-#define esp32S3_convert_mV_to_G(temp_vol) (((6.0f / 3000.0f) * (temp_vol - 100)) - 3.0f)
-#endif
-
 static int __0043_prepare(void *arg);
 static int __0043_init(l_ezlopi_item_t *item);
 static int __0043_get_cjson_value(l_ezlopi_item_t *item, void *arg);
