@@ -85,7 +85,7 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t 
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
@@ -97,7 +97,7 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJ
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
-static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, s_hx711_data_t *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, s_hx711_data_t *user_data)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -129,11 +129,11 @@ static int __0047_prepare(void *arg)
             l_ezlopi_device_t *hx711_device = ezlopi_device_add_device();
             if (hx711_device)
             {
-                __prepare_device_digi_cloud_properties(hx711_device, device_prep_arg->cjson_device);
+                __prepare_device_cloud_properties(hx711_device, device_prep_arg->cjson_device);
                 l_ezlopi_item_t *hx711_item = ezlopi_device_add_item_to_device(hx711_device, sensor_0047_other_HX711_loadcell);
                 if (hx711_item)
                 {
-                    __prepare_item_digi_cloud_properties(hx711_item, device_prep_arg->cjson_device, hx711_data);
+                    __prepare_item_cloud_properties(hx711_item, device_prep_arg->cjson_device, hx711_data);
                 }
                 else
                 {
