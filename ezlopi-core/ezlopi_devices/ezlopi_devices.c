@@ -141,6 +141,7 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, int
         {
             memset(new_item, 0, sizeof(l_ezlopi_item_t));
             new_item->func = item_func;
+            new_item->cloud_properties.device_id = device->cloud_properties.device_id;
 
             if (NULL == device->items)
             {
