@@ -136,8 +136,11 @@ static int __0043_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-        ret = 1;
+        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        {
+            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
+            ret = 1;
+        }
     }
     return ret;
 }
