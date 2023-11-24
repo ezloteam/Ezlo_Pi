@@ -20,6 +20,8 @@ EZLOPI_DEVICE_LIST("sensor-LDR-digital-in", 25, sensor_0025_digitalIn_LDR)
 EZLOPI_DEVICE_LIST("sensor-LDR-ADC", 26, sensor_0026_ADC_LDR)
 EZLOPI_DEVICE_LIST("sensor-WATERLEAK-ADC", 27, sensor_0027_ADC_waterLeak)
 
+EZLOPI_DEVICE_LIST("sensor-GY61-other-accelerometer", 28, sensor_0028_other_GY61)
+
 EZLOPI_DEVICE_LIST("sensor-GXHTC3-I2C-temp-humidity", 29, sensor_0029_I2C_GXHTC3)
 EZLOPI_DEVICE_LIST("sensor-DS18B20-1-wire-temp", 30, sensor_0030_oneWire_DS18B20)
 EZLOPI_DEVICE_LIST("sensor-JNSR04T-digital-distance", 31, sensor_0031_other_JSNSR04T)
