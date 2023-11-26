@@ -15,32 +15,32 @@
  * gpio6 => gpio_pulse_output   GPIO_NUM_15
  */
 
-typedef enum TCS230_queue_enum
+typedef enum e_TCS230_queue
 {
     TCS230_QUEUE_RESET = 0,
     TCS230_QUEUE_AVAILABLE,
     TCS230_QUEUE_FULL,
-} TCS230_queue_enum_t;
+} e_TCS230_queue_t;
 
-typedef enum TCS230_color_enum
+typedef enum e_TCS230_color
 {
     COLOR_SENSOR_COLOR_RED = 0,
     COLOR_SENSOR_COLOR_BLUE,
     COLOR_SENSOR_COLOR_CLEAR,
     COLOR_SENSOR_COLOR_GREEN,
     COLOR_SENSOR_COLOR_MAX
-} TCS230_color_enum_t;
+} e_TCS230_color_t;
 
-typedef enum TCS230_freq_scaling_enum
+typedef enum e_TCS230_freq_scaling
 {
     COLOR_SENSOR_FREQ_SCALING_POWER_DOWN = 0,
     COLOR_SENSOR_FREQ_SCALING_2_PERCENT,
     COLOR_SENSOR_FREQ_SCALING_20_PERCENT,
     COLOR_SENSOR_FREQ_SCALING_100_PERCENT,
     COLOR_SENSOR_FREQ_SCALING_MAX
-} TCS230_freq_scaling_enum_t;
+} e_TCS230_freq_scaling_t;
 
-typedef struct
+typedef struct s_TCS230_calib_data
 {
     // contains larger time_periods
     int32_t least_red_timeP;
@@ -51,9 +51,9 @@ typedef struct
     int32_t most_red_timeP;
     int32_t most_green_timeP;
     int32_t most_blue_timeP;
-} TCS230_calib_data_t;
+} s_TCS230_calib_data_t;
 
-typedef struct
+typedef struct s_TCS230_pin
 {
     uint32_t gpio_s0;
     uint32_t gpio_s1;
@@ -61,25 +61,24 @@ typedef struct
     uint32_t gpio_s3;
     uint32_t gpio_output_en;    // 'gpio_output_en' pin acts as a gate to start/stop output from 'gpio_pulse_output' pin
     uint32_t gpio_pulse_output; // 'gpio_pulse_output' pin produces pulses, whose periods determine the corresponding color.
-} TCS230_pin_t;
+} s_TCS230_pin_t;
 
-typedef struct
+typedef struct s_TCS230_data
 {
     bool calibration_complete;
-    TCS230_calib_data_t calib_data;
+    s_TCS230_calib_data_t calib_data;
     uint32_t red_mapped;
     uint32_t green_mapped;
     uint32_t blue_mapped;
-    TCS230_pin_t TCS230_pin;
-} TCS230_data_t;
+    s_TCS230_pin_t TCS230_pin;
+} s_TCS230_data_t;
 
 //------------------------------------------------------------------------
 
+bool tcs230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color);
+bool tcs230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t scale);
 
-bool TCS230_set_filter_color(l_ezlopi_item_t *item, TCS230_color_enum_t color);
-bool TCS230_set_frequency_scaling(l_ezlopi_item_t *item, TCS230_freq_scaling_enum_t scale);
-
-void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP);
+void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP);
 bool get_tcs230_sensor_value(l_ezlopi_item_t *item);
 
 //------------------------------------------------------------------------

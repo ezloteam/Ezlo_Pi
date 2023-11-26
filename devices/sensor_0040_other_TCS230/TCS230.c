@@ -5,7 +5,7 @@
 #define TCS230_QUEUE_SIZE 5
 
 static QueueHandle_t tcs230_queue = NULL;
-static TCS230_queue_enum_t QueueFlag = TCS230_QUEUE_RESET;
+static e_TCS230_queue_t QueueFlag = TCS230_QUEUE_RESET;
 //------------------------------------------------------------------------------
 
 static void IRAM_ATTR gpio_isr_handler(void *args) // argument => time_us
@@ -128,12 +128,12 @@ static void Get_mapped_color_value(uint32_t *color_value, gpio_num_t gpio_pulse_
     *(color_value) = MAP_color_value(*period, min_time_limit, max_time_limit, 0, 255);
 }
 
-bool TCS230_set_filter_color(l_ezlopi_item_t *item, TCS230_color_enum_t color_code)
+bool tcs230_set_filter_color(l_ezlopi_item_t *item, e_TCS230_color_t color_code)
 {
     bool ret = false;
     if (item)
     {
-        TCS230_data_t *_TCS230_user_data = (TCS230_data_t *)item->user_arg;
+        s_TCS230_data_t *_TCS230_user_data = (s_TCS230_data_t *)item->user_arg;
         switch (color_code)
         {
         case COLOR_SENSOR_COLOR_RED:
@@ -168,12 +168,12 @@ bool TCS230_set_filter_color(l_ezlopi_item_t *item, TCS230_color_enum_t color_co
     return ret;
 }
 
-bool TCS230_set_frequency_scaling(l_ezlopi_item_t *item, TCS230_freq_scaling_enum_t scale)
+bool tcs230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t scale)
 {
     bool ret = false;
     if (item)
     {
-        TCS230_data_t *_TCS230_user_data = (TCS230_data_t *)item->user_arg;
+        s_TCS230_data_t *_TCS230_user_data = (s_TCS230_data_t *)item->user_arg;
         switch (scale)
         {
         case COLOR_SENSOR_FREQ_SCALING_POWER_DOWN:
@@ -209,7 +209,7 @@ bool TCS230_set_frequency_scaling(l_ezlopi_item_t *item, TCS230_freq_scaling_enu
 }
 
 // function to calibrate the data for 30 seconds
-void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP)
+void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP)
 {
     int32_t Period = 0;
     *least_color_timeP = 0;
@@ -248,13 +248,13 @@ void Calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_p
 bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
 {
     if (item)
-    { // 'void_type' addrress -> 'TCS230_data_t' address
-        TCS230_data_t *_TCS230_user_data = (TCS230_data_t *)item->user_arg;
+    { // 'void_type' addrress -> 's_TCS230_data_t' address
+        s_TCS230_data_t *_TCS230_user_data = (s_TCS230_data_t *)item->user_arg;
         ESP_ERROR_CHECK(gpio_set_level(_TCS230_user_data->TCS230_pin.gpio_output_en, 1));
 
         //--------------------------------------------------
         int32_t Red_period = 0;
-        TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
+        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
                                          &Red_period);
         Get_mapped_color_value(&_TCS230_user_data->red_mapped,                  // dest_var
@@ -266,7 +266,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
         //--------------------------------------------------
 
         int32_t Green_period = 0;
-        TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
+        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
                                          &Green_period);
         Get_mapped_color_value(&_TCS230_user_data->green_mapped, // dest_var
@@ -278,7 +278,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
         //--------------------------------------------------
 
         int32_t Blue_period = 0;
-        TCS230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
+        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
         Extract_TCS230_Pulse_Period_func(_TCS230_user_data->TCS230_pin.gpio_pulse_output,
                                          &Blue_period);
         Get_mapped_color_value(&_TCS230_user_data->blue_mapped, // dest_var
