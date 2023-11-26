@@ -1,16 +1,14 @@
 #include <cJSON.h>
 #include <math.h>
 #include "trace.h"
-
 #include "ezlopi_timer.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
-
 #include "sensor_0007_I2C_GY271.h"
-
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
@@ -20,7 +18,6 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __gy271_calibration_task(void *params);
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
@@ -55,7 +52,6 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void
     return ret;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
@@ -283,10 +279,6 @@ static int __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 static void __gy271_calibration_task(void *params) // calibrate task
 {
 
@@ -354,5 +346,3 @@ static void __gy271_calibration_task(void *params) // calibrate task
     }
     vTaskDelete(NULL);
 }
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
