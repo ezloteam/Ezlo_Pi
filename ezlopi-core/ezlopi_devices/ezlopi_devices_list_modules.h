@@ -3,6 +3,8 @@ EZLOPI_DEVICE_LIST("digital-out relay", 2, device_0002_digitalOut_relay)
 EZLOPI_DEVICE_LIST("digital-out plug", 3, device_0003_digitalOut_plug)
 EZLOPI_DEVICE_LIST("digital-in generic", 4, device_0004_digitalIn_generic)
 
+EZLOPI_DEVICE_LIST("sensor-ADXL345-I2C", 6, sensor_0006_I2C_ADXL345)
+
 EZLOPI_DEVICE_LIST("sensor-LTR303ALS-I2C", 8, sensor_0008_I2C_LTR303ALS)
 EZLOPI_DEVICE_LIST("device-rgp_strip-RMT_SK6812", 9, device_0009_other_RMT_SK6812)
 
