@@ -10,6 +10,8 @@ EZLOPI_DEVICE_LIST("sensor-bme280-i2c-temp-humid", 12, sensor_0012_I2C_BME280)
 
 EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid", 16, sensor_0016_oneWire_DHT22)
 
+EZLOPI_DEVICE_LIST("sensor-potentiometer-ADC", 17, sensor_0017_ADC_potentiometer)
+
 EZLOPI_DEVICE_LIST("sensor-PIR-digital-proximity", 19, sensor_0019_digitalIn_PIR)
 
 EZLOPI_DEVICE_LIST("sensor-MB1013-UART-distance", 21, sensor_0021_UART_MB1013)

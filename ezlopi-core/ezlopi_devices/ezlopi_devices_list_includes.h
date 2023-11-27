@@ -13,6 +13,8 @@
 
 #include "sensor_0016_oneWire_DHT22.h"
 
+#include "sensor_0017_ADC_potentiometer.h"
+
 #include "sensor_0019_digitalIn_PIR.h"
 
 #include "sensor_0021_UART_MB1013.h"
