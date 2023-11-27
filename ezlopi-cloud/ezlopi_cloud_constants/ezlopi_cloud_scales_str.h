@@ -51,4 +51,7 @@ const static char *scales_liter_per_hour = "liter_per_hour";
 /// @brief force
 const static char *scales_newton = "newton";
 
+/// @brief force
+const static char *scales_meter_per_square_second = "meter_per_square_second";
+
 #endif // __EZLOPI_SCALES_STR_H__

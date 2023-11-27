@@ -6,6 +6,7 @@
 #include "device_0003_digitalOut_plug.h"
 #include "device_0004_digitalIn_generic.h"
 
+#include "sensor_0005_I2C_MPU6050.h"
 #include "sensor_0008_I2C_LTR303ALS.h"
 #include "device_0009_other_RMT_SK6812.h"
 

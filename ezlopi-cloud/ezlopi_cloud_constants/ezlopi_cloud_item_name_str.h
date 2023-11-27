@@ -231,5 +231,8 @@ const static char *ezlopi_item_name_applied_force_on_sensor = "applied_force_on_
 const static char *ezlopi_item_name_send_ir_code = "send_ir_code";
 const static char *ezlopi_item_name_learn_ir_code = "learn_ir_code";
 const static char *ezlopi_item_name_soil_humidity = "soil_humidity";
+const static char *ezlopi_item_name_gyroscope_x_axis = "gyroscope_x_axis";
+const static char *ezlopi_item_name_gyroscope_y_axis = "gyroscope_y_axis";
+const static char *ezlopi_item_name_gyroscope_z_axis = "gyroscope_z_axis";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__
