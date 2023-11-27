@@ -5,33 +5,36 @@
 
 static esp_err_t activate_set_reset_period(l_ezlopi_item_t *item)
 {
+    esp_err_t ret = ESP_FAIL;
     if (item)
     {
         uint8_t write_buffer[] = {GY271_SET_RESET_PERIOD_REGISTER, GY271_DEFAULT_SET_RESET_PERIOD}; // REG_INTR_STATUS;
-        ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
+        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
-    return ESP_OK;
+    return ret;
 }
 static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item)
 {
+    esp_err_t ret = ESP_FAIL;
     if (item)
     {
         uint8_t write_byte[] = {GY271_CONTROL_REGISTER_1, GY271_OPERATION_MODE};
-        ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
+        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
-    return ESP_OK;
+    return ret;
 }
 static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item)
 {
+    esp_err_t ret = ESP_FAIL;
     if (item)
     {
         uint8_t write_byte[] = {GY271_CONTROL_REGISTER_2, GY271_INT_EN};
-        ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
+        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
-    return ESP_OK;
+    return ret;
 }
 
 static int __gy271_Get_azimuth(float dx, float dy)
@@ -90,6 +93,7 @@ int __gy271_configure(l_ezlopi_item_t *item)
         ESP_ERROR_CHECK_WITHOUT_ABORT(activate_set_reset_period(item));
         ESP_ERROR_CHECK_WITHOUT_ABORT(set_to_measure_mode(item));
         ESP_ERROR_CHECK_WITHOUT_ABORT(enable_data_ready_interrupt(item));
+        ret = 1;
     }
     return ret;
 }

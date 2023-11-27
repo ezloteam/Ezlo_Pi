@@ -91,7 +91,6 @@ typedef struct s_gy271_calib
     float scale_axis[3];      // delta_avg / delta_axis
     float calibrated_axis[3]; // scale_axis[0] * ( raw_axis - bias_axis[0] )
 } s_gy271_calib_t;
-
 typedef struct s_gy271_raw_data
 {
     int16_t raw_x;
@@ -99,7 +98,6 @@ typedef struct s_gy271_raw_data
     int16_t raw_z;
     int16_t raw_temp;
 } s_gy271_raw_data_t;
-
 typedef struct s_gy271_data
 {
     bool calibration_complete;

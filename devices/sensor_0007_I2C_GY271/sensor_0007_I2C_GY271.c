@@ -8,6 +8,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 #include "sensor_0007_I2C_GY271.h"
+
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -160,7 +161,7 @@ static int __prepare(void *arg)
                     gyro_temp_item->cloud_properties.scale = scales_celsius;
                     __prepare_item_interface_properties(gyro_temp_item, cj_device);
                 }
-                else
+                if ((NULL == gyro_x_item) && (NULL == gyro_y_item) && (NULL == gyro_z_item) && (NULL == gyro_azi_item) && (NULL == gyro_temp_item))
                 {
                     ezlopi_device_free_device(gy271_device);
                     free(user_data);
@@ -187,10 +188,11 @@ static int __init(l_ezlopi_item_t *item)
         ezlopi_i2c_master_init(&item->interface.i2c_master);
         TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
         TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
-        __gy271_configure(item);
-
-        TRACE_W("Gathering Max-Min values for 2min.....");
-        xTaskCreate(&__gy271_calibration_task, "GY271_Calibration_Task", 2048, item, 1, NULL);
+        if (__gy271_configure(item))
+        {
+            TRACE_W("Gathering Max-Min values for 2min.....");
+            xTaskCreate(&__gy271_calibration_task, "GY271_Calibration_Task", 2048, item, 1, NULL);
+        }
     }
     return ret;
 }
@@ -250,7 +252,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             free(valueFormatted);
             cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
-
         ret = 1;
     }
     return ret;
