@@ -51,4 +51,8 @@ const static char *scales_liter_per_hour = "liter_per_hour";
 /// @brief force
 const static char *scales_newton = "newton";
 
+/// @brief mass
+const static char *scales_kilo_gram = "kilo_gram";
+const static char *scales_pounds = "pounds";
+
 #endif // __EZLOPI_SCALES_STR_H__
