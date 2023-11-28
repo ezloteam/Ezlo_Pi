@@ -6,6 +6,8 @@ EZLOPI_DEVICE_LIST("digital-in generic", 4, device_0004_digitalIn_generic)
 EZLOPI_DEVICE_LIST("sensor-LTR303ALS-I2C", 8, sensor_0008_I2C_LTR303ALS)
 EZLOPI_DEVICE_LIST("device-rgp_strip-RMT_SK6812", 9, device_0009_other_RMT_SK6812)
 
+EZLOPI_DEVICE_LIST("sensor-bme680-i2c", 10, sensor_0010_I2C_BME680)
+
 EZLOPI_DEVICE_LIST("sensor-bme280-i2c-temp-humid", 12, sensor_0012_I2C_BME280)
 
 EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid", 16, sensor_0016_oneWire_DHT22)

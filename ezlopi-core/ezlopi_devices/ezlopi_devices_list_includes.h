@@ -9,6 +9,7 @@
 #include "sensor_0008_I2C_LTR303ALS.h"
 #include "device_0009_other_RMT_SK6812.h"
 
+#include "sensor_0010_I2C_BME680.h"
 #include "sensor_0012_I2C_BME280.h"
 
 #include "sensor_0016_oneWire_DHT22.h"
