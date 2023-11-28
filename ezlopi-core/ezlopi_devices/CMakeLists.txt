@@ -42,7 +42,6 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                         
                                 sensor_0042_ADC_shunt_voltmeter                                                         
                                 sensor_0044_I2C_TSL256_luminosity
-                                sensor_0047_other_HX711_loadcell
                                 
                                 sensor_0053_UART_GYGPS6MV2
                                 sensor_0054_PWM_YFS201_flowmeter

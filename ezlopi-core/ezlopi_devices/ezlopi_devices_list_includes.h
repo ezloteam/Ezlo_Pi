@@ -35,7 +35,6 @@
 #include "device_0038_other_RGB.h"
 #include "sensor_0042_ADC_shunt_voltmeter.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
-#include "sensor_0047_other_HX711_loadcell.h"
 
 #include "sensor_0048_other_MQ4_CH4_detector.h"
 #include "sensor_0049_other_MQ2_LPG_detector.h"
