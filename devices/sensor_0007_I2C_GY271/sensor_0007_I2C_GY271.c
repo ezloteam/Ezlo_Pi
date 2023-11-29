@@ -191,7 +191,7 @@ static int __init(l_ezlopi_item_t *item)
         if (__gy271_configure(item))
         {
             TRACE_W("Gathering Max-Min values for 2min.....");
-            xTaskCreate(&__gy271_calibration_task, "GY271_Calibration_Task", 2048, item, 1, NULL);
+            xTaskCreate(&__gy271_calibration_task, "GY271_Calibration_Task", 2*2048, item, 1, NULL);
         }
     }
     return ret;

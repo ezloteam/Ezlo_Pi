@@ -211,8 +211,8 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
             // if 'bit0' in INTR register is set ; then read procced to read :- magnetometer registers
             if (Check_Register == GY271_DATA_SKIP_FLAG)
             {
-                TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val : {%#x}", Check_Register);
-                TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit set..**********...");
+                // TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val : {%#x}", Check_Register);
+                // TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit set..**********...");
                 address_val = (GY271_DATA_Z_LSB_REGISTER);
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&buffer_0), 1);
@@ -223,12 +223,12 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
-                TRACE_W(" 1.{%#x}", Check_Register);
-                TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit set..**********...");
+                // TRACE_W(" 1.{%#x}", Check_Register);
+                // TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit set..**********...");
             }
             if (Check_Register & GY271_DATA_READY_FLAG)
             {
-                TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x00H: {%#x}", Check_Register);
+                // TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x00H: {%#x}", Check_Register);
                 TRACE_I(" 1. FIRST_INIT_CALIB :--- 00H reading started....");
                 // read the axis data
                 for (uint8_t i = 0; i < (REG_COUNT_LEN); i += 2)
@@ -247,12 +247,12 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
                 TRACE_I(" 1. FIRST_INIT_CALIB :--- 06H reading ended....");
-                TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x06H : {%#x}", Check_Register);
+                // TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x06H : {%#x}", Check_Register);
             }
         }
         else
         {
-            TRACE_W("Data not ready ... Error type:- %d ", err);
+            // TRACE_W("Data not ready ... Error type:- %d ", err);
         }
 
         // generate the raw_axis_values

@@ -408,16 +408,16 @@ static const char *switch_box_constant_config =
 static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[         {\
+    \"dev_detail\":[{\
             \"dev_type\": 8,\
-            \"dev_name\": \"ADXL 345\",\
+            \"dev_name\": \"GY271\",\
             \"id_room\": \"\",\
-            \"id_item\": 6,\
+            \"id_item\": 7,\
             \"gpio_sda\": 1,\
             \"gpio_scl\": 2,\
             \"pullup_scl\": true,\
             \"pullup_sda\": true,\
-            \"slave_addr\": 83\
+            \"slave_addr\": 13\
         }\
     ],\
     \"dev_total\":1\
