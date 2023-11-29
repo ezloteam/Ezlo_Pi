@@ -37,6 +37,7 @@ EZLOPI_DEVICE_LIST("sensor-proximity-digital", 34, sensor_0034_digitalIn_proximi
 EZLOPI_DEVICE_LIST("sensor-TPP223B-digital-touch", 35, sensor_0035_digitalIn_touch_sensor_TPP223B)
 
 EZLOPI_DEVICE_LIST("sensor-TCS230-other-color", 40, sensor_0040_other_TCS230)
+EZLOPI_DEVICE_LIST("sensor-GYML8511-ADC-intensity", 43, sensor_0043_ADC_GYML8511_UV_intensity)
 EZLOPI_DEVICE_LIST("sensor-TSL256-I2C-luminosity", 44, sensor_0044_I2C_TSL256_luminosity)
 
 EZLOPI_DEVICE_LIST("sensor-ACS712-currentmeter-ADC", 46, sensor_0046_ADC_ACS712_05B_currentmeter)

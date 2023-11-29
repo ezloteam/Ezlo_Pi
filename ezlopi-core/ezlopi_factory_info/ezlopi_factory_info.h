@@ -428,12 +428,12 @@ static const char *test_device_constant_config =
 #endif
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[{\
-                \"dev_type\": 7,\
-                \"dev_name\": \"DHT 11\",\
+    \"dev_detail\":[    {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"GYML8511_UV\",\
                 \"id_room\": \"\",\
-                \"id_item\": 15,\
-                \"gpio\": 18\
+                \"id_item\": 43,\
+               \"gpio\": 33\
             }\
     ],\
     \"dev_total\":1\
