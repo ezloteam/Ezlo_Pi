@@ -423,18 +423,19 @@ static const char *test_device_constant_config =
                \"gpio6\": 15\
             }\
     ],\
-    \"dev_total\":2\
+    \"dev_total\":1\
     }";
 #endif
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[    {\
-      \"dev_type\": 8,\
-      \"dev_name\": \"ACS712_currentMeter\",\
-      \"id_room\": \"\",\
-      \"id_item\": 46,\
-      \"gpio\": 33\
-    }],\
+    \"dev_detail\":[{\
+                \"dev_type\": 7,\
+                \"dev_name\": \"DHT 11\",\
+                \"id_room\": \"\",\
+                \"id_item\": 15,\
+                \"gpio\": 18\
+            }\
+    ],\
     \"dev_total\":1\
     }";
 

@@ -21,6 +21,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 device_0009_other_RMT_SK6812
                                 sensor_0010_I2C_BME680
                                 sensor_0012_I2C_BME280
+                                sensor_0015_oneWire_DHT11
                                 sensor_0016_oneWire_DHT22
 
                                 sensor_0018_other_internal_hall_effect
