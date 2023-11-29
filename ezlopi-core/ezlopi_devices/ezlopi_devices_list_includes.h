@@ -35,7 +35,7 @@
 
 #include "device_0038_other_RGB.h"
 
-#include"sensor_0041_ADC_FC28_soilMoisture.h"
+#include "sensor_0040_other_TCS230.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 
 #include "sensor_0048_other_MQ4_CH4_detector.h"
