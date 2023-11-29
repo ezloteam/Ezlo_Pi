@@ -406,23 +406,19 @@ static const char *switch_box_constant_config =
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
-
-#if 0
-  "{\
+    "{\
     \"cmd\":3,\
-    \"dev_detail\":[{\
-                \"dev_type\": 10,\
-                \"dev_name\": \"fingerprint\",\
+    \"dev_detail\":[ {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"Shunt_voltmeter\",\
                 \"id_room\": \"\",\
-                \"id_item\": 66,\
-                \"gpio1\": 17,\
-                \"gpio2\": 16,\
-                \"gpio3\": 25\
-            }\
+                \"id_item\": 42,\
+               \"gpio\": 1\
+}\
     ],\
     \"dev_total\":1\
     }";
-#endif
+#if 0
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
@@ -436,6 +432,7 @@ static const char *test_device_constant_config =
     \"dev_total\":1\
     }";
 
+#endif
 #endif
 
 #ifdef __cplusplus

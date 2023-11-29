@@ -390,9 +390,9 @@ static void ezlopi_device_parse_json_v3(char *config_string)
         TRACE_D("|~~~~~~~~~~~~~~~~ Device - %d ~~~~~~~~~~~~~~~~|", device_count);
         TRACE_D("|- Name: %.*s", 32, isprint(tm_device_l_list->cloud_properties.device_name[0]) ? tm_device_l_list->cloud_properties.device_name : "null");
         TRACE_D("|- Id: %08X", tm_device_l_list->cloud_properties.device_id);
-        // TRACE_D("|- Category: %s", tm_device_l_list->cloud_properties.category ? tm_device_l_list->cloud_properties.category : "null");
-        // TRACE_D("|- Sub-category: %s", tm_device_l_list->cloud_properties.subcategory ? tm_device_l_list->cloud_properties.subcategory : "null");
-        // TRACE_D("|- Device-type: %s", tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : "null");
+        TRACE_D("|- Category: %s", tm_device_l_list->cloud_properties.category ? tm_device_l_list->cloud_properties.category : "null");
+        TRACE_D("|- Sub-category: %s", tm_device_l_list->cloud_properties.subcategory ? tm_device_l_list->cloud_properties.subcategory : "null");
+        TRACE_D("|- Device-type: %s", tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : "null");
 
         int item_count = 0;
         l_ezlopi_item_t *tm_itme_l_list = tm_device_l_list->items;
@@ -401,11 +401,11 @@ static void ezlopi_device_parse_json_v3(char *config_string)
             TRACE_D("|~~~|--------------- Item - %d ---------------|", item_count);
             TRACE_D("|~~~|- Id: %08X", tm_itme_l_list->cloud_properties.item_id);
             TRACE_D("|~~~|- Category: %s", tm_itme_l_list->cloud_properties.item_name ? tm_itme_l_list->cloud_properties.item_name : "null");
-            // TRACE_D("|~~~|- Value: %s", tm_itme_l_list->cloud_properties.value_type ? tm_itme_l_list->cloud_properties.value_type : "null");
-            // TRACE_D("|~~~|- Device-type: %.*s", 32, tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : "null");
+            TRACE_D("|~~~|- Value: %s", tm_itme_l_list->cloud_properties.value_type ? tm_itme_l_list->cloud_properties.value_type : "null");
+            TRACE_D("|~~~|- Device-type: %.*s", 32, tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : "null");
 
-            // TRACE_D("|~~~|- Interface-type: %d", tm_itme_l_list->interface_type);
-            // ezlopi_device_print_interface_type(tm_itme_l_list);
+            TRACE_D("|~~~|- Interface-type: %d", tm_itme_l_list->interface_type);
+            ezlopi_device_print_interface_type(tm_itme_l_list);
 
             tm_itme_l_list = tm_itme_l_list->next;
             item_count++;

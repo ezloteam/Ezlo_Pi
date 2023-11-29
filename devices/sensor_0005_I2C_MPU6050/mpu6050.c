@@ -213,6 +213,7 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
         user_data->gy = (RAW_DATA.raw_gy / gyro_sen_calib_val) - GYRO_Y_OFFSET; // deg*/s
         user_data->gz = (RAW_DATA.raw_gz / gyro_sen_calib_val) - GYRO_Z_OFFSET; // deg*/s
         user_data->tmp = ((RAW_DATA.raw_t / 340) + 36.530f);
+        printf("%f\n", user_data->gx);
     }
 }
 
