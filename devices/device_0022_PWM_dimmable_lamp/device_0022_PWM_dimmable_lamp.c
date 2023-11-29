@@ -28,7 +28,7 @@ static int __init(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-int device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg)
+int device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg,void *user_arg)
 {
     int ret = 0;
 
