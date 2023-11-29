@@ -428,19 +428,19 @@ static const char *test_device_constant_config =
 #endif
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[    {\
-        \"dev_type\": 8,\
-            \"dev_name\": \"ADXL 345\",\
-            \"id_room\": \"\",\
-            \"id_item\": 6,\
-            \"gpio_sda\": 18,\
-            \"gpio_scl\": 19,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 83\
+    \"dev_detail\":[{\
+                \"dev_type\": 8,\
+                \"dev_name\": \"BME680\",\
+                \"id_room\": \"\",\
+                \"id_item\": 10,\
+                \"gpio_sda\": 18,\
+                \"gpio_scl\": 19,\
+                \"pullup_scl\": true,\
+                \"pullup_sda\": true,\
+                \"slave_addr\": \
             }\
     ],\
-    \"dev_total\":2\
+    \"dev_total\":1\
     }";
 
 #endif
