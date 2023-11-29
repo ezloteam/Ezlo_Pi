@@ -175,7 +175,7 @@ static int __0041_notify(l_ezlopi_item_t *item)
 
         float new_hum = (((float)(4095.0f - (adc_data.value)) / 4095.0f) * 100);
 
-        if (fabs((user_data->hum_val) - new_hum) > 0.05)
+        if (fabs((user_data->hum_val) - new_hum) > 5) // percent
         {
             user_data->hum_val = new_hum;
             ezlopi_device_value_updated_from_device_v3(item);
