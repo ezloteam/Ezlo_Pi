@@ -212,7 +212,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float(user_data->X);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
+            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
         if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
@@ -221,7 +221,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float(user_data->Y);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
+            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
         if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
@@ -230,7 +230,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float(user_data->Z);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
+            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
         if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
         {
@@ -240,7 +240,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
+            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
 
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
@@ -250,7 +250,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float(user_data->T);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
+            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
         ret = 1;
     }
