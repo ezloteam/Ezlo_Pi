@@ -97,12 +97,13 @@ int16_t __adxl345_get_axis_value(l_ezlopi_item_t *item)
     int16_t axis_data = 0;
     if (item)
     {
-        uint8_t buffer_0, buffer_1;
+        uint8_t buffer_0 = 0, buffer_1 = 0;
         uint8_t Check_Register = 0;
         uint8_t address_val;
         esp_err_t err = ESP_OK;
         if ((err = adxl345_check_data_ready_INTR(item, &Check_Register)) == ESP_OK)
         {
+            TRACE_I("chk: %d:",Check_Register);
             if ((Check_Register & (1 << 7)))
             {
                 if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)

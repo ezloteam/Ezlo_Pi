@@ -232,6 +232,7 @@ static int __notify(l_ezlopi_item_t *item)
         {
             float prev_y = user_data->acc_y;
             user_data->acc_y = __adxl345_get_axis_value(item);
+            TRACE_I("y- %d:",user_data->acc_y);
             if (fabs((prev_y - user_data->acc_x) > 0.05))
             {
                 ezlopi_device_value_updated_from_device_v3(item);
