@@ -23,18 +23,6 @@
  *
  *
  **/
-
-//------------------------------------------
-
-/**
- * Please don't forget to uncomment ,
- * -> If you added a voltage divider at sensor's analog output. [Make sure voltage does not exceed 2.5V]
- *      |
- *      |
- *      V
- */
-// #define VOLTAGE_DIVIDER_ADDED 1
-
 //------------------------------------------
 int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 

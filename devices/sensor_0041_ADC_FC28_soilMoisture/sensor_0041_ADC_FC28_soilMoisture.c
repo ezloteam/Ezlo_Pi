@@ -8,7 +8,6 @@
 #include "ezlopi_device_value_updated.h"
 
 #include "sensor_0041_ADC_FC28_soilMoisture.h"
-//--------------------------------------------------------------------------------------------------------
 
 typedef struct s_fc28_data
 {
@@ -170,10 +169,10 @@ static int __0041_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
-        s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
+        s_ezlopi_analog_data_t ezlopi_adc_data = {.value = 0, .voltage = 0};
+        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_adc_data);
 
-        float new_hum = (((float)(4095.0f - (adc_data.value)) / 4095.0f) * 100);
+        float new_hum = (((float)(4095.0f - (ezlopi_adc_data.value)) / 4095.0f) * 100);
 
         if (fabs((user_data->hum_val) - new_hum) > 5) // percent
         {
