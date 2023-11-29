@@ -408,21 +408,6 @@ static const char *switch_box_constant_config =
 static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[ {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"2Axis_Joystick\",\
-                \"id_room\": \"\",\
-                \"id_item\": 20,\
-                \"gpio1\": 33,\
-                \"gpio2\": 34,\
-                \"gpio3\": 26\
-                }\
-    ],\
-    \"dev_total\":2\
-    }";
-#endif
-    "{\
-    \"cmd\":3,\
     \"dev_detail\":[{\
                 \"dev_type\": 8,\
                 \"dev_name\": \"MPU6050\",\
@@ -435,8 +420,9 @@ static const char *test_device_constant_config =
                 \"slave_addr\": 104\
             }\
     ],\
-    \"dev_total\":2\
+    \"dev_total\":1\
     }";
+ 
 
 #endif
 
