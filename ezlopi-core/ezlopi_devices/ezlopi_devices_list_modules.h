@@ -18,7 +18,8 @@ EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid", 16, sensor_0016_oneWire_DHT
 
 EZLOPI_DEVICE_LIST("sensor-PIR-digital-proximity", 19, sensor_0019_digitalIn_PIR)
 
-EZLOPI_DEVICE_LIST("sensor-MB1013-UART-distance", 21, sensor_0021_UART_MB1013)
+EZLOPI_DEVICE_LIST("sensor-2AXIS-JOYSTICK", 20, sensor_0020_other_2axis_joystick)
+
 EZLOPI_DEVICE_LIST("device-PWM-dimmable-lamp", 22, device_0022_PWM_dimmable_lamp)
 EZLOPI_DEVICE_LIST("sensor-TTP223B-digital-touch", 23, sensor_0023_digitalIn_touch_switch_TTP223B)
 EZLOPI_DEVICE_LIST("sensor-HCSR04-pulse-width", 24, sensor_0024_other_HCSR04_v3)

@@ -51,6 +51,10 @@ const static char *scales_liter_per_hour = "liter_per_hour";
 /// @brief force
 const static char *scales_newton = "newton";
 
+/// @brief electric_potential
+const static char *scales_milli_volt = "milli_volt";
+const static char *scales_volt = "volt";
+
 /// @brief acceleration
 const static char *scales_meter_per_square_second = "meter_per_square_second";
 

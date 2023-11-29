@@ -20,6 +20,8 @@ extern "C"
 
     // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
 #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
+    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -410,32 +412,15 @@ static const char *test_device_constant_config =
 #if 0
     "{\
     \"cmd\":3,\
-    \"dev_detail\":[{\
-                  \"dev_type\": 10,\
-                \"dev_name\": \"TCS230\",\
-                \"id_room\": \"\",\
-                \"id_item\": 40,\
-               \"gpio1\": 25\
-               \"gpio2\": 26\
-               \"gpio3\": 12\
-               \"gpio4\": 14\
-               \"gpio5\": 13\
-               \"gpio6\": 15\
-            }\
-    ],\
-    \"dev_total\":1\
-    }";
-#endif
-    "{\
-    \"cmd\":3,\
-    \"dev_detail\":[    {\
-                \"dev_name\": \"HX711_loadcell\",\
+    \"dev_detail\":[ {\
                 \"dev_type\": 10,\
-                \"id_item\": 47,\
+                \"dev_name\": \"2Axis_Joystick\",\
                 \"id_room\": \"\",\
-                \"gpio1\": 18,\
-                \"gpio2\": 19\
-            }\
+                \"id_item\": 20,\
+                \"gpio1\": 33,\
+                \"gpio2\": 34,\
+                \"gpio3\": 26\
+                }\
     ],\
     \"dev_total\":1\
     }";
