@@ -44,7 +44,7 @@
 #include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 #include "sensor_0046_ADC_ACS712_05B_currentmeter.h"
-
+#include "sensor_0047_other_HX711_loadcell.h"
 #include "sensor_0048_other_MQ4_CH4_detector.h"
 #include "sensor_0049_other_MQ2_LPG_detector.h"
 #include "sensor_0050_other_MQ3_alcohol_detector.h"

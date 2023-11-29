@@ -42,6 +42,8 @@ EZLOPI_DEVICE_LIST("sensor-TSL256-I2C-luminosity", 44, sensor_0044_I2C_TSL256_lu
 
 EZLOPI_DEVICE_LIST("sensor-ACS712-currentmeter-ADC", 46, sensor_0046_ADC_ACS712_05B_currentmeter)
 
+EZLOPI_DEVICE_LIST("sensor-HX711-loadcell", 47, sensor_0047_other_HX711_loadcell)
+
 EZLOPI_DEVICE_LIST("sensor-MQ4-CH4-methane", 48, sensor_0048_other_MQ4_CH4_detector)
 EZLOPI_DEVICE_LIST("sensor-MQ2-LPG-detector", 49, sensor_0049_other_MQ2_LPG_detector)
 EZLOPI_DEVICE_LIST("sensor-MQ3-alcohol-detector", 50, sensor_0050_other_MQ3_alcohol_detector)

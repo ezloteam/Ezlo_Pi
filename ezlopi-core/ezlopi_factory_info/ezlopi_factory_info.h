@@ -429,11 +429,12 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[    {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"GYML8511_UV\",\
+                \"dev_name\": \"HX711_loadcell\",\
+                \"dev_type\": 10,\
+                \"id_item\": 47,\
                 \"id_room\": \"\",\
-                \"id_item\": 43,\
-               \"gpio\": 33\
+                \"gpio1\": 18,\
+                \"gpio2\": 19\
             }\
     ],\
     \"dev_total\":1\

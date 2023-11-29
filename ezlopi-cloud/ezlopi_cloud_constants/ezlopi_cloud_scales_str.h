@@ -58,4 +58,8 @@ const static char *scales_meter_per_square_second = "meter_per_square_second";
 const static char *scales_ampere = "ampere";
 const static char *scales_milli_ampere = "milli_ampere";
 
+/// @brief mass
+const static char *scales_kilo_gram = "kilo_gram";
+const static char *scales_pounds = "pounds";
+
 #endif // __EZLOPI_SCALES_STR_H__
