@@ -22,7 +22,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
 
                                 sensor_0018_other_internal_hall_effect
                                 sensor_0019_digitalIn_PIR
-                                sensor_0020_ADC_2axis_joystick
+                                sensor_0020_other_2axis_joystick
                                 sensor_0021_UART_MB1013
                                 device_0022_PWM_dimmable_lamp
                                 sensor_0023_digitalIn_touch_switch_TTP223B

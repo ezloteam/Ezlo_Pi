@@ -12,7 +12,7 @@
 #include "ezlopi_device_value_updated.h"
 #include "ezlopi_valueformatter.h"
 
-#include "sensor_0020_ADC_2axis_joystick.h"
+#include "sensor_0020_other_2axis_joystick.h"
 
 typedef struct s_joystick_data
 {
@@ -27,7 +27,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 static int __notify(l_ezlopi_item_t *item);
 static void __joystick_intr_callback(void *arg);
 
-int sensor_0020_ADC_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -115,21 +115,19 @@ static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_d
         if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
         {
             item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-            CJSON_GET_VALUE_INT(cj_device, "gpio_x", item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.adc.gpio_num);
             item->interface.adc.resln_bit = 3;
         }
         if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
         {
             item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-            CJSON_GET_VALUE_INT(cj_device, "gpio_y", item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.adc.gpio_num);
             item->interface.adc.resln_bit = 3;
         }
         if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] == item->cloud_properties.item_id)
         {
             item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT;
-            CJSON_GET_VALUE_INT(cj_device, "gpio_sw", item->interface.gpio.gpio_in.gpio_num);
-            // CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
-            // CJSON_GET_VALUE_INT(cj_device, "gpio_sw_en", item->interface.gpio.gpio_in.enable);
+            CJSON_GET_VALUE_INT(cj_device, "gpio3", item->interface.gpio.gpio_in.gpio_num);
             item->interface.gpio.gpio_in.enable = true;
             item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
             item->interface.gpio.gpio_in.pull = GPIO_PULLUP_ONLY;
@@ -162,7 +160,7 @@ static int __prepare(void *arg)
                     joystick_x_device->cloud_properties.subcategory = subcategory_electricity;
                     __setup_device_cloud_properties(joystick_x_device, cj_device);
 
-                    l_ezlopi_item_t *joystick_x_item = ezlopi_device_add_item_to_device(joystick_x_device, sensor_0020_ADC_2axis_joystick);
+                    l_ezlopi_item_t *joystick_x_item = ezlopi_device_add_item_to_device(joystick_x_device, sensor_0020_other_2axis_joystick);
                     if (joystick_x_item)
                     {
                         joystick_x_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X];
@@ -181,7 +179,7 @@ static int __prepare(void *arg)
                     joystick_y_device->cloud_properties.subcategory = subcategory_electricity;
                     __setup_device_cloud_properties(joystick_y_device, cj_device);
 
-                    l_ezlopi_item_t *joystick_y_item = ezlopi_device_add_item_to_device(joystick_y_device, sensor_0020_ADC_2axis_joystick);
+                    l_ezlopi_item_t *joystick_y_item = ezlopi_device_add_item_to_device(joystick_y_device, sensor_0020_other_2axis_joystick);
                     if (joystick_y_item)
                     {
                         joystick_y_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y];
@@ -200,7 +198,7 @@ static int __prepare(void *arg)
                     joystick_sw_device->cloud_properties.subcategory = subcategory_in_wall;
                     __setup_device_cloud_properties(joystick_sw_device, cj_device);
 
-                    l_ezlopi_item_t *joystick_sw_item = ezlopi_device_add_item_to_device(joystick_sw_device, sensor_0020_ADC_2axis_joystick);
+                    l_ezlopi_item_t *joystick_sw_item = ezlopi_device_add_item_to_device(joystick_sw_device, sensor_0020_other_2axis_joystick);
                     if (joystick_sw_item)
                     {
                         joystick_sw_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH];
