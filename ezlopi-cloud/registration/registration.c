@@ -36,36 +36,41 @@ void registered(cJSON *cj_request, cJSON *cj_response)
 
 static void registration_process(void *pv)
 {
-    char mac_str[18];
-    uint8_t mac_addr[6];
-    char reg_str[300] = "";
-
-    esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
-    snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
-             mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-
-    snprintf(reg_str, sizeof(reg_str),
-             "{\"id\":\"%u\",\"method\":\"register\",\"params\":"
-             "{\"firmware\":\"%s\",\"timeOffset\":18000, \"media\":\"radio\","
-             "\"hubType\":\"32.1\",\"mac_address\":\"%s\",\"maxFrameSize\":4096}}",
-             esp_random(), VERSION_STR, mac_str);
-
-    cJSON *cjson_data = cJSON_Parse(reg_str);
-
-    while (false == ezlopi_websocket_client_is_connected())
+    cJSON *cj_register = cJSON_CreateObject();
+    if (cj_register)
     {
-        vTaskDelay(200 / portTICK_RATE_MS);
-    }
+        char mac_str[18];
+        uint8_t mac_addr[6];
 
-    while (0 == is_registered)
-    {
-        web_provisioning_send_to_nma_websocket(cjson_data, TRACE_TYPE_D);
-        vTaskDelay(2000 / portTICK_RATE_MS);
-    }
+        esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
+        snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
+                 mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
-    if (cjson_data)
-    {
-        cJSON_Delete(cjson_data);
+        cJSON_AddStringToObject(cj_register, "id", "__ID__");
+        cJSON_AddStringToObject(cj_register, "method", "register");
+        cJSON *cj_params = cJSON_AddObjectToObject(cj_register, "params");
+        if (cj_params)
+        {
+            cJSON_AddStringToObject(cj_params, "firmware", VERSION_STR);
+            cJSON_AddNumberToObject(cj_params, "timeOffset", 18000);
+            cJSON_AddStringToObject(cj_params, "media", "radio");
+            cJSON_AddStringToObject(cj_params, "hubType", "32.1");
+            cJSON_AddStringToObject(cj_params, "mac_address", mac_str);
+            cJSON_AddNumberToObject(cj_params, "maxFrameSize", 4096);
+        }
+
+        while (false == ezlopi_websocket_client_is_connected())
+        {
+            vTaskDelay(200 / portTICK_RATE_MS);
+        }
+
+        while (0 == is_registered)
+        {
+            web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_D);
+            vTaskDelay(2000 / portTICK_RATE_MS);
+        }
+
+        cJSON_Delete(cj_register);
     }
 
     vTaskDelete(NULL);
