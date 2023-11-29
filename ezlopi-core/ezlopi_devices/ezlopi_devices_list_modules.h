@@ -40,8 +40,9 @@ EZLOPI_DEVICE_LIST("sensor-turbidity-ADC", 33, sensor_0033_ADC_turbidity)
 EZLOPI_DEVICE_LIST("sensor-proximity-digital", 34, sensor_0034_digitalIn_proximity)
 EZLOPI_DEVICE_LIST("sensor-TPP223B-digital-touch", 35, sensor_0035_digitalIn_touch_sensor_TPP223B)
 
-EZLOPI_DEVICE_LIST("sensor-shunt-voltmeter-ADC", 42, sensor_0042_ADC_shunt_voltmeter)
 EZLOPI_DEVICE_LIST("sensor-TCS230-other-color", 40, sensor_0040_other_TCS230)
+EZLOPI_DEVICE_LIST("sensor-FC28-soilMoisture-ADC", 41, sensor_0041_ADC_FC28_soilMoisture)
+EZLOPI_DEVICE_LIST("sensor-shunt-voltmeter-ADC", 42, sensor_0042_ADC_shunt_voltmeter)
 EZLOPI_DEVICE_LIST("sensor-GYML8511-ADC-intensity", 43, sensor_0043_ADC_GYML8511_UV_intensity)
 EZLOPI_DEVICE_LIST("sensor-TSL256-I2C-luminosity", 44, sensor_0044_I2C_TSL256_luminosity)
 

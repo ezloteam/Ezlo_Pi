@@ -427,10 +427,10 @@ static const char *test_device_constant_config =
     \"cmd\":3,\
     \"dev_detail\":[{\
             \"dev_type\": 3,\
-            \"dev_name\": \"shuntVolt\",\
+            \"dev_name\": \"FC28_soilmoisture\",\
             \"id_room\": \"\",\
-            \"id_item\": 42,\
-            \"gpio\": 19\
+            \"id_item\": 41,\
+            \"gpio\": 33\
             }\
     ],\
     \"dev_total\":1\
