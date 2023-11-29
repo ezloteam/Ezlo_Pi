@@ -20,8 +20,6 @@ extern "C"
 
     // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
 #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
-    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -408,8 +406,6 @@ static const char *switch_box_constant_config =
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
-
-#if 0
     "{\
     \"cmd\":3,\
     \"dev_detail\":[ {\
@@ -426,6 +422,7 @@ static const char *test_device_constant_config =
     }";
 
 #endif
+
 #ifdef __cplusplus
 }
 #endif
