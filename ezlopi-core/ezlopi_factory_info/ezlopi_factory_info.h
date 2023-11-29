@@ -408,18 +408,16 @@ static const char *switch_box_constant_config =
 static const char *test_device_constant_config =
 
 #if 0
-    "{\
+  "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_type\": 8,\
-                \"dev_name\": \"MPU6050\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"fingerprint\",\
                 \"id_room\": \"\",\
-                \"id_item\": 5,\
-                \"gpio_sda\": 18,\
-                \"gpio_scl\": 19,\
-                \"pullup_scl\": true,\
-                \"pullup_sda\": true,\
-                \"slave_addr\": 104\
+                \"id_item\": 66,\
+                \"gpio1\": 17,\
+                \"gpio2\": 16,\
+                \"gpio3\": 25\
             }\
     ],\
     \"dev_total\":1\
@@ -429,11 +427,10 @@ static const char *test_device_constant_config =
     \"cmd\":3,\
     \"dev_detail\":[{\
             \"dev_type\": 3,\
-            \"dev_name\": \"POT\",\
+            \"dev_name\": \"shuntVolt\",\
             \"id_room\": \"\",\
-            \"id_item\": 17,\
-            \"gpio\": 32,\
-            \"resln_bit\": 3\
+            \"id_item\": 42,\
+            \"gpio\": 19\
             }\
     ],\
     \"dev_total\":1\

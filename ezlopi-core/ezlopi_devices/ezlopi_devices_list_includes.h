@@ -43,7 +43,7 @@
 // #include "device_0036_PWM_servo_MG996R.h"
 
 #include "device_0038_other_RGB.h"
-
+#include "sensor_0042_ADC_shunt_voltmeter.h"
 #include "sensor_0040_other_TCS230.h"
 #include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
