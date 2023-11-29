@@ -25,6 +25,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 sensor_0015_oneWire_DHT11
                                 sensor_0016_oneWire_DHT22
 
+                                sensor_0017_ADC_potentiometer
                                 sensor_0018_other_internal_hall_effect
                                 sensor_0019_digitalIn_PIR
                                 sensor_0020_other_2axis_joystick

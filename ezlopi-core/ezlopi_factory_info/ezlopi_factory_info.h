@@ -422,7 +422,20 @@ static const char *test_device_constant_config =
     ],\
     \"dev_total\":1\
     }";
- 
+#endif
+    "{\
+    \"cmd\":3,\
+    \"dev_detail\":[{\
+            \"dev_type\": 3,\
+            \"dev_name\": \"POT\",\
+            \"id_room\": \"\",\
+            \"id_item\": 17,\
+            \"gpio\": 32,\
+            \"resln_bit\": 3\
+            }\
+    ],\
+    \"dev_total\":1\
+    }";
 
 #endif
 
