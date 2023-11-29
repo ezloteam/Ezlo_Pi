@@ -15,6 +15,7 @@ idf_component_register(SRCS "ezlopi_devices.c" "ezlopi_device_value_updated.c" "
                                 device_0003_digitalOut_plug
                                 device_0004_digitalIn_generic
                                 
+                                sensor_0005_I2C_MPU6050
                                 sensor_0007_I2C_GY271
                                 sensor_0006_I2C_ADXL345
                                 sensor_0008_I2C_LTR303ALS

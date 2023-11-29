@@ -3,6 +3,7 @@ EZLOPI_DEVICE_LIST("digital-out relay", 2, device_0002_digitalOut_relay)
 EZLOPI_DEVICE_LIST("digital-out plug", 3, device_0003_digitalOut_plug)
 EZLOPI_DEVICE_LIST("digital-in generic", 4, device_0004_digitalIn_generic)
 
+EZLOPI_DEVICE_LIST("sensor-MPU6050-I2C", 5, sensor_0005_I2C_MPU6050)
 EZLOPI_DEVICE_LIST("sensor-ADXL345-I2C", 6, sensor_0006_I2C_ADXL345)
 EZLOPI_DEVICE_LIST("sensor-GY271-I2C", 7, sensor_0007_I2C_GY271)
 EZLOPI_DEVICE_LIST("sensor-LTR303ALS-I2C", 8, sensor_0008_I2C_LTR303ALS)

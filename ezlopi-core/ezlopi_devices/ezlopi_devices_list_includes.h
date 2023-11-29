@@ -6,6 +6,7 @@
 #include "device_0003_digitalOut_plug.h"
 #include "device_0004_digitalIn_generic.h"
 
+#include "sensor_0005_I2C_MPU6050.h"
 
 #include "sensor_0006_I2C_ADXL345.h"
 
