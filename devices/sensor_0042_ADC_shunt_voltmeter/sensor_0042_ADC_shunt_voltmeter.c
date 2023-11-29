@@ -167,7 +167,7 @@ static int __0042_notify(l_ezlopi_item_t *item)
         s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        float Vout = (2 * ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
+        float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 
         if (fabs(Vout - (user_data->volt)) > 0.5)
         {
