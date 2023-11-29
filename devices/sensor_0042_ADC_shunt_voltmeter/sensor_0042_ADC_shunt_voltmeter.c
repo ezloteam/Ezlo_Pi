@@ -149,9 +149,9 @@ static int __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->volt);
+            char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 4.2f);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->volt);
+            cJSON_AddNumberToObject(cj_result, "value", (user_data->volt) * 4.2f);
             free(valueFormatted);
             ret = 1;
         }
