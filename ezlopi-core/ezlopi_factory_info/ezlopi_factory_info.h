@@ -406,6 +406,8 @@ static const char *switch_box_constant_config =
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
+
+#if 0
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
