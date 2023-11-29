@@ -425,14 +425,18 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[    {\
-            \"dev_type\": 3,\
-            \"dev_name\": \"FC28_soilmoisture\",\
+        \"dev_type\": 8,\
+            \"dev_name\": \"GY271\",\
             \"id_room\": \"\",\
-            \"id_item\": 41,\
-            \"gpio\": 33,\
+            \"id_item\": 7,\
+            \"gpio_sda\": 18,\
+            \"gpio_scl\": 19,\
+            \"pullup_scl\": true,\
+            \"pullup_sda\": true,\
+            \"slave_addr\": 13\
             }\
     ],\
-    \"dev_total\":2\
+    \"dev_total\":1\
     }";
 
 #endif

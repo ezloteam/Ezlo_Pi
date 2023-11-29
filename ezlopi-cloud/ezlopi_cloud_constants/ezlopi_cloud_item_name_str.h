@@ -232,4 +232,7 @@ const static char *ezlopi_item_name_send_ir_code = "send_ir_code";
 const static char *ezlopi_item_name_learn_ir_code = "learn_ir_code";
 const static char *ezlopi_item_name_soil_humidity = "soil_humidity";
 
+const static char *ezlopi_item_name_magnetic_strength_x_axis = "magnetic_strength_x_axis";
+const static char *ezlopi_item_name_magnetic_strength_y_axis = "magnetic_strength_y_axis";
+const static char *ezlopi_item_name_magnetic_strength_z_axis = "magnetic_strength_z_axis";
 #endif // __EZLOPI_ITEM_NAME_STR_H__
