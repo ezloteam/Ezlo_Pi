@@ -54,4 +54,8 @@ const static char *scales_newton = "newton";
 /// @brief acceleration
 const static char *scales_meter_per_square_second = "meter_per_square_second";
 
+/// @brief electric_current
+const static char *scales_ampere = "ampere";
+const static char *scales_milli_ampere = "milli_ampere";
+
 #endif // __EZLOPI_SCALES_STR_H__
