@@ -425,15 +425,13 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[    {\
-        \"dev_type\": 8,\
-            \"dev_name\": \"GY271\",\
-            \"id_room\": \"\",\
-            \"id_item\": 7,\
-            \"gpio_sda\": 18,\
-            \"gpio_scl\": 19,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 13\
+                \"dev_type\": 10,\
+                \"dev_name\": \"GY61\",\
+                \"id_room\": \"\",\
+                \"id_item\": 28,\
+                \"gpio1\": 33,\
+                \"gpio2\": 34,\
+                \"gpio3\": 35\
             }\
     ],\
     \"dev_total\":1\
