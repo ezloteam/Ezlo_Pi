@@ -232,21 +232,25 @@ static int __0015_notify(l_ezlopi_item_t *item)
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 float temperature = getTemperature_dht11();
-                TRACE_I("Temperature: %.2f", temperature);
-                if (fabs(dht11_data->temperature - temperature) > 0.5)
-                {
-                    dht11_data->temperature = temperature;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                if (temperature > 15)
+                { // TRACE_I("Temperature: %.2f", temperature);
+                    if (fabs(dht11_data->temperature - temperature) > 1)
+                    {
+                        dht11_data->temperature = temperature;
+                        ezlopi_device_value_updated_from_device_v3(item);
+                    }
                 }
             }
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
                 float humidity = getHumidity_dht11();
-                TRACE_I("Humidity: %.2f", humidity);
-                if (fabs(dht11_data->humidity - humidity) > 0.5)
-                {
-                    dht11_data->humidity = humidity;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                if (humidity > 20)
+                { // TRACE_I("Humidity: %.2f", humidity);
+                    if (fabs(dht11_data->humidity - humidity) > 1)
+                    {
+                        dht11_data->humidity = humidity;
+                        ezlopi_device_value_updated_from_device_v3(item);
+                    }
                 }
             }
         }

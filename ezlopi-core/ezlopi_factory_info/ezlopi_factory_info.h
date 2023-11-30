@@ -427,11 +427,11 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-            \"dev_type\": 3,\
-            \"dev_name\": \"FC28_soilmoisture\",\
-            \"id_room\": \"\",\
-            \"id_item\": 41,\
-            \"gpio\": 33\
+                \"dev_type\": 7,\
+                \"dev_name\": \"DHT 11\",\
+                \"id_room\": \"\",\
+                \"id_item\": 15,\
+                \"gpio\": 18\
             }\
     ],\
     \"dev_total\":1\
