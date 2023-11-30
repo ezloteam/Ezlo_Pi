@@ -424,7 +424,6 @@ static const char *test_device_constant_config =
     \"dev_total\":1\
     }";
 #endif
-
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
