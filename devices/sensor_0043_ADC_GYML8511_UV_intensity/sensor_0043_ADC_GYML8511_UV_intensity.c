@@ -73,10 +73,10 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_ultraviolet;
+    item->cloud_properties.item_name = ezlopi_item_name_solar_radiation;
     item->cloud_properties.show = true;
     item->cloud_properties.value_type = value_type_ultraviolet;
-    item->cloud_properties.scale = scales_lux;
+    item->cloud_properties.scale = scales_watt_per_square_meter;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
@@ -155,9 +155,9 @@ static int __0043_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
 
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->uv_data);
+            char *valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data));
+            cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
             // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
             free(valueFormatted);
 
@@ -175,8 +175,9 @@ static int __0043_notify(l_ezlopi_item_t *item)
         s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
         s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
-        float new_uvIntensity = mapfloat(((adc_data.voltage) / 1000.0f), 0.97, 2.7, 0.0, 15.0);
-        if (fabs((user_data->uv_data) - new_uvIntensity) > 0.05)
+        float new_uvIntensity = mapfloat(((float)(adc_data.voltage) / 1000), 0.97, 2.7, 0.0, 15.0);
+        TRACE_I("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
+        if (fabs((user_data->uv_data) - new_uvIntensity) > 0.01)
         {
             user_data->uv_data = new_uvIntensity;
             ezlopi_device_value_updated_from_device_v3(item);
@@ -188,5 +189,10 @@ static int __0043_notify(l_ezlopi_item_t *item)
 
 static float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
 {
-    return (x - in_min) * ((out_max - out_min) / (in_max - in_min)) + out_min;
+    float res = ((x - in_min) * ((out_max - out_min) / (in_max - in_min)) + out_min);
+    if (res < 0)
+    {
+        res = 0;
+    }
+    return res;
 }

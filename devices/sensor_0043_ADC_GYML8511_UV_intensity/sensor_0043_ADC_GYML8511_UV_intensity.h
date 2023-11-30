@@ -6,6 +6,8 @@
 /**
  *  -> GYML_8511 - UV sensor operates in 3.3V
  *
+ *  -> Better to connect EN->3.3v
+ *
  *  Output analog voltage range : [0.99v - 2.7V ] which is acceptable for esp32 input range with only small error.
  */
 // action function

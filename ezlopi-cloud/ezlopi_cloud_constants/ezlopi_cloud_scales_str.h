@@ -66,4 +66,7 @@ const static char *scales_milli_ampere = "milli_ampere";
 const static char *scales_kilo_gram = "kilo_gram";
 const static char *scales_pounds = "pounds";
 
+/// @brief irradiance
+const static char *scales_watt_per_square_meter = "watt_per_square_meter";
+
 #endif // __EZLOPI_SCALES_STR_H__
