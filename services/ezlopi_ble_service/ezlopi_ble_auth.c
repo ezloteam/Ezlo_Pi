@@ -56,7 +56,9 @@ e_auth_status_t ezlopi_ble_auth_check_user_id(char *user_id)
     }
     else
     {
-        sg_last_auth_status = BLE_AUTH_USER_ID_NOT_FOUND;
+        ezlopi_nvs_write_user_id_str(user_id);
+        // sg_last_auth_status = BLE_AUTH_USER_ID_NOT_FOUND;
+        sg_last_auth_status = BLE_AUTH_SUCCESS;
     }
 
     return sg_last_auth_status;

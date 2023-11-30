@@ -218,13 +218,16 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         CJSON_GET_VALUE_STRING(cj_config, "uuid", ezlopi_config_basic->device_uuid);
                                         CJSON_GET_VALUE_STRING(cj_config, "uuid_provisioning", ezlopi_config_basic->prov_uuid);
 
-                                        char *mac = (char *)malloc(10);
+                                        char *mac = NULL;
                                         CJSON_GET_VALUE_STRING(cj_config, "mac", mac);
-                                        for (int i = 0; i < 6; i++)
+                                        if (mac)
                                         {
-                                            sscanf(mac + 3 * i, "%2hhx", &ezlopi_config_basic->device_mac[i]);
+                                            for (int i = 0; i < 6; i++)
+                                            {
+                                                sscanf(mac + 3 * i, "%2hhx", &ezlopi_config_basic->device_mac[i]);
+                                            }
                                         }
-                                        free(mac);
+
                                         CJSON_GET_VALUE_STRING(cj_config, "provision_server", ezlopi_config_basic->provision_server);
                                         CJSON_GET_VALUE_STRING(cj_config, "cloud_server", ezlopi_config_basic->cloud_server);
                                         CJSON_GET_VALUE_STRING(cj_config, "provision_token", ezlopi_config_basic->provision_token);
@@ -241,24 +244,44 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         free(ezlopi_config_basic);
                                     }
 
-                                    char *ssl_private_key = NULL;
-                                    // TRACE_W("Here");
-                                    char *ssl_shared_key = NULL;
-                                    // char *ssl_public_key = NULL; // Currently not needed by Ezlo_Pi stack
                                     char *ca_certs = NULL;
-                                    char *ezlopi_config = NULL;
+                                    char *ssl_shared_key = NULL;
+                                    char *ssl_private_key = NULL;
 
                                     CJSON_GET_VALUE_STRING(cj_config, "ssl_private_key", ssl_private_key);
                                     // CJSON_GET_VALUE_STRING(cj_config, "ssl_public_key", ssl_public_key);
                                     CJSON_GET_VALUE_STRING(cj_config, "ssl_shared_key", ssl_shared_key);
                                     CJSON_GET_VALUE_STRING(cj_config, "signing_ca_certificate", ca_certs);
-                                    CJSON_GET_VALUE_STRING(cj_config, "ezlopi_config", ezlopi_config);
 
-                                    ezlopi_factory_info_v2_set_ezlopi_config(ezlopi_config);
                                     ezlopi_factory_info_v2_set_ca_cert(ca_certs);
                                     ezlopi_factory_info_v2_set_ssl_shared_key(ssl_shared_key);
                                     ezlopi_factory_info_v2_set_ssl_private_key(ssl_private_key);
                                     // ezlopi_factory_info_v2_set_ssl_public_key(ssl_public_key);
+
+                                    cJSON *cj_device_config = cJSON_GetObjectItem(cj_config, "device_config");
+                                    if (cj_device_config)
+                                    {
+                                        cJSON_DeleteItemFromObject(cj_config, "cmd");
+                                        cJSON_AddNumberToObject(cj_device_config, "cmd", 3);
+                                        char *tmp_str = cJSON_Print(cj_device_config);
+                                        if (tmp_str)
+                                        {
+                                            TRACE_D("device_config: %s", tmp_str);
+                                            ezlopi_factory_info_v2_set_ezlopi_config(tmp_str);
+                                            free(tmp_str);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    TRACE_E("User varification failed!");
+
+                                    char *curr_user_id = ezlopi_nvs_read_user_id_str();
+                                    if (curr_user_id)
+                                    {
+                                        TRACE_D("current user: %s", curr_user_id);
+                                        free(curr_user_id);
+                                    }
                                 }
 
                                 cJSON_Delete(cj_config);
@@ -543,6 +566,7 @@ static char *__provisioning_info_jsonify(void)
         char *ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
         char *ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
         char *ca_cert = ezlopi_factory_info_v2_get_ca_certificate();
+        char *device_config = ezlopi_factory_info_v2_get_ezlopi_config(); // don't free this, it is being used by other modules as well
 
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
         cJSON_AddStringToObject(cj_prov_info, "config_id", tmp_buffer);
@@ -560,6 +584,7 @@ static char *__provisioning_info_jsonify(void)
         // cJSON_AddStringToObject(cj_prov_info, "ssl_public_key"); // Not needed by Ezlo_Pi stack for now
         cJSON_AddStringToObject(cj_prov_info, "ca_cert", ca_cert);
         cJSON_AddStringToObject(cj_prov_info, "device_type_ezlopi", ezlopi_factory_info_v2_get_device_type());
+        cJSON_AddRawToObject(cj_prov_info, "device_config", device_config);
 
         ezlopi_factory_info_v2_free(device_name);
         ezlopi_factory_info_v2_free(brand);
@@ -573,7 +598,6 @@ static char *__provisioning_info_jsonify(void)
         if (str_json_prov_info)
         {
             cJSON_Minify(str_json_prov_info);
-            TRACE_D("str_json_prov_info: %s", str_json_prov_info)
         }
 
         cJSON_Delete(cj_prov_info);
@@ -584,7 +608,7 @@ static char *__provisioning_info_jsonify(void)
 
 static char *__provisioning_info_base64(void)
 {
-    const uint32_t base64_data_len = 4096;
+    const uint32_t base64_data_len = 5120;
     char *base64_data = malloc(base64_data_len);
     if (base64_data)
     {
@@ -592,7 +616,11 @@ static char *__provisioning_info_base64(void)
         char *str_provisioning_data = __provisioning_info_jsonify();
         if (str_provisioning_data)
         {
-            mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len, (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
+            TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);
+
+            int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len, (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
+
+            TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
             free(str_provisioning_data);
         }
 
@@ -601,6 +629,9 @@ static char *__provisioning_info_base64(void)
             free(base64_data);
             base64_data = NULL;
         }
+
+        TRACE_D("out-put-len: %d", out_put_len);
+        TRACE_D("base64_data[len: %d]: %s", strlen(base64_data), base64_data);
     }
 
     return base64_data;

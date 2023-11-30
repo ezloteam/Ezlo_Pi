@@ -10,7 +10,6 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"
 
-
 static const esp_partition_t *partition_ctx_v2 = NULL;
 static char *g_ca_certificate = NULL;
 static char *g_ssl_private_key = NULL;
@@ -278,7 +277,8 @@ char *ezlopi_factory_info_v2_get_device_type(void)
     {
     case EZLOPI_DEVICE_TYPE_TEST_DEVICE:
     {
-        return ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
+        ret = ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
+        break;
     }
     case EZLOPI_DEVICE_TYPE_GENERIC:
     case EZLOPI_DEVICE_TYPE_SWITCH_BOX:
@@ -286,11 +286,14 @@ char *ezlopi_factory_info_v2_get_device_type(void)
     case EZLOPI_DEVICE_TYPE_SOUND_SENSOR:
     case EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO:
     {
+
         ret = ezlopi_device_type_str[EZLOPI_DEVICE_TYPE];
+        break;
     }
     default:
     {
         ret = undefined;
+        break;
     }
     }
 
@@ -705,6 +708,14 @@ static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
             {
                 ret = 1;
             }
+            else
+            {
+                TRACE_E("esp-partition write failed!");
+            }
+        }
+        else
+        {
+            TRACE_E("esp-partition erase failed!");
         }
     }
 

@@ -110,10 +110,14 @@ static void ezlopi_ble_basic_init(void)
 {
     // static const char *ble_device_name = "LED";
     char ble_device_name[32];
+    memset(ble_device_name, 0, sizeof(ble_device_name));
+
     // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
     // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v2_get_id());
+
+    char *device_name = ezlopi_factory_info_v2_get_name();
     char *device_type = ezlopi_factory_info_v2_get_device_type();
-    if ((NULL != device_type) && (isprint(device_type[0])))
+    if ((NULL != device_type) && (NULL != device_name) && (isprint(device_name[0])))
     {
         snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v2_get_id());
     }
@@ -124,7 +128,6 @@ static void ezlopi_ble_basic_init(void)
         esp_read_mac(mac, ESP_MAC_BT);
         snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%02x%02x%02x%02x%02x%02x",
                  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-        ble_device_name[19] = '\0';
     }
 
     dump("ble_device_name", ble_device_name, 0, 32);

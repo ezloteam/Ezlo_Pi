@@ -20,7 +20,7 @@ static const char *ir_blaster_constant_config =
             }\
         ],\
     \"dev_total\": 1}";
-    
+
 #elif (EZLOPI_DEVICE_TYPE_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
 const char *switch_box_constant_config =
     "{\
