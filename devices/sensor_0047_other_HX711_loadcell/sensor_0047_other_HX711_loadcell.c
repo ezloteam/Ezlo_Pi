@@ -215,7 +215,7 @@ static int __0047_notify(l_ezlopi_item_t *item)
         float Mass = __hx711_avg_reading(item, 10); /// 1000.0f; // to avoid spikes
         float weight_in_kg = ((Mass - (user_data->HX711_tare_wt)) / 100.0f) / 1000.0f;
 
-        if (fabs(weight_in_kg - (user_data->weight)) > 0.01)
+        if (fabs(weight_in_kg - (user_data->weight)) > 0.05)
         {
             if (weight_in_kg < 0)
             {
