@@ -4,13 +4,9 @@
 #include "stdint.h"
 #include "string.h"
 #include "time.h"
-// #include "freertos/FreeRTOS.h"
-// #include "freertos/task.h"
 #include "gpio_isr_service.h"
-#include "esp_err.h"
-#include "esp_types.h"
+#include "esp_timer.h"
 
-#include "ezlopi_actions.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_uart.h"
 #include "ezlopi_cloud.h"
@@ -39,23 +35,47 @@ static void IRAM_ATTR gpio_notify_isr(void *param)
     }
 }
 
+static e_sensor_fp_items_t sensor_fp_item_ids[SENSOR_FP_ITEM_ID_MAX];
+
 static int __0066_prepare(void *arg);
 static int __0066_init(l_ezlopi_item_t *item);
 static int __0066_set_value(l_ezlopi_item_t *item, void *arg);
 static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
-static void Fingerprint_Operation_task(void *params);
-static void uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
+static void __fingerprint_operation_task(void *params);
+static void __uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-
 static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
 static void __prepare_item_action_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
 static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
+static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
-static e_sensor_fp_items_t sensor_fp_item_ids[SENSOR_FP_ITEM_ID_MAX];
-
-// static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void timer_callback(void *param)
+{
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
+    if (item)
+    {
+        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        time_t now = 0;
+        time(&now);
+        if ((now - (user_data->timeout_start_time)) <= (time_t)30) // 30 sec
+        {
+            if (user_data->opmode != FINGERPRINT_ENROLLMENT_MODE)
+            {
+                user_data->opmode = FINGERPRINT_MATCH_MODE;
+                // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
+                esp_timer_stop(user_data->timerHandler);
+            }
+        }
+        else
+        {
+            user_data->opmode = FINGERPRINT_MATCH_MODE;
+            ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
+            esp_timer_stop(user_data->timerHandler);
+        }
+    }
+}
 
 //---------------------------------------------------------------------------------------------------------------
 int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -98,44 +118,46 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     char *dev_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
+    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
+    device->cloud_properties.device_type_id = NULL;
+    device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor; /*needs to be changed to custom*/
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data)
 {
-    item->cloud_properties.show = true;
+    item->cloud_properties.item_id = item_id;
     item->cloud_properties.has_getter = false;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_name = ezlopi_item_name_learn_fingerprint; // For match
-    item->cloud_properties.value_type = value_type_bool;                   // ID + %
+    item->cloud_properties.show = true;
+    item->cloud_properties.value_type = value_type_bool; // bool
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
 static void __prepare_item_action_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data)
 {
-    item->cloud_properties.show = true;
+    item->cloud_properties.item_id = item_id;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_fingerprint_action; // For Enrollment
-    item->cloud_properties.value_type = value_type_fingerprint_action;      // ID only
+    item->cloud_properties.show = true;
+    item->cloud_properties.value_type = value_type_fingerprint_action; // ID only
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
 static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data)
 {
-    item->cloud_properties.show = true;
+    item->cloud_properties.item_id = item_id;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_fingerprint_ids; // For List
-    item->cloud_properties.value_type = value_type_array;                // Range
+    item->cloud_properties.show = true;
+    item->cloud_properties.value_type = value_type_array; // Range
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = item_id;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
@@ -204,7 +226,7 @@ static int __0066_prepare(void *arg)
                     __prepare_item_interface_properties(fingerprint_item_ids, cj_device);
                 }
 
-                if ((NULL == fingerprint_item_enroll) || (NULL == fingerprint_item_action) || (NULL == fingerprint_item_ids))
+                if ((NULL == fingerprint_item_enroll) && (NULL == fingerprint_item_action) && (NULL == fingerprint_item_ids))
                 {
                     ezlopi_device_free_device(fingerprint_device);
                     free(user_data);
@@ -228,9 +250,7 @@ static int __0066_init(l_ezlopi_item_t *item)
         if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO(user_data->intr_pin) && GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
         {
             gpio_num_t intr_pin = user_data->intr_pin;
-            TRACE_W("tx:%d ; rx%d ; intr:%d", item->interface.uart.tx, item->interface.uart.rx, intr_pin);
-
-            s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, uart_0066_fingerprint_upcall, item);
+            s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_0066_fingerprint_upcall, item);
             item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
 
             const gpio_config_t FingerPrint_intr_gpio_config = {
@@ -243,25 +263,32 @@ static int __0066_init(l_ezlopi_item_t *item)
 
             if (0 == gpio_config(&FingerPrint_intr_gpio_config))
             {
-                if (FINGERPRINT_OK != fingerprint_config(item))
+                if (FINGERPRINT_OK != r307_as606_fingerprint_config(item))
                 {
                     TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
                 }
                 else
                 {
-                    // user_data->opmode = MODE_DEFAULT;
-                    // user_data->user_id = USERID_DEFAULT;
-                    // user_data->id_counts = IDCOUNT_DEFAULT;
-                    Update_ID_status_list(item);
-                    xTaskCreate(Fingerprint_Operation_task, "Fingerprint_activation", 2048 * 2, item, 1, &(user_data->notifyHandler));
-
-                    // Now set a intr callback that triggers above 'Fingerprint_Operation_task', (according to the opmode)
-                    if (gpio_isr_handler_add(intr_pin, gpio_notify_isr, item)) // add -> gpio_isr_handle(pin_num)
+                    if (NULL == (user_data->notifyHandler))
                     {
-                        // disable -> gpio_isr_handle_remove(pin_num)
+                        TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
+                        xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", 2048 * 2, item, 1, &(user_data->notifyHandler));
+                    }
+                    if (gpio_isr_handler_add(intr_pin, gpio_notify_isr, item))
+                    {
                         TRACE_E("Error!! : Failed to add GPIO ISR handler.");
                         gpio_isr_handler_remove(intr_pin);
                     }
+
+                    const esp_timer_create_args_t esp_timer_create_args = {
+                        .callback = timer_callback,
+                        .arg = (void *)item,
+                        .name = "Enrollment timer"};
+                    if (0 == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
+                    {
+                        TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
+                    }
+
                     ret = 1;
                 }
             }
@@ -281,9 +308,9 @@ static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg)
     if (cj_result && item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id)
+        if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id) // enroll
         {
-            TRACE_E("op mode : %d", user_data->opmode);
+            TRACE_E("(get_cjson) op_mode : %d", user_data->opmode);
             if (user_data->opmode != FINGERPRINT_ENROLLMENT_MODE)
             {
                 cJSON_AddFalseToObject(cj_result, "value");
@@ -295,16 +322,15 @@ static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, "valueFormatted", "true");
             }
         }
-        else if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION] == item->cloud_properties.item_id)
+        else if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION] == item->cloud_properties.item_id) // match
         {
             cJSON *cj_value = cJSON_CreateObject();
-
             cJSON_AddNumberToObject(cj_value, "id", user_data->matched_id);
             cJSON_AddNumberToObject(cj_value, "confidence_level", user_data->matched_confidence_level);
             cJSON_AddItemToObject(cj_result, "value", cj_value);
             cJSON_AddStringToObject(cj_result, "valueFormatted", "");
         }
-        else if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS] == item->cloud_properties.item_id)
+        else if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS] == item->cloud_properties.item_id) // erase
         {
             cJSON_AddStringToObject(cj_result, "elementType", "int");
             cJSON *cj_value_array = cJSON_AddArrayToObject(cj_result, "value");
@@ -320,46 +346,16 @@ static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg)
         }
         else
         {
+            TRACE_W("HERE!! Match");
         }
         ret = 1;
     }
     return ret;
 }
 
-static void fingerprint_enroll_timeout_check(void *pv)
-{
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)pv;
-
-    if (item)
-    {
-        bool flag_break = false;
-        server_packet_t *uer_data = (server_packet_t *)item->user_arg;
-        for (uint32_t i = 0; i < 30; i++)
-        {
-            // TRACE_E("Here, tick: %d", i);
-            if (uer_data->opmode != FINGERPRINT_ENROLLMENT_MODE)
-            {
-                flag_break = true;
-                break;
-            }
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-        }
-        if (flag_break != true)
-        {
-            // TRACE_E("Here: %s", flag_break ? "true" : "false");
-            uer_data->opmode = FINGERPRINT_MATCH_MODE;
-            // ezlopi_device_value_updated_from_device_v3(item);
-            ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
-        }
-    }
-
-    vTaskDelete(NULL);
-}
-
 static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    static xTaskHandle *task_haldner = NULL;
     cJSON *cjson_params = (cJSON *)arg;
     if ((NULL != cjson_params) && (NULL != item))
     {
@@ -369,21 +365,32 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
             cJSON *cj_value_cmd = cJSON_GetObjectItem(cjson_params, "value");
             if (cj_value_cmd)
             {
+                TRACE_E("HERE!! enroll");
                 if (cJSON_IsTrue(cj_value_cmd)) // true conditon
                 {
-                    if (task_haldner == NULL)
-                    {
-                        xTaskCreate(fingerprint_enroll_timeout_check, "timeout_timer", 2048, item, 2, task_haldner);
-                    }
 
                     time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
                     user_data->opmode = FINGERPRINT_ENROLLMENT_MODE;
+
+                    /* Start the timers */
+                    esp_err_t _tm_state = esp_timer_start_periodic(user_data->timerHandler, 1000000);
+                    if (0 != _tm_state) // ESP_ERR_INVALID_STATE
+                    {
+                        TRACE_I("Restarting timer...");
+                        esp_timer_stop(user_data->timerHandler);
+                        esp_timer_start_periodic(user_data->timerHandler, 1000000);
+                    }
+                    else
+                    {
+                        TRACE_I("Starting timer...");
+                    }
                 }
                 else
                 {
                     user_data->opmode = FINGERPRINT_MATCH_MODE;
                 }
             }
+            // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
         }
         else if (sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS] == item->cloud_properties.item_id) // Set condition erase IDs
         {
@@ -394,35 +401,38 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                 uint16_t value_array_size = cJSON_GetArraySize(cj_value_ids);
                 if (value_array_size > 0)
                 {
-                    for (uint16_t i = 0; i < value_array_size; i++)
+                    TRACE_W("HERE!! erase specific");
+                    for (uint16_t i = 0; i < value_array_size; i++) // first protect => [2,4,5]
                     {
                         cJSON *fp_id = cJSON_GetArrayItem(cj_value_ids, i);
-                        for (uint16_t j = 1; j <= FINGERPRINT_MAX_CAPACITY_LIMIT; j++)
-                        {
-                            if ((j != fp_id->valueint) && (user_data->validity[j] == true))
-                            {
-                                user_data->opmode = FINGERPRINT_ERASE_WITH_IDS_MODE;
-                                user_data->user_id = j;
-                                xTaskNotifyGive(user_data->notifyHandler);
-                                vTaskDelay(1000 / portTICK_PERIOD_MS);
-                            }
-                        }
-                        user_data->user_id = 1;
-                        user_data->opmode = FINGERPRINT_MATCH_MODE;
+                        TRACE_I("Protected ID:[#%d]", (fp_id->valueint));
+                        user_data->protect[fp_id->valueint] = 1; // protect this ID -> 2/4/5
+                    }
+
+                    user_data->opmode = FINGERPRINT_ERASE_WITH_IDS_MODE;
+                    if (false == (user_data->__busy_guard))
+                    {
+                        user_data->__busy_guard = true;
+                        xTaskNotifyGive(user_data->notifyHandler); // activate the task
                     }
                 }
                 else
                 {
+                    TRACE_W("HERE!! erase all");
                     user_data->opmode = FINGERPRINT_ERASE_ALL_MODE;
-                    xTaskNotifyGive(user_data->notifyHandler);
+                    if (false == (user_data->__busy_guard))
+                    {
+                        user_data->__busy_guard = true;
+                        xTaskNotifyGive(user_data->notifyHandler); // activate the task
+                    }
                 }
             }
         }
+        ret = 1;
     }
     return ret;
 }
-
-static void uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void __uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
     char *temp_buf = (char *)malloc(256);
     if (NULL != temp_buf)
@@ -521,33 +531,20 @@ static void uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_h
     }
 }
 
-static void Fingerprint_Operation_task(void *params)
+static void __fingerprint_operation_task(void *params)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)
     {
         int uart_channel_num = item->interface.uart.channel;
-        static const time_t timeout_seconds = 30;
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
-
+        time(&user_data->timeout_start_time);   // !< reset the internal timer_start_time
+        r307_as606_update_id_status_list(item); // !< The best place to update after testing
         for (;;)
         {
             ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-            time_t now = 0;
-            time(&now);
-            if ((now - user_data->timeout_start_time) >= timeout_seconds)
-            {
-                if (user_data->opmode == FINGERPRINT_ENROLLMENT_MODE)
-                {
-                    user_data->opmode = FINGERPRINT_MATCH_MODE;
-                    TRACE_E("Here !!!");
-                    ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
-                }
-            }
-
-            gpio_isr_handler_remove(user_data->intr_pin);
             user_data->__busy_guard = true;
+            gpio_isr_handler_remove(user_data->intr_pin);
 
             switch (user_data->opmode)
             {
@@ -560,62 +557,54 @@ static void Fingerprint_Operation_task(void *params)
                 {
                     if (tempelate_count > 0)
                     {
-
                         for (uint16_t j = 1; j <= FINGERPRINT_MAX_CAPACITY_LIMIT; j++)
                         {
-                            user_data->user_id = j;
-                            if (Match_ID(item))
+                            if (true == user_data->validity[j]) // if user_id is occupied then only perform 'match_action'
                             {
-                                TRACE_B(
-                                    "                   >  Matched ID: [%d] ; Confidence : [%d]",
-                                    (user_data->user_id),
-                                    (user_data->confidence_level));
-                                user_data->matched_id = user_data->user_id;
-                                user_data->matched_confidence_level = user_data->confidence_level;
-                                user_data->matched_confidence_level = (((user_data->confidence_level) > (uint16_t)100) ? 100 : (user_data->confidence_level));
-                                //                                user_data->validity[user_data->user_id] = true;
-                                break;
-                            }
-                            else
-                            {
-                                user_data->matched_confidence_level = 0;
-                                user_data->matched_id = user_data->user_id;
+                                user_data->user_id = j;
+                                if (r307_as606_match_id(item))
+                                {
+                                    user_data->matched_id = user_data->user_id;
+                                    user_data->matched_confidence_level = (((user_data->confidence_level) > (uint16_t)100) ? 100 : (user_data->confidence_level));
+                                    TRACE_B(" ---->  Matched ID: [%d] ; Confidence : [%d]", (user_data->matched_id), (user_data->matched_confidence_level));
+                                    break;
+                                }
+                                else
+                                {
+                                    user_data->matched_id = user_data->user_id;
+                                    user_data->matched_confidence_level = 0;
+                                }
                             }
                         }
-
-                        vTaskDelay(200 / portTICK_PERIOD_MS);
                     }
                 }
                 else
                 {
-                    TRACE_E("No USER_ID left.... Please trigger [ENROLLMENT] mode");
+                    TRACE_E("No USER_ID found ; internal library is empty.... Please trigger [ENROLLMENT] mode to add fingerprint");
                 }
                 ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION]);
-                LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
-                user_data->user_id = temp_id; // --->> give to matched_id
 
+                user_data->user_id = temp_id;
+                LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
                 break;
             }
             case FINGERPRINT_ENROLLMENT_MODE:
             {
                 LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
 
-                uint16_t current_id = Find_immediate_vaccant_ID(item);
-
+                uint16_t current_id = r307_as606_find_immediate_vaccant_id(item);
                 if ((current_id) > 0)
                 {
-                    current_id = Enroll_Fingerprint(item);
+                    current_id = r307_as606_enroll_fingerprint(item);
                     if (0 != current_id)
                     {
                         if ((user_data->user_id) == current_id)
                         {
                             TRACE_B("RESULT:...Enrollment of user_id[%d].... process => Success", current_id);
-                            user_data->validity[user_data->user_id] = true;
 
                             user_data->opmode = FINGERPRINT_MATCH_MODE;
-                            TRACE_E("Here !");
+                            // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                             ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
-                            ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                         }
                         else
                         {
@@ -625,32 +614,59 @@ static void Fingerprint_Operation_task(void *params)
                 }
                 else
                 {
-                    TRACE_E("ALL user_id => occupied ; ... Try again with different_ID  or  Change to [default]: 'MATCH_MODE' ");
+                    TRACE_E("ALL user_id => occupied ; ... Delete IDs to enroll again.");
                 }
-                LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
 
+                LedControl(uart_channel_num, 1, (user_data->recieved_buffer), 200);
                 break;
             }
 
             case FINGERPRINT_ERASE_WITH_IDS_MODE:
             {
-                if (Erase_Specified_ID(item))
+                uint16_t temp_id = user_data->user_id;
+
+                for (uint16_t i = 1; i <= FINGERPRINT_MAX_CAPACITY_LIMIT; i++)
                 {
-                    user_data->validity[user_data->user_id] = false;
+                    if (0 == user_data->protect[i]) // first check if this ID is unprotected
+                    {
+                        if (true == user_data->validity[i]) // second check if the id is occupied
+                        {
+                            TRACE_W("DELETING ID[#%d]", i);
+                            user_data->user_id = i;
+                            if (r307_as606_erase_specified_id(item)) // then delete and update 'validity[]' status
+                            {
+                                TRACE_I(" Success... DELETED ID[#%d]", i);
+                                user_data->validity[i] = false;
+                            }
+                            else
+                            {
+                                TRACE_I(" Fail... NOT DELETED ID[#%d]", i);
+                            }
+                        }
+                    }
                 }
+                for (uint16_t i = 1; i <= FINGERPRINT_MAX_CAPACITY_LIMIT; i++)
+                {
+                    user_data->protect[i] = 0;
+                }
+
+                user_data->user_id = temp_id;
+                // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
+                user_data->opmode = FINGERPRINT_MATCH_MODE;
                 break;
             }
             case FINGERPRINT_ERASE_ALL_MODE:
             {
-                if (Erase_all_ID(item))
+                if (r307_as606_erase_all_id(item))
                 {
                     for (uint16_t i = 1; i <= FINGERPRINT_MAX_CAPACITY_LIMIT; i++)
                     {
                         user_data->validity[i] = false;
                     }
-                    TRACE_D("____ SENDING _____");
+                    TRACE_W("____ ERASE_ALL: SENDING _____");
                     // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                 }
+                user_data->opmode = FINGERPRINT_MATCH_MODE;
                 break;
             }
 
@@ -662,13 +678,10 @@ static void Fingerprint_Operation_task(void *params)
             }
             }
 
-            user_data->__busy_guard = false;
+            TRACE_I("     --->> Remove Finger; To activate next Task_notify <<----");
             gpio_isr_handler_add(user_data->intr_pin, gpio_notify_isr, item);
-
-            TRACE_B("           >> Remove finger  &  Wait => [2sec] ; To activate next Task_notify<<");
-            vTaskDelay(500 / portTICK_PERIOD_MS);
+            user_data->__busy_guard = false;
         }
     }
-
     vTaskDelete(NULL);
 }

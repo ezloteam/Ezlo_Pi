@@ -48,7 +48,7 @@
 // #define USERID_DEFAULT 1
 // #define IDCOUNT_DEFAULT 10
 
-#define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
+#define FINGERPRINT_MAX_CAPACITY_LIMIT 10                                  // !< Setting the max quantity of fingerprints allowed to be stored >
 #define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >
 #define MAX_PACKET_LENGTH_VAL 64                                           // !< Setting the max length of the transferring data package >
 #define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600) // !< Setting Baudrate for transferring data via uart >
@@ -104,33 +104,22 @@
 #define ACK_ERR_PRIM_IMG 0x15     //: fail to generate the image for the lackness of valid primary image;
 #define ACK_ERR_STORE 0x18        //: error when writing/storing template into flash library;
 #define ACK_ERR_WRNG_REGS 0x1A    //: wrong resgister number;
+#define ACK_ERR_CONFIG 0x1B       //: incorrect configuration of register;
+#define ACK_ERR_PAGE 0x1C         //: wrong notepad page number;
 #define ACK_ERR_OP_FAIL 0x1D      //: fail to operate the communication port;
+#define ACK_ERR_DUP_FP 0x45       //: Duplicate fingerprint
+
 #if 0
-// 0x1B //: incorrect configuration of register;
-// 0x1C //: wrong notepad page number;
-// 0x41 //: No finger on sensor when add fingerprint on second time.
-// 0x42 //: fail to enroll the finger for second fingerprint add.
-// 0x43 //: fail to generate character file due to lackness of character point or over-smallness of fingerprint image for second fingerprint add
-// 0x44 //: fail to generate character file due to the over-disorderly fingerprint image for second fingerprint add;
-// 0x45 //: Duplicate fingerprint
+// #define ACK_ERR_ 0x41 //: No finger on sensor when add fingerprint on second time.
+// #define ACK_ERR_ 0x42 //: fail to enroll the finger for second fingerprint add.
+// #define ACK_ERR_ 0x43 //: fail to generate character file due to lackness of character point or over-smallness of fingerprint image for second fingerprint add
+// #define ACK_ERR_ 0x44 //: fail to generate character file due to the over-disorderly fingerprint image for second fingerprint add;
 #endif
 //---------------------------------------------------------------------
 // !< BAUDRATE Baudrate_control_register
 #define FINGERPRINT_BAUDRATE_CONTROL 0x04 //!< Targets the baudrate control register
 #define FINGERPRINT_BAUDRATE_57600 0x06   //!< UART baud 57600
-#if 0
-// #define FINGERPRINT_BAUDRATE_9600 0x01 //!< UART baud 9600
-// #define FINGERPRINT_BAUDRATE_19200 0x02 //!< UART baud 19200
-// #define FINGERPRINT_BAUDRATE_28800 0x03  //!< UART baud 28800
-// #define FINGERPRINT_BAUDRATE_38400 0x04  //!< UART baud 38400
-// #define FINGERPRINT_BAUDRATE_48000 0x05 //!< UART baud 48000
-// #define FINGERPRINT_BAUDRATE_67200 0x07  //!< UART baud 67200
-// #define FINGERPRINT_BAUDRATE_76800 0x08  //!< UART baud 76800
-// #define FINGERPRINT_BAUDRATE_86400 0x09  //!< UART baud 86400
-// #define FINGERPRINT_BAUDRATE_96000 0x0A  //!< UART baud 96000
-// #define FINGERPRINT_BAUDRATE_105600 0x0B //!< UART baud 105600
-// #define FINGERPRINT_BAUDRATE_115200 0x0C //!< UART baud 115200
-#endif
+
 // !< BAUDRATE Security_control_register
 #define FINGERPRINT_SECURITY_LEVEL 0x05 //!< Targets the security level register
 #define FINGERPRINT_SECURITY_1 0x01     //!< Searching and matching security level 1
@@ -170,14 +159,14 @@
 #define UART_PORT_OFF (uint8_t)0 //!< Uart port is OFF
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom enum for status response after executing a command >
-typedef enum FINGERPRINT_STATUS_t
+typedef enum
 {
     FINGERPRINT_FAIL = 0,
     FINGERPRINT_OK,
-} FINGERPRINT_STATUS_t;
+} fingerprint_status_t;
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom enum indicating the current operation phase >
-typedef enum e_FINGERPRINT_OP_MODE_t
+typedef enum
 {
     FINGERPRINT_MATCH_MODE = 0,
     FINGERPRINT_ENROLLMENT_MODE,
@@ -185,7 +174,7 @@ typedef enum e_FINGERPRINT_OP_MODE_t
     FINGERPRINT_ERASE_WITH_IDS_MODE,
     FINGERPRINT_ERASE_ALL_MODE,
     FINGERPRINT_MODE_MAX
-} e_FINGERPRINT_OP_MODE_t;
+} e_fingerprint_op_mode_t;
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom tx-packet >
 typedef struct fingerprint_packet_t
@@ -198,24 +187,7 @@ typedef struct fingerprint_packet_t
     uint8_t chk_sum[2];
 } fingerprint_packet_t;
 //----------------------------------------------------------------------------------------------------------------
-// !< Custom structure to send as a reply to server (@ MATCH phase) >
-typedef struct server_packet_t
-{
-    e_FINGERPRINT_OP_MODE_t opmode; /*Hold current operation mode*/
-    uint16_t id_counts;             /*This is used as an information for list and erase operations*/
-    uint16_t user_id;               /*Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode'] */
-    uint16_t confidence_level;      /*0~100*/
-    uint16_t matched_id;                               /* Used to store most recently matched ID*/
-    uint16_t matched_confidence_level;                 /* Used to store most recently matched confidence*/
-    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];    /*This array store incomming uart message*/
-    volatile bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /*status of each ID [1~500]*/
-    bool __busy_guard;                                 /*Gaurd_flag used during notification actions*/
-    uint32_t intr_pin;                                 /* Stores custom interrupt pin num*/
-    time_t timeout_start_time;                         /* Variable to store immediate time value */
-    TaskHandle_t notifyHandler;
-    // TaskHandle_t timerHandle;
-} server_packet_t;
-
+// !< Custom item_ids >
 typedef enum
 {
     SENSOR_FP_ITEM_ID_ENROLL,
@@ -223,7 +195,30 @@ typedef enum
     SENSOR_FP_ITEM_ID_FP_IDS,
     SENSOR_FP_ITEM_ID_MAX,
 } e_sensor_fp_items_t;
-//---------- FUNCTIONS Defination for Fingerprint Library ------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------
+// !< Custom structure to send as a reply to server (@ MATCH phase) >
+typedef struct server_packet_t
+{
+    volatile e_fingerprint_op_mode_t opmode;                      /* Hold current operation mode*/
+    uint32_t intr_pin;                                            /* Stores custom interrupt pin num*/
+    uint16_t id_counts;                                           /* This is used as an information for list and erase operations*/
+    uint16_t user_id;                                             /* Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode']*/
+    uint16_t confidence_level;                                    /* 0~100*/
+    uint16_t matched_id;                                          /* Used to store most recently matched ID*/
+    uint16_t matched_confidence_level;                            /* Used to store most recently matched confidence*/
+    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];               /* This array store incomming uart message*/
+    volatile uint8_t protect[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /* Array that indicate which index to clear [ 1-> protect ]*/
+    volatile bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1];   /* status of each ID {1~500} ; [ true -> occupied]*/
+    volatile bool __busy_guard;                                   /* Gaurd_flag used during notification actions*/
+    time_t timeout_start_time;                                    /* Variable to store immediate time value*/
+    TaskHandle_t notifyHandler;                                   /* Notify handler*/
+    esp_timer_handle_t timerHandler;
+} server_packet_t;
+
+//-------------------------------------------------------------------------------------------------------------------
+//  FUNCTIONS Defination for Fingerprint Library
+//-------------------------------------------------------------------------------------------------------------------
+
 #if 0
 // bool UpImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 // bool DownImage(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
@@ -232,60 +227,277 @@ typedef enum
 // bool DownChar(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
 #endif
 
+/**
+ * @brief #### This function delete all the templates in the Flash library.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool Empty(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function mannually detecting finger and store the detected finger image in ImageBuffer.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool GenImg(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function mannually combine information of character files from CharBuffer1 and CharBuffer2 ; Then generate a template which is stored back in both CharBuffer1 and CharBuffer2.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool RegModel(int uart_channel_num, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function Turn Led ON/OFF .
+ *
+ * @param uart_channel_num(int): The UART channel number
+ * @param LED_state(bool): 1 => [ON] ; 0 => [0FF]
+ * @param recieved_buffer(uint8_t*): Holds the address to a uart_buffer with recieved and filtered message
+ * @param timeout(uint32_t): Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function mannually generate character file from the original finger image in ImageBuffer & store the file in [CharBuffer1 or CharBuffer2].
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t)CharBufferID: Character file buffer number [Chrbuff1 = 1h ; Chrbuff1 = 2h] // [NOTE : BufferID of CharBuffer1 and CharBuffer2 are 1h and 2h respectively. Other values (except 1h, 2h) would be processed as CharBuffer2]
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool Img2Tz(int uart_channel_num, uint8_t CharBufferID, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function return Total valid template number.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint16_t*)TempNum: Reads and Stores, current valid template number of the Module,in this address
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0] , *TempNum <= 0bxxx.
+ */
 bool ReadTempNum(int uart_channel_num, uint16_t *TempNum, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function Sets Module Address.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint32_t)new_address: New address of module
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool SetAdder(int uart_channel_num, uint32_t new_address, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function Verifyies Module handshaking password.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint32_t)the_password: Value as a password
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool VerifyPwd(int uart_channel_num, uint32_t the_password, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function executes precise matching of templates from CharBuffer1 and CharBuffer2.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint16_t*)InspectionScore: Holds the address to a buffer, which store the score after inpection-matching of templates in ChrBuffer-1&2
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0] , *InspectionScore <= XXXX.
+ */
 bool Match(int uart_channel_num, uint16_t *InspectionScore, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function Sets UART Port ON/OFF.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t)Control_code: Choose [ON/OFF] Uart_Port -> [1/0]
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool PortControl(int uart_channel_num, uint8_t Control_code, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function Reads System Parameters.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint16_t*)Status_bits: Holds the address to buffer, where extracted system's status bits gets stored
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0] ;  *Status_bits <= 0bxxxxxxxx0000.
+ */
 bool ReadSysPara(int uart_channel_num, uint16_t *Status_bits, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function mannually loads template at the specified (PageID) of Flash library to => template buffer [CharBuffer1/CharBuffer2].
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t)CharBufferID: Character file buffer number [Chrbuff1 = 1h ; Chrbuff1 = 2h]
+ * @param (uint16_t)PageID: PAGE_ID location of the template, inside Library [two bytes :- high byte (MSB) front & low byte (LSB) behind]
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function deletes a segment:-(N) templates of Flash library started from the specified location (or PageID).
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint16_t)PageID: (Start)Flash location of the template [two bytes :- high byte (MSB) front & low byte (LSB) behind]
+ * @param (uint16_t)TempCount: No of templates to delele.
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool Delete(int uart_channel_num, uint16_t PageID, uint16_t TempCount, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function mannually stores the template of specified buffer (Buffer1/Buffer2) at the designated location of Flash library.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t)CharBufferID: Character file buffer number [Chrbuff1 = 1h ; Chrbuff1 = 2h]
+ * @param (uint16_t)PageID: Flash location of the template [two bytes :- high byte (MSB) front & low byte (LSB) behind]
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool Store(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function Auto-collects fingeprint and matches the captured fingerprint with one stored in library.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint16_t*)PageID_ptr: This address points to value of Page_value(inside FingerPrint_library) of current matched fingerprint.
+ * @param (uint16_t*)MatchScore_ptr: This address points to the confidence_level of current matched fingerprint.
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0] , *PageID_ptr <= XXXX , *MatchScore_ptr <= XXXX.
+ */
 bool GR_Identify(int uart_channel_num, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function Sets System Parameters.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t)Parameter_Number: This value targets the parameter [Baud_rate_control:4 / Security_Level:5 / Data_package_length:6]
+ * @param (uint8_t)Parameter_Content: Choose the new setting for designated 'Parameter_Number'
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0]
+ */
 bool SetSysPara(int uart_channel_num, uint8_t Parameter_Number, uint8_t Parameter_content, uint8_t *recieved_buffer, uint32_t timeout);
 
+/**
+ * @brief #### This function searchs the whole finger library for the template that matches the one in CharBuffer1 or CharBuffer2. When found, PageID will be returned.
+ *
+ * @param (int)uart_channel_num: The UART channel number
+ * @param (uint8_t)CharBufferID: Character_file ID [Chrbuff1 = 1h ; Chrbuff1 = 2h], containing the template you want to search
+ * @param (uint16_t)StartPage: Searching start address [0~ max fingerprint capacity] (MSB first).
+ * @param (uint16_t)PageNum: Searching Quantity [0 ~ (N-1) max fingerprint capacity] (MSB first).
+ * @param (uint16_t*)PageID_ptr: This address will point to, value of Page_value(inside FingerPrint_library) of current matched fingerprint.
+ * @param (uint16_t*)MatchScore_ptr: This address will point to, the confidence_level of current matched fingerprint.
+ * @param (uint8_t*)recieved_buffer: Holds the address to a uart_buffer with recieved and filtered message
+ * @param (uint32_t)timeout: Timeout(N*1ms) for uart message polling
+ *
+ * @return succcess[>0] or failure[0] , *PageID_ptr <= XXXX , *MatchScore_ptr <= XXXX.
+ */
 bool Search(int uart_channel_num, uint8_t CharBufferID, uint16_t StartPage, uint16_t PageNum, uint16_t *PageID_ptr, uint16_t *MatchScore_ptr, uint8_t *recieved_buffer, uint32_t timeout);
 
 //-------------------------------------------------------------------------------------------------------------------
 // FUNCTIONS Defination for Operation modes
 //-------------------------------------------------------------------------------------------------------------------
-bool Match_ID(l_ezlopi_item_t *item);
 
-bool Erase_all_ID(l_ezlopi_item_t *item);
+/**
+ * @brief #### This function extracts fingerprint after interrupt signal and then
+ */
+bool r307_as606_match_id(l_ezlopi_item_t *item);
 
-bool Erase_Specified_ID(l_ezlopi_item_t *item);
+/**
+ * @brief #### This function erases fingerprint from internal libraray
+ *
+ */
+bool r307_as606_erase_all_id(l_ezlopi_item_t *item);
 
-bool Check_PAGEID_Empty(l_ezlopi_item_t *item);
+/**
+ * @brief #### This Function searches and erases specified range of IDs only.
+ */
+bool r307_as606_erase_specified_id(l_ezlopi_item_t *item);
 
-bool Update_ID_status_list(l_ezlopi_item_t *item);
+/**
+ * @brief #### This function checks the perticular USER/PAGE_ID .
+ * @return {true ==> empty} / {false == not empty}
+ */
+bool r307_as606_check_pageid_empty(l_ezlopi_item_t *item);
 
-uint16_t Enroll_Fingerprint(l_ezlopi_item_t *item);
+/**
+ * @brief #### This function Scans and update validity status of [1~500(max defined)] PAGE_IDs.
+ */
+bool r307_as606_update_id_status_list(l_ezlopi_item_t *item);
 
-uint16_t Find_immediate_vaccant_ID(l_ezlopi_item_t *item);
+/**
+ * @brief This function store only valid fingerprint, in vacant PAGEID
+ * @paragraph IF match_% < 20 ; storing takes place
+ * @paragraph IF match_% > 20 ; Duplicate_ID is returened *
+ * @return {0} => Unsucessful_cmds ; {same_id} => Successfully_stored ; {different_id} => Duplicate_ID
+ */
+uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t *item);
 
-FINGERPRINT_STATUS_t fingerprint_config(l_ezlopi_item_t *item);
+/**
+ * @brief #### This function finds immediate vaccant ID.
+ *
+ * @return {0 => vaccant IDs not found}
+ */
+uint16_t r307_as606_find_immediate_vaccant_id(l_ezlopi_item_t *item);
 
-bool Wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
+/**
+ * @brief This function Configure the fingerprint sensors
+ * @return {success => FINGERPRINT_OK} ; { fail => FINGERPRINT_FAIL}
+ */
+fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t *item);
+
+/**
+ * @brief #### This function checks if system is in free.
+ *
+ * @param (int)uart_channel_num: The uart channel number
+ * @param (uint32_t)timeout_ms: Timeout(N*1ms) for uart message polling
+ *
+ * @return [succcess='true'] & [failure='false']
+ */
+bool r307_as606_wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
 
 //-------------------------------------------------------------------------------------------------------------------
 int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);

@@ -428,15 +428,12 @@ static const char *test_device_constant_config =
     \"cmd\":3,\
     \"dev_detail\":[{\
                 \"dev_type\": 10,\
-                \"dev_name\": \"TCS230\",\
+                \"dev_name\": \"fingerprint\",\
                 \"id_room\": \"\",\
-                \"id_item\": 40,\
-                \"gpio1\": 25,\
-                \"gpio2\": 26,\
-                \"gpio3\": 12,\
-                \"gpio4\": 14,\
-                \"gpio5\": 13,\
-                \"gpio6\": 15\
+                \"id_item\": 66,\
+                \"gpio1\": 17,\
+                \"gpio2\": 16,\
+                \"gpio3\": 25\
             }\
     ],\
     \"dev_total\":1\
