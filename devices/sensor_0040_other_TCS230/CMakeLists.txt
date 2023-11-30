@@ -1,6 +1,6 @@
-# file(GLOB_RECURSE config_src "*.c")
+file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "TCS230.c" "sensor_0040_other_TCS230.c"
+idf_component_register(SRCS "${config_src}"
                     INCLUDE_DIRS "."
                     REQUIRES   trace 
                                 freertos

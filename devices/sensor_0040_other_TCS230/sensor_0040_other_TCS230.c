@@ -60,7 +60,7 @@ static void __tcs230_setup_gpio(gpio_num_t s0_pin,
     esp_err_t ret = ESP_FAIL;
     // Configure GPIO ouput pins (S0, S1, S2, S3 & Freq_scale) for TCS230.
     gpio_config_t output_conf;
-    output_conf.pin_bit_mask = (1ULL << s0_pin) | (1ULL << s1_pin) | (1ULL << s2_pin) | (1ULL << s3_pin) | (1ULL << gpio_output_en);
+    output_conf.pin_bit_mask = ((1ULL << s0_pin) | (1ULL << s1_pin) | (1ULL << s2_pin) | (1ULL << s3_pin) | (1ULL << gpio_output_en));
     output_conf.intr_type = GPIO_INTR_DISABLE;
     output_conf.mode = GPIO_MODE_OUTPUT;
     output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
@@ -93,7 +93,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_generic_sensor;
-    device->cloud_properties.subcategory = subcategory_gas;
+    device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -104,9 +104,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_rgbcolor;
+    item->cloud_properties.value_type = value_type_rgb;
     item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
-    item->cloud_properties.value_type = value_type_rgb;
     item->user_arg = user_data;
 }
 
@@ -168,19 +168,27 @@ static int __0040_init(l_ezlopi_item_t *item)
     if (item)
     {
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
-        __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
-                            user_data->TCS230_pin.gpio_s1,
-                            user_data->TCS230_pin.gpio_s2,
-                            user_data->TCS230_pin.gpio_s3,
-                            user_data->TCS230_pin.gpio_output_en,
-                            user_data->TCS230_pin.gpio_pulse_output);
-        TRACE_W("Entering Calibration Phase for 30 seconds.....");
+        if (GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s0) &&
+            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s1) &&
+            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s2) &&
+            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s3) &&
+            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_output_en) &&
+            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
+        {
+            __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
+                                user_data->TCS230_pin.gpio_s1,
+                                user_data->TCS230_pin.gpio_s2,
+                                user_data->TCS230_pin.gpio_s3,
+                                user_data->TCS230_pin.gpio_output_en,
+                                user_data->TCS230_pin.gpio_pulse_output);
+            TRACE_W("Entering Calibration Phase for 30 seconds.....");
 
-        // configure Freq_scale at 20%
-        tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
+            // configure Freq_scale at 20%
+            tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
 
-        // activate a task to calibrate data
-        xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
+            // activate a task to calibrate data
+            xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
+        }
         ret = 1;
     }
     return ret;
@@ -214,17 +222,23 @@ static int __0040_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        uint32_t red = user_data->red_mapped;
+        uint32_t green = user_data->green_mapped;
+        uint32_t blue = user_data->blue_mapped;
         bool valid_status = get_tcs230_sensor_value(item); // Informs and updates if valid data
         if (valid_status)
         {
-            // now using the data_stored within "USER_ARG"
-            TRACE_I("---------------------------------------");
-            TRACE_I("Red : %d", user_data->red_mapped);
-            TRACE_I("Green :%d", user_data->green_mapped);
-            TRACE_I("Blue : %d", user_data->blue_mapped);
-            TRACE_I("---------------------------------------");
-
-            ezlopi_device_value_updated_from_device_v3(item);
+            if (fabs(red - user_data->red_mapped) > 10 ||
+                fabs(green - user_data->green_mapped) > 10 ||
+                fabs(blue - user_data->blue_mapped) > 10)
+            {
+                TRACE_I("---------------------------------------");
+                TRACE_I("Red : %d", user_data->red_mapped);
+                TRACE_I("Green :%d", user_data->green_mapped);
+                TRACE_I("Blue : %d", user_data->blue_mapped);
+                TRACE_I("---------------------------------------");
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
     }
     return ret;
@@ -233,7 +247,7 @@ static int __0040_notify(l_ezlopi_item_t *item)
 //------------------------------------------------------------------------------
 static void __tcs230_calibration_task(void *params) // calibration task
 {
-    // vTaskDelay(4000 / portTICK_PERIOD_MS); // 4sec
+    vTaskDelay(4000 / portTICK_PERIOD_MS); // 4sec
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (item)
     { // extracting the 'user_args' from "item"

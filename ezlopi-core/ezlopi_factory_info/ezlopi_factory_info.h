@@ -427,12 +427,16 @@ static const char *test_device_constant_config =
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-                \"dev_name\": \"HX711_loadcell\",\
                 \"dev_type\": 10,\
-                \"id_item\": 47,\
+                \"dev_name\": \"TCS230\",\
                 \"id_room\": \"\",\
-                \"gpio1\": 18,\
-                \"gpio2\": 19\
+                \"id_item\": 40,\
+                \"gpio1\": 25,\
+                \"gpio2\": 26,\
+                \"gpio3\": 12,\
+                \"gpio4\": 14,\
+                \"gpio5\": 13,\
+                \"gpio6\": 15\
             }\
     ],\
     \"dev_total\":1\

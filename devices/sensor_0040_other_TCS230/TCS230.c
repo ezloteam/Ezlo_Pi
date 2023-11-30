@@ -207,7 +207,7 @@ bool tcs230_set_frequency_scaling(l_ezlopi_item_t *item, e_TCS230_freq_scaling_t
     }
     return ret;
 }
-
+#if 0
 // function to calibrate the data for 30 seconds
 void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output, int32_t *least_color_timeP, int32_t *most_color_timeP)
 {
@@ -216,10 +216,10 @@ void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_p
     *most_color_timeP = 1000;
     for (uint8_t x = 0; x <= 100; x++) // 50ms * 100 = 10sec
     {
-        if (x % 10 == 0)
-        {
-            TRACE_W(".....................................................%d", x);
-        }
+        // if (x % 10 == 0)
+        // {
+        //     TRACE_W(".....................................................%d", x);
+        // }
         //--------------------------------------------------
         ESP_ERROR_CHECK(gpio_set_level(gpio_output_en, 1));
         Extract_TCS230_Pulse_Period_func(gpio_pulse_output, &Period); // stalls for 10 queue to be filled // 10ms delay
@@ -244,6 +244,7 @@ void calculate_max_min_color_values(gpio_num_t gpio_output_en, gpio_num_t gpio_p
         TRACE_E("Calibration............. failed");
     }
 }
+#endif
 
 bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
 {
@@ -262,7 +263,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
                                &Red_period,                                     // src_var
                                _TCS230_user_data->calib_data.most_red_timeP,    // calib paramter
                                _TCS230_user_data->calib_data.least_red_timeP);  // calib paramter
-        TRACE_E("RED => %d....", _TCS230_user_data->red_mapped);
+        // TRACE_E("RED => %d....", _TCS230_user_data->red_mapped);
         //--------------------------------------------------
 
         int32_t Green_period = 0;
@@ -274,7 +275,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
                                &Green_period,
                                _TCS230_user_data->calib_data.most_green_timeP,
                                _TCS230_user_data->calib_data.least_green_timeP);
-        TRACE_I("GREEN => %d....", _TCS230_user_data->green_mapped);
+        // TRACE_I("GREEN => %d....", _TCS230_user_data->green_mapped);
         //--------------------------------------------------
 
         int32_t Blue_period = 0;
@@ -286,11 +287,11 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
                                &Blue_period,
                                _TCS230_user_data->calib_data.most_blue_timeP,
                                _TCS230_user_data->calib_data.least_blue_timeP);
-        TRACE_B("\t\t BLUE => %d....", _TCS230_user_data->blue_mapped);
+        // TRACE_B("\t\t BLUE => %d....", _TCS230_user_data->blue_mapped);
         //--------------------------------------------------
 
         ESP_ERROR_CHECK(gpio_set_level(_TCS230_user_data->TCS230_pin.gpio_output_en, 0));
-        TRACE_B("------------------------------------------------------");
+        // TRACE_B("------------------------------------------------------");
     }
     return true;
 }
