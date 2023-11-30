@@ -11,7 +11,7 @@
 
 typedef struct s_fc28_data
 {
-    float hum_val;
+    int hum_val;
 } s_fc28_data_t;
 
 static int __0041_prepare(void *arg);
@@ -152,10 +152,10 @@ static int __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->hum_val);
+            char *valueFormatted = ezlopi_valueformatter_int(user_data->hum_val);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", (user_data->hum_val));
-            // TRACE_I("soil moisture  : %.2f", user_data->hum_val);
+            // TRACE_I("soil moisture  : %d", user_data->hum_val);
             free(valueFormatted);
             ret = 1;
         }
@@ -172,9 +172,9 @@ static int __0041_notify(l_ezlopi_item_t *item)
         s_ezlopi_analog_data_t ezlopi_adc_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_adc_data);
 
-        float new_hum = (((float)(4095.0f - (ezlopi_adc_data.value)) / 4095.0f) * 100);
+        int new_hum = ((int)((4095.0f - (ezlopi_adc_data.value)) / 4095.0f) * 100);
 
-        if (fabs((user_data->hum_val) - new_hum) > 5) // percent
+        if (fabs((user_data->hum_val) - new_hum) > 0.5) // percent
         {
             user_data->hum_val = new_hum;
             ezlopi_device_value_updated_from_device_v3(item);
