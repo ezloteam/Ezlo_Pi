@@ -1,3 +1,4 @@
+#include "esp_err.h"
 #include "math.h"
 #include "trace.h"
 #include "ezlopi_i2c_master.h"
@@ -8,9 +9,13 @@ static esp_err_t activate_set_reset_period(l_ezlopi_item_t *item)
     esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        uint8_t write_buffer[] = {GY271_SET_RESET_PERIOD_REGISTER, GY271_DEFAULT_SET_RESET_PERIOD}; // REG_INTR_STATUS;
-        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        // soft reset
+        uint8_t write_buffer1[2] = {0x0A, 0x80};
+        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer1, 2);
+        uint8_t write_buffer2[2] = {GY271_SET_RESET_PERIOD_REGISTER, GY271_DEFAULT_SET_RESET_PERIOD}; // REG_INTR_STATUS;
+        // uint8_t write_buffer2[2] = {0x0B, 0x01}; // REG_INTR_STATUS;
+        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer2, 2);
+        // vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     return ret;
 }
@@ -19,9 +24,10 @@ static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item)
     esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        uint8_t write_byte[] = {GY271_CONTROL_REGISTER_1, GY271_OPERATION_MODE};
-        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        uint8_t write_buffer[2] = {GY271_CONTROL_REGISTER_1, GY271_OPERATION_MODE1};
+        // uint8_t write_buffer[2] = {0x09, 0x45};
+        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
+        // vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     return ret;
 }
@@ -30,9 +36,10 @@ static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item)
     esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        uint8_t write_byte[] = {GY271_CONTROL_REGISTER_2, GY271_INT_EN};
-        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        uint8_t write_buffer[2] = {GY271_CONTROL_REGISTER_2, GY271_OPERATION_MODE2};
+        // uint8_t write_buffer[2] = {0x0A, 0x40};
+        ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
+        // vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     return ret;
 }
@@ -65,7 +72,7 @@ static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *u
 }
 
 // function to check for INTR bit [in 0x06H], before any data extraction is done from data registers
-static esp_err_t __gy271_check_INTR(l_ezlopi_item_t *item, uint8_t *temp)
+static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp)
 {
     esp_err_t err = ESP_OK;
     // Must request INTR_REG
@@ -86,16 +93,26 @@ static esp_err_t __gy271_check_INTR(l_ezlopi_item_t *item, uint8_t *temp)
 
 int __gy271_configure(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        vTaskDelay(100 / portTICK_PERIOD_MS); // 100 ms
-        ESP_ERROR_CHECK_WITHOUT_ABORT(activate_set_reset_period(item));
-        ESP_ERROR_CHECK_WITHOUT_ABORT(set_to_measure_mode(item));
-        ESP_ERROR_CHECK_WITHOUT_ABORT(enable_data_ready_interrupt(item));
-        ret = 1;
+        if (ESP_OK == activate_set_reset_period(item))
+        {
+            TRACE_I("DONE CONFIG1");
+            ret = ESP_OK;
+        }
+        if (ESP_OK == set_to_measure_mode(item))
+        {
+            TRACE_I("DONE CONFIG2");
+            ret = ESP_OK;
+        }
+        if (ESP_OK == enable_data_ready_interrupt(item))
+        {
+            TRACE_I("DONE CONFIG3");
+            ret = ESP_OK;
+        }
     }
-    return ret;
+    return (int)ret;
 }
 
 bool __gy271_update_value(l_ezlopi_item_t *item)
@@ -103,15 +120,15 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
     bool valid_data = false;
     if (item)
     {
-        static s_gy271_raw_data_t RAW_DATA = {0};
-        static uint8_t tmp_buf[REG_COUNT_LEN] = {0}; // axis
-        static uint8_t buffer_0, buffer_1;           // tempr
-        uint8_t Check_Register;
-        uint8_t address_val;
+        s_gy271_raw_data_t RAW_DATA = {0};
+        uint8_t buffer_0, buffer_1;     // tempr
+        uint8_t tmp_buf[REG_COUNT_LEN]; // axis
+        uint8_t Check_Register = 0;
+        uint8_t address_val = 0;
         esp_err_t err = ESP_OK;
         // Read specified FIFO buffer size (depends on configuration set)g
 
-        if (ESP_OK == (err = __gy271_check_INTR(item, &Check_Register)))
+        if (ESP_OK == (err = __gy271_check_status(item, &Check_Register)))
         {
 
             // if 'bit0' in INTR register is set ; then read procced to read :- magnetometer registers
@@ -129,37 +146,46 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
-                TRACE_W(" 2. {%#x}", Check_Register);
-                TRACE_W(" 2.  ****** DOR bit set.n *******...");
-                if ((0 != Check_Register) | (1 != Check_Register))
-                {
-                    valid_data = false;
-                }
+                TRACE_W(" 2.  ****** DOR bit reset *******...");
+                TRACE_W(" 2.  Status :- after DOR reset {%#x}", Check_Register);
             }
+
             if (Check_Register & GY271_DATA_READY_FLAG)
             {
-                TRACE_W(" 2. Check_reg_val @ 0x00H: {%#x}", Check_Register);
-                TRACE_I(" 2. 00H reading started....");
-                // read the axis data
-                for (uint8_t i = 0; i < (REG_COUNT_LEN); i += 2)
-                {
-                    // GY271_DATA_X_LSB_REGISTER = 0x00
-                    address_val = (GY271_DATA_X_LSB_REGISTER + i);
-                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf + i), 1);
-                    // GY271_DATA_X_LSB_REGISTER = 0x00 +1
-                    address_val = (GY271_DATA_X_LSB_REGISTER + i + 1);
-                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf + i + 1), 1);
-                }
-                // read temperature data
+                TRACE_W(" 2. Before temperature @ 0x06H: {%#x}", Check_Register);
                 address_val = GY271_DATA_TEMP_LSB_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&buffer_0), 1);
                 address_val = GY271_DATA_TEMP_MSB_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&buffer_1), 1);
+
+                // check status after reading temperature
+                address_val = GY271_STATUS_REGISTER;
+                ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
+                TRACE_W(" 2. After temperature @ 0x06H: {%#x}", Check_Register);
+
+                TRACE_I(" 2. [00~05H] reading started....");
+                // read the axis data
+                address_val = (GY271_DATA_X_LSB_REGISTER);
+                ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), REG_COUNT_LEN);
+
+                // for (uint8_t i = 0; i < (REG_COUNT_LEN); i += 2)
+                // {
+                //     // GY271_DATA_X_LSB_REGISTER = 0x00
+                //     address_val = (GY271_DATA_X_LSB_REGISTER + i);
+                //     ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                //     ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf + i), 1);
+                //     // GY271_DATA_X_LSB_REGISTER = 0x00 +1
+                //     address_val = (GY271_DATA_X_LSB_REGISTER + i + 1);
+                //     ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                //     ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf + i + 1), 1);
+                // }
+                // read temperature data
                 // now read the status byte 0x06H
+
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
@@ -206,13 +232,13 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
         uint8_t Check_Register;
         uint8_t address_val;
         esp_err_t err = ESP_OK;
-        if (ESP_OK == (err = __gy271_check_INTR(item, &Check_Register)))
+        if (ESP_OK == (err = __gy271_check_status(item, &Check_Register)))
         {
             // if 'bit0' in INTR register is set ; then read procced to read :- magnetometer registers
             if (Check_Register == GY271_DATA_SKIP_FLAG)
             {
                 // TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val : {%#x}", Check_Register);
-                // TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit set..**********...");
+                TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit set..**********...");
                 address_val = (GY271_DATA_Z_LSB_REGISTER);
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&buffer_0), 1);
@@ -223,31 +249,37 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
-                // TRACE_W(" 1.{%#x}", Check_Register);
-                // TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit set..**********...");
+                TRACE_W(" 1. FIRST_INIT_CALIB :--*********- DOR bit reset **********...");
+                TRACE_W(" 1. Status :- after DOR reset {%#x}", Check_Register);
             }
             if (Check_Register & GY271_DATA_READY_FLAG)
             {
-                // TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x00H: {%#x}", Check_Register);
-                TRACE_I(" 1. FIRST_INIT_CALIB :--- 00H reading started....");
+                TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x06H: {%#x}", Check_Register);
+                TRACE_I(" 1. FIRST_INIT_CALIB :--- [00~05H] reading started....");
                 // read the axis data
-                for (uint8_t i = 0; i < (REG_COUNT_LEN); i += 2)
-                {
-                    // GY271_DATA_X_LSB_REGISTER = 0x00
-                    address_val = (GY271_DATA_X_LSB_REGISTER + i);
-                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (cal_tmp_buf + i), 1);
-                    // GY271_DATA_X_LSB_REGISTER = 0x00 +1
-                    address_val = (GY271_DATA_X_LSB_REGISTER + i + 1);
-                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (cal_tmp_buf + i + 1), 1);
-                }
+
+                address_val = (GY271_DATA_X_LSB_REGISTER);
+                ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (cal_tmp_buf), REG_COUNT_LEN);
+
+                // for (uint8_t i = 0; i < (REG_COUNT_LEN); i += 2)
+                // {
+                //     // GY271_DATA_X_LSB_REGISTER = 0x00
+                //     address_val = (GY271_DATA_X_LSB_REGISTER + i);
+                //     ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                //     ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (cal_tmp_buf + i), 1);
+                //     // GY271_DATA_X_LSB_REGISTER = 0x00 +1
+                //     address_val = (GY271_DATA_X_LSB_REGISTER + i + 1);
+                //     ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                //     ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (cal_tmp_buf + i + 1), 1);
+                // }
+
                 // now read the status byte 0x06H
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
                 TRACE_I(" 1. FIRST_INIT_CALIB :--- 06H reading ended....");
-                // TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x06H : {%#x}", Check_Register);
+                TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x06H : {%#x}", Check_Register);
             }
         }
         else

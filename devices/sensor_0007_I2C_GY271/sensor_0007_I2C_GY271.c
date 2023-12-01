@@ -42,7 +42,12 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        static uint8_t cnt;
+        if (cnt++ > 1)
+        {
+            ret = __notify(item);
+            cnt = 0;
+        }
         break;
     }
     default:
@@ -188,10 +193,10 @@ static int __init(l_ezlopi_item_t *item)
         ezlopi_i2c_master_init(&item->interface.i2c_master);
         TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
         TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
-        if (__gy271_configure(item))
+        if (0 == __gy271_configure(item))
         {
-            TRACE_W("Gathering Max-Min values for 2min.....");
-            xTaskCreate(&__gy271_calibration_task, "GY271_Calibration_Task", 2*2048, item, 1, NULL);
+            TRACE_W("Calibrating.....");
+            xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
         }
     }
     return ret;
@@ -263,18 +268,22 @@ static int __notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
-        float prev_X = user_data->X;
-        float prev_Y = user_data->Y;
-        float prev_Z = user_data->Z;
-        float prev_T = user_data->T;
-        int prev_azimuth = user_data->azimuth;
-        if (__gy271_update_value(item))
+        if (user_data->calibration_complete)
         {
-            if ((prev_X != user_data->X) || (prev_Y != user_data->Y) || (prev_Z != user_data->Z) || (prev_azimuth != user_data->azimuth) || (prev_T != user_data->T))
+            float prev_X = user_data->X;
+            float prev_Y = user_data->Y;
+            float prev_Z = user_data->Z;
+            float prev_T = user_data->T;
+            int prev_azimuth = user_data->azimuth;
+            if (__gy271_update_value(item))
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                if ((prev_X != user_data->X) || (prev_Y != user_data->Y) || (prev_Z != user_data->Z) || (prev_azimuth != user_data->azimuth) || (prev_T != user_data->T))
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
+
         ret = 1;
     }
     return ret;
@@ -291,7 +300,7 @@ static void __gy271_calibration_task(void *params) // calibrate task
                                      {0, 0}}; // zmin,zmax// Initialization added!
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
 
-        vTaskDelay(5000 / portTICK_PERIOD_MS); // 5 sec
+        // vTaskDelay(3000 / portTICK_PERIOD_MS); // 3 sec
         for (uint16_t i = 0; i <= 100; i++)
         {
             // call the data gathering function [100 * 20 ms = 20 sec]

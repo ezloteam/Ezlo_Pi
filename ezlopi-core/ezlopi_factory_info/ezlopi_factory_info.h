@@ -414,8 +414,8 @@ static const char *test_device_constant_config =
             \"dev_name\": \"GY271\",\
             \"id_room\": \"\",\
             \"id_item\": 7,\
-            \"gpio_sda\": 1,\
-            \"gpio_scl\": 2,\
+            \"gpio_sda\": 18,\
+            \"gpio_scl\": 19,\
             \"pullup_scl\": true,\
             \"pullup_sda\": true,\
             \"slave_addr\": 13\
@@ -428,12 +428,12 @@ static const char *test_device_constant_config =
     \"cmd\":3,\
     \"dev_detail\":[{\
                 \"dev_type\": 10,\
-                \"dev_name\": \"fingerprint\",\
+                \"dev_name\": \"Hall_effect\",\
                 \"id_room\": \"\",\
-                \"id_item\": 66,\
-                \"gpio1\": 17,\
-                \"gpio2\": 16,\
-                \"gpio3\": 25\
+                \"id_item\": 18,\
+                \"gpio1\": 36,\
+                \"gpio2\": 0,\
+                \"gpio3\": 0\
             }\
     ],\
     \"dev_total\":1\

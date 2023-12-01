@@ -16,6 +16,7 @@
 #include "sensor_0015_oneWire_DHT11.h"
 #include "sensor_0016_oneWire_DHT22.h"
 #include "sensor_0017_ADC_potentiometer.h"
+#include "sensor_0018_other_internal_hall_effect.h"
 #include "sensor_0019_digitalIn_PIR.h"
 #include "sensor_0020_other_2axis_joystick.h"
 #include "sensor_0021_UART_MB1013.h"

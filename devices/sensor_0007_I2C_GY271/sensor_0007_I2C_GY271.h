@@ -59,12 +59,20 @@
 //  e.g:-
 //  OSR  = 01 [256]
 //  RNG  = 00 [+-2G]    with 12000 LSB/G
-//  ODR  = 00 [10Hz]
+//  ODR  = 01 [50Hz]
 //  MODE = 01 [continous]
-#define GY271_OPERATION_MODE (GY271_OSR_256) | (GY271_RNG_2G) | (GY271_ODR_10hz) | (GY271_MODE_CONT)
+#define GY271_OPERATION_MODE1 ((GY271_OSR_256) | (GY271_RNG_2G) | (GY271_ODR_50hz) | (GY271_MODE_CONT))
 
 // Enable INTERUPT bit from control register2 [in 0x0A] + Masked Bits.
-#define GY271_INT_EN (0x00)
+#define GY271_INT_EN_PIN (0x00)
+#define GY271_INT_DISABLE_PIN (1 << 0)
+// Enable roll point in control2
+#define GY271_ROL_PNT_EN (1 << 6)
+
+// Control Register 2 : - setup
+#define GY271_OPERATION_MODE2 (GY271_INT_EN_PIN) // | (GY271_ROL_PNT_EN)
+
+// Enable roll-over function ; data pointer automatically rolls between 00H ~ 06H, if I2C read begins at any address
 
 // Data ready flag [Masked Bit0] in "{STATUS_REGISTER - 06H}"
 #define GY271_DATA_READY_FLAG (1 << 0)
