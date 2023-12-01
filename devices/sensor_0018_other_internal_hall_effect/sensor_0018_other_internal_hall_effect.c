@@ -1,4 +1,5 @@
 
+
 #include "sdkconfig.h"
 
 #ifdef CONFIG_IDF_TARGET_ESP32
@@ -263,4 +264,4 @@ static void __hall_calibration_task(void *params) // calibrate task
     vTaskDelete(NULL);
 }
 
-#endif
+#endif // CONFIG_IDF_TARGET_ESP32
