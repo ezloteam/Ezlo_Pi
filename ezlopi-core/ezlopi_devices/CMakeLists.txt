@@ -56,22 +56,22 @@ idf_component_register(SRCS "ezlopi_controller.c" "ezlopi_devices.c" "ezlopi_dev
                                 sensor_0046_ADC_ACS712_05B_currentmeter
 
                                 sensor_0047_other_HX711_loadcell
-                                # sensor_0048_other_MQ4_CH4_detector
-                                # sensor_0049_other_MQ2_LPG_detector
-                                # sensor_0050_other_MQ3_alcohol_detector
-                                # sensor_0051_other_MQ8_H2_detector
-                                # sensor_0052_other_MQ135_NH3_detector
-                                # sensor_0053_UART_GYGPS6MV2
-                                # sensor_0054_PWM_YFS201_flowmeter
-                                # sensor_0055_ADC_FlexResistor
-                                # sensor_0056_ADC_Force_Sensitive_Resistor                                
-                                # sensor_0057_other_KY026_FlameDetector
-                                # sensor_0059_other_MQ6_LPG_detector
-                                # sensor_0060_digitalIn_vibration_detector
-                                # sensor_0061_digitalIn_reed_switch
-                                # sensor_0062_other_MQ7_CO_detector
-                                # sensor_0063_other_MQ9_LPG_flameable_detector
-                                # sensor_0065_digitalIn_float_switch
+                                sensor_0048_other_MQ4_CH4_detector
+                                sensor_0049_other_MQ2_LPG_detector
+                                sensor_0050_other_MQ3_alcohol_detector
+                                sensor_0051_other_MQ8_H2_detector
+                                sensor_0052_other_MQ135_NH3_detector
+                                sensor_0053_UART_GYGPS6MV2
+                                sensor_0054_PWM_YFS201_flowmeter
+                                sensor_0055_ADC_FlexResistor
+                                sensor_0056_ADC_Force_Sensitive_Resistor                                
+                                sensor_0057_other_KY026_FlameDetector
+                                sensor_0059_other_MQ6_LPG_detector
+                                sensor_0060_digitalIn_vibration_detector
+                                sensor_0061_digitalIn_reed_switch
+                                sensor_0062_other_MQ7_CO_detector
+                                sensor_0063_other_MQ9_LPG_flameable_detector
+                                sensor_0065_digitalIn_float_switch
                                 sensor_0066_other_R307_FingerPrint
                                 )
 

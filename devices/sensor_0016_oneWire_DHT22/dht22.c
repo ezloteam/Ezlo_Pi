@@ -21,6 +21,8 @@
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
+#ifdef CONFIG_IDF_TARGET_ESP32C3
+
 // #include "esp_log.h"
 #include "driver/gpio.h"
 #if CONFIG_IDF_TARGET_ESP32S3
@@ -244,3 +246,5 @@ int readDHT22()
     else
         return DHT_CHECKSUM_ERROR;
 }
+
+#endif // CONFIG_IDF_TARGET_ESP32C3

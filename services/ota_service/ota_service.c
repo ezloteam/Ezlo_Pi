@@ -15,7 +15,7 @@ static void ota_service_process(void *pv);
 
 void ota_service_init(void)
 {
-    xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
+    // xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
 }
 static void ota_service_process(void *pv)
 {
