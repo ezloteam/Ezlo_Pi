@@ -81,12 +81,14 @@ int sensor_0018_other_internal_hall_effect(e_ezlopi_actions_t action, l_ezlopi_i
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name)
     ASSIGN_DEVICE_NAME_V2(device, device_name);
-
+    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_door;
     device->cloud_properties.device_type = dev_type_doorlock;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
 }
 
 static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
@@ -230,7 +232,7 @@ static int __notify(l_ezlopi_item_t *item)
 #endif
             TRACE_D(" Hall door value ; %d", sensor_data);
 
-            curret_value = ((fabs(user_data->Custom_stable_val - sensor_data) > 25) ? "dw_is_closed" : "dw_is_opened");
+            curret_value = ((fabs(user_data->Custom_stable_val - sensor_data) > 35) ? "dw_is_closed" : "dw_is_opened");
 
             if (curret_value != user_data->hall_state) // calls update only if there is change in state
             {
@@ -263,4 +265,4 @@ static void __hall_calibration_task(void *params) // calibrate task
     vTaskDelete(NULL);
 }
 
-#endif
+#endif // CONFIG_IDF_TARGET_ESP32

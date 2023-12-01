@@ -19,7 +19,9 @@ EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid", 16, sensor_0016_oneWire_DHT
 
 EZLOPI_DEVICE_LIST("sensor-potentiometer-ADC", 17, sensor_0017_ADC_potentiometer)
 
+#ifdef CONFIG_IDF_TARGET_ESP32
 EZLOPI_DEVICE_LIST("sensor-Hall-effect", 18, sensor_0018_other_internal_hall_effect)
+#endif //CONFIG_IDF_TARGET_ESP32
 
 EZLOPI_DEVICE_LIST("sensor-PIR-digital-proximity", 19, sensor_0019_digitalIn_PIR)
 
