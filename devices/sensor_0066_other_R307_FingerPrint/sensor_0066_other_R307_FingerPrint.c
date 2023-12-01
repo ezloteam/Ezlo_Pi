@@ -603,7 +603,7 @@ static void __fingerprint_operation_task(void *params)
                             TRACE_B("RESULT:...Enrollment of user_id[%d].... process => Success", current_id);
 
                             user_data->opmode = FINGERPRINT_MATCH_MODE;
-                            // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
+                            ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                             ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
                         }
                         else
@@ -651,7 +651,7 @@ static void __fingerprint_operation_task(void *params)
                 }
 
                 user_data->user_id = temp_id;
-                // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
+                ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                 user_data->opmode = FINGERPRINT_MATCH_MODE;
                 break;
             }
@@ -664,7 +664,7 @@ static void __fingerprint_operation_task(void *params)
                         user_data->validity[i] = false;
                     }
                     TRACE_W("____ ERASE_ALL: SENDING _____");
-                    // ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
+                    ezlopi_device_value_updated_from_device_item_id_v3(sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS]);
                 }
                 user_data->opmode = FINGERPRINT_MATCH_MODE;
                 break;
