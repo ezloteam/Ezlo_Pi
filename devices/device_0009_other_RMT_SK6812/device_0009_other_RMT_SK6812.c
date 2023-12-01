@@ -207,19 +207,32 @@ static int __init(l_ezlopi_item_t *item)
             dimmer_args->sk6812_strip.channel = RMT_CHANNEL_0;
 
             led_strip_install();
-            ESP_ERROR_CHECK(led_strip_init(&dimmer_args->sk6812_strip));
-            rgb_t color = {
-                .red = 255,
-                .green = 255,
-                .blue = 255,
-            };
-            led_strip_fill(&dimmer_args->sk6812_strip, 0, &dimmer_args->sk6812_strip.length, color);
-            led_strip_set_brightness(&dimmer_args->sk6812_strip, 255);
-            ESP_ERROR_CHECK(led_strip_flush(&dimmer_args->sk6812_strip));
+            esp_err_t err = led_strip_init(&dimmer_args->sk6812_strip);
+            if (ESP_OK == err)
+            {
+                rgb_t color = {
+                    .red = 255,
+                    .green = 255,
+                    .blue = 255,
+                };
 
-            dimmer_args->sk6812_led_strip_initialized = true;
+                err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, &dimmer_args->sk6812_strip.length, color);
+                err |= led_strip_set_brightness(&dimmer_args->sk6812_strip, 255);
+                err |= led_strip_flush(&dimmer_args->sk6812_strip);
+
+                if (ESP_OK == err)
+                {
+                    dimmer_args->sk6812_led_strip_initialized = true;
+                }
+            }
+
+            if (ESP_OK != err)
+            {
+                ezlopi_device_free_device_by_item(item);
+            }
         }
     }
+
     return ret;
 }
 

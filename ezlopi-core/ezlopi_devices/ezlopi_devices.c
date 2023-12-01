@@ -102,6 +102,28 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device)
     }
 }
 
+void ezlopi_device_free_device_by_item(l_ezlopi_item_t *item)
+{
+    if (item)
+    {
+        l_ezlopi_device_t *device_node = l_device_head;
+        while (device_node)
+        {
+            l_ezlopi_item_t *item_node = device_node->items;
+            while (item_node)
+            {
+                if (item_node == item)
+                {
+                    ezlopi_device_free_device(device_node);
+                    return;
+                }
+            }
+
+            device_node = device_node->next;
+        }
+    }
+}
+
 l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id)
 {
     l_ezlopi_item_t *item_to_return = NULL;

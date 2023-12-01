@@ -205,6 +205,7 @@ const char *switch_box_constant_config =
             }\
         ],\
     \"dev_total\": 1}";
+
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 const char *test_device_constant_config =

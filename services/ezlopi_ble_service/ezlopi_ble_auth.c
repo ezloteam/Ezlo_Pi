@@ -38,12 +38,12 @@ e_auth_status_t ezlopi_ble_auth_check_user_id(char *user_id)
 
     if (NULL != stored_user_id)
     {
-        TRACE_D("here");
         if (user_id)
         {
-            TRACE_D("stored_user_id: %s, user_id:%s", stored_user_id, user_id);
+            TRACE_D("stored_user_id: %s, user_id: %s", stored_user_id, user_id);
             if (0 == strncmp(stored_user_id, user_id, strlen(stored_user_id)))
             {
+                TRACE_I("Authenticated.");
                 sg_last_auth_status = BLE_AUTH_SUCCESS;
             }
             else

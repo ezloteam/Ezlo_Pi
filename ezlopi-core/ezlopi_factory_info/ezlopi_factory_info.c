@@ -694,7 +694,15 @@ int ezlopi_factory_info_v2_set_ca_cert(char *data)
 
 int ezlopi_factory_info_v2_set_ezlopi_config(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x1000);
+    int ret = ezlopi_factory_info_v2_set_4kb(data, 0x1000);
+    if (ret)
+    {
+        free(g_ezlopi_config);
+        g_ezlopi_config = NULL;
+        ezlopi_factory_info_v2_get_ezlopi_config();
+    }
+
+    return ret;
 }
 
 static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
@@ -706,6 +714,7 @@ static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
         {
             if (ESP_OK == esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1))
             {
+                TRACE_I("Flash write succeessful");
                 ret = 1;
             }
             else

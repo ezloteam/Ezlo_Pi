@@ -1,6 +1,6 @@
 #!/bin/bash
 
-project="Ezlo_Pi_v2x"
+project="Ezlo_Pi_v3x"
 versionFile="components/version/include/version.h"
 releaseNote="" # firmware/v$V_MAJOR_$V_MINOR_$V_BATCH_$V_BUILD/releaseNote.txt
 release=0

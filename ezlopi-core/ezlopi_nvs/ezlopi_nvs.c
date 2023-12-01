@@ -307,7 +307,7 @@ void ezlopi_nvs_set_provisioning_status(void)
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, provisioning_status_nvs_name, 1);
-        TRACE_E("nvs_set_u32 - error: %s", esp_err_to_name(err));
+        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
     }
 }
 

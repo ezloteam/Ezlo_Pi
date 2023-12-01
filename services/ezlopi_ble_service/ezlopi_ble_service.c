@@ -30,6 +30,7 @@ extern void ezlopi_ble_service_security_init(void);
 extern void ezlopi_ble_service_wifi_profile_init(void);
 extern void ezlopi_ble_service_provisioning_init(void);
 extern void ezlopi_ble_service_device_info_init(void);
+extern void ezlopi_ble_service_dynamic_config_init(void);
 
 static void ezlopi_ble_basic_init(void);
 static void ezlopi_ble_start_secure_gatt_server(void);
@@ -41,14 +42,16 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_service_security_init();
     ezlopi_ble_service_provisioning_init();
     ezlopi_ble_service_device_info_init();
+    ezlopi_ble_service_dynamic_config_init();
 
     // ezlopi_ble_profile_print();
     ezlopi_ble_basic_init();
 
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts app-0 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_SECURITY_SERVICE_HANDLE), "gatts app-1 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PROVISIONING_ID_HANDLE), "gatts app-2 register error");
-    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_DEVICE_INFO_ID_HANDLE), "gatts app-3 register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts 'wifi-app' register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_SECURITY_SERVICE_HANDLE), "gatts 'security-app' register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_PROVISIONING_ID_HANDLE), "gatts 'provisioning-app' register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_DEVICE_INFO_ID_HANDLE), "gatts 'device-info-app' register error");
+    CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_DYNAMIC_CONFIG_HANDLE), "gatts 'dynamic-config-app' register error");
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
 #if (1 == EZLOPI_BLE_ENALBE_PAIRING)
