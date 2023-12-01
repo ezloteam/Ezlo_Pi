@@ -1,6 +1,6 @@
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "sensor_0028_other_GY61.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES  
                 trace 

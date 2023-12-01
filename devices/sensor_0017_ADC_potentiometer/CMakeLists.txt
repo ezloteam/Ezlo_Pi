@@ -1,6 +1,6 @@
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "sensor_0017_ADC_potentiometer.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    trace 
                 ezlopi_actions 
