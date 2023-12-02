@@ -149,9 +149,14 @@ static int __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
+#if VOLTAGE_DIVIDER_EN
+            char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 9.52f);
+            cJSON_AddNumberToObject(cj_result, "value", (user_data->volt) * 9.52f);
+#else
             char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 4.2f);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", (user_data->volt) * 4.2f);
+#endif
+            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
             ret = 1;
         }

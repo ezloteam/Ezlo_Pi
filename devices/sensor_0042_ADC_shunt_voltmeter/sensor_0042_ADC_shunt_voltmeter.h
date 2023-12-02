@@ -12,15 +12,21 @@
  *  Remedy:  introduce a voltage divider of ratio [1:2 , i.e. 50%]  on the Sensor analog output , so that esp32 adc pin recieves half voltage only.
  *             ( Half of 5) -> ~2.5V
  *
- *            > 5V------,
- *                      |
- *                     {1KOhm}
- *                      |
- *                      +------------+ ~2.4V
- *                      |                ^
- *                     {1KOhm}           |  esp32 analog input
- *                      |                v
- *            > 0V------+------------+ 0V
+ *       +------------>+
+ *       |             |
+ *       |             |
+ *       |          {30Kohm}
+ *       |             |
+ *       |             |
+ *   [1v-25v]          +----->{X}V<-----+
+ *       |             |                |
+ *       |             |               {2.7k or 3.3K}
+ *       |             |                |
+ *       |          {7.5Kohm}           +------------+ 100mV~2500mV
+ *       |             |                |                ^
+ *       |             |               {9.4K or 10k}     |  esp32 analog input
+ *       |             |                |                v
+ *       +------------>+----->{0}V<-----+------------+ 0V
  **/
 
 //------------------------------------------
@@ -32,6 +38,7 @@
  *      |
  *      V
  */
+// #define VOLTAGE_DIVIDER_EN 1
 
 //------------------------------------------
 
