@@ -177,19 +177,24 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
                 TRACE_E(" Data Not Ready ...");
                 uint32_t start_time = esp_timer_get_time() / 1000;
                 uint32_t dummy_timer = 0;
-                while (!(Check_Register & GY271_DATA_READY_FLAG))
+
+                for (uint8_t try = 20; (try > 0) && (!(Check_Register & GY271_DATA_READY_FLAG)); try--)
                 {
                     address_val = GY271_STATUS_REGISTER;
                     ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                     ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
-                    dummy_timer = (esp_timer_get_time() / 1000) - start_time;
-                    if ((dummy_timer - start_time) > 1500) // 1.5 sec
+                    // dummy_timer = (esp_timer_get_time() / 1000) - start_time;
+                    // if ((dummy_timer - start_time) > 1500) // 1.5 sec
+                    // {
+                    //     TRACE_W("Reg @ 0x06H: -> {%#x}", Check_Register);
+                    //     break;
+                    // }
+                    if ((Check_Register & GY271_DATA_READY_FLAG)) // 1.5 sec
                     {
                         TRACE_W("Reg @ 0x06H: -> {%#x}", Check_Register);
                         break;
                     }
                     TRACE_W("Extracting.... Reg @ 0x06H: -> {%#x}", Check_Register);
-                    vTaskDelay(100 / portTICK_PERIOD_MS);
                 }
             }
         }
