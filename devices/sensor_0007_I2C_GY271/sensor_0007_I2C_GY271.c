@@ -1,5 +1,5 @@
-#include <cJSON.h>
-#include <math.h>
+#include "cJSON.h"
+#include "math.h"
 #include "trace.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_i2c_master.h"
@@ -211,7 +211,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
         if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
         {
-            // TRACE_I("X-axis field Strength : %.2fG", user_data->X);
             cJSON_AddNumberToObject(cj_result, "value", user_data->X);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->X);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -219,7 +218,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
         {
-            // TRACE_I("Y-axis field Strength : %.2fG", user_data->Y);
             cJSON_AddNumberToObject(cj_result, "value", user_data->Y);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->Y);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -227,7 +225,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
         {
-            // TRACE_I("Z-axis field Strength : %.2fG", user_data->Z);
             cJSON_AddNumberToObject(cj_result, "value", user_data->Z);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->Z);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -236,7 +233,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
         {
 
-            // TRACE_I("Azimuth : %d *deg", user_data->azimuth);
             cJSON_AddNumberToObject(cj_result, "value", (user_data->azimuth));
             char *valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -245,7 +241,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            // TRACE_I("temperature : %.2f*C", user_data->T);
             cJSON_AddNumberToObject(cj_result, "value", user_data->T);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->T);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -276,7 +271,6 @@ static int __notify(l_ezlopi_item_t *item)
                 prev_Z = user_data->Z;
                 prev_T = user_data->T;
                 prev_azimuth = user_data->azimuth;
-                // TRACE_W(".........UPDATEING X");
                 if (__gy271_update_value(item))
                 {
                     if (fabs(prev_X - user_data->X) > 0.01)
@@ -287,7 +281,6 @@ static int __notify(l_ezlopi_item_t *item)
             }
             if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
             {
-                // TRACE_W(".........UPDATEING Y");
                 if (fabs(prev_Y - user_data->Y) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
@@ -295,7 +288,6 @@ static int __notify(l_ezlopi_item_t *item)
             }
             if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
             {
-                // TRACE_W(".........UPDATEING Z");
                 if (fabs(prev_Z - user_data->Z) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
@@ -303,7 +295,6 @@ static int __notify(l_ezlopi_item_t *item)
             }
             if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
             {
-                // TRACE_W(".........UPDATEING Azimuth");
                 if (fabs(prev_azimuth - user_data->azimuth) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
@@ -311,7 +302,6 @@ static int __notify(l_ezlopi_item_t *item)
             }
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-                // TRACE_W(".........UPDATEING Temperature");
                 if (fabs(prev_T - user_data->T) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
@@ -337,12 +327,7 @@ static void __gy271_calibration_task(void *params) // calibrate task
 
         for (uint16_t i = 0; i <= 50; i++)
         {
-            // call the data gathering function [50 * 200 ms = 10 sec]
             __gy271_get_raw_max_min_values(item, calibrationData);
-            // if (i % 5 == 0)
-            // {
-            //     TRACE_I(" --------------------- Time :- {%u sec} ---------------------", (i / 5));
-            // }
             vTaskDelay(200 / portTICK_PERIOD_MS);
         }
 

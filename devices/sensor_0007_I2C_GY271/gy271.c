@@ -10,13 +10,10 @@ static esp_err_t activate_set_reset_period(l_ezlopi_item_t *item)
     esp_err_t ret = ESP_FAIL;
     if (item)
     {
-        // soft reset
         uint8_t write_buffer1[2] = {0x0A, 0x80};
         ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer1, 2);
         uint8_t write_buffer2[2] = {GY271_SET_RESET_PERIOD_REGISTER, GY271_DEFAULT_SET_RESET_PERIOD}; // REG_INTR_STATUS;
-        // uint8_t write_buffer2[2] = {0x0B, 0x01}; // REG_INTR_STATUS;
         ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer2, 2);
-        // vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     return ret;
 }
@@ -26,9 +23,7 @@ static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item)
     if (item)
     {
         uint8_t write_buffer[2] = {GY271_CONTROL_REGISTER_1, GY271_OPERATION_MODE1};
-        // uint8_t write_buffer[2] = {0x09, 0x45};
         ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
-        // vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     return ret;
 }
@@ -38,16 +33,13 @@ static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item)
     if (item)
     {
         uint8_t write_buffer[2] = {GY271_CONTROL_REGISTER_2, GY271_OPERATION_MODE2};
-        // uint8_t write_buffer[2] = {0x0A, 0x40};
         ret = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2);
-        // vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     return ret;
 }
 
 static int __gy271_Get_azimuth(float dx, float dy)
 {
-    // calculate azimuth
     int azi = (int)((float)(180.0 * atan2(dy, dx)) / PI);
     return ((azi <= 0) ? (azi += 360) : (azi));
 }
@@ -67,7 +59,6 @@ static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *u
     user_data->Y = ((user_data->calib_factor.calibrated_axis[1]) / GY271_CONVERSION_TO_G);
     user_data->Z = ((user_data->calib_factor.calibrated_axis[2]) / GY271_CONVERSION_TO_G);
     user_data->T = (((float)RAW_DATA->raw_temp) / GY271_TEMPERATURE_SENSITIVITY) + 32.53f;
-    // calculate azimuth
     user_data->azimuth = __gy271_Get_azimuth((user_data->calib_factor.calibrated_axis[0]),
                                              (user_data->calib_factor.calibrated_axis[1]));
 
@@ -79,14 +70,11 @@ static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *u
             user_data->azimuth);
 }
 
-// function to check for INTR bit [in 0x06H], before any data extraction is done from data registers
 static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp)
 {
     esp_err_t err = ESP_OK;
-    // Must request INTR_REG
-    uint8_t write_buffer[] = {GY271_STATUS_REGISTER}; // REG_INTR_STATUS;
+    uint8_t write_buffer[] = {GY271_STATUS_REGISTER};
     ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
-    // Read -> INTR_BIT
     ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, temp, 1);
     if (NULL != temp)
     {
@@ -122,19 +110,14 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
         volatile uint8_t Check_Register = 0;
         volatile uint8_t address_val = 0;
         esp_err_t err = ESP_OK;
-        // Read specified FIFO buffer size (depends on configuration set)g
 
         if (ESP_OK == (err = __gy271_check_status(item, &Check_Register)))
         {
             // TRACE_I(" (2) Check_reg_val @ 0x06H: {%#x}", Check_Register);
-
             if (Check_Register == GY271_DATA_OVERRUN_FLAG)
             {
                 TRACE_W(" (2) Status :- Before DOR reset {%#x}", Check_Register);
                 TRACE_W(" (2) :--*********- DOR bit set..**********...");
-                // address_val = (GY271_DATA_Z_LSB_REGISTER);
-                // ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                // ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&buffer_0), 1);
                 address_val = (GY271_DATA_Z_MSB_REGISTER);
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&buffer_1), 1);
@@ -157,7 +140,6 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&buffer_1), 1);
 
                 // TRACE_I(" (2) ...[00~05H] reading started....");
-
                 address_val = GY271_DATA_X_LSB_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), REG_COUNT_LEN);
@@ -166,7 +148,6 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
-
                 // TRACE_I(" (2) :--- 06H reading ended....");
                 // TRACE_I(" (2) :--- Check_reg_val @ 0x06H : {%#x}", Check_Register);
 
@@ -183,12 +164,7 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
                     address_val = GY271_STATUS_REGISTER;
                     ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                     ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
-                    // dummy_timer = (esp_timer_get_time() / 1000) - start_time;
-                    // if ((dummy_timer - start_time) > 1500) // 1.5 sec
-                    // {
-                    //     TRACE_W("Reg @ 0x06H: -> {%#x}", Check_Register);
-                    //     break;
-                    // }
+
                     if ((Check_Register & GY271_DATA_READY_FLAG)) // 1.5 sec
                     {
                         TRACE_W("Reg @ 0x06H: -> {%#x}", Check_Register);
@@ -203,11 +179,8 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
             TRACE_E(".......... Unable to access 'registers'. ");
         }
 
-        // proceed to replace the old data ; if generated data is valid
         if (valid_data)
         {
-            // TRACE_B("Valid data generated............. writing correct data......");
-            // Configure data structure // total 8 bytes
             RAW_DATA.raw_x = (int16_t)(tmp_buf[1] << 8 | tmp_buf[0]);  // x_axis =  0x01 [msb]  & 0x00 [lsb]
             RAW_DATA.raw_y = (int16_t)(tmp_buf[3] << 8 | tmp_buf[2]);  // y_axis =  0x03        & 0x02
             RAW_DATA.raw_z = (int16_t)(tmp_buf[5] << 8 | tmp_buf[4]);  // z_axis =  0x05        & 0x04
@@ -216,7 +189,7 @@ bool __gy271_update_value(l_ezlopi_item_t *item)
         }
         else
         {
-            TRACE_E("......................................Invalid data generated.\n");
+            TRACE_E("......................Invalid data generated.\n");
         }
     }
     return valid_data;
@@ -254,13 +227,11 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
             {
                 TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x06H: {%#x}", Check_Register);
                 TRACE_I(" 1. FIRST_INIT_CALIB :--- [00~05H] reading started....");
-                // read the axis data
-
+              
                 address_val = (GY271_DATA_X_LSB_REGISTER);
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (cal_tmp_buf), REG_COUNT_LEN);
-
-                // now read the status byte 0x06H
+               
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);
@@ -274,7 +245,6 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
         }
 
         // generate the raw_axis_values
-        // Configure data structure // total 8 bytes
         x = (int16_t)(cal_tmp_buf[1] << 8 | cal_tmp_buf[0]); // x_axis =  0x01 [msb]  & 0x00 [lsb]
         y = (int16_t)(cal_tmp_buf[3] << 8 | cal_tmp_buf[2]); // y_axis =  0x03        & 0x02
         z = (int16_t)(cal_tmp_buf[5] << 8 | cal_tmp_buf[4]); // z_axis =  0x05        & 0x04
