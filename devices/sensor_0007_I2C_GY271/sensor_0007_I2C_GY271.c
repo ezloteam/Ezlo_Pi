@@ -126,7 +126,7 @@ static int __prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(gyro_x_item, user_data);
                     gyro_x_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_x_axis;
-                    gyro_x_item->cloud_properties.value_type = value_type_int;
+                    gyro_x_item->cloud_properties.value_type = value_type_float;
                     gyro_x_item->cloud_properties.scale = NULL;
                     __prepare_item_interface_properties(gyro_x_item, cj_device);
                 }
@@ -135,7 +135,7 @@ static int __prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(gyro_y_item, user_data);
                     gyro_y_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_y_axis;
-                    gyro_y_item->cloud_properties.value_type = value_type_int;
+                    gyro_y_item->cloud_properties.value_type = value_type_float;
                     gyro_y_item->cloud_properties.scale = NULL;
                     __prepare_item_interface_properties(gyro_y_item, cj_device);
                 }
@@ -144,7 +144,7 @@ static int __prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(gyro_z_item, user_data);
                     gyro_z_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_z_axis;
-                    gyro_z_item->cloud_properties.value_type = value_type_int;
+                    gyro_z_item->cloud_properties.value_type = value_type_float;
                     gyro_z_item->cloud_properties.scale = NULL;
                     __prepare_item_interface_properties(gyro_z_item, cj_device);
                 }
@@ -191,11 +191,10 @@ static int __init(l_ezlopi_item_t *item)
     if (item->interface.i2c_master.enable)
     {
         ezlopi_i2c_master_init(&item->interface.i2c_master);
-        TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
         TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
         if (0 == __gy271_configure(item))
         {
-            TRACE_W("Calibrating.....");
+            TRACE_B("DONE CONFIGURATION _____ Calibrating..... ");
             xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
         }
     }
@@ -210,52 +209,47 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
 
-        if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+        if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("X-axis field Strength : %.2fG", user_data->X);
+            // TRACE_I("X-axis field Strength : %.2fG", user_data->X);
             cJSON_AddNumberToObject(cj_result, "value", user_data->X);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->X);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
-        if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+        if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Y-axis field Strength : %.2fG", user_data->Y);
+            // TRACE_I("Y-axis field Strength : %.2fG", user_data->Y);
             cJSON_AddNumberToObject(cj_result, "value", user_data->Y);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->Y);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
-        if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+        if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Z-axis field Strength : %.2fG", user_data->Z);
+            // TRACE_I("Z-axis field Strength : %.2fG", user_data->Z);
             cJSON_AddNumberToObject(cj_result, "value", user_data->Z);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->Z);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
         if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
         {
 
-            TRACE_I("Azimuth : %d *deg", user_data->azimuth);
+            // TRACE_I("Azimuth : %d *deg", user_data->azimuth);
             cJSON_AddNumberToObject(cj_result, "value", (user_data->azimuth));
             char *valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
 
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            TRACE_I("temperature : %.2f*C", user_data->T);
+            // TRACE_I("temperature : %.2f*C", user_data->T);
             cJSON_AddNumberToObject(cj_result, "value", user_data->T);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->T);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
-            // cJSON_AddStringToObject(cj_result, "scales", item->cloud_properties.scale);
         }
         ret = 1;
     }
@@ -265,19 +259,60 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
+    static float prev_X;
+    static float prev_Y;
+    static float prev_Z;
+    static float prev_T;
+    static float prev_azimuth;
     if (item)
     {
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
         if (user_data->calibration_complete)
         {
-            float prev_X = user_data->X;
-            float prev_Y = user_data->Y;
-            float prev_Z = user_data->Z;
-            float prev_T = user_data->T;
-            int prev_azimuth = user_data->azimuth;
-            if (__gy271_update_value(item))
+            if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
             {
-                if ((prev_X != user_data->X) || (prev_Y != user_data->Y) || (prev_Z != user_data->Z) || (prev_azimuth != user_data->azimuth) || (prev_T != user_data->T))
+                prev_X = user_data->X;
+                prev_Y = user_data->Y;
+                prev_Z = user_data->Z;
+                prev_T = user_data->T;
+                prev_azimuth = user_data->azimuth;
+                // TRACE_W(".........UPDATEING X");
+                if (__gy271_update_value(item))
+                {
+                    if (fabs(prev_X - user_data->X) > 0.01)
+                    {
+                        ezlopi_device_value_updated_from_device_v3(item);
+                    }
+                }
+            }
+            if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
+            {
+                // TRACE_W(".........UPDATEING Y");
+                if (fabs(prev_Y - user_data->Y) > 0.01)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
+            {
+                // TRACE_W(".........UPDATEING Z");
+                if (fabs(prev_Z - user_data->Z) > 0.01)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
+            {
+                // TRACE_W(".........UPDATEING Azimuth");
+                if (fabs(prev_azimuth - user_data->azimuth) > 0.01)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+            {
+                // TRACE_W(".........UPDATEING Temperature");
+                if (fabs(prev_T - user_data->T) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
@@ -291,7 +326,7 @@ static int __notify(l_ezlopi_item_t *item)
 
 static void __gy271_calibration_task(void *params) // calibrate task
 {
-
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (item)
     {
@@ -300,19 +335,18 @@ static void __gy271_calibration_task(void *params) // calibrate task
                                      {0, 0}}; // zmin,zmax// Initialization added!
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
 
-        // vTaskDelay(3000 / portTICK_PERIOD_MS); // 3 sec
-        for (uint16_t i = 0; i <= 100; i++)
+        for (uint16_t i = 0; i <= 50; i++)
         {
-            // call the data gathering function [100 * 20 ms = 20 sec]
+            // call the data gathering function [50 * 200 ms = 10 sec]
             __gy271_get_raw_max_min_values(item, calibrationData);
-            if (i % 5 == 0)
-            {
-                TRACE_I(" ------------------------------------------------- Time :- {%u sec} ", (i / 5));
-            }
-            vTaskDelay(200 / portTICK_PERIOD_MS); // 200ms
+            // if (i % 5 == 0)
+            // {
+            //     TRACE_I(" --------------------- Time :- {%u sec} ---------------------", (i / 5));
+            // }
+            vTaskDelay(200 / portTICK_PERIOD_MS);
         }
 
-        TRACE_W("..........................Calculating Paramter.......................");
+        TRACE_W(".....................Calculating Paramter.......................");
         // Calculate the : 1.bias_axis , 2.delta_axis , 3.delta_avg , 4.scale_axis
         // 1. bias_axis{x,y,z}
         user_data->calib_factor.bias_axis[0] = ((long)(calibrationData[0][1] + calibrationData[0][0]) / 2); // x-axis
@@ -350,8 +384,7 @@ static void __gy271_calibration_task(void *params) // calibrate task
                 user_data->calib_factor.scale_axis[0],
                 user_data->calib_factor.scale_axis[1],
                 user_data->calib_factor.scale_axis[0]);
-        TRACE_W("...............................................................\n\n");
-
+        TRACE_W("......................CALIBRATION COMPLETE.....................");
         user_data->calibration_complete = true;
     }
     vTaskDelete(NULL);
