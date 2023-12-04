@@ -14,8 +14,7 @@ static esp_err_t get_device_id(l_ezlopi_item_t *item)
         uint8_t write_buffer[] = {ADXL345_DEVICE_ID_REGISTER}; // REG_INTR_STATUS;
         err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
         err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, &dev_id, 1);
-        // vTaskDelay(10);
-        TRACE_B("The device id is %d", dev_id);
+        TRACE_E("The device id is {%#x}", dev_id);
     }
     return err;
 }
@@ -26,7 +25,6 @@ static esp_err_t data_formatting(l_ezlopi_item_t *item)
     {
         uint8_t write_byte[] = {ADXL345_DATA_FORMAT_REGISTER, ADXL345_FORMAT_REGISTER_DATA};
         err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
-        // vTaskDelay(10);
     }
     return err;
 }
@@ -37,7 +35,6 @@ static esp_err_t set_to_measure_mode(l_ezlopi_item_t *item)
     {
         uint8_t write_byte[] = {ADXL345_DEVICE_POWER_CTRL, ADXL345_POWER_CTRL_SET_TO_MEASUTEMENT};
         err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
-        // vTaskDelay(10);
     }
     return err;
 }
@@ -48,7 +45,6 @@ static esp_err_t enable_data_ready_interrupt(l_ezlopi_item_t *item)
     {
         uint8_t write_byte[] = {ADXL345_INT_ENABLE_REGISTER, ADXL345_INT_EN};
         err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
-        // vTaskDelay(10);
     }
     return err;
 }
@@ -59,7 +55,6 @@ static esp_err_t reset_measure_mode(l_ezlopi_item_t *item)
     {
         uint8_t write_byte[] = {ADXL345_DEVICE_POWER_CTRL, ADXL345_POWER_CTRL_RESET};
         err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_byte, 2);
-        // vTaskDelay(10);
     }
     return err;
 }
