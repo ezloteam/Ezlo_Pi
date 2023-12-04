@@ -7,6 +7,7 @@
 #define REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
 // Offsets and conversion values : 1g = 9.80665 m/s^2
 #define MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE (9.80665f)
+
 #define GYRO_X_OFFSET (1.6f)  // if +ve avg offset, use -neg value and vice versa
 #define GYRO_Y_OFFSET (0.10f) // if +ve avg offset, use -neg value and vice versa
 #define GYRO_Z_OFFSET (1.5f)  // if +ve avg offset, use -neg value and vice versa
@@ -81,9 +82,8 @@
 #define A_CFG_16G (BIT_3 | BIT_4) //[+-16G]
 
 // Interrupt enable configuration + mode masks
-#define INTR_EN_DATA_RDY (BIT_0) // When set; this bit enables the Data Ready interrupt, which occurs each time a write operation to all of the sensor registers has been completed.
-#define DATA_RDY_INT_FLAG (BIT_0)   // when intr is generated this flag is high
-
+#define INTR_EN_DATA_RDY (BIT_0)  // When set; this bit enables the Data Ready interrupt, which occurs each time a write operation to all of the sensor registers has been completed.
+#define DATA_RDY_INT_FLAG (BIT_0) // when intr is generated this flag is high
 
 // Power management (1) configuration + mode masks
 #define PWR_MGMT_1_RESET (BIT_7)                               // When set, this bit resets all internal registers to their default values.(automatically clears to 0)
@@ -99,9 +99,10 @@
 // #### Custom structure to store processed data
 typedef struct s_mpu6050_data
 {
+    
     float tmp;
-    float ax, ay, az;   // 
-    float gx, gy, gz;   // rpm
+    float ax, ay, az; //
+    float gx, gy, gz; // rpm
 } s_mpu6050_data_t;
 
 // #### Custom structure to store raw data
@@ -127,6 +128,7 @@ typedef enum e_mpu6050_err
     MPU6050_ERR_UNKNOWN,             // Unknown error
     MPU6050_ERR_MAX
 } e_mpu6050_err_t;
+
 #if 0
 // typedef enum e_sensor_i2c_mpu6050_item_ids
 // {
@@ -140,6 +142,7 @@ typedef enum e_mpu6050_err
 //     SENSOR_I2C_MPU6050_ITEM_MAX
 // } e_sensor_i2c_mpu6050_item_ids_t;
 #endif
+
 void __mpu6050_get_data(l_ezlopi_item_t *item);
 e_mpu6050_err_t __mpu6050_config_device(l_ezlopi_item_t *item);
 

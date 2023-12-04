@@ -76,4 +76,9 @@ const static char *scales_kilo_hertz = "kilo_hertz";
 const static char *scales_breaths_per_minute = "breaths_per_minute";
 const static char *scales_beats_per_minute = "beats_per_minute";
 
+/// @brief magnetic field strength
+const static char *scales_guass = "guass";
+const static char *scales_tesla = "tesla";
+const static char *scales_weber_per_square_meter = "weber_per_square_meter";
+
 #endif // __EZLOPI_SCALES_STR_H__

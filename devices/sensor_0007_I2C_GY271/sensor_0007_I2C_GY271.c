@@ -42,12 +42,12 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t cnt;
-        if (cnt++ > 1)
-        {
-            ret = __notify(item);
-            cnt = 0;
-        }
+        // static uint8_t cnt;
+        // if (cnt++ > 1)
+        // {
+        ret = __notify(item);
+        //     cnt = 0;
+        // }
         break;
     }
     default:
@@ -127,7 +127,7 @@ static int __prepare(void *arg)
                     __prepare_item_cloud_properties(gyro_x_item, user_data);
                     gyro_x_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_x_axis;
                     gyro_x_item->cloud_properties.value_type = value_type_float;
-                    gyro_x_item->cloud_properties.scale = NULL;
+                    gyro_x_item->cloud_properties.scale = scales_guass;
                     __prepare_item_interface_properties(gyro_x_item, cj_device);
                 }
                 l_ezlopi_item_t *gyro_y_item = ezlopi_device_add_item_to_device(gy271_device, sensor_0007_I2C_GY271);
@@ -136,7 +136,7 @@ static int __prepare(void *arg)
                     __prepare_item_cloud_properties(gyro_y_item, user_data);
                     gyro_y_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_y_axis;
                     gyro_y_item->cloud_properties.value_type = value_type_float;
-                    gyro_y_item->cloud_properties.scale = NULL;
+                    gyro_y_item->cloud_properties.scale = scales_guass;
                     __prepare_item_interface_properties(gyro_y_item, cj_device);
                 }
                 l_ezlopi_item_t *gyro_z_item = ezlopi_device_add_item_to_device(gy271_device, sensor_0007_I2C_GY271);
@@ -145,7 +145,7 @@ static int __prepare(void *arg)
                     __prepare_item_cloud_properties(gyro_z_item, user_data);
                     gyro_z_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_z_axis;
                     gyro_z_item->cloud_properties.value_type = value_type_float;
-                    gyro_z_item->cloud_properties.scale = NULL;
+                    gyro_z_item->cloud_properties.scale = scales_guass;
                     __prepare_item_interface_properties(gyro_z_item, cj_device);
                 }
                 l_ezlopi_item_t *gyro_azi_item = ezlopi_device_add_item_to_device(gy271_device, sensor_0007_I2C_GY271);
@@ -194,7 +194,7 @@ static int __init(l_ezlopi_item_t *item)
         TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
         if (0 == __gy271_configure(item))
         {
-            TRACE_B("DONE CONFIGURATION _____ Calibrating..... ");
+            TRACE_B(" CONFIGURATION  Compplete _____ Calibration Started _____");
             xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
         }
     }

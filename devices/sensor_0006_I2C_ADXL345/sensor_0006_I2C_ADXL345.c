@@ -1,5 +1,5 @@
-#include <cJSON.h>
-#include <math.h>
+#include "cJSON.h"
+#include "math.h"
 #include "trace.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_i2c_master.h"
@@ -8,13 +8,6 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 #include "sensor_0006_I2C_ADXL345.h"
-
-typedef struct s_adxl345_data
-{
-    int acc_x;
-    int acc_y;
-    int acc_z;
-} s_adxl345_data_t;
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -170,7 +163,10 @@ static int __init(l_ezlopi_item_t *item)
         if (item->interface.i2c_master.enable)
         {
             ezlopi_i2c_master_init(&item->interface.i2c_master);
-            __adxl345_configure_device(item);
+            if (0 == __adxl345_configure_device(item))
+            {
+                TRACE_I("Configuration Complete...");
+            }
         }
     }
     return ret;
@@ -216,33 +212,31 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
+    static float __prev[3] = {0};
     if (item)
     {
         s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
-            float prev_x = user_data->acc_x;
-            user_data->acc_x = __adxl345_get_axis_value(item);
-            if (fabs((prev_x - user_data->acc_x) > 0.05))
+            __prev[0] = user_data->acc_x;
+            __adxl345_get_axis_value(item);
+            if (fabs((__prev[0] - user_data->acc_x) > 0.5))
             {
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
         if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
-            float prev_y = user_data->acc_y;
-            user_data->acc_y = __adxl345_get_axis_value(item);
-            TRACE_I("y- %d:",user_data->acc_y);
-            if (fabs((prev_y - user_data->acc_x) > 0.05))
+            __prev[1] = user_data->acc_y;
+            if (fabs((__prev[1] - user_data->acc_x) > 0.5))
             {
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
         if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
-            float prev_z = user_data->acc_z;
-            user_data->acc_z = __adxl345_get_axis_value(item);
-            if (fabs((prev_z - user_data->acc_x) > 0.05))
+            __prev[2] = user_data->acc_z;
+            if (fabs((__prev[2] - user_data->acc_x) > 0.5))
             {
                 ezlopi_device_value_updated_from_device_v3(item);
             }

@@ -82,8 +82,6 @@
 /*******************************************************************/
 // list of cosntants
 /*******************************************************************/
-// Offsets and conversion values : 1g = 9.80665 m/s^2
-#define GY271_STANDARD_G_TO_ACCEL_CONVERSION_VALUE (9.80665f)
 // Following are the conversion factor of data according to the datahsheet.
 #define GY271_TEMPERATURE_SENSITIVITY 100.0f // [100 LSB/*c]
 // At Field_Range = +-2G (), the conversion LSB per G => 12000 LSB/Gauss.

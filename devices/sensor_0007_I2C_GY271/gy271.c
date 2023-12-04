@@ -227,11 +227,11 @@ void __gy271_get_raw_max_min_values(l_ezlopi_item_t *item, int (*calibrationData
             {
                 TRACE_W(" 1. FIRST_INIT_CALIB :--- Check_reg_val @ 0x06H: {%#x}", Check_Register);
                 TRACE_I(" 1. FIRST_INIT_CALIB :--- [00~05H] reading started....");
-              
+
                 address_val = (GY271_DATA_X_LSB_REGISTER);
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (cal_tmp_buf), REG_COUNT_LEN);
-               
+
                 address_val = GY271_STATUS_REGISTER;
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (&Check_Register), 1);

@@ -216,6 +216,7 @@ static int __init(l_ezlopi_item_t *item)
             if (MPU6050_ERR_OK == __mpu6050_config_device(item))
             {
                 TRACE_I("Configuration Complete.... ");
+                // xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2 * 2048, item, 1, NULL);
             }
         }
         ret = 1;
@@ -359,4 +360,61 @@ static int __notify(l_ezlopi_item_t *item)
         ret = 1;
     }
     return ret;
+}
+
+static void __mpu6050_calibration_task(void *params) // calibrate task
+{
+#if 0 
+vTaskDelay(4000 / portTICK_PERIOD_MS);
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
+    if (item)
+    {
+        int calibrationData[3][2] = {{0, 0},  // xmin,xmax
+                                     {0, 0},  // ymin,ymax
+                                     {0, 0}}; // zmin,zmax// Initialization added!
+        s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
+
+        TRACE_W(".....................Calculating Paramter.......................");
+        // Calculate the : 1.bias_axis , 2.delta_axis , 3.delta_avg , 4.scale_axis
+        // 1. bias_axis{x,y,z}
+        user_data->calib_factor.bias_axis[0] = ((long)(calibrationData[0][1] + calibrationData[0][0]) / 2); // x-axis
+        user_data->calib_factor.bias_axis[1] = ((long)(calibrationData[1][1] + calibrationData[1][0]) / 2); // y-axis
+        user_data->calib_factor.bias_axis[2] = ((long)(calibrationData[2][1] + calibrationData[2][0]) / 2); // z-axis
+
+        // 2. delta_axis{x,y,z}
+        user_data->calib_factor.delta_axis[0] = (long)(calibrationData[0][1] - calibrationData[0][0]); // x-axis
+        user_data->calib_factor.delta_axis[1] = (long)(calibrationData[1][1] - calibrationData[1][0]); // y-axis
+        user_data->calib_factor.delta_axis[2] = (long)(calibrationData[2][1] - calibrationData[2][0]); // z-axis
+
+        // 3. delta_avg
+        user_data->calib_factor.delta_avg = ((float)((user_data->calib_factor.delta_axis[0]) +
+                                                     (user_data->calib_factor.delta_axis[1]) +
+                                                     (user_data->calib_factor.delta_axis[2])) /
+                                             3.0f);
+
+        // 4. Scale_axis{x,y,z}
+        user_data->calib_factor.scale_axis[0] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[0]; // x-axis
+        user_data->calib_factor.scale_axis[1] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[1]; // y-axis
+        user_data->calib_factor.scale_axis[2] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[2]; // z-axis
+
+        TRACE_B("Bias :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
+                user_data->calib_factor.bias_axis[0],
+                user_data->calib_factor.bias_axis[1],
+                user_data->calib_factor.bias_axis[2]);
+
+        TRACE_B("Delta :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
+                user_data->calib_factor.delta_axis[0],
+                user_data->calib_factor.delta_axis[1],
+                user_data->calib_factor.delta_axis[2]);
+        TRACE_B("Delta_AVG :--- %6f", user_data->calib_factor.delta_avg);
+
+        TRACE_B("Scale :--- _Xaxis=%6f | _Yaxis=%6f | _Zaxis=%6f ",
+                user_data->calib_factor.scale_axis[0],
+                user_data->calib_factor.scale_axis[1],
+                user_data->calib_factor.scale_axis[0]);
+        TRACE_W("......................CALIBRATION COMPLETE.....................");
+        user_data->calibration_complete = true;
+    }
+#endif
+    vTaskDelete(NULL);
 }

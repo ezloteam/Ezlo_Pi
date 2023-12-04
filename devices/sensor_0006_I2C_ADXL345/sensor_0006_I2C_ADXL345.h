@@ -11,8 +11,8 @@
 // For reference following github repository can be consulted.
 // https://github.com/Embetronicx/incubator-nuttx-apps/tree/master/examples/etx_i2c
 
-#define ADXL345_ADDR 0x53 // if (AD0->Vcc) then; [i2c_address->0x1D]
-
+#define ADXL345_ADDR (0x53) // if (AD0->Vcc) then; [i2c_address->0x1D]
+#define ADXL345_ODR_CNT 6
 /*******************************************************************/
 // REGISTER ADDRESS
 /*******************************************************************/
@@ -33,7 +33,7 @@
 // Configuration values
 /*******************************************************************/
 // (HEX) Value to enable the "data_ready interrupt"(ie. bit7) in [0x2E—INT_ENABLE]
-#define ADXL345_INT_EN 0x80
+#define ADXL345_INT_EN (1 << 7)
 
 // Data ready flag [ie. bit7 ] in "INT_SOURCE_REGISTER" (0x30)
 #define ADXL345_DATA_READY_FLAG (1 << 7)
@@ -42,14 +42,14 @@
 // D3 = 1; setting device data in full resolution, i.e 13-bits.
 // D2 = 0; right justification. i.e. MSB left.
 // (D1, D0) = (1, 1); for acceleration measurement up to 16g.
-#define ADXL345_FORMAT_REGISTER_DATA 0x0B
+#define ADXL345_FORMAT_REGISTER_DATA (0x0B)
 
 // This is defined to reset power control register, setting device in standby mode so that other device configurations can be done.
-#define ADXL345_POWER_CTRL_RESET 0x00
+#define ADXL345_POWER_CTRL_RESET (0x00)
 
 // This is defined to set power control register's measurement bit on so that device can initiate the
 // measurement process after completion of device configuration.
-#define ADXL345_POWER_CTRL_SET_TO_MEASUTEMENT 0x08
+#define ADXL345_POWER_CTRL_SET_TO_MEASUTEMENT (0x08)
 
 /*******************************************************************/
 // list of cosntants
@@ -63,8 +63,16 @@
 // 1g = 9.80665 m/s^2
 #define ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE 9.80665
 
-int16_t __adxl345_get_axis_value(l_ezlopi_item_t *item);
+typedef struct s_adxl345_data
+{
+    float acc_x;
+    float acc_y;
+    float acc_z;
+} s_adxl345_data_t;
+
+void __adxl345_get_axis_value(l_ezlopi_item_t *item);
 int __adxl345_configure_device(l_ezlopi_item_t *item);
+
 // Action function
 int sensor_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
