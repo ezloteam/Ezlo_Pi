@@ -253,12 +253,8 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __notify(l_ezlopi_item_t *item)
 {
+    static float __prev[5] = {0};
     int ret = 0;
-    static float prev_X;
-    static float prev_Y;
-    static float prev_Z;
-    static float prev_T;
-    static float prev_azimuth;
     if (item)
     {
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
@@ -266,14 +262,14 @@ static int __notify(l_ezlopi_item_t *item)
         {
             if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
             {
-                prev_X = user_data->X;
-                prev_Y = user_data->Y;
-                prev_Z = user_data->Z;
-                prev_T = user_data->T;
-                prev_azimuth = user_data->azimuth;
+                __prev[0] = user_data->X;
+                __prev[1] = user_data->Y;
+                __prev[2] = user_data->Z;
+                __prev[3] = user_data->T;
+                __prev[4] = user_data->azimuth;
                 if (__gy271_update_value(item))
                 {
-                    if (fabs(prev_X - user_data->X) > 0.01)
+                    if (fabs(__prev[0] - user_data->X) > 0.01)
                     {
                         ezlopi_device_value_updated_from_device_v3(item);
                     }
@@ -281,28 +277,28 @@ static int __notify(l_ezlopi_item_t *item)
             }
             if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
             {
-                if (fabs(prev_Y - user_data->Y) > 0.01)
+                if (fabs(__prev[1] - user_data->Y) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
             if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
             {
-                if (fabs(prev_Z - user_data->Z) > 0.01)
-                {
-                    ezlopi_device_value_updated_from_device_v3(item);
-                }
-            }
-            if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
-            {
-                if (fabs(prev_azimuth - user_data->azimuth) > 0.01)
+                if (fabs(__prev[2] - user_data->Z) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-                if (fabs(prev_T - user_data->T) > 0.01)
+                if (fabs(__prev[3] - user_data->T) > 0.01)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[4] - user_data->azimuth) > 0.01)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }

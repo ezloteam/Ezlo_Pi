@@ -30,13 +30,13 @@ static const char *mpu6050_err_to_str(e_mpu6050_err_t err)
     }
 }
 
-static e_mpu6050_err_t mpu6050_configure_power(l_ezlopi_item_t *item)
+static e_mpu6050_err_t __mpu6050_configure_power(l_ezlopi_item_t *item)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
     if (item)
     {
-        uint8_t write_buffer[] = {0x6B, 0x03};
-        // uint8_t write_buffer[] = {REG_PWR_MGMT_1, PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF};
+        // uint8_t write_buffer[] = {0x6B, 0x03};
+        uint8_t write_buffer[] = {REG_PWR_MGMT_1, PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF};
         if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
@@ -45,13 +45,13 @@ static e_mpu6050_err_t mpu6050_configure_power(l_ezlopi_item_t *item)
     }
     return err;
 }
-static e_mpu6050_err_t mpu6050_configure_accelerometer(l_ezlopi_item_t *item, uint8_t flags)
+static e_mpu6050_err_t __mpu6050_configure_accelerometer(l_ezlopi_item_t *item, uint8_t flags)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
     if (item)
     {
-        uint8_t write_buffer[] = {0x1C, 0x00};
-        // uint8_t write_buffer[] = {REG_A_CFG, A_CFG_2G};
+        // uint8_t write_buffer[] = {0x1C, 0x00};
+        uint8_t write_buffer[] = {REG_A_CFG, A_CFG_2G};
         switch (flags)
         {
         case A_CFG_2G:
@@ -77,13 +77,13 @@ static e_mpu6050_err_t mpu6050_configure_accelerometer(l_ezlopi_item_t *item, ui
     }
     return err;
 }
-static e_mpu6050_err_t mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint8_t flags)
+static e_mpu6050_err_t __mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint8_t flags)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
     if (item)
     {
-        uint8_t write_buffer[] = {0x1B, 0x00};
-        // uint8_t write_buffer[] = {REG_G_CFG, G_CFG_250};
+        // uint8_t write_buffer[] = {0x1B, 0x00};
+        uint8_t write_buffer[] = {REG_G_CFG, G_CFG_250};
         switch (flags)
         {
         case G_CFG_250:
@@ -110,13 +110,13 @@ static e_mpu6050_err_t mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint8_
     }
     return err;
 }
-static e_mpu6050_err_t mpu6050_configure_dlfp(l_ezlopi_item_t *item)
+static e_mpu6050_err_t __mpu6050_configure_dlfp(l_ezlopi_item_t *item)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
     if (item)
     {
-        uint8_t write_buffer[] = {0x1A, 0x00};
-        // uint8_t write_buffer[] = {REG_DLFP_CFG, DLFP_CFG_FILTER_0};
+        // uint8_t write_buffer[] = {0x1A, 0x00};
+        uint8_t write_buffer[] = {REG_DLFP_CFG, DLFP_CFG_FILTER_0};
         if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
@@ -125,13 +125,13 @@ static e_mpu6050_err_t mpu6050_configure_dlfp(l_ezlopi_item_t *item)
     }
     return err;
 }
-static e_mpu6050_err_t mpu6050_enable_interrupt(l_ezlopi_item_t *item)
+static e_mpu6050_err_t __mpu6050_enable_interrupt(l_ezlopi_item_t *item)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
     if (item)
     {
-        uint8_t write_buffer[] = {0x38, 0x00};
-        // uint8_t write_buffer[] = {REG_INTR_EN, INTR_EN_DATA_RDY};
+        // uint8_t write_buffer[] = {0x38, 0x00};
+        uint8_t write_buffer[] = {REG_INTR_EN, INTR_EN_DATA_RDY};
         if (ESP_OK != ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 2))
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
@@ -145,10 +145,9 @@ static e_mpu6050_err_t mpu6050_enable_interrupt(l_ezlopi_item_t *item)
 static e_mpu6050_err_t mpu6050_check_data_ready_INTR(l_ezlopi_item_t *item, uint8_t *temp)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
-    {                                               // Must request INTR_REG
+    {
         uint8_t write_buffer[] = {REG_INTR_STATUS}; // REG_INTR_STATUS;
         ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
-        // Read -> INTR_BIT
         ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, temp, 1);
         if (NULL != temp)
         {
@@ -174,26 +173,26 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
         uint8_t address_val = 0;
 
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        // Read specified FIFO buffer size (depends on configuration set)g
-        for (uint8_t i = 0; i < REG_COUNT_LEN; i += 2)
+        if ((err = mpu6050_check_data_ready_INTR(item, &Check_Register)) == MPU6050_ERR_OK)
         {
-            if ((err = mpu6050_check_data_ready_INTR(item, &Check_Register)) == MPU6050_ERR_OK)
+            if (Check_Register & DATA_RDY_INT_FLAG)
             {
-                // if 'bit0' in INTR register is set ; then read procced to read :- acc,gyro & tmp registers
-                if (Check_Register == BIT_0)
-                { // ACCEL_X_H = 0x3B
-                    address_val = (ACCEL_X_H + i);
-                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf + i), 1);
-                    // ACCEL_X_H = 0x3B +1
-                    address_val = (ACCEL_X_H + i + 1);
-                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf + i + 1), 1);
-                }
+                address_val = (ACCEL_X_H);
+                ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), REG_COUNT_LEN); //(tmp_buf+i), 1);
             }
-            else
+        }
+        else
+        {
+            TRACE_E("Data not ready ... Error type:- %d (%s)", err, mpu6050_err_to_str(err));
+            for (uint8_t try = 10; ((try > 0) && !(Check_Register & DATA_RDY_INT_FLAG)); try--)
             {
-                TRACE_E("Data not ready ... Error type:- %d (%s)", err, mpu6050_err_to_str(err));
+                if (MPU6050_ERR_OK == mpu6050_check_data_ready_INTR(item, &Check_Register))
+                {
+                    TRACE_E(" Check Register ... 0x3AH : {%#x}", Check_Register);
+                    if (Check_Register & DATA_RDY_INT_FLAG)
+                        break;
+                }
             }
         }
 
@@ -207,13 +206,12 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
         RAW_DATA.raw_gz = (int16_t)(tmp_buf[12] << 8 | tmp_buf[13]); // gz = 71 & 72
 
         user_data->ax = (RAW_DATA.raw_ax / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
-        user_data->ay = (RAW_DATA.raw_ay / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE;
-        user_data->az = (RAW_DATA.raw_az / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE;
-        user_data->gx = (RAW_DATA.raw_gx / gyro_sen_calib_val) - GYRO_X_OFFSET; // deg*/s
-        user_data->gy = (RAW_DATA.raw_gy / gyro_sen_calib_val) - GYRO_Y_OFFSET; // deg*/s
-        user_data->gz = (RAW_DATA.raw_gz / gyro_sen_calib_val) - GYRO_Z_OFFSET; // deg*/s
+        user_data->ay = (RAW_DATA.raw_ay / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+        user_data->az = (RAW_DATA.raw_az / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+        user_data->gx = ((RAW_DATA.raw_gx / gyro_sen_calib_val) - GYRO_X_OFFSET) / 6.0f;                      // -> revolutions per minute = degrees per second ÷ 6
+        user_data->gy = ((RAW_DATA.raw_gy / gyro_sen_calib_val) - GYRO_Y_OFFSET) / 6.0f;                      // -> revolutions per minute = degrees per second ÷ 6
+        user_data->gz = ((RAW_DATA.raw_gz / gyro_sen_calib_val) - GYRO_Z_OFFSET) / 6.0f;                      // -> revolutions per minute = degrees per second ÷ 6
         user_data->tmp = ((RAW_DATA.raw_t / 340) + 36.530f);
-        printf("%f\n", user_data->gx);
     }
 }
 
@@ -223,51 +221,42 @@ e_mpu6050_err_t __mpu6050_config_device(l_ezlopi_item_t *item)
     if (item)
     {
         uint8_t flags = 0;
-
-        // Initialize I2C
-        // flags = PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF; // choose PLL-z-axis; as internal clk refr
-        if ((err = mpu6050_configure_power(item)) != MPU6050_ERR_OK)
+        // choose PLL-z-axis; as internal clk refr
+        // flags = PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF;
+        if ((err = __mpu6050_configure_power(item)) != MPU6050_ERR_OK)
         {
             TRACE_E("Initializtion unsuccessful %d", err);
             TRACE_E("%s", mpu6050_err_to_str(err));
             return err;
         }
-
         // Configure accelerometer sensitivity
         flags = A_CFG_2G; // 16384 steps
-        if ((err = mpu6050_configure_accelerometer(item, flags)) != MPU6050_ERR_OK)
+        if ((err = __mpu6050_configure_accelerometer(item, flags)) != MPU6050_ERR_OK)
         {
-
             TRACE_E("Initializtion unsuccessful %d", err);
             TRACE_E("%s", mpu6050_err_to_str(err));
             return err;
         }
-
         // Configure gyro sensitivity
         flags = G_CFG_250; // +-250 deg/s
-        if ((err = mpu6050_configure_gyroscope(item, flags)) != MPU6050_ERR_OK)
+        if ((err = __mpu6050_configure_gyroscope(item, flags)) != MPU6050_ERR_OK)
         {
-
             TRACE_E("Initializtion unsuccessful %d", err);
             TRACE_E("%s", mpu6050_err_to_str(err));
             return err;
         }
-
         // Configure the Digital-Low-Pass-Filter
         // flags = DLFP_CFG_FILTER_0; // default -> no dlfp -> 8Mhz clk ref
-        if ((err = mpu6050_configure_dlfp(item)) != MPU6050_ERR_OK)
+        if ((err = __mpu6050_configure_dlfp(item)) != MPU6050_ERR_OK)
         {
-
             TRACE_E("Initializtion unsuccessful %d", err);
             TRACE_E("%s", mpu6050_err_to_str(err));
             return err;
         }
-
         // Enable interrupts after every sensor refresh
         // flags = INTR_EN_DATA_RDY;
-        if ((err = mpu6050_enable_interrupt(item)) != MPU6050_ERR_OK) // DATA_RDY_EN = 1 //  occurs each-time a write operation to the sensor registers has been completed.
+        if ((err = __mpu6050_enable_interrupt(item)) != MPU6050_ERR_OK) // DATA_RDY_EN = 1 //  occurs each-time a write operation to the sensor registers has been completed.
         {
-
             TRACE_E("Initializtion unsuccessful %d", err);
             TRACE_E("%s", mpu6050_err_to_str(err));
             return err;

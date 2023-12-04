@@ -82,6 +82,8 @@
 
 // Interrupt enable configuration + mode masks
 #define INTR_EN_DATA_RDY (BIT_0) // When set; this bit enables the Data Ready interrupt, which occurs each time a write operation to all of the sensor registers has been completed.
+#define DATA_RDY_INT_FLAG (BIT_0)   // when intr is generated this flag is high
+
 
 // Power management (1) configuration + mode masks
 #define PWR_MGMT_1_RESET (BIT_7)                               // When set, this bit resets all internal registers to their default values.(automatically clears to 0)
@@ -98,8 +100,8 @@
 typedef struct s_mpu6050_data
 {
     float tmp;
-    float ax, ay, az;
-    float gx, gy, gz;
+    float ax, ay, az;   // 
+    float gx, gy, gz;   // rpm
 } s_mpu6050_data_t;
 
 // #### Custom structure to store raw data

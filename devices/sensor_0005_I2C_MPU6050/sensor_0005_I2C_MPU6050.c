@@ -42,7 +42,12 @@ int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, vo
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        static uint8_t cnt;
+        if (cnt++ > 1)
+        {
+            __notify(item);
+            cnt = 0;
+        }
         break;
     }
     default:
@@ -154,14 +159,14 @@ static int __prepare(void *arg)
                     mpu6050_temp_item->cloud_properties.scale = scales_celsius;
                     __prepare_item_interface_properties(mpu6050_temp_item, cj_device);
                 }
-#if 1
+
                 l_ezlopi_item_t *mpu6050_gyro_x_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_gyro_x_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_gyro_x_item, user_data);
                     mpu6050_gyro_x_item->cloud_properties.item_name = ezlopi_item_name_gyroscope_x_axis;
-                    mpu6050_gyro_x_item->cloud_properties.value_type = value_type_angle;
-                    mpu6050_gyro_x_item->cloud_properties.scale = scales_north_pole_degress;
+                    mpu6050_gyro_x_item->cloud_properties.value_type = value_type_frequency;
+                    mpu6050_gyro_x_item->cloud_properties.scale = scales_revolutions_per_minute;
                     __prepare_item_interface_properties(mpu6050_gyro_x_item, cj_device);
                 }
                 l_ezlopi_item_t *mpu6050_gyro_y_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
@@ -169,8 +174,8 @@ static int __prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(mpu6050_gyro_y_item, user_data);
                     mpu6050_gyro_y_item->cloud_properties.item_name = ezlopi_item_name_gyroscope_y_axis;
-                    mpu6050_gyro_y_item->cloud_properties.value_type = value_type_angle;
-                    mpu6050_gyro_y_item->cloud_properties.scale = scales_north_pole_degress;
+                    mpu6050_gyro_y_item->cloud_properties.value_type = value_type_frequency;
+                    mpu6050_gyro_y_item->cloud_properties.scale = scales_revolutions_per_minute;
                     __prepare_item_interface_properties(mpu6050_gyro_y_item, cj_device);
                 }
                 l_ezlopi_item_t *mpu6050_gyro_z_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
@@ -178,12 +183,12 @@ static int __prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(mpu6050_gyro_z_item, user_data);
                     mpu6050_gyro_z_item->cloud_properties.item_name = ezlopi_item_name_gyroscope_z_axis;
-                    mpu6050_gyro_z_item->cloud_properties.value_type = value_type_angle;
-                    mpu6050_gyro_z_item->cloud_properties.scale = scales_north_pole_degress;
+                    mpu6050_gyro_z_item->cloud_properties.value_type = value_type_frequency;
+                    mpu6050_gyro_z_item->cloud_properties.scale = scales_revolutions_per_minute;
                     __prepare_item_interface_properties(mpu6050_gyro_z_item, cj_device);
                 }
-#endif
-                if ((NULL == mpu6050_acc_x_item) && (NULL == mpu6050_acc_y_item) && (NULL == mpu6050_acc_z_item) && (NULL == mpu6050_temp_item)) //&& (NULL == mpu6050_gyro_x_item) && (NULL == mpu6050_gyro_y_item) && (NULL == mpu6050_gyro_z_item))
+
+                if ((NULL == mpu6050_acc_x_item) && (NULL == mpu6050_acc_y_item) && (NULL == mpu6050_acc_z_item) && (NULL == mpu6050_temp_item) && (NULL == mpu6050_gyro_x_item) && (NULL == mpu6050_gyro_y_item) && (NULL == mpu6050_gyro_z_item))
                 {
                     ezlopi_device_free_device(mpu6050_device);
                     free(user_data);
@@ -203,14 +208,17 @@ static int __prepare(void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (true == item->interface.i2c_master.enable)
+    if (item)
     {
-        ezlopi_i2c_master_init(&item->interface.i2c_master);
-        // configure the MPU6050
-        if (MPU6050_ERR_OK == __mpu6050_config_device(item))
+        if (true == item->interface.i2c_master.enable)
         {
-            TRACE_I("Configuration Complete.... ");
+            ezlopi_i2c_master_init(&item->interface.i2c_master);
+            if (MPU6050_ERR_OK == __mpu6050_config_device(item))
+            {
+                TRACE_I("Configuration Complete.... ");
+            }
         }
+        ret = 1;
     }
     return ret;
 }
@@ -222,7 +230,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     if (cj_result && item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
             TRACE_I("Accel-x : %.2fG", user_data->ax);
@@ -247,7 +254,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
         }
-
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
             TRACE_I("Temp : %.2f*C", user_data->tmp);
@@ -256,33 +262,30 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
         }
-#if 1
         if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Gyro-x : %f *deg", user_data->gx);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->gx));
-            char *valueFormatted = ezlopi_valueformatter_int(user_data->gx);
+            TRACE_I("Gyro-x : %d rpm", (int)user_data->gx);
+            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gx));
+            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gx);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Gyro-y : %f *deg", user_data->gy);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->gy));
-            char *valueFormatted = ezlopi_valueformatter_int(user_data->gy);
+            TRACE_I("Gyro-y : %d rpm", (int)user_data->gy);
+            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gy));
+            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gy);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Gyro-z : %f *deg", user_data->gz);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->gz));
-            char *valueFormatted = ezlopi_valueformatter_int(user_data->gz);
+            TRACE_I("Gyro-z : %d rpm", (int)user_data->gz);
+            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gz));
+            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gz);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             free(valueFormatted);
         }
-#endif
-
         ret = 1;
     }
     return ret;
@@ -290,59 +293,69 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __notify(l_ezlopi_item_t *item)
 {
+    static float __prev[7] = {0};
     int ret = 0;
     if (item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        float prev_ax = user_data->ax;
-        float prev_ay = user_data->ay;
-        float prev_az = user_data->az;
-        float prev_tmp = user_data->tmp;
-        float prev_gx = user_data->gx;
-        float prev_gy = user_data->gy;
-        float prev_gz = user_data->gz;
-        __mpu6050_get_data(item); // update the sensor data
-
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
-            if (fabs(prev_ax - user_data->ax) > 0.5)
+            __prev[0] = user_data->ax;
+            __prev[1] = user_data->ay;
+            __prev[2] = user_data->az;
+            __prev[3] = user_data->tmp;
+            __prev[4] = user_data->gx;
+            __prev[5] = user_data->gy;
+            __prev[6] = user_data->gz;
+            __mpu6050_get_data(item); // update the sensor data
+            if (fabs(__prev[0] - user_data->ax) > 0.5)
+            {
                 ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
         if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
-            if (fabs(prev_ay - user_data->ay) > 0.5)
+            if (fabs(__prev[1] - user_data->ay) > 0.5)
+            {
                 ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
         if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
-            if (fabs(prev_az - user_data->az) > 0.5)
+            if (fabs(__prev[2] - user_data->az) > 0.5)
+            {
                 ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            if (fabs(prev_tmp - user_data->tmp) > 0.5)
+            if (fabs(__prev[3] - user_data->tmp) > 0.5)
+            {
                 ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
-#if 1
+
         if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
         {
-            TRACE_B("HERE, %f, %f", prev_gx, user_data->gx);
-            TRACE_B("Here, %f", fabs(prev_gx - user_data->gx));
-            if (fabs(prev_gx - user_data->gx) > 0.05)
+            if (fabs(__prev[4] - user_data->gx) > 0.5)
+            {
                 ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
         if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
         {
-            if (fabs(prev_gy - user_data->gy) > 0.05)
+            if (fabs(__prev[5] - user_data->gy) > 0.5)
+            {
                 ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
         if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
         {
-            if (fabs(prev_gz - user_data->gz) > 0.05)
+            if (fabs(__prev[6] - user_data->gz) > 0.5)
+            {
                 ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
-#endif
-
         ret = 1;
     }
     return ret;
