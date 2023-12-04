@@ -1,3 +1,6 @@
+
+#include "sdkconfig.h"
+
 EZLOPI_DEVICE_LIST("digital-out generic", 1, device_0001_digitalOut_generic)
 EZLOPI_DEVICE_LIST("digital-out relay", 2, device_0002_digitalOut_relay)
 EZLOPI_DEVICE_LIST("digital-out plug", 3, device_0003_digitalOut_plug)
@@ -9,13 +12,17 @@ EZLOPI_DEVICE_LIST("sensor-GY271-I2C", 7, sensor_0007_I2C_GY271)
 EZLOPI_DEVICE_LIST("sensor-LTR303ALS-I2C", 8, sensor_0008_I2C_LTR303ALS)
 EZLOPI_DEVICE_LIST("device-rgp_strip-RMT_SK6812", 9, device_0009_other_RMT_SK6812)
 
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
 EZLOPI_DEVICE_LIST("sensor-bme680-i2c", 10, sensor_0010_I2C_BME680)
+#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 
 EZLOPI_DEVICE_LIST("sensor-bme280-i2c-temp-humid", 12, sensor_0012_I2C_BME280)
 
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
 EZLOPI_DEVICE_LIST("sensor-DHT11-1-wire-temp-humid", 15, sensor_0015_oneWire_DHT11)
 
 EZLOPI_DEVICE_LIST("sensor-DHT22-1-wire-temp-humid", 16, sensor_0016_oneWire_DHT22)
+#endif // CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 
 EZLOPI_DEVICE_LIST("sensor-potentiometer-ADC", 17, sensor_0017_ADC_potentiometer)
 
