@@ -33,7 +33,7 @@ void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
         if (source_urls)
         {
             cJSON *firmware_url = cJSON_GetObjectItem(source_urls, "firmware");
-            TRACE_D("OTA - source: %s", (source_urls && source_urls->valuestring) ? source_urls->valuestring : "null");
+            TRACE_D("OTA - source: %s", (firmware_url && firmware_url->valuestring) ? firmware_url->valuestring : "null");
 
             if (firmware_url)
             {
@@ -59,17 +59,19 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddNullToObject(cj_response, "error");
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *params = cJSON_GetObjectItem(cj_request, ezlopi_result_str);
-    if (params)
+    TRACE_E("OTA Response : %s", cJSON_Print(cj_request));
+
+    cJSON *result = cJSON_GetObjectItem(cj_request, "result");
+    if (result)
     {
         cJSON *version = NULL;
-        version = cJSON_GetObjectItem(params, "version");
+        version = cJSON_GetObjectItem(result, "version");
         if (version != NULL)
             TRACE_I("version: %s", version->valuestring);
         TRACE_D("Upgrading to version: %s", (version && version->valuestring) ? version->valuestring : "null");
 
         cJSON *source_urls = NULL;
-        source_urls = cJSON_GetObjectItem(params, "urls");
+        source_urls = cJSON_GetObjectItem(result, "urls");
         if (source_urls)
         {
             cJSON *firmware_url = cJSON_GetObjectItem(source_urls, "firmware");
