@@ -10,6 +10,7 @@
 #include "web_provisioning.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_websocket_client.h"
+#include "ezlopi_event_group.h"
 
 static volatile uint32_t is_registered = 0;
 static void registration_process(void *pv);
@@ -31,7 +32,7 @@ void registered(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
     TRACE_I("Device registration successful.");
-    is_registered = 1;
+    ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
 }
 
 static void registration_process(void *pv)
@@ -57,10 +58,10 @@ static void registration_process(void *pv)
         vTaskDelay(200 / portTICK_RATE_MS);
     }
 
-    while (0 == is_registered)
+    while (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000 / portTICK_RATE_MS, false))
     {
-        web_provisioning_send_to_nma_websocket(cjson_data, TRACE_TYPE_D);
-        vTaskDelay(2000 / portTICK_RATE_MS);
+        web_provisioning_send_to_nma_websocket(cjson_data, TRACE_TYPE_B);
+        // vTaskDelay(2000 / portTICK_RATE_MS);
     }
 
     if (cjson_data)
