@@ -12,18 +12,15 @@
 #include "ezlopi_websocket_client.h"
 #include "ezlopi_event_group.h"
 
-static volatile uint32_t is_registered = 0;
 static void registration_process(void *pv);
 
 void registration_init(void)
 {
-    is_registered = 0;
     xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
 }
 
 void register_repeat(cJSON *cj_request, cJSON *cj_response)
 {
-    is_registered = 0;
     registration_init();
 }
 
