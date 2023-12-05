@@ -15,7 +15,7 @@ static void ota_service_process(void *pv);
 
 void ota_service_init(void)
 {
-    // xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
+    xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
 }
 static void ota_service_process(void *pv)
 {
@@ -23,8 +23,10 @@ static void ota_service_process(void *pv)
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
     while (1)
     {
-        int ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 30 * 1000, 1);
-        TRACE_D("Configuration Selection %d", ret);
+
+        int ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 60000 / portTICK_RATE_MS, false);
+        ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
+        // TRACE_D("Configuration Selection %d", ret);
         if (-1 != ret)
         {
             TRACE_D("Sending firmware check request...");
@@ -32,7 +34,7 @@ static void ota_service_process(void *pv)
             cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
             if (NULL != firmware_info_request)
             {
-                web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_D);
+                web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_B);
                 cJSON_Delete(firmware_info_request);
                 firmware_info_request = NULL;
             }

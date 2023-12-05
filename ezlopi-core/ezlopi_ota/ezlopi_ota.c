@@ -19,6 +19,8 @@
 #include <sys/socket.h>
 #include "ezlopi_ota.h"
 
+#include "esp_crt_bundle.h"
+
 // #include "nvs.h"
 // #include "nvs_flash.h"
 
@@ -44,13 +46,17 @@ void ezlopi_ota_start(cJSON *url)
 {
     if (url && url->valuestring)
     {
+        char *ota_url = (char *)malloc(OTA_URL_SIZE);
+        memcpy(ota_url, url->valuestring, OTA_URL_SIZE);
         if (0 == __ota_in_process)
         {
-            xTaskCreate(ezlopi_ota_process, "ezlopi ota process", 4096, url, 3, NULL);
+            xTaskCreate(ezlopi_ota_process, "ezlopi ota process", 4096, ota_url, 3, NULL);
         }
         else
         {
             TRACE_W("Ota in progress...");
+            free(ota_url);
+            ota_url = NULL;
         }
     }
     else
@@ -62,7 +68,8 @@ void ezlopi_ota_start(cJSON *url)
 static void ezlopi_ota_process(void *pv)
 {
     __ota_in_process = 1;
-    cJSON *url = (cJSON *)pv;
+    // cJSON *url = (cJSON *)pv;
+    char *url = pv;
 
     TRACE_I("Starting OTA ");
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
@@ -109,14 +116,17 @@ static void ezlopi_ota_process(void *pv)
                                      "-----END CERTIFICATE-----\r\n";
 
     esp_http_client_config_t config = {
-        .url = url->valuestring,
+        .url = url,
         .event_handler = _http_event_handler,
         .keep_alive_enable = true,
-        .client_cert_pem = client_cert,
-        .transport_type = HTTP_TRANSPORT_UNKNOWN,
-    // .cert_pem = ezlopi_factory_info_v2_get_ca_certificate(),
-    // .client_cert_pem = ezlopi_factory_info_v2_get_ssl_shared_key(),
-    // .client_key_pem = ezlopi_factory_info_v2_get_ssl_private_key(),
+        .transport_type = HTTP_TRANSPORT_OVER_SSL,
+        // .skip_cert_common_name_check = true,
+        // .transport_type = HTTP_TRANSPORT_UNKNOWN,
+        // .cert_pem = ezlopi_factory_info_v2_get_ca_certificate(),
+        // .client_cert_pem = ezlopi_factory_info_v2_get_ssl_shared_key(),
+        // .client_key_pem = ezlopi_factory_info_v2_get_ssl_private_key(),
+        .crt_bundle_attach = esp_crt_bundle_attach,
+
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
         .if_name = &ifr,
 #endif
@@ -142,6 +152,7 @@ static void ezlopi_ota_process(void *pv)
     esp_err_t ret = esp_https_ota(&config);
     if (ret == ESP_OK)
     {
+        TRACE_W("Firmware Upgrade Successful, restarting !");
         esp_restart();
     }
     else
@@ -151,6 +162,9 @@ static void ezlopi_ota_process(void *pv)
 
     __ota_in_process = 0;
     vTaskDelete(NULL);
+
+    if (url)
+        free(url);
 }
 
 static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
@@ -179,7 +193,10 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     }
     case HTTP_EVENT_ON_DATA:
     {
+        static int32_t byte_count;
         TRACE_D("HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
+        byte_count += evt->data_len;
+        TRACE_D("Received Bytes: %d", byte_count);
         break;
     }
     case HTTP_EVENT_ON_FINISH:
