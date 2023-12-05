@@ -410,14 +410,14 @@ static const char *test_device_constant_config =
     \"cmd\":3,\
     \"dev_detail\":[{\
             \"dev_type\": 8,\
-            \"dev_name\": \"ADXL345\",\
+            \"dev_name\": \"MPU6050\",\
             \"id_room\": \"\",\
-            \"id_item\": 6,\
+            \"id_item\": 5,\
             \"gpio_sda\": 18,\
             \"gpio_scl\": 19,\
             \"pullup_scl\": true,\
             \"pullup_sda\": true,\
-            \"slave_addr\": 83\
+            \"slave_addr\": 104\
         }\
     ],\
     \"dev_total\":1\

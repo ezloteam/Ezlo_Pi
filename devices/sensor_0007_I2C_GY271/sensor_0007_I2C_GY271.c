@@ -42,12 +42,7 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        // static uint8_t cnt;
-        // if (cnt++ > 1)
-        // {
         ret = __notify(item);
-        //     cnt = 0;
-        // }
         break;
     }
     default:

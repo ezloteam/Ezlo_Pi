@@ -17,7 +17,7 @@ static int __notify(l_ezlopi_item_t *item);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data);
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-
+static void __mpu6050_calibration_task(void *params);
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -42,12 +42,7 @@ int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, vo
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static uint8_t cnt;
-        if (cnt++ > 1)
-        {
-            __notify(item);
-            cnt = 0;
-        }
+        __notify(item);
         break;
     }
     default:
@@ -216,7 +211,7 @@ static int __init(l_ezlopi_item_t *item)
             if (MPU6050_ERR_OK == __mpu6050_config_device(item))
             {
                 TRACE_I("Configuration Complete.... ");
-                // xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2 * 2048, item, 1, NULL);
+                xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2048, item, 1, NULL);
             }
         }
         ret = 1;
@@ -233,7 +228,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Accel-x : %.2fG", user_data->ax);
+            TRACE_I("Accel-x : %.2fm/s^2", user_data->ax);
             cJSON_AddNumberToObject(cj_result, "value", user_data->ax);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->ax);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -241,7 +236,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Accel-y : %.2fG", user_data->ay);
+            TRACE_I("Accel-y : %.2fm/s^2", user_data->ay);
             cJSON_AddNumberToObject(cj_result, "value", user_data->ay);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->ay);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -249,7 +244,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Accel-z : %.2fG", user_data->az);
+            TRACE_I("Accel-z : %.2fm/s^2", user_data->az);
             cJSON_AddNumberToObject(cj_result, "value", user_data->az);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->az);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -294,67 +289,80 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __notify(l_ezlopi_item_t *item)
 {
-    static float __prev[7] = {0};
+    static float __prev[7];
     int ret = 0;
     if (item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+        if (user_data->calibration_complete)
         {
-            __prev[0] = user_data->ax;
-            __prev[1] = user_data->ay;
-            __prev[2] = user_data->az;
-            __prev[3] = user_data->tmp;
-            __prev[4] = user_data->gx;
-            __prev[5] = user_data->gy;
-            __prev[6] = user_data->gz;
-            __mpu6050_get_data(item); // update the sensor data
-            if (fabs(__prev[0] - user_data->ax) > 0.5)
+            if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
-            }
-        }
-        if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
-        {
-            if (fabs(__prev[1] - user_data->ay) > 0.5)
-            {
-                ezlopi_device_value_updated_from_device_v3(item);
-            }
-        }
-        if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
-        {
-            if (fabs(__prev[2] - user_data->az) > 0.5)
-            {
-                ezlopi_device_value_updated_from_device_v3(item);
-            }
-        }
-        if (ezlopi_item_name_temp == item->cloud_properties.item_name)
-        {
-            if (fabs(__prev[3] - user_data->tmp) > 0.5)
-            {
-                ezlopi_device_value_updated_from_device_v3(item);
-            }
-        }
+                __prev[0] = user_data->ax;
+                __prev[1] = user_data->ay;
+                __prev[2] = user_data->az;
+                __prev[3] = user_data->tmp;
+                __prev[4] = user_data->gx;
+                __prev[5] = user_data->gy;
+                __prev[6] = user_data->gz;
 
-        if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
-        {
-            if (fabs(__prev[4] - user_data->gx) > 0.5)
-            {
-                ezlopi_device_value_updated_from_device_v3(item);
+                // if (user_data->extract_counts >= RECALIBRATE_ITERAION_COUNT)
+                // {
+                //     user_data->extract_counts = 0;
+                //     user_data->calibration_complete = false;
+                //     xTaskCreate(__mpu6050_calibration_task, "MPU6050_ReCalibration_Task", 2048, item, 1, NULL);
+                // }
+                // else
+                // {
+                    __mpu6050_get_data(item); // update the sensor data
+                    if (fabs(__prev[0] - user_data->ax) > 0.5)
+                    {
+                        ezlopi_device_value_updated_from_device_v3(item);
+                    }
+                // }
             }
-        }
-        if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
-        {
-            if (fabs(__prev[5] - user_data->gy) > 0.5)
+            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(__prev[1] - user_data->ay) > 0.5)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
-        {
-            if (fabs(__prev[6] - user_data->gz) > 0.5)
+            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(__prev[2] - user_data->az) > 0.5)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[3] - user_data->tmp) > 0.5)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+
+            if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[4] - user_data->gx) > 0.5)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[5] - user_data->gy) > 0.5)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
+            {
+                if (fabs(__prev[6] - user_data->gz) > 0.5)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
         ret = 1;
@@ -364,57 +372,75 @@ static int __notify(l_ezlopi_item_t *item)
 
 static void __mpu6050_calibration_task(void *params) // calibrate task
 {
-#if 0 
-vTaskDelay(4000 / portTICK_PERIOD_MS);
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (item)
     {
-        int calibrationData[3][2] = {{0, 0},  // xmin,xmax
-                                     {0, 0},  // ymin,ymax
-                                     {0, 0}}; // zmin,zmax// Initialization added!
-        s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
+        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
+        uint8_t buf[REG_COUNT_LEN] = {0}; // 0 - 13
+        uint8_t dummy[REG_COUNT_LEN] = {0};
 
-        TRACE_W(".....................Calculating Paramter.......................");
-        // Calculate the : 1.bias_axis , 2.delta_axis , 3.delta_avg , 4.scale_axis
-        // 1. bias_axis{x,y,z}
-        user_data->calib_factor.bias_axis[0] = ((long)(calibrationData[0][1] + calibrationData[0][0]) / 2); // x-axis
-        user_data->calib_factor.bias_axis[1] = ((long)(calibrationData[1][1] + calibrationData[1][0]) / 2); // y-axis
-        user_data->calib_factor.bias_axis[2] = ((long)(calibrationData[2][1] + calibrationData[2][0]) / 2); // z-axis
+        float calibrationData[3] = {0};
+        uint8_t Check_Register = 0;
+        esp_err_t err = ESP_OK;
+        TRACE_W(".....................Calculating Paramter");
 
-        // 2. delta_axis{x,y,z}
-        user_data->calib_factor.delta_axis[0] = (long)(calibrationData[0][1] - calibrationData[0][0]); // x-axis
-        user_data->calib_factor.delta_axis[1] = (long)(calibrationData[1][1] - calibrationData[1][0]); // y-axis
-        user_data->calib_factor.delta_axis[2] = (long)(calibrationData[2][1] - calibrationData[2][0]); // z-axis
+        uint8_t write_buffer[] = {REG_INTR_STATUS}; // REG_INTR_STATUS;
+        uint8_t address_val = (ACCEL_X_H);
 
-        // 3. delta_avg
-        user_data->calib_factor.delta_avg = ((float)((user_data->calib_factor.delta_axis[0]) +
-                                                     (user_data->calib_factor.delta_axis[1]) +
-                                                     (user_data->calib_factor.delta_axis[2])) /
-                                             3.0f);
+        for (uint8_t i = CALIBRATION_SAMPLES + 50; i > 0; i--)
+        {
+            err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
+            err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, &Check_Register, 1);
 
-        // 4. Scale_axis{x,y,z}
-        user_data->calib_factor.scale_axis[0] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[0]; // x-axis
-        user_data->calib_factor.scale_axis[1] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[1]; // y-axis
-        user_data->calib_factor.scale_axis[2] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[2]; // z-axis
+            if (ESP_OK == err)
+            {
+                if (Check_Register & DATA_RDY_INT_FLAG)
+                {
+                    err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                    err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (buf), REG_COUNT_LEN);
+                }
+                if (i <= CALIBRATION_SAMPLES)
+                {
+                    if (ESP_OK != err)
+                    {
+                        buf[8] = dummy[8];
+                        buf[9] = dummy[9];
+                        buf[10] = dummy[10];
+                        buf[11] = dummy[11];
+                        buf[12] = dummy[12];
+                        buf[13] = dummy[13];
+                    }
+                    else
+                    {
+                        dummy[8] = buf[8];
+                        dummy[9] = buf[9];
+                        dummy[10] = buf[10];
+                        dummy[11] = buf[11];
+                        dummy[12] = buf[12];
+                        dummy[13] = buf[13];
+                    }
+                    calibrationData[0] += (float)((int16_t)(buf[8] << 8 | buf[9]));   // mean_raw_gx = 67 & 68;
+                    calibrationData[1] += (float)((int16_t)(buf[10] << 8 | buf[11])); // mean_raw_gy = 69 & 70;
+                    calibrationData[2] += (float)((int16_t)(buf[12] << 8 | buf[13])); // mean_raw_gz = 71 & 72;
+                }
+            }
+            else
+            {
+                TRACE_E("Data not ready ... [%d]", i);
+            }
+        }
 
-        TRACE_B("Bias :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
-                user_data->calib_factor.bias_axis[0],
-                user_data->calib_factor.bias_axis[1],
-                user_data->calib_factor.bias_axis[2]);
+        user_data->gyro_x_offset = calibrationData[0] / (CALIBRATION_SAMPLES);
+        user_data->gyro_y_offset = calibrationData[1] / (CALIBRATION_SAMPLES);
+        user_data->gyro_z_offset = calibrationData[2] / (CALIBRATION_SAMPLES);
 
-        TRACE_B("Delta :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
-                user_data->calib_factor.delta_axis[0],
-                user_data->calib_factor.delta_axis[1],
-                user_data->calib_factor.delta_axis[2]);
-        TRACE_B("Delta_AVG :--- %6f", user_data->calib_factor.delta_avg);
-
-        TRACE_B("Scale :--- _Xaxis=%6f | _Yaxis=%6f | _Zaxis=%6f ",
-                user_data->calib_factor.scale_axis[0],
-                user_data->calib_factor.scale_axis[1],
-                user_data->calib_factor.scale_axis[0]);
-        TRACE_W("......................CALIBRATION COMPLETE.....................");
+        TRACE_I("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
+                user_data->gyro_x_offset,
+                user_data->gyro_y_offset,
+                user_data->gyro_z_offset);
+        TRACE_W("......................CALIBRATION COMPLETE");
         user_data->calibration_complete = true;
     }
-#endif
     vTaskDelete(NULL);
 }

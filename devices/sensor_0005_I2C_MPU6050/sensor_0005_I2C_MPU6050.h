@@ -5,12 +5,10 @@
 #include "ezlopi_devices.h"
 
 #define REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
-// Offsets and conversion values : 1g = 9.80665 m/s^2
-#define MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE (9.80665f)
+// #define RECALIBRATE_ITERAION_COUNT 1000
+#define CALIBRATION_SAMPLES 200
 
-#define GYRO_X_OFFSET (1.6f)  // if +ve avg offset, use -neg value and vice versa
-#define GYRO_Y_OFFSET (0.10f) // if +ve avg offset, use -neg value and vice versa
-#define GYRO_Z_OFFSET (1.5f)  // if +ve avg offset, use -neg value and vice versa
+#define MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE (9.80665f) // Offsets and conversion values : 1g = 9.80665 m/s^2
 
 // defination to allow the i2c to check for ack
 #define MPU6050_ADDR (0x68)
@@ -99,10 +97,12 @@
 // #### Custom structure to store processed data
 typedef struct s_mpu6050_data
 {
-    
+    bool calibration_complete;
+    // uint16_t extract_counts;
     float tmp;
-    float ax, ay, az; //
+    float ax, ay, az; // m/s2
     float gx, gy, gz; // rpm
+    float gyro_x_offset, gyro_y_offset, gyro_z_offset; // raw
 } s_mpu6050_data_t;
 
 // #### Custom structure to store raw data

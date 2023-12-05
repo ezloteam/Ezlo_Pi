@@ -3,10 +3,12 @@
 #include "esp_err.h"
 #include "sensor_0005_I2C_MPU6050.h"
 
-static float acc_sen_calib_val = 0;
-static float gyro_sen_calib_val = 0;
+float acc_mpu6050_calib_val = 0;
+float gyro_mpu6050_calib_val = 0;
 
+#if 0
 // Table mapping e_mpu6050_err_t enumerals to strings
+
 static const char *mpu6050_err_str[MPU6050_ERR_MAX] = {
     [MPU6050_ERR_OK] = "No error",
     [MPU6050_ERR_PARAM_CFG_FAIL] = "i2c_param_config() error",
@@ -17,6 +19,7 @@ static const char *mpu6050_err_str[MPU6050_ERR_MAX] = {
     [MPU6050_ERR_OPERATION_TIMEOUT] = "Timeout; Bus busy",
     [MPU6050_ERR_UNKNOWN] = "Unknown error",
 };
+
 // mapper function for MPU6050_err
 static const char *mpu6050_err_to_str(e_mpu6050_err_t err)
 {
@@ -29,7 +32,7 @@ static const char *mpu6050_err_to_str(e_mpu6050_err_t err)
         return mpu6050_err_str[err];
     }
 }
-
+#endif
 static e_mpu6050_err_t __mpu6050_configure_power(l_ezlopi_item_t *item)
 {
     e_mpu6050_err_t err = MPU6050_ERR_OK;
@@ -41,7 +44,6 @@ static e_mpu6050_err_t __mpu6050_configure_power(l_ezlopi_item_t *item)
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
-        vTaskDelay(10);
     }
     return err;
 }
@@ -55,16 +57,16 @@ static e_mpu6050_err_t __mpu6050_configure_accelerometer(l_ezlopi_item_t *item, 
         switch (flags)
         {
         case A_CFG_2G:
-            acc_sen_calib_val = 16384.0f; //	{16384 LSB/g}
+            acc_mpu6050_calib_val = 16384.0f; //	{16384 LSB/g}
             break;
         case A_CFG_4G:
-            acc_sen_calib_val = 8192.0f; //	{8192 LSB/g}
+            acc_mpu6050_calib_val = 8192.0f; //	{8192 LSB/g}
             break;
         case A_CFG_8G:
-            acc_sen_calib_val = 4096.0f; //	{4096 LSB/g}
+            acc_mpu6050_calib_val = 4096.0f; //	{4096 LSB/g}
             break;
         case A_CFG_16G:
-            acc_sen_calib_val = 2048.0f; //	{2048 LSB/g}
+            acc_mpu6050_calib_val = 2048.0f; //	{2048 LSB/g}
             break;
         default:
             break;
@@ -73,7 +75,6 @@ static e_mpu6050_err_t __mpu6050_configure_accelerometer(l_ezlopi_item_t *item, 
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
-        vTaskDelay(10);
     }
     return err;
 }
@@ -87,16 +88,16 @@ static e_mpu6050_err_t __mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint
         switch (flags)
         {
         case G_CFG_250:
-            gyro_sen_calib_val = 131.0f; //	{131 LSB/deg/s}
+            gyro_mpu6050_calib_val = 131.0f; //	{131 LSB/deg/s}
             break;
         case G_CFG_500:
-            gyro_sen_calib_val = 65.5f; //	{65.5 LSB/deg/s}
+            gyro_mpu6050_calib_val = 65.5f; //	{65.5 LSB/deg/s}
             break;
         case G_CFG_1000:
-            gyro_sen_calib_val = 32.8f; //	{32.8 LSB/deg/s}
+            gyro_mpu6050_calib_val = 32.8f; //	{32.8 LSB/deg/s}
             break;
         case G_CFG_2000:
-            gyro_sen_calib_val = 16.4f; //	{16.4 LSB/deg/s}
+            gyro_mpu6050_calib_val = 16.4f; //	{16.4 LSB/deg/s}
             break;
         default:
             break;
@@ -106,7 +107,6 @@ static e_mpu6050_err_t __mpu6050_configure_gyroscope(l_ezlopi_item_t *item, uint
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
-        vTaskDelay(10);
     }
     return err;
 }
@@ -121,7 +121,6 @@ static e_mpu6050_err_t __mpu6050_configure_dlfp(l_ezlopi_item_t *item)
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
-        vTaskDelay(10);
     }
     return err;
 }
@@ -136,7 +135,6 @@ static e_mpu6050_err_t __mpu6050_enable_interrupt(l_ezlopi_item_t *item)
         {
             err = MPU6050_ERR_DRIVER_INSTALL_FAIL;
         }
-        vTaskDelay(10);
     }
     return err;
 }
@@ -167,8 +165,8 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
     if (item)
     {
         e_mpu6050_err_t err = MPU6050_ERR_OK;
-        static s_raw_mpu6050_data_t RAW_DATA = {0};
-        static uint8_t tmp_buf[REG_COUNT_LEN] = {0}; // 0 - 13
+        s_raw_mpu6050_data_t RAW_DATA = {0};
+        uint8_t tmp_buf[REG_COUNT_LEN] = {0}; // 0 - 13
         uint8_t Check_Register = 0;
         uint8_t address_val = 0;
 
@@ -181,17 +179,21 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), REG_COUNT_LEN); //(tmp_buf+i), 1);
             }
+            // user_data->extract_counts++;
+            // TRACE_I("Total Extracted : [%d]", user_data->extract_counts);
         }
         else
         {
-            TRACE_E("Data not ready ... Error type:- %d (%s)", err, mpu6050_err_to_str(err));
+            TRACE_E("Data not ready ... Error type:- %d ", err);
             for (uint8_t try = 10; ((try > 0) && !(Check_Register & DATA_RDY_INT_FLAG)); try--)
             {
                 if (MPU6050_ERR_OK == mpu6050_check_data_ready_INTR(item, &Check_Register))
                 {
                     TRACE_E(" Check Register ... 0x3AH : {%#x}", Check_Register);
                     if (Check_Register & DATA_RDY_INT_FLAG)
+                    {
                         break;
+                    }
                 }
             }
         }
@@ -205,12 +207,12 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
         RAW_DATA.raw_gy = (int16_t)(tmp_buf[10] << 8 | tmp_buf[11]); // gy = 69 & 70
         RAW_DATA.raw_gz = (int16_t)(tmp_buf[12] << 8 | tmp_buf[13]); // gz = 71 & 72
 
-        user_data->ax = (RAW_DATA.raw_ax / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
-        user_data->ay = (RAW_DATA.raw_ay / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
-        user_data->az = (RAW_DATA.raw_az / acc_sen_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
-        user_data->gx = ((RAW_DATA.raw_gx / gyro_sen_calib_val) - GYRO_X_OFFSET) / 6.0f;                      // -> revolutions per minute = degrees per second ÷ 6
-        user_data->gy = ((RAW_DATA.raw_gy / gyro_sen_calib_val) - GYRO_Y_OFFSET) / 6.0f;                      // -> revolutions per minute = degrees per second ÷ 6
-        user_data->gz = ((RAW_DATA.raw_gz / gyro_sen_calib_val) - GYRO_Z_OFFSET) / 6.0f;                      // -> revolutions per minute = degrees per second ÷ 6
+        user_data->ax = (RAW_DATA.raw_ax / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+        user_data->ay = (RAW_DATA.raw_ay / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+        user_data->az = (RAW_DATA.raw_az / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+        user_data->gx = ((RAW_DATA.raw_gx - user_data->gyro_x_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
+        user_data->gy = ((RAW_DATA.raw_gy - user_data->gyro_y_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
+        user_data->gz = ((RAW_DATA.raw_gz - user_data->gyro_z_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
         user_data->tmp = ((RAW_DATA.raw_t / 340) + 36.530f);
     }
 }
@@ -225,40 +227,35 @@ e_mpu6050_err_t __mpu6050_config_device(l_ezlopi_item_t *item)
         // flags = PWR_MGMT_1_PLL_Z_AXIS_INTERNAL_CLK_REF;
         if ((err = __mpu6050_configure_power(item)) != MPU6050_ERR_OK)
         {
-            TRACE_E("Initializtion unsuccessful %d", err);
-            TRACE_E("%s", mpu6050_err_to_str(err));
+            TRACE_E("Initializtion unsuccessful [%d]", err);
             return err;
         }
         // Configure accelerometer sensitivity
         flags = A_CFG_2G; // 16384 steps
         if ((err = __mpu6050_configure_accelerometer(item, flags)) != MPU6050_ERR_OK)
         {
-            TRACE_E("Initializtion unsuccessful %d", err);
-            TRACE_E("%s", mpu6050_err_to_str(err));
+            TRACE_E("Initializtion unsuccessful [%d]", err);
             return err;
         }
         // Configure gyro sensitivity
         flags = G_CFG_250; // +-250 deg/s
         if ((err = __mpu6050_configure_gyroscope(item, flags)) != MPU6050_ERR_OK)
         {
-            TRACE_E("Initializtion unsuccessful %d", err);
-            TRACE_E("%s", mpu6050_err_to_str(err));
+            TRACE_E("Initializtion unsuccessful [%d]", err);
             return err;
         }
         // Configure the Digital-Low-Pass-Filter
         // flags = DLFP_CFG_FILTER_0; // default -> no dlfp -> 8Mhz clk ref
         if ((err = __mpu6050_configure_dlfp(item)) != MPU6050_ERR_OK)
         {
-            TRACE_E("Initializtion unsuccessful %d", err);
-            TRACE_E("%s", mpu6050_err_to_str(err));
+            TRACE_E("Initializtion unsuccessful [%d]", err);
             return err;
         }
         // Enable interrupts after every sensor refresh
         // flags = INTR_EN_DATA_RDY;
         if ((err = __mpu6050_enable_interrupt(item)) != MPU6050_ERR_OK) // DATA_RDY_EN = 1 //  occurs each-time a write operation to the sensor registers has been completed.
         {
-            TRACE_E("Initializtion unsuccessful %d", err);
-            TRACE_E("%s", mpu6050_err_to_str(err));
+            TRACE_E("Initializtion unsuccessful [%d]", err);
             return err;
         }
     }
