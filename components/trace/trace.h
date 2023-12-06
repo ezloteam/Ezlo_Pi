@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-#define ENABLE_TRACE 0
+#define ENABLE_TRACE 1
 
     void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
 

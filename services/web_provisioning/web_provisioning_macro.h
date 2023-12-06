@@ -16,8 +16,8 @@ CLOUD_METHOD("hub.info.get", info_get, NULL)
 
 CLOUD_METHOD("hub.network.get", network_get, NULL)
 
-// CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)
-// CLOUD_METHOD("hub.firmware.update.start", firmware_update_start, NULL)
+CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)
+CLOUD_METHOD("hub.firmware.update.start", firmware_update_start, NULL)
 
 CLOUD_METHOD("hub.device.settings.list", ezlopi_device_settings_list_v3, NULL)
 CLOUD_METHOD("hub.device.setting.value.set", ezlopi_device_settings_value_set_v3, NULL)

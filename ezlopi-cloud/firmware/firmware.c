@@ -59,8 +59,6 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddNullToObject(cj_response, "error");
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    TRACE_E("OTA Response : %s", cJSON_Print(cj_request));
-
     cJSON *result = cJSON_GetObjectItem(cj_request, "result");
     if (result)
     {
@@ -88,6 +86,7 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
         else
         {
             // send "cloud.firmware.info.get"
+            // ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
         }
     }
 }
@@ -110,19 +109,19 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
             {
                 if (isalpha(device_type[0]))
                 {
-                    cJSON_AddStringToObject(cj_params, "firmware_type", device_type);
+                    cJSON_AddStringToObject(cj_params, "firmware_type", device_type); //
                 }
                 else
                 {
-                    cJSON_AddStringToObject(cj_params, "firmware_type", "generic");
+                    cJSON_AddStringToObject(cj_params, "firmware_type", "unknown");
                 }
                 // free(device_type);
             }
             else
             {
-                cJSON_AddStringToObject(cj_params, "firmware_type", "generic");
+                cJSON_AddStringToObject(cj_params, "firmware_type", "unknown");
             }
-            cJSON_AddStringToObject(cj_params, "firmware_hardware", "ezlopi");
+            cJSON_AddStringToObject(cj_params, "firmware_hardware", CONFIG_IDF_TARGET);
         }
 
         char *str_request = cJSON_Print(cj_request);
