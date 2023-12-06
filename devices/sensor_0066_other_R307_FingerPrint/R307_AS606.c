@@ -1321,7 +1321,7 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t *item)
         vTaskDelay(100 / portTICK_PERIOD_MS);
         SetSysPara(uart_channel_num, FINGERPRINT_DATA_PACKAGE_LENGTH, FINGERPRINT_DATA_LENGTH_64, (user_data->recieved_buffer), 1000);
         vTaskDelay(100 / portTICK_PERIOD_MS);
-        TRACE_D("------------  >> STARTING THE SYSTEM << -------------------");
+        TRACE_D("------  >> STARTING THE SYSTEM << --------");
         for (uint8_t i = 0; i < 2; i++)
         {
             if (LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200))
@@ -1335,6 +1335,8 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t *item)
                 vTaskDelay(300 / portTICK_PERIOD_MS);
             }
         }
+        TRACE_D("           >> LED OFF <<");
+        LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
         F_res = FINGERPRINT_OK;
     }
     return F_res;
