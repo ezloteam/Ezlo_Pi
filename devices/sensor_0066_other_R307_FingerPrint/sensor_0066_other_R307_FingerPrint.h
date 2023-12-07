@@ -43,16 +43,11 @@
  *
  */
 
-//----------------------------------------------------------------------------------------------
-// #define MODE_DEFAULT FINGERPRINT_MATCH_MODE
-// #define USERID_DEFAULT 1
-// #define IDCOUNT_DEFAULT 10
-
-#define FINGERPRINT_MAX_CAPACITY_LIMIT 10                                  // !< Setting the max quantity of fingerprints allowed to be stored >
+//---------------------------------------------------------------------------------------------------------------
+#define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
 #define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >
 #define MAX_PACKET_LENGTH_VAL 64                                           // !< Setting the max length of the transferring data package >
 #define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600) // !< Setting Baudrate for transferring data via uart >
-
 //----------------------------------------------------------------------------------------------------------------
 // Step 1: List the instructions cmds
 #define FINGERPRINT_GETIMAGE 0x01       //!< Collect finger image
@@ -112,7 +107,7 @@
 #if 0
 // #define ACK_ERR_ 0x41 //: No finger on sensor when add fingerprint on second time.
 // #define ACK_ERR_ 0x42 //: fail to enroll the finger for second fingerprint add.
-// #define ACK_ERR_ 0x43 //: fail to generate character file due to lackness of character point or over-smallness of fingerprint image for second fingerprint add
+// #define ACK_ERR_ 0x43 //: fail to generate character file ; lackness of character_point or over-smallness of second fingerprint image
 // #define ACK_ERR_ 0x44 //: fail to generate character file due to the over-disorderly fingerprint image for second fingerprint add;
 #endif
 //---------------------------------------------------------------------
@@ -159,14 +154,14 @@
 #define UART_PORT_OFF (uint8_t)0 //!< Uart port is OFF
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom enum for status response after executing a command >
-typedef enum
+typedef enum fingerprint_status
 {
     FINGERPRINT_FAIL = 0,
     FINGERPRINT_OK,
 } fingerprint_status_t;
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom enum indicating the current operation phase >
-typedef enum
+typedef enum e_fingerprint_op_mode
 {
     FINGERPRINT_MATCH_MODE = 0,
     FINGERPRINT_ENROLLMENT_MODE,
@@ -175,20 +170,10 @@ typedef enum
     FINGERPRINT_ERASE_ALL_MODE,
     FINGERPRINT_MODE_MAX
 } e_fingerprint_op_mode_t;
-//----------------------------------------------------------------------------------------------------------------
-// !< Custom tx-packet >
-typedef struct fingerprint_packet_t
-{
-    uint8_t header_code[2];              /* HeaderCode [0xEF01]*/
-    uint8_t device_address[4];           /* 0xFF; 0xFF; 0xFF; 0xFF*/
-    uint8_t PID;                         /* Identifier : cmd, data, ack or end*/
-    uint8_t Packet_len[2];               /* [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
-    uint8_t data[MAX_PACKET_LENGTH_VAL]; /* Inst_code + Data_content */
-    uint8_t chk_sum[2];
-} fingerprint_packet_t;
+
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom item_ids >
-typedef enum
+typedef enum e_sensor_fp_items
 {
     SENSOR_FP_ITEM_ID_ENROLL,
     SENSOR_FP_ITEM_ID_ACTION,
@@ -199,20 +184,21 @@ typedef enum
 // !< Custom structure to send as a reply to server (@ MATCH phase) >
 typedef struct server_packet_t
 {
-    volatile e_fingerprint_op_mode_t opmode;                      /* Hold current operation mode*/
-    uint32_t intr_pin;                                            /* Stores custom interrupt pin num*/
-    uint16_t id_counts;                                           /* This is used as an information for list and erase operations*/
-    uint16_t user_id;                                             /* Stores: Template or character_page ID (0~999) [Also, used as starting ID in 'EraseID_mode']*/
-    uint16_t confidence_level;                                    /* 0~100*/
-    uint16_t matched_id;                                          /* Used to store most recently matched ID*/
-    uint16_t matched_confidence_level;                            /* Used to store most recently matched confidence*/
-    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];               /* This array store incomming uart message*/
-    volatile uint8_t protect[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /* Array that indicate which index to clear [ 1-> protect ]*/
-    volatile bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1];   /* status of each ID {1~500} ; [ true -> occupied]*/
-    volatile bool __busy_guard;                                   /* Gaurd_flag used during notification actions*/
-    time_t timeout_start_time;                                    /* Variable to store immediate time value*/
-    TaskHandle_t notifyHandler;                                   /* Notify handler*/
+    volatile e_fingerprint_op_mode_t opmode;                    /* Hold current operation mode*/
+    volatile bool __busy_guard;                                 /* Gaurd_flag used during notification actions*/
+    volatile bool notify_flag;                                  /* It triggers a reply after set_action*/
+    uint8_t intr_pin;                                           /* Stores custom interrupt pin num*/
+    uint16_t confidence_level;                                  /* 0~100*/
+    uint16_t matched_confidence_level;                          /* Used to store most recently matched confidence*/
+    uint16_t user_id;                                           /* Stores: Template or character_page ID (0~999)*/
+    uint16_t matched_id;                                        /* Used to store most recently matched ID*/
+    uint8_t recieved_buffer[MAX_PACKET_LENGTH_VAL];             /* This array store incomming uart message*/
+    volatile bool protect[FINGERPRINT_MAX_CAPACITY_LIMIT + 1];  /* Array indicate which index to protect*/
+    volatile bool validity[FINGERPRINT_MAX_CAPACITY_LIMIT + 1]; /* status of each ID {1~500} ; [ true -> occupied]*/
+    time_t timeout_start_time;                                  /* Variable to store immediate time value*/
+    TaskHandle_t notifyHandler;                                 /* Notify handler*/
     esp_timer_handle_t timerHandler;
+    e_sensor_fp_items_t sensor_fp_item_ids[SENSOR_FP_ITEM_ID_MAX];
 } server_packet_t;
 
 //-------------------------------------------------------------------------------------------------------------------

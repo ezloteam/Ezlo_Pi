@@ -431,8 +431,8 @@ static const char *test_device_constant_config =
                 \"dev_name\": \"fingerprint\",\
                 \"id_room\": \"\",\
                 \"id_item\": 66,\
-                \"gpio1\": 17,\
-                \"gpio2\": 16,\
+                \"gpio1\": 18,\
+                \"gpio2\": 19,\
                 \"gpio3\": 25\
             }\
     ],\

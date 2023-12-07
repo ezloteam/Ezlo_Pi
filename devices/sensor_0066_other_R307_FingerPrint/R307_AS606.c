@@ -3,9 +3,20 @@
 #include "ezlopi_uart.h"
 #include "sensor_0066_other_R307_FingerPrint.h"
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------
+// !< Custom tx-packet >
+typedef struct fingerprint_packet_t
+{
+    uint8_t header_code[2];              /* HeaderCode [0xEF01]*/
+    uint8_t device_address[4];           /* 0xFF; 0xFF; 0xFF; 0xFF*/
+    uint8_t PID;                         /* Identifier : cmd, data, ack or end*/
+    uint8_t Packet_len[2];               /* [PID + P_LEN + (data_fields)] should not exceed 256bytes*/
+    uint8_t data[MAX_PACKET_LENGTH_VAL]; /* Inst_code + Data_content */
+    uint8_t chk_sum[2];
+} fingerprint_packet_t;
+//---------------------------------------------------------------------------------------------------------------------------------
 // Function for Communication-Packet (Generation and Response).
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------
 
 /**
  * @brief This is a function generates/prepares appropriate transmission packets actions.
@@ -686,7 +697,7 @@ bool Load(int uart_channel_num, uint8_t CharBufferID, uint16_t PageID, uint8_t *
         F_res = __Response_function(recieved_buffer, timeout);
         if (FINGERPRINT_OK == F_res)
         {
-            uint16_t Checksum = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF); //(1~12)
+            // uint16_t Checksum = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF); //(1~12)
             // TRACE_D("Load =>Checksum [4]: %#x", Checksum);
         }
         // TRACE_W("---------------------------------------------------");
@@ -800,7 +811,7 @@ bool LedControl(int uart_channel_num, bool LED_state, uint8_t *recieved_buffer, 
         F_res = __Response_function(recieved_buffer, timeout);
         if (FINGERPRINT_OK == F_res)
         {
-            uint16_t Checksum = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF); //(1~12)
+            // uint16_t Checksum = ((uint16_t)recieved_buffer[4] << 8) + ((uint16_t)recieved_buffer[5] & 0xFF); //(1~12)
             // TRACE_D("LedControl =>Checksum [4]: %#x", Checksum);
         }
         // TRACE_W("---------------------------------------------------");
@@ -1274,7 +1285,7 @@ uint16_t r307_as606_enroll_fingerprint(l_ezlopi_item_t *item)
         {
             TRACE_I("Storing desired, USER_ID: [%d] -> into PAGE_ID[#%d] ", custom_USER_ID, (user_data->user_id)); // we have made sure that:->  [custom_USER_ID != (user_data->user_id)]
             p = FINGERPRINT_FAIL;
-            TRACE_I("[Phase:-5] ...Store the unique fingerprint [Phase:-5]... Place same finger again......");
+            TRACE_I("[Phase:-5] ...Storing the unique fingerprint......");
             // Loop until Second fingerprint collection is successful
             start_time = esp_timer_get_time() / 1000; //  !< ms
             dummy_timer = esp_timer_get_time() / 1000;
@@ -1336,7 +1347,7 @@ fingerprint_status_t r307_as606_fingerprint_config(l_ezlopi_item_t *item)
             }
         }
         TRACE_D("           >> LED OFF <<");
-        LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 200);
+        LedControl(uart_channel_num, 0, (user_data->recieved_buffer), 300);
         F_res = FINGERPRINT_OK;
     }
     return F_res;
