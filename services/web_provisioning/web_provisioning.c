@@ -21,6 +21,7 @@
 #include "firmware.h"
 #include "settings.h"
 #include "scenes_scripts.h"
+#include "scenes_expressions.h"
 
 #include "ezlopi_wifi.h"
 #include "ezlopi_http.h"
@@ -297,5 +298,4 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
 {
     esp_restart();
-    return NULL;
 }

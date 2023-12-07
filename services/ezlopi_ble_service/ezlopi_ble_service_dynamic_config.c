@@ -16,6 +16,7 @@
 #include "ezlopi_ble_buffer.h"
 #include "ezlopi_ble_profile.h"
 #include "ezlopi_ble_service.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_factory_info.h"
 #include "esp_gatt_common_api.h"
 

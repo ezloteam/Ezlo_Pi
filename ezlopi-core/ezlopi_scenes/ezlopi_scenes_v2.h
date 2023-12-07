@@ -167,4 +167,7 @@ cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene);
 cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_v2_t *scenes_list);
 char *ezlopi_scenes_create_json_string(l_scenes_list_v2_t *scenes_list);
 
+e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field);
+e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type);
+
 #endif // __EZLOPI_SCENES_V2_H__

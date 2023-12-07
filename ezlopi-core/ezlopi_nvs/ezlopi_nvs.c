@@ -23,6 +23,7 @@ static const char *ezlopi_scripts_nvs_ids = "ezlopi_scripts";
 static const char *settings_initialized_status_name = "settings_magic";
 static const char *config_info_update_time_name = "conf_update_time";
 static const char *config_info_version_number = "conf_ver_no";
+static const char *ezlopi_scenes_expression_ids = "ezlopi_exp";
 
 int ezlopi_nvs_init(void)
 {
@@ -100,6 +101,7 @@ void ezlopi_nvs_config_info_update_time_set(uint32_t value)
         TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
     }
 }
+
 void ezlopi_nvs_config_info_version_number_set(uint32_t value)
 {
     if (ezlopi_nvs_init())
@@ -111,12 +113,7 @@ void ezlopi_nvs_config_info_version_number_set(uint32_t value)
 
 int ezlopi_nvs_scene_set_v2(char *scene)
 {
-    int ret = 0;
-    if (scene)
-    {
-        ret = ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_v2_nvs_name);
-    }
-    return ret;
+    return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_v2_nvs_name);
 }
 
 char *ezlopi_nvs_scene_get_v2(void)
@@ -126,12 +123,7 @@ char *ezlopi_nvs_scene_get_v2(void)
 
 int ezlopi_nvs_scene_set(char *scene)
 {
-    int ret = 0;
-    if (scene)
-    {
-        ret = ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_nvs_name);
-    }
-    return ret;
+    return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_nvs_name);
 }
 
 char *ezlopi_nvs_scene_get(void)
@@ -152,14 +144,7 @@ int ezlopi_nvs_factory_reset(void)
 
 int ezlopi_nvs_write_scenes_scripts(char *data)
 {
-    int ret = 0;
-
-    if (1 == ezlopi_nvs_write_str(data, strlen(data), (char *)ezlopi_scripts_nvs_ids))
-    {
-        ret = 1;
-    }
-
-    return ret;
+    return ezlopi_nvs_write_str(data, strlen(data), (char *)ezlopi_scripts_nvs_ids);
 }
 
 char *ezlopi_nvs_read_scenes_scripts(void)
@@ -167,14 +152,19 @@ char *ezlopi_nvs_read_scenes_scripts(void)
     return ezlopi_nvs_read_str(ezlopi_scripts_nvs_ids);
 }
 
+int ezlopi_nvs_write_scenes_expressions(char *data)
+{
+    return ezlopi_nvs_write_str(data, strlen(data), ezlopi_scenes_expression_ids);
+}
+
+char *ezlopi_nvs_read_scenes_expressions(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_scenes_expression_ids);
+}
+
 int ezlopi_nvs_write_config_data_str(char *data)
 {
-    int ret = 0;
-    if (1 == ezlopi_nvs_write_str(data, strlen(data), config_nvs_name))
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_write_str(data, strlen(data), config_nvs_name);
 }
 
 char *ezlopi_nvs_read_config_data_str(void)
@@ -231,12 +221,7 @@ int ezlopi_nvs_write_ble_passkey(uint32_t passkey)
 
 int ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len)
 {
-    int ret = 0;
-    if (1 == ezlopi_nvs_write_str(wifi_info, len, wifi_info_nvs_name))
-    {
-        ret = 1;
-    }
-    return ret;
+    return ezlopi_nvs_write_str(wifi_info, len, wifi_info_nvs_name);
 }
 
 int ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
@@ -522,40 +507,43 @@ char *ezlopi_nvs_read_str(char *nvs_name)
 {
     char *return_str = NULL;
 
-    if (1 == ezlopi_nvs_init())
+    if (nvs_name)
     {
-        esp_err_t err = ESP_OK;
-        size_t buf_len_needed = 0;
-        err = nvs_get_str(ezlopi_nvs_handle, nvs_name, NULL, &buf_len_needed);
-
-        if (buf_len_needed && (ESP_OK == err))
+        if (1 == ezlopi_nvs_init())
         {
-            return_str = malloc(buf_len_needed + 1);
+            esp_err_t err = ESP_OK;
+            size_t buf_len_needed = 0;
+            err = nvs_get_str(ezlopi_nvs_handle, nvs_name, NULL, &buf_len_needed);
 
-            if (return_str)
+            if (buf_len_needed && (ESP_OK == err))
             {
-                memset(return_str, 0, buf_len_needed + 1);
-                err = nvs_get_str(ezlopi_nvs_handle, nvs_name, return_str, &buf_len_needed);
+                return_str = malloc(buf_len_needed + 1);
 
-                if (ESP_OK == err)
+                if (return_str)
                 {
-                    // TRACE_D("%s read success. \r\nData[%d]: \r\n%s", nvs_name, buf_len_needed, return_str);
+                    memset(return_str, 0, buf_len_needed + 1);
+                    err = nvs_get_str(ezlopi_nvs_handle, nvs_name, return_str, &buf_len_needed);
+
+                    if (ESP_OK == err)
+                    {
+                        // TRACE_D("%s read success. \r\nData[%d]: \r\n%s", nvs_name, buf_len_needed, return_str);
+                    }
+                    else
+                    {
+                        TRACE_E("%s read error: %s", nvs_name, esp_err_to_name(err));
+                        free(return_str);
+                        return_str = NULL;
+                    }
                 }
                 else
                 {
-                    TRACE_E("%s read error: %s", nvs_name, esp_err_to_name(err));
-                    free(return_str);
-                    return_str = NULL;
+                    TRACE_E("MALLOC ERROR");
                 }
             }
             else
             {
-                TRACE_E("MALLOC ERROR");
+                TRACE_E("%s: buf_len_needed: %d, err: %s", nvs_name, buf_len_needed, esp_err_to_name(err));
             }
-        }
-        else
-        {
-            TRACE_E("%s: buf_len_needed: %d, err: %s", nvs_name, buf_len_needed, esp_err_to_name(err));
         }
     }
 

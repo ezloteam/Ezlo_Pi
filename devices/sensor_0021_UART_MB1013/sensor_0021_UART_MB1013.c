@@ -9,6 +9,7 @@
 #include "ezlopi_cloud.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"

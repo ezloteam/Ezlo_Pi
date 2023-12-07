@@ -115,12 +115,18 @@ uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
         }
 
         curr_script->next = __scripts_create_node(script_id, cj_script);
-        new_script_id = curr_script->next->id;
+        if (curr_script)
+        {
+            new_script_id = curr_script->next->id;
+        }
     }
     else
     {
         script_head = __scripts_create_node(script_id, cj_script);
-        new_script_id = script_head->id;
+        if (script_head)
+        {
+            new_script_id = script_head->id;
+        }
     }
 
     return new_script_id;
@@ -472,7 +478,7 @@ static char *__script_report(lua_State *lua_state, int status)
 {
     if (status == LUA_OK)
     {
-        return;
+        return NULL;
     }
 
     const char *msg = lua_tostring(lua_state, -1);

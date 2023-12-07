@@ -39,6 +39,7 @@ CLOUD_METHOD("hub.scenes.scripts.set", scenes_scripts_set, NULL)
 CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
 // CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 // CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set) // Not implemented
+CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, NULL)
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 

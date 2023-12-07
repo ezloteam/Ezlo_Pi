@@ -1,13 +1,15 @@
 #include "ctype.h"
-
 #include "cJSON.h"
 
 #include "items.h"
 #include "trace.h"
+
 #include "ezlopi_nvs.h"
 #include "ezlopi_devices.h"
-#include "web_provisioning.h"
 #include "ezlopi_factory_info.h"
+#include "ezlopi_cjson_macros.h"
+
+#include "web_provisioning.h"
 
 static l_ezlopi_device_t *l_device_head = NULL;
 static s_ezlopi_cloud_controller_t s_controller_information;

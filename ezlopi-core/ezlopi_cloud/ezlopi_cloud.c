@@ -9,14 +9,16 @@ static const uint32_t ROOM_ID_START = 0x30000000;
 static const uint32_t SETTINGS_ID_START = 0x50000000;
 static const uint32_t SCENE_ID_START = 0x60000000;
 static const uint32_t SCRIPT_ID_START = 0x70000000;
+static const uint32_t EXPRESSION_ID_START = 0x80000000;
 
-static uint64_t device_id = 0;
-static uint64_t item_id = 0;
-static uint64_t room_id = 0;
-static uint64_t gateway_id = 0;
-static uint64_t settings_id = 0;
-static uint32_t scene_id = 0;
-static uint32_t script_id = 0;
+static uint32_t g_device_id = 0;
+static uint32_t g_item_id = 0;
+static uint32_t g_room_id = 0;
+static uint32_t g_gateway_id = 0;
+static uint32_t g_settings_id = 0;
+static uint32_t g_scene_id = 0;
+static uint32_t g_script_id = 0;
+static uint32_t g_expression_id = 0;
 
 static uint32_t ezlopi_get_mac_crc(void)
 {
@@ -32,9 +34,13 @@ static uint32_t ezlopi_get_mac_crc(void)
         for (int j = 0; j < 8; j++)
         {
             if (crc & 0x8000)
+            {
                 crc = (crc << 1) ^ CRC16_POLY;
+            }
             else
+            {
                 crc <<= 1;
+            }
         }
     }
 
@@ -43,87 +49,97 @@ static uint32_t ezlopi_get_mac_crc(void)
 
 uint32_t ezlopi_cloud_generate_device_id(void)
 {
-    if (0 == device_id)
+    if (0 == g_device_id)
     {
-        device_id = DEVICE_ID_START + ezlopi_get_mac_crc();
+        g_device_id = DEVICE_ID_START + ezlopi_get_mac_crc();
     }
     else
     {
-        device_id++;
+        g_device_id++;
     }
-    // TRACE_D("device_id: %u\r\n", device_id);
-    return device_id;
+    // TRACE_D("g_device_id: %u\r\n", g_device_id);
+    return g_device_id;
 }
 
 uint32_t ezlopi_cloud_generate_item_id(void)
 {
-    if (0 == item_id)
+    if (0 == g_item_id)
     {
-        item_id = ITEM_ID_START + ezlopi_get_mac_crc();
+        g_item_id = ITEM_ID_START + ezlopi_get_mac_crc();
     }
     else
     {
-        item_id++;
+        g_item_id++;
     }
-    // TRACE_D("item_id: %u\r\n", item_id);
+    // TRACE_D("g_item_id: %u\r\n", g_item_id);
 
-    return item_id;
+    return g_item_id;
 }
 
 uint32_t ezlopi_cloud_generate_room_id(void)
 {
-    if (0 == room_id)
+    if (0 == g_room_id)
     {
-        room_id = ROOM_ID_START + ezlopi_get_mac_crc();
+        g_room_id = ROOM_ID_START + ezlopi_get_mac_crc();
     }
     else
     {
-        room_id++;
+        g_room_id++;
     }
-    // TRACE_D("room_id: %u\r\n", room_id);
-    return room_id;
+    // TRACE_D("g_room_id: %u\r\n", g_room_id);
+    return g_room_id;
 }
 
 uint32_t ezlopi_cloud_generate_gateway_id(void)
 {
-    if (0 == gateway_id)
+    if (0 == g_gateway_id)
     {
-        gateway_id = 0x457a5069;
+        g_gateway_id = 0x457a5069;
     }
-    // TRACE_D("gateway_id: %u\r\n", gateway_id);
-    return gateway_id;
+    // TRACE_D("g_gateway_id: %u\r\n", g_gateway_id);
+    return g_gateway_id;
 }
 
 uint32_t ezlopi_cloud_generate_settings_id(void)
 {
-    if (0 == settings_id)
+    if (0 == g_settings_id)
     {
-        settings_id = SETTINGS_ID_START + ezlopi_get_mac_crc();
+        g_settings_id = SETTINGS_ID_START + ezlopi_get_mac_crc();
     }
     else
     {
-        settings_id++;
+        g_settings_id++;
     }
-    // TRACE_D("settings_id: %u\r\n", gateway_id);
-    return settings_id;
+    // TRACE_D("g_settings_id: %u\r\n", g_gateway_id);
+    return g_settings_id;
 }
 
 void ezlopi_cloud_update_scene_id(uint32_t a_scene_id)
 {
-    scene_id = (a_scene_id > scene_id) ? a_scene_id : scene_id;
+    g_scene_id = (a_scene_id > g_scene_id) ? a_scene_id : g_scene_id;
 }
 uint32_t ezlopi_cloud_generate_scene_id(void)
 {
-    scene_id = (0 == scene_id) ? (SCENE_ID_START + ezlopi_get_mac_crc()) : (scene_id + 1);
-    return scene_id;
+    g_scene_id = (0 == g_scene_id) ? (SCENE_ID_START + ezlopi_get_mac_crc()) : (g_scene_id + 1);
+    return g_scene_id;
 }
 
 void ezlopi_cloud_update_script_id(uint32_t a_script_id)
 {
-    script_id = (a_script_id > script_id) ? a_script_id : script_id;
+    g_script_id = (a_script_id > g_script_id) ? a_script_id : g_script_id;
 }
 uint32_t ezlopi_cloud_generate_script_id(void)
 {
-    script_id = (0 == script_id) ? (SCRIPT_ID_START + ezlopi_get_mac_crc()) : (script_id + 1);
-    return script_id;
+    g_script_id = (0 == g_script_id) ? (SCRIPT_ID_START + ezlopi_get_mac_crc()) : (g_script_id + 1);
+    return g_script_id;
+}
+
+void ezlopi_cloud_update_expression_id(uint32_t a_expression_id)
+{
+    g_expression_id = (a_expression_id > g_expression_id) ? a_expression_id : g_expression_id;
+}
+uint32_t ezlopi_cloud_generate_expression_id(void)
+{
+    g_expression_id = (0 == g_expression_id) ? (EXPRESSION_ID_START + ezlopi_get_mac_crc()) : (g_expression_id + 1);
+    return g_expression_id;
 }

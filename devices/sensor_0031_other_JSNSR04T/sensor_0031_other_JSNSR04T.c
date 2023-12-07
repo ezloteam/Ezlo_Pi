@@ -1,14 +1,11 @@
-#include "jsn_sr04t.h"
-
 #include "trace.h"
 
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
-#include "ezlopi_valueformatter.h"
 
-#include "sensor_0031_other_JSNSR04T.h"
-
+#include "jsn_sr04t.h"
 #include "sensor_0031_other_JSNSR04T.h"
 
 static int __prepare(void *arg);

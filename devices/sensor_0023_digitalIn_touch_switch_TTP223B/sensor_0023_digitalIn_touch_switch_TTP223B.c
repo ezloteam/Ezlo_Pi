@@ -4,6 +4,7 @@
 
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
@@ -11,8 +12,6 @@
 #include "items.h"
 #include "trace.h"
 #include "gpio_isr_service.h"
-
-#include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 

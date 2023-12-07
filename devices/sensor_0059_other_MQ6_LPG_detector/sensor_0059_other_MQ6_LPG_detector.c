@@ -1,17 +1,18 @@
+#include "math.h"
 #include "trace.h"
 #include "cJSON.h"
-#include "ezlopi_actions.h"
-#include "ezlopi_timer.h"
 #include "items.h"
-#include "math.h"
-#include "stdbool.h"
 #include "string.h"
+#include "stdbool.h"
 
 #include "ezlopi_adc.h"
+#include "ezlopi_timer.h"
+#include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
+#include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
-#include "ezlopi_valueformatter.h"
 
 #include "sensor_0059_other_MQ6_LPG_detector.h"
 

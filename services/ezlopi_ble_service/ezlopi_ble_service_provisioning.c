@@ -8,15 +8,17 @@
 
 #include "trace.h"
 
-#include "ezlopi_wifi.h"
 #include "ezlopi_nvs.h"
-#include "ezlopi_ble_buffer.h"
+#include "ezlopi_wifi.h"
+#include "ezlopi_devices.h"
 #include "ezlopi_ble_gatt.h"
+#include "ezlopi_ble_auth.h"
+#include "ezlopi_ble_buffer.h"
 #include "ezlopi_ble_profile.h"
 #include "ezlopi_ble_service.h"
 #include "ezlopi_factory_info.h"
-#include "ezlopi_devices.h"
-#include "ezlopi_ble_auth.h"
+#include "ezlopi_cjson_macros.h"
+
 #include "esp_gatt_common_api.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))

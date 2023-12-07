@@ -4,9 +4,11 @@
 #include "trace.h"
 
 #include "cJSON.h"
+#include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_methods_str.h"
-#include "ezlopi_devices_list.h"
+
 #include "web_provisioning.h"
 
 void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)

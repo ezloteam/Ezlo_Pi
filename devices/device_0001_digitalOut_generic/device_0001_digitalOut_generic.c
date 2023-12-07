@@ -5,26 +5,26 @@
 #include "trace.h"
 
 #include "items.h"
-#include "gpio_isr_service.h"
 
 #include "ezlopi_gpio.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
+
+#include "ezlopi_nvs.h"
+#include "ezlopi_gpio.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 
 #include "gpio_isr_service.h"
-#include "ezlopi_gpio.h"
-#include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_valueformatter.h"
-#include "ezlopi_nvs.h"
-
 #include "device_0001_digitalOut_generic.h"
 
 // #define DEV_TEST_SETTINGS_EN

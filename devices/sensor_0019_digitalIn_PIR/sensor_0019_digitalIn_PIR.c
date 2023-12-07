@@ -1,9 +1,10 @@
 
 
 #include "ezlopi_cloud.h"
-#include "gpio_isr_service.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 
+#include "gpio_isr_service.h"
 #include "sensor_0019_digitalIn_PIR.h"
 
 static int sensor_pir_prepare_v3(void *arg);

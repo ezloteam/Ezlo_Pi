@@ -1,8 +1,9 @@
 #include "ezlopi_cloud.h"
-#include "gpio_isr_service.h"
-#include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_value_type_str.h"
 
+#include "gpio_isr_service.h"
 #include "sensor_0034_digitalIn_proximity.h"
 
 static int proximity_sensor_prepare(void *args);

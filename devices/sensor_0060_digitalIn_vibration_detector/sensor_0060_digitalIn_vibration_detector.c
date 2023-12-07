@@ -2,17 +2,19 @@
 
 #include "trace.h"
 #include "items.h"
-#include "gpio_isr_service.h"
 
 #include "ezlopi_gpio.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_actions.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 
+#include "gpio_isr_service.h"
 #include "sensor_0060_digitalIn_vibration_detector.h"
+
 //---------------------------------------------------------------------------------------------------------
 const char *Sw420_vibration_activity_state_token[] = {
     "no_activity",
