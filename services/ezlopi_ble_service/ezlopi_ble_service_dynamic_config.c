@@ -176,6 +176,10 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                         char *decoded_data = __base64_decode_dynamic_config(tot_len); // uncommente f
                         if (decoded_data)
                         {
+
+                            ezlopi_factory_info_v2_set_ezlopi_config(decoded_data);
+
+#if 0
                             cJSON *cj_config = cJSON_Parse(decoded_data);
                             if (cj_config)
                             {
@@ -207,7 +211,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
 
                                 cJSON_Delete(cj_config);
                             }
-
+#endif
                             free(decoded_data);
                         }
 
