@@ -70,6 +70,9 @@ extern "C"
     int ezlopi_nvs_write_scenes_scripts(char *data);
     void ezlopi_nvs_delete_stored_script(uint32_t script_id);
 
+    char *ezlopi_nvs_read_scenes_expressions(void);
+    int ezlopi_nvs_write_scenes_expressions(char *data);
+
 #ifdef __cplusplus
 }
 #endif

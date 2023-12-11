@@ -276,7 +276,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t *scene_node, void *arg)
 
         if (item_id && value_field && comparator_field)
         {
-            ret = ezlopi_scenes_operators_compare_value_number(item_id, value_field, comparator_field);
+            ret = ezlopi_scenes_operators_value_number_operations(item_id, value_field, comparator_field);
         }
     }
 

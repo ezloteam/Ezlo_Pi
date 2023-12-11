@@ -73,4 +73,47 @@ typedef struct s_ezlopi_expressions
 
 } s_ezlopi_expressions_t;
 
+/**
+ * @brief Fetch expressions from NVS flash and populate to linklist
+ * 
+ */
+void ezlopi_scenes_expressions_init(void);
+
+/**
+ * @brief Populate new expression to the linklist, and store it to the flash
+ *
+ * @param exp_id expression id, if is zero then 'cj_expression' is cosidered as new expression and stored to nvs
+ * @param cj_expression cJSON pointer to the expression
+ * @return uint32_t expression id, if input 'exp_id' is zero then new expression-id is created and returned
+ */
+uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON *cj_expression);
+
+/**
+ * @brief POP the expression from linklist
+ * 
+ * @return s_ezlopi_expressions_t* 
+ */
+s_ezlopi_expressions_t *ezlopi_scenes_expressions_node_pop(void);
+
+/**
+ * @brief Delete the expression-item and its childs
+ * 
+ * @param exp_items 
+ */
+void ezlopi_scenes_expressions_delete_exp_item(s_exp_items_t *exp_items);
+
+/**
+ * @brief Delete the expression-device item name and its childs
+ * 
+ * @param exp_device_item_names 
+ */
+void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_names_t *exp_device_item_names);
+
+/**
+ * @brief Delete the expressions node and its childs 
+ * 
+ * @param exp_node 
+ */
+void ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
+
 #endif // __EZLOPI_SCENES_EXPRESSIONS_H__

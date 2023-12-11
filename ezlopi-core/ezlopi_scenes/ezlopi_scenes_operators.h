@@ -4,19 +4,64 @@
 #include <string.h>
 #include "ezlopi_scenes_v2.h"
 
-typedef enum e_scene_cmp_operators
+typedef enum e_scene_num_cmp_operators
 {
-#define SCENES_OPERATORS(OPERATOR, op, name, method) SCENES_OPERATORS_##OPERATOR,
-#include "ezlopi_scenes_operators_macros.h"
-#undef SCENES_OPERATORS
-} e_scene_cmp_operators_t;
+#define SCENES_NUM_COMP_OPERATORS(OPERATOR, op, name, method) SCENES_NUM_COMP_OPERATORS_##OPERATOR,
+#include "__operators_macros/__numeric_comparision_operators_macros.h"
+#undef SCENES_NUM_COMP_OPERATORS
+} e_scene_num_cmp_operators_t;
 
-// Operators
-char *ezlopi_scenes_operators_get_op(e_scene_cmp_operators_t operator);
-char *ezlopi_scenes_operators_get_name(e_scene_cmp_operators_t operator);
-const char *ezlopi_scenes_operators_get_method(e_scene_cmp_operators_t operator);
+typedef enum e_scene_str_cmp_operators
+{
+#define SCENES_STRINGS_OPERATORS(OPERATOR, op, name, method) SCENES_STRINGS_OPERATORS_##OPERATOR,
+#include "__operators_macros/__strings_comparision_operators_macros.h"
+#undef SCENES_STRINGS_OPERATORS
+} e_scene_str_cmp_operators_t;
 
-e_scene_cmp_operators_t ezlopi_scenes_operators_get_enum(char *operator_str);
-int ezlopi_scenes_operators_compare_value_number(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+typedef enum e_scene_value_with_less_cmp_operators
+{
+#define SCENES_VALUES_WITH_LESS_OPERATORS(OPERATOR, op, name, method) SCENES_VALUES_WITH_LESS_OPERATORS_##OPERATOR,
+#include "__operators_macros/__value_with_less_comparision_operators_macros.h"
+#undef SCENES_VALUES_WITH_LESS_OPERATORS
+} e_scene_value_with_less_cmp_operators_t;
+
+typedef enum e_scene_value_without_less_cmp_operators
+{
+#define SCENES_VALUES_WITHOUT_LESS_OPERATORS(OPERATOR, op, name, method) SCENES_VALUES_WITHOUT_LESS_OPERATORS_##OPERATOR,
+#include "__operators_macros/__value_without_less_comparision_operators_macros.h"
+#undef SCENES_VALUES_WITHOUT_LESS_OPERATORS
+} e_scene_value_without_less_cmp_operators_t;
+
+// Numeric Operators
+e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);
+const char *ezlopi_scenes_numeric_comparator_operators_get_name(e_scene_num_cmp_operators_t operator);
+const char *ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cmp_operators_t operator);
+
+int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+
+// Strings Operators
+e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_strings_comparator_operators_get_op(e_scene_str_cmp_operators_t operator);
+const char *ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_operators_t operator);
+const char *ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator);
+
+int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+
+// Value with less Operators
+e_scene_value_with_less_cmp_operators_t ezlopi_scenes_value_with_less_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_value_with_less_comparator_operators_get_op(e_scene_value_with_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_with_less_comparator_operators_get_name(e_scene_value_with_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scene_value_with_less_cmp_operators_t operator);
+
+int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+
+// Value without less Operators
+e_scene_value_without_less_cmp_operators_t ezlopi_scenes_value_without_less_comparator_operators_get_enum(char *operator_str);
+const char *ezlopi_scenes_value_without_less_comparator_operators_get_op(e_scene_value_without_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_without_less_comparator_operators_get_name(e_scene_value_without_less_cmp_operators_t operator);
+const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_scene_value_without_less_cmp_operators_t operator);
+
+int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
 
 #endif // __EZLOPI_SCENES_OPERATORS_H__
