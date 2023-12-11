@@ -406,24 +406,22 @@ static const char *switch_box_constant_config =
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
 #define EZLOPI_DEVICE_TYPE_NAME "generic"
 static const char *test_device_constant_config =
-#if 0
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
-            \"dev_type\": 8,\
-            \"dev_name\": \"MPU6050\",\
-            \"id_room\": \"\",\
-            \"id_item\": 5,\
-            \"gpio_sda\": 18,\
-            \"gpio_scl\": 19,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 104\
+        \"dev_type\":5,\
+        \"dev_name\":\"Servo\",\
+        \"id_room\":\"\",\
+        \"id_item\":36,\
+        \"gpio\":18,\
+        \"pwm_resln\":3,\
+        \"freq_hz\":50,\
+        \"duty_cycle\":0\
         }\
     ],\
     \"dev_total\":1\
     }";
-#endif
+#if 0
     "{\
     \"cmd\":3,\
     \"dev_detail\":[{\
@@ -438,6 +436,7 @@ static const char *test_device_constant_config =
     ],\
     \"dev_total\":1\
     }";
+#endif
 
 #endif
 
