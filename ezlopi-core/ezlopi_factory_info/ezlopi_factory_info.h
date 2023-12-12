@@ -414,8 +414,8 @@ static const char *test_device_constant_config =
         \"id_room\":\"\",\
         \"id_item\":36,\
         \"gpio\":18,\
-        \"pwm_resln\":3,\
         \"freq_hz\":50,\
+        \"pwm_resln\":3,\
         \"duty_cycle\":0\
         }\
     ],\
