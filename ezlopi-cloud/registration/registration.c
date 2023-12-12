@@ -64,13 +64,21 @@ static void registration_process(void *pv)
             vTaskDelay(200 / portTICK_RATE_MS);
         }
 
-        while (0 == is_registered)
-        {
-            web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_D);
-            vTaskDelay(2000 / portTICK_RATE_MS);
-        }
-
+        char *data_to_send = cJSON_Print(cj_register);
         cJSON_Delete(cj_register);
+
+        if (data_to_send)
+        {
+            cJSON_Minify(data_to_send);
+            while (0 == is_registered)
+            {
+                web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                // web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_D);
+                vTaskDelay(2000 / portTICK_RATE_MS);
+            }
+
+            free(data_to_send);
+        }
     }
 
     vTaskDelete(NULL);

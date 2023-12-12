@@ -22,8 +22,14 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
                     cJSON *cj_response = ezlopi_cloud_items_updated_from_devices_v3(curr_device, item);
                     if (cj_response)
                     {
-                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_D);
+                        char *data_to_send = cJSON_Print(cj_response);
                         cJSON_Delete(cj_response);
+                        if (data_to_send)
+                        {
+                            ret = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                            // ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_D);
+                            free(data_to_send);
+                        }
                     }
                     break;
                 }
@@ -53,8 +59,15 @@ int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_v3_t *s
                     cJSON *cj_response = ezlopi_cloud_settings_updated_from_devices_v3(curr_device, setting);
                     if (cj_response)
                     {
-                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
+                        char *data_to_send = cJSON_Print(cj_response);
                         cJSON_Delete(cj_response);
+                        if (data_to_send)
+                        {
+                            cJSON_Minify(data_to_send);
+                            ret = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                            free(data_to_send);
+                            // ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
+                        }
                     }
                     break;
                 }
@@ -66,34 +79,3 @@ int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_v3_t *s
 
     return ret;
 }
-
-#if 0 // v2.x
-int ezlopi_device_value_updated_from_device(s_ezlopi_device_properties_t *device_properties)
-{
-    int ret = 0;
-
-    if (device_properties)
-    {
-        l_ezlopi_configured_devices_t *registered_devices = ezlopi_devices_list_get_configured_items();
-        while (registered_devices)
-        {
-            if (NULL != registered_devices->properties)
-            {
-                if (registered_devices->properties == device_properties)
-                {
-                    cJSON *cj_response = ezlopi_cloud_items_updated_from_devices(registered_devices);
-                    if (cj_response)
-                    {
-                        ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_D);
-                        cJSON_Delete(cj_response);
-                    }
-                }
-            }
-
-            registered_devices = registered_devices->next;
-        }
-    }
-
-    return ret;
-}
-#endif

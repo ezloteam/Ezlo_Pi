@@ -11,6 +11,12 @@
 #include "ezlopi_scenes_operators.h"
 #include "ezlopi_meshbot_service.h"
 
+typedef struct s_data_source_n_target_object
+{
+    char *types;
+    char *field;
+} s_data_source_n_target_object_t;
+
 static void __value_types_list(char *list_name, cJSON *cj_result);
 static void __scalable_value_types_list(char *list_name, cJSON *cj_result);
 static void __value_scales_list(char *list_name, cJSON *cj_result);
@@ -20,6 +26,8 @@ static void __comparison_operators_list(char *list_name, cJSON *cj_result);
 static void __comparison_methods_list(char *list_name, cJSON *cj_result);
 static void __action_methods_list(char *list_name, cJSON *cj_result);
 static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result);
+
+static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list);
 
 void scenes_list(cJSON *cj_request, cJSON *cj_response)
 {
@@ -308,21 +316,16 @@ void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
             if (cj_result)
             {
-                cJSON *temp = cj_params->child;
-
-                while (temp != NULL)
+                uint32_t idx = 0;
+                while (block_data_list_collector[idx].func)
                 {
-                    uint32_t idx = 0;
-                    while (block_data_list_collector[idx].func)
+                    cJSON *cj_value = cJSON_GetObjectItem(cj_params, block_data_list_collector[idx].key_string);
+                    if (cj_value && (cj_value->type == cJSON_True))
                     {
-                        if (0 == strcmp(block_data_list_collector[idx].key_string, temp->string))
-                        {
-                            block_data_list_collector[idx].func(block_data_list_collector[idx].key_string, cj_result);
-                        }
-                        idx++;
+                        block_data_list_collector[idx].func(block_data_list_collector[idx].key_string, cj_result);
                     }
 
-                    temp = temp->next;
+                    idx++;
                 }
             }
         }
@@ -612,14 +615,14 @@ static cJSON *__comparision_operators_values_without_less(void)
         if (cj_methods_array)
         {
             e_scene_value_without_less_cmp_operators_t op_idx = SCENES_VALUES_WITHOUT_LESS_OPERATORS_NONE + 1;
-            while (ezlopi_scenes_value_with_less_comparator_operators_get_op(op_idx))
+            while (ezlopi_scenes_value_without_less_comparator_operators_get_op(op_idx))
             {
                 cJSON *cj_method = cJSON_CreateObject();
                 if (cj_method)
                 {
-                    cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_value_with_less_comparator_operators_get_op(op_idx));
-                    cJSON_AddStringToObject(cj_method, "name", ezlopi_scenes_value_with_less_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, "method", ezlopi_scenes_value_with_less_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_value_without_less_comparator_operators_get_op(op_idx));
+                    cJSON_AddStringToObject(cj_method, "name", ezlopi_scenes_value_without_less_comparator_operators_get_name(op_idx));
+                    cJSON_AddStringToObject(cj_method, "method", ezlopi_scenes_value_without_less_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -684,12 +687,6 @@ static cJSON *__comparision_method_info(void)
     return cj_info;
 }
 
-typedef struct s_data_source_n_target_object
-{
-    char *types;
-    char *field;
-} s_data_source_n_target_object_t;
-
 static cJSON *__comparision_method_compare_number_range(void)
 {
     cJSON *cj_compare_number_range = cJSON_CreateObject();
@@ -706,37 +703,14 @@ static cJSON *__comparision_method_compare_number_range(void)
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
         }
 
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_compare_number_range, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
-                {.types = "[\"constant\"]", .field = "startValue"},
-                {.types = "[\"constant\"]", .field = "endValue"},
-                {.types = NULL, .field = NULL},
-            };
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
+            {.types = "[\"constant\"]", .field = "startValue"},
+            {.types = "[\"constant\"]", .field = "endValue"},
+            {.types = NULL, .field = NULL},
+        };
 
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        __add_data_src_dest_array_to_object(cj_compare_number_range, "dataSource", data_src_obj);
     }
 
     return cj_compare_number_range;
@@ -759,36 +733,12 @@ static cJSON *__comparision_method_compare_numbers(void)
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
         }
 
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_compare_numbers, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"item\",\"expression\"]", .field = NULL},
-                {.types = "[\"constant\",\"expression\"]", .field = NULL},
-                {.types = NULL, .field = NULL},
-            };
-
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"item\",\"expression\"]", .field = NULL},
+            {.types = "[\"constant\",\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_src_dest_array_to_object(cj_compare_numbers, "dataSource", data_src_obj);
     }
 
     return cj_compare_numbers;
@@ -810,8 +760,12 @@ static cJSON *__comparision_method_compare_strings(void)
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
         }
 
-        const static char *data_source = "[{\"index\":0,\"types\":[\"item\",\"expression\"]},{\"index\":1,\"types\":[\"constant\",\"expression\"]}]";
-        cJSON_AddRawToObject(cj_compare_strings, "dataSource", data_source);
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
+            {.types = "[\"constant\",\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_src_dest_array_to_object(cj_compare_strings, "dataSource", data_src_obj);
     }
 
     return cj_compare_strings;
@@ -833,37 +787,12 @@ static cJSON *__comparision_method_compare_values(void)
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
         }
 
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_compare_values, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] =
-                {
-                    {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
-                    {.types = "[\"constant\",\"expression\"]", .field = NULL},
-                    {.types = NULL, .field = NULL},
-                };
-
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
+            {.types = "[\"constant\",\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_src_dest_array_to_object(cj_compare_values, "dataSource", data_src_obj);
     }
 
     return cj_compare_values;
@@ -885,36 +814,12 @@ static cJSON *__comparision_method_in_array(void)
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
         }
 
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_in_array, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
-                {.types = "[\"constant\"]", .field = NULL},
-                {.types = NULL, .field = NULL},
-            };
-
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"item\",\"expression\"]", .field = NULL},
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_src_dest_array_to_object(cj_in_array, "dataSource", data_src_obj);
     }
 
     return cj_in_array;
@@ -925,36 +830,13 @@ static cJSON *__comparision_method_is_device_item_group(void)
     cJSON *cj_is_device_item_grp = cJSON_CreateObject();
     if (cj_is_device_item_grp)
     {
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_device_item_grp, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"device_group\"]", .field = NULL},
-                {.types = "[\"item_group\"]", .field = NULL},
-                {.types = NULL, .field = NULL},
-            };
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"device_group\"]", .field = NULL},
+            {.types = "[\"item_group\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
 
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        __add_data_src_dest_array_to_object(cj_is_device_item_grp, "dataSource", data_src_obj);
     }
 
     return cj_is_device_item_grp;
@@ -965,36 +847,13 @@ static cJSON *__comparision_method_is_device_state(void)
     cJSON *cj_is_device_state = cJSON_CreateObject();
     if (cj_is_device_state)
     {
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_device_state, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"device\",\"device_group\"]", .field = NULL},
-                {.types = "[\"constant\"]", .field = NULL},
-                {.types = NULL, .field = NULL},
-            };
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"device\",\"device_group\"]", .field = NULL},
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
 
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        __add_data_src_dest_array_to_object(cj_is_device_state, "dataSource", data_src_obj);
     }
 
     return cj_is_device_state;
@@ -1005,36 +864,13 @@ static cJSON *__comparision_method_is_item_state(void)
     cJSON *cj_is_item_state = cJSON_CreateObject();
     if (cj_is_item_state)
     {
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_item_state, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"device_item\",\"item\",\"item_group\",\"device_group\"]", .field = NULL},
-                {.types = "[\"constant\",\"expression\"]", .field = NULL},
-                {.types = NULL, .field = NULL},
-            };
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"device_item\",\"item\",\"item_group\",\"device_group\"]", .field = NULL},
+            {.types = "[\"constant\",\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
 
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        __add_data_src_dest_array_to_object(cj_is_item_state, "dataSource", data_src_obj);
     }
 
     return cj_is_item_state;
@@ -1045,37 +881,14 @@ static cJSON *__comparision_method_is_item_state_changed(void)
     cJSON *cj_is_item_state_changed = cJSON_CreateObject();
     if (cj_is_item_state_changed)
     {
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_item_state_changed, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"item\",\"expression\"]", .field = NULL},
-                {.types = "[\"constant\",\"expression\"]", .field = "start"},
-                {.types = "[\"constant\",\"expression\"]", .field = "finish"},
-                {.types = NULL, .field = NULL},
-            };
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"item\",\"expression\"]", .field = NULL},
+            {.types = "[\"constant\",\"expression\"]", .field = "start"},
+            {.types = "[\"constant\",\"expression\"]", .field = "finish"},
+            {.types = NULL, .field = NULL},
+        };
 
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        __add_data_src_dest_array_to_object(cj_is_item_state_changed, "dataSource", data_src_obj);
     }
 
     return cj_is_item_state_changed;
@@ -1097,36 +910,13 @@ static cJSON *__comparision_method_string_operation(void)
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
         }
 
-        cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_string_operation, "dataSource");
-        if (cj_data_source_list)
-        {
-            static const s_data_source_n_target_object_t data_src_obj[] = {
-                {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
-                {.types = "[\"constant\",\"expression\"]", .field = "start"},
-                {.types = NULL, .field = NULL},
-            };
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
+            {.types = "[\"constant\",\"expression\"]", .field = "start"},
+            {.types = NULL, .field = NULL},
+        };
 
-            uint32_t idx = 0;
-            while (data_src_obj[idx].field || data_src_obj[idx].types)
-            {
-                cJSON *cj_data_source = cJSON_CreateObject();
-                if (cj_data_source)
-                {
-                    cJSON_AddNumberToObject(cj_data_source, "index", idx);
-                    if (data_src_obj[idx].types)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "types", data_src_obj[idx].types);
-                    }
-
-                    if (data_src_obj[idx].field)
-                    {
-                        cJSON_AddRawToObject(cj_data_source, "field", data_src_obj[idx].field);
-                    }
-                }
-
-                idx++;
-            }
-        }
+        __add_data_src_dest_array_to_object(cj_string_operation, "dataSource", data_src_obj);
     }
 
     return cj_string_operation;
@@ -1154,27 +944,6 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
     }
 }
 
-static void __add_data_array_to_method(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
-{
-    cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_method, array_name);
-    if (cj_data_source_list)
-    {
-        uint32_t idx = 0;
-        while (data_list[idx].types || data_list[idx].field)
-        {
-            cJSON_AddNumberToObject(cj_data_source_list, "index", idx);
-            if (data_list[idx].types)
-            {
-                cJSON_AddRawToObject(cj_data_source_list, "types", data_list[idx].types);
-            }
-            if (data_list[idx].field)
-            {
-                cJSON_AddRawToObject(cj_data_source_list, "field", data_list[idx].field);
-            }
-        }
-    }
-}
-
 static cJSON *__action_methods_info(void)
 {
     cJSON *cj_method = cJSON_CreateObject();
@@ -1195,14 +964,14 @@ static cJSON *__action_methods_set_item_value()
             {.types = NULL, .field = NULL},
         };
 
-        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        __add_data_src_dest_array_to_object(cj_method, "dataSource", data_src_obj);
 
         static const s_data_source_n_target_object_t data_target_obj[] = {
             {.types = "[\"item\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
 
-        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
     }
 
     return cj_method;
@@ -1352,14 +1121,14 @@ static cJSON *__action_methods_set_expression()
             {.types = NULL, .field = NULL},
         };
 
-        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        __add_data_src_dest_array_to_object(cj_method, "dataSource", data_src_obj);
 
         static const s_data_source_n_target_object_t data_target_obj[] = {
             {.types = "[\"expression\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
 
-        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
 
         static const char *execution_raw_str = "[\"sync\"]";
         cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
@@ -1374,7 +1143,7 @@ static cJSON *__action_methods_set_expression()
             if (cj_side_eff_elem)
             {
                 cJSON_AddStringToObject(cj_side_eff_elem, "action", "saveResult");
-                __add_data_array_to_method(cj_side_eff_elem, "dataTarget", data_target_obj);
+                __add_data_src_dest_array_to_object(cj_side_eff_elem, "dataTarget", data_target_obj);
 
                 if (!cJSON_AddItemToArray(cj_side_effects, cj_side_eff_elem))
                 {
@@ -1466,6 +1235,41 @@ static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)
         if (cj_avance_scenes_version)
         {
             cJSON_AddStringToObject(cj_avance_scenes_version, "version", "Major.Minor");
+        }
+    }
+}
+
+// helper functions
+
+static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
+{
+    cJSON *cj_data_source_n_target_list = cJSON_AddArrayToObject(cj_method, array_name);
+    if (cj_data_source_n_target_list)
+    {
+        uint32_t idx = 0;
+        while (data_list[idx].types || data_list[idx].field)
+        {
+            cJSON *cj_arr_object = cJSON_CreateObject();
+            if (cj_arr_object)
+            {
+                cJSON_AddNumberToObject(cj_arr_object, "index", idx);
+                if (data_list[idx].types)
+                {
+                    cJSON_AddRawToObject(cj_arr_object, "types", data_list[idx].types);
+                }
+
+                if (data_list[idx].field)
+                {
+                    cJSON_AddStringToObject(cj_arr_object, "field", data_list[idx].field);
+                }
+
+                if (!cJSON_AddItemToArray(cj_data_source_n_target_list, cj_arr_object))
+                {
+                    cJSON_Delete(cj_arr_object);
+                }
+            }
+
+            idx++;
         }
     }
 }

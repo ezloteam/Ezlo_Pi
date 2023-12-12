@@ -43,6 +43,7 @@ static void __message_upcall(const char *payload, uint32_t len);
 static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void __fetch_wss_endpoint(void *pv);
+static void __print_sending_data(char *data_str, e_trace_type_t print_type);
 
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
@@ -64,6 +65,35 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
+int web_provisioning_send_str_data_to_nma_websocket(char *str_data, e_trace_type_t print_type)
+{
+    int ret = 0;
+    if (str_data)
+    {
+        int retries = 3;
+        while (--retries)
+        {
+            if (ezlopi_websocket_client_send(str_data, strlen(str_data)) > 0)
+            {
+                ret = 1;
+                message_counter++;
+                break;
+            }
+        }
+
+        if (ret)
+        {
+            __print_sending_data(str_data, print_type);
+        }
+        else
+        {
+            __print_sending_data(str_data, TRACE_TYPE_W);
+        }
+    }
+
+    return ret;
+}
+
 int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
@@ -75,26 +105,6 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
             if (cjson_str_data)
             {
                 cJSON_Minify(cjson_str_data);
-                switch (print_type)
-                {
-                case TRACE_TYPE_D:
-                {
-                    TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
-                    break;
-                }
-                case TRACE_TYPE_E:
-                {
-                    TRACE_E("## WSS-SENDING  >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
-                    break;
-                }
-                case TRACE_TYPE_I:
-                {
-                    TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                    break;
-                }
-                default:
-                    break;
-                }
 
                 int retries = 3;
                 while (--retries)
@@ -106,6 +116,15 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
                         message_counter++;
                         break;
                     }
+                }
+
+                if (ret)
+                {
+                    __print_sending_data(cjson_str_data, print_type);
+                }
+                else
+                {
+                    __print_sending_data(cjson_data, TRACE_TYPE_W);
                 }
 
                 free(cjson_str_data);
@@ -230,8 +249,17 @@ static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method,
 
                 method_func(cj_request, cj_response);
 
-                web_provisioning_send_to_nma_websocket(cj_response, print_type);
+                char *data_to_send = cJSON_Print(cj_response);
                 cJSON_Delete(cj_response);
+
+                if (data_to_send)
+                {
+                    cJSON_Minify(data_to_send);
+                    web_provisioning_send_str_data_to_nma_websocket(data_to_send, print_type);
+                    free(data_to_send);
+                }
+
+                // web_provisioning_send_to_nma_websocket(cj_response, print_type);
             }
             else
             {
@@ -298,4 +326,36 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
 {
     esp_restart();
+}
+
+static void __print_sending_data(char *data_str, e_trace_type_t print_type)
+{
+    switch (print_type)
+    {
+    case TRACE_TYPE_W:
+    {
+        TRACE_W("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_D:
+    {
+        TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_E:
+    {
+        TRACE_E("## WSS-SENDING  >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_I:
+    {
+        TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    default:
+    {
+        TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    }
 }

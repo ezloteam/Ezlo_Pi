@@ -149,6 +149,7 @@ int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v
             TRACE_W("'SCENES_OPERATORS_NOT_BETWEEN' not implemented!");
             break;
         }
+#if 0
         case SCENES_NUM_COMP_OPERATORS_ANY_OF:
         {
             TRACE_W("'SCENES_OPERATORS_ANY_OF' not implemented!");
@@ -159,6 +160,7 @@ int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v
             TRACE_W("'SCENES_OPERATORS_NONE_OF' not implemented!");
             break;
         }
+#endif
         default:
         {
             break;
@@ -612,7 +614,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 
                 item = item->next;
             }
-            
+
             device = device->next;
         }
 
