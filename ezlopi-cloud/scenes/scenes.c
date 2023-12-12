@@ -1154,10 +1154,270 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
     }
 }
 
+static void __add_data_array_to_method(cJSON *cj_method, char *array_name, s_data_source_object_t *data_list)
+{
+    cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_method, array_name);
+    if (cj_data_source_list)
+    {
+        uint32_t idx = 0;
+        while (data_list[idx].types || data_list[idx].field)
+        {
+            cJSON_AddNumberToObject(cj_data_source_list, "index", idx);
+            if (data_list[idx].types)
+            {
+                cJSON_AddRawToObject(cj_data_source_list, "types", data_list[idx].types);
+            }
+            if (data_list[idx].field)
+            {
+                cJSON_AddRawToObject(cj_data_source_list, "field", data_list[idx].field);
+            }
+        }
+    }
+}
+
+static cJSON *__action_methods_info(void)
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+        cJSON_AddStringToObject(cj_method, "schema_version", "0.0.1");
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_set_item_value()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+        static const s_data_source_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+
+        static const s_data_source_object_t data_target_obj[] = {
+            {.types = "[\"item\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_set_device_armed()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_send_cloud_abstract_command()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_switch_house_mode()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_send_http_request()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_run_custom_script()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_run_plugin_script()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_run_scene()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_stop_scene()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_set_scene_state()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_reboot_hub()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_cloud_api()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_reset_hub()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_reset_latch()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_set_variable()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_reset_scene_latches()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_set_expression()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_toggle_value()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_group_set_item_value()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_group_toggle_value()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+static cJSON *__action_methods_group_set_device_armed()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method)
+    {
+    }
+
+    return cj_method;
+}
+
 static void __action_methods_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
+        cJSON *cj_action_methods = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_action_methods)
+        {
+            cJSON_AddItemToObject(cj_action_methods, "Info", __action_methods_info());
+            cJSON_AddItemToObject(cj_action_methods, "setItemValue", __action_methods_set_item_value());
+            cJSON_AddItemToObject(cj_action_methods, "setDeviceArmed", __action_methods_set_device_armed());
+            cJSON_AddItemToObject(cj_action_methods, "sendCloudAbstractCommand", __action_methods_send_cloud_abstract_command());
+            cJSON_AddItemToObject(cj_action_methods, "switchHouseMode", __action_methods_switch_house_mode());
+            cJSON_AddItemToObject(cj_action_methods, "sendHttpRequest", __action_methods_send_http_request());
+            cJSON_AddItemToObject(cj_action_methods, "runCustomScript", __action_methods_run_custom_script());
+            cJSON_AddItemToObject(cj_action_methods, "runPluginScript", __action_methods_run_plugin_script());
+            cJSON_AddItemToObject(cj_action_methods, "runScene", __action_methods_run_scene());
+            cJSON_AddItemToObject(cj_action_methods, "stopScene", __action_methods_stop_scene());
+            cJSON_AddItemToObject(cj_action_methods, "setSceneState", __action_methods_set_scene_state());
+            cJSON_AddItemToObject(cj_action_methods, "rebootHub", __action_methods_reboot_hub());
+            cJSON_AddItemToObject(cj_action_methods, "cloudAPI", __action_methods_cloud_api());
+            cJSON_AddItemToObject(cj_action_methods, "resetHub", __action_methods_reset_hub());
+            cJSON_AddItemToObject(cj_action_methods, "resetLatch", __action_methods_reset_latch());
+            cJSON_AddItemToObject(cj_action_methods, "setVariable", __action_methods_set_variable());
+            cJSON_AddItemToObject(cj_action_methods, "resetSceneLatches", __action_methods_reset_scene_latches());
+            cJSON_AddItemToObject(cj_action_methods, "setExpression", __action_methods_set_expression());
+            cJSON_AddItemToObject(cj_action_methods, "toggleValue", __action_methods_toggle_value());
+            cJSON_AddItemToObject(cj_action_methods, "groupSetItemValue", __action_methods_group_set_item_value());
+            cJSON_AddItemToObject(cj_action_methods, "groupToggleValue", __action_methods_group_toggle_value());
+            cJSON_AddItemToObject(cj_action_methods, "groupSetDeviceArmed", __action_methods_group_set_device_armed());
+        }
     }
 }
 
@@ -1165,5 +1425,10 @@ static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)
 {
     if (cj_result)
     {
+        cJSON *cj_avance_scenes_version = cJSON_AddObjectToObject(cj_result, list_name);
+        if (cj_avance_scenes_version)
+        {
+            cJSON_AddStringToObject(cj_avance_scenes_version, "version", "Major.Minor");
+        }
     }
 }
