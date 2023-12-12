@@ -684,11 +684,11 @@ static cJSON *__comparision_method_info(void)
     return cj_info;
 }
 
-typedef struct s_data_source_object
+typedef struct s_data_source_n_target_object
 {
     char *types;
     char *field;
-} s_data_source_object_t;
+} s_data_source_n_target_object_t;
 
 static cJSON *__comparision_method_compare_number_range(void)
 {
@@ -709,7 +709,7 @@ static cJSON *__comparision_method_compare_number_range(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_compare_number_range, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
                 {.types = "[\"constant\"]", .field = "startValue"},
                 {.types = "[\"constant\"]", .field = "endValue"},
@@ -762,7 +762,7 @@ static cJSON *__comparision_method_compare_numbers(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_compare_numbers, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"item\",\"expression\"]", .field = NULL},
                 {.types = "[\"constant\",\"expression\"]", .field = NULL},
                 {.types = NULL, .field = NULL},
@@ -836,7 +836,7 @@ static cJSON *__comparision_method_compare_values(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_compare_values, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] =
+            static const s_data_source_n_target_object_t data_src_obj[] =
                 {
                     {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
                     {.types = "[\"constant\",\"expression\"]", .field = NULL},
@@ -888,7 +888,7 @@ static cJSON *__comparision_method_in_array(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_in_array, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
                 {.types = "[\"constant\"]", .field = NULL},
                 {.types = NULL, .field = NULL},
@@ -928,7 +928,7 @@ static cJSON *__comparision_method_is_device_item_group(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_device_item_grp, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"device_group\"]", .field = NULL},
                 {.types = "[\"item_group\"]", .field = NULL},
                 {.types = NULL, .field = NULL},
@@ -968,7 +968,7 @@ static cJSON *__comparision_method_is_device_state(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_device_state, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"device\",\"device_group\"]", .field = NULL},
                 {.types = "[\"constant\"]", .field = NULL},
                 {.types = NULL, .field = NULL},
@@ -1008,7 +1008,7 @@ static cJSON *__comparision_method_is_item_state(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_item_state, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"device_item\",\"item\",\"item_group\",\"device_group\"]", .field = NULL},
                 {.types = "[\"constant\",\"expression\"]", .field = NULL},
                 {.types = NULL, .field = NULL},
@@ -1048,7 +1048,7 @@ static cJSON *__comparision_method_is_item_state_changed(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_is_item_state_changed, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"item\",\"expression\"]", .field = NULL},
                 {.types = "[\"constant\",\"expression\"]", .field = "start"},
                 {.types = "[\"constant\",\"expression\"]", .field = "finish"},
@@ -1100,7 +1100,7 @@ static cJSON *__comparision_method_string_operation(void)
         cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_string_operation, "dataSource");
         if (cj_data_source_list)
         {
-            static const s_data_source_object_t data_src_obj[] = {
+            static const s_data_source_n_target_object_t data_src_obj[] = {
                 {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
                 {.types = "[\"constant\",\"expression\"]", .field = "start"},
                 {.types = NULL, .field = NULL},
@@ -1154,7 +1154,7 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
     }
 }
 
-static void __add_data_array_to_method(cJSON *cj_method, char *array_name, s_data_source_object_t *data_list)
+static void __add_data_array_to_method(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
 {
     cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_method, array_name);
     if (cj_data_source_list)
@@ -1190,14 +1190,14 @@ static cJSON *__action_methods_set_item_value()
     cJSON *cj_method = cJSON_CreateObject();
     if (cj_method)
     {
-        static const s_data_source_object_t data_src_obj[] = {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
             {.types = "[\"constant\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
 
         __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
 
-        static const s_data_source_object_t data_target_obj[] = {
+        static const s_data_source_n_target_object_t data_target_obj[] = {
             {.types = "[\"item\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
@@ -1347,6 +1347,43 @@ static cJSON *__action_methods_set_expression()
     cJSON *cj_method = cJSON_CreateObject();
     if (cj_method)
     {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+
+        static const char *execution_raw_str = "[\"sync\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+
+        static const char *type_system_raw_str = "[\"itemValueTypes\",\"free\"]";
+        cJSON_AddRawToObject(cj_method, "typeSystem", type_system_raw_str);
+
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(cj_method, "sideEffects");
+        if (cj_side_effects)
+        {
+            cJSON *cj_side_eff_elem = cJSON_CreateObject();
+            if (cj_side_eff_elem)
+            {
+                cJSON_AddStringToObject(cj_side_eff_elem, "action", "saveResult");
+                __add_data_array_to_method(cj_side_eff_elem, "dataTarget", data_target_obj);
+
+                if (!cJSON_AddItemToArray(cj_side_effects, cj_side_eff_elem))
+                {
+                    cJSON_Delete(cj_side_eff_elem);
+                }
+            }
+        }
+
+        return cj_method;
     }
 
     return cj_method;
