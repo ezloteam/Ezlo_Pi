@@ -944,197 +944,521 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
     }
 }
 
+static void __add_data_array_to_method(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
+{
+    cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_method, array_name);
+    if (cj_data_source_list)
+    {
+        uint32_t idx = 0;
+        while (data_list[idx].types || data_list[idx].field)
+        {
+            cJSON_AddNumberToObject(cj_data_source_list, "index", idx);
+            if (data_list[idx].types)
+            {
+                cJSON_AddRawToObject(cj_data_source_list, "types", data_list[idx].types);
+            }
+            if (data_list[idx].field)
+            {
+                cJSON_AddRawToObject(cj_data_source_list, "field", data_list[idx].field);
+            }
+            idx++;
+        }
+    }
+}
+
 static cJSON *__action_methods_info(void)
 {
     cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
+    if (cj_method) // Info
     {
         cJSON_AddStringToObject(cj_method, "schema_version", "0.0.1");
     }
-
     return cj_method;
 }
 static cJSON *__action_methods_set_item_value()
 {
     cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
+    if (cj_method) // setItemValue
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
             {.types = "[\"constant\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
-
-        __add_data_src_dest_array_to_object(cj_method, "dataSource", data_src_obj);
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
 
         static const s_data_source_n_target_object_t data_target_obj[] = {
             {.types = "[\"item\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
 
-        __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        cJSON_AddStringToObject(cj_method, "typeSystem", "itemValueTypes");
+        //-------------------------------------------------------------------------
+
+        static const char *scope_raw_str = "[\"local\",\"global\"]";
+        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        //-------------------------------------------------------------------------
     }
-
     return cj_method;
 }
 static cJSON *__action_methods_set_device_armed()
 {
     cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_send_cloud_abstract_command()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_switch_house_mode()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_send_http_request()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_run_custom_script()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_run_plugin_script()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_run_scene()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_stop_scene()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_set_scene_state()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_reboot_hub()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_cloud_api()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_reset_hub()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_reset_latch()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_set_variable()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_reset_scene_latches()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
-    {
-    }
-
-    return cj_method;
-}
-static cJSON *__action_methods_set_expression()
-{
-    cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
+    if (cj_method) // setDeviceArmed
     {
         static const s_data_source_n_target_object_t data_src_obj[] = {
             {.types = "[\"constant\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
 
-        __add_data_src_dest_array_to_object(cj_method, "dataSource", data_src_obj);
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"device\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        static const char *scope_raw_str = "[\"local\",\"global\"]";
+        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_send_cloud_abstract_command()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // sendCloudAbstractCommand
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"object\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"cloud\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"sync\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_switch_house_mode()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // switchHouseMode
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"houseMode\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_send_http_request()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // sendHttpRequest
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        cJSON_AddNullToObject(cj_method, "dataTarget");
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t dataTarget_sideEffects_obj[] = {
+            {.types = "[\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(cj_method, "sideEffects");
+        if (cj_side_effects)
+        {
+            cJSON *cj_side_eff_elem = cJSON_CreateObject();
+            if (cj_side_eff_elem)
+            {
+                cJSON_AddStringToObject(cj_side_eff_elem, "action", "saveResult");
+                __add_data_array_to_method(cj_side_eff_elem, "dataTarget", dataTarget_sideEffects_obj);
+
+                if (!cJSON_AddItemToArray(cj_side_effects, cj_side_eff_elem))
+                {
+                    cJSON_Delete(cj_side_eff_elem);
+                }
+            }
+        }
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_run_custom_script()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // runCustomScript
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_run_plugin_script()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // runPluginScript
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"script\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"sync\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_run_scene()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // runScene
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"scene\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_stop_scene()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // stopScene
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"scene\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_set_scene_state()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // setSceneState
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"scene\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_reboot_hub()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // rebootHub
+    {
+        cJSON_AddNullToObject(cj_method, "dataSource");
+        //-------------------------------------------------------------------------
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_cloud_api()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // cloudAPI
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t dataTarget_sideEffects_obj[] = {
+            {.types = "[\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(cj_method, "sideEffects");
+        if (cj_side_effects)
+        {
+            cJSON *cj_side_eff_elem = cJSON_CreateObject();
+            if (cj_side_eff_elem)
+            {
+                cJSON_AddStringToObject(cj_side_eff_elem, "action", "saveResult");
+                __add_data_array_to_method(cj_side_eff_elem, "dataTarget", dataTarget_sideEffects_obj);
+
+                if (!cJSON_AddItemToArray(cj_side_effects, cj_side_eff_elem))
+                {
+                    cJSON_Delete(cj_side_eff_elem);
+                }
+            }
+        }
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_reset_hub()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // resetHub
+    {
+        cJSON_AddNullToObject(cj_method, "dataSource");
+        //-------------------------------------------------------------------------
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_reset_latch()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // resetLatch
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_set_variable()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // setVariable
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
 
         static const s_data_source_n_target_object_t data_target_obj[] = {
             {.types = "[\"expression\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
-
-        __add_data_src_dest_array_to_object(cj_method, "dataTarget", data_target_obj);
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
 
         static const char *execution_raw_str = "[\"sync\"]";
         cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
 
         static const char *type_system_raw_str = "[\"itemValueTypes\",\"free\"]";
         cJSON_AddRawToObject(cj_method, "typeSystem", type_system_raw_str);
+        //-------------------------------------------------------------------------
+
+        cJSON *cj_side_effects = cJSON_AddArrayToObject(cj_method, "sideEffects");
+        if (cj_side_effects)
+        {
+            cJSON *cj_side_eff_elem = cJSON_CreateObject();
+            if (cj_side_eff_elem)
+            {
+                cJSON_AddStringToObject(cj_side_eff_elem, "action", "saveResult");
+                __add_data_array_to_method(cj_side_eff_elem, "dataTarget", data_target_obj);
+
+                if (!cJSON_AddItemToArray(cj_side_effects, cj_side_eff_elem))
+                {
+                    cJSON_Delete(cj_side_eff_elem);
+                }
+            }
+        }
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_reset_scene_latches()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // resetSceneLatches
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
+    return cj_method;
+}
+static cJSON *__action_methods_set_expression()
+{
+    cJSON *cj_method = cJSON_CreateObject();
+    if (cj_method) // setExpression
+    {
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
+
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"sync\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        static const char *type_system_raw_str = "[\"itemValueTypes\",\"free\"]";
+        cJSON_AddRawToObject(cj_method, "typeSystem", type_system_raw_str);
+        //-------------------------------------------------------------------------
 
         cJSON *cj_side_effects = cJSON_AddArrayToObject(cj_method, "sideEffects");
         if (cj_side_effects)
@@ -1151,46 +1475,126 @@ static cJSON *__action_methods_set_expression()
                 }
             }
         }
-
-        return cj_method;
+        //-------------------------------------------------------------------------
     }
-
     return cj_method;
 }
 static cJSON *__action_methods_toggle_value()
 {
     cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
+    if (cj_method) // toggleValue
     {
-    }
+        cJSON_AddNullToObject(cj_method, "dataSource");
+        //-------------------------------------------------------------------------
 
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"item\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        cJSON_AddStringToObject(cj_method, "typeSystem", "itemValueTypes");
+        //-------------------------------------------------------------------------
+    }
     return cj_method;
 }
 static cJSON *__action_methods_group_set_item_value()
 {
     cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
+    if (cj_method) // groupSetItemValue
     {
-    }
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\",\"expression\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
 
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"device_group\"]", .field = NULL},
+            {.types = "[\"item_group\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        cJSON_AddStringToObject(cj_method, "typeSystem", "itemValueTypes");
+        //-------------------------------------------------------------------------
+
+        static const char *scope_raw_str = "[\"local\"]";
+        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
     return cj_method;
 }
 static cJSON *__action_methods_group_toggle_value()
 {
     cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
+    if (cj_method) // groupToggleValue
     {
-    }
+        cJSON_AddNullToObject(cj_method, "dataSource");
+        //-------------------------------------------------------------------------
 
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"device_group\"]", .field = NULL},
+            {.types = "[\"item_group\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        cJSON_AddStringToObject(cj_method, "typeSystem", "itemValueTypes");
+        //-------------------------------------------------------------------------
+
+        static const char *scope_raw_str = "[\"local\"]";
+        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
     return cj_method;
 }
 static cJSON *__action_methods_group_set_device_armed()
 {
     cJSON *cj_method = cJSON_CreateObject();
-    if (cj_method)
+    if (cj_method) // groupSetDeviceArmed
     {
-    }
+        static const s_data_source_n_target_object_t data_src_obj[] = {
+            {.types = "[\"constant\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataSource", data_src_obj);
+        //-------------------------------------------------------------------------
 
+        static const s_data_source_n_target_object_t data_target_obj[] = {
+            {.types = "[\"device_group\"]", .field = NULL},
+            {.types = NULL, .field = NULL},
+        };
+        __add_data_array_to_method(cj_method, "dataTarget", data_target_obj);
+        //-------------------------------------------------------------------------
+
+        static const char *execution_raw_str = "[\"async\"]";
+        cJSON_AddRawToObject(cj_method, "execution", execution_raw_str);
+        //-------------------------------------------------------------------------
+
+        cJSON_AddStringToObject(cj_method, "typeSystem", "itemValueTypes");
+        //-------------------------------------------------------------------------
+
+        static const char *scope_raw_str = "[\"local\"]";
+        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        //-------------------------------------------------------------------------
+    }
     return cj_method;
 }
 
