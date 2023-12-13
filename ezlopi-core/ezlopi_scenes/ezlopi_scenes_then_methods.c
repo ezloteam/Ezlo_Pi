@@ -24,24 +24,24 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
                 {
                     cJSON_AddStringToObject(cj_params, "_id", curr_field->value.value_string);
                     item_id = strtoul(curr_field->value.value_string, NULL, 16);
-                    TRACE_D("item_id: %s", curr_field->value.value_string);
+                    // TRACE_D("item_id: %s", curr_field->value.value_string);
                 }
                 else if (0 == strncmp(curr_field->name, "value", 5))
                 {
                     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                     {
                         cJSON_AddNumberToObject(cj_params, "value", curr_field->value.value_int);
-                        TRACE_D("value: %f", curr_field->value.value_double);
+                        // TRACE_D("value: %f", curr_field->value.value_double);
                     }
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
                         cJSON_AddBoolToObject(cj_params, "value", curr_field->value.value_bool);
-                        TRACE_D("value: %s", curr_field->value.value_bool ? "true" : "false");
+                        // TRACE_D("value: %s", curr_field->value.value_bool ? "true" : "false");
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
                         cJSON_AddBoolToObject(cj_params, "value", curr_field->value.value_string);
-                        TRACE_D("value: %s", curr_field->value.value_string);
+                        // TRACE_D("value: %s", curr_field->value.value_string);
                     }
                 }
 
@@ -94,8 +94,71 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 }
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    // TRACE_W("Warning: then-method not implemented!");
+
+    static const char *url = NULL;
+
+    int ret = 0;
+    if (curr_scene)
+    {
+        cJSON *cj_params = cJSON_CreateObject();
+        if (cj_params)
+        {
+            l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
+            if (curr_then)
+            {
+                l_fields_v2_t *curr_field = curr_then->fields;
+                while (curr_field) // fields
+                {
+
+                    if (0 == strncmp(curr_field->name, "url", strlen("url") + 1))
+                    {
+                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                        {
+                            cJSON_AddStringToObject(cj_params, "value", curr_field->value.value_string); //"https://ezlo.com/"
+                        }
+                    }
+                    else if (0 == strncmp(curr_field->name, "credential", strlen("credential") + 1))
+                    {
+                        // value_type => credential
+                        cJSON_AddNumberToObject(cj_params, "value", curr_field->value.value_int);
+                    }
+                    else if (0 == strncmp(curr_field->name, "request", strlen("request") + 1))
+                    {
+                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                        {
+                            cJSON_AddStringToObject(cj_params, "value", curr_field->value.value_string); //"https://ezlo.com/"
+                        }
+                    }
+                    else if (0 == strncmp(curr_field->name, "contentType", strlen("contentType") + 1))
+                    {
+                    }
+                    else if (0 == strncmp(curr_field->name, "content", strlen("content") + 1))
+                    {
+                    }
+                    else if (0 == strncmp(curr_field->name, "headers", strlen("headers") + 1))
+                    {
+                        if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
+                        {
+                        }
+                    }
+                    else if (0 == strncmp(curr_field->name, "skipSecurity", strlen("skipSecurity") + 1))
+                    {
+                        if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                        {
+                            cJSON_AddBoolToObject(cj_params, "value", curr_field->value.value_bool);
+                            // TRACE_D("value: %s", curr_field->value.value_bool ? "true" : "false");
+                        }
+                    }
+
+                    curr_field = curr_field->next;
+                }
+            }
+
+            cJSON_Delete(cj_params);
+        }
+    }
+    return ret;
 }
 int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
