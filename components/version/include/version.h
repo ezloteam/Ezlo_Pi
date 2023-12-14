@@ -5,16 +5,16 @@ extern "C"
 {
 #endif
 #define V_TYPE 2
-#define BUILD_DATE 1701432130
+#define BUILD_DATE 1701862983
 #define MAJOR 3
 #define MINOR 0
 #define BATCH 4
-#define BUILD 179
+#define BUILD 180
 #define VERSION_STR "3.0.4"
 #define DEVELOPER "lomas.subedi@ezlo.com"
-#define COMPILE_TIME "Fri 01 Dec 2023 05:47:10 PM +0545"
-#define CURRENT_BRANCH "dev_v3_prerelease"
-#define COMMIT_HASH "d940b315fdcb432035a6e7ad3051392e9530b74b"
+#define COMPILE_TIME "Wed 06 Dec 2023 05:27:52 PM +0545"
+#define CURRENT_BRANCH "dev_v3"
+#define COMMIT_HASH "4892ac52ccabaa8558a85d1c658e55fbc7afc6d0"
 #ifdef __cplusplus
 }
 #endif
