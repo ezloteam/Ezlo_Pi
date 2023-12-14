@@ -154,6 +154,7 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
+
 static int __get_ezlopi_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
@@ -212,7 +213,16 @@ static int __init(l_ezlopi_item_t *item)
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
         }
-        return ret;
+        else
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
+
     return ret;
 }

@@ -228,7 +228,6 @@ static int __0053_prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(gps_device);
                     free(sensor_0053_UART_gps6mv2_data);
                 }
             }

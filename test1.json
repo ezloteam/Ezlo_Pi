@@ -1,0 +1,1059 @@
+{
+    "valueTypes": {
+        "list": []
+    },
+    "scalableValueTypes": {
+        "list": []
+    },
+    "valueScales": {},
+    "scenesValueTypes": {
+        "list": [
+            "int",
+            "bool",
+            "float",
+            "string",
+            "dictionary",
+            "array",
+            "rgb",
+            "cameraStream",
+            "userCode",
+            "weekly_interval",
+            "daily_interval",
+            "token",
+            "button_state",
+            "user_lock_operation",
+            "user_code_action",
+            "sound_info",
+            "camera_hotzone",
+            "hotzone_match",
+            "geofence",
+            "illuminance",
+            "pressure",
+            "substance_amount",
+            "power",
+            "velocity",
+            "acceleration",
+            "direction",
+            "general_purpose",
+            "acidity",
+            "electric_potential",
+            "electric_current",
+            "force",
+            "irradiance",
+            "precipitation",
+            "length",
+            "mass",
+            "volume_flow",
+            "volume",
+            "angle",
+            "frequency",
+            "seismic_intensity",
+            "seismic_magnitude",
+            "ultraviolet",
+            "electrical_resistance",
+            "electrical_conductivity",
+            "loudness",
+            "moisture",
+            "time",
+            "radon_concentration",
+            "blood_pressure",
+            "energy",
+            "rf_signal_strength",
+            "temperature",
+            "humidity",
+            "kilo_volt_ampere_hour",
+            "reactive_power_instant",
+            "amount_of_useful_energy",
+            "reactive_power_consumption",
+            "device",
+            "item",
+            "expression",
+            "24_hours_time",
+            "24_hours_time_array",
+            "int_array",
+            "interval",
+            "hms_interval",
+            "blocks"
+        ]
+    },
+    "valueTypeFamilies": {
+        "numeric": [
+            "int",
+            "float",
+            "scalableValueTypes"
+        ],
+        "strings": [
+            "string",
+            "token"
+        ],
+        "valuesWithLess": [
+            "int",
+            "float",
+            "scalableValueTypes",
+            "string"
+        ],
+        "valuesWithoutLess": []
+    },
+    "comparisonOperators": {
+        "families": [
+            {
+                "family": "numeric",
+                "methods": [
+                    {
+                        "op": "<",
+                        "name": "less",
+                        "method": "compareNumbers"
+                    },
+                    {
+                        "op": ">",
+                        "name": "greater",
+                        "method": "compareNumbers"
+                    },
+                    {
+                        "op": "<=",
+                        "name": "less equal",
+                        "method": "compareNumbers"
+                    },
+                    {
+                        "op": ">=",
+                        "name": "greater equal",
+                        "method": "compareNumbers"
+                    },
+                    {
+                        "op": "==",
+                        "name": "equal",
+                        "method": "compareNumbers"
+                    },
+                    {
+                        "op": "!=",
+                        "name": "not equal",
+                        "method": "compareNumbers"
+                    },
+                    {
+                        "op": "between",
+                        "name": "between",
+                        "method": "compareNumberRange"
+                    },
+                    {
+                        "op": "not_between",
+                        "name": "not between",
+                        "method": "compareNumberRange"
+                    }
+                ]
+            },
+            {
+                "family": "strings",
+                "methods": [
+                    {
+                        "op": "<",
+                        "name": "less",
+                        "method": "compareStrings"
+                    },
+                    {
+                        "op": ">",
+                        "name": "greater",
+                        "method": "compareStrings"
+                    },
+                    {
+                        "op": "<=",
+                        "name": "less equal",
+                        "method": "compareStrings"
+                    },
+                    {
+                        "op": ">=",
+                        "name": "greater equal",
+                        "method": "compareStrings"
+                    },
+                    {
+                        "op": "==",
+                        "name": "equal",
+                        "method": "compareStrings"
+                    },
+                    {
+                        "op": "!=",
+                        "name": "not equal",
+                        "method": "compareStrings"
+                    },
+                    {
+                        "op": "begin",
+                        "name": "begins with",
+                        "method": "stringOperation"
+                    },
+                    {
+                        "op": "end",
+                        "name": "ends with",
+                        "method": "stringOperation"
+                    },
+                    {
+                        "op": "contain",
+                        "name": "contains",
+                        "method": "stringOperation"
+                    },
+                    {
+                        "op": "length",
+                        "name": "length equal to",
+                        "method": "stringOperation"
+                    },
+                    {
+                        "op": "not_begin",
+                        "name": "doesn't begin with",
+                        "method": "stringOperation"
+                    },
+                    {
+                        "op": "not_end",
+                        "name": "doesn't end with",
+                        "method": "stringOperation"
+                    },
+                    {
+                        "op": "not_contain",
+                        "name": "doesn't contain",
+                        "method": "stringOperation"
+                    },
+                    {
+                        "op": "not_length",
+                        "name": "length not equal to",
+                        "method": "stringOperation"
+                    }
+                ]
+            },
+            {
+                "family": "valuesWithLess",
+                "methods": [
+                    {
+                        "op": "<",
+                        "name": "less",
+                        "method": "compareValues"
+                    },
+                    {
+                        "op": ">",
+                        "name": "greater",
+                        "method": "compareValues"
+                    },
+                    {
+                        "op": "<=",
+                        "name": "less equal",
+                        "method": "compareValues"
+                    },
+                    {
+                        "op": ">=",
+                        "name": "greater equal",
+                        "method": "compareValues"
+                    },
+                    {
+                        "op": "==",
+                        "name": "equal",
+                        "method": "compareValues"
+                    },
+                    {
+                        "op": "!=",
+                        "name": "not equal",
+                        "method": "compareValues"
+                    }
+                ]
+            },
+            {
+                "family": "valuesWithoutLess",
+                "methods": [
+                    {
+                        "op": "==",
+                        "name": "equal",
+                        "method": "compareValues"
+                    },
+                    {
+                        "op": "!=",
+                        "name": "not equal",
+                        "method": "compareValues"
+                    }
+                ]
+            }
+        ]
+    },
+    "comparisonMethods": {
+        "info": {
+            "version": "1.0.0"
+        },
+        "compareNumberRange": {
+            "comparator": {
+                "family": "numeric",
+                "field": "comparator",
+                "type": "enum",
+                "options": [
+                    "between",
+                    "not_between"
+                ]
+            },
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item",
+                        "expression",
+                        "device_group",
+                        "item_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant"
+                    ],
+                    "field": "startValue"
+                },
+                {
+                    "index": 2,
+                    "types": [
+                        "constant"
+                    ],
+                    "field": "endValue"
+                }
+            ]
+        },
+        "compareNumbers": {
+            "comparator": {
+                "family": "numeric",
+                "field": "comparator",
+                "type": "enum",
+                "options": [
+                    "<",
+                    ">",
+                    "<=",
+                    ">=",
+                    "==",
+                    "!="
+                ]
+            },
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item",
+                        "expression",
+                        "device_group",
+                        "item_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ]
+                }
+            ]
+        },
+        "compareStrings": {
+            "comparator": {
+                "family": "strings",
+                "field": "comparator",
+                "type": "enum",
+                "options": [
+                    "<",
+                    ">",
+                    "<=",
+                    ">=",
+                    "==",
+                    "!="
+                ]
+            },
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item",
+                        "expression",
+                        "device_group",
+                        "item_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ]
+                }
+            ]
+        },
+        "compareValues": {
+            "comparator": {
+                "family": "valuesWithoutLess",
+                "field": "comparator",
+                "type": "enum",
+                "options": [
+                    "==",
+                    "!="
+                ]
+            },
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item",
+                        "expression",
+                        "device_group",
+                        "item_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ]
+                }
+            ]
+        },
+        "inArray": {
+            "comparator": {
+                "family": "array",
+                "field": "comparator",
+                "type": "enum",
+                "options": [
+                    "in",
+                    "not_in"
+                ]
+            },
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item",
+                        "expression",
+                        "device_group",
+                        "item_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ]
+        },
+        "isDeviceItemGroup": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "device_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "item_group"
+                    ]
+                }
+            ]
+        },
+        "isDeviceState": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "device",
+                        "device_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ]
+        },
+        "isItemState": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "device_item",
+                        "item",
+                        "item_group",
+                        "device_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ]
+                }
+            ]
+        },
+        "isItemStateChanged": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item",
+                        "expression"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ],
+                    "field": "start"
+                },
+                {
+                    "index": 2,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ],
+                    "field": "finish"
+                }
+            ]
+        },
+        "stringOperation": {
+            "comparator": {
+                "family": "strings",
+                "field": "comparator",
+                "type": "enum",
+                "options": [
+                    "begin",
+                    "end",
+                    "contain",
+                    "length",
+                    "not_begin",
+                    "not_end",
+                    "not_contain",
+                    "not_length"
+                ]
+            },
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item",
+                        "expression",
+                        "device_group",
+                        "item_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ]
+                }
+            ]
+        }
+    },
+    "actionMethods": {
+        "Info": {
+            "schema_version": "0.0.1"
+        },
+        "setItemValue": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ],
+            "typeSystem": "itemValueTypes",
+            "scope": [
+                "local",
+                "global"
+            ]
+        },
+        "setDeviceArmed": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "device"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ],
+            "scope": [
+                "local",
+                "global"
+            ]
+        },
+        "sendCloudAbstractCommand": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "object"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "cloud"
+                    ]
+                }
+            ],
+            "execution": [
+                "sync"
+            ]
+        },
+        "switchHouseMode": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "houseMode"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "sendHttpRequest": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": null,
+            "execution": [
+                "async"
+            ],
+            "sideEffects": [
+                {
+                    "action": "saveResult",
+                    "dataTarget": [
+                        {
+                            "index": 0,
+                            "types": [
+                                "expression"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "runCustomScript": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "runPluginScript": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "script"
+                    ]
+                }
+            ],
+            "execution": [
+                "sync"
+            ]
+        },
+        "runScene": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "scene"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "stopScene": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "scene"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "setSceneState": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "scene"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "rebootHub": {
+            "dataSource": null,
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "cloudAPI": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ],
+            "sideEffects": [
+                {
+                    "action": "saveResult",
+                    "dataTarget": [
+                        {
+                            "index": 0,
+                            "types": [
+                                "expression"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "resetHub": {
+            "dataSource": null,
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "resetLatch": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "setVariable": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "expression"
+                    ]
+                }
+            ],
+            "execution": [
+                "sync"
+            ],
+            "typeSystem": [
+                "itemValueTypes",
+                "free"
+            ],
+            "sideEffects": [
+                {
+                    "action": "saveResult",
+                    "dataTarget": [
+                        {
+                            "index": 0,
+                            "types": [
+                                "expression"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "resetSceneLatches": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ]
+        },
+        "setExpression": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "expression"
+                    ]
+                }
+            ],
+            "execution": [
+                "sync"
+            ],
+            "typeSystem": [
+                "itemValueTypes",
+                "free"
+            ],
+            "sideEffects": [
+                {
+                    "action": "saveResult",
+                    "dataTarget": [
+                        {
+                            "index": 0,
+                            "types": [
+                                "expression"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "toggleValue": {
+            "dataSource": null,
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "item"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ],
+            "typeSystem": "itemValueTypes"
+        },
+        "groupSetItemValue": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant",
+                        "expression"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "device_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "item_group"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ],
+            "typeSystem": "itemValueTypes",
+            "scope": [
+                "local"
+            ]
+        },
+        "groupToggleValue": {
+            "dataSource": null,
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "device_group"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "types": [
+                        "item_group"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ],
+            "typeSystem": "itemValueTypes",
+            "scope": [
+                "local"
+            ]
+        },
+        "groupSetDeviceArmed": {
+            "dataSource": [
+                {
+                    "index": 0,
+                    "types": [
+                        "constant"
+                    ]
+                }
+            ],
+            "dataTarget": [
+                {
+                    "index": 0,
+                    "types": [
+                        "device_group"
+                    ]
+                }
+            ],
+            "execution": [
+                "async"
+            ],
+            "typeSystem": "itemValueTypes",
+            "scope": [
+                "local"
+            ]
+        }
+    },
+    "advancedScenesVersion": {
+        "version": "Major.Minor"
+    }
+}

@@ -87,13 +87,19 @@ static int __init(l_ezlopi_item_t *item)
 #endif
         if (error)
         {
+            ret = -1;
             TRACE_E("Error 'sensor_door_init'. rror: %s)", esp_err_to_name(error));
+            if (item->user_args)
+            {
+                free(item->user_args);
+                item->user_args = NULL;
+            }
         }
         else
         {
+            ret = 1;
             TRACE_I("Width configuration was successfully done!");
         }
-        ret = 1;
     }
     return ret;
 }
@@ -144,7 +150,7 @@ static int __prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }

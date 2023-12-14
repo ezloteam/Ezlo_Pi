@@ -84,6 +84,7 @@ static int __init(l_ezlopi_item_t *item)
     int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
     gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
+    ret = 1;
 
     return ret;
 }
@@ -117,10 +118,6 @@ static int __prepare(void *arg)
             {
                 ezlopi_device_free_device(touch_device);
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(touch_device);
         }
     }
 

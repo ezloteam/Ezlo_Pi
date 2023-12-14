@@ -14,7 +14,7 @@
 static l_ezlopi_device_t *l_device_head = NULL;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static void ezlopi_device_free(l_ezlopi_device_t *device);
+static void ezlopi_device_free_single(l_ezlopi_device_t *device);
 static void ezlopi_device_parse_json_v3(char *config_string);
 static void ezlopi_device_print_controller_cloud_information_v3(void);
 
@@ -77,7 +77,8 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device)
         {
             if (l_device_head == device)
             {
-                ezlopi_device_free(l_device_head);
+                TRACE_D("Device-ID: %08x", device->cloud_properties.device_id);
+                ezlopi_device_free_single(l_device_head);
                 l_device_head = NULL;
             }
             else
@@ -85,19 +86,19 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device)
                 l_ezlopi_device_t *curr_device = l_device_head;
                 while (curr_device->next)
                 {
+                    TRACE_D("Device-ID: %08x", curr_device->next->cloud_properties.device_id);
                     if (curr_device->next == device)
                     {
+                        TRACE_E("To free Device-ID: %08x", curr_device->next->cloud_properties.device_id);
+
+                        l_ezlopi_device_t *free_device = curr_device->next;
+                        curr_device->next = curr_device->next->next;
+                        free_device->next = NULL;
+                        ezlopi_device_free_single(free_device);
                         break;
                     }
 
                     curr_device = curr_device->next;
-                }
-
-                if (curr_device->next)
-                {
-                    l_ezlopi_device_t *free_device = curr_device->next;
-                    curr_device->next = curr_device->next->next;
-                    ezlopi_device_free(free_device);
                 }
             }
         }
@@ -119,6 +120,8 @@ void ezlopi_device_free_device_by_item(l_ezlopi_item_t *item)
                     ezlopi_device_free_device(device_node);
                     return;
                 }
+
+                item_node = item_node->next;
             }
 
             device_node = device_node->next;
@@ -467,16 +470,18 @@ static void ezlopi_device_free_item(l_ezlopi_item_t *items)
 //     {
 //         ezlopi_device_free_item(settings->next);
 //     }
-
+//
 //     free(settings);
 // }
 
-static void ezlopi_device_free(l_ezlopi_device_t *device)
+static void ezlopi_device_free_single(l_ezlopi_device_t *device)
 {
     if (device->items)
     {
         ezlopi_device_free_item(device->items);
+        device->items = NULL;
     }
+
     free(device);
 }
 

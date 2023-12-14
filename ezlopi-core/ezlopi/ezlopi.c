@@ -35,11 +35,12 @@ void ezlopi_init(void)
     ezlopi_factory_info_v2_init();
     print_factory_info_v2();
 
-    // Init devices
     ezlopi_event_group_create();
-    ezlopi_device_prepare();
-    vTaskDelay(10);
     ezlopi_wifi_initialize();
+    vTaskDelay(10);
+
+    // Init devices
+    ezlopi_device_prepare();
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
@@ -63,22 +64,40 @@ void ezlopi_init(void)
 
 static void ezlopi_initialize_devices_v3(void)
 {
+    int device_init_ret = 0;
     l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
     while (curr_device)
     {
+        TRACE_D("Init - Device-ID: %08x", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t *curr_item = curr_device->items;
         while (curr_item)
         {
+            TRACE_D("        Item-ID: %08x", curr_item->cloud_properties.item_id);
             if (curr_item->func)
             {
-                curr_item->func(EZLOPI_ACTION_INITIALIZE, curr_item, NULL, NULL);
+                if ((device_init_ret = curr_item->func(EZLOPI_ACTION_INITIALIZE, curr_item, NULL, NULL)) < 0)
+                {
+                    break;
+                }
             }
             else
             {
                 TRACE_E("Function is not defined!");
             }
+
             curr_item = curr_item->next;
         }
-        curr_device = curr_device->next;
+
+        if (device_init_ret < 0)
+        {
+            l_ezlopi_device_t *device_to_free = curr_device;
+            curr_device = curr_device->next;
+            device_to_free->next = NULL;
+            ezlopi_device_free_device(device_to_free);
+        }
+        else
+        {
+            curr_device = curr_device->next;
+        }
     }
 }

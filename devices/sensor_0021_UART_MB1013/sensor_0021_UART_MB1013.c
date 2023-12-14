@@ -123,6 +123,17 @@ static int __init(l_ezlopi_item_t *item)
             ret = 1;
         }
     }
+
+    if (0 == ret)
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
+    }
+
     return ret;
 }
 
@@ -190,7 +201,7 @@ static int __prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }

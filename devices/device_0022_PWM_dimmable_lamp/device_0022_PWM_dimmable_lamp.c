@@ -147,8 +147,20 @@ static int __init(l_ezlopi_item_t *item)
             dimmable_bulb_arg->previous_brightness_value = item->interface.pwm.duty_cycle;
             dimmable_bulb_arg->dimmable_bulb_initialized = true;
             ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
+            ret = 1;
         }
     }
+
+    if (0 == ret)
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
+    }
+
     return ret;
 }
 
@@ -315,7 +327,7 @@ static int __prepare(void *arg)
 
                 if ((NULL == dimmable_bulb_arg->item_dimmer) || (NULL == dimmable_bulb_arg->item_dimmer_up) || (NULL == dimmable_bulb_arg->item_dimmer_down) || (NULL == dimmable_bulb_arg->item_dimmer_stop) || (NULL == dimmable_bulb_arg->item_dimmer_switch))
                 {
-                    ezlopi_device_free_device(device);
+                    ret = -1;
                     free(dimmable_bulb_arg);
                 }
             }

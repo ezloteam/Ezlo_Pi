@@ -107,10 +107,6 @@ static int __0048_prepare(void *arg)
                 ezlopi_device_free_device(MQ4_device_digi);
             }
         }
-        else
-        {
-            ezlopi_device_free_device(MQ4_device_digi);
-        }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
 
@@ -136,7 +132,6 @@ static int __0048_prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(MQ4_device_adc);
                 free(MQ4_value);
             }
             ret = 1;

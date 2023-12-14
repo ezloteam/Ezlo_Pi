@@ -734,7 +734,7 @@ static cJSON *__comparision_method_compare_numbers(void)
         }
 
         static const s_data_source_n_target_object_t data_src_obj[] = {
-            {.types = "[\"item\",\"expression\"]", .field = NULL},
+            {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
             {.types = "[\"constant\",\"expression\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
@@ -815,7 +815,7 @@ static cJSON *__comparision_method_in_array(void)
         }
 
         static const s_data_source_n_target_object_t data_src_obj[] = {
-            {.types = "[\"item\",\"expression\"]", .field = NULL},
+            {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
             {.types = "[\"constant\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
@@ -912,7 +912,7 @@ static cJSON *__comparision_method_string_operation(void)
 
         static const s_data_source_n_target_object_t data_src_obj[] = {
             {.types = "[\"item\",\"expression\",\"device_group\",\"item_group\"]", .field = NULL},
-            {.types = "[\"constant\",\"expression\"]", .field = "start"},
+            {.types = "[\"constant\",\"expression\"]", .field = NULL},
             {.types = NULL, .field = NULL},
         };
 
@@ -940,28 +940,6 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
             cJSON_AddItemToObject(cj_comparision_methods, "isItemState", __comparision_method_is_item_state());
             cJSON_AddItemToObject(cj_comparision_methods, "isItemStateChanged", __comparision_method_is_item_state_changed());
             cJSON_AddItemToObject(cj_comparision_methods, "stringOperation", __comparision_method_string_operation());
-        }
-    }
-}
-
-static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
-{
-    cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_method, array_name);
-    if (cj_data_source_list)
-    {
-        uint32_t idx = 0;
-        while (data_list[idx].types || data_list[idx].field)
-        {
-            cJSON_AddNumberToObject(cj_data_source_list, "index", idx);
-            if (data_list[idx].types)
-            {
-                cJSON_AddRawToObject(cj_data_source_list, "types", data_list[idx].types);
-            }
-            if (data_list[idx].field)
-            {
-                cJSON_AddRawToObject(cj_data_source_list, "field", data_list[idx].field);
-            }
-            idx++;
         }
     }
 }
@@ -1002,7 +980,7 @@ static cJSON *__action_methods_set_item_value()
         //-------------------------------------------------------------------------
 
         static const char *scope_raw_str = "[\"local\",\"global\"]";
-        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        cJSON_AddRawToObject(cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
@@ -1031,7 +1009,7 @@ static cJSON *__action_methods_set_device_armed()
         //-------------------------------------------------------------------------
 
         static const char *scope_raw_str = "[\"local\",\"global\"]";
-        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        cJSON_AddRawToObject(cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
@@ -1531,7 +1509,7 @@ static cJSON *__action_methods_group_set_item_value()
         //-------------------------------------------------------------------------
 
         static const char *scope_raw_str = "[\"local\"]";
-        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        cJSON_AddRawToObject(cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
@@ -1560,7 +1538,7 @@ static cJSON *__action_methods_group_toggle_value()
         //-------------------------------------------------------------------------
 
         static const char *scope_raw_str = "[\"local\"]";
-        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        cJSON_AddRawToObject(cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;
@@ -1592,7 +1570,7 @@ static cJSON *__action_methods_group_set_device_armed()
         //-------------------------------------------------------------------------
 
         static const char *scope_raw_str = "[\"local\"]";
-        cJSON_AddRawToObject(cj_method, "scope", execution_raw_str);
+        cJSON_AddRawToObject(cj_method, "scope", scope_raw_str);
         //-------------------------------------------------------------------------
     }
     return cj_method;

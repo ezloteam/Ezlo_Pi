@@ -89,6 +89,7 @@ static int __init(l_ezlopi_item_t *item)
 
     ESP_ERROR_CHECK(gpio_config(&touch_switch_config));
     gpio_isr_service_register_v3(item, touch_switch_callback, 200);
+    ret = 1;
 
     return ret;
 }
@@ -121,10 +122,6 @@ static int __prepare(void *arg)
             {
                 ezlopi_device_free_device(touch_device);
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(touch_device);
         }
     }
 

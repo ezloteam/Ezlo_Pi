@@ -141,6 +141,15 @@ static int __init(l_ezlopi_item_t *item)
         ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
         ret = 1;
     }
+    else
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
+    }
     return ret;
 }
 

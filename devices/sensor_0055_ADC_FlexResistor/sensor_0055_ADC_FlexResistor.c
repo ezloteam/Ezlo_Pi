@@ -120,7 +120,6 @@ static int __0055_prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(device_adc);
                 free(FLEX_value);
             }
             ret = 1;

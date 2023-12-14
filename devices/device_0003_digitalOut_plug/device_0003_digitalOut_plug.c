@@ -27,7 +27,6 @@ static void __write_gpio_value(l_ezlopi_item_t *item);
 static void __interrupt_upcall(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
 
-
 int device_0003_digitalOut_plug(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
@@ -164,6 +163,7 @@ static int __init(l_ezlopi_item_t *item)
             gpio_config(&io_conf);
             // digital_io_write_gpio_value(item);
             __write_gpio_value(item);
+            ret = 1;
         }
     }
 
@@ -189,7 +189,19 @@ static int __init(l_ezlopi_item_t *item)
 
         gpio_config(&io_conf);
         gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+        ret = 1;
     }
+
+    if (0 == ret)
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
+    }
+
     return ret;
 }
 

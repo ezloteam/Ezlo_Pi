@@ -132,6 +132,16 @@ static int __init(l_ezlopi_item_t *item)
     if (item->interface.i2c_master.enable)
     {
         ezlopi_i2c_master_init(&item->interface.i2c_master);
+        ret = 1;
+    }
+    else
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
     }
 
     return ret;
@@ -218,6 +228,7 @@ static int __prepare(void *arg)
 
             if ((NULL == item_humdity) && (NULL == item_temperature))
             {
+                ret = -1;
                 ezlopi_device_free_device(device);
             }
             else
@@ -235,6 +246,8 @@ static int __prepare(void *arg)
                     {
                         item_temperature->user_arg = (void *)value_ptr;
                     }
+
+                    ret = 1;
                 }
             }
         }

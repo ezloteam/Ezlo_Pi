@@ -203,6 +203,17 @@ static int __init(l_ezlopi_item_t *item)
 
             rgb_args->RGB_LED_initialized = true;
         }
+
+        ret = 1;
+    }
+    else
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
     }
 
     return ret;
@@ -346,6 +357,7 @@ static int __prepare(void *arg)
 
                 if (!rgb_args->RGB_LED_item && !rgb_args->RGB_LED_onoff_switch_item && !rgb_args->RGB_LED_dimmer_item)
                 {
+                    free(rgb_args);
                     ezlopi_device_free_device(RGB_device);
                 }
             }

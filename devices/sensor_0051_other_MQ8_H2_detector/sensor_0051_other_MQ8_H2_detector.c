@@ -105,10 +105,6 @@ static int __0051_prepare(void *arg)
                 ezlopi_device_free_device(MQ8_device_digi);
             }
         }
-        else
-        {
-            ezlopi_device_free_device(MQ8_device_digi);
-        }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
         mq8_value_t *MQ8_value = (mq8_value_t *)malloc(sizeof(mq8_value_t));
@@ -133,7 +129,6 @@ static int __0051_prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(MQ8_device_adc);
                 free(MQ8_value);
             }
             ret = 1;

@@ -89,6 +89,16 @@ static int __init(l_ezlopi_item_t *item)
             }
 
             gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
+            ret = 1;
+        }
+        else
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;

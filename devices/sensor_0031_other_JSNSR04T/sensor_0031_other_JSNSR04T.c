@@ -132,6 +132,9 @@ static int __init(l_ezlopi_item_t *item)
             }
             else
             {
+                ret = -1;
+                item->user_arg = NULL;
+                free(jsn_sr04t_config);
                 TRACE_E("JSN_SR04T not initializeed");
             }
         }

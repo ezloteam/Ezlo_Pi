@@ -126,10 +126,6 @@ static int __0060_prepare(void *arg)
                     ezlopi_device_free_device(vibration_device);
                 }
             }
-            else
-            {
-                ezlopi_device_free_device(vibration_device);
-            }
         }
         ret = 1;
     }

@@ -26,6 +26,7 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
                         cJSON_Delete(cj_response);
                         if (data_to_send)
                         {
+                            cJSON_Minify(data_to_send);
                             ret = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                             // ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_D);
                             free(data_to_send);

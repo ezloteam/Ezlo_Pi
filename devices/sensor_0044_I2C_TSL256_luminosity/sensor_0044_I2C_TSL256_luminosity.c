@@ -112,9 +112,16 @@ static int __init(l_ezlopi_item_t *item)
         {
             TRACE_B("TSL561 initialization finished.........");
             sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
+            ret = 1;
         }
         else
         {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
             TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
         }
     }
@@ -189,7 +196,6 @@ static int __prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(tsl256_device);
                 free(TSL2561_lux_data);
             }
             ret = 1;

@@ -109,6 +109,16 @@ static int __init(l_ezlopi_item_t *item)
     {
         ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
         ltr303_get_val(als_ltr303_data);
+        ret = 1;
+    }
+    else
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
     }
 
     return ret;
@@ -174,10 +184,6 @@ static int __prepare(void *arg)
             {
                 ezlopi_device_free_device(als_ltr303_device);
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(als_ltr303_device);
         }
     }
 

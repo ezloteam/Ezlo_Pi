@@ -122,7 +122,7 @@ static int sensor_pir_prepare_v3(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }

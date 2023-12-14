@@ -131,7 +131,6 @@ static int __0054_prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(flowmeter_device);
                 free(yfs201_data);
             }
 

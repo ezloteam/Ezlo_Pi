@@ -119,7 +119,6 @@ static int __0056_prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(FSR_device);
                 free(FSR_struct);
             }
             ret = 1;

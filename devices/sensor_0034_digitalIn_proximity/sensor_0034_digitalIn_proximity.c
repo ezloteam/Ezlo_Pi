@@ -105,7 +105,7 @@ static int proximity_sensor_prepare(void *args)
             }
             else
             {
-                ezlopi_device_free_device(device);
+                ret = -1;
             }
         }
     }

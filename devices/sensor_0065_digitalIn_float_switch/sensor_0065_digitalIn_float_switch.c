@@ -122,10 +122,6 @@ static int __0065_prepare(void *arg)
                     ezlopi_device_free_device(float_device);
                 }
             }
-            else
-            {
-                ezlopi_device_free_device(float_device);
-            }
         }
         ret = 1;
     }

@@ -95,10 +95,6 @@ static int __0057_prepare(void *arg)
                 ezlopi_device_free_device(flame_device_digi);
             }
         }
-        else
-        {
-            ezlopi_device_free_device(flame_device_digi);
-        }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
         flame_t *FLAME_struct = (flame_t *)malloc(sizeof(flame_t));
@@ -123,7 +119,6 @@ static int __0057_prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(flame_device_adc);
                 free(FLAME_struct);
             }
             ret = 1;

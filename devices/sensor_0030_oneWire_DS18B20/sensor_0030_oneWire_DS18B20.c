@@ -103,7 +103,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
 static int __init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    int ret = -1;
 
     if (item->interface.onewire_master.enable)
     {
@@ -116,6 +116,23 @@ static int __init(l_ezlopi_item_t *item)
                 ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
+        }
+        else
+        {
+            ret = -1;
+        }
+
+        if (-1 == ret)
+        {
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
             }
         }
     }
@@ -171,7 +188,7 @@ static int __prepare(void *arg)
             }
             if (NULL == item_temperature)
             {
-                ezlopi_device_free_device(device);
+                ret = -1;
             }
             else
             {

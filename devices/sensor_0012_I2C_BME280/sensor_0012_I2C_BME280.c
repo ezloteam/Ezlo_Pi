@@ -173,6 +173,17 @@ static int __init(l_ezlopi_item_t *item)
             bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
             bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
             bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
+            ret = 1;
+        }
+    }
+
+    if (0 == ret)
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
         }
     }
 
@@ -186,7 +197,6 @@ static int __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        int error_settingup_device = 0;
         l_ezlopi_device_t *pressure_deivce = ezlopi_device_add_device();
         l_ezlopi_device_t *temp_humid_device = ezlopi_device_add_device();
         s_ezlopi_bmp280_t *bme280_sensor_params = (s_ezlopi_bmp280_t *)malloc(sizeof(s_ezlopi_bmp280_t));
@@ -205,7 +215,7 @@ static int __prepare(void *arg)
             }
             else
             {
-                error_settingup_device = -1;
+                ret = -1;
             }
 
             l_ezlopi_item_t *humidity_item = ezlopi_device_add_item_to_device(temp_humid_device, sensor_0012_I2C_BME280);
@@ -216,7 +226,7 @@ static int __prepare(void *arg)
             }
             else
             {
-                error_settingup_device = -1;
+                ret = -1;
             }
 
             __prepare_pressure_device_cloud_properties(pressure_deivce, prep_arg->cjson_device);
@@ -229,18 +239,28 @@ static int __prepare(void *arg)
             }
             else
             {
-                error_settingup_device = -1;
+                ret = -1;
             }
         }
 
-        if (error_settingup_device)
+        if (-1 == ret)
         {
             if (temp_humid_device)
+            {
                 ezlopi_device_free_device(temp_humid_device);
+            }
             if (pressure_deivce)
+            {
                 ezlopi_device_free_device(pressure_deivce);
+            }
             if (bme280_sensor_params)
+            {
                 free(bme280_sensor_params);
+            }
+        }
+        else
+        {
+            ret = 1;
         }
     }
 
