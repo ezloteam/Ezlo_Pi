@@ -944,28 +944,6 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
     }
 }
 
-static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
-{
-    cJSON *cj_data_source_list = cJSON_AddArrayToObject(cj_method, array_name);
-    if (cj_data_source_list)
-    {
-        uint32_t idx = 0;
-        while (data_list[idx].types || data_list[idx].field)
-        {
-            cJSON_AddNumberToObject(cj_data_source_list, "index", idx);
-            if (data_list[idx].types)
-            {
-                cJSON_AddRawToObject(cj_data_source_list, "types", data_list[idx].types);
-            }
-            if (data_list[idx].field)
-            {
-                cJSON_AddRawToObject(cj_data_source_list, "field", data_list[idx].field);
-            }
-            idx++;
-        }
-    }
-}
-
 static cJSON *__action_methods_info(void)
 {
     cJSON *cj_method = cJSON_CreateObject();
@@ -1644,7 +1622,6 @@ static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)
 }
 
 // helper functions
-
 static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
 {
     cJSON *cj_data_source_n_target_list = cJSON_AddArrayToObject(cj_method, array_name);
