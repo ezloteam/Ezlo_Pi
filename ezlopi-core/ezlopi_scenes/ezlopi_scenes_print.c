@@ -66,6 +66,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             ezlopi_print_when_blocks((l_when_block_v2_t *)fields->value.when_block);
             break;
         }
+        case EZLOPI_VALUE_TYPE_CREDENTIAL:
         case EZLOPI_VALUE_TYPE_DICTIONARY:
         case EZLOPI_VALUE_TYPE_ARRAY:
         case EZLOPI_VALUE_TYPE_RGB:

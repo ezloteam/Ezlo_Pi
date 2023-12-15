@@ -26,7 +26,7 @@ extern "C"
     typedef struct ezlopi_http_data
     {
         char *response;
-        int status_code;
+        int status_code; 
 
     } s_ezlopi_http_data_t;
 

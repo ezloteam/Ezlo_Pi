@@ -62,11 +62,6 @@ typedef struct s_value_cred
     char *password;
 } s_value_cred_t;
 
-typedef struct s_value_token
-{
-    char *token;
-} s_value_token_t;
-
 typedef union u_field_value_v2
 {
     char *value_string;
@@ -74,8 +69,8 @@ typedef union u_field_value_v2
     int value_int;
     uint32_t value_uint;
     bool value_bool;
-    s_value_cred_t value_cred;
-    s_value_token_t value_token;
+    s_value_cred_t value_credential;
+    cJSON *value_json;
 
     struct l_when_block_v2 *when_block;
 
