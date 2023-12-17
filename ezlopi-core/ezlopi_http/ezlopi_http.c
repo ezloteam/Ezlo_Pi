@@ -20,7 +20,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
         }                     \
     }
 
-s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
+s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
 {
     char *ret = NULL;
     int status_code = 0;
@@ -38,7 +38,30 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
             .event_handler = ezlopi_http_event_handler,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+
         };
+        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
+        if (NULL != tmp_config)
+        {
+            // config.host = tmp_config->host;
+            // config.port = tmp_config->port;
+            // config.path = tmp_config->path;
+            // config.query = tmp_config->query;
+            // config.username = tmp_config->username;
+            // config.password = tmp_config->password;
+            // config.buffer_size = tmp_config->buffer_size;
+            // config.buffer_size_tx = tmp_config->buffer_size_tx;
+            // config.auth_type = tmp_config->auth_type;
+            config.timeout_ms = tmp_config->timeout_ms;
+            config.keep_alive_enable = tmp_config->keep_alive_enable;
+            config.keep_alive_idle = tmp_config->keep_alive_idle;         // Time for remote server to answer // default 5 sec
+            config.keep_alive_interval = tmp_config->keep_alive_interval; // Time for transferring data of the HTTP response // default 5 sec
+            config.disable_auto_redirect = tmp_config->disable_auto_redirect;
+            config.max_redirection_count = tmp_config->max_redirection_count; // default 0
+            config.max_authorization_retries = tmp_config->max_authorization_retries;
+            config.skip_cert_common_name_check = tmp_config->skip_cert_common_name_check;
+        }
+
         // TRACE_E("cloud_url: %s", cloud_url);
         // TRACE_E("ca_certificate: %s", ca_certificate);
         // TRACE_E("shared_key: %s", shared_key);
@@ -70,7 +93,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
                             TRACE_D("%.*s", cur_d->len, cur_d->ptr);
                             cur_d = cur_d->next;
                         }
-                        
+
                         http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
                         if (http_get_data)
                         {
@@ -93,9 +116,10 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
     return http_get_data;
 }
 
-s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate)
+s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
 {
     char *ret = NULL;
+
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
     s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
@@ -124,6 +148,19 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
+
+        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
+        if (NULL != tmp_config)
+        {
+            config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
+            config.keep_alive_enable = tmp_config->keep_alive_enable;
+            config.keep_alive_idle = tmp_config->keep_alive_idle; // // Time for transferring data of the HTTP response // default 5 sec
+            // config.keep_alive_interval = tmp_config->keep_alive_interval;
+            config.disable_auto_redirect = tmp_config->disable_auto_redirect;
+            config.max_redirection_count = tmp_config->max_redirection_count; // default 0
+            config.max_authorization_retries = tmp_config->max_authorization_retries;
+            config.skip_cert_common_name_check = tmp_config->skip_cert_common_name_check;
+        }
 
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)

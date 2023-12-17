@@ -42,7 +42,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
-                        cJSON_AddBoolToObject(cj_params, "value", curr_field->value.value_string);
+                        cJSON_AddStringToObject(cj_params, "value", curr_field->value.value_string);
                         // TRACE_D("value: %s", curr_field->value.value_string);
                     }
                 }
@@ -98,50 +98,17 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 //---------------------------------------------------------------------------------------
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
-    char url[100]; //"https://ezlo.com/",
-    esp_http_client_method_t method;
-    char *host; //= "10.101.101.10";
-    char *username;
-    char *password;
-    char content_type[20];
+    char url[100];         //"https://ezlo.com/",
+    char encoded_url[350]; // POST%20%2F%20HTTP%2F1.1%0AHost%3A%20ezlo.com
+    char user_pass[64];
+    char content_type[40];
     char content[100];
     uint32_t port;                    //= 80;
     bool skip_cert_common_name_check; // bool
     cJSON *header;
-    void *user_data;
+    esp_http_client_method_t method;
 
 } s_ezlopi_scenes_then_methods_send_http_t;
-
-// helper functions
-// static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
-// {
-//     cJSON *cj_data_source_n_target_list = cJSON_AddArrayToObject(cj_method, array_name);
-//     if (cj_data_source_n_target_list)
-//     {
-//         uint32_t idx = 0;
-//         while (data_list[idx].types || data_list[idx].field)
-//         {
-//             cJSON *cj_arr_object = cJSON_CreateObject();
-//             if (cj_arr_object)
-//             {
-//                 cJSON_AddNumberToObject(cj_arr_object, "index", idx);
-//                 if (data_list[idx].types)
-//                 {
-//                     cJSON_AddRawToObject(cj_arr_object, "types", data_list[idx].types);
-//                 }
-//                 if (data_list[idx].field)
-//                 {
-//                     cJSON_AddStringToObject(cj_arr_object, "field", data_list[idx].field);
-//                 }
-//                 if (!cJSON_AddItemToArray(cj_data_source_n_target_list, cj_arr_object))
-//                 {
-//                     cJSON_Delete(cj_arr_object);
-//                 }
-//             }
-//             idx++;
-//         }
-//     }
-// }
 
 static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config)
 {
@@ -156,163 +123,195 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config)
     /* needed URI */
     // POST%20%2F%20HTTP%2F1.1%0AHost%3A%20ezlo.com%0AContent-Type%3A%20text%2Fplain%0AContent-Length%3A%2013%0A%0ARequest%20check
 
-    char *tmp_cloud_server = ezlopi_factory_info_v2_get_cloud_server();
+    /**
+     *  ' ' => %20
+     *  '/' => %2F
+     *  ':' => %3A
+     *  '\r\n' => %0A
+     *
+     */
+    // char *tmp_cloud_server = ezlopi_factory_info_v2_get_cloud_server();
     char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
     char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
-
-    esp_http_client_config_t http_config = {
-        .url = config->url,
-        .method = config->method,
-        .cert_pem = tmp_ca_certificate,
-        .client_cert_pem = tmp_ssl_shared_key,
-        .client_key_pem = tmp_ssl_private_key,
-        .skip_cert_common_name_check = config->skip_cert_common_name_check,
-        .transport_type = HTTP_TRANSPORT_OVER_SSL,
-
-        .user_data = NULL,   // 'my_data' will be filled in 'ezlopi_http_event_handler'
-        .timeout_ms = 30000, // 30sec
-        .max_redirection_count = 10,
-        .auth_type = HTTP_AUTH_TYPE_NONE,
-    };
-
     TRACE_W("URI :- '%s' [%d]", config->url, strlen(config->url));
-    TRACE_W("content_type : %s", config->content_type);
+    TRACE_W("ENCODED_URI :- '%s' [%d]", config->encoded_url, strlen(config->encoded_url));
+    TRACE_W("content-type : %s", config->content_type);
     TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
-    esp_http_client_handle_t client = esp_http_client_init(&http_config);
-    if (client)
+    switch (config->method)
     {
-        switch (config->method)
+    case HTTP_METHOD_GET:
+    {
+        // GET
+        s_ezlopi_http_data_t *http_reply = NULL;
+
+        esp_http_client_config_t tmp_http_config; // initialize with default values
+        if (config->skip_cert_common_name_check)
         {
-        case HTTP_METHOD_GET:
+            // -> Fill remaining members of this structure according to reqm
+            // eg : port , host ...
+            tmp_http_config.timeout_ms = 30000;         // 30sec
+            tmp_http_config.max_redirection_count = 10; // default 0
+            tmp_http_config.skip_cert_common_name_check = config->skip_cert_common_name_check;
+        }
+
+        http_reply = ezlopi_http_get_request(config->encoded_url, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, NULL);
+        if (http_reply)
         {
-            // GET
+            TRACE_D("HTTP GET Status_resonse = %s, Status_code = %d",
+                    http_reply->response,
+                    http_reply->status_code);
 
-            esp_err_t err = esp_http_client_perform(client);
-            if (err == ESP_OK)
+            if (http_reply->response)
             {
-                TRACE_I("HTTP GET Status = %d, content_length = %d",
-                        esp_http_client_get_status_code(client),
-                        esp_http_client_get_content_length(client));
-                while (!esp_http_client_is_complete_data_received(client))
-                {
-                    vTaskDelay(50 / portTICK_RATE_MS);
-                }
+                free(http_reply->response);
             }
-            else
-            {
-                TRACE_E("HTTP GET request failed: %d", (err));
-            }
-
-            // s_ezlopi_http_data_t *http_reply = NULL;
-            // http_reply = ezlopi_http_get_request(config->url, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate);
-            // if (http_reply)
-            // {
-            //     TRACE_D("HTTP GET Status_resonse = %s, Status_code = %d",
-            //             http_reply->response,
-            //             http_reply->status_code);
-
-            //     if (http_reply->response)
-            //     {
-            //         free(http_reply->response);
-            //     }
-            //     free(http_reply);
-            // }
-            break;
+            free(http_reply);
         }
-        case HTTP_METHOD_POST:
-        { // POST
-          // const char *post_data = "{\"field1\":\"value1\"}";
-
-            const char *post_data = "field1=value1&field2=value2";
-
-            esp_http_client_set_method(client, HTTP_METHOD_POST);
-            esp_http_client_set_post_field(client, post_data, strlen(post_data));
-
-            esp_err_t err = esp_http_client_perform(client);
-            if (err == ESP_OK)
-            {
-                TRACE_I("HTTP GET Status = %d, content_length = %d",
-                        esp_http_client_get_status_code(client),
-                        esp_http_client_get_content_length(client));
-                while (!esp_http_client_is_complete_data_received(client))
-                {
-                    vTaskDelay(50 / portTICK_RATE_MS);
-                }
-            }
-            else
-            {
-                TRACE_E("HTTP POST request failed: %s", esp_err_to_name(err));
-            }
-
-            // s_ezlopi_http_data_t *http_reply = NULL;
-            // http_reply = ezlopi_http_post_request(config->url, NULL, NULL, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate);
-            // if (http_reply)
-            // {
-            //     TRACE_D("HTTP GET Status_resonse = %s, Status_code = %d",
-            //             http_reply->response,
-            //             http_reply->status_code);
-            //     if (http_reply->response)
-            //     {
-            //         free(http_reply->response);
-            //     }
-            //     free(http_reply);
-            // }
-
-            break;
-        }
-#if 0
-        case HTTP_METHOD_PUT:
-        { // PUT
-            esp_http_client_set_url(http_config, config->url);
-            esp_http_client_set_method(http_config, HTTP_METHOD_PUT);
-            err = esp_http_client_perform(http_config);
-            if (err == ESP_OK)
-            {
-                TRACE_I("HTTP PUT Status = %d, content_length = %d",
-                        esp_http_client_get_status_code(http_config),
-                        esp_http_client_get_content_length(http_config));
-            }
-            else
-            {
-                TRACE_I("HTTP PUT request failed: %d", (err));
-            }
-            break;
-        }
-        case HTTP_METHOD_DELETE:
-        { // DELETE
-            esp_http_client_set_url(http_config, config->url);
-            esp_http_client_set_method(http_config, HTTP_METHOD_DELETE);
-            err = esp_http_client_perform(http_config);
-            if (err == ESP_OK)
-            {
-                TRACE_I("HTTP DELETE Status = %d, content_length = %d",
-                        esp_http_client_get_status_code(http_config),
-                        esp_http_client_get_content_length(http_config));
-            }
-            else
-            {
-                TRACE_I("HTTP DELETE request failed: %d", (err));
-            }
-            break;
-        }
-#endif
-        default:
-
-            break;
-        }
-
-        esp_http_client_cleanup(client);
+        break;
     }
+    case HTTP_METHOD_POST:
+    { // POST
+      // const char *post_data = "{\"field1\":\"value1\"}";
+
+        const char *location = NULL;
+        s_ezlopi_http_data_t *http_reply = NULL;
+
+        esp_http_client_config_t tmp_http_config; // initialize with default values
+        if (config->skip_cert_common_name_check)
+        {
+            // -> Fill remaining members of this structure according to reqm
+            // eg : port , host ...
+            tmp_http_config.timeout_ms = 30000;         // 30sec
+            tmp_http_config.max_redirection_count = 10; // default 0
+            tmp_http_config.skip_cert_common_name_check = config->skip_cert_common_name_check;
+        }
+
+        http_reply = ezlopi_http_post_request(config->url, NULL, config->header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, (void *)&tmp_http_config);
+        if (http_reply)
+        {
+            TRACE_D("HTTP GET Status_resonse = %s, Status_code = %d",
+                    http_reply->response,
+                    http_reply->status_code);
+            if (http_reply->response)
+            {
+                free(http_reply->response);
+            }
+            free(http_reply);
+        }
+
+        break;
+    }
+#if 0
+    case HTTP_METHOD_PUT:
+    { // PUT
+        esp_http_client_set_url(http_config, config->url);
+        esp_http_client_set_method(http_config, HTTP_METHOD_PUT);
+        err = esp_http_client_perform(http_config);
+        if (err == ESP_OK)
+        {
+            TRACE_I("HTTP PUT Status = %d, content_length = %d",
+                    esp_http_client_get_status_code(http_config),
+                    esp_http_client_get_content_length(http_config));
+        }
+        else
+        {
+            TRACE_I("HTTP PUT request failed: %d", (err));
+        }
+        break;
+    }
+    case HTTP_METHOD_DELETE:
+    { // DELETE
+        esp_http_client_set_url(http_config, config->url);
+        esp_http_client_set_method(http_config, HTTP_METHOD_DELETE);
+        err = esp_http_client_perform(http_config);
+        if (err == ESP_OK)
+        {
+            TRACE_I("HTTP DELETE Status = %d, content_length = %d",
+                    esp_http_client_get_status_code(http_config),
+                    esp_http_client_get_content_length(http_config));
+        }
+        else
+        {
+            TRACE_I("HTTP DELETE request failed: %d", (err));
+        }
+        break;
+    }
+#endif
+    default:
+
+        break;
+    }
+}
+
+char *urlEncode(const char *input, int *encoded_len)
+{
+    // Calculate the length of the encoded string
+    int len = 0;
+    for (const char *ptr = input; *ptr != '\0'; ++ptr)
+    {
+        if (' ' == *ptr || ':' == *ptr || '/' == *ptr || '\n' == *ptr)
+        {
+            len += 3; // Space (' ') becomes '%20', slash ('/') becomes '%2F', colon (':') becomes '%3A' , Newline ('\n') becomes '%0A'
+        }
+        else
+        {
+            len += 1; // Other characters remain as is
+        }
+    }
+    *encoded_len = len;
+    // Allocate memory for the encoded string
+    char *encoded = (char *)malloc(len + 1); // +1 for the null terminator
+
+    // Perform the encoding
+    int j = 0;
+    for (const char *ptr = input; *ptr != '\0'; ++ptr)
+    {
+        if (*ptr == ' ')
+        {
+            encoded[j++] = '%';
+            encoded[j++] = '2';
+            encoded[j++] = '0';
+        }
+        else if (*ptr == '/')
+        {
+            encoded[j++] = '%';
+            encoded[j++] = '2';
+            encoded[j++] = 'F';
+        }
+        else if (*ptr == ':')
+        {
+            encoded[j++] = '%';
+            encoded[j++] = '3';
+            encoded[j++] = 'A';
+        }
+        else if (*ptr == '\n')
+        {
+            encoded[j++] = '%';
+            encoded[j++] = '0';
+            encoded[j++] = 'A';
+        }
+        else
+        {
+            encoded[j++] = *ptr;
+        }
+    }
+    // Null-terminate the encoded string
+    encoded[j] = '\0';
+
+    return encoded;
 }
 
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    // TRACE_W("Warning: then-method not implemented!");
-    // char http_request[100] = {'\0'};
-    char request_line[80] = {'\0'};
+    /* needed URI */
+    // POST%20%2F%20HTTP%2F1.1%0AHost%3A%20ezlo.com%0AContent-Type%3A%20text%2Fplain%0AContent-Length%3A%2013%0A%0ARequest%20check
+
+    char encoded_uri_line[100] = {'\0'};
+    char encoded_content_line[100] = {'\0'};
+    char encoded_content_type_line[50] = {'\0'};
     int ret = 0;
 
     l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
@@ -322,101 +321,134 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
         s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data = (s_ezlopi_scenes_then_methods_send_http_t *)malloc(sizeof(s_ezlopi_scenes_then_methods_send_http_t));
         if (tmp_http_data)
         {
-
             memset(tmp_http_data, 0, sizeof(s_ezlopi_scenes_then_methods_send_http_t));
-            tmp_http_data->username = NULL;
-            tmp_http_data->password = NULL;
-            tmp_http_data->host = "192.168.01.10";
-            tmp_http_data->port = 8080;
-
-            l_fields_v2_t *curr_field = curr_then->fields;
-            while (NULL != curr_field) // fields
+            tmp_http_data->header = NULL;
+            tmp_http_data->header = cJSON_CreateObject();
+            if (tmp_http_data->header) //  headers
             {
-                // create a  requrest line
-                if (0 == strncmp(curr_field->name, "request", strlen("request") + 1))
+                l_fields_v2_t *curr_field = curr_then->fields;
+                while (NULL != curr_field) // fields
                 {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                    // create a  requrest line
+                    if (0 == strncmp(curr_field->name, "request", 8))
                     {
-                        if (0 == strncmp(curr_field->value.value_string, "GET", 4))
+                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                         {
-                            tmp_http_data->method = HTTP_METHOD_GET;
-                        }
-                        if (0 == strncmp(curr_field->value.value_string, "POST", 5))
-                        {
-                            tmp_http_data->method = HTTP_METHOD_POST;
-                        }
-                        if (0 == strncmp(curr_field->value.value_string, "PUT", 4))
-                        {
-                            tmp_http_data->method = HTTP_METHOD_PUT;
-                        }
-                        if (0 == strncmp(curr_field->value.value_string, "DELETE", 7))
-                        {
-                            tmp_http_data->method = HTTP_METHOD_DELETE;
-                        }
+                            if (0 == strncmp(curr_field->value.value_string, "GET", 4))
+                            {
+                                tmp_http_data->method = HTTP_METHOD_GET;
+                            }
+                            if (0 == strncmp(curr_field->value.value_string, "POST", 5))
+                            {
+                                tmp_http_data->method = HTTP_METHOD_POST;
+                            }
+                            if (0 == strncmp(curr_field->value.value_string, "PUT", 4))
+                            {
+                                tmp_http_data->method = HTTP_METHOD_PUT;
+                            }
+                            if (0 == strncmp(curr_field->value.value_string, "DELETE", 7))
+                            {
+                                tmp_http_data->method = HTTP_METHOD_DELETE;
+                            }
 
-                        // TRACE_I("http_request : %s ", http_request);
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "url", strlen("url") + 1))
-                {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                    {
-                        memset(request_line, '\0', sizeof(request_line));
-                        snprintf(request_line, strlen(curr_field->value.value_string) + 1, "%s", curr_field->value.value_string);
-                        // snprintf(request_line, strlen(curr_field->value.value_string) + 1, " %s HTTP/1.1\r\n", curr_field->value.value_string);
-                        TRACE_I("URI : '%s' [%d]", request_line, strlen(request_line));
-                    }
-                }
-                // else if (0 == strncmp(curr_field->name, "credential", strlen("credential") + 1))
-                // {
-                // if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
-                //     {
-                //         tmp_http_data->username = curr_field->value.value_credential.username;
-                //         tmp_http_data->password = curr_field->value.value_credential.password;
-                //         TRACE_W("->username : %s", tmp_http_data->username);
-                //         TRACE_W("->password : %s", tmp_http_data->password);
-                //     }
-                // }
-                else if (0 == strncmp(curr_field->name, "contentType", strlen("contentType") + 1))
-                {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                    {
-                        snprintf(tmp_http_data->content_type, sizeof(tmp_http_data->content_type), "%s", curr_field->value.value_string);
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "content", strlen("content") + 1))
-                {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                    {
-                        snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s", curr_field->value.value_string);
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "headers", strlen("headers") + 1))
-                {
-                    if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
-                    {
-                        cJSON *headers = cJSON_Parse(curr_field->value.value_json);
-                        while (headers)
-                        {
-                            /* code */
+                            // TRACE_I("http_request : %s ", http_request);
                         }
                     }
-                }
-                else if (0 == strncmp(curr_field->name, "skipSecurity", strlen("skipSecurity") + 1))
-                {
-                    if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                    else if (0 == strncmp(curr_field->name, "url", 4))
                     {
-                        tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
+                        // add to uri
+                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                        {
+                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
+                            snprintf(encoded_uri_line, sizeof(encoded_uri_line), "%s\n", curr_field->value.value_string);
+                        }
                     }
+                    // else if (0 == strncmp(curr_field->name, "credential", 11))
+                    // {
+                    //     if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
+                    //     {
+                    //         // tmp_http_data->username = curr_field->value.value_credential.username;
+                    //         // tmp_http_data->password = curr_field->value.value_credential.password;
+                    //         cJSON *credential_object = cJSON_GetObjectItem(curr_field->value.value_json, "value");
+                    //         if (credential_object)
+                    //         {
+                    //             snprintf(tmp_http_data->user_pass, strlen(curr_field->value.value_string) + 1, "%s", curr_field->value.value_string);
+                    //
+                    //             cJSON_Delete(credential_object);
+                    //         }
+                    //     }
+                    // }
+                    else if (0 == strncmp(curr_field->name, "contentType", 12))
+                    {
+                        // add to uri
+                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                        {
+                            snprintf(tmp_http_data->content_type, sizeof(tmp_http_data->content_type), "%s", curr_field->value.value_string);
+                            snprintf(encoded_content_type_line, sizeof(encoded_content_type_line), "Content-Type: %s\n", (curr_field->value.value_string));
+                        }
+                    }
+                    else if (0 == strncmp(curr_field->name, "content", 8))
+                    {
+                        // add to uri
+                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                        {
+                            memset(tmp_http_data->content, 0, sizeof(tmp_http_data->content));
+                            snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s", curr_field->value.value_string);
+                            uint8_t i = 0;
+                            for (; i < sizeof(tmp_http_data->content); i++)
+                            {
+                                if (('\0' == tmp_http_data->content[i]) || (0 == tmp_http_data->content[i]))
+                                    break;
+                            }
+                            snprintf(encoded_content_line, sizeof(encoded_content_line), "Content-Length: %d\n\n%s", i, (curr_field->value.value_string));
+                        }
+                    }
+                    // else if (0 == strncmp(curr_field->name, "headers", 8))
+                    // {
+                    //     if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
+                    //     {
+                    //         if (cJSON_HasObjectItem(curr_field->value.value_json, "value"))
+                    //         {
+                    //             cJSON *tmp_header_item = cJSON_GetObjectItem(curr_field->value.value_json, "value");
+                    //             if (tmp_header_item)
+                    //             {
+                    //                 cJSON_AddItemToObject(tmp_http_data->header, "headers", tmp_header_item);
+                    //             }
+                    //         }
+                    //     }
+                    // }
+                    else if (0 == strncmp(curr_field->name, "skipSecurity", 12))
+                    {
+                        if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                        {
+                            tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
+                        }
+                    }
+
+                    curr_field = curr_field->next;
                 }
 
-                curr_field = curr_field->next;
+                // if src is  'empty' no characters are coppied
+                strncat(tmp_http_data->encoded_url, encoded_uri_line, (size_t)(sizeof(encoded_uri_line)));
+                strncat(tmp_http_data->encoded_url, encoded_content_type_line, (size_t)(sizeof(encoded_content_type_line)));
+                strncat(tmp_http_data->encoded_url, encoded_content_line, (size_t)(sizeof(encoded_content_line)));
+
+                int encoded_len = 0;
+                char *encoded = urlEncode(tmp_http_data->encoded_url, &encoded_len);
+                if (encoded)
+                {
+                    TRACE_D("Original: %s", (tmp_http_data->url));
+                    TRACE_D("Encoded : %s [%d]", encoded, encoded_len);
+                    snprintf(tmp_http_data->encoded_url, sizeof(tmp_http_data->encoded_url), "%s", encoded);
+
+                    free(encoded); // Don't forget to free the allocated memory
+                    // TRACE_I("Encoded-url : '%s' [%d]", tmp_http_data->encoded_url, strlen(tmp_http_data->encoded_url));
+                }
+
+                __http_request_api(tmp_http_data);
+
+                cJSON_Delete(tmp_http_data->header);
             }
-
-            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", request_line);
-
-            __http_request_api(tmp_http_data);
-
             free(tmp_http_data);
         }
     }
