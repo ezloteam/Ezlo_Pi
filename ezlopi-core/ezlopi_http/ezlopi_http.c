@@ -20,7 +20,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
         }                     \
     }
 
-s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
+s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
 {
     char *ret = NULL;
     int status_code = 0;
@@ -60,6 +60,17 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)
         {
+            if (NULL != headers)
+            {
+                TRACE_B(" list of Headers in [GET]");
+                cJSON *header = headers->child;
+                while (header)
+                {
+                    TRACE_I("%s: %s", header->string, header->valuestring);
+                    esp_http_client_set_header(client, header->string, header->valuestring);
+                    header = header->next;
+                }
+            }
             esp_err_t err = esp_http_client_perform(client);
             status_code = esp_http_client_get_status_code(client);
             if (err == ESP_OK)
@@ -157,12 +168,16 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
         if (NULL != client)
         {
             esp_http_client_set_method(client, HTTP_METHOD_POST);
-            cJSON *header = headers->child;
-            while (header)
+            if (NULL != headers)
             {
-                // TRACE_B("%s: %s", header->string, header->valuestring);
-                esp_http_client_set_header(client, header->string, header->valuestring);
-                header = header->next;
+                TRACE_B(" list of Headers in [POST]");
+                cJSON *header = headers->child;
+                while (header)
+                {
+                    TRACE_I("%s: %s", header->string, header->valuestring);
+                    esp_http_client_set_header(client, header->string, header->valuestring);
+                    header = header->next;
+                }
             }
             esp_err_t err = esp_http_client_perform(client);
             status_code = esp_http_client_get_status_code(client);
@@ -200,6 +215,204 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
                 TRACE_E("Error perform http request %s", esp_err_to_name(err));
                 free(http_get_data);
                 http_get_data = NULL;
+            }
+
+            ezlopi_http_free_rx_data(my_data);
+            esp_http_client_cleanup(client);
+        }
+    }
+    return http_get_data;
+}
+
+s_ezlopi_http_data_t *ezlopi_http_put_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
+{
+    char *ret = NULL;
+    int status_code = 0;
+    s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
+    s_ezlopi_http_data_t *http_get_data = NULL;
+    if ((NULL != my_data))
+    {
+        memset(my_data, 0, sizeof(s_rx_data_t));
+
+        esp_http_client_config_t config = {
+            .url = cloud_url,
+            .cert_pem = ca_certificate,
+            .client_cert_pem = shared_key,
+            .client_key_pem = private_key,
+            .event_handler = ezlopi_http_event_handler,
+            .transport_type = HTTP_TRANSPORT_OVER_SSL,
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+
+        };
+        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
+        if (NULL != tmp_config)
+        {
+            // config.keep_alive_interval = tmp_config->keep_alive_interval;
+            config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
+            config.keep_alive_enable = tmp_config->keep_alive_enable;
+            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
+            config.disable_auto_redirect = tmp_config->disable_auto_redirect;
+            config.max_redirection_count = tmp_config->max_redirection_count; // default 0
+            config.max_authorization_retries = tmp_config->max_authorization_retries;
+            config.skip_cert_common_name_check = tmp_config->skip_cert_common_name_check;
+        }
+
+        // TRACE_E("cloud_url: %s", cloud_url);
+        // TRACE_E("ca_certificate: %s", ca_certificate);
+        // TRACE_E("shared_key: %s", shared_key);
+        // TRACE_E("private_key: %s", private_key);
+        esp_http_client_handle_t client = esp_http_client_init(&config);
+        if (NULL != client)
+        {
+            esp_http_client_set_method(client, HTTP_METHOD_PUT);
+            if (NULL != headers)
+            {
+                TRACE_B(" list of Headers in [PUT]");
+                cJSON *header = headers->child;
+                while (header)
+                {
+                    TRACE_I("%s: %s", header->string, header->valuestring);
+                    esp_http_client_set_header(client, header->string, header->valuestring);
+                    header = header->next;
+                }
+            }
+            esp_err_t err = esp_http_client_perform(client);
+            status_code = esp_http_client_get_status_code(client);
+            if (err == ESP_OK)
+            {
+                while (!esp_http_client_is_complete_data_received(client))
+                {
+                    vTaskDelay(50 / portTICK_RATE_MS);
+                }
+
+                if (my_data->total_len)
+                {
+                    ret = (char *)malloc(my_data->total_len + 1);
+                    // TRACE_E("Response lent: %d", my_data->total_len);
+                    if (ret)
+                    {
+                        s_rx_data_t *cur_d = my_data;
+                        memset(ret, 0, my_data->total_len + 1);
+
+                        while (cur_d)
+                        {
+                            strcat(ret, cur_d->ptr);
+                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
+                            cur_d = cur_d->next;
+                        }
+
+                        http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
+                        if (http_get_data)
+                        {
+                            memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
+                            http_get_data->response = ret;
+                            http_get_data->status_code = status_code;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TRACE_E("Error perform http request %s", esp_err_to_name(err));
+            }
+
+            ezlopi_http_free_rx_data(my_data);
+            esp_http_client_cleanup(client);
+        }
+    }
+    return http_get_data;
+}
+
+s_ezlopi_http_data_t *ezlopi_http_delete_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
+{
+    char *ret = NULL;
+    int status_code = 0;
+    s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
+    s_ezlopi_http_data_t *http_get_data = NULL;
+    if ((NULL != my_data))
+    {
+        memset(my_data, 0, sizeof(s_rx_data_t));
+
+        esp_http_client_config_t config = {
+            .url = cloud_url,
+            .cert_pem = ca_certificate,
+            .client_cert_pem = shared_key,
+            .client_key_pem = private_key,
+            .event_handler = ezlopi_http_event_handler,
+            .transport_type = HTTP_TRANSPORT_OVER_SSL,
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+
+        };
+        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
+        if (NULL != tmp_config)
+        {
+            // config.keep_alive_interval = tmp_config->keep_alive_interval;
+            config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
+            config.keep_alive_enable = tmp_config->keep_alive_enable;
+            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
+            config.disable_auto_redirect = tmp_config->disable_auto_redirect;
+            config.max_redirection_count = tmp_config->max_redirection_count; // default 0
+            config.max_authorization_retries = tmp_config->max_authorization_retries;
+            config.skip_cert_common_name_check = tmp_config->skip_cert_common_name_check;
+        }
+
+        // TRACE_E("cloud_url: %s", cloud_url);
+        // TRACE_E("ca_certificate: %s", ca_certificate);
+        // TRACE_E("shared_key: %s", shared_key);
+        // TRACE_E("private_key: %s", private_key);
+        esp_http_client_handle_t client = esp_http_client_init(&config);
+        if (NULL != client)
+        {
+            esp_http_client_set_method(client, HTTP_METHOD_DELETE);
+            if (NULL != headers)
+            {
+                TRACE_B(" list of Headers in [DELETE]");
+                cJSON *header = headers->child;
+                while (header)
+                {
+                    TRACE_I("%s: %s", header->string, header->valuestring);
+                    esp_http_client_set_header(client, header->string, header->valuestring);
+                    header = header->next;
+                }
+            }
+            esp_err_t err = esp_http_client_perform(client);
+            status_code = esp_http_client_get_status_code(client);
+            if (err == ESP_OK)
+            {
+                while (!esp_http_client_is_complete_data_received(client))
+                {
+                    vTaskDelay(50 / portTICK_RATE_MS);
+                }
+
+                if (my_data->total_len)
+                {
+                    ret = (char *)malloc(my_data->total_len + 1);
+                    // TRACE_E("Response lent: %d", my_data->total_len);
+                    if (ret)
+                    {
+                        s_rx_data_t *cur_d = my_data;
+                        memset(ret, 0, my_data->total_len + 1);
+
+                        while (cur_d)
+                        {
+                            strcat(ret, cur_d->ptr);
+                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
+                            cur_d = cur_d->next;
+                        }
+
+                        http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
+                        if (http_get_data)
+                        {
+                            memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
+                            http_get_data->response = ret;
+                            http_get_data->status_code = status_code;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TRACE_E("Error perform http request %s", esp_err_to_name(err));
             }
 
             ezlopi_http_free_rx_data(my_data);

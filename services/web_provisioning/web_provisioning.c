@@ -156,7 +156,7 @@ static void __fetch_wss_endpoint(void *pv)
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
         TRACE_D("http_request: %s", http_request);
-        ws_endpoint = ezlopi_http_get_request(http_request, ssl_private_key, ssl_shared_key, ca_certificate, NULL);
+        ws_endpoint = ezlopi_http_get_request(http_request, NULL, ssl_private_key, ssl_shared_key, ca_certificate, NULL);
 
         if (ws_endpoint)
         {
