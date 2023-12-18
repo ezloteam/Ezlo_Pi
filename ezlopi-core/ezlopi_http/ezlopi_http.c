@@ -43,19 +43,10 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
         esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
         if (NULL != tmp_config)
         {
-            // config.host = tmp_config->host;
-            // config.port = tmp_config->port;
-            // config.path = tmp_config->path;
-            // config.query = tmp_config->query;
-            // config.username = tmp_config->username;
-            // config.password = tmp_config->password;
-            // config.buffer_size = tmp_config->buffer_size;
-            // config.buffer_size_tx = tmp_config->buffer_size_tx;
-            // config.auth_type = tmp_config->auth_type;
-            config.timeout_ms = tmp_config->timeout_ms;
+            // config.keep_alive_interval = tmp_config->keep_alive_interval;
+            config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
-            config.keep_alive_idle = tmp_config->keep_alive_idle;         // Time for remote server to answer // default 5 sec
-            config.keep_alive_interval = tmp_config->keep_alive_interval; // Time for transferring data of the HTTP response // default 5 sec
+            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
             config.disable_auto_redirect = tmp_config->disable_auto_redirect;
             config.max_redirection_count = tmp_config->max_redirection_count; // default 0
             config.max_authorization_retries = tmp_config->max_authorization_retries;
@@ -152,10 +143,10 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
         esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
         if (NULL != tmp_config)
         {
+            // config.keep_alive_interval = tmp_config->keep_alive_interval;
             config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
-            config.keep_alive_idle = tmp_config->keep_alive_idle; // // Time for transferring data of the HTTP response // default 5 sec
-            // config.keep_alive_interval = tmp_config->keep_alive_interval;
+            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
             config.disable_auto_redirect = tmp_config->disable_auto_redirect;
             config.max_redirection_count = tmp_config->max_redirection_count; // default 0
             config.max_authorization_retries = tmp_config->max_authorization_retries;

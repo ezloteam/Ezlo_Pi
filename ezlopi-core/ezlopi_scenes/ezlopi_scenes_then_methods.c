@@ -99,8 +99,8 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
     char url[100];         //"https://ezlo.com/",
-    char encoded_url[350]; // POST%20%2F%20HTTP%2F1.1%0AHost%3A%20ezlo.com
-    char user_pass[64];
+    char encoded_url[250]; // POST%20%2F%20HTTP%2F1.1%0AHost%3A%20ezlo.com
+    // char user_pass[64];
     char content_type[40];
     char content[100];
     uint32_t port;                    //= 80;
@@ -128,8 +128,8 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config)
      *  '/' => %2F
      *  ':' => %3A
      *  '\r\n' => %0A
-     *
      */
+
     // char *tmp_cloud_server = ezlopi_factory_info_v2_get_cloud_server();
     char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
@@ -147,17 +147,17 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config)
         // GET
         s_ezlopi_http_data_t *http_reply = NULL;
 
-        esp_http_client_config_t tmp_http_config; // initialize with default values
-        if (config->skip_cert_common_name_check)
-        {
+        esp_http_client_config_t tmp_http_config = {
+            // initialize with default values
+
             // -> Fill remaining members of this structure according to reqm
             // eg : port , host ...
-            tmp_http_config.timeout_ms = 30000;         // 30sec
-            tmp_http_config.max_redirection_count = 10; // default 0
-            tmp_http_config.skip_cert_common_name_check = config->skip_cert_common_name_check;
-        }
+            .timeout_ms = 30000,         // 30sec
+            .max_redirection_count = 10, // default 0
+            .skip_cert_common_name_check = config->skip_cert_common_name_check,
+        };
 
-        http_reply = ezlopi_http_get_request(config->encoded_url, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, NULL);
+        http_reply = ezlopi_http_get_request(config->url, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, NULL);
         if (http_reply)
         {
             TRACE_D("HTTP GET Status_resonse = %s, Status_code = %d",
@@ -179,17 +179,17 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config)
         const char *location = NULL;
         s_ezlopi_http_data_t *http_reply = NULL;
 
-        esp_http_client_config_t tmp_http_config; // initialize with default values
-        if (config->skip_cert_common_name_check)
-        {
+        esp_http_client_config_t tmp_http_config = {
+            // initialize with default values
+
             // -> Fill remaining members of this structure according to reqm
             // eg : port , host ...
-            tmp_http_config.timeout_ms = 30000;         // 30sec
-            tmp_http_config.max_redirection_count = 10; // default 0
-            tmp_http_config.skip_cert_common_name_check = config->skip_cert_common_name_check;
-        }
+            .timeout_ms = 30000,         // 30sec
+            .max_redirection_count = 10, // default 0
+            .skip_cert_common_name_check = config->skip_cert_common_name_check,
+        };
 
-        http_reply = ezlopi_http_post_request(config->url, NULL, config->header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, (void *)&tmp_http_config);
+        http_reply = ezlopi_http_post_request(config->url, "", config->header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         if (http_reply)
         {
             TRACE_D("HTTP GET Status_resonse = %s, Status_code = %d",
