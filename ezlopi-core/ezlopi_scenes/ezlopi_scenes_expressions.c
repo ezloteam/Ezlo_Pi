@@ -23,7 +23,6 @@ static void __expressions_device_item_names_add(s_ezlopi_expressions_t *exp_node
 
 static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON *cj_expression);
 
-
 uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON *cj_expression)
 {
     uint32_t new_exp_id = 0;
@@ -121,6 +120,8 @@ void ezlopi_scenes_expressions_init(void)
     char *exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
     if (exp_id_list_str)
     {
+        TRACE_D("exp_id_list_str: %s", exp_id_list_str);
+
         cJSON *cj_exp_id_list = cJSON_Parse(exp_id_list_str);
         if (cj_exp_id_list)
         {
@@ -314,9 +315,8 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
     if (new_exp_node)
     {
         char *code_str = NULL;
-
         memset(new_exp_node, 0, sizeof(s_ezlopi_expressions_t));
-        CJSON_GET_VALUE_BOOL(cj_expression, "variable", new_exp_node->variable);
+
         CJSON_GET_VALUE_STRING_BY_COPY(cj_expression, "name", new_exp_node->name);
         CJSON_GET_VALUE_STRING(cj_expression, "code", code_str);
 
@@ -338,6 +338,8 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
             __expressions_items_add(new_exp_node, cJSON_GetObjectItem(cj_params, "items"));
             __expressions_device_item_names_add(new_exp_node, cJSON_GetObjectItem(cj_params, "device_item_names"));
         }
+
+        CJSON_GET_VALUE_BOOL(cj_expression, "variable", new_exp_node->variable);
 
         __expressions_meta_data_add(new_exp_node, cJSON_GetObjectItem(cj_expression, "metadata"));
         new_exp_node->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_expression, "valueType"));
@@ -391,6 +393,7 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
                                     exp_id_list_str = cJSON_Print(cj_exp_id_list);
                                     if (exp_id_list_str)
                                     {
+                                        TRACE_D("Updated expression-id list: %s", exp_id_list_str);
                                         cJSON_Minify(exp_id_list_str);
                                         ezlopi_nvs_write_scenes_expressions(exp_id_list_str);
                                         free(exp_id_list_str);

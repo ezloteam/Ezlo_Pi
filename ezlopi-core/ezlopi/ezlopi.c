@@ -47,6 +47,7 @@ void ezlopi_init(void)
 
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_scripts_init();
+    ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
 
     // ezlopi_ethernet_init();

@@ -4,7 +4,6 @@
 /*****************************************************************************************
  *                                     Methods                                           *
  *****************************************************************************************/
-extern const char *msg_sub_class_method_hub_item_updated;
 extern const char *method_hub_item_updated;
 extern const char *method_add_device;
 extern const char *method_add_all_devices;
