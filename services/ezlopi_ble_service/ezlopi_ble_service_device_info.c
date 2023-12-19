@@ -132,6 +132,7 @@ static char *device_info_jsonify(void)
         __add_factory_info_to_root(root, "device_name", ezlopi_factory_info_v2_get_name());
         __add_factory_info_to_root(root, "brand", ezlopi_factory_info_v2_get_brand());
         __add_factory_info_to_root(root, "manufacturer", ezlopi_factory_info_v2_get_manufacturer());
+        cJSON_AddNumberToObject(root, "serial", ezlopi_factory_info_v2_get_id());
 
         char *ssid = ezlopi_factory_info_v2_get_ssid();
         if (ssid)
