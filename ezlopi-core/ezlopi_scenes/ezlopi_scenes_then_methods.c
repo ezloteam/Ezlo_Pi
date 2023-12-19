@@ -386,11 +386,11 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             // 'value_json' need to be created -> incomplete value
                             if (cJSON_HasObjectItem(curr_field->value.value_json, "value"))
                             {
-                                // cJSON *tmp_header_item = cJSON_GetObjectItem(curr_field->value.value_json, "value");
-                                // if (tmp_header_item)
-                                // {
-                                //     cJSON_AddItemToObject(tmp_http_data->header, "headers", tmp_header_item);
-                                // }
+                                cJSON *tmp_header_item = cJSON_GetObjectItem(curr_field->value.value_json, "value");
+                                if (tmp_header_item)
+                                {
+                                    cJSON_AddItemToObject(tmp_http_data->header, "headers", tmp_header_item);
+                                }
                             }
                             // else
                             // { // this is a sample test

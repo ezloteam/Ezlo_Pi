@@ -69,8 +69,8 @@ typedef union u_field_value_v2
     int value_int;
     uint32_t value_uint;
     bool value_bool;
-    s_value_cred_t value_credential;
-    cJSON *value_json;
+    // s_value_cred_t value_credential;
+    // cJSON *value_json;
 
     struct l_when_block_v2 *when_block;
 
