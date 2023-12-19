@@ -56,12 +56,6 @@ typedef struct s_action_delay_v2
     uint16_t seconds;
 } s_action_delay_v2_t;
 
-typedef struct s_value_cred
-{
-    char *username;
-    char *password;
-} s_value_cred_t;
-
 typedef union u_field_value_v2
 {
     char *value_string;
@@ -69,8 +63,7 @@ typedef union u_field_value_v2
     int value_int;
     uint32_t value_uint;
     bool value_bool;
-    // s_value_cred_t value_credential;
-    // cJSON *value_json;
+    cJSON *value_json;
 
     struct l_when_block_v2 *when_block;
 

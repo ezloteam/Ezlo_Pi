@@ -776,6 +776,18 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             }
             break;
         }
+        case cJSON_Object:
+        {
+            TRACE_E("DETACHED value");
+            // field->value.value_json = cJSON_DetachItemFromObject(cj_value, "value");
+            // char *c = cJSON_Print(field->value.value_json);
+            // if (c)
+            // {
+            //     TRACE_B("detachedValueItem: %s", c);
+            //     free(c);
+            // }
+            break;
+        }
         default:
         {
             TRACE_E("cj_value type: %d", cj_value->type);
@@ -797,7 +809,7 @@ static l_fields_v2_t *__new_field_populate(cJSON *cj_field)
             CJSON_GET_VALUE_STRING_BY_COPY(cj_field, "name", field->name);
 
             field->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_field, "type"));
-            cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
+            // cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
             __fields_get_value(field, cJSON_GetObjectItem(cj_field, "value"));
 
 #if 0

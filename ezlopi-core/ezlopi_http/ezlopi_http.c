@@ -45,12 +45,11 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
             config.method = tmp_config->method;
             config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
-            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
+            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transfer response // default 5s
             config.disable_auto_redirect = tmp_config->disable_auto_redirect;
             config.max_redirection_count = tmp_config->max_redirection_count; // default 0
             config.max_authorization_retries = tmp_config->max_authorization_retries;
             config.skip_cert_common_name_check = tmp_config->skip_cert_common_name_check;
-            // config.keep_alive_interval = tmp_config->keep_alive_interval;
         }
 
         // TRACE_E("cloud_url: %s", cloud_url);
@@ -152,10 +151,9 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
 
         if (NULL != tmp_config)
         {
-            // config.keep_alive_interval = tmp_config->keep_alive_interval;
             config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
-            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
+            config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transfer response // default 5s
             config.disable_auto_redirect = tmp_config->disable_auto_redirect;
             config.max_redirection_count = tmp_config->max_redirection_count; // default 0
             config.max_authorization_retries = tmp_config->max_authorization_retries;
@@ -254,8 +252,7 @@ s_ezlopi_http_data_t *ezlopi_http_put_request(char *cloud_url, cJSON *headers, c
         };
         if (NULL != tmp_config)
         {
-            // config.keep_alive_interval = tmp_config->keep_alive_interval;
-            config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
+                        config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
             config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
             config.disable_auto_redirect = tmp_config->disable_auto_redirect;
@@ -357,8 +354,7 @@ s_ezlopi_http_data_t *ezlopi_http_delete_request(char *cloud_url, cJSON *headers
         };
         if (NULL != tmp_config)
         {
-            // config.keep_alive_interval = tmp_config->keep_alive_interval;
-            config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
+                        config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
             config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
             config.disable_auto_redirect = tmp_config->disable_auto_redirect;
