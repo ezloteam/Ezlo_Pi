@@ -179,7 +179,9 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
             }
             if (NULL != post_content_data)
             {
-                esp_http_client_set_post_field(client, post_content_data, strlen(post_content_data));
+                char tmp_str[100] = {0};
+                snprintf(tmp_str, sizeof(tmp_str), "%s", post_content_data);
+                esp_http_client_set_post_field(client, tmp_str, sizeof(tmp_str));
             }
             esp_err_t err = esp_http_client_perform(client);
             status_code = esp_http_client_get_status_code(client);
