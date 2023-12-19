@@ -98,8 +98,8 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 //---------------------------------------------------------------------------------------
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
-    char url[100]; //"https://ezlo.com/",
     // char encoded_url[250]; // POST%20%2F%20HTTP%2F1.1%0AHost%3A%20ezlo.com
+    char url[100]; //"https://ezlo.com/",
     char content_type[40];
     char content[100];
     int content_length;
@@ -124,28 +124,11 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config)
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
     esp_http_client_config_t tmp_http_config = {
+        .method = config->method,
         .timeout_ms = 30000,         // 30sec
         .max_redirection_count = 10, // default 0
         .skip_cert_common_name_check = config->skip_cert_common_name_check,
     };
-    // if (config->header)
-    // {
-    //     cJSON *contentType = cJSON_GetObjectItemCaseSensitive(config->header, "Content-Type");
-    //     if (cJSON_IsString(contentType))
-    //     {
-    //         TRACE_I("Content-Type: %s", contentType->valuestring);
-    //     }
-    //     cJSON *token = cJSON_GetObjectItemCaseSensitive(config->header, "token");
-    //     if (cJSON_IsString(token))
-    //     {
-    //         TRACE_I("Token: %s", token->valuestring);
-    //     }
-    //     cJSON *contentLength = cJSON_GetObjectItemCaseSensitive(config->header, "Content-Length");
-    //     if (cJSON_IsNumber(contentLength))
-    //     {
-    //         TRACE_I("contentLength: %d", contentLength->valueint);
-    //     }
-    // }
     switch (config->method)
     {
     case HTTP_METHOD_GET:
@@ -169,7 +152,7 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config)
     case HTTP_METHOD_POST:
     {
         s_ezlopi_http_data_t *http_reply = NULL;
-        http_reply = ezlopi_http_post_request(config->url, "", config->header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        http_reply = ezlopi_http_post_request(config->url, "", config->content, config->header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         if (http_reply)
         {
             TRACE_D("HTTP POST Status_resonse = %s, Status_code = %d",
@@ -314,7 +297,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             {
                                 tmp_http_data->method = HTTP_METHOD_GET;
                                 // for GET https://bookstore.toolsqa.com/BookStore/v1/Books
-                                // cJSON_AddStringToObject(tmp_http_data->header, "Accept", "*/*");
+                                cJSON_AddStringToObject(tmp_http_data->header, "Accept", "*/*");
                                 // cJSON_AddStringToObject(tmp_http_data->header, "Accept-Encoding", "gzip, deflate, br");
                                 // cJSON_AddStringToObject(tmp_http_data->header, "Connection", "keep-alive");
                             }
@@ -409,15 +392,10 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                                 //     cJSON_AddItemToObject(tmp_http_data->header, "headers", tmp_header_item);
                                 // }
                             }
-                            else
-                            { // this is a sample test
-                                cJSON_AddStringToObject(tmp_http_data->header, "token", "SecurityToken13");
-                                // cJSON_AddStringToObject(tmp_http_data->header, "Host", "bookstore.toolsqa.com");
-                                // cJSON_AddStringToObject(tmp_http_data->header, "User-Agent", "PostmanRuntime/7.36.0");
-                                // cJSON_AddStringToObject(tmp_http_data->header, "Accept", "*/*");
-                                // cJSON_AddStringToObject(tmp_http_data->header, "Accept-Encoding", "gzip, deflate, br");
-                                // cJSON_AddStringToObject(tmp_http_data->header, "Connection", "keep-alive");
-                            }
+                            // else
+                            // { // this is a sample test
+                            //     cJSON_AddStringToObject(tmp_http_data->header, "Accept", "application/json");
+                            // }
                         }
                     }
                     else if (0 == strncmp(curr_field->name, "skipSecurity", 12))

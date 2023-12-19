@@ -20,7 +20,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
         }                     \
     }
 
-s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
+s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, esp_http_client_config_t *tmp_config)
 {
     char *ret = NULL;
     int status_code = 0;
@@ -40,10 +40,9 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
 
         };
-        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
         if (NULL != tmp_config)
         {
-            // config.keep_alive_interval = tmp_config->keep_alive_interval;
+            config.method = tmp_config->method;
             config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
             config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transferring data of the HTTP response // default 5 sec
@@ -51,6 +50,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
             config.max_redirection_count = tmp_config->max_redirection_count; // default 0
             config.max_authorization_retries = tmp_config->max_authorization_retries;
             config.skip_cert_common_name_check = tmp_config->skip_cert_common_name_check;
+            // config.keep_alive_interval = tmp_config->keep_alive_interval;
         }
 
         // TRACE_E("cloud_url: %s", cloud_url);
@@ -62,7 +62,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
         {
             if (NULL != headers)
             {
-                TRACE_B(" list of Headers in [GET]");
+                TRACE_B(" list of Headers :-");
                 cJSON *header = headers->child;
                 while (header)
                 {
@@ -92,7 +92,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
                         while (cur_d)
                         {
                             strcat(ret, cur_d->ptr);
-                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
+                            // TRACE_D("%.*s", cur_d->len, cur_d->ptr);
                             cur_d = cur_d->next;
                         }
 
@@ -118,13 +118,12 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
     return http_get_data;
 }
 
-s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
+s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, char *post_content_data, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, esp_http_client_config_t *tmp_config)
 {
     char *ret = NULL;
-
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
+    s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t)); // memory leak?
 
     if (my_data)
     {
@@ -151,7 +150,6 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
 
-        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
         if (NULL != tmp_config)
         {
             // config.keep_alive_interval = tmp_config->keep_alive_interval;
@@ -170,7 +168,7 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
             esp_http_client_set_method(client, HTTP_METHOD_POST);
             if (NULL != headers)
             {
-                TRACE_B(" list of Headers in [POST]");
+                TRACE_B(" list of Headers :-");
                 cJSON *header = headers->child;
                 while (header)
                 {
@@ -178,6 +176,10 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
                     esp_http_client_set_header(client, header->string, header->valuestring);
                     header = header->next;
                 }
+            }
+            if (NULL != post_content_data)
+            {
+                esp_http_client_set_post_field(client, post_content_data, strlen(post_content_data));
             }
             esp_err_t err = esp_http_client_perform(client);
             status_code = esp_http_client_get_status_code(client);
@@ -224,8 +226,12 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
     return http_get_data;
 }
 
-s_ezlopi_http_data_t *ezlopi_http_put_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
+s_ezlopi_http_data_t *ezlopi_http_put_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, esp_http_client_config_t *tmp_http_config)
 {
+    s_ezlopi_http_data_t *http_get_data = NULL;
+    http_get_data = ezlopi_http_get_request(cloud_url, headers, private_key, shared_key, ca_certificate, tmp_http_config);
+    return http_get_data;
+#if 0
     char *ret = NULL;
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
@@ -244,7 +250,6 @@ s_ezlopi_http_data_t *ezlopi_http_put_request(char *cloud_url, cJSON *headers, c
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
 
         };
-        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
         if (NULL != tmp_config)
         {
             // config.keep_alive_interval = tmp_config->keep_alive_interval;
@@ -267,7 +272,7 @@ s_ezlopi_http_data_t *ezlopi_http_put_request(char *cloud_url, cJSON *headers, c
             esp_http_client_set_method(client, HTTP_METHOD_PUT);
             if (NULL != headers)
             {
-                TRACE_B(" list of Headers in [PUT]");
+                TRACE_B(" list of Headers ");
                 cJSON *header = headers->child;
                 while (header)
                 {
@@ -321,10 +326,15 @@ s_ezlopi_http_data_t *ezlopi_http_put_request(char *cloud_url, cJSON *headers, c
         }
     }
     return http_get_data;
+#endif
 }
 
-s_ezlopi_http_data_t *ezlopi_http_delete_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, void *custom_http_config)
+s_ezlopi_http_data_t *ezlopi_http_delete_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, esp_http_client_config_t *tmp_http_config)
 {
+    s_ezlopi_http_data_t *http_get_data = NULL;
+    http_get_data = ezlopi_http_get_request(cloud_url, headers, private_key, shared_key, ca_certificate, tmp_http_config);
+    return http_get_data;
+#if 0
     char *ret = NULL;
     int status_code = 0;
     s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
@@ -343,7 +353,6 @@ s_ezlopi_http_data_t *ezlopi_http_delete_request(char *cloud_url, cJSON *headers
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
 
         };
-        esp_http_client_config_t *tmp_config = (esp_http_client_config_t *)custom_http_config;
         if (NULL != tmp_config)
         {
             // config.keep_alive_interval = tmp_config->keep_alive_interval;
@@ -366,7 +375,7 @@ s_ezlopi_http_data_t *ezlopi_http_delete_request(char *cloud_url, cJSON *headers
             esp_http_client_set_method(client, HTTP_METHOD_DELETE);
             if (NULL != headers)
             {
-                TRACE_B(" list of Headers in [DELETE]");
+                TRACE_B(" list of Headers :-");
                 cJSON *header = headers->child;
                 while (header)
                 {
@@ -420,6 +429,7 @@ s_ezlopi_http_data_t *ezlopi_http_delete_request(char *cloud_url, cJSON *headers
         }
     }
     return http_get_data;
+#endif
 }
 
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt)
