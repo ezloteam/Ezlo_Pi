@@ -63,6 +63,7 @@ typedef union u_field_value_v2
     int value_int;
     uint32_t value_uint;
     bool value_bool;
+    cJSON *cj_value;
     struct l_when_block_v2 *when_block;
 } u_field_value_v2_t;
 

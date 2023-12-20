@@ -232,13 +232,8 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
     cJSON *cjson_params = (cJSON *)arg;
 
     if (NULL != cjson_params)
-    {
-        char *cjson_params_str = cJSON_Print(cjson_params);
-        if (cjson_params)
-        {
-            TRACE_D("cjson_params: %s", cjson_params_str);
-            free(cjson_params_str);
-        }
+    { 
+        CJSON_TRACE("cjson_params", cjson_params);
 
         int value = 0;
         cJSON *cj_value = cJSON_GetObjectItem(cjson_params, "value");

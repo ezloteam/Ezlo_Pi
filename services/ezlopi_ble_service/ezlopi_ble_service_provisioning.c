@@ -88,12 +88,12 @@ static char *__provisioning_status_jsonify(void)
         cJSON_AddNumberToObject(root, "config_time", ezlopi_nvs_config_info_update_time_get());
 
         prov_status_jstr = cJSON_Print(root);
+        cJSON_Delete(root);
+
         if (prov_status_jstr)
         {
             cJSON_Minify(prov_status_jstr);
         }
-
-        cJSON_Delete(root);
     }
 
     return prov_status_jstr;
@@ -566,7 +566,6 @@ static char *__provisioning_info_jsonify(void)
         cJSON_AddStringToObject(cj_prov_info, "cloud_server", cloud_server);
         cJSON_AddStringToObject(cj_prov_info, "ssl_private_key", ssl_private_key);
         cJSON_AddStringToObject(cj_prov_info, "ssl_shared_key", ssl_shared_key);
-        // cJSON_AddStringToObject(cj_prov_info, "ssl_public_key"); // Not needed by Ezlo_Pi stack for now
         cJSON_AddStringToObject(cj_prov_info, "ca_cert", ca_cert);
         cJSON_AddStringToObject(cj_prov_info, "device_type_ezlopi", ezlopi_factory_info_v2_get_device_type());
 
@@ -579,12 +578,12 @@ static char *__provisioning_info_jsonify(void)
         ezlopi_factory_info_v2_free(cloud_server);
 
         str_json_prov_info = cJSON_Print(cj_prov_info);
+        cJSON_Delete(cj_prov_info);
+
         if (str_json_prov_info)
         {
             cJSON_Minify(str_json_prov_info);
         }
-
-        cJSON_Delete(cj_prov_info);
     }
 
     return str_json_prov_info;

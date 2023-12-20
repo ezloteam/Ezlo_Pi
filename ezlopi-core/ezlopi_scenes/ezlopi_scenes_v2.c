@@ -285,8 +285,8 @@ f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_metho
 
 const char *ezlopi_scene_get_scene_value_type_name_v2(e_scene_value_type_v2_t value_type)
 {
-    const char *ret = NULL;
-    if ((value_type > EZLOPI_VALUE_TYPE_NONE) && (value_type < EZLOPI_VALUE_TYPE_MAX))
+    const char *ret = "";
+    if ((value_type >= EZLOPI_VALUE_TYPE_NONE) && (value_type < EZLOPI_VALUE_TYPE_MAX))
     {
         ret = scenes_value_type_name[value_type];
     }
@@ -751,6 +751,11 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         {
             field->value.value_bool = false;
             TRACE_B("value: false");
+            break;
+        }
+        case cJSON_Object:
+        {
+            
             break;
         }
         case cJSON_Array:

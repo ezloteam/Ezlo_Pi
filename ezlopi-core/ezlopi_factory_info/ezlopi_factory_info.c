@@ -25,7 +25,7 @@ const char *ezlopi_device_type_str[] = {
     "ezlopi_sensor_ambienttrackerpro",
 };
 
-static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
+static int ezlopi_factory_info_v2_set_4kb(char *name, char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
 
 const esp_partition_t *ezlopi_factory_info_v2_init(void)
@@ -674,28 +674,29 @@ int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password)
 
 int ezlopi_factory_info_v2_set_ssl_private_key(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x4000);
+    return ezlopi_factory_info_v2_set_4kb("ssl_private_key", data, SSL_PRIVATE_KEY_OFFSET);
 }
 
 int ezlopi_factory_info_v2_set_ssl_public_key(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x4000);
+    // return ezlopi_factory_info_v2_set_4kb("ssl-public-key", data, 0x4000);
+    return 0;
 }
 
 int ezlopi_factory_info_v2_set_ssl_shared_key(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x5000);
+    return ezlopi_factory_info_v2_set_4kb("ssl-shared-key", data, SSL_SHARED_KEY_OFFSET);
 }
 
 int ezlopi_factory_info_v2_set_ca_cert(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x3000);
+    return ezlopi_factory_info_v2_set_4kb("ca-cert", data, CA_CERTIFICATE_OFFSET);
 }
 
 int ezlopi_factory_info_v2_set_ezlopi_config(char *data)
 {
-    int ret = ezlopi_factory_info_v2_set_4kb(data, 0x1000);
-    if (ret)
+    int ret = ezlopi_factory_info_v2_set_4kb("ezlopi-config", data, EZLOPI_CONFIG_OFFSET);
+    if (1 == ret)
     {
         free(g_ezlopi_config);
         g_ezlopi_config = NULL;
@@ -705,26 +706,26 @@ int ezlopi_factory_info_v2_set_ezlopi_config(char *data)
     return ret;
 }
 
-static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
+static int ezlopi_factory_info_v2_set_4kb(char *name, char *data, uint32_t offset)
 {
     int ret = 0;
     if (data)
     {
-        if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, offset, 0x1000))
+        if (ESP_OK == (ret = esp_partition_erase_range(partition_ctx_v2, offset, 0x1000)))
         {
-            if (ESP_OK == esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1))
+            if (ESP_OK == (ret = esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1)))
             {
-                TRACE_I("Flash write succeessful");
+                TRACE_I("%s: Flash write succeessful", name ? name : "");
                 ret = 1;
             }
             else
             {
-                TRACE_E("esp-partition write failed!");
+                TRACE_E("%s: esp-partition write failed!", name ? name : "");
             }
         }
         else
         {
-            TRACE_E("esp-partition erase failed!");
+            TRACE_E("%s: esp-partition erase failed!", name ? name : "");
         }
     }
 

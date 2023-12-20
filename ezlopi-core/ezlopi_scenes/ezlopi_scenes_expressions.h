@@ -62,7 +62,7 @@ typedef struct s_ezlopi_expressions
     char *code;
     s_exp_items_t *items;
     s_exp_device_item_names_t *device_item_names;
-    char *meta_data; // not used for now
+    cJSON *meta_data; // not used for now
     bool variable;
 
     u_exp_value_t exp_value;
@@ -75,7 +75,7 @@ typedef struct s_ezlopi_expressions
 
 /**
  * @brief Fetch expressions from NVS flash and populate to linklist
- * 
+ *
  */
 void ezlopi_scenes_expressions_init(void);
 
@@ -90,30 +90,44 @@ uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON *cj_expres
 
 /**
  * @brief POP the expression from linklist
- * 
- * @return s_ezlopi_expressions_t* 
+ *
+ * @return s_ezlopi_expressions_t*
  */
 s_ezlopi_expressions_t *ezlopi_scenes_expressions_node_pop(void);
 
 /**
  * @brief Delete the expression-item and its childs
- * 
- * @param exp_items 
+ *
+ * @param exp_items
  */
 void ezlopi_scenes_expressions_delete_exp_item(s_exp_items_t *exp_items);
 
 /**
  * @brief Delete the expression-device item name and its childs
- * 
- * @param exp_device_item_names 
+ *
+ * @param exp_device_item_names
  */
 void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_names_t *exp_device_item_names);
 
 /**
- * @brief Delete the expressions node and its childs 
- * 
- * @param exp_node 
+ * @brief Delete the expressions node and its childs
+ *
+ * @param exp_node
  */
 void ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
+
+/**
+ * @brief construct expressions in cJSON and add it to cj_expression_array
+ *
+ * @param cj_expresson_array
+ */
+void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params);
+
+/**
+ * @brief print the informations inside exp-node
+ *
+ * @param exp_node
+ */
+void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t *exp_node);
 
 #endif // __EZLOPI_SCENES_EXPRESSIONS_H__

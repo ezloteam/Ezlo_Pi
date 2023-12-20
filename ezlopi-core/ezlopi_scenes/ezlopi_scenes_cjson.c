@@ -3,6 +3,7 @@
 
 #include "trace.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_cjson_macros.h"
 
 static void ezlopi_scenes_cjson_add_action_block_options(cJSON *cj_block_array, l_action_block_v2_t *then_block);
 static void ezlopi_scenes_cjson_add_action_delay(cJSON *cj_then_block, s_action_delay_v2_t *action_delay);
@@ -241,12 +242,7 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_v2_t *field
                                 curr_when_block = curr_when_block->next;
                             }
 
-                            char *str_vlaue = cJSON_Print(vlaue_block_array);
-                            if (str_vlaue)
-                            {
-                                TRACE_I("value: %s", str_vlaue);
-                                free(str_vlaue);
-                            }
+                            CJSON_TRACE("value", vlaue_block_array);
                         }
                         break;
                     }
@@ -512,11 +508,12 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_v2_t *scenes_list)
     if (cj_scenes_array)
     {
         scenes_list_str = cJSON_Print(cj_scenes_array);
+        cJSON_Delete(cj_scenes_array);
+        
         if (scenes_list_str)
         {
             cJSON_Minify(scenes_list_str);
         }
-        cJSON_Delete(cj_scenes_array);
     }
     return scenes_list_str;
 }

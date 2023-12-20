@@ -136,7 +136,8 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
         {
             cJSON *cjson_params_rgb_values = cJSON_GetObjectItem(cjson_params, "value");
-            TRACE_B("%s", cJSON_Print(cjson_params_rgb_values));
+
+            CJSON_TRACE("cjson_params_rgb_values", cjson_params_rgb_values);
 
             CJSON_GET_VALUE_INT(cjson_params_rgb_values, "red", rgb_args->red_struct.value);
             CJSON_GET_VALUE_INT(cjson_params_rgb_values, "green", rgb_args->green_struct.value);

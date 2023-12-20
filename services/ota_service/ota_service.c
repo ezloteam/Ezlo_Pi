@@ -41,16 +41,11 @@ static void ota_service_process(void *pv)
                     cJSON_Minify(data_to_send);
                     ret = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                     free(data_to_send);
-                    // ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_B);
                 }
-
-                // web_provisioning_send_to_nma_websocket(firmware_info_request, TRACE_TYPE_D);
-                // cJSON_Delete(firmware_info_request);
             }
         }
         else
-        { // firmware_send_firmware_query_to_nma_server();
-            // send "cloud.firmware.info.get"
+        {
             vTaskDelay(1000 / portTICK_RATE_MS);
         }
     }

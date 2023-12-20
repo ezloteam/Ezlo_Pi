@@ -258,8 +258,6 @@ static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method,
                     web_provisioning_send_str_data_to_nma_websocket(data_to_send, print_type);
                     free(data_to_send);
                 }
-
-                // web_provisioning_send_to_nma_websocket(cj_response, print_type);
             }
             else
             {

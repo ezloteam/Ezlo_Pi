@@ -81,12 +81,12 @@ static char *__provisioning_status_jsonify(void)
         cJSON_AddNumberToObject(root, "config_time", ezlopi_nvs_config_info_update_time_get());
 
         prov_status_jstr = cJSON_Print(root);
+        cJSON_Delete(root);
+
         if (prov_status_jstr)
         {
             cJSON_Minify(prov_status_jstr);
         }
-
-        cJSON_Delete(root);
     }
 
     return prov_status_jstr;
@@ -189,7 +189,6 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                                     char *save_config_str = cJSON_Print(cj_config);
                                     if (save_config_str)
                                     {
-                                        TRACE_D("here");
                                         ezlopi_factory_info_v2_set_ezlopi_config(save_config_str);
                                         free(save_config_str);
                                     }
@@ -360,67 +359,6 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
     }
 }
 
-#if 0
-static void __dynamic_config_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
-{
-    if (g_dynamic_config_linked_buffer)
-    {
-        TRACE_D("Write execute function called.");
-        ezlopi_ble_buffer_accumulate_to_start(g_dynamic_config_linked_buffer);
-        __process_dynamic_config(g_dynamic_config_linked_buffer->buffer, g_dynamic_config_linked_buffer->len);
-        ezlopi_ble_buffer_free_buffer(g_dynamic_config_linked_buffer);
-        g_dynamic_config_linked_buffer = NULL;
-    }
-}
-
-static void __process_dynamic_config(uint8_t *value, uint32_t len)
-{
-    if ((NULL != value) && (len > 0))
-    {
-        cJSON *cj_config = cJSON_Parse((const char *)value);
-        if (cj_config)
-        {
-            char *user_id = NULL;
-            CJSON_GET_VALUE_STRING(cj_config, "user_id", user_id);
-
-            if (user_id && (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id)))
-            {
-                cJSON *cj_device_config = cJSON_GetObjectItem(cj_config, "device_config");
-                if (cj_device_config)
-                {
-                    cJSON_DeleteItemFromObject(cj_config, "cmd");
-                    cJSON_AddNumberToObject(cj_device_config, "cmd", 3);
-                    char *tmp_str = cJSON_Print(cj_device_config);
-                    if (tmp_str)
-                    {
-                        TRACE_D("device_config: %s", tmp_str);
-                        ezlopi_factory_info_v2_set_ezlopi_config(tmp_str);
-                        free(tmp_str);
-                    }
-                }
-            }
-            else
-            {
-                TRACE_E("User varification failed!");
-
-                char *curr_user_id = ezlopi_nvs_read_user_id_str();
-                if (curr_user_id)
-                {
-                    TRACE_D("current user: %s", curr_user_id);
-                    free(curr_user_id);
-                }
-            }
-
-            cJSON_Delete(cj_config);
-        }
-        else
-        {
-            TRACE_E("Invalid json packet received!");
-        }
-    }
-}
-#endif
-
 static char *__base64_decode_dynamic_config(uint32_t total_size)
 {
     char *decoded_config_json = NULL;
@@ -480,35 +418,6 @@ static char *__base64_decode_dynamic_config(uint32_t total_size)
 
     return decoded_config_json;
 }
-
-#if 0
-static char *__dynamic_config_jsonify(void)
-{
-    char *str_json_prov_info = NULL;
-
-    char *device_config = ezlopi_factory_info_v2_get_ezlopi_config(); // don't free this, it is being used by other modules as well
-
-    if (device_config)
-    {
-        TRACE_D("device-config: %s", device_config);
-        cJSON *cj_device_config = cJSON_Parse(device_config);
-
-        if (cj_device_config)
-        {
-            cJSON_DeleteItemFromObject(cj_device_config, "cmd");
-            cJSON_AddNumberToObject(cj_device_config, "config_time", ezlopi_nvs_config_info_update_time_get());
-            cJSON_AddNumberToObject(cj_device_config, "_")
-            str_json_prov_info = cJSON_Print(cj_device_config);
-            if (str_json_prov_info)
-            {
-                cJSON_Minify(str_json_prov_info);
-            }
-        }
-    }
-
-    return str_json_prov_info;
-}
-#endif
 
 static char *__dynamic_config_base64(void)
 {

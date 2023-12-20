@@ -47,7 +47,6 @@ void ezlopi_init(void)
 
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_scripts_init();
-    ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
 
     // ezlopi_ethernet_init();
@@ -69,11 +68,9 @@ static void ezlopi_initialize_devices_v3(void)
     l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
     while (curr_device)
     {
-        TRACE_D("Init - Device-ID: %08x", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t *curr_item = curr_device->items;
         while (curr_item)
         {
-            TRACE_D("        Item-ID: %08x", curr_item->cloud_properties.item_id);
             if (curr_item->func)
             {
                 if ((device_init_ret = curr_item->func(EZLOPI_ACTION_INITIALIZE, curr_item, NULL, NULL)) < 0)

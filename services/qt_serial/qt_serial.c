@@ -318,11 +318,7 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-
             qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
-            // const int len = strlen(my_json_string);
-            // const int txBytes = uart_write_bytes(UART_NUM_0, my_json_string, len); // Send the data over uart
-
             cJSON_free(my_json_string);
         }
     }
@@ -384,14 +380,12 @@ static void qt_serial_read_config(void)
     if (root)
     {
         char *my_json_string = cJSON_Print(root);
+        cJSON_Delete(root); // free Json string
 
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-            cJSON_Delete(root); // free Json string
-            const int len = strlen(my_json_string);
-            qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
-            // TRACE_D("Sending: %s", my_json_string);
+            qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string); // Send the data over uart
             cJSON_free(my_json_string);
         }
     }

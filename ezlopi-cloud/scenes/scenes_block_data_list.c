@@ -211,16 +211,21 @@ static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
             if (cj_value_array)
             {
                 uint32_t idx = EZLOPI_VALUE_TYPE_NONE + 1;
-                while (ezlopi_scene_get_scene_value_type_name_v2(idx))
+                while (idx < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    cJSON *cj_string_val = cJSON_CreateString(ezlopi_scene_get_scene_value_type_name_v2(idx));
-                    if (cj_string_val)
+                    char *type_name_str = ezlopi_scene_get_scene_value_type_name_v2(idx);
+                    if (type_name_str)
                     {
-                        if (!cJSON_AddItemToArray(cj_value_array, cj_string_val))
+                        cJSON *cj_string_val = cJSON_CreateString(type_name_str);
+                        if (cj_string_val)
                         {
-                            cJSON_Delete(cj_string_val);
+                            if (!cJSON_AddItemToArray(cj_value_array, cj_string_val))
+                            {
+                                cJSON_Delete(cj_string_val);
+                            }
                         }
                     }
+
                     idx++;
                 }
             }

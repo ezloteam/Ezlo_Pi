@@ -97,7 +97,7 @@ void ezlopi_scenes_meshbot_init(void)
     l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
     while (scene_node)
     {
-        if (scene_node->enabled)
+        if (scene_node->enabled && (scene_node->else_block || scene_node->then_block))
         {
             xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
         }

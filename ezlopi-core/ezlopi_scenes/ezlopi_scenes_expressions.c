@@ -12,7 +12,6 @@ static s_ezlopi_expressions_t *l_expressions_head = NULL;
 
 static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression);
 
-static void __expressions_meta_data_add(s_ezlopi_expressions_t *exp_node, cJSON *cj_meta_data);
 static void __expressions_get_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_value, e_scene_value_type_v2_t value_type);
 
 static s_exp_items_t *__expressions_items_create(cJSON *cj_item);
@@ -22,6 +21,120 @@ static s_exp_device_item_names_t *__expressions_device_item_names_create(cJSON *
 static void __expressions_device_item_names_add(s_ezlopi_expressions_t *exp_node, cJSON *cj_device_item_names);
 
 static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON *cj_expression);
+
+void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
+{
+    bool show_code = false;
+    cJSON *cj_types_filter_array = NULL;
+
+    if (cj_params)
+    {
+        CJSON_GET_VALUE_BOOL(cj_params, "showCode", show_code);
+        cj_types_filter_array = cJSON_GetObjectItem(cj_params, "filterTypes");
+    }
+
+#if 0
+    if (cj_expresson_array)
+    {
+        char *expression_ids = ezlopi_nvs_read_scenes_expressions();
+        if (expression_ids)
+        {
+            cJSON *cj_expression_ids = cJSON_Parse(expression_ids);
+            free(expression_ids);
+
+            CJSON_TRACE("expression-ids", cj_expression_ids);
+
+            if (cj_expression_ids)
+            {
+                uint32_t idx = 0;
+                cJSON *cj_id = NULL;
+                while (NULL != (cj_id = cJSON_GetArrayItem(cj_expression_ids, idx++)))
+                {
+                    if (cj_id && cj_id->valuestring)
+                    {
+                        char *expression_str = ezlopi_nvs_read_str(cj_id->valuestring);
+                        if (expression_str)
+                        {
+                            cJSON *cj_expression = cJSON_Parse(expression_str);
+                            free(expression_str);
+
+                            if (cj_expression)
+                            {
+                                if (cj_types_filter_array)
+                                {
+                        
+                                    uint32_t idx = 0;
+                                    cJSON *cj_type = NULL;
+                                    while (NULL != (cj_type = cJSON_GetArrayItem(cj_types_filter_array, idx++)))
+                                    {
+
+                                    }
+                                }
+                                else
+                                {
+                                    if (false == show_code)
+                                    {
+                                        cJSON_DeleteItemFromObject(cj_expression, "code");
+                                    }
+
+                                    if (!cJSON_AddItemToArray(cj_expresson_array, cj_expression))
+                                    {
+                                        cJSON_Delete(cj_expression);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                cJSON_Delete(cj_expression_ids);
+            }
+        }
+    }
+#endif
+}
+
+void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t *exp_node)
+{
+    if (exp_node)
+    {
+        TRACE_D("----------------- Expression --------------------");
+        TRACE_D("Name: %s", exp_node->name);
+        TRACE_D("Exp_id: %08x", exp_node->exp_id);
+        TRACE_D("code: %s", exp_node->code ? exp_node->code : "");
+
+        TRACE_D("-- Items:");
+        int count = 0;
+        s_exp_items_t *items = exp_node->items;
+        while (items)
+        {
+            TRACE_D("\t-------------- item-%d ------------", ++count);
+            TRACE_D("\tname: %s", items->name);
+            TRACE_D("\t_id: %08x", items->_id);
+            items = items->next;
+        }
+        TRACE_D("\t-----------------------------------");
+
+        TRACE_D("-- Device Item Names:");
+        count = 0;
+        s_exp_device_item_names_t *device_item_names = exp_node->device_item_names;
+        while (device_item_names)
+        {
+            TRACE_D("\t----------device-item-names-%d-------", ++count);
+            TRACE_D("\tname: %s", device_item_names->name);
+            TRACE_D("\titem-name: %s", device_item_names->item_name);
+            TRACE_D("\tdevice-name: %s", device_item_names->device_name);
+            device_item_names = device_item_names->next;
+        }
+        TRACE_D("\t-----------------------------------");
+
+        CJSON_TRACE("meta-data", exp_node->meta_data);
+        TRACE_D("Is variable: %s", exp_node->variable ? "True" : "False");
+        TRACE_D("value-type: %s", ezlopi_scene_get_scene_value_type_name_v2(exp_node->value_type));
+
+        TRACE_D("----------------- ---------- --------------------");
+    }
+}
 
 uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON *cj_expression)
 {
@@ -154,6 +267,10 @@ void ezlopi_scenes_expressions_init(void)
 
         free(exp_id_list_str);
     }
+    else
+    {
+        TRACE_E("Expression's ids not found");
+    }
 }
 
 static s_exp_items_t *__expressions_items_create(cJSON *cj_item)
@@ -174,6 +291,10 @@ static s_exp_items_t *__expressions_items_create(cJSON *cj_item)
                 new_item_node->_id = strtoul(item_id_string, NULL, 16);
             }
         }
+        else
+        {
+            TRACE_E("Error: malloc failed!");
+        }
     }
 
     return new_item_node;
@@ -185,22 +306,36 @@ static void __expressions_items_add(s_ezlopi_expressions_t *exp_node, cJSON *cj_
     {
         uint32_t item_index = 0;
         cJSON *cj_item = NULL;
+        s_exp_items_t *new_item_head = NULL;
+        s_exp_items_t *curr_item_node = NULL;
+
         while (NULL != (cj_item = cJSON_GetArrayItem(cj_items, item_index++)))
         {
-            if (exp_node->items)
+            if (new_item_head)
             {
-                s_exp_items_t *exp_item_node = exp_node->items;
-                while (exp_item_node->next)
-                {
-                    exp_item_node = exp_item_node->next;
-                }
-
-                exp_item_node->next = __expressions_items_create(cj_item);
+                curr_item_node->next = __expressions_items_create(cj_item);
+                curr_item_node = curr_item_node->next;
             }
             else
             {
-                exp_node->items = __expressions_items_create(cj_item);
+                new_item_head = __expressions_items_create(cj_item);
+                curr_item_node = new_item_head;
             }
+        }
+
+        if (exp_node->items)
+        {
+            s_exp_items_t *exp_item_node = exp_node->items;
+            while (exp_item_node->next)
+            {
+                exp_item_node = exp_item_node->next;
+            }
+
+            exp_item_node->next = new_item_head;
+        }
+        else
+        {
+            exp_node->items = new_item_head;
         }
     }
 }
@@ -226,36 +361,41 @@ static s_exp_device_item_names_t *__expressions_device_item_names_create(cJSON *
 
 static void __expressions_device_item_names_add(s_ezlopi_expressions_t *exp_node, cJSON *cj_device_item_names)
 {
-
     if (cj_device_item_names)
     {
         uint32_t dev_item_name_index = 0;
         cJSON *cj_dev_item_name = NULL;
+        s_exp_device_item_names_t *new_device_item_names_head = NULL;
+        s_exp_device_item_names_t *cur_device_item_names_head = NULL;
+
         while (NULL != (cj_dev_item_name = cJSON_GetArrayItem(cj_device_item_names, dev_item_name_index++)))
         {
-            if (exp_node->device_item_names)
+            if (new_device_item_names_head)
             {
-                s_exp_device_item_names_t *curr_node = exp_node->device_item_names;
-                while (curr_node->next)
-                {
-                    curr_node = curr_node->next;
-                }
-
-                curr_node->next = __expressions_device_item_names_create(cj_dev_item_name);
+                cur_device_item_names_head->next = __expressions_device_item_names_create(cj_dev_item_name);
+                cur_device_item_names_head = cur_device_item_names_head->next;
             }
             else
             {
-                exp_node->device_item_names = __expressions_device_item_names_create(cj_dev_item_name);
+                new_device_item_names_head = __expressions_device_item_names_create(cj_dev_item_name);
+                cur_device_item_names_head = new_device_item_names_head;
             }
         }
-    }
-}
 
-static void __expressions_meta_data_add(s_ezlopi_expressions_t *exp_node, cJSON *cj_meta_data)
-{
-    if (cj_meta_data)
-    {
-        exp_node->meta_data = cJSON_Print(cj_meta_data);
+        if (exp_node->device_item_names)
+        {
+            s_exp_device_item_names_t *exp_device_item_names_node = exp_node->device_item_names;
+            while (exp_device_item_names_node->next)
+            {
+                exp_device_item_names_node = exp_device_item_names_node->next;
+            }
+
+            exp_device_item_names_node->next = new_device_item_names_head;
+        }
+        else
+        {
+            exp_node->device_item_names = new_device_item_names_head;
+        }
     }
 }
 
@@ -329,23 +469,32 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
                 memset(new_exp_node->code, 0, code_str_len);
                 strcpy(new_exp_node->code, code_str);
             }
+            else
+            {
+                TRACE_E("Error: Failed to alloc code-string!");
+            }
         }
 
         cJSON *cj_params = cJSON_GetObjectItem(cj_expression, "params");
 
         if (cj_params)
         {
-            __expressions_items_add(new_exp_node, cJSON_GetObjectItem(cj_params, "items"));
-            __expressions_device_item_names_add(new_exp_node, cJSON_GetObjectItem(cj_params, "device_item_names"));
+            cJSON *cj_items = cJSON_GetObjectItem(cj_params, "items");
+            __expressions_items_add(new_exp_node, cj_items);
+
+            cJSON *cj_device_item_names = cJSON_GetObjectItem(cj_params, "device_item_names");
+            __expressions_device_item_names_add(new_exp_node, cj_device_item_names);
         }
 
         CJSON_GET_VALUE_BOOL(cj_expression, "variable", new_exp_node->variable);
 
-        __expressions_meta_data_add(new_exp_node, cJSON_GetObjectItem(cj_expression, "metadata"));
+        new_exp_node->meta_data = cJSON_GetObjectItem(cj_expression, "metadata");
         new_exp_node->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_expression, "valueType"));
         __expressions_get_value(new_exp_node, cJSON_GetObjectItem(cj_expression, "value"), new_exp_node->value_type);
 
         new_exp_node->exp_id = __expression_store_to_nvs(exp_id, cj_expression);
+
+        ezlopi_scenes_expressions_print(new_exp_node);
     }
 
     return new_exp_node;
@@ -358,61 +507,72 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON *cj_expression)
         char *exp_string = cJSON_Print(cj_expression);
         if (exp_string)
         {
+            cJSON_Minify(exp_string);
             exp_id = ezlopi_cloud_generate_expression_id();
             if (exp_id)
             {
                 char exp_id_str[32];
                 snprintf(exp_id_str, sizeof(exp_id_str), "%08x", exp_id);
+
                 if (ezlopi_nvs_write_str(exp_string, strlen(exp_string), exp_id_str))
                 {
                     bool free_exp_id_list_str = 1;
                     char *exp_id_list_str = ezlopi_nvs_read_scenes_expressions();
-                    if (exp_id_list_str)
+                    if (NULL == exp_id_list_str)
                     {
                         exp_id_list_str = "[]";
                         free_exp_id_list_str = 0;
+                        TRACE_W("Expressions ids-list not found in NVS");
                     }
 
-                    if (exp_id_list_str)
+                    TRACE_D("Expressions-IDs: %s", exp_id_list_str);
+                    cJSON *cj_exp_id_list = cJSON_Parse(exp_id_list_str);
+
+                    if (free_exp_id_list_str)
                     {
-                        cJSON *cj_exp_id_list = cJSON_Parse(exp_id_list_str);
+                        free(exp_id_list_str);
+                        exp_id_list_str = NULL;
+                    }
 
-                        if (free_exp_id_list_str)
-                        {
-                            free(exp_id_list_str);
-                            exp_id_list_str = NULL;
-                        }
+                    CJSON_TRACE("cj_esp-ids", cj_exp_id_list);
 
-                        if (cj_exp_id_list)
+                    if (cj_exp_id_list)
+                    {
+                        TRACE_D("Here");
+                        cJSON *cj_exp_id = cJSON_CreateString(exp_id_str);
+                        if (cj_exp_id)
                         {
-                            cJSON *cj_exp_id = cJSON_CreateString(exp_id_str);
-                            if (cj_exp_id)
+                            TRACE_D("Here");
+                            if (cJSON_AddItemToArray(cj_exp_id_list, cj_exp_id))
                             {
-                                if (cJSON_AddItemToArray(cj_exp_id_list, cj_exp_id))
+                                exp_id_list_str = cJSON_Print(cj_exp_id_list);
+                                if (exp_id_list_str)
                                 {
-                                    exp_id_list_str = cJSON_Print(cj_exp_id_list);
-                                    if (exp_id_list_str)
-                                    {
-                                        TRACE_D("Updated expression-id list: %s", exp_id_list_str);
-                                        cJSON_Minify(exp_id_list_str);
-                                        ezlopi_nvs_write_scenes_expressions(exp_id_list_str);
-                                        free(exp_id_list_str);
-                                    }
-                                }
-                                else
-                                {
-                                    cJSON_Delete(cj_exp_id);
+                                    cJSON_Minify(exp_id_list_str);
+                                    ezlopi_nvs_write_scenes_expressions(exp_id_list_str);
+                                    free(exp_id_list_str);
                                 }
                             }
-
-                            cJSON_Delete(cj_exp_id_list);
+                            else
+                            {
+                                cJSON_Delete(cj_exp_id);
+                            }
                         }
+
+                        cJSON_Delete(cj_exp_id_list);
                     }
+                }
+                else
+                {
                 }
             }
 
             free(exp_string);
         }
+    }
+    else
+    {
+        ezlopi_cloud_update_expression_id(exp_id);
     }
 
     return exp_id;

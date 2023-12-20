@@ -1,176 +1,24 @@
 {
-    "when": [
-        {
-            "label": {
-                "lang_tag": "ui0_token",
-                "text": "English string"
+    "name": "exp-1",
+    "code": "params.dht____temp;\nparams.dht____humidity\nparams.office_test_switch;\n\nif params.dht____temp > 20 then \n    params.office_test_switch = 1\nelse\n    params.office_test_switch = 0\nend\n\nreturn params.office_test_switch",
+    "metadata": {
+        "dataType": "expression",
+        "createdAt": 1703056865007
+    },
+    "params": {
+        "items": [
+            {
+                "name": "dht____temp",
+                "_id": "202ec000"
             },
-            "blockOptions": {
-                "method": {
-                    "args": {
-                        "item": "item",
-                        "value": "value",
-                        "armed": "armed"
-                    },
-                    "name": "isItemValue"
-                }
+            {
+                "name": "dht____humidity",
+                "_id": "202ec001"
             },
-            "blockType": "when",
-            "fields": [
-                {
-                    "name": "item",
-                    "type": "item",
-                    "value": "5dd2a8efc1b5be6d20008c56"
-                },
-                {
-                    "name": "value",
-                    "type": "bool",
-                    "options": [
-                        {
-                            "value": true,
-                            "label": {
-                                "lang_tag": "ui1_token",
-                                "text": "Enable"
-                            }
-                        },
-                        {
-                            "value": false,
-                            "label": {
-                                "lang_tag": "ui2_token",
-                                "text": "Disable"
-                            }
-                        }
-                    ],
-                    "value": true
-                },
-                {
-                    "name": "armed",
-                    "type": "bool",
-                    "value": true
-                }
-            ]
-        },
-        {
-            "label": {
-                "lang_tag": "ui0_token",
-                "text": "English string"
-            },
-            "blockOptions": {
-                "method": {
-                    "args": {
-                        "item": "item",
-                        "comparator": "comparator",
-                        "value": "value"
-                    },
-                    "name": "compareNumbers"
-                }
-            },
-            "blockType": "when",
-            "fields": [
-                {
-                    "name": "item",
-                    "type": "item",
-                    "value": "897607_32771_2"
-                },
-                {
-                    "name": "comparator",
-                    "type": "string",
-                    "options": [
-                        {
-                            "value": "==",
-                            "label": {
-                                "lang_tag": "ui3_token",
-                                "text": "Equal"
-                            }
-                        },
-                        {
-                            "value": "!=",
-                            "label": {
-                                "lang_tag": "ui4_token",
-                                "text": "Not equal"
-                            }
-                        },
-                        {
-                            "value": ">",
-                            "label": {
-                                "lang_tag": "ui5_token",
-                                "text": "Greater"
-                            }
-                        },
-                        {
-                            "value": "<",
-                            "label": {
-                                "lang_tag": "ui6_token",
-                                "text": "Less"
-                            }
-                        },
-                        {
-                            "value": ">=",
-                            "label": {
-                                "lang_tag": "ui7_token",
-                                "text": "Greater and equal"
-                            }
-                        },
-                        {
-                            "value": "<=",
-                            "label": {
-                                "lang_tag": "ui8_token",
-                                "text": "Less and equal"
-                            }
-                        }
-                    ],
-                    "value": "=="
-                },
-                {
-                    "name": "value",
-                    "type": "int",
-                    "value": 10
-                }
-            ]
-        },
-        {
-            "label": {
-                "lang_tag": "ui0_token",
-                "text": "English string"
-            },
-            "blockOptions": {
-                "method": {
-                    "args": {
-                        "item": "item",
-                        "value": "value"
-                    },
-                    "name": "isDictionaryValueState"
-                }
-            },
-            "blockType": "when",
-            "fields": [
-                {
-                    "name": "item",
-                    "type": "item",
-                    "value": "897607_32771_3"
-                },
-                {
-                    "name": "value",
-                    "type": "token",
-                    "options": [
-                        {
-                            "value": "low_battery",
-                            "label": {
-                                "lang_tag": "ui9_token",
-                                "text": "Low battery"
-                            }
-                        },
-                        {
-                            "value": "not_detected",
-                            "label": {
-                                "lang_tag": "ui10_token",
-                                "text": "Not detected"
-                            }
-                        }
-                    ],
-                    "value": "low_battery"
-                }
-            ]
-        }
-    ]
+            {
+                "name": "office_test_switch",
+                "_id": "202ec002"
+            }
+        ]
+    }
 }

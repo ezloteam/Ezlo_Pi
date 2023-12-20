@@ -5,14 +5,15 @@
 #include "data.h"
 #include "trace.h"
 
+#include "ezlopi_ota.h"
+#include "ezlopi_event_group.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_factory_info.h"
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_methods_str.h"
 
 #include "version.h"
-#include "ezlopi_ota.h"
-#include "ezlopi_factory_info.h"
-#include "ezlopi_event_group.h"
 
 void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 {
@@ -95,7 +96,6 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
     {
         cJSON_AddStringToObject(cj_request, "method", "cloud.firmware.info.get");
         cJSON_AddNumberToObject(cj_request, "id", message_count);
-        // cJSON_AddObjectToObject(cj_request, "sender");
         cJSON *cj_params = cJSON_AddObjectToObject(cj_request, ezlopi_params_str);
         if (cj_params)
         {
@@ -112,7 +112,6 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
                 {
                     cJSON_AddStringToObject(cj_params, "firmware_type", "generic");
                 }
-                // free(device_type);
             }
             else
             {
@@ -121,13 +120,7 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
             cJSON_AddStringToObject(cj_params, "firmware_hardware", "ezlopi");
         }
 
-        char *str_request = cJSON_Print(cj_request);
-        cJSON_Minify(str_request);
-        if (str_request)
-        {
-            TRACE_I("firmware status request: \n%s", str_request);
-            free(str_request);
-        }
+        CJSON_TRACE("firmware status request", cj_request);
     }
 
     return cj_request;

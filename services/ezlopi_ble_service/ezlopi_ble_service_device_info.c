@@ -148,13 +148,13 @@ static char *device_info_jsonify(void)
         cJSON_AddNumberToObject(root, "internet_status", flag_internet_status);
 
         device_info = cJSON_Print(root);
+        cJSON_Delete(root);
+
         if (device_info)
         {
             cJSON_Minify(device_info);
             TRACE_I("Created device info: %s", device_info);
         }
-
-        cJSON_Delete(root);
     }
 
     return device_info;

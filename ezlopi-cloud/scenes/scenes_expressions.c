@@ -1,5 +1,6 @@
 #include "trace.h"
 
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_expressions.h"
 
@@ -20,11 +21,7 @@ void scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            char *params_str = cJSON_Print(cj_params);
-            if (params_str)
-            {
-                TRACE_D("expressions params: %s", params_str);
-            }
+            CJSON_TRACE("exp-params", cj_params);
 
             cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
             if (cj_result)
@@ -32,6 +29,7 @@ void scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_expressions_array = cJSON_AddArrayToObject(cj_result, "expressions");
                 if (cj_expressions_array)
                 {
+                    ezlopi_scenes_expressions_list_cjson(cj_expressions_array, cj_params);
                 }
             }
         }
@@ -48,12 +46,7 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            char *params_str = cJSON_Print(cj_params);
-            if (params_str)
-            {
-                TRACE_D("expressions params: %s", params_str);
-            }
-
+            CJSON_TRACE("expressions params", cj_params);
             ezlopi_scenes_expressions_add_to_head(0, cj_params);
         }
     }
