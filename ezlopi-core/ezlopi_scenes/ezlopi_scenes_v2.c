@@ -778,14 +778,51 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         }
         case cJSON_Object:
         {
-            TRACE_E("DETACHED value");
-            // field->value.value_json = cJSON_DetachItemFromObject(cj_value, "value");
-            // char *c = cJSON_Print(field->value.value_json);
-            // if (c)
-            // {
-            //     TRACE_B("detachedValueItem: %s", c);
-            //     free(c);
-            // }
+            if (NULL != field->value.value_json)
+            {
+                char *c = cJSON_Print(field->value.value_json);
+                if (c)
+                {
+                    TRACE_E("Prev value: %s", c);
+                    cJSON_free(c);
+                }
+                cJSON_Delete(field->value.value_json);
+            }
+
+            // cJSON_DetachItemViaPointer()
+            field->value.value_json = cJSON_CreateObject();
+            if (field->value.value_json)
+            {
+                TRACE_I("Creating CJSON object '.value_json'");
+                char key[50] = {'\0'};
+                char value[256] = {'\0'};
+                //----------------------------------------------------------------
+
+                cJSON *h = cj_value->child;
+                while (h)
+                {
+                    snprintf(key, sizeof(key), "%s", h->string);
+                    snprintf(value, sizeof(value), "%s", h->valuestring);
+                    cJSON_AddStringToObject(field->value.value_json, key, value);
+                    h = h->next;
+                }
+
+                // cJSON *header = cj_value->child;
+                // while (header)
+                // {
+                //     cJSON_AddStringToObject(field->value.value_json, header->string, header->valuestring);
+                //     header = header->next;
+                // }
+
+                //----------------------------------------------------------------
+
+                char *c = cJSON_Print(field->value.value_json);
+                if (c)
+                {
+                    TRACE_W("NEW header_values: \n%s", c);
+                    cJSON_free(c);
+                }
+            }
             break;
         }
         default:
@@ -810,6 +847,7 @@ static l_fields_v2_t *__new_field_populate(cJSON *cj_field)
 
             field->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_field, "type"));
             // cJSON *cj_value = cJSON_GetObjectItem(cj_field, "value");
+
             __fields_get_value(field, cJSON_GetObjectItem(cj_field, "value"));
 
 #if 0

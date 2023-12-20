@@ -10,7 +10,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     uint32_t item_id = 0;
-    uint32_t value = 0;
+    // uint32_t value = 0;
 
     cJSON *cj_params = cJSON_CreateObject();
 
@@ -98,9 +98,10 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 //---------------------------------------------------------------------------------------
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
-    // char encoded_url[250]; // POST%20%2F%20HTTP%2F1.1%0AHost%3A%20ezlo.com
-    char url[100]; //"https://ezlo.com/",
-    char content[100];
+    char url[128]; //"https://ezlo.com/",
+    char username[16];
+    char password[16];
+    char content[128];
     bool skip_cert_common_name_check; // bool
     esp_http_client_method_t method;
 } s_ezlopi_scenes_then_methods_send_http_t;
@@ -112,10 +113,12 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
     TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
-    char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
-    char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
-    char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
-
+    // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+    // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+    // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+    char *tmp_ca_certificate = NULL;
+    char *tmp_ssl_shared_key = NULL;
+    char *tmp_ssl_private_key = NULL;
     esp_http_client_config_t tmp_http_config = {
         .method = config->method,
         .timeout_ms = 30000,         // 30sec
@@ -141,13 +144,13 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
     case HTTP_METHOD_PUT:
     {
         TRACE_W("HTTP PUT-METHOD [%d]", tmp_http_config.method);
-        http_reply = ezlopi_http_put_request(config->url, NULL, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        http_reply = ezlopi_http_put_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
     case HTTP_METHOD_DELETE:
     {
         TRACE_W("HTTP DELETE-METHOD [%d]", tmp_http_config.method);
-        http_reply = ezlopi_http_delete_request(config->url, NULL, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        http_reply = ezlopi_http_delete_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
     default:
@@ -167,70 +170,10 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
         free(http_reply);
     }
 }
-#if 0 
-char *urlEncode(const char *input, int *encoded_len)
-{
-    // Calculate the length of the encoded string
-    int len = 0;
-    for (const char *ptr = input; *ptr != '\0'; ++ptr)
-    {
-        if (' ' == *ptr || ':' == *ptr || '/' == *ptr || '\n' == *ptr)
-        {
-            len += 3; // Space (' ') becomes '%20', slash ('/') becomes '%2F', colon (':') becomes '%3A' , Newline ('\n') becomes '%0A'
-        }
-        else
-        {
-            len += 1; // Other characters remain as is
-        }
-    }
-    *encoded_len = len;
-    // Allocate memory for the encoded string
-    char *encoded = (char *)malloc(len + 1); // +1 for the null terminator
 
-    // Perform the encoding
-    int j = 0;
-    for (const char *ptr = input; *ptr != '\0'; ++ptr)
-    {
-        if (*ptr == ' ')
-        {
-            encoded[j++] = '%';
-            encoded[j++] = '2';
-            encoded[j++] = '0';
-        }
-        else if (*ptr == '/')
-        {
-            encoded[j++] = '%';
-            encoded[j++] = '2';
-            encoded[j++] = 'F';
-        }
-        else if (*ptr == ':')
-        {
-            encoded[j++] = '%';
-            encoded[j++] = '3';
-            encoded[j++] = 'A';
-        }
-        else if (*ptr == '\n')
-        {
-            encoded[j++] = '%';
-            encoded[j++] = '0';
-            encoded[j++] = 'A';
-        }
-        else
-        {
-            encoded[j++] = *ptr;
-        }
-    }
-    // Null-terminate the encoded string
-    encoded[j] = '\0';
-
-    return encoded;
-}
-#endif
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    // char encoded_uri_line[100] = {'\0'};
     int ret = 0;
-
     l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
     if (curr_then)
     {
@@ -240,14 +183,21 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_scenes_then_methods_send_http_t));
 
-            cJSON *header = cJSON_CreateObject();
-            if (header) //  headers
+            cJSON *cj_header = cJSON_CreateObject();
+            if (cj_header) //  headers
             {
                 l_fields_v2_t *curr_field = curr_then->fields;
                 while (NULL != curr_field) // fields
                 {
                     // create a  requrest line
-                    if (0 == strncmp(curr_field->name, "request", 8))
+                    if (0 == strncmp(curr_field->name, "url", 4))
+                    {
+                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                        {
+                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
+                        }
+                    }
+                    else if (0 == strncmp(curr_field->name, "request", 8))
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                         {
@@ -269,35 +219,56 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             }
                         }
                     }
-                    else if (0 == strncmp(curr_field->name, "url", 4))
+                    else if (0 == strncmp(curr_field->name, "credential", 11))
                     {
-                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                        if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
                         {
-                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
+                            cJSON *tmp_item = (curr_field->value.value_json);
+                            if (NULL != tmp_item)
+                            {
+                                char *cj_ptr = cJSON_Print(tmp_item);
+                                if (cj_ptr)
+                                {
+                                    TRACE_W("-user/pass sent:-\n%s\n", cj_ptr);
+                                    cJSON_free(cj_ptr);
+
+                                    cJSON *userItem = cJSON_GetObjectItem(tmp_item, "user");
+                                    cJSON *passwordItem = cJSON_GetObjectItem(tmp_item, "password");
+
+                                    if ((userItem != NULL) && (passwordItem != NULL))
+                                    {
+                                        const char *userValue = cJSON_GetStringValue(userItem);
+                                        const char *passValue = cJSON_GetStringValue(passwordItem);
+                                        TRACE_I("User: %s", userValue);
+                                        TRACE_I("Password: %s", passValue);
+                                        snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
+                                        snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
+
+                                        // TRACE_W("Deleting : CRED -> [curr_field->value.value_json] obj");
+                                        // cJSON_Delete(tmp_item);
+                                    }
+                                }
+                                else
+                                {
+                                    TRACE_E("Missing 'username' or 'password' field in credential");
+                                }
+                            }
                         }
                     }
-                    // else if (0 == strncmp(curr_field->name, "credential", 11))
-                    // {
-                    //     if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
-                    //     {
-                    //         cJSON *credential_object = cJSON_GetObjectItem(curr_field->value.value_json, "username");
-                    //        if(cJSON_IsString(credential_object))
-                    //     }
-                    // }
                     else if (0 == strncmp(curr_field->name, "contentType", 12))
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
-                            cJSON_AddStringToObject(header, "Content-Type", curr_field->value.value_string);
+                            cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
                         }
                     }
                     else if (0 == strncmp(curr_field->name, "content", 8))
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
-                            snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s", curr_field->value.value_string);
+                            snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "\r\n%s", curr_field->value.value_string);
 
-                            uint8_t i = 0;
+                            int i = 0;
                             for (; i < sizeof(tmp_http_data->content); i++)
                             {
                                 if ('\0' == tmp_http_data->content[i])
@@ -307,7 +278,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             {
                                 char str[20];
                                 snprintf(str, sizeof(str), "%d", i);
-                                cJSON_AddStringToObject(header, "Content-Length", str);
+                                cJSON_AddStringToObject(cj_header, "Content-Length", str);
                             }
                         }
                     }
@@ -315,22 +286,21 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
                         {
-
-                            TRACE_E(" list of Headers :-");
-
-                            if (curr_field->value.value_json)
+                            cJSON *tmp_item = (curr_field->value.value_json);
+                            if (NULL != tmp_item)
                             {
-                                // cJSON *tmp_item = cJSON_GetObjectItem(curr_field->value.value_json, "value");
-                                // if (NULL != tmp_item)
-                                // {
-                                //     cJSON *header = tmp_item->child;
-                                //     while (header)
-                                //     {
-                                //         TRACE_E("%s: %s", tmp_item->string, tmp_item->valuestring);
-                                //         cJSON_AddStringToObject(header, tmp_item->string, tmp_item->valuestring);
-                                //         header = header->next;
-                                //     }
-                                // }
+                                char *cj_ptr = cJSON_Print(tmp_item);
+                                if (cj_ptr)
+                                {
+                                    TRACE_W("-HEADERS sent:-\n%s\n", cj_ptr);
+                                    cJSON_free(cj_ptr);
+                                }
+                                cJSON *header = (curr_field->value.value_json->child);
+                                while (header)
+                                {
+                                    cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
+                                    header = header->next;
+                                }
                             }
                         }
                     }
@@ -342,32 +312,43 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         }
                     }
 
+                    // if (NULL != (curr_field->value.value_json))
+                    // {
+                    //     TRACE_W("Deleting : cj_Header -> [curr_field->value.value_json] obj");
+
+                    //     cJSON_free(curr_field->value.value_json);
+                    // }
+
                     curr_field = curr_field->next;
                 }
-#if 0
-                // if src is  'empty' no characters are coppied
-                // strncat(tmp_http_data->encoded_url, encoded_uri_line, (size_t)(sizeof(encoded_uri_line)));
-                // int encoded_len = 0;
-                // char *encoded = urlEncode(tmp_http_data->encoded_url, &encoded_len);
-                // if (encoded)
-                // {
-                //     // TRACE_D("Original: %s", (tmp_http_data->url));
-                //     // TRACE_D("Encoded : %s [%d]", encoded, encoded_len);
-                //     snprintf(tmp_http_data->encoded_url, sizeof(tmp_http_data->encoded_url), "%s", encoded);
-                //     free(encoded); // Don't forget to free the allocated memory
-                //     // TRACE_I("Encoded-url : '%s' [%d]", tmp_http_data->encoded_url, strlen(tmp_http_data->encoded_url));
-                // }
-#endif
 
-                __http_request_api(tmp_http_data, header);
-                char *header_str = cJSON_Print(header);
+                // function to add the credential field in url or content-body
+                if ((0 < strlen(tmp_http_data->username)) && (0 < strlen(tmp_http_data->password)))
+                {
+                    char cred[64] = {'\0'};
+                    if (HTTP_METHOD_GET == tmp_http_data->method)
+                    {
+                        snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
+                        strncat(tmp_http_data->url, cred, 64);
+                    }
+                    else // for other http-request method
+                    {
+                        snprintf(cred, sizeof(cred), "\r\nuser:%s\r\npassword:%s", tmp_http_data->username, tmp_http_data->password);
+                        strncat(tmp_http_data->content, cred, 64);
+                    }
+                }
+
+                // Invoke http-request
+                __http_request_api(tmp_http_data, cj_header);
+
+                char *header_str = cJSON_Print(cj_header);
                 if (header_str)
                 {
-                    TRACE_W("Original JSON Object:\n%s\n", header_str);
+                    TRACE_B("JSON-Object-HEADERS sent:-\n%s\n", header_str);
                     cJSON_free(header_str);
                 }
 
-                cJSON_Delete(header);
+                cJSON_Delete(cj_header);
             }
             free(tmp_http_data);
         }
