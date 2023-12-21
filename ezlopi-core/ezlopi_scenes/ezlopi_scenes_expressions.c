@@ -22,15 +22,144 @@ static void __expressions_device_item_names_add(s_ezlopi_expressions_t *exp_node
 
 static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON *cj_expression);
 
+static bool __check_type_filter(s_ezlopi_expressions_t *exp_node, e_exp_value_type_t *type_filter_arr)
+{
+    bool ret = true;
+    if (type_filter_arr)
+    {
+        ret = false;
+        uint32_t idx = 0;
+        while (type_filter_arr[idx])
+        {
+            if (type_filter_arr[idx] == exp_node->value_type)
+            {
+                ret = true;
+                break;
+            }
+            idx++;
+        }
+    }
+
+    return ret;
+}
+static e_exp_value_type_t *__parse_type_filter(cJSON *cj_params)
+{
+    e_exp_value_type_t *type_filter_array = NULL;
+    cJSON *cj_types_filter_array = cJSON_GetObjectItem(cj_params, "filterTypes");
+    if (cj_types_filter_array)
+    {
+        type_filter_array = calloc(sizeof(e_exp_value_type_t), cJSON_GetArraySize(cj_types_filter_array) + 1);
+        if (type_filter_array)
+        {
+            uint32_t idx = 0;
+            cJSON *cj_type = NULL;
+            while (NULL != (cj_type = cJSON_GetArrayItem(cj_types_filter_array, idx)))
+            {
+                type_filter_array[idx] = ezlopi_scenes_get_expressions_value_type(cj_type);
+                idx++;
+            }
+            type_filter_array[idx] = 0;
+        }
+    }
+
+    return type_filter_array;
+}
+
 void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_params)
 {
-    bool show_code = false;
-    cJSON *cj_types_filter_array = NULL;
-
-    if (cj_params)
+    if (cj_expresson_array)
     {
-        CJSON_GET_VALUE_BOOL(cj_params, "showCode", show_code);
-        cj_types_filter_array = cJSON_GetObjectItem(cj_params, "filterTypes");
+        bool show_code = false;
+        e_exp_value_type_t *type_filter_array = NULL;
+
+        if (cj_params)
+        {
+            CJSON_GET_VALUE_BOOL(cj_params, "showCode", show_code);
+            type_filter_array = __parse_type_filter(cj_params);
+        }
+
+        s_ezlopi_expressions_t *curr_exp = l_expressions_head;
+        while (curr_exp)
+        {
+            cJSON *cj_expr = cJSON_CreateObject();
+            if (cj_expr)
+            {
+                if (__check_type_filter(cj_expr, type_filter_array))
+                {
+                    cJSON_AddStringToObject(cj_expr, "name", curr_exp->name);
+                    if (show_code && curr_exp->code)
+                    {
+                        cJSON_AddStringToObject(cj_expr, "code", curr_exp->code);
+                    }
+                    if (curr_exp->meta_data)
+                    {
+                        cJSON *cj_meta = cJSON_AddItemToObject(cj_expr, "metadata", curr_exp->meta_data);
+                    }
+
+                    cJSON *cj_params = cJSON_AddObjectToObject(cj_expr, "params");
+                    if (cj_params)
+                    {
+                        if (curr_exp->items)
+                        {
+                            cJSON *cj_items = cJSON_AddArrayToObject(cj_params, "items");
+                            if (cj_items)
+                            {
+                                s_exp_items_t *curr_item = curr_exp->items;
+                                while (curr_item)
+                                {
+                                    cJSON *cj_item = cJSON_CreateObject();
+                                    if (cj_item)
+                                    {
+                                        cJSON_AddStringToObject(cj_item, "name", curr_item->name);
+
+                                        char id_str[32];
+                                        snprintf(id_str, sizeof(id_str), "%08x", curr_item->_id);
+                                        cJSON_AddStringToObject(cj_item, "_id", id_str);
+                                        if (!cJSON_AddItemToArray(cj_items, cj_item))
+                                        {
+                                            cJSON_Delete(cj_item);
+                                        }
+                                    }
+                                    curr_item = curr_item->next;
+                                }
+                            }
+                        }
+
+                        if (curr_exp->device_item_names)
+                        {
+                            cJSON *cj_device_item_names = cJSON_AddArrayToObject(cj_params, "items");
+                            if (cj_device_item_names)
+                            {
+                                s_exp_device_item_names_t *curr_device_item_names = curr_exp->device_item_names;
+                                while (curr_device_item_names)
+                                {
+                                    cJSON *cj_device_item_name = cJSON_CreateObject();
+                                    if (cj_device_item_name)
+                                    {
+                                        cJSON_AddStringToObject(cj_device_item_name, "name", curr_device_item_names->name);
+                                        cJSON_AddStringToObject(cj_device_item_name, "deviceName", curr_device_item_names->device_name);
+                                        cJSON_AddStringToObject(cj_device_item_name, "itemName", curr_device_item_names->item_name);
+
+                                        if (!cJSON_AddItemToArray(cj_device_item_names, cj_device_item_name))
+                                        {
+                                            cJSON_Delete(cj_device_item_name);
+                                        }
+                                    }
+                                    curr_device_item_names = curr_device_item_names->next;
+                                }
+                            }
+                        }
+                    }
+
+                    if (EZLOPI_VALUE_TYPE_NONE < curr_exp->value_type && EZLOPI_VALUE_TYPE_MAX > curr_exp->value_type)
+                    {
+                        cJSON_AddStringToObject(cj_expr, "valueType", ezlopi_scene_get_scene_value_type_name_v2(curr_exp->value_type));
+                    }
+                }
+            }
+
+            curr_exp = curr_exp->next;
+        }
     }
 
 #if 0
