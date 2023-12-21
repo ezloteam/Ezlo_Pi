@@ -1,5 +1,5 @@
 #include <string.h>
-
+#include <trace.h>
 #include "ezlopi_scenes_v2.h"
 
 void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications)
@@ -27,6 +27,26 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
 {
     if (fields)
     {
+        switch (fields->value_type)
+        {
+        case EZLOPI_VALUE_TYPE_TOKEN:
+        case EZLOPI_VALUE_TYPE_CREDENTIAL:
+        case EZLOPI_VALUE_TYPE_DICTIONARY:
+        {
+            if (fields->value.value_json)
+            {
+                TRACE_I("Deleting_fields_value_json");
+                cJSON_Delete(fields->value.value_json);
+                fields->value.value_json = NULL;
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+
         ezlopi_scenes_delete_fields(fields->next);
         fields->next = NULL;
         free(fields);

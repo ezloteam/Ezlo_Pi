@@ -246,6 +246,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
 
                                         // TRACE_W("Deleting : CRED -> [curr_field->value.value_json] obj");
                                         // cJSON_Delete(tmp_item);
+                                        
                                     }
                                 }
                                 else
@@ -312,12 +313,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         }
                     }
 
-                    // if (NULL != (curr_field->value.value_json))
-                    // {
-                    //     TRACE_W("Deleting : cj_Header -> [curr_field->value.value_json] obj");
-
-                    //     cJSON_free(curr_field->value.value_json);
-                    // }
+                   
 
                     curr_field = curr_field->next;
                 }
