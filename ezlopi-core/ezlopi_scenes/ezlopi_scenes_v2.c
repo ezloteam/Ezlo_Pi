@@ -787,10 +787,11 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
                     cJSON_free(c);
                 }
                 cJSON_Delete(field->value.value_json);
+                field->value.value_json = NULL;
             }
 
             // cJSON_DetachItemViaPointer()
-            field->value.value_json = cJSON_CreateObject();
+            field->value.value_json = cJSON_Duplicate(cj_value, 0);
             if (field->value.value_json)
             {
                 TRACE_I("Creating CJSON object '.value_json'");
