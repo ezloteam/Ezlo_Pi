@@ -113,13 +113,14 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
     TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
-    // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
-    // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
-    // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
-    char *tmp_ca_certificate = NULL;
-    char *tmp_ssl_shared_key = NULL;
-    char *tmp_ssl_private_key = NULL;
+    char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+    char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+    char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+    // char *tmp_ca_certificate = NULL;
+    // char *tmp_ssl_shared_key = NULL;
+    // char *tmp_ssl_private_key = NULL;
     esp_http_client_config_t tmp_http_config = {
+        .auth_type = HTTP_AUTH_TYPE_NONE,
         .method = config->method,
         .timeout_ms = 30000,         // 30sec
         .max_redirection_count = 10, // default 0
@@ -243,9 +244,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                                         TRACE_I("Password: %s", passValue);
                                         snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
                                         snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
-
-                                        // TRACE_W("Deleting : CRED -> [curr_field->value.value_json] obj");
-                                        // cJSON_Delete(tmp_item);
                                     }
                                 }
                                 else
@@ -333,13 +331,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
 
                 // Invoke http-request
                 __http_request_api(tmp_http_data, cj_header);
-
-                char *header_str = cJSON_Print(cj_header);
-                if (header_str)
-                {
-                    TRACE_B("JSON-Object-HEADERS sent:-\n%s\n", header_str);
-                    cJSON_free(header_str);
-                }
 
                 cJSON_Delete(cj_header);
             }

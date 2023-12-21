@@ -42,6 +42,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
         };
         if (NULL != tmp_config)
         {
+            config.auth_type = tmp_config->auth_type,
             config.method = tmp_config->method;
             config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
@@ -65,7 +66,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
                 cJSON *header = headers->child;
                 while (header)
                 {
-                    TRACE_D("%s: %s", header->string, header->valuestring);
+                    TRACE_B("%s: %s", header->string, header->valuestring);
                     esp_http_client_set_header(client, header->string, header->valuestring);
                     header = header->next;
                 }
@@ -151,6 +152,7 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
 
         if (NULL != tmp_config)
         {
+            config.auth_type = tmp_config->auth_type,
             config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
             config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transfer response // default 5s
@@ -170,7 +172,7 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
                 cJSON *header = headers->child;
                 while (header)
                 {
-                    TRACE_I("%s: %s", header->string, header->valuestring);
+                    TRACE_B("%s: %s", header->string, header->valuestring);
                     esp_http_client_set_header(client, header->string, header->valuestring);
                     header = header->next;
                 }
