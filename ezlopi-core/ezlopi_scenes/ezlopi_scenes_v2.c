@@ -790,23 +790,11 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
                 field->value.value_json = NULL;
             }
 
-            // cJSON_DetachItemViaPointer()
-            field->value.value_json = cJSON_Duplicate(cj_value, 0);
+            field->value.value_json = cJSON_Duplicate(cj_value, 1);
             if (field->value.value_json)
             {
-                TRACE_I("Creating CJSON object '.value_json'");
-                char key[50] = {'\0'};
-                char value[256] = {'\0'};
+                TRACE_I("Duplicating and copyig into :- CJSON object '.value_json'");
                 //----------------------------------------------------------------
-
-                cJSON *h = cj_value->child;
-                while (h)
-                {
-                    snprintf(key, sizeof(key), "%s", h->string);
-                    snprintf(value, sizeof(value), "%s", h->valuestring);
-                    cJSON_AddStringToObject(field->value.value_json, key, value);
-                    h = h->next;
-                }
 
                 // cJSON *header = cj_value->child;
                 // while (header)
