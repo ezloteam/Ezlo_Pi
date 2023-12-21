@@ -10,8 +10,7 @@
 #include "ezlopi_cjson_macros.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
-#include "ezlopi_cloud_keywords.h"
-#include "ezlopi_cloud_methods_str.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "version.h"
 
@@ -19,7 +18,7 @@ void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON_AddNullToObject(cj_response, "error");
+    cJSON_AddNullToObject(cj_response, ezlopi_error_str);
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     cJSON *version = NULL;
@@ -27,7 +26,7 @@ void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
     cJSON *params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (params)
     {
-        version = cJSON_GetObjectItem(params, "version");
+        version = cJSON_GetObjectItem(params, ezlopi_version_str);
         TRACE_D("OTA - version: %s", (version && version->valuestring) ? version->valuestring : "null");
 
         source_urls = cJSON_GetObjectItem(params, "urls");
@@ -64,7 +63,7 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
     if (params)
     {
         cJSON *version = NULL;
-        version = cJSON_GetObjectItem(params, "version");
+        version = cJSON_GetObjectItem(params, ezlopi_version_str);
         TRACE_D("Upgrading to version: %s", (version && version->valuestring) ? version->valuestring : "null");
 
         cJSON *source_urls = NULL;
@@ -94,7 +93,7 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
     cJSON *cj_request = cJSON_CreateObject();
     if (NULL != cj_request)
     {
-        cJSON_AddStringToObject(cj_request, "method", "cloud.firmware.info.get");
+        cJSON_AddStringToObject(cj_request, ezlopi_key_method_str, "cloud.firmware.info.get");
         cJSON_AddNumberToObject(cj_request, "id", message_count);
         cJSON *cj_params = cJSON_AddObjectToObject(cj_request, ezlopi_params_str);
         if (cj_params)

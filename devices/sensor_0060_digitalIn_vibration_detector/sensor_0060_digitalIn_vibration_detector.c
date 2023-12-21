@@ -190,7 +190,7 @@ static int __0060_get_item(l_ezlopi_item_t *item, void *arg)
             //--------------------------------------------------------------------------------------
 
             cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_activity");
-            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_activity");
             ret = 1;
         }
     }
@@ -205,7 +205,7 @@ static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_activity");
-            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_activity");
             ret = 1;
         }
     }

@@ -88,7 +88,7 @@ static int _get_item_list(l_ezlopi_item_t *item, void *arg)
             cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
         }
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", present_light_status);
-        cJSON_AddStringToObject(cjson_propertise, "value", present_light_status);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, present_light_status);
         ret = 1;
     }
 
@@ -101,7 +101,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        cJSON_AddStringToObject(cjson_propertise, "value", present_light_status);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, present_light_status);
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", present_light_status);
         ret = 1;
     }

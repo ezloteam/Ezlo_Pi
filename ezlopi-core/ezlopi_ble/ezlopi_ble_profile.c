@@ -3,6 +3,7 @@
 #include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_config.h"
 #include "ezlopi_ble_profile.h"
+#include "ezlopi_cloud_constants.h"
 
 static s_gatt_service_t *gatt_head_service = NULL;
 
@@ -394,7 +395,7 @@ void ezlopi_ble_gatt_print_service(s_gatt_service_t *service)
 
 void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
 {
-    msg = msg ? msg : "";
+    msg = msg ? msg : ezlopi__str;
 
     if (uuid)
     {

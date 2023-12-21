@@ -60,7 +60,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_value_obj = (cJSON *)arg;
         int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        cJSON_AddBoolToObject(cj_value_obj, "value", item->interface.gpio.gpio_in.value);
+        cJSON_AddBoolToObject(cj_value_obj, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
         cJSON_AddStringToObject(cj_value_obj, "valueFormatted", valueFormatted);
         ret = 1;
@@ -310,7 +310,7 @@ static int sensor_ldr_digital_module_get_value_cjson(s_ezlopi_device_properties_
     {
         int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
         properties->interface.gpio.gpio_in.value = (0 == properties->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
 

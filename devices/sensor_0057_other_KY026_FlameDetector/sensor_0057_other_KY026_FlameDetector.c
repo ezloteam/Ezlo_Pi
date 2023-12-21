@@ -238,7 +238,7 @@ static int __0057_get_item(l_ezlopi_item_t *item, void *arg)
                 }
                 //--------------------------------------------------------------------------------------
                 cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "heat_ok");
-                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
             if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -246,7 +246,7 @@ static int __0057_get_item(l_ezlopi_item_t *item, void *arg)
 
                 char *valueFormatted = ezlopi_valueformatter_float(FLAME_struct->_absorbed_percent);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", FLAME_struct->_absorbed_percent);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLAME_struct->_absorbed_percent);
                 free(valueFormatted);
             }
             ret = 1;
@@ -266,14 +266,14 @@ static int __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
             {
                 cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "heat_ok");
-                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
             if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
                 flame_t *FLAME_struct = (flame_t *)item->user_arg;
                 char *valueFormatted = ezlopi_valueformatter_float(FLAME_struct->_absorbed_percent);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", FLAME_struct->_absorbed_percent);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLAME_struct->_absorbed_percent);
                 free(valueFormatted);
             }
             ret = 1;

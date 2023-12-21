@@ -8,6 +8,7 @@
 #include "ezlopi_devices.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cjson_macros.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "web_provisioning.h"
 
@@ -527,7 +528,7 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
         {
             char tmp_string[64];
             snprintf(tmp_string, sizeof(tmp_string), "%08x", device_prop->cloud_properties.device_id);
-            cJSON_AddStringToObject(cj_device, "_id", tmp_string);
+            cJSON_AddStringToObject(cj_device, ezlopi__id_str, tmp_string);
             if (device_prop->cloud_properties.device_type_id)
             {
                 cJSON_AddStringToObject(cj_device, "deviceTypeId", device_prop->cloud_properties.device_type_id);
@@ -551,16 +552,16 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_cloud_generate_gateway_id());
             cJSON_AddStringToObject(cj_device, "gatewayId", tmp_string);
             cJSON_AddBoolToObject(cj_device, "batteryPowered", false);
-            cJSON_AddStringToObject(cj_device, "name", device_prop->cloud_properties.device_name);
-            cJSON_AddStringToObject(cj_device, "type", device_prop->cloud_properties.device_type);
+            cJSON_AddStringToObject(cj_device, ezlopi_name_str, device_prop->cloud_properties.device_name);
+            cJSON_AddStringToObject(cj_device, ezlopi_type_str, device_prop->cloud_properties.device_type);
             cJSON_AddBoolToObject(cj_device, "reachable", true);
             cJSON_AddBoolToObject(cj_device, "persistent", true);
             cJSON_AddBoolToObject(cj_device, "serviceNotification", false);
             // cJSON_AddBoolToObject(cj_device, "armed", false);
-            cJSON_AddStringToObject(cj_device, "roomId", "");
-            cJSON_AddStringToObject(cj_device, "security", "");
+            cJSON_AddStringToObject(cj_device, "roomId", ezlopi__str);
+            cJSON_AddStringToObject(cj_device, "security", ezlopi__str);
             cJSON_AddBoolToObject(cj_device, "ready", true);
-            cJSON_AddStringToObject(cj_device, "status", "synced");
+            cJSON_AddStringToObject(cj_device, ezlopi_status_str, "synced");
             if (NULL != device_prop->cloud_properties.info)
             {
                 cJSON_AddItemReferenceToObject(cj_device, "info", device_prop->cloud_properties.info);

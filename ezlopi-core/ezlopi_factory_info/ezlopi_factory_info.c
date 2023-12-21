@@ -7,8 +7,10 @@
 #include "freertos/task.h"
 
 #include "trace.h"
-#include "ezlopi_factory_info.h"
+
 #include "ezlopi_nvs.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_cloud_constants.h"
 
 static const esp_partition_t *partition_ctx_v2 = NULL;
 static char *g_ca_certificate = NULL;
@@ -98,7 +100,7 @@ void print_factory_info_v2(void)
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     TRACE_W("EZLOPI_CONFIG [off: 0x%04X, size: 0x%04X]:         %s", EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH, ezlopi_config);
 #elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
-    // TRACE_W("EZLOPI_CONFIG:                                     %s", ezlopi_config ? ezlopi_config : "");
+    // TRACE_W("EZLOPI_CONFIG:                                     %s", ezlopi_config ? ezlopi_config : ezlopi__str);
 #endif
     TRACE_D("-------------------------------------------------");
 
@@ -715,17 +717,17 @@ static int ezlopi_factory_info_v2_set_4kb(char *name, char *data, uint32_t offse
         {
             if (ESP_OK == (ret = esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1)))
             {
-                TRACE_I("%s: Flash write succeessful", name ? name : "");
+                TRACE_I("%s: Flash write succeessful", name ? name : ezlopi__str);
                 ret = 1;
             }
             else
             {
-                TRACE_E("%s: esp-partition write failed!", name ? name : "");
+                TRACE_E("%s: esp-partition write failed!", name ? name : ezlopi__str);
             }
         }
         else
         {
-            TRACE_E("%s: esp-partition erase failed!", name ? name : "");
+            TRACE_E("%s: esp-partition erase failed!", name ? name : ezlopi__str);
         }
     }
 

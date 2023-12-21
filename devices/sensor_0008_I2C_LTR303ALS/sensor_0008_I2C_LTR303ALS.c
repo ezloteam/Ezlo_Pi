@@ -69,7 +69,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
     if (cj_param && als_ltr303_data)
     {
-        cJSON_AddNumberToObject(cj_param, "value", als_ltr303_data->lux);
+        cJSON_AddNumberToObject(cj_param, ezlopi_value_str, als_ltr303_data->lux);
         char *valueFormatted = ezlopi_valueformatter_double(als_ltr303_data->lux);
         cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
         free(valueFormatted);

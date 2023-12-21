@@ -47,7 +47,7 @@ static void registration_process(void *pv)
                  mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
         cJSON_AddStringToObject(cj_register, "id", "__ID__");
-        cJSON_AddStringToObject(cj_register, "method", "register");
+        cJSON_AddStringToObject(cj_register, ezlopi_key_method_str, "register");
         cJSON *cj_params = cJSON_AddObjectToObject(cj_register, "params");
         if (cj_params)
         {

@@ -95,7 +95,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
         if (value_type_temperature == item->cloud_properties.value_type)
         {
-            cJSON_AddNumberToObject(cj_result, "value", value_ptr->temperature);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, value_ptr->temperature);
             char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
             if (valueFormatted)
             {
@@ -108,7 +108,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         else if (value_type_humidity == item->cloud_properties.value_type)
         {
-            cJSON_AddNumberToObject(cj_result, "value", value_ptr->humidity);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, value_ptr->humidity);
             char *valueFormatted = ezlopi_valueformatter_float(value_ptr->humidity);
             if (valueFormatted)
             {

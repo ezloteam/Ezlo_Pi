@@ -88,7 +88,7 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     if (script_to_delete)
     {
         ezlopi_scenes_scripts_stop(script_to_delete);
-        ezlopi_nvs_delete_stored_script(script_to_delete->id); // deleting script from nvs
+        ezlopi_nvs_delete_stored_data_by_id(script_to_delete->id); // deleting script from nvs
         __scripts_remove_id_and_update_list(script_to_delete->id);
 
         if (script_to_delete->code)
@@ -175,7 +175,7 @@ void ezlopi_scenes_scripts_update(cJSON *cj_script)
                     }
 
                     {
-                        cJSON *cj_name = cJSON_GetObjectItem(cj_script, "name");
+                        cJSON *cj_name = cJSON_GetObjectItem(cj_script, ezlopi_name_str);
                         if (cj_name && cj_name->valuestring)
                         {
                             uint32_t len = strlen(cj_name->valuestring) + 1;
@@ -418,7 +418,7 @@ static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON
 
     if (cj_script)
     {
-        cJSON *cj_script_name = cJSON_GetObjectItem(cj_script, "name");
+        cJSON *cj_script_name = cJSON_GetObjectItem(cj_script, ezlopi_name_str);
         cJSON *cj_script_code = cJSON_GetObjectItem(cj_script, "code");
 
         if (cj_script_name && cj_script_name->valuestring && cj_script_code && cj_script_code->string)

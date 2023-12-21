@@ -153,7 +153,7 @@ static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             flex_t *FLEX_value = (flex_t *)item->user_arg;
             char *valueFormatted = ezlopi_valueformatter_int(FLEX_value->RS_0055);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", FLEX_value->RS_0055);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLEX_value->RS_0055);
             free(valueFormatted);
             ret = 1;
         }

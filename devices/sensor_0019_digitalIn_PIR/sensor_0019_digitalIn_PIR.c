@@ -3,6 +3,7 @@
 #include "ezlopi_cloud.h"
 #include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "gpio_isr_service.h"
 #include "sensor_0019_digitalIn_PIR.h"
@@ -53,7 +54,7 @@ static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *args)
     if (cj_result)
     {
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_out.value);
+        cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_out.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         ret = 1;

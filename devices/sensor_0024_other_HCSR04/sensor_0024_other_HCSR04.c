@@ -87,7 +87,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     {
         snprintf(valueFormatted, 20, "%d cm", ultrasonic_sensor->distance);
         cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_param, "value", ultrasonic_sensor->distance);
+        cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
     }
 
     return ret;

@@ -18,6 +18,7 @@
 #include "ezlopi_ble_service.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cjson_macros.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "esp_gatt_common_api.h"
 
@@ -74,12 +75,12 @@ static char *__provisioning_status_jsonify(void)
         if (1 == prov_stat)
         {
             cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v2_get_version());
-            cJSON_AddNumberToObject(root, "status", prov_stat);
+            cJSON_AddNumberToObject(root, ezlopi_status_str, prov_stat);
         }
         else
         {
             cJSON_AddNumberToObject(root, "version", 0);
-            cJSON_AddNumberToObject(root, "status", 0);
+            cJSON_AddNumberToObject(root, ezlopi_status_str, 0);
         }
 
         char tmp_buffer[32];
@@ -449,19 +450,19 @@ static void __process_provisioning_info(uint8_t *value, uint32_t len)
             char *device_type_ezlopi = cJSON_GetObjectItemCaseSensitive(root, "device_type_ezlopi")->valuestring;
 
             TRACE_D("************************* BLE-PROVISIONING *************************");
-            TRACE_D("user_id:               %s", user_id ? user_id : "");
-            TRACE_D("device_name:           %s", device_name ? device_name : "");
-            TRACE_D("brand:                 %s", brand ? brand : "");
-            TRACE_D("manufacturer_name:     %s", manufacturer_name ? manufacturer_name : "");
-            TRACE_D("model_number:          %s", model_number ? model_number : "");
-            TRACE_D("uuid:                  %s", uuid ? uuid : "");
-            TRACE_D("uuid_provisioning:     %s", uuid_provisioning ? uuid_provisioning : "");
+            TRACE_D("user_id:               %s", user_id ? user_id : ezlopi__str);
+            TRACE_D("device_name:           %s", device_name ? device_name : ezlopi__str);
+            TRACE_D("brand:                 %s", brand ? brand : ezlopi__str);
+            TRACE_D("manufacturer_name:     %s", manufacturer_name ? manufacturer_name : ezlopi__str);
+            TRACE_D("model_number:          %s", model_number ? model_number : ezlopi__str);
+            TRACE_D("uuid:                  %s", uuid ? uuid : ezlopi__str);
+            TRACE_D("uuid_provisioning:     %s", uuid_provisioning ? uuid_provisioning : ezlopi__str);
             TRACE_D("serial:                %f", serial);
-            TRACE_D("cloud_server:          %s", cloud_server ? cloud_server : "");
-            TRACE_D("ssl_private_key:       %s", ssl_private_key ? ssl_private_key : "");
-            TRACE_D("ssl_public_key:        %s", ssl_public_key ? ssl_public_key : "");
-            TRACE_D("ca_cert:               %s", ca_cert ? ca_cert : "");
-            TRACE_D("device_type_ezlopi:    %s", device_type_ezlopi ? device_type_ezlopi : "");
+            TRACE_D("cloud_server:          %s", cloud_server ? cloud_server : ezlopi__str);
+            TRACE_D("ssl_private_key:       %s", ssl_private_key ? ssl_private_key : ezlopi__str);
+            TRACE_D("ssl_public_key:        %s", ssl_public_key ? ssl_public_key : ezlopi__str);
+            TRACE_D("ca_cert:               %s", ca_cert ? ca_cert : ezlopi__str);
+            TRACE_D("device_type_ezlopi:    %s", device_type_ezlopi ? device_type_ezlopi : ezlopi__str);
             TRACE_D("********************************************************************");
 
             cJSON_Delete(root);

@@ -7,6 +7,7 @@
 #include "mbedtls/base64.h"
 
 #include "trace.h"
+#include "esp_gatt_common_api.h"
 
 #include "ezlopi_nvs.h"
 #include "ezlopi_wifi.h"
@@ -18,7 +19,7 @@
 #include "ezlopi_ble_service.h"
 #include "ezlopi_cjson_macros.h"
 #include "ezlopi_factory_info.h"
-#include "esp_gatt_common_api.h"
+#include "ezlopi_cloud_constants.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
@@ -67,12 +68,12 @@ static char *__provisioning_status_jsonify(void)
         if (1 == prov_stat)
         {
             cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v2_get_version());
-            cJSON_AddNumberToObject(root, "status", prov_stat);
+            cJSON_AddNumberToObject(root, ezlopi_status_str, prov_stat);
         }
         else
         {
             cJSON_AddNumberToObject(root, "version", 0);
-            cJSON_AddNumberToObject(root, "status", 0);
+            cJSON_AddNumberToObject(root, ezlopi_status_str, 0);
         }
 
         char tmp_buffer[32];

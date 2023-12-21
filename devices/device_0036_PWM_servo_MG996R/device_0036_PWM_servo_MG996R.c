@@ -150,7 +150,7 @@ static int ezlopi_servo_motor_MG_996R_set_value(s_ezlopi_device_properties_t *pr
     if (NULL != cjson_params)
     {
         int value = 0;
-        CJSON_GET_VALUE_INT(cjson_params, "value", value);
+        CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, value);
 
         TRACE_I("item_name: %s", properties->ezlopi_cloud.item_name);
         TRACE_I("gpio_num: %d", properties->interface.pwm.gpio_num);
@@ -174,7 +174,7 @@ static int ezlopi_servo_motor_MG_996R_get_value_cjson(s_ezlopi_device_properties
     {
         uint32_t duty = ezlopi_pwm_get_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode);
         int target_duty = (int)(((duty - 13) * 100) / 17);
-        cJSON_AddNumberToObject(cjson_propertise, "value", target_duty);
+        cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, target_duty);
         ret = 1;
     }
     return ret;

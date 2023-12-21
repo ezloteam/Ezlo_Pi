@@ -256,14 +256,14 @@ static int __0049_get_item(l_ezlopi_item_t *item, void *arg)
                 }
                 //--------------------------------------------------------------------------------------
                 cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 mq2_value_t *MQ2_value = ((mq2_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ2_value->_LPG_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", MQ2_value->_LPG_ppm);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ2_value->_LPG_ppm);
                 free(valueFormatted);
             }
             ret = 1;
@@ -283,14 +283,14 @@ static int __0049_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
                 cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 mq2_value_t *MQ2_value = ((mq2_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ2_value->_LPG_ppm);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", MQ2_value->_LPG_ppm);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ2_value->_LPG_ppm);
                 free(valueFormatted);
             }
             ret = 1;

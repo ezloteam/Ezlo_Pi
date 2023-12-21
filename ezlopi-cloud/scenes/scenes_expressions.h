@@ -6,5 +6,6 @@
 
 void scenes_expressions_list(cJSON *cj_request, cJSON *cj_response);
 void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response);
+void scenes_expressions_delete(cJSON *cj_request, cJSON *cj_response);
 
 #endif // __SCENES_EXPRESSIONS_H__

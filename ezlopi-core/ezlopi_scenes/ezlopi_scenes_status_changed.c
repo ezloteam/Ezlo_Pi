@@ -43,8 +43,8 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const 
                     cJSON_AddFalseToObject(cj_result, ezlopi_userNotification_str);
                 }
 
-                cJSON_AddStringToObject(cj_result, ezlopi_room_id_str, "");
-                cJSON_AddStringToObject(cj_result, ezlopi_room_name_str, "");
+                cJSON_AddStringToObject(cj_result, ezlopi_room_id_str, ezlopi__str);
+                cJSON_AddStringToObject(cj_result, ezlopi_room_name_str, ezlopi__str);
             }
 
             char *data_to_send = cJSON_Print(cj_response);

@@ -67,7 +67,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     cJSON *param = (cJSON *)arg;
     if (param)
     {
-        cJSON_AddBoolToObject(param, "value", item->interface.gpio.gpio_in.value);
+        cJSON_AddBoolToObject(param, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
         cJSON_AddStringToObject(param, "valueFormatted", valueFormatted);
     }
@@ -308,7 +308,7 @@ static int sensor_touch_tpp_223b_get_value_cjson(s_ezlopi_device_properties_t *p
     {
         int gpio_level = gpio_get_level(properties->interface.gpio.gpio_in.gpio_num);
         properties->interface.gpio.gpio_in.value = 0 == properties->interface.gpio.gpio_in.invert ? gpio_level : !gpio_level;
-        cJSON_AddBoolToObject(cjson_propertise, "value", properties->interface.gpio.gpio_in.value);
+        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, properties->interface.gpio.gpio_in.value);
         ret = 1;
     }
 

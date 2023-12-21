@@ -26,16 +26,11 @@ typedef struct s_exp_device_item_names
 
 typedef enum e_exp_value_type
 {
-    EXPRESSION_VALUE_TYPE_UNDEFINED = 0,
-    EXPRESSION_VALUE_TYPE_STRING,
-    EXPRESSION_VALUE_TYPE_U8,
-    EXPRESSION_VALUE_TYPE_I8,
-    EXPRESSION_VALUE_TYPE_U16,
-    EXPRESSION_VALUE_TYPE_I16,
-    EXPRESSION_VALUE_TYPE_U32,
-    EXPRESSION_VALUE_TYPE_I32,
-    EXPRESSION_VALUE_TYPE_F,
-    EXPRESSION_VALUE_TYPE_D,
+    EXPRESSION_VALUE_TYPE_UNDEFINED = 0, // type not defined
+    EXPRESSION_VALUE_TYPE_STRING,        // char *
+    EXPRESSION_VALUE_TYPE_CJ,            // cJSON *
+    EXPRESSION_VALUE_TYPE_BOOL,          // bool
+    EXPRESSION_VALUE_TYPE_NUMBER,        // number
 
     EXPRESSION_VALUE_TYPE_MAX,
 } e_exp_value_type_t;
@@ -43,17 +38,16 @@ typedef enum e_exp_value_type
 typedef union u_exp_value
 {
     char *str_value;
-    int8_t i_8_value;
-    uint8_t u_8_value;
-    int16_t i_16_value;
-    uint16_t u_16_value;
-    int32_t i_32_value;
-    uint32_t u_32_value;
-    float float_value;
-    double double_value;
+    cJSON *cj_value;
     bool boolean_value;
-
+    double number_value;
 } u_exp_value_t;
+
+typedef struct s_exp_value
+{
+    u_exp_value_t u_value;
+    e_exp_value_type_t type;
+} s_exp_value_t;
 
 typedef struct s_ezlopi_expressions
 {
@@ -65,7 +59,7 @@ typedef struct s_ezlopi_expressions
     cJSON *meta_data; // not used for now
     bool variable;
 
-    u_exp_value_t exp_value;
+    s_exp_value_t exp_value;
     e_scene_value_type_v2_t value_type; // value type returned by expression
     // e_exp_value_type_t exp_value_type;
 
@@ -109,12 +103,7 @@ void ezlopi_scenes_expressions_delete_exp_item(s_exp_items_t *exp_items);
  */
 void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_names_t *exp_device_item_names);
 
-/**
- * @brief Delete the expressions node and its childs
- *
- * @param exp_node
- */
-void ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
+
 
 /**
  * @brief construct expressions in cJSON and add it to cj_expression_array
@@ -129,5 +118,20 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
  * @param exp_node
  */
 void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t *exp_node);
+
+/**
+ * @brief Delete all the expressions in the linked list
+ *
+ * @param exp_node
+ */
+int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
+
+/**
+ * @brief Delete the expression by its name
+ *
+ * @param expression_name
+ * @return int return 1 on suceess and 0 on failed
+ */
+int ezlopi_scenes_expressions_delete_by_name(char *expression_name);
 
 #endif // __EZLOPI_SCENES_EXPRESSIONS_H__

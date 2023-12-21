@@ -210,7 +210,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", item->interface.gpio.gpio_out.value);
+        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
         ret = 1;
     }
@@ -235,7 +235,7 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
         CJSON_TRACE("cjson_params", cjson_params);
 
         int value = 0;
-        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, "value");
+        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
         if (cj_value)
         {
             switch (cj_value->type)

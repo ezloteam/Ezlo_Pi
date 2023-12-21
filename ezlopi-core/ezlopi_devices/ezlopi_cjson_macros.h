@@ -71,19 +71,19 @@
             TRACE_E("%s: NULL", item_name);                   \
         }                                                     \
     }
-// TRACE_B("%s: %s", item_name, item_val ? item_val : "");
+// TRACE_B("%s: %s", item_name, item_val ? item_val : ezlopi__str);
 
-#define CJSON_TRACE(name, object)                                \
-    {                                                            \
-        if (object)                                              \
-        {                                                        \
-            char *obj_str = cJSON_Print(object);                 \
-            if (obj_str)                                         \
-            {                                                    \
-                TRACE_D("%s:\r\n%s", name ? name : "", obj_str); \
-                free(obj_str);                                   \
-            }                                                    \
-        }                                                        \
+#define CJSON_TRACE(name, object)                                         \
+    {                                                                     \
+        if (object)                                                       \
+        {                                                                 \
+            char *obj_str = cJSON_Print(object);                          \
+            if (obj_str)                                                  \
+            {                                                             \
+                TRACE_D("%s:\r\n%s", name ? name : ezlopi__str, obj_str); \
+                free(obj_str);                                            \
+            }                                                             \
+        }                                                                 \
     }
 
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \

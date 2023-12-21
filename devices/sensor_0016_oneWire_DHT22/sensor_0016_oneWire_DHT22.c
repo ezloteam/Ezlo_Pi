@@ -116,7 +116,7 @@ static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args)
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
 
-            cJSON_AddNumberToObject(cj_properties, "value", dht22_data->temperature);
+            cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, dht22_data->temperature);
             char *valueFormatted = ezlopi_valueformatter_float(dht22_data->temperature);
             cJSON_AddStringToObject(cj_properties, "valueFormatted", valueFormatted);
             free(valueFormatted);
@@ -125,7 +125,7 @@ static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t *item, void *args)
 
         if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
-            cJSON_AddNumberToObject(cj_properties, "value", dht22_data->humidity);
+            cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, dht22_data->humidity);
             char *valueFormatted = ezlopi_valueformatter_float(dht22_data->humidity);
             cJSON_AddStringToObject(cj_properties, "valueFormatted", valueFormatted);
             free(valueFormatted);

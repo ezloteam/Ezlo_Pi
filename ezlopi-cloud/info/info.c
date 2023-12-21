@@ -59,7 +59,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddStringToObject(cjson_result, "hardware", CONFIG_IDF_TARGET);
         cJSON_AddNumberToObject(cjson_result, "serial", ezlopi_factory_info_v2_get_id());
 
-        cJSON_AddStringToObject(cjson_result, "uuid", device_uuid ? device_uuid : "");
+        cJSON_AddStringToObject(cjson_result, "uuid", device_uuid ? device_uuid : ezlopi__str);
         cJSON_AddBoolToObject(cjson_result, "offlineAnonymousAccess", true);
         cJSON_AddBoolToObject(cjson_result, "offlineInsecureAccess", true);
 
@@ -68,8 +68,8 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         {
             cJSON_AddNumberToObject(cjson_location, "latitude", 0);
             cJSON_AddNumberToObject(cjson_location, "longitude", 0);
-            cJSON_AddStringToObject(cjson_location, "timezone", "");
-            cJSON_AddStringToObject(cjson_location, "state", "");
+            cJSON_AddStringToObject(cjson_location, "timezone", ezlopi__str);
+            cJSON_AddStringToObject(cjson_location, "state", ezlopi__str);
         }
 
         cJSON *cjson_build = cJSON_AddObjectToObject(cjson_result, "build");
@@ -87,7 +87,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
             cJSON_AddNumberToObject(cjson_battery, "stateOfCharge", 0);
             cJSON_AddNumberToObject(cjson_battery, "remainingTime", 0);
             cJSON_AddNumberToObject(cjson_battery, "health", 0);
-            cJSON_AddStringToObject(cjson_battery, "status", "");
+            cJSON_AddStringToObject(cjson_battery, ezlopi_status_str, ezlopi__str);
         }
 
         // time_t now;
@@ -100,7 +100,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         // localtime_r(&now, &timeinfo);
         // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
 
-        cJSON_AddStringToObject(cjson_result, "localtime", "");
+        cJSON_AddStringToObject(cjson_result, "localtime", ezlopi__str);
 
         // now = sntp_core_get_up_time();
         // localtime_r(&now, &timeinfo);
@@ -113,7 +113,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         }
         else
         {
-            cJSON_AddStringToObject(cjson_result, "uptime", "");
+            cJSON_AddStringToObject(cjson_result, "uptime", ezlopi__str);
         }
     }
 }

@@ -1,5 +1,6 @@
 #include "trace.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_cloud_constants.h"
 
 void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks);
 
@@ -27,7 +28,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         TRACE_D("\t\t\t|-- name: %s", fields->name);
 
         const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(fields->value_type);
-        TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : "");
+        TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : ezlopi__str);
 
         switch (fields->value_type)
         {
@@ -136,12 +137,6 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             TRACE_E("Value type not matched!");
             break;
         }
-        }
-
-        fields = fields->next;
-        if (fields)
-        {
-            TRACE_D("");
         }
     }
     TRACE_D("\t\t\t|------------------------------------");

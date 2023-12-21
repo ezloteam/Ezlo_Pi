@@ -5,6 +5,7 @@
 
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_operators.h"
 
 /************* Numeric ************/
@@ -93,7 +94,7 @@ int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
-                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, "value");
+                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             item_value = cj_value->valuedouble;
@@ -262,7 +263,7 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
-                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, "value");
+                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             item_value = cj_value->valuedouble;
@@ -452,7 +453,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
-                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, "value");
+                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             item_value = cj_value->valuedouble;
@@ -602,7 +603,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void *)cj_item_value, NULL);
-                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, "value");
+                        cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
                             item_value = cj_value->valuedouble;

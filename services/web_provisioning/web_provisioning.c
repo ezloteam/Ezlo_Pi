@@ -274,13 +274,13 @@ static void __message_upcall(const char *payload, uint32_t len)
     if (cj_request)
     {
         cJSON *cj_error = cJSON_GetObjectItem(cj_request, "error");
-        cJSON *cj_method = cJSON_GetObjectItem(cj_request, "method");
+        cJSON *cj_method = cJSON_GetObjectItem(cj_request, ezlopi_key_method_str);
 
         if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, "null", 4))))
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
-                TRACE_I("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
+                TRACE_I("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ezlopi__str), len, payload);
 
                 uint32_t method_idx = __search_method_in_list(cj_method);
 
@@ -298,7 +298,7 @@ static void __message_upcall(const char *payload, uint32_t len)
         }
         else
         {
-            TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : "") : "", len, payload);
+            TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
             TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : "null") : "null");
         }
 

@@ -96,7 +96,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
         {
-            cJSON *color_json = cJSON_AddObjectToObject(cjson_properties, "value");
+            cJSON *color_json = cJSON_AddObjectToObject(cjson_properties, ezlopi_value_str);
             if (color_json)
             {
                 int green = sk6812_strip->buf[0];
@@ -117,7 +117,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             item->interface.pwm.duty_cycle = (int)ceil(((sk6812_strip->brightness * 100.0) / 255.0));
-            cJSON_AddNumberToObject(cjson_properties, "value", item->interface.pwm.duty_cycle);
+            cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, item->interface.pwm.duty_cycle);
             char *formatted_val = ezlopi_valueformatter_int32(item->interface.pwm.duty_cycle);
             if (formatted_val)
             {
@@ -128,7 +128,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
             item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
-            cJSON_AddBoolToObject(cjson_properties, "value", item->interface.gpio.gpio_in.value);
+            cJSON_AddBoolToObject(cjson_properties, ezlopi_value_str, item->interface.gpio.gpio_in.value);
             char *formatted_val = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
             cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_val);
         }
@@ -149,7 +149,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON *cjson_params_color_values = cJSON_GetObjectItem(cjson_params, "value");
+                cJSON *cjson_params_color_values = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
 
                 rgb_t color = {
                     .red = 0,
@@ -169,7 +169,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dimmable_value_percentage = 0;
-                CJSON_GET_VALUE_INT(cjson_params, "value", dimmable_value_percentage);
+                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, dimmable_value_percentage);
                 int dimmable_value = (int)((dimmable_value_percentage * 255) / 100);
                 led_strip_set_brightness(&dimmer_args->sk6812_strip, dimmable_value);
                 led_strip_flush(&dimmer_args->sk6812_strip);
@@ -179,7 +179,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 int led_state = 0;
-                CJSON_GET_VALUE_INT(cjson_params, "value", led_state);
+                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, led_state);
                 dimmer_args->previous_brightness = (false == led_state) ? dimmer_args->sk6812_strip.brightness : dimmer_args->previous_brightness;
                 int brightness_value = (false == led_state) ? 0 : ((0 == dimmer_args->previous_brightness) ? 255 : dimmer_args->previous_brightness);
                 led_strip_set_brightness(&dimmer_args->sk6812_strip, brightness_value);

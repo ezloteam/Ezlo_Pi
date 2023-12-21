@@ -4,4 +4,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "ezlopi_gateway.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES trace)
+    REQUIRES trace ezlopi_cloud_constants)

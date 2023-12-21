@@ -5,6 +5,8 @@
 
 #include "trace.h"
 #include "ezlopi_devices.h"
+#include "ezlopi_cloud_constants.h"
+
 #include "core_updaters_api.h"
 
 int lcore_update_item_value(lua_State *lua_state)
@@ -23,7 +25,7 @@ int lcore_update_item_value(lua_State *lua_state)
             {
                 char tmp_buffer[32];
                 snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", item_node->cloud_properties.item_id);
-                cJSON_AddStringToObject(cj_params, "_id", tmp_buffer);
+                cJSON_AddStringToObject(cj_params, ezlopi__id_str, tmp_buffer);
 
                 int check_val = lua_type(lua_state, 2);
 
@@ -32,21 +34,21 @@ int lcore_update_item_value(lua_State *lua_state)
                 case LUA_TBOOLEAN:
                 {
                     int bool_val = lua_toboolean(lua_state, 2);
-                    cJSON_AddBoolToObject(cj_params, "value", bool_val);
+                    cJSON_AddBoolToObject(cj_params, ezlopi_value_str, bool_val);
                     ret = 1;
                     break;
                 }
                 case LUA_TNUMBER:
                 {
                     double number_val = lua_tonumber(lua_state, 2);
-                    cJSON_AddNumberToObject(cj_params, "value", number_val);
+                    cJSON_AddNumberToObject(cj_params, ezlopi_value_str, number_val);
                     ret = 1;
                     break;
                 }
                 case LUA_TSTRING:
                 {
                     char *string_val = lua_tostring(lua_state, 2);
-                    cJSON_AddStringToObject(cj_params, "value", string_val);
+                    cJSON_AddStringToObject(cj_params, ezlopi_value_str, string_val);
                     ret = 1;
                     break;
                 }

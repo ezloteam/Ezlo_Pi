@@ -147,7 +147,7 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
             cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
         }
 
-        cJSON_AddStringToObject(cjson_propertise, "value", (char *)item->user_arg ? item->user_arg : _no_water_leak);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", (char *)item->user_arg ? item->user_arg : _no_water_leak);
 
         ret = 1;
@@ -163,7 +163,7 @@ static int __get_ezlopi_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : _no_water_leak);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
             cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : _no_water_leak);
             ret = 1;
         }

@@ -153,7 +153,7 @@ static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             fsr_t *FSR_struct = (fsr_t *)item->user_arg;
             char *valueFormatted = ezlopi_valueformatter_float(FSR_struct->FSR_value);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", FSR_struct->FSR_value);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FSR_struct->FSR_value);
             free(valueFormatted);
             ret = 1;
         }

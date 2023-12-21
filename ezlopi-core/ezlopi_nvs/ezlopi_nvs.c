@@ -550,7 +550,7 @@ char *ezlopi_nvs_read_str(char *nvs_name)
     return return_str;
 }
 
-void ezlopi_nvs_delete_stored_script(uint32_t script_id)
+void ezlopi_nvs_delete_stored_data_by_id(uint32_t script_id)
 {
     esp_err_t err = ESP_OK;
     if (1 == ezlopi_nvs_init())

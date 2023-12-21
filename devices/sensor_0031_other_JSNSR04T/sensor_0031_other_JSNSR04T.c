@@ -69,31 +69,13 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 // jsn_sr04t_print_data(jsn_sr04t_data);
 
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
-                cJSON_AddNumberToObject(cj_result, "value", distance);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, distance);
 
                 char *valueFormatted = ezlopi_valueformatter_float(distance);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 free(valueFormatted);
                 cJSON_AddStringToObject(cj_result, "scale", "meter");
                 ret = 1;
-#if 0
-                if (jsn_sr04t_data.distance_cm >= 50 && jsn_sr04t_data.distance_cm < 100)
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "water_level_ok");
-                }
-                else if (jsn_sr04t_data.distance_cm >= 100)
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "water_level_below_low_threshold");
-                }
-                else if (jsn_sr04t_data.distance_cm < 50)
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "water_level_above_high_threshold");
-                }
-                else
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "unknown");
-                }
-#endif
             }
             else
             {

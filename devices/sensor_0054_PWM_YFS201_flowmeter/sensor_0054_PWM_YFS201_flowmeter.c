@@ -183,7 +183,7 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 free(valueFormatted);
             }
-            cJSON_AddNumberToObject(cj_result, "value", Lt_per_hr);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, Lt_per_hr);
             ret = 1;
         }
     }

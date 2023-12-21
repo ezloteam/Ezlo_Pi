@@ -78,7 +78,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         s_ezlopi_analog_data_t *soil_moisture_data = (s_ezlopi_analog_data_t *)item->user_arg;
         double percent_data = ((4095 - soil_moisture_data->value) / 4095.0) * 100;
-        cJSON_AddNumberToObject(cj_result, "value", percent_data);
+        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, percent_data);
         char *valueFormatted = ezlopi_valueformatter_double(percent_data);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         free(valueFormatted);

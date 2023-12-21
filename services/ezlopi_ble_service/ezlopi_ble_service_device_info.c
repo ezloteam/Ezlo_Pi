@@ -12,14 +12,14 @@
 #include "ezlopi_wifi.h"
 
 #include "ezlopi_nvs.h"
-#include "ezlopi_ble_gatt.h"
-#include "ezlopi_ble_profile.h"
-
 #include "ezlopi_ping.h"
+#include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_buffer.h"
+#include "ezlopi_ble_profile.h"
 #include "ezlopi_ble_service.h"
-#include "ezlopi_factory_info.h"
 #include "ezlopi_system_info.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_cloud_constants.h"
 
 static s_gatt_service_t *g_device_info_service = NULL;
 
@@ -136,7 +136,7 @@ static char *device_info_jsonify(void)
         char *ssid = ezlopi_factory_info_v2_get_ssid();
         if (ssid)
         {
-            cJSON_AddStringToObject(root, "wifi_ssid", (isprint(ssid[0])) ? ssid : "");
+            cJSON_AddStringToObject(root, "wifi_ssid", (isprint(ssid[0])) ? ssid : ezlopi__str);
         }
         esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
         // cJSON_AddStringToObject(root, "wifi-ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));

@@ -151,7 +151,7 @@ static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
             cJSON_AddNumberToObject(value, "min_still_distance", 0.75);
             cJSON_AddNumberToObject(value, "max_still_distance", 1.5);
             cJSON_AddTrueToObject(value, "is_active");
-            cJSON_AddItemToObject(cjson_propertise, "value", value);
+            cJSON_AddItemToObject(cjson_propertise, ezlopi_value_str, value);
 
             cJSON_AddNumberToObject(value_default, "min_move_distance", 0.75);
             cJSON_AddNumberToObject(value_default, "max_move_distance", 6.0);
@@ -177,7 +177,7 @@ static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
 
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
 
-            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
+            cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
             cJSON_AddNumberToObject(cjson_propertise, "valueMin", 0);
             cJSON_AddNumberToObject(cjson_propertise, "valueMax", 100);
             cJSON_AddNumberToObject(cjson_propertise, "valueDefault", 50);
@@ -200,7 +200,7 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
             int32_t value = 0;
-            CJSON_GET_VALUE_INT(cjson_propertise, "value", value);
+            CJSON_GET_VALUE_INT(cjson_propertise, ezlopi_value_str, value);
             TRACE_D("Setting Value : %d", value);
 
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
@@ -247,7 +247,7 @@ static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
-            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
+            cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
         }
     }
     return ret;
@@ -446,7 +446,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", item->interface.gpio.gpio_out.value);
+        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
         cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
         ret = 1;
     }
@@ -471,7 +471,7 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
         CJSON_TRACE("cjson_params", cjson_params);
 
         int value = 0;
-        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, "value");
+        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
         if (cj_value)
         {
             switch (cj_value->type)

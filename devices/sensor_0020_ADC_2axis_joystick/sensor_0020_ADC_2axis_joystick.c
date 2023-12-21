@@ -69,7 +69,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         s_ezlopi_analog_data_t ezlopi_analog_data;
         memset(&ezlopi_analog_data, 0, sizeof(s_ezlopi_analog_data_t));
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        cJSON_AddNumberToObject(cj_result, "value", ezlopi_analog_data.value);
+        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ezlopi_analog_data.value);
         ret = 1;
     }
     return ret;

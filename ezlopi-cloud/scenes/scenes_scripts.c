@@ -24,7 +24,7 @@ void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
                     char script_id_str[32];
                     snprintf(script_id_str, sizeof(script_id_str), "%08x", script_nodes->id);
                     cJSON_AddStringToObject(cj_script, ezlopi__id_str, script_id_str);
-                    cJSON_AddStringToObject(cj_script, "name", script_nodes->name);
+                    cJSON_AddStringToObject(cj_script, ezlopi_name_str, script_nodes->name);
 
                     if (!cJSON_AddItemToArray(cj_result, cj_script))
                     {
@@ -68,7 +68,7 @@ void scenes_scripts_get(cJSON *cj_request, cJSON *cj_response)
                     if (script_id_num == script_nodes->id)
                     {
                         cJSON_AddItemReferenceToObject(cj_result, ezlopi__id_str, cj_script_id);
-                        cJSON_AddStringToObject(cj_result, "name", script_nodes->name);
+                        cJSON_AddStringToObject(cj_result, ezlopi_name_str, script_nodes->name);
                         cJSON_AddStringToObject(cj_result, "code", script_nodes->code);
 
                         break;

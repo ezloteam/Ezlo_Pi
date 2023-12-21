@@ -73,7 +73,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         s_mb1013_args_t *mb1013_args = item->user_arg;
 
         cJSON *cj_result = (cJSON *)arg;
-        cJSON_AddNumberToObject(cj_result, "value", mb1013_args->current_value);
+        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, mb1013_args->current_value);
         snprintf(valueFormatted, 20, "%.2f", mb1013_args->current_value);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         ret = 1;

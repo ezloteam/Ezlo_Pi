@@ -1,7 +1,7 @@
 #include "ezlopi_cloud.h"
 #include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
-#include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "gpio_isr_service.h"
 #include "sensor_0034_digitalIn_proximity.h"
@@ -158,7 +158,7 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
         {
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
-        cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
+        cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? false : true);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         ret = 1;

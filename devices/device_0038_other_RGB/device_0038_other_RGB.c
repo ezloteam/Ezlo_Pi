@@ -96,7 +96,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
         {
-            cJSON *color_values = cJSON_AddObjectToObject(cjson_params, "value");
+            cJSON *color_values = cJSON_AddObjectToObject(cjson_params, ezlopi_value_str);
             if (color_values)
             {
                 cJSON_AddNumberToObject(color_values, "red", rgb_args->red_struct.value);
@@ -110,13 +110,13 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
             int state = ((0 == rgb_args->brightness) ? 0 : 1);
-            cJSON_AddBoolToObject(cjson_params, "value", state);
+            cJSON_AddBoolToObject(cjson_params, ezlopi_value_str, state);
             cJSON_AddStringToObject(cjson_params, "valueFormatted", ezlopi_valueformatter_bool(state ? true : false));
         }
         if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             int dim_percentage = (int)(rgb_args->brightness * 100);
-            cJSON_AddNumberToObject(cjson_params, "value", dim_percentage);
+            cJSON_AddNumberToObject(cjson_params, ezlopi_value_str, dim_percentage);
             char *formatted_val = ezlopi_valueformatter_int(dim_percentage);
             cJSON_AddStringToObject(cjson_params, "valueFormatted", formatted_val);
             free(formatted_val);
@@ -135,7 +135,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
         {
-            cJSON *cjson_params_rgb_values = cJSON_GetObjectItem(cjson_params, "value");
+            cJSON *cjson_params_rgb_values = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
 
             CJSON_TRACE("cjson_params_rgb_values", cjson_params_rgb_values);
 
@@ -148,7 +148,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
             int led_state = 0;
-            CJSON_GET_VALUE_INT(cjson_params, "value", led_state);
+            CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, led_state);
             rgb_args->previous_dim_factor = ((0 == led_state) ? rgb_args->brightness : rgb_args->previous_dim_factor);
             rgb_args->brightness = ((0 == led_state) ? 0.0 : ((0 == rgb_args->previous_dim_factor) ? 1.0 : rgb_args->previous_dim_factor));
             TRACE_B("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
@@ -159,7 +159,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             int dim_percent = 0;
-            CJSON_GET_VALUE_INT(cjson_params, "value", dim_percent);
+            CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, dim_percent);
             float dim_brightness_factor = dim_percent / 100.0;
             TRACE_B("dim_percent %d, dim_brightness_factor is %f", dim_percent, dim_brightness_factor);
             rgb_args->brightness = dim_brightness_factor;

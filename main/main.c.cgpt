@@ -81,7 +81,7 @@ typedef struct l_scenes_list
 void parseArgs(cJSON *json, s_args_t *args)
 {
     cJSON *item = cJSON_GetObjectItem(json, "item");
-    cJSON *value = cJSON_GetObjectItem(json, "value");
+    cJSON *value = cJSON_GetObjectItem(json, ezlopi_value_str);
     if (item && value)
     {
         strncpy(args->item, item->valuestring, sizeof(args->item));
@@ -91,8 +91,8 @@ void parseArgs(cJSON *json, s_args_t *args)
 
 void parseMethod(cJSON *json, s_method_t *method)
 {
-    cJSON *name = cJSON_GetObjectItem(json, "name");
-    cJSON *args = cJSON_GetObjectItem(json, "args");
+    cJSON *name = cJSON_GetObjectItem(json, ezlopi_name_str);
+    cJSON *args = cJSON_GetObjectItem(json, ezlopi_args_str);
     if (name && args)
     {
         strncpy(method->name, name->valuestring, sizeof(method->name));
@@ -102,7 +102,7 @@ void parseMethod(cJSON *json, s_method_t *method)
 
 void parseBlockOptions(cJSON *json, s_block_options_t *blockOptions)
 {
-    cJSON *method = cJSON_GetObjectItem(json, "method");
+    cJSON *method = cJSON_GetObjectItem(json, ezlopi_key_method_str);
     if (method)
     {
         parseMethod(method, &(blockOptions->method));
@@ -111,9 +111,9 @@ void parseBlockOptions(cJSON *json, s_block_options_t *blockOptions)
 
 void parseFields(cJSON *json, l_fields_t **fields)
 {
-    cJSON *name = cJSON_GetObjectItem(json, "name");
-    cJSON *type = cJSON_GetObjectItem(json, "type");
-    cJSON *value = cJSON_GetObjectItem(json, "value");
+    cJSON *name = cJSON_GetObjectItem(json, ezlopi_name_str);
+    cJSON *type = cJSON_GetObjectItem(json, ezlopi_type_str);
+    cJSON *value = cJSON_GetObjectItem(json, ezlopi_value_str);
     if (name && type && value)
     {
         l_fields_t *field = malloc(sizeof(l_fields_t));
@@ -149,9 +149,9 @@ void parseFields(cJSON *json, l_fields_t **fields)
 
 void parseThenBlock(cJSON *json, l_then_block_t **thenBlock)
 {
-    cJSON *blockOptions = cJSON_GetObjectItem(json, "blockOptions");
-    cJSON *blockType = cJSON_GetObjectItem(json, "blockType");
-    cJSON *fields = cJSON_GetObjectItem(json, "fields");
+    cJSON *blockOptions = cJSON_GetObjectItem(json, ezlopi_blockOptions_str);
+    cJSON *blockType = cJSON_GetObjectItem(json, ezlopi_blockType_str);
+    cJSON *fields = cJSON_GetObjectItem(json, ezlopi_fields_str);
     if (blockOptions && blockType && fields)
     {
         l_then_block_t *block = malloc(sizeof(l_then_block_t));
@@ -185,9 +185,9 @@ void parseThenBlock(cJSON *json, l_then_block_t **thenBlock)
 
 void parseWhenBlock(cJSON *json, l_when_block_t **whenBlock)
 {
-    cJSON *blockOptions = cJSON_GetObjectItem(json, "blockOptions");
-    cJSON *blockType = cJSON_GetObjectItem(json, "blockType");
-    cJSON *fields = cJSON_GetObjectItem(json, "fields");
+    cJSON *blockOptions = cJSON_GetObjectItem(json, ezlopi_blockOptions_str);
+    cJSON *blockType = cJSON_GetObjectItem(json, ezlopi_blockType_str);
+    cJSON *fields = cJSON_GetObjectItem(json, ezlopi_fields_str);
     if (blockOptions && blockType && fields)
     {
         l_when_block_t *block = malloc(sizeof(l_when_block_t));
@@ -289,15 +289,15 @@ void parseJsonPacket(const char *jsonPacket, l_scenes_list_t **scenesList)
     {
         l_scenes_list_t *sceneItem = malloc(sizeof(l_scenes_list_t));
 
-        cJSON *enabled = cJSON_GetObjectItem(scene, "enabled");
-        cJSON *groupId = cJSON_GetObjectItem(scene, "group_id");
-        cJSON *isGroup = cJSON_GetObjectItem(scene, "is_group");
-        cJSON *name = cJSON_GetObjectItem(scene, "name");
-        cJSON *parentId = cJSON_GetObjectItem(scene, "parent_id");
-        cJSON *userNotifications = cJSON_GetObjectItem(scene, "user_notifications");
-        cJSON *houseModes = cJSON_GetObjectItem(scene, "house_modes");
-        cJSON *then = cJSON_GetObjectItem(scene, "then");
-        cJSON *when = cJSON_GetObjectItem(scene, "when");
+        cJSON *enabled = cJSON_GetObjectItem(scene, ezlopi_enabled_str);
+        cJSON *groupId = cJSON_GetObjectItem(scene, ezlopi_group_id_str);
+        cJSON *isGroup = cJSON_GetObjectItem(scene, ezlopi_is_group_str);
+        cJSON *name = cJSON_GetObjectItem(scene, ezlopi_name_str);
+        cJSON *parentId = cJSON_GetObjectItem(scene, ezlopi_parent_id_str);
+        cJSON *userNotifications = cJSON_GetObjectItem(scene, ezlopi_user_notifications_str);
+        cJSON *houseModes = cJSON_GetObjectItem(scene, ezlopi_house_modes_str);
+        cJSON *then = cJSON_GetObjectItem(scene, ezlopi_then_str);
+        cJSON *when = cJSON_GetObjectItem(scene, ezlopi_when_str);
 
         sceneItem->next = NULL;
 
@@ -308,7 +308,7 @@ void parseJsonPacket(const char *jsonPacket, l_scenes_list_t **scenesList)
 
         if (groupId && cJSON_IsNull(groupId))
         {
-            strncpy(sceneItem->group_id, "", sizeof(sceneItem->group_id));
+            strncpy(sceneItem->group_id, ezlopi__str, sizeof(sceneItem->group_id));
         }
         else if (groupId && cJSON_IsString(groupId))
         {

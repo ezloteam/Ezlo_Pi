@@ -2,6 +2,7 @@
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_then_methods.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
@@ -22,25 +23,25 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
             {
                 if (0 == strncmp(curr_field->name, "item", 4))
                 {
-                    cJSON_AddStringToObject(cj_params, "_id", curr_field->value.value_string);
+                    cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->value.value_string);
                     item_id = strtoul(curr_field->value.value_string, NULL, 16);
                     TRACE_D("item_id: %s", curr_field->value.value_string);
                 }
-                else if (0 == strncmp(curr_field->name, "value", 5))
+                else if (0 == strncmp(curr_field->name, ezlopi_value_str, 5))
                 {
                     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                     {
-                        cJSON_AddNumberToObject(cj_params, "value", curr_field->value.value_int);
+                        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, curr_field->value.value_int);
                         TRACE_D("value: %f", curr_field->value.value_double);
                     }
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
-                        cJSON_AddBoolToObject(cj_params, "value", curr_field->value.value_bool);
+                        cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->value.value_bool);
                         TRACE_D("value: %s", curr_field->value.value_bool ? "true" : "false");
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
-                        cJSON_AddBoolToObject(cj_params, "value", curr_field->value.value_string);
+                        cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->value.value_string);
                         TRACE_D("value: %s", curr_field->value.value_string);
                     }
                 }

@@ -64,7 +64,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         int sensor_data = hall_sensor_read();
         char *door_is = ((sensor_data >= 60) || (sensor_data <= 20)) ? "dw_is_closed" : "dw_is_opened";
 
-        cJSON_AddStringToObject(cj_result, "value", door_is);
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, door_is);
         ret = 1;
     }
     return ret;

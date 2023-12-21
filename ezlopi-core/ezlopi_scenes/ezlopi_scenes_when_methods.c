@@ -1,8 +1,10 @@
 #include <string.h>
 
 #include "trace.h"
+
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_operators.h"
 #include "ezlopi_scenes_when_methods.h"
 
@@ -23,7 +25,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
             {
                 item_id = strtoul(curr_field->value.value_string, NULL, 16);
             }
-            else if (0 == strncmp(curr_field->name, "value", 4))
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 4))
             {
                 value_field = curr_field;
             }
@@ -44,7 +46,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
                         if (cj_tmp_value)
                         {
                             curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL);
-                            cJSON *cj_value = cJSON_GetObjectItem(cj_tmp_value, "value");
+                            cJSON *cj_value = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
                             if (cj_value)
                             {
                                 switch (cj_value->type)
@@ -263,7 +265,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t *scene_node, void *arg)
             {
                 item_id = strtoul(curr_field->value.value_string, NULL, 16);
             }
-            else if (0 == strncmp(curr_field->name, "value", 4))
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 4))
             {
                 value_field = curr_field;
             }

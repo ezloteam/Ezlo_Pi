@@ -82,7 +82,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int value = 0;
-                CJSON_GET_VALUE_INT(device_details, "value", value);
+                CJSON_GET_VALUE_INT(device_details, ezlopi_value_str, value);
                 int target_value = (int)ceil(((value * 4095.0) / 100.0));
                 ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
                 dimmable_bulb_arg->previous_brightness_value = dimmable_bulb_arg->current_brightness_value;
@@ -92,7 +92,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 bool switch_state = false;
-                CJSON_GET_VALUE_INT(device_details, "value", switch_state);
+                CJSON_GET_VALUE_INT(device_details, ezlopi_value_str, switch_state);
                 dimmable_bulb_arg->previous_brightness_value = (false == switch_state) ? dimmable_bulb_arg->current_brightness_value : dimmable_bulb_arg->previous_brightness_value;
                 dimmable_bulb_arg->current_brightness_value = (false == switch_state) ? 0 : (0 == dimmable_bulb_arg->previous_brightness_value ? 4095 : dimmable_bulb_arg->previous_brightness_value);
                 ezlopi_pwm_change_duty(dimmable_bulb_arg->item_dimmer->interface.pwm.channel, dimmable_bulb_arg->item_dimmer->interface.pwm.speed_mode, dimmable_bulb_arg->current_brightness_value);
@@ -115,7 +115,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             int dimmable_value_percentage = (int)floor(((dimmable_bulb_arg->current_brightness_value * 100.0) / 4095.0));
-            cJSON_AddNumberToObject(param, "value", dimmable_value_percentage);
+            cJSON_AddNumberToObject(param, ezlopi_value_str, dimmable_value_percentage);
             char *formatted_val = ezlopi_valueformatter_int(dimmable_value_percentage);
             cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
             free(formatted_val);
@@ -123,7 +123,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
             bool switch_state = (0 == dimmable_bulb_arg->current_brightness_value) ? false : true;
-            cJSON_AddBoolToObject(param, "value", switch_state);
+            cJSON_AddBoolToObject(param, ezlopi_value_str, switch_state);
             cJSON_AddStringToObject(param, "valueFormatted", ezlopi_valueformatter_bool(switch_state));
         }
     }

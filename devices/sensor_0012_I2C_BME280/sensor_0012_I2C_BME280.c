@@ -138,21 +138,21 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             snprintf(valueFormatted, 20, "%0.3f", bmp280_sensor_params->temperature);
             cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", bmp280_sensor_params->temperature);
+            cJSON_AddNumberToObject(cj_device, ezlopi_value_str, bmp280_sensor_params->temperature);
             cJSON_AddStringToObject(cj_device, "scale", "celsius");
         }
         if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
             snprintf(valueFormatted, 20, "%0.3f", bmp280_sensor_params->humidity);
             cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", bmp280_sensor_params->humidity);
+            cJSON_AddNumberToObject(cj_device, ezlopi_value_str, bmp280_sensor_params->humidity);
             cJSON_AddStringToObject(cj_device, "scale", "percent");
         }
         if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
         {
             snprintf(valueFormatted, 20, "%0.3f", (bmp280_sensor_params->pressure / 1000.0));
             cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", (bmp280_sensor_params->pressure / 1000.0));
+            cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (bmp280_sensor_params->pressure / 1000.0));
             cJSON_AddStringToObject(cj_device, "scale", "kilo_pascal");
         }
     }

@@ -9,25 +9,28 @@
 #include "freertos/FreeRTOSConfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/uart.h"
-#include "string.h"
-#include "nvs_flash.h"
+
 #include "nvs.h"
-#include "driver/gpio.h"
 #include "cJSON.h"
-#include "trace.h"
+#include "string.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
 #include "esp_netif.h"
-#include "sdkconfig.h"
+#include "esp_system.h"
+#include "driver/uart.h"
+#include "driver/gpio.h"
 #include "esp_idf_version.h"
 
-#include "ezlopi_nvs.h"
-#include "qt_serial.h"
-#include "ezlopi_factory_info.h"
+#include "trace.h"
 #include "version.h"
+#include "qt_serial.h"
+#include "sdkconfig.h"
+
+#include "ezlopi_nvs.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_system_info.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_cloud_constants.h"
 
 static const int RX_BUF_SIZE = 3096;
 
@@ -186,7 +189,7 @@ static void qt_serial_get_info()
         const char *device_type = ezlopi_factory_info_v2_get_device_type();
 
         cJSON_AddNumberToObject(get_info, "cmd", 1);
-        cJSON_AddNumberToObject(get_info, "status", 1);
+        cJSON_AddNumberToObject(get_info, ezlopi_status_str, 1);
         // cJSON_AddNumberToObject(get_info, "v_fmw", (MAJOR << 16) | (MINOR << 8) | BATCH);
         cJSON_AddStringToObject(get_info, "v_fmw", VERSION_STR);
         cJSON_AddNumberToObject(get_info, "v_type", V_TYPE);
@@ -208,12 +211,12 @@ static void qt_serial_get_info()
 
         char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
         // char *wifi_password = ezlopi_factory_info_v2_get_password();
-        cJSON_AddStringToObject(get_info, "ssid", wifi_ssid ? wifi_ssid : "");
+        cJSON_AddStringToObject(get_info, "ssid", wifi_ssid ? wifi_ssid : ezlopi__str);
         cJSON_AddStringToObject(get_info, "dev_name", device_name);
         cJSON_AddNumberToObject(get_info, "dev_type", 1);
         cJSON_AddStringToObject(get_info, "dev_type_ezlopi", device_type);
         cJSON_AddStringToObject(get_info, "dev_flash", CONFIG_ESPTOOLPY_FLASHSIZE);
-        cJSON_AddStringToObject(get_info, "dev_free_flash", "");
+        cJSON_AddStringToObject(get_info, "dev_free_flash", ezlopi__str);
         cJSON_AddStringToObject(get_info, "brand", device_brand);
         cJSON_AddStringToObject(get_info, "manf_name", device_manufacturer);
         cJSON_AddStringToObject(get_info, "model_num", device_model);
@@ -241,7 +244,7 @@ static void qt_serial_get_info()
         else
         {
             cJSON_AddBoolToObject(get_info, "sta_connection", false);
-            cJSON_AddStringToObject(get_info, "ip_sta", "");
+            cJSON_AddStringToObject(get_info, "ip_sta", ezlopi__str);
         }
 
         free(wifi_status);

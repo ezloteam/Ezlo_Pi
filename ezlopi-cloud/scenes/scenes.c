@@ -47,7 +47,7 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_ids = cJSON_GetObjectItem(cj_params, "_id");
+        cJSON *cj_ids = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
         if (cj_ids && cj_ids->valuestring)
         {
             char *scene_str = ezlopi_nvs_read_str(cj_ids->valuestring);
@@ -57,7 +57,7 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
                 cJSON *cj_scene = cJSON_Parse(scene_str);
                 if (cj_scene)
                 {
-                    if (!cJSON_AddItemToObject(cj_response, "result", cj_scene))
+                    if (!cJSON_AddItemToObject(cj_response, ezlopi_result_str, cj_scene))
                     {
                         cJSON_Delete(cj_scene);
                     }
@@ -77,7 +77,7 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
+        cJSON *cj_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
         if (cj_id && cj_id->valuestring)
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
@@ -98,7 +98,7 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
 //     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
 //     if (cj_params)
 //     {
-//         cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
+//         cJSON *cj_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
 //         if (cj_id && cj_id->valuestring)
 //         {
 //             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
@@ -120,11 +120,11 @@ void scenes_delete(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_id = cJSON_GetObjectItem(cj_params, "_id");
+        cJSON *cj_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
         if (cj_id && cj_id->valuestring)
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
-            ezlopi_nvs_delete_stored_script(u_id);
+            ezlopi_nvs_delete_stored_data_by_id(u_id);
             ezlopi_scenes_depopulate_by_id_v2(u_id);
             ezlopi_scenes_remove_id_from_list_v2(u_id);
         }
