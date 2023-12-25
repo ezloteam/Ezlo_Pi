@@ -12,6 +12,33 @@
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_scenes_then_methods.h"
+#include "esp_crt_bundle.h"
+#include "esp_tls.h"
+
+#ifdef CONFIG_ESP_TLS_USING_MBEDTLS
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+#include "lwip/netdb.h"
+#include "lwip/dns.h"
+
+#include "mbedtls/platform.h"
+#include "mbedtls/net_sockets.h"
+#include "mbedtls/esp_debug.h"
+#include "mbedtls/ssl.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/error.h"
+#include "mbedtls/certs.h"
+#endif
+/* Constants that aren't configurable in menuconfig */
+#define WEB_SERVER "worldtimeapi.org"
+#define WEB_PORT "443"
+#define WEB_URL "https://worldtimeapi.org/api/timezone/Europe/dublin" //"https://worldtimeapi.org/api/timezone/Europe/dublin"
+
+static const char *REQUEST = "GET " WEB_URL " HTTP/1.0\r\n"
+                             "User-Agent: esp-idf/1.0 esp32\r\n"
+                             "\r\n";
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
@@ -100,6 +127,222 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
+}
+
+static void https_get_task()
+{
+    char tmp_buf[512];
+    int ret, flags, len;
+
+    static mbedtls_entropy_context entropy;
+    static mbedtls_ctr_drbg_context ctr_drbg;
+    static mbedtls_ssl_context ssl;
+    static mbedtls_x509_crt cacert;
+    static mbedtls_ssl_config conf;
+    static mbedtls_net_context server_fd;
+
+    mbedtls_ssl_init(&ssl);
+    mbedtls_x509_crt_init(&cacert);
+    mbedtls_ctr_drbg_init(&ctr_drbg);
+
+    mbedtls_ssl_config_init(&conf);
+
+    mbedtls_entropy_init(&entropy);
+
+    if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
+                                     NULL, 0)) != 0)
+    {
+        TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
+        return (0);
+    }
+
+    TRACE_I("Attaching the certificate bundle...");
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    ret = esp_crt_bundle_attach(&conf);
+
+    if (ret < 0)
+    {
+        TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
+        return (0);
+    }
+
+    TRACE_I("Setting hostname for TLS session...");
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    /* Hostname set here should match CN in server certificate */
+    if ((ret = mbedtls_ssl_set_hostname(&ssl, WEB_SERVER)) != 0)
+    {
+        TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
+        return (0);
+    }
+
+    TRACE_I("Setting up the SSL/TLS structure...");
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    if ((ret = mbedtls_ssl_config_defaults(&conf,
+                                           MBEDTLS_SSL_IS_CLIENT,
+                                           MBEDTLS_SSL_TRANSPORT_STREAM,
+                                           MBEDTLS_SSL_PRESET_DEFAULT)) != 0)
+    {
+        TRACE_E("mbedtls_ssl_config_defaults returned %d", ret);
+        goto exit;
+    }
+
+    /* MBEDTLS_SSL_VERIFY_OPTIONAL is bad for security, in this example it will print
+       a warning if CA verification fails but it will continue to connect.
+
+       You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
+    */
+    mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
+    mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
+    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
+#ifdef CONFIG_MBEDTLS_DEBUG
+    mbedtls_esp_enable_debug_log(&conf, CONFIG_MBEDTLS_DEBUG_LEVEL);
+#endif
+
+    if ((ret = mbedtls_ssl_setup(&ssl, &conf)) != 0)
+    {
+        TRACE_E("mbedtls_ssl_setup returned -0x%x\n\n", -ret);
+        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+        goto exit;
+    }
+
+    mbedtls_net_init(&server_fd);
+
+    TRACE_I("Connecting to %s:%s...", WEB_SERVER, WEB_PORT);
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    if ((ret = mbedtls_net_connect(&server_fd, WEB_SERVER,
+                                   WEB_PORT, MBEDTLS_NET_PROTO_TCP)) != 0)
+    {
+        TRACE_E("mbedtls_net_connect returned -%x", -ret);
+        goto exit;
+    }
+
+    TRACE_I("Connected.");
+
+    mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
+
+    TRACE_I("Performing the SSL/TLS handshake...");
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    while ((ret = mbedtls_ssl_handshake(&ssl)) != 0)
+    {
+        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
+        {
+            TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
+            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+            goto exit;
+        }
+    }
+
+    TRACE_I("Verifying peer X.509 certificate...");
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    if ((flags = mbedtls_ssl_get_verify_result(&ssl)) != 0)
+    {
+        /* In real life, we probably want to close connection if ret != 0 */
+        TRACE_W("Failed to verify peer certificate!");
+        bzero(tmp_buf, sizeof(tmp_buf));
+        mbedtls_x509_crt_verify_info(tmp_buf, sizeof(tmp_buf), "  ! ", flags);
+        TRACE_W("verification info: %s", tmp_buf);
+        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    }
+    else
+    {
+        TRACE_I("Certificate verified.");
+        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    }
+
+    TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
+
+    TRACE_I("Writing HTTP request...");
+
+    size_t written_bytes = 0;
+    do
+    {
+        ret = mbedtls_ssl_write(&ssl,
+                                (const unsigned char *)REQUEST + written_bytes,
+                                strlen(REQUEST) - written_bytes);
+        if (ret >= 0)
+        {
+            TRACE_I("%d bytes written", ret);
+            written_bytes += ret;
+        }
+        else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
+        {
+            TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
+            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+            goto exit;
+        }
+    } while (written_bytes < strlen(REQUEST));
+
+    TRACE_I("Reading HTTP response...");
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    do
+    {
+        len = sizeof(tmp_buf) - 1;
+        bzero(tmp_buf, sizeof(tmp_buf));
+        ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
+
+        if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
+            continue;
+
+        if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
+        {
+            ret = 0;
+            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+            break;
+        }
+
+        if (ret < 0)
+        {
+            TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
+            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+            break;
+        }
+
+        if (ret == 0)
+        {
+            TRACE_I("connection closed");
+            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+            // response_complete_flag = true;
+            break;
+        }
+
+        len = ret;
+        TRACE_D(" [%d] bytes read : %s", len, tmp_buf);
+
+    } while (1);
+
+    mbedtls_ssl_close_notify(&ssl);
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+exit:
+    mbedtls_ssl_session_reset(&ssl);
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    mbedtls_net_free(&server_fd);
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    if (ret != 0)
+    {
+        mbedtls_strerror(ret, tmp_buf, 100);
+        TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
+    }
+
+    // putchar('\n'); // JSON output doesn't have a newline at end
+
+    static int request_count;
+    TRACE_I("Completed %d requests", ++request_count);
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    mbedtls_ssl_config_free(&conf);
 }
 
 //---------------------------------------------------------------------------------------
@@ -211,7 +454,7 @@ static void http_get_socket(void *pvParameters)
     }
 }
 
-static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
+static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
 {
     // TRACE_W("ENCODED_URI :- '%s' [%d]", config->encoded_url, strlen(config->encoded_url));
     TRACE_W("URI :- '%s' [%d]", config->url, strlen(config->url));
@@ -224,12 +467,22 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
     char *tmp_ca_certificate = NULL;
     char *tmp_ssl_shared_key = NULL;
     char *tmp_ssl_private_key = NULL;
+    // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+    // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+    // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+    char *tmp_ca_certificate = NULL;
+    char *tmp_ssl_shared_key = NULL;
+    char *tmp_ssl_private_key = NULL;
     esp_http_client_config_t tmp_http_config = {
         .auth_type = HTTP_AUTH_TYPE_NONE,
         .method = config->method,
-        .timeout_ms = 30000,         // 30sec
-        .max_redirection_count = 10, // default 0
+        .use_global_ca_store = true,
+        .crt_bundle_attach = esp_crt_bundle_attach,
         .skip_cert_common_name_check = config->skip_cert_common_name_check,
+        .keep_alive_enable = true,
+        // .timeout_ms = 30000,         // 30sec
+        // .max_redirection_count = 10, // default 0
+        // .keep_alive_idle = 60000,
         .use_global_ca_store = true,
 
     };
@@ -239,8 +492,10 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
     {
     case HTTP_METHOD_GET:
     {
+        https_get_task();
+
         TRACE_W("HTTP GET-METHOD [%d]", tmp_http_config.method);
-        http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        // http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
     case HTTP_METHOD_POST:
@@ -266,7 +521,7 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
     }
     if (http_reply)
     {
-        TRACE_D("HTTP METHOD[_%d_] Status_resonse = %s, Status_code = %d",
+        TRACE_I("HTTP METHOD[_%d_] Status_resonse = %s, Status_code = %d",
                 config->method,
                 http_reply->response,
                 http_reply->status_code);
@@ -303,7 +558,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
                             snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", "http://quotes.rest/qod");
-                            // snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
+                            // snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string); // REQUEST);
                         }
                     }
                     else if (0 == strncmp(curr_field->name, "request", 8))
@@ -332,26 +587,23 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
                         {
-                            cJSON *tmp_item = (curr_field->value.value_json);
-                            if (NULL != tmp_item)
+                            if (NULL != curr_field->value.value_json)
                             {
-                                char *cj_ptr = cJSON_Print(tmp_item);
+                                char *cj_ptr = cJSON_Print(curr_field->value.value_json);
                                 if (cj_ptr)
                                 {
                                     TRACE_W("-user/pass sent:-\n%s\n", cj_ptr);
                                     cJSON_free(cj_ptr);
 
-                                    cJSON *userItem = cJSON_GetObjectItem(tmp_item, "user");
-                                    cJSON *passwordItem = cJSON_GetObjectItem(tmp_item, "password");
-
+                                    cJSON *userItem = cJSON_GetObjectItem(curr_field->value.value_json, "user");
+                                    cJSON *passwordItem = cJSON_GetObjectItem(curr_field->value.value_json, "password");
                                     if ((userItem != NULL) && (passwordItem != NULL))
                                     {
                                         const char *userValue = cJSON_GetStringValue(userItem);
                                         const char *passValue = cJSON_GetStringValue(passwordItem);
-                                        TRACE_I("User: %s", userValue);
-                                        TRACE_I("Password: %s", passValue);
                                         snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
                                         snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
+                                        TRACE_I("User: %s\nPassword: %s", userValue, passValue);
                                     }
                                 }
                                 else
@@ -392,10 +644,9 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
                         {
-                            cJSON *tmp_item = (curr_field->value.value_json);
-                            if (NULL != tmp_item)
+                            if (NULL != curr_field->value.value_json)
                             {
-                                char *cj_ptr = cJSON_Print(tmp_item);
+                                char *cj_ptr = cJSON_Print(curr_field->value.value_json);
                                 if (cj_ptr)
                                 {
                                     TRACE_W("-HEADERS sent:-\n%s\n", cj_ptr);
@@ -438,7 +689,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 }
 
                 // Invoke http-request
-                __http_request_api(tmp_http_data, cj_header);
+                __scenes_then_method_http_request_api(tmp_http_data, cj_header);
 
                 cJSON_Delete(cj_header);
             }

@@ -38,18 +38,17 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, c
             .event_handler = ezlopi_http_event_handler,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
-
         };
         if (NULL != tmp_config)
         {
+            config.crt_bundle_attach = tmp_config->crt_bundle_attach,
             config.auth_type = tmp_config->auth_type,
             config.method = tmp_config->method;
             config.timeout_ms = tmp_config->timeout_ms; // Time for remote server to answer
             config.keep_alive_enable = tmp_config->keep_alive_enable;
             config.keep_alive_idle = tmp_config->keep_alive_idle; // Time for transfer response // default 5s
-            config.disable_auto_redirect = tmp_config->disable_auto_redirect;
+            config.use_global_ca_store = tmp_config->use_global_ca_store,
             config.max_redirection_count = tmp_config->max_redirection_count; // default 0
-            config.max_authorization_retries = tmp_config->max_authorization_retries;
             config.skip_cert_common_name_check = tmp_config->skip_cert_common_name_check;
         }
 
