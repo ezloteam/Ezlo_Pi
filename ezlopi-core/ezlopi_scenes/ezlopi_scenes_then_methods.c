@@ -336,8 +336,6 @@ exit:
         TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
     }
 
-    // putchar('\n'); // JSON output doesn't have a newline at end
-
     static int request_count;
     TRACE_I("Completed %d requests", ++request_count);
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
