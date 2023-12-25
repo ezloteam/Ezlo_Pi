@@ -245,7 +245,7 @@ static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method,
 
                 cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
                 cJSON_AddItemReferenceToObject(cj_response, ezlopi_sender_str, cj_sender);
-                cJSON_AddNullToObject(cj_response, "error");
+                cJSON_AddNullToObject(cj_response, ezlopi_error_str);
 
                 method_func(cj_request, cj_response);
 
@@ -273,10 +273,10 @@ static void __message_upcall(const char *payload, uint32_t len)
 
     if (cj_request)
     {
-        cJSON *cj_error = cJSON_GetObjectItem(cj_request, "error");
+        cJSON *cj_error = cJSON_GetObjectItem(cj_request, ezlopi_error_str);
         cJSON *cj_method = cJSON_GetObjectItem(cj_request, ezlopi_key_method_str);
 
-        if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, "null", 4))))
+        if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, ezlopi_null_str, 4))))
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
@@ -299,7 +299,7 @@ static void __message_upcall(const char *payload, uint32_t len)
         else
         {
             TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
-            TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : "null") : "null");
+            TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : ezlopi_null_str) : ezlopi_null_str);
         }
 
         cJSON_Delete(cj_request);
@@ -310,12 +310,12 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, "error");
+    cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, ezlopi_error_str);
     if (cjson_error)
     {
-        cJSON_AddNumberToObject(cjson_error, "code", -32602);
-        cJSON_AddStringToObject(cjson_error, "data", "rpc.method.notfound");
-        cJSON_AddStringToObject(cjson_error, "message", "Unknown method");
+        cJSON_AddNumberToObject(cjson_error, ezlopi_code_str, -32602);
+        cJSON_AddStringToObject(cjson_error, ezlopi_data_str, ezlopi_rpc_method_notfound_str);
+        cJSON_AddStringToObject(cjson_error, ezlopi_message_str, ezlopi_Unknown_method_str);
     }
 
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);

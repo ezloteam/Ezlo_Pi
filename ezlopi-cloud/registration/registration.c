@@ -48,10 +48,10 @@ static void registration_process(void *pv)
 
         cJSON_AddStringToObject(cj_register, "id", "__ID__");
         cJSON_AddStringToObject(cj_register, ezlopi_key_method_str, "register");
-        cJSON *cj_params = cJSON_AddObjectToObject(cj_register, "params");
+        cJSON *cj_params = cJSON_AddObjectToObject(cj_register, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON_AddStringToObject(cj_params, "firmware", VERSION_STR);
+            cJSON_AddStringToObject(cj_params, ezlopi_firmware_str, VERSION_STR);
             cJSON_AddNumberToObject(cj_params, "timeOffset", 18000);
             cJSON_AddStringToObject(cj_params, "media", "radio");
             cJSON_AddStringToObject(cj_params, "hubType", "32.1");

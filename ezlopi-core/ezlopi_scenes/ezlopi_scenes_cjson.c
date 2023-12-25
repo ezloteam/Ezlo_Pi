@@ -314,7 +314,7 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_v2_t *field
                     default:
                     {
                         const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(curr_field->value_type);
-                        TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : "null");
+                        TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : ezlopi_null_str);
                         break;
                     }
                     }

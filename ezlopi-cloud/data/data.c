@@ -95,7 +95,7 @@ static cJSON *ezlopi_cloud_data_list_settings(l_ezlopi_configured_devices_t *ezl
             snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_device->properties->ezlopi_cloud.room_id);
             cJSON_AddStringToObject(cjson_settings, "roomId", tmp_string);
             cJSON_AddStringToObject(cjson_settings, "security", ezlopi__str);
-            cJSON_AddBoolToObject(cjson_settings, "ready", true);
+            cJSON_AddBoolToObject(cjson_settings, ezlopi_ready_str, true);
             cJSON_AddStringToObject(cjson_settings, ezlopi_status_str, "synced");
             cJSON_AddStringToObject(cjson_settings, "info", "{}");
         }

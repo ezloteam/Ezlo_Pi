@@ -2,7 +2,7 @@
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 
 #include "stdio.h"
-// const  char *ezlopi_ezlopi_str = "ezlopi";
+const char *ezlopi_ezlopi_str = "ezlopi";
 const char *ezlopi__str = "";
 const char *ezlopi_id_str = "id";
 const char *ezlopi_ids_str = "ids";
@@ -61,5 +61,25 @@ const char *ezlopi_gateway_str = "gateway";
 const char *ezlopi_mode_str = "mode";
 const char *ezlopi_dhcp_str = "dhcp";
 const char *ezlopi_ipv4_str = "ipv4";
+const char *ezlopi_gateways_str = "gateways";
+const char *ezlopi_label_str = "label";
+const char *ezlopi_yes_str = "yes";
+const char *ezlopi_no_str = "no";
+const char *ezlopi_ready_str = "ready";
+const char *ezlopi_not_ready_str = "not ready";
+const char *ezlopi_settings_str = "settings";
+const char *ezlopi_valueType_str = "valueType";
+const char *ezlopi_metadata_str = "metadata";
+const char *ezlopi_code_str = "code";
+const char *ezlopi_data_str = "data";
+const char *ezlopi_message_str = "message";
+const char *ezlopi_Unknown_method_str = "Unknown method";
+const char *ezlopi_firmware_str = "firmware";
+const char *ezlopi_null_str = "null";
+const char *ezlopi_firmware_version_str = "firmware_version";
+const char *ezlopi_uptime_str = "uptime";
+const char *ezlopi_mac_str = "mac";
+const char *ezlopi_uuid_str = "uuid";
+const char *ezlopi_firmware_type_str = "firmware_type";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

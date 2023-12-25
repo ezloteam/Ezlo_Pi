@@ -61,5 +61,25 @@ extern const char *ezlopi_gateway_str;
 extern const char *ezlopi_mode_str;
 extern const char *ezlopi_dhcp_str;
 extern const char *ezlopi_ipv4_str;
+extern const char *ezlopi_gateways_str;
+extern const char *ezlopi_label_str;
+extern const char *ezlopi_yes_str;
+extern const char *ezlopi_no_str;
+extern const char *ezlopi_ready_str;
+extern const char *ezlopi_not_ready_str;
+extern const char *ezlopi_settings_str;
+extern const char *ezlopi_valueType_str;
+extern const char *ezlopi_metadata_str;
+extern const char *ezlopi_code_str;
+extern const char *ezlopi_data_str;
+extern const char *ezlopi_message_str;
+extern const char *ezlopi_Unknown_method_str;
+extern const char *ezlopi_firmware_str;
+extern const char *ezlopi_null_str;
+extern const char *ezlopi_firmware_version_str;
+extern const char *ezlopi_uptime_str;
+extern const char *ezlopi_mac_str;
+extern const char *ezlopi_uuid_str;
+extern const char *ezlopi_firmware_type_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

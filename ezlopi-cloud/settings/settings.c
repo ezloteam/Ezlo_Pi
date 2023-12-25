@@ -56,7 +56,7 @@ void ezlopi_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         char *setting_id_str = 0;
@@ -92,7 +92,7 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, "params");
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         l_ezlopi_device_t *curr_device = ezlopi_device_get_head();

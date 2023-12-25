@@ -69,7 +69,7 @@ void scenes_scripts_get(cJSON *cj_request, cJSON *cj_response)
                     {
                         cJSON_AddItemReferenceToObject(cj_result, ezlopi__id_str, cj_script_id);
                         cJSON_AddStringToObject(cj_result, ezlopi_name_str, script_nodes->name);
-                        cJSON_AddStringToObject(cj_result, "code", script_nodes->code);
+                        cJSON_AddStringToObject(cj_result, ezlopi_code_str, script_nodes->code);
 
                         break;
                     }

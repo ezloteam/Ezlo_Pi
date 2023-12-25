@@ -94,14 +94,14 @@ void ezlopi_scenes_expressions_list_cjson(cJSON *cj_expresson_array, cJSON *cj_p
                     cJSON_AddStringToObject(cj_expr, ezlopi_name_str, curr_exp->name);
                     if (show_code && curr_exp->code)
                     {
-                        cJSON_AddStringToObject(cj_expr, "code", curr_exp->code);
+                        cJSON_AddStringToObject(cj_expr, ezlopi_code_str, curr_exp->code);
                     }
                     if (curr_exp->meta_data)
                     {
-                        cJSON_AddItemReferenceToObject(cj_expr, "metadata", curr_exp->meta_data);
+                        cJSON_AddItemReferenceToObject(cj_expr, ezlopi_metadata_str, curr_exp->meta_data);
                     }
 
-                    cJSON *cj_params = cJSON_AddObjectToObject(cj_expr, "params");
+                    cJSON *cj_params = cJSON_AddObjectToObject(cj_expr, ezlopi_params_str);
                     if (cj_params)
                     {
                         __add_expression_items(curr_exp, cj_params);
@@ -602,7 +602,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
         memset(new_exp_node, 0, sizeof(s_ezlopi_expressions_t));
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_expression, ezlopi_name_str, new_exp_node->name);
-        CJSON_GET_VALUE_STRING(cj_expression, "code", code_str);
+        CJSON_GET_VALUE_STRING(cj_expression, ezlopi_code_str, code_str);
 
         if (code_str)
         {
@@ -619,7 +619,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
             }
         }
 
-        cJSON *cj_params = cJSON_GetObjectItem(cj_expression, "params");
+        cJSON *cj_params = cJSON_GetObjectItem(cj_expression, ezlopi_params_str);
 
         if (cj_params)
         {
@@ -632,8 +632,8 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
 
         CJSON_GET_VALUE_BOOL(cj_expression, "variable", new_exp_node->variable);
 
-        new_exp_node->meta_data = cJSON_DetachItemFromObject(cj_expression, "metadata");
-        new_exp_node->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_expression, "valueType"));
+        new_exp_node->meta_data = cJSON_DetachItemFromObject(cj_expression, ezlopi_metadata_str);
+        new_exp_node->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_expression, ezlopi_valueType_str));
         __get_expressions_value(new_exp_node, cJSON_GetObjectItem(cj_expression, ezlopi_value_str), new_exp_node->value_type);
 
         new_exp_node->exp_id = __expression_store_to_nvs(exp_id, cj_expression);
@@ -769,7 +769,7 @@ static void __add_expression_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_e
 {
     if (EZLOPI_VALUE_TYPE_NONE < exp_node->value_type && EZLOPI_VALUE_TYPE_MAX > exp_node->value_type)
     {
-        cJSON_AddStringToObject(cj_expr, "valueType", ezlopi_scene_get_scene_value_type_name_v2(exp_node->value_type));
+        cJSON_AddStringToObject(cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name_v2(exp_node->value_type));
         switch (exp_node->exp_value.type)
         {
         case EXPRESSION_VALUE_TYPE_STRING:

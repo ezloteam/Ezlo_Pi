@@ -54,12 +54,12 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         // #include "esp_app_format.h"
         cJSON_AddStringToObject(cjson_result, "model", ezlopi_factory_info_v2_get_device_type());
         cJSON_AddStringToObject(cjson_result, "architecture", tmp_architecture);
-        cJSON_AddStringToObject(cjson_result, "firmware", VERSION_STR);
+        cJSON_AddStringToObject(cjson_result, ezlopi_firmware_str, VERSION_STR);
         cJSON_AddStringToObject(cjson_result, "kernel", "FreeRTOS");
         cJSON_AddStringToObject(cjson_result, "hardware", CONFIG_IDF_TARGET);
         cJSON_AddNumberToObject(cjson_result, "serial", ezlopi_factory_info_v2_get_id());
 
-        cJSON_AddStringToObject(cjson_result, "uuid", device_uuid ? device_uuid : ezlopi__str);
+        cJSON_AddStringToObject(cjson_result, ezlopi_uuid_str, device_uuid ? device_uuid : ezlopi__str);
         cJSON_AddBoolToObject(cjson_result, "offlineAnonymousAccess", true);
         cJSON_AddBoolToObject(cjson_result, "offlineInsecureAccess", true);
 
@@ -108,12 +108,12 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         char *time_string = tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
         if (time_string)
         {
-            cJSON_AddStringToObject(cjson_result, "uptime", time_string);
+            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
             free(time_string);
         }
         else
         {
-            cJSON_AddStringToObject(cjson_result, "uptime", ezlopi__str);
+            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, ezlopi__str);
         }
     }
 }

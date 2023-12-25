@@ -275,7 +275,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
                     cJSON_AddNumberToObject(cj_response, "len", copy_size);
                     cJSON_AddNumberToObject(cj_response, "total_len", total_data_len);
                     cJSON_AddNumberToObject(cj_response, "sequence", g_dynamic_config_sequence_no);
-                    cJSON_AddStringToObject(cj_response, "data", data_buffer);
+                    cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
                     char *send_data = cJSON_Print(cj_response);
                     if (send_data)
@@ -379,7 +379,7 @@ static char *__base64_decode_dynamic_config(uint32_t total_size)
                 uint32_t len = CJ_GET_NUMBER("len");
                 // uint32_t tot_len = CJ_GET_NUMBER("total_len");
                 // uint32_t sequence = CJ_GET_NUMBER("sequence");
-                char *data = CJ_GET_STRING("data");
+                char *data = CJ_GET_STRING(ezlopi_data_str);
                 if (data)
                 {
                     memcpy(base64_buffer + pos, data, len);

@@ -241,7 +241,7 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     free(brand);
     lua_settable(lua_state, -3);
 
-    lua_pushstring(lua_state, "firmware");
+    lua_pushstring(lua_state, ezlopi_firmware_str);
     lua_newtable(lua_state);
 
     lua_create_table_string_key_value("version", VERSION_STR);

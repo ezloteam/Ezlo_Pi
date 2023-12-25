@@ -204,11 +204,11 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         CJSON_GET_VALUE_STRING(cj_config, "brand", ezlopi_config_basic->brand);
                                         CJSON_GET_VALUE_STRING(cj_config, "model_number", ezlopi_config_basic->model_number);
                                         CJSON_GET_VALUE_DOUBLE(cj_config, "serial", ezlopi_config_basic->id);
-                                        CJSON_GET_VALUE_STRING(cj_config, "uuid", ezlopi_config_basic->device_uuid);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_uuid_str, ezlopi_config_basic->device_uuid);
                                         CJSON_GET_VALUE_STRING(cj_config, "uuid_provisioning", ezlopi_config_basic->prov_uuid);
 
                                         char *mac = NULL;
-                                        CJSON_GET_VALUE_STRING(cj_config, "mac", mac);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_mac_str, mac);
                                         if (mac)
                                         {
                                             for (int i = 0; i < 6; i++)
@@ -329,7 +329,7 @@ static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts
                     cJSON_AddNumberToObject(cj_response, "len", copy_size);
                     cJSON_AddNumberToObject(cj_response, "total_len", total_data_len);
                     cJSON_AddNumberToObject(cj_response, "sequence", g_provisioning_sequence_no);
-                    cJSON_AddStringToObject(cj_response, "data", data_buffer);
+                    cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
                     char *send_data = cJSON_Print(cj_response);
                     if (send_data)
@@ -440,7 +440,7 @@ static void __process_provisioning_info(uint8_t *value, uint32_t len)
             char *brand = cJSON_GetObjectItemCaseSensitive(root, "brand")->valuestring;
             char *manufacturer_name = cJSON_GetObjectItemCaseSensitive(root, "manufacturer_name")->valuestring;
             char *model_number = cJSON_GetObjectItemCaseSensitive(root, "model_number")->valuestring;
-            char *uuid = cJSON_GetObjectItemCaseSensitive(root, "uuid")->valuestring;
+            char *uuid = cJSON_GetObjectItemCaseSensitive(root, ezlopi_uuid_str)->valuestring;
             char *uuid_provisioning = cJSON_GetObjectItemCaseSensitive(root, "uuid_provisioning")->valuestring;
             double serial = cJSON_GetObjectItemCaseSensitive(root, "serial")->valuedouble;
             char *cloud_server = cJSON_GetObjectItemCaseSensitive(root, "cloud_server")->valuestring;
@@ -494,7 +494,7 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
                 uint32_t len = CJ_GET_NUMBER("len");
                 // uint32_t tot_len = CJ_GET_NUMBER("total_len");
                 // uint32_t sequence = CJ_GET_NUMBER("sequence");
-                char *data = CJ_GET_STRING("data");
+                char *data = CJ_GET_STRING(ezlopi_data_str);
                 if (data)
                 {
                     memcpy(base64_buffer + pos, data, len);
@@ -561,7 +561,7 @@ static char *__provisioning_info_jsonify(void)
         cJSON_AddStringToObject(cj_prov_info, "brand", brand);
         cJSON_AddStringToObject(cj_prov_info, "manufacturer_name", manufacturer_name);
         cJSON_AddStringToObject(cj_prov_info, "model_number", model_number);
-        cJSON_AddStringToObject(cj_prov_info, "uuid", uuid);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_uuid_str, uuid);
         cJSON_AddStringToObject(cj_prov_info, "uuid_provisioning", uuid_provisioning);
         cJSON_AddNumberToObject(cj_prov_info, "serial", ezlopi_factory_info_v2_get_id());
         cJSON_AddStringToObject(cj_prov_info, "cloud_server", cloud_server);

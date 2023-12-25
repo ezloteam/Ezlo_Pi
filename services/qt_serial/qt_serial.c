@@ -196,16 +196,16 @@ static void qt_serial_get_info()
         cJSON_AddNumberToObject(get_info, "build", BUILD);
         cJSON_AddStringToObject(get_info, "chip", CONFIG_IDF_TARGET);
         cJSON_AddNumberToObject(get_info, "v_idf", ESP_IDF_VERSION);
-        cJSON_AddNumberToObject(get_info, "uptime", xTaskGetTickCount() / portTICK_RATE_MS);
+        cJSON_AddNumberToObject(get_info, ezlopi_uptime_str, xTaskGetTickCount() / portTICK_RATE_MS);
         cJSON_AddNumberToObject(get_info, "build_date", BUILD_DATE);
         cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddNumberToObject(get_info, "boot_reason", esp_reset_reason());
         uint8_t base_mac[6];
         esp_read_mac(base_mac, ESP_MAC_WIFI_STA);
-        dump("mac", base_mac, 0, 6);
+        dump(ezlopi_mac_str, base_mac, 0, 6);
         uint64_t long_mac = 0xFFFFFFFFFFFFULL & ((base_mac[0] & 0xFFULL) | ((base_mac[1] & 0xFFULL) << 8) | ((base_mac[2] & 0xFFULL) << 16) | ((base_mac[3] & 0xFFULL) << 24) | ((base_mac[4] & 0xFFULL) << 32) | ((base_mac[5] & 0xFFULL) << 40));
-        cJSON_AddNumberToObject(get_info, "mac", long_mac);
-        cJSON_AddStringToObject(get_info, "uuid", controller_uuid);
+        cJSON_AddNumberToObject(get_info, ezlopi_mac_str, long_mac);
+        cJSON_AddStringToObject(get_info, ezlopi_uuid_str, controller_uuid);
         cJSON_AddStringToObject(get_info, "uuid_prov", provisioning_uuid);
         cJSON_AddNumberToObject(get_info, "serial", serial_id);
 
