@@ -1,4 +1,11 @@
 #include "trace.h"
+
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+#include "lwip/netdb.h"
+#include "lwip/dns.h"
+
 #include "ezlopi_http.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
@@ -99,12 +106,110 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
     char url[128]; //"https://ezlo.com/",
-    char username[16];
-    char password[16];
+    char username[32];
+    char password[32];
     char content[128];
     bool skip_cert_common_name_check; // bool
     esp_http_client_method_t method;
 } s_ezlopi_scenes_then_methods_send_http_t;
+
+/* Constants that aren't configurable in menuconfig */
+#define WEB_SERVER "quotes.rest"
+#define WEB_PORT "80"
+#define WEB_PATH "/qod"
+
+static const char *REQUEST = "GET " WEB_PATH " HTTP/1.0\r\n"
+                             "Host: " WEB_SERVER ":" WEB_PORT "\r\n"
+                             "User-Agent: esp-idf/1.0 esp32\r\n"
+                             "\r\n";
+
+static void http_get_socket(void *pvParameters)
+{
+    const struct addrinfo hints = {
+        .ai_family = AF_INET,
+        .ai_socktype = SOCK_STREAM,
+    };
+    struct addrinfo *res;
+    struct in_addr *addr;
+    int s, r;
+    char recv_buf[64];
+
+    while (1)
+    {
+        int err = getaddrinfo(WEB_SERVER, WEB_PORT, &hints, &res);
+
+        if (err != 0 || res == NULL)
+        {
+            TRACE_E("DNS lookup failed err=%d res=%p", err, res);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            continue;
+        }
+
+        /* Code to print the resolved IP.
+
+           Note: inet_ntoa is non-reentrant, look at ipaddr_ntoa_r for "real" code */
+        addr = &((struct sockaddr_in *)res->ai_addr)->sin_addr;
+        TRACE_I("DNS lookup succeeded. IP=%s", inet_ntoa(*addr));
+
+        s = socket(res->ai_family, res->ai_socktype, 0);
+        if (s < 0)
+        {
+            TRACE_E("... Failed to allocate socket.");
+            freeaddrinfo(res);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            continue;
+        }
+        TRACE_I("... allocated socket");
+
+        if (connect(s, res->ai_addr, res->ai_addrlen) != 0)
+        {
+            TRACE_E("... socket connect failed ");
+            close(s);
+            freeaddrinfo(res);
+            vTaskDelay(4000 / portTICK_PERIOD_MS);
+            continue;
+        }
+
+        TRACE_I("... connected");
+        freeaddrinfo(res);
+
+        if (write(s, REQUEST, strlen(REQUEST)) < 0)
+        {
+            TRACE_E("... socket send failed");
+            close(s);
+            vTaskDelay(4000 / portTICK_PERIOD_MS);
+            continue;
+        }
+        TRACE_I("... socket send success");
+
+        struct timeval receiving_timeout;
+        receiving_timeout.tv_sec = 5;
+        receiving_timeout.tv_usec = 0;
+        if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &receiving_timeout,
+                       sizeof(receiving_timeout)) < 0)
+        {
+            TRACE_E("... failed to set socket receiving timeout");
+            close(s);
+            vTaskDelay(4000 / portTICK_PERIOD_MS);
+            continue;
+        }
+        TRACE_I("... set socket receiving timeout success");
+
+        /* Read HTTP response */
+        do
+        {
+            bzero(recv_buf, sizeof(recv_buf));
+            r = read(s, recv_buf, sizeof(recv_buf) - 1);
+            for (int i = 0; i < r; i++)
+            {
+                putchar(recv_buf[i]);
+            }
+        } while (r > 0);
+
+        TRACE_I("... done reading from socket. Last read return=%d ", r);
+        close(s);
+    }
+}
 
 static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
 {
@@ -113,18 +218,20 @@ static void __http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config,
     TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
-    char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
-    char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
-    char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
-    // char *tmp_ca_certificate = NULL;
-    // char *tmp_ssl_shared_key = NULL;
-    // char *tmp_ssl_private_key = NULL;
+    // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+    // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
+    // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+    char *tmp_ca_certificate = NULL;
+    char *tmp_ssl_shared_key = NULL;
+    char *tmp_ssl_private_key = NULL;
     esp_http_client_config_t tmp_http_config = {
         .auth_type = HTTP_AUTH_TYPE_NONE,
         .method = config->method,
         .timeout_ms = 30000,         // 30sec
         .max_redirection_count = 10, // default 0
         .skip_cert_common_name_check = config->skip_cert_common_name_check,
+        .use_global_ca_store = true,
+
     };
 
     s_ezlopi_http_data_t *http_reply = NULL;
@@ -195,7 +302,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
-                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
+                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", "http://quotes.rest/qod");
+                            // snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
                         }
                     }
                     else if (0 == strncmp(curr_field->name, "request", 8))
@@ -266,7 +374,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         {
                             snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "\r\n%s", curr_field->value.value_string);
 
-                            int i = 0;
+                            uint8_t i = 0;
                             for (; i < sizeof(tmp_http_data->content); i++)
                             {
                                 if ('\0' == tmp_http_data->content[i])
@@ -274,7 +382,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             }
                             if (0 < i) // counting content length
                             {
-                                char str[20];
+                                char str[10];
                                 snprintf(str, sizeof(str), "%d", i);
                                 cJSON_AddStringToObject(cj_header, "Content-Length", str);
                             }
@@ -316,16 +424,16 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 // function to add the credential field in url or content-body
                 if ((0 < strlen(tmp_http_data->username)) && (0 < strlen(tmp_http_data->password)))
                 {
-                    char cred[64] = {'\0'};
+                    char cred[96] = {'\0'};
                     if (HTTP_METHOD_GET == tmp_http_data->method)
                     {
-                        snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->url, cred, 64);
+                        snprintf(cred, 96, "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
+                        strncat(tmp_http_data->url, cred, 96);
                     }
                     else // for other http-request method
                     {
-                        snprintf(cred, sizeof(cred), "\r\nuser:%s\r\npassword:%s", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->content, cred, 64);
+                        snprintf(cred, 96, "\r\nuser:%s\r\npassword:%s", tmp_http_data->username, tmp_http_data->password);
+                        strncat(tmp_http_data->content, cred, 96);
                     }
                 }
 
