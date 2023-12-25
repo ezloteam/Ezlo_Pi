@@ -459,13 +459,7 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
-    // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
-    // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
-    // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
-    char *tmp_ca_certificate = NULL;
-    char *tmp_ssl_shared_key = NULL;
-    char *tmp_ssl_private_key = NULL;
-    // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+       // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
     // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
     char *tmp_ca_certificate = NULL;
@@ -481,7 +475,6 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
         // .timeout_ms = 30000,         // 30sec
         // .max_redirection_count = 10, // default 0
         // .keep_alive_idle = 60000,
-        .use_global_ca_store = true,
 
     };
 
