@@ -34,11 +34,12 @@
 /* Constants that aren't configurable in menuconfig */
 #define WEB_SERVER "worldtimeapi.org"
 #define WEB_PORT "443"
-#define WEB_URL "https://worldtimeapi.org/api/timezone/Europe/dublin" //"https://worldtimeapi.org/api/timezone/Europe/dublin"
+#define WEB_URL "https://worldtimeapi.org/api/timezone/Europe/dublin"
 
 static const char *REQUEST = "GET " WEB_URL " HTTP/1.0\r\n"
                              "User-Agent: esp-idf/1.0 esp32\r\n"
                              "\r\n";
+//                              "Host: " WEB_SERVER ":" WEB_PORT "\r\n"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
@@ -144,6 +145,7 @@ static void https_get_task()
     mbedtls_ssl_init(&ssl);
     mbedtls_x509_crt_init(&cacert);
     mbedtls_ctr_drbg_init(&ctr_drbg);
+    TRACE_I("Seeding the random number generator");
 
     mbedtls_ssl_config_init(&conf);
 
@@ -153,7 +155,8 @@ static void https_get_task()
                                      NULL, 0)) != 0)
     {
         TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
-        return (0);
+        // abort();
+        goto exit;
     }
 
     TRACE_I("Attaching the certificate bundle...");
@@ -164,7 +167,8 @@ static void https_get_task()
     if (ret < 0)
     {
         TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
-        return (0);
+        // abort();
+        goto exit;
     }
 
     TRACE_I("Setting hostname for TLS session...");
@@ -174,7 +178,8 @@ static void https_get_task()
     if ((ret = mbedtls_ssl_set_hostname(&ssl, WEB_SERVER)) != 0)
     {
         TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
-        return (0);
+        // abort();
+        goto exit;
     }
 
     TRACE_I("Setting up the SSL/TLS structure...");
@@ -313,7 +318,6 @@ static void https_get_task()
             TRACE_I("connection closed");
             TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
-            // response_complete_flag = true;
             break;
         }
 
@@ -340,30 +344,25 @@ exit:
     TRACE_I("Completed %d requests", ++request_count);
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
+    mbedtls_ssl_free(&ssl);
     mbedtls_ssl_config_free(&conf);
+    mbedtls_ctr_drbg_free(&ctr_drbg);
+    mbedtls_entropy_free(&entropy);
+    TRACE_D("----> Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 }
 
 //---------------------------------------------------------------------------------------
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
-    char url[128]; //"https://ezlo.com/",
+    char url[128];
     char username[32];
     char password[32];
     char content[128];
-    bool skip_cert_common_name_check; // bool
+    bool skip_cert_common_name_check;
     esp_http_client_method_t method;
 } s_ezlopi_scenes_then_methods_send_http_t;
 
-/* Constants that aren't configurable in menuconfig */
-#define WEB_SERVER "quotes.rest"
-#define WEB_PORT "80"
-#define WEB_PATH "/qod"
-
-static const char *REQUEST = "GET " WEB_PATH " HTTP/1.0\r\n"
-                             "Host: " WEB_SERVER ":" WEB_PORT "\r\n"
-                             "User-Agent: esp-idf/1.0 esp32\r\n"
-                             "\r\n";
-
+#if 0
 static void http_get_socket(void *pvParameters)
 {
     const struct addrinfo hints = {
@@ -451,6 +450,7 @@ static void http_get_socket(void *pvParameters)
         close(s);
     }
 }
+#endif
 
 static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
 {
@@ -459,7 +459,7 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
-       // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
+    // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
     // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
     char *tmp_ca_certificate = NULL;
