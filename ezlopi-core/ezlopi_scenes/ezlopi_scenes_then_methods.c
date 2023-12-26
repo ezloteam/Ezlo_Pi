@@ -1,4 +1,5 @@
 #include "trace.h"
+#include "string.h"
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
@@ -11,6 +12,7 @@
 #include "ezlopi_scenes_v2.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
+#include "ezlopi_nvs.h"
 #include "ezlopi_scenes_then_methods.h"
 #include "esp_crt_bundle.h"
 #include "esp_tls.h"
@@ -31,15 +33,6 @@
 #include "mbedtls/error.h"
 #include "mbedtls/certs.h"
 #endif
-/* Constants that aren't configurable in menuconfig */
-#define WEB_SERVER "worldtimeapi.org"
-#define WEB_PORT "443"
-#define WEB_URL "https://worldtimeapi.org/api/timezone/Europe/dublin"
-
-static const char *REQUEST = "GET " WEB_URL " HTTP/1.0\r\n"
-                             "User-Agent: esp-idf/1.0 esp32\r\n"
-                             "\r\n";
-//                              "Host: " WEB_SERVER ":" WEB_PORT "\r\n"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
@@ -130,7 +123,20 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
     return 0;
 }
 
-static void https_get_task()
+//---------------------------------------------------------------------------------------
+typedef struct s_ezlopi_scenes_then_methods_send_http
+{
+    char url[200];
+    char content[128];
+    char web_server[100];
+    char username[32];
+    char password[32];
+    bool skip_cert_common_name_check;
+    esp_http_client_method_t method;
+    char *web_port;
+} s_ezlopi_scenes_then_methods_send_http_t;
+
+static void __https_using_mbedTLS(const char *web_server, const char *web_port, const char *url_req)
 {
     char tmp_buf[512];
     int ret, flags, len;
@@ -160,7 +166,6 @@ static void https_get_task()
     }
 
     TRACE_I("Attaching the certificate bundle...");
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     ret = esp_crt_bundle_attach(&conf);
 
@@ -172,10 +177,9 @@ static void https_get_task()
     }
 
     TRACE_I("Setting hostname for TLS session...");
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     /* Hostname set here should match CN in server certificate */
-    if ((ret = mbedtls_ssl_set_hostname(&ssl, WEB_SERVER)) != 0)
+    if ((ret = mbedtls_ssl_set_hostname(&ssl, web_server)) != 0)
     {
         TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
         // abort();
@@ -183,7 +187,6 @@ static void https_get_task()
     }
 
     TRACE_I("Setting up the SSL/TLS structure...");
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     if ((ret = mbedtls_ssl_config_defaults(&conf,
                                            MBEDTLS_SSL_IS_CLIENT,
@@ -209,18 +212,16 @@ static void https_get_task()
     if ((ret = mbedtls_ssl_setup(&ssl, &conf)) != 0)
     {
         TRACE_E("mbedtls_ssl_setup returned -0x%x\n\n", -ret);
-        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
         goto exit;
     }
 
     mbedtls_net_init(&server_fd);
 
-    TRACE_I("Connecting to %s:%s...", WEB_SERVER, WEB_PORT);
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    TRACE_I("Connecting to %s:%s...", web_server, web_port);
 
-    if ((ret = mbedtls_net_connect(&server_fd, WEB_SERVER,
-                                   WEB_PORT, MBEDTLS_NET_PROTO_TCP)) != 0)
+    if ((ret = mbedtls_net_connect(&server_fd, web_server,
+                                   web_port, MBEDTLS_NET_PROTO_TCP)) != 0)
     {
         TRACE_E("mbedtls_net_connect returned -%x", -ret);
         goto exit;
@@ -245,7 +246,6 @@ static void https_get_task()
     }
 
     TRACE_I("Verifying peer X.509 certificate...");
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     if ((flags = mbedtls_ssl_get_verify_result(&ssl)) != 0)
     {
@@ -254,24 +254,23 @@ static void https_get_task()
         bzero(tmp_buf, sizeof(tmp_buf));
         mbedtls_x509_crt_verify_info(tmp_buf, sizeof(tmp_buf), "  ! ", flags);
         TRACE_W("verification info: %s", tmp_buf);
-        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     }
     else
     {
         TRACE_I("Certificate verified.");
-        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     }
 
     TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
 
     TRACE_I("Writing HTTP request...");
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     size_t written_bytes = 0;
     do
     {
         ret = mbedtls_ssl_write(&ssl,
-                                (const unsigned char *)REQUEST + written_bytes,
-                                strlen(REQUEST) - written_bytes);
+                                (const unsigned char *)url_req + written_bytes,
+                                strlen(url_req) - written_bytes);
         if (ret >= 0)
         {
             TRACE_I("%d bytes written", ret);
@@ -280,11 +279,9 @@ static void https_get_task()
         else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
         {
             TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
-            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
             goto exit;
         }
-    } while (written_bytes < strlen(REQUEST));
+    } while (written_bytes < strlen(url_req));
 
     TRACE_I("Reading HTTP response...");
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
@@ -300,29 +297,23 @@ static void https_get_task()
         if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
         {
             ret = 0;
-            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
             break;
         }
 
         if (ret < 0)
         {
             TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
-            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
             break;
         }
 
         if (ret == 0)
         {
             TRACE_I("connection closed");
-            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
             break;
         }
 
         len = ret;
-        TRACE_D(" [%d] bytes read : %s", len, tmp_buf);
+        TRACE_D(" [%d] bytes read :\n %s", len, tmp_buf);
 
     } while (1);
 
@@ -330,8 +321,8 @@ static void https_get_task()
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
 exit:
-    mbedtls_ssl_session_reset(&ssl);
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    // mbedtls_ssl_session_reset(&ssl);
+    // TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     mbedtls_net_free(&server_fd);
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     if (ret != 0)
@@ -348,114 +339,14 @@ exit:
     mbedtls_ssl_config_free(&conf);
     mbedtls_ctr_drbg_free(&ctr_drbg);
     mbedtls_entropy_free(&entropy);
-    TRACE_D("----> Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 }
-
-//---------------------------------------------------------------------------------------
-typedef struct s_ezlopi_scenes_then_methods_send_http
-{
-    char url[128];
-    char username[32];
-    char password[32];
-    char content[128];
-    bool skip_cert_common_name_check;
-    esp_http_client_method_t method;
-} s_ezlopi_scenes_then_methods_send_http_t;
-
-#if 0
-static void http_get_socket(void *pvParameters)
-{
-    const struct addrinfo hints = {
-        .ai_family = AF_INET,
-        .ai_socktype = SOCK_STREAM,
-    };
-    struct addrinfo *res;
-    struct in_addr *addr;
-    int s, r;
-    char recv_buf[64];
-
-    while (1)
-    {
-        int err = getaddrinfo(WEB_SERVER, WEB_PORT, &hints, &res);
-
-        if (err != 0 || res == NULL)
-        {
-            TRACE_E("DNS lookup failed err=%d res=%p", err, res);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            continue;
-        }
-
-        /* Code to print the resolved IP.
-
-           Note: inet_ntoa is non-reentrant, look at ipaddr_ntoa_r for "real" code */
-        addr = &((struct sockaddr_in *)res->ai_addr)->sin_addr;
-        TRACE_I("DNS lookup succeeded. IP=%s", inet_ntoa(*addr));
-
-        s = socket(res->ai_family, res->ai_socktype, 0);
-        if (s < 0)
-        {
-            TRACE_E("... Failed to allocate socket.");
-            freeaddrinfo(res);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            continue;
-        }
-        TRACE_I("... allocated socket");
-
-        if (connect(s, res->ai_addr, res->ai_addrlen) != 0)
-        {
-            TRACE_E("... socket connect failed ");
-            close(s);
-            freeaddrinfo(res);
-            vTaskDelay(4000 / portTICK_PERIOD_MS);
-            continue;
-        }
-
-        TRACE_I("... connected");
-        freeaddrinfo(res);
-
-        if (write(s, REQUEST, strlen(REQUEST)) < 0)
-        {
-            TRACE_E("... socket send failed");
-            close(s);
-            vTaskDelay(4000 / portTICK_PERIOD_MS);
-            continue;
-        }
-        TRACE_I("... socket send success");
-
-        struct timeval receiving_timeout;
-        receiving_timeout.tv_sec = 5;
-        receiving_timeout.tv_usec = 0;
-        if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &receiving_timeout,
-                       sizeof(receiving_timeout)) < 0)
-        {
-            TRACE_E("... failed to set socket receiving timeout");
-            close(s);
-            vTaskDelay(4000 / portTICK_PERIOD_MS);
-            continue;
-        }
-        TRACE_I("... set socket receiving timeout success");
-
-        /* Read HTTP response */
-        do
-        {
-            bzero(recv_buf, sizeof(recv_buf));
-            r = read(s, recv_buf, sizeof(recv_buf) - 1);
-            for (int i = 0; i < r; i++)
-            {
-                putchar(recv_buf[i]);
-            }
-        } while (r > 0);
-
-        TRACE_I("... done reading from socket. Last read return=%d ", r);
-        close(s);
-    }
-}
-#endif
 
 static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
 {
-    // TRACE_W("ENCODED_URI :- '%s' [%d]", config->encoded_url, strlen(config->encoded_url));
     TRACE_W("URI :- '%s' [%d]", config->url, strlen(config->url));
+    TRACE_W("WEB_SERVER :- '%s' [%d]", config->web_server, strlen(config->web_server));
+    TRACE_W("WEB_PORT :- '%s' ", config->web_port);
     TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
 
@@ -465,6 +356,7 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     char *tmp_ca_certificate = NULL;
     char *tmp_ssl_shared_key = NULL;
     char *tmp_ssl_private_key = NULL;
+
     esp_http_client_config_t tmp_http_config = {
         .auth_type = HTTP_AUTH_TYPE_NONE,
         .method = config->method,
@@ -475,38 +367,43 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
         // .timeout_ms = 30000,         // 30sec
         // .max_redirection_count = 10, // default 0
         // .keep_alive_idle = 60000,
-
     };
 
     s_ezlopi_http_data_t *http_reply = NULL;
+    char REQUEST[512] = {'\0'};
     switch (config->method)
     {
+        // case HTTP_METHOD_GET:
+        // {
+        //     snprintf(REQUEST, sizeof(REQUEST), "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n\r\n", config->url);
+        //     TRACE_W(" REQUEST : %s = [%d]\n", REQUEST, strlen(REQUEST));
+        //     __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
+        //     TRACE_W("HTTP GET-METHOD [%d] : ", tmp_http_config.method);
+        //     http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        //     break;
+        // }
     case HTTP_METHOD_GET:
     {
-        https_get_task();
+        snprintf(REQUEST, sizeof(REQUEST), "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n\r\n", config->url);
+        TRACE_W(" REQUEST : %s = [%d]\n", REQUEST, strlen(REQUEST));
+        __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
 
-        TRACE_W("HTTP GET-METHOD [%d]", tmp_http_config.method);
-        // http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-        break;
-    }
-    case HTTP_METHOD_POST:
-    {
         TRACE_W("HTTP POST-METHOD [%d]", tmp_http_config.method);
-        http_reply = ezlopi_http_post_request(config->url, "", config->content, NULL, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        // http_reply = ezlopi_http_post_request(config->url, "", config->content, NULL, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
-    case HTTP_METHOD_PUT:
-    {
-        TRACE_W("HTTP PUT-METHOD [%d]", tmp_http_config.method);
-        http_reply = ezlopi_http_put_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-        break;
-    }
-    case HTTP_METHOD_DELETE:
-    {
-        TRACE_W("HTTP DELETE-METHOD [%d]", tmp_http_config.method);
-        http_reply = ezlopi_http_delete_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-        break;
-    }
+    // case HTTP_METHOD_PUT:
+    // {
+    //     TRACE_W("HTTP PUT-METHOD [%d]", tmp_http_config.method);
+    //     http_reply = ezlopi_http_put_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+    //     break;
+    // }
+    // case HTTP_METHOD_DELETE:
+    // {
+    //     TRACE_W("HTTP DELETE-METHOD [%d]", tmp_http_config.method);
+    //     http_reply = ezlopi_http_delete_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+    //     break;
+    // }
     default:
         break;
     }
@@ -548,8 +445,24 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
-                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", "http://quotes.rest/qod");
-                            // snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string); // REQUEST);
+                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
+
+                            tmp_http_data->web_port = (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80";
+                            char *start = strstr(curr_field->value.value_string, "://");
+                            if (start != NULL)
+                            {
+                                start += 3;
+                                char *end = strchr(start, '/');
+                                if (end != NULL)
+                                { // Calculate the length between "://" and the next '/'
+                                    int length = end - start;
+                                    char domain[100] = {'\0'};
+                                    strncpy(domain, start, ((length > 100) ? 100 : length));
+                                    domain[100] = '\0';
+                                    tmp_http_data->web_server[100] = '\0';
+                                    snprintf(tmp_http_data->web_server, sizeof(tmp_http_data->web_server), "%s", domain);
+                                }
+                            }
                         }
                     }
                     else if (0 == strncmp(curr_field->name, "request", 8))
@@ -594,7 +507,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                                         const char *passValue = cJSON_GetStringValue(passwordItem);
                                         snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
                                         snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
-                                        TRACE_I("User: %s\nPassword: %s", userValue, passValue);
                                     }
                                 }
                                 else
@@ -666,16 +578,17 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 // function to add the credential field in url or content-body
                 if ((0 < strlen(tmp_http_data->username)) && (0 < strlen(tmp_http_data->password)))
                 {
+                    TRACE_B("writing the credential");
                     char cred[96] = {'\0'};
                     if (HTTP_METHOD_GET == tmp_http_data->method)
                     {
-                        snprintf(cred, 96, "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->url, cred, 96);
+                        snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
+                        strncat(tmp_http_data->url, cred, (int)strlen(cred));
                     }
                     else // for other http-request method
                     {
-                        snprintf(cred, 96, "\r\nuser:%s\r\npassword:%s", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->content, cred, 96);
+                        snprintf(cred, sizeof(cred), "\r\nuser:%s\r\npassword:%s", tmp_http_data->username, tmp_http_data->password);
+                        strncat(tmp_http_data->content, cred, (int)strlen(cred));
                     }
                 }
 
@@ -730,8 +643,47 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 }
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    cJSON *cj_params = cJSON_CreateObject();
+
+    if (cj_params)
+    {
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t *curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, "type", 5))
+                {
+                    if (EZLOPI_VALUE_TYPE_ENUM == curr_field->value_type)
+                    {
+                        TRACE_D("value: %s", curr_field->value.value_string);
+                        if (0 == strncmp(curr_field->name, "factory", 8))
+                        {
+                            TRACE_E("Factory Reseting ESP... ");
+
+                            // ezlopi_nvs_set_boot_count(0);
+                            // nvs_erase_key(0, "wifi_info");
+                            ezlopi_nvs_factory_reset();
+
+                            esp_restart();
+                        }
+                        if (0 == strncmp(curr_field->name, "soft", 5))
+                        {
+                            TRACE_E("Rebooting ESP... ");
+                            esp_restart();
+                        }
+                    }
+                }
+
+                curr_field = curr_field->next;
+            }
+        }
+
+        cJSON_Delete(cj_params);
+    }
+    return ret;
 }
 int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
 {
