@@ -794,17 +794,6 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             if (field->value.value_json)
             {
                 TRACE_I("Duplicating and copyig into :- CJSON object '.value_json'");
-                //----------------------------------------------------------------
-
-                // cJSON *header = cj_value->child;
-                // while (header)
-                // {
-                //     cJSON_AddStringToObject(field->value.value_json, header->string, header->valuestring);
-                //     header = header->next;
-                // }
-
-                //----------------------------------------------------------------
-
                 char *c = cJSON_Print(field->value.value_json);
                 if (c)
                 {

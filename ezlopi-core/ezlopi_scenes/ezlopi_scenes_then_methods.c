@@ -126,14 +126,15 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 //---------------------------------------------------------------------------------------
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
+    char web_port[5];
     char url[200];
-    char content[128];
     char web_server[100];
+    char header[256];
+    char content[256];
     char username[32];
     char password[32];
     bool skip_cert_common_name_check;
     esp_http_client_method_t method;
-    char *web_port;
 } s_ezlopi_scenes_then_methods_send_http_t;
 
 static void __https_using_mbedTLS(const char *web_server, const char *web_port, const char *url_req)
@@ -152,9 +153,7 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     mbedtls_x509_crt_init(&cacert);
     mbedtls_ctr_drbg_init(&ctr_drbg);
     TRACE_I("Seeding the random number generator");
-
     mbedtls_ssl_config_init(&conf);
-
     mbedtls_entropy_init(&entropy);
 
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
@@ -164,7 +163,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
         // abort();
         goto exit;
     }
-
     TRACE_I("Attaching the certificate bundle...");
 
     ret = esp_crt_bundle_attach(&conf);
@@ -175,7 +173,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
         // abort();
         goto exit;
     }
-
     TRACE_I("Setting hostname for TLS session...");
 
     /* Hostname set here should match CN in server certificate */
@@ -199,7 +196,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
 
     /* MBEDTLS_SSL_VERIFY_OPTIONAL is bad for security, in this example it will print
        a warning if CA verification fails but it will continue to connect.
-
        You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
     */
     mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
@@ -215,7 +211,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
 
         goto exit;
     }
-
     mbedtls_net_init(&server_fd);
 
     TRACE_I("Connecting to %s:%s...", web_server, web_port);
@@ -226,7 +221,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
         TRACE_E("mbedtls_net_connect returned -%x", -ret);
         goto exit;
     }
-
     TRACE_I("Connected.");
 
     mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
@@ -244,7 +238,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
             goto exit;
         }
     }
-
     TRACE_I("Verifying peer X.509 certificate...");
 
     if ((flags = mbedtls_ssl_get_verify_result(&ssl)) != 0)
@@ -259,17 +252,14 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     {
         TRACE_I("Certificate verified.");
     }
-
     TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
-
     TRACE_I("Writing HTTP request...");
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     size_t written_bytes = 0;
     do
     {
-        ret = mbedtls_ssl_write(&ssl,
-                                (const unsigned char *)url_req + written_bytes,
+        ret = mbedtls_ssl_write(&ssl, (const unsigned char *)url_req + written_bytes,
                                 strlen(url_req) - written_bytes);
         if (ret >= 0)
         {
@@ -292,26 +282,24 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
         ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
 
         if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
+        {
             continue;
-
+        }
         if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
         {
             ret = 0;
             break;
         }
-
         if (ret < 0)
         {
             TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
             break;
         }
-
         if (ret == 0)
         {
             TRACE_I("connection closed");
             break;
         }
-
         len = ret;
         TRACE_D(" [%d] bytes read :\n %s", len, tmp_buf);
 
@@ -360,9 +348,9 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     esp_http_client_config_t tmp_http_config = {
         .auth_type = HTTP_AUTH_TYPE_NONE,
         .method = config->method,
+        .skip_cert_common_name_check = config->skip_cert_common_name_check,
         .use_global_ca_store = true,
         .crt_bundle_attach = esp_crt_bundle_attach,
-        .skip_cert_common_name_check = config->skip_cert_common_name_check,
         .keep_alive_enable = true,
         // .timeout_ms = 30000,         // 30sec
         // .max_redirection_count = 10, // default 0
@@ -373,16 +361,20 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     char REQUEST[512] = {'\0'};
     switch (config->method)
     {
-        // case HTTP_METHOD_GET:
-        // {
-        //     snprintf(REQUEST, sizeof(REQUEST), "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n\r\n", config->url);
-        //     TRACE_W(" REQUEST : %s = [%d]\n", REQUEST, strlen(REQUEST));
-        //     __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
-        //     TRACE_W("HTTP GET-METHOD [%d] : ", tmp_http_config.method);
-        //     http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-        //     break;
-        // }
     case HTTP_METHOD_GET:
+    {
+        snprintf(REQUEST, sizeof(REQUEST), "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n\r\n", config->url);
+        
+
+
+
+        TRACE_W(" REQUEST : %s = [%d]\n", REQUEST, strlen(REQUEST));
+        __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
+        TRACE_W("HTTP GET-METHOD [%d] : ", tmp_http_config.method);
+        http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        break;
+    }
+    case HTTP_METHOD_POST:
     {
         snprintf(REQUEST, sizeof(REQUEST), "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n\r\n", config->url);
         TRACE_W(" REQUEST : %s = [%d]\n", REQUEST, strlen(REQUEST));
@@ -446,8 +438,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
                             snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
-
-                            tmp_http_data->web_port = (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80";
+                            snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80");
                             char *start = strstr(curr_field->value.value_string, "://");
                             if (start != NULL)
                             {
@@ -540,6 +531,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                                 char str[10];
                                 snprintf(str, sizeof(str), "%d", i);
                                 cJSON_AddStringToObject(cj_header, "Content-Length", str);
+                                strncat(tmp_http_data->header,"Content-Length:",16);
+                                
                             }
                         }
                     }
@@ -559,6 +552,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                                 while (header)
                                 {
                                     cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
+
+
                                     header = header->next;
                                 }
                             }
@@ -662,7 +657,6 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         if (0 == strncmp(curr_field->name, "factory", 8))
                         {
                             TRACE_E("Factory Reseting ESP... ");
-
                             // ezlopi_nvs_set_boot_count(0);
                             // nvs_erase_key(0, "wifi_info");
                             ezlopi_nvs_factory_reset();
