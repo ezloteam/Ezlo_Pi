@@ -127,10 +127,10 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
     char web_port[5];
-    char url[100];
-    char web_server[48];
-    char header[150];
-    char content[128];
+    char url[196];
+    char web_server[96];
+    char header[256];
+    char content[384];
     char username[32];
     char password[32];
     bool skip_cert_common_name_check;
@@ -226,15 +226,11 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
 
     TRACE_I("Performing the SSL/TLS handshake...");
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
     while ((ret = mbedtls_ssl_handshake(&ssl)) != 0)
     {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
             TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
-            TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
             goto exit;
         }
     }
@@ -254,7 +250,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     }
     TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
     TRACE_I("Writing HTTP request...");
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     size_t written_bytes = 0;
     do
@@ -274,7 +269,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     } while (written_bytes < strlen(url_req));
 
     TRACE_I("Reading HTTP response...");
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     do
     {
         len = sizeof(tmp_buf) - 1;
@@ -306,11 +300,8 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     } while (1);
 
     mbedtls_ssl_close_notify(&ssl);
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
 exit:
     // mbedtls_ssl_session_reset(&ssl);
-    // TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     mbedtls_net_free(&server_fd);
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     if (ret != 0)
@@ -334,16 +325,14 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     TRACE_W("[%d]WEB_PORT :- '%s' ", (sizeof(config->web_port)), config->web_port);
     TRACE_W("[%d]URI :- '%s' [%d]", (sizeof(config->url)), config->url, strlen(config->url));
     TRACE_W("[%d]WEB_SERVER :- '%s' [%d]", (sizeof(config->web_server)), config->web_server, strlen(config->web_server));
-    TRACE_W("[%d]Content : \n%s [%d] ", (sizeof(config->content)), config->content, strlen(config->content));
-    TRACE_W("[%d]Headers : \n%s [%d] ", (sizeof(config->header)), config->header, strlen(config->header));
-
+    TRACE_W("[%d]Content : occupied [%d] ", (sizeof(config->content)), strlen(config->content));
+    TRACE_W("[%d]Header : occupied [%d] ", (sizeof(config->header)), strlen(config->header));
     // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
     // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
     // char *tmp_ca_certificate = NULL;
     // char *tmp_ssl_shared_key = NULL;
     // char *tmp_ssl_private_key = NULL;
-
     // esp_http_client_config_t tmp_http_config = {
     //     .auth_type = HTTP_AUTH_TYPE_NONE,
     //     .method = config->method,
@@ -355,59 +344,52 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     // .max_redirection_count = 10, // default 0
     // .keep_alive_idle = 60000,
     // };
-
     // s_ezlopi_http_data_t *http_reply = NULL;
-    char REQUEST[576] = {'\0'};
 
+    char REQUEST[1024] = {'\0'};
     int limit = sizeof(REQUEST);
     int size = 0;
     switch (config->method)
     {
     case HTTP_METHOD_GET:
     {
-        TRACE_W("HTTP GET-METHOD [%d] : ", config->method);
-        // adding 'Request_line' to request_buffer
+        TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
         snprintf(REQUEST, sizeof(REQUEST), "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-
-        // http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
     case HTTP_METHOD_POST:
     {
-        TRACE_W("HTTP POST-METHOD [%d]", config->method);
+        TRACE_I("HTTP POST-METHOD [%d]", config->method);
         snprintf(REQUEST, sizeof(REQUEST), "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-
         // http_reply = ezlopi_http_post_request(config->url, "", config->content, NULL, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
-        // case HTTP_METHOD_PUT:
-        // {
-        //     TRACE_W("HTTP PUT-METHOD [%d]", config->method);
-        //     http_reply = ezlopi_http_put_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-        //     break;
-        // }
-        // case HTTP_METHOD_DELETE:
-        // {
-        //     TRACE_W("HTTP DELETE-METHOD [%d]", config->method);
-        //     http_reply = ezlopi_http_delete_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-        //     break;
-        // }
+    case HTTP_METHOD_PUT:
+    {
+        TRACE_I("HTTP PUT-METHOD [%d]", config->method);
+        snprintf(REQUEST, sizeof(REQUEST), "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+        break;
+    }
+    case HTTP_METHOD_DELETE:
+    {
+        TRACE_I("HTTP DELETE-METHOD [%d]", config->method);
+        snprintf(REQUEST, sizeof(REQUEST), "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+        break;
+    }
     default:
         break;
     }
-
     // adding 'Headers' to request_buffer
     limit -= (strlen(REQUEST) + 1);
     limit = (limit < 0) ? 0 : limit;
-    size = (strlen(config->header) + 1) + 5;
+    size = (strlen(config->header) + 1) + 3;
     if (size < limit)
     {
         snprintf(REQUEST + (strlen(REQUEST)),
                  limit,
-                 "%s\r\n\r\n",
+                 "%s\r\n",
                  config->header);
     }
-
     // adding content body to request
     limit -= (strlen(REQUEST) + 1);
     limit = (limit < 0) ? 0 : limit;
@@ -451,232 +433,235 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_scenes_then_methods_send_http_t));
 
-            cJSON *cj_header = cJSON_CreateObject();
-            if (cj_header) //  headers
+            // cJSON *cj_header = cJSON_CreateObject();
+            // if (cj_header) //  headers
+            // {
+            l_fields_v2_t *curr_field = curr_then->fields;
+            while (NULL != curr_field) // fields
             {
-                l_fields_v2_t *curr_field = curr_then->fields;
-                while (NULL != curr_field) // fields
+                if (0 == strncmp(curr_field->name, "request", 8))
                 {
-                    // create a  requrest line
-                    if (0 == strncmp(curr_field->name, "url", 4))
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
-                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                        if (0 == strncmp(curr_field->value.value_string, "GET", 4))
                         {
-                            snprintf(tmp_http_data->url,
-                                     sizeof(tmp_http_data->url),
-                                     "%s",
+                            tmp_http_data->method = HTTP_METHOD_GET;
+                        }
+                        if (0 == strncmp(curr_field->value.value_string, "POST", 5))
+                        {
+                            tmp_http_data->method = HTTP_METHOD_POST;
+                        }
+                        if (0 == strncmp(curr_field->value.value_string, "PUT", 4))
+                        {
+                            tmp_http_data->method = HTTP_METHOD_PUT;
+                        }
+                        if (0 == strncmp(curr_field->value.value_string, "DELETE", 7))
+                        {
+                            tmp_http_data->method = HTTP_METHOD_DELETE;
+                        }
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "url", 4))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                    {
+                        snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
+                        snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80");
+                        char *start = strstr(curr_field->value.value_string, "://");
+                        if (start != NULL)
+                        {
+                            start += 3;
+                            int buf_size = sizeof(tmp_http_data->web_server);
+                            int length = 0;
+                            char *end = strchr(start, '/');
+                            if (end != NULL)
+                            {
+                                length = end - start;
+                                if ((length + 1) < buf_size)
+                                {
+                                    snprintf(tmp_http_data->web_server, length + 1, "%s", start);
+                                }
+                            }
+                            else
+                            {
+                                char *ptr = curr_field->value.value_string;
+                                TRACE_E("%d , https://[%d] \n", (int)ptr, (int)(start - ptr));
+                                length = strlen(curr_field->value.value_string) - (int)(start - ptr);
+                                if ((length + 1) < buf_size)
+                                {
+                                    snprintf(tmp_http_data->web_server, length + 1, "%s", (ptr + ((int)(start - ptr))));
+                                }
+                            }
+                            tmp_http_data->web_server[buf_size] = '\0';
+                        }
+
+                        // 1. adding 'User-Agent & host' to header-buffer
+                        int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                        limit = (limit < 0) ? 0 : limit;
+                        int size = (6 + (strlen(tmp_http_data->web_server) + 1)) + 3;
+                        if (size < limit)
+                        {
+                            snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
+                                     limit,
+                                     "Host: %s\r\n",
+                                     tmp_http_data->web_server);
+                        }
+                    }
+                }
+
+                else if (0 == strncmp(curr_field->name, "credential", 11))
+                {
+                    if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
+                    {
+                        if (NULL != curr_field->value.value_json)
+                        {
+                            char *cj_ptr = cJSON_Print(curr_field->value.value_json);
+                            if (cj_ptr)
+                            {
+                                // TRACE_W("-user/pass sent:-\n%s\n", cj_ptr);
+                                cJSON_free(cj_ptr);
+
+                                cJSON *userItem = cJSON_GetObjectItem(curr_field->value.value_json, "user");
+                                cJSON *passwordItem = cJSON_GetObjectItem(curr_field->value.value_json, "password");
+                                if ((userItem != NULL) && (passwordItem != NULL))
+                                {
+                                    const char *userValue = cJSON_GetStringValue(userItem);
+                                    const char *passValue = cJSON_GetStringValue(passwordItem);
+                                    snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
+                                    snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
+                                }
+                            }
+                            else
+                            {
+                                TRACE_E("Missing 'username' or 'password' field in credential");
+                            }
+                        }
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "contentType", 12))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                    {
+                        // cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
+                        // 2. adding 'Content-Type' to header-buffer
+                        int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                        limit = (limit < 0) ? 0 : limit;
+                        int size = (14 + strlen(curr_field->value.value_string)) + 3;
+                        if (size < limit)
+                        {
+                            snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
+                                     limit,
+                                     "Content-Type: %s\r\n",
                                      curr_field->value.value_string);
+                        }
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "content", 8))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                    {
+                        snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", curr_field->value.value_string);
+                        uint32_t i = 0; // variable to store 'content-length'
+                        // for (; i < sizeof(tmp_http_data->content); i++)
 
-                            snprintf(tmp_http_data->web_port,
-                                     5,
-                                     "%s",
-                                     (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80");
-
-                            char *start = strstr(curr_field->value.value_string, "://");
-                            if (start != NULL)
-                            {
-                                start += 3;
-                                char *end = strchr(start, '/');
-                                if (end != NULL)
-                                {
-                                    int length = end - start;
-                                    char domain[sizeof(tmp_http_data->web_server)] = {'\0'};
-                                    strncpy(domain, start, ((length > sizeof(tmp_http_data->web_server)) ? sizeof(tmp_http_data->web_server) : length));
-                                    domain[sizeof(tmp_http_data->web_server)] = '\0';
-                                    tmp_http_data->web_server[sizeof(tmp_http_data->web_server)] = '\0';
-                                    snprintf(tmp_http_data->web_server, sizeof(tmp_http_data->web_server), "%s", domain);
-                                }
-                            }
-
-                            // 1. adding 'User-Agent & host' to header-buffer
+                        for (; i < strlen(curr_field->value.value_string); i++)
+                        {
+                            if ('\0' == tmp_http_data->content[i])
+                                break;
+                        }
+                        if (i > 0) // '\r\n'
+                        {
+                            char str[i];
+                            snprintf(str, sizeof(str), "%d", i);
+                            // cJSON_AddStringToObject(cj_header, "Content-Length", str);
+                            // 3. adding 'Content-Length' to header-buffer
                             int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
                             limit = (limit < 0) ? 0 : limit;
-                            int size = (6 + (strlen(tmp_http_data->web_server) + 1)) + 3;
-                            if (size < limit)
-                            {
-                                snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                         limit,
-                                         "Host: %s\r\n",
-                                         tmp_http_data->web_server);
-                            }
-                        }
-                    }
-                    else if (0 == strncmp(curr_field->name, "request", 8))
-                    {
-                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
-                        {
-                            if (0 == strncmp(curr_field->value.value_string, "GET", 4))
-                            {
-                                tmp_http_data->method = HTTP_METHOD_GET;
-                            }
-                            if (0 == strncmp(curr_field->value.value_string, "POST", 5))
-                            {
-                                tmp_http_data->method = HTTP_METHOD_POST;
-                            }
-                            if (0 == strncmp(curr_field->value.value_string, "PUT", 4))
-                            {
-                                tmp_http_data->method = HTTP_METHOD_PUT;
-                            }
-                            if (0 == strncmp(curr_field->value.value_string, "DELETE", 7))
-                            {
-                                tmp_http_data->method = HTTP_METHOD_DELETE;
-                            }
-                        }
-                    }
-                    else if (0 == strncmp(curr_field->name, "credential", 11))
-                    {
-                        if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
-                        {
-                            if (NULL != curr_field->value.value_json)
-                            {
-                                char *cj_ptr = cJSON_Print(curr_field->value.value_json);
-                                if (cj_ptr)
-                                {
-                                    TRACE_W("-user/pass sent:-\n%s\n", cj_ptr);
-                                    cJSON_free(cj_ptr);
-
-                                    cJSON *userItem = cJSON_GetObjectItem(curr_field->value.value_json, "user");
-                                    cJSON *passwordItem = cJSON_GetObjectItem(curr_field->value.value_json, "password");
-                                    if ((userItem != NULL) && (passwordItem != NULL))
-                                    {
-                                        const char *userValue = cJSON_GetStringValue(userItem);
-                                        const char *passValue = cJSON_GetStringValue(passwordItem);
-                                        snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
-                                        snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
-                                    }
-                                }
-                                else
-                                {
-                                    TRACE_E("Missing 'username' or 'password' field in credential");
-                                }
-                            }
-                        }
-                    }
-                    else if (0 == strncmp(curr_field->name, "contentType", 12))
-                    {
-                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                        {
-                            // cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
-                            // 2. adding 'Content-Type' to header-buffer
-                            int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                            limit = (limit < 0) ? 0 : limit;
-                            int size = (14 + strlen(curr_field->value.value_string)) + 3;
-                            if (size < limit)
-                            {
-                                snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                         limit,
-                                         "Content-Type: %s\r\n",
-                                         curr_field->value.value_string);
-                            }
-                        }
-                    }
-                    else if (0 == strncmp(curr_field->name, "content", 8))
-                    {
-                        if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                        {
-                            snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", curr_field->value.value_string);
-                            uint32_t i = 0; // variable to store 'content-length'
-                            for (; i < sizeof(tmp_http_data->content); i++)
-                            {
-                                if ('\0' == tmp_http_data->content[i])
-                                    break;
-                            }
-                            if (i > 2)
-                            {
-                                char str[i];
-                                snprintf(str, sizeof(str), "%d", i);
-                                // cJSON_AddStringToObject(cj_header, "Content-Length", str);
-                                // 3. adding 'Content-Length' to header-buffer
-                                int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                                limit = (limit < 0) ? 0 : limit;
-                                int size = (16 + strlen(str)) + 3;
-                                if (size < limit)
-                                {
-                                    snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
-                                             limit,
-                                             "Content-Length: %s\r\n",
-                                             str);
-                                }
-                            }
-                        }
-                    }
-                    else if (0 == strncmp(curr_field->name, "headers", 8))
-                    {
-                        if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
-                        {
-                            if (NULL != curr_field->value.value_json)
-                            {
-                                // char *cj_ptr = cJSON_Print(curr_field->value.value_json);
-                                // if (cj_ptr)
-                                // {
-                                //     TRACE_W("-HEADERS sent:-\n%s\n", cj_ptr);
-                                //     cJSON_free(cj_ptr);
-                                // }
-                                int limit = 0, size = 0;
-                                cJSON *header = (curr_field->value.value_json->child);
-                                while (header)
-                                {
-                                    // cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
-                                    // 4. adding 'remaining' to header-buffer
-                                    limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                                    limit = (limit < 0) ? 0 : limit;
-                                    size = ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3;
-                                    if (size < limit)
-                                    {
-                                        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                                 limit,
-                                                 "%s: %s\r\n",
-                                                 header->string, header->valuestring);
-                                    }
-                                    header = header->next;
-                                }
-                            }
-                        }
-                    }
-                    else if (0 == strncmp(curr_field->name, "skipSecurity", 12))
-                    {
-                        if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
-                        {
-                            tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
-                            // 4. adding 'remaining' to header-buffer
-                            int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                            limit = (limit < 0) ? 0 : limit;
-                            int size = (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3;
-
+                            int size = (16 + strlen(str)) + 3;
                             if (size < limit)
                             {
                                 snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
                                          limit,
-                                         "skipSecurity: %s\r\n",
-                                         ((curr_field->value.value_bool) ? "true" : "false"));
+                                         "Content-Length: %s\r\n",
+                                         str);
                             }
                         }
                     }
-
-                    curr_field = curr_field->next;
                 }
-
-                // function to add the credential field in url or content-body
-                if ((0 < strlen(tmp_http_data->username)) && (0 < strlen(tmp_http_data->password)))
+                else if (0 == strncmp(curr_field->name, "headers", 8))
                 {
-                    char cred[96] = {'\0'};
-                    if (HTTP_METHOD_GET == tmp_http_data->method)
+                    if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
                     {
-                        snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->url, cred, strlen(cred));
+                        if (NULL != curr_field->value.value_json)
+                        {
+                            // char *cj_ptr = cJSON_Print(curr_field->value.value_json);
+                            // if (cj_ptr)
+                            // {
+                            //     TRACE_W("-HEADERS sent:-\n%s\n", cj_ptr);
+                            //     cJSON_free(cj_ptr);
+                            // }
+                            int limit = 0, size = 0;
+                            cJSON *header = (curr_field->value.value_json->child);
+                            while (header)
+                            {
+                                // cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
+                                // 4. adding 'remaining' to header-buffer
+                                limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                                limit = (limit < 0) ? 0 : limit;
+                                size = ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3;
+                                if (size < limit)
+                                {
+                                    snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
+                                             limit,
+                                             "%s: %s\r\n",
+                                             header->string, header->valuestring);
+                                }
+                                header = header->next;
+                            }
+                        }
                     }
-                    else
+                }
+                else if (0 == strncmp(curr_field->name, "skipSecurity", 12))
+                {
+                    if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
-                        snprintf(cred, sizeof(cred), "user:%s\r\npassword:%s\r\n", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->content, cred, strlen(cred));
+                        tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
+                        // 4. adding 'remaining' to header-buffer
+                        int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                        limit = (limit < 0) ? 0 : limit;
+                        int size = (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3;
+
+                        if (size < limit)
+                        {
+                            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
+                                     limit,
+                                     "skipSecurity: %s\r\n",
+                                     ((curr_field->value.value_bool) ? "true" : "false"));
+                        }
                     }
                 }
 
-                // Invoke http-request
-                __scenes_then_method_http_request_api(tmp_http_data, NULL);
-
-                cJSON_Delete(cj_header);
+                curr_field = curr_field->next;
             }
+            // function to add the credential field in url or content-body
+            if ((0 < strlen(tmp_http_data->username)) && (0 < strlen(tmp_http_data->password)))
+            {
+                char cred[96] = {'\0'};
+                if (HTTP_METHOD_GET == tmp_http_data->method)
+                {
+                    snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
+                    strncat(tmp_http_data->url, cred, strlen(cred));
+                }
+                else
+                {
+                    snprintf(cred, sizeof(cred), "user:%s\r\npassword:%s\r\n", tmp_http_data->username, tmp_http_data->password);
+                    strncat(tmp_http_data->content, cred, strlen(cred));
+                }
+            }
+
+            __scenes_then_method_http_request_api(tmp_http_data, NULL);
+            //     cJSON_Delete(cj_header);
+            // }
             free(tmp_http_data);
         }
     }
