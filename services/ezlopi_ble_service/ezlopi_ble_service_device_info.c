@@ -106,15 +106,15 @@ static char *device_info_jsonify(void)
         uint64_t uptime_sec = uptime_us / 1000000;
 
         cJSON_AddStringToObject(root, ezlopi_firmware_version_str, VERSION_STR);
-        cJSON_AddNumberToObject(root, "firmware_build", BUILD);
-        cJSON_AddStringToObject(root, "chip", CONFIG_IDF_TARGET);
+        cJSON_AddNumberToObject(root, ezlopi_firmware_build_str, BUILD);
+        cJSON_AddStringToObject(root, ezlopi_chip_str, CONFIG_IDF_TARGET);
         // cJSON_AddStringToObject(root, "flash_size", CONFIG_ESPTOOLPY_FLASHSIZE);
         // cJSON_AddStringToObject(root, "version_idf", esp_get_idf_version());
         cJSON_AddNumberToObject(root, ezlopi_uptime_str, uptime_sec);
-        cJSON_AddNumberToObject(root, "build_date", BUILD_DATE);
+        cJSON_AddNumberToObject(root, ezlopi_build_date_str, BUILD_DATE);
         // cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
         // cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
-        cJSON_AddBoolToObject(root, "provisioned_status", ezlopi_factory_info_v2_get_provisioning_status());
+        cJSON_AddBoolToObject(root, ezlopi_provisioned_status_str, ezlopi_factory_info_v2_get_provisioning_status());
 
         uint8_t _mac[6];
         ezlopi_factory_info_v2_get_ezlopi_mac(_mac);
@@ -127,25 +127,25 @@ static char *device_info_jsonify(void)
         // ezlopi_generate_UUID(ezpi_uuid);
         // cJSON_AddStringToObject(root, ezlopi_uuid_str, ezpi_uuid);
 
-        cJSON_AddStringToObject(root, "ezlopi_device_type", ezlopi_factory_info_v2_get_device_type());
-        __add_factory_info_to_root(root, "model", ezlopi_factory_info_v2_get_model());
-        __add_factory_info_to_root(root, "device_name", ezlopi_factory_info_v2_get_name());
-        __add_factory_info_to_root(root, "brand", ezlopi_factory_info_v2_get_brand());
-        __add_factory_info_to_root(root, "manufacturer", ezlopi_factory_info_v2_get_manufacturer());
+        cJSON_AddStringToObject(root, ezlopi_ezlopi_device_type_str, ezlopi_factory_info_v2_get_device_type());
+        __add_factory_info_to_root(root, ezlopi_model_str, ezlopi_factory_info_v2_get_model());
+        __add_factory_info_to_root(root, ezlopi_device_name_str, ezlopi_factory_info_v2_get_name());
+        __add_factory_info_to_root(root, ezlopi_brand_str, ezlopi_factory_info_v2_get_brand());
+        __add_factory_info_to_root(root, ezlopi_manufacturer_str, ezlopi_factory_info_v2_get_manufacturer());
 
         char *ssid = ezlopi_factory_info_v2_get_ssid();
         if (ssid)
         {
-            cJSON_AddStringToObject(root, "wifi_ssid", (isprint(ssid[0])) ? ssid : ezlopi__str);
+            cJSON_AddStringToObject(root, ezlopi_wifi_ssid_str, (isprint(ssid[0])) ? ssid : ezlopi__str);
         }
-        esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
+        // esp_netif_ip_info_t *wifi_ip_info = ezlopi_wifi_get_ip_infos();
         // cJSON_AddStringToObject(root, "wifi-ip", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->ip));
         // cJSON_AddStringToObject(root, "wifi-gw", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->gw));
         // cJSON_AddStringToObject(root, "wifi-netmask", ip4addr_ntoa((const ip4_addr_t *)&wifi_ip_info->netmask));
-        cJSON_AddNumberToObject(root, "wifi-connection_status", ezlopi_wifi_got_ip());
+        cJSON_AddNumberToObject(root, ezlopi_wifi_connection_status_str, ezlopi_wifi_got_ip());
         // cJSON_AddStringToObject(root, "wifi-error", ezlopi_wifi_get_last_disconnect_reason());
         uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? 1 : 0;
-        cJSON_AddNumberToObject(root, "internet_status", flag_internet_status);
+        cJSON_AddNumberToObject(root, ezlopi_internet_status_str, flag_internet_status);
 
         device_info = cJSON_Print(root);
         cJSON_Delete(root);
@@ -170,7 +170,7 @@ void __add_factory_info_to_root(cJSON *root, char *key, char *value)
         }
         else
         {
-            cJSON_AddStringToObject(root, key, "unknown");
+            cJSON_AddStringToObject(root, key, ezlopi_unknown_str);
         }
         // free(value);
     }

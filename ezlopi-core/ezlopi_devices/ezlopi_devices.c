@@ -203,7 +203,7 @@ void ezlopi_device_prepare(void)
     s_controller_information.security = ezlopi_null_str;
     s_controller_information.service_notification = false;
     s_controller_information.ready = true;
-    s_controller_information.status = "synced";
+    s_controller_information.status = ezlopi_synced_str;
 
     char *config_string = ezlopi_factory_info_v2_get_ezlopi_config();
 
@@ -231,16 +231,16 @@ static void ezlopi_device_print_controller_cloud_information_v3(void)
 
 static void ezlopi_device_print_interface_digital_io(l_ezlopi_item_t *item)
 {
-    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.enable: %s", item->interface.gpio.gpio_in.enable ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.enable: %s", item->interface.gpio.gpio_in.enable ? ezlopi_true_str : ezlopi_false_str);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.gpio_num: %d", item->interface.gpio.gpio_in.gpio_num);
-    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.invert: %s", item->interface.gpio.gpio_in.invert ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_in.invert: %s", item->interface.gpio.gpio_in.invert ? ezlopi_true_str : ezlopi_false_str);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.value: %d", item->interface.gpio.gpio_in.value);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.pull: %d", item->interface.gpio.gpio_in.pull);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.interrupt: %d", item->interface.gpio.gpio_in.interrupt);
 
-    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.enable: %s", item->interface.gpio.gpio_out.enable ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.enable: %s", item->interface.gpio.gpio_out.enable ? ezlopi_true_str : ezlopi_false_str);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_out.gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
-    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.invert: %s", item->interface.gpio.gpio_out.invert ? "true" : "false");
+    TRACE_D(" |~~~|- item->interface.gpio.gpio_out.invert: %s", item->interface.gpio.gpio_out.invert ? ezlopi_true_str : ezlopi_false_str);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_out.value: %d", item->interface.gpio.gpio_out.value);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_out.pull: %d", item->interface.gpio.gpio_out.pull);
     TRACE_D(" |~~~|- item->interface.gpio.gpio_in.interrupt: %d", item->interface.gpio.gpio_in.interrupt);
@@ -275,7 +275,7 @@ static void ezlopi_device_print_interface_uart(l_ezlopi_item_t *item)
 
 static void ezlopi_device_print_interface_i2c_master(l_ezlopi_item_t *item)
 {
-    TRACE_D("|~~~|- item->interface.i2c_master.enable: %s", item->interface.i2c_master.enable ? "true" : "false");
+    TRACE_D("|~~~|- item->interface.i2c_master.enable: %s", item->interface.i2c_master.enable ? ezlopi_true_str : ezlopi_false_str);
     TRACE_D("|~~~|- item->interface.i2c_master.channel: %d", item->interface.i2c_master.channel);
     TRACE_D("|~~~|- item->interface.i2c_master.clock_speed: %d", item->interface.i2c_master.clock_speed);
     TRACE_D("|~~~|- item->interface.i2c_master.scl: %d", item->interface.i2c_master.scl);
@@ -364,7 +364,7 @@ static void ezlopi_device_parse_json_v3(char *config_string)
 
     if (cjson_config)
     {
-        cJSON *cjson_device_list = cJSON_GetObjectItem(cjson_config, "dev_detail");
+        cJSON *cjson_device_list = cJSON_GetObjectItem(cjson_config, ezlopi_dev_detail_str);
         if (cjson_device_list)
         {
             int config_dev_idx = 0;
@@ -376,7 +376,7 @@ static void ezlopi_device_parse_json_v3(char *config_string)
                 TRACE_B("Device-%d:", config_dev_idx);
 
                 int id_item = 0;
-                CJSON_GET_VALUE_INT(cjson_device, "id_item", id_item);
+                CJSON_GET_VALUE_INT(cjson_device, ezlopi_id_item_str, id_item);
 
                 if (0 != id_item)
                 {
@@ -531,11 +531,11 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             cJSON_AddStringToObject(cj_device, ezlopi__id_str, tmp_string);
             if (device_prop->cloud_properties.device_type_id)
             {
-                cJSON_AddStringToObject(cj_device, "deviceTypeId", device_prop->cloud_properties.device_type_id);
+                cJSON_AddStringToObject(cj_device, ezlopi_deviceTypeId_str, device_prop->cloud_properties.device_type_id);
             }
             else
             {
-                cJSON_AddStringToObject(cj_device, "deviceTypeId", EZLOPI_DEVICE_TYPE_ID);
+                cJSON_AddStringToObject(cj_device, ezlopi_deviceTypeId_str, ezlopi_ezlopi_str);
             }
 
             if (device_prop->parent_device_id)
@@ -546,25 +546,25 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             {
                 tmp_string[0] = '\0';
             }
-            cJSON_AddStringToObject(cj_device, "parentDeviceId", tmp_string);
-            cJSON_AddStringToObject(cj_device, "category", device_prop->cloud_properties.category);
-            cJSON_AddStringToObject(cj_device, "subcategory", device_prop->cloud_properties.subcategory);
+            cJSON_AddStringToObject(cj_device, ezlopi_parentDeviceId_str, tmp_string);
+            cJSON_AddStringToObject(cj_device, ezlopi_category_str, device_prop->cloud_properties.category);
+            cJSON_AddStringToObject(cj_device, ezlopi_subcategory_str, device_prop->cloud_properties.subcategory);
             snprintf(tmp_string, sizeof(tmp_string), "%08x", ezlopi_cloud_generate_gateway_id());
-            cJSON_AddStringToObject(cj_device, "gatewayId", tmp_string);
-            cJSON_AddBoolToObject(cj_device, "batteryPowered", false);
+            cJSON_AddStringToObject(cj_device, ezlopi_gatewayId_str, tmp_string);
+            cJSON_AddBoolToObject(cj_device, ezlopi_batteryPowered_str, false);
             cJSON_AddStringToObject(cj_device, ezlopi_name_str, device_prop->cloud_properties.device_name);
             cJSON_AddStringToObject(cj_device, ezlopi_type_str, device_prop->cloud_properties.device_type);
-            cJSON_AddBoolToObject(cj_device, "reachable", true);
-            cJSON_AddBoolToObject(cj_device, "persistent", true);
-            cJSON_AddBoolToObject(cj_device, "serviceNotification", false);
+            cJSON_AddBoolToObject(cj_device, ezlopi_reachable_str, true);
+            cJSON_AddBoolToObject(cj_device, ezlopi_persistent_str, true);
+            cJSON_AddBoolToObject(cj_device, ezlopi_serviceNotification_str, false);
             // cJSON_AddBoolToObject(cj_device, "armed", false);
-            cJSON_AddStringToObject(cj_device, "roomId", ezlopi__str);
-            cJSON_AddStringToObject(cj_device, "security", ezlopi__str);
-            cJSON_AddBoolToObject(cj_device, "ready", true);
-            cJSON_AddStringToObject(cj_device, ezlopi_status_str, "synced");
+            cJSON_AddStringToObject(cj_device, ezlopi_roomId_str, ezlopi__str);
+            cJSON_AddStringToObject(cj_device, ezlopi_security_str, ezlopi__str);
+            cJSON_AddBoolToObject(cj_device, ezlopi_ready_str, true);
+            cJSON_AddStringToObject(cj_device, ezlopi_status_str, ezlopi_synced_str);
             if (NULL != device_prop->cloud_properties.info)
             {
-                cJSON_AddItemReferenceToObject(cj_device, "info", device_prop->cloud_properties.info);
+                cJSON_AddItemReferenceToObject(cj_device, ezlopi_info_str, device_prop->cloud_properties.info);
             }
         }
     }

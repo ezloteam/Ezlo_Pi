@@ -103,7 +103,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddNumberToObject(color_values, "green", rgb_args->green_struct.value);
                 cJSON_AddNumberToObject(color_values, "blue", rgb_args->blue_struct.value);
                 char *formatted_val = ezlopi_valueformatter_rgb(rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
-                cJSON_AddStringToObject(cjson_params, "valueFormatted", formatted_val);
+                cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, formatted_val);
                 free(formatted_val);
             }
         }
@@ -111,14 +111,14 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             int state = ((0 == rgb_args->brightness) ? 0 : 1);
             cJSON_AddBoolToObject(cjson_params, ezlopi_value_str, state);
-            cJSON_AddStringToObject(cjson_params, "valueFormatted", ezlopi_valueformatter_bool(state ? true : false));
+            cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(state ? true : false));
         }
         if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             int dim_percentage = (int)(rgb_args->brightness * 100);
             cJSON_AddNumberToObject(cjson_params, ezlopi_value_str, dim_percentage);
             char *formatted_val = ezlopi_valueformatter_int(dim_percentage);
-            cJSON_AddStringToObject(cjson_params, "valueFormatted", formatted_val);
+            cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, formatted_val);
             free(formatted_val);
         }
     }
@@ -223,7 +223,7 @@ static int __init(l_ezlopi_item_t *item)
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
@@ -235,9 +235,9 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_RGB_LED_user_args(s_rgb_args_t *rgb_args, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "gpio1", rgb_args->red_struct.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "gpio2", rgb_args->green_struct.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "gpio3", rgb_args->blue_struct.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, rgb_args->red_struct.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, rgb_args->green_struct.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, rgb_args->blue_struct.gpio_num);
 
     rgb_args->red_struct.duty_cycle = 0;
     rgb_args->green_struct.duty_cycle = 0;

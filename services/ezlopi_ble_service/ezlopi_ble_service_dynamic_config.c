@@ -27,7 +27,6 @@
 static s_gatt_service_t *g_dynamic_config_service = NULL;
 static s_linked_buffer_t *g_dynamic_config_linked_buffer = NULL;
 
-static char *__dynamic_config_jsonify(void);
 static char *__dynamic_config_base64(void);
 static char *__base64_decode_dynamic_config(uint32_t total_size);
 
@@ -67,19 +66,19 @@ static char *__provisioning_status_jsonify(void)
         uint32_t prov_stat = ezlopi_nvs_get_provisioning_status();
         if (1 == prov_stat)
         {
-            cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v2_get_version());
+            cJSON_AddNumberToObject(root, ezlopi_version_str, ezlopi_factory_info_v2_get_version());
             cJSON_AddNumberToObject(root, ezlopi_status_str, prov_stat);
         }
         else
         {
-            cJSON_AddNumberToObject(root, "version", 0);
+            cJSON_AddNumberToObject(root, ezlopi_version_str, 0);
             cJSON_AddNumberToObject(root, ezlopi_status_str, 0);
         }
 
         char tmp_buffer[32];
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
-        cJSON_AddStringToObject(root, "config_id", tmp_buffer);
-        cJSON_AddNumberToObject(root, "config_time", ezlopi_nvs_config_info_update_time_get());
+        cJSON_AddStringToObject(root, ezlopi_config_id_str, tmp_buffer);
+        cJSON_AddNumberToObject(root, ezlopi_config_time_str, ezlopi_nvs_config_info_update_time_get());
 
         prov_status_jstr = cJSON_Print(root);
         cJSON_Delete(root);
@@ -163,9 +162,9 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
             if (root)
             {
 
-                uint32_t len = CJ_GET_NUMBER("len");
-                uint32_t tot_len = CJ_GET_NUMBER("total_len");
-                uint32_t sequence = CJ_GET_NUMBER("sequence");
+                uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
+                uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
+                uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
 
                 TRACE_D("Len: %d", len);
                 TRACE_D("tot_len: %d", tot_len);
@@ -182,11 +181,11 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                             if (cj_config)
                             {
                                 char *user_id = NULL;
-                                CJSON_GET_VALUE_STRING(cj_config, "user_id", user_id);
+                                CJSON_GET_VALUE_STRING(cj_config, ezlopi_user_id_str, user_id);
 
                                 if (user_id && (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id)))
                                 {
-                                    cJSON_DeleteItemFromObject(cj_config, "user_id");
+                                    cJSON_DeleteItemFromObject(cj_config, ezlopi_user_id_str);
                                     char *save_config_str = cJSON_Print(cj_config);
                                     if (save_config_str)
                                     {
@@ -272,9 +271,9 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
                     static char data_buffer[400 + 1];
                     snprintf(data_buffer, sizeof(data_buffer), "%.*s", copy_size, g_dynamic_config_base64 + (g_dynamic_config_sequence_no * 400));
 
-                    cJSON_AddNumberToObject(cj_response, "len", copy_size);
-                    cJSON_AddNumberToObject(cj_response, "total_len", total_data_len);
-                    cJSON_AddNumberToObject(cj_response, "sequence", g_dynamic_config_sequence_no);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_len_str, copy_size);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_total_len_str, total_data_len);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_sequence_str, g_dynamic_config_sequence_no);
                     cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
                     char *send_data = cJSON_Print(cj_response);
@@ -376,9 +375,9 @@ static char *__base64_decode_dynamic_config(uint32_t total_size)
             cJSON *root = cJSON_ParseWithLength((const char *)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
             if (root)
             {
-                uint32_t len = CJ_GET_NUMBER("len");
-                // uint32_t tot_len = CJ_GET_NUMBER("total_len");
-                // uint32_t sequence = CJ_GET_NUMBER("sequence");
+                uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
+                // uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
+                // uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
                 char *data = CJ_GET_STRING(ezlopi_data_str);
                 if (data)
                 {

@@ -4,26 +4,25 @@
 #include "cJSON.h"
 
 #include "trace.h"
-#include "ezlopi_wifi.h"
 
 #include "ezlopi_nvs.h"
+#include "ezlopi_wifi.h"
 #include "ezlopi_ble_gap.h"
 #include "ezlopi_ble_gatt.h"
+#include "ezlopi_ble_buffer.h"
+#include "ezlopi_ble_service.h"
 #include "ezlopi_ble_profile.h"
 #include "ezlopi_factory_info.h"
-#include "ezlopi_nvs.h"
+#include "ezlopi_cloud_constants.h"
 
-#include "ezlopi_ble_service.h"
-#include "ezlopi_ble_buffer.h"
-
-s_gatt_service_t *security_service = NULL;
+static s_gatt_service_t *security_service = NULL;
 
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
 s_gatt_char_t *passkey_characterstic = NULL;
 static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 #endif
 
-s_gatt_char_t *factory_reset_characterstic = NULL;
+static s_gatt_char_t *factory_reset_characterstic = NULL;
 static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
@@ -85,7 +84,7 @@ static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_p
             static uint32_t start_tick;
 #endif
 
-            uint32_t cmd = CJ_GET_NUMBER("cmd");
+            uint32_t cmd = CJ_GET_NUMBER(ezlopi_cmd_str);
 
             TRACE_D("cmd: %d", cmd);
             if (2 == cmd) // factory reset command

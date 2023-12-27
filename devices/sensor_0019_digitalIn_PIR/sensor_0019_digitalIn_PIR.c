@@ -56,7 +56,7 @@ static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *args)
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_out.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
         ret = 1;
     }
 
@@ -137,7 +137,7 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *devic
     if (device && cj_device)
     {
         char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
         ASSIGN_DEVICE_NAME_V2(device, device_name);
 
         device->cloud_properties.category = category_security_sensor;
@@ -159,11 +159,11 @@ static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.show = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
 
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_INT(cj_device, "pull_up", tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;

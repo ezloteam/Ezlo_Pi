@@ -109,14 +109,14 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
                 }
                 else
                 {
-                    cJSON_AddStringToObject(cj_params, ezlopi_firmware_type_str, "generic");
+                    cJSON_AddStringToObject(cj_params, ezlopi_firmware_type_str, ezlopi_generic_str);
                 }
             }
             else
             {
-                cJSON_AddStringToObject(cj_params, ezlopi_firmware_type_str, "generic");
+                cJSON_AddStringToObject(cj_params, ezlopi_firmware_type_str, ezlopi_generic_str);
             }
-            cJSON_AddStringToObject(cj_params, "firmware_hardware", ezlopi_ezlopi_str);
+            cJSON_AddStringToObject(cj_params, ezlopi_firmware_hardware_str, ezlopi_ezlopi_str);
         }
 
         CJSON_TRACE("firmware status request", cj_request);

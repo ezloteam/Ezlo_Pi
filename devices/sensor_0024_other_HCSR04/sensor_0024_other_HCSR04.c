@@ -19,7 +19,6 @@
 
 #include "sensor_0024_other_HCSR04.h"
 
-#warning "use of static variable"
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 /**
@@ -86,7 +85,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     if (cj_param && ultrasonic_sensor)
     {
         snprintf(valueFormatted, 20, "%d cm", ultrasonic_sensor->distance);
-        cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
         cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
     }
 
@@ -167,7 +166,7 @@ static int __init(l_ezlopi_item_t *item)
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
@@ -188,8 +187,8 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.scale = scales_centi_meter;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_out.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.gpio.gpio_in.gpio_num);
 
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
@@ -246,8 +245,6 @@ static int __prepare(void *arg)
 
 static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *item)
 {
-    uint32_t distance;
-
     s_ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
     if (ultrasonic_HCSR04_sensor)
     {
@@ -278,6 +275,7 @@ static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *ite
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
     }
+
     return true;
 }
 

@@ -39,7 +39,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         }
         case EZLOPI_VALUE_TYPE_BOOL:
         {
-            TRACE_D("\t\t\t|-- value: [%d]%s", fields->value.value_bool, fields->value.value_bool ? "true" : "false");
+            TRACE_D("\t\t\t|-- value: [%d]%s", fields->value.value_bool, fields->value.value_bool ? ezlopi_true_str : ezlopi_false_str);
             break;
         }
         case EZLOPI_VALUE_TYPE_FLOAT:

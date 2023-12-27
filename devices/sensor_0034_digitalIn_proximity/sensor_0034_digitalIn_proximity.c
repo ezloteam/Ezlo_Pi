@@ -48,7 +48,7 @@ static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *de
     if (device && cj_device)
     {
         char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
         ASSIGN_DEVICE_NAME_V2(device, device_name);
 
         device->cloud_properties.category = category_switch;
@@ -64,7 +64,6 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
 {
     if (item && cj_device)
     {
-        int tmp_var = 0;
         item->cloud_properties.has_getter = true;
         item->cloud_properties.has_setter = false;
         item->cloud_properties.item_name = ezlopi_item_name_switch;
@@ -73,11 +72,11 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
         item->cloud_properties.scale = NULL;
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-        CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.gpio.gpio_in.enable = true;
         item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
-        CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
         CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
         // CJSON_GET_VALUE_INT(cj_device, "pull_up", tmp_var);
         item->interface.gpio.gpio_in.pull = GPIO_PULLUP_ONLY; // tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
@@ -160,7 +159,7 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
         }
         cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? false : true);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
         ret = 1;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
     }

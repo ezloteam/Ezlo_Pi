@@ -19,7 +19,7 @@ void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON *cj_settings_array = cJSON_AddArrayToObject(cj_result, "settings");
+        cJSON *cj_settings_array = cJSON_AddArrayToObject(cj_result, ezlopi_settings_str);
         if (cj_settings_array)
         {
             l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
@@ -35,8 +35,8 @@ void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
                         snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_setting->cloud_properties.setting_id);
                         cJSON_AddStringToObject(cj_properties, ezlopi__id_str, tmp_string);
                         snprintf(tmp_string, sizeof(tmp_string), "%08x", curr_device->cloud_properties.device_id);
-                        cJSON_AddStringToObject(cj_properties, ezlopi_device_id_str, tmp_string);
-                        cJSON_AddStringToObject(cj_properties, ezlopi_status_str, "synced");
+                        cJSON_AddStringToObject(cj_properties, ezlopi_deviceId_str, tmp_string);
+                        cJSON_AddStringToObject(cj_properties, ezlopi_status_str, ezlopi_synced_str);
                         curr_setting->func(EZLOPI_SETTINGS_ACTION_GET_SETTING, curr_setting, cj_properties, curr_setting->user_arg);
                         if (!cJSON_AddItemToArray(cj_settings_array, cj_properties))
                         {
@@ -99,10 +99,10 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
         uint32_t found_setting = 0;
         while (curr_device)
         {
-            if (cJSON_HasObjectItem(cj_params, ezlopi_device_id_str))
+            if (cJSON_HasObjectItem(cj_params, ezlopi_deviceId_str))
             {
                 char *device_id_str = 0;
-                CJSON_GET_VALUE_STRING(cj_params, ezlopi_device_id_str, device_id_str);
+                CJSON_GET_VALUE_STRING(cj_params, ezlopi_deviceId_str, device_id_str);
                 int device_id = strtol(device_id_str, NULL, 16);
                 TRACE_E("device_id: %X", device_id);
                 if (device_id == curr_device->cloud_properties.device_id)

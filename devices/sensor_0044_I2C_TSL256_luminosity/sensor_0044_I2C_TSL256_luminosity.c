@@ -90,7 +90,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         char *valueFormatted = ezlopi_valueformatter_int((int)(illuminance_value->lux_val));
         if (valueFormatted)
         {
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         cJSON_AddNumberToObject(cjson_properties, "values", (int)illuminance_value->lux_val);
@@ -131,7 +131,7 @@ static int __init(l_ezlopi_item_t *item)
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_light_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -143,7 +143,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_lux;
@@ -152,13 +152,13 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.scale = scales_lux;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;
-    if (NULL == item->interface.i2c_master.address)
+    if (0x00 == item->interface.i2c_master.address)
     {
         item->interface.i2c_master.address = TSL2561_ADDRESS;
     }

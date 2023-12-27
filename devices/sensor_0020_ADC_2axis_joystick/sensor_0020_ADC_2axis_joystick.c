@@ -96,7 +96,7 @@ static int __init(l_ezlopi_item_t *item)
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_not_defined;
@@ -120,7 +120,7 @@ static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_d
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
 }
 
 static int __prepare(void *arg)

@@ -15,7 +15,7 @@ static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
 
-static uint8_t manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
+// static uint8_t manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
 static uint8_t *all_service_uuid = NULL;
 static uint32_t all_service_uuid_len = 0;
 

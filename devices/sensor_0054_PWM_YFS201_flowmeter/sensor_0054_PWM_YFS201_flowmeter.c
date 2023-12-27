@@ -75,7 +75,7 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_flow_meter;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -94,8 +94,8 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->cloud_properties.scale = scales_liter_per_hour;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.pwm.gpio_num);
 
     // passing the custom data_structure
     item->user_arg = user_data;
@@ -180,7 +180,7 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
             cJSON_AddNumberToObject(cj_result, ezlopi_value_str, Lt_per_hr);
@@ -238,7 +238,7 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
                 }
                 // check queue_full => 1
 
-                if (xQueueSend(yfs201_queue, &(yfs201_data->_pulses_yfs201), NULL))
+                if (xQueueSend(yfs201_queue, &(yfs201_data->_pulses_yfs201), 0))
                 {
                     (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;
                     // TRACE_E("Pulse_count : %d", (yfs201_data->_pulses_yfs201));

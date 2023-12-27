@@ -17,13 +17,14 @@ static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __get_item_list(l_ezlopi_item_t *item, void *arg);
 
-const char *water_filter_replacement_alarm_states[] = {
+#warning "Use of static variable, static variable can't be used!"
+static char *ezlopi_water_present_turbidity_state = NULL;
+
+static const char *water_filter_replacement_alarm_states[] = {
     "water_filter_ok",
     "replace_water_filter",
     "unknown",
 };
-
-static char *ezlopi_water_present_turbidity_state = NULL;
 
 int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
@@ -80,7 +81,7 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+            cJSON_AddItemToObject(cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
 
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
@@ -100,12 +101,12 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_water_present_turbidity_state)
         {
             cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, ezlopi_water_present_turbidity_state);
-            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_water_present_turbidity_state);
+            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_water_present_turbidity_state);
         }
         else
         {
             cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
-            cJSON_AddStringToObject(cjson_propertise, "valueFormatted", water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
+            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, water_filter_replacement_alarm_states[TURBIDITY__UNKNOWN]);
         }
         ret = 1;
     }
@@ -149,7 +150,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (turbidity_sensor_state)
         {
             cJSON_AddStringToObject(cj_result, ezlopi_value_str, turbidity_sensor_state);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", turbidity_sensor_state);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, turbidity_sensor_state);
         }
         ret = 1;
     }
@@ -170,7 +171,7 @@ static int __init(l_ezlopi_item_t *item)
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
@@ -193,7 +194,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
     item->user_arg = user_arg;
 }
 

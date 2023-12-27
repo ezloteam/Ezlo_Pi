@@ -676,7 +676,7 @@ int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password)
 
 int ezlopi_factory_info_v2_set_ssl_private_key(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb("ssl_private_key", data, SSL_PRIVATE_KEY_OFFSET);
+    return ezlopi_factory_info_v2_set_4kb(ezlopi_ssl_private_key_str, data, SSL_PRIVATE_KEY_OFFSET);
 }
 
 int ezlopi_factory_info_v2_set_ssl_public_key(char *data)
@@ -820,16 +820,16 @@ static void ezlopi_factory_info_print(void)
         PRINT_FACTORY_INFO("ezlopi_manufacturer", MANUFACTURER_OFFSET, factory_info_v2->ezlopi_manufacturer);
         PRINT_FACTORY_INFO("ezlopi_brand", MANUFACTURER_OFFSET, factory_info_v2->ezlopi_brand);
         PRINT_FACTORY_INFO("ezlopi_model", MANUFACTURER_OFFSET, factory_info_v2->ezlopi_model);
-        PRINT_FACTORY_INFO("ezlopi_device_type", MANUFACTURER_OFFSET, factory_info_v2->ezlopi_device_type);
+        PRINT_FACTORY_INFO(ezlopi_ezlopi_device_type_str, MANUFACTURER_OFFSET, factory_info_v2->ezlopi_device_type);
 
         PRINT_FACTORY_INFO("provisioning_uuid", PROVISIONING_UUID_OFFSET, factory_info_v2->provisioning_uuid);
         PRINT_FACTORY_INFO("provisioning_server", PROVISIONING_SERVER_OFFSET, factory_info_v2->provisioning_server);
         PRINT_FACTORY_INFO("provisioning_token", PROVISIONING_TOKEN_OFFSET, factory_info_v2->provisioning_token);
-        PRINT_FACTORY_INFO("cloud_server", CLOUD_SERVER_OFFSET, factory_info_v2->cloud_server);
+        PRINT_FACTORY_INFO(ezlopi_cloud_server_str, CLOUD_SERVER_OFFSET, factory_info_v2->cloud_server);
         PRINT_FACTORY_INFO("ezlopi_config", CLOUD_SERVER_OFFSET, factory_info_v2->ezlopi_config);
         PRINT_FACTORY_INFO("ca_certificate", CA_CERTIFICATE_OFFSET, factory_info_v2->ca_certificate);
-        PRINT_FACTORY_INFO("ssl_private_key", SSL_PRIVATE_KEY_OFFSET, factory_info_v2->ssl_private_key);
-        PRINT_FACTORY_INFO("ssl_shared_key", SSL_SHARED_KEY_OFFSET, factory_info_v2->ssl_shared_key);
+        PRINT_FACTORY_INFO(ezlopi_ssl_private_key_str, SSL_PRIVATE_KEY_OFFSET, factory_info_v2->ssl_private_key);
+        PRINT_FACTORY_INFO(ezlopi_ezlopi_ssl_shared_key_str, SSL_SHARED_KEY_OFFSET, factory_info_v2->ssl_shared_key);
     }
 }
 
@@ -886,16 +886,16 @@ s_ezlopi_factory_info_t *ezlopi_factory_info_init(void)
         PRINT_FACTORY_INFO("ezlopi_manufacturer", MANUFACTURER_OFFSET, factory_info->ezlopi_manufacturer);
         PRINT_FACTORY_INFO("ezlopi_brand", MANUFACTURER_OFFSET, factory_info->ezlopi_brand);
         PRINT_FACTORY_INFO("ezlopi_model", MANUFACTURER_OFFSET, factory_info->ezlopi_model);
-        PRINT_FACTORY_INFO("ezlopi_device_type", MANUFACTURER_OFFSET, factory_info->ezlopi_device_type);
+        PRINT_FACTORY_INFO(ezlopi_ezlopi_device_type_str, MANUFACTURER_OFFSET, factory_info->ezlopi_device_type);
 
         PRINT_FACTORY_INFO("provisioning_uuid", PROVISIONING_UUID_OFFSET, factory_info->provisioning_uuid);
         PRINT_FACTORY_INFO("provisioning_server", PROVISIONING_SERVER_OFFSET, factory_info->provisioning_server);
         PRINT_FACTORY_INFO("provisioning_token", PROVISIONING_TOKEN_OFFSET, factory_info->provisioning_token);
-        PRINT_FACTORY_INFO("cloud_server", CLOUD_SERVER_OFFSET, factory_info->cloud_server);
+        PRINT_FACTORY_INFO(ezlopi_cloud_server_str, CLOUD_SERVER_OFFSET, factory_info->cloud_server);
         PRINT_FACTORY_INFO("ezlopi_config", CLOUD_SERVER_OFFSET, factory_info->ezlopi_config);
         PRINT_FACTORY_INFO("ca_certificate", CA_CERTIFICATE_OFFSET, factory_info->ca_certificate);
-        PRINT_FACTORY_INFO("ssl_private_key", SSL_PRIVATE_KEY_OFFSET, factory_info->ssl_private_key);
-        PRINT_FACTORY_INFO("ssl_shared_key", SSL_SHARED_KEY_OFFSET, factory_info->ssl_shared_key);
+        PRINT_FACTORY_INFO(ezlopi_ssl_private_key_str, SSL_PRIVATE_KEY_OFFSET, factory_info->ssl_private_key);
+        PRINT_FACTORY_INFO(ezlopi_ezlopi_ssl_shared_key_str, SSL_SHARED_KEY_OFFSET, factory_info->ssl_shared_key);
     }
 
     return factory_info;

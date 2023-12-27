@@ -81,7 +81,7 @@ static ezlo_uart_channel_t get_available_channel()
 static void ezlopi_uart_channel_task(void *args)
 {
     uart_event_t event;
-    uint8_t *buffer = (uint8_t *)malloc(256);
+    uint8_t *buffer = NULL;
 
     // s_ezlopi_uart_object_t *ezlopi_uart_object = (s_ezlopi_uart_object_t*)args;
     s_ezlopi_uart_object_handle_t ezlopi_uart_object = (s_ezlopi_uart_object_handle_t)args;
@@ -93,12 +93,24 @@ static void ezlopi_uart_channel_task(void *args)
         // Start reveceiving UART events for first channel.
         if (xQueueReceive(ezlopi_uart_object->ezlopi_uart_queue_handle, (void *)&event, portMAX_DELAY))
         {
-            memset(buffer, 0, 256);
             switch (event.type)
             {
             case UART_DATA:
             {
-                data_len = uart_read_bytes(ezlopi_uart_object->ezlopi_uart.channel, buffer, event.size, 100 / portTICK_PERIOD_MS);
+                uint32_t bufferred_data_len = 0;
+                esp_err_t error = uart_get_buffered_data_len(ezlopi_uart_object->ezlopi_uart.channel, &bufferred_data_len);
+                if (bufferred_data_len)
+                {
+                    buffer = malloc(bufferred_data_len);
+                    if (buffer)
+                    {
+                        data_len = uart_read_bytes(ezlopi_uart_object->ezlopi_uart.channel, buffer, event.size, 100 / portTICK_PERIOD_MS);
+                    }
+                    else
+                    {
+                        uart_flush_input(ezlopi_uart_object->ezlopi_uart.channel);
+                    }
+                }
                 break;
             }
             case UART_BREAK:
@@ -118,6 +130,11 @@ static void ezlopi_uart_channel_task(void *args)
         }
 
         ezlopi_uart_object->upcall(buffer, data_len, ezlopi_uart_object);
+        if (buffer)
+        {
+            free(buffer);
+            buffer = NULL;
+        }
         data_len = 0;
     }
 }

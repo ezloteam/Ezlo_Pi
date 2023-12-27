@@ -35,7 +35,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
                     {
                         cj_devices_req = elem;
                     }
-                    else if (strstr("items", elem->valuestring))
+                    else if (strstr(ezlopi_items_str, elem->valuestring))
                     {
                         cj_items_req = elem;
                     }
@@ -54,7 +54,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
         if (cj_favorites)
         {
             cJSON *cj_device_list = cj_devices_req ? cJSON_AddArrayToObject(cj_favorites, "devices") : NULL;
-            cJSON *cj_items_list = cj_items_req ? cJSON_AddArrayToObject(cj_favorites, "items") : NULL;
+            cJSON *cj_items_list = cj_items_req ? cJSON_AddArrayToObject(cj_favorites,ezlopi_items_str) : NULL;
             cJSON *cj_rules_list = cj_rules_req ? cJSON_AddArrayToObject(cj_favorites, "rules") : NULL;
 
             l_ezlopi_device_t *curr_device = ezlopi_device_get_head();

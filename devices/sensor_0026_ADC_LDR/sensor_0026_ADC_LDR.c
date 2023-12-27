@@ -15,11 +15,11 @@
 static char *present_light_status = "no_light";
 static char *previous_light_status = "no_light";
 
-const char *light_alarm_states[] =
-    {
-        "no_light",
-        "light_detected",
-        "unknown"};
+const char *light_alarm_states[] = {
+    "no_light",
+    "light_detected",
+    "unknown",
+};
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -85,9 +85,9 @@ static int _get_item_list(l_ezlopi_item_t *item, void *arg)
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+            cJSON_AddItemToObject(cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", present_light_status);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, present_light_status);
         cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, present_light_status);
         ret = 1;
     }
@@ -102,7 +102,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     if (cjson_propertise)
     {
         cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, present_light_status);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", present_light_status);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, present_light_status);
         ret = 1;
     }
 
@@ -180,7 +180,7 @@ static int __prepare(void *arg)
 
                     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
                     item->interface.adc.resln_bit = 3;
-                    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+                    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
                 }
             }
         }
@@ -191,7 +191,7 @@ static int __prepare(void *arg)
 static void __setup_device_cloud_params(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_light_sensor;

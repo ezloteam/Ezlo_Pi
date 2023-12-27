@@ -80,7 +80,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         double percent_data = ((4095 - soil_moisture_data->value) / 4095.0) * 100;
         cJSON_AddNumberToObject(cj_result, ezlopi_value_str, percent_data);
         char *valueFormatted = ezlopi_valueformatter_double(percent_data);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
         free(valueFormatted);
         ret = 1;
     }
@@ -101,15 +101,15 @@ static int __init(l_ezlopi_item_t *item)
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_moisture;
     device->cloud_properties.device_type = dev_type_sensor;
     // cJSON *cj_info = cJSON_CreateObject();
-    // cJSON_AddStringToObject(cj_info, "manufacturer", "EzloPi");
-    // cJSON_AddStringToObject(cj_info, "model", "EzloPi Generic");
+    // cJSON_AddStringToObject(cj_info, ezlopi_manufacturer_str, "EzloPi");
+    // cJSON_AddStringToObject(cj_info, ezlopi_model_str, "EzloPi Generic");
     // cJSON_AddStringToObject(cj_info, "protocol", "WiFi");
     // cJSON_AddStringToObject(cj_info, "firmware.stack", "3.0.4");
     // cJSON_AddStringToObject(cj_info, "hardware", "ESP32");
@@ -120,7 +120,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_soil_humidity;
@@ -131,7 +131,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
     item->user_arg = user_arg;
 }
 

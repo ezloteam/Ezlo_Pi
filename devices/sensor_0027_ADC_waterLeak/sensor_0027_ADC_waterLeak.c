@@ -15,11 +15,11 @@
 const static char *_no_water_leak = "no_water_leak";
 const static char *_water_leak_detected = "water_leak_detected";
 
-const char *water_leak_alarm_states[] =
-    {
-        "no_water_leak",
-        "water_leak_detected",
-        "unknown"};
+const char *water_leak_alarm_states[] = {
+    "no_water_leak",
+    "water_leak_detected",
+    "unknown",
+};
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -70,7 +70,7 @@ int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, 
 static void prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
@@ -95,7 +95,7 @@ static void prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
 static void prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
 
@@ -144,11 +144,11 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cjson_propertise, "enum", json_array_enum);
+            cJSON_AddItemToObject(cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
 
         cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", (char *)item->user_arg ? item->user_arg : _no_water_leak);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
 
         ret = 1;
     }
@@ -164,7 +164,7 @@ static int __get_ezlopi_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : _no_water_leak);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
             ret = 1;
         }
     }
@@ -207,7 +207,6 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        int ret = 0;
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);

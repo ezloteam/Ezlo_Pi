@@ -239,7 +239,7 @@ static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args)
             sensor_door_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
 
             char *device_name = NULL;
-            CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+            CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
             ASSIGN_DEVICE_NAME(sensor_door_properties, device_name);
             sensor_door_properties->ezlopi_cloud.category = category_security_sensor;
             sensor_door_properties->ezlopi_cloud.subcategory = subcategory_door;

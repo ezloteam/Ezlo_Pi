@@ -117,5 +117,7 @@ extern const char *method_hub_reboot;
 // extern const  char *method_hub_detection_devices_scans_top;
 extern const char *method_hub_scene_run_progress;
 extern const char *ezlopi_rpc_method_notfound_str;
+extern const char *ezlopi_hub_scene_changed_str;
+extern const char *ezlopi_hub_scene_added_str;
 
 #endif // __EZLOPI_METHODS_STR_H__

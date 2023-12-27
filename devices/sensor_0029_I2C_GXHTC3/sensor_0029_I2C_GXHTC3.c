@@ -68,12 +68,12 @@ static void __read_value_from_sensor(l_ezlopi_item_t *item)
         uint8_t temp_measure_cmd[] = {0x7C, 0xA2}; // temperature first-clock stretching
 
         ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, wakeup_cmd, 2);
-        vTaskDelay(1);
+        vTaskDelay(5);
         ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, temp_measure_cmd, 2);
         vTaskDelay(5);
         uint8_t read_buffer[6];
-        ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, read_buffer, 6);
-        dump("read_buffer", read_buffer, 0, 6);
+        ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, read_buffer, sizeof(read_buffer));
+        dump("read_buffer", read_buffer, 0, sizeof(read_buffer));
 
         value_ptr->temperature = 100.0 * (read_buffer[0] << 8 | read_buffer[1]) / 65536.0;
         value_ptr->humidity = -45.0 + 175 * (read_buffer[0] << 8 | read_buffer[1]) / 65536.0;
@@ -99,10 +99,10 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
-            cJSON_AddStringToObject(cj_result, "scale", "celsius");
+            cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
 
             value_ptr->temperature = ideal_value;
         }
@@ -112,10 +112,10 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float(value_ptr->humidity);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
-            cJSON_AddStringToObject(cj_result, "scale", "percent");
+            cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_percent);
 
             value_ptr->humidity = ideal_value;
         }
@@ -150,7 +150,7 @@ static int __init(l_ezlopi_item_t *item)
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_humidity;
@@ -163,7 +163,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_temperature_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_temp;
@@ -176,14 +176,14 @@ static void __prepare_temperature_item_properties(l_ezlopi_item_t *item, cJSON *
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 100000;
-    CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
     CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 }
 
 static void __prepare_humidity_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_humidity;
@@ -196,8 +196,8 @@ static void __prepare_humidity_item_properties(l_ezlopi_item_t *item, cJSON *cj_
     item->interface.i2c_master.enable = false;
     item->interface.i2c_master.channel = 0;
     item->interface.i2c_master.clock_speed = 100000;
-    CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
     CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 }
 

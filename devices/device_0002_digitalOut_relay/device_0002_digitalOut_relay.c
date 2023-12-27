@@ -66,7 +66,7 @@ int device_0002_digitalOut_relay(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_switch;
@@ -88,21 +88,21 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
-    CJSON_GET_VALUE_INT(cjson_device, "is_ip", item->interface.gpio.gpio_in.enable);
-    CJSON_GET_VALUE_INT(cjson_device, "gpio_in", item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cjson_device, "ip_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cjson_device, "val_ip", item->interface.gpio.gpio_in.value);
-    CJSON_GET_VALUE_INT(cjson_device, "pullup_ip", tmp_var);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_ip_str, tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 
     item->interface.gpio.gpio_out.enable = true;
-    CJSON_GET_VALUE_INT(cjson_device, "gpio_out", item->interface.gpio.gpio_out.gpio_num);
-    CJSON_GET_VALUE_INT(cjson_device, "op_inv", item->interface.gpio.gpio_out.invert);
-    CJSON_GET_VALUE_INT(cjson_device, "val_op", item->interface.gpio.gpio_out.value);
-    CJSON_GET_VALUE_INT(cjson_device, "pullup_op", tmp_var);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
 }
@@ -211,7 +211,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     if (cjson_propertise)
     {
         cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
         ret = 1;
     }
 

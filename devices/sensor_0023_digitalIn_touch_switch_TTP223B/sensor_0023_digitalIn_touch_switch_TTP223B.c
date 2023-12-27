@@ -69,7 +69,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         cJSON_AddBoolToObject(param, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(param, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, valueFormatted);
     }
 
     return ret;
@@ -131,7 +131,7 @@ static int __prepare(void *arg)
 static void __prepare_touch_switch_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
 
     device->cloud_properties.category = category_switch;
@@ -144,7 +144,7 @@ static void __prepare_touch_switch_device_cloud_properties(l_ezlopi_device_t *de
 
 static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.scale = true;
@@ -153,10 +153,10 @@ static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_d
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "ip_inv", item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
     int val_ip = 0;
-    CJSON_GET_VALUE_INT(cj_device, "val_ip", val_ip);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, val_ip);
 
     item->interface.gpio.gpio_in.value = (true == item->interface.gpio.gpio_in.invert) ? !val_ip : val_ip;
     item->interface.gpio.gpio_in.enable = true;
@@ -236,7 +236,7 @@ static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_prepare(cJSON *cjson_
         sensor_touch_tpp_223b_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT;
 
         char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+        CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
         ASSIGN_DEVICE_NAME(sensor_touch_tpp_223b_properties, device_name);
         sensor_touch_tpp_223b_properties->ezlopi_cloud.category = category_switch;
         sensor_touch_tpp_223b_properties->ezlopi_cloud.subcategory = subcategory_in_wall;
@@ -253,9 +253,9 @@ static s_ezlopi_device_properties_t *sensor_touch_tpp_223b_prepare(cJSON *cjson_
         sensor_touch_tpp_223b_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
         sensor_touch_tpp_223b_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.gpio_num);
-        CJSON_GET_VALUE_INT(cjson_device, "ip_inv", sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.invert);
-        CJSON_GET_VALUE_INT(cjson_device, "val_ip", sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.value);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_name_str, sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_ip_inv_str, sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.invert);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.value);
 
         sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.enable = true;
         sensor_touch_tpp_223b_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_POSEDGE;

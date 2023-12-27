@@ -66,7 +66,7 @@ int device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *it
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_switch;
@@ -89,8 +89,8 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     item->interface.gpio.gpio_in.enable = true;
-    CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
-    CJSON_GET_VALUE_INT(cjson_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cjson_device, "logic_inv", item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_INT(cjson_device, "pull_up", tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
@@ -178,7 +178,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     if (cjson_propertise)
     {
         cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false));
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false));
         ret = 1;
     }
 

@@ -126,7 +126,7 @@ typedef struct l_scenes_list_v2
     TaskHandle_t task_handle;
 
     uint32_t _id;
-    uint32_t enabled;
+    bool enabled;
     uint32_t is_group;
     char group_id[32];
     char name[32];

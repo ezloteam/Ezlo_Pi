@@ -20,7 +20,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __value_updated_from_interrupt(void *arg);
 
-int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void **user_arg)
+int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -62,7 +62,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
         cJSON_AddBoolToObject(cj_value_obj, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(cj_value_obj, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_value_obj, ezlopi_valueFormatted_str, valueFormatted);
         ret = 1;
     }
     return ret;
@@ -149,10 +149,10 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cj_device, "val_ip", item->interface.gpio.gpio_in.value);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
@@ -161,7 +161,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_switch;
@@ -244,7 +244,7 @@ static s_ezlopi_device_properties_t *sensor_ldr_digital_module_prepare(cJSON *cj
         sensor_ldr_digital_module_properties->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT;
 
         char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+        CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
         ASSIGN_DEVICE_NAME(sensor_ldr_digital_module_properties, device_name);
         sensor_ldr_digital_module_properties->ezlopi_cloud.category = category_switch;
         sensor_ldr_digital_module_properties->ezlopi_cloud.subcategory = subcategory_in_wall;
@@ -261,9 +261,9 @@ static s_ezlopi_device_properties_t *sensor_ldr_digital_module_prepare(cJSON *cj
         sensor_ldr_digital_module_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
         sensor_ldr_digital_module_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        CJSON_GET_VALUE_INT(cjson_device, "gpio", sensor_ldr_digital_module_properties->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_name_str, sensor_ldr_digital_module_properties->interface.gpio.gpio_in.gpio_num);
         CJSON_GET_VALUE_INT(cjson_device, "logic_inv", sensor_ldr_digital_module_properties->interface.gpio.gpio_in.invert);
-        CJSON_GET_VALUE_INT(cjson_device, "val_ip", sensor_ldr_digital_module_properties->interface.gpio.gpio_in.value);
+        CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, sensor_ldr_digital_module_properties->interface.gpio.gpio_in.value);
 
         sensor_ldr_digital_module_properties->interface.gpio.gpio_in.enable = true;
         sensor_ldr_digital_module_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;

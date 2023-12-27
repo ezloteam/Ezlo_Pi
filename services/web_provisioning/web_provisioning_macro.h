@@ -31,17 +31,20 @@ CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)
 CLOUD_METHOD("hub.scenes.delete", scenes_delete, NULL)
 CLOUD_METHOD("hub.scenes.blocks.list", scenes_blocks_list, NULL)
 CLOUD_METHOD("hub.scenes.block.data.list", scenes_block_data_list, NULL)
+CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set, scene_update_changed)
+// CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
+
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)
 CLOUD_METHOD("hub.scenes.scripts.add", scenes_scripts_add, NULL)
 CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
 CLOUD_METHOD("hub.scenes.scripts.delete", scenes_scripts_delete, NULL)
 CLOUD_METHOD("hub.scenes.scripts.set", scenes_scripts_set, NULL)
 CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
-// CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
-// CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set) // Not implemented
+
 CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, NULL)
 CLOUD_METHOD("hub.scenes.expressions.list", scenes_expressions_list, NULL)
 CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
+
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 

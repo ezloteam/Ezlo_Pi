@@ -62,7 +62,7 @@ int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -81,8 +81,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.scale = scales_newton;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
@@ -152,7 +152,7 @@ static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             fsr_t *FSR_struct = (fsr_t *)item->user_arg;
             char *valueFormatted = ezlopi_valueformatter_float(FSR_struct->FSR_value);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FSR_struct->FSR_value);
             free(valueFormatted);
             ret = 1;

@@ -52,12 +52,12 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         char *device_uuid = ezlopi_factory_info_v2_get_device_uuid();
         char *tmp_architecture = CONFIG_SDK_TOOLPREFIX;
         // #include "esp_app_format.h"
-        cJSON_AddStringToObject(cjson_result, "model", ezlopi_factory_info_v2_get_device_type());
+        cJSON_AddStringToObject(cjson_result, ezlopi_model_str, ezlopi_factory_info_v2_get_device_type());
         cJSON_AddStringToObject(cjson_result, "architecture", tmp_architecture);
         cJSON_AddStringToObject(cjson_result, ezlopi_firmware_str, VERSION_STR);
         cJSON_AddStringToObject(cjson_result, "kernel", "FreeRTOS");
         cJSON_AddStringToObject(cjson_result, "hardware", CONFIG_IDF_TARGET);
-        cJSON_AddNumberToObject(cjson_result, "serial", ezlopi_factory_info_v2_get_id());
+        cJSON_AddNumberToObject(cjson_result, ezlopi_serial_str, ezlopi_factory_info_v2_get_id());
 
         cJSON_AddStringToObject(cjson_result, ezlopi_uuid_str, device_uuid ? device_uuid : ezlopi__str);
         cJSON_AddBoolToObject(cjson_result, "offlineAnonymousAccess", true);

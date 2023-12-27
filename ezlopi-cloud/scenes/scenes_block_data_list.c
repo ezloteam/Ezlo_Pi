@@ -447,7 +447,7 @@ static cJSON *__comparision_method_compare_number_range(void)
         {
             cJSON_AddStringToObject(cj_comparator, "family", "numeric");
             cJSON_AddStringToObject(cj_comparator, "field", "comparator");
-            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, "enum");
+            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
             const char *options_str = "[\"between\", \"not_between\"]";
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
@@ -477,7 +477,7 @@ static cJSON *__comparision_method_compare_numbers(void)
         {
             cJSON_AddStringToObject(cj_comparator, "family", "numeric");
             cJSON_AddStringToObject(cj_comparator, "field", "comparator");
-            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, "enum");
+            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
             const static char *options_str = "[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"]";
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
@@ -504,7 +504,7 @@ static cJSON *__comparision_method_compare_strings(void)
         {
             cJSON_AddStringToObject(cj_comparator, "family", "strings");
             cJSON_AddStringToObject(cj_comparator, "field", "comparator");
-            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, "enum");
+            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
             const static char *options_str = "[\"<\",\">\",\"<=\",\">=\",\"==\",\"!=\"]";
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
@@ -531,7 +531,7 @@ static cJSON *__comparision_method_compare_values(void)
         {
             cJSON_AddStringToObject(cj_comparator, "family", "valuesWithoutLess");
             cJSON_AddStringToObject(cj_comparator, "field", "comparator");
-            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, "enum");
+            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
             const static char *options_str = "[\"==\",\"!=\"]";
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
@@ -558,7 +558,7 @@ static cJSON *__comparision_method_in_array(void)
         {
             cJSON_AddStringToObject(cj_comparator, "family", "array");
             cJSON_AddStringToObject(cj_comparator, "field", "comparator");
-            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, "enum");
+            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
             const static char *options_str = "[\"in\",\"not_in\"]";
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
@@ -654,7 +654,7 @@ static cJSON *__comparision_method_string_operation(void)
         {
             cJSON_AddStringToObject(cj_comparator, "family", "strings");
             cJSON_AddStringToObject(cj_comparator, "field", "comparator");
-            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, "enum");
+            cJSON_AddStringToObject(cj_comparator, ezlopi_type_str, ezlopi_enum_str);
 
             const static char *options_str = "[\"begin\",\"end\",\"contain\",\"length\",\"not_begin\",\"not_end\",\"not_contain\",\"not_length\"]";
             cJSON_AddRawToObject(cj_comparator, "options", options_str);
@@ -679,7 +679,7 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result)
         cJSON *cj_comparision_methods = cJSON_AddObjectToObject(cj_result, list_name);
         if (cj_comparision_methods)
         {
-            cJSON_AddItemToObject(cj_comparision_methods, "info", __comparision_method_info());
+            cJSON_AddItemToObject(cj_comparision_methods, ezlopi_info_str, __comparision_method_info());
             cJSON_AddItemToObject(cj_comparision_methods, "compareNumberRange", __comparision_method_compare_number_range());
             cJSON_AddItemToObject(cj_comparision_methods, "compareNumbers", __comparision_method_compare_numbers());
             cJSON_AddItemToObject(cj_comparision_methods, "compareStrings", __comparision_method_compare_strings());
