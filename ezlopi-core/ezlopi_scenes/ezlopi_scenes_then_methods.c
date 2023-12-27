@@ -485,7 +485,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             else
                             {
                                 char *ptr = curr_field->value.value_string;
-                                TRACE_E("%d , https://[%d] \n", (int)ptr, (int)(start - ptr));
                                 length = strlen(curr_field->value.value_string) - (int)(start - ptr);
                                 if ((length + 1) < buf_size)
                                 {
