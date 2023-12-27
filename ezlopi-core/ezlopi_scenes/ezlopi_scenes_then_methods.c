@@ -127,10 +127,10 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 typedef struct s_ezlopi_scenes_then_methods_send_http
 {
     char web_port[5];
-    char url[200];
-    char web_server[100];
-    char header[256];
-    char content[256];
+    char url[100];
+    char web_server[48];
+    char header[150];
+    char content[128];
     char username[32];
     char password[32];
     bool skip_cert_common_name_check;
@@ -142,12 +142,12 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     char tmp_buf[512];
     int ret, flags, len;
 
-    static mbedtls_entropy_context entropy;
-    static mbedtls_ctr_drbg_context ctr_drbg;
-    static mbedtls_ssl_context ssl;
-    static mbedtls_x509_crt cacert;
-    static mbedtls_ssl_config conf;
-    static mbedtls_net_context server_fd;
+    mbedtls_entropy_context entropy;
+    mbedtls_ctr_drbg_context ctr_drbg;
+    mbedtls_ssl_context ssl;
+    mbedtls_x509_crt cacert;
+    mbedtls_ssl_config conf;
+    mbedtls_net_context server_fd;
 
     mbedtls_ssl_init(&ssl);
     mbedtls_x509_crt_init(&cacert);
@@ -319,99 +319,124 @@ exit:
         TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
     }
 
-    static int request_count;
-    TRACE_I("Completed %d requests", ++request_count);
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
+    // static int request_count;
+    // TRACE_I("Completed %d requests", ++request_count);
     mbedtls_ssl_free(&ssl);
     mbedtls_ssl_config_free(&conf);
     mbedtls_ctr_drbg_free(&ctr_drbg);
     mbedtls_entropy_free(&entropy);
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+    TRACE_I("Completed a request");
 }
 
 static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
 {
-    TRACE_W("URI :- '%s' [%d]", config->url, strlen(config->url));
-    TRACE_W("WEB_SERVER :- '%s' [%d]", config->web_server, strlen(config->web_server));
-    TRACE_W("WEB_PORT :- '%s' ", config->web_port);
-    TRACE_W("content : %s", config->content);
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
+    TRACE_W("[%d]WEB_PORT :- '%s' ", (sizeof(config->web_port)), config->web_port);
+    TRACE_W("[%d]URI :- '%s' [%d]", (sizeof(config->url)), config->url, strlen(config->url));
+    TRACE_W("[%d]WEB_SERVER :- '%s' [%d]", (sizeof(config->web_server)), config->web_server, strlen(config->web_server));
+    TRACE_W("[%d]Content : \n%s [%d] ", (sizeof(config->content)), config->content, strlen(config->content));
+    TRACE_W("[%d]Headers : \n%s [%d] ", (sizeof(config->header)), config->header, strlen(config->header));
 
     // char *tmp_ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     // char *tmp_ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
     // char *tmp_ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
-    char *tmp_ca_certificate = NULL;
-    char *tmp_ssl_shared_key = NULL;
-    char *tmp_ssl_private_key = NULL;
+    // char *tmp_ca_certificate = NULL;
+    // char *tmp_ssl_shared_key = NULL;
+    // char *tmp_ssl_private_key = NULL;
 
-    esp_http_client_config_t tmp_http_config = {
-        .auth_type = HTTP_AUTH_TYPE_NONE,
-        .method = config->method,
-        .skip_cert_common_name_check = config->skip_cert_common_name_check,
-        .use_global_ca_store = true,
-        .crt_bundle_attach = esp_crt_bundle_attach,
-        .keep_alive_enable = true,
-        // .timeout_ms = 30000,         // 30sec
-        // .max_redirection_count = 10, // default 0
-        // .keep_alive_idle = 60000,
-    };
+    // esp_http_client_config_t tmp_http_config = {
+    //     .auth_type = HTTP_AUTH_TYPE_NONE,
+    //     .method = config->method,
+    //     .skip_cert_common_name_check = config->skip_cert_common_name_check,
+    //     .use_global_ca_store = true,
+    //     .crt_bundle_attach = esp_crt_bundle_attach,
+    //     .keep_alive_enable = true,
+    // .timeout_ms = 30000,         // 30sec
+    // .max_redirection_count = 10, // default 0
+    // .keep_alive_idle = 60000,
+    // };
 
-    s_ezlopi_http_data_t *http_reply = NULL;
-    char REQUEST[512] = {'\0'};
+    // s_ezlopi_http_data_t *http_reply = NULL;
+    char REQUEST[576] = {'\0'};
+
+    int limit = sizeof(REQUEST);
+    int size = 0;
     switch (config->method)
     {
     case HTTP_METHOD_GET:
     {
-        snprintf(REQUEST, sizeof(REQUEST), "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n\r\n", config->url);
-        
+        TRACE_W("HTTP GET-METHOD [%d] : ", config->method);
+        // adding 'Request_line' to request_buffer
+        snprintf(REQUEST, sizeof(REQUEST), "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
 
-
-
-        TRACE_W(" REQUEST : %s = [%d]\n", REQUEST, strlen(REQUEST));
-        __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
-        TRACE_W("HTTP GET-METHOD [%d] : ", tmp_http_config.method);
-        http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        // http_reply = ezlopi_http_get_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
     case HTTP_METHOD_POST:
     {
-        snprintf(REQUEST, sizeof(REQUEST), "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n\r\n", config->url);
-        TRACE_W(" REQUEST : %s = [%d]\n", REQUEST, strlen(REQUEST));
-        __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
+        TRACE_W("HTTP POST-METHOD [%d]", config->method);
+        snprintf(REQUEST, sizeof(REQUEST), "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
 
-        TRACE_W("HTTP POST-METHOD [%d]", tmp_http_config.method);
         // http_reply = ezlopi_http_post_request(config->url, "", config->content, NULL, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
         break;
     }
-    // case HTTP_METHOD_PUT:
-    // {
-    //     TRACE_W("HTTP PUT-METHOD [%d]", tmp_http_config.method);
-    //     http_reply = ezlopi_http_put_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-    //     break;
-    // }
-    // case HTTP_METHOD_DELETE:
-    // {
-    //     TRACE_W("HTTP DELETE-METHOD [%d]", tmp_http_config.method);
-    //     http_reply = ezlopi_http_delete_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
-    //     break;
-    // }
+        // case HTTP_METHOD_PUT:
+        // {
+        //     TRACE_W("HTTP PUT-METHOD [%d]", config->method);
+        //     http_reply = ezlopi_http_put_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        //     break;
+        // }
+        // case HTTP_METHOD_DELETE:
+        // {
+        //     TRACE_W("HTTP DELETE-METHOD [%d]", config->method);
+        //     http_reply = ezlopi_http_delete_request(config->url, tmp_header, tmp_ssl_private_key, tmp_ssl_shared_key, tmp_ca_certificate, &tmp_http_config);
+        //     break;
+        // }
     default:
         break;
     }
-    if (http_reply)
-    {
-        TRACE_I("HTTP METHOD[_%d_] Status_resonse = %s, Status_code = %d",
-                config->method,
-                http_reply->response,
-                http_reply->status_code);
 
-        if (http_reply->response)
-        {
-            free(http_reply->response);
-        }
-        free(http_reply);
+    // adding 'Headers' to request_buffer
+    limit -= (strlen(REQUEST) + 1);
+    limit = (limit < 0) ? 0 : limit;
+    size = (strlen(config->header) + 1) + 5;
+    if (size < limit)
+    {
+        snprintf(REQUEST + (strlen(REQUEST)),
+                 limit,
+                 "%s\r\n\r\n",
+                 config->header);
     }
+
+    // adding content body to request
+    limit -= (strlen(REQUEST) + 1);
+    limit = (limit < 0) ? 0 : limit;
+    size = (strlen(config->content) + 1) + 3;
+    if (size < limit)
+    {
+        snprintf(REQUEST + (strlen(REQUEST)),
+                 limit,
+                 "%s\r\n",
+                 config->content);
+    }
+
+    REQUEST[sizeof(REQUEST)] = '\0';
+    TRACE_D("REQUEST : \n%s = [%d]\n", REQUEST, strlen(REQUEST));
+
+    __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
+
+    // if (http_reply)
+    // {
+    //     TRACE_I("HTTP METHOD[_%d_] Status_resonse = %s, Status_code = %d",
+    //             config->method,
+    //             http_reply->response,
+    //             http_reply->status_code);
+    //     if (http_reply->response)
+    //     {
+    //         free(http_reply->response);
+    //     }
+    //     free(http_reply);
+    // }
 }
 
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
@@ -437,22 +462,42 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
-                            snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
-                            snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80");
+                            snprintf(tmp_http_data->url,
+                                     sizeof(tmp_http_data->url),
+                                     "%s",
+                                     curr_field->value.value_string);
+
+                            snprintf(tmp_http_data->web_port,
+                                     5,
+                                     "%s",
+                                     (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80");
+
                             char *start = strstr(curr_field->value.value_string, "://");
                             if (start != NULL)
                             {
                                 start += 3;
                                 char *end = strchr(start, '/');
                                 if (end != NULL)
-                                { // Calculate the length between "://" and the next '/'
+                                {
                                     int length = end - start;
-                                    char domain[100] = {'\0'};
-                                    strncpy(domain, start, ((length > 100) ? 100 : length));
-                                    domain[100] = '\0';
-                                    tmp_http_data->web_server[100] = '\0';
+                                    char domain[sizeof(tmp_http_data->web_server)] = {'\0'};
+                                    strncpy(domain, start, ((length > sizeof(tmp_http_data->web_server)) ? sizeof(tmp_http_data->web_server) : length));
+                                    domain[sizeof(tmp_http_data->web_server)] = '\0';
+                                    tmp_http_data->web_server[sizeof(tmp_http_data->web_server)] = '\0';
                                     snprintf(tmp_http_data->web_server, sizeof(tmp_http_data->web_server), "%s", domain);
                                 }
+                            }
+
+                            // 1. adding 'User-Agent & host' to header-buffer
+                            int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                            limit = (limit < 0) ? 0 : limit;
+                            int size = (6 + (strlen(tmp_http_data->web_server) + 1)) + 3;
+                            if (size < limit)
+                            {
+                                snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
+                                         limit,
+                                         "Host: %s\r\n",
+                                         tmp_http_data->web_server);
                             }
                         }
                     }
@@ -511,28 +556,47 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
-                            cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
+                            // cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
+                            // 2. adding 'Content-Type' to header-buffer
+                            int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                            limit = (limit < 0) ? 0 : limit;
+                            int size = (14 + strlen(curr_field->value.value_string)) + 3;
+                            if (size < limit)
+                            {
+                                snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
+                                         limit,
+                                         "Content-Type: %s\r\n",
+                                         curr_field->value.value_string);
+                            }
                         }
                     }
                     else if (0 == strncmp(curr_field->name, "content", 8))
                     {
                         if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                         {
-                            snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "\r\n%s", curr_field->value.value_string);
-
-                            uint8_t i = 0;
+                            snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", curr_field->value.value_string);
+                            uint32_t i = 0; // variable to store 'content-length'
                             for (; i < sizeof(tmp_http_data->content); i++)
                             {
                                 if ('\0' == tmp_http_data->content[i])
                                     break;
                             }
-                            if (0 < i) // counting content length
+                            if (i > 2)
                             {
-                                char str[10];
+                                char str[i];
                                 snprintf(str, sizeof(str), "%d", i);
-                                cJSON_AddStringToObject(cj_header, "Content-Length", str);
-                                strncat(tmp_http_data->header,"Content-Length:",16);
-                                
+                                // cJSON_AddStringToObject(cj_header, "Content-Length", str);
+                                // 3. adding 'Content-Length' to header-buffer
+                                int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                                limit = (limit < 0) ? 0 : limit;
+                                int size = (16 + strlen(str)) + 3;
+                                if (size < limit)
+                                {
+                                    snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
+                                             limit,
+                                             "Content-Length: %s\r\n",
+                                             str);
+                                }
                             }
                         }
                     }
@@ -542,18 +606,28 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         {
                             if (NULL != curr_field->value.value_json)
                             {
-                                char *cj_ptr = cJSON_Print(curr_field->value.value_json);
-                                if (cj_ptr)
-                                {
-                                    TRACE_W("-HEADERS sent:-\n%s\n", cj_ptr);
-                                    cJSON_free(cj_ptr);
-                                }
+                                // char *cj_ptr = cJSON_Print(curr_field->value.value_json);
+                                // if (cj_ptr)
+                                // {
+                                //     TRACE_W("-HEADERS sent:-\n%s\n", cj_ptr);
+                                //     cJSON_free(cj_ptr);
+                                // }
+                                int limit = 0, size = 0;
                                 cJSON *header = (curr_field->value.value_json->child);
                                 while (header)
                                 {
-                                    cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
-
-
+                                    // cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
+                                    // 4. adding 'remaining' to header-buffer
+                                    limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                                    limit = (limit < 0) ? 0 : limit;
+                                    size = ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3;
+                                    if (size < limit)
+                                    {
+                                        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
+                                                 limit,
+                                                 "%s: %s\r\n",
+                                                 header->string, header->valuestring);
+                                    }
                                     header = header->next;
                                 }
                             }
@@ -564,6 +638,18 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                         {
                             tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
+                            // 4. adding 'remaining' to header-buffer
+                            int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
+                            limit = (limit < 0) ? 0 : limit;
+                            int size = (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3;
+
+                            if (size < limit)
+                            {
+                                snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
+                                         limit,
+                                         "skipSecurity: %s\r\n",
+                                         ((curr_field->value.value_bool) ? "true" : "false"));
+                            }
                         }
                     }
 
@@ -573,22 +659,21 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 // function to add the credential field in url or content-body
                 if ((0 < strlen(tmp_http_data->username)) && (0 < strlen(tmp_http_data->password)))
                 {
-                    TRACE_B("writing the credential");
                     char cred[96] = {'\0'};
                     if (HTTP_METHOD_GET == tmp_http_data->method)
                     {
                         snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->url, cred, (int)strlen(cred));
+                        strncat(tmp_http_data->url, cred, strlen(cred));
                     }
-                    else // for other http-request method
+                    else
                     {
-                        snprintf(cred, sizeof(cred), "\r\nuser:%s\r\npassword:%s", tmp_http_data->username, tmp_http_data->password);
-                        strncat(tmp_http_data->content, cred, (int)strlen(cred));
+                        snprintf(cred, sizeof(cred), "user:%s\r\npassword:%s\r\n", tmp_http_data->username, tmp_http_data->password);
+                        strncat(tmp_http_data->content, cred, strlen(cred));
                     }
                 }
 
                 // Invoke http-request
-                __scenes_then_method_http_request_api(tmp_http_data, cj_header);
+                __scenes_then_method_http_request_api(tmp_http_data, NULL);
 
                 cJSON_Delete(cj_header);
             }
