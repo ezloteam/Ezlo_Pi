@@ -39,7 +39,6 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
                     cJSON *cj_devices_array = cJSON_GetObjectItem(cj_paramas, "devices");
                     if (cj_devices_array && (cJSON_Array == cj_devices_array->type))
                     {
-                        TRACE_D("Here");
                         __add_scenes_blocks_by_device_ids(block_type, cj_block_array, cj_devices_array);
                     }
                 }

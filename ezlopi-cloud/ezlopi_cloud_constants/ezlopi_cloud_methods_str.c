@@ -119,5 +119,6 @@ const char *method_hub_scene_run_progress = "hub.scene.run.progress";
 const char *ezlopi_rpc_method_notfound_str = "rpc.method.notfound";
 const char *ezlopi_hub_scene_changed_str = "hub.scene.changed";
 const char *ezlopi_hub_scene_added_str = "hub.scene.added";
+const char *ezlopi_hub_scene_deleted_str = "hub.scene.deleted";
 
 #endif // __EZLOPI_METHODS_STR_H__

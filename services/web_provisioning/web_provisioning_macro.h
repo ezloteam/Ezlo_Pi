@@ -24,14 +24,14 @@ CLOUD_METHOD("hub.device.setting.value.set", ezlopi_device_settings_value_set_v3
 CLOUD_METHOD("hub.device.setting.reset", ezlopi_device_settings_reset_v3, NULL)
 
 CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
-CLOUD_METHOD("hub.scenes.create", scenes_create, NULL)
+CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
 CLOUD_METHOD("hub.scenes.run", scenes_run, NULL)
 CLOUD_METHOD("hub.scenes.get", scenes_get, NULL)
-// CLOUD_METHOD("hub.scenes.edit", scenes_edit, NULL)
-CLOUD_METHOD("hub.scenes.delete", scenes_delete, NULL)
+CLOUD_METHOD("hub.scenes.edit", scenes_edit, scene_changed)
+CLOUD_METHOD("hub.scenes.delete", scenes_delete, scene_deleted)
 CLOUD_METHOD("hub.scenes.blocks.list", scenes_blocks_list, NULL)
 CLOUD_METHOD("hub.scenes.block.data.list", scenes_block_data_list, NULL)
-CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set, scene_update_changed)
+CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set, scene_changed)
 // CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)
@@ -44,7 +44,6 @@ CLOUD_METHOD("hub.scenes.scripts.run", scenes_scripts_run, NULL)
 CLOUD_METHOD("hub.scenes.expressions.set", scenes_expressions_set, NULL)
 CLOUD_METHOD("hub.scenes.expressions.list", scenes_expressions_list, NULL)
 CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
-
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 

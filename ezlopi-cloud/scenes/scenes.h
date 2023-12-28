@@ -12,14 +12,18 @@ extern "C"
     void scenes_list(cJSON *cj_request, cJSON *cj_response);
     void scenes_create(cJSON *cj_request, cJSON *cj_response);
     void scenes_get(cJSON *cj_request, cJSON *cj_response);
-    // void scenes_edit(cJSON *cj_request, cJSON *cj_response);
+    void scenes_edit(cJSON *cj_request, cJSON *cj_response);
     void scenes_delete(cJSON *cj_request, cJSON *cj_response);
     // void scenes_status_get(cJSON *cj_request, cJSON *cj_response);
     void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response);
     void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response);
     void scenes_run(cJSON *cj_request, cJSON *cj_response);
     void scenes_enable_set(cJSON *cj_request, cJSON *cj_response);
-    void scene_update_changed(cJSON *cj_request, cJSON *cj_response);
+
+    ///////////// updaters
+    void scene_changed(cJSON *cj_request, cJSON *cj_response);
+    void scene_added(cJSON *cj_request, cJSON *cj_response);
+    void scene_deleted(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus
 }

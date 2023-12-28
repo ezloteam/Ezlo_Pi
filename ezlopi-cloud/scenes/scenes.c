@@ -35,6 +35,9 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
         uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
         if (new_scene_id)
         {
+            char tmp_buff[32];
+            snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
+            cJSON_AddStringToObject(cj_request, ezlopi__id_str, tmp_buff);
             ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
         }
     }
@@ -52,18 +55,9 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
         if (cj_ids && cj_ids->valuestring)
         {
             char *scene_str = ezlopi_nvs_read_str(cj_ids->valuestring);
-
             if (scene_str)
             {
-                cJSON *cj_scene = cJSON_Parse(scene_str);
-                if (cj_scene)
-                {
-                    if (!cJSON_AddItemToObject(cj_response, ezlopi_result_str, cj_scene))
-                    {
-                        cJSON_Delete(cj_scene);
-                    }
-                }
-
+                cJSON_AddRawToObject(cj_response, ezlopi_result_str, scene_str);
                 free(scene_str);
             }
         }
@@ -136,7 +130,6 @@ void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
@@ -144,11 +137,11 @@ void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_sceneId_str);
         if (cj_scene_id && cj_scene_id->valuestring)
         {
-            uint32_t u_id = strtoul(cj_scene_id->valuestring, NULL, 16);
-            l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(u_id);
-            if (scene_node)
+            char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+            if (scene_str)
             {
-                // scene_node->status;
+                cJSON_AddRawToObject(cj_response, ezlopi_result_str, scene_str);
+                free(scene_str);
             }
         }
     }
@@ -227,7 +220,7 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
 
 /////////// updater for scene
 ////// useful for 'hub.scenes.enabled.set'
-void scene_update_changed(cJSON *cj_request, cJSON *cj_response)
+void scene_changed(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
@@ -259,6 +252,30 @@ void scene_added(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_added_str);
 
-    
+    cJSON *new_scene_id = cJSON_GetObjectItem(cj_request, ezlopi__id_str);
+    if (new_scene_id && new_scene_id->valuestring)
+    {
+        char *new_scene = ezlopi_nvs_read_str(new_scene_id->valuestring);
+        if (new_scene)
+        {
+            cJSON_AddRawToObject(cj_response, ezlopi_result_str, new_scene);
+            free(new_scene);
+        }
+    }
+}
 
+void scene_deleted(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
+
+    cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+    cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_deleted_str);
+
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_result_str, cJSON_GetObjectItem(cj_request, ezlopi_params_str));
+    cJSON *cj_result = cJSON_GetObjectItem(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON_AddBoolToObject(cj_result, ezlopi_syncNotification_str, true);
+    }
 }
