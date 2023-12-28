@@ -563,3 +563,31 @@ void ezlopi_nvs_delete_stored_script(uint32_t script_id)
         }
     }
 }
+
+void __ezlopi_nvs_factory_info_reset(void)
+{
+    esp_err_t err = ESP_OK;
+    if (1 == ezlopi_nvs_init())
+    {
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, config_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", config_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, passkey_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", passkey_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, user_id_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", user_id_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, wifi_info_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", wifi_info_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, provisioning_status_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", provisioning_status_nvs_name, esp_err_to_name(err));
+        }
+    }
+}

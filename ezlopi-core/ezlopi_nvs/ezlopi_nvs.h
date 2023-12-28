@@ -73,6 +73,8 @@ extern "C"
     char *ezlopi_nvs_read_scenes_expressions(void);
     int ezlopi_nvs_write_scenes_expressions(char *data);
 
+    void __ezlopi_scene_then_factory_info_reset(void);
+
 #ifdef __cplusplus
 }
 #endif

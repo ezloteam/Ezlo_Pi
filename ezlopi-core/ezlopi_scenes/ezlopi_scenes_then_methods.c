@@ -301,7 +301,7 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
 
     mbedtls_ssl_close_notify(&ssl);
 exit:
-    // mbedtls_ssl_session_reset(&ssl);
+    // mbedtls_ssl_session_reset(&ssl); // dont need this line
     mbedtls_net_free(&server_fd);
     TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
     if (ret != 0)
@@ -310,8 +310,7 @@ exit:
         TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
     }
 
-    // static int request_count;
-    // TRACE_I("Completed %d requests", ++request_count);
+    // Clearing used structures
     mbedtls_ssl_free(&ssl);
     mbedtls_ssl_config_free(&conf);
     mbedtls_ctr_drbg_free(&ctr_drbg);
@@ -444,21 +443,13 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
                         if (0 == strncmp(curr_field->value.value_string, "GET", 4))
-                        {
                             tmp_http_data->method = HTTP_METHOD_GET;
-                        }
                         if (0 == strncmp(curr_field->value.value_string, "POST", 5))
-                        {
                             tmp_http_data->method = HTTP_METHOD_POST;
-                        }
                         if (0 == strncmp(curr_field->value.value_string, "PUT", 4))
-                        {
                             tmp_http_data->method = HTTP_METHOD_PUT;
-                        }
                         if (0 == strncmp(curr_field->value.value_string, "DELETE", 7))
-                        {
                             tmp_http_data->method = HTTP_METHOD_DELETE;
-                        }
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "url", 4))
@@ -493,7 +484,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             }
                             tmp_http_data->web_server[buf_size] = '\0';
                         }
-
                         // 1. adding 'User-Agent & host' to header-buffer
                         int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
                         limit = (limit < 0) ? 0 : limit;
@@ -560,10 +550,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
                         snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", curr_field->value.value_string);
-                        uint32_t i = 0; // variable to store 'content-length'
-                        // for (; i < sizeof(tmp_http_data->content); i++)
-
-                        for (; i < strlen(curr_field->value.value_string); i++)
+                        uint32_t i = 0;                                         // variable to store 'content-length'
+                        for (; i < strlen(curr_field->value.value_string); i++) // compare with incoming -> 'value_string'
                         {
                             if ('\0' == tmp_http_data->content[i])
                                 break;
@@ -593,12 +581,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (NULL != curr_field->value.value_json)
                         {
-                            // char *cj_ptr = cJSON_Print(curr_field->value.value_json);
-                            // if (cj_ptr)
-                            // {
-                            //     TRACE_W("-HEADERS sent:-\n%s\n", cj_ptr);
-                            //     cJSON_free(cj_ptr);
-                            // }
                             int limit = 0, size = 0;
                             cJSON *header = (curr_field->value.value_json->child);
                             while (header)
@@ -629,7 +611,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
                         limit = (limit < 0) ? 0 : limit;
                         int size = (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3;
-
                         if (size < limit)
                         {
                             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
@@ -705,6 +686,7 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
+
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
@@ -725,16 +707,45 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         TRACE_D("value: %s", curr_field->value.value_string);
                         if (0 == strncmp(curr_field->name, "factory", 8))
                         {
-                            TRACE_E("Factory Reseting ESP... ");
-                            // ezlopi_nvs_set_boot_count(0);
-                            // nvs_erase_key(0, "wifi_info");
-                            ezlopi_nvs_factory_reset();
+                            int ret = 0;
 
+                            if (NULL != curr_scene)
+                            {
+                                __ezlopi_scene_then_factory_info_reset();
+
+                                l_scenes_list_v2_t *head = ezlopi_scenes_get_scenes_head_v2();
+                                while (head->next)
+                                {
+                                    ezlopi_nvs_delete_stored_script(head->_id);
+                                    // ezlopi_scenes_scripts_delete_by_id(head->_id);
+                                    ezlopi_scenes_depopulate_by_id_v2(head->_id);
+                                    head = head->next;
+                                }
+
+                                ezlopi_scenes_expressions_delete_node();
+                            }
+                            // int ret = ezlopi_factory_info_v2_factory_reset();
+                            // if (ret)
+                            // {
+                            //     TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
+                            // }
+
+                            // // //---- Remove Basic data type from storage ---------------------------
+                            // ret = ezlopi_nvs_factory_reset();
+                            // if (ret)
+                            // {
+                            //     TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
+                            // }
+                            // TRACE_B("factory reset done, rebooting now .......................");
                             esp_restart();
+                            // //--------------------------------------------------------------------
+
+                            // vTaskDelay(1000 / portTICK_RATE_MS);
                         }
                         if (0 == strncmp(curr_field->name, "soft", 5))
                         {
-                            TRACE_E("Rebooting ESP... ");
+                            TRACE_E("Rebooting ESP......................... ");
+                            vTaskDelay(1000 / portTICK_RATE_MS);
                             esp_restart();
                         }
                     }
