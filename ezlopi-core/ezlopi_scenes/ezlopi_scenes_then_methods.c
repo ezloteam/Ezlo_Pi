@@ -711,18 +711,14 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 
                             if (NULL != curr_scene)
                             {
-                                __ezlopi_scene_then_factory_info_reset();
 
-                                l_scenes_list_v2_t *head = ezlopi_scenes_get_scenes_head_v2();
-                                while (head->next)
-                                {
-                                    ezlopi_nvs_delete_stored_script(head->_id);
-                                    // ezlopi_scenes_scripts_delete_by_id(head->_id);
-                                    ezlopi_scenes_depopulate_by_id_v2(head->_id);
-                                    head = head->next;
-                                }
+                                ezlopi_scenes_scripts_factory_info_reset();
 
-                                ezlopi_scenes_expressions_delete_node();
+                                // ezlopi_scenes_expressions_delete_node();
+
+                                ezlopi_scenes_factory_info_reset();
+
+                                ezlopi_nvs_factory_info_reset();
                             }
                             // int ret = ezlopi_factory_info_v2_factory_reset();
                             // if (ret)

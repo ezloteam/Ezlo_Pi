@@ -564,7 +564,7 @@ void ezlopi_nvs_delete_stored_script(uint32_t script_id)
     }
 }
 
-void __ezlopi_nvs_factory_info_reset(void)
+void ezlopi_nvs_factory_info_reset(void)
 {
     esp_err_t err = ESP_OK;
     if (1 == ezlopi_nvs_init())
@@ -589,5 +589,9 @@ void __ezlopi_nvs_factory_info_reset(void)
         {
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", provisioning_status_nvs_name, esp_err_to_name(err));
         }
+
+        // add scenes - 121 // add this
+        // add scripts - 152    // dont need 
+        // setting magic number?
     }
 }
