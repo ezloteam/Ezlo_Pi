@@ -11,13 +11,17 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_websocket_client.h"
 
+static TaskHandle_t g_registration_task_handle = NULL;
 static volatile uint32_t is_registered = 0;
 static void registration_process(void *pv);
 
 void registration_init(void)
 {
     is_registered = 0;
-    xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
+    if (NULL == g_registration_task_handle)
+    {
+        xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, &g_registration_task_handle);
+    }
 }
 
 void register_repeat(cJSON *cj_request, cJSON *cj_response)
@@ -81,5 +85,6 @@ static void registration_process(void *pv)
         }
     }
 
+    g_registration_task_handle = NULL;
     vTaskDelete(NULL);
 }

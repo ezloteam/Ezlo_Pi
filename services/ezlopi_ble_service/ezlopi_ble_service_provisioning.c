@@ -228,6 +228,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
 
                                         time_t now;
                                         time(&now);
+                                        TRACE_D("time now{size: %u}: %lu", sizeof(time_t), now);
                                         ezlopi_nvs_config_info_update_time_set(now);
 
                                         free(ezlopi_config_basic);

@@ -21,7 +21,7 @@ static const char *ezlopi_scenes_nvs_name = "ezlopi_scenes";
 static const char *ezlopi_scenes_v2_nvs_name = "ez_scenes_v2";
 static const char *ezlopi_scripts_nvs_ids = "ezlopi_scripts";
 static const char *settings_initialized_status_name = "settings_magic";
-static const char *config_info_update_time_name = "conf_update_time";
+static const char *config_info_update_time_name = "config_time";
 static const char *config_info_version_number = "conf_ver_no";
 static const char *ezlopi_scenes_expression_ids = "ezlopi_exp";
 
@@ -97,6 +97,7 @@ void ezlopi_nvs_config_info_update_time_set(uint32_t value)
 {
     if (ezlopi_nvs_init())
     {
+        nvs_erase_key(ezlopi_nvs_handle, config_info_update_time_name);
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, config_info_update_time_name, value);
         TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
     }

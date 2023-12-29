@@ -15,6 +15,21 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 
+typedef enum e_ble_security_commands
+{
+    BLE_CMD_UNDEFINED = 0, // 0
+    BLE_CMD_REBOOT,        // 1
+    BLE_CMD_SOFTRESET,     // 2
+    BLE_CMD_HARDREST,      // 3
+    BLE_CMD_FACTORY_RESET, // 4
+    BLE_CMD_AUTHENTICATE,  // 5
+    BLE_CMD_MAX,
+} e_ble_security_commands_t;
+
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+static uint32_t start_tick = 0;
+static uint32_t authenticated_flag = 0;
+#endif
 static s_gatt_service_t *security_service = NULL;
 
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
@@ -23,6 +38,11 @@ static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t
 #endif
 
 static s_gatt_char_t *factory_reset_characterstic = NULL;
+static void __process_auth_command(cJSON *root);
+static void __process_soft_reset_command(void);
+static void __process_hard_reset_command(void);
+static void __process_factory_reset_command(void);
+
 static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
@@ -71,82 +91,110 @@ static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t
 
 static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
 {
-
     if (param && param->write.len && param->write.value)
     {
-
         cJSON *root = cJSON_ParseWithLength((const char *)param->write.value, param->write.len);
         if (root)
         {
 
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
-            static uint32_t authenticated_flag;
-            static uint32_t start_tick;
-#endif
-
             uint32_t cmd = CJ_GET_NUMBER(ezlopi_cmd_str);
 
             TRACE_D("cmd: %d", cmd);
-            if (2 == cmd) // factory reset command
+
+            switch (cmd)
             {
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
-                uint32_t current_tick = xTaskGetTickCount();
-                if ((current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS) && (1 == authenticated_flag)) // once authenticated, valid for 30 seconds only
-                {
-#endif
-                    int ret = ezlopi_factory_info_v2_factory_reset();
-                    if (ret)
-                    {
-                        TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
-                    }
-
-                    ret = ezlopi_nvs_factory_reset();
-                    if (ret)
-                    {
-                        TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
-                    }
-
-                    TRACE_B("factory reset done, rebooting now .............................................");
-                    vTaskDelay(2000 / portTICK_RATE_MS);
-                    esp_restart();
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
-                }
-                else
-                {
-                    authenticated_flag = 0;
-                    TRACE_W("Not authenticated for factory-reset!");
-                }
-#endif
+            case BLE_CMD_REBOOT:
+            {
+                esp_restart();
+                break;
             }
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
-            else if (1 == cmd) // authentication request for soft-factory-reset
+            case BLE_CMD_FACTORY_RESET: // factory reset command
             {
-
-                uint32_t passkey = CJ_GET_NUMBER("passkey");
-                uint32_t original_passkey = 0;
-                ezlopi_nvs_read_ble_passkey(&original_passkey);
-
-                TRACE_D("Old passkey: %u, current_passkey: %u", original_passkey, passkey);
-
-                if (passkey == original_passkey)
-                {
-                    authenticated_flag = 1;
-                    TRACE_W("Authenticated!");
-                    start_tick = xTaskGetTickCount();
-                }
-                else
-                {
-                    authenticated_flag = 0;
-                    TRACE_W("Not authenticated!");
-                }
+                __process_factory_reset_command();
+                break;
             }
-#endif
-            else
+            case BLE_CMD_HARDREST:
             {
-                TRACE_W("Command not valid: [cmd: %u].", cmd);
+                __process_hard_reset_command();
+                break;
+            }
+            case BLE_CMD_AUTHENTICATE: // authentication request for soft-factory-reset
+            {
+                __process_auth_command(root);
+                break;
+            }
+            default:
+            {
+                TRACE_W("Command not valid -> {cmd: %u}.", cmd);
+                break;
+            }
             }
 
             cJSON_free(root);
         }
     }
+}
+
+static void __process_hard_reset_command(void)
+{
+
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+    uint32_t current_tick = xTaskGetTickCount();
+    if ((1 == authenticated_flag) && (current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS)) // once authenticated, valid for 30 seconds only
+    {
+#endif
+        int ret = ezlopi_factory_info_v2_factory_reset();
+        if (ret)
+        {
+            TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
+        }
+
+        ret = ezlopi_nvs_factory_reset();
+        if (ret)
+        {
+            TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
+        }
+
+        TRACE_B("factory reset done, rebooting now .............................................");
+        vTaskDelay(2000 / portTICK_RATE_MS);
+        esp_restart();
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+    }
+    else
+    {
+        authenticated_flag = 0;
+        TRACE_W("Not authenticated for factory-reset!");
+    }
+#endif
+}
+
+static void __process_soft_reset_command(void)
+{
+}
+
+static void __process_factory_reset_command(void)
+{
+}
+
+static void __process_auth_command(cJSON *root)
+{
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+    uint32_t passkey = CJ_GET_NUMBER("passkey");
+    uint32_t original_passkey = 0;
+    ezlopi_nvs_read_ble_passkey(&original_passkey);
+
+    TRACE_D("Old passkey: %u, current_passkey: %u", original_passkey, passkey);
+
+    if (passkey == original_passkey)
+    {
+        authenticated_flag = 1;
+        TRACE_W("Authenticated!");
+        start_tick = xTaskGetTickCount();
+    }
+    else
+    {
+        authenticated_flag = 0;
+        TRACE_W("Not authenticated!");
+    }
+#endif
 }

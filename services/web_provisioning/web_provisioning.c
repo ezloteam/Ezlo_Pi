@@ -189,6 +189,7 @@ static void __fetch_wss_endpoint(void *pv)
 
 static void __connection_upcall(bool connected)
 {
+    TRACE_D("connected: %d", connected);
     static bool prev_status;
     if (connected)
     {
