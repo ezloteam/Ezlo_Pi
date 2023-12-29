@@ -233,7 +233,7 @@ void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
     }
 }
 
-void ezlopi_scenes_factory_info_reset(void)
+void ezlopi_scenes_factory_info_reset_v2(void)
 {
     l_scenes_list_v2_t *scene_to_delete = scenes_list_head_v2;
     while (scene_to_delete->_id)

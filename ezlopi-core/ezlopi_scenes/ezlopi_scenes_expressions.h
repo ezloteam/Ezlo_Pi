@@ -75,7 +75,7 @@ typedef struct s_ezlopi_expressions
 
 /**
  * @brief Fetch expressions from NVS flash and populate to linklist
- * 
+ *
  */
 void ezlopi_scenes_expressions_init(void);
 
@@ -90,30 +90,32 @@ uint32_t ezlopi_scenes_expressions_add_to_head(uint32_t exp_id, cJSON *cj_expres
 
 /**
  * @brief POP the expression from linklist
- * 
- * @return s_ezlopi_expressions_t* 
+ *
+ * @return s_ezlopi_expressions_t*
  */
 s_ezlopi_expressions_t *ezlopi_scenes_expressions_node_pop(void);
 
 /**
  * @brief Delete the expression-item and its childs
- * 
- * @param exp_items 
+ *
+ * @param exp_items
  */
 void ezlopi_scenes_expressions_delete_exp_item(s_exp_items_t *exp_items);
 
 /**
  * @brief Delete the expression-device item name and its childs
- * 
- * @param exp_device_item_names 
+ *
+ * @param exp_device_item_names
  */
 void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_names_t *exp_device_item_names);
 
 /**
- * @brief Delete the expressions node and its childs 
- * 
- * @param exp_node 
+ * @brief Delete the expressions node and its childs
+ *
+ * @param exp_node
  */
 void ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
+
+void ezlopi_scenes_expressions_factory_info_reset(void);
 
 #endif // __EZLOPI_SCENES_EXPRESSIONS_H__

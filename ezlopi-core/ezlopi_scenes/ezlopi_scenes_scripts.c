@@ -106,9 +106,11 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
 void ezlopi_scenes_scripts_factory_info_reset(void)
 {
     l_ezlopi_scenes_script_t *script_to_delete = script_head;
-    while (script_to_delete->id)
+
+    while (NULL != script_to_delete)
     {
         ezlopi_scenes_scripts_delete_by_id(script_to_delete->id);
+        script_to_delete = script_to_delete->next;
     }
 }
 

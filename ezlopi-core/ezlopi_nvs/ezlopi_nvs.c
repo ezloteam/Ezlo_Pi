@@ -564,6 +564,20 @@ void ezlopi_nvs_delete_stored_script(uint32_t script_id)
     }
 }
 
+void ezlopi_nvs_delete_stored_expression(uint32_t exp_id)
+{
+    esp_err_t err = ESP_OK;
+    if (1 == ezlopi_nvs_init())
+    {
+        char exp_id_str[32];
+        snprintf(exp_id_str, sizeof(exp_id_str), "%08x", exp_id);
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, exp_id_str)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", exp_id_str, esp_err_to_name(err));
+        }
+    }
+}
+
 void ezlopi_nvs_factory_info_reset(void)
 {
     esp_err_t err = ESP_OK;
@@ -573,13 +587,13 @@ void ezlopi_nvs_factory_info_reset(void)
         {
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", config_nvs_name, esp_err_to_name(err));
         }
-        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, passkey_nvs_name)))
-        {
-            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", passkey_nvs_name, esp_err_to_name(err));
-        }
         if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, user_id_nvs_name)))
         {
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", user_id_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, passkey_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", passkey_nvs_name, esp_err_to_name(err));
         }
         if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, wifi_info_nvs_name)))
         {
@@ -589,9 +603,12 @@ void ezlopi_nvs_factory_info_reset(void)
         {
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", provisioning_status_nvs_name, esp_err_to_name(err));
         }
-
-        // add scenes - 121 // add this
-        // add scripts - 152    // dont need 
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, ezlopi_scenes_v2_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scenes_v2_nvs_name, esp_err_to_name(err));
+        }
+        // script-> removed in "ezlopi_scenes_scripts.c" : line 112
+        // expression -> removed in "ezlopi_scenes_expressions.c" : line 124
         // setting magic number?
     }
 }

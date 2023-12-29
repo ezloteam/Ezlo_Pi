@@ -10,6 +10,8 @@
 #include "ezlopi_http.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_scenes_scripts.h"
+#include "ezlopi_scenes_expressions.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"
@@ -707,36 +709,12 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         TRACE_D("value: %s", curr_field->value.value_string);
                         if (0 == strncmp(curr_field->name, "factory", 8))
                         {
-                            int ret = 0;
+                            ezlopi_scenes_scripts_factory_info_reset();
+                            ezlopi_scenes_expressions_factory_info_reset();
+                            ezlopi_scenes_factory_info_reset_v2();
+                            ezlopi_nvs_factory_info_reset();
 
-                            if (NULL != curr_scene)
-                            {
-
-                                ezlopi_scenes_scripts_factory_info_reset();
-
-                                // ezlopi_scenes_expressions_delete_node();
-
-                                ezlopi_scenes_factory_info_reset();
-
-                                ezlopi_nvs_factory_info_reset();
-                            }
-                            // int ret = ezlopi_factory_info_v2_factory_reset();
-                            // if (ret)
-                            // {
-                            //     TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
-                            // }
-
-                            // // //---- Remove Basic data type from storage ---------------------------
-                            // ret = ezlopi_nvs_factory_reset();
-                            // if (ret)
-                            // {
-                            //     TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
-                            // }
-                            // TRACE_B("factory reset done, rebooting now .......................");
                             esp_restart();
-                            // //--------------------------------------------------------------------
-
-                            // vTaskDelay(1000 / portTICK_RATE_MS);
                         }
                         if (0 == strncmp(curr_field->name, "soft", 5))
                         {
