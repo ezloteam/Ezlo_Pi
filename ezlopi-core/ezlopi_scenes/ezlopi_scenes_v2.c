@@ -53,6 +53,26 @@ static l_user_notification_v2_t *__user_notifications_populate(cJSON *cj_user_no
 static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_id);
 static l_scenes_list_v2_t *__scenes_populate(cJSON *cj_scene, uint32_t scene_id);
 
+void ezlopi_scene_add_users_in_notifications(l_scenes_list_v2_t *scene_node, cJSON *cj_user)
+{
+    if (scene_node && cj_user && cj_user->valuestring)
+    {
+        if (scene_node->user_notifications)
+        {
+            l_user_notification_v2_t *user_node = scene_node->user_notifications;
+            while (user_node->next)
+            {
+                user_node = user_node->next;
+            }
+            user_node->next = __new_user_notification_populate(cj_user);
+        }
+        else
+        {
+            scene_node->user_notifications = __new_user_notification_populate(cj_user);
+        }
+    }
+}
+
 uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene)
 {
     uint32_t new_scene_id = 0;

@@ -147,12 +147,6 @@ void ezlopi_scenes_init_v2(void);
 uint32_t ezlopi_store_new_scene_v2(cJSON *cj_new_scene);
 uint32_t ezlopi_scenes_get_list_v2(cJSON *cj_scenes_array);
 
-void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list);
-void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list);
-l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id);
-void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
-void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
-
 l_scenes_list_v2_t *ezlopi_scenes_get_scenes_head_v2(void);
 f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_method_type);
 const char *ezlopi_scene_get_scene_value_type_name_v2(e_scene_value_type_v2_t value_type);
@@ -170,5 +164,15 @@ char *ezlopi_scenes_create_json_string(l_scenes_list_v2_t *scenes_list);
 
 e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field);
 e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type);
+
+void ezlopi_scene_add_users_in_notifications(l_scenes_list_v2_t *scene_node, cJSON *cj_user);
+
+void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list);
+l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id);
+void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
+void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
+void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications);
+
+void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list);
 
 #endif // __EZLOPI_SCENES_V2_H__

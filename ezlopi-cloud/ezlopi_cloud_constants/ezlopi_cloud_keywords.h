@@ -174,6 +174,7 @@ extern const char *ezlopi_len_str;
 extern const char *ezlopi_total_len_str;
 extern const char *ezlopi_sequence_str;
 extern const char *ezlopi_user_id_str;
+extern const char *ezlopi_userId_str;
 extern const char *ezlopi_coinfig_time_str;
 extern const char *ezlopi_wifi_password_str;
 extern const char *ezlopi_ca_cert_str;

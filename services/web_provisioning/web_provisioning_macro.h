@@ -32,6 +32,8 @@ CLOUD_METHOD("hub.scenes.delete", scenes_delete, scene_deleted)
 CLOUD_METHOD("hub.scenes.blocks.list", scenes_blocks_list, NULL)
 CLOUD_METHOD("hub.scenes.block.data.list", scenes_block_data_list, NULL)
 CLOUD_METHOD("hub.scenes.enabled.set", scenes_enable_set, scene_changed)
+CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_changed)
+CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 // CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)

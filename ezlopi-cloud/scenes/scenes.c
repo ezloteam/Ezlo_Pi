@@ -11,6 +11,7 @@
 #include "ezlopi_meshbot_service.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_operators.h"
+#include "ezlopi_scenes_notifications.h"
 
 void scenes_list(cJSON *cj_request, cJSON *cj_response)
 {
@@ -170,8 +171,6 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
-    uint32_t scene_update_status = 0;
-
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
@@ -204,7 +203,6 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
                             {
                                 cJSON_Minify(updated_scene_str);
                                 ezlopi_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
-                                scene_update_status = 1;
 
                                 free(updated_scene_str);
                             }
@@ -216,6 +214,32 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
     }
 
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+}
+
+void scenes_notification_add(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        ezlopi_scenes_notifications_add(cj_params);
+    }
+}
+
+void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        ezlopi_scenes_notifications_remove(cj_params);
+    }
 }
 
 /////////// updater for scene

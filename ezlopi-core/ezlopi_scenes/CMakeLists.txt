@@ -2,7 +2,7 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "ezlopi_scenes_operators.c" "ezlopi_scenes_scripts.c" "ezlopi_scenes_expressions.c" "ezlopi_scenes_then_methods.c" "ezlopi_scenes_when_methods.c" "ezlopi_scenes_print.c" "ezlopi_scenes_cjson.c" "ezlopi_scenes_delete.c" "ezlopi_scenes_status_changed.c" "ezlopi_scenes_v2.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_scenes_notifications.c" "ezlopi_scenes_operators.c" "ezlopi_scenes_scripts.c" "ezlopi_scenes_expressions.c" "ezlopi_scenes_then_methods.c" "ezlopi_scenes_when_methods.c" "ezlopi_scenes_print.c" "ezlopi_scenes_cjson.c" "ezlopi_scenes_delete.c" "ezlopi_scenes_status_changed.c" "ezlopi_scenes_v2.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES trace json ezlopi_devices lua
     core ezlopi_meshbot_service)

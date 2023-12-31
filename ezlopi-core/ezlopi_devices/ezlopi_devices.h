@@ -62,12 +62,13 @@ typedef struct l_ezlopi_item
 
 typedef struct l_ezlopi_device_settings_v3
 {
-    s_ezlopi_cloud_device_settings_t cloud_properties;
     void *user_arg;
+    s_ezlopi_cloud_device_settings_t cloud_properties;
     int (*func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
     struct l_ezlopi_device_settings_v3 *next;
 
 } l_ezlopi_device_settings_v3_t;
+
 typedef struct l_ezlopi_device
 {
     uint32_t parent_device_id;

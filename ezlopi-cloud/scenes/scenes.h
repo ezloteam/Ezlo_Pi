@@ -19,6 +19,8 @@ extern "C"
     void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response);
     void scenes_run(cJSON *cj_request, cJSON *cj_response);
     void scenes_enable_set(cJSON *cj_request, cJSON *cj_response);
+    void scenes_notification_add(cJSON *cj_request, cJSON *cj_response);
+    void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response);
 
     ///////////// updaters
     void scene_changed(cJSON *cj_request, cJSON *cj_response);
