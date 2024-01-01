@@ -72,35 +72,34 @@ l_ezlopi_device_t *ezlopi_device_add_device(void)
 
 void ezlopi_device_free_device(l_ezlopi_device_t *device)
 {
-    if (device)
+    if (device && l_device_head)
     {
-        if (l_device_head)
+        if (l_device_head == device)
         {
-            if (l_device_head == device)
+            l_device_head = l_device_head->next;
+            device->next = NULL;
+
+            TRACE_D("Device-ID: %08x", device->cloud_properties.device_id);
+            ezlopi_device_free_single(device);
+        }
+        else
+        {
+            l_ezlopi_device_t *curr_device = l_device_head;
+            while (curr_device->next)
             {
-                TRACE_D("Device-ID: %08x", device->cloud_properties.device_id);
-                ezlopi_device_free_single(l_device_head);
-                l_device_head = NULL;
-            }
-            else
-            {
-                l_ezlopi_device_t *curr_device = l_device_head;
-                while (curr_device->next)
+                TRACE_D("Device-ID: %08x", curr_device->next->cloud_properties.device_id);
+                if (curr_device->next == device)
                 {
-                    TRACE_D("Device-ID: %08x", curr_device->next->cloud_properties.device_id);
-                    if (curr_device->next == device)
-                    {
-                        TRACE_E("To free Device-ID: %08x", curr_device->next->cloud_properties.device_id);
+                    TRACE_E("To free Device-ID: %08x", curr_device->next->cloud_properties.device_id);
 
-                        l_ezlopi_device_t *free_device = curr_device->next;
-                        curr_device->next = curr_device->next->next;
-                        free_device->next = NULL;
-                        ezlopi_device_free_single(free_device);
-                        break;
-                    }
-
-                    curr_device = curr_device->next;
+                    l_ezlopi_device_t *free_device = curr_device->next;
+                    curr_device->next = curr_device->next->next;
+                    free_device->next = NULL;
+                    ezlopi_device_free_single(free_device);
+                    break;
                 }
+
+                curr_device = curr_device->next;
             }
         }
     }

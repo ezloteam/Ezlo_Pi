@@ -1,4 +1,7 @@
 file(GLOB_RECURSE src_files "*.c*")
-idf_component_register(SRCS "scenes_block_list.c" "scenes_block_data_list.c" "scenes_expressions.c" "scenes_scripts.c" "scenes.c" "${src_files}"
+idf_component_register(SRCS "scenes.c" "${src_files}"
     INCLUDE_DIRS "."
-    REQUIRES frozen ezlopi_factory_info trace ezlopi_factory_info trace json ezlopi_cloud_constants ezlopi_scenes)
+    REQUIRES frozen json trace
+    ezlopi_factory_info
+    ezlopi_cloud_constants 
+    ezlopi_scenes)

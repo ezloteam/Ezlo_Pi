@@ -13,9 +13,12 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_operators.h"
 
-static cJSON *__get_device_scene_block_list(e_scenes_block_type_v2_t block_type, cJSON *cj_device_id);
-static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *cj_result, cJSON **cj_block_array, cJSON *cj_block_type);
+static cJSON *__create_when_block_cjson(l_when_block_v2_t *when_block);
+
+static bool __found_item_in_field(l_fields_v2_t *field_node, uint32_t item_id);
 static void __add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_block_array, cJSON *cj_devices_array);
+static void __add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_block_array, l_ezlopi_item_t *item_list);
+static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *cj_result, cJSON **cj_block_array, cJSON *cj_block_type);
 
 void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 {
@@ -47,88 +50,197 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-static cJSON *__get_device_scene_block_list_by_item_id(e_scenes_block_type_v2_t block_type, uint32_t item_id)
+static cJSON *__create_field_object_cjson(l_fields_v2_t *field_node)
 {
-    cJSON *cj_block = NULL;
-    l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
-    while (scene_node)
+    cJSON *cj_field = NULL;
+
+    if (field_node)
     {
-        TRACE_D("Here");
-        switch (block_type)
+        cj_field = cJSON_CreateObject();
+        if (cj_field)
         {
-        case SCENE_BLOCK_TYPE_WHEN:
-        {
-            if (scene_node->when_block)
+            const char *value_type_str = ezlopi_scene_get_scene_value_type_name_v2(field_node->value_type);
+            if (value_type_str)
             {
-                TRACE_D("Here");
-
-                l_fields_v2_t *field_node = scene_node->when_block->fields;
-                while (field_node)
+                cJSON_AddStringToObject(cj_field, ezlopi_type_str, value_type_str);
+                cJSON_AddStringToObject(cj_field, ezlopi_name_str, field_node->name);
+                if (field_node->scale)
                 {
-                    TRACE_D("field->name: %s", field_node->name);
-                    TRACE_D("field->value_type: %d", field_node->value_type);
-
-                    if (0 == strncmp("item", field_node->name, 5))
-                    {
-                        TRACE_D("item: %d", field_node->value_type);
-
-                        if (field_node->value.value_double == item_id)
-                        {
-                        }
-                        break;
-                    }
-                    field_node = field_node->next;
+                    cJSON_AddStringToObject(cj_field, ezlopi_scale_str, field_node->scale);
                 }
+
             }
             else
             {
-                TRACE_D("Here");
+                cJSON_Delete(cj_field);
+                cj_field = NULL;
             }
-
-            break;
         }
-        case SCENE_BLOCK_TYPE_THEN:
-        {
-            TRACE_D("Here");
-            break;
-        }
-        case SCENE_BLOCK_TYPE_ELSE:
-        {
-            TRACE_D("Here");
-            break;
-        }
-        default:
-        {
-
-            TRACE_D("Here");
-            break;
-        }
-        }
-
-        scene_node = scene_node->next;
     }
 
-    return cj_block;
+    return cj_field;
+}
+
+static void __add_block_options_and_fields_cjson(cJSON *cj_block, s_block_options_v2_t *block_options, l_fields_v2_t *fields_node)
+{
+    cJSON *cj_block_opt = cJSON_AddObjectToObject(cj_block, ezlopi_blockOptions_str);
+    cJSON *cj_fields = cJSON_AddArrayToObject(cj_block, ezlopi_fields_str);
+    if (cj_block_opt && cj_fields)
+    {
+        cJSON *cj_method = cJSON_AddObjectToObject(cj_block_opt, ezlopi_key_method_str);
+        if (cj_method)
+        {
+            cJSON_AddStringToObject(cj_method, ezlopi_name_str, block_options->method.name);
+            cJSON *cj_args = cJSON_AddObjectToObject(cj_method, ezlopi_args_str);
+            if (cj_args)
+            {
+                while (fields_node)
+                {
+                    cJSON_AddStringToObject(cj_args, fields_node->name, fields_node->name);
+
+                    cJSON *cj_field_obj = __create_field_object_cjson(fields_node);
+                    if (!cJSON_AddItemToArray(cj_fields, cj_field_obj))
+                    {
+                        cJSON_Delete(cj_field_obj);
+                    }
+
+                    fields_node = fields_node->next;
+                }
+            }
+        }
+    }
+}
+
+static cJSON *__create_when_block_cjson(l_when_block_v2_t *when_block)
+{
+    cJSON *cj_when_block = NULL;
+
+    if (when_block)
+    {
+        cj_when_block = cJSON_CreateObject();
+        if (cj_when_block)
+        {
+            __add_block_options_and_fields_cjson(cj_when_block, &when_block->block_options, when_block->fields);
+            cJSON_AddStringToObject(cj_when_block, ezlopi_blockType_str, ezlopi_when_str);
+        }
+    }
+
+    return cj_when_block;
+}
+
+static cJSON *__create_then_block_cjson(l_action_block_v2_t *then_block)
+{
+    cJSON *cj_then_block = NULL;
+
+    if (then_block)
+    {
+        cj_then_block = cJSON_CreateObject();
+        if (cj_then_block)
+        {
+            __add_block_options_and_fields_cjson(cj_then_block, &then_block->block_options, then_block->fields);
+            cJSON_AddStringToObject(cj_then_block, ezlopi_blockType_str, ezlopi_then_str);
+        }
+    }
+
+    return cj_then_block;
+}
+
+static cJSON *__create_else_block_cjson(l_action_block_v2_t *else_block)
+{
+    cJSON *cj_else_block = NULL;
+
+    if (else_block)
+    {
+        cj_else_block = cJSON_CreateObject();
+        if (cj_else_block)
+        {
+            __add_block_options_and_fields_cjson(cj_else_block, &else_block->block_options, else_block->fields);
+            cJSON_AddStringToObject(cj_else_block, ezlopi_blockType_str, ezlopi_else_str);
+        }
+    }
+
+    return cj_else_block;
+}
+
+static bool __found_item_in_field(l_fields_v2_t *field_node, uint32_t item_id)
+{
+    bool ret = false;
+    while (field_node)
+    {
+        if (0 == strncmp("item", field_node->name, 5))
+        {
+            if (field_node->value.value_double == item_id)
+            {
+                ret = 1;
+            }
+        }
+
+        field_node = field_node->next;
+    }
+
+    return ret;
 }
 
 static void __add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_block_array, l_ezlopi_item_t *item_list)
 {
     while (item_list)
     {
-        cJSON *cj_block = __get_device_scene_block_list_by_item_id(block_type, item_list->cloud_properties.item_id);
-        if (cj_block)
+        l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+        while (scene_node)
         {
-            TRACE_D("Here");
-            if (!cJSON_AddItemToArray(cj_block_array, cj_block))
+            cJSON *cj_block = NULL;
+
+            switch (block_type)
             {
-                cJSON_Delete(cj_block);
+            case SCENE_BLOCK_TYPE_WHEN:
+            {
+                if (scene_node->when_block)
+                {
+                    if (__found_item_in_field(scene_node->when_block->fields, item_list->cloud_properties.item_id))
+                    {
+                        cj_block = __create_when_block_cjson(scene_node->when_block);
+                    }
+                }
+                break;
             }
-        }
-        else
-        {
-            TRACE_D("Here");
+            case SCENE_BLOCK_TYPE_THEN:
+            {
+                if (scene_node->then_block)
+                {
+                    if (__found_item_in_field(scene_node->then_block->fields, item_list->cloud_properties.item_id))
+                    {
+                        // cj_block = __create_then_block_cjson(scene_node->then_block);
+                    }
+                }
+                break;
+            }
+            case SCENE_BLOCK_TYPE_ELSE:
+            {
+                if (scene_node->else_block)
+                {
+                    if (__found_item_in_field(scene_node->else_block->fields, item_list->cloud_properties.item_id))
+                    {
+                        // cj_block = __create_else_block_cjson(scene_node->else_block);
+                    }
+                }
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+
+            if (cj_block)
+            {
+
+                cj_block = NULL;
+            }
+
+            scene_node = scene_node->next;
         }
 
+        // __get_device_scene_block_list_by_item_id(block_type, item_list->cloud_properties.item_id, cj_block_array);
         item_list = item_list->next;
     }
 }
