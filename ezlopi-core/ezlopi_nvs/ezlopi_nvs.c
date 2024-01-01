@@ -607,8 +607,9 @@ void ezlopi_nvs_factory_info_reset(void)
         {
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scenes_v2_nvs_name, esp_err_to_name(err));
         }
-        // script-> removed in "ezlopi_scenes_scripts.c" : line 112
-        // expression -> removed in "ezlopi_scenes_expressions.c" : line 124
-        // setting magic number?
+
+        // script-> removed inside : "ezlopi_scenes_scripts.c" : line 112
+        // expression -> removed inside : "ezlopi_scenes_expressions.c" : line 124
+       
     }
 }

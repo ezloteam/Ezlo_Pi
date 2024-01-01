@@ -118,11 +118,9 @@ void ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node)
 
 void ezlopi_scenes_expressions_factory_info_reset(void)
 {
-    s_ezlopi_expressions_t *current_exp_node = l_expressions_head;
-    while (NULL != current_exp_node)
+    if (l_expressions_head)
     {
-        ezlopi_scenes_expressions_delete_node(current_exp_node);
-        current_exp_node = current_exp_node->next;
+        ezlopi_scenes_expressions_delete_node(l_expressions_head);
     }
 }
 
@@ -235,7 +233,6 @@ static s_exp_device_item_names_t *__expressions_device_item_names_create(cJSON *
 
 static void __expressions_device_item_names_add(s_ezlopi_expressions_t *exp_node, cJSON *cj_device_item_names)
 {
-
     if (cj_device_item_names)
     {
         uint32_t dev_item_name_index = 0;

@@ -29,6 +29,22 @@
 #include "mbedtls/certs.h"
 #endif
 
+
+//---------------------------------------------------------------------------------------
+typedef struct s_ezlopi_scenes_then_methods_send_http
+{
+    char web_port[5];
+    char url[196];
+    char web_server[96];
+    char header[256];
+    char content[384];
+    char username[32];
+    char password[32];
+    bool skip_cert_common_name_check;
+    esp_http_client_method_t method;
+} s_ezlopi_scenes_then_methods_send_http_t;
+
+
 static void __https_using_mbedTLS(const char *web_server, const char *web_port, const char *url_req)
 {
     char tmp_buf[512];
@@ -404,20 +420,6 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
     return 0;
 }
 
-//---------------------------------------------------------------------------------------
-typedef struct s_ezlopi_scenes_then_methods_send_http
-{
-    char web_port[5];
-    char url[196];
-    char web_server[96];
-    char header[256];
-    char content[384];
-    char username[32];
-    char password[32];
-    bool skip_cert_common_name_check;
-    esp_http_client_method_t method;
-} s_ezlopi_scenes_then_methods_send_http_t;
-
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
@@ -701,11 +703,11 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         TRACE_D("value: %s", curr_field->value.value_string);
                         if (0 == strncmp(curr_field->name, "factory", 8))
                         {
-                            
                             ezlopi_scenes_scripts_factory_info_reset();
                             ezlopi_scenes_expressions_factory_info_reset();
-                            ezlopi_scenes_factory_info_reset_v2();
+                            // ezlopi_scenes_factory_info_reset_v2();
                             ezlopi_nvs_factory_info_reset();
+                            // ezlopi_device_factory_info_reset();
                             esp_restart();
                         }
                         if (0 == strncmp(curr_field->name, "soft", 5))

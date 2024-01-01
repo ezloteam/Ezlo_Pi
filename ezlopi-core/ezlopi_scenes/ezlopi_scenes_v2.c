@@ -235,13 +235,10 @@ void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
 
 void ezlopi_scenes_factory_info_reset_v2(void)
 {
-    l_scenes_list_v2_t *scene_to_delete = scenes_list_head_v2;
-    while (scene_to_delete->_id)
+    if (scenes_list_head_v2)
     {
-        // the head is moved within 'ezlopi_scenes_pop_by_id_v2' function
-        ezlopi_scenes_depopulate_by_id_v2(scene_to_delete->_id);
+        ezlopi_scenes_delete(scenes_list_head_v2);
     }
-    // you can clear the vs here but better do it in 'ezlopi_nvs.c'
 }
 
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
