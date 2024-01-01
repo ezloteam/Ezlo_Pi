@@ -126,6 +126,17 @@ void ezlopi_device_free_device_by_item(l_ezlopi_item_t *item)
     }
 }
 
+void ezlopi_device_factory_info_reset(void)
+{
+    // clear all devices, along with their : items and settings
+    l_ezlopi_device_t *curr_device = l_device_head;
+    while (curr_device->next)
+    {
+        ezlopi_device_free_device(curr_device); // clears
+        curr_device = curr_device->next;
+    }
+}
+
 l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id)
 {
     l_ezlopi_item_t *item_to_return = NULL;
@@ -461,21 +472,29 @@ static void ezlopi_device_free_item(l_ezlopi_item_t *items)
     free(items);
 }
 
-// static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3 *settings)
-// {
-//     if (settings->next)
-//     {
-//         ezlopi_device_free_item(settings->next);
-//     }
+static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t *settings)
+{
+    if (settings->next)
+    {
+        ezlopi_device_free_item(settings->next);
+    }
 
-//     free(settings);
-// }
+    free(settings);
+}
 
 static void ezlopi_device_free(l_ezlopi_device_t *device)
 {
     if (device->items)
     {
-        ezlopi_device_free_item(device->items);
+        ezlopi_device_free_item(device->items); // recursive item clearing
+    }
+    if (device->settings)
+    {
+        ezlopi_device_free_setting(device->settings); // recursive settings clearing
+    }
+    if (NULL != device->cloud_properties.info) // if info object is created
+    {
+        cJSON_Delete(device->cloud_properties.info);
     }
     free(device);
 }
