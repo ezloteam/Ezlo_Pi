@@ -304,8 +304,7 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
     // s_ezlopi_http_data_t *http_reply = NULL;
 #endif
     char REQUEST[1024] = {'\0'}; // need to make it dynamic
-    int limit = sizeof(REQUEST);
-    int size = 0;
+    int limit = 0;
     switch (config->method)
     {
     case HTTP_METHOD_GET:
@@ -336,10 +335,9 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
         break;
     }
     // adding 'Headers' to request_buffer
-    limit -= (strlen(REQUEST) + 1);
-    limit = (limit < 0) ? 0 : limit;
-    size = (strlen(config->header) + 1) + 3;
-    if (size < limit)
+
+    limit = _limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->header) + 1) + 3);
+    if (limit > 0)
     {
         snprintf(REQUEST + (strlen(REQUEST)),
                  limit,
@@ -347,10 +345,8 @@ static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_s
                  config->header);
     }
     // adding content body to request
-    limit -= (strlen(REQUEST) + 1);
-    limit = (limit < 0) ? 0 : limit;
-    size = (strlen(config->content) + 1) + 3;
-    if (size < limit)
+    limit = _limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->content) + 1) + 3);
+    if (limit > 0)
     {
         snprintf(REQUEST + (strlen(REQUEST)),
                  limit,
