@@ -731,6 +731,8 @@ static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
     return ret;
 }
 
+
+
 int ezlopi_factory_info_v2_factory_reset(void)
 {
     int ret = 0;
@@ -787,6 +789,8 @@ static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_
 
     return read_string;
 }
+
+
 
 #if 0
 /**********************************************************************************/

@@ -713,8 +713,8 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                 {
                     if (EZLOPI_VALUE_TYPE_ENUM == curr_field->value_type)
                     {
-                        TRACE_D("value: %s", curr_field->value.value_string);
-                        if (0 == strncmp(curr_field->name, "factory", 8))
+                        TRACE_I("value: %s", curr_field->value.value_string);
+                        if (0 == strncmp(curr_field->value.value_string, "factory", 8))
                         {
                             // ezlopi_scenes_scripts_factory_info_reset();
                             // ezlopiscenes_expressions_factory_info_reset();
@@ -722,13 +722,12 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             // ezlopi_device_factory_info_reset();
                             TRACE_E("Factory Reseting ESP......................... ");
                             ezlopi_nvs_factory_info_reset();
-                            vTaskDelay(1000 / portTICK_RATE_MS);
                             esp_restart();
                         }
-                        if (0 == strncmp(curr_field->name, "soft", 5))
+                        if (0 == strncmp(curr_field->value.value_string, "soft", 5))
                         {
                             TRACE_E("Rebooting ESP......................... ");
-                            vTaskDelay(1000 / portTICK_RATE_MS);
+                            ezlopi_nvs_soft_reset();
                             esp_restart();
                         }
                     }
