@@ -116,6 +116,6 @@ void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_na
  */
 void ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
 
-void ezlopi_scenes_expressions_factory_info_reset(void);
+// void ezlopi_scenes_expressions_factory_info_reset(void);
 
 #endif // __EZLOPI_SCENES_EXPRESSIONS_H__

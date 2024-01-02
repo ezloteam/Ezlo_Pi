@@ -607,9 +607,17 @@ void ezlopi_nvs_factory_info_reset(void)
         {
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scenes_v2_nvs_name, esp_err_to_name(err));
         }
-
-        // script-> removed inside : "ezlopi_scenes_scripts.c" : line 112
-        // expression -> removed inside : "ezlopi_scenes_expressions.c" : line 124
-       
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, ezlopi_scripts_nvs_ids)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scripts_nvs_ids, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, ezlopi_scenes_expression_ids)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scenes_expression_ids, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, settings_initialized_status_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", settings_initialized_status_name, esp_err_to_name(err));
+        }
     }
 }

@@ -116,13 +116,13 @@ void ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node)
     }
 }
 
-void ezlopi_scenes_expressions_factory_info_reset(void)
-{
-    if (l_expressions_head)
-    {
-        ezlopi_scenes_expressions_delete_node(l_expressions_head);
-    }
-}
+// void ezlopi_scenes_expressions_factory_info_reset(void)
+// {
+//     if (l_expressions_head)
+//     {
+//         ezlopi_scenes_expressions_delete_node(l_expressions_head);
+//     }
+// }
 
 void ezlopi_scenes_expressions_init(void)
 {

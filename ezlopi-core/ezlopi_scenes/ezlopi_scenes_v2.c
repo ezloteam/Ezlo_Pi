@@ -233,13 +233,13 @@ void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
     }
 }
 
-void ezlopi_scenes_factory_info_reset_v2(void)
-{
-    if (scenes_list_head_v2)
-    {
-        ezlopi_scenes_delete(scenes_list_head_v2);
-    }
-}
+// void ezlopi_scenes_factory_info_reset_v2(void)
+// {
+//     if (scenes_list_head_v2)
+//     {
+//         ezlopi_scenes_delete(scenes_list_head_v2);
+//     }
+// }
 
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
 {

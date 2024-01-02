@@ -716,11 +716,13 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         TRACE_D("value: %s", curr_field->value.value_string);
                         if (0 == strncmp(curr_field->name, "factory", 8))
                         {
-                            ezlopi_scenes_scripts_factory_info_reset();
-                            ezlopi_scenes_expressions_factory_info_reset();
+                            // ezlopi_scenes_scripts_factory_info_reset();
+                            // ezlopiscenes_expressions_factory_info_reset();
                             // ezlopi_scenes_factory_info_reset_v2();
-                            ezlopi_nvs_factory_info_reset();
                             // ezlopi_device_factory_info_reset();
+                            TRACE_E("Factory Reseting ESP......................... ");
+                            ezlopi_nvs_factory_info_reset();
+                            vTaskDelay(1000 / portTICK_RATE_MS);
                             esp_restart();
                         }
                         if (0 == strncmp(curr_field->name, "soft", 5))
