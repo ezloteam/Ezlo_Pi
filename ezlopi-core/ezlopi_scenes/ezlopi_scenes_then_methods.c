@@ -29,6 +29,8 @@
 #include "mbedtls/certs.h"
 #endif
 
+//---------------------------------------------------------------------------------------
+// #define
 
 //---------------------------------------------------------------------------------------
 typedef struct s_ezlopi_scenes_then_methods_send_http
@@ -44,6 +46,53 @@ typedef struct s_ezlopi_scenes_then_methods_send_http
     esp_http_client_method_t method;
 } s_ezlopi_scenes_then_methods_send_http_t;
 
+int _parse_web_host_name(char *dest_addr, int dest_limit, char *src_addr)
+{
+    int ret = 0;
+    char *start = strstr(src_addr, "://");
+    if (start != NULL)
+    {
+        start += 3;
+        int buf_size = dest_limit;
+        int length = 0;
+        char *end = strchr(start, '/');
+        if (end != NULL)
+        {
+            length = end - start;
+            if ((length + 1) < buf_size)
+            {
+                snprintf(dest_addr, length + 1, "%s", start);
+            }
+        }
+        else
+        {
+            char *ptr = src_addr;
+            length = strlen(src_addr) - (int)(start - ptr);
+            if ((length + 1) < buf_size)
+            {
+                snprintf(dest_addr, length + 1, "%s", (ptr + ((int)(start - ptr))));
+            }
+        }
+        dest_addr[buf_size] = '\0';
+        ret = 1;
+    }
+    else
+    {
+        TRACE_E("Cannot find web_server/host_name");
+    }
+    return ret;
+}
+
+int _limit_size_check(char *dest_buff, int dest_size, int reqd_size)
+{
+    int limit = dest_size - (strlen(dest_buff) + 1);
+    limit = (limit < 0) ? 0 : limit;
+    if (limit > reqd_size)
+    {
+        return limit;
+    }
+    return 0;
+}
 
 static void __https_using_mbedTLS(const char *web_server, const char *web_port, const char *url_req)
 {
@@ -225,6 +274,7 @@ exit:
     mbedtls_entropy_free(&entropy);
     TRACE_I("Completed a request");
 }
+
 static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
 {
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
@@ -457,37 +507,12 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
                         snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80");
-                        char *start = strstr(curr_field->value.value_string, "://");
-                        if (start != NULL)
-                        {
-                            start += 3;
-                            int buf_size = sizeof(tmp_http_data->web_server);
-                            int length = 0;
-                            char *end = strchr(start, '/');
-                            if (end != NULL)
-                            {
-                                length = end - start;
-                                if ((length + 1) < buf_size)
-                                {
-                                    snprintf(tmp_http_data->web_server, length + 1, "%s", start);
-                                }
-                            }
-                            else
-                            {
-                                char *ptr = curr_field->value.value_string;
-                                length = strlen(curr_field->value.value_string) - (int)(start - ptr);
-                                if ((length + 1) < buf_size)
-                                {
-                                    snprintf(tmp_http_data->web_server, length + 1, "%s", (ptr + ((int)(start - ptr))));
-                                }
-                            }
-                            tmp_http_data->web_server[buf_size] = '\0';
-                        }
+
+                        _parse_web_host_name(tmp_http_data->web_server, sizeof(tmp_http_data->web_server), curr_field->value.value_string);
+
                         // 1. adding 'User-Agent & host' to header-buffer
-                        int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                        limit = (limit < 0) ? 0 : limit;
-                        int size = (6 + (strlen(tmp_http_data->web_server) + 1)) + 3;
-                        if (size < limit)
+                        int limit = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (6 + (strlen(tmp_http_data->web_server) + 1)) + 3);
+                        if (limit > 0)
                         {
                             snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
                                      limit,
@@ -531,10 +556,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         // cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
                         // 2. adding 'Content-Type' to header-buffer
-                        int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                        limit = (limit < 0) ? 0 : limit;
-                        int size = (14 + strlen(curr_field->value.value_string)) + 3;
-                        if (size < limit)
+                        int limit = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + strlen(curr_field->value.value_string)) + 3);
+                        if (limit > 0)
                         {
                             snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
                                      limit,
@@ -560,10 +583,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             snprintf(str, sizeof(str), "%d", i);
                             // cJSON_AddStringToObject(cj_header, "Content-Length", str);
                             // 3. adding 'Content-Length' to header-buffer
-                            int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                            limit = (limit < 0) ? 0 : limit;
-                            int size = (16 + strlen(str)) + 3;
-                            if (size < limit)
+                            int limit = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (16 + strlen(str)) + 3);
+                            if (limit > 0)
                             {
                                 snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
                                          limit,
@@ -579,16 +600,14 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (NULL != curr_field->value.value_json)
                         {
-                            int limit = 0, size = 0;
+                            int limit = 0;
                             cJSON *header = (curr_field->value.value_json->child);
                             while (header)
                             {
                                 // cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
                                 // 4. adding 'remaining' to header-buffer
-                                limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                                limit = (limit < 0) ? 0 : limit;
-                                size = ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3;
-                                if (size < limit)
+                                limit = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3);
+                                if (limit > 0)
                                 {
                                     snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
                                              limit,
@@ -606,10 +625,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
                         // 4. adding 'remaining' to header-buffer
-                        int limit = sizeof(tmp_http_data->header) - (strlen(tmp_http_data->header) + 1);
-                        limit = (limit < 0) ? 0 : limit;
-                        int size = (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3;
-                        if (size < limit)
+                        int limit = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3);
+                        if (limit > 0)
                         {
                             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
                                      limit,
