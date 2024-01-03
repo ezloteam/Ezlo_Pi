@@ -74,6 +74,7 @@ extern "C"
     int ezlopi_nvs_write_scenes_expressions(char *data);
     void ezlopi_nvs_delete_stored_expression(uint32_t exp_id);
 
+    void ezlopi_nvs_soft_reset(void);
     void ezlopi_nvs_factory_info_reset(void);
 
 #ifdef __cplusplus

@@ -12,8 +12,8 @@
 #include "ezlopi_scenes_scripts.h"
 #include "ezlopi_scenes_expressions.h"
 #include "ezlopi_devices_list.h"
-#include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"
+#include "ezlopi_factory_info.h"
 #include "ezlopi_scenes_then_methods.h"
 #include "esp_crt_bundle.h"
 #include "esp_tls.h"
@@ -117,7 +117,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
                                      NULL, 0)) != 0)
     {
         TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
-        // abort();
         goto exit;
     }
     TRACE_I("Attaching the certificate bundle...");
@@ -127,7 +126,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     if (ret < 0)
     {
         TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
-        // abort();
         goto exit;
     }
     TRACE_I("Setting hostname for TLS session...");
@@ -136,7 +134,6 @@ static void __https_using_mbedTLS(const char *web_server, const char *web_port, 
     if ((ret = mbedtls_ssl_set_hostname(&ssl, web_server)) != 0)
     {
         TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
-        // abort();
         goto exit;
     }
 
@@ -567,13 +564,13 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
                         snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", curr_field->value.value_string);
-                        uint32_t i = 0;                                         // variable to store 'content-length'
-                        for (; i < strlen(curr_field->value.value_string); i++) // compare with incoming -> 'value_string'
+                        uint32_t i = 0; // variable to store 'content-length'
+                        for (; i < strlen(curr_field->value.value_string); i++)
                         {
                             if ('\0' == tmp_http_data->content[i])
                                 break;
                         }
-                        if (i > 0) // '\r\n'
+                        if (i > 0)
                         {
                             char str[i];
                             snprintf(str, sizeof(str), "%d", i);
@@ -692,8 +689,21 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *
 }
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    cJSON *cj_params = cJSON_CreateObject();
+
+    if (cj_params)
+    {
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
+        if (curr_then)
+        {
+            TRACE_E("Rebooting ESP......................... ");
+            esp_restart();
+        }
+
+        cJSON_Delete(cj_params);
+    }
+    return ret;
 }
 
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
@@ -721,13 +731,20 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             // ezlopi_scenes_factory_info_reset_v2();
                             // ezlopi_device_factory_info_reset();
                             TRACE_E("Factory Reseting ESP......................... ");
+                            // clear the settings realated to scenes, devices, items, rooms,etc
+                            ezlopi_device_factory_info_reset();
                             ezlopi_nvs_factory_info_reset();
+                            ezlopi_factory_info_soft_reset(); // only affects wifi sector
+
                             esp_restart();
                         }
                         if (0 == strncmp(curr_field->value.value_string, "soft", 5))
                         {
-                            TRACE_E("Rebooting ESP......................... ");
+
                             ezlopi_nvs_soft_reset();
+                            ezlopi_factory_info_soft_reset(); // only affects wifi sector
+                            TRACE_E("Rebooting ESP......................... ");
+                            vTaskDelay(1000 / portTICK_PERIOD_MS);
                             esp_restart();
                         }
                     }

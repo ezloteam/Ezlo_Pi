@@ -208,6 +208,8 @@ typedef struct s_basic_factory_info
 
     void ezlopi_factory_info_v2_free(void *arg);
     int ezlopi_factory_info_v2_factory_reset(void);
+    int ezlopi_factory_info_soft_reset(void);
+    int ezlopi_factory_info_v2_hard_reset(void);
 
 #ifdef __cplusplus
 }

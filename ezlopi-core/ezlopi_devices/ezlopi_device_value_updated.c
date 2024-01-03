@@ -45,7 +45,6 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
 int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_v3_t *setting)
 {
     int ret = 0;
-
     if (setting)
     {
         l_ezlopi_device_t *curr_device = ezlopi_device_get_head();

@@ -46,6 +46,8 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
             break;
         }
+        case EZLOPI_VALUE_TYPE_ENUM:
+        case EZLOPI_VALUE_TYPE_TOKEN:
         case EZLOPI_VALUE_TYPE_STRING:
         {
             TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
@@ -60,7 +62,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         {
             TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
             break;
-        }
+        }        
         case EZLOPI_VALUE_TYPE_BLOCKS:
         {
             ezlopi_print_when_blocks((l_when_block_v2_t *)fields->value.when_block);
@@ -68,13 +70,25 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         }
         case EZLOPI_VALUE_TYPE_CREDENTIAL:
         case EZLOPI_VALUE_TYPE_DICTIONARY:
+        {
+            char *fields_json_value = cJSON_PrintUnformatted(fields->value.value_json);
+            if (fields_json_value)
+            {
+                TRACE_D("\t\t\t|-- value: %s", fields_json_value);
+                free(fields_json_value);
+            }
+            else
+            {
+                TRACE_E("Value type not matched!");
+            }
+            break;
+        }
         case EZLOPI_VALUE_TYPE_ARRAY:
         case EZLOPI_VALUE_TYPE_RGB:
         case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
         case EZLOPI_VALUE_TYPE_USER_CODE:
         case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
         case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-        case EZLOPI_VALUE_TYPE_TOKEN:
         case EZLOPI_VALUE_TYPE_BUTTON_STATE:
         case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
         case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:

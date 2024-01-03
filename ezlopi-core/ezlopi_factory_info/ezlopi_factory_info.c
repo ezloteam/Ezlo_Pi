@@ -731,7 +731,19 @@ static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
     return ret;
 }
 
-
+int ezlopi_factory_info_soft_reset(void)
+{
+    int ret = 0;
+    if (ezlopi_factory_info_v2_set_wifi("ezlopitest", "ezlopitest"))
+    {
+        ret = 1;
+    }
+    else
+    {
+        TRACE_B("Could not activate soft reset");
+    }
+    return ret;
+}
 
 int ezlopi_factory_info_v2_factory_reset(void)
 {
@@ -745,6 +757,14 @@ int ezlopi_factory_info_v2_factory_reset(void)
         }
     }
 
+    return ret;
+}
+
+int ezlopi_factory_info_v2_hard_reset(void)
+{
+    int ret = 0;
+    ret = ezlopi_factory_info_v2_factory_reset();
+    ret = ezlopi_nvs_factory_reset();
     return ret;
 }
 
@@ -789,8 +809,6 @@ static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_
 
     return read_string;
 }
-
-
 
 #if 0
 /**********************************************************************************/

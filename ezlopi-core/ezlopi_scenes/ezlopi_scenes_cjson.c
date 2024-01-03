@@ -250,6 +250,7 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_v2_t *field
                         }
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_TOKEN:
                     case EZLOPI_VALUE_TYPE_DICTIONARY:
                     case EZLOPI_VALUE_TYPE_ARRAY:
                     case EZLOPI_VALUE_TYPE_RGB:
@@ -257,7 +258,6 @@ static void ezlopi_scenes_cjson_add_fields(cJSON *cj_block, l_fields_v2_t *field
                     case EZLOPI_VALUE_TYPE_USER_CODE:
                     case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
                     case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-                    case EZLOPI_VALUE_TYPE_TOKEN:
                     case EZLOPI_VALUE_TYPE_BUTTON_STATE:
                     case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
                     case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
