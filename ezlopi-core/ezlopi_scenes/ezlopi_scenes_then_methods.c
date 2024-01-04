@@ -726,15 +726,12 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                         TRACE_I("value: %s", curr_field->value.value_string);
                         if (0 == strncmp(curr_field->value.value_string, "factory", 8))
                         {
-                            // ezlopi_scenes_scripts_factory_info_reset();
-                            // ezlopiscenes_expressions_factory_info_reset();
-                            // ezlopi_scenes_factory_info_reset_v2();
-                            // ezlopi_device_factory_info_reset();
                             TRACE_E("Factory Reseting ESP......................... ");
                             // clear the settings realated to scenes, devices, items, rooms,etc
+                            ezlopi_scenes_scripts_factory_info_reset();
                             ezlopi_device_factory_info_reset();
-                            ezlopi_nvs_factory_info_reset();
-                            ezlopi_factory_info_soft_reset(); // only affects wifi sector
+                            ezlopi_nvs_factory_info_reset();  // 'nvs' partitions
+                            ezlopi_factory_info_soft_reset(); // 'ID' partition :- 'wifi' sector
 
                             esp_restart();
                         }
@@ -758,6 +755,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
     }
     return ret;
 }
+
 int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");

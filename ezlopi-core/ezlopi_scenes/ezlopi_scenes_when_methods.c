@@ -157,8 +157,96 @@ int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t *scene_node, void
 
 int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_W("Warning: when-method 'is_button_state' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    if (when_block)
+    {
+        uint32_t item_id = 0;
+        l_fields_v2_t *value_field = NULL;
+
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                item_id = strtoul(curr_field->value.value_string, NULL, 16); // base 16
+            }
+            else if (0 == strncmp(curr_field->name, "value", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type)
+                {
+                    // Here !! token_type is a -> "string"  | eg. "released"
+                    //------------------------------------------------------------------------------
+                    // const char *button_actions[] = {
+                    //     "idle",
+                    //     "press_1_time",
+                    //     "released",
+                    //     "...",
+                    // };
+                    // for (;;)
+                    // {
+                    //     if (button_actions[] == curr_field->value)
+                    //     {
+                    //         //value_field = curr_field;
+                    //     }
+                    // }
+                    //------------------------------------------------------------------------------
+
+                    value_field = curr_field; // pass the pointer holding the ->  button_actions:'released'
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && value_field)
+        {
+            // "value": {button_number = 1, button_state = "press_1_time"},
+
+            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+            while (curr_device)
+            {
+                l_ezlopi_item_t *curr_item = curr_device->items;
+                while (curr_item)
+                {
+                    if (item_id == curr_item->cloud_properties.item_id) // perticular item with name->button_state
+                    {
+                        cJSON *cj_tmp_value = cJSON_CreateObject();
+                        if (cj_tmp_value)
+                        {
+                            curr_item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, curr_item, (void *)cj_tmp_value, NULL);
+                            if (EZLOPI_VALUE_TYPE_BUTTON_STATE == curr_field->value_type)
+                            {
+                                cJSON *cj_value = cJSON_GetObjectItem(cj_tmp_value, "value"); //
+                                if (cj_value)
+                                {
+                                    switch (cj_value->type)
+                                    {
+                                    case cJSON_String:
+                                    {
+                                        uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->value.value_string);
+                                        if (0 == strncmp(cj_value->valuestring, value_field->value.value_string, cmp_size))
+                                        {
+                                            ret = 1;
+                                        }
+                                        break;
+                                    }
+                                    default:
+                                    {
+                                        TRACE_E("Value type mis-matched!");
+                                    }
+                                    }
+                                }
+                            }
+                            cJSON_Delete(cj_tmp_value);
+                        }
+                    }
+                    curr_item = curr_item->next;
+                }
+                curr_device = curr_device->next;
+            }
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
@@ -169,7 +257,35 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
 
 int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_W("Warning: when-method 'is_date' not implemented!");
+    int ret = 0;
+    if (scene_node)
+    {
+        l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "type", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                {
+                }
+            }
+            if (0 == strncmp(curr_field->name, "time", 5))
+            {
+            }
+            if (0 == strncmp(curr_field->name, "weekdays", 9))
+            {
+            }
+            if (0 == strncmp(curr_field->name, "days", 5))
+            {
+            }
+            if (0 == strncmp(curr_field->name, "time", 5))
+            {
+            }
+            curr_field = curr_field->next;
+        }
+    }
     return 0;
 }
 

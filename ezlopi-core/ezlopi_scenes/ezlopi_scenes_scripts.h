@@ -36,5 +36,5 @@ void ezlopi_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node);
 void ezlopi_scenes_scripts_run_by_id(uint32_t script_id);
 void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id);
 
-// void ezlopi_scenes_scripts_factory_info_reset(void);
+void ezlopi_scenes_scripts_factory_info_reset(void);
 #endif // __EZLOPI_LUA_H__

@@ -103,15 +103,14 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     }
 }
 
-void ezlopi_scenes_scripts_factory_info_reset(void)
+void ezlopi_scenes_scripts_factory_info_reset(void) 
 {
-    // if (NULL != script_head)
-    // {
-    //     while (script_head)
-    //     {
-    //         ezlopi_scenes_scripts_delete_by_id(script_head->id);
-    //     }
-    // }
+    l_ezlopi_scenes_script_t *curr_script = ezlopi_scenes_scripts_get_head();
+
+    while (curr_script)
+    {
+        ezlopi_scenes_scripts_delete_by_id(curr_script->id);
+    }
 }
 
 uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
