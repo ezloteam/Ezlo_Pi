@@ -702,7 +702,7 @@ static l_fields_v2_t *__fields_populate(cJSON *cj_fields)
         cJSON *cj_field = NULL;
         while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, fields_idx++)))
         {
-            if (tmp_fields_head)
+            if (tmp_fields_head)//?
             {
                 l_fields_v2_t *tmp_flield = tmp_fields_head;
                 while (tmp_flield->next)
