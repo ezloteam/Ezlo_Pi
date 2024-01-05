@@ -24,6 +24,7 @@ static const char *settings_initialized_status_name = "settings_magic";
 static const char *config_info_update_time_name = "config_time";
 static const char *config_info_version_number = "conf_ver_no";
 static const char *ezlopi_scenes_expression_ids = "ezlopi_exp";
+static const char *ezlopi_room_ids_nvs_name = "ezlopi_room";
 
 int ezlopi_nvs_init(void)
 {
@@ -161,6 +162,16 @@ int ezlopi_nvs_write_scenes_expressions(char *data)
 char *ezlopi_nvs_read_scenes_expressions(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_expression_ids);
+}
+
+char *ezlopi_nvs_read_room_ids(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_room_ids_nvs_name);
+}
+
+void ezlopi_nvs_write_room_ids(char *data)
+{
+    return ezlopi_nvs_write_str(data, strlen(data), ezlopi_room_ids_nvs_name);
 }
 
 int ezlopi_nvs_write_config_data_str(char *data)

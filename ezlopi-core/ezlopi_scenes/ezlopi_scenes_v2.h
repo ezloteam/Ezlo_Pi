@@ -56,12 +56,24 @@ typedef struct s_action_delay_v2
     uint16_t seconds;
 } s_action_delay_v2_t;
 
+typedef enum e_value_type
+{
+    VALUE_TYPE_UNDEFINED = 0,
+    VALUE_TYPE_NUMBER,
+    VALUE_TYPE_STRING,
+    VALUE_TYPE_BOOL,
+    VALUE_TYPE_CJSON,
+    VALUE_TYPE_BLOCK,
+    VALUE_TYPE_MAX
+} e_value_type_t;
+
 typedef union u_field_value_v2
 {
+    e_value_type_t type;
     char *value_string;
     double value_double;
-    int value_int;
-    uint32_t value_uint;
+    // int value_int;
+    // uint32_t value_uint;
     bool value_bool;
     cJSON *cj_value;
     struct l_when_block_v2 *when_block;
@@ -74,7 +86,7 @@ typedef struct l_fields_v2
     e_scene_value_type_v2_t value_type; // 0: double, 1: string
     u_field_value_v2_t value;
     char *scale;
-    void *user_arg;
+    void *user_arg; // user by when-methods
     struct l_fields_v2 *next;
 } l_fields_v2_t;
 
@@ -153,14 +165,6 @@ const char *ezlopi_scene_get_scene_value_type_name_v2(e_scene_value_type_v2_t va
 
 l_scenes_list_v2_t *ezlopi_scenes_get_by_id_v2(uint32_t _id);
 l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32_t scene_id);
-
-cJSON *ezlopi_scenes_cjson_create_then_block(l_action_block_v2_t *then_block);
-cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);
-void ezlopi_scenes_cjson_add_then_blocks(cJSON *root, l_action_block_v2_t *then_blocks);
-void ezlopi_scenes_cjson_add_when_blocks(cJSON *root, l_when_block_v2_t *when_blocks);
-cJSON *ezlopi_scenes_create_cjson_scene(l_scenes_list_v2_t *scene);
-cJSON *ezlopi_scenes_create_cjson_scene_list(l_scenes_list_v2_t *scenes_list);
-char *ezlopi_scenes_create_json_string(l_scenes_list_v2_t *scenes_list);
 
 e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field);
 e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type);

@@ -96,4 +96,7 @@ void ezlopi_cloud_update_script_id(uint32_t a_script_id);
 uint32_t ezlopi_cloud_generate_expression_id(void);
 void ezlopi_cloud_update_expression_id(uint32_t a_expression_id);
 
+uint32_t ezlopi_cloud_generate_room_id(void);
+void ezlopi_cloud_update_room_id(uint32_t a_room_id);
+
 #endif // __EZLOPI_CLOUD_H__

@@ -10,6 +10,7 @@ static const uint32_t SETTINGS_ID_START = 0x50000000;
 static const uint32_t SCENE_ID_START = 0x60000000;
 static const uint32_t SCRIPT_ID_START = 0x70000000;
 static const uint32_t EXPRESSION_ID_START = 0x80000000;
+static const uint32_t ROOM_ID_START = 0x90000000;
 
 static uint32_t g_device_id = 0;
 static uint32_t g_item_id = 0;
@@ -19,6 +20,7 @@ static uint32_t g_settings_id = 0;
 static uint32_t g_scene_id = 0;
 static uint32_t g_script_id = 0;
 static uint32_t g_expression_id = 0;
+static uint32_t g_room_id = 0;
 
 static uint32_t ezlopi_get_mac_crc(void)
 {
@@ -142,4 +144,14 @@ uint32_t ezlopi_cloud_generate_expression_id(void)
 {
     g_expression_id = (0 == g_expression_id) ? (EXPRESSION_ID_START + ezlopi_get_mac_crc()) : (g_expression_id + 1);
     return g_expression_id;
+}
+
+void ezlopi_cloud_update_room_id(uint32_t a_room_id)
+{
+    g_room_id = (a_room_id > g_room_id) ? a_room_id : g_room_id;
+}
+uint32_t ezlopi_cloud_generate_room_id(void)
+{
+    g_room_id = (0 == g_room_id) ? (ROOM_ID_START + ezlopi_get_mac_crc()) : (g_room_id + 1);
+    return g_room_id;
 }

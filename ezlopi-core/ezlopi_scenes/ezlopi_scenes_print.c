@@ -138,6 +138,8 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             break;
         }
         }
+
+        fields = fields->next;
     }
     TRACE_D("\t\t\t|------------------------------------");
 }

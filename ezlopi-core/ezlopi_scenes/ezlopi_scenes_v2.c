@@ -14,6 +14,7 @@
 #include "ezlopi_scenes_when_methods.h"
 #include "ezlopi_scenes_then_methods.h"
 #include "ezlopi_scenes_status_changed.h"
+#include "ezlopi_scenes_cjson.h"
 
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
 
@@ -171,6 +172,9 @@ uint32_t ezlopi_scenes_get_list_v2(cJSON *cj_scenes_array)
                         cJSON *cj_scene = cJSON_Parse(scene_str);
                         if (cj_scene)
                         {
+                            char scene_id_str[32];
+                            snprintf(scene_id_str, sizeof(scene_id_str), "%08x", (uint32_t)cj_scene_id->valuedouble);
+                            cJSON_AddStringToObject(cj_scene, ezlopi__id_str, scene_id_str);
                             if (!cJSON_AddItemToArray(cj_scenes_array, cj_scene))
                             {
                                 cJSON_Delete(cj_scene);
@@ -344,8 +348,15 @@ void ezlopi_scenes_init_v2(void)
                         cJSON *cj_scene = cJSON_Parse(scene_str);
                         if (cj_scene)
                         {
-                            __scenes_populate(cj_scene, scene_id);
+                            l_scenes_list_v2_t *new_scene = __scenes_populate(cj_scene, scene_id);
                             cJSON_Delete(cj_scene);
+
+                            if (new_scene)
+                            {
+                                cJSON *cj_new_scene = ezlopi_scenes_create_cjson_scene(new_scene);
+                                CJSON_TRACE("new_scene", cj_new_scene);
+                                cJSON_Delete(cj_new_scene);
+                            }
                         }
 
                         free(scene_str);
@@ -739,16 +750,19 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
 {
     if (field && cj_value)
     {
+        trace("type: %s", ezlopi_scene_get_scene_value_type_name_v2(field->value_type));
         switch (cj_value->type)
         {
         case cJSON_Number:
         {
+            field->value.type = VALUE_TYPE_NUMBER;
             field->value.value_double = cj_value->valuedouble;
             TRACE_B("value: %f", field->value.value_double);
             break;
         }
         case cJSON_String:
         {
+            field->value.type = VALUE_TYPE_STRING;
             uint32_t value_len = strlen(cj_value->valuestring) + 1;
             field->value.value_string = malloc(value_len);
             if (field->value.value_string)
@@ -764,25 +778,31 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         }
         case cJSON_True:
         {
+            field->value.type = VALUE_TYPE_BOOL;
             field->value.value_bool = true;
             TRACE_B("value: true");
             break;
         }
         case cJSON_False:
         {
+            field->value.type = VALUE_TYPE_BOOL;
             field->value.value_bool = false;
             TRACE_B("value: false");
             break;
         }
         case cJSON_Object:
         {
-
+            field->value.type = VALUE_TYPE_CJSON;
+            field->value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
+            CJSON_TRACE("value", field->value.cj_value);
             break;
         }
         case cJSON_Array:
         {
-            cJSON *cj_block = NULL;
             int block_idx = 0;
+            cJSON *cj_block = NULL;
+            field->value.type = VALUE_TYPE_BLOCK;
+            CJSON_TRACE("value", cj_value);
 
             while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
             {
@@ -804,6 +824,7 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         }
         default:
         {
+            field->value.type = VALUE_TYPE_UNDEFINED;
             TRACE_E("cj_value type: %d", cj_value->type);
             break;
         }

@@ -182,31 +182,43 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
             {
                 bool enabled_flag = false;
                 CJSON_GET_VALUE_BOOL(cj_params, ezlopi_enabled_str, enabled_flag);
-                l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
-                if (scene_node && (scene_node->enabled != enabled_flag))
+                char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+
+                if (scene_str)
                 {
-                    char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
-                    if (scene_str)
+                    cJSON *cj_scene = cJSON_Parse(scene_str);
+                    free(scene_str);
+
+                    if (cj_scene)
                     {
-                        cJSON *cj_scene = cJSON_Parse(scene_str);
-                        free(scene_str);
+                        cJSON_DeleteItemFromObject(cj_scene, ezlopi_enabled_str);
+                        cJSON_AddBoolToObject(cj_scene, ezlopi_enabled_str, enabled_flag);
 
-                        if (cj_scene)
+                        char *updated_scene_str = cJSON_Print(cj_scene);
+                        cJSON_Delete(cj_scene);
+
+                        if (updated_scene_str)
                         {
-                            cJSON_DeleteItemFromObject(cj_scene, ezlopi_enabled_str);
-                            cJSON_AddBoolToObject(cj_scene, ezlopi_enabled_str, enabled_flag);
+                            TRACE_D("updated-scene: %s", updated_scene_str);
+                            cJSON_Minify(updated_scene_str);
+                            ezlopi_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
 
-                            char *updated_scene_str = cJSON_Print(cj_scene);
-                            cJSON_Delete(cj_scene);
-
-                            if (updated_scene_str)
-                            {
-                                cJSON_Minify(updated_scene_str);
-                                ezlopi_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
-
-                                free(updated_scene_str);
-                            }
+                            free(updated_scene_str);
                         }
+                    }
+                }
+
+                l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
+                if (scene_node)
+                {
+                    scene_node->enabled = enabled_flag;
+                    if (false == scene_node->enabled)
+                    {
+                        ezlopi_meshobot_service_stop_scene(scene_node);
+                    }
+                    else if (true == scene_node->enabled)
+                    {
+                        ezlopi_meshbot_service_start_scene(scene_node);
                     }
                 }
             }
