@@ -56,7 +56,7 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
-    core_sntp_init();
+    // core_sntp_init();
 }
 
 static void ezlopi_initialize_devices_v3(void)

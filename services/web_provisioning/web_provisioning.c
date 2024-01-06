@@ -16,7 +16,6 @@
 #include "modes.h"
 #include "items.h"
 #include "room.h"
-#include "feature.h"
 #include "network.h"
 #include "firmware.h"
 #include "settings.h"
@@ -76,6 +75,11 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
                 cJSON_Minify(cjson_str_data);
                 switch (print_type)
                 {
+                case TRACE_TYPE_B:
+                {
+                    TRACE_B("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
+                    break;
+                }
                 case TRACE_TYPE_D:
                 {
                     TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);

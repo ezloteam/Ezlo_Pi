@@ -116,7 +116,7 @@ const char *ezlopi_item_name_humidity = "humidity";
 // const  char *ezlopi_item_name_loudness = "loudness";
 const char *ezlopi_item_name_lux = "lux";
 // const  char *ezlopi_item_name_meter_reset = "meter_reset";
-// const  char *ezlopi_item_name_moisture = "moisture";
+const char *ezlopi_item_name_moisture = "moisture";
 const char *ezlopi_item_name_motion = "motion";
 // const  char *ezlopi_item_name_power = "power";
 // const  char *ezlopi_item_name_pressure = "pressure";
@@ -132,7 +132,7 @@ const char *ezlopi_item_name_rgbcolor = "rgbcolor";
 // const  char *ezlopi_item_name_shutter_command = "shutter_command";
 // const  char *ezlopi_item_name_shutter_state = "shutter_state";
 // const  char *ezlopi_item_name_soil_temperature = "soil_temperature";
-// const  char *ezlopi_item_name_solar_radiation = "solar_radiation";
+const char *ezlopi_item_name_solar_radiation = "solar_radiation";
 const char *ezlopi_item_name_switch = "switch";
 const char *ezlopi_item_name_temp = "temp";
 // const  char *ezlopi_item_name_thermostat_fan_mode = "thermostat_fan_mode";
@@ -153,9 +153,9 @@ const char *ezlopi_item_name_temp = "temp";
 // const  char *ezlopi_item_name_user_code_action = "user_code_action";
 // const  char *ezlopi_item_name_user_codes_scan_progress = "user_codes_scan_progress";
 // const  char *ezlopi_item_name_velocity = "velocity";
-// const  char *ezlopi_item_name_voltage = "voltage";
-// const  char *ezlopi_item_name_current = "current";
-// const  char *ezlopi_item_name_weight = "weight";
+const char *ezlopi_item_name_voltage = "voltage";
+const char *ezlopi_item_name_current = "current";
+const char *ezlopi_item_name_weight = "weight";
 // const  char *ezlopi_item_name_air_flow = "air_flow";
 // const  char *ezlopi_item_name_tank_capacity = "tank_capacity";
 // const  char *ezlopi_item_name_water_temperature = "water_temperature";
@@ -231,5 +231,17 @@ const char *ezlopi_item_name_applied_force_on_sensor = "applied_force_on_sensor"
 const char *ezlopi_item_name_send_ir_code = "send_ir_code";
 const char *ezlopi_item_name_learn_ir_code = "learn_ir_code";
 const char *ezlopi_item_name_soil_humidity = "soil_humidity";
+
+const char *ezlopi_item_name_magnetic_strength_x_axis = "magnetic_strength_x_axis";
+const char *ezlopi_item_name_magnetic_strength_y_axis = "magnetic_strength_y_axis";
+const char *ezlopi_item_name_magnetic_strength_z_axis = "magnetic_strength_z_axis";
+
+const char *ezlopi_item_name_gyroscope_x_axis = "gyroscope_x_axis";
+const char *ezlopi_item_name_gyroscope_y_axis = "gyroscope_y_axis";
+const char *ezlopi_item_name_gyroscope_z_axis = "gyroscope_z_axis";
+
+const char *ezlopi_item_name_learn_fingerprint = "learn_fingerprint";
+const char *ezlopi_item_name_fingerprint_action = "fingerprint_action";
+const char *ezlopi_item_name_fingerprint_ids = "fingerprint_ids";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__
