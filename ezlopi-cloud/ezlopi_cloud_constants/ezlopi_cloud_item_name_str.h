@@ -116,7 +116,7 @@ extern const char *ezlopi_item_name_humidity;
 // extern const  char *ezlopi_item_name_loudness;
 extern const char *ezlopi_item_name_lux;
 // extern const  char *ezlopi_item_name_meter_reset;
-// extern const  char *ezlopi_item_name_moisture;
+extern const char *ezlopi_item_name_moisture;
 extern const char *ezlopi_item_name_motion;
 // extern const  char *ezlopi_item_name_power;
 // extern const  char *ezlopi_item_name_pressure;
@@ -132,7 +132,7 @@ extern const char *ezlopi_item_name_rgbcolor;
 // extern const  char *ezlopi_item_name_shutter_command;
 // extern const  char *ezlopi_item_name_shutter_state;
 // extern const  char *ezlopi_item_name_soil_temperature;
-// extern const  char *ezlopi_item_name_solar_radiation;
+extern const char *ezlopi_item_name_solar_radiation;
 extern const char *ezlopi_item_name_switch;
 extern const char *ezlopi_item_name_temp;
 // extern const  char *ezlopi_item_name_thermostat_fan_mode;
@@ -153,9 +153,9 @@ extern const char *ezlopi_item_name_temp;
 // extern const  char *ezlopi_item_name_user_code_action;
 // extern const  char *ezlopi_item_name_user_codes_scan_progress;
 // extern const  char *ezlopi_item_name_velocity;
-// extern const  char *ezlopi_item_name_voltage;
-// extern const  char *ezlopi_item_name_current;
-// extern const  char *ezlopi_item_name_weight;
+extern const char *ezlopi_item_name_voltage;
+extern const char *ezlopi_item_name_current;
+extern const char *ezlopi_item_name_weight;
 // extern const  char *ezlopi_item_name_air_flow;
 // extern const  char *ezlopi_item_name_tank_capacity;
 // extern const  char *ezlopi_item_name_water_temperature;
@@ -231,5 +231,17 @@ extern const char *ezlopi_item_name_applied_force_on_sensor;
 extern const char *ezlopi_item_name_send_ir_code;
 extern const char *ezlopi_item_name_learn_ir_code;
 extern const char *ezlopi_item_name_soil_humidity;
+
+extern const char *ezlopi_item_name_magnetic_strength_x_axis;
+extern const char *ezlopi_item_name_magnetic_strength_y_axis;
+extern const char *ezlopi_item_name_magnetic_strength_z_axis;
+
+extern const char *ezlopi_item_name_gyroscope_x_axis;
+extern const char *ezlopi_item_name_gyroscope_y_axis;
+extern const char *ezlopi_item_name_gyroscope_z_axis;
+
+extern const char *ezlopi_item_name_learn_fingerprint;
+extern const char *ezlopi_item_name_fingerprint_action;
+extern const char *ezlopi_item_name_fingerprint_ids;
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

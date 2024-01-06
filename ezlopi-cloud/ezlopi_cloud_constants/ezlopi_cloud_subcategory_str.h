@@ -54,7 +54,7 @@ extern const char *subcategory_water;
 // extern const  char *subcategory_modulation;
 // extern const  char *subcategory_soil;
 // extern const  char *subcategory_airpullution;
-// extern const  char *subcategory_electricity;
+extern const char *subcategory_electricity;
 extern const char *subcategory_sound;
 extern const char *subcategory_navigation;
 // extern const  char *subcategory_seismicity;

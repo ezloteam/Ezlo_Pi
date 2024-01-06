@@ -47,10 +47,6 @@ void ezlopi_factory_info_v2_free(void *arg)
 
 void print_factory_info_v2(void)
 {
-    // char *name = ezlopi_factory_info_v2_get_name();
-    // char *manufacturer = ezlopi_factory_info_v2_get_manufacturer();
-    // char *brand = ezlopi_factory_info_v2_get_brand();
-    // char *model = ezlopi_factory_info_v2_get_model();
 
     uint8_t mac[6];
     memset(mac, 0, 6);

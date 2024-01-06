@@ -51,4 +51,34 @@ extern const char *scales_liter_per_hour;
 /// @brief force
 extern const char *scales_newton;
 
+/// @brief electric_potential
+const static char *scales_milli_volt = "milli_volt";
+const static char *scales_volt = "volt";
+
+/// @brief acceleration
+const static char *scales_meter_per_square_second = "meter_per_square_second";
+
+/// @brief electric_current
+const static char *scales_ampere = "ampere";
+const static char *scales_milli_ampere = "milli_ampere";
+
+/// @brief mass
+const static char *scales_kilo_gram = "kilo_gram";
+const static char *scales_pounds = "pounds";
+
+/// @brief irradiance
+const static char *scales_watt_per_square_meter = "watt_per_square_meter";
+
+/// @brief frequency
+const static char *scales_revolutions_per_minute = "revolutions_per_minute";
+const static char *scales_hertz = "hertz";
+const static char *scales_kilo_hertz = "kilo_hertz";
+const static char *scales_breaths_per_minute = "breaths_per_minute";
+const static char *scales_beats_per_minute = "beats_per_minute";
+
+/// @brief magnetic field strength
+const static char *scales_guass = "guass";
+const static char *scales_tesla = "tesla";
+const static char *scales_weber_per_square_meter = "weber_per_square_meter";
+
 #endif // __EZLOPI_SCALES_STR_H__

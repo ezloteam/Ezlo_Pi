@@ -1,5 +1,5 @@
 #include "cJSON.h"
-
+#include "math.h"
 #include "trace.h"
 
 #include "ezlopi_adc.h"
@@ -59,7 +59,7 @@ static int __notify(l_ezlopi_item_t *item)
     {
         s_ezlopi_analog_data_t tmp_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_data);
-        if (tmp_data.value != soil_moisture_data->value)
+        if (fabs(tmp_data.voltage - soil_moisture_data->voltage) > 100)
         {
             soil_moisture_data->value = tmp_data.value;
             soil_moisture_data->voltage = tmp_data.voltage;
@@ -77,6 +77,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         s_ezlopi_analog_data_t *soil_moisture_data = (s_ezlopi_analog_data_t *)item->user_arg;
         double percent_data = ((4095 - soil_moisture_data->value) / 4095.0) * 100;
+        
         cJSON_AddNumberToObject(cj_result, "value", percent_data);
         char *valueFormatted = ezlopi_valueformatter_double(percent_data);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);

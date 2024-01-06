@@ -19,7 +19,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __value_updated_from_interrupt(void *arg);
 
-int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void **user_arg)
+int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 
