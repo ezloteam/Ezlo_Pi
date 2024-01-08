@@ -164,12 +164,12 @@ char *ezlopi_nvs_read_scenes_expressions(void)
     return ezlopi_nvs_read_str(ezlopi_scenes_expression_ids);
 }
 
-char *ezlopi_nvs_read_room_ids(void)
+char *ezlopi_nvs_read_rooms(void)
 {
     return ezlopi_nvs_read_str(ezlopi_room_ids_nvs_name);
 }
 
-void ezlopi_nvs_write_room_ids(char *data)
+int ezlopi_nvs_write_rooms(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_room_ids_nvs_name);
 }

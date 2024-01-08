@@ -307,6 +307,7 @@ void ADS131M08::spi_init()
         .quadhd_io_num = -1,
         .max_transfer_sz = 32,
     };
+
     spi_device_interface_config_t devcfg = {
         .command_bits = 0, // 8-bit command length
         .address_bits = 0, // no address
@@ -316,6 +317,7 @@ void ADS131M08::spi_init()
         .queue_size = 20,
         //.input_delay_ns = 25 // minimum of td(SCCS) = 25ns
     };
+
     ESP_ERROR_CHECK(spi_bus_initialize(ADS131M08_SPI_PORT, &buscfg, 0 /*dma_chan - 0 no DMA*/));
     ESP_ERROR_CHECK(spi_bus_add_device(ADS131M08_SPI_PORT, &devcfg, &spi));
 }

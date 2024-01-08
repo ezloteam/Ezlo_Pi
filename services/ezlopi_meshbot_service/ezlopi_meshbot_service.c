@@ -218,7 +218,7 @@ static void __scenes_process(void *arg)
                             stopped_condition_count += 1;
                         }
 
-                        started_condition_fired_count = 0;started_condition_fired_count
+                        started_condition_fired_count = 0;
                     }
                     else
                     {

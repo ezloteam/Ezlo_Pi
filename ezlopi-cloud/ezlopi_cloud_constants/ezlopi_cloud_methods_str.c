@@ -121,4 +121,9 @@ const char *ezlopi_hub_scene_changed_str = "hub.scene.changed";
 const char *ezlopi_hub_scene_added_str = "hub.scene.added";
 const char *ezlopi_hub_scene_deleted_str = "hub.scene.deleted";
 
+const char *ezlopi_hub_room_created_str = "hub.room.created";
+const char *ezlopi_hub_room_edited_str = "hub.room.edited";
+const char *ezlopi_hub_room_deleted_str = "hub.room.deleted";
+const char *ezlopi_hub_room_reordered_str = "hub.room.reordered";
+
 #endif // __EZLOPI_METHODS_STR_H__

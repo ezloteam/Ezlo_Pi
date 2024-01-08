@@ -121,4 +121,9 @@ extern const char *ezlopi_hub_scene_changed_str;
 extern const char *ezlopi_hub_scene_added_str;
 extern const char *ezlopi_hub_scene_deleted_str;
 
+extern const char *ezlopi_hub_room_created_str;
+extern const char *ezlopi_hub_room_edited_str;
+extern const char *ezlopi_hub_room_deleted_str;
+extern const char *ezlopi_hub_room_reordered_str;
+
 #endif // __EZLOPI_METHODS_STR_H__

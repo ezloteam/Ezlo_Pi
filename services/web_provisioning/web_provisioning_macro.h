@@ -36,6 +36,14 @@ CLOUD_METHOD("hub.scenes.notification.add", scenes_notification_add, scene_chang
 CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene_changed)
 // CLOUD_METHOD("hub.scenes.status.get", scenes_status_get, NULL) // Incomplete
 
+CLOUD_METHOD("hub.room.list", room_list, NULL)
+CLOUD_METHOD("hub.room.create", room_create, room_created)
+CLOUD_METHOD("hub.room.name.set", room_name_set, room_edited)
+CLOUD_METHOD("hub.room.order.set", NULL, NULL)
+CLOUD_METHOD("hub.room.get", room_get, NULL)
+CLOUD_METHOD("hub.room.delete", room_delete, room_deleted)
+CLOUD_METHOD("hub.room.all.delete", room_all_delete, NULL)
+
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)
 CLOUD_METHOD("hub.scenes.scripts.add", scenes_scripts_add, NULL)
 CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
