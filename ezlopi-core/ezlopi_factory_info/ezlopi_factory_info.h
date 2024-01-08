@@ -8,8 +8,10 @@ extern "C"
 
 #define ID_BIN_VERSION_1 1
 #define ID_BIN_VERSION_2 2
+#define ID_BIN_VERSION_3 3
 
-#define ID_BIN_VERSION ID_BIN_VERSION_1
+// #define ID_BIN_VERSION ID_BIN_VERSION_1
+#define ID_BIN_VERSION ID_BIN_VERSION_3
 
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
@@ -33,10 +35,22 @@ extern const char *test_device_constant_config;
 
 #include "esp_partition.h"
 
+#if (ID_BIN_VERSION_3 == ID_BIN_VERSION)
+
+#define EZLOPI_FACTORY_INFO_V3_PARTITION_NAME "prov_data"
+#define EZLOPI_FACTORY_INFO_V3_PARTITION_SIZE 0x8000 // 32KB
+#define EZLOPI_FACTORY_INFO_V3_PARTITION_TYPE 0x40
+#define EZLOPI_FACTORY_INFO_V3_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
+
+#define OFFSET_CONNECTION_DATA 0x0000
+#define OFFSET_HUB_DATA 0x6000
+
+#elif (ID_BIN_VERSION_2 == ID_BIN_VERSION)
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_SIZE 0xF000 // 20480 // 20KB
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_TYPE 0x40
 #define EZLOPI_FACTORY_INFO_V2_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
+#endif
 
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     typedef enum e_ezlopi_factory_info_v2_offset
@@ -169,6 +183,81 @@ typedef struct s_basic_factory_info
     char *user_id;
     uint16_t config_version;
 } s_basic_factory_info_t;
+
+#elif (ID_BIN_VERSION_3 == ID_BIN_VERSION)
+typedef enum e_ezlopi_factory_info_v3_offset
+{
+    CONFIG_VERSION_OFFSET = OFFSET_CONNECTION_DATA + 0x02,
+    PROVISIONING_UUID_OFFSET = OFFSET_CONNECTION_DATA + 0x0004,
+    DEVICE_UUID_OFFSET = OFFSET_CONNECTION_DATA + 0x0082,
+    PROVISIONING_SERVER_OFFSET = OFFSET_CONNECTION_DATA + 0X100,
+    PROVISIONING_TOKEN_OFFSET = OFFSET_CONNECTION_DATA + 0X200,
+    CLOUD_SERVER_OFFSET = OFFSET_CONNECTION_DATA + 0x0400,
+    EZLOPI_CONFIG_OFFSET = OFFSET_CONNECTION_DATA + 0x1000,
+    CA_CERTIFICATE_OFFSET = OFFSET_CONNECTION_DATA + 0x3000,
+    SSL_PRIVATE_KEY_OFFSET = OFFSET_CONNECTION_DATA + 0x4000,
+    SSL_SHARED_KEY_OFFSET = OFFSET_CONNECTION_DATA + 0x5000,
+
+    SERIAL_NUMBER_OFFSET = OFFSET_HUB_DATA,
+    VERSION_OFFSET = OFFSET_HUB_DATA + 0x0002,
+    BUILD_OFFSET = OFFSET_HUB_DATA + 0x0006,
+    ID_OFFSET = OFFSET_HUB_DATA + 0X008,
+    SSID_OFFSET = OFFSET_HUB_DATA + 0x0020,
+    PASSWORD_OFFSET = OFFSET_HUB_DATA + 0x0040,
+    DEVICE_MAC_OFFSET = OFFSET_HUB_DATA + 0x0080,
+    NAME_OFFSET = OFFSET_HUB_DATA + 0x0C0,
+    MANUFACTURER_OFFSET = OFFSET_HUB_DATA + 0x0100,
+    BRAND_OFFSET = OFFSET_HUB_DATA + 0x0140,
+    MODEL_OFFSET = OFFSET_HUB_DATA + 0x0180,
+    DEVICE_TYPE_OFFSET = OFFSET_HUB_DATA + 0x01C0
+
+} e_ezlopi_factory_info_v3_offset_t;
+
+typedef enum e_ezlopi_factory_info_v3_length
+{
+    VERSION_LENGTH = 0x0004,
+    CONFIG_VERSION_LENGTH = 0x0002,
+    NAME_LENGTH = 0x0040,
+    MANUFACTURER_LENGTH = 0x0040,
+    BRAND_LENGTH = 0x0040,
+    MODEL_LENGTH = 0x0040,
+    ID_LENGTH = 0x0008,
+    DEVICE_UUID_LENGTH = 0x007E,
+    PROVISIONING_UUID_LENGTH = 0x007E,
+    SSID_LENGTH = 0x0020,
+    PASSWORD_LENGTH = 0x0040,
+    DEVICE_MAC_LENGTH = 0x0040,
+    CLOUD_SERVER_LENGTH = 0x00100,
+    DEVICE_TYPE_LENGTH = 0x0040,
+    CA_CERTIFICATE_LENGTH = 0x1000,
+    SSL_PRIVATE_KEY_LENGTH = 0x1000,
+    SSL_SHARED_KEY_LENGTH = 0x1000,
+    EZLOPI_CONFIG_LENGTH = 0x1000,
+    PROVISIONING_TOKEN_LENGTH = 0x200,
+    PROVISIONING_SERVER_LENGTH = 0x100
+} e_ezlopi_factory_info_v3_length_t;
+
+typedef struct s_basic_factory_info
+{
+    int16_t version;
+    char *device_name;
+    char *manufacturer;
+    char *brand;
+    char *model_number;
+    unsigned long long id;
+    char *device_uuid;
+    char *prov_uuid;
+    // char *wifi_ssid;
+    // char *wifi_password;
+    uint8_t device_mac[6];
+    char *cloud_server;
+    char *device_type;
+    char *provision_server;
+    char *provision_token;
+    char *user_id;
+    uint16_t config_version;
+} s_basic_factory_info_t;
+
 #endif
 
     void print_factory_info_v2(void);
