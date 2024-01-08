@@ -24,13 +24,13 @@ typedef enum e_isdate_type_modes
     ISDATE_MONTHLY_MODE,
     ISDATE_WEEKS_MODE,
     ISDATE_YEAR_WEEKS_MODE,
-    ISDATE_NONE_MODE,
+    ISDATE_UNDEFINED_MODE,
 } e_isdate_modes_t;
 
 typedef struct s_field_filter
 {
     const char *field_name;
-    uint8_t (*field_func)(e_isdate_modes_t mode_type, struct tm *info, const void *arg);
+    uint8_t (*field_func)(e_isdate_modes_t mode_type, time_t *rawtime, cJSON *arg);
 } s_field_filter_t;
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
@@ -292,7 +292,7 @@ static e_isdate_modes_t field_type_check(const char *check_type_name)
         "yearWeeks",
     };
 
-    e_isdate_modes_t ret = ISDATE_NONE_MODE;
+    e_isdate_modes_t ret = ISDATE_UNDEFINED_MODE;
     for (uint8_t t = 0; t < 5; t++)
     {
         if (0 == strncmp(field_type_name[t], check_type_name, strlen(check_type_name) + 1))
@@ -303,126 +303,122 @@ static e_isdate_modes_t field_type_check(const char *check_type_name)
     }
     return ret;
 }
-static uint8_t field_time_check(e_isdate_modes_t mode_type, struct tm *info, const void *arg)
+static uint8_t field_time_check(e_isdate_modes_t mode_type, time_t *rawtime, cJSON *cj_time_arr)
 {
     uint8_t ret = 0;
-    cJSON *cj_time_arr = (cJSON *)arg;
     if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
     {
-        TRACE_B("time__[' hh:mm ']");
-        char field_hr_mm[10];
+        struct tm *info;
+        info = localtime(rawtime); // assign current date+time
+        char field_hr_mm[10] = {0};
         strftime(field_hr_mm, 10, "%H:%M", info);
+        field_hr_mm[10] = '\0';
 
-        cJSON *curr_value = cj_time_arr->child;
-        while (curr_value) // iterates over the whole array ["8:05" ,"10:22", ....]
+        int array_size = cJSON_GetArraySize(cj_time_arr);
+        for (int i = 0; i < array_size; i++)
         {
-            if (0 == strncmp(cj_time_arr->valuestring, field_hr_mm, 10))
+            cJSON *array_item = cJSON_GetArrayItem(cj_time_arr, i);
+            if (array_item && cJSON_IsString(array_item))
             {
-                ret = TIME_FLAG; // One of the TIME-condition has been met.
-                break;
+                TRACE_B("Value at index %d: %s, [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
+                if (0 == strncmp(array_item->valuestring, field_hr_mm, 10))
+                {
+                    ret = TIME_FLAG; // One of the TIME-condition has been met.
+                    break;
+                }
             }
-            curr_value = curr_value->next;
         }
-        // if we are given :- "value": []
-        if (0 == strncmp(cj_time_arr->valuestring, "00:00", 6)) // 24-hr format
+        if (!array_size) // if we are given : -"value" : []
         {
-            ret = TIME_FLAG; // TIME-condition "00:00" has been met.
+            if (0 == strncmp(field_hr_mm, "00:00", 10)) // 24-hr format
+            {
+                ret = TIME_FLAG; // TIME-condition "00:00" has been met.
+            }
         }
     }
     return ret;
 }
-static uint8_t field_weekdays_check(e_isdate_modes_t mode_type, struct tm *info, const void *arg)
+static uint8_t field_weekdays_check(e_isdate_modes_t mode_type, time_t *rawtime, cJSON *cj_weekdays_arr)
 {
     uint8_t ret = 0;
-    cJSON *cj_weekdays_arr = (cJSON *)arg;
     if (cj_weekdays_arr && (cJSON_Array == cj_weekdays_arr->type))
     {
-        TRACE_B("weekdays__[ 1 - 7 ]");
+        // TRACE_I("field_weekdays_check, arr_type[cJSON_Array:%d] ", cj_weekdays_arr->type);
+        struct tm *info;
+        info = localtime(rawtime);                // assign current date+time
         int field_weekdays = (info->tm_wday) + 1; // sunday => 0+1 ... saturday => 6+1
 
-        cJSON *curr_value = cj_weekdays_arr->child;
-        while (curr_value) // iterates over the whole array [1,2,...,7]
+        int array_size = cJSON_GetArraySize(cj_weekdays_arr);
+        for (int i = 0; i < array_size; i++)
         {
-            if (cj_weekdays_arr->valuedouble == field_weekdays)
+            cJSON *array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
+            if (array_item && cJSON_IsNumber(array_item))
             {
-                ret = WEEKDAYS_FLAG; // One of the WEEKDAYS-condition has been met.
-                break;
+                TRACE_B("Value at index %d: %d, [field_weekdays: %d]", i, (int)(array_item->valuedouble), field_weekdays);
+                if (cj_weekdays_arr->valuedouble == field_weekdays)
+                {
+                    ret = WEEKDAYS_FLAG; // One of the WEEKDAYS-condition has been met.
+                    break;
+                }
             }
-            curr_value = curr_value->next;
         }
     }
     return ret;
 }
-static uint8_t field_days_check(e_isdate_modes_t mode_type, struct tm *info, const void *arg)
+static uint8_t field_days_check(e_isdate_modes_t mode_type, time_t *rawtime, cJSON *cj_days_arr)
 {
     uint8_t ret = 0;
-    cJSON *cj_days_arr = (cJSON *)arg;
     if (cj_days_arr && (cJSON_Array == cj_days_arr->type))
     {
-        TRACE_B("days__[ 1 - 31 ]");
+        struct tm *info;
+        info = localtime(rawtime); // assign current date+time
+        int array_size = cJSON_GetArraySize(cj_days_arr);
         int field_days = info->tm_mday; // 1-31
-        cJSON *curr_value = cj_days_arr->child;
-        while (curr_value) // iterates over the whole array [1,2,...,31]
+
+        for (int i = 0; i < array_size; i++)
         {
-            if (cj_days_arr->valuedouble == field_days)
+            cJSON *array_item = cJSON_GetArrayItem(cj_days_arr, i);
+            if (array_item && cJSON_IsNumber(array_item))
             {
-                ret = DAYS_FLAG; // One of the DAYS-condition has been met.
-                break;
+                TRACE_B("Value at index %d: %d, [field_days: %d]", i, (int)(array_item->valuedouble), field_days);
+                if (cj_days_arr->valuedouble == field_days)
+                {
+                    ret = DAYS_FLAG; // One of the DAYS-condition has been met.
+                    break;
+                }
             }
-            curr_value = curr_value->next;
         }
     }
     return ret;
 }
-static uint8_t field_weeks_check(e_isdate_modes_t mode_type, struct tm *info, const void *arg)
+static uint8_t field_weeks_check(e_isdate_modes_t mode_type, time_t *rawtime, cJSON *cj_weeks_arr)
 {
     int ret = 0;
-    cJSON *cj_weeks_arr = (cJSON *)arg;
     if (cj_weeks_arr && (cJSON_Array == cj_weeks_arr->type))
     {
-
-        char field_weeks[10] = {'/0'};         // week_value extracted from ESP32.
+        char field_weeks[10] = {0}; // week_value extracted from ESP32.
+        struct tm *info;
+        info = localtime(rawtime);             // assign current date+time
         strftime(field_weeks, 10, "%W", info); // [First day => Monday] ; Week number within (00-53)
-        TRACE_B("days__[0, ..., 53]");         // -1 = last week of the year
+        field_weeks[10] = '\0';
 
-        // compare if today lies in (last week) of month
-        // if (ISDATE_WEEKS_MODE == mode_type)
-        // {
-        //     strftime(field_weeks, 10, "%W", info); // [First day => Monday] ; Week number within (00-53)
-        //     TRACE_B("days__[1, ..., 6, -1]");      // -1 = last week of the month
-        // }
-
-        if (-1 == (cj_weeks_arr->valuedouble))
+        char week_val[10] = {0}; // week_value given to us from cloud.
+        int array_size = cJSON_GetArraySize(cj_weeks_arr);
+        for (int i = 0; i < array_size; i++)
         {
-            // compare if today lies in (last week) of december
-            if (ISDATE_WEEKS_MODE == mode_type)
+            cJSON *array_item = cJSON_GetArrayItem(cj_weeks_arr, i);
+            if (array_item && cJSON_IsNumber(array_item))
             {
-                if (0 == strncmp(field_weeks, "06", 10))
-                { // int weeK_number = ((info->tm_mday) % 7);
-                    ret = WEEKS_FLAG;
-                }
-            }
-            else // if (ISDATE_WEEKS_MODE == mode_type)
-            {
-                if (0 == strncmp(field_weeks, "53", 10))
-                {
-                    ret = WEEKS_FLAG;
-                }
-            }
-        }
-        else
-        {
-            char week_val[10] = {'/0'};                                    // week_value given to us from cloud.
-            snprintf(week_val, 10, "%f", (cj_weeks_arr->valuedouble - 1)); //[1-54] to [0-53]//[1, ..., 54, -1] x// converting to str for comparision
+                snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1)); // [1_54, -1] ---> [0_53, -2]
+                field_weeks[10] = '\0';
+                TRACE_B("Value at index %d: %s, [field_weeks: %s]", i, week_val, field_weeks);
 
-            cJSON *curr_value = cj_weeks_arr->child;
-            while (curr_value) // iterates over the whole array [0,1,...,53]
-            {
-                if (0 == strncmp(week_val, field_weeks, 10))
+                // comparsion in string formats only
+                if (0 == strncmp(array_item->valuestring, field_weeks, 10))
                 {
-                    ret = WEEKS_FLAG;
+                    ret = TIME_FLAG; // One of the TIME-condition has been met.
+                    break;
                 }
-                curr_value = curr_value->next;
             }
         }
     }
@@ -446,54 +442,90 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
         l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
         if (when_block)
         {
-            e_isdate_modes_t mode_type = ISDATE_NONE_MODE;
+            e_isdate_modes_t mode_type = ISDATE_UNDEFINED_MODE;
             uint8_t flag_check = 0; // clear : masks & flags
             l_fields_v2_t *curr_field = when_block->fields;
 
             // calculate the rawtime
-            time_t rawtime;
+            time_t rawtime = 0;
             time(&rawtime);
-            struct tm *info;
-            info = localtime(&rawtime); // assign current date+time
 
-            // function counter
+            // Condition checker
             while (NULL != curr_field)
             {
                 if (0 == strncmp(curr_field->name, "type", 5))
                 {
-                    if ((NULL != curr_field->value_type) && (NULL != curr_field->value.value_string))
+                    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
                     {
                         mode_type = field_type_check(curr_field->value.value_string);
                     }
                 }
                 else
-                { // checks all the function names and executes one
+                {
                     for (uint8_t i = 0; i < ((sizeof(field_filter_arr) / sizeof(field_filter_arr[i]))); i++)
                     {
                         if (0 == strncmp(field_filter_arr[i].field_name, curr_field->name, strlen(curr_field->name) + 1))
                         {
-                            TRACE_I("mode[%d] :  Activating... ['%s']", mode_type, field_filter_arr[i].field_name);
-                            // First fill the mask bit
-                            flag_check |= (1 << (i + 4)); // bit4 - bit7
-                            // Then fill in the status for respective function
-                            flag_check |= (field_filter_arr[i].field_func)(mode_type, info, curr_field->value.value_json); // bit0 - bit3
+                            // TRACE_I("mode[%d] :  Activating... ['%s']", mode_type, field_filter_arr[i].field_name);
+                            flag_check |= (1 << (i + 4));                                                                      // bit4 - bit7
+                            flag_check |= (field_filter_arr[i].field_func)(mode_type, &rawtime, curr_field->value.value_json); // bit0 - bit3
                             break;
                         }
                     }
                 }
-
                 curr_field = curr_field->next;
             }
+            TRACE_B("FLAG_STATUS: %#x", flag_check);
 
-            // examine if any of the mask bit are high ; if yes then proceed
-            if ((flag_check & MASK_FOR_TIME_ARG) || (flag_check & MASK_FOR_WEEKDAYS_ARG) || (flag_check & MASK_FOR_DAYS_ARG) || (flag_check & MASK_FOR_WEEKS_ARG)) // if any one of the condition is satisfied
+            // Output Filter
+            switch (mode_type)
             {
-                if ((flag_check & TIME_FLAG) || (flag_check & WEEKDAYS_FLAG) || (flag_check & DAYS_FLAG) || (flag_check & WEEKS_FLAG))
+            case ISDATE_DAILY_MODE:
+            {
+                // examine if any of the mask bit are high ; if yes then proceed
+                if ((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) // if any one of the condition is satisfied
+                {
                     ret = 1;
+                }
+                break;
+            }
+            case ISDATE_WEEKLY_MODE:
+            {
+                // examine if any of the mask bit are high ; if yes then proceed
+                if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
+                    ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))) // if any one of the condition is satisfied
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case ISDATE_MONTHLY_MODE:
+            {
+                // examine if any of the mask bit are high ; if yes then proceed
+                if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
+                    ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))) // if any one of the condition is satisfied
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            case ISDATE_WEEKS_MODE:
+            case ISDATE_YEAR_WEEKS_MODE:
+            {
+                // examine if any of the mask bit are high ; if yes then proceed
+                if ((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG)) // if any one of the condition is satisfied
+                {
+                    ret = 1;
+                }
+                break;
+            }
+            default:
+                ret = 0;
+                break;
             }
         }
     }
-    return 0;
+    return ret;
 }
 
 int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)

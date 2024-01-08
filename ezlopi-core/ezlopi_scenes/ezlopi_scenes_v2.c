@@ -702,7 +702,7 @@ static l_fields_v2_t *__fields_populate(cJSON *cj_fields)
         cJSON *cj_field = NULL;
         while (NULL != (cj_field = cJSON_GetArrayItem(cj_fields, fields_idx++)))
         {
-            if (tmp_fields_head)//?
+            if (tmp_fields_head)
             {
                 l_fields_v2_t *tmp_flield = tmp_fields_head;
                 while (tmp_flield->next)
@@ -765,21 +765,36 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         {
             cJSON *cj_block = NULL;
             int block_idx = 0;
-
-            while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
+            if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY == field->value_type) || (EZLOPI_VALUE_TYPE_INT_ARRAY == field->value_type))
             {
-                if (field->value.when_block)
+                field->value.value_json = cJSON_Duplicate(cj_value, 1);
+                if (field->value.value_json)
                 {
-                    l_when_block_v2_t *curr_when_block = field->value.when_block;
-                    while (curr_when_block->next)
+                    char *c = cJSON_Print(field->value.value_json);
+                    if (c)
                     {
-                        curr_when_block = curr_when_block->next;
+                        TRACE_B("values: %s", c);
+                        cJSON_free(c);
                     }
-                    curr_when_block->next = __new_when_block_populate(cj_block);
                 }
-                else
+            }
+            else
+            {
+                while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 {
-                    field->value.when_block = __new_when_block_populate(cj_block);
+                    if (field->value.when_block)
+                    {
+                        l_when_block_v2_t *curr_when_block = field->value.when_block;
+                        while (curr_when_block->next)
+                        {
+                            curr_when_block = curr_when_block->next;
+                        }
+                        curr_when_block->next = __new_when_block_populate(cj_block);
+                    }
+                    else
+                    {
+                        field->value.when_block = __new_when_block_populate(cj_block);
+                    }
                 }
             }
             break;

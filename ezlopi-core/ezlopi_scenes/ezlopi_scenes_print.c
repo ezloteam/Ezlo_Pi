@@ -62,7 +62,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         {
             TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
             break;
-        }        
+        }
         case EZLOPI_VALUE_TYPE_BLOCKS:
         {
             ezlopi_print_when_blocks((l_when_block_v2_t *)fields->value.when_block);
@@ -70,6 +70,9 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         }
         case EZLOPI_VALUE_TYPE_CREDENTIAL:
         case EZLOPI_VALUE_TYPE_DICTIONARY:
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+        case EZLOPI_VALUE_TYPE_INT_ARRAY:
+        case EZLOPI_VALUE_TYPE_ARRAY:
         {
             char *fields_json_value = cJSON_PrintUnformatted(fields->value.value_json);
             if (fields_json_value)
@@ -83,7 +86,6 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             }
             break;
         }
-        case EZLOPI_VALUE_TYPE_ARRAY:
         case EZLOPI_VALUE_TYPE_RGB:
         case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
         case EZLOPI_VALUE_TYPE_USER_CODE:
@@ -137,8 +139,6 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         case EZLOPI_VALUE_TYPE_DEVICE:
         case EZLOPI_VALUE_TYPE_EXPRESSION:
         case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-        case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-        case EZLOPI_VALUE_TYPE_INT_ARRAY:
         case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
