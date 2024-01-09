@@ -95,7 +95,7 @@ static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_p
                 if ((current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS) && (1 == authenticated_flag)) // once authenticated, valid for 30 seconds only
                 {
 #endif
-                    int ret = ezlopi_factory_info_v2_factory_reset();
+                    int ret = ezlopi_factory_info_v3_factory_reset();
                     if (ret)
                     {
                         TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");

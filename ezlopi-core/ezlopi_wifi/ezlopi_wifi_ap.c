@@ -29,10 +29,10 @@ void ezlopi_configure_wifi_ap()
         },
     };
 
-    char *device_type = ezlopi_factory_info_v2_get_device_type();
+    char *device_type = ezlopi_factory_info_v3_get_device_type();
     if ((NULL != device_type) && (isprint(device_type[0])))
     {
-        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, ezlopi_factory_info_v2_get_id());
+        snprintf(ezlopi_wifi_ap_ssid, sizeof(ezlopi_wifi_ap_ssid), "ezlopi_%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
     }
     else
     {

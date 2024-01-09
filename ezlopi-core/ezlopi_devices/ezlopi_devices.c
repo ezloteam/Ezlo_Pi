@@ -164,7 +164,7 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, int
             memset(new_item, 0, sizeof(l_ezlopi_item_t));
             new_item->func = item_func;
             new_item->cloud_properties.device_id = device->cloud_properties.device_id;
-            
+
             if (NULL == device->items)
             {
                 device->items = new_item;
@@ -200,7 +200,7 @@ void ezlopi_device_prepare(void)
     s_controller_information.ready = true;
     s_controller_information.status = "synced";
 
-    char *config_string = ezlopi_factory_info_v2_get_ezlopi_config();
+    char *config_string = ezlopi_factory_info_v3_get_ezlopi_config();
 
     if (config_string)
     {

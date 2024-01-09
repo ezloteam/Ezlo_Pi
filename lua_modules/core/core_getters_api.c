@@ -18,7 +18,7 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
 int lcore_get_product_name(lua_State *lua_state)
 {
     int ret = 0;
-    char *product_name = ezlopi_factory_info_v2_get_name();
+    char *product_name = ezlopi_factory_info_v3_get_name();
     if (product_name)
     {
         lua_pushstring(lua_state, product_name);
@@ -228,15 +228,15 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     lua_pushstring(lua_state, "info");
     lua_newtable(lua_state);
 
-    char *manufacturer = ezlopi_factory_info_v2_get_manufacturer();
+    char *manufacturer = ezlopi_factory_info_v3_get_manufacturer();
     lua_create_table_string_key_value("manufacturer", manufacturer);
     free(manufacturer);
 
-    char *model = ezlopi_factory_info_v2_get_model();
+    char *model = ezlopi_factory_info_v3_get_model();
     lua_create_table_string_key_value("model", model);
     free(model);
 
-    char *brand = ezlopi_factory_info_v2_get_brand();
+    char *brand = ezlopi_factory_info_v3_get_brand();
     lua_create_table_string_key_value("brand", brand);
     free(brand);
     lua_settable(lua_state, -3);

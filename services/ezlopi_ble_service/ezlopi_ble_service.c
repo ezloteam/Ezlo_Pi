@@ -116,13 +116,13 @@ static void ezlopi_ble_basic_init(void)
     memset(ble_device_name, 0, sizeof(ble_device_name));
 
     // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
-    // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v2_get_id());
+    // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v3_get_id());
 
-    char *device_name = ezlopi_factory_info_v2_get_name();
-    char *device_type = ezlopi_factory_info_v2_get_device_type();
+    char *device_name = ezlopi_factory_info_v3_get_name();
+    char *device_type = ezlopi_factory_info_v3_get_device_type();
     if ((NULL != device_type) && (NULL != device_name) && (isprint(device_name[0])))
     {
-        snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v2_get_id());
+        snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
     }
     else
     {

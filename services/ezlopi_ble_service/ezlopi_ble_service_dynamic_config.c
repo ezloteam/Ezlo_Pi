@@ -65,7 +65,7 @@ static char *__provisioning_status_jsonify(void)
         uint32_t prov_stat = ezlopi_nvs_get_provisioning_status();
         if (1 == prov_stat)
         {
-            cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v2_get_version());
+            cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v3_get_version());
             cJSON_AddNumberToObject(root, "status", prov_stat);
         }
         else
@@ -177,7 +177,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                         if (decoded_data)
                         {
 
-                            ezlopi_factory_info_v2_set_ezlopi_config(decoded_data);
+                            ezlopi_factory_info_v3_set_ezlopi_config(decoded_data);
 
 #if 0
                             cJSON *cj_config = cJSON_Parse(decoded_data);
@@ -520,7 +520,7 @@ static char *__dynamic_config_base64(void)
     if (base64_data)
     {
         uint32_t out_put_len = 0;
-        char *str_provisioning_data = ezlopi_factory_info_v2_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
+        char *str_provisioning_data = ezlopi_factory_info_v3_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
         if (str_provisioning_data)
         {
             TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);

@@ -42,8 +42,16 @@ extern const char *test_device_constant_config;
 #define EZLOPI_FACTORY_INFO_V3_PARTITION_TYPE 0x40
 #define EZLOPI_FACTORY_INFO_V3_SUBTYPE ESP_PARTITION_SUBTYPE_APP_FACTORY // ESP_PARTITION_SUBTYPE_ANY
 
-#define OFFSET_CONNECTION_DATA 0x0000
-#define OFFSET_HUB_DATA 0x6000
+#define EZLOPI_FINFO_OFFSET_CONN_DATA 0x0000
+#define EZLOPI_FINFO_OFFSET_HUB_DATA 0x6000
+
+#define EZLOPI_FINFO_READ_LEN_4KB 4096
+    typedef enum e_factory_info_v3_partition_type
+    {
+        E_EZLOPI_FACTORY_INFO_CONN_DATA,
+        E_EZLOPI_FACTORY_INFO_HUB_DATA,
+        E_EZLOPI_FACTORY_INFO_MAX
+    } e_factory_info_v3_partition_type_t;
 
 #elif (ID_BIN_VERSION_2 == ID_BIN_VERSION)
 #define EZLOPI_FACTORY_INFO_V2_PARTITION_NAME "id"
@@ -187,54 +195,56 @@ typedef struct s_basic_factory_info
 #elif (ID_BIN_VERSION_3 == ID_BIN_VERSION)
 typedef enum e_ezlopi_factory_info_v3_offset
 {
-    CONFIG_VERSION_OFFSET = OFFSET_CONNECTION_DATA + 0x02,
-    PROVISIONING_UUID_OFFSET = OFFSET_CONNECTION_DATA + 0x0004,
-    DEVICE_UUID_OFFSET = OFFSET_CONNECTION_DATA + 0x0082,
-    PROVISIONING_SERVER_OFFSET = OFFSET_CONNECTION_DATA + 0X100,
-    PROVISIONING_TOKEN_OFFSET = OFFSET_CONNECTION_DATA + 0X200,
-    CLOUD_SERVER_OFFSET = OFFSET_CONNECTION_DATA + 0x0400,
-    EZLOPI_CONFIG_OFFSET = OFFSET_CONNECTION_DATA + 0x1000,
-    CA_CERTIFICATE_OFFSET = OFFSET_CONNECTION_DATA + 0x3000,
-    SSL_PRIVATE_KEY_OFFSET = OFFSET_CONNECTION_DATA + 0x4000,
-    SSL_SHARED_KEY_OFFSET = OFFSET_CONNECTION_DATA + 0x5000,
+    // Offset Connection Data
+    EZLOPI_FINFO_REL_OFFSET_CONFIG_VERSION = 0x02,
+    EZLOPI_FINFO_REL_OFFSET_PROVISIONING_UUID = 0x0004,
+    EZLOPI_FINFO_REL_OFFSET_DEVICE_UUID = 0x0082,
+    EZLOPI_FINFO_REL_OFFSET_PROVISIONING_SERVER_URL = 0X100,
+    EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN = 0X200,
+    EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL = 0x0400,
+    EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON = 0x1000,
+    EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE = 0x3000,
+    EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY = 0x4000,
+    EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY = 0x5000,
 
-    SERIAL_NUMBER_OFFSET = OFFSET_HUB_DATA,
-    VERSION_OFFSET = OFFSET_HUB_DATA + 0x0002,
-    BUILD_OFFSET = OFFSET_HUB_DATA + 0x0006,
-    ID_OFFSET = OFFSET_HUB_DATA + 0X008,
-    SSID_OFFSET = OFFSET_HUB_DATA + 0x0020,
-    PASSWORD_OFFSET = OFFSET_HUB_DATA + 0x0040,
-    DEVICE_MAC_OFFSET = OFFSET_HUB_DATA + 0x0080,
-    NAME_OFFSET = OFFSET_HUB_DATA + 0x0C0,
-    MANUFACTURER_OFFSET = OFFSET_HUB_DATA + 0x0100,
-    BRAND_OFFSET = OFFSET_HUB_DATA + 0x0140,
-    MODEL_OFFSET = OFFSET_HUB_DATA + 0x0180,
-    DEVICE_TYPE_OFFSET = OFFSET_HUB_DATA + 0x01C0
+    // Offset Hub Data
+    EZLOPI_FINFO_REL_OFFSET_SERIAL_NUMBER = 0,
+    EZLOPI_FINFO_REL_OFFSET_FMW_VERSION = 0x0002,
+    EZLOPI_FINFO_REL_OFFSET_FMW_BUILD = 0x0006,
+    EZLOPI_FINFO_REL_OFFSET_DEVICE_ID = 0X008,
+    EZLOPI_FINFO_REL_OFFSET_WIFI_SSID = 0x0020,
+    EZLOPI_FINFO_REL_OFFSET_WIFI_PASS = 0x0040,
+    EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC = 0x0080,
+    EZLOPI_FINFO_REL_OFFSET_DEVICE_NAME = 0x0C0,
+    EZLOPI_FINFO_REL_OFFSET_MANUF_NAME = 0x0100,
+    EZLOPI_FINFO_REL_OFFSET_BRAND_NAME = 0x0140,
+    EZLOPI_FINFO_REL_OFFSET_MODEL_NAME = 0x0180,
+    EZLOPI_FINFO_REL_OFFSET_EZLOPI_DEVICE_TYPE = 0x01C0
 
 } e_ezlopi_factory_info_v3_offset_t;
 
 typedef enum e_ezlopi_factory_info_v3_length
 {
-    VERSION_LENGTH = 0x0004,
-    CONFIG_VERSION_LENGTH = 0x0002,
-    NAME_LENGTH = 0x0040,
-    MANUFACTURER_LENGTH = 0x0040,
-    BRAND_LENGTH = 0x0040,
-    MODEL_LENGTH = 0x0040,
-    ID_LENGTH = 0x0008,
-    DEVICE_UUID_LENGTH = 0x007E,
-    PROVISIONING_UUID_LENGTH = 0x007E,
-    SSID_LENGTH = 0x0020,
-    PASSWORD_LENGTH = 0x0040,
-    DEVICE_MAC_LENGTH = 0x0040,
-    CLOUD_SERVER_LENGTH = 0x00100,
-    DEVICE_TYPE_LENGTH = 0x0040,
-    CA_CERTIFICATE_LENGTH = 0x1000,
-    SSL_PRIVATE_KEY_LENGTH = 0x1000,
-    SSL_SHARED_KEY_LENGTH = 0x1000,
-    EZLOPI_CONFIG_LENGTH = 0x1000,
-    PROVISIONING_TOKEN_LENGTH = 0x200,
-    PROVISIONING_SERVER_LENGTH = 0x100
+    EZLOPI_FINFO_LEN_VERSION = 0x0004,
+    EZLOPI_FINFO_LEN_CONFIG_VERSION = 0x0002,
+    EZLOPI_FINFO_LEN_DEVICE_NAME = 0x0040,
+    EZLOPI_FINFO_LEN_MANUF_NAME = 0x0040,
+    EZLOPI_FINFO_LEN_BRAND_NAME = 0x0040,
+    EZLOPI_FINFO_LEN_MODEL_NAME = 0x0040,
+    EZLOPI_FINFO_LEN_DEVICE_ID = 0x0008,
+    EZLOPI_FINFO_LEN_DEVICE_UUID = 0x007E,
+    EZLOPI_FINFO_LEN_PROV_UUID = 0x007E,
+    EZLOPI_FINFO_LEN_WIFI_SSID = 0x0020,
+    EZLOPI_FINFO_LEN_WIFI_PASS = 0x0040,
+    EZLOPI_FINFO_LEN_DEVICE_MAC = 0x0040,
+    EZLOPI_FINFO_LEN_CLOUD_SERVER_URL = 0x00100,
+    EZLOPI_FINFO_LEN_EZLOPI_DEVICE_TYPE = 0x0040,
+    EZLOPI_FINFO_LEN_CA_CERTIFICATE = 0x1000,
+    EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY = 0x1000,
+    EZLOPI_FINFO_LEN_SSL_SHARED_KEY = 0x1000,
+    EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON = 0x1000,
+    EZLOPI_FINFO_LEN_PROVISIONING_TOKEN = 0x200,
+    EZLOPI_FINFO_LEN_PROVISIONING_SERVER_URL = 0x100
 } e_ezlopi_factory_info_v3_length_t;
 
 typedef struct s_basic_factory_info
@@ -260,6 +270,47 @@ typedef struct s_basic_factory_info
 
 #endif
 
+    uint32_t ezlopi_factory_info_v3_get_abs_address(uint32_t relative_offset, e_factory_info_v3_partition_type_t partition_type);
+
+    void print_factory_info_v3(void);
+    const esp_partition_t *ezlopi_factory_info_v3_init(void);
+
+    uint32_t ezlopi_factory_info_v3_get_provisioning_status(void);
+
+    uint16_t ezlopi_factory_info_v3_get_version(void);
+    char *ezlopi_factory_info_v3_get_name(void);
+    char *ezlopi_factory_info_v3_get_manufacturer(void);
+    char *ezlopi_factory_info_v3_get_brand(void);
+    char *ezlopi_factory_info_v3_get_model(void);
+    unsigned long long ezlopi_factory_info_v3_get_id(void);
+    char *ezlopi_factory_info_v3_get_device_uuid(void);
+    char *ezlopi_factory_info_v3_get_provisioning_uuid(void);
+    char *ezlopi_factory_info_v3_get_ssid(void);
+    char *ezlopi_factory_info_v3_get_password(void);
+    char *ezlopi_factory_info_v3_get_ezlopi_mac(void);
+    char *ezlopi_factory_info_v3_get_cloud_server(void);
+    char *ezlopi_factory_info_v3_get_device_type(void);
+    char *ezlopi_factory_info_v3_get_ca_certificate(void);
+    char *ezlopi_factory_info_v3_get_ssl_private_key(void);
+    char *ezlopi_factory_info_v3_get_ssl_shared_key(void);
+    char *ezlopi_factory_info_v3_get_ezlopi_config(void);
+    char *ezlopi_factory_info_get_v3_provision_token(void);
+    char *ezlopi_factory_info_v3_get_provisioning_server(void);
+    uint16_t ezlopi_factory_info_v3_get_config_version(void);
+
+    int ezlopi_factory_info_v3_set_wifi(char *ssid, char *password);
+
+    int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic);
+    int ezlopi_factory_info_v3_set_ezlopi_config(char *data);
+    int ezlopi_factory_info_v3_set_ca_cert(char *data);
+    int ezlopi_factory_info_v3_set_ssl_shared_key(char *data);
+    int ezlopi_factory_info_v3_set_ssl_public_key(char *data);
+    int ezlopi_factory_info_v3_set_ssl_private_key(char *data);
+
+    void ezlopi_factory_info_v3_free(void *arg);
+    int ezlopi_factory_info_v3_factory_reset(void);
+
+#if 0 // V2
     void print_factory_info_v2(void);
     const esp_partition_t *ezlopi_factory_info_v2_init(void);
 
@@ -297,6 +348,8 @@ typedef struct s_basic_factory_info
 
     void ezlopi_factory_info_v2_free(void *arg);
     int ezlopi_factory_info_v2_factory_reset(void);
+
+#endif // v2
 
 #ifdef __cplusplus
 }

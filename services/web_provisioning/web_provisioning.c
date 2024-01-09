@@ -132,10 +132,10 @@ static void __fetch_wss_endpoint(void *pv)
     {
         ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
 
-        cloud_server = ezlopi_factory_info_v2_get_cloud_server();
-        ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
-        ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
-        ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
+        cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+        ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+        ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
+        ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);

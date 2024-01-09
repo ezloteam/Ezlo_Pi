@@ -114,7 +114,7 @@ ezlopi_wifi_status_t *ezlopi_wifi_status(void)
 static void set_wifi_station_host_name(void)
 {
     static char station_host_name[32];
-    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", ezlopi_factory_info_v2_get_id());
+    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", ezlopi_factory_info_v3_get_id());
     esp_err_t err = tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, station_host_name);
     TRACE_W("'tcpip_adapter_set_hostname' ERROR: %s", esp_err_to_name(err));
 }
@@ -213,8 +213,8 @@ void ezlopi_wifi_initialize(void)
 
 void ezlopi_wifi_connect_from_id_bin(void)
 {
-    char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
-    char *wifi_password = ezlopi_factory_info_v2_get_password();
+    char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
+    char *wifi_password = ezlopi_factory_info_v3_get_password();
     ezlopi_wifi_set_new_wifi_flag();
 
     if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
@@ -230,8 +230,8 @@ void ezlopi_wifi_connect_from_id_bin(void)
         strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
     }
 
-    ezlopi_factory_info_v2_free(wifi_ssid);
-    ezlopi_factory_info_v2_free(wifi_password);
+    ezlopi_factory_info_v3_free(wifi_ssid);
+    ezlopi_factory_info_v3_free(wifi_password);
 
     esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass_global_buffer[0], &wifi_ssid_pass_global_buffer[32]);
     TRACE_W("wifi_error: %u", wifi_error);
