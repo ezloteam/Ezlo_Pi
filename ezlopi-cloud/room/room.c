@@ -116,6 +116,22 @@ void room_all_delete(cJSON *cj_request, cJSON *cj_response)
     ezlopi_room_delete_all();
 }
 
+void room_order_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        cJSON *cj_rooms_id = cJSON_GetObjectItem(cj_params, ezlopi_roomsId_str);
+        if (cj_rooms_id)
+        {
+            ezlopi_room_reorder(cj_rooms_id);
+        }
+    }
+}
+
 //////////////////
 void room_created(cJSON *cj_request, cJSON *cj_response)
 {

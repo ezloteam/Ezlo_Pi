@@ -92,6 +92,7 @@ const char *ezlopi_reachable_str = "reachable";
 const char *ezlopi_persistent_str = "persistent";
 const char *ezlopi_serviceNotification_str = "serviceNotification";
 const char *ezlopi_roomId_str = "roomId";
+const char *ezlopi_roomsId_str = "roomsId";
 const char *ezlopi_security_str = "security";
 const char *ezlopi_synced_str = "synced";
 const char *ezlopi_info_str = "info";

@@ -92,6 +92,7 @@ extern const char *ezlopi_reachable_str;
 extern const char *ezlopi_persistent_str;
 extern const char *ezlopi_serviceNotification_str;
 extern const char *ezlopi_roomId_str;
+extern const char *ezlopi_roomsId_str;
 extern const char *ezlopi_security_str;
 extern const char *ezlopi_synced_str;
 extern const char *ezlopi_info_str;
