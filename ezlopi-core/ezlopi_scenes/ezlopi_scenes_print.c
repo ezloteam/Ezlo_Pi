@@ -49,6 +49,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         case EZLOPI_VALUE_TYPE_ENUM:
         case EZLOPI_VALUE_TYPE_TOKEN:
         case EZLOPI_VALUE_TYPE_STRING:
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
         {
             TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
             break;
@@ -138,7 +139,6 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
         case EZLOPI_VALUE_TYPE_DEVICE:
         case EZLOPI_VALUE_TYPE_EXPRESSION:
-        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
         case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
