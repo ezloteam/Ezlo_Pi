@@ -177,7 +177,12 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                         if (decoded_data)
                         {
 
-                            ezlopi_factory_info_v3_set_ezlopi_config(decoded_data);
+                            if (ezlopi_factory_info_v3_set_ezlopi_config(decoded_data))
+                            {
+                                TRACE_W("Restarting .....");
+                                vTaskDelay(100 / portTICK_PERIOD_MS);
+                                esp_restart();
+                            }
 
 #if 0
                             cJSON *cj_config = cJSON_Parse(decoded_data);
