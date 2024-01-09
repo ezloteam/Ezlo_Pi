@@ -10,20 +10,15 @@
 #include "ezlopi_factory_info.h"
 #include "ezlopi_nvs.h"
 
-static const esp_partition_t *partition_ctx_v3 = NULL;
+#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
 static char *g_ca_certificate = NULL;
 static char *g_ssl_private_key = NULL;
 static char *g_ssl_shared_key = NULL;
 static char *g_ezlopi_config = NULL;
-static uint32_t g_provisioning_status = 0;
+#endif
 
-const char *ezlopi_device_type_str[] = {
-    "ezlopi_generic",
-    "ezlopi_device_switchbox",
-    "ezlopi_device_irblaster",
-    "ezlopi_sensor_sound",
-    "ezlopi_sensor_ambienttrackerpro",
-};
+static const esp_partition_t *partition_ctx_v3 = NULL;
+static uint32_t g_provisioning_status = 0;
 
 static int ezlopi_factory_info_v3_set_4kb(char *data, uint32_t offset)
 {
@@ -325,83 +320,29 @@ char *ezlopi_factory_info_v3_get_provisioning_server(void)
 
 char *ezlopi_factory_info_v3_get_device_type(void)
 {
-    const static char *undefined = "undefined";
-    char *ret = undefined;
-    // return ezlopi_factory_info_v3_read_string(DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH);
-    switch (EZLOPI_DEVICE_TYPE)
-    {
-    case EZLOPI_DEVICE_TYPE_TEST_DEVICE:
-    {
-        ret = ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
-        break;
-    }
-    case EZLOPI_DEVICE_TYPE_GENERIC:
-        ret = ezlopi_device_type_str[EZLOPI_DEVICE_TYPE_GENERIC];
-        break;
-    case EZLOPI_DEVICE_TYPE_SWITCH_BOX:
-    case EZLOPI_DEVICE_TYPE_IR_BLASTER:
-    case EZLOPI_DEVICE_TYPE_SOUND_SENSOR:
-    case EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO:
-    {
-
-        ret = ezlopi_device_type_str[EZLOPI_DEVICE_TYPE];
-        break;
-    }
-    default:
-    {
-        ret = undefined;
-        break;
-    }
-    }
-
-    return ret;
+    return "ezlopi_generic";
 }
 
 char *ezlopi_factory_info_v3_get_ca_certificate(void)
 {
-    if (NULL == g_ca_certificate)
-    {
-        g_ca_certificate = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE);
-    }
-    return g_ca_certificate;
+
+    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CA_CERTIFICATE);
 }
 
 char *ezlopi_factory_info_v3_get_ssl_private_key(void)
 {
-    if (NULL == g_ssl_private_key)
-    {
-        g_ssl_private_key = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
-    }
-    return g_ssl_private_key;
+    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_PRIVATE_KEY);
 }
 
 char *ezlopi_factory_info_v3_get_ssl_shared_key(void)
 {
-    if (NULL == g_ssl_shared_key)
-    {
-        g_ssl_shared_key = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY);
-    }
-    return g_ssl_shared_key;
+
+    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_SSL_SHARED_KEY);
 }
 
 char *ezlopi_factory_info_v3_get_ezlopi_config(void)
 {
-#if (EZLOPI_DEVICE_TYPE_SWITCH_BOX == EZLOPI_DEVICE_TYPE)
-    return switch_box_constant_config;
-#elif (EZLOPI_DEVICE_TYPE_IR_BLASTER == EZLOPI_DEVICE_TYPE)
-    return ir_blaster_constant_config;
-#elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
-    return test_device_constant_config;
-#elif (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
-    if (NULL == g_ezlopi_config)
-    {
-        g_ezlopi_config = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
-    }
-    return g_ezlopi_config;
-#elif (EZLOPI_DEVICE_TYPE_AMBIENT_TRACKER_PRO == EZLOPI_DEVICE_TYPE)
-    return ambient_tracker_constant_config;
-#endif
-    return NULL;
+    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
 }
 
 #if 0 // IF version 2
@@ -855,35 +796,27 @@ int ezlopi_factory_info_v3_set_wifi(char *ssid, char *password)
 
 int ezlopi_factory_info_v3_set_ssl_private_key(char *data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, 0x4000);
+    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_PRIVATE_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA));
 }
 
-int ezlopi_factory_info_v3_set_ssl_public_key(char *data)
-{
-    return ezlopi_factory_info_v3_set_4kb(data, 0x4000);
-}
+// int ezlopi_factory_info_v3_set_ssl_public_key(char *data)
+// {
+//     return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA));
+// }
 
 int ezlopi_factory_info_v3_set_ssl_shared_key(char *data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, 0x5000);
+    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_SSL_SHARED_KEY, E_EZLOPI_FACTORY_INFO_CONN_DATA));
 }
 
 int ezlopi_factory_info_v3_set_ca_cert(char *data)
 {
-    return ezlopi_factory_info_v3_set_4kb(data, 0x3000);
+    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CA_CERTIFICATE, E_EZLOPI_FACTORY_INFO_CONN_DATA));
 }
 
 int ezlopi_factory_info_v3_set_ezlopi_config(char *data)
 {
-    int ret = ezlopi_factory_info_v3_set_4kb(data, 0x1000);
-    if (ret)
-    {
-        free(g_ezlopi_config);
-        g_ezlopi_config = NULL;
-        ezlopi_factory_info_v3_get_ezlopi_config();
-    }
-
-    return ret;
+    return ezlopi_factory_info_v3_set_4kb(data, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA));
 }
 
 int ezlopi_factory_info_v3_factory_reset(void)
