@@ -203,17 +203,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         CJSON_GET_VALUE_DOUBLE(cj_config, "serial", ezlopi_config_basic->id);
                                         CJSON_GET_VALUE_STRING(cj_config, "uuid", ezlopi_config_basic->device_uuid);
                                         CJSON_GET_VALUE_STRING(cj_config, "uuid_provisioning", ezlopi_config_basic->prov_uuid);
-
-                                        char *mac = NULL;
-                                        CJSON_GET_VALUE_STRING(cj_config, "mac", mac);
-                                        if (mac)
-                                        {
-                                            for (int i = 0; i < 6; i++)
-                                            {
-                                                sscanf(mac + 3 * i, "%2hhx", &ezlopi_config_basic->device_mac[i]);
-                                            }
-                                        }
-
+                                        CJSON_GET_VALUE_STRING(cj_config, "mac", ezlopi_config_basic->device_mac);
                                         CJSON_GET_VALUE_STRING(cj_config, "provision_server", ezlopi_config_basic->provision_server);
                                         CJSON_GET_VALUE_STRING(cj_config, "cloud_server", ezlopi_config_basic->cloud_server);
                                         CJSON_GET_VALUE_STRING(cj_config, "provision_token", ezlopi_config_basic->provision_token);

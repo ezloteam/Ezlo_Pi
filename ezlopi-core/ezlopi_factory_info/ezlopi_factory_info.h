@@ -259,7 +259,7 @@ typedef struct s_basic_factory_info
     char *prov_uuid;
     // char *wifi_ssid;
     // char *wifi_password;
-    uint8_t device_mac[6];
+    char *device_mac;
     char *cloud_server;
     char *device_type;
     char *provision_server;
