@@ -312,6 +312,7 @@ static uint8_t __field_time_check(e_isdate_modes_t mode_type, struct tm *info, c
                 // TRACE_B("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
                 if (0 == strncmp(array_item->valuestring, field_hr_mm, 10))
                 {
+
                     ret = (1 << 0); // One of the TIME-condition has been met.
                     break;
                 }
@@ -319,6 +320,7 @@ static uint8_t __field_time_check(e_isdate_modes_t mode_type, struct tm *info, c
         }
         if (!array_size) // if we are given : -"value" : []
         {
+            TRACE_B("Time activate :- [00:00],  [field_hr_mm: %s]", field_hr_mm);
             if (0 == strncmp(field_hr_mm, "00:00", 10)) // 24-hr format
             {
                 ret = (1 << 0); // TIME-condition "00:00" has been met.
@@ -376,15 +378,19 @@ static uint8_t __field_days_check(e_isdate_modes_t mode_type, struct tm *info, c
     }
     return ret;
 }
-static uint8_t __compare_week_date(e_isdate_modes_t mode_type, struct tm *info)
+static uint8_t __compare_end_week_date(e_isdate_modes_t mode_type, struct tm *info)
 {
     uint8_t ret = 0;
+    static uint8_t _last_day_of_curr_month = 0;
     static int _starting_date_of_last_week = -1;
-    if (info->tm_mday > 22) // filter out the first 22 days ; which (definately) do-not lie in last week of the month
+    // filter out the first 22 days ;
+    // which (definately) do-not lie in last week of the month
+    if (info->tm_mday > 22)
     {
         // 1. Find out the 'valid' starting date of last week ( return -1 , if invalid )
         if (-1 == _starting_date_of_last_week)
         {
+            //-------------------------------------------------------------------
             // 1.1 find the nearest-prev sunday and assign it.
             switch (info->tm_wday)
             {
@@ -411,6 +417,7 @@ static uint8_t __compare_week_date(e_isdate_modes_t mode_type, struct tm *info)
                 break;
             }
 
+            //-------------------------------------------------------------------
             // 1.2 validate the generated sunday number
             switch (info->tm_mon)
             {
@@ -420,10 +427,12 @@ static uint8_t __compare_week_date(e_isdate_modes_t mode_type, struct tm *info)
                 if ((0 == (year % 4)) && ((0 == (year % 400)) || (0 != (year % 100))))
                 {
                     _starting_date_of_last_week = ((29 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1; // if this sunday's day_num lies within last 7-days of the month ; return this sunday's date
+                    _last_day_of_curr_month = 29;
                 }
                 else // non-leap years
                 {
                     _starting_date_of_last_week = ((28 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1; // if this sunday's day_num lies within last 7-days of the month ; return this sunday's date
+                    _last_day_of_curr_month = 28;
                 }
 
                 break;
@@ -434,11 +443,13 @@ static uint8_t __compare_week_date(e_isdate_modes_t mode_type, struct tm *info)
             case 10: // NOV
             {
                 _starting_date_of_last_week = ((30 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1;
+                _last_day_of_curr_month = 30;
                 break;
             }
             default: // JAN , MAR , MAY , JULY , AUG , OCT , DEC
             {
                 _starting_date_of_last_week = ((31 - _starting_date_of_last_week) < 7) ? _starting_date_of_last_week : -1;
+                _last_day_of_curr_month = 31;
                 break;
             }
             }
@@ -448,66 +459,108 @@ static uint8_t __compare_week_date(e_isdate_modes_t mode_type, struct tm *info)
         if (-1 != _starting_date_of_last_week)
         {
             TRACE_B(" Last week of [%d] starts from [%d] :", info->tm_mon, _starting_date_of_last_week);
-            if (ISDATE_YEAR_WEEKS_MODE == mode_type)
+
+            if (ISDATE_YEAR_WEEKS_MODE == mode_type) // last week of the year
             {
-                if ((11 == info->tm_mon) && (info->tm_mday >= _starting_date_of_last_week)) // last week of the year
+                if ((11 == info->tm_mon) && (info->tm_mday >= _starting_date_of_last_week))
                 {
-                    ret = (1 << 3); // One of the TIME-condition has been met.
+                    if (info->tm_mday >= _last_day_of_curr_month)
+                    { // refresh the calculation flag '_starting_date_of_last_week'
+                        _starting_date_of_last_week = -1;
+                    }
+                    ret = (1 << 3);
                 }
             }
-            else
+            else if (ISDATE_WEEKS_MODE == mode_type) // last week of the month
             {
-                if (info->tm_mday >= _starting_date_of_last_week) // last week of the month
+                if (info->tm_mday >= _starting_date_of_last_week)
                 {
-                    ret = (1 << 3); // One of the TIME-condition has been met.
+                    if (info->tm_mday >= _last_day_of_curr_month)
+                    { // refresh the calculation flag '_starting_date_of_last_week'
+                        _starting_date_of_last_week = -1;
+                    }
+                    ret = (1 << 3);
                 }
             }
         }
     }
     return ret;
 }
+static uint8_t __find_nth_week_of_curr_month(struct tm *info)
+{
+    // 2. find the fisrt day in this month
+    uint8_t tmp_week_num = 1;                        // starts with 1 ; since are already in one of the week-count
+    int tmp_weekday_of_curr_month = (info->tm_wday); // 0-6 ; sun = 0
+    for (uint8_t i = (info->tm_mday); i > 1; i--)    // total_days_in_curr_month - 1
+    {
+        if (1 == tmp_weekday_of_curr_month) // if 'monday' ; add count
+        {
+            tmp_week_num++;
+        }
+        tmp_weekday_of_curr_month--;
+        if (0 > tmp_weekday_of_curr_month)
+        {
+            tmp_weekday_of_curr_month = 6; // sunday -> saturday
+        }
+    }
+
+    // TRACE_B("First day in current month = %d", tmp_weekday_of_curr_month);
+    // TRACE_I("[1-7] : %dth_Day  lies in week[%dth] of the current month", (info->tm_wday + 1), tmp_week_num);
+
+    return tmp_week_num;
+}
 static uint8_t __field_weeks_check(e_isdate_modes_t mode_type, struct tm *info, cJSON *cj_weeks_arr)
 {
-    int ret = 0;
-
+    uint8_t ret = 0;
     if (cj_weeks_arr && (cJSON_Array == cj_weeks_arr->type))
     {
-        char field_weeks[10] = {0}; // week_value extracted from ESP32.
-        char week_val[10] = {0};    // week_value given to us from cloud.
-
-        strftime(field_weeks, 10, "%W", info); // [First day => Monday] ; Week number within (00-53)
-        field_weeks[10] = '\0';
 
         int array_size = cJSON_GetArraySize(cj_weeks_arr);
         for (int i = 0; i < array_size; i++)
         {
+            // extract ;- [1,4,5,23,6,9,...,-1]
             cJSON *array_item = cJSON_GetArrayItem(cj_weeks_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
-                if (-1 != (int)(array_item->valuedouble))
+                if (-1 == (int)(array_item->valuedouble)) // for case :- '-1'
                 {
-                    snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1)); // [1_54, -1] ---> [0_53, -2]
+                    if (0 != (ret = __compare_end_week_date(mode_type, info))) // ret = (1<<3), if last-week confirmed
+                    {
+                        TRACE_I("Weeks_condition : '-1' has been satisfied ; ret = %#x", ret);
+                        break;
+                    }
+                }
+                else // for case :- 'n'
+                {
+                    char field_weeks[10] = {0}; // week_value extracted from ESP32.
+                    char week_val[10] = {0};    // week_value given to us from cloud.
+
+                    // reducing array values by -1, for easier comparison ::==>  [1_54]--->[0_53]      or      [1_6]-->[0_5]
+                    snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1));
                     week_val[10] = '\0';
-                    // TRACE_B("Weeks activate_%d: %s, [field_weeks: %s]", i, week_val, field_weeks);
+
+                    if (ISDATE_YEAR_WEEKS_MODE == mode_type)
+                    {
+                        strftime(field_weeks, 10, "%W", info); // [First day => Monday] ; Week number within (00-53)
+                        field_weeks[10] = '\0';
+                    }
+                    else if (ISDATE_WEEKS_MODE == mode_type)
+                    {
+                        int tmp_week = __find_nth_week_of_curr_month(info); // return the current week-number with 'monday' as first day
+                        snprintf(field_weeks, 10, "%d", tmp_week);
+                        field_weeks[10] = '\0';
+                    }
 
                     if (0 == strncmp(week_val, field_weeks, 10)) // comparsion in string formats only
                     {
                         ret = (1 << 3); // One of the TIME-condition has been met.
-                        break;
-                    }
-                }
-                else
-                { // for case :- '-1'
-                    if (0 != (ret = __compare_week_date(mode_type, info)))
-                    {
-                        TRACE_I("Weeks_condition : '-1' has been satisfied %#x", ret);
+                        // TRACE_I("Weeks_condition '%sth week' [reqd : %s]  has been satisfied ; ret = (1<<3)", field_weeks, week_val);
                         break;
                     }
                 }
             }
         }
     }
-
     return ret;
 }
 
@@ -522,7 +575,10 @@ static const s_field_filter_t field_isdate_filter_arr[] = {
 int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    static char prev_date_time[20] = {0};
+    static uint8_t hhmm_daily_activation_count;   // half a minute mark counter for 'mode1'
+    static uint8_t hhmm_weekly_activation_count;  // half a minute mark counter for 'mode2'
+    static uint8_t hhmm_monthly_activation_count; // half a minute mark counter for 'mode3'
+    static uint8_t hhmm_week_activation_count;    // half a minute mark counter for 'mode4'
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block)
     {
@@ -570,60 +626,71 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             }
             curr_field = curr_field->next;
         }
-
+        // TRACE_B("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
         // Output Filter based on date+time of activation
-        char buffer[20] = {0};
-        strftime(buffer, 20, "%x-%I:%M%p", info);
-        buffer[20] = '\0';
         switch (mode_type)
         {
         case ISDATE_DAILY_MODE:
         {
-            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) && (0 != strncmp(buffer, prev_date_time, 20)))
+            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
+            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG))) //&&(0 != strncmp(buffer, prev_date_time, 20)))
             {
-                snprintf(prev_date_time, 20, "%s", buffer);
-                prev_date_time[20] = '\0';
-                ret = 1;
+                if (55 == hhmm_daily_activation_count++) // activate at the last second of 1 min
+                {
+                    TRACE_W("here! time");
+                    hhmm_daily_activation_count = 0;
+                    ret = 1;
+                }
             }
             break;
         }
         case ISDATE_WEEKLY_MODE:
         {
+            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
             if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-                 ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))) &&
-                (0 != strncmp(buffer, prev_date_time, 20)))
+                 ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
             {
-                snprintf(prev_date_time, 20, "%s", buffer);
-                prev_date_time[20] = '\0';
-                ret = 1;
+                if (55 == hhmm_weekly_activation_count++) // activate at the last second of 1 min
+                {
+                    TRACE_W("here! week_days and time");
+                    hhmm_weekly_activation_count = 0;
+                    ret = 1;
+                }
             }
             break;
         }
         case ISDATE_MONTHLY_MODE:
         {
+            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
             if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-                 ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))) &&
-                (0 != strncmp(buffer, prev_date_time, 20)))
+                 ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
             {
-                snprintf(prev_date_time, 20, "%s", buffer);
-                prev_date_time[20] = '\0';
-                ret = 1;
+                if (55 == hhmm_monthly_activation_count++) // activate at the last second of 1 min
+                {
+                    TRACE_W("here! mon_days and time");
+                    hhmm_monthly_activation_count = 0;
+                    ret = 1;
+                }
             }
             break;
         }
         case ISDATE_WEEKS_MODE:
         case ISDATE_YEAR_WEEKS_MODE:
         {
-            if (((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG)) && (0 != strncmp(buffer, prev_date_time, 20)))
+            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
+            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
+                ((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG))) // && (0 != strncmp(buffer, prev_date_time, 20)))
             {
-                snprintf(prev_date_time, 20, "%s", buffer);
-                prev_date_time[20] = '\0';
-                ret = 1;
+                if (55 == hhmm_week_activation_count++) // activate at the last second of 1 min
+                {
+                    TRACE_W("here! week and time");
+                    hhmm_week_activation_count = 0;
+                    ret = 1;
+                }
             }
             break;
         }
         default:
-            // TRACE_W("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
             break;
         }
     }
@@ -635,10 +702,9 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    // static char prev_date_time[20] = {0};
-    static uint8_t count = 35;
+    static uint8_t hhmm_is_once_counter; // half a minute mark counter for 'mode1'
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
-    if (when_block)
+    if (when_block && scene_node)
     {
         // calculate the rawtime
         time_t rawtime = 0;
@@ -658,7 +724,7 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
         {
             if (0 == strncmp(curr_field->name, "time", 5))
             {
-                if (EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type)
+                if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
                 {
                     char field_hr_mm[10] = {0};
                     strftime(field_hr_mm, 10, "%H:%M", info);
@@ -666,10 +732,7 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
 
                     if (0 == strncmp(curr_field->value.value_string, field_hr_mm, 10))
                     {
-                        if (--count == 0)
-                        {
-                            flag_check |= TIME_FLAG; // One of the TIME-condition has been met.
-                        }
+                        flag_check |= TIME_FLAG; // One of the TIME-condition has been met.
                     }
                 }
             }
@@ -703,25 +766,24 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
                     }
                 }
             }
-
             curr_field = curr_field->next;
         }
 
         // Output Filter based on date & time
-        TRACE_B("isOnce :- FLAG_STATUS: %#x", flag_check);
+        TRACE_D("isOnce :- FLAG_STATUS: 0x0%x", flag_check);
         if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
         {
-            // char buffer[20] = {0};
-            // strftime(buffer, 20, "%x-%I:%M%p", info);
-            // buffer[20] = '\0';
-
-            // if (0 != strncmp(buffer, prev_date_time, 20))
-            // {
-            // snprintf(prev_date_time, 20, "%s", buffer);
-            // prev_date_time[20] = '\0';
-            count = 35;
-            ret = 1;
-            // }
+            // now to disable the scene and also store in ezlopi_nvs
+            if (55 == hhmm_is_once_counter++) // activate at the last second of 1 min
+            {
+                TRACE_W("here! once and time");
+                hhmm_is_once_counter = 0;
+                scene_node->enabled = 0;
+                // ezlopi_meshbot_service_stop_for_scene_id(scene_node->_id);
+                // ezlopi_scenes_remove_id_from_list_v2(scene_node->_id);
+                
+                ret = 1;
+            }
         }
     }
     return ret;
@@ -729,8 +791,127 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
 
 int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_W("Warning: when-method 'is_date_range' not implemented!");
-    return 0;
+    int ret = 0;
+    static uint8_t hhmm_is_once_counter; // half a minute mark counter for 'mode1'
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    if (when_block && scene_node)
+    {
+        // calculate the rawtime
+        time_t rawtime = 0;
+        time(&rawtime);
+        struct tm *info;
+        info = localtime(&rawtime);
+
+        // temporary flags
+        uint8_t flag_check = 0;
+        const uint8_t TIME_FLAG = (1 << 0); // HH:MM
+        const uint8_t DAY_FLAG = (1 << 1);  // 
+        const uint8_t MONTH_FLAG = (1 << 2);
+        const uint8_t YEAR_FLAG = (1 << 3);
+
+        // Default values to store
+        struct tm start;
+        struct tm end;
+
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "startTime", 10))
+            {
+                if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
+                {
+                    char startTime[10];
+                    snprintf(startTime, 10, "%s", curr_field->value.value_string);
+                    startTime[10] = '\0';
+                    char *ptr = NULL;
+                    if (0 != strlen(startTime))
+                    {
+                        start.tm_hour = strtoul(startTime, &ptr, 10);
+                        start.tm_min = strtoul(ptr + 1, NULL, 10);
+                    }
+                    else
+                    {
+                        start.tm_hour = 0;
+                        start.tm_min = 0;
+                    }
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "startDay", 9))
+            {
+                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+                {
+                    start.tm_yday = ((int)(curr_field->value.value_double));
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "startMonth", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+                {
+                    start.tm_mon = ((int)(curr_field->value.value_double));
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "startYear", 10))
+            {
+                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+                {
+                    start.tm_year = ((int)(curr_field->value.value_double));
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "endTime", 8))
+            {
+                if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
+                {
+                    char endTime[10];
+                    snprintf(endTime, 10, "%s", curr_field->value.value_string);
+                    endTime[10] = '\0';
+                    char *ptr = NULL;
+                    if (0 != strlen(endTime))
+                    {
+                        end.tm_hour = strtoul(endTime, &ptr, 10);
+                        end.tm_min = strtoul(ptr + 1, NULL, 10);
+                    }
+                    else
+                    {
+                        end.tm_hour = 23;
+                        end.tm_min = 59;
+                    }
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "endDay", 7))
+            {
+                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+                {
+                    end.tm_yday = ((int)(curr_field->value.value_double));
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "endMonth", 9))
+            {
+                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+                {
+                    end.tm_mon = ((int)(curr_field->value.value_double));
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "endYear", 8))
+            {
+                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+                {
+                    end.tm_year = ((int)(curr_field->value.value_double));
+                }
+            }
+
+            curr_field = curr_field->next;
+        }
+
+        // calculate the rawtime
+        time_t rawtime = 0;
+        time(&rawtime);
+        struct tm *info;
+        info = localtime(&rawtime);
+
+        if (info->tm_year <=)
+            ;
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, void *arg)

@@ -33,7 +33,7 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         {
         case EZLOPI_VALUE_TYPE_INT:
         {
-            TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
+            TRACE_D("\t\t\t|-- value: %d", (int)(fields->value.value_double));
             break;
         }
         case EZLOPI_VALUE_TYPE_BOOL:
@@ -46,20 +46,12 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
             break;
         }
+        case EZLOPI_VALUE_TYPE_ITEM:
         case EZLOPI_VALUE_TYPE_ENUM:
         case EZLOPI_VALUE_TYPE_TOKEN:
         case EZLOPI_VALUE_TYPE_STRING:
-        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-        {
-            TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
-            break;
-        }
-        case EZLOPI_VALUE_TYPE_ITEM:
-        {
-            TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
-            break;
-        }
         case EZLOPI_VALUE_TYPE_INTERVAL:
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
         {
             TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
             break;
@@ -69,11 +61,11 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             ezlopi_print_when_blocks((l_when_block_v2_t *)fields->value.when_block);
             break;
         }
+        case EZLOPI_VALUE_TYPE_ARRAY:
+        case EZLOPI_VALUE_TYPE_INT_ARRAY:
         case EZLOPI_VALUE_TYPE_CREDENTIAL:
         case EZLOPI_VALUE_TYPE_DICTIONARY:
         case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-        case EZLOPI_VALUE_TYPE_INT_ARRAY:
-        case EZLOPI_VALUE_TYPE_ARRAY:
         {
             char *fields_json_value = cJSON_PrintUnformatted(fields->value.value_json);
             if (fields_json_value)

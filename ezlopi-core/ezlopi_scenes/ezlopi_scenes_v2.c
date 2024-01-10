@@ -241,6 +241,60 @@ void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
 //     }
 // }
 
+void ezlopi_scenes_disable_id_from_list_v2(uint32_t _id)
+{
+    char *scenes_id_list_str = ezlopi_nvs_scene_get_v2();
+    if (scenes_id_list_str)
+    {
+        cJSON *cj_scene_id_list = cJSON_Parse(scenes_id_list_str);
+        if (cj_scene_id_list)
+        {
+            uint32_t list_len = cJSON_GetArraySize(cj_scene_id_list);
+
+            for (int idx = list_len; idx < list_len; idx++)
+            {
+                cJSON *cj_scene_id = cJSON_GetArrayItem(cj_scene_id_list, idx);
+                if (cj_scene_id && cj_scene_id->valuedouble)
+                {
+                    if (cj_scene_id->valuedouble == _id)
+                    {
+                        char tmp_buffer[32];
+                        uint32_t scene_id = (uint32_t)(cj_scene_id->valuedouble);
+                        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
+
+                        char *scene_str = ezlopi_nvs_read_str(tmp_buffer);
+                        if (scene_str)
+                        {
+
+                            // cJSON *cj_scene = cJSON_Parse(scene_str);
+                            // if (cj_scene)
+                            // {
+                            //     Trace("%s", cj_scene);
+                            //     // __scenes_populate(cj_scene, scene_id);
+                            //     cJSON_Delete(cj_scene);
+                            // }
+
+                            free(scene_str);
+                        }
+
+                        // cJSON_DeleteItemFromArray(cj_scene_id_list, idx);
+
+                        char *updated_id_list_str = cJSON_Print(cj_scene_id_list);
+                        if (updated_id_list_str)
+                        {
+                            ezlopi_nvs_scene_set_v2(updated_id_list_str);
+                            free(updated_id_list_str);
+                        }
+                    }
+                }
+            }
+
+            cJSON_Delete(cj_scene_id_list);
+        }
+        free(scenes_id_list_str);
+    }
+}
+
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
 {
     char *scenes_id_list_str = ezlopi_nvs_scene_get_v2();

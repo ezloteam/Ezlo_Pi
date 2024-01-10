@@ -29,10 +29,10 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
     {
         switch (fields->value_type)
         {
-        case EZLOPI_VALUE_TYPE_TOKEN:
+        case EZLOPI_VALUE_TYPE_ARRAY:
+        case EZLOPI_VALUE_TYPE_INT_ARRAY:
         case EZLOPI_VALUE_TYPE_CREDENTIAL:
         case EZLOPI_VALUE_TYPE_DICTIONARY:
-        case EZLOPI_VALUE_TYPE_INT_ARRAY:
         case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
         {
             if (fields->value.value_json)
