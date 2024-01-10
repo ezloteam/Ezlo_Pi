@@ -25,6 +25,7 @@
 #include "ezlopi_http.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cloud_constants.h"
+#include "ezlopi_event_group.h"
 
 #include "web_provisioning.h"
 #include "ezlopi_websocket_client.h"
@@ -108,7 +109,6 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
                         break;
                     }
                 }
-
                 free(cjson_str_data);
             }
         }
@@ -464,6 +464,7 @@ static void __connection_upcall(bool connected)
     else
     {
         TRACE_E("Web-socket dis-connected!");
+        ezlopi_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
     }
 
     prev_status = connected;

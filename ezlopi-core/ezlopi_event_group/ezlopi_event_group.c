@@ -25,6 +25,14 @@ void ezlopi_event_group_set_event(e_ezlopi_event_t event)
     }
 }
 
+void ezlopi_event_group_clear_event(e_ezlopi_event_t event)
+{
+    if (ezlopi_event_group_handle && (event < BIT31))
+    {
+        xEventGroupClearBits(ezlopi_event_group_handle, event);
+    }
+}
+
 int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time_ms, uint32_t clear_on_exit)
 {
     int ret = 0;
