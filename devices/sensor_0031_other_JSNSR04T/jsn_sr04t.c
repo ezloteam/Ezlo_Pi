@@ -135,7 +135,7 @@ esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_d
     if (items)
     {
         length /= 4; // one RMT = 4 Bytes
-        ESP_LOGD("Length", "Received RMT words = %d", length);
+        TRACE_B("Received RMT words = %d", length);
         rmt_item32_t *temp_ptr = items; // Use a temporary pointer (=pointing to the beginning of the item array)
         for (uint8_t i = 0; i < length; i++)
         {
@@ -219,7 +219,6 @@ esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *js
         if (ESP_OK != ret)
         {
             ESP_LOGE(TAG1, "ERROR in reading");
-            goto err;
         }
         log_raw_data(sample[i]);
         if (sample[i].is_an_error == true)
@@ -227,20 +226,31 @@ esp_err_t measurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_data_t *js
             ESP_LOGE(TAG1, "ERROR");
             count_errors += 1;
         }
-        distance += sample[i].distance_cm;
+        // distance += sample[i].distance_cm;
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
-
-    if (count_errors > 0)
+    printf("[ ");
+    for (int i = 0; i < jsn_sr04t_config->no_of_samples; i++)
     {
-        jsn_sr04t_data->is_an_error = true;
-        ret = ESP_ERR_INVALID_RESPONSE;
-        ESP_LOGE(TAG1, "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
-        goto err;
+        printf("%.2f ", sample[i].distance_cm);
+        if (!sample[i].is_an_error)
+        {
+            distance += sample[i].distance_cm;
+        }
     }
+    printf("]\n");
+
+    // if (count_errors > 0)
+    // {
+    //     jsn_sr04t_data->is_an_error = true;
+    //     ret = ESP_ERR_INVALID_RESPONSE;
+    //     ESP_LOGE(TAG1, "%s(). Abort At least one measurement is incorrect", __FUNCTION__);
+    //     goto err;
+    // }
 
     jsn_sr04t_data->data_received = true;
-    jsn_sr04t_data->distance_cm = distance / jsn_sr04t_config->no_of_samples;
+    jsn_sr04t_data->distance_cm = distance / (jsn_sr04t_config->no_of_samples - count_errors);
 
-err:
-    return ret;
+    // err:
+    return jsn_sr04t_data->data_received;
 }

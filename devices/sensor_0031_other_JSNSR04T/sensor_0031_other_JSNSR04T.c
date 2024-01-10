@@ -67,7 +67,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             jsn_sr04t_data_t jsn_sr04t_data;
             ret = measurement(tmp_config, &jsn_sr04t_data);
-            if (ESP_OK == ret)
+            if (ret)
             {
                 // jsn_sr04t_print_data(jsn_sr04t_data);
 
@@ -103,8 +103,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 ESP_LOGE(TAG1, "ERROR in getting measurement: ret=%d", ret);
             }
         }
-
-        cJSON_AddStringToObject(cj_result, "valueFormatted", "false");
     }
 
     return ret;
@@ -152,8 +150,6 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
-    device->cloud_properties.info = NULL;
-    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
@@ -173,7 +169,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio_out", item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_out.gpio_num);
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
@@ -181,7 +177,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
     item->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_out.value = 0;
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio_in", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_in.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
@@ -201,12 +197,11 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_distance = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
-            if (item_distance)
+            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
+            if (item_temperature)
             {
-                item_distance->cloud_properties.device_id = device->cloud_properties.device_id;
-                __prepare_item_cloud_properties(item_distance, prep_arg->cjson_device);
-                __prepare_item_interface_properties(item_distance, prep_arg->cjson_device);
+                __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
+                __prepare_item_interface_properties(item_temperature, prep_arg->cjson_device);
             }
         }
     }
