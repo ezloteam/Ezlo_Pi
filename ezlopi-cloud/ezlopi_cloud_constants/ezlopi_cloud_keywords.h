@@ -28,4 +28,16 @@ extern const char *ezlopi_room_id_str;
 extern const char *ezlopi_room_name_str;
 extern const char *ezlopi_error_str;
 
+extern const char *ezlopi_scale_str;
+extern const char *ezlopi_enum_str;
+extern const char *ezlopi_valueformatted_str;
+extern const char *ezlopi_value_default_str;
+extern const char *ezlopi_text_str;
+extern const char *ezlopi_label_str;
+extern const char *ezlopi_lang_tag_str;
+extern const char *ezlopi_description_str;
+extern const char *ezlopi_value_type_str;
+extern const char *ezlopi_value_min_str;
+extern const char *ezlopi_value_max_str;
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include "driver/i2c.h"
 #include "ezlopi_i2c_master.h"
+#include "trace.h"
 
 static s_ezlopi_i2c_master_t *i2c_master_conf_ptr[I2C_NUM_MAX] = {NULL, NULL};
 static int ezlopi_i2c_check_channel(s_ezlopi_i2c_master_t *i2c_master_conf)
@@ -35,6 +36,10 @@ int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
                     .scl_pullup_en = GPIO_PULLUP_ENABLE,
                     .master.clk_speed = i2c_master_conf->clock_speed,
                 };
+
+                TRACE_W("Frequency : %d", i2c_master_conf->clock_speed);
+                TRACE_W("Pin SDA : %d", i2c_master_conf->sda);
+                TRACE_W("Pin SCL : %d", i2c_master_conf->scl);
 
                 ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &i2c_config));
                 ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0));

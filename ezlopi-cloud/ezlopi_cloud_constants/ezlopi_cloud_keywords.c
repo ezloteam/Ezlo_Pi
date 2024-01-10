@@ -28,4 +28,16 @@ const char *ezlopi_room_id_str = "room_id";
 const char *ezlopi_room_name_str = "room_name";
 const char *ezlopi_error_str = "error";
 
+const char *ezlopi_scale_str = "scale";
+const char *ezlopi_enum_str = "enum";
+const char *ezlopi_valueformatted_str = "valueFormatted";
+const char *ezlopi_value_default_str = "valueDefault";
+const char *ezlopi_text_str = "text";
+const char *ezlopi_label_str = "label";
+const char *ezlopi_lang_tag_str = "lang_tag";
+const char *ezlopi_description_str = "description";
+const char *ezlopi_value_type_str = "valueType";
+const char *ezlopi_value_min_str = "valueMin";
+const char *ezlopi_value_max_str = "valueMax";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

@@ -200,7 +200,13 @@ void ezlopi_device_prepare(void)
     s_controller_information.ready = true;
     s_controller_information.status = "synced";
 
+#if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
     char *config_string = ezlopi_factory_info_v3_get_ezlopi_config();
+#elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    char *config_string = ezlopi_config_test;
+#else
+    char *config_string = ezlopi_factory_info_v3_get_ezlopi_config();
+#endif
 
     if (config_string)
     {
@@ -552,9 +558,9 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             cJSON_AddBoolToObject(cj_device, "serviceNotification", false);
             // cJSON_AddBoolToObject(cj_device, "armed", false);
             cJSON_AddStringToObject(cj_device, "roomId", "");
-            cJSON_AddStringToObject(cj_device, "security", "");
+            cJSON_AddStringToObject(cj_device, "security", "no");
             cJSON_AddBoolToObject(cj_device, "ready", true);
-            cJSON_AddStringToObject(cj_device, "status", "synced");
+            cJSON_AddStringToObject(cj_device, "status", "idle");
             if (NULL != device_prop->cloud_properties.info)
             {
                 cJSON_AddItemReferenceToObject(cj_device, "info", device_prop->cloud_properties.info);

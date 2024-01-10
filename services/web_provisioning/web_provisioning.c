@@ -314,6 +314,7 @@ static void web_provisioning_config_check(void *pv)
 
     while (1)
     {
+        ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
 
         TRACE_D("water_mark: %d", water_mark);
@@ -376,7 +377,6 @@ static void web_provisioning_config_check(void *pv)
             else
             {
                 free(response);
-                TRACE_E("Here");
             }
             if (flag_break_loop)
             {
