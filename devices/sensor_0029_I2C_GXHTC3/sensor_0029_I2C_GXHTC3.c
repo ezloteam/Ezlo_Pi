@@ -37,13 +37,16 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
                 {
                     ezlopi_i2c_master_init(&item->interface.i2c_master);
                     gxhtce_val->gxhtc3 = GXHTC3_init(item->interface.i2c_master.channel, item->interface.i2c_master.address);
-                    if (gxhtce_val->gxhtc3->id.status)
+                    if (gxhtce_val->gxhtc3)
                     {
-                        TRACE_E("GXHTC3 Chip ID: 0x%x", gxhtce_val->gxhtc3->id.id);
-                    }
-                    else
-                    {
-                        TRACE_E("GXHTC3 Chip ID not ready!");
+                        if (gxhtce_val->gxhtc3->id.status)
+                        {
+                            TRACE_E("GXHTC3 Chip ID: 0x%x", gxhtce_val->gxhtc3->id.id);
+                        }
+                        else
+                        {
+                            TRACE_E("GXHTC3 Chip ID not ready!");
+                        }
                     }
                 }
             }
@@ -168,7 +171,7 @@ static int __get_cjson_update_value(l_ezlopi_item_t *item)
     {
         s_gxhtc3_value_t *value_ptr = (s_gxhtc3_value_t *)item->user_arg;
 
-        if (value_ptr)
+        if (value_ptr && value_ptr->gxhtc3)
         {
             if (GXHTC3_read_sensor(value_ptr->gxhtc3))
             {

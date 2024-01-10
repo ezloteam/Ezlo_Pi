@@ -407,8 +407,9 @@ static void __fetch_wss_endpoint(void *pv)
     {
 
         ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
-
         ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
+
+        vTaskDelay(100 / portTICK_RATE_MS);
 
         char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
         char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
@@ -442,7 +443,10 @@ static void __fetch_wss_endpoint(void *pv)
 
             free(ws_endpoint);
         }
-
+        free(cloud_server);
+        free(ca_certificate);
+        free(ssl_shared_key);
+        free(ssl_private_key);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
 

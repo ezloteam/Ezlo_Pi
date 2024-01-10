@@ -1,4 +1,5 @@
-#include "string.h"
+#include <string.h>
+#include <ctype.h>
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_partition.h"
@@ -80,7 +81,15 @@ static char *ezlopi_factory_info_v3_read_string(e_ezlopi_factory_info_v3_offset_
                 read_string = (char *)malloc(s_length + 1);
                 if (NULL != read_string)
                 {
-                    snprintf(read_string, s_length + 1, "%s", tmp_buffer);
+                    if (1) // (isprint(tmp_buffer[0]))
+                    {
+                        snprintf(read_string, s_length + 1, "%s", tmp_buffer);
+                    }
+                    else
+                    {
+                        free(read_string);
+                        read_string = NULL;
+                    }
                 }
                 else
                 {
@@ -169,6 +178,7 @@ void print_factory_info_v3(void)
 
     TRACE_D("-------------------------------------------------");
 
+    ezlopi_factory_info_v3_free(mac);
     ezlopi_factory_info_v3_free(name);
     ezlopi_factory_info_v3_free(manufacturer);
     ezlopi_factory_info_v3_free(brand);
@@ -178,7 +188,9 @@ void print_factory_info_v3(void)
     ezlopi_factory_info_v3_free(wifi_ssid);
     ezlopi_factory_info_v3_free(wifi_password);
     ezlopi_factory_info_v3_free(cloud_server);
-    // ezlopi_factory_info_v3_free(device_type);
+    ezlopi_factory_info_v3_free(ca_certificate);
+    ezlopi_factory_info_v3_free(ssl_private_key);
+    ezlopi_factory_info_v3_free(ssl_shared_key);
 }
 
 /** Getter */
@@ -213,27 +225,75 @@ uint16_t ezlopi_factory_info_v3_get_version(void)
 
 char *ezlopi_factory_info_v3_get_name(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_NAME);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_NAME);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_manufacturer(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MANUF_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MANUF_NAME);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MANUF_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MANUF_NAME);
+
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_brand(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_BRAND_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_BRAND_NAME);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_BRAND_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_BRAND_NAME);
+
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_model(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MODEL_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MODEL_NAME);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_MODEL_NAME, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_MODEL_NAME);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 char *ezlopi_factory_info_get_v3_provision_token(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_TOKEN, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROVISIONING_TOKEN);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 uint16_t ezlopi_factory_info_v3_get_config_version(void)
@@ -272,27 +332,75 @@ unsigned long long ezlopi_factory_info_v3_get_id(void)
 
 char *ezlopi_factory_info_v3_get_device_uuid(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_UUID);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_UUID);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_provisioning_uuid(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROV_UUID);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_PROVISIONING_UUID, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_PROV_UUID);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_ssid(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_SSID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_SSID);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_SSID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_SSID);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_password(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_PASS, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_PASS);
+
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_WIFI_PASS, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_WIFI_PASS);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_ezlopi_mac(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
+
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
+    if (read_data)
+    {
+        if (!isprint(read_data[0]))
+        {
+            free(read_data);
+            read_data = NULL;
+        }
+    }
+    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_cloud_server(void)

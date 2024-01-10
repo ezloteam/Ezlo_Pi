@@ -181,32 +181,34 @@ bool gxhtc3_compute_values(s_gxhtc3_sensor_handler_t *handler)
 bool GXHTC3_read_sensor(s_gxhtc3_sensor_handler_t *handler)
 {
     bool ret = true;
-
-    if (!gxhtc3_wake_sensor(handler))
-        ret = false;
-    vTaskDelay(1 / portTICK_RATE_MS);
-    if (!gxhtc3_start_measurement(handler))
-        ret = false;
-    vTaskDelay(5 / portTICK_RATE_MS);
-    esp_err_t err = i2c_master_read_from_device(handler->i2c_ch_num, handler->i2c_slave_addr, handler->raw_data_reg, GXHTC3_I2C_RAW_DATA_LEN, (GXHTC3_I2C_TIMEOUT / portTICK_RATE_MS));
-    if (err != ESP_OK)
+    if (handler)
     {
-        ret = false;
-    }
-
-    if ((gxhtc3_check_crc8(gxhtc3_get_crc8(handler->raw_data_reg, 2), handler->raw_data_reg[2])) && (gxhtc3_check_crc8(gxhtc3_get_crc8(&handler->raw_data_reg[3], 2), handler->raw_data_reg[5])))
-    {
-        if (!gxhtc3_compute_values(handler))
+        if (!gxhtc3_wake_sensor(handler))
             ret = false;
-    }
-    else
-    {
-        TRACE_E("CRC Did not match");
-        ret = false;
-    }
+        vTaskDelay(1 / portTICK_RATE_MS);
+        if (!gxhtc3_start_measurement(handler))
+            ret = false;
+        vTaskDelay(5 / portTICK_RATE_MS);
+        esp_err_t err = i2c_master_read_from_device(handler->i2c_ch_num, handler->i2c_slave_addr, handler->raw_data_reg, GXHTC3_I2C_RAW_DATA_LEN, (GXHTC3_I2C_TIMEOUT / portTICK_RATE_MS));
+        if (err != ESP_OK)
+        {
+            ret = false;
+        }
 
-    // if (gxhtc3_sleep_sensor(handler))
-    //     ret = false;
+        if ((gxhtc3_check_crc8(gxhtc3_get_crc8(handler->raw_data_reg, 2), handler->raw_data_reg[2])) && (gxhtc3_check_crc8(gxhtc3_get_crc8(&handler->raw_data_reg[3], 2), handler->raw_data_reg[5])))
+        {
+            if (!gxhtc3_compute_values(handler))
+                ret = false;
+        }
+        else
+        {
+            TRACE_E("CRC Did not match");
+            ret = false;
+        }
+
+        // if (gxhtc3_sleep_sensor(handler))
+        //     ret = false;
+    }
 
     return ret;
 }
@@ -226,8 +228,10 @@ s_gxhtc3_sensor_handler_t *GXHTC3_init(int32_t i2c_ch_num, uint8_t i2c_slave_add
             free(gxhtc3_handler);
             gxhtc3_handler = NULL;
         }
-
-        gxhtc3_read_id(gxhtc3_handler);
+        else
+        {
+            gxhtc3_read_id(gxhtc3_handler);
+        }
     }
 
     return gxhtc3_handler;
