@@ -97,5 +97,6 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device);
 void ezlopi_device_free_device_by_item(l_ezlopi_item_t *item);
 cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);
 s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void);
+void ezlopi_device_name_set_by_device_id(uint32_t device_id, cJSON *cj_new_name);
 
 #endif // __EZLOPI_DEVICE_H__

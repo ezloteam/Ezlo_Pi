@@ -21,6 +21,7 @@ extern "C"
     } e_trace_type_t;
 
     void web_provisioning_init(void);
+    void web_provisioning_deinit(void);
     uint32_t web_provisioning_get_message_count(void);
     char *parse_device_from_web_payload(void *ws_ctx, char *web_payload);
     int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type);

@@ -12,6 +12,7 @@ extern "C"
     void room_list(cJSON *cj_request, cJSON *cj_response);
     void room_create(cJSON *cj_request, cJSON *cj_response);
     void room_name_set(cJSON *cj_request, cJSON *cj_response);
+    void room_order_set(cJSON *cj_request, cJSON *cj_response);
     void room_delete(cJSON *cj_request, cJSON *cj_response);
     void room_all_delete(cJSON *cj_request, cJSON *cj_response);
 

@@ -46,3 +46,27 @@ void devices_list_v3(cJSON *cj_request, cJSON *cj_response)
         TRACE_E("Failed to create 'result'");
     }
 }
+
+void device_name_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+        cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+        if (cj_params)
+        {
+            cJSON *cj_device_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
+            if (cj_device_id)
+            {
+                uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
+                if (device_id)
+                {
+                    ezlopi_device_name_set_by_device_id(device_id, cJSON_GetObjectItem(cj_params, ezlopi_name_str));
+                }
+            }
+        }
+    }
+}

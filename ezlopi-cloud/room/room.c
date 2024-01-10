@@ -124,10 +124,10 @@ void room_order_set(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_rooms_id = cJSON_GetObjectItem(cj_params, ezlopi_roomsId_str);
-        if (cj_rooms_id)
+        cJSON *cj_rooms_ids = cJSON_GetObjectItem(cj_params, ezlopi_roomsId_str);
+        if (cj_rooms_ids)
         {
-            ezlopi_room_reorder(cj_rooms_id);
+            ezlopi_room_reorder(cj_rooms_ids);
         }
     }
 }
@@ -177,5 +177,4 @@ void room_reordered(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_reordered_str);
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    /////
 }

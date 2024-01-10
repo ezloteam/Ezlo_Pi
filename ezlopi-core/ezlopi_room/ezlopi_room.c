@@ -5,10 +5,12 @@
 #include "ezlopi_room.h"
 #include "ezlopi_cloud.h"
 #include "web_provisioning.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"
 
 static s_ezlopi_room_t *l_room_head = NULL;
 
+static void __sort_by_pos(void);
 static void __free_nodes(s_ezlopi_room_t *room);
 static void __update_cloud_room_deleted(uint32_t room_id);
 
@@ -219,53 +221,136 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room)
     return ret;
 }
 
-int ezlopi_room_reorder(cJSON *cj_rooms_id)
+int ezlopi_room_reorder(cJSON *cj_rooms_ids)
 {
     int ret = 0;
 
-    if (cj_rooms_id)
+    if (cj_rooms_ids)
     {
-        int idx = 0;
-        cJSON *cj_room_id = NULL;
-        uint32_t rooms_id_arr_size = cJSON_GetArraySize(cj_rooms_id);
-        uint32_t rooms_id_arr[rooms_id_arr_size];
+        CJSON_TRACE("new-order ids", cj_rooms_ids);
+        uint32_t rooms_id_arr_size = cJSON_GetArraySize(cj_rooms_ids);
 
-        while (NULL != (cj_room_id = cJSON_GetArrayItem(cj_rooms_id, idx)))
+        if (rooms_id_arr_size)
         {
-            rooms_id_arr[idx] = strtoul(cj_room_id->valuestring, NULL, 16);
-            idx++;
-        }
+            int idx = 0;
+            cJSON *cj_reordered_rooms = cJSON_CreateArray();
 
-        char *room_list_str = ezlopi_nvs_read_rooms();
-
-        if (room_list_str)
-        {
-            cJSON *cj_stored_room_list = cJSON_Parse(room_list_str);
-            free(room_list_str);
-
-            if (cj_stored_room_list)
+            if (cj_reordered_rooms)
             {
-                int idx2 = 0;
-                cJSON *cj_stored_room = NULL;
-                cJSON *cj_reordered_rooms = cJSON_CreateArray();
+                cJSON *cj_room_id = NULL;
 
-                if (cj_reordered_rooms)
+                while (NULL != (cj_room_id = cJSON_GetArrayItem(cj_rooms_ids, idx)))
                 {
-                    while (NULL != (cj_stored_room = cJSON_GetArrayItem(cj_stored_room_list, idx)))
+                    uint32_t room_id = strtoul(cj_room_id->valuestring, NULL, 16);
+                    if (room_id)
                     {
-                        cJSON *cj_stored_room_id = cJSON_GetObjectItem(cj_stored_room, ezlopi__id_str);
-                        if (cj_stored_room_id && cj_stored_room_id->valuestring)
+                        s_ezlopi_room_t *room_node = l_room_head;
+                        while (room_node)
                         {
-                            uint32_t stored_room_id = strtoul(cj_stored_room_id->valuestring, NULL, 16);
-                            for (int i = 0; i < rooms_id_arr_size)
-                        }
+                            if (room_id == room_node->_id)
+                            {
+                                room_node->_pos = idx;
 
-                        idx++;
+                                cJSON *cj_room = cJSON_CreateObject();
+                                if (cj_room)
+                                {
+                                    cJSON_AddStringToObject(cj_room, ezlopi__id_str, cj_room_id->valuestring);
+                                    cJSON_AddStringToObject(cj_room, ezlopi_name_str, room_node->name);
+
+                                    if (!cJSON_AddItemToArray(cj_reordered_rooms, cj_room))
+                                    {
+                                        cJSON_Delete(cj_room);
+                                    }
+                                }
+                            }
+
+                            room_node = room_node->next;
+                        }
+                    }
+
+                    idx++;
+                }
+
+                __sort_by_pos();
+
+                if (cJSON_GetArraySize(cj_reordered_rooms))
+                {
+                    char *reordered_rooms_str = cJSON_Print(cj_reordered_rooms);
+                    if (reordered_rooms_str)
+                    {
+                        cJSON_Minify(reordered_rooms_str);
+                        ezlopi_nvs_write_rooms(reordered_rooms_str);
+                        free(reordered_rooms_str);
                     }
                 }
 
-                cJSON_Delete(cj_stored_room_list);
+                cJSON_Delete(cj_reordered_rooms);
             }
+
+#if 0 
+            int idx = 0;
+            cJSON *cj_room_id = NULL;
+            uint32_t rooms_id_arr[rooms_id_arr_size];
+
+            while (NULL != (cj_room_id = cJSON_GetArrayItem(cj_rooms_ids, idx)))
+            {
+                rooms_id_arr[idx] = strtoul(cj_room_id->valuestring, NULL, 16);
+                idx++;
+            }
+            char *room_list_str = ezlopi_nvs_read_rooms();
+
+            if (room_list_str)
+            {
+                TRACE_D("old-order list: %s", room_list_str);
+                cJSON *cj_stored_room_list = cJSON_Parse(room_list_str);
+                free(room_list_str);
+
+                if (cj_stored_room_list)
+                {
+                    cJSON *cj_reordered_rooms = cJSON_CreateArray();
+
+                    if (cj_reordered_rooms)
+                    {
+                        int idx1 = 0;
+                        while (idx1 < rooms_id_arr_size)
+                        {
+                            int idx2 = 0;
+                            cJSON *cj_stored_room = NULL;
+                            while (NULL != (cj_stored_room = cJSON_GetArrayItem(cj_stored_room_list, idx2)))
+                            {
+                                cJSON *cj_stored_room_id = cJSON_GetObjectItem(cj_stored_room, ezlopi__id_str);
+                                if (cj_stored_room_id && cj_stored_room_id->valuestring)
+                                {
+                                    uint32_t stored_room_id = strtoul(cj_stored_room_id->valuestring, NULL, 16);
+                                    if (stored_room_id == rooms_id_arr[idx1])
+                                    {
+                                        cJSON_AddItemReferenceToArray(cj_reordered_rooms, cj_stored_room);
+                                    }
+                                }
+
+                                idx2++;
+                            }
+
+                            __rooms_move_to_pos(rooms_id_arr[idx1], idx1);
+                            idx1++;
+                        }
+
+                        char *reordered_rooms_str = cJSON_Print(cj_reordered_rooms);
+                        cJSON_Delete(cj_reordered_rooms);
+
+                        if (reordered_rooms_str)
+                        {
+                            TRACE_D("reordered room list: %s", reordered_rooms_str);
+                            cJSON_Minify(reordered_rooms_str);
+                            // ezlopi_nvs_write_rooms(reordered_rooms_str);
+                            free(reordered_rooms_str);
+                        }
+                    }
+
+                    cJSON_Delete(cj_stored_room_list);
+                }
+            }
+#endif
         }
     }
 
@@ -320,11 +405,12 @@ void ezlopi_room_init(void)
             cJSON *cj_room = NULL;
             s_ezlopi_room_t *curr_room_node = NULL;
 
-            while (NULL != (cj_room = cJSON_GetArrayItem(cj_rooms, idx++)))
+            while (NULL != (cj_room = cJSON_GetArrayItem(cj_rooms, idx)))
             {
                 s_ezlopi_room_t *new_room = ezlopi_room_add_to_list(cj_rooms);
                 if (new_room)
                 {
+                    new_room->_pos = idx;
                     if (curr_room_node)
                     {
                         curr_room_node->next = new_room;
@@ -336,6 +422,8 @@ void ezlopi_room_init(void)
                         curr_room_node = l_room_head;
                     }
                 }
+
+                idx++;
             }
         }
     }
@@ -376,5 +464,35 @@ static void __free_nodes(s_ezlopi_room_t *room)
         __free_nodes(room->next);
         __update_cloud_room_deleted(room->_id);
         free(room);
+    }
+}
+
+static void __sort_by_pos(void)
+{
+    uint32_t size = 0;
+    s_ezlopi_room_t *room_ptr_arr[32];
+    s_ezlopi_room_t *curr_room = l_room_head;
+
+    curr_room = l_room_head;
+    memset(room_ptr_arr, 0, sizeof(room_ptr_arr));
+
+    while (curr_room)
+    {
+        size++;
+        room_ptr_arr[curr_room->_pos] = curr_room;
+        curr_room = curr_room->next;
+    }
+
+    l_room_head = room_ptr_arr[0];
+    l_room_head->next = NULL;
+    curr_room = l_room_head;
+
+    int idx = 1;
+    
+    while (idx < size)
+    {
+        curr_room->next = room_ptr_arr[idx];
+        curr_room->next->next = NULL;
+        idx++;
     }
 }

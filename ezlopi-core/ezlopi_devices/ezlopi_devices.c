@@ -15,9 +15,49 @@
 static l_ezlopi_device_t *l_device_head = NULL;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static void ezlopi_device_free_single(l_ezlopi_device_t *device);
 static void ezlopi_device_parse_json_v3(char *config_string);
+static void ezlopi_device_free_single(l_ezlopi_device_t *device);
 static void ezlopi_device_print_controller_cloud_information_v3(void);
+
+void ezlopi_device_name_set_by_device_id(uint32_t device_id, cJSON *cj_new_name)
+{
+    if (device_id && cj_new_name && cj_new_name->valuestring)
+    {
+        l_ezlopi_device_t *l_device_node = l_device_head;
+        while (l_device_node)
+        {
+            if (device_id == l_device_node->cloud_properties.device_id)
+            {
+                snprintf(l_device_node->cloud_properties.device_name, sizeof(l_device_node->cloud_properties.device_name), "%s", cj_new_name->valuestring);
+                break;
+            }
+
+            l_device_node = l_device_node->next;
+        }
+
+        char *device_config_str = ezlopi_factory_info_v2_get_ezlopi_config();
+        if (device_config_str)
+        {
+            cJSON *cj_device_config = cJSON_Parse(device_config_str);
+            if (cj_device_config)
+            {
+                cJSON *cj_devices = cJSON_GetObjectItem(cj_device_config, ezlopi_dev_type_str);
+                if (cj_devices)
+                {
+                    uint32_t idx = 0;
+                    cJSON *cj_device = NULL;
+                    while (NULL != (cj_device = cJSON_GetArrayItem(cj_devices, idx)))
+                    {
+
+#warning "Needs to change "
+
+                        idx++;
+                    }
+                }
+            }
+        }
+    }
+}
 
 s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void)
 {

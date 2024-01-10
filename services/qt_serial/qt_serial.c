@@ -28,6 +28,7 @@
 
 #include "ezlopi_nvs.h"
 #include "ezlopi_wifi.h"
+#include "ezlopi_reboot.h"
 #include "ezlopi_system_info.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cloud_constants.h"
@@ -118,7 +119,8 @@ static int qt_serial_parse_rx_data(const char *data)
                 const static char *reboot_response = "{\"cmd\":0,\"status\":1}";
                 qt_serial_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
                 vTaskDelay(20);
-                esp_restart();
+                // esp_restart();
+                ezlopi_reboot();
                 break;
             }
 

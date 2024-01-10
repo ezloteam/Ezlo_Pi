@@ -32,6 +32,7 @@
 #include "ezlopi_websocket_client.h"
 
 static uint32_t message_counter = 0;
+static xTaskHandle _task_handle = NULL;
 
 static char *cloud_server = NULL;
 static char *ca_certificate = NULL;
@@ -137,7 +138,17 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
 
 void web_provisioning_init(void)
 {
-    xTaskCreate(__fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, NULL);
+    xTaskCreate(__fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, &_task_handle);
+}
+
+void web_provisioning_deinit(void)
+{
+    if (_task_handle)
+    {
+        vTaskDelete(_task_handle);
+    }
+
+    ezlopi_websocket_client_kill();
 }
 
 static void __fetch_wss_endpoint(void *pv)
@@ -324,6 +335,7 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
 {
+    web_provisioning_deinit();
     esp_restart();
 }
 

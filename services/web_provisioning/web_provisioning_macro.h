@@ -3,6 +3,7 @@ CLOUD_METHOD("hub.items.list", items_list_v3, NULL)
 CLOUD_METHOD("hub.item.value.set", items_set_value_v3, items_update_v3)
 
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
+CLOUD_METHOD("hub.device.name.set", device_name_set, NULL)
 
 CLOUD_METHOD("hub.room.list", room_list, NULL)
 
@@ -39,7 +40,7 @@ CLOUD_METHOD("hub.scenes.notification.remove", scenes_notification_remove, scene
 CLOUD_METHOD("hub.room.list", room_list, NULL)
 CLOUD_METHOD("hub.room.create", room_create, room_created)
 CLOUD_METHOD("hub.room.name.set", room_name_set, room_edited)
-CLOUD_METHOD("hub.room.order.set", NULL, NULL)
+CLOUD_METHOD("hub.room.order.set", room_order_set, room_reordered)
 CLOUD_METHOD("hub.room.get", room_get, NULL)
 CLOUD_METHOD("hub.room.delete", room_delete, room_deleted)
 CLOUD_METHOD("hub.room.all.delete", room_all_delete, NULL)
