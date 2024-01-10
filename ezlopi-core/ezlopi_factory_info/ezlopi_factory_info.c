@@ -476,9 +476,9 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic
 
     if (ezlopi_config_basic)
     {
-        if (ezlopi_factory_info_v3_init())
-        {
 #if (ID_BIN_VERSION_1 == ID_BIN_VERSION)
+        if (ezlopi_factory_info_v2_init())
+        {
             uint32_t length = 4 * 1024;
             uint32_t flash_offset = 0xE000; // hub_0_offset
 
@@ -619,11 +619,12 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                 // ESP_LOG_BUFFER_HEXDUMP("PROV", tmp_buffer, length, ESP_LOG_INFO);
                 free(tmp_buffer);
             }
-#endif
         }
-        else if (ezlopi_factory_info_v3_init())
-        {
+#endif
+
 #if (ID_BIN_VERSION_3 == ID_BIN_VERSION)
+        if (ezlopi_factory_info_v3_init())
+        {
             char *tmp_buffer = (char *)malloc(EZLOPI_FINFO_READ_LEN_4KB);
             if (tmp_buffer)
             {
@@ -748,8 +749,8 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic
                 // ESP_LOG_BUFFER_HEXDUMP("PROV", tmp_buffer, length, ESP_LOG_INFO);
                 free(tmp_buffer);
             }
-#endif
         }
+#endif
     }
     return ret;
 }
