@@ -367,6 +367,7 @@ static void qt_serial_set_wifi(const char *data)
 {
     uint32_t status = 0;
     cJSON *root = cJSON_Parse(data);
+    uint8_t status_write = 0;
 
     if (root)
     {
@@ -377,21 +378,34 @@ static void qt_serial_set_wifi(const char *data)
 
             if (ssid && pass && (strlen(pass) >= 8))
             {
-                ezlopi_factory_info_v3_set_wifi(ssid, pass);
+                if (ezlopi_factory_info_v3_set_wifi(ssid, pass))
+                {
+                    status_write = 1;
+                }
                 ezlopi_wifi_set_new_wifi_flag();
-                esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
-                TRACE_W("wifi_error: %u", wifi_error);
-                status = 1;
+                static uint8_t attempt = 5;
+                while (attempt > 0)
+                {
+                    esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
+                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    if (wifi_error == ESP_OK)
+                    {
+                        status = 1;
+                        break;
+                    }
+                    else
+                    {
+                        TRACE_W("wifi_error: %u", wifi_error);
+                        status = 0;
+                    }
+                }
             }
         }
 
         cJSON_Delete(root); // free Json string
     }
 
-    if (0 == status)
-    {
-        qt_serial_response(2, 0, 5);
-    }
+    qt_serial_response(2, status_write, status);
 }
 
 static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
@@ -403,11 +417,7 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
     {
         cJSON_AddNumberToObject(response, "cmd", cmd);
         cJSON_AddNumberToObject(response, "status_write", status_write);
-
-        if (status_connect != 5) // Unknown
-        {
-            cJSON_AddNumberToObject(response, "status_connect", status_connect);
-        }
+        cJSON_AddNumberToObject(response, "status_connect", status_connect);
 
         char *my_json_string = cJSON_Print(response);
         cJSON_Delete(response); // free Json string
@@ -417,7 +427,7 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
             cJSON_Minify(my_json_string);
 
             qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
-            // const int len = strlen(my_json_string);
+            const int len = strlen(my_json_string);
             // const int txBytes = uart_write_bytes(UART_NUM_0, my_json_string, len); // Send the data over uart
 
             cJSON_free(my_json_string);
