@@ -4,6 +4,7 @@
 #include "trace.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_meshbot_service.h"
 #include "ezlopi_scenes_operators.h"
 #include "ezlopi_scenes_when_methods.h"
 
@@ -735,6 +736,7 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
                         flag_check |= TIME_FLAG; // One of the TIME-condition has been met.
                     }
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "day", 4))
             {
@@ -745,6 +747,7 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
                         flag_check |= DAY_FLAG;
                     }
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "month", 6))
             {
@@ -755,6 +758,7 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
                         flag_check |= MONTH_FLAG;
                     }
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "year", 5))
             {
@@ -765,7 +769,9 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
                         flag_check |= YEAR_FLAG;
                     }
                 }
+                goto next;
             }
+        next:
             curr_field = curr_field->next;
         }
 
@@ -778,10 +784,10 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
             {
                 TRACE_W("here! once and time");
                 hhmm_is_once_counter = 0;
-                scene_node->enabled = 0;
-                // ezlopi_meshbot_service_stop_for_scene_id(scene_node->_id);
-                // ezlopi_scenes_remove_id_from_list_v2(scene_node->_id);
-                
+
+                scene_node->enabled = false;
+                ezlopi_scenes_enable_disable_id_from_list_v2(scene_node->_id, false);
+
                 ret = 1;
             }
         }
@@ -789,6 +795,89 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
     return ret;
 }
 
+static uint8_t __check_time_range(struct tm *start, struct tm *end, struct tm *info)
+{
+    uint8_t ret = 0;
+
+    // first confirm if the time range has positive or negative difference (end - start)
+    if ((end->tm_hour - start->tm_hour) > 0)
+    {
+        if ((info->tm_hour == start->tm_hour) && (info->tm_min >= start->tm_min))
+        {
+            ret |= (1 << 0);
+            goto end;
+        }
+        if ((info->tm_hour == end->tm_hour) && (info->tm_min <= end->tm_min))
+        {
+            ret |= (1 << 0);
+            goto end;
+        }
+        if ((info->tm_hour > start->tm_hour) && (info->tm_hour < end->tm_hour))
+        {
+            ret |= (1 << 0);
+            goto end;
+        }
+    }
+    else
+    {
+        if ((info->tm_mday >= start->tm_mday) && (info->tm_mday <= end->tm_mday))
+        {
+            if (((info->tm_hour >= start->tm_hour) && (info->tm_hour <= end->tm_hour)))
+            {
+                ret |= (1 << 0);
+                goto end;
+            }
+            else
+            {
+                TRACE_B("Invalid day-orders : start[%d] vs end[%d]", start->tm_mday, end->tm_mday);
+            }
+        }
+    }
+end:
+    return ret;
+}
+
+static uint8_t __check_day_range(struct tm *start, struct tm *end, struct tm *info)
+{
+    uint8_t ret = 0;
+    if ((info->tm_mday >= start->tm_mday) && (info->tm_mday <= end->tm_mday))
+    {
+        ret |= (1 << 1);
+    }
+    else
+    {
+        TRACE_B("Invalid day-orders : start[%d] vs end[%d]", start->tm_mday, end->tm_mday);
+    }
+    return ret;
+}
+
+static uint8_t __check_month_range(struct tm *start, struct tm *end, struct tm *info)
+{
+    uint8_t ret = 0;
+    if (((info->tm_mon + 1) >= start->tm_mon) && ((info->tm_mon + 1) <= end->tm_mon))
+    {
+        ret |= (1 << 2);
+    }
+    else
+    {
+        TRACE_B("Invalid month-orders : start[%d] vs end[%d]", start->tm_mon, end->tm_mon);
+    }
+    return ret;
+}
+
+static uint8_t __check_year_range(struct tm *start, struct tm *end, struct tm *info)
+{
+    uint8_t ret = 0;
+    if (((info->tm_year + 1900) >= start->tm_year) && ((info->tm_year + 1900) <= end->tm_year))
+    {
+        ret |= (1 << 2);
+    }
+    else
+    {
+        TRACE_B("Invalid year-orders : start[%d] vs end[%d]", start->tm_year, end->tm_year);
+    }
+    return ret;
+}
 int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
@@ -805,13 +894,27 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
         // temporary flags
         uint8_t flag_check = 0;
         const uint8_t TIME_FLAG = (1 << 0); // HH:MM
-        const uint8_t DAY_FLAG = (1 << 1);  // 
+        const uint8_t DAY_FLAG = (1 << 1);  //
         const uint8_t MONTH_FLAG = (1 << 2);
         const uint8_t YEAR_FLAG = (1 << 3);
 
         // Default values to store
-        struct tm start;
-        struct tm end;
+        struct tm start = {
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_mday = 1,
+            .tm_mon = 1,
+            .tm_year = 1,
+        };
+        // total days in current_month
+
+        struct tm end = {
+            .tm_hour = 23,
+            .tm_min = 59,
+            .tm_mday = 31,
+            .tm_mon = 12,
+            .tm_year = 9999,
+        };
 
         l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
@@ -829,26 +932,24 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
                         start.tm_hour = strtoul(startTime, &ptr, 10);
                         start.tm_min = strtoul(ptr + 1, NULL, 10);
                     }
-                    else
-                    {
-                        start.tm_hour = 0;
-                        start.tm_min = 0;
-                    }
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "startDay", 9))
             {
                 if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                 {
-                    start.tm_yday = ((int)(curr_field->value.value_double));
+                    start.tm_mday = ((curr_field->value.value_double)) ? ((int)(curr_field->value.value_double)) : 1;
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "startMonth", 11))
             {
                 if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                 {
-                    start.tm_mon = ((int)(curr_field->value.value_double));
+                    start.tm_mon = ((curr_field->value.value_double)) ? ((int)(curr_field->value.value_double)) : 1;
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "startYear", 10))
             {
@@ -856,6 +957,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
                 {
                     start.tm_year = ((int)(curr_field->value.value_double));
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "endTime", 8))
             {
@@ -870,19 +972,16 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
                         end.tm_hour = strtoul(endTime, &ptr, 10);
                         end.tm_min = strtoul(ptr + 1, NULL, 10);
                     }
-                    else
-                    {
-                        end.tm_hour = 23;
-                        end.tm_min = 59;
-                    }
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "endDay", 7))
             {
                 if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                 {
-                    end.tm_yday = ((int)(curr_field->value.value_double));
+                    end.tm_mday = ((int)(curr_field->value.value_double));
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "endMonth", 9))
             {
@@ -890,6 +989,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
                 {
                     end.tm_mon = ((int)(curr_field->value.value_double));
                 }
+                goto next;
             }
             else if (0 == strncmp(curr_field->name, "endYear", 8))
             {
@@ -897,8 +997,9 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
                 {
                     end.tm_year = ((int)(curr_field->value.value_double));
                 }
+                goto next;
             }
-
+        next:
             curr_field = curr_field->next;
         }
 
@@ -908,8 +1009,13 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
         struct tm *info;
         info = localtime(&rawtime);
 
-        if (info->tm_year <=)
-            ;
+        // 1. Check the time validity
+        flag_check |= __check_time_range(&start, &end, info);
+        flag_check |= __check_day_range(&start, &end, info);
+        flag_check |= __check_month_range(&start, &end, info);
+        flag_check |= __check_year_range(&start, &end, info);
+
+        // now compare the flag status
     }
     return ret;
 }

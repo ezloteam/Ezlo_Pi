@@ -154,7 +154,7 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list);
 l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
 // void ezlopi_scenes_factory_info_reset_v2(void);
-void ezlopi_scenes_disable_id_from_list_v2(uint32_t _id);
+void ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag);
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
 
 l_scenes_list_v2_t *ezlopi_scenes_get_scenes_head_v2(void);
