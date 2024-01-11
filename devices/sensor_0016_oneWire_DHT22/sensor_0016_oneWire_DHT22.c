@@ -171,7 +171,7 @@ static int dht22_sensor_prepare_v3(void *arg)
 
             if (device_humidity)
             {
-                device_humidity->parent_device_id = device_temperature->cloud_properties.device_id;
+                device_humidity->cloud_properties.parent_device_id = device_temperature->cloud_properties.device_id;
                 s_ezlopi_dht22_data_t *dht22_sensor_data_hum = (s_ezlopi_dht22_data_t *)malloc(sizeof(s_ezlopi_dht22_data_t));
 
                 if (dht22_sensor_data_hum)

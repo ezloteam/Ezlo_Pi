@@ -62,12 +62,12 @@ static void __gy271_correct_data(s_gy271_raw_data_t *RAW_DATA, s_gy271_data_t *u
     user_data->azimuth = __gy271_Get_azimuth((user_data->calib_factor.calibrated_axis[0]),
                                              (user_data->calib_factor.calibrated_axis[1]));
 
-    TRACE_W("Final Data :--- X = %.2fG | Y = %.2fG | Z = %.2fG | T = %.2f*C | AZI = %d*deg ",
-            user_data->X,
-            user_data->Y,
-            user_data->Z,
-            user_data->T,
-            user_data->azimuth);
+    // TRACE_W("Final Data :--- X = %.2fG | Y = %.2fG | Z = %.2fG | T = %.2f*C | AZI = %d*deg ",
+    //         user_data->X,
+    //         user_data->Y,
+    //         user_data->Z,
+    //         user_data->T,
+    //         user_data->azimuth);
 }
 
 static esp_err_t __gy271_check_status(l_ezlopi_item_t *item, uint8_t *temp)

@@ -109,20 +109,20 @@
         }                                                                                         \
     }
 
-#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                                   \
-    {                                                                             \
-        if ((NULL != dev_name) && ('\0' != dev_name[0]))                          \
-        {                                                                         \
-            snprintf(device->cloud_properties.device_name,                        \
-                     sizeof(device->cloud_properties.device_name),                \
-                     "%s", dev_name);                                             \
-        }                                                                         \
-        else                                                                      \
-        {                                                                         \
-            snprintf(device->cloud_properties.device_name,                        \
-                     sizeof(device->cloud_properties.device_name),                \
-                     "device-%d:digital_io", device->cloud_properties.device_id); \
-        }                                                                         \
+#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                        \
+    {                                                                  \
+        if ((NULL != dev_name) && ('\0' != dev_name[0]))               \
+        {                                                              \
+            snprintf(device->cloud_properties.device_name,             \
+                     sizeof(device->cloud_properties.device_name),     \
+                     "%s", dev_name);                                  \
+        }                                                              \
+        else                                                           \
+        {                                                              \
+            snprintf(device->cloud_properties.device_name,             \
+                     sizeof(device->cloud_properties.device_name),     \
+                     "device-%d", device->cloud_properties.device_id); \
+        }                                                              \
     }
 
 // typedef int (*f_item_func_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
@@ -180,7 +180,6 @@ typedef struct l_ezlopi_device_settings_v3
 } l_ezlopi_device_settings_v3_t;
 typedef struct l_ezlopi_device
 {
-    uint32_t parent_device_id;
     l_ezlopi_item_t *items;
     l_ezlopi_device_settings_v3_t *settings;
     s_ezlopi_cloud_device_t cloud_properties;
