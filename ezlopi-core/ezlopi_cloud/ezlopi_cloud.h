@@ -43,7 +43,8 @@ typedef struct s_ezlopi_cloud_device_settings
 
 typedef struct s_ezlopi_cloud_device
 {
-    uint32_t device_id;      // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
+    uint32_t device_id; // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
+    uint32_t parent_device_id;
     char device_name[32];    // 'name' -> https://api.ezlo.com/hub/devices_api/index.html
     char *device_type_id;    // deviceTypeId -> https://log.ezlo.com/new/hub/devices_api/
     const char *category;    // 'category' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/category_str.h

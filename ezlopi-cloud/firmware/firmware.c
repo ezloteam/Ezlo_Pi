@@ -115,7 +115,6 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
                 {
                     cJSON_AddStringToObject(cj_params, "firmware_type", "unknown");
                 }
-                // free(device_type);
             }
             else
             {

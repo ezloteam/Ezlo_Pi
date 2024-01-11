@@ -565,6 +565,9 @@ static char *__provisioning_info_jsonify(void)
         ezlopi_factory_info_v3_free(uuid);
         ezlopi_factory_info_v3_free(uuid_provisioning);
         ezlopi_factory_info_v3_free(cloud_server);
+        ezlopi_factory_info_v3_free(ssl_private_key);
+        ezlopi_factory_info_v3_free(ssl_shared_key);
+        ezlopi_factory_info_v3_free(ca_cert);
 
         str_json_prov_info = cJSON_Print(cj_prov_info);
         if (str_json_prov_info)

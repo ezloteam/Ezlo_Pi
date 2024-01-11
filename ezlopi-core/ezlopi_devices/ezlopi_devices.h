@@ -194,6 +194,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(void);
 
 l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id);
 l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
+l_ezlopi_device_settings_v3_t *ezlopi_device_settings_get_by_id(uint32_t settings_id);
 
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
