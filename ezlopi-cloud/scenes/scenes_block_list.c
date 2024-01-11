@@ -18,7 +18,7 @@ static cJSON *__create_when_block_cjson(l_when_block_v2_t *when_block);
 static bool __found_item_in_field(l_fields_v2_t *field_node, uint32_t item_id);
 static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_devices_array);
 static cJSON *__add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_type, l_ezlopi_item_t *item_list);
-static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *cj_result, char **block_type_name, cJSON *cj_block_type);
+static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *cj_result, char const **block_type_name, cJSON *cj_block_type);
 
 void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 {
@@ -228,7 +228,6 @@ static cJSON *__add_scenes_blocks_by_item_ids(e_scenes_block_type_v2_t block_typ
 
 static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_type, cJSON *cj_devices_array)
 {
-    int ret = 0;
     int device_id_idx = 0;
     cJSON *cj_device_id = NULL;
     cJSON *cj_block_array = NULL;
@@ -245,7 +244,6 @@ static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
             if (device_node)
             {
                 TRACE_D("Here");
-                ret = 1;
                 cJSON *cj_block = __add_scenes_blocks_by_item_ids(block_type, device_node->items);
                 if (cj_block)
                 {
@@ -273,7 +271,7 @@ static cJSON *__add_scenes_blocks_by_device_ids(e_scenes_block_type_v2_t block_t
     return cj_block_array;
 }
 
-static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *cj_result, char **block_type_name, cJSON *cj_block_type)
+static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *cj_result, char const **block_type_name, cJSON *cj_block_type)
 {
     e_scenes_block_type_v2_t block_type = SCENE_BLOCK_TYPE_NONE;
 

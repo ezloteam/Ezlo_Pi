@@ -266,6 +266,7 @@ int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_
                         cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
+#warning "Krishna needs to complete this"
                             item_value = cj_value->valuedouble;
                         }
                     }
@@ -456,6 +457,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
                         cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
+#warning "Krishna needs to complete this"
                             item_value = cj_value->valuedouble;
                         }
                     }
@@ -606,6 +608,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
                         cJSON *cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
                         if (cj_value)
                         {
+#warning "Krishna needs to complete this"
                             item_value = cj_value->valuedouble;
                         }
                     }

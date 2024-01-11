@@ -90,7 +90,7 @@ static int __0051_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *MQ8_device_digi = ezlopi_device_add_device();
+        l_ezlopi_device_t *MQ8_device_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
         if (MQ8_device_digi)
         {
             __prepare_device_digi_cloud_properties(MQ8_device_digi, device_prep_arg->cjson_device);
@@ -111,7 +111,7 @@ static int __0051_prepare(void *arg)
         if (NULL != MQ8_value)
         {
             memset(MQ8_value, 0, sizeof(mq8_value_t));
-            l_ezlopi_device_t *MQ8_device_adc = ezlopi_device_add_device();
+            l_ezlopi_device_t *MQ8_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (MQ8_device_adc)
             {
                 __prepare_device_adc_cloud_properties(MQ8_device_adc, device_prep_arg->cjson_device);
@@ -172,15 +172,16 @@ static int __0051_init(l_ezlopi_item_t *item)
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
@@ -199,15 +200,16 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
@@ -305,7 +307,7 @@ static int __0051_notify(l_ezlopi_item_t *item)
     {
         if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
         {
-            char *curret_value = NULL;
+            const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
                 // curret_value = "combustible_gas_detected";

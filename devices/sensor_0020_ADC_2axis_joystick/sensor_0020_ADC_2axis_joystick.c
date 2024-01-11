@@ -95,14 +95,14 @@ static int __init(l_ezlopi_item_t *item)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_not_defined;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_device;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -132,7 +132,7 @@ static int __prepare(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);

@@ -125,7 +125,7 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
                 }
                 else
                 {
-                    __print_sending_data(cjson_data, TRACE_TYPE_W);
+                    __print_sending_data(cjson_str_data, TRACE_TYPE_W);
                 }
 
                 free(cjson_str_data);

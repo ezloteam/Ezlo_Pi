@@ -73,15 +73,16 @@ int sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item,
 //---------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
-    ASSIGN_DEVICE_NAME_V2(device, dev_name);
+    // char *dev_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
+    // ASSIGN_DEVICE_NAME_V2(device, dev_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_lat_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, GPS6MV2_t *gps_arg)
 {
@@ -182,7 +183,7 @@ static int __0053_prepare(void *arg)
             if (NULL != sensor_0053_UART_gps6mv2_data)
             {
                 memset(sensor_0053_UART_gps6mv2_data, 0, sizeof(GPS6MV2_t));
-                l_ezlopi_device_t *gps_device = ezlopi_device_add_device();
+                l_ezlopi_device_t *gps_device = ezlopi_device_add_device(cjson_device);
                 if (gps_device)
                 {
                     __prepare_device_cloud_properties(gps_device, device_prep_arg->cjson_device);
@@ -236,7 +237,8 @@ static int __0053_prepare(void *arg)
             ret = 1;
         }
     }
-    return 0;
+
+    return ret;
 }
 //----------------------------------------------------------------------------------------------------------------------
 static int __0053_init(l_ezlopi_item_t *item)

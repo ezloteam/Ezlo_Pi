@@ -27,7 +27,7 @@ static void __comparison_methods_list(char *list_name, cJSON *cj_result);
 static void __action_methods_list(char *list_name, cJSON *cj_result);
 static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result);
 
-static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list);
+static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, const s_data_source_n_target_object_t *data_list);
 
 void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
 {
@@ -213,7 +213,7 @@ static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
                 uint32_t idx = EZLOPI_VALUE_TYPE_NONE + 1;
                 while (idx < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    char *type_name_str = ezlopi_scene_get_scene_value_type_name_v2(idx);
+                    const char *type_name_str = ezlopi_scene_get_scene_value_type_name_v2(idx);
                     if (type_name_str)
                     {
                         cJSON *cj_string_val = cJSON_CreateString(type_name_str);
@@ -1373,7 +1373,7 @@ static void __advanced_scenes_version_list(char *list_name, cJSON *cj_result)
 
 // helper functions
 
-static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, s_data_source_n_target_object_t *data_list)
+static void __add_data_src_dest_array_to_object(cJSON *cj_method, char *array_name, const s_data_source_n_target_object_t *data_list)
 {
     cJSON *cj_data_source_n_target_list = cJSON_AddArrayToObject(cj_method, array_name);
     if (cj_data_source_n_target_list)

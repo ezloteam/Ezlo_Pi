@@ -26,7 +26,7 @@ static int __0061_get_item(l_ezlopi_item_t *item, void *arg);
 static int __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static void _0061_update_from_device(l_ezlopi_item_t *item);
+static void _0061_update_from_device(void *arg);
 //-----------------------------------------------------------------------
 
 int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
@@ -65,15 +65,16 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t
 //----------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_door;
     device->cloud_properties.device_type = dev_type_doorlock;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
@@ -103,7 +104,7 @@ static int __0061_prepare(void *arg)
         s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
         if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *reed_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (reed_device)
             {
                 __prepare_device_cloud_properties(reed_device, device_prep_arg->cjson_device);
@@ -209,13 +210,18 @@ static int __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 }
 
 //------------------------------------------------------------------------------------------------------------
-static void _0061_update_from_device(l_ezlopi_item_t *item)
+static void _0061_update_from_device(void *arg)
 {
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
     if (item)
     {
-        char *curret_value = NULL;
+        const char *curret_value = NULL;
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
+
+        item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert)
+                                                 ? (item->interface.gpio.gpio_in.value)
+                                                 : (!item->interface.gpio.gpio_in.value);
+
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
             curret_value = reed_door_window_states[0]; //"dw_is_opened";
@@ -224,6 +230,7 @@ static void _0061_update_from_device(l_ezlopi_item_t *item)
         {
             curret_value = reed_door_window_states[1]; //"dw_is_closed";
         }
+
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
         {
             item->user_arg = (void *)curret_value;

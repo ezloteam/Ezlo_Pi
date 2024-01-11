@@ -137,14 +137,14 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t *scene_node, void *arg)
 
             if (((xTaskGetTickCount() - last_update) / 1000) > interval)
             {
-                scene_node->when_block->fields->user_arg = xTaskGetTickCount();
+                scene_node->when_block->fields->user_arg = (void *)xTaskGetTickCount();
                 ret = 1;
             }
         }
         else
         {
             ret = 1;
-            scene_node->when_block->fields->user_arg = xTaskGetTickCount();
+            scene_node->when_block->fields->user_arg = (void *)xTaskGetTickCount();
         }
     }
 

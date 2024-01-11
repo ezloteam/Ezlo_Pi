@@ -8,7 +8,7 @@
 
 static int proximity_sensor_prepare(void *args);
 static int proximity_sensor_init(l_ezlopi_item_t *item);
-static void proximity_sensor_value_updated_from_device(l_ezlopi_item_t *item);
+static void proximity_sensor_value_updated_from_device(void *arg);
 static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args);
 
 int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
@@ -47,16 +47,16 @@ static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *de
 {
     if (device && cj_device)
     {
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-        ASSIGN_DEVICE_NAME_V2(device, device_name);
+        // char *device_name = NULL;
+        // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+        // ASSIGN_DEVICE_NAME_V2(device, device_name);
+        // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
         device->cloud_properties.category = category_switch;
         device->cloud_properties.subcategory = subcategory_in_wall;
         device->cloud_properties.device_type = dev_type_sensor_motion;
         device->cloud_properties.info = NULL;
         device->cloud_properties.device_type_id = NULL;
-        device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     }
 }
 
@@ -91,7 +91,7 @@ static int proximity_sensor_prepare(void *args)
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device();
+        l_ezlopi_device_t *device = ezlopi_device_add_device(device_prep_arg->cjson_device);
         if (device)
         {
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);
@@ -141,9 +141,13 @@ static int proximity_sensor_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void proximity_sensor_value_updated_from_device(l_ezlopi_item_t *item)
+static void proximity_sensor_value_updated_from_device(void *arg)
 {
-    ezlopi_device_value_updated_from_device_v3(item);
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    if (item)
+    {
+        ezlopi_device_value_updated_from_device_v3(item);
+    }
 }
 
 static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)

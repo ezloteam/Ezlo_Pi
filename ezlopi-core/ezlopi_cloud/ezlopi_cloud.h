@@ -16,9 +16,9 @@ typedef struct s_ezlopi_cloud_controller
     char room_id[40];          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
     bool persistent;           // 'persistent' -> https://api.ezlo.com/hub/devices_api/index.html
     bool service_notification; // 'serviceNotification' -> https://api.ezlo.com/hub/devices_api/index.html
-    char *security;            // 'security' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_security_str.h
+    const char *security;      // 'security' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_security_str.h
     bool ready;                // 'ready' -> https://api.ezlo.com/hub/devices_api/index.html
-    char *status;              // 'status' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_status_str.h
+    const char *status;        // 'status' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_status_str.h
 
 } s_ezlopi_cloud_controller_t;
 
@@ -77,6 +77,7 @@ typedef struct s_ezlopi_cloud_info
 } s_ezlopi_cloud_info_t;
 
 uint32_t ezlopi_cloud_generate_device_id(void);
+void ezlopi_cloud_update_device_id(uint32_t device_id);
 
 uint32_t ezlopi_cloud_generate_item_id(void);
 

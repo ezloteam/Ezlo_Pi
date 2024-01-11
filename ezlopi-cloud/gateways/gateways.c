@@ -25,7 +25,7 @@ void gateways_list(cJSON *cj_request, cJSON *cj_response)
                 s_ezlopi_gateway_t *gateway_prop = ezlopi_gateway_get();
                 if (gateway_prop)
                 {
-                    char *tmp_buffer[32];
+                    char tmp_buffer[32];
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", gateway_prop->_id);
 
                     cJSON_AddStringToObject(cjson_gateway, ezlopi__id_str, tmp_buffer);

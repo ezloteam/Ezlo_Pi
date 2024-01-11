@@ -60,15 +60,16 @@ int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
@@ -102,7 +103,7 @@ static int __0055_prepare(void *arg)
         {
             memset(FLEX_value, 0, sizeof(flex_t));
 
-            l_ezlopi_device_t *device_adc = ezlopi_device_add_device();
+            l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (device_adc)
             {
                 __prepare_device_adc_cloud_properties(device_adc, device_prep_arg->cjson_device);

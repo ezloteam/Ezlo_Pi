@@ -81,7 +81,7 @@ typedef struct l_ezlopi_device
 void ezlopi_device_prepare(void);
 
 l_ezlopi_device_t *ezlopi_device_get_head(void);
-l_ezlopi_device_t *ezlopi_device_add_device(void);
+l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device);
 
 l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id);
 l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);

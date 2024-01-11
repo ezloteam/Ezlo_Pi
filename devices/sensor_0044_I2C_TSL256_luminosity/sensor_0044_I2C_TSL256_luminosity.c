@@ -130,15 +130,16 @@ static int __init(l_ezlopi_item_t *item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_light_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
@@ -177,7 +178,7 @@ static int __prepare(void *arg)
         if (NULL != TSL2561_lux_data)
         {
             memset(TSL2561_lux_data, 0, sizeof(TSL256_lum_t));
-            l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (tsl256_device)
             {
                 __prepare_device_cloud_properties(tsl256_device, prep_arg->cjson_device);

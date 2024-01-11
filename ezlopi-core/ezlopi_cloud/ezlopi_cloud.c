@@ -47,6 +47,10 @@ static uint32_t ezlopi_get_mac_crc(void)
     return (crc << 8) & 0x00FFFF00;
 }
 
+void ezlopi_cloud_update_device_id(uint32_t device_id)
+{
+    g_device_id = (device_id > g_device_id) ? device_id : g_device_id;
+}
 uint32_t ezlopi_cloud_generate_device_id(void)
 {
     if (0 == g_device_id)

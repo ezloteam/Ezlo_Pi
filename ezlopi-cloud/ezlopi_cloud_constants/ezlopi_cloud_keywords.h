@@ -207,4 +207,10 @@ extern const char *ezlopi_baud_rate_str;
 extern const char *ezlopi_sceneId_str;
 extern const char *ezlopi_changed_by_str;
 
+extern const char *scene_status_started_str;
+extern const char *scene_status_finished_str;
+extern const char *scene_status_partially_finished_str;
+extern const char *scene_status_failed_str;
+extern const char *scene_status_stopped_str;
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

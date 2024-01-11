@@ -366,6 +366,7 @@ s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room)
 
         if (cj_room)
         {
+            CJSON_TRACE("room", cj_room);
             cJSON *cj_room_id = cJSON_GetObjectItem(cj_room, ezlopi__id_str);
             if (cj_room_id && cj_room_id->valuestring)
             {
@@ -442,7 +443,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
         {
             char tmp_str[32];
             snprintf(tmp_str, sizeof(tmp_str), "%08x", room_id);
-            cJSON_AddItemReferenceToObject(cj_result, ezlopi__id_str, tmp_str);
+            cJSON_AddStringToObject(cj_result, ezlopi__id_str, tmp_str);
         }
 
         char *data_str = cJSON_Print(cj_response);
@@ -488,7 +489,7 @@ static void __sort_by_pos(void)
     curr_room = l_room_head;
 
     int idx = 1;
-    
+
     while (idx < size)
     {
         curr_room->next = room_ptr_arr[idx];

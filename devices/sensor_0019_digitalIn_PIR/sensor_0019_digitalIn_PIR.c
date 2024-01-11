@@ -10,8 +10,8 @@
 
 static int sensor_pir_prepare_v3(void *arg);
 static int sensor_pir_init_v3(l_ezlopi_item_t *item);
+static void sensor_pir_value_updated_from_device_v3(void *arg);
 static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg);
-static void sensor_pir_value_updated_from_device_v3(l_ezlopi_item_t *item);
 static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj_device);
 static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *device, cJSON *cj_device);
 
@@ -63,9 +63,13 @@ static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *args)
     return ret;
 }
 
-static void sensor_pir_value_updated_from_device_v3(l_ezlopi_item_t *item)
+static void sensor_pir_value_updated_from_device_v3(void *arg)
 {
-    ezlopi_device_value_updated_from_device_v3(item);
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    if (item)
+    {
+        ezlopi_device_value_updated_from_device_v3(item);
+    }
 }
 
 static int sensor_pir_init_v3(l_ezlopi_item_t *item)
@@ -108,7 +112,7 @@ static int sensor_pir_prepare_v3(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device)
             {
                 sensor_pir_setup_device_cloud_properties_v3(device, cj_device);
@@ -136,16 +140,16 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *devic
 {
     if (device && cj_device)
     {
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-        ASSIGN_DEVICE_NAME_V2(device, device_name);
+        // char *device_name = NULL;
+        // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+        // ASSIGN_DEVICE_NAME_V2(device, device_name);
+        // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
         device->cloud_properties.category = category_security_sensor;
         device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;
         device->cloud_properties.info = NULL;
         device->cloud_properties.device_type_id = NULL;
-        device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     }
 }
 

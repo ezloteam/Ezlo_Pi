@@ -844,7 +844,6 @@ static l_fields_v2_t *__new_field_populate(cJSON *cj_field)
             CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, field->name);
 
             field->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_field, ezlopi_type_str));
-            cJSON *cj_value = cJSON_GetObjectItem(cj_field, ezlopi_value_str);
             __fields_get_value(field, cJSON_GetObjectItem(cj_field, ezlopi_value_str));
 
 #if 0

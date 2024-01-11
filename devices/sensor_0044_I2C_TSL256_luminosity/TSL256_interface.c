@@ -2,7 +2,6 @@
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 #include "trace.h"
 
-
 static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain)
 {
     unsigned long chScale;
@@ -47,6 +46,8 @@ static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t c
     unsigned long ratio = (ratio1 + 1) >> 1;
     // is ratio <= eachBreak ?
     unsigned int b, m;
+
+#warning "Nabin needs to check this!, Note: Unsigned value type is always true for (ratio >= 0)."
     if ((ratio >= 0) && (ratio <= TSL2561_LUX_K1T))
     {
         b = TSL2561_LUX_B1T;
@@ -93,6 +94,7 @@ static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t c
     temp = ((channel0 * b) - (channel1 * m));
 
     // do not allow negative lux value
+#warning "Nabin needs to check this!, Note: Unsigned value type is always false for (temp < 0)."
     if (temp < 0)
     {
         temp = 0;
@@ -232,20 +234,20 @@ uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master)
         // extract the CH1-bits first
         target_address = (SELECT_CMD_REGISTER | DO_WORD_TRANSACTION | TSL2561_REGISTER_CHAN1_LOW);
         ezlopi_i2c_master_write_to_device(i2c_master, &target_address, 1);
-        ezlopi_i2c_master_read_from_device(i2c_master, &IR, 2); // extracts CH1-data
+        ezlopi_i2c_master_read_from_device(i2c_master, (uint8_t *)&IR, 2); // extracts CH1-data
         // readRegister8(i2c_master, &target_address, 1, &IR, 2);
 
         // extract the CH0-bits first
         target_address = (SELECT_CMD_REGISTER | DO_WORD_TRANSACTION | TSL2561_REGISTER_CHAN0_LOW);
         ezlopi_i2c_master_write_to_device(i2c_master, &target_address, 1);
-        ezlopi_i2c_master_read_from_device(i2c_master, &Visible_Ir, 2); // extracts CH2-data
+        ezlopi_i2c_master_read_from_device(i2c_master, (uint8_t *)&Visible_Ir, 2); // extracts CH2-data
         // readRegister8(i2c_master, &target_address, 1, &Visible_Ir, 2);
 
         // Calculate the lux value
         illuminance_value = TSL2561_CalculateLux(Visible_Ir,                    // CH0
-                                             IR,                            // CH1
-                                             TSL2561_INTEGRATIONTIME_101MS, // conv_time
-                                             TSL2561_GAIN_x1);              // adc_gain
+                                                 IR,                            // CH1
+                                                 TSL2561_INTEGRATIONTIME_101MS, // conv_time
+                                                 TSL2561_GAIN_x1);              // adc_gain
         // TRACE_B("IR : %d", IR);
         // TRACE_B("Visible : %d", Visible_Ir - IR);
         // TRACE_B("Lux : %d", Lux_intensity);
@@ -257,4 +259,3 @@ uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master)
     }
     return illuminance_value;
 }
-

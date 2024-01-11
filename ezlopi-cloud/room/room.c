@@ -20,6 +20,10 @@ void room_list(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddRawToObject(cj_response, ezlopi_result_str, rooms_str);
         free(rooms_str);
     }
+    else
+    {
+        cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    }
 }
 
 void room_get(cJSON *cj_request, cJSON *cj_response)

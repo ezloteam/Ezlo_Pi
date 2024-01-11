@@ -106,13 +106,13 @@ static int __init(l_ezlopi_item_t *item)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_door;
     device->cloud_properties.device_type = dev_type_doorlock;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -138,7 +138,7 @@ static int __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device)
             {
                 __setup_device_cloud_properties(device, cj_device);
@@ -238,9 +238,11 @@ static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args)
             memset(sensor_door_properties, 0, sizeof(s_ezlopi_device_properties_t));
             sensor_door_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
 
-            char *device_name = NULL;
-            CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
-            ASSIGN_DEVICE_NAME(sensor_door_properties, device_name);
+            // char *device_name = NULL;
+            // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
+            // ASSIGN_DEVICE_NAME(sensor_door_properties, device_name);
+            // sensor_door_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+
             sensor_door_properties->ezlopi_cloud.category = category_security_sensor;
             sensor_door_properties->ezlopi_cloud.subcategory = subcategory_door;
             sensor_door_properties->ezlopi_cloud.item_name = ezlopi_item_name_dw_state;
@@ -252,7 +254,6 @@ static s_ezlopi_device_properties_t *sensor_door_prepare_properties(void *args)
             sensor_door_properties->ezlopi_cloud.battery_powered = false;
             sensor_door_properties->ezlopi_cloud.show = true;
             sensor_door_properties->ezlopi_cloud.room_name[0] = '\0';
-            sensor_door_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
             sensor_door_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
             sensor_door_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
             sensor_door_properties->interface.gpio.gpio_in.gpio_num = GPIO_NUM_36;

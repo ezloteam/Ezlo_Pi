@@ -5,6 +5,7 @@
 
 #include "ezlopi_scenes_v2.h"
 #include "ezlopi_meshbot_service.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_status_changed.h"
 
 static void __scenes_process(void *arg);

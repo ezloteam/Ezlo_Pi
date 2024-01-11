@@ -9,8 +9,6 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     uint32_t item_id = 0;
-    uint32_t value = 0;
-
     cJSON *cj_params = cJSON_CreateObject();
 
     if (cj_params)
@@ -41,7 +39,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
-                        cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->value.value_string);
+                        cJSON_AddStringToObject(cj_params, ezlopi_value_str, curr_field->value.value_string);
                         TRACE_D("value: %s", curr_field->value.value_string);
                     }
                 }

@@ -128,4 +128,26 @@
         }                                                                         \
     }
 
+#define CJSON_GET_ID(id, cj_id)                         \
+    {                                                   \
+        if (cj_id && cj_id->valuestring)                \
+        {                                               \
+            id = strtoul(cj_id->valuestring, NULL, 16); \
+        }                                               \
+        else                                            \
+        {                                               \
+            id = 0;                                     \
+        }                                               \
+    }
+
+#define CJSON_ASSIGN_ID(cj_object, id, id_str)                   \
+    {                                                            \
+        if (id && cj_object && id_str)                           \
+        {                                                        \
+            char tmp_str[32];                                    \
+            snprintf(tmp_str, sizeof(tmp_str), "%08x", id);      \
+            cJSON_AddStringToObject(cj_object, id_str, tmp_str); \
+        }                                                        \
+    }
+
 #endif // __EZLOPI_CJSON_MACROS_H__

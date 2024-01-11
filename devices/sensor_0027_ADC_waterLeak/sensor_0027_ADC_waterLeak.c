@@ -69,16 +69,16 @@ int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, 
 
 static void prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_leak;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -109,7 +109,7 @@ static int __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device)
             {
                 prepare_device_cloud_properties(device, cj_device);
@@ -177,7 +177,7 @@ static int __notify(l_ezlopi_item_t *item)
 
     if (item)
     {
-        char *curret_value = NULL;
+        const char *curret_value = NULL;
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);

@@ -96,7 +96,7 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
     if (cj_params)
     {
         l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
-        uint32_t found_setting = 0;
+
         while (curr_device)
         {
             if (cJSON_HasObjectItem(cj_params, ezlopi_deviceId_str))

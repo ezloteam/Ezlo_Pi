@@ -92,9 +92,11 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         memset(ezlopi_servo_motor_MG_996R_properties, 0, sizeof(s_ezlopi_device_properties_t));
         ezlopi_servo_motor_MG_996R_properties->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
 
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
-        ASSIGN_DEVICE_NAME(ezlopi_servo_motor_MG_996R_properties, device_name);
+        // char *device_name = NULL;
+        // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
+        // ASSIGN_DEVICE_NAME(ezlopi_servo_motor_MG_996R_properties, device_name);
+        // ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.category = category_dimmable_light;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.subcategory = subcategory_dimmable_bulb;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.item_name = ezlopi_item_name_dimmer;
@@ -106,7 +108,6 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.battery_powered = false;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.show = true;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.room_name[0] = '\0';
-        ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 

@@ -74,15 +74,16 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t 
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_flow_meter;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
@@ -113,7 +114,7 @@ static int __0054_prepare(void *arg)
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
-            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (flowmeter_device)
             {
                 __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);
