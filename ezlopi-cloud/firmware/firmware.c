@@ -102,7 +102,9 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
         cJSON *cj_params = cJSON_AddObjectToObject(cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON_AddStringToObject(cj_params, "firmware_version", VERSION_STR);
+            char firmware_version_str[20];
+            snprintf(firmware_version_str, sizeof(firmware_version_str), "%s.%d", VERSION_STR, BUILD);
+            cJSON_AddStringToObject(cj_params, "firmware_version", firmware_version_str);
 
             char *device_type = ezlopi_factory_info_v3_get_device_type();
             if (device_type)
