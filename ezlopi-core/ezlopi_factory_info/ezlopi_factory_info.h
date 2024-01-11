@@ -304,16 +304,15 @@ static const char *ezlopi_config_test =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\
-        {\
-            \"dev_type\": 8,\
-            \"dev_name\": \"GY271\",\
-            \"id_room\": \"\",\
-            \"id_item\": 7,\
-            \"gpio_sda\": 18,\
-            \"gpio_scl\": 19,\
-            \"pullup_scl\": true,\
-            \"pullup_sda\": true,\
-            \"slave_addr\": 13\
+{\
+        \"dev_type\":5,\
+        \"dev_name\":\"Dimmer\",\
+        \"id_room\":\"\",\
+        \"id_item\":22,\
+        \"gpio\":21,\
+        \"pwm_resln\":3,\
+        \"freq_hz\":50,\
+        \"duty_cycle\":0\
         }\
         ],\
     \"dev_total\": 1}";

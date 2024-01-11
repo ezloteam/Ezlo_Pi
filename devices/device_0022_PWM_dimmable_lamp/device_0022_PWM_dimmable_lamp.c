@@ -29,6 +29,7 @@ typedef struct s_dimmable_bulb_properties
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
+static int __list_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 
@@ -54,6 +55,8 @@ int device_0022_PWM_dimmable_lamp(e_ezlopi_actions_t action, l_ezlopi_item_t *it
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
+        __list_cjson_value(item, arg);
+        break;
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = __get_cjson_value(item, arg);
@@ -86,6 +89,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
                 dimmable_bulb_arg->previous_brightness_value = dimmable_bulb_arg->current_brightness_value;
                 dimmable_bulb_arg->current_brightness_value = target_value;
+                ezlopi_device_value_updated_from_device_v3(dimmable_bulb_arg->item_dimmer);
                 ezlopi_device_value_updated_from_device_v3(dimmable_bulb_arg->item_dimmer_switch);
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
@@ -96,7 +100,70 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
                 dimmable_bulb_arg->current_brightness_value = (false == switch_state) ? 0 : (0 == dimmable_bulb_arg->previous_brightness_value ? 4095 : dimmable_bulb_arg->previous_brightness_value);
                 ezlopi_pwm_change_duty(dimmable_bulb_arg->item_dimmer->interface.pwm.channel, dimmable_bulb_arg->item_dimmer->interface.pwm.speed_mode, dimmable_bulb_arg->current_brightness_value);
                 ezlopi_device_value_updated_from_device_v3(dimmable_bulb_arg->item_dimmer);
+                ezlopi_device_value_updated_from_device_v3(dimmable_bulb_arg->item_dimmer_switch);
             }
+        }
+    }
+
+    return ret;
+}
+
+static int __list_cjson_value(l_ezlopi_item_t *item, void *arg)
+{
+    int ret = 0;
+
+    cJSON *param = (cJSON *)arg;
+    if (param && item && item->user_arg)
+    {
+        s_dimmable_bulb_properties_t *dimmable_bulb_arg = (s_dimmable_bulb_properties_t *)item->user_arg;
+        if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
+        {
+            int dimmable_value_percentage = (int)floor(((dimmable_bulb_arg->current_brightness_value * 100.0) / 4095.0));
+            cJSON_AddNumberToObject(param, "value", dimmable_value_percentage);
+            char *formatted_val = ezlopi_valueformatter_int(dimmable_value_percentage);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
+                free(formatted_val);
+            }
+            cJSON_AddNumberToObject(param, "minValue", 0);
+            cJSON_AddNumberToObject(param, "maxValue", 100);
+        }
+        else if (ezlopi_item_name_dimmer_up == item->cloud_properties.item_name)
+        {
+            cJSON_AddNumberToObject(param, "value", 0);
+            char *formatted_val = ezlopi_valueformatter_int(0);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
+                free(formatted_val);
+            }
+        }
+        else if (ezlopi_item_name_dimmer_down == item->cloud_properties.item_name)
+        {
+            cJSON_AddNumberToObject(param, "value", 0);
+            char *formatted_val = ezlopi_valueformatter_int(0);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
+                free(formatted_val);
+            }
+        }
+        else if (ezlopi_item_name_dimmer_stop == item->cloud_properties.item_name)
+        {
+            cJSON_AddNumberToObject(param, "value", 0);
+            char *formatted_val = ezlopi_valueformatter_int(0);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
+                free(formatted_val);
+            }
+        }
+        else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
+        {
+            bool switch_state = (0 == dimmable_bulb_arg->current_brightness_value) ? false : true;
+            cJSON_AddBoolToObject(param, "value", switch_state);
+            cJSON_AddStringToObject(param, "valueFormatted", ezlopi_valueformatter_bool(switch_state));
         }
     }
 
@@ -118,6 +185,36 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *formatted_val = ezlopi_valueformatter_int(dimmable_value_percentage);
             cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
             free(formatted_val);
+        }
+        else if (ezlopi_item_name_dimmer_up == item->cloud_properties.item_name)
+        {
+            cJSON_AddNumberToObject(param, "value", 0);
+            char *formatted_val = ezlopi_valueformatter_int(0);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
+                free(formatted_val);
+            }
+        }
+        else if (ezlopi_item_name_dimmer_down == item->cloud_properties.item_name)
+        {
+            cJSON_AddNumberToObject(param, "value", 0);
+            char *formatted_val = ezlopi_valueformatter_int(0);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
+                free(formatted_val);
+            }
+        }
+        else if (ezlopi_item_name_dimmer_stop == item->cloud_properties.item_name)
+        {
+            cJSON_AddNumberToObject(param, "value", 0);
+            char *formatted_val = ezlopi_valueformatter_int(0);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(param, "valueFormatted", formatted_val);
+                free(formatted_val);
+            }
         }
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
