@@ -305,16 +305,14 @@ static const char *ezlopi_config_test =
         \"dev_detail\":\
         [\
 {\
-                \"dev_name\" : \"GXHTC3-Sensor\",\
-                \"dev_type\" : 8,\
-                \"gpio_scl\" : 47,\
-                \"gpio_sda\" : 48,\
-                \"id_item\" : 29,\
-                \"id_room\" : \"\",\
-                \"pullup_scl\" : true,\
-                \"pullup_sda\" : true,\
-                \"slave_addr\" : 112\
-            }\
+                \"dev_type\": 2,\
+                \"dev_name\": \"Proximity\",\
+                \"id_room\": \"\",\
+                \"id_item\": 34,\
+               \"gpio\": 1,\
+               \"val_ip\": 0,\
+               \"logic_inv\": false\
+}\
         ],\
     \"dev_total\": 1}";
 #endif

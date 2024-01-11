@@ -50,8 +50,8 @@ static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *de
         CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
         ASSIGN_DEVICE_NAME_V2(device, device_name);
 
-        device->cloud_properties.category = category_switch;
-        device->cloud_properties.subcategory = subcategory_in_wall;
+        device->cloud_properties.category = category_generic_sensor;
+        device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;
         device->cloud_properties.info = NULL;
         device->cloud_properties.device_type_id = NULL;
@@ -66,7 +66,7 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
         int tmp_var = 0;
         item->cloud_properties.has_getter = true;
         item->cloud_properties.has_setter = false;
-        item->cloud_properties.item_name = ezlopi_item_name_switch;
+        item->cloud_properties.item_name = ezlopi_item_name_motion;
         item->cloud_properties.value_type = value_type_bool;
         item->cloud_properties.show = true;
         item->cloud_properties.scale = NULL;
@@ -157,8 +157,9 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
         {
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
+        item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;
         cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
-        char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? false : true);
+        char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
         cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         ret = 1;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
