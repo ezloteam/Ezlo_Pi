@@ -795,10 +795,11 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
     return ret;
 }
 
+//--------------------------- ezlopi_scene_when_is_date_range --------------------------------------------------------------
+
 static uint8_t __check_time_range(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
-
     // first confirm if the time range has positive or negative difference (end - start)
     if ((end->tm_hour - start->tm_hour) > 0)
     {
@@ -807,19 +808,19 @@ static uint8_t __check_time_range(struct tm *start, struct tm *end, struct tm *i
             ret |= (1 << 0);
             goto end;
         }
-        if ((info->tm_hour == end->tm_hour) && (info->tm_min <= end->tm_min))
+        else if ((info->tm_hour == end->tm_hour) && (info->tm_min <= end->tm_min))
         {
             ret |= (1 << 0);
             goto end;
         }
-        if ((info->tm_hour > start->tm_hour) && (info->tm_hour < end->tm_hour))
+        else if ((info->tm_hour > start->tm_hour) && (info->tm_hour < end->tm_hour))
         {
             ret |= (1 << 0);
             goto end;
         }
     }
     else
-    {
+    { // for inverted hours [ie. end(say): 2pm  / start(say): 5pm ; take 'mday' into consideration]
         if ((info->tm_mday >= start->tm_mday) && (info->tm_mday <= end->tm_mday))
         {
             if (((info->tm_hour >= start->tm_hour) && (info->tm_hour <= end->tm_hour)))
@@ -827,10 +828,10 @@ static uint8_t __check_time_range(struct tm *start, struct tm *end, struct tm *i
                 ret |= (1 << 0);
                 goto end;
             }
-            else
-            {
-                TRACE_B("Invalid day-orders : start[%d] vs end[%d]", start->tm_mday, end->tm_mday);
-            }
+        }
+        else
+        {
+            TRACE_B("Invalid day-orders : start[%d] vs end[%d]", start->tm_mday, end->tm_mday);
         }
     }
 end:
@@ -878,6 +879,23 @@ static uint8_t __check_year_range(struct tm *start, struct tm *end, struct tm *i
     }
     return ret;
 }
+
+typedef enum e_isdate_range_func
+{
+    ISDATE_RANGE_TIME = 0,
+    ISDATE_RANGE_DAY,
+    ISDATE_RANGE_MONTH,
+    ISDATE_RANGE_YEAR,
+    ISDATE_RANGE_MAX,
+} e_isdate_range_func_t;
+
+static uint8_t (*_isDate_range_func[])(struct tm *start, struct tm *end, struct tm *info) = {
+    __check_time_range,
+    __check_day_range,
+    __check_month_range,
+    __check_year_range,
+};
+
 int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
@@ -885,20 +903,14 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
-        // calculate the rawtime
-        time_t rawtime = 0;
-        time(&rawtime);
-        struct tm *info;
-        info = localtime(&rawtime);
-
         // temporary flags
         uint8_t flag_check = 0;
-        const uint8_t TIME_FLAG = (1 << 0); // HH:MM
-        const uint8_t DAY_FLAG = (1 << 1);  //
-        const uint8_t MONTH_FLAG = (1 << 2);
-        const uint8_t YEAR_FLAG = (1 << 3);
+        const uint8_t TIME_FLAG = (1 << 0);  // HH:MM
+        const uint8_t DAY_FLAG = (1 << 1);   // 1-31
+        const uint8_t MONTH_FLAG = (1 << 2); // 1-12
+        const uint8_t YEAR_FLAG = (1 << 3);  // 1-9999
 
-        // Default values to store
+        // Default values to store start and end boundries
         struct tm start = {
             .tm_hour = 0,
             .tm_min = 0,
@@ -906,8 +918,6 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
             .tm_mon = 1,
             .tm_year = 1,
         };
-        // total days in current_month
-
         struct tm end = {
             .tm_hour = 23,
             .tm_min = 59,
@@ -916,6 +926,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
             .tm_year = 9999,
         };
 
+        // now to fill out required date
         l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
         {
@@ -1009,13 +1020,18 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
         struct tm *info;
         info = localtime(&rawtime);
 
-        // 1. Check the time validity
-        flag_check |= __check_time_range(&start, &end, info);
-        flag_check |= __check_day_range(&start, &end, info);
-        flag_check |= __check_month_range(&start, &end, info);
-        flag_check |= __check_year_range(&start, &end, info);
+        // 1. Check the time,day,month and year validity
+        for (uint8_t i = 0; i < ISDATE_RANGE_MAX; i++)
+        {
+            flag_check |= _isDate_range_func[i](&start, &end, info);
+        }
 
         // now compare the flag status
+        TRACE_B("isdate_range flag_check [0x0%x]", flag_check);
+        if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
+        {
+            ret = 1;
+        }
     }
     return ret;
 }
