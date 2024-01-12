@@ -344,55 +344,50 @@ static void qt_serial_save_config(const char *data)
 
 static void qt_serial_read_config(void)
 {
-    cJSON *root = NULL;
-    char *buf = ezlopi_factory_info_v2_get_ezlopi_config();
+    uint32_t ret = 0;
+    cJSON *cj_ezlopi_config = NULL;
+    static const char *empty_config_resp = "{\"cmd\":4}";
+    char *ezlopi_config_str = ezlopi_factory_info_v2_get_ezlopi_config();
 
-    if (buf)
+    if (ezlopi_config_str)
     {
-        TRACE_D("buf[len: %d]: %s", strlen(buf), buf);
-        root = cJSON_Parse(buf);
+        TRACE_D("ezlopi_config_str[len: %d]: %s", strlen(ezlopi_config_str), ezlopi_config_str);
+        cj_ezlopi_config = cJSON_Parse(ezlopi_config_str);
+        ezlopi_factory_info_v2_free_ezlopi_config();
 
-        if (root)
+        if (cj_ezlopi_config)
         {
-            cJSON_DeleteItemFromObject(root, ezlopi_cmd_str);
-            cJSON_AddNumberToObject(root, ezlopi_cmd_str, 4);
+            cJSON_DeleteItemFromObject(cj_ezlopi_config, ezlopi_cmd_str);
+            cJSON_AddNumberToObject(cj_ezlopi_config, ezlopi_cmd_str, 4);
+
+            char *data_to_send = cJSON_Print(cj_ezlopi_config);
+            cJSON_Delete(cj_ezlopi_config);
+
+            if (data_to_send)
+            {
+                cJSON_Minify(data_to_send);
+                qt_serial_tx_data(strlen(data_to_send), (uint8_t *)data_to_send); // Send the data over uart
+                free(data_to_send);
+                ret = 1;
+            }
+            else
+            {
+                TRACE_E("Failed to generate string data!");
+            }
         }
         else
         {
-            TRACE_E("'root' is null!");
+            TRACE_E("ezlopi_config - json parsing failed!");
         }
     }
     else
     {
-        TRACE_E("'buf' is null!");
+        TRACE_E("ezlopi-config not found in id.bin partition!");
     }
 
-    if (NULL == root)
+    if (0 == ret)
     {
-        TRACE_E("Reading config failed!");
-        root = cJSON_CreateObject();
-        if (root)
-        {
-            cJSON_AddNumberToObject(root, ezlopi_cmd_str, 4);
-            TRACE_D("'root'");
-        }
-        else
-        {
-            TRACE_E("Failed to create 'root'!");
-        }
-    }
-
-    if (root)
-    {
-        char *my_json_string = cJSON_Print(root);
-        cJSON_Delete(root); // free Json string
-
-        if (my_json_string)
-        {
-            cJSON_Minify(my_json_string);
-            qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string); // Send the data over uart
-            cJSON_free(my_json_string);
-        }
+        qt_serial_tx_data(strlen(empty_config_resp), (uint8_t *)empty_config_resp); // Send the data over uart
     }
 }
 

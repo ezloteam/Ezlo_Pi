@@ -73,11 +73,6 @@ int sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item,
 //---------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    // char *dev_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
-    // ASSIGN_DEVICE_NAME_V2(device, dev_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;

@@ -1,12 +1,13 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "scenes.h"
 #include "trace.h"
 #include "cJSON.h"
+#include "scenes.h"
+
 #include "ezlopi_nvs.h"
-// #include "ezlopi_scenes_v2.h"
 #include "ezlopi_devices.h"
+#include "ezlopi_scenes_v2.h"
 #include "ezlopi_cjson_macros.h"
 #include "ezlopi_meshbot_service.h"
 #include "ezlopi_cloud_constants.h"
@@ -29,11 +30,14 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
+        TRACE_D("new-scene-id: %08x", new_scene_id);
+
         if (new_scene_id)
         {
             char tmp_buff[32];
@@ -65,57 +69,32 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-#if 0
 void scenes_edit(cJSON *cj_request, cJSON *cj_response)
 {
+
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
 
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
-        if (cj_id && cj_id->valuestring)
+        cJSON *cj_eo = cJSON_GetObjectItem(cj_params, "eo");
+        if (cj_eo)
         {
-            uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
-            cJSON *cj_eo = cJSON_GetObjectItem(cj_params, "eo");
-            if (cj_eo)
+            CJSON_TRACE("scene-edit eo", cj_eo);
+
+            cJSON *cj_id = cJSON_GetObjectItem(cj_eo, ezlopi__id_str);
+            if (cj_id && cj_id->valuestring)
             {
-                // ezlopi_scenes_update_by_id(u_id, cj_eo);
+                if (cj_id && cj_id->valuestring)
+                {
+                    uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
+                    // ezlopi_scenes_edit_by_id(u_id, cj_eo);
+                }
             }
         }
     }
 }
-#endif
-
-#if 1
-void scenes_edit(cJSON *cj_request, cJSON *cj_response)
-{
-    TRACE_B("'hub.scenes.edit' command received");
-    char *tmp_data = cJSON_Print(cj_request);
-    TRACE_B("%s", tmp_data);
-    free(tmp_data);
-
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
-    if (cj_params)
-    {
-        cJSON *cj_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
-        if (cj_id && cj_id->valuestring)
-        {
-
-            // uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
-            // cJSON *cj_eo = cJSON_GetObjectItem(cj_params, "eo");
-            // if (cj_eo)
-            // {
-            //     ezlopi_scenes_update_by_id(u_id, cj_eo);
-            // }
-        }
-    }
-}
-#endif
 
 void scenes_delete(cJSON *cj_request, cJSON *cj_response)
 {

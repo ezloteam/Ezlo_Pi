@@ -180,5 +180,6 @@ void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_noti
 void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list);
 
 void ezlopi_scenes_notifications_add(cJSON *cj_notifications);
+int ezlopi_scenes_edit_by_id(uint32_t scene_id, cJSON *cj_updated_scene);
 
 #endif // __EZLOPI_SCENES_V2_H__

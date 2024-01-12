@@ -206,7 +206,10 @@ typedef struct s_basic_factory_info
     int ezlopi_factory_info_v2_set_ssl_public_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
 
+    /** Functions to free **/
     void ezlopi_factory_info_v2_free(void *arg);
+    void ezlopi_factory_info_v2_free_ezlopi_config(void);
+
     int ezlopi_factory_info_v2_factory_reset(void);
 
 #ifdef __cplusplus

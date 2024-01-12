@@ -341,12 +341,15 @@ static char *__dynamic_config_base64(void)
     if (base64_data)
     {
         uint32_t out_put_len = 0;
-        char *str_provisioning_data = ezlopi_factory_info_v2_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
-        if (str_provisioning_data)
+        char *str_ezlopi_config = ezlopi_factory_info_v2_get_ezlopi_config(); // do not free 'str_ezlopi_config', it is used by other modules
+        if (str_ezlopi_config)
         {
-            TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);
+            TRACE_D("str_ezlopi_config[len: %d]: %s", strlen(str_ezlopi_config), str_ezlopi_config);
 
-            int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len, (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
+            int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
+                                            (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
+
+            ezlopi_factory_info_v2_free_ezlopi_config();
 
             TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
         }
