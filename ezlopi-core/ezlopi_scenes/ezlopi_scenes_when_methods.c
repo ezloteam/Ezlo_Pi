@@ -273,7 +273,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
     return 0;
 }
 
-//------------------------------- ezlopi_scene_when_is_date ---------------------------------------------------------------
+//------------------------------- ezlopi_scene_when_is_date -----------------------------------------------------------
 static e_isdate_modes_t __field_type_check(const char *check_type_name)
 {
     const char *field_type_name[] = {
@@ -313,7 +313,6 @@ static uint8_t __field_time_check(e_isdate_modes_t mode_type, struct tm *info, c
                 // TRACE_B("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
                 if (0 == strncmp(array_item->valuestring, field_hr_mm, 10))
                 {
-
                     ret = (1 << 0); // One of the TIME-condition has been met.
                     break;
                 }
@@ -335,8 +334,8 @@ static uint8_t __field_weekdays_check(e_isdate_modes_t mode_type, struct tm *inf
     uint8_t ret = 0;
     if (cj_weekdays_arr && (cJSON_Array == cj_weekdays_arr->type))
     {
-        // TRACE_I("field_weekdays_check, arr_type[cJSON_Array:%d] ", cj_weekdays_arr->type);
-        int field_weekdays = (info->tm_wday) + 1; // sunday => 0+1 ... saturday => 6+1
+        // Only for comparisions dont change 'info->tm_wday' -> 'sun:0,mon:1, ... , sat:6' to 'sun:7,mon:1, ... ,sat:6'
+        int field_weekdays = (0 == (info->tm_wday)) ? 7 : (info->tm_wday); // sunday => 0+1 ... saturday => 6+1
 
         int array_size = cJSON_GetArraySize(cj_weekdays_arr);
         for (int i = 0; i < array_size; i++)
@@ -384,8 +383,7 @@ static uint8_t __compare_end_week_date(e_isdate_modes_t mode_type, struct tm *in
     uint8_t ret = 0;
     static uint8_t _last_day_of_curr_month = 0;
     static int _starting_date_of_last_week = -1;
-    // filter out the first 22 days ;
-    // which (definately) do-not lie in last week of the month
+    // filter out the first 22 days ; which do-not lie in last week of the month
     if (info->tm_mday > 22)
     {
         // 1. Find out the 'valid' starting date of last week ( return -1 , if invalid )
@@ -393,6 +391,7 @@ static uint8_t __compare_end_week_date(e_isdate_modes_t mode_type, struct tm *in
         {
             //-------------------------------------------------------------------
             // 1.1 find the nearest-prev sunday and assign it.
+            // for this calculation dont change default 'info->tm_wday' -> '0-6'
             switch (info->tm_wday)
             {
             case 1: // monday
@@ -417,7 +416,7 @@ static uint8_t __compare_end_week_date(e_isdate_modes_t mode_type, struct tm *in
                 _starting_date_of_last_week = info->tm_mday;
                 break;
             }
-
+            TRACE_I("sunday :%dth_Day ", _starting_date_of_last_week);
             //-------------------------------------------------------------------
             // 1.2 validate the generated sunday number
             switch (info->tm_mon)
@@ -491,6 +490,7 @@ static uint8_t __find_nth_week_of_curr_month(struct tm *info)
 {
     // 2. find the fisrt day in this month
     uint8_t tmp_week_num = 1;                        // starts with 1 ; since are already in one of the week-count
+                                                     // for this calculation dont change default 'info->tm_wday' -> '0-6'
     int tmp_weekday_of_curr_month = (info->tm_wday); // 0-6 ; sun = 0
     for (uint8_t i = (info->tm_mday); i > 1; i--)    // total_days_in_curr_month - 1
     {
@@ -506,7 +506,7 @@ static uint8_t __find_nth_week_of_curr_month(struct tm *info)
     }
 
     // TRACE_B("First day in current month = %d", tmp_weekday_of_curr_month);
-    // TRACE_I("[1-7] : %dth_Day  lies in week[%dth] of the current month", (info->tm_wday + 1), tmp_week_num);
+    // TRACE_B("[1-7] : %dth_Day  lies in week[%dth] of the current month", (info->tm_wday), tmp_week_num);
 
     return tmp_week_num;
 }
@@ -515,7 +515,6 @@ static uint8_t __field_weeks_check(e_isdate_modes_t mode_type, struct tm *info, 
     uint8_t ret = 0;
     if (cj_weeks_arr && (cJSON_Array == cj_weeks_arr->type))
     {
-
         int array_size = cJSON_GetArraySize(cj_weeks_arr);
         for (int i = 0; i < array_size; i++)
         {
@@ -572,14 +571,9 @@ static const s_field_filter_t field_isdate_filter_arr[] = {
     {.field_name = "weeks", .field_func = __field_weeks_check},
     {.field_name = NULL, .field_func = NULL},
 };
-
 int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    static uint8_t hhmm_daily_activation_count;   // half a minute mark counter for 'mode1'
-    static uint8_t hhmm_weekly_activation_count;  // half a minute mark counter for 'mode2'
-    static uint8_t hhmm_monthly_activation_count; // half a minute mark counter for 'mode3'
-    static uint8_t hhmm_week_activation_count;    // half a minute mark counter for 'mode4'
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block)
     {
@@ -627,7 +621,7 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             }
             curr_field = curr_field->next;
         }
-        // TRACE_B("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
+
         // Output Filter based on date+time of activation
         switch (mode_type)
         {
@@ -636,12 +630,17 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
             if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG))) //&&(0 != strncmp(buffer, prev_date_time, 20)))
             {
-                if (55 == hhmm_daily_activation_count++) // activate at the last second of 1 min
+                if (57 == (int)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
                 {
                     TRACE_W("here! time");
-                    hhmm_daily_activation_count = 0;
                     ret = 1;
                 }
+                int _is_date_counter = (int)(scene_node->when_block->fields->user_arg);
+                TRACE_B("user_arg = [%d]", _is_date_counter);
+            }
+            else
+            {
+                (scene_node->when_block->fields->user_arg) = 0;
             }
             break;
         }
@@ -651,12 +650,17 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
                  ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
             {
-                if (55 == hhmm_weekly_activation_count++) // activate at the last second of 1 min
+                if (57 == (int)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
                 {
                     TRACE_W("here! week_days and time");
-                    hhmm_weekly_activation_count = 0;
                     ret = 1;
                 }
+                int _is_date_counter = (int)(scene_node->when_block->fields->user_arg);
+                TRACE_B("user_arg = [%d]", _is_date_counter);
+            }
+            else
+            {
+                (scene_node->when_block->fields->user_arg) = 0;
             }
             break;
         }
@@ -666,12 +670,17 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
                  ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
             {
-                if (55 == hhmm_monthly_activation_count++) // activate at the last second of 1 min
+                if (57 == (int)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
                 {
                     TRACE_W("here! mon_days and time");
-                    hhmm_monthly_activation_count = 0;
                     ret = 1;
                 }
+                int _is_date_counter = (int)(scene_node->when_block->fields->user_arg);
+                TRACE_B("user_arg = [%d]", _is_date_counter);
+            }
+            else
+            {
+                (scene_node->when_block->fields->user_arg) = 0;
             }
             break;
         }
@@ -682,12 +691,17 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
                 ((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG))) // && (0 != strncmp(buffer, prev_date_time, 20)))
             {
-                if (55 == hhmm_week_activation_count++) // activate at the last second of 1 min
+                if (57 == (int)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
                 {
                     TRACE_W("here! week and time");
-                    hhmm_week_activation_count = 0;
                     ret = 1;
                 }
+                int _is_date_counter = (int)(scene_node->when_block->fields->user_arg);
+                TRACE_B("user_arg = [%d]", _is_date_counter);
+            }
+            else
+            {
+                (scene_node->when_block->fields->user_arg) = 0;
             }
             break;
         }
@@ -699,11 +713,10 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 }
 
 //--------------------------- ezlopi_scene_when_is_once --------------------------------------------------------------
-
 int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    static uint8_t hhmm_is_once_counter; // half a minute mark counter for 'mode1'
+
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
@@ -780,23 +793,25 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
         if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
         {
             // now to disable the scene and also store in ezlopi_nvs
-            if (55 == hhmm_is_once_counter++) // activate at the last second of 1 min
+            if (57 == (int)(scene_node->when_block->fields->user_arg)++)
             {
                 TRACE_W("here! once and time");
-                hhmm_is_once_counter = 0;
-
                 scene_node->enabled = false;
                 ezlopi_scenes_enable_disable_id_from_list_v2(scene_node->_id, false);
-
                 ret = 1;
             }
+            int _is_once_counter = (int)(scene_node->when_block->fields->user_arg);
+            TRACE_B("user_arg = [%d]", _is_once_counter);
+        }
+        else
+        {
+            (scene_node->when_block->fields->user_arg) = 0;
         }
     }
     return ret;
 }
 
-//--------------------------- ezlopi_scene_when_is_date_range --------------------------------------------------------------
-
+//--------------------------- ezlopi_scene_when_is_date_range --------------------------------------------------------
 static uint8_t __check_time_range(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -826,7 +841,6 @@ static uint8_t __check_time_range(struct tm *start, struct tm *end, struct tm *i
             if (((info->tm_hour >= start->tm_hour) && (info->tm_hour <= end->tm_hour)))
             {
                 ret |= (1 << 0);
-                goto end;
             }
         }
         else
@@ -837,7 +851,6 @@ static uint8_t __check_time_range(struct tm *start, struct tm *end, struct tm *i
 end:
     return ret;
 }
-
 static uint8_t __check_day_range(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -851,7 +864,6 @@ static uint8_t __check_day_range(struct tm *start, struct tm *end, struct tm *in
     }
     return ret;
 }
-
 static uint8_t __check_month_range(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -865,7 +877,6 @@ static uint8_t __check_month_range(struct tm *start, struct tm *end, struct tm *
     }
     return ret;
 }
-
 static uint8_t __check_year_range(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -879,7 +890,6 @@ static uint8_t __check_year_range(struct tm *start, struct tm *end, struct tm *i
     }
     return ret;
 }
-
 typedef enum e_isdate_range_func
 {
     ISDATE_RANGE_TIME = 0,
@@ -889,7 +899,7 @@ typedef enum e_isdate_range_func
     ISDATE_RANGE_MAX,
 } e_isdate_range_func_t;
 
-static uint8_t (*_isDate_range_func[])(struct tm *start, struct tm *end, struct tm *info) = {
+static uint8_t (*_is_date_range_func[])(struct tm *start, struct tm *end, struct tm *info) = {
     __check_time_range,
     __check_day_range,
     __check_month_range,
@@ -899,7 +909,6 @@ static uint8_t (*_isDate_range_func[])(struct tm *start, struct tm *end, struct 
 int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-    static uint8_t hhmm_is_once_counter; // half a minute mark counter for 'mode1'
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
@@ -1023,19 +1032,31 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
         // 1. Check the time,day,month and year validity
         for (uint8_t i = 0; i < ISDATE_RANGE_MAX; i++)
         {
-            flag_check |= _isDate_range_func[i](&start, &end, info);
+            flag_check |= _is_date_range_func[i](&start, &end, info);
         }
 
         // now compare the flag status
-        TRACE_B("isdate_range flag_check [0x0%x]", flag_check);
+        TRACE_D("isdate_range flag_check [0x0%x]", flag_check);
         if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
         {
-            ret = 1;
+            // increment the counter and store it in 'scence->field->user_arg'.
+            if (57 == (int)(scene_node->when_block->fields->user_arg)++)
+            {
+                TRACE_W("here! isDate_range");
+                ret = 1;
+            }
+            int _is_date_range_counter = (int)(scene_node->when_block->fields->user_arg);
+            TRACE_B("user_arg = [%d]", _is_date_range_counter);
+        }
+        else
+        {
+            (scene_node->when_block->fields->user_arg) = 0;
         }
     }
     return ret;
 }
 
+//-------------------------------------------------------------------------------------------------------------------
 int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, void *arg)
 {
     TRACE_W("Warning: when-method 'is_user_lock_operation' not implemented!");
