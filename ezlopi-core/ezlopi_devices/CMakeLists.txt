@@ -34,8 +34,8 @@ idf_component_register(SRCS "ezlopi_controller.c" "ezlopi_devices.c" "ezlopi_dev
                                 sensor_0023_digitalIn_touch_switch_TTP223B
                                 sensor_0024_other_HCSR04
                                 sensor_0025_digitalIn_LDR
-                                sensor_0027_ADC_waterLeak                                
                                 sensor_0026_ADC_LDR
+                                sensor_0027_ADC_waterLeak                                
                                 
                                 sensor_0028_other_GY61
                                 sensor_0029_I2C_GXHTC3

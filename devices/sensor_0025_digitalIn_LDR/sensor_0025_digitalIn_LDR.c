@@ -19,7 +19,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __value_updated_from_interrupt(void *arg);
 
-int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void **user_arg)
 {
     int ret = 0;
 
@@ -117,7 +117,6 @@ static int __prepare(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     item->func = sensor_0025_digitalIn_LDR;
                     __setup_item_properties(item, cj_device);
                 }
@@ -156,8 +155,6 @@ static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_devic
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_outlet;
-    device->cloud_properties.info = NULL;
-    device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
