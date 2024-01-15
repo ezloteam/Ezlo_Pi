@@ -213,4 +213,7 @@ extern const char *scene_status_partially_finished_str;
 extern const char *scene_status_failed_str;
 extern const char *scene_status_stopped_str;
 
+extern const char *ezlopi_armed_str;
+extern const char *ezlopi_subtype_str;
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

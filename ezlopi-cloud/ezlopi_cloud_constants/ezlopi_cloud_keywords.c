@@ -213,4 +213,7 @@ const char *scene_status_partially_finished_str = "partially_finished";
 const char *scene_status_failed_str = "failed";
 const char *scene_status_stopped_str = "stopped";
 
+const char *ezlopi_armed_str = "armed";
+const char *ezlopi_subtype_str = "subtype";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
