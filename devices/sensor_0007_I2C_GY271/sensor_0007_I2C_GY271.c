@@ -14,7 +14,7 @@ static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __notify(l_ezlopi_item_t *item);
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+// static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data);
 static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __gy271_calibration_task(void *params);
