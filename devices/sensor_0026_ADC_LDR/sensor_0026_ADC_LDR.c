@@ -185,9 +185,8 @@ static int __notify(l_ezlopi_item_t *item)
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-
         char *curr_ldr_state = NULL;
-        if ((ezlopi_analog_data.value / 4096) > 0.3f) // pot_val : [100% - 30%]
+        if (((float)(4096 - ezlopi_analog_data.value) / 4096.0f) > 0.5f) // pot_val : [100% - 30%]
         {
             curr_ldr_state = light_alarm_states[0]; // no light
         }
@@ -197,8 +196,6 @@ static int __notify(l_ezlopi_item_t *item)
         }
         if (curr_ldr_state != (char *)item->user_arg)
         {
-            TRACE_B("Value is: %d : %s", ezlopi_analog_data.value, curr_ldr_state);
-
             item->user_arg = (void *)curr_ldr_state;
             ezlopi_device_value_updated_from_device_v3(item);
         }

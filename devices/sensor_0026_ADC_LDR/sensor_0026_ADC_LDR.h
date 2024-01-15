@@ -6,6 +6,22 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_devices.h"
 
+/**
+ *
+ *
+ *            > 3.3V----+
+ *                      |
+ *                   {_LDR_}
+ *                      |
+ *                      +------------+ ~3.3V
+ *                      |                ^
+ *                   {10KOhm}         esp32 analog input
+ *                      |                v
+ *            > 0V------+------------+ 0V
+ *
+ *
+ **/
+
 typedef enum
 {
     LIGHT_ALARM_NO_LIGHT,
