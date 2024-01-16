@@ -145,7 +145,7 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *devic
         // ASSIGN_DEVICE_NAME_V2(device, device_name);
         // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-        device->cloud_properties.category = category_security_sensor;
+        device->cloud_properties.category = category_generic_sensor;
         device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;
         device->cloud_properties.info = NULL;

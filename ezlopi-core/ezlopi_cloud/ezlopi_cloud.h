@@ -43,8 +43,9 @@ typedef struct s_ezlopi_cloud_device_settings
 
 typedef struct s_ezlopi_cloud_device
 {
-    uint32_t device_id;      // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
-    char device_name[32];    // 'name' -> https://api.ezlo.com/hub/devices_api/index.html
+    uint32_t device_id; // '_id' -> https://api.ezlo.com/hub/devices_api/index.html
+    uint32_t parent_device_id;
+    char device_name[64];    // 'name' -> https://api.ezlo.com/hub/devices_api/index.html
     char *device_type_id;    // deviceTypeId -> https://log.ezlo.com/new/hub/devices_api/
     const char *category;    // 'category' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/category_str.h
     const char *subcategory; // 'subcategory' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/subcategory_str.h
@@ -75,6 +76,14 @@ typedef struct s_ezlopi_cloud_info
     bool show; // make device visible on UI
 
 } s_ezlopi_cloud_info_t;
+
+extern const uint32_t DEVICE_ID_START;
+extern const uint32_t ITEM_ID_START;
+extern const uint32_t ROOM_ID_START;
+extern const uint32_t SETTINGS_ID_START;
+extern const uint32_t SCENE_ID_START;
+extern const uint32_t SCRIPT_ID_START;
+extern const uint32_t EXPRESSION_ID_START;
 
 uint32_t ezlopi_cloud_generate_device_id(void);
 void ezlopi_cloud_update_device_id(uint32_t device_id);

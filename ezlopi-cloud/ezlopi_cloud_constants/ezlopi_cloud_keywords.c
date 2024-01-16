@@ -165,6 +165,7 @@ const char *ezlopi_provisioned_status_str = "provisioned_status";
 const char *ezlopi_model_number_str = "model_number";
 const char *ezlopi_serial_str = "serial";
 const char *ezlopi_uuid_provisioning_str = "uuid_provisioning";
+const char *ezlopi_provision_server_str = "provision_server";
 const char *ezlopi_cloud_server_str = "cloud_server";
 const char *ezlopi_provision_token_str = "provision_token";
 const char *ezlopi_device_type_ezlopi_str = "device_type_ezlopi";
@@ -212,5 +213,13 @@ const char *scene_status_finished_str = "finished";
 const char *scene_status_partially_finished_str = "partially_finished";
 const char *scene_status_failed_str = "failed";
 const char *scene_status_stopped_str = "stopped";
+const char *ezlopi_valueformatted_str = "valueFormatted";
+const char *ezlopi_value_default_str = "valueDefault";
+const char *ezlopi_text_str = "text";
+const char *ezlopi_lang_tag_str = "lang_tag";
+const char *ezlopi_description_str = "description";
+const char *ezlopi_value_min_str = "valueMin";
+const char *ezlopi_value_max_str = "valueMax";
+const char *ezlopi_idle_str = "idle";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

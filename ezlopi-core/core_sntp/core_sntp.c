@@ -1,3 +1,4 @@
+#if 0
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -48,3 +49,5 @@ void core_sntp_init(void)
     sntp_set_sync_interval(10 * 1000);
     esp_sntp_init();
 }
+
+#endif

@@ -52,8 +52,8 @@ static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *de
         // ASSIGN_DEVICE_NAME_V2(device, device_name);
         // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-        device->cloud_properties.category = category_switch;
-        device->cloud_properties.subcategory = subcategory_in_wall;
+        device->cloud_properties.category = category_generic_sensor;
+        device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;
         device->cloud_properties.info = NULL;
         device->cloud_properties.device_type_id = NULL;
@@ -66,7 +66,7 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
     {
         item->cloud_properties.has_getter = true;
         item->cloud_properties.has_setter = false;
-        item->cloud_properties.item_name = ezlopi_item_name_switch;
+        item->cloud_properties.item_name = ezlopi_item_name_motion;
         item->cloud_properties.value_type = value_type_bool;
         item->cloud_properties.show = true;
         item->cloud_properties.scale = NULL;

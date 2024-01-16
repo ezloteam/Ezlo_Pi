@@ -165,6 +165,7 @@ extern const char *ezlopi_provisioned_status_str;
 extern const char *ezlopi_model_number_str;
 extern const char *ezlopi_serial_str;
 extern const char *ezlopi_uuid_provisioning_str;
+extern const char *ezlopi_provision_server_str;
 extern const char *ezlopi_cloud_server_str;
 extern const char *ezlopi_provision_token_str;
 extern const char *ezlopi_device_type_ezlopi_str;
@@ -212,5 +213,19 @@ extern const char *scene_status_finished_str;
 extern const char *scene_status_partially_finished_str;
 extern const char *scene_status_failed_str;
 extern const char *scene_status_stopped_str;
+
+extern const char *ezlopi_scale_str;
+extern const char *ezlopi_enum_str;
+extern const char *ezlopi_valueformatted_str;
+extern const char *ezlopi_value_default_str;
+extern const char *ezlopi_text_str;
+extern const char *ezlopi_label_str;
+extern const char *ezlopi_lang_tag_str;
+extern const char *ezlopi_description_str;
+extern const char *ezlopi_value_type_str;
+extern const char *ezlopi_value_min_str;
+extern const char *ezlopi_value_max_str;
+extern const char *ezlopi_no_str;
+extern const char *ezlopi_idle_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
