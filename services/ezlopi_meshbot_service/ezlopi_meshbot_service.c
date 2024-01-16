@@ -143,6 +143,7 @@ void ezlopi_scenes_meshbot_init(void)
         {
             scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
+
         scene_node = scene_node->next;
     }
 }
