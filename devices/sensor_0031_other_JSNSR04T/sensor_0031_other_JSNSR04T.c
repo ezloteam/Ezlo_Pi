@@ -1,14 +1,11 @@
-#include "jsn_sr04t.h"
-
 #include "trace.h"
 
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
-#include "ezlopi_valueformatter.h"
 
-#include "sensor_0031_other_JSNSR04T.h"
-
+#include "jsn_sr04t.h"
 #include "sensor_0031_other_JSNSR04T.h"
 
 static int __prepare(void *arg);
@@ -72,31 +69,13 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 // jsn_sr04t_print_data(jsn_sr04t_data);
 
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
-                cJSON_AddNumberToObject(cj_result, "value", distance);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, distance);
 
                 char *valueFormatted = ezlopi_valueformatter_float(distance);
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
-                cJSON_AddStringToObject(cj_result, "scale", "meter");
+                cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_meter);
                 ret = 1;
-#if 0
-                if (jsn_sr04t_data.distance_cm >= 50 && jsn_sr04t_data.distance_cm < 100)
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "water_level_ok");
-                }
-                else if (jsn_sr04t_data.distance_cm >= 100)
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "water_level_below_low_threshold");
-                }
-                else if (jsn_sr04t_data.distance_cm < 50)
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "water_level_above_high_threshold");
-                }
-                else
-                {
-                    cJSON_AddStringToObject(cj_result, "value", "unknown");
-                }
-#endif
             }
             else
             {
@@ -114,7 +93,6 @@ static int __init(l_ezlopi_item_t *item)
 
     if (item)
     {
-        int ret = 0;
         jsn_sr04t_config_t *jsn_sr04t_config = malloc(sizeof(jsn_sr04t_config_t));
         if (jsn_sr04t_config)
         {
@@ -133,6 +111,9 @@ static int __init(l_ezlopi_item_t *item)
             }
             else
             {
+                ret = -1;
+                item->user_arg = NULL;
+                free(jsn_sr04t_config);
                 TRACE_E("JSN_SR04T not initializeed");
             }
         }
@@ -143,19 +124,21 @@ static int __init(l_ezlopi_item_t *item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
 }
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_distance;
@@ -169,7 +152,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
@@ -177,7 +160,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
     item->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_out.value = 0;
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_in.invert = EZLOPI_GPIO_LOGIC_NONINVERTED;
@@ -193,7 +176,7 @@ static int __prepare(void *arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device();
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);

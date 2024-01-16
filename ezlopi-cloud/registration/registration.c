@@ -45,16 +45,16 @@ static void registration_process(void *pv)
                  mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
         cJSON_AddStringToObject(cj_register, "id", "__ID__");
-        cJSON_AddStringToObject(cj_register, "method", "register");
-        cJSON *cj_params = cJSON_AddObjectToObject(cj_register, "params");
+        cJSON_AddStringToObject(cj_register, ezlopi_key_method_str, "register");
+        cJSON *cj_params = cJSON_AddObjectToObject(cj_register, ezlopi_params_str);
         if (cj_params)
         {
-            cJSON_AddStringToObject(cj_params, "firmware", VERSION_STR);
+            cJSON_AddStringToObject(cj_params, ezlopi_firmware_str, VERSION_STR);
             cJSON_AddNumberToObject(cj_params, "timeOffset", 18000);
             cJSON_AddStringToObject(cj_params, "media", "radio");
             cJSON_AddStringToObject(cj_params, "hubType", "32.1");
             cJSON_AddStringToObject(cj_params, "mac_address", mac_str);
-            cJSON_AddNumberToObject(cj_params, "maxFrameSize", 4096);
+            cJSON_AddNumberToObject(cj_params, "maxFrameSize", (20 * 1024));
         }
 
         while (false == ezlopi_websocket_client_is_connected())
@@ -62,7 +62,7 @@ static void registration_process(void *pv)
             vTaskDelay(200 / portTICK_RATE_MS);
         }
 
-        while (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000 / portTICK_RATE_MS, true))
+        while (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000, true))
         {
             web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_B);
             // vTaskDelay(2000 / portTICK_RATE_MS);
@@ -70,6 +70,5 @@ static void registration_process(void *pv)
 
         cJSON_Delete(cj_register);
     }
-
     vTaskDelete(NULL);
 }

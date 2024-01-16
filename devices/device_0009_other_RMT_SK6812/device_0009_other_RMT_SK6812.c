@@ -13,6 +13,7 @@
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_spi_master.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
@@ -95,7 +96,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
         {
-            cJSON *color_json = cJSON_AddObjectToObject(cjson_properties, "value");
+            cJSON *color_json = cJSON_AddObjectToObject(cjson_properties, ezlopi_value_str);
             if (color_json)
             {
                 int green = sk6812_strip->buf[0];
@@ -106,24 +107,30 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddNumberToObject(color_json, "blue", blue);
                 cJSON_AddNumberToObject(color_json, "cwhite", ((red << 16) | (green << 8) | (blue)));
                 char *formatted_val = ezlopi_valueformatter_rgb(red, green, blue);
-                cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_val);
-                free(formatted_val);
+                if (formatted_val)
+                {
+                    cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
+                    free(formatted_val);
+                }
             }
         }
         else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
         {
             item->interface.pwm.duty_cycle = (int)ceil(((sk6812_strip->brightness * 100.0) / 255.0));
-            cJSON_AddNumberToObject(cjson_properties, "value", item->interface.pwm.duty_cycle);
+            cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, item->interface.pwm.duty_cycle);
             char *formatted_val = ezlopi_valueformatter_int32(item->interface.pwm.duty_cycle);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_val);
-            free(formatted_val);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
+                free(formatted_val);
+            }
         }
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
             item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
-            cJSON_AddBoolToObject(cjson_properties, "value", item->interface.gpio.gpio_in.value);
+            cJSON_AddBoolToObject(cjson_properties, ezlopi_value_str, item->interface.gpio.gpio_in.value);
             char *formatted_val = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", formatted_val);
+            cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
         }
     }
     return ret;
@@ -142,7 +149,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON *cjson_params_color_values = cJSON_GetObjectItem(cjson_params, "value");
+                cJSON *cjson_params_color_values = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
 
                 rgb_t color = {
                     .red = 0,
@@ -162,7 +169,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dimmable_value_percentage = 0;
-                CJSON_GET_VALUE_INT(cjson_params, "value", dimmable_value_percentage);
+                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, dimmable_value_percentage);
                 int dimmable_value = (int)((dimmable_value_percentage * 255) / 100);
                 led_strip_set_brightness(&dimmer_args->sk6812_strip, dimmable_value);
                 led_strip_flush(&dimmer_args->sk6812_strip);
@@ -172,7 +179,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 int led_state = 0;
-                CJSON_GET_VALUE_INT(cjson_params, "value", led_state);
+                CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, led_state);
                 dimmer_args->previous_brightness = (false == led_state) ? dimmer_args->sk6812_strip.brightness : dimmer_args->previous_brightness;
                 int brightness_value = (false == led_state) ? 0 : ((0 == dimmer_args->previous_brightness) ? 255 : dimmer_args->previous_brightness);
                 led_strip_set_brightness(&dimmer_args->sk6812_strip, brightness_value);
@@ -216,20 +223,32 @@ static int __init(l_ezlopi_item_t *item)
                     .blue = 255,
                 };
 
-                err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, &dimmer_args->sk6812_strip.length, color);
-                err |= led_strip_set_brightness(&dimmer_args->sk6812_strip, 255);
-                err |= led_strip_flush(&dimmer_args->sk6812_strip);
-
-                if (ESP_OK == err)
+                err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, dimmer_args->sk6812_strip.length, color);
+                if (ESP_OK == (err = led_strip_set_brightness(&dimmer_args->sk6812_strip, 255)))
                 {
-                    dimmer_args->sk6812_led_strip_initialized = true;
+                    if (ESP_OK == (err = led_strip_flush(&dimmer_args->sk6812_strip)))
+                    {
+                        ret = 1;
+                        dimmer_args->sk6812_led_strip_initialized = true;
+                    }
                 }
             }
 
             if (ESP_OK != err)
             {
-                ezlopi_device_free_device_by_item(item);
+                TRACE_E("Couldn't initiate device!, error: %d", err);
             }
+        }
+    }
+
+    if (0 == ret)
+    {
+        TRACE_E("Here");
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
         }
     }
 
@@ -238,15 +257,16 @@ static int __init(l_ezlopi_item_t *item)
 
 static void __prepare_device_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_SK6812_RGB_color_item(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -261,7 +281,7 @@ static void __prepare_SK6812_RGB_color_item(l_ezlopi_item_t *item, cJSON *cj_dev
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
     item->interface.pwm.channel = 0;
     item->interface.pwm.value = 0;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -279,7 +299,7 @@ static void __prepare_SK6812_RGB_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_de
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
     item->interface.pwm.channel = 0;
     item->interface.pwm.value = 0;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -287,7 +307,7 @@ static void __prepare_SK6812_RGB_dimmer_item(l_ezlopi_item_t *item, cJSON *cj_de
 
 static void __prepare_SK6812_RGB_dimmer_up_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -296,7 +316,7 @@ static void __prepare_SK6812_RGB_dimmer_up_item(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -304,7 +324,7 @@ static void __prepare_SK6812_RGB_dimmer_up_item(l_ezlopi_item_t *item, cJSON *cj
 
 static void __prepare_SK6812_RGB_dimmer_down_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -313,7 +333,7 @@ static void __prepare_SK6812_RGB_dimmer_down_item(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -321,7 +341,7 @@ static void __prepare_SK6812_RGB_dimmer_down_item(l_ezlopi_item_t *item, cJSON *
 
 static void __prepare_SK6812_RGB_dimmer_stop_item(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -330,7 +350,7 @@ static void __prepare_SK6812_RGB_dimmer_stop_item(l_ezlopi_item_t *item, cJSON *
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
@@ -363,7 +383,7 @@ static int __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device();
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
         if (device)
         {
             __prepare_device_properties(device, prep_arg->cjson_device);
@@ -405,6 +425,8 @@ static int __prepare(void *arg)
                 }
                 else
                 {
+                    TRACE_E("Here");
+
                     free(dimmer_args);
                     ezlopi_device_free_device(device);
                 }

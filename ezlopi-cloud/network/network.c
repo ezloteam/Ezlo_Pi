@@ -5,7 +5,6 @@
 #include "ezlopi_wifi.h"
 #include "trace.h"
 
-
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
@@ -19,38 +18,38 @@ void network_get(cJSON *cj_request, cJSON *cj_response)
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        cJSON *interfaces_array = cJSON_AddArrayToObject(cjson_result, "interfaces");
+        cJSON *interfaces_array = cJSON_AddArrayToObject(cjson_result, ezlopi_interfaces_str);
         if (interfaces_array)
         {
             cJSON *wifi_properties = cJSON_CreateObject();
             if (wifi_properties)
             {
                 char tmp_string[64];
-                cJSON_AddStringToObject(wifi_properties, "_id", "wifi");
-                cJSON_AddStringToObject(wifi_properties, "enabled", "auto");
+                cJSON_AddStringToObject(wifi_properties, ezlopi__id_str, ezlopi_wifi_str);
+                cJSON_AddStringToObject(wifi_properties, ezlopi_enabled_str, ezlopi_auto_str);
 
                 uint8_t mac_addr[6];
                 esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
                 snprintf(tmp_string, sizeof(tmp_string), "%02x:%02x:%02x:%02x:%02x:%02x", MAC_ADDR_EXPANDED(mac_addr));
-                cJSON_AddStringToObject(wifi_properties, "hwaddr", tmp_string);
-                cJSON_AddBoolToObject(wifi_properties, "internetAvailable", true);
-                cJSON_AddStringToObject(wifi_properties, "network", "wan");
-                cJSON_AddStringToObject(wifi_properties, "status", "up");
-                cJSON_AddStringToObject(wifi_properties, "type", "wifi");
+                cJSON_AddStringToObject(wifi_properties, ezlopi_hwaddr_str, tmp_string);
+                cJSON_AddBoolToObject(wifi_properties, ezlopi_internetAvailable_str, true);
+                cJSON_AddStringToObject(wifi_properties, ezlopi_network_str, ezlopi_wan_str);
+                cJSON_AddStringToObject(wifi_properties, ezlopi_status_str, ezlopi_up_str);
+                cJSON_AddStringToObject(wifi_properties, ezlopi_type_str, ezlopi_wifi_str);
 
                 cJSON *wifi_ipv4 = cJSON_CreateObject();
                 if (wifi_ipv4)
                 {
                     esp_netif_ip_info_t *ip_info = ezlopi_wifi_get_ip_infos();
                     snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->gw));
-                    cJSON_AddStringToObject(wifi_ipv4, "ip", tmp_string);
+                    cJSON_AddStringToObject(wifi_ipv4, ezlopi_ip_str, tmp_string);
                     snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->ip));
-                    cJSON_AddStringToObject(wifi_ipv4, "mask", tmp_string);
+                    cJSON_AddStringToObject(wifi_ipv4, ezlopi_mask_str, tmp_string);
                     snprintf(tmp_string, sizeof(tmp_string), IPSTR, IP2STR(&ip_info->netmask));
-                    cJSON_AddStringToObject(wifi_ipv4, "gateway", tmp_string);
-                    cJSON_AddStringToObject(wifi_ipv4, "mode", "dhcp");
+                    cJSON_AddStringToObject(wifi_ipv4, ezlopi_gateway_str, tmp_string);
+                    cJSON_AddStringToObject(wifi_ipv4, ezlopi_mode_str, ezlopi_dhcp_str);
 
-                    if (!cJSON_AddItemToObjectCS(wifi_properties, "ipv4", wifi_ipv4))
+                    if (!cJSON_AddItemToObjectCS(wifi_properties, ezlopi_ipv4_str, wifi_ipv4))
                     {
                         cJSON_Delete(wifi_ipv4);
                         wifi_ipv4 = NULL;

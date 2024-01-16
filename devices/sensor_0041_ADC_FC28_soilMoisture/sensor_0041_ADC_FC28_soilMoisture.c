@@ -102,7 +102,7 @@ static int __0041_prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_fc28_data_t));
-            l_ezlopi_device_t *fc28_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *fc28_device = ezlopi_device_add_device(cj_device);
             if (fc28_device)
             {
                 __prepare_device_cloud_properties(fc28_device, cj_device);

@@ -1,13 +1,14 @@
 #include "ezlopi_cloud.h"
-#include "gpio_isr_service.h"
-#include "ezlopi_cloud_value_type_str.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
 
+#include "gpio_isr_service.h"
 #include "sensor_0034_digitalIn_proximity.h"
 
 static int proximity_sensor_prepare(void *args);
 static int proximity_sensor_init(l_ezlopi_item_t *item);
-static void proximity_sensor_value_updated_from_device(l_ezlopi_item_t *item);
+static void proximity_sensor_value_updated_from_device(void *arg);
 static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args);
 
 int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
@@ -46,16 +47,16 @@ static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *de
 {
     if (device && cj_device)
     {
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-        ASSIGN_DEVICE_NAME_V2(device, device_name);
+        // char *device_name = NULL;
+        // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+        // ASSIGN_DEVICE_NAME_V2(device, device_name);
+        // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
         device->cloud_properties.category = category_generic_sensor;
         device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;
         device->cloud_properties.info = NULL;
         device->cloud_properties.device_type_id = NULL;
-        device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     }
 }
 
@@ -63,7 +64,6 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
 {
     if (item && cj_device)
     {
-        int tmp_var = 0;
         item->cloud_properties.has_getter = true;
         item->cloud_properties.has_setter = false;
         item->cloud_properties.item_name = ezlopi_item_name_motion;
@@ -72,11 +72,11 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
         item->cloud_properties.scale = NULL;
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-        CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.gpio.gpio_in.enable = true;
         item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
-        CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
         CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
         // CJSON_GET_VALUE_INT(cj_device, "pull_up", tmp_var);
         item->interface.gpio.gpio_in.pull = GPIO_PULLUP_ONLY; // tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
@@ -91,7 +91,7 @@ static int proximity_sensor_prepare(void *args)
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device();
+        l_ezlopi_device_t *device = ezlopi_device_add_device(device_prep_arg->cjson_device);
         if (device)
         {
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);
@@ -104,7 +104,7 @@ static int proximity_sensor_prepare(void *args)
             }
             else
             {
-                ezlopi_device_free_device(device);
+                ret = -1;
             }
         }
     }
@@ -141,9 +141,13 @@ static int proximity_sensor_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void proximity_sensor_value_updated_from_device(l_ezlopi_item_t *item)
+static void proximity_sensor_value_updated_from_device(void *arg)
 {
-    ezlopi_device_value_updated_from_device_v3(item);
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    if (item)
+    {
+        ezlopi_device_value_updated_from_device_v3(item);
+    }
 }
 
 static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
@@ -157,10 +161,9 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
         {
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
-        item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;
-        cJSON_AddBoolToObject(cj_result, "value", item->interface.gpio.gpio_in.value);
-        char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+        cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_in.value);
+        char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? false : true);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
         ret = 1;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
     }

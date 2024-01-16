@@ -27,6 +27,22 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
 {
     if (fields)
     {
+        switch (fields->value_type)
+        {
+        case EZLOPI_VALUE_TYPE_TOKEN:
+        {
+            if (fields->value.cj_value)
+            {
+                cJSON_Delete(fields->value.cj_value);
+                fields->value.cj_value = NULL;
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
         ezlopi_scenes_delete_fields(fields->next);
         fields->next = NULL;
         free(fields);

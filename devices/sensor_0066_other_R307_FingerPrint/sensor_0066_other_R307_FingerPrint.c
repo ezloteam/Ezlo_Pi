@@ -213,7 +213,7 @@ static int __0066_prepare(void *arg)
     {
         cJSON *cj_device = (dev_prep_arg->cjson_device);
         /* device-1 */
-        l_ezlopi_device_t *fingerprint_device = ezlopi_device_add_device();
+        l_ezlopi_device_t *fingerprint_device = ezlopi_device_add_device(cj_device);
         if (fingerprint_device)
         {
             server_packet_t *user_data = (server_packet_t *)malloc(sizeof(server_packet_t));

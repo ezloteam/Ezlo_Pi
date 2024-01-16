@@ -111,7 +111,7 @@ static int __prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_adxl345_data_t));
-            l_ezlopi_device_t *adxl345_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *adxl345_device = ezlopi_device_add_device(cj_device);
             if (adxl345_device)
             {
                 __prepare_device_cloud_properties(adxl345_device, cj_device);

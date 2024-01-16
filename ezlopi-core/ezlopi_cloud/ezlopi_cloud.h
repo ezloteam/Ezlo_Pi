@@ -16,9 +16,9 @@ typedef struct s_ezlopi_cloud_controller
     char room_id[40];          // 'roomId' -> https://api.ezlo.com/hub/devices_api/index.html
     bool persistent;           // 'persistent' -> https://api.ezlo.com/hub/devices_api/index.html
     bool service_notification; // 'serviceNotification' -> https://api.ezlo.com/hub/devices_api/index.html
-    char *security;            // 'security' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_security_str.h
+    const char *security;      // 'security' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_security_str.h
     bool ready;                // 'ready' -> https://api.ezlo.com/hub/devices_api/index.html
-    char *status;              // 'status' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_status_str.h
+    const char *status;        // 'status' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/ezlopi_cloud_constants/ezlopi_cloud_status_str.h
 
 } s_ezlopi_cloud_controller_t;
 
@@ -83,12 +83,18 @@ extern const uint32_t ROOM_ID_START;
 extern const uint32_t SETTINGS_ID_START;
 extern const uint32_t SCENE_ID_START;
 extern const uint32_t SCRIPT_ID_START;
+extern const uint32_t EXPRESSION_ID_START;
 
 uint32_t ezlopi_cloud_generate_device_id(void);
+void ezlopi_cloud_update_device_id(uint32_t device_id);
+
 uint32_t ezlopi_cloud_generate_item_id(void);
+
 uint32_t ezlopi_cloud_generate_room_id(void);
-uint32_t ezlopi_cloud_generate_gateway_id(void);
+
 uint32_t ezlopi_cloud_get_gateway_id(void);
+uint32_t ezlopi_cloud_generate_gateway_id(void);
+
 uint32_t ezlopi_cloud_generate_settings_id(void);
 
 uint32_t ezlopi_cloud_generate_scene_id(void);
@@ -96,5 +102,11 @@ void ezlopi_cloud_update_scene_id(uint32_t a_scene_id);
 
 uint32_t ezlopi_cloud_generate_script_id(void);
 void ezlopi_cloud_update_script_id(uint32_t a_script_id);
+
+uint32_t ezlopi_cloud_generate_expression_id(void);
+void ezlopi_cloud_update_expression_id(uint32_t a_expression_id);
+
+uint32_t ezlopi_cloud_generate_room_id(void);
+void ezlopi_cloud_update_room_id(uint32_t a_room_id);
 
 #endif // __EZLOPI_CLOUD_H__

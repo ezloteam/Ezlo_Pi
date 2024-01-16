@@ -153,7 +153,7 @@ static int __prepare(void *arg)
                     user_data->sensor_0020_joystick_item_ids[i] = ezlopi_cloud_generate_item_id();
                 }
 
-                l_ezlopi_device_t *joystick_x_device = ezlopi_device_add_device();
+                l_ezlopi_device_t *joystick_x_device = ezlopi_device_add_device(cj_device);
                 if (joystick_x_device)
                 {
                     joystick_x_device->cloud_properties.category = category_level_sensor;
@@ -172,7 +172,7 @@ static int __prepare(void *arg)
                         ezlopi_device_free_device(joystick_x_device);
                     }
                 }
-                l_ezlopi_device_t *joystick_y_device = ezlopi_device_add_device();
+                l_ezlopi_device_t *joystick_y_device = ezlopi_device_add_device(cj_device);
                 if (joystick_y_device)
                 {
                     joystick_y_device->cloud_properties.category = category_level_sensor;
@@ -191,7 +191,7 @@ static int __prepare(void *arg)
                         ezlopi_device_free_device(joystick_y_device);
                     }
                 }
-                l_ezlopi_device_t *joystick_sw_device = ezlopi_device_add_device();
+                l_ezlopi_device_t *joystick_sw_device = ezlopi_device_add_device(cj_device);
                 if (joystick_sw_device)
                 {
                     joystick_sw_device->cloud_properties.category = category_switch;

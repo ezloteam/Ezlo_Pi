@@ -23,10 +23,8 @@ typedef struct s_event_arg
     f_interrupt_upcall_t __upcall;
 } s_event_arg_t;
 
-static void IRAM_ATTR __gpio_isr_handler(void *arg);
-static void gpio_isr_process(void *pv);
-
 static void gpio_isr_process_v3(void *pv);
+static void IRAM_ATTR __gpio_isr_handler(void *arg);
 
 void gpio_isr_service_init(void)
 {

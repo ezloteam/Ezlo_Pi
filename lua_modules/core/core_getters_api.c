@@ -27,7 +27,7 @@ int lcore_get_product_name(lua_State *lua_state)
     }
     else
     {
-        lua_pushstring(lua_state, "");
+        lua_pushstring(lua_state, ezlopi__str);
     }
     return ret;
 }
@@ -217,48 +217,50 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     snprintf(tmp_str, sizeof(tmp_str), "%08x", ezlopi_gateway_get()->_id);
     lua_create_table_string_key_value(ezlopi_gateway_id_str, &tmp_str[0]);
 
-    lua_create_table_string_key_value("name", device_prop->cloud_properties.device_name);
-    lua_create_table_string_key_value("category", device_prop->cloud_properties.category);
-    lua_create_table_string_key_value("subcategory", device_prop->cloud_properties.subcategory);
-    lua_create_table_string_key_value("type", device_prop->cloud_properties.device_type);
-    lua_create_table_string_key_value("device_type_id", controller_info->device_type_id);
-    lua_create_table_string_key_value("room_id", controller_info->room_id);
-    lua_create_table_string_key_value("parent_device_id", controller_info->parent_device_id);
+    lua_create_table_string_key_value(ezlopi_name_str, device_prop->cloud_properties.device_name);
+    lua_create_table_string_key_value(ezlopi_category_str, device_prop->cloud_properties.category);
+    lua_create_table_string_key_value(ezlopi_subcategory_str, device_prop->cloud_properties.subcategory);
+    lua_create_table_string_key_value(ezlopi_type_str, device_prop->cloud_properties.device_type);
+    lua_create_table_string_key_value(ezlopi_device_type_id_str, controller_info->device_type_id);
+    lua_create_table_string_key_value(ezlopi_room_id_str, controller_info->room_id);
+    lua_create_table_string_key_value(ezlopi_parent_device_id_str, controller_info->parent_device_id);
 
-    lua_pushstring(lua_state, "info");
+    lua_pushstring(lua_state, ezlopi_info_str);
     lua_newtable(lua_state);
 
     char *manufacturer = ezlopi_factory_info_v3_get_manufacturer();
-    lua_create_table_string_key_value("manufacturer", manufacturer);
+    lua_create_table_string_key_value(ezlopi_manufacturer_str, manufacturer);
     free(manufacturer);
 
     char *model = ezlopi_factory_info_v3_get_model();
-    lua_create_table_string_key_value("model", model);
+    lua_create_table_string_key_value(ezlopi_model_str, model);
     free(model);
 
     char *brand = ezlopi_factory_info_v3_get_brand();
-    lua_create_table_string_key_value("brand", brand);
+    lua_create_table_string_key_value(ezlopi_brand_str, brand);
     free(brand);
     lua_settable(lua_state, -3);
 
-    lua_pushstring(lua_state, "firmware");
+    lua_pushstring(lua_state, ezlopi_firmware_str);
     lua_newtable(lua_state);
 
-    lua_create_table_string_key_value("version", VERSION_STR);
-    lua_create_table_string_key_value("build-date", COMPILE_TIME);
-    lua_create_table_string_key_value("hash", COMMIT_HASH);
-    lua_create_table_string_key_value("branch", CURRENT_BRANCH);
-    lua_create_table_string_key_value("developer", DEVELOPER);
+    lua_create_table_string_key_value(ezlopi_version_str, VERSION_STR);
+    lua_create_table_string_key_value(ezlopi_build__date_str, COMPILE_TIME);
+    lua_create_table_string_key_value(ezlopi_hash_str, COMMIT_HASH);
+    lua_create_table_string_key_value(ezlopi_branch_str, CURRENT_BRANCH);
+    lua_create_table_string_key_value(ezlopi_developer_str, DEVELOPER);
     lua_settable(lua_state, -3);
 
-    lua_create_table_bool_key_value("battery_powered", controller_info->battery_powered);
-    lua_create_table_bool_key_value("reachable", controller_info->reachable);
-    lua_create_table_bool_key_value("persistent", controller_info->persistent);
-    lua_create_table_string_key_value("security", controller_info->security);
-    lua_create_table_bool_key_value("ready", controller_info->ready);
-    lua_create_table_string_key_value("status", controller_info->status ? controller_info->status : "");
-    lua_create_table_bool_key_value("house_modes_options", "");
-    lua_create_table_bool_key_value("parent_room", "");
+    lua_create_table_bool_key_value(ezlopi_battery_powered_str, controller_info->battery_powered);
+    lua_create_table_bool_key_value(ezlopi_reachable_str, controller_info->reachable);
+    lua_create_table_bool_key_value(ezlopi_persistent_str, controller_info->persistent);
+    lua_create_table_string_key_value(ezlopi_security_str, controller_info->security);
+    lua_create_table_bool_key_value(ezlopi_ready_str, controller_info->ready);
+    lua_create_table_string_key_value(ezlopi_status_str, controller_info->status ? controller_info->status : ezlopi__str);
+
+#warning "Krishna needs to verify below 2 lines"
+    lua_create_table_bool_key_value(ezlopi_house_modes_options_str, ezlopi__str);
+    lua_create_table_bool_key_value(ezlopi_parent_room_str, ezlopi__str);
 
     return 1;
 }
@@ -274,21 +276,21 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
     lua_create_table_string_key_value(ezlopi_id_str, &tmp_str[0]);
 
     snprintf(tmp_str, sizeof(tmp_str), "%08x", device_id);
-    lua_create_table_string_key_value("device_id", &tmp_str[0]);
+    lua_create_table_string_key_value(ezlopi_device_id_str, &tmp_str[0]);
 
-    lua_create_table_string_key_value("name", item_prop->cloud_properties.item_name);
-    lua_create_table_bool_key_value("has_getter", item_prop->cloud_properties.has_getter);
-    lua_create_table_bool_key_value("has_setter", item_prop->cloud_properties.has_setter);
-    lua_create_table_bool_key_value("show", item_prop->cloud_properties.show);
-    lua_create_table_string_key_value("scale", item_prop->cloud_properties.scale);
-    lua_create_table_string_key_value("value_type", item_prop->cloud_properties.value_type);
+    lua_create_table_string_key_value(ezlopi_name_str, item_prop->cloud_properties.item_name);
+    lua_create_table_bool_key_value(ezlopi_has_getter_str, item_prop->cloud_properties.has_getter);
+    lua_create_table_bool_key_value(ezlopi_has_setter_str, item_prop->cloud_properties.has_setter);
+    lua_create_table_bool_key_value(ezlopi_show_str, item_prop->cloud_properties.show);
+    lua_create_table_string_key_value(ezlopi_scale_str, item_prop->cloud_properties.scale);
+    lua_create_table_string_key_value(ezlopi_value_type_str, item_prop->cloud_properties.value_type);
 
     if (value_type_token == item_prop->cloud_properties.value_type)
     {
-        lua_pushstring(lua_state, "enum");
+        lua_pushstring(lua_state, ezlopi_enum_str);
         lua_newtable(lua_state);
 
-        lua_create_table_string_value(1, "None"); // Remains for future
+        lua_create_table_string_value(1, ezlopi_None_str); // Remains for future
 
         lua_settable(lua_state, -3);
     }
@@ -298,7 +300,7 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
         if (cj_result)
         {
             item_prop->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_prop, cj_result, item_prop->user_arg);
-            cJSON *cj_value = cJSON_GetObjectItem(cj_result, "value");
+            cJSON *cj_value = cJSON_GetObjectItem(cj_result, ezlopi_value_str);
             if (cj_value)
             {
                 switch (cj_value->type)
@@ -306,19 +308,19 @@ static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *it
                 case cJSON_True:
                 case cJSON_False:
                 {
-                    lua_create_table_bool_key_value("value", cj_value->valuedouble ? true : false);
+                    lua_create_table_bool_key_value(ezlopi_value_str, cj_value->valuedouble ? true : false);
                     break;
                 }
                 case cJSON_Number:
                 {
-                    lua_create_table_number_key_value("value", cj_value->valuedouble);
+                    lua_create_table_number_key_value(ezlopi_value_str, cj_value->valuedouble);
                     break;
                 }
                 case cJSON_String:
                 {
                     if (cj_value->valuestring)
                     {
-                        lua_create_table_string_key_value("value", cj_value->valuestring);
+                        lua_create_table_string_key_value(ezlopi_value_str, cj_value->valuestring);
                     }
                     break;
                 }
@@ -343,17 +345,20 @@ static int __create_lua_table_for_gateway(lua_State *lua_state, s_ezlopi_gateway
     snprintf(tmp_str, sizeof(tmp_str), "%08x", gateway_prop->_id);
     lua_create_table_string_key_value(ezlopi_id_str, &tmp_str[0]);
 
-    lua_create_table_string_key_value("name", gateway_prop->name);
-    lua_create_table_bool_key_value("plugin_id", gateway_prop->pluginid);
-    lua_create_table_bool_key_value("lable", gateway_prop->label);
-    lua_create_table_bool_key_value("reason", "");
-    lua_create_table_string_key_value("unreachable_reasons", "");
-    lua_create_table_string_key_value("unreachable_actions", "");
-    lua_create_table_bool_key_value("manual_device_adding", gateway_prop->manual_device_adding);
+    lua_create_table_string_key_value(ezlopi_name_str, gateway_prop->name);
 
-    lua_pushstring(lua_state, "info");
+#warning "Krishna needs to check below 3 lines"
+    lua_create_table_bool_key_value(ezlopi_plugin_id_str, gateway_prop->pluginid);
+    lua_create_table_bool_key_value(ezlopi_label_str, gateway_prop->label);
+    lua_create_table_bool_key_value(ezlopi_reason_str, ezlopi__str);
+
+    lua_create_table_string_key_value(ezlopi_unreachable_reasons_str, ezlopi__str);
+    lua_create_table_string_key_value(ezlopi_unreachable_actions_str, ezlopi__str);
+    lua_create_table_bool_key_value(ezlopi_manual_device_adding_str, gateway_prop->manual_device_adding);
+
+    lua_pushstring(lua_state, ezlopi_info_str);
     lua_newtable(lua_state);
-    lua_create_table_bool_key_value("manual_device_adding", gateway_prop->status);
+    lua_create_table_bool_key_value(ezlopi_manual_device_adding_str, gateway_prop->status);
     lua_settable(lua_state, -3);
 
     return 1;

@@ -9,6 +9,7 @@
 
 #include "ezlopi_adc.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
@@ -90,7 +91,7 @@ static int __0052_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t *MQ135_device_digi = ezlopi_device_add_device();
+        l_ezlopi_device_t *MQ135_device_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
         if (MQ135_device_digi)
         {
             __prepare_device_digi_cloud_properties(MQ135_device_digi, device_prep_arg->cjson_device);
@@ -105,17 +106,13 @@ static int __0052_prepare(void *arg)
                 ezlopi_device_free_device(MQ135_device_digi);
             }
         }
-        else
-        {
-            ezlopi_device_free_device(MQ135_device_digi);
-        }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
         mq135_value_t *MQ135_value = (mq135_value_t *)malloc(sizeof(mq135_value_t));
         if (NULL != MQ135_value)
         {
             memset(MQ135_value, 0, sizeof(mq135_value_t));
-            l_ezlopi_device_t *MQ135_device_adc = ezlopi_device_add_device();
+            l_ezlopi_device_t *MQ135_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (MQ135_device_adc)
             {
                 __prepare_device_adc_cloud_properties(MQ135_device_adc, device_prep_arg->cjson_device);
@@ -133,7 +130,6 @@ static int __0052_prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(MQ135_device_adc);
                 free(MQ135_value);
             }
             ret = 1;
@@ -177,15 +173,16 @@ static int __0052_init(l_ezlopi_item_t *item)
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
@@ -197,22 +194,23 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_I("MQ135-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
@@ -224,8 +222,8 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
     item->cloud_properties.scale = scales_parts_per_million;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
     TRACE_I("MQ135-> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
@@ -256,11 +254,11 @@ static int __0052_get_item(l_ezlopi_item_t *item, void *arg)
                             cJSON_AddItemToArray(json_array_enum, json_value);
                         }
                     }
-                    cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
+                    cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
@@ -268,10 +266,10 @@ static int __0052_get_item(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(MQ135_value->_NH3_ppm);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
-                cJSON_AddNumberToObject(cj_result, "value", MQ135_value->_NH3_ppm);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ135_value->_NH3_ppm);
             }
             ret = 1;
         }
@@ -289,8 +287,8 @@ static int __0052_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(cj_result, "valueFormatted", (char *)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, "value", (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
@@ -298,10 +296,10 @@ static int __0052_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(MQ135_value->_NH3_ppm);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
-                cJSON_AddNumberToObject(cj_result, "value", MQ135_value->_NH3_ppm);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ135_value->_NH3_ppm);
             }
             ret = 1;
         }
@@ -316,7 +314,7 @@ static int __0052_notify(l_ezlopi_item_t *item)
     {
         if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
         {
-            char *curret_value = NULL;
+            const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
                 // curret_value = "combustible_gas_detected";

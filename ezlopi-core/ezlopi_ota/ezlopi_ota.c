@@ -1,13 +1,20 @@
-#include "string.h"
+#include <cJSON.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <esp_ota_ops.h>
+#include <esp_https_ota.h>
+#include <esp_http_client.h>
 
-#include "cJSON.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/queue.h"
-#include "esp_http_client.h"
-#include "esp_tls.h"
+#include <esp_tls.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/queue.h>
+#include <esp_http_client.h>
 
 #include "trace.h"
+
+#include "ezlopi_ota.h"
+#include "ezlopi_reboot.h"
 #include "ezlopi_factory_info.h"
 
 // #include "esp_system.h"

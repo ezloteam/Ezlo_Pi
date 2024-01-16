@@ -4,7 +4,6 @@
 /*****************************************************************************************
  *                                     Methods                                           *
  *****************************************************************************************/
-extern const char *msg_sub_class_method_hub_item_updated;
 extern const char *method_hub_item_updated;
 extern const char *method_add_device;
 extern const char *method_add_all_devices;
@@ -117,5 +116,14 @@ extern const char *method_hub_reboot;
 // extern const  char *method_hub_detection_devices_scan_start;
 // extern const  char *method_hub_detection_devices_scans_top;
 extern const char *method_hub_scene_run_progress;
+extern const char *ezlopi_rpc_method_notfound_str;
+extern const char *ezlopi_hub_scene_changed_str;
+extern const char *ezlopi_hub_scene_added_str;
+extern const char *ezlopi_hub_scene_deleted_str;
+
+extern const char *ezlopi_hub_room_created_str;
+extern const char *ezlopi_hub_room_edited_str;
+extern const char *ezlopi_hub_room_deleted_str;
+extern const char *ezlopi_hub_room_reordered_str;
 
 #endif // __EZLOPI_METHODS_STR_H__

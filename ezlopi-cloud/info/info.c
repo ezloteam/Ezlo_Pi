@@ -50,14 +50,14 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
     {
         char *device_uuid = ezlopi_factory_info_v3_get_device_uuid();
         // #include "esp_app_format.h"
-        cJSON_AddStringToObject(cjson_result, "model", ezlopi_factory_info_v3_get_device_type());
+        cJSON_AddStringToObject(cjson_result, ezlopi_model_str, ezlopi_factory_info_v3_get_device_type());
         cJSON_AddStringToObject(cjson_result, "architecture", CONFIG_SDK_TOOLPREFIX);
-        cJSON_AddStringToObject(cjson_result, "firmware", VERSION_STR);
+        cJSON_AddStringToObject(cjson_result, ezlopi_firmware_str, VERSION_STR);
         cJSON_AddStringToObject(cjson_result, "kernel", "FreeRTOS");
         cJSON_AddStringToObject(cjson_result, "hardware", CONFIG_IDF_TARGET);
-        cJSON_AddNumberToObject(cjson_result, "serial", ezlopi_factory_info_v3_get_id());
+        cJSON_AddNumberToObject(cjson_result, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
 
-        cJSON_AddStringToObject(cjson_result, "uuid", device_uuid ? device_uuid : "");
+        cJSON_AddStringToObject(cjson_result, ezlopi_uuid_str, device_uuid ? device_uuid : ezlopi__str);
         cJSON_AddBoolToObject(cjson_result, "offlineAnonymousAccess", true);
         cJSON_AddBoolToObject(cjson_result, "offlineInsecureAccess", true);
 
@@ -66,8 +66,8 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         {
             cJSON_AddNumberToObject(cjson_location, "latitude", 0);
             cJSON_AddNumberToObject(cjson_location, "longitude", 0);
-            cJSON_AddStringToObject(cjson_location, "timezone", "");
-            cJSON_AddStringToObject(cjson_location, "state", "");
+            cJSON_AddStringToObject(cjson_location, "timezone", ezlopi__str);
+            cJSON_AddStringToObject(cjson_location, "state", ezlopi__str);
         }
 
         cJSON *cjson_build = cJSON_AddObjectToObject(cjson_result, "build");
@@ -85,7 +85,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
             cJSON_AddNumberToObject(cjson_battery, "stateOfCharge", 0);
             cJSON_AddNumberToObject(cjson_battery, "remainingTime", 0);
             cJSON_AddNumberToObject(cjson_battery, "health", 0);
-            cJSON_AddStringToObject(cjson_battery, "status", "");
+            cJSON_AddStringToObject(cjson_battery, ezlopi_status_str, ezlopi__str);
         }
 
         // time_t now;
@@ -98,7 +98,7 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         // localtime_r(&now, &timeinfo);
         // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
 
-        cJSON_AddStringToObject(cjson_result, "localtime", "");
+        cJSON_AddStringToObject(cjson_result, "localtime", ezlopi__str);
 
         // now = sntp_core_get_up_time();
         // localtime_r(&now, &timeinfo);
@@ -106,12 +106,12 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         char *time_string = ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
         if (time_string)
         {
-            cJSON_AddStringToObject(cjson_result, "uptime", time_string);
+            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
             free(time_string);
         }
         else
         {
-            cJSON_AddStringToObject(cjson_result, "uptime", "");
+            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, ezlopi__str);
         }
         ezlopi_factory_info_v3_free(device_uuid);
     }

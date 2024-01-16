@@ -5,24 +5,24 @@
 #include "esp_event_base.h"
 
 #include "trace.h"
-#include "ezlopi_wifi.h"
 
 #include "ezlopi_nvs.h"
-#include "ezlopi_ble_gatt.h"
-#include "ezlopi_ble_profile.h"
-
-#include "ezlopi_ble_service.h"
-#include "ezlopi_ble_buffer.h"
-#include "ezlopi_factory_info.h"
-#include "ezlopi_ble_auth.h"
+#include "ezlopi_wifi.h"
 #include "ezlopi_ping.h"
+#include "ezlopi_ble_auth.h"
+#include "ezlopi_ble_gatt.h"
+#include "ezlopi_ble_buffer.h"
+#include "ezlopi_ble_service.h"
+#include "ezlopi_ble_profile.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_cloud_constants.h"
 
 static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
 
 static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len);
-static void wifi_event_notify_upcall(esp_event_base_t event, void *arg);
+// static void wifi_event_notify_upcall(esp_event_base_t event, void *arg);
 
 static s_gatt_service_t *wifi_ble_service;
 
@@ -84,9 +84,9 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
         cJSON *root = cJSON_Parse((const char *)value);
         if (root)
         {
-            cJSON *cj_user_id = cJSON_GetObjectItemCaseSensitive(root, "user_id");
-            cJSON *cj_ssid = cJSON_GetObjectItemCaseSensitive(root, "wifi_ssid");
-            cJSON *cj_password = cJSON_GetObjectItemCaseSensitive(root, "wifi_password");
+            cJSON *cj_user_id = cJSON_GetObjectItemCaseSensitive(root, ezlopi_user_id_str);
+            cJSON *cj_ssid = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_ssid_str);
+            cJSON *cj_password = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_password_str);
 
             if (cj_user_id && cj_password && cj_ssid)
             {

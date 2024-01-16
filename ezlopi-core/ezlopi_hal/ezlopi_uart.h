@@ -8,13 +8,19 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
-#define EZLOPI_UART_CHANNEL_1 1
+typedef int ezlo_uart_channel_t;
+
+typedef enum e_ezlopi_uart_channel
+{
+    EZLOPI_UART_CHANNEL_UNDEFINED = -1,
+    EZLOPI_UART_CHANNEL_0 = UART_NUM_0,
+    EZLOPI_UART_CHANNEL_1 = UART_NUM_1,
 #if UART_NUM_MAX > 2
-#define EZLOPI_UART_CHANNEL_2 2
+    EZLOPI_UART_CHANNEL_2 = UART_NUM_2,
 #endif
 #define EZLOPI_UART_CHANNEL_MAX UART_NUM_MAX
+} e_ezlopi_uart_channel_t;
 
-typedef int ezlo_uart_channel_t;
 typedef struct s_ezlopi_uart_object *s_ezlopi_uart_object_handle_t;
 typedef void (*__uart_upcall)(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
 

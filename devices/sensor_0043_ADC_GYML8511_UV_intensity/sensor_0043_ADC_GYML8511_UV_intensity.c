@@ -103,7 +103,7 @@ static int __0043_prepare(void *arg)
         if (NULL != gyml8511_value)
         {
             memset(gyml8511_value, 0, sizeof(s_gyml8511_data_t));
-            l_ezlopi_device_t *gyml8511_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *gyml8511_device = ezlopi_device_add_device(cj_device);
             if (gyml8511_device)
             {
                 __prepare_device_cloud_properties(gyml8511_device, cj_device);

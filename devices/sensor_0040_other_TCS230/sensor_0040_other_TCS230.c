@@ -135,7 +135,7 @@ static int __0040_prepare(void *arg)
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)malloc(sizeof(s_TCS230_data_t));
         if (user_data)
         {
-            l_ezlopi_device_t *tcs230_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *tcs230_device = ezlopi_device_add_device(cj_device);
             if (tcs230_device)
             {
                 __prepare_device_cloud_properties(tcs230_device, cj_device);

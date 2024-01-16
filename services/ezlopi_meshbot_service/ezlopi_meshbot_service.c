@@ -5,6 +5,7 @@
 
 #include "ezlopi_scenes_v2.h"
 #include "ezlopi_meshbot_service.h"
+#include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_status_changed.h"
 
 static void __scenes_process(void *arg);
@@ -32,6 +33,43 @@ uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
         ret = 1;
     }
 
+    return ret;
+}
+
+uint32_t ezlopi_meshobot_service_stop_scene(l_scenes_list_v2_t *scene_node)
+{
+    int ret = 0;
+    if (scene_node)
+    {
+        if (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status)
+        {
+            scene_node->status = EZLOPI_SCENE_STATUS_STOP;
+        }
+
+        while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
+        {
+            vTaskDelay(50 / portTICK_RATE_MS);
+        }
+
+        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+
+        ret = 1;
+    }
+    return ret;
+}
+
+uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t *scene_node)
+{
+    int ret = 0;
+    if (scene_node)
+    {
+        if ((EZLOPI_SCENE_STATUS_NONE == scene_node->status) ||
+            (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
+        {
+            xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+            ret = 1;
+        }
+    }
     return ret;
 }
 
@@ -97,9 +135,13 @@ void ezlopi_scenes_meshbot_init(void)
     l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
     while (scene_node)
     {
-        if (scene_node->enabled)
+        if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
             xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+        }
+        else
+        {
+            scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
         }
         scene_node = scene_node->next;
     }

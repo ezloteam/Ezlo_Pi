@@ -88,7 +88,7 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     if (script_to_delete)
     {
         ezlopi_scenes_scripts_stop(script_to_delete);
-        ezlopi_nvs_delete_stored_script(script_to_delete->id); // deleting script from nvs
+        ezlopi_nvs_delete_stored_data_by_id(script_to_delete->id); // deleting script from nvs
         __scripts_remove_id_and_update_list(script_to_delete->id);
 
         if (script_to_delete->code)
@@ -115,12 +115,18 @@ uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON *cj_script)
         }
 
         curr_script->next = __scripts_create_node(script_id, cj_script);
-        new_script_id = curr_script->next->id;
+        if (curr_script)
+        {
+            new_script_id = curr_script->next->id;
+        }
     }
     else
     {
         script_head = __scripts_create_node(script_id, cj_script);
-        new_script_id = script_head->id;
+        if (script_head)
+        {
+            new_script_id = script_head->id;
+        }
     }
 
     return new_script_id;
@@ -169,7 +175,7 @@ void ezlopi_scenes_scripts_update(cJSON *cj_script)
                     }
 
                     {
-                        cJSON *cj_name = cJSON_GetObjectItem(cj_script, "name");
+                        cJSON *cj_name = cJSON_GetObjectItem(cj_script, ezlopi_name_str);
                         if (cj_name && cj_name->valuestring)
                         {
                             uint32_t len = strlen(cj_name->valuestring) + 1;
@@ -179,7 +185,7 @@ void ezlopi_scenes_scripts_update(cJSON *cj_script)
                     }
 
                     {
-                        cJSON *cj_code = cJSON_GetObjectItem(cj_script, "code");
+                        cJSON *cj_code = cJSON_GetObjectItem(cj_script, ezlopi_code_str);
                         if (cj_code && cj_code->valuestring)
                         {
                             uint32_t len = strlen(cj_code->valuestring) + 1;
@@ -191,7 +197,9 @@ void ezlopi_scenes_scripts_update(cJSON *cj_script)
                     char *script_to_update = cJSON_Print(cj_script);
                     if (script_to_update)
                     {
+                        cJSON_Minify(script_to_update);
                         ezlopi_nvs_write_str(script_to_update, strlen(script_to_update), cj_script_id->valuestring);
+                        free(script_to_update);
                     }
 
                     break;
@@ -294,6 +302,7 @@ static void __scripts_add_script_id(uint32_t script_id)
                 char *script_ids_str_updated = cJSON_Print(cj_script_ids);
                 if (script_ids_str_updated)
                 {
+                    cJSON_Minify(script_ids_str_updated);
                     ezlopi_nvs_write_scenes_scripts(script_ids_str_updated);
                     free(script_ids_str_updated);
                 }
@@ -409,8 +418,8 @@ static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON
 
     if (cj_script)
     {
-        cJSON *cj_script_name = cJSON_GetObjectItem(cj_script, "name");
-        cJSON *cj_script_code = cJSON_GetObjectItem(cj_script, "code");
+        cJSON *cj_script_name = cJSON_GetObjectItem(cj_script, ezlopi_name_str);
+        cJSON *cj_script_code = cJSON_GetObjectItem(cj_script, ezlopi_code_str);
 
         if (cj_script_name && cj_script_name->valuestring && cj_script_code && cj_script_code->string)
         {
@@ -424,6 +433,7 @@ static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON
                 char *script_str = cJSON_Print(cj_script);
                 if (script_str)
                 {
+                    cJSON_Minify(script_str);
                     char scrpt_id_str[32];
                     snprintf(scrpt_id_str, sizeof(scrpt_id_str), "%08x", script_id);
                     ezlopi_nvs_write_str(script_str, strlen(script_str), scrpt_id_str);
@@ -472,7 +482,7 @@ static char *__script_report(lua_State *lua_state, int status)
 {
     if (status == LUA_OK)
     {
-        return;
+        return NULL;
     }
 
     const char *msg = lua_tostring(lua_state, -1);

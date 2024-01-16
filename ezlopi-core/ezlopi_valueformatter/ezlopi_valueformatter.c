@@ -3,9 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "ezlopi_cloud_constants.h"
+
 char *ezlopi_valueformatter_bool(bool val)
 {
-    return val ? "true" : "false";
+    return val ? ezlopi_true_str : ezlopi_false_str;
 }
 
 char *ezlopi_valueformatter_float(float val)

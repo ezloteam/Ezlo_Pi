@@ -172,12 +172,13 @@ typedef struct l_ezlopi_item
 
 typedef struct l_ezlopi_device_settings_v3
 {
-    s_ezlopi_cloud_device_settings_t cloud_properties;
     void *user_arg;
+    s_ezlopi_cloud_device_settings_t cloud_properties;
     int (*func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
     struct l_ezlopi_device_settings_v3 *next;
 
 } l_ezlopi_device_settings_v3_t;
+
 typedef struct l_ezlopi_device
 {
     l_ezlopi_item_t *items;
@@ -189,7 +190,7 @@ typedef struct l_ezlopi_device
 void ezlopi_device_prepare(void);
 
 l_ezlopi_device_t *ezlopi_device_get_head(void);
-l_ezlopi_device_t *ezlopi_device_add_device(void);
+l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device);
 
 l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id);
 l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
@@ -206,5 +207,6 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device);
 void ezlopi_device_free_device_by_item(l_ezlopi_item_t *item);
 cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);
 s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void);
+void ezlopi_device_name_set_by_device_id(uint32_t device_id, cJSON *cj_new_name);
 
 #endif // __EZLOPI_DEVICE_H__

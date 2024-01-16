@@ -8,13 +8,12 @@
 
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 
 #include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
-
-static bool sensor_bme280_initialized = false;
 
 static int __prepare(void *arg);
 static void __prepare_touch_sensor_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
@@ -58,9 +57,9 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     cJSON *param = (cJSON *)arg;
     if (param)
     {
-        cJSON_AddBoolToObject(param, "value", item->interface.gpio.gpio_in.value);
+        cJSON_AddBoolToObject(param, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(param, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, valueFormatted);
     }
 
     return ret;
@@ -83,6 +82,7 @@ static int __init(l_ezlopi_item_t *item)
     int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
     gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
+    ret = 1;
 
     return ret;
 }
@@ -99,10 +99,10 @@ static int __prepare(void *arg)
 {
     int ret = 0;
 
-    s_ezlopi_prep_arg_t *prep_arg = (cJSON *)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *touch_device = ezlopi_device_add_device();
+        l_ezlopi_device_t *touch_device = ezlopi_device_add_device(prep_arg->cjson_device);
         if (touch_device)
         {
             __prepare_touch_sensor_device_cloud_properties(touch_device, prep_arg->cjson_device);
@@ -117,10 +117,6 @@ static int __prepare(void *arg)
                 ezlopi_device_free_device(touch_device);
             }
         }
-        else
-        {
-            ezlopi_device_free_device(touch_device);
-        }
     }
 
     return ret;
@@ -128,32 +124,32 @@ static int __prepare(void *arg)
 
 static void __prepare_touch_sensor_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_touch_sensor_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.scale = true;
+    item->cloud_properties.scale = NULL;
     item->cloud_properties.item_name = ezlopi_item_name_switch;
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "ip_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cj_device, "val_ip", item->interface.gpio.gpio_in.value);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
 
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;

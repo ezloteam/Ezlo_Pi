@@ -20,6 +20,7 @@
 #include "firmware.h"
 #include "settings.h"
 #include "scenes_scripts.h"
+#include "scenes_expressions.h"
 
 #include "ezlopi_wifi.h"
 #include "ezlopi_http.h"
@@ -31,6 +32,7 @@
 #include "ezlopi_websocket_client.h"
 
 static uint32_t message_counter = 0;
+static xTaskHandle _task_handle = NULL;
 
 static TaskHandle_t ezlopi_update_config_notifier = NULL;
 
@@ -40,6 +42,7 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void __fetch_wss_endpoint(void *pv);
 static void web_provisioning_config_check(void *pv);
+static void __print_sending_data(char *data_str, e_trace_type_t print_type);
 
 typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
 typedef struct s_method_list_v2
@@ -61,6 +64,35 @@ uint32_t web_provisioning_get_message_count(void)
     return message_counter;
 }
 
+int web_provisioning_send_str_data_to_nma_websocket(char *str_data, e_trace_type_t print_type)
+{
+    int ret = 0;
+    if (str_data)
+    {
+        int retries = 3;
+        while (--retries)
+        {
+            if (ezlopi_websocket_client_send(str_data, strlen(str_data)) > 0)
+            {
+                ret = 1;
+                message_counter++;
+                break;
+            }
+        }
+
+        if (ret)
+        {
+            __print_sending_data(str_data, print_type);
+        }
+        else
+        {
+            __print_sending_data(str_data, TRACE_TYPE_W);
+        }
+    }
+
+    return ret;
+}
+
 int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
@@ -72,31 +104,6 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
             if (cjson_str_data)
             {
                 cJSON_Minify(cjson_str_data);
-                switch (print_type)
-                {
-                case TRACE_TYPE_B:
-                {
-                    TRACE_B("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
-                    break;
-                }
-                case TRACE_TYPE_D:
-                {
-                    TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
-                    break;
-                }
-                case TRACE_TYPE_E:
-                {
-                    TRACE_E("## WSS-SENDING  >>>>>>>>>>>>>>>>>>>\r\n%s", cjson_str_data);
-                    break;
-                }
-                case TRACE_TYPE_I:
-                {
-                    TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", cjson_str_data);
-                    break;
-                }
-                default:
-                    break;
-                }
 
                 int retries = 3;
                 while (--retries)
@@ -109,6 +116,16 @@ int web_provisioning_send_to_nma_websocket(cJSON *cjson_data, e_trace_type_t pri
                         break;
                     }
                 }
+
+                if (ret)
+                {
+                    __print_sending_data(cjson_str_data, print_type);
+                }
+                else
+                {
+                    __print_sending_data(cjson_str_data, TRACE_TYPE_W);
+                }
+
                 free(cjson_str_data);
             }
         }
@@ -314,7 +331,7 @@ static void web_provisioning_config_check(void *pv)
 
     while (1)
     {
-        ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
+        ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
 
         TRACE_D("water_mark: %d", water_mark);
@@ -399,6 +416,16 @@ static void web_provisioning_config_check(void *pv)
     vTaskDelete(NULL);
 }
 
+void web_provisioning_deinit(void)
+{
+    if (_task_handle)
+    {
+        vTaskDelete(_task_handle);
+    }
+
+    ezlopi_websocket_client_kill();
+}
+
 static void __fetch_wss_endpoint(void *pv)
 {
     s_ezlopi_http_data_t *ws_endpoint = NULL;
@@ -407,7 +434,7 @@ static void __fetch_wss_endpoint(void *pv)
     {
 
         ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
-        ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
+        ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
 
         vTaskDelay(100 / portTICK_RATE_MS);
 
@@ -455,6 +482,7 @@ static void __fetch_wss_endpoint(void *pv)
 
 static void __connection_upcall(bool connected)
 {
+    TRACE_D("connected: %d", connected);
     static bool prev_status;
     if (connected)
     {
@@ -512,12 +540,19 @@ static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method,
 
                 cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
                 cJSON_AddItemReferenceToObject(cj_response, ezlopi_sender_str, cj_sender);
-                cJSON_AddNullToObject(cj_response, "error");
+                cJSON_AddNullToObject(cj_response, ezlopi_error_str);
 
                 method_func(cj_request, cj_response);
 
-                web_provisioning_send_to_nma_websocket(cj_response, print_type);
+                char *data_to_send = cJSON_Print(cj_response);
                 cJSON_Delete(cj_response);
+
+                if (data_to_send)
+                {
+                    cJSON_Minify(data_to_send);
+                    web_provisioning_send_str_data_to_nma_websocket(data_to_send, print_type);
+                    free(data_to_send);
+                }
             }
             else
             {
@@ -533,14 +568,14 @@ static void __message_upcall(const char *payload, uint32_t len)
 
     if (cj_request)
     {
-        cJSON *cj_error = cJSON_GetObjectItem(cj_request, "error");
-        cJSON *cj_method = cJSON_GetObjectItem(cj_request, "method");
+        cJSON *cj_error = cJSON_GetObjectItem(cj_request, ezlopi_error_str);
+        cJSON *cj_method = cJSON_GetObjectItem(cj_request, ezlopi_key_method_str);
 
-        if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, "null", 4))))
+        if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, ezlopi_null_str, 4))))
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
-                TRACE_I("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ""), len, payload);
+                TRACE_I("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ezlopi__str), len, payload);
 
                 uint32_t method_idx = __search_method_in_list(cj_method);
 
@@ -558,8 +593,8 @@ static void __message_upcall(const char *payload, uint32_t len)
         }
         else
         {
-            TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : "") : "", len, payload);
-            TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : "null") : "null");
+            TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
+            TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : ezlopi_null_str) : ezlopi_null_str);
         }
 
         cJSON_Delete(cj_request);
@@ -570,12 +605,12 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
-    cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, "error");
+    cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, ezlopi_error_str);
     if (cjson_error)
     {
-        cJSON_AddNumberToObject(cjson_error, "code", -32602);
-        cJSON_AddStringToObject(cjson_error, "data", "rpc.method.notfound");
-        cJSON_AddStringToObject(cjson_error, "message", "Unknown method");
+        cJSON_AddNumberToObject(cjson_error, ezlopi_code_str, -32602);
+        cJSON_AddStringToObject(cjson_error, ezlopi_data_str, ezlopi_rpc_method_notfound_str);
+        cJSON_AddStringToObject(cjson_error, ezlopi_message_str, ezlopi_Unknown_method_str);
     }
 
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
@@ -583,6 +618,38 @@ static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 
 static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
 {
+    web_provisioning_deinit();
     esp_restart();
-    return NULL;
+}
+
+static void __print_sending_data(char *data_str, e_trace_type_t print_type)
+{
+    switch (print_type)
+    {
+    case TRACE_TYPE_W:
+    {
+        TRACE_W("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_D:
+    {
+        TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_E:
+    {
+        TRACE_E("## WSS-SENDING  >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_I:
+    {
+        TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    default:
+    {
+        TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    }
 }

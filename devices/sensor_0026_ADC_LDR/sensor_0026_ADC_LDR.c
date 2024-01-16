@@ -1,6 +1,7 @@
 #include "ezlopi_adc.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 
@@ -105,18 +106,21 @@ static int __prepare(void *arg)
     if (prep_arg && prep_arg->cjson_device)
     {
         cJSON *cj_device = prep_arg->cjson_device;
-        l_ezlopi_device_t *device = ezlopi_device_add_device();
-        if (device)
+        if (cj_device)
         {
-            __setup_device_cloud_params(device, cj_device);
-            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0026_ADC_LDR);
-            if (item)
+            l_ezlopi_device_t *device = ezlopi_device_add_device(cj_device);
+            if (device)
             {
-                __setup_item_cloud_properties(item, cj_device);
-            }
-            else
-            {
-                ezlopi_device_free_device(device);
+                __setup_device_cloud_params(device, cj_device);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0026_ADC_LDR);
+                if (item)
+                {
+                    __setup_item_cloud_properties(item, cj_device);
+                }
+                else
+                {
+                    ezlopi_device_free_device(device);
+                }
             }
         }
     }
@@ -154,10 +158,10 @@ static int _get_item_list(l_ezlopi_item_t *item, void *arg)
                     cJSON_AddItemToArray(json_array_enum, json_value);
                 }
             }
-            cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
+            cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(cj_result, "value", ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
 
@@ -170,8 +174,8 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     cJSON *cj_result = (cJSON *)arg;
     if (cj_result && item)
     {
-        cJSON_AddStringToObject(cj_result, "value", ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
     return ret;

@@ -126,7 +126,7 @@ static int __0047_prepare(void *arg)
         {
             memset(hx711_data, 0, sizeof(s_hx711_data_t));
             //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-            l_ezlopi_device_t *hx711_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *hx711_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (hx711_device)
             {
                 __prepare_device_cloud_properties(hx711_device, device_prep_arg->cjson_device);

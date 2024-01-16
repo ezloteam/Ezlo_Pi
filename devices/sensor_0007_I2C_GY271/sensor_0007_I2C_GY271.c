@@ -175,7 +175,7 @@ static int __prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_gy271_data_t));
-            l_ezlopi_device_t *gy271_device_parent_x_item = ezlopi_device_add_device();
+            l_ezlopi_device_t *gy271_device_parent_x_item = ezlopi_device_add_device(cj_device);
             if (gy271_device_parent_x_item)
             {
                 __prepare_device_cloud_properties_parent_x(gy271_device_parent_x_item, cj_device);
@@ -195,7 +195,7 @@ static int __prepare(void *arg)
                 }
             }
 
-            l_ezlopi_device_t *gy271_device_child_y_item = ezlopi_device_add_device();
+            l_ezlopi_device_t *gy271_device_child_y_item = ezlopi_device_add_device(cj_device);
             if (gy271_device_parent_x_item && gy271_device_child_y_item)
             {
                 __prepare_device_cloud_properties_child_y(gy271_device_child_y_item, cj_device);
@@ -216,7 +216,7 @@ static int __prepare(void *arg)
                 }
             }
 
-            l_ezlopi_device_t *gy271_device_child_z_item = ezlopi_device_add_device();
+            l_ezlopi_device_t *gy271_device_child_z_item = ezlopi_device_add_device(cj_device);
             if (gy271_device_parent_x_item && gy271_device_child_z_item)
             {
                 __prepare_device_cloud_properties_child_z(gy271_device_child_z_item, cj_device);
@@ -236,7 +236,7 @@ static int __prepare(void *arg)
                     ezlopi_device_free_device(gy271_device_child_z_item);
                 }
             }
-            l_ezlopi_device_t *gy271_device_child_azi_item = ezlopi_device_add_device();
+            l_ezlopi_device_t *gy271_device_child_azi_item = ezlopi_device_add_device(cj_device);
             if (gy271_device_parent_x_item && gy271_device_child_azi_item)
             {
                 __prepare_device_cloud_properties_child_azi(gy271_device_child_azi_item, cj_device);
@@ -256,7 +256,7 @@ static int __prepare(void *arg)
                     ezlopi_device_free_device(gy271_device_child_azi_item);
                 }
             }
-            l_ezlopi_device_t *gy271_device_child_temp_item = ezlopi_device_add_device();
+            l_ezlopi_device_t *gy271_device_child_temp_item = ezlopi_device_add_device(cj_device);
             if (gy271_device_parent_x_item && gy271_device_child_temp_item)
             {
                 __prepare_device_cloud_properties_child_temp(gy271_device_child_temp_item, cj_device);

@@ -24,11 +24,11 @@ void modes_get(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON_AddStringToObject(cj_result, "current", "");
-        cJSON_AddStringToObject(cj_result, "switchTo", "");
-        cJSON_AddStringToObject(cj_result, "timeIsLeftToSwitch", "");
-        cJSON_AddStringToObject(cj_result, "switchToDelay", "");
-        cJSON_AddStringToObject(cj_result, "alarmDelay", "");
+        cJSON_AddStringToObject(cj_result, "current", ezlopi__str);
+        cJSON_AddStringToObject(cj_result, "switchTo", ezlopi__str);
+        cJSON_AddStringToObject(cj_result, "timeIsLeftToSwitch", ezlopi__str);
+        cJSON_AddStringToObject(cj_result, "switchToDelay", ezlopi__str);
+        cJSON_AddStringToObject(cj_result, "alarmDelay", ezlopi__str);
         cJSON_AddArrayToObject(cj_result, "modes");
     }
 }

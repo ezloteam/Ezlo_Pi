@@ -95,7 +95,7 @@ static int __prepare(void *arg)
     {
         cJSON *cj_device = dev_prep_arg->cjson_device;
 
-        l_ezlopi_device_t *servo_device = ezlopi_device_add_device();
+        l_ezlopi_device_t *servo_device = ezlopi_device_add_device(dev_prep_arg->cjson_device);
         if (servo_device)
         {
             __prepare_device_cloud_properties(servo_device, cj_device);
@@ -204,7 +204,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 
-#warning "Implementation required"
 #include "device_0036_PWM_servo_MG996R.h"
 
 static int ezlopi_servo_motor_MG_996R_prepare_and_add(void *args);
@@ -281,9 +280,11 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         memset(ezlopi_servo_motor_MG_996R_properties, 0, sizeof(s_ezlopi_device_properties_t));
         ezlopi_servo_motor_MG_996R_properties->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
 
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-        ASSIGN_DEVICE_NAME(ezlopi_servo_motor_MG_996R_properties, device_name);
+        // char *device_name = NULL;
+        // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
+        // ASSIGN_DEVICE_NAME(ezlopi_servo_motor_MG_996R_properties, device_name);
+        // ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
+
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.category = category_dimmable_light;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.subcategory = subcategory_dimmable_bulb;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.item_name = ezlopi_item_name_dimmer;
@@ -295,11 +296,10 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.battery_powered = false;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.show = true;
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.room_name[0] = '\0';
-        ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        // CJSON_GET_VALUE_INT(cjson_device, "gpio", ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num);
+        // CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_name_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "duty_cycle", ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle);
         // CJSON_GET_VALUE_INT(cjson_device, "freq_hz", ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz);
         // CJSON_GET_VALUE_INT(cjson_device, "pwm_resln", ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln);
@@ -339,7 +339,7 @@ static int ezlopi_servo_motor_MG_996R_set_value(s_ezlopi_device_properties_t *pr
     if (NULL != cjson_params)
     {
         int value = 0;
-        CJSON_GET_VALUE_INT(cjson_params, "value", value);
+        CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, value);
 
         TRACE_I("item_name: %s", properties->ezlopi_cloud.item_name);
         TRACE_I("gpio_num: %d", properties->interface.pwm.gpio_num);
@@ -363,7 +363,7 @@ static int ezlopi_servo_motor_MG_996R_get_value_cjson(s_ezlopi_device_properties
     {
         uint32_t duty = ezlopi_pwm_get_duty(properties->interface.pwm.channel, properties->interface.pwm.speed_mode);
         int target_duty = (int)(((duty - 13) * 100) / 17);
-        cJSON_AddNumberToObject(cjson_propertise, "value", target_duty);
+        cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, target_duty);
         ret = 1;
     }
     return ret;

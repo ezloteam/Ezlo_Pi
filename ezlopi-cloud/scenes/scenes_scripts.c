@@ -15,8 +15,7 @@ void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
         cJSON *cj_result = cJSON_AddArrayToObject(cj_response, ezlopi_result_str);
         if (cj_result)
         {
-            // l_ezlopi_scenes_script_t *script_nodes = ezlopi_scenes_scripts_get_head();
-            l_ezlopi_scenes_script_t *script_nodes = NULL;
+            l_ezlopi_scenes_script_t *script_nodes = ezlopi_scenes_scripts_get_head();
             while (script_nodes)
             {
                 cJSON *cj_script = cJSON_CreateObject();
@@ -25,7 +24,7 @@ void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)
                     char script_id_str[32];
                     snprintf(script_id_str, sizeof(script_id_str), "%08x", script_nodes->id);
                     cJSON_AddStringToObject(cj_script, ezlopi__id_str, script_id_str);
-                    cJSON_AddStringToObject(cj_script, "name", script_nodes->name);
+                    cJSON_AddStringToObject(cj_script, ezlopi_name_str, script_nodes->name);
 
                     if (!cJSON_AddItemToArray(cj_result, cj_script))
                     {
@@ -63,15 +62,14 @@ void scenes_scripts_get(cJSON *cj_request, cJSON *cj_response)
 
             if (script_id_num)
             {
-                // l_ezlopi_scenes_script_t *script_nodes = ezlopi_scenes_scripts_get_head();
-                l_ezlopi_scenes_script_t *script_nodes = NULL;
+                l_ezlopi_scenes_script_t *script_nodes = ezlopi_scenes_scripts_get_head();
                 while (script_nodes)
                 {
                     if (script_id_num == script_nodes->id)
                     {
                         cJSON_AddItemReferenceToObject(cj_result, ezlopi__id_str, cj_script_id);
-                        cJSON_AddStringToObject(cj_result, "name", script_nodes->name);
-                        cJSON_AddStringToObject(cj_result, "code", script_nodes->code);
+                        cJSON_AddStringToObject(cj_result, ezlopi_name_str, script_nodes->name);
+                        cJSON_AddStringToObject(cj_result, ezlopi_code_str, script_nodes->code);
 
                         break;
                     }
@@ -91,8 +89,7 @@ void scenes_scripts_add(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        // uint32_t script_id = ezlopi_scenes_scripts_add_to_head(0, cj_params);
-        uint32_t script_id = NULL;
+        uint32_t script_id = ezlopi_scenes_scripts_add_to_head(0, cj_params);
 
         cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
         if (cj_result)
@@ -125,8 +122,8 @@ void scenes_scripts_delete(cJSON *cj_request, cJSON *cj_response)
             if (cj_script_id && cj_script_id->valuestring)
             {
                 script_id_num = strtoul(cj_script_id->valuestring, NULL, 16);
-                // ezlopi_scenes_scripts_stop_by_id(script_id_num);
-                // ezlopi_scenes_scripts_delete_by_id(script_id_num);
+                ezlopi_scenes_scripts_stop_by_id(script_id_num);
+                ezlopi_scenes_scripts_delete_by_id(script_id_num);
             }
         }
     }
@@ -141,7 +138,7 @@ void scenes_scripts_set(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        // ezlopi_scenes_scripts_update(cj_params);
+        ezlopi_scenes_scripts_update(cj_params);
     }
 }
 
@@ -160,7 +157,7 @@ void scenes_scripts_run(cJSON *cj_request, cJSON *cj_response)
             uint32_t script_id = strtoul(cj_script_id->valuestring, NULL, 16);
             if (script_id)
             {
-                // ezlopi_scenes_scripts_run_by_id(script_id);
+                ezlopi_scenes_scripts_run_by_id(script_id);
             }
         }
     }

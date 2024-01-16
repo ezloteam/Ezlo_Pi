@@ -9,12 +9,13 @@
 #include "trace.h"
 #include "ezlopi_ble_gap.h"
 #include "ezlopi_ble_profile.h"
+#include "ezlopi_cloud_constants.h"
 
 static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
 
-static uint8_t manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
+// static uint8_t manufacturer[] = {'e', 'z', 'l', 'o', 'p', 'i'};
 static uint8_t *all_service_uuid = NULL;
 static uint32_t all_service_uuid_len = 0;
 
@@ -95,14 +96,15 @@ void ezlopi_ble_gap_config_adv_data(void)
     // adv_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
-    if (ret)
-    {
-        TRACE_E("config adv data failed, error code = %x", ret);
-    }
-    else
+    if (ESP_OK == ret)
     {
         TRACE_I("Adv-data set complete");
     }
+    else
+    {
+        TRACE_E("config adv data failed, error code = %x", ret);
+    }
+
     adv_config_done |= ADV_CONFIG_FLAG;
 }
 
@@ -277,7 +279,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
         TRACE_I("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
-        dump("", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
+        dump("bd_adrr", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
         TRACE_I("------------------------------------");
         break;
     }
@@ -692,30 +694,29 @@ static char *ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
     }
 
 #endif // #if (BLE_50_FEATURE_SUPPORT == TRUE)
-    // case ESP_GAP_BLE_SC_OOB_REQ_EVT:
-    // {
-    //     ret = "ESP_GAP_BLE_SC_OOB_REQ_EVT";
-    //     break;
-    // }
-    // case ESP_GAP_BLE_EVT_MAX:
-    // {
-    //     ret = "ESP_GAP_BLE_EVT_MAX";
-    //     break;
-    // }
-    // case ESP_GAP_BLE_SC_CR_LOC_OOB_EVT:
-    // {
-    //     ret = "ESP_GAP_BLE_SC_CR_LOC_OOB_EVT";
-    //     break;
-    // }
-    // case ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT:
-    // {
-    //     ret = "ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT";
-    //     break;
-    // }
+       // case ESP_GAP_BLE_SC_OOB_REQ_EVT:
+       // {
+       //     ret = "ESP_GAP_BLE_SC_OOB_REQ_EVT";
+       //     break;
+       // }
+       // case ESP_GAP_BLE_EVT_MAX:
+       // {
+       //     ret = "ESP_GAP_BLE_EVT_MAX";
+       //     break;
+       // }
+       // case ESP_GAP_BLE_SC_CR_LOC_OOB_EVT:
+       // {
+       //     ret = "ESP_GAP_BLE_SC_CR_LOC_OOB_EVT";
+       //     break;
+       // }
+       // case ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT:
+       // {
+       //     ret = "ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT";
+       //     break;
+       // }
 
     default:
         break;
-
     }
 
     return ret;
@@ -843,5 +844,5 @@ static void ezlopi_ble_setup_service_uuid(void)
         }
     }
 
-    dump("complete-uuid", (all_service_uuid ? all_service_uuid : ""), 0, all_service_uuid_len);
+    dump("complete-uuid", (all_service_uuid ? all_service_uuid : ezlopi__str), 0, all_service_uuid_len);
 }

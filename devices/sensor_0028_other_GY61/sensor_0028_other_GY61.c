@@ -125,7 +125,7 @@ static int __0028_prepare(void *arg)
         if (NULL != gy61_value)
         {
             memset(gy61_value, 0, sizeof(s_gy61_data_t));
-            l_ezlopi_device_t *gy61_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *gy61_device = ezlopi_device_add_device(cj_device);
             if (gy61_device)
             {
                 __prepare_device_cloud_properties(gy61_device, cj_device);

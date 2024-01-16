@@ -43,12 +43,22 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const 
                     cJSON_AddFalseToObject(cj_result, ezlopi_userNotification_str);
                 }
 
-                cJSON_AddStringToObject(cj_result, ezlopi_room_id_str, "");
-                cJSON_AddStringToObject(cj_result, ezlopi_room_name_str, "");
+                cJSON_AddStringToObject(cj_result, ezlopi_room_id_str, ezlopi__str);
+                cJSON_AddStringToObject(cj_result, ezlopi_room_name_str, ezlopi__str);
             }
 
-            ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
+            char *data_to_send = cJSON_Print(cj_response);
             cJSON_Delete(cj_response);
+            
+            if (data_to_send)
+            {
+                cJSON_Minify(data_to_send);
+                ret = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                free(data_to_send);
+            }
+
+            // ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
+            // cJSON_Delete(cj_response);
         }
     }
 

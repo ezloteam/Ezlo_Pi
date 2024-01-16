@@ -4,7 +4,6 @@
 /*****************************************************************************************
  *                                     Methods                                           *
  *****************************************************************************************/
-const char *msg_sub_class_method_hub_item_updated = "method_hub_item_updated";
 const char *method_hub_item_updated = "hub.item.updated";
 const char *method_add_device = "addDevice";
 const char *method_add_all_devices = "addAllDevices";
@@ -117,5 +116,14 @@ const char *method_hub_reboot = "hub.reboot";
 // const  char *method_hub_detection_devices_scan_start = "hub.detection.devices.scan.start";
 // const  char *method_hub_detection_devices_scans_top = "hub.detection.devices.scan.stop";
 const char *method_hub_scene_run_progress = "hub.scene.run.progress";
+const char *ezlopi_rpc_method_notfound_str = "rpc.method.notfound";
+const char *ezlopi_hub_scene_changed_str = "hub.scene.changed";
+const char *ezlopi_hub_scene_added_str = "hub.scene.added";
+const char *ezlopi_hub_scene_deleted_str = "hub.scene.deleted";
+
+const char *ezlopi_hub_room_created_str = "hub.room.created";
+const char *ezlopi_hub_room_edited_str = "hub.room.edited";
+const char *ezlopi_hub_room_deleted_str = "hub.room.deleted";
+const char *ezlopi_hub_room_reordered_str = "hub.room.reordered";
 
 #endif // __EZLOPI_METHODS_STR_H__

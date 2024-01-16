@@ -9,6 +9,7 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_i2c_master.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
@@ -89,7 +90,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         char *valueFormatted = ezlopi_valueformatter_int((int)(illuminance_value->lux_val));
         if (valueFormatted)
         {
-            cJSON_AddStringToObject(cjson_properties, "valueFormatted", valueFormatted);
+            cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         cJSON_AddNumberToObject(cjson_properties, "values", (int)illuminance_value->lux_val);
@@ -111,9 +112,16 @@ static int __init(l_ezlopi_item_t *item)
         {
             TRACE_B("TSL561 initialization finished.........");
             sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
+            ret = 1;
         }
         else
         {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
             TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
         }
     }
@@ -122,20 +130,21 @@ static int __init(l_ezlopi_item_t *item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+
     device->cloud_properties.category = category_light_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_lux;
@@ -144,13 +153,13 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.scale = scales_lux;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;
-    if (NULL == item->interface.i2c_master.address)
+    if (0x00 == item->interface.i2c_master.address)
     {
         item->interface.i2c_master.address = TSL2561_ADDRESS;
     }
@@ -169,7 +178,7 @@ static int __prepare(void *arg)
         if (NULL != TSL2561_lux_data)
         {
             memset(TSL2561_lux_data, 0, sizeof(TSL256_lum_t));
-            l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *tsl256_device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (tsl256_device)
             {
                 __prepare_device_cloud_properties(tsl256_device, prep_arg->cjson_device);
@@ -188,7 +197,6 @@ static int __prepare(void *arg)
             }
             else
             {
-                ezlopi_device_free_device(tsl256_device);
                 free(TSL2561_lux_data);
             }
             ret = 1;

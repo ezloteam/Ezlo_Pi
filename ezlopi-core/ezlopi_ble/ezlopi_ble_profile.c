@@ -3,6 +3,7 @@
 #include "ezlopi_ble_gatt.h"
 #include "ezlopi_ble_config.h"
 #include "ezlopi_ble_profile.h"
+#include "ezlopi_cloud_constants.h"
 
 static s_gatt_service_t *gatt_head_service = NULL;
 
@@ -10,7 +11,6 @@ static void ezlopi_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t *c
 static void ezlopi_ble_gatt_append_characterstic_to_service(s_gatt_service_t *service_obj, s_gatt_char_t *character_object);
 static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t *service_obj);
 static s_gatt_service_t *ezlopi_ble_gatt_search_service_by_characteristic(s_gatt_char_t *characteristic);
-static char *ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event);
 s_gatt_service_t *ezlopi_ble_profile_get_head(void)
 {
     return gatt_head_service;
@@ -394,7 +394,7 @@ void ezlopi_ble_gatt_print_service(s_gatt_service_t *service)
 
 void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
 {
-    msg = msg ? msg : "";
+    msg = msg ? msg : ezlopi__str;
 
     if (uuid)
     {

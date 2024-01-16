@@ -8,15 +8,18 @@
 
 #include "trace.h"
 
-#include "ezlopi_wifi.h"
 #include "ezlopi_nvs.h"
-#include "ezlopi_ble_buffer.h"
+#include "ezlopi_wifi.h"
+#include "ezlopi_devices.h"
 #include "ezlopi_ble_gatt.h"
+#include "ezlopi_ble_auth.h"
+#include "ezlopi_ble_buffer.h"
 #include "ezlopi_ble_profile.h"
 #include "ezlopi_ble_service.h"
 #include "ezlopi_factory_info.h"
-#include "ezlopi_devices.h"
-#include "ezlopi_ble_auth.h"
+#include "ezlopi_cjson_macros.h"
+#include "ezlopi_cloud_constants.h"
+
 #include "esp_gatt_common_api.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
@@ -71,27 +74,27 @@ static char *__provisioning_status_jsonify(void)
         uint32_t prov_stat = ezlopi_nvs_get_provisioning_status();
         if (1 == prov_stat)
         {
-            cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v3_get_version());
-            cJSON_AddNumberToObject(root, "status", prov_stat);
+            cJSON_AddNumberToObject(root, ezlopi_version_str, ezlopi_factory_info_v3_get_version());
+            cJSON_AddNumberToObject(root, ezlopi_status_str, prov_stat);
         }
         else
         {
-            cJSON_AddNumberToObject(root, "version", 0);
-            cJSON_AddNumberToObject(root, "status", 0);
+            cJSON_AddNumberToObject(root, ezlopi_version_str, 0);
+            cJSON_AddNumberToObject(root, ezlopi_status_str, 0);
         }
 
         char tmp_buffer[32];
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
-        cJSON_AddStringToObject(root, "config_id", tmp_buffer);
-        cJSON_AddNumberToObject(root, "config_time", ezlopi_nvs_config_info_update_time_get());
+        cJSON_AddStringToObject(root, ezlopi_config_id_str, tmp_buffer);
+        cJSON_AddNumberToObject(root, ezlopi_config_time_str, ezlopi_nvs_config_info_update_time_get());
 
         prov_status_jstr = cJSON_Print(root);
+        cJSON_Delete(root);
+
         if (prov_status_jstr)
         {
             cJSON_Minify(prov_status_jstr);
         }
-
-        cJSON_Delete(root);
     }
 
     return prov_status_jstr;
@@ -167,9 +170,9 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
             if (root)
             {
 
-                uint32_t len = CJ_GET_NUMBER("len");
-                uint32_t tot_len = CJ_GET_NUMBER("total_len");
-                uint32_t sequence = CJ_GET_NUMBER("sequence");
+                uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
+                uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
+                uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
 
                 TRACE_D("Len: %d", len);
                 TRACE_D("tot_len: %d", tot_len);
@@ -186,7 +189,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                             if (cj_config)
                             {
                                 char *user_id = NULL;
-                                CJSON_GET_VALUE_STRING(cj_config, "user_id", user_id);
+                                CJSON_GET_VALUE_STRING(cj_config, ezlopi_user_id_str, user_id);
 
                                 if (user_id && (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id)))
                                 {
@@ -196,18 +199,20 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         // ezlopi_config_basic->user_id = user_id;
                                         memset(ezlopi_config_basic, 0, sizeof(s_basic_factory_info_t));
 
-                                        CJSON_GET_VALUE_STRING(cj_config, "device_name", ezlopi_config_basic->device_name);
-                                        CJSON_GET_VALUE_STRING(cj_config, "manufacturer_name", ezlopi_config_basic->manufacturer);
-                                        CJSON_GET_VALUE_STRING(cj_config, "brand", ezlopi_config_basic->brand);
-                                        CJSON_GET_VALUE_STRING(cj_config, "model_number", ezlopi_config_basic->model_number);
-                                        CJSON_GET_VALUE_DOUBLE(cj_config, "serial", ezlopi_config_basic->id);
-                                        CJSON_GET_VALUE_STRING(cj_config, "uuid", ezlopi_config_basic->device_uuid);
-                                        CJSON_GET_VALUE_STRING(cj_config, "uuid_provisioning", ezlopi_config_basic->prov_uuid);
-                                        CJSON_GET_VALUE_STRING(cj_config, "mac", ezlopi_config_basic->device_mac);
-                                        CJSON_GET_VALUE_STRING(cj_config, "provision_server", ezlopi_config_basic->provision_server);
-                                        CJSON_GET_VALUE_STRING(cj_config, "cloud_server", ezlopi_config_basic->cloud_server);
-                                        CJSON_GET_VALUE_STRING(cj_config, "provision_token", ezlopi_config_basic->provision_token);
-                                        CJSON_GET_VALUE_STRING(cj_config, "device_type_ezlopi", ezlopi_config_basic->device_type);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_device_name_str, ezlopi_config_basic->device_name);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_manufacturer_name_str, ezlopi_config_basic->manufacturer);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_brand_str, ezlopi_config_basic->brand);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_model_number_str, ezlopi_config_basic->model_number);
+                                        CJSON_GET_VALUE_DOUBLE(cj_config, ezlopi_serial_str, ezlopi_config_basic->id);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_uuid_str, ezlopi_config_basic->device_uuid);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_uuid_provisioning_str, ezlopi_config_basic->prov_uuid);
+
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_mac_str, ezlopi_config_basic->device_mac);
+
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_provision_server_str, ezlopi_config_basic->provision_server);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_cloud_server_str, ezlopi_config_basic->cloud_server);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_provision_token_str, ezlopi_config_basic->provision_token);
+                                        CJSON_GET_VALUE_STRING(cj_config, ezlopi_device_type_ezlopi_str, ezlopi_config_basic->device_type);
 
                                         ezlopi_factory_info_v3_set_basic(ezlopi_config_basic);
                                         uint32_t version_no = ezlopi_nvs_config_info_version_number_get() + 1;
@@ -215,6 +220,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
 
                                         time_t now;
                                         time(&now);
+                                        TRACE_D("time now{size: %u}: %lu", sizeof(time_t), now);
                                         ezlopi_nvs_config_info_update_time_set(now);
 
                                         free(ezlopi_config_basic);
@@ -224,10 +230,10 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                     char *ssl_shared_key = NULL;
                                     char *ssl_private_key = NULL;
 
-                                    CJSON_GET_VALUE_STRING(cj_config, "ssl_private_key", ssl_private_key);
+                                    CJSON_GET_VALUE_STRING(cj_config, ezlopi_ssl_private_key_str, ssl_private_key);
                                     // CJSON_GET_VALUE_STRING(cj_config, "ssl_public_key", ssl_public_key);
-                                    CJSON_GET_VALUE_STRING(cj_config, "ssl_shared_key", ssl_shared_key);
-                                    CJSON_GET_VALUE_STRING(cj_config, "signing_ca_certificate", ca_certs);
+                                    CJSON_GET_VALUE_STRING(cj_config, ezlopi_ssl_shared_key_str, ssl_shared_key);
+                                    CJSON_GET_VALUE_STRING(cj_config, ezlopi_signing_ca_certificate_str, ca_certs);
 
                                     ezlopi_factory_info_v3_set_ca_cert(ca_certs);
                                     ezlopi_factory_info_v3_set_ssl_shared_key(ssl_shared_key);
@@ -313,10 +319,10 @@ static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts
                     static char data_buffer[400 + 1];
                     snprintf(data_buffer, sizeof(data_buffer), "%.*s", copy_size, g_provisioning_info_base64 + (g_provisioning_sequence_no * 400));
 
-                    cJSON_AddNumberToObject(cj_response, "len", copy_size);
-                    cJSON_AddNumberToObject(cj_response, "total_len", total_data_len);
-                    cJSON_AddNumberToObject(cj_response, "sequence", g_provisioning_sequence_no);
-                    cJSON_AddStringToObject(cj_response, "data", data_buffer);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_len_str, copy_size);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_total_len_str, total_data_len);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_sequence_str, g_provisioning_sequence_no);
+                    cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
                     char *send_data = cJSON_Print(cj_response);
                     if (send_data)
@@ -422,34 +428,34 @@ static void __process_provisioning_info(uint8_t *value, uint32_t len)
         if (root)
         {
             TRACE_D("value = %s", value);
-            char *user_id = cJSON_GetObjectItemCaseSensitive(root, "user_id")->valuestring;
-            char *device_name = cJSON_GetObjectItemCaseSensitive(root, "device_name")->valuestring;
-            char *brand = cJSON_GetObjectItemCaseSensitive(root, "brand")->valuestring;
-            char *manufacturer_name = cJSON_GetObjectItemCaseSensitive(root, "manufacturer_name")->valuestring;
-            char *model_number = cJSON_GetObjectItemCaseSensitive(root, "model_number")->valuestring;
-            char *uuid = cJSON_GetObjectItemCaseSensitive(root, "uuid")->valuestring;
-            char *uuid_provisioning = cJSON_GetObjectItemCaseSensitive(root, "uuid_provisioning")->valuestring;
-            double serial = cJSON_GetObjectItemCaseSensitive(root, "serial")->valuedouble;
-            char *cloud_server = cJSON_GetObjectItemCaseSensitive(root, "cloud_server")->valuestring;
-            char *ssl_private_key = cJSON_GetObjectItemCaseSensitive(root, "ssl_private_key")->valuestring;
+            char *user_id = cJSON_GetObjectItemCaseSensitive(root, ezlopi_user_id_str)->valuestring;
+            char *device_name = cJSON_GetObjectItemCaseSensitive(root, ezlopi_device_name_str)->valuestring;
+            char *brand = cJSON_GetObjectItemCaseSensitive(root, ezlopi_brand_str)->valuestring;
+            char *manufacturer_name = cJSON_GetObjectItemCaseSensitive(root, ezlopi_manufacturer_name_str)->valuestring;
+            char *model_number = cJSON_GetObjectItemCaseSensitive(root, ezlopi_model_number_str)->valuestring;
+            char *uuid = cJSON_GetObjectItemCaseSensitive(root, ezlopi_uuid_str)->valuestring;
+            char *uuid_provisioning = cJSON_GetObjectItemCaseSensitive(root, ezlopi_uuid_provisioning_str)->valuestring;
+            double serial = cJSON_GetObjectItemCaseSensitive(root, ezlopi_serial_str)->valuedouble;
+            char *cloud_server = cJSON_GetObjectItemCaseSensitive(root, ezlopi_cloud_server_str)->valuestring;
+            char *ssl_private_key = cJSON_GetObjectItemCaseSensitive(root, ezlopi_ssl_private_key_str)->valuestring;
             char *ssl_public_key = cJSON_GetObjectItemCaseSensitive(root, "ssl_public_key")->valuestring;
-            char *ca_cert = cJSON_GetObjectItemCaseSensitive(root, "ca_cert")->valuestring;
-            char *device_type_ezlopi = cJSON_GetObjectItemCaseSensitive(root, "device_type_ezlopi")->valuestring;
+            char *ca_cert = cJSON_GetObjectItemCaseSensitive(root, ezlopi_ca_cert_str)->valuestring;
+            char *device_type_ezlopi = cJSON_GetObjectItemCaseSensitive(root, ezlopi_device_type_ezlopi_str)->valuestring;
 
             TRACE_D("************************* BLE-PROVISIONING *************************");
-            TRACE_D("user_id:               %s", user_id ? user_id : "");
-            TRACE_D("device_name:           %s", device_name ? device_name : "");
-            TRACE_D("brand:                 %s", brand ? brand : "");
-            TRACE_D("manufacturer_name:     %s", manufacturer_name ? manufacturer_name : "");
-            TRACE_D("model_number:          %s", model_number ? model_number : "");
-            TRACE_D("uuid:                  %s", uuid ? uuid : "");
-            TRACE_D("uuid_provisioning:     %s", uuid_provisioning ? uuid_provisioning : "");
+            TRACE_D("user_id:               %s", user_id ? user_id : ezlopi__str);
+            TRACE_D("device_name:           %s", device_name ? device_name : ezlopi__str);
+            TRACE_D("brand:                 %s", brand ? brand : ezlopi__str);
+            TRACE_D("manufacturer_name:     %s", manufacturer_name ? manufacturer_name : ezlopi__str);
+            TRACE_D("model_number:          %s", model_number ? model_number : ezlopi__str);
+            TRACE_D("uuid:                  %s", uuid ? uuid : ezlopi__str);
+            TRACE_D("uuid_provisioning:     %s", uuid_provisioning ? uuid_provisioning : ezlopi__str);
             TRACE_D("serial:                %f", serial);
-            TRACE_D("cloud_server:          %s", cloud_server ? cloud_server : "");
-            TRACE_D("ssl_private_key:       %s", ssl_private_key ? ssl_private_key : "");
-            TRACE_D("ssl_public_key:        %s", ssl_public_key ? ssl_public_key : "");
-            TRACE_D("ca_cert:               %s", ca_cert ? ca_cert : "");
-            TRACE_D("device_type_ezlopi:    %s", device_type_ezlopi ? device_type_ezlopi : "");
+            TRACE_D("cloud_server:          %s", cloud_server ? cloud_server : ezlopi__str);
+            TRACE_D("ssl_private_key:       %s", ssl_private_key ? ssl_private_key : ezlopi__str);
+            TRACE_D("ssl_public_key:        %s", ssl_public_key ? ssl_public_key : ezlopi__str);
+            TRACE_D("ca_cert:               %s", ca_cert ? ca_cert : ezlopi__str);
+            TRACE_D("device_type_ezlopi:    %s", device_type_ezlopi ? device_type_ezlopi : ezlopi__str);
             TRACE_D("********************************************************************");
 
             cJSON_Delete(root);
@@ -478,10 +484,10 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
             cJSON *root = cJSON_ParseWithLength((const char *)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
             if (root)
             {
-                uint32_t len = CJ_GET_NUMBER("len");
-                // uint32_t tot_len = CJ_GET_NUMBER("total_len");
-                // uint32_t sequence = CJ_GET_NUMBER("sequence");
-                char *data = CJ_GET_STRING("data");
+                uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
+                // uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
+                // uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
+                char *data = CJ_GET_STRING(ezlopi_data_str);
                 if (data)
                 {
                     memcpy(base64_buffer + pos, data, len);
@@ -542,21 +548,20 @@ static char *__provisioning_info_jsonify(void)
         char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
 
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
-        cJSON_AddStringToObject(cj_prov_info, "config_id", tmp_buffer);
-        cJSON_AddNumberToObject(cj_prov_info, "config_time", ezlopi_nvs_config_info_update_time_get());
-        cJSON_AddStringToObject(cj_prov_info, "device_name", device_name);
-        cJSON_AddStringToObject(cj_prov_info, "brand", brand);
-        cJSON_AddStringToObject(cj_prov_info, "manufacturer_name", manufacturer_name);
-        cJSON_AddStringToObject(cj_prov_info, "model_number", model_number);
-        cJSON_AddStringToObject(cj_prov_info, "uuid", uuid);
-        cJSON_AddStringToObject(cj_prov_info, "uuid_provisioning", uuid_provisioning);
-        cJSON_AddNumberToObject(cj_prov_info, "serial", ezlopi_factory_info_v3_get_id());
-        cJSON_AddStringToObject(cj_prov_info, "cloud_server", cloud_server);
-        cJSON_AddStringToObject(cj_prov_info, "ssl_private_key", ssl_private_key);
-        cJSON_AddStringToObject(cj_prov_info, "ssl_shared_key", ssl_shared_key);
-        // cJSON_AddStringToObject(cj_prov_info, "ssl_public_key"); // Not needed by Ezlo_Pi stack for now
-        cJSON_AddStringToObject(cj_prov_info, "ca_cert", ca_cert);
-        cJSON_AddStringToObject(cj_prov_info, "device_type_ezlopi", ezlopi_factory_info_v3_get_device_type());
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_config_id_str, tmp_buffer);
+        cJSON_AddNumberToObject(cj_prov_info, ezlopi_config_time_str, ezlopi_nvs_config_info_update_time_get());
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_device_name_str, device_name);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_brand_str, brand);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_manufacturer_name_str, manufacturer_name);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_model_number_str, model_number);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_uuid_str, uuid);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_uuid_provisioning_str, uuid_provisioning);
+        cJSON_AddNumberToObject(cj_prov_info, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_cloud_server_str, cloud_server);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_ssl_private_key_str, ssl_private_key);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_ssl_shared_key_str, ssl_shared_key);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_ca_cert_str, ca_cert);
+        cJSON_AddStringToObject(cj_prov_info, ezlopi_device_type_ezlopi_str, ezlopi_factory_info_v3_get_device_type());
 
         ezlopi_factory_info_v3_free(device_name);
         ezlopi_factory_info_v3_free(brand);
@@ -570,12 +575,12 @@ static char *__provisioning_info_jsonify(void)
         ezlopi_factory_info_v3_free(ca_cert);
 
         str_json_prov_info = cJSON_Print(cj_prov_info);
+        cJSON_Delete(cj_prov_info);
+
         if (str_json_prov_info)
         {
             cJSON_Minify(str_json_prov_info);
         }
-
-        cJSON_Delete(cj_prov_info);
     }
 
     return str_json_prov_info;

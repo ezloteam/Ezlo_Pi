@@ -126,7 +126,7 @@ typedef enum e_ezlopi_factory_info_v2_offset
     PROVISIONING_SERVER_OFFSET = 0X000 + 0X14,
     PROVISIONING_TOKEN_OFFSET = 0X000 + 0X114,
     PROVISIONING_UUID_OFFSET = 0x0000 + 0x0314,
-    CONFIG_VERSION_OFFSET = 0X000 + 0x02,
+    CONFIG_VERSION_OFFSET = 0X0000 + 0x02,
     CA_CERTIFICATE_OFFSET = 0x0000 + 0x3000,
     SSL_PRIVATE_KEY_OFFSET = 0x0000 + 0x4000,
     SSL_SHARED_KEY_OFFSET = 0x0000 + 0x5000,
@@ -354,7 +354,10 @@ static const char *ezlopi_config_test =
     int ezlopi_factory_info_v2_set_ssl_public_key(char *data);
     int ezlopi_factory_info_v2_set_ssl_private_key(char *data);
 
+    /** Functions to free **/
     void ezlopi_factory_info_v2_free(void *arg);
+    void ezlopi_factory_info_v2_free_ezlopi_config(void);
+
     int ezlopi_factory_info_v2_factory_reset(void);
 
 #endif // v2

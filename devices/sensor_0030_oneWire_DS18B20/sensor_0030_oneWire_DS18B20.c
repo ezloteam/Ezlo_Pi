@@ -3,6 +3,7 @@
 #include "ezlopi_adc.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
@@ -91,18 +92,18 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         cJSON *cj_result = (cJSON *)arg;
         double *temperatue_value = (double *)item->user_arg;
-        cJSON_AddNumberToObject(cj_result, "value", *temperatue_value);
+        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, *temperatue_value);
         char *valueFormatted = ezlopi_valueformatter_double(*temperatue_value);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
         free(valueFormatted);
-        cJSON_AddStringToObject(cj_result, "scale", "celsius");
+        cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
     }
     return ret;
 }
 
 static int __init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    int ret = -1;
 
     if (item->interface.onewire_master.enable)
     {
@@ -116,6 +117,23 @@ static int __init(l_ezlopi_item_t *item)
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = 1;
             }
+            else
+            {
+                ret = -1;
+            }
+        }
+        else
+        {
+            ret = -1;
+        }
+
+        if (-1 == ret)
+        {
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
@@ -123,21 +141,21 @@ static int __init(l_ezlopi_item_t *item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_temperature;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -148,7 +166,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.onewire_master.onewire_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.onewire_master.onewire_pin);
 }
 
 static int __prepare(void *arg)
@@ -158,7 +176,7 @@ static int __prepare(void *arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device();
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
@@ -170,7 +188,7 @@ static int __prepare(void *arg)
             }
             if (NULL == item_temperature)
             {
-                ezlopi_device_free_device(device);
+                ret = -1;
             }
             else
             {
@@ -191,144 +209,6 @@ static int __prepare(void *arg)
 
     return ret;
 }
-
-#if 0
-static int ds18b20_sensor_prepare_and_add(void *args);
-static s_ezlopi_device_properties_t *ds18b20_sensor_prepare(cJSON *cjson_device);
-static int ds18b20_sensor_init(s_ezlopi_device_properties_t *properties);
-static int get_ds18b20_sensor_value_to_cloud(s_ezlopi_device_properties_t *properties, void *args);
-
-int ds18b20_sensor(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *ezlo_device, void *arg, void *user_arg)
-{
-    int ret = 0;
-
-    switch (action)
-    {
-    case EZLOPI_ACTION_PREPARE:
-    {
-        ret = ds18b20_sensor_prepare_and_add(arg);
-        break;
-    }
-    case EZLOPI_ACTION_INITIALIZE:
-    {
-        ret = ds18b20_sensor_init(ezlo_device);
-        break;
-    }
-    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-    {
-        ret = get_ds18b20_sensor_value_to_cloud(ezlo_device, arg);
-        break;
-    }
-    case EZLOPI_ACTION_NOTIFY_1000_MS:
-    {
-        ezlopi_device_value_updated_from_device(ezlo_device);
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
-    return ret;
-}
-
-static int ds18b20_sensor_prepare_and_add(void *args)
-{
-    int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
-
-    if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
-    {
-        s_ezlopi_device_properties_t *ds18b20_sensor_properties = ds18b20_sensor_prepare(device_prep_arg->cjson_device);
-        if (ds18b20_sensor_properties)
-        {
-            if (0 == ezlopi_devices_list_add(device_prep_arg->device, ds18b20_sensor_properties, NULL))
-            {
-                free(ds18b20_sensor_properties);
-            }
-            else
-            {
-                ret = 1;
-            }
-        }
-    }
-
-    return ret;
-}
-
-static s_ezlopi_device_properties_t *ds18b20_sensor_prepare(cJSON *cjson_device)
-{
-    s_ezlopi_device_properties_t *ds18b20_sensor_properties = malloc(sizeof(s_ezlopi_device_properties_t));
-
-    if (ds18b20_sensor_properties)
-    {
-        memset(ds18b20_sensor_properties, 0, sizeof(s_ezlopi_device_properties_t));
-        ds18b20_sensor_properties->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-
-        char *device_name = NULL;
-        CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
-        ASSIGN_DEVICE_NAME(ds18b20_sensor_properties, device_name);
-        ds18b20_sensor_properties->ezlopi_cloud.category = category_temperature;
-        ds18b20_sensor_properties->ezlopi_cloud.subcategory = subcategory_not_defined;
-        ds18b20_sensor_properties->ezlopi_cloud.item_name = ezlopi_item_name_temp;
-        ds18b20_sensor_properties->ezlopi_cloud.device_type = dev_type_sensor;
-        ds18b20_sensor_properties->ezlopi_cloud.value_type = value_type_temperature;
-        ds18b20_sensor_properties->ezlopi_cloud.has_getter = true;
-        ds18b20_sensor_properties->ezlopi_cloud.has_setter = false;
-        ds18b20_sensor_properties->ezlopi_cloud.reachable = true;
-        ds18b20_sensor_properties->ezlopi_cloud.battery_powered = false;
-        ds18b20_sensor_properties->ezlopi_cloud.show = true;
-        ds18b20_sensor_properties->ezlopi_cloud.room_name[0] = '\0';
-        ds18b20_sensor_properties->ezlopi_cloud.device_id = ezlopi_cloud_generate_device_id();
-        ds18b20_sensor_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
-        ds18b20_sensor_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
-
-        CJSON_GET_VALUE_INT(cjson_device, "gpio", ds18b20_sensor_properties->interface.gpio.gpio_in.gpio_num);
-        ds18b20_sensor_properties->interface.gpio.gpio_out.enable = false;
-        ds18b20_sensor_properties->interface.gpio.gpio_in.enable = true;
-        // ds18b20_sensor_properties->interface.gpio.gpio_in.gpio_num = 2;
-        ds18b20_sensor_properties->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
-        ds18b20_sensor_properties->interface.gpio.gpio_in.invert = false;
-        ds18b20_sensor_properties->interface.gpio.gpio_in.mode = GPIO_MODE_DISABLE;
-        ds18b20_sensor_properties->interface.gpio.gpio_in.pull = GPIO_FLOATING;
-        ds18b20_sensor_properties->interface.gpio.gpio_in.value = 0;
-    }
-    return ds18b20_sensor_properties;
-}
-
-static int ds18b20_sensor_init(s_ezlopi_device_properties_t *properties)
-{
-    int ret = 0;
-    if (ds18b20_reset_line(properties->interface.gpio.gpio_in.gpio_num))
-    {
-        if (ds18b20_recognize_device(properties->interface.gpio.gpio_in.gpio_num))
-        {
-            TRACE_B("Providing initial settings to DS18B20.");
-            ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, properties->interface.gpio.gpio_in.gpio_num);
-            ret = 1;
-        }
-    }
-    return ret;
-}
-
-static int get_ds18b20_sensor_value_to_cloud(s_ezlopi_device_properties_t *properties, void *args)
-{
-    int ret = 0;
-    double temperature = 0;
-    cJSON *cjson_properties = (cJSON *)args;
-
-    if (cjson_properties)
-    {
-        ds18b20_get_temperature_data(&temperature, properties->interface.gpio.gpio_in.gpio_num);
-        TRACE_B("Temperature is: %f degree censius", temperature);
-        cJSON_AddNumberToObject(cjson_properties, "value", temperature);
-        cJSON_AddStringToObject(cjson_properties, "scale", "celsius");
-    }
-
-    return ret;
-}
-
-#endif
 
 static esp_err_t ds18b20_write_data(uint8_t *data, uint32_t gpio_pin)
 {

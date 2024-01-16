@@ -4,6 +4,7 @@
 
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
@@ -19,7 +20,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __value_updated_from_interrupt(void *arg);
 
-int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void **user_arg)
+int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 
@@ -59,9 +60,9 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_value_obj = (cJSON *)arg;
         int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        cJSON_AddBoolToObject(cj_value_obj, "value", item->interface.gpio.gpio_in.value);
+        cJSON_AddBoolToObject(cj_value_obj, ezlopi_value_str, item->interface.gpio.gpio_in.value);
         char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(cj_value_obj, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_value_obj, ezlopi_valueFormatted_str, valueFormatted);
         ret = 1;
     }
     return ret;
@@ -88,6 +89,16 @@ static int __init(l_ezlopi_item_t *item)
             }
 
             gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
+            ret = 1;
+        }
+        else
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
@@ -110,7 +121,7 @@ static int __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device)
             {
                 __setup_device_properties(device, cj_device);
@@ -137,10 +148,10 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cj_device, "val_ip", item->interface.gpio.gpio_in.value);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
@@ -148,12 +159,14 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 
 static void __setup_device_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_outlet;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
 }

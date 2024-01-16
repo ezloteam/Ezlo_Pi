@@ -119,7 +119,7 @@ static int __prepare(void *arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_hall_data_t));
-            l_ezlopi_device_t *hall_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *hall_device = ezlopi_device_add_device(cj_device);
             if (hall_device)
             {
                 __setup_device_cloud_properties(hall_device, cj_device);
@@ -156,13 +156,13 @@ static int __init(l_ezlopi_item_t *item)
         }
         else
         {
+            ret = 1;
             TRACE_I("Width configuration was successfully done!");
             TRACE_W("Calibrating.....");
             s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
             user_data->hall_state = "dw_is_closed";
             xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", 2048, item, 1, NULL);
         }
-        ret = 1;
     }
     return ret;
 }

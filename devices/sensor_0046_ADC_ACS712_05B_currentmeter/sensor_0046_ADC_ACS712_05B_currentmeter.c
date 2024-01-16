@@ -100,7 +100,7 @@ static int __0046_prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_currentmeter_t));
-            l_ezlopi_device_t *currentmeter_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *currentmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (currentmeter_device)
             {
                 __prepare_device_cloud_properties(currentmeter_device, device_prep_arg->cjson_device);

@@ -74,7 +74,7 @@ static int __0015_prepare(void *arg)
             s_ezlopi_dht11_data_t *dht11_sensor_data = (s_ezlopi_dht11_data_t *)malloc(sizeof(s_ezlopi_dht11_data_t));
             if (dht11_sensor_data)
             {
-                l_ezlopi_device_t *device_temperature = ezlopi_device_add_device();
+                l_ezlopi_device_t *device_temperature = ezlopi_device_add_device(cjson_device);
                 if (device_temperature)
                 {
                     __dht11_setup_device_cloud_properties_temperature(device_temperature, cjson_device);
@@ -85,7 +85,7 @@ static int __0015_prepare(void *arg)
                         __dht11_setup_item_properties_temperature(item_temperature, cjson_device, dht11_sensor_data);
                     }
                 }
-                l_ezlopi_device_t *device_humidity = ezlopi_device_add_device();
+                l_ezlopi_device_t *device_humidity = ezlopi_device_add_device(cjson_device);
                 if (device_humidity)
                 {
                     __dht11_setup_device_cloud_properties_humidity(device_humidity, cjson_device);

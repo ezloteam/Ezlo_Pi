@@ -7,6 +7,7 @@
 #include "mbedtls/base64.h"
 
 #include "trace.h"
+#include "esp_gatt_common_api.h"
 
 #include "ezlopi_nvs.h"
 #include "ezlopi_wifi.h"
@@ -16,8 +17,9 @@
 #include "ezlopi_ble_buffer.h"
 #include "ezlopi_ble_profile.h"
 #include "ezlopi_ble_service.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_factory_info.h"
-#include "esp_gatt_common_api.h"
+#include "ezlopi_cloud_constants.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
@@ -25,19 +27,11 @@
 static s_gatt_service_t *g_dynamic_config_service = NULL;
 static s_linked_buffer_t *g_dynamic_config_linked_buffer = NULL;
 
-static char *__dynamic_config_jsonify(void);
 static char *__dynamic_config_base64(void);
 static char *__base64_decode_dynamic_config(uint32_t total_size);
 
 static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-
-#if 0
-static void __process_dynamic_config(uint8_t *value, uint32_t len);
-static void __dynamic_config_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-#endif
-
-static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
 void ezlopi_ble_service_dynamic_config_init(void)
 {
@@ -54,87 +48,6 @@ void ezlopi_ble_service_dynamic_config_init(void)
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
     ezlopi_ble_gatt_add_characteristic(g_dynamic_config_service, &uuid, permission, properties, __dynamic_config_read_func, __dynamic_config_write_func, NULL); // reliable-write is not implemented for now
-}
-
-static char *__provisioning_status_jsonify(void)
-{
-    char *prov_status_jstr = NULL;
-    cJSON *root = cJSON_CreateObject();
-    if (root)
-    {
-        uint32_t prov_stat = ezlopi_nvs_get_provisioning_status();
-        if (1 == prov_stat)
-        {
-            cJSON_AddNumberToObject(root, "version", ezlopi_factory_info_v3_get_version());
-            cJSON_AddNumberToObject(root, "status", prov_stat);
-        }
-        else
-        {
-            cJSON_AddNumberToObject(root, "version", 0);
-            cJSON_AddNumberToObject(root, "status", 0);
-        }
-
-        char tmp_buffer[32];
-        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
-        cJSON_AddStringToObject(root, "config_id", tmp_buffer);
-        cJSON_AddNumberToObject(root, "config_time", ezlopi_nvs_config_info_update_time_get());
-
-        prov_status_jstr = cJSON_Print(root);
-        if (prov_status_jstr)
-        {
-            cJSON_Minify(prov_status_jstr);
-        }
-
-        cJSON_Delete(root);
-    }
-
-    return prov_status_jstr;
-}
-
-static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
-{
-    if (value)
-    {
-        static char *prov_status_jstr;
-        if (NULL == prov_status_jstr)
-        {
-            prov_status_jstr = __provisioning_status_jsonify();
-        }
-
-        if (NULL != prov_status_jstr)
-        {
-            uint32_t total_data_len = strlen(prov_status_jstr);
-            uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
-            uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
-
-            if ((0 != total_data_len) && (total_data_len > param->read.offset))
-            {
-                strncpy((char *)value->value, prov_status_jstr + param->read.offset, copy_size);
-                value->len = copy_size;
-            }
-            else
-            {
-                value->len = 1;
-                value->value[0] = 0; // Read 0 if the device not provisioned yet.
-            }
-
-            if ((param->read.offset + copy_size) >= total_data_len)
-            {
-                free(prov_status_jstr);
-                prov_status_jstr = NULL;
-            }
-        }
-        else
-        {
-            TRACE_E("Unable to create json string");
-            value->len = 1;
-            value->value[0] = 0; // Read 0 if the device not provisioned yet.
-        }
-    }
-    else
-    {
-        TRACE_E("VALUE IS NULL");
-    }
 }
 
 static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
@@ -161,9 +74,9 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
             if (root)
             {
 
-                uint32_t len = CJ_GET_NUMBER("len");
-                uint32_t tot_len = CJ_GET_NUMBER("total_len");
-                uint32_t sequence = CJ_GET_NUMBER("sequence");
+                uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
+                uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
+                uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
 
                 TRACE_D("Len: %d", len);
                 TRACE_D("tot_len: %d", tot_len);
@@ -189,15 +102,17 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                             if (cj_config)
                             {
                                 char *user_id = NULL;
-                                CJSON_GET_VALUE_STRING(cj_config, "user_id", user_id);
+                                CJSON_GET_VALUE_STRING(cj_config, ezlopi_user_id_str, user_id);
 
                                 if (user_id && (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id)))
                                 {
-                                    cJSON_DeleteItemFromObject(cj_config, "user_id");
+                                    cJSON_DeleteItemFromObject(cj_config, ezlopi_user_id_str);
+                                    time_t now;
+                                    time(&now);
+                                    cJSON_AddNumberToObject(cj_config, ezlopi_coinfig_time_str, now);
                                     char *save_config_str = cJSON_Print(cj_config);
                                     if (save_config_str)
                                     {
-                                        TRACE_D("here");
                                         ezlopi_factory_info_v2_set_ezlopi_config(save_config_str);
                                         free(save_config_str);
                                     }
@@ -280,10 +195,10 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
                     static char data_buffer[400 + 1];
                     snprintf(data_buffer, sizeof(data_buffer), "%.*s", copy_size, g_dynamic_config_base64 + (g_dynamic_config_sequence_no * 400));
 
-                    cJSON_AddNumberToObject(cj_response, "len", copy_size);
-                    cJSON_AddNumberToObject(cj_response, "total_len", total_data_len);
-                    cJSON_AddNumberToObject(cj_response, "sequence", g_dynamic_config_sequence_no);
-                    cJSON_AddStringToObject(cj_response, "data", data_buffer);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_len_str, copy_size);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_total_len_str, total_data_len);
+                    cJSON_AddNumberToObject(cj_response, ezlopi_sequence_str, g_dynamic_config_sequence_no);
+                    cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
                     char *send_data = cJSON_Print(cj_response);
                     if (send_data)
@@ -368,67 +283,6 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
     }
 }
 
-#if 0
-static void __dynamic_config_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
-{
-    if (g_dynamic_config_linked_buffer)
-    {
-        TRACE_D("Write execute function called.");
-        ezlopi_ble_buffer_accumulate_to_start(g_dynamic_config_linked_buffer);
-        __process_dynamic_config(g_dynamic_config_linked_buffer->buffer, g_dynamic_config_linked_buffer->len);
-        ezlopi_ble_buffer_free_buffer(g_dynamic_config_linked_buffer);
-        g_dynamic_config_linked_buffer = NULL;
-    }
-}
-
-static void __process_dynamic_config(uint8_t *value, uint32_t len)
-{
-    if ((NULL != value) && (len > 0))
-    {
-        cJSON *cj_config = cJSON_Parse((const char *)value);
-        if (cj_config)
-        {
-            char *user_id = NULL;
-            CJSON_GET_VALUE_STRING(cj_config, "user_id", user_id);
-
-            if (user_id && (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id)))
-            {
-                cJSON *cj_device_config = cJSON_GetObjectItem(cj_config, "device_config");
-                if (cj_device_config)
-                {
-                    cJSON_DeleteItemFromObject(cj_config, "cmd");
-                    cJSON_AddNumberToObject(cj_device_config, "cmd", 3);
-                    char *tmp_str = cJSON_Print(cj_device_config);
-                    if (tmp_str)
-                    {
-                        TRACE_D("device_config: %s", tmp_str);
-                        ezlopi_factory_info_v2_set_ezlopi_config(tmp_str);
-                        free(tmp_str);
-                    }
-                }
-            }
-            else
-            {
-                TRACE_E("User varification failed!");
-
-                char *curr_user_id = ezlopi_nvs_read_user_id_str();
-                if (curr_user_id)
-                {
-                    TRACE_D("current user: %s", curr_user_id);
-                    free(curr_user_id);
-                }
-            }
-
-            cJSON_Delete(cj_config);
-        }
-        else
-        {
-            TRACE_E("Invalid json packet received!");
-        }
-    }
-}
-#endif
-
 static char *__base64_decode_dynamic_config(uint32_t total_size)
 {
     char *decoded_config_json = NULL;
@@ -445,10 +299,10 @@ static char *__base64_decode_dynamic_config(uint32_t total_size)
             cJSON *root = cJSON_ParseWithLength((const char *)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
             if (root)
             {
-                uint32_t len = CJ_GET_NUMBER("len");
-                // uint32_t tot_len = CJ_GET_NUMBER("total_len");
-                // uint32_t sequence = CJ_GET_NUMBER("sequence");
-                char *data = CJ_GET_STRING("data");
+                uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
+                // uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
+                // uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
+                char *data = CJ_GET_STRING(ezlopi_data_str);
                 if (data)
                 {
                     memcpy(base64_buffer + pos, data, len);
@@ -489,35 +343,6 @@ static char *__base64_decode_dynamic_config(uint32_t total_size)
     return decoded_config_json;
 }
 
-#if 0
-static char *__dynamic_config_jsonify(void)
-{
-    char *str_json_prov_info = NULL;
-
-    char *device_config = ezlopi_factory_info_v2_get_ezlopi_config(); // don't free this, it is being used by other modules as well
-
-    if (device_config)
-    {
-        TRACE_D("device-config: %s", device_config);
-        cJSON *cj_device_config = cJSON_Parse(device_config);
-
-        if (cj_device_config)
-        {
-            cJSON_DeleteItemFromObject(cj_device_config, "cmd");
-            cJSON_AddNumberToObject(cj_device_config, "config_time", ezlopi_nvs_config_info_update_time_get());
-            cJSON_AddNumberToObject(cj_device_config, "_")
-            str_json_prov_info = cJSON_Print(cj_device_config);
-            if (str_json_prov_info)
-            {
-                cJSON_Minify(str_json_prov_info);
-            }
-        }
-    }
-
-    return str_json_prov_info;
-}
-#endif
-
 static char *__dynamic_config_base64(void)
 {
     const uint32_t base64_data_len = 4096;
@@ -525,12 +350,15 @@ static char *__dynamic_config_base64(void)
     if (base64_data)
     {
         uint32_t out_put_len = 0;
-        char *str_provisioning_data = ezlopi_factory_info_v3_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
-        if (str_provisioning_data)
+        char *str_ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
+        if (str_ezlopi_config)
         {
-            TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);
+            TRACE_D("str_ezlopi_config[len: %d]: %s", strlen(str_ezlopi_config), str_ezlopi_config);
 
-            int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len, (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
+            int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
+                                            (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
+
+            ezlopi_factory_info_v3_free(str_ezlopi_config);
 
             TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
         }

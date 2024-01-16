@@ -8,8 +8,10 @@
 #include "freertos/task.h"
 
 #include "trace.h"
-#include "ezlopi_factory_info.h"
+
 #include "ezlopi_nvs.h"
+#include "ezlopi_factory_info.h"
+#include "ezlopi_cloud_constants.h"
 
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
 static char *g_ca_certificate = NULL;
@@ -126,6 +128,7 @@ void ezlopi_factory_info_v3_free(void *arg)
     if (arg)
     {
         free(arg);
+        arg = NULL;
     }
 }
 
@@ -948,6 +951,14 @@ int ezlopi_factory_info_v3_factory_reset(void)
 static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset);
 static char *ezlopi_factory_info_v2_read_string(e_ezlopi_factory_info_v2_offset_t offset, e_ezlopi_factory_info_v2_length_t length);
 
+#define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
+    {                                                      \
+        if (data)                                          \
+        {                                                  \
+            snprintf(buffer + offset, length, "%s", data); \
+        }                                                  \
+    }
+
 const esp_partition_t *ezlopi_factory_info_v2_init(void)
 {
     if (NULL == partition_ctx_v2)
@@ -988,24 +999,21 @@ void print_factory_info_v2(void)
     char *ca_certificate = ezlopi_factory_info_v2_get_ca_certificate();
     char *ssl_private_key = ezlopi_factory_info_v2_get_ssl_private_key();
     char *ssl_shared_key = ezlopi_factory_info_v2_get_ssl_shared_key();
-#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
+
     char *ezlopi_config = ezlopi_factory_info_v2_get_ezlopi_config();
-#elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
-    char *ezlopi_config = ezlopi_nvs_read_config_data_str();
-#endif
 
     TRACE_D("----------------- Factory Info -----------------");
     // TRACE_W("VERSION[off: 0x%04X, size: 0x%04X]:                %d", VERSION_OFFSET, VERSION_LENGTH, version);
     TRACE_W("SERIAL-ID [off: 0x%04X, size: 0x%04X]:             %llu", ID_OFFSET, ID_LENGTH, id);
     // TRACE_W("MAC [off: 0x%04X, size: 0x%04X]:                   %02X:%02X:%02X:%02X:%02X:%02X", DEVICE_MAC_OFFSET, DEVICE_MAC_LENGTH, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    TRACE_W("NAME [off: 0x%04X, size: 0x%04X]:                  %s", NAME_OFFSET, NAME_LENGTH, name ? name : "null");
-    // TRACE_W("MANUFACTURER [off: 0x%04X, size: 0x%04X]:          %s", MANUFACTURER_OFFSET, MANUFACTURER_LENGTH, manufacturer ? manufacturer : "null");
-    // TRACE_W("BRAND [off: 0x%04X, size: 0x%04X]:                 %s", BRAND_OFFSET, BRAND_LENGTH, brand ? brand : "null");
-    // TRACE_W("MODEL [off: 0x%04X, size: 0x%04X]:                 %s", MODEL_OFFSET, MODEL_LENGTH, model ? model : "null");
-    TRACE_W("DEVICE_UUID [off: 0x%04X, size: 0x%04X]:           %s", DEVICE_UUID_OFFSET, DEVICE_UUID_LENGTH, device_uuid ? device_uuid : "null");
-    // TRACE_W("PROVISIONING_UUID [off: 0x%04X, size: 0x%04X]:     %s", PROVISIONING_UUID_OFFSET, PROVISIONING_UUID_LENGTH, provisioning_uuid ? provisioning_uuid : "null");
-    TRACE_W("WIFI-SSID [off: 0x%04X, size: 0x%04X]:             %s", SSID_OFFSET, SSID_LENGTH, wifi_ssid ? wifi_ssid : "null");
-    // TRACE_W("WIFI-PASSWORD [off: 0x%04X, size: 0x%04X]:         %s", PASSWORD_OFFSET, PASSWORD_LENGTH, wifi_password ? wifi_password : "null");
+    TRACE_W("NAME [off: 0x%04X, size: 0x%04X]:                  %s", NAME_OFFSET, NAME_LENGTH, name ? name : ezlopi_null_str);
+    // TRACE_W("MANUFACTURER [off: 0x%04X, size: 0x%04X]:          %s", MANUFACTURER_OFFSET, MANUFACTURER_LENGTH, manufacturer ? manufacturer : ezlopi_null_str);
+    // TRACE_W("BRAND [off: 0x%04X, size: 0x%04X]:                 %s", BRAND_OFFSET, BRAND_LENGTH, brand ? brand : ezlopi_null_str);
+    // TRACE_W("MODEL [off: 0x%04X, size: 0x%04X]:                 %s", MODEL_OFFSET, MODEL_LENGTH, model ? model : ezlopi_null_str);
+    TRACE_W("DEVICE_UUID [off: 0x%04X, size: 0x%04X]:           %s", DEVICE_UUID_OFFSET, DEVICE_UUID_LENGTH, device_uuid ? device_uuid : ezlopi_null_str);
+    // TRACE_W("PROVISIONING_UUID [off: 0x%04X, size: 0x%04X]:     %s", PROVISIONING_UUID_OFFSET, PROVISIONING_UUID_LENGTH, provisioning_uuid ? provisioning_uuid : ezlopi_null_str);
+    TRACE_W("WIFI-SSID [off: 0x%04X, size: 0x%04X]:             %s", SSID_OFFSET, SSID_LENGTH, wifi_ssid ? wifi_ssid : ezlopi_null_str);
+    // TRACE_W("WIFI-PASSWORD [off: 0x%04X, size: 0x%04X]:         %s", PASSWORD_OFFSET, PASSWORD_LENGTH, wifi_password ? wifi_password : ezlopi_null_str);
     // TRACE_W("CLOUD_SERVER [off: 0x%04X, size: 0x%04X]:          %s", CLOUD_SERVER_OFFSET, CLOUD_SERVER_LENGTH, cloud_server);
     // TRACE_W("DEVICE_TYPE [off: 0x%04X, size: 0x%04X]:           %s", DEVICE_TYPE_OFFSET, DEVICE_TYPE_LENGTH, device_type);
     // TRACE_W("CA_CERTIFICATE [off: 0x%04X, size: 0x%04X]:        %s", CA_CERTIFICATE_OFFSET, CA_CERTIFICATE_LENGTH, ca_certificate);
@@ -1014,7 +1022,7 @@ void print_factory_info_v2(void)
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
     TRACE_W("EZLOPI_CONFIG [off: 0x%04X, size: 0x%04X]:         %s", EZLOPI_CONFIG_OFFSET, EZLOPI_CONFIG_LENGTH, ezlopi_config);
 #elif (ID_BIN_VERSION_1 == ID_BIN_VERSION)
-    // TRACE_W("EZLOPI_CONFIG:                                     %s", ezlopi_config ? ezlopi_config : "");
+    // TRACE_W("EZLOPI_CONFIG:                                     %s", ezlopi_config ? ezlopi_config : ezlopi__str);
 #endif
     TRACE_D("-------------------------------------------------");
 
@@ -1027,7 +1035,7 @@ void print_factory_info_v2(void)
     ezlopi_factory_info_v2_free(wifi_ssid);
     ezlopi_factory_info_v2_free(wifi_password);
     ezlopi_factory_info_v2_free(cloud_server);
-    // ezlopi_factory_info_v2_free(device_type);
+    ezlopi_factory_info_v2_free_ezlopi_config();
 }
 
 /** Getter */
@@ -1263,131 +1271,6 @@ char *ezlopi_factory_info_v2_get_ezlopi_config(void)
     return NULL;
 }
 
-#if 0
-/** Setter */
-uint16_t ezlopi_factory_info_v2_set_version(void)
-{
-    uint16_t _version = 0ULL;
-
-    if (ezlopi_factory_info_v2_init())
-    {
-        uint8_t tmp_version_arr[2];
-        memset(tmp_version_arr, 0, 2);
-        esp_partition_read(partition_ctx_v2, VERSION_OFFSET, &tmp_version_arr, VERSION_LENGTH);
-
-        for (int i = 0; i < 8; i++)
-        {
-            _version |= tmp_version_arr[i] << (i * 8);
-        }
-    }
-
-    return _version;
-}
-
-char *ezlopi_factory_info_v2_set_name(void)
-{
-    return ezlopi_factory_info_v2_read_string(NAME_OFFSET, NAME_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_manufacturer(void)
-{
-    return ezlopi_factory_info_v2_read_string(MANUFACTURER_OFFSET, MANUFACTURER_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_brand(void)
-{
-    return ezlopi_factory_info_v2_read_string(BRAND_OFFSET, BRAND_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_model(void)
-{
-    return ezlopi_factory_info_v2_read_string(MODEL_OFFSET, MODEL_LENGTH);
-}
-
-unsigned long long ezlopi_factory_info_v2_set_id(void)
-{
-    unsigned long long _id = 0ULL;
-
-    if (ezlopi_factory_info_v2_init())
-    {
-        uint8_t tmp_id_arr[8];
-        memset(tmp_id_arr, 0, 8);
-        esp_partition_read(partition_ctx_v2, ID_OFFSET, &tmp_id_arr, ID_LENGTH);
-
-        for (int i = 0; i < 8; i++)
-        {
-            _id |= tmp_id_arr[i] << (i * 8);
-        }
-    }
-
-    return _id;
-}
-
-char *ezlopi_factory_info_v2_set_device_uuid(void)
-{
-    return ezlopi_factory_info_v2_read_string(DEVICE_UUID_OFFSET, DEVICE_UUID_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_provisioning_uuid(void)
-{
-    return ezlopi_factory_info_v2_read_string(PROVISIONING_UUID_OFFSET, PROVISIONING_UUID_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ssid(void)
-{
-    return ezlopi_factory_info_v2_read_string(SSID_OFFSET, SSID_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_password(void)
-{
-    return ezlopi_factory_info_v2_read_string(PASSWORD_OFFSET, PASSWORD_LENGTH);
-}
-
-uint8_t *ezlopi_factory_info_v2_set_ezlopi_mac(void)
-{
-    uint8_t *tmp_mac_arr = malloc(DEVICE_MAC_LENGTH);
-
-    if (tmp_mac_arr)
-    {
-        if (ezlopi_factory_info_v2_init())
-        {
-            memset(tmp_mac_arr, 0, DEVICE_MAC_LENGTH);
-            esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, &tmp_mac_arr, DEVICE_MAC_LENGTH);
-        }
-    }
-
-    return tmp_mac_arr;
-}
-
-char *ezlopi_factory_info_v2_set_cloud_server(void)
-{
-    return ezlopi_factory_info_v2_read_string(CLOUD_SERVER_OFFSET, CLOUD_SERVER_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ca_certificate(void)
-{
-    return ezlopi_factory_info_v2_read_string(CA_CERTIFICATE_OFFSET, CA_CERTIFICATE_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ssl_private_key(void)
-{
-    return ezlopi_factory_info_v2_read_string(SSL_PRIVATE_KEY_OFFSET, SSL_PRIVATE_KEY_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ssl_shared_key(void)
-{
-    return ezlopi_factory_info_v2_read_string(SSL_SHARED_KEY_OFFSET, SSL_SHARED_KEY_LENGTH);
-}
-#endif
-
-#define UPDATE_STRING_VALUE(buffer, data, offset, length)  \
-    {                                                      \
-        if (data)                                          \
-        {                                                  \
-            snprintf(buffer + offset, length, "%s", data); \
-        }                                                  \
-    }
-
 int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic)
 {
     int ret = 0;
@@ -1589,57 +1472,61 @@ int ezlopi_factory_info_v2_set_wifi(char *ssid, char *password)
 
 int ezlopi_factory_info_v2_set_ssl_private_key(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x4000);
+    return ezlopi_factory_info_v2_set_4kb(ezlopi_ssl_private_key_str, data, SSL_PRIVATE_KEY_OFFSET);
 }
 
 int ezlopi_factory_info_v2_set_ssl_public_key(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x4000);
+    // return ezlopi_factory_info_v2_set_4kb("ssl-public-key", data, 0x4000);
+    return 0;
 }
 
 int ezlopi_factory_info_v2_set_ssl_shared_key(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x5000);
+    return ezlopi_factory_info_v2_set_4kb("ssl-shared-key", data, SSL_SHARED_KEY_OFFSET);
 }
 
 int ezlopi_factory_info_v2_set_ca_cert(char *data)
 {
-    return ezlopi_factory_info_v2_set_4kb(data, 0x3000);
+    return ezlopi_factory_info_v2_set_4kb("ca-cert", data, CA_CERTIFICATE_OFFSET);
 }
 
 int ezlopi_factory_info_v2_set_ezlopi_config(char *data)
 {
-    int ret = ezlopi_factory_info_v2_set_4kb(data, 0x1000);
-    if (ret)
+    int ret = ezlopi_factory_info_v2_set_4kb("ezlopi-config", data, EZLOPI_CONFIG_OFFSET);
+    if (1 == ret)
     {
-        free(g_ezlopi_config);
-        g_ezlopi_config = NULL;
-        ezlopi_factory_info_v2_get_ezlopi_config();
+        ezlopi_factory_info_v2_free_ezlopi_config();
     }
 
     return ret;
 }
 
-static int ezlopi_factory_info_v2_set_4kb(char *data, uint32_t offset)
+static int ezlopi_factory_info_v2_set_4kb(char *name, char *data, uint32_t offset)
 {
     int ret = 0;
     if (data)
     {
-        if (ESP_OK == esp_partition_erase_range(partition_ctx_v2, offset, 0x1000))
+        if (ESP_OK == (ret = esp_partition_erase_range(partition_ctx_v2, offset, 0x1000)))
         {
-            if (ESP_OK == esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1))
+            if (ESP_OK == (ret = esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1)))
             {
-                TRACE_I("Flash write succeessful");
+                char *updated_data_from_flash = ezlopi_factory_info_v2_read_string(offset, 0x1000);
+                if (updated_data_from_flash)
+                {
+                    free(updated_data_from_flash);
+                }
+
                 ret = 1;
             }
             else
             {
-                TRACE_E("esp-partition write failed!");
+                TRACE_E("%s: esp-partition write failed!", name ? name : ezlopi__str);
             }
         }
         else
         {
-            TRACE_E("esp-partition erase failed!");
+            TRACE_E("%s: esp-partition erase failed!", name ? name : ezlopi__str);
         }
     }
 
@@ -1659,6 +1546,16 @@ int ezlopi_factory_info_v2_factory_reset(void)
     }
 
     return ret;
+}
+
+/** Free **/
+void ezlopi_factory_info_v2_free_ezlopi_config(void)
+{
+    if (g_ezlopi_config)
+    {
+        free(g_ezlopi_config);
+        g_ezlopi_config = NULL;
+    }
 }
 
 /** Reader */

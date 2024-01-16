@@ -113,7 +113,7 @@ static int __prepare(void *arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_mpu6050_data_t));
-            l_ezlopi_device_t *mpu6050_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *mpu6050_device = ezlopi_device_add_device(cj_device);
             if (mpu6050_device)
             {
                 __prepare_device_cloud_properties(mpu6050_device, cj_device);

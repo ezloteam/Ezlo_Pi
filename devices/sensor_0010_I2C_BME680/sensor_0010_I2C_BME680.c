@@ -100,7 +100,7 @@ static int __prepare(void *arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(bme680_data_t));
-            l_ezlopi_device_t *temp_humid_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *temp_humid_device = ezlopi_device_add_device(cj_device);
             if (temp_humid_device)
             {
                 temp_humid_device->cloud_properties.category = category_temperature;
@@ -130,7 +130,7 @@ static int __prepare(void *arg)
             {
                 ezlopi_device_free_device(temp_humid_device);
             }
-            l_ezlopi_device_t *pressure_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *pressure_device = ezlopi_device_add_device(cj_device);
             if (pressure_device)
             {
                 pressure_device->cloud_properties.category = category_level_sensor;
@@ -152,7 +152,7 @@ static int __prepare(void *arg)
             {
                 ezlopi_device_free_device(pressure_device);
             }
-            l_ezlopi_device_t *aqi_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *aqi_device = ezlopi_device_add_device(cj_device);
             if (aqi_device)
             {
                 aqi_device->cloud_properties.category = category_level_sensor;
@@ -174,7 +174,7 @@ static int __prepare(void *arg)
             {
                 ezlopi_device_free_device(aqi_device);
             }
-            l_ezlopi_device_t *altitude_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *altitude_device = ezlopi_device_add_device(cj_device);
             if (altitude_device)
             {
                 altitude_device->cloud_properties.category = category_level_sensor;
@@ -196,7 +196,7 @@ static int __prepare(void *arg)
             {
                 ezlopi_device_free_device(altitude_device);
             }
-            l_ezlopi_device_t *co2_device = ezlopi_device_add_device();
+            l_ezlopi_device_t *co2_device = ezlopi_device_add_device(cj_device);
             if (co2_device)
             {
                 co2_device->cloud_properties.category = category_level_sensor;

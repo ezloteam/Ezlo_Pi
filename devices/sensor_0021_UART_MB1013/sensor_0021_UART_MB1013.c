@@ -9,6 +9,7 @@
 #include "ezlopi_cloud.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
@@ -72,9 +73,9 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         s_mb1013_args_t *mb1013_args = item->user_arg;
 
         cJSON *cj_result = (cJSON *)arg;
-        cJSON_AddNumberToObject(cj_result, "value", mb1013_args->current_value);
+        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, mb1013_args->current_value);
         snprintf(valueFormatted, 20, "%.2f", mb1013_args->current_value);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
         ret = 1;
     }
     return ret;
@@ -122,21 +123,32 @@ static int __init(l_ezlopi_item_t *item)
             ret = 1;
         }
     }
+
+    if (0 == ret)
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
+    }
+
     return ret;
 }
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
@@ -153,9 +165,9 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
 static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
-    CJSON_GET_VALUE_INT(cj_device, "baud_rate", item->interface.uart.baudrate);
-    CJSON_GET_VALUE_INT(cj_device, "gpio_tx", item->interface.uart.tx);
-    CJSON_GET_VALUE_INT(cj_device, "gpio_rx", item->interface.uart.rx);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_baud_rate_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
 }
 
 static int __prepare(void *arg)
@@ -167,7 +179,7 @@ static int __prepare(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
@@ -189,7 +201,7 @@ static int __prepare(void *arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }

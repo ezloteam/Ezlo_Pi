@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "ezlopi_gateway.h"
+#include "ezlopi_cloud_constants.h"
 
 static s_ezlopi_gateway_t ezlopi_gateway = {
     .ready = true,

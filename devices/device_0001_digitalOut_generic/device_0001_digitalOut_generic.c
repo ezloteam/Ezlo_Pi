@@ -5,26 +5,26 @@
 #include "trace.h"
 
 #include "items.h"
-#include "gpio_isr_service.h"
 
 #include "ezlopi_gpio.h"
 #include "ezlopi_cloud.h"
 #include "ezlopi_timer.h"
 #include "ezlopi_actions.h"
 #include "ezlopi_devices_list.h"
+#include "ezlopi_cjson_macros.h"
+#include "ezlopi_valueformatter.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_device_value_updated.h"
+
+#include "ezlopi_nvs.h"
+#include "ezlopi_gpio.h"
+#include "ezlopi_cloud.h"
+#include "ezlopi_devices_list.h"
 #include "ezlopi_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_device_value_updated.h"
 
 #include "gpio_isr_service.h"
-#include "ezlopi_gpio.h"
-#include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_valueformatter.h"
-#include "ezlopi_nvs.h"
-
 #include "device_0001_digitalOut_generic.h"
 
 // #define DEV_TEST_SETTINGS_EN
@@ -34,9 +34,9 @@ static int __init(l_ezlopi_item_t *item);
 static int __set_value(l_ezlopi_item_t *item, void *arg);
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
+static void __interrupt_upcall(void *arg);
 static void __toggle_gpio(l_ezlopi_item_t *item);
 static void __write_gpio_value(l_ezlopi_item_t *item);
-static void __interrupt_upcall(l_ezlopi_item_t *item);
 static void __set_gpio_value(l_ezlopi_item_t *item, int value);
 
 #ifdef DEV_TEST_SETTINGS_EN
@@ -142,16 +142,16 @@ static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
             cJSON_AddStringToObject(description, "text", "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
             cJSON_AddStringToObject(description, "lang_tag", "ezlopi_presence_user_defined_mode_description");
 
-            cJSON_AddItemToObject(cjson_propertise, "label", label);
+            cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
             cJSON_AddItemToObject(cjson_propertise, "description", description);
-            cJSON_AddStringToObject(cjson_propertise, "valueType", "presence_operation_mode");
+            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueType_str, "presence_operation_mode");
 
             cJSON_AddNumberToObject(value, "min_move_distance", 0.75);
             cJSON_AddNumberToObject(value, "max_move_distance", 1.5);
             cJSON_AddNumberToObject(value, "min_still_distance", 0.75);
             cJSON_AddNumberToObject(value, "max_still_distance", 1.5);
             cJSON_AddTrueToObject(value, "is_active");
-            cJSON_AddItemToObject(cjson_propertise, "value", value);
+            cJSON_AddItemToObject(cjson_propertise, ezlopi_value_str, value);
 
             cJSON_AddNumberToObject(value_default, "min_move_distance", 0.75);
             cJSON_AddNumberToObject(value_default, "max_move_distance", 6.0);
@@ -171,13 +171,13 @@ static int __settings_get(void *arg, l_ezlopi_device_settings_v3_t *setting)
             cJSON_AddStringToObject(description, "text", "This is PWM setting value for setting the backlight brightness");
             cJSON_AddStringToObject(description, "lang_tag", "ezlopi_digitalio_pwm_setting_description");
 
-            cJSON_AddItemToObject(cjson_propertise, "label", label);
+            cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
             cJSON_AddItemToObject(cjson_propertise, "description", description);
-            cJSON_AddStringToObject(cjson_propertise, "valueType", "int");
+            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueType_str, "int");
 
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
 
-            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
+            cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
             cJSON_AddNumberToObject(cjson_propertise, "valueMin", 0);
             cJSON_AddNumberToObject(cjson_propertise, "valueMax", 100);
             cJSON_AddNumberToObject(cjson_propertise, "valueDefault", 50);
@@ -200,7 +200,7 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
             int32_t value = 0;
-            CJSON_GET_VALUE_INT(cjson_propertise, "value", value);
+            CJSON_GET_VALUE_INT(cjson_propertise, ezlopi_value_str, value);
             TRACE_D("Setting Value : %d", value);
 
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
@@ -247,7 +247,7 @@ static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
             s_digio_settings_t *settings_data = (s_digio_settings_t *)setting->user_arg;
-            cJSON_AddNumberToObject(cjson_propertise, "value", settings_data->settings_int_data);
+            cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
         }
     }
     return ret;
@@ -257,16 +257,18 @@ static int __settings_update(void *arg, l_ezlopi_device_settings_v3_t *setting)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cjson_device, "dev_name", device_name);
+    // uint32_t device_id = 0;
+    // char *device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
+    // CJSON_GET_ID(device_id, cJSON_GetObjectItem(cjson_device, ezlopi__id_str));
+    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_inwall;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
@@ -280,21 +282,21 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cjson_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
-    CJSON_GET_VALUE_INT(cjson_device, "is_ip", item->interface.gpio.gpio_in.enable);
-    CJSON_GET_VALUE_INT(cjson_device, "gpio_in", item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cjson_device, "ip_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cjson_device, "val_ip", item->interface.gpio.gpio_in.value);
-    CJSON_GET_VALUE_INT(cjson_device, "pullup_ip", tmp_var);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_ip_str, tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 
     item->interface.gpio.gpio_out.enable = true;
-    CJSON_GET_VALUE_INT(cjson_device, "gpio_out", item->interface.gpio.gpio_out.gpio_num);
-    CJSON_GET_VALUE_INT(cjson_device, "op_inv", item->interface.gpio.gpio_out.invert);
-    CJSON_GET_VALUE_INT(cjson_device, "val_op", item->interface.gpio.gpio_out.value);
-    CJSON_GET_VALUE_INT(cjson_device, "pullup_op", tmp_var);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
+    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
 }
@@ -314,7 +316,7 @@ static int __prepare(void *arg)
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device();
+            l_ezlopi_device_t *device = ezlopi_device_add_device(cjson_device);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
@@ -398,6 +400,7 @@ static int __init(l_ezlopi_item_t *item)
             gpio_config(&io_conf);
             // digital_io_write_gpio_value(item);
             __write_gpio_value(item);
+            ret = 1;
         }
     }
 
@@ -423,7 +426,19 @@ static int __init(l_ezlopi_item_t *item)
 
         gpio_config(&io_conf);
         gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+        ret = 1;
     }
+
+    if (0 == ret)
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
+        }
+    }
+
     return ret;
 }
 
@@ -433,8 +448,8 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        cJSON_AddBoolToObject(cjson_propertise, "value", item->interface.gpio.gpio_out.value);
-        cJSON_AddStringToObject(cjson_propertise, "valueFormatted", ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
+        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
         ret = 1;
     }
 
@@ -443,7 +458,6 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 
 static void __set_gpio_value(l_ezlopi_item_t *item, int value)
 {
-    int temp_value = (0 == item->interface.gpio.gpio_out.invert) ? value : !(value);
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, value);
     item->interface.gpio.gpio_out.value = value;
 }
@@ -455,15 +469,10 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
 
     if (NULL != cjson_params)
     {
-        char *cjson_params_str = cJSON_Print(cjson_params);
-        if (cjson_params)
-        {
-            TRACE_D("cjson_params: %s", cjson_params_str);
-            free(cjson_params_str);
-        }
+        CJSON_TRACE("cjson_params", cjson_params);
 
         int value = 0;
-        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, "value");
+        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
         if (cj_value)
         {
             switch (cj_value->type)
@@ -531,10 +540,14 @@ static void __write_gpio_value(l_ezlopi_item_t *item)
     gpio_set_level(item->interface.gpio.gpio_out.gpio_num, write_value);
 }
 
-static void __interrupt_upcall(l_ezlopi_item_t *item)
+static void __interrupt_upcall(void *arg)
 {
-    __toggle_gpio(item);
-    ezlopi_device_value_updated_from_device_v3(item);
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    if (item)
+    {
+        __toggle_gpio(item);
+        ezlopi_device_value_updated_from_device_v3(item);
+    }
 }
 
 static void __toggle_gpio(l_ezlopi_item_t *item)
