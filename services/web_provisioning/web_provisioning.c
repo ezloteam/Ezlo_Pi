@@ -314,7 +314,7 @@ static void web_provisioning_config_check(void *pv)
 
     while (1)
     {
-        ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
+        ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
         UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
 
         TRACE_D("water_mark: %d", water_mark);
@@ -407,7 +407,7 @@ static void __fetch_wss_endpoint(void *pv)
     {
 
         ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
-        ezlopi_wait_for_wifi_to_connect(UINT32_MAX);
+        ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
 
         vTaskDelay(100 / portTICK_RATE_MS);
 

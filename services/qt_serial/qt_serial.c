@@ -337,7 +337,6 @@ static void qt_serial_get_info()
                 {
                     cJSON_AddFalseToObject(json_net_info, "wifi_connection_status");
                 }
-                free(net_stat);
             }
             cJSON_AddItemToObject(get_info, "net_info", json_net_info);
         }
@@ -371,41 +370,59 @@ static void qt_serial_set_wifi(const char *data)
 
     if (root)
     {
-        if (cJSON_GetObjectItem(root, "pass"))
+        cJSON *cj_wifi_ssid = cJSON_GetObjectItem(root, "ssid");
+        cJSON *cj_wifi_pass = cJSON_GetObjectItem(root, "pass");
+        if (cj_wifi_ssid && cj_wifi_pass && cj_wifi_ssid->valuestring && cj_wifi_pass->valuestring)
         {
-            char *ssid = cJSON_GetObjectItem(root, "ssid")->valuestring;
-            char *pass = cJSON_GetObjectItem(root, "pass")->valuestring;
+            char *ssid = cj_wifi_ssid->valuestring;
+            char *pass = cj_wifi_pass->valuestring;
 
-            if (ssid && pass && (strlen(pass) >= 8))
+            if (strlen(pass) >= EZLOPI_WIFI_MIN_PASS_CHAR)
             {
+                // TRACE_I("SSID: %s\tPass : %s\r\n", ssid, pass);
                 if (ezlopi_factory_info_v3_set_wifi(ssid, pass))
                 {
                     status_write = 1;
                 }
                 ezlopi_wifi_set_new_wifi_flag();
-                static uint8_t attempt = 5;
-                while (attempt > 0)
+                uint8_t attempt = 1;
+                while (attempt <= EZLOPI_WIFI_CONN_RETRY_ATTEMPT)
                 {
                     esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
-                    vTaskDelay(1000 / portTICK_PERIOD_MS);
-                    if (wifi_error == ESP_OK)
+                    ezlopi_wait_for_wifi_to_connect((uint32_t)EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL);
+                    s_ezlopi_net_status_t *net_stat = ezlopi_get_net_status();
+                    if (net_stat)
                     {
-                        status = 1;
-                        break;
+                        if (net_stat->wifi_status->wifi_connection)
+                        {
+                            status = 1;
+                            break;
+                        }
+                        else
+                        {
+                            TRACE_E("WiFi Connection to AP: %s failed !", ssid);
+                            // printf("WiFi Connection to AP: %s failed !\r\n", ssid);
+                            status = 0;
+                        }
                     }
-                    else
-                    {
-                        TRACE_W("wifi_error: %u", wifi_error);
-                        status = 0;
-                    }
+                    TRACE_W("Trying to connect to AP : %s, attempt %d ....", ssid, attempt);
+                    // printf("Trying to connect to AP : %s, attempt %d ....\r\n", ssid, attempt);
+                    attempt++;
+                    // vTaskDelay(EZLOPI_WIFI_CONNECT_ATTEMPT_INTERVAL / portTICK_PERIOD_MS);
                 }
+
+                qt_serial_response(2, status_write, status);
+            }
+            else
+            {
+                TRACE_E("Invalid WiFi SSID or Password, aborting!");
+                // printf("Invalid WiFi SSID or Password, aborting!\r\n");
+                qt_serial_response(2, 0, 0);
             }
         }
 
         cJSON_Delete(root); // free Json string
     }
-
-    qt_serial_response(2, status_write, status);
 }
 
 static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
@@ -427,9 +444,6 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
             cJSON_Minify(my_json_string);
 
             qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
-            const int len = strlen(my_json_string);
-            // const int txBytes = uart_write_bytes(UART_NUM_0, my_json_string, len); // Send the data over uart
-
             cJSON_free(my_json_string);
         }
     }
