@@ -70,3 +70,54 @@ void device_name_set(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
+
+void device_updated(cJSON *cj_request, cJSON *cj_response)
+{
+    if (cj_request)
+    {
+        cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
+        cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
+
+        cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, "hub.device.updated");
+
+        cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+        if (cj_result)
+        {
+            cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+            if (cj_params)
+            {
+                cJSON *cj_device_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
+                if (cj_device_id && cj_device_id->valuestring)
+                {
+                    uint32_t device_id = strtoul(cj_device_id->valuestring, NULL, 16);
+                    l_ezlopi_device_t *device_node = ezlopi_device_get_head();
+
+                    while (device_node)
+                    {
+                        if (device_id == device_node->cloud_properties.device_id)
+                        {
+                            char tmp_str[32];
+                            snprintf(tmp_str, sizeof(tmp_str), "%08x", device_id);
+                            cJSON_AddStringToObject(cj_result, ezlopi__id_str, tmp_str);
+                            cJSON_AddStringToObject(cj_result, ezlopi_name_str, device_node->cloud_properties.device_name);
+                            cJSON_AddTrueToObject(cj_result, ezlopi_syncNotification_str);
+
+                            s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+
+                            if (controller_info)
+                            {
+                                cJSON_AddBoolToObject(cj_result, ezlopi_armed_str, controller_info->armed ? ezlopi_true_str : ezlopi_false_str);
+                                cJSON_AddBoolToObject(cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? ezlopi_true_str : ezlopi_false_str);
+                            }
+
+                            break;
+                        }
+
+                        device_node = device_node->next;
+                    }
+                }
+            }
+        }
+    }
+}

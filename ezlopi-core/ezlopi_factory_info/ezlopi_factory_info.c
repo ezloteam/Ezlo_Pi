@@ -1271,123 +1271,6 @@ char *ezlopi_factory_info_v2_get_ezlopi_config(void)
     return NULL;
 }
 
-#if 0
-/** Setter */
-uint16_t ezlopi_factory_info_v2_set_version(void)
-{
-    uint16_t _version = 0ULL;
-
-    if (ezlopi_factory_info_v2_init())
-    {
-        uint8_t tmp_version_arr[2];
-        memset(tmp_version_arr, 0, 2);
-        esp_partition_read(partition_ctx_v2, VERSION_OFFSET, &tmp_version_arr, VERSION_LENGTH);
-
-        for (int i = 0; i < 8; i++)
-        {
-            _version |= tmp_version_arr[i] << (i * 8);
-        }
-    }
-
-    return _version;
-}
-
-char *ezlopi_factory_info_v2_set_name(void)
-{
-    return ezlopi_factory_info_v2_read_string(NAME_OFFSET, NAME_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_manufacturer(void)
-{
-    return ezlopi_factory_info_v2_read_string(MANUFACTURER_OFFSET, MANUFACTURER_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_brand(void)
-{
-    return ezlopi_factory_info_v2_read_string(BRAND_OFFSET, BRAND_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_model(void)
-{
-    return ezlopi_factory_info_v2_read_string(MODEL_OFFSET, MODEL_LENGTH);
-}
-
-unsigned long long ezlopi_factory_info_v2_set_id(void)
-{
-    unsigned long long _id = 0ULL;
-
-    if (ezlopi_factory_info_v2_init())
-    {
-        uint8_t tmp_id_arr[8];
-        memset(tmp_id_arr, 0, 8);
-        esp_partition_read(partition_ctx_v2, ID_OFFSET, &tmp_id_arr, ID_LENGTH);
-
-        for (int i = 0; i < 8; i++)
-        {
-            _id |= tmp_id_arr[i] << (i * 8);
-        }
-    }
-
-    return _id;
-}
-
-char *ezlopi_factory_info_v2_set_device_uuid(void)
-{
-    return ezlopi_factory_info_v2_read_string(DEVICE_UUID_OFFSET, DEVICE_UUID_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_provisioning_uuid(void)
-{
-    return ezlopi_factory_info_v2_read_string(PROVISIONING_UUID_OFFSET, PROVISIONING_UUID_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ssid(void)
-{
-    return ezlopi_factory_info_v2_read_string(SSID_OFFSET, SSID_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_password(void)
-{
-    return ezlopi_factory_info_v2_read_string(PASSWORD_OFFSET, PASSWORD_LENGTH);
-}
-
-uint8_t *ezlopi_factory_info_v2_set_ezlopi_mac(void)
-{
-    uint8_t *tmp_mac_arr = malloc(DEVICE_MAC_LENGTH);
-
-    if (tmp_mac_arr)
-    {
-        if (ezlopi_factory_info_v2_init())
-        {
-            memset(tmp_mac_arr, 0, DEVICE_MAC_LENGTH);
-            esp_partition_read(partition_ctx_v2, DEVICE_MAC_OFFSET, &tmp_mac_arr, DEVICE_MAC_LENGTH);
-        }
-    }
-
-    return tmp_mac_arr;
-}
-
-char *ezlopi_factory_info_v2_set_cloud_server(void)
-{
-    return ezlopi_factory_info_v2_read_string(CLOUD_SERVER_OFFSET, CLOUD_SERVER_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ca_certificate(void)
-{
-    return ezlopi_factory_info_v2_read_string(CA_CERTIFICATE_OFFSET, CA_CERTIFICATE_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ssl_private_key(void)
-{
-    return ezlopi_factory_info_v2_read_string(SSL_PRIVATE_KEY_OFFSET, SSL_PRIVATE_KEY_LENGTH);
-}
-
-char *ezlopi_factory_info_v2_set_ssl_shared_key(void)
-{
-    return ezlopi_factory_info_v2_read_string(SSL_SHARED_KEY_OFFSET, SSL_SHARED_KEY_LENGTH);
-}
-#endif
-
 int ezlopi_factory_info_v2_set_basic(s_basic_factory_info_t *ezlopi_config_basic)
 {
     int ret = 0;
@@ -1628,7 +1511,12 @@ static int ezlopi_factory_info_v2_set_4kb(char *name, char *data, uint32_t offse
         {
             if (ESP_OK == (ret = esp_partition_write(partition_ctx_v2, offset, data, strlen(data) + 1)))
             {
-                TRACE_I("%s: Flash write succeessful", name ? name : ezlopi__str);
+                char *updated_data_from_flash = ezlopi_factory_info_v2_read_string(offset, 0x1000);
+                if (updated_data_from_flash)
+                {
+                    free(updated_data_from_flash);
+                }
+
                 ret = 1;
             }
             else

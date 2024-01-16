@@ -96,14 +96,15 @@ void ezlopi_ble_gap_config_adv_data(void)
     // adv_data.service_uuid_len = all_service_uuid_len;
 
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
-    if (ret)
-    {
-        TRACE_E("config adv data failed, error code = %x", ret);
-    }
-    else
+    if (ESP_OK == ret)
     {
         TRACE_I("Adv-data set complete");
     }
+    else
+    {
+        TRACE_E("config adv data failed, error code = %x", ret);
+    }
+
     adv_config_done |= ADV_CONFIG_FLAG;
 }
 

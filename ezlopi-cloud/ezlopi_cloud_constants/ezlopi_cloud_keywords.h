@@ -214,6 +214,9 @@ extern const char *scene_status_partially_finished_str;
 extern const char *scene_status_failed_str;
 extern const char *scene_status_stopped_str;
 
+extern const char *ezlopi_armed_str;
+extern const char *ezlopi_subtype_str;
+
 extern const char *ezlopi_scale_str;
 extern const char *ezlopi_enum_str;
 extern const char *ezlopi_valueformatted_str;

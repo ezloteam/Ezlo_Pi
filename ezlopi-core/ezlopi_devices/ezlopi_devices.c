@@ -24,16 +24,12 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON *cj_new_nam
 {
     if (a_device_id && cj_new_name && cj_new_name->valuestring)
     {
-        TRACE_D("Device-ID: %08x", a_device_id);
-        CJSON_TRACE("new device name", cj_new_name);
-
         l_ezlopi_device_t *l_device_node = l_device_head;
         while (l_device_node)
         {
             if (a_device_id == l_device_node->cloud_properties.device_id)
             {
                 snprintf(l_device_node->cloud_properties.device_name, sizeof(l_device_node->cloud_properties.device_name), "%s", cj_new_name->valuestring);
-                TRACE_D("New device name set to structure: %s", l_device_node->cloud_properties.device_name);
                 break;
             }
 
@@ -48,7 +44,7 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON *cj_new_nam
 
             if (cj_device_config)
             {
-                cJSON *cj_devices = cJSON_GetObjectItem(cj_device_config, ezlopi_dev_type_str);
+                cJSON *cj_devices = cJSON_GetObjectItem(cj_device_config, ezlopi_dev_detail_str);
                 if (cj_devices)
                 {
                     uint32_t idx = 0;

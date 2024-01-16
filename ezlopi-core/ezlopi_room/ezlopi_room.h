@@ -7,11 +7,22 @@
 
 #include "cJSON.h"
 
+typedef enum e_room_subtype
+{
+#ifndef ROOM_SUBTYPE
+#define ROOM_SUBTYPE(name, e_num) ROOM_SUBTYPE_##e_num,
+#include "ezlopi_room_subtype_macro.h"
+#undef ROOM_SUBTYPE
+#endif
+} e_room_subtype_t;
+
 typedef struct s_ezlopi_room
 {
     uint32_t _pos;
     char name[32];
     uint32_t _id;
+    e_room_subtype_t subtype;
+    uint32_t image_id;
     struct s_ezlopi_room *next;
 } s_ezlopi_room_t;
 

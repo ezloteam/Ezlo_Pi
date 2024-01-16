@@ -150,6 +150,7 @@ static bool __found_item_in_field(l_fields_v2_t *field_node, uint32_t item_id)
             if (item_id_check == item_id)
             {
                 ret = 1;
+                break;
             }
         }
 

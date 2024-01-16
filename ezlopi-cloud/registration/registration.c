@@ -54,7 +54,7 @@ static void registration_process(void *pv)
             cJSON_AddStringToObject(cj_params, "media", "radio");
             cJSON_AddStringToObject(cj_params, "hubType", "32.1");
             cJSON_AddStringToObject(cj_params, "mac_address", mac_str);
-            cJSON_AddNumberToObject(cj_params, "maxFrameSize", 4096);
+            cJSON_AddNumberToObject(cj_params, "maxFrameSize", (20 * 1024));
         }
 
         while (false == ezlopi_websocket_client_is_connected())

@@ -93,7 +93,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri->valuestring,
             .task_stack = 8 * 1024,
-            .buffer_size = 2 * 1024,
+            .buffer_size = 12 * 1024,
             .cert_pem = ezlopi_factory_info_v3_get_ca_certificate(),
             .client_cert = ezlopi_factory_info_v3_get_ssl_shared_key(),
             .client_key = ezlopi_factory_info_v3_get_ssl_private_key(),

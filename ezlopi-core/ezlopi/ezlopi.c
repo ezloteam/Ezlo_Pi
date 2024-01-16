@@ -40,6 +40,7 @@ void ezlopi_init(void)
     ezlopi_wifi_initialize();
     vTaskDelay(10);
 
+#if 1
     // Init devices
     ezlopi_device_prepare();
     vTaskDelay(10);
@@ -47,10 +48,9 @@ void ezlopi_init(void)
     vTaskDelay(10);
 
     ezlopi_room_init();
-    ezlopi_scenes_expressions_init();
     ezlopi_scenes_scripts_init();
+    ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-
     // ezlopi_ethernet_init();
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
@@ -62,6 +62,7 @@ void ezlopi_init(void)
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
     // core_sntp_init();
+#endif
 }
 
 static void ezlopi_initialize_devices_v3(void)

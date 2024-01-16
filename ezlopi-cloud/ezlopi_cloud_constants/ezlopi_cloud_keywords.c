@@ -222,4 +222,7 @@ const char *ezlopi_value_min_str = "valueMin";
 const char *ezlopi_value_max_str = "valueMax";
 const char *ezlopi_idle_str = "idle";
 
+const char *ezlopi_armed_str = "armed";
+const char *ezlopi_subtype_str = "subtype";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

@@ -141,6 +141,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             cJSON_AddNumberToObject(cj_device, ezlopi_value_str, bmp280_sensor_params->temperature);
             cJSON_AddStringToObject(cj_device, ezlopi_scale_str, scales_celsius);
         }
+
         if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
             snprintf(valueFormatted, 20, "%0.3f", bmp280_sensor_params->humidity);
@@ -148,6 +149,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             cJSON_AddNumberToObject(cj_device, ezlopi_value_str, bmp280_sensor_params->humidity);
             cJSON_AddStringToObject(cj_device, ezlopi_scale_str, scales_percent);
         }
+
         if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
         {
             snprintf(valueFormatted, 20, "%0.3f", (bmp280_sensor_params->pressure / 1000.0));

@@ -80,6 +80,7 @@ void room_create(cJSON *cj_request, cJSON *cj_response)
     {
         ezlopi_room_add_to_list(cj_params);
         ezlopi_room_add_to_nvs(cj_params);
+
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_result_str, cj_params);
     }
 }
@@ -139,7 +140,8 @@ void room_order_set(cJSON *cj_request, cJSON *cj_response)
 //////////////////
 void room_created(cJSON *cj_request, cJSON *cj_response)
 {
-    cJSON_DeleteItemFromObject(cj_response, ezlopi_id_str);
+    cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
+    cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
 
     cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_created_str);
