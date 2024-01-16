@@ -43,7 +43,7 @@ static cJSON *ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t *item_pr
         {
             cJSON_AddStringToObject(cj_item_properties, ezlopi_scale_str, item_properties->cloud_properties.scale);
         }
-        cJSON_AddStringToObject(cj_item_properties, ezlopi_status_str, ezlopi_synced_str);
+        cJSON_AddStringToObject(cj_item_properties, "status", "idle");
     }
 
     return cj_item_properties;

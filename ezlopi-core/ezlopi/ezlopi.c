@@ -33,8 +33,8 @@ void ezlopi_init(void)
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    ezlopi_factory_info_v2_init();
-    print_factory_info_v2();
+    ezlopi_factory_info_v3_init();
+    print_factory_info_v3();
 
     ezlopi_event_group_create();
     ezlopi_wifi_initialize();
@@ -61,7 +61,7 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
-    core_sntp_init();
+    // core_sntp_init();
 #endif
 }
 

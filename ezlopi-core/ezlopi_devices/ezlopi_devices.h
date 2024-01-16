@@ -15,6 +15,116 @@
 #include "ezlopi_actions.h"
 #include "ezlopi_settings.h"
 
+#define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            item_val = o_item->valuedouble;                   \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = 0;                                     \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
+    }
+
+// TRACE_B("%s: %f", item_name, (double)item_val);
+
+#define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            if (o_item->type == cJSON_False)                  \
+            {                                                 \
+                item_val = 0;                                 \
+            }                                                 \
+            else                                              \
+            {                                                 \
+                item_val = 1;                                 \
+            }                                                 \
+            item_val = o_item->valueint;                      \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = 0;                                     \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
+    }
+
+#define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item)                                           \
+        {                                                     \
+            item_val = o_item->valueint;                      \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = 0;                                     \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
+    }
+// TRACE_B("%s: %d", item_name, item_val);
+
+#define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item && o_item->valuestring)                    \
+        {                                                     \
+            item_val = o_item->valuestring;                   \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = NULL;                                  \
+            TRACE_E("%s: NULL", item_name);                   \
+        }                                                     \
+    }
+// TRACE_B("%s: %s", item_name, item_val ? item_val : "");
+
+#define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \
+    {                                                                 \
+        char *tmp_item_val = NULL;                                    \
+        CJSON_GET_VALUE_STRING(root, item_name, tmp_item_val);        \
+        if (tmp_item_val)                                             \
+        {                                                             \
+            snprintf(item_val, sizeof(item_val), "%s", tmp_item_val); \
+        }                                                             \
+    }
+
+#define ASSIGN_DEVICE_NAME(digital_io_device_properties, dev_name)                                \
+    {                                                                                             \
+        if ((NULL != dev_name) && ('\0' != dev_name[0]))                                          \
+        {                                                                                         \
+            snprintf(digital_io_device_properties->ezlopi_cloud.device_name,                      \
+                     sizeof(digital_io_device_properties->ezlopi_cloud.device_name),              \
+                     "%s", dev_name);                                                             \
+        }                                                                                         \
+        else                                                                                      \
+        {                                                                                         \
+            snprintf(digital_io_device_properties->ezlopi_cloud.device_name,                      \
+                     sizeof(digital_io_device_properties->ezlopi_cloud.device_name),              \
+                     "dev-%d:digital_out", digital_io_device_properties->ezlopi_cloud.device_id); \
+        }                                                                                         \
+    }
+
+#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                        \
+    {                                                                  \
+        if ((NULL != dev_name) && ('\0' != dev_name[0]))               \
+        {                                                              \
+            snprintf(device->cloud_properties.device_name,             \
+                     sizeof(device->cloud_properties.device_name),     \
+                     "%s", dev_name);                                  \
+        }                                                              \
+        else                                                           \
+        {                                                              \
+            snprintf(device->cloud_properties.device_name,             \
+                     sizeof(device->cloud_properties.device_name),     \
+                     "device-%d", device->cloud_properties.device_id); \
+        }                                                              \
+    }
+
 // typedef int (*f_item_func_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);
 
 typedef enum e_ezlopi_device_interface_type
@@ -71,7 +181,6 @@ typedef struct l_ezlopi_device_settings_v3
 
 typedef struct l_ezlopi_device
 {
-    uint32_t parent_device_id;
     l_ezlopi_item_t *items;
     l_ezlopi_device_settings_v3_t *settings;
     s_ezlopi_cloud_device_t cloud_properties;
@@ -85,6 +194,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device);
 
 l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id);
 l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
+l_ezlopi_device_settings_v3_t *ezlopi_device_settings_get_by_id(uint32_t settings_id);
 
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
 l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,

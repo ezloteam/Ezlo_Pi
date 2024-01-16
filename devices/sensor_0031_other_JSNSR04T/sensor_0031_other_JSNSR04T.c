@@ -64,7 +64,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             jsn_sr04t_data_t jsn_sr04t_data;
             ret = measurement(tmp_config, &jsn_sr04t_data);
-            if (ESP_OK == ret)
+            if (ret)
             {
                 // jsn_sr04t_print_data(jsn_sr04t_data);
 
@@ -82,8 +82,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 ESP_LOGE(TAG1, "ERROR in getting measurement: ret=%d", ret);
             }
         }
-
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi_false_str);
     }
 
     return ret;
@@ -182,12 +180,11 @@ static int __prepare(void *arg)
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t *item_distance = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
-            if (item_distance)
+            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
+            if (item_temperature)
             {
-                item_distance->cloud_properties.device_id = device->cloud_properties.device_id;
-                __prepare_item_cloud_properties(item_distance, prep_arg->cjson_device);
-                __prepare_item_interface_properties(item_distance, prep_arg->cjson_device);
+                __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
+                __prepare_item_interface_properties(item_temperature, prep_arg->cjson_device);
             }
         }
     }

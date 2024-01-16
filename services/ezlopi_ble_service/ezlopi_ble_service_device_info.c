@@ -114,26 +114,17 @@ static char *device_info_jsonify(void)
         cJSON_AddNumberToObject(root, ezlopi_build_date_str, BUILD_DATE);
         // cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
         // cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
-        cJSON_AddBoolToObject(root, ezlopi_provisioned_status_str, ezlopi_factory_info_v2_get_provisioning_status());
+        cJSON_AddBoolToObject(root, ezlopi_provisioned_status_str, ezlopi_factory_info_v3_get_provisioning_status());
+        cJSON_AddStringToObject(root, ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
 
-        uint8_t _mac[6];
-        ezlopi_factory_info_v2_get_ezlopi_mac(_mac);
-        char mac_string[32];
-        snprintf(mac_string, sizeof(mac_string), "%02x:%02x:%02x:%02x:%02x:%02x",
-                 _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]);
-        cJSON_AddStringToObject(root, ezlopi_mac_str, mac_string);
-        TRACE_E("mac_string: %s", mac_string);
-        // char ezpi_uuid[50];
-        // ezlopi_generate_UUID(ezpi_uuid);
-        // cJSON_AddStringToObject(root, ezlopi_uuid_str, ezpi_uuid);
+        cJSON_AddStringToObject(root, ezlopi_ezlopi_device_type_str, ezlopi_factory_info_v3_get_device_type());
+        __add_factory_info_to_root(root, ezlopi_model_str, ezlopi_factory_info_v3_get_model());
+        __add_factory_info_to_root(root, ezlopi_device_name_str, ezlopi_factory_info_v3_get_name());
+        __add_factory_info_to_root(root, ezlopi_brand_str, ezlopi_factory_info_v3_get_brand());
+        __add_factory_info_to_root(root, ezlopi_manufacturer_str, ezlopi_factory_info_v3_get_manufacturer());
+        cJSON_AddNumberToObject(root, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
 
-        cJSON_AddStringToObject(root, ezlopi_ezlopi_device_type_str, ezlopi_factory_info_v2_get_device_type());
-        __add_factory_info_to_root(root, ezlopi_model_str, ezlopi_factory_info_v2_get_model());
-        __add_factory_info_to_root(root, ezlopi_device_name_str, ezlopi_factory_info_v2_get_name());
-        __add_factory_info_to_root(root, ezlopi_brand_str, ezlopi_factory_info_v2_get_brand());
-        __add_factory_info_to_root(root, ezlopi_manufacturer_str, ezlopi_factory_info_v2_get_manufacturer());
-
-        char *ssid = ezlopi_factory_info_v2_get_ssid();
+        char *ssid = ezlopi_factory_info_v3_get_ssid();
         if (ssid)
         {
             cJSON_AddStringToObject(root, ezlopi_wifi_ssid_str, (isprint(ssid[0])) ? ssid : ezlopi__str);

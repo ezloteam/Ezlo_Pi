@@ -41,7 +41,7 @@ static int station_got_ip = 0;
 static const char *const wifi_no_error_str = "NO_ERROR";
 static const char *last_disconnect_reason = wifi_no_error_str;
 static ll_ezlopi_wifi_event_upcall_t *__event_upcall_head = NULL;
-static bool ezlopi_flag_wifi_status = false;
+static volatile bool ezlopi_flag_wifi_status = false;
 
 static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg);
 
@@ -73,11 +73,11 @@ esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void)
     return &my_ip;
 }
 
-static void alert_qt_wifi_fail(void)
-{
-    char *qt_resp = "{\"cmd\":2,\"status_write\":0,\"status_connect\":0}";
-    qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
-}
+// static void alert_qt_wifi_fail(void)
+// {
+//     char *qt_resp = "{\"cmd\":2,\"status_write\":0,\"status_connect\":0}";
+//     qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
+// }
 
 int ezlopi_wifi_got_ip(void)
 {
@@ -111,28 +111,12 @@ ezlopi_wifi_status_t *ezlopi_wifi_status(void)
     return wifi_stat;
 }
 
-static void set_wifi_station_host_name(void)
+static esp_err_t set_wifi_station_host_name(void)
 {
     static char station_host_name[32];
-    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", ezlopi_factory_info_v2_get_id());
+    snprintf(station_host_name, sizeof(station_host_name), "EZLOPI-%llu", ezlopi_factory_info_v3_get_id());
     esp_err_t err = tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, station_host_name);
-    TRACE_W("'tcpip_adapter_set_hostname' ERROR: %s", esp_err_to_name(err));
-}
-
-static void alert_qt_wifi_got_ip(void)
-{
-    if (new_wifi)
-    {
-        new_wifi = 0;
-        char *qt_resp = "{\"cmd\":2,\"status_write\":1,\"status_connect\":1}";
-        qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
-    }
-    else
-    {
-
-        char *qt_resp = "{\"cmd\":2,\"status_connect\":1}";
-        qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
-    }
+    return err;
 }
 
 static void __event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
@@ -160,7 +144,6 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         else
         {
             ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_FAIL);
-            alert_qt_wifi_fail();
             s_retry_num = 0;
         }
         TRACE_W("connect to the AP fail");
@@ -179,8 +162,9 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
 
         memcpy(&my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
         ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
+        ezlopi_flag_wifi_status = true;
 
-        alert_qt_wifi_got_ip();
+        // alert_qt_wifi_got_ip();
     }
 
     ll_ezlopi_wifi_event_upcall_t *curr_upcall = __event_upcall_head;
@@ -213,8 +197,8 @@ void ezlopi_wifi_initialize(void)
 
 void ezlopi_wifi_connect_from_id_bin(void)
 {
-    char *wifi_ssid = ezlopi_factory_info_v2_get_ssid();
-    char *wifi_password = ezlopi_factory_info_v2_get_password();
+    char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
+    char *wifi_password = ezlopi_factory_info_v3_get_password();
     ezlopi_wifi_set_new_wifi_flag();
 
     if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
@@ -230,8 +214,8 @@ void ezlopi_wifi_connect_from_id_bin(void)
         strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
     }
 
-    ezlopi_factory_info_v2_free(wifi_ssid);
-    ezlopi_factory_info_v2_free(wifi_password);
+    ezlopi_factory_info_v3_free(wifi_ssid);
+    ezlopi_factory_info_v3_free(wifi_password);
 
     esp_err_t wifi_error = ezlopi_wifi_connect(&wifi_ssid_pass_global_buffer[0], &wifi_ssid_pass_global_buffer[32]);
     TRACE_W("wifi_error: %u", wifi_error);
@@ -279,24 +263,40 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
         wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
 
         esp_wifi_stop();
-        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-        err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-        ESP_ERROR_CHECK(esp_wifi_start());
-        set_wifi_station_host_name();
+        esp_err_t _err = esp_wifi_set_mode(WIFI_MODE_STA);
+        // TRACE_W("WiFi Err : %s", esp_err_to_name(_err));
+        if (_err == ESP_OK)
+        {
+            _err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+            // TRACE_W("WiFi Err : %s", esp_err_to_name(_err));
+            if (_err == ESP_OK)
+            {
+                _err = esp_wifi_start();
+                // TRACE_W("WiFi Err : %s", esp_err_to_name(_err));
+                if (_err == ESP_OK)
+                {
+                    _err = set_wifi_station_host_name();
+                    // TRACE_W("WiFi Err : %s", esp_err_to_name(_err));
+                    if (_err != ESP_OK)
+                        TRACE_W("'tcpip_adapter_set_hostname' ERROR: %s", esp_err_to_name(err));
+                }
+            }
+        }
+        err = _err;
     }
-
+    TRACE_W("WiFi Err : %s", esp_err_to_name(err));
     return err;
 }
 
-uint32_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
+int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 {
     uint32_t ret = 0;
-    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms / portTICK_RATE_MS, 0))
+    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, 0))
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms / portTICK_RATE_MS, 0);
+    ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, 0);
     return ret;
 }
 

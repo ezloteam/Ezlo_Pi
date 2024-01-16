@@ -145,7 +145,7 @@ static void __process_hard_reset_command(void)
     if ((1 == authenticated_flag) && (current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS)) // once authenticated, valid for 30 seconds only
     {
 #endif
-        int ret = ezlopi_factory_info_v2_factory_reset();
+        int ret = ezlopi_factory_info_v3_factory_reset();
         if (ret)
         {
             TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");

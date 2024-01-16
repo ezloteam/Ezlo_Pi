@@ -89,6 +89,15 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
                         char *decoded_data = __base64_decode_dynamic_config(tot_len); // uncommente f
                         if (decoded_data)
                         {
+
+                            if (ezlopi_factory_info_v3_set_ezlopi_config(decoded_data))
+                            {
+                                TRACE_W("Restarting .....");
+                                vTaskDelay(100 / portTICK_PERIOD_MS);
+                                esp_restart();
+                            }
+
+#if 0
                             cJSON *cj_config = cJSON_Parse(decoded_data);
                             if (cj_config)
                             {
@@ -122,7 +131,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t *value, esp_ble_gatts_c
 
                                 cJSON_Delete(cj_config);
                             }
-
+#endif
                             free(decoded_data);
                         }
 
@@ -341,7 +350,7 @@ static char *__dynamic_config_base64(void)
     if (base64_data)
     {
         uint32_t out_put_len = 0;
-        char *str_ezlopi_config = ezlopi_factory_info_v2_get_ezlopi_config(); // do not free 'str_ezlopi_config', it is used by other modules
+        char *str_ezlopi_config = ezlopi_factory_info_v3_get_ezlopi_config(); // do not free 'str_provisioning_data', it is used by other modules
         if (str_ezlopi_config)
         {
             TRACE_D("str_ezlopi_config[len: %d]: %s", strlen(str_ezlopi_config), str_ezlopi_config);
@@ -349,7 +358,7 @@ static char *__dynamic_config_base64(void)
             int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len,
                                             (const unsigned char *)str_ezlopi_config, strlen(str_ezlopi_config));
 
-            ezlopi_factory_info_v2_free_ezlopi_config();
+            ezlopi_factory_info_v3_free(str_ezlopi_config);
 
             TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
         }

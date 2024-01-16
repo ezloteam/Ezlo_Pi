@@ -10,23 +10,17 @@
 #include "web_provisioning.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_websocket_client.h"
+#include "ezlopi_event_group.h"
 
-static TaskHandle_t g_registration_task_handle = NULL;
-static volatile uint32_t is_registered = 0;
 static void registration_process(void *pv);
 
 void registration_init(void)
 {
-    is_registered = 0;
-    if (NULL == g_registration_task_handle)
-    {
-        xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, &g_registration_task_handle);
-    }
+    xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
 }
 
 void register_repeat(cJSON *cj_request, cJSON *cj_response)
 {
-    is_registered = 0;
     registration_init();
 }
 
@@ -35,7 +29,7 @@ void registered(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
     TRACE_I("Device registration successful.");
-    is_registered = 1;
+    ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
 }
 
 static void registration_process(void *pv)
@@ -68,23 +62,13 @@ static void registration_process(void *pv)
             vTaskDelay(200 / portTICK_RATE_MS);
         }
 
-        char *data_to_send = cJSON_Print(cj_register);
-        cJSON_Delete(cj_register);
-
-        if (data_to_send)
+        while (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000, true))
         {
-            cJSON_Minify(data_to_send);
-            while (0 == is_registered)
-            {
-                web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
-                // web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_D);
-                vTaskDelay(2000 / portTICK_RATE_MS);
-            }
-
-            free(data_to_send);
+            web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_B);
+            // vTaskDelay(2000 / portTICK_RATE_MS);
         }
-    }
 
-    g_registration_task_handle = NULL;
+        cJSON_Delete(cj_register);
+    }
     vTaskDelete(NULL);
 }

@@ -36,11 +36,11 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON *cj_new_nam
             l_device_node = l_device_node->next;
         }
 
-        char *device_config_str = ezlopi_factory_info_v2_get_ezlopi_config();
+        char *device_config_str = ezlopi_factory_info_v3_get_ezlopi_config();
         if (device_config_str)
         {
             cJSON *cj_device_config = cJSON_Parse(device_config_str);
-            ezlopi_factory_info_v2_free_ezlopi_config();
+            ezlopi_factory_info_v3_free(device_config_str);
 
             if (cj_device_config)
             {
@@ -72,7 +72,7 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON *cj_new_nam
                 if (update_device_config)
                 {
                     cJSON_Minify(update_device_config);
-                    ezlopi_factory_info_v2_set_ezlopi_config(update_device_config);
+                    ezlopi_factory_info_v3_set_ezlopi_config(update_device_config);
                     free(update_device_config);
                 }
             }
@@ -265,6 +265,7 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, int
         {
             memset(new_item, 0, sizeof(l_ezlopi_item_t));
             new_item->func = item_func;
+            new_item->cloud_properties.device_id = device->cloud_properties.device_id;
 
             if (NULL == device->items)
             {
@@ -288,7 +289,6 @@ l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device, int
 
 void ezlopi_device_prepare(void)
 {
-    s_controller_information.armed = false;
     s_controller_information.battery_powered = false;
     snprintf(s_controller_information.device_type_id, sizeof(s_controller_information.device_type_id), ezlopi_ezlopi_str);
     s_controller_information.gateway_id[0] = '\0';
@@ -296,18 +296,24 @@ void ezlopi_device_prepare(void)
     s_controller_information.persistent = true;
     s_controller_information.reachable = true;
     s_controller_information.room_id[0] = '\0';
-    s_controller_information.security = ezlopi_null_str;
+    s_controller_information.security = "no";
     s_controller_information.service_notification = false;
     s_controller_information.ready = true;
-    s_controller_information.status = ezlopi_synced_str;
+    s_controller_information.status = "idle";
 
-    char *config_string = ezlopi_factory_info_v2_get_ezlopi_config();
+#if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
+    char *config_string = ezlopi_factory_info_v3_get_ezlopi_config();
+#elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    char *config_string = ezlopi_config_test;
+#else
+    char *config_string = ezlopi_factory_info_v3_get_ezlopi_config();
+#endif
 
     if (config_string)
     {
         TRACE_D("Initial config:\r\n%s", config_string);
         cJSON *cj_config = cJSON_Parse(config_string);
-        ezlopi_factory_info_v2_free_ezlopi_config();
+        ezlopi_factory_info_v3_free(config_string);
 
         if (cj_config)
         {
@@ -320,7 +326,7 @@ void ezlopi_device_prepare(void)
                 {
                     TRACE_D("Updated config:\r\n%s", config_string);
                     cJSON_Minify(updated_config);
-                    ezlopi_factory_info_v2_set_ezlopi_config(updated_config);
+                    ezlopi_factory_info_v3_set_ezlopi_config(updated_config);
                     free(updated_config);
                 }
             }
@@ -523,25 +529,27 @@ static void ezlopi_device_parse_json_v3(cJSON *cjson_config)
     l_ezlopi_device_t *tm_device_l_list = l_device_head;
     while (tm_device_l_list)
     {
-        TRACE_D("|~~~~~~~~~~~~~~~~ Device - %d ~~~~~~~~~~~~~~~~|", device_count);
+        TRACE_D("|~~~~~~~~~~~~~~~~ Device - %d ~~~~~~~~~~~~~~~~|", device_count + 1);
+        // TRACE_D("|- Device Pointer: %p", tm_device_l_list);
         TRACE_D("|- Name: %.*s", 32, isprint(tm_device_l_list->cloud_properties.device_name[0]) ? tm_device_l_list->cloud_properties.device_name : ezlopi_null_str);
         TRACE_D("|- Id: %08X", tm_device_l_list->cloud_properties.device_id);
-        // TRACE_D("|- Category: %s", tm_device_l_list->cloud_properties.category ? tm_device_l_list->cloud_properties.category : ezlopi_null_str);
-        // TRACE_D("|- Sub-category: %s", tm_device_l_list->cloud_properties.subcategory ? tm_device_l_list->cloud_properties.subcategory : ezlopi_null_str);
-        // TRACE_D("|- Device-type: %s", tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : ezlopi_null_str);
+        TRACE_D("|- Parent Device ID: %08X", tm_device_l_list->cloud_properties.parent_device_id);
+        TRACE_D("|- Category: %s", tm_device_l_list->cloud_properties.category ? tm_device_l_list->cloud_properties.category : ezlopi_null_str);
+        TRACE_D("|- Sub-category: %s", tm_device_l_list->cloud_properties.subcategory ? tm_device_l_list->cloud_properties.subcategory : ezlopi_null_str);
+        TRACE_D("|- Device-type: %s", tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : ezlopi_null_str);
 
         int item_count = 0;
         l_ezlopi_item_t *tm_itme_l_list = tm_device_l_list->items;
         while (tm_itme_l_list)
         {
-            TRACE_D("|~~~|--------------- Item - %d ---------------|", item_count);
+            TRACE_D("|~~~|--------------- Item - %d ---------------|", item_count + 1);
             TRACE_D("|~~~|- Id: %08X", tm_itme_l_list->cloud_properties.item_id);
             TRACE_D("|~~~|- Category: %s", tm_itme_l_list->cloud_properties.item_name ? tm_itme_l_list->cloud_properties.item_name : ezlopi_null_str);
-            // TRACE_D("|~~~|- Value: %s", tm_itme_l_list->cloud_properties.value_type ? tm_itme_l_list->cloud_properties.value_type : ezlopi_null_str);
-            // TRACE_D("|~~~|- Device-type: %.*s", 32, tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : ezlopi_null_str);
+            // TRACE_D("|~~~|- Value: %s", tm_itme_l_list->cloud_properties.value_type ? tm_itme_l_list->cloud_properties.value_type : "null");
+            // TRACE_D("|~~~|- Device-type: %.*s", 32, tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : "null");
 
-            // TRACE_D("|~~~|- Interface-type: %d", tm_itme_l_list->interface_type);
-            // ezlopi_device_print_interface_type(tm_itme_l_list);
+            TRACE_D("|~~~|- Interface-type: %d", tm_itme_l_list->interface_type);
+            ezlopi_device_print_interface_type(tm_itme_l_list);
 
             tm_itme_l_list = tm_itme_l_list->next;
             item_count++;
@@ -647,9 +655,9 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
                 cJSON_AddStringToObject(cj_device, ezlopi_deviceTypeId_str, ezlopi_ezlopi_str);
             }
 
-            if (device_prop->parent_device_id)
+            if (device_prop->cloud_properties.parent_device_id >= DEVICE_ID_START)
             {
-                snprintf(tmp_string, sizeof(tmp_string), "%08x", device_prop->parent_device_id);
+                snprintf(tmp_string, sizeof(tmp_string), "%08x", device_prop->cloud_properties.parent_device_id);
             }
             else
             {
@@ -668,9 +676,9 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
             cJSON_AddBoolToObject(cj_device, ezlopi_serviceNotification_str, false);
             // cJSON_AddBoolToObject(cj_device, "armed", false);
             cJSON_AddStringToObject(cj_device, ezlopi_roomId_str, ezlopi__str);
-            cJSON_AddStringToObject(cj_device, ezlopi_security_str, ezlopi__str);
+            cJSON_AddStringToObject(cj_device, ezlopi_security_str, ezlopi_no_str);
             cJSON_AddBoolToObject(cj_device, ezlopi_ready_str, true);
-            cJSON_AddStringToObject(cj_device, ezlopi_status_str, ezlopi_synced_str);
+            cJSON_AddStringToObject(cj_device, ezlopi_status_str, ezlopi_idle_str);
             if (NULL != device_prop->cloud_properties.info)
             {
                 cJSON_AddItemReferenceToObject(cj_device, ezlopi_info_str, device_prop->cloud_properties.info);

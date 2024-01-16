@@ -3,13 +3,13 @@
 
 #define CRC16_POLY 0x4460
 
-static const uint32_t DEVICE_ID_START = 0x10000000;
-static const uint32_t ITEM_ID_START = 0x20000000;
-static const uint32_t ROOM_ID_START = 0x30000000;
-static const uint32_t SETTINGS_ID_START = 0x50000000;
-static const uint32_t SCENE_ID_START = 0x60000000;
-static const uint32_t SCRIPT_ID_START = 0x70000000;
-static const uint32_t EXPRESSION_ID_START = 0x80000000;
+const uint32_t DEVICE_ID_START = 0x10000000;
+const uint32_t ITEM_ID_START = 0x20000000;
+const uint32_t ROOM_ID_START = 0x30000000;
+const uint32_t SETTINGS_ID_START = 0x50000000;
+const uint32_t SCENE_ID_START = 0x60000000;
+const uint32_t SCRIPT_ID_START = 0x70000000;
+const uint32_t EXPRESSION_ID_START = 0x80000000;
 
 static uint32_t g_device_id = 0;
 static uint32_t g_item_id = 0;

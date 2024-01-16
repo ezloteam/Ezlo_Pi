@@ -9,6 +9,7 @@ extern "C"
 {
 #endif
 
+    char *ezlopi_tick_to_time(uint32_t ms);
     void info_get(cJSON *cj_request, cJSON *cj_response);
 
 #ifdef __cplusplus

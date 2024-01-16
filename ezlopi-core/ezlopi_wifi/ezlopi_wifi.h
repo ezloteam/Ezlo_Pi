@@ -31,7 +31,7 @@ extern "C"
     esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass);
     void ezlopi_wifi_connect_from_nvs(void);
     void ezlopi_wifi_connect_from_id_bin(void);
-    uint32_t ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms);
+    int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms);
     esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void);
     const char *ezlopi_wifi_get_last_disconnect_reason(void);
 

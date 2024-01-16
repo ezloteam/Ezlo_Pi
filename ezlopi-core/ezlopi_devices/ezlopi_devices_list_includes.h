@@ -6,15 +6,23 @@
 #include "device_0003_digitalOut_plug.h"
 #include "device_0004_digitalIn_generic.h"
 
+#include "sensor_0005_I2C_MPU6050.h"
+#include "sensor_0006_I2C_ADXL345.h"
+#include "sensor_0007_I2C_GY271.h"
 #include "sensor_0008_I2C_LTR303ALS.h"
 #include "device_0009_other_RMT_SK6812.h"
-
+#include "sensor_0010_I2C_BME680.h"
 #include "sensor_0012_I2C_BME280.h"
-
+#include "sensor_0015_oneWire_DHT11.h"
 #include "sensor_0016_oneWire_DHT22.h"
+#include "sensor_0017_ADC_potentiometer.h"
+
+#ifdef CONFIG_IDF_TARGET_ESP32
+#include "sensor_0018_other_internal_hall_effect.h"
+#endif // CONFIG_IDF_TARGET_ESP32
 
 #include "sensor_0019_digitalIn_PIR.h"
-
+#include "sensor_0020_other_2axis_joystick.h"
 #include "sensor_0021_UART_MB1013.h"
 #include "device_0022_PWM_dimmable_lamp.h"
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
@@ -22,7 +30,7 @@
 #include "sensor_0025_digitalIn_LDR.h"
 #include "sensor_0026_ADC_LDR.h"
 #include "sensor_0027_ADC_waterLeak.h"
-
+#include "sensor_0028_other_GY61.h"
 #include "sensor_0029_I2C_GXHTC3.h"
 #include "sensor_0030_oneWire_DS18B20.h"
 #include "sensor_0031_other_JSNSR04T.h"
@@ -30,12 +38,17 @@
 #include "sensor_0033_ADC_turbidity.h"
 #include "sensor_0034_digitalIn_proximity.h"
 #include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
-// #include "device_0036_PWM_servo_MG996R.h"
+#include "device_0036_PWM_servo_MG996R.h"
 
 #include "device_0038_other_RGB.h"
 
+#include "sensor_0040_other_TCS230.h"
+#include "sensor_0041_ADC_FC28_soilMoisture.h"
+#include "sensor_0042_ADC_shunt_voltmeter.h"
+#include "sensor_0043_ADC_GYML8511_UV_intensity.h"
 #include "sensor_0044_I2C_TSL256_luminosity.h"
-
+#include "sensor_0046_ADC_ACS712_05B_currentmeter.h"
+#include "sensor_0047_other_HX711_loadcell.h"
 #include "sensor_0048_other_MQ4_CH4_detector.h"
 #include "sensor_0049_other_MQ2_LPG_detector.h"
 #include "sensor_0050_other_MQ3_alcohol_detector.h"
@@ -53,5 +66,6 @@
 #include "sensor_0062_other_MQ7_CO_detector.h"
 #include "sensor_0063_other_MQ9_LPG_flameable_detector.h"
 #include "sensor_0065_digitalIn_float_switch.h"
+#include "sensor_0066_other_R307_FingerPrint.h"
 
 #endif // __EZLOPI_DEVICES_INCLUDES_H__
