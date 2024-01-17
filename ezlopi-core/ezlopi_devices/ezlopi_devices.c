@@ -14,7 +14,7 @@
 static l_ezlopi_device_t *l_device_head = NULL;
 static s_ezlopi_cloud_controller_t s_controller_information;
 
-static void ezlopi_device_free(l_ezlopi_device_t *device);
+static void ezlopi_device_free_single(l_ezlopi_device_t *device);
 static void ezlopi_device_parse_json_v3(char *config_string);
 static void ezlopi_device_print_controller_cloud_information_v3(void);
 
@@ -77,7 +77,7 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device)
         {
             if (l_device_head == device)
             {
-                ezlopi_device_free(l_device_head);
+                ezlopi_device_free_single(l_device_head);
                 l_device_head = NULL;
             }
             else
@@ -97,7 +97,7 @@ void ezlopi_device_free_device(l_ezlopi_device_t *device)
                 {
                     l_ezlopi_device_t *free_device = curr_device->next;
                     curr_device->next = curr_device->next->next;
-                    ezlopi_device_free(free_device);
+                    ezlopi_device_free_single(free_device);
                 }
             }
         }
@@ -125,8 +125,6 @@ void ezlopi_device_free_device_by_item(l_ezlopi_item_t *item)
         }
     }
 }
-
-
 
 l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id)
 {
@@ -472,16 +470,18 @@ static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t *settings)
     free(settings);
 }
 
-static void ezlopi_device_free(l_ezlopi_device_t *device)
+static void ezlopi_device_free_single(l_ezlopi_device_t *device)
 {
     if (device->items)
     {
         ezlopi_device_free_item(device->items); // recursive item clearing
+        device->items = NULL;
         // how to clear; item-> *user_arg?
     }
     if (device->settings)
     {
         ezlopi_device_free_setting(device->settings); // recursive settings clearing
+        device->settings = NULL;
     }
     // if (device->cloud_properties.device_type_id)
     // {

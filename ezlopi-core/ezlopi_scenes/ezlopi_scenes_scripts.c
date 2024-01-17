@@ -103,13 +103,14 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     }
 }
 
-void ezlopi_scenes_scripts_factory_info_reset(void) 
+void ezlopi_scenes_scripts_factory_info_reset(void)
 {
     l_ezlopi_scenes_script_t *curr_script = ezlopi_scenes_scripts_get_head();
 
     while (curr_script)
     {
         ezlopi_scenes_scripts_delete_by_id(curr_script->id);
+        curr_script = ezlopi_scenes_scripts_get_head();
     }
 }
 
