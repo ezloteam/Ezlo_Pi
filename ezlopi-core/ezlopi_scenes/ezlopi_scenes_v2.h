@@ -72,8 +72,6 @@ typedef union u_field_value_v2
     e_value_type_t type;
     char *value_string;
     double value_double;
-    // int value_int;
-    // uint32_t value_uint;
     bool value_bool;
     cJSON *cj_value;
     struct l_when_block_v2 *when_block;
@@ -172,14 +170,17 @@ e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value
 void ezlopi_scene_add_users_in_notifications(l_scenes_list_v2_t *scene_node, cJSON *cj_user);
 
 void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list);
-l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id);
-void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
-void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
+void ezlopi_scenes_delete_field_value(l_fields_v2_t *field);
+void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks);
+void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t *house_modes);
+void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks);
 void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications);
 
-void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list);
+void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
+void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
+l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
+void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list);
 void ezlopi_scenes_notifications_add(cJSON *cj_notifications);
-int ezlopi_scenes_edit_by_id(uint32_t scene_id, cJSON *cj_updated_scene);
 
 #endif // __EZLOPI_SCENES_V2_H__

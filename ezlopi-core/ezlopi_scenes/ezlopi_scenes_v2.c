@@ -30,8 +30,6 @@ static const f_scene_method_v2_t ezlopi_scenes_methods[] = {
 #undef EZLOPI_SCENE
 };
 
-static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block);
-
 static l_fields_v2_t *______new_field_populate(cJSON *cj_field);
 static l_fields_v2_t *_____fields_populate(cJSON *cj_fields);
 
@@ -63,12 +61,9 @@ e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field)
         CJSON_GET_VALUE_STRING(cj_field, ezlopi_type_str, type_str);
         if (type_str)
         {
-            uint32_t type_str_len = strlen(type_str);
             for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
             {
-                uint32_t check_str_len = strlen(scenes_value_type_name[i]);
-                uint32_t check_len = (check_str_len < type_str_len) ? type_str_len : check_str_len;
-                if (0 == strncmp(scenes_value_type_name[i], type_str, check_len))
+                if (0 == strcmp(scenes_value_type_name[i], type_str))
                 {
                     ret = i;
                     break;
@@ -84,12 +79,9 @@ e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value
     e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
     if (cj_value_type && cj_value_type->valuestring)
     {
-        uint32_t type_str_len = strlen(cj_value_type->valuestring);
         for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
         {
-            uint32_t check_str_len = strlen(scenes_value_type_name[i]);
-            uint32_t check_len = (check_str_len < type_str_len) ? type_str_len : check_str_len;
-            if (0 == strncmp(scenes_value_type_name[i], cj_value_type->valuestring, check_len))
+            if (0 == strcmp(scenes_value_type_name[i], cj_value_type->valuestring))
             {
                 ret = i;
                 break;

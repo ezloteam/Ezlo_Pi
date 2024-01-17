@@ -42,10 +42,10 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t *new_scene, cJSON *cj_scene
         }
 
         {
-            cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, ezlopi_when_str);
-            if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
+            cJSON *cj_when_blocks = cJSON_GetObjectItem(cj_scene, ezlopi_when_str);
+            if (cj_when_blocks && (cJSON_Array == cj_when_blocks->type))
             {
-                new_scene->when_block = ezlopi_scenes_populate_when_blocks(cj_then_blocks);
+                new_scene->when_block = ezlopi_scenes_populate_when_blocks(cj_when_blocks);
             }
         }
 

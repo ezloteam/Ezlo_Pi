@@ -564,14 +564,19 @@ char *ezlopi_nvs_read_str(char *nvs_name)
 
 void ezlopi_nvs_delete_stored_data_by_id(uint32_t script_id)
 {
-    esp_err_t err = ESP_OK;
+    char script_id_str[32];
+    snprintf(script_id_str, sizeof(script_id_str), "%08x", script_id);
+    ezlopi_nvs_delete_stored_data_by_name(script_id_str);
+}
+
+void ezlopi_nvs_delete_stored_data_by_name(char *nvs_name)
+{
     if (1 == ezlopi_nvs_init())
     {
-        char script_id_str[32];
-        snprintf(script_id_str, sizeof(script_id_str), "%08x", script_id);
-        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, script_id_str)))
+        esp_err_t err = ESP_OK;
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, nvs_name)))
         {
-            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", script_id_str, esp_err_to_name(err));
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", nvs_name, esp_err_to_name(err));
         }
     }
 }

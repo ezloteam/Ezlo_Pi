@@ -8,6 +8,7 @@
 #include "ezlopi_nvs.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_scenes_edit.h"
 #include "ezlopi_cjson_macros.h"
 #include "ezlopi_meshbot_service.h"
 #include "ezlopi_cloud_constants.h"
@@ -89,7 +90,8 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
                 if (cj_id && cj_id->valuestring)
                 {
                     uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
-                    // ezlopi_scenes_edit_by_id(u_id, cj_eo);
+                    ezlopi_scenes_edit_by_id(u_id, cj_eo);
+                    ezlopi_store_new_scene_v2(cj_eo);
                 }
             }
         }
