@@ -1,345 +1,18 @@
 #include "trace.h"
 #include "string.h"
 
-#include "lwip/err.h"
-#include "lwip/sockets.h"
-#include "lwip/sys.h"
-#include "lwip/netdb.h"
-#include "lwip/dns.h"
-
+#include "ezlopi_nvs.h"
 #include "ezlopi_http.h"
 #include "ezlopi_scenes_v2.h"
 #include "ezlopi_scenes_scripts.h"
 #include "ezlopi_scenes_expressions.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_nvs.h"
-#include "ezlopi_factory_info.h"
 #include "ezlopi_scenes_then_methods.h"
-#include "esp_crt_bundle.h"
-#include "esp_tls.h"
-
-#ifdef CONFIG_ESP_TLS_USING_MBEDTLS
-#include "mbedtls/platform.h"
-#include "mbedtls/net_sockets.h"
-#include "mbedtls/esp_debug.h"
-#include "mbedtls/ssl.h"
-#include "mbedtls/entropy.h"
-#include "mbedtls/ctr_drbg.h"
-#include "mbedtls/error.h"
-#include "mbedtls/certs.h"
-#endif
+#include "ezlopi_devices_list.h"
+#include "ezlopi_factory_info.h"
 
 //---------------------------------------------------------------------------------------
 // #define
-
 //---------------------------------------------------------------------------------------
-#warning "'s_ezlopi_scenes_then_methods_send_http_t' its size look too big"
-#warning "'s_ezlopi_scenes_then_methods_send_http_t' better to define in seperate module"
-typedef struct s_ezlopi_scenes_then_methods_send_http
-{
-    char web_port[5]; // use number instead of char-array
-    char url[196];
-    char web_server[96];
-    char header[256];
-    char content[384]; // content size should be dynamic
-    char username[32];
-    char password[32];
-    bool skip_cert_common_name_check;
-    esp_http_client_method_t method;
-} s_ezlopi_scenes_then_methods_send_http_t;
-
-static int _parse_web_host_name(char *dest_addr, int dest_limit, char *src_addr)
-{
-    int ret = 0;
-    char *start = strstr(src_addr, "://");
-    if (start != NULL)
-    {
-        start += 3;
-        int buf_size = dest_limit;
-        int length = 0;
-        char *end = strchr(start, '/');
-        if (end != NULL)
-        {
-            length = end - start;
-            if ((length + 1) < buf_size)
-            {
-                snprintf(dest_addr, length + 1, "%s", start);
-            }
-        }
-        else
-        {
-            char *ptr = src_addr;
-            length = strlen(src_addr) - (int)(start - ptr);
-            if ((length + 1) < buf_size)
-            {
-                snprintf(dest_addr, length + 1, "%s", (ptr + ((int)(start - ptr))));
-            }
-        }
-        dest_addr[buf_size] = '\0';
-        ret = 1;
-    }
-    else
-    {
-        TRACE_E("Cannot find web_server/host_name");
-    }
-    return ret;
-}
-
-static int _limit_size_check(char *dest_buff, int dest_size, int reqd_size)
-{
-    int limit = dest_size - (strlen(dest_buff) + 1);
-    limit = (limit < 0) ? 0 : limit;
-    if (limit > reqd_size)
-    {
-        return limit;
-    }
-    return 0;
-}
-
-#warning "better to include it in different module, possibly ezlopi_core.ezlopi_http"
-static void __https_using_mbedTLS(const char *web_server, const char *web_port, const char *url_req)
-{
-    char tmp_buf[512];
-    int ret, flags, len;
-
-    mbedtls_entropy_context entropy;
-    mbedtls_ctr_drbg_context ctr_drbg;
-    mbedtls_ssl_context ssl;
-    mbedtls_x509_crt cacert;
-    mbedtls_ssl_config conf;
-    mbedtls_net_context server_fd;
-
-    mbedtls_ssl_init(&ssl);
-    mbedtls_x509_crt_init(&cacert);
-    mbedtls_ctr_drbg_init(&ctr_drbg);
-    TRACE_I("Seeding the random number generator");
-    mbedtls_ssl_config_init(&conf);
-    mbedtls_entropy_init(&entropy);
-
-    if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-                                     NULL, 0)) != 0)
-    {
-        TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
-        goto exit;
-    }
-    TRACE_I("Attaching the certificate bundle...");
-
-    ret = esp_crt_bundle_attach(&conf);
-
-    if (ret < 0)
-    {
-        TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
-        goto exit;
-    }
-    TRACE_I("Setting hostname for TLS session...");
-
-    /* Hostname set here should match CN in server certificate */
-    if ((ret = mbedtls_ssl_set_hostname(&ssl, web_server)) != 0)
-    {
-        TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
-        goto exit;
-    }
-
-    TRACE_I("Setting up the SSL/TLS structure...");
-
-    if ((ret = mbedtls_ssl_config_defaults(&conf,
-                                           MBEDTLS_SSL_IS_CLIENT,
-                                           MBEDTLS_SSL_TRANSPORT_STREAM,
-                                           MBEDTLS_SSL_PRESET_DEFAULT)) != 0)
-    {
-        TRACE_E("mbedtls_ssl_config_defaults returned %d", ret);
-        goto exit;
-    }
-
-    /* MBEDTLS_SSL_VERIFY_OPTIONAL is bad for security, in this example it will print
-       a warning if CA verification fails but it will continue to connect.
-       You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
-    */
-    mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
-    mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
-    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
-#ifdef CONFIG_MBEDTLS_DEBUG
-    mbedtls_esp_enable_debug_log(&conf, CONFIG_MBEDTLS_DEBUG_LEVEL);
-#endif
-
-    if ((ret = mbedtls_ssl_setup(&ssl, &conf)) != 0)
-    {
-        TRACE_E("mbedtls_ssl_setup returned -0x%x\n\n", -ret);
-
-        goto exit;
-    }
-    mbedtls_net_init(&server_fd);
-
-    TRACE_I("Connecting to %s:%s...", web_server, web_port);
-
-    if ((ret = mbedtls_net_connect(&server_fd, web_server,
-                                   web_port, MBEDTLS_NET_PROTO_TCP)) != 0)
-    {
-        TRACE_E("mbedtls_net_connect returned -%x", -ret);
-        goto exit;
-    }
-    TRACE_I("Connected.");
-
-    mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
-
-    TRACE_I("Performing the SSL/TLS handshake...");
-    while ((ret = mbedtls_ssl_handshake(&ssl)) != 0)
-    {
-        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
-        {
-            TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
-            goto exit;
-        }
-    }
-    TRACE_I("Verifying peer X.509 certificate...");
-
-    if ((flags = mbedtls_ssl_get_verify_result(&ssl)) != 0)
-    {
-        /* In real life, we probably want to close connection if ret != 0 */
-        TRACE_W("Failed to verify peer certificate!");
-        bzero(tmp_buf, sizeof(tmp_buf));
-        mbedtls_x509_crt_verify_info(tmp_buf, sizeof(tmp_buf), "  ! ", flags);
-        TRACE_W("verification info: %s", tmp_buf);
-    }
-    else
-    {
-        TRACE_I("Certificate verified.");
-    }
-    TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
-    TRACE_I("Writing HTTP request...");
-
-    size_t written_bytes = 0;
-    do
-    {
-        ret = mbedtls_ssl_write(&ssl, (const unsigned char *)url_req + written_bytes,
-                                strlen(url_req) - written_bytes);
-        if (ret >= 0)
-        {
-            TRACE_I("%d bytes written", ret);
-            written_bytes += ret;
-        }
-        else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
-        {
-            TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
-            goto exit;
-        }
-    } while (written_bytes < strlen(url_req));
-
-    TRACE_I("Reading HTTP response...");
-    do
-    {
-        len = sizeof(tmp_buf) - 1;
-        bzero(tmp_buf, sizeof(tmp_buf));
-        ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
-
-        if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
-        {
-            continue;
-        }
-        if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
-        {
-            ret = 0;
-            break;
-        }
-        if (ret < 0)
-        {
-            TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
-            break;
-        }
-        if (ret == 0)
-        {
-            TRACE_I("connection closed");
-            break;
-        }
-        len = ret;
-        TRACE_D(" [%d] bytes read :\n %s", len, tmp_buf);
-
-    } while (1);
-
-    mbedtls_ssl_close_notify(&ssl);
-exit:
-    // mbedtls_ssl_session_reset(&ssl); // dont need this line
-    mbedtls_net_free(&server_fd);
-    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-    if (ret != 0)
-    {
-        mbedtls_strerror(ret, tmp_buf, 100);
-        TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
-    }
-
-    // Clearing used structures
-    mbedtls_ssl_free(&ssl);
-    mbedtls_ssl_config_free(&conf);
-    mbedtls_ctr_drbg_free(&ctr_drbg);
-    mbedtls_entropy_free(&entropy);
-    TRACE_I("Completed a request");
-}
-#warning "better to include it in different module, possibly ezlopi_core.ezlopi_http"
-static void __scenes_then_method_http_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
-{
-    TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
-    TRACE_W("[%d]WEB_PORT :- '%s' ", (sizeof(config->web_port)), config->web_port);
-    TRACE_W("[%d]URI :- '%s' [%d]", (sizeof(config->url)), config->url, strlen(config->url));
-    TRACE_W("[%d]WEB_SERVER :- '%s' [%d]", (sizeof(config->web_server)), config->web_server, strlen(config->web_server));
-    TRACE_W("[%d]Content : occupied [%d] ", (sizeof(config->content)), strlen(config->content));
-    TRACE_W("[%d]Header : occupied [%d] ", (sizeof(config->header)), strlen(config->header));
-
-    char REQUEST[1024] = {'\0'}; // need to make it dynamic
-    switch (config->method)
-    {
-    case HTTP_METHOD_GET:
-    {
-        TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
-        snprintf(REQUEST, sizeof(REQUEST), "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-        break;
-    }
-    case HTTP_METHOD_POST:
-    {
-        TRACE_I("HTTP POST-METHOD [%d]", config->method);
-        snprintf(REQUEST, sizeof(REQUEST), "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-        break;
-    }
-    case HTTP_METHOD_PUT:
-    {
-        TRACE_I("HTTP PUT-METHOD [%d]", config->method);
-        snprintf(REQUEST, sizeof(REQUEST), "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-        break;
-    }
-    case HTTP_METHOD_DELETE:
-    {
-        TRACE_I("HTTP DELETE-METHOD [%d]", config->method);
-        snprintf(REQUEST, sizeof(REQUEST), "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-        break;
-    }
-    default:
-        break;
-    }
-    // adding 'Headers' to request_buffer
-    int max_cpy_len = 0;
-    max_cpy_len = _limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->header) + 1) + 3);
-    if (max_cpy_len > 0)
-    {
-        snprintf(REQUEST + (strlen(REQUEST)),
-                 max_cpy_len,
-                 "%s\r\n",
-                 config->header);
-    }
-    // adding content body to request
-    max_cpy_len = _limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->content) + 1) + 3);
-    if (max_cpy_len > 0)
-    {
-        snprintf(REQUEST + (strlen(REQUEST)),
-                 max_cpy_len,
-                 "%s\r\n",
-                 config->content);
-    }
-
-    REQUEST[sizeof(REQUEST)] = '\0'; // null terminating array
-    TRACE_D("REQUEST : \n%s = [%d]\n", REQUEST, strlen(REQUEST));
-
-    // executing the request
-    __https_using_mbedTLS(config->web_server, config->web_port, REQUEST);
-}
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {
@@ -430,6 +103,42 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
     return 0;
 }
 
+static int _parse_web_host_name(char *dest_addr, int dest_limit, char *src_addr)
+{
+    int ret = 0;
+    char *start = strstr(src_addr, "://");
+    if (start != NULL)
+    {
+        start += 3;
+        int buf_size = dest_limit;
+        int length = 0;
+        char *end = strchr(start, '/');
+        if (end != NULL)
+        {
+            length = end - start;
+            if ((length + 1) < buf_size)
+            {
+                snprintf(dest_addr, length + 1, "%s", start);
+            }
+        }
+        else
+        {
+            char *ptr = src_addr;
+            length = strlen(src_addr) - (int)(start - ptr);
+            if ((length + 1) < buf_size)
+            {
+                snprintf(dest_addr, length + 1, "%s", (ptr + ((int)(start - ptr))));
+            }
+        }
+        dest_addr[buf_size] = '\0';
+        ret = 1;
+    }
+    else
+    {
+        TRACE_E("Cannot find web_server/host_name");
+    }
+    return ret;
+}
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
@@ -441,9 +150,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
         if (tmp_http_data)
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_scenes_then_methods_send_http_t));
-            // cJSON *cj_header = cJSON_CreateObject();
-            // if (cj_header) //  headers
-            // {
             l_fields_v2_t *curr_field = curr_then->fields;
             while (NULL != curr_field) // fields
             {
@@ -483,11 +189,11 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
 
 // 1. adding 'User-Agent & host' to header-buffer
 #warning "name 'limit' sounds incomplete"
-                        int max_cpy_len = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (6 + (strlen(tmp_http_data->web_server) + 1)) + 3);
-                        if (max_cpy_len > 0)
+                        int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (6 + (strlen(tmp_http_data->web_server) + 1)) + 3);
+                        if (max_allowed_len > 0)
                         {
                             snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                     max_cpy_len,
+                                     max_allowed_len,
                                      "Host: %s\r\n",
                                      tmp_http_data->web_server);
                         }
@@ -529,11 +235,11 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         // cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
                         // 2. adding 'Content-Type' to header-buffer
-                        int max_cpy_len = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + strlen(curr_field->value.value_string)) + 3);
-                        if (max_cpy_len > 0)
+                        int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + strlen(curr_field->value.value_string)) + 3);
+                        if (max_allowed_len > 0)
                         {
                             snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                     max_cpy_len,
+                                     max_allowed_len,
                                      "Content-Type: %s\r\n",
                                      curr_field->value.value_string);
                         }
@@ -557,11 +263,11 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                             snprintf(str, sizeof(str), "%d", i);
                             // cJSON_AddStringToObject(cj_header, "Content-Length", str);
                             // 3. adding 'Content-Length' to header-buffer
-                            int max_cpy_len = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (16 + strlen(str)) + 3);
-                            if (max_cpy_len > 0)
+                            int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (16 + strlen(str)) + 3);
+                            if (max_allowed_len > 0)
                             {
                                 snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
-                                         max_cpy_len,
+                                         max_allowed_len,
                                          "Content-Length: %s\r\n",
                                          str);
                             }
@@ -575,17 +281,17 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         if (NULL != curr_field->value.value_json)
                         {
-                            int max_cpy_len = 0;
+                            int max_allowed_len = 0;
                             cJSON *header = (curr_field->value.value_json->child);
                             while (header)
                             {
                                 // cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
                                 // 4. adding 'remaining' to header-buffer
-                                max_cpy_len = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3);
-                                if (max_cpy_len > 0)
+                                max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3);
+                                if (max_allowed_len > 0)
                                 {
                                     snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                             max_cpy_len,
+                                             max_allowed_len,
                                              "%s: %s\r\n",
                                              header->string, header->valuestring);
                                 }
@@ -600,11 +306,11 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     {
                         tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
                         // 4. adding 'remaining' to header-buffer
-                        int max_cpy_len = _limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3);
-                        if (max_cpy_len > 0)
+                        int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3);
+                        if (max_allowed_len > 0)
                         {
                             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
-                                     max_cpy_len,
+                                     max_allowed_len,
                                      "skipSecurity: %s\r\n",
                                      ((curr_field->value.value_bool) ? "true" : "false"));
                         }
@@ -629,9 +335,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     strncat(tmp_http_data->content, cred, strlen(cred));
                 }
             }
-            __scenes_then_method_http_request_api(tmp_http_data, NULL);
-            //     cJSON_Delete(cj_header);
-            // }
+            ezlopi_http_scenes_sendhttp_request_api(tmp_http_data, NULL);
             free(tmp_http_data);
         }
     }
@@ -682,6 +386,7 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
         if (curr_then)
         {
             TRACE_E("Rebooting ESP......................... ");
+            // stop web_provisioning
             esp_restart();
         }
 
@@ -716,7 +421,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             ezlopi_device_factory_info_reset();
                             ezlopi_nvs_factory_info_reset();  // 'nvs' partitions
                             ezlopi_factory_info_soft_reset(); // 'ID' partition :- 'wifi' sector
-
+                            // stop web_provisioning
                             esp_restart();
                         }
                         if (0 == strncmp(curr_field->value.value_string, "soft", 5))
@@ -726,6 +431,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             ezlopi_factory_info_soft_reset(); // only affects wifi sector
                             TRACE_E("Rebooting ESP......................... ");
                             vTaskDelay(1000 / portTICK_PERIOD_MS);
+                            // stop web_provisioning
                             esp_restart();
                         }
                     }
