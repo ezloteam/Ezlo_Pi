@@ -9,6 +9,7 @@
 #include "ezlopi_scenes_then_methods.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_factory_info.h"
+#include "web_provisioning.h"
 
 //---------------------------------------------------------------------------------------
 // #define
@@ -103,49 +104,12 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
     return 0;
 }
 
-static int _parse_web_host_name(char *dest_addr, int dest_limit, char *src_addr)
-{
-    int ret = 0;
-    char *start = strstr(src_addr, "://");
-    if (start != NULL)
-    {
-        start += 3;
-        int buf_size = dest_limit;
-        int length = 0;
-        char *end = strchr(start, '/');
-        if (end != NULL)
-        {
-            length = end - start;
-            if ((length + 1) < buf_size)
-            {
-                snprintf(dest_addr, length + 1, "%s", start);
-            }
-        }
-        else
-        {
-            char *ptr = src_addr;
-            length = strlen(src_addr) - (int)(start - ptr);
-            if ((length + 1) < buf_size)
-            {
-                snprintf(dest_addr, length + 1, "%s", (ptr + ((int)(start - ptr))));
-            }
-        }
-        dest_addr[buf_size] = '\0';
-        ret = 1;
-    }
-    else
-    {
-        TRACE_E("Cannot find web_server/host_name");
-    }
-    return ret;
-}
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     int ret = 0;
     l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
     if (curr_then)
     {
-        // configuration for http_request
         s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data = (s_ezlopi_scenes_then_methods_send_http_t *)malloc(sizeof(s_ezlopi_scenes_then_methods_send_http_t));
         if (tmp_http_data)
         {
@@ -173,147 +137,49 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         {
                             tmp_http_data->method = HTTP_METHOD_DELETE;
                         }
-#warning "Some http-methods are still remaining"
+#warning "Some http-methods are still remaining"    // Document mentions only four of them.
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "url", 4))
                 {
-#warning "add url parser in ezlopi_core.ezlopi_http"
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
-                        snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", curr_field->value.value_string);
-#warning "web_port -> use number instead of string"
-                        snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(curr_field->value.value_string, "https")) ? "443" : "80");
-
-                        _parse_web_host_name(tmp_http_data->web_server, sizeof(tmp_http_data->web_server), curr_field->value.value_string);
-
-// 1. adding 'User-Agent & host' to header-buffer
-#warning "name 'limit' sounds incomplete"
-                        int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (6 + (strlen(tmp_http_data->web_server) + 1)) + 3);
-                        if (max_allowed_len > 0)
-                        {
-                            snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                     max_allowed_len,
-                                     "Host: %s\r\n",
-                                     tmp_http_data->web_server);
-                        }
+                        ezlopi_http_scenes_then_parse_url(tmp_http_data, curr_field->value.value_string); // extracts : url, Host_name & Port_num.
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "credential", 11))
                 {
-                    if (EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type)
+                    if ((EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type) && (cJSON_IsObject(curr_field->value.value_json)))
                     {
-                        if (NULL != curr_field->value.value_json)
-                        {
-                            char *cj_ptr = cJSON_Print(curr_field->value.value_json);
-                            if (cj_ptr)
-                            {
-                                // TRACE_W("-user/pass sent:-\n%s\n", cj_ptr);
-                                cJSON_free(cj_ptr);
-
-                                cJSON *userItem = cJSON_GetObjectItem(curr_field->value.value_json, "user");
-                                cJSON *passwordItem = cJSON_GetObjectItem(curr_field->value.value_json, "password");
-                                if ((userItem != NULL) && (passwordItem != NULL))
-                                {
-                                    const char *userValue = cJSON_GetStringValue(userItem);
-                                    const char *passValue = cJSON_GetStringValue(passwordItem);
-                                    snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
-                                    snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
-                                }
-                            }
-                            else
-                            {
-                                TRACE_E("Missing 'username' or 'password' field in credential");
-                            }
-                        }
+                        ezlopi_http_scenes_then_parse_username_password(tmp_http_data, curr_field->value.value_json);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "contentType", 12))
                 {
-#warning "place it in ezlopi_core.ezlopi_http"
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
-                        // cJSON_AddStringToObject(cj_header, "Content-Type", curr_field->value.value_string);
-                        // 2. adding 'Content-Type' to header-buffer
-                        int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + strlen(curr_field->value.value_string)) + 3);
-                        if (max_allowed_len > 0)
-                        {
-                            snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                     max_allowed_len,
-                                     "Content-Type: %s\r\n",
-                                     curr_field->value.value_string);
-                        }
+                        ezlopi_http_scenes_then_parse_content_type(tmp_http_data, curr_field->value.value_string);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "content", 8))
                 {
-#warning "place it in ezlopi_core.ezlopi_http"
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
-                        snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", curr_field->value.value_string);
-                        uint32_t i = 0; // variable to store 'content-length'
-                        for (; i < strlen(curr_field->value.value_string); i++)
-                        {
-                            if ('\0' == tmp_http_data->content[i])
-                                break;
-                        }
-                        if (i > 0)
-                        {
-                            char str[i];
-                            snprintf(str, sizeof(str), "%d", i);
-                            // cJSON_AddStringToObject(cj_header, "Content-Length", str);
-                            // 3. adding 'Content-Length' to header-buffer
-                            int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (16 + strlen(str)) + 3);
-                            if (max_allowed_len > 0)
-                            {
-                                snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
-                                         max_allowed_len,
-                                         "Content-Length: %s\r\n",
-                                         str);
-                            }
-                        }
+                        ezlopi_http_scenes_then_parse_content(tmp_http_data, curr_field->value.value_string);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "headers", 8))
                 {
-#warning "place it in ezlopi_core.ezlopi_http"
-                    if (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type)
+                    if ((EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type) && (cJSON_IsObject(curr_field->value.value_json)))
                     {
-                        if (NULL != curr_field->value.value_json)
-                        {
-                            int max_allowed_len = 0;
-                            cJSON *header = (curr_field->value.value_json->child);
-                            while (header)
-                            {
-                                // cJSON_AddStringToObject(cj_header, header->string, header->valuestring);
-                                // 4. adding 'remaining' to header-buffer
-                                max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3);
-                                if (max_allowed_len > 0)
-                                {
-                                    snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                                             max_allowed_len,
-                                             "%s: %s\r\n",
-                                             header->string, header->valuestring);
-                                }
-                                header = header->next;
-                            }
-                        }
+                        ezlopi_http_scenes_then_parse_headers(tmp_http_data, curr_field->value.value_json);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "skipSecurity", 12))
                 {
                     if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
-                        tmp_http_data->skip_cert_common_name_check = curr_field->value.value_bool;
-                        // 4. adding 'remaining' to header-buffer
-                        int max_allowed_len = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + (strlen((curr_field->value.value_bool) ? "true" : "false"))) + 3);
-                        if (max_allowed_len > 0)
-                        {
-                            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
-                                     max_allowed_len,
-                                     "skipSecurity: %s\r\n",
-                                     ((curr_field->value.value_bool) ? "true" : "false"));
-                        }
+                        ezlopi_http_scenes_then_parse_skipsecurity(tmp_http_data, curr_field->value.value_bool);
                     }
                 }
                 curr_field = curr_field->next;
@@ -325,17 +191,17 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 if (HTTP_METHOD_GET == tmp_http_data->method)
                 {
                     snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
-#warning "its not how strncat should be used, fiind the better way"
+#warning "its not how strncat should be used, find the better way"
                     strncat(tmp_http_data->url, cred, strlen(cred));
                 }
                 else
                 {
                     snprintf(cred, sizeof(cred), "user:%s\r\npassword:%s\r\n", tmp_http_data->username, tmp_http_data->password);
-#warning "its not how strncat should be used, fiind the better way"
+#warning "its not how strncat should be used, find the better way"
                     strncat(tmp_http_data->content, cred, strlen(cred));
                 }
             }
-            ezlopi_http_scenes_sendhttp_request_api(tmp_http_data, NULL);
+            ezlopi_http_scenes_then_sendhttp_request(tmp_http_data, NULL);
             free(tmp_http_data);
         }
     }
@@ -386,7 +252,7 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
         if (curr_then)
         {
             TRACE_E("Rebooting ESP......................... ");
-            // stop web_provisioning
+            web_provisioning_deinit();
             esp_restart();
         }
 
@@ -421,7 +287,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             ezlopi_device_factory_info_reset();
                             ezlopi_nvs_factory_info_reset();  // 'nvs' partitions
                             ezlopi_factory_info_soft_reset(); // 'ID' partition :- 'wifi' sector
-                            // stop web_provisioning
+                            web_provisioning_deinit();
                             esp_restart();
                         }
                         if (0 == strncmp(curr_field->value.value_string, "soft", 5))
@@ -431,7 +297,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             ezlopi_factory_info_soft_reset(); // only affects wifi sector
                             TRACE_E("Rebooting ESP......................... ");
                             vTaskDelay(1000 / portTICK_PERIOD_MS);
-                            // stop web_provisioning
+                            web_provisioning_deinit();
                             esp_restart();
                         }
                     }

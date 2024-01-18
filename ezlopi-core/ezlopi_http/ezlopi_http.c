@@ -36,6 +36,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
         }                     \
     }
 
+//--------------- Scenes:- Sendhttp_request_method --------------------------
 static void __ezlopi_http_request_via_mbedTLS(const char *web_server, const char *web_port, const char *url_req)
 {
     char tmp_buf[512];
@@ -213,6 +214,42 @@ exit:
     mbedtls_entropy_free(&entropy);
     TRACE_I("Completed a request");
 }
+static int ezlopi_http_parse_web_host_name(char *dest_addr, int dest_limit, char *src_addr)
+{
+    int ret = 0;
+    char *start = strstr(src_addr, "://");
+    if (start != NULL)
+    {
+        start += 3;
+        int buf_size = dest_limit;
+        int length = 0;
+        char *end = strchr(start, '/');
+        if (end != NULL)
+        {
+            length = end - start;
+            if ((length + 1) < buf_size)
+            {
+                snprintf(dest_addr, length + 1, "%s", start);
+            }
+        }
+        else
+        {
+            char *ptr = src_addr;
+            length = strlen(src_addr) - (int)(start - ptr);
+            if ((length + 1) < buf_size)
+            {
+                snprintf(dest_addr, length + 1, "%s", (ptr + ((int)(start - ptr))));
+            }
+        }
+        dest_addr[buf_size] = '\0';
+        ret = 1;
+    }
+    else
+    {
+        TRACE_E("Cannot find web_server/host_name");
+    }
+    return ret;
+}
 int ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd_size)
 {
     int limit = dest_size - (strlen(dest_buff) + 1);
@@ -223,7 +260,96 @@ int ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd_size)
     }
     return 0;
 }
-void ezlopi_http_scenes_sendhttp_request_api(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
+void ezlopi_http_scenes_then_parse_url(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", field_value_string);
+#warning "web_port -> use number instead of string"
+    // tmp_http_data->web_port =  (NULL != strstr(field_value_string, "https")?443:80;
+    snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(field_value_string, "https")) ? "443" : "80");
+
+    ezlopi_http_parse_web_host_name(tmp_http_data->web_server, sizeof(tmp_http_data->web_server), field_value_string);
+
+    // 1. adding 'host' to header-buffer
+    int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (6 + (strlen(tmp_http_data->web_server) + 1)) + 3);
+    if (max_allowed > 0)
+    {
+        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
+                 max_allowed,
+                 "Host: %s\r\n", //  "Host: %d\r\n",
+                 tmp_http_data->web_server);
+    }
+}
+void ezlopi_http_scenes_then_parse_content(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", field_value_string);
+    uint32_t i = 0; // variable to store 'content-length'
+    for (; i < strlen(field_value_string); i++)
+    {
+        if ('\0' == tmp_http_data->content[i])
+            break;
+    }
+    if (i > 0)
+    {
+        char str[i];
+        snprintf(str, sizeof(str), "%d", i);
+        // 3. adding 'Content-Length' to header-buffer
+        int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (16 + strlen(str)) + 3);
+        if (max_allowed > 0)
+        {
+            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "Content-Length: %s\r\n", str);
+        }
+    }
+}
+void ezlopi_http_scenes_then_parse_content_type(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    // 2. adding 'Content-Type' to header-buffer
+    int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + strlen(field_value_string)) + 3);
+    if (max_allowed > 0)
+    {
+        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "Content-Type: %s\r\n", field_value_string);
+    }
+}
+void ezlopi_http_scenes_then_parse_headers(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *value_json)
+{
+    int max_allowed = 0;
+    cJSON *header = (value_json->child);
+    while (header)
+    {
+        // 4. adding 'remaining' to header-buffer
+        max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3);
+        if (max_allowed > 0)
+        {
+            snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "%s: %s\r\n", header->string, header->valuestring);
+        }
+        header = header->next;
+    }
+}
+void ezlopi_http_scenes_then_parse_skipsecurity(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, bool value_bool)
+{
+    // 4. adding 'remaining' to header-buffer
+    tmp_http_data->skip_cert_common_name_check = value_bool;
+    int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + (strlen((1 == value_bool) ? "true" : "false"))) + 3);
+    if (max_allowed > 0)
+    {
+        snprintf((tmp_http_data->header) + strlen(tmp_http_data->header),
+                 max_allowed,
+                 "skipSecurity: %s\r\n",
+                 ((value_bool) ? "true" : "false"));
+    }
+}
+void ezlopi_http_scenes_then_parse_username_password(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *value_json)
+{
+    cJSON *userItem = cJSON_GetObjectItem(value_json, "user");
+    cJSON *passwordItem = cJSON_GetObjectItem(value_json, "password");
+    if ((NULL != userItem) && (NULL != passwordItem))
+    {
+        const char *userValue = cJSON_GetStringValue(userItem);
+        snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
+        const char *passValue = cJSON_GetStringValue(passwordItem);
+        snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
+    }
+}
+void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
 {
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
     TRACE_W("[%d]WEB_PORT :- '%s' ", (sizeof(config->web_port)), config->web_port);
@@ -263,23 +389,17 @@ void ezlopi_http_scenes_sendhttp_request_api(s_ezlopi_scenes_then_methods_send_h
         break;
     }
     // adding 'Headers' to request_buffer
-    int max_allowed_len = 0;
-    max_allowed_len = ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->header) + 1) + 3);
-    if (max_allowed_len > 0)
+    int max_allowed = 0;
+    max_allowed = ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->header) + 1) + 3);
+    if (max_allowed > 0)
     {
-        snprintf(REQUEST + (strlen(REQUEST)),
-                 max_allowed_len,
-                 "%s\r\n",
-                 config->header);
+        snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->header);
     }
     // adding content body to request
-    max_allowed_len = ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->content) + 1) + 3);
-    if (max_allowed_len > 0)
+    max_allowed = ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->content) + 1) + 3);
+    if (max_allowed > 0)
     {
-        snprintf(REQUEST + (strlen(REQUEST)),
-                 max_allowed_len,
-                 "%s\r\n",
-                 config->content);
+        snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->content);
     }
 
     REQUEST[sizeof(REQUEST)] = '\0'; // null terminating array
@@ -288,6 +408,7 @@ void ezlopi_http_scenes_sendhttp_request_api(s_ezlopi_scenes_then_methods_send_h
     // executing the request
     __ezlopi_http_request_via_mbedTLS(config->web_server, config->web_port, REQUEST);
 }
+//---------------------------------------------------------------------------
 
 s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, cJSON *headers, char *private_key, char *shared_key, char *ca_certificate, esp_http_client_config_t *tmp_config)
 {
