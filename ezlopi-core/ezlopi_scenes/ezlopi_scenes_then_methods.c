@@ -184,8 +184,10 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 }
                 curr_field = curr_field->next;
             }
+
             // function to add the credential field in url or content-body
-            if ((0 < strlen(tmp_http_data->username)) && (0 < strlen(tmp_http_data->password)))
+            if (((NULL != tmp_http_data->username) && (0 < strlen(tmp_http_data->username))) &&
+                ((NULL != tmp_http_data->password) && (0 < strlen(tmp_http_data->password))))
             {
                 char cred[96] = {'\0'};
                 if (HTTP_METHOD_GET == tmp_http_data->method)
@@ -201,7 +203,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                     strncat(tmp_http_data->content, cred, strlen(cred));
                 }
             }
-            ezlopi_http_scenes_then_sendhttp_request(tmp_http_data, NULL);
+            ezlopi_http_scenes_then_sendhttp_request(tmp_http_data);
             free(tmp_http_data);
         }
     }

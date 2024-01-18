@@ -37,10 +37,13 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
     }
 
 //--------------- Scenes:- Sendhttp_request_method --------------------------
-static void __ezlopi_http_request_via_mbedTLS(const char *web_server, const char *web_port, const char *url_req)
+static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req)
 {
-    char tmp_buf[512];
     int ret, flags, len;
+    char tmp_buf[512];
+    char web_port[10] = {0};
+    snprintf(web_port, 10, "%d", web_port_num);
+    web_port[10] = '\0';
 
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
@@ -214,43 +217,7 @@ exit:
     mbedtls_entropy_free(&entropy);
     TRACE_I("Completed a request");
 }
-static int ezlopi_http_parse_web_host_name(char *dest_addr, int dest_limit, char *src_addr)
-{
-    int ret = 0;
-    char *start = strstr(src_addr, "://");
-    if (start != NULL)
-    {
-        start += 3;
-        int buf_size = dest_limit;
-        int length = 0;
-        char *end = strchr(start, '/');
-        if (end != NULL)
-        {
-            length = end - start;
-            if ((length + 1) < buf_size)
-            {
-                snprintf(dest_addr, length + 1, "%s", start);
-            }
-        }
-        else
-        {
-            char *ptr = src_addr;
-            length = strlen(src_addr) - (int)(start - ptr);
-            if ((length + 1) < buf_size)
-            {
-                snprintf(dest_addr, length + 1, "%s", (ptr + ((int)(start - ptr))));
-            }
-        }
-        dest_addr[buf_size] = '\0';
-        ret = 1;
-    }
-    else
-    {
-        TRACE_E("Cannot find web_server/host_name");
-    }
-    return ret;
-}
-int ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd_size)
+static int ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd_size)
 {
     int limit = dest_size - (strlen(dest_buff) + 1);
     limit = (limit < 0) ? 0 : limit;
@@ -260,23 +227,94 @@ int ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd_size)
     }
     return 0;
 }
+static int fresh_dynamic_alloc(char **__dest_ptr, const char *src_ptr)
+{
+    int ret = 0;
+    if (NULL != *__dest_ptr) // clear if occupied
+    {
+        free(*__dest_ptr);
+        *__dest_ptr = NULL;
+    }
+    else if (NULL == *__dest_ptr) // do a fresh allocation
+    {
+
+        size_t dest_length = ((NULL != src_ptr) ? strlen(src_ptr) : 0) + 1; // non-zero
+        char *tmp_ptr = malloc(sizeof(char) * dest_length);                 // automagically converted to the correct type.
+        if (tmp_ptr)
+        {
+            bzero(tmp_ptr, (sizeof(char) * dest_length));
+            TRACE_D("Dynamic allocation complete");
+            if (NULL != src_ptr)
+            {
+                TRACE_B("Copying to newly allocated buffer");
+                snprintf(tmp_ptr, dest_length, "%s", src_ptr);
+            }
+            tmp_ptr[dest_length] = '\0';
+            *__dest_ptr = tmp_ptr;
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+static int dynamic_relloc_and_append(char **Buf, const char *src_ptr, size_t NewSize)
+{
+    if ((NULL != *Buf) && (NULL != src_ptr))
+    {
+        printf("*Buf :%p \n", *Buf);
+        void *NewBuf = realloc(*Buf, sizeof(char) * NewSize);
+        if ((NewBuf != NULL)) // newSize  = old + strlen(src_ptr)
+        {
+            printf("NewBuf :%s\n", NewBuf);
+            snprintf(NewBuf + strlen(NewBuf), NewSize, "%s", src_ptr);
+            printf("NewBuf :%s\n", NewBuf);
+            *Buf = NewBuf;
+            return 1; // return success
+        }
+    }
+    return 0;
+}
+
 void ezlopi_http_scenes_then_parse_url(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
 {
     snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", field_value_string);
 #warning "web_port -> use number instead of string"
-    // tmp_http_data->web_port =  (NULL != strstr(field_value_string, "https")?443:80;
-    snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(field_value_string, "https")) ? "443" : "80");
+    tmp_http_data->web_port = (NULL != strstr(field_value_string, "https")) ? 443 : 80;
+    // snprintf(tmp_http_data->web_port, sizeof(tmp_http_data->web_port), "%s", (NULL != strstr(field_value_string, "https")) ? "443" : "80");
 
-    ezlopi_http_parse_web_host_name(tmp_http_data->web_server, sizeof(tmp_http_data->web_server), field_value_string);
+    // parse_web_host_name
+    char *start = strstr(field_value_string, "://");
+    if (start != NULL)
+    {
+        start += 3;
+        int buf_size = sizeof(tmp_http_data->web_server);
+        int length = 0;
+        char *end = strchr(start, '/');
+        if (end != NULL)
+        {
+            length = end - start;
+            if ((length + 1) < buf_size)
+            {
+                snprintf(tmp_http_data->web_server, (length + 1), "%s", start);
+            }
+        }
+        else
+        {
+            const char *ptr = field_value_string;
+            length = strlen(field_value_string) - (int)(start - ptr);
+            if ((length + 1) < buf_size)
+            {
+                snprintf(tmp_http_data->web_server, (length + 1), "%s", (ptr + ((int)(start - ptr))));
+            }
+        }
+        tmp_http_data->web_server[buf_size] = '\0';
+    }
 
     // 1. adding 'host' to header-buffer
     int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (6 + (strlen(tmp_http_data->web_server) + 1)) + 3);
     if (max_allowed > 0)
     {
-        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)),
-                 max_allowed,
-                 "Host: %s\r\n", //  "Host: %d\r\n",
-                 tmp_http_data->web_server);
+        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "Host: %s\r\n", tmp_http_data->web_server);
     }
 }
 void ezlopi_http_scenes_then_parse_content(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
@@ -344,15 +382,16 @@ void ezlopi_http_scenes_then_parse_username_password(s_ezlopi_scenes_then_method
     if ((NULL != userItem) && (NULL != passwordItem))
     {
         const char *userValue = cJSON_GetStringValue(userItem);
-        snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
         const char *passValue = cJSON_GetStringValue(passwordItem);
+
+        snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
         snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
     }
 }
-void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config, cJSON *tmp_header)
+void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config)
 {
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
-    TRACE_W("[%d]WEB_PORT :- '%s' ", (sizeof(config->web_port)), config->web_port);
+    TRACE_W("[%d]WEB_PORT :- '%d' ", (sizeof(config->web_port)), config->web_port);
     TRACE_W("[%d]URI :- '%s' [%d]", (sizeof(config->url)), config->url, strlen(config->url));
     TRACE_W("[%d]WEB_SERVER :- '%s' [%d]", (sizeof(config->web_server)), config->web_server, strlen(config->web_server));
     TRACE_W("[%d]Content : occupied [%d] ", (sizeof(config->content)), strlen(config->content));
