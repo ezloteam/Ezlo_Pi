@@ -37,6 +37,37 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
     }
 
 //--------------- Scenes:- Sendhttp_request_method --------------------------
+static void __parse_web_host_name(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    char *start = strstr(field_value_string, "://");
+    if (start != NULL)
+    {
+        start += 3;
+        int buf_size = sizeof(tmp_http_data->web_server);
+        int length = 0;
+        char *end = strchr(start, '/');
+        if (end != NULL)
+        {
+            length = end - start;
+            if ((length + 1) < buf_size)
+            {
+#warning # this need to be dynamic
+                snprintf(tmp_http_data->web_server, (length + 1), "%s", start);
+            }
+        }
+        else
+        {
+            const char *ptr = field_value_string;
+            length = strlen(field_value_string) - (int)(start - ptr);
+            if ((length + 1) < buf_size)
+            {
+#warning # this need to be dynamic
+                snprintf(tmp_http_data->web_server, (length + 1), "%s", (ptr + ((int)(start - ptr))));
+            }
+        }
+        tmp_http_data->web_server[buf_size] = '\0';
+    }
+}
 static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req)
 {
     int ret, flags, len;
@@ -217,7 +248,7 @@ exit:
     mbedtls_entropy_free(&entropy);
     TRACE_I("Completed a request");
 }
-static int ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd_size)
+static int __ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd_size)
 {
     int limit = dest_size - (strlen(dest_buff) + 1);
     limit = (limit < 0) ? 0 : limit;
@@ -227,7 +258,15 @@ static int ezlopi_http_limit_size_check(char *dest_buff, int dest_size, int reqd
     }
     return 0;
 }
-static int fresh_dynamic_alloc(char **__dest_ptr, const char *src_ptr)
+
+/**
+ * @brief This function returns New_malloced_size
+ *
+ * @param __dest_ptr [ Address of ptr which will point to (char*) block of memory. ]
+ * @param src_ptr    [ Address of the string literal you want to store/append. ]
+ * @return int [size_of_malloced block]
+ */
+static int __fresh_dynamic_alloc(char **__dest_ptr, const char *src_ptr)
 {
     int ret = 0;
     if (NULL != src_ptr)
@@ -243,146 +282,224 @@ static int fresh_dynamic_alloc(char **__dest_ptr, const char *src_ptr)
         if (tmp_ptr)
         {
             bzero(tmp_ptr, (sizeof(char) * dest_length));
-            TRACE_B("Dynamic allocation complete. Copying to newly allocated buffer");
             snprintf(tmp_ptr, dest_length, "%s", src_ptr);
-
             tmp_ptr[dest_length] = '\0';
+            TRACE_D("Fresh allocation complete. *Malloc_New_buffer (%p) : [%d]", tmp_ptr, dest_length);
             *__dest_ptr = tmp_ptr;
-            ret = dest_length; // return the size-of the currently mallocated block of memory
+            // Lastly, return the size-of the currently mallocated block of memory
+            ret = dest_length;
         }
+    }
+    else
+    {
+        TRACE_E(" Error !!, given 'src_ptr' is NULL .... Allocation Aborted...");
+    }
+    return ret;
+}
+/**
+ * @brief This function creates new_memory_block(of 'NewSize') & Rellocates Original memory-block to new_memory_block_address
+ *
+ * @param Buf       [ Address of ptr which will point to (char*) original block of memory. ]
+ * @param NewSize   [ new-size to be allocated. ]
+ * @return int [0 ==> Fail ; 1 ==> Success]
+ */
+static int __dynamic_rellocation(char **Buf, int NewSize)
+{
+    int ret = 0;
+    if ((NULL != *Buf) && (NewSize > 0)) // strictly:  (new-size != 0)
+    {
+        char *NewBuf = (char *)realloc(*Buf, sizeof(char) * NewSize); // NewSize ≤ 1.6 * n
+        if (NewBuf != NULL)
+        {
+            TRACE_D("Relocating [%p] to [%p]: NewBuf[%d]", *Buf, NewBuf, NewSize);
+            *Buf = NewBuf;
+            ret = 1; // return success
+        }
+        TRACE_I("*Buf (new): %p", *Buf);
+    }
+    return ret;
+}
+/**
+ * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_scenes_then_methods_send_http_t'
+ *
+ * @param tmp_http_data     [ Pointer to (s_ezlopi_scenes_then_methods_send_http_t*) block of memory. ]
+ * @param prev_size         [ Original size of the '*header' memory-block. ]
+ * @param append_size       [ Size of 'string' to be appended. ]
+ * @param append_str        [ 'string_literal' to be appended. ]
+ * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
+ */
+static int __relloc_header_mem_ptr(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, int prev_size, int append_size, const char *append_str)
+{
+    int ret = (tmp_http_data->header_maxlen);                           // Assign Old-block size as default
+    int new_size = prev_size + append_size;                             // this size count only :- 'characters' after combining them
+    int tmp_maxlen = (int)(1.6f * (float)tmp_http_data->header_maxlen); // find the perfect new_size amount
+    while (new_size >= tmp_maxlen)
+    {
+        tmp_maxlen = (int)(1.6f * tmp_maxlen); // Golden ration => 1.6
+        TRACE_I("Not enough... adding x1.6");
+        // possible constraint :- if(tmp_maxlen > (4096*sizeof(char))) break;
+    }
+    new_size = tmp_maxlen;
+    if (__dynamic_rellocation(&(tmp_http_data->header), new_size)) // now rellocate: 'tmp_http_data->header' with suitable 'new_size'
+    {
+        snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
+        TRACE_D("Append Successful ... Header[%d]:\n%s[%d]", (tmp_http_data->header_maxlen), tmp_http_data->header, strlen(tmp_http_data->header));
+        ret = new_size; // return new memory-block size
     }
     return ret;
 }
 
-static int dynamic_rellocation(char **Buf, size_t NewSize)
-{
-    if ((NULL != *Buf) && (NewSize > 0)) // strictly:  (new-size != 0)
-    {
-        TRACE_W("*Buf :%p \n", *Buf);
-        void *NewBuf = realloc(*Buf, sizeof(char) * NewSize); // NewSize = [n×f2 ≤ n + n×f]
-        if (NewBuf != NULL)                                   // newSize  = old + strlen(src_ptr)
-        {
-            TRACE_D("Relocating to NewBuf :%s [%d]\n", NewBuf, NewSize);
-            // snprintf(NewBuf + strlen(NewBuf), NewSize, "%s", src_ptr);
-            *Buf = NewBuf;
-            return 1; // return success
-        }
-    }
-    return 0; // return failure
-}
-
 void ezlopi_http_scenes_then_parse_url(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
 {
-    snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", field_value_string);
-    tmp_http_data->web_port = (NULL != strstr(field_value_string, "https")) ? 443 : 80;
-
-    // parse_web_host_name
-    char *start = strstr(field_value_string, "://");
-    if (start != NULL)
+    if (NULL != field_value_string)
     {
-        start += 3;
-        int buf_size = sizeof(tmp_http_data->web_server);
-        int length = 0;
-        char *end = strchr(start, '/');
-        if (end != NULL)
+#warning # this need to be dynamic
+        snprintf(tmp_http_data->url, sizeof(tmp_http_data->url), "%s", field_value_string);
+        tmp_http_data->web_port = (NULL != strstr(field_value_string, "https")) ? 443 : 80;
+
+        //--------------------------------------------
+#warning # this need to be dynamic
+        __parse_web_host_name(tmp_http_data, field_value_string); // tmp_http_data->web_server_maxlen
+        //--------------------------------------------
+
+        // 1. adding 'host' to header-buffer
+        int prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
+        if (0 == prev_size)
         {
-            length = end - start;
-            if ((length + 1) < buf_size)
+            TRACE_E("Here!");
+            tmp_http_data->header_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->header), "\0");
+            prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
+        }
+        if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
+        {
+            int append_size = ((6 + (strlen(tmp_http_data->web_server) + 1)) + 3); // only extracted 'google.com' from 'field_value_string'
+            int max_allowed = __ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+            if (max_allowed > 0)
             {
-                snprintf(tmp_http_data->web_server, (length + 1), "%s", start);
+                snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "Host: %s\r\n", tmp_http_data->web_server); // 'google.com'
+            }
+            else // if there is no space left ; we reallocate:- 'tmp_http_data->header'
+            {
+                char *append_str = malloc(sizeof(char) * (append_size + 1)); // append_str != NULL
+                if (append_str)
+                {
+                    bzero(append_str, sizeof(char) * (append_size + 1));
+                    snprintf(append_str, (append_size + 1), "Host: %s\r\n", tmp_http_data->web_server);
+                    append_str[append_size + 1] = '\0';
+                    //-----------------------------------------------------------------------------------
+                    TRACE_I("Here!");
+                    tmp_http_data->header_maxlen = __relloc_header_mem_ptr(tmp_http_data, prev_size, append_size, (const char *)append_str);
+                    //-----------------------------------------------------------------------------------
+                    free(append_str);
+                }
             }
         }
-        else
-        {
-            const char *ptr = field_value_string;
-            length = strlen(field_value_string) - (int)(start - ptr);
-            if ((length + 1) < buf_size)
-            {
-                snprintf(tmp_http_data->web_server, (length + 1), "%s", (ptr + ((int)(start - ptr))));
-            }
-        }
-        tmp_http_data->web_server[buf_size] = '\0';
-    }
-
-    // 1. adding 'host' to header-buffer
-    int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (6 + (strlen(tmp_http_data->web_server) + 1)) + 3);
-    if (max_allowed > 0)
-    {
-        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "Host: %s\r\n", tmp_http_data->web_server);
     }
 }
 void ezlopi_http_scenes_then_parse_content(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
 {
-    snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", field_value_string);
-    uint32_t i = 0; // variable to store 'content-length'
-    for (; i < strlen(field_value_string); i++)
+    if (NULL != field_value_string)
     {
-        if ('\0' == tmp_http_data->content[i])
-            break;
-    }
-    if (i > 0)
-    {
-        char str[i];
-        snprintf(str, sizeof(str), "%d", i);
-        // 3. adding 'Content-Length' to header-buffer
-        int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (16 + strlen(str)) + 3);
-        if (max_allowed > 0)
+        snprintf(tmp_http_data->content, sizeof(tmp_http_data->content), "%s\r\n", field_value_string);
+        uint32_t i = 0; // variable to store 'content-length'
+        for (; i < strlen(field_value_string); i++)
         {
-            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "Content-Length: %s\r\n", str);
+            if ('\0' == tmp_http_data->content[i])
+                break;
+        }
+        if (i > 0)
+        {
+            char str[i];
+            snprintf(str, sizeof(str), "%d", i);
+            // 3. adding 'Content-Length' to header-buffer
+            int max_allowed = __ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), (16 + strlen(str)) + 3);
+            if (max_allowed > 0)
+            {
+                snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "Content-Length: %s\r\n", str);
+            }
         }
     }
 }
 void ezlopi_http_scenes_then_parse_content_type(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
 {
-    // 2. adding 'Content-Type' to header-buffer
-    int prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
-    char *append_str = "Content-Type: true\r\n";
-    if (0 == prev_size)
-    {
-        /* Never use : sizeof()*/
-        // int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), (14 + (strlen((1 == value_bool) ? "true" : "false"))) + 3);
-        // if (max_allowed > 0)
-        // {
-        //     snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "skipSecurity: %s\r\n", ((value_bool) ? "true" : "false"));
-        // }
-
-        fresh_dynamic_alloc(&(tmp_http_data->header), append_str);
-    }
-    else
-    {
-        int append_size = (NULL != append_str) ? (strlen(append_str) + 1) : 0;
-        int new_size = prev_size + append_size;
-        TRACE_D("Adding [%d] spaces to [%d] : -> New header[%d] ", append_size, prev_size, new_size)
-        if (dynamic_rellocation(&(tmp_http_data->header), new_size))
+    if (NULL != field_value_string)
+    { // 2. adding 'Content-Type' to header-buffer
+        int prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
+        if (0 == prev_size)
         {
-            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
-            TRACE_B("Append Successful ... \nHeader :%s[%d]\n", tmp_http_data->header, strlen(tmp_http_data->header));
+            tmp_http_data->header_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->header), "\0");
+            prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
         }
-    }
-
-    int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), (14 + strlen(field_value_string)) + 3);
-    if (max_allowed > 0)
-    {
-        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "Content-Type: %s\r\n", field_value_string);
+        if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
+        {
+            int append_size = ((14 + strlen(field_value_string)) + 3);
+            int max_allowed = __ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+            if (max_allowed > 0)
+            {
+                snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "Content-Type: %s\r\n", field_value_string);
+            }
+            else // if there is no space left ; we reallocate:- 'tmp_http_data->header'
+            {
+                char *append_str = malloc(sizeof(char) * (append_size + 1)); // append_str != NULL
+                if (append_str)
+                {
+                    bzero(append_str, sizeof(char) * (append_size + 1));
+                    snprintf(append_str, (append_size + 1), "Content-Type: %s\r\n", field_value_string);
+                    append_str[append_size + 1] = '\0';
+                    //-----------------------------------------------------------------------------------
+                    TRACE_I("Here!");
+                    tmp_http_data->header_maxlen = __relloc_header_mem_ptr(tmp_http_data, prev_size, append_size, (const char *)append_str);
+                    //-----------------------------------------------------------------------------------
+                    free(append_str);
+                }
+            }
+        }
     }
 }
 void ezlopi_http_scenes_then_parse_headers(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *value_json)
 {
-    int max_allowed = 0;
-    cJSON *header = (value_json->child);
-    while (header)
+    if (cJSON_IsObject(value_json))
     {
-        // 4. adding 'remaining' to header-buffer
-        max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, sizeof(tmp_http_data->header), ((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3);
-        if (max_allowed > 0)
+        int max_allowed = 0;
+        int prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0; // we need to compare the previous characters stored
+        if (0 == prev_size)
         {
-            snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "%s: %s\r\n", header->string, header->valuestring);
+            TRACE_E("Here!");
+            tmp_http_data->header_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->header), "\0");
+            prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
         }
-        else
+        if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
         {
+            cJSON *header = (value_json->child);
+            while (header)
+            {
+                if ((NULL != header->string) && (NULL != header->valuestring))
+                { // 4. adding 'remaining' to header-buffer
+                    int append_size = (((strlen(header->string) + 1) + 2 + (strlen(header->valuestring) + 1)) + 3);
+                    max_allowed = __ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+                    if (max_allowed > 0)
+                    {
+                        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "%s: %s\r\n", header->string, header->valuestring);
+                    }
+                    else // if there is no space left ; we reallocate:- 'tmp_http_data->header'
+                    {
+                        char *append_str = malloc(sizeof(char) * (append_size + 1)); // append_str != NULL
+                        if (append_str)
+                        {
+                            bzero(append_str, sizeof(char) * (append_size + 1));
+                            snprintf(append_str, (append_size + 1), "%s: %s\r\n", header->string, header->valuestring);
+                            append_str[append_size + 1] = '\0';
+                            //-----------------------------------------------------------------------------------
+                            TRACE_I("Here!");
+                            tmp_http_data->header_maxlen = __relloc_header_mem_ptr(tmp_http_data, prev_size, append_size, (const char *)append_str);
+                            //-----------------------------------------------------------------------------------
+                            free(append_str);
+                        }
+                    }
+                }
+                header = header->next;
+            }
         }
-
-        header = header->next;
     }
 }
 void ezlopi_http_scenes_then_parse_skipsecurity(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, bool value_bool)
@@ -390,53 +507,47 @@ void ezlopi_http_scenes_then_parse_skipsecurity(s_ezlopi_scenes_then_methods_sen
     // 4. adding 'remaining' to header-buffer
     tmp_http_data->skip_cert_common_name_check = value_bool;
     int prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0; // we need to compare the previous characters stored
-    char *append_str = ((value_bool) ? "skipSecurity: true\r\n" : "skipSecurity: false\r\n");
+    const char *append_str = ((value_bool) ? ("skipSecurity: true\r\n") : ("skipSecurity: false\r\n"));
     if (0 == prev_size)
     {
-        tmp_http_data->header_maxlen = fresh_dynamic_alloc(&(tmp_http_data->header), append_str);
+        TRACE_E("Here!");
+        tmp_http_data->header_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->header), "\0");
+        prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
     }
-    else // if this characters exsists in the 'tmp_http_data->header'
+    if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
     {
-        int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), (14 + (strlen((1 == value_bool) ? "true" : "false"))) + 3);
+        int append_size = (NULL != append_str) ? (strlen(append_str) + 1) : 0;
+        int max_allowed = __ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
         if (max_allowed > 0)
         {
-            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "skipSecurity: %s\r\n", ((value_bool) ? "true" : "false"));
+            snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "%s", append_str);
         }
-        else // if there is no space left to allocated the data ; we reallocate:- 'tmp_http_data->header'
+        else // if there is no space left ; we reallocate:- 'tmp_http_data->header'
         {
-            int append_size = (NULL != append_str) ? (strlen(append_str) + 1) : 0;
-            int new_size = prev_size + append_size; // this size count only the characters after combining them
-
-            // find the perfect new_size amount
-            int tmp_maxlen = (int)(1.6f * (float)tmp_http_data->header_maxlen);
-            while (new_size >= tmp_maxlen)
-            {
-                tmp_maxlen = (int)(1.6f * tmp_maxlen); // Golden ration => 1.6
-            }
-            new_size = tmp_maxlen;
-            TRACE_D("Adding [%d] spaces to [%d] : -> New header[%d] ", append_size, prev_size, new_size)
-            if (dynamic_rellocation(&(tmp_http_data->header), new_size))
-            {
-                tmp_http_data->header_maxlen = new_size; // update the header_max_len
-                snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
-                TRACE_B("Append Successful ... \nHeader :%s[%d]\n", tmp_http_data->header, strlen(tmp_http_data->header));
-            }
+            //-----------------------------------------------------------------------------------
+            TRACE_I("Here!");
+            tmp_http_data->header_maxlen = __relloc_header_mem_ptr(tmp_http_data, prev_size, append_size, append_str);
+            //-----------------------------------------------------------------------------------
         }
     }
 }
 void ezlopi_http_scenes_then_parse_username_password(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *value_json)
 {
-    cJSON *userItem = cJSON_GetObjectItem(value_json, "user");
-    cJSON *passwordItem = cJSON_GetObjectItem(value_json, "password");
-    if ((NULL != userItem) && (NULL != passwordItem))
+    if (cJSON_IsObject(value_json))
     {
-        const char *userValue = cJSON_GetStringValue(userItem);
-        const char *passValue = cJSON_GetStringValue(passwordItem);
+        cJSON *userItem = cJSON_GetObjectItem(value_json, "user");
+        cJSON *passwordItem = cJSON_GetObjectItem(value_json, "password");
+        if ((NULL != userItem) && (NULL != passwordItem))
+        {
+            const char *userValue = cJSON_GetStringValue(userItem);
+            const char *passValue = cJSON_GetStringValue(passwordItem);
 
-        // create a fresh_dynamic_alloation for username & password
-
-        snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
-        snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
+            // tmp_http_data->username_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->username), userValue);
+            // tmp_http_data->password_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->password), passValue);
+#warning # this need to be dynamic
+            snprintf(tmp_http_data->username, sizeof(tmp_http_data->username), "%s", userValue);
+            snprintf(tmp_http_data->password, sizeof(tmp_http_data->password), "%s", passValue);
+        }
     }
 }
 void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config)
@@ -446,12 +557,12 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
     TRACE_W("[%d]URI :- '%s' [%d]", (sizeof(config->url)), config->url, strlen(config->url));
     TRACE_W("[%d]WEB_SERVER :- '%s' [%d]", (sizeof(config->web_server)), config->web_server, strlen(config->web_server));
     TRACE_W("[%d]Content : occupied [%d] ", (sizeof(config->content)), strlen(config->content));
-    TRACE_W("[%d]Header : occupied [%d] ", (sizeof(config->header)), strlen(config->header));
-
+    TRACE_W("[%d]Header : occupied [%d] ", config->header_maxlen, strlen(config->header));
+#warning # this need to be dynamic
     char REQUEST[1024] = {'\0'}; // need to make it dynamic
-
-    // char * REQUEST =NULL;
-    //
+    // size_t REQUEST_LENGTH = 100 + (1+strlen(config->url)) + (1+strlen(config->header)) + (1+strlen(config->content));
+    // char * REQUEST = malloc(sizeof(char)*REQUEST_LENGTH);
+    // if(REQUEST){free(REQUEST);}
     switch (config->method)
     {
     case HTTP_METHOD_GET:
@@ -483,13 +594,13 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
     }
     // adding 'Headers' to request_buffer
     int max_allowed = 0;
-    max_allowed = ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->header) + 1) + 3);
+    max_allowed = __ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->header) + 1) + 3);
     if (max_allowed > 0)
     {
         snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->header);
     }
     // adding content body to request
-    max_allowed = ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->content) + 1) + 3);
+    max_allowed = __ezlopi_http_limit_size_check(REQUEST, sizeof(REQUEST), (strlen(config->content) + 1) + 3);
     if (max_allowed > 0)
     {
         snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->content);
@@ -500,6 +611,8 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
 
     // executing the request
     __ezlopi_http_request_via_mbedTLS(config->web_server, config->web_port, REQUEST);
+
+   
 }
 //---------------------------------------------------------------------------
 

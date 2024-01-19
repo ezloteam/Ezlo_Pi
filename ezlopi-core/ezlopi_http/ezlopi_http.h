@@ -44,7 +44,7 @@ extern "C"
         uint32_t password_maxlen;
         char url[196];
         char web_server[96];
-        char header[256];
+        char *header;
         char content[384];
         char username[32];
         char password[32];

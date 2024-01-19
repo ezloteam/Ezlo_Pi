@@ -137,7 +137,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                         {
                             tmp_http_data->method = HTTP_METHOD_DELETE;
                         }
-#warning "Some http-methods are still remaining"    // Document mentions only four of them.
+#warning "Some http-methods are still remaining" // Document mentions only four of them.
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "url", 4))
@@ -204,6 +204,13 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 }
             }
             ezlopi_http_scenes_then_sendhttp_request(tmp_http_data);
+            if (tmp_http_data->header)
+            {
+                TRACE_W("Freed the header* pointer and assigned it NULL : [%d]", strlen(tmp_http_data->header));
+                free(&(tmp_http_data->header));
+                // TRACE_W("Freed the header* pointer and assigned it NULL : [%d]", strlen(tmp_http_data->header));
+                tmp_http_data->header = NULL;
+            }
             free(tmp_http_data);
         }
     }
