@@ -386,9 +386,9 @@ static bool ld2410_parse_data_frame_()
 				}
 				if(radar_data_frame_[8] & 0x02)
 				{
-					printf(" stationary at %d", stationary_target_distance_);
-					printf(F("cm power "));
-					printf(stationary_target_energy_);
+					printf(" stationary at %d cm", stationary_target_distance_);
+					// printf(F("cm power "));
+					// printf(stationary_target_energy_);
 				}
 			#endif
 			radar_uart_last_packet_ = millis();

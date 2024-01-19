@@ -99,6 +99,7 @@ static int __notify(l_ezlopi_item_t *item)
     if (hilink_data)
     {
         ld2410_outputs_t present_hilink_data;
+        memcpy(&present_hilink_data, hilink_data, sizeof(ld2410_outputs_t));
         ESP_ERROR_CHECK(ld2410_get_data(&present_hilink_data));
         // If direction is stationay, no target is moving so, set moving_target_distance to prevent continuous update to the cloud in abasence of moving target.
         if (STATIONARY == present_hilink_data.direction)
