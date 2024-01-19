@@ -67,5 +67,6 @@
 #include "sensor_0063_other_MQ9_LPG_flameable_detector.h"
 #include "sensor_0065_digitalIn_float_switch.h"
 #include "sensor_0066_other_R307_FingerPrint.h"
+#include "sensor_0067_hilink_presence_sensor.h"
 
 #endif // __EZLOPI_DEVICES_INCLUDES_H__

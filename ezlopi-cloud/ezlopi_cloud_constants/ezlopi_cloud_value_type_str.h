@@ -68,5 +68,6 @@ extern const char *value_type_temperature;
 // extern const  char *value_keypad_unlock_operation;
 // extern const  char *value_manual_not_fully_locked_operation;
 extern const char *value_type_fingerprint_action;
+static const char *value_type_presence_operation_mode;
 
 #endif // __EZLOPI_VLAUES_STR_H__

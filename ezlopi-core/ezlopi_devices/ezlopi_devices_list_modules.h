@@ -84,6 +84,7 @@ EZLOPI_DEVICE_LIST("sensor-MQ9-LPG-flameable-detector   ", 63, sensor_0063_other
 
 EZLOPI_DEVICE_LIST("sensor-float-switch-digital", 65, sensor_0065_digitalIn_float_switch)
 EZLOPI_DEVICE_LIST("sensor-fingerprint-sensor", 66, sensor_0066_other_R307_FingerPrint)
+EZLOPI_DEVICE_LIST("sensor-hilink-presence-sensor", 67, sensor_0067_hilink_presence_sensor_v3)
 
 //////// End of sensor/device list
 EZLOPI_DEVICE_LIST(NULL, 0, NULL)

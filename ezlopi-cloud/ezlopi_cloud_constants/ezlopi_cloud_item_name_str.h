@@ -220,7 +220,7 @@ extern const char *ezlopi_item_name_applied_force_on_sensor;
 // extern const  char *ezlopi_item_name_evaporator_coil_temperature;
 // extern const  char *ezlopi_item_name_lead;
 // extern const  char *ezlopi_item_name_liquid_line_temperature;
-// extern const  char *ezlopi_item_name_motion_direction;
+extern const  char *ezlopi_item_name_motion_direction;
 // extern const  char *ezlopi_item_name_nitrogen_dioxide;
 // extern const  char *ezlopi_item_name_ozone;
 // extern const  char *ezlopi_item_name_particulate_matter_1;

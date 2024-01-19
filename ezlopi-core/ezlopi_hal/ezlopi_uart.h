@@ -39,6 +39,7 @@ struct s_ezlopi_uart_object
     s_ezlopi_uart_t ezlopi_uart;
     __uart_upcall upcall;
     QueueHandle_t ezlopi_uart_queue_handle;
+    TaskHandle_t taskHandle;
 };
 
 s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg);

@@ -16,7 +16,7 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
     // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
@@ -305,14 +305,13 @@ static const char *ezlopi_config_test =
         \"dev_detail\":\
         [\
 {\
-        \"dev_type\":5,\
-        \"dev_name\":\"Dimmer\",\
+        \"dev_type\":6,\
+        \"dev_name\":\"Hilink Presence Sensor\",\
         \"id_room\":\"\",\
-        \"id_item\":22,\
-        \"gpio\":21,\
-        \"pwm_resln\":3,\
-        \"freq_hz\":50,\
-        \"duty_cycle\":0\
+        \"id_item\":67,\
+        \"tx\":12,\
+        \"rx\":13,\
+        \"baudrate\":256000\
         }\
         ],\
     \"dev_total\": 1}";
