@@ -340,7 +340,7 @@ void ezlopi_http_scenes_then_parse_content_type(s_ezlopi_scenes_then_methods_sen
     if (0 == prev_size)
     {
         /* Never use : sizeof()*/
-        // int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, strlen(tmp_http_data->header)+1, (14 + (strlen((1 == value_bool) ? "true" : "false"))) + 3);
+        // int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), (14 + (strlen((1 == value_bool) ? "true" : "false"))) + 3);
         // if (max_allowed > 0)
         // {
         //     snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "skipSecurity: %s\r\n", ((value_bool) ? "true" : "false"));
@@ -389,20 +389,20 @@ void ezlopi_http_scenes_then_parse_skipsecurity(s_ezlopi_scenes_then_methods_sen
 {
     // 4. adding 'remaining' to header-buffer
     tmp_http_data->skip_cert_common_name_check = value_bool;
-    int prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0;
+    int prev_size = (NULL != tmp_http_data->header) ? (strlen(tmp_http_data->header) + 1) : 0; // we need to compare the previous characters stored
     char *append_str = ((value_bool) ? "skipSecurity: true\r\n" : "skipSecurity: false\r\n");
     if (0 == prev_size)
     {
         tmp_http_data->header_maxlen = fresh_dynamic_alloc(&(tmp_http_data->header), append_str);
     }
-    else
+    else // if this characters exsists in the 'tmp_http_data->header'
     {
         int max_allowed = ezlopi_http_limit_size_check(tmp_http_data->header, (tmp_http_data->header_maxlen), (14 + (strlen((1 == value_bool) ? "true" : "false"))) + 3);
         if (max_allowed > 0)
         {
             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), max_allowed, "skipSecurity: %s\r\n", ((value_bool) ? "true" : "false"));
         }
-        else
+        else // if there is no space left to allocated the data ; we reallocate:- 'tmp_http_data->header'
         {
             int append_size = (NULL != append_str) ? (strlen(append_str) + 1) : 0;
             int new_size = prev_size + append_size; // this size count only the characters after combining them
