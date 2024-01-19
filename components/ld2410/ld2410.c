@@ -5,12 +5,12 @@ static const char *TAG = "ld2410";
 
 esp_err_t ld2410_setup(s_ezlopi_uart_t uart_settings)
 {
-    printf("\nConnect LD2410 radar TX to GPIO: %d\n", uart_settings.rx);
-    printf("Connect LD2410 radar RX to GPIO: %d\n", uart_settings.tx);
-    printf("LD2410 radar sensor initialising:\n");
+    TRACE_B("Connect LD2410 radar TX to GPIO: %d", uart_settings.rx);
+    TRACE_B("Connect LD2410 radar RX to GPIO: %d", uart_settings.tx);
+    TRACE_B("LD2410 radar sensor initialising:");
     if (ld2410_begin(true, uart_settings))
     {
-        printf("OK\n");
+        TRACE_B("OK");
 
         ld2410_settings_t settings =
             {
@@ -24,7 +24,7 @@ esp_err_t ld2410_setup(s_ezlopi_uart_t uart_settings)
     }
     else
     {
-        printf("not connected\n");
+        TRACE_B("not connected");
     }
     return ESP_FAIL;
 }
@@ -122,34 +122,33 @@ esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t *p_s
         break;
 
     default:
-        ESP_LOGE(TAG, "unknown template");
+        TRACE_E("unknown template");
         return ESP_FAIL;
         break;
     }
 
 #if TEST_SETTINGS
-    printf("no_one_duration : %d max_still_distance : %d max_move_distance : %d\n", settings.no_one_duration, settings.max_still_distance, settings.max_move_distance);
-    printf("still_sensitivity : ");
+    TRACE_B("no_one_duration : %d max_still_distance : %d max_move_distance : %d", settings.no_one_duration, settings.max_still_distance, settings.max_move_distance);
+    TRACE_B("still_sensitivity : ");
     for (uint8_t i = 0; i < 9; i++)
     {
-        printf("%d ", still_sensitivity[i]);
+        TRACE_B("%d ", still_sensitivity[i]);
     }
-    printf("\nmove_sensitivity : ");
+    TRACE_B("move_sensitivity : ");
     for (uint8_t i = 0; i < 9; i++)
     {
-        printf("%d ", still_sensitivity[i]);
+        TRACE_B("%d ", still_sensitivity[i]);
     }
-    printf("\n");
 #endif
 
     if (!ld2410_set_max_values(settings.max_move_distance, settings.max_still_distance, settings.no_one_duration)) // (max_moving_distance, max_still_distance, no_one_duration in seconds)
     {
-        ESP_LOGE(TAG, "unable to set configuations");
+        TRACE_E("unable to set configuations");
         return ESP_FAIL;
     }
     if (!ld2410_set_gates_sensitivity_threshold(move_sensitivity, still_sensitivity))
     {
-        ESP_LOGE(TAG, "unable to set gates sensitivity");
+        TRACE_E("unable to set gates sensitivity");
         return ESP_FAIL;
     }
     return ESP_OK;
@@ -174,7 +173,6 @@ esp_err_t ld2410_get_data(ld2410_outputs_t *output)
         if (ld2410_moving_target_detected())
         {
             uint16_t new_distance = ld2410_moving_target_distance();
-            // TRACE_B("new_distance: %d and old_distance: %d", new_distance, output->moving_target_distance);
 
             if (output->moving_target_distance < new_distance)
             {
