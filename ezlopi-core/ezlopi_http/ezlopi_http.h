@@ -34,14 +34,20 @@ extern "C"
 #warning "'s_ezlopi_scenes_then_methods_send_http_t' its size look too big"
     typedef struct s_ezlopi_scenes_then_methods_send_http
     {
+        bool skip_cert_common_name_check;
         int web_port;
+        uint32_t url_maxlen;
+        uint32_t web_server_maxlen;
+        uint32_t header_maxlen;
+        uint32_t content_maxlen;
+        uint32_t username_maxlen;
+        uint32_t password_maxlen;
         char url[196];
         char web_server[96];
         char header[256];
-        char content[384]; // content size should be dynamic
+        char content[384];
         char username[32];
         char password[32];
-        bool skip_cert_common_name_check;
         esp_http_client_method_t method;
     } s_ezlopi_scenes_then_methods_send_http_t;
 
