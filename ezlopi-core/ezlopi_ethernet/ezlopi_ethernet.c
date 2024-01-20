@@ -1,3 +1,6 @@
+
+#if (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
+
 #include <stdio.h>
 #include <string.h>
 
@@ -226,3 +229,5 @@ static void ezlopi_ethernet_reset(void)
     gpio_set_level(EZLOPI_ETHERNET_W5500_RST_PIN, 1);
     vTaskDelay(10 / portTICK_RATE_MS);
 }
+
+#endif // (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32)
