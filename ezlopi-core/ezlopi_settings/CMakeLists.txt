@@ -10,7 +10,7 @@ idf_component_register(SRCS "ezlopi_settings.c" "${config_src}"
              esp_http_client 
              ezlopi_factory_info 
              ezlopi_settings
-             ezlopi_cloud_constants
+             ezlopi-cloud-constants
              esp-tls 
              app_update 
              esp_https_ota 

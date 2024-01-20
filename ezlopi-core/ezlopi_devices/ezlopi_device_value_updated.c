@@ -1,6 +1,6 @@
 #include "trace.h"
-#include "items.h"
-#include "settings.h"
+#include "ezlopi_cloud_items.h"
+#include "ezlopi_cloud_settings.h"
 #include "web_provisioning.h"
 #include "ezlopi_devices_list.h"
 #include "ezlopi_device_value_updated.h"

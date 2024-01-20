@@ -3,7 +3,7 @@
 
 #include "trace.h"
 
-#include "core_sntp.h"
+#include "ezlopi_sntp.h"
 #include "ezlopi.h"
 #include "ezlopi_wifi.h"
 #include "ezlopi_devices.h"

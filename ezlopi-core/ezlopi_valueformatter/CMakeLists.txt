@@ -9,7 +9,7 @@ idf_component_register(SRCS "ezlopi_valueformatter.c" "${config_src}"
              json 
              esp_http_client 
              ezlopi_factory_info 
-             ezlopi_cloud_constants
+             ezlopi-cloud-constants
              esp-tls 
              app_update 
              esp_https_ota 

@@ -1,7 +1,7 @@
 #include "ctype.h"
 #include "cJSON.h"
 
-#include "items.h"
+#include "ezlopi_cloud_items.h"
 #include "trace.h"
 
 #include "ezlopi_nvs.h"
