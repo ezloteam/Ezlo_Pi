@@ -73,6 +73,7 @@ idf_component_register(SRCS "ezlopi_controller.c" "ezlopi_devices.c" "ezlopi_dev
                                 sensor_0063_other_MQ9_LPG_flameable_detector
                                 sensor_0065_digitalIn_float_switch
                                 sensor_0066_other_R307_FingerPrint
+                                sensor_0067_hilink_presence_sensor
                                 )
 
 

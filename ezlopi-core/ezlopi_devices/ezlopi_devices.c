@@ -313,8 +313,7 @@ void ezlopi_device_prepare(void)
     {
         TRACE_D("Initial config:\r\n%s", config_string);
         cJSON *cj_config = cJSON_Parse(config_string);
-        ezlopi_factory_info_v3_free(config_string);
-
+        // ezlopi_factory_info_v3_free(config_string);
         if (cj_config)
         {
             ezlopi_device_parse_json_v3(cj_config);

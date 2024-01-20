@@ -55,7 +55,7 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
         uart_object_handle->ezlopi_uart.enable = true;
         uart_object_handle->upcall = upcall;
 
-        xTaskCreate(ezlopi_uart_channel_task, "ezlopi_uart_channel_task", 2048 * 2, (void *)uart_object_handle, 10, NULL);
+        xTaskCreate(ezlopi_uart_channel_task, "ezlopi_uart_channel_task", 2048 * 2, (void *)uart_object_handle, 13, &(uart_object_handle->taskHandle));
     }
     else
     {
@@ -85,7 +85,6 @@ static void ezlopi_uart_channel_task(void *args)
 
     // s_ezlopi_uart_object_t *ezlopi_uart_object = (s_ezlopi_uart_object_t*)args;
     s_ezlopi_uart_object_handle_t ezlopi_uart_object = (s_ezlopi_uart_object_handle_t)args;
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     while (1)
     {
@@ -128,7 +127,6 @@ static void ezlopi_uart_channel_task(void *args)
             }
             }
         }
-
         ezlopi_uart_object->upcall(buffer, data_len, ezlopi_uart_object);
         if (buffer)
         {
