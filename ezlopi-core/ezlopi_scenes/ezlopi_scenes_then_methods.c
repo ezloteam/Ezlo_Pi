@@ -185,32 +185,46 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 curr_field = curr_field->next;
             }
 
-            // function to add the credential field in url or content-body
-            if (((NULL != tmp_http_data->username) && (0 < strlen(tmp_http_data->username))) &&
-                ((NULL != tmp_http_data->password) && (0 < strlen(tmp_http_data->password))))
-            {
-                char cred[96] = {'\0'};
-                if (HTTP_METHOD_GET == tmp_http_data->method)
-                {
-                    snprintf(cred, sizeof(cred), "?username=%s&password=%s", tmp_http_data->username, tmp_http_data->password);
-#warning "its not how strncat should be used, find the better way"
-                    strncat(tmp_http_data->url, cred, strlen(cred));
-                }
-                else
-                {
-                    snprintf(cred, sizeof(cred), "user:%s\r\npassword:%s\r\n", tmp_http_data->username, tmp_http_data->password);
-#warning "its not how strncat should be used, find the better way"
-                    strncat(tmp_http_data->content, cred, strlen(cred));
-                }
-            }
             ezlopi_http_scenes_then_sendhttp_request(tmp_http_data);
+
+            //-----------------------------------------------------------------
+            if (tmp_http_data->url)
+            {
+                free(tmp_http_data->url);
+                // TRACE_W("#url [%p] : %d ==> %s [%d]\n", tmp_http_data->url, (int)((tmp_http_data->url) ? strlen(tmp_http_data->url) : 0), (tmp_http_data->url), tmp_http_data->url_maxlen);
+                tmp_http_data->url = NULL;
+            }
+            if (tmp_http_data->web_server)
+            {
+                free(tmp_http_data->web_server);
+                // TRACE_W("#web_server [%p] : %d ==> %s [%d]\n", tmp_http_data->web_server, (int)((tmp_http_data->web_server) ? strlen(tmp_http_data->web_server) : 0), (tmp_http_data->web_server), tmp_http_data->web_server_maxlen);
+                tmp_http_data->web_server = NULL;
+            }
             if (tmp_http_data->header)
             {
-                TRACE_W("Freed the header* pointer and assigned it NULL : [%d]", strlen(tmp_http_data->header));
-                free(&(tmp_http_data->header));
-                // TRACE_W("Freed the header* pointer and assigned it NULL : [%d]", strlen(tmp_http_data->header));
+                free(tmp_http_data->header);
+                // TRACE_W("#header [%p] : %d ==> %s [%d]\n", tmp_http_data->header, (int)((tmp_http_data->header) ? strlen(tmp_http_data->header) : 0), (tmp_http_data->header), tmp_http_data->header_maxlen);
                 tmp_http_data->header = NULL;
             }
+            if (tmp_http_data->content)
+            {
+                free(tmp_http_data->content);
+                // TRACE_W("#content [%p] : %d ==> %s [%d]\n", tmp_http_data->content, (int)((tmp_http_data->content) ? strlen(tmp_http_data->content) : 0), (tmp_http_data->content), tmp_http_data->content_maxlen);
+                tmp_http_data->content = NULL;
+            }
+            if (tmp_http_data->username)
+            {
+                free(tmp_http_data->username);
+                // TRACE_W("#username [%p] : %d ==> %s [%d]\n", tmp_http_data->username, (int)((tmp_http_data->username) ? strlen(tmp_http_data->username) : 0), (tmp_http_data->username), tmp_http_data->username_maxlen);
+                tmp_http_data->username = NULL;
+            }
+            if (tmp_http_data->password)
+            {
+                free(tmp_http_data->password);
+                // TRACE_W("#password [%p] : %d ==> %s [%d]\n", tmp_http_data->password, (int)((tmp_http_data->password) ? strlen(tmp_http_data->password) : 0), (tmp_http_data->password), tmp_http_data->password_maxlen);
+                tmp_http_data->password = NULL;
+            }
+
             free(tmp_http_data);
         }
     }

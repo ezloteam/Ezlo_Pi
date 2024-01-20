@@ -35,19 +35,19 @@ extern "C"
     typedef struct s_ezlopi_scenes_then_methods_send_http
     {
         bool skip_cert_common_name_check;
-        int web_port;
-        uint32_t url_maxlen;
-        uint32_t web_server_maxlen;
-        uint32_t header_maxlen;
-        uint32_t content_maxlen;
-        uint32_t username_maxlen;
-        uint32_t password_maxlen;
-        char url[196];
-        char web_server[96];
+        uint16_t web_port;
+        uint16_t url_maxlen; // cap to 65536
+        uint16_t web_server_maxlen;
+        uint16_t header_maxlen;
+        uint16_t content_maxlen;
+        uint8_t username_maxlen; // cap to 256
+        uint8_t password_maxlen;
+        char *url;
+        char *web_server;
         char *header;
-        char content[384];
-        char username[32];
-        char password[32];
+        char *content;
+        char *username;
+        char *password;
         esp_http_client_method_t method;
     } s_ezlopi_scenes_then_methods_send_http_t;
 
