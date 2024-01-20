@@ -27,6 +27,8 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 
 #define TAG __FILE__
 
+#define GET_STRING_SIZE(str) ((NULL != str) ? (1 + strlen(str)) : 0)
+
 #define FREE_IF_NOT_NULL(ptr) \
     {                         \
         if (ptr)              \
@@ -126,7 +128,6 @@ static int __relloc_header_mem_ptr(s_ezlopi_scenes_then_methods_send_http_t *tmp
     }
     return ret;
 }
-
 static void __parse_web_host_name(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
 {
     if (NULL != field_value_string)
@@ -363,10 +364,6 @@ static int __ezlopi_http_get_empty_bufsize(char *dest_buff, int dest_size, int r
     }
     return 0;
 }
-static int __ezlopi_http_str_size(char *str)
-{
-    return ((NULL != str) ? (1 + strlen(str)) : 0);
-}
 
 void ezlopi_http_scenes_then_parse_url(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
 {
@@ -602,37 +599,37 @@ void ezlopi_http_scenes_then_clear_struct_ptr_mem(s_ezlopi_scenes_then_methods_s
     if (config->url)
     {
         free(config->url);
-        TRACE_D("#url [%p] : %d ==> %s [%d]\n", config->url, __ezlopi_http_str_size(config->url), (config->url), config->url_maxlen);
+        TRACE_D("#url [%p] : %d ==> %s [%d]\n", config->url, GET_STRING_SIZE(config->url), (config->url), config->url_maxlen);
         config->url = NULL;
     }
     if (config->web_server)
     {
         free(config->web_server);
-        TRACE_D("#web_server [%p] : %d ==> %s [%d]\n", config->web_server, __ezlopi_http_str_size(config->web_server), (config->web_server), config->web_server_maxlen);
+        TRACE_D("#web_server [%p] : %d ==> %s [%d]\n", config->web_server, GET_STRING_SIZE(config->web_server), (config->web_server), config->web_server_maxlen);
         config->web_server = NULL;
     }
     if (config->header)
     {
         free(config->header);
-        TRACE_D("#header [%p] : %d ==> %s [%d]\n", config->header, __ezlopi_http_str_size(config->header), (config->header), config->header_maxlen);
+        TRACE_D("#header [%p] : %d ==> %s [%d]\n", config->header, GET_STRING_SIZE(config->header), (config->header), config->header_maxlen);
         config->header = NULL;
     }
     if (config->content)
     {
         free(config->content);
-        TRACE_D("#content [%p] : %d ==> %s [%d]\n", config->content, __ezlopi_http_str_size(config->content), (config->content), config->content_maxlen);
+        TRACE_D("#content [%p] : %d ==> %s [%d]\n", config->content, GET_STRING_SIZE(config->content), (config->content), config->content_maxlen);
         config->content = NULL;
     }
     if (config->username)
     {
         free(config->username);
-        TRACE_D("#username [%p] : %d ==> %s [%d]\n", config->username, __ezlopi_http_str_size(config->username), (config->username), config->username_maxlen);
+        TRACE_D("#username [%p] : %d ==> %s [%d]\n", config->username, GET_STRING_SIZE(config->username), (config->username), config->username_maxlen);
         config->username = NULL;
     }
     if (config->password)
     {
         free(config->password);
-        TRACE_D("#password [%p] : %d ==> %s [%d]\n", config->password, __ezlopi_http_str_size(config->password), (config->password), config->password_maxlen);
+        TRACE_D("#password [%p] : %d ==> %s [%d]\n", config->password, GET_STRING_SIZE(config->password), (config->password), config->password_maxlen);
         config->password = NULL;
     }
 }
@@ -640,14 +637,14 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
 {
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
     TRACE_W("[%d]WEB_PORT :- '%d'", sizeof(config->web_port), config->web_port);
-    TRACE_W("[%d]URI :- [%d] '%s'", config->url_maxlen, __ezlopi_http_str_size(config->url), config->url);
-    TRACE_W("[%d]WEB_SERVER :- [%d] '%s'", config->web_server_maxlen, __ezlopi_http_str_size(config->web_server), config->web_server);
-    TRACE_W("[%d]Header : [%d] occupied", config->header_maxlen, __ezlopi_http_str_size(config->header));
-    TRACE_W("[%d]Username : [%d] occupied", config->username_maxlen, __ezlopi_http_str_size(config->username));
-    TRACE_W("[%d]Password : [%d] occupied", config->password_maxlen, __ezlopi_http_str_size(config->password));
-    TRACE_W("[%d]Content : [%d] occupied", config->content_maxlen, __ezlopi_http_str_size(config->content));
+    TRACE_W("[%d]URI :- [%d] '%s'", config->url_maxlen, GET_STRING_SIZE(config->url), config->url);
+    TRACE_W("[%d]WEB_SERVER :- [%d] '%s'", config->web_server_maxlen, GET_STRING_SIZE(config->web_server), config->web_server);
+    TRACE_W("[%d]Header : [%d] occupied", config->header_maxlen, GET_STRING_SIZE(config->header));
+    TRACE_W("[%d]Username : [%d] occupied", config->username_maxlen, GET_STRING_SIZE(config->username));
+    TRACE_W("[%d]Password : [%d] occupied", config->password_maxlen, GET_STRING_SIZE(config->password));
+    TRACE_W("[%d]Content : [%d] occupied", config->content_maxlen, GET_STRING_SIZE(config->content));
 
-    int REQUEST_LENGTH = 100 + __ezlopi_http_str_size(config->url) + __ezlopi_http_str_size(config->header) + __ezlopi_http_str_size(config->content);
+    int REQUEST_LENGTH = 100 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
     char *REQUEST = malloc(sizeof(char) * REQUEST_LENGTH);
     if (REQUEST)
     {
@@ -688,7 +685,7 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
         int max_allowed = 0;
         if (NULL != config->header)
         {
-            max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (__ezlopi_http_str_size(config->header) + 3));
+            max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->header) + 3));
             if (max_allowed > 0)
             {
                 snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->header);
@@ -698,9 +695,9 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
         if (NULL != config->content)
         {
             if ((0 != config->method) && (NULL != config->username) && (NULL != config->password))
-                max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (__ezlopi_http_str_size(config->username) + __ezlopi_http_str_size(config->password) + __ezlopi_http_str_size(config->content) + 3));
+                max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->username) + GET_STRING_SIZE(config->password) + GET_STRING_SIZE(config->content) + 3));
             else
-                max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (__ezlopi_http_str_size(config->content) + 3));
+                max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->content) + 3));
 
             if (max_allowed > 0)
             {
