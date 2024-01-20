@@ -363,6 +363,10 @@ static int __ezlopi_http_get_empty_bufsize(char *dest_buff, int dest_size, int r
     }
     return 0;
 }
+static int __ezlopi_http_str_size(char *str)
+{
+    return ((NULL != str) ? (1 + strlen(str)) : 0);
+}
 
 void ezlopi_http_scenes_then_parse_url(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
 {
@@ -593,12 +597,45 @@ void ezlopi_http_scenes_then_parse_username_password(s_ezlopi_scenes_then_method
         }
     }
 }
-
-static int __ezlopi_http_str_size(char *str)
+void ezlopi_http_scenes_then_clear_struct_ptr_mem(s_ezlopi_scenes_then_methods_send_http_t *config)
 {
-    return ((NULL != str) ? (1 + strlen(str)) : 0);
+    if (config->url)
+    {
+        free(config->url);
+        TRACE_D("#url [%p] : %d ==> %s [%d]\n", config->url, __ezlopi_http_str_size(config->url), (config->url), config->url_maxlen);
+        config->url = NULL;
+    }
+    if (config->web_server)
+    {
+        free(config->web_server);
+        TRACE_D("#web_server [%p] : %d ==> %s [%d]\n", config->web_server, __ezlopi_http_str_size(config->web_server), (config->web_server), config->web_server_maxlen);
+        config->web_server = NULL;
+    }
+    if (config->header)
+    {
+        free(config->header);
+        TRACE_D("#header [%p] : %d ==> %s [%d]\n", config->header, __ezlopi_http_str_size(config->header), (config->header), config->header_maxlen);
+        config->header = NULL;
+    }
+    if (config->content)
+    {
+        free(config->content);
+        TRACE_D("#content [%p] : %d ==> %s [%d]\n", config->content, __ezlopi_http_str_size(config->content), (config->content), config->content_maxlen);
+        config->content = NULL;
+    }
+    if (config->username)
+    {
+        free(config->username);
+        TRACE_D("#username [%p] : %d ==> %s [%d]\n", config->username, __ezlopi_http_str_size(config->username), (config->username), config->username_maxlen);
+        config->username = NULL;
+    }
+    if (config->password)
+    {
+        free(config->password);
+        TRACE_D("#password [%p] : %d ==> %s [%d]\n", config->password, __ezlopi_http_str_size(config->password), (config->password), config->password_maxlen);
+        config->password = NULL;
+    }
 }
-
 void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config)
 {
     TRACE_W("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
@@ -610,7 +647,6 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
     TRACE_W("[%d]Password : [%d] occupied", config->password_maxlen, __ezlopi_http_str_size(config->password));
     TRACE_W("[%d]Content : [%d] occupied", config->content_maxlen, __ezlopi_http_str_size(config->content));
 
-#warning # this need to be dynamic
     int REQUEST_LENGTH = 100 + __ezlopi_http_str_size(config->url) + __ezlopi_http_str_size(config->header) + __ezlopi_http_str_size(config->content);
     char *REQUEST = malloc(sizeof(char) * REQUEST_LENGTH);
     if (REQUEST)
