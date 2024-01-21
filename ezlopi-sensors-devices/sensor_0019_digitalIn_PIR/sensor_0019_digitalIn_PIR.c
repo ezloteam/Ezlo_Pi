@@ -5,7 +5,7 @@
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 #include "sensor_0019_digitalIn_PIR.h"
 
 static int sensor_pir_prepare_v3(void *arg);

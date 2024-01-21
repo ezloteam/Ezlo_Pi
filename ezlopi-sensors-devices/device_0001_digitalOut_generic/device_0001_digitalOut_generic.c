@@ -23,7 +23,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
 
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 #include "device_0001_digitalOut_generic.h"
 
 // #define DEV_TEST_SETTINGS_EN

@@ -9,7 +9,7 @@
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_meshbot_service.h"
+#include "ezlopi_service_meshbot.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_operators.h"
 

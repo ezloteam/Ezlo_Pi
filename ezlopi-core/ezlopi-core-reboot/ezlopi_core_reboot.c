@@ -1,6 +1,6 @@
 #include <esp_system.h>
 
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 
 void ezlopi_reboot(void)
 {

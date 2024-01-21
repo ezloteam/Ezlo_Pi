@@ -10,7 +10,7 @@
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_valueformatter.h"

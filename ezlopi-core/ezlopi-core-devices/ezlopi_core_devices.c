@@ -10,7 +10,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"
 
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 
 static l_ezlopi_device_t *l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;

@@ -4,7 +4,7 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_cloud.h"
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"
 

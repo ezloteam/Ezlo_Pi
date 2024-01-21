@@ -2,7 +2,7 @@
 
 #include "trace.h"
 #include "ezlopi_cloud_items.h"
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 
 #include "ezlopi_hal_gpio.h"
 #include "ezlopi_core_timer.h"

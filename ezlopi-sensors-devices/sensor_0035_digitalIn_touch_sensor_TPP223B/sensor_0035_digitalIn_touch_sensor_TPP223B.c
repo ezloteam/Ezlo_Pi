@@ -4,7 +4,7 @@
 #include "esp_err.h"
 #include "driver/gpio.h"
 
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_devices_list.h"

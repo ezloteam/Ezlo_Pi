@@ -16,7 +16,7 @@
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
-#include "ezlopi_ble_service.h"
+#include "ezlopi_service_ble.h"
 #include "ezlopi_hal_system_info.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_constants.h"

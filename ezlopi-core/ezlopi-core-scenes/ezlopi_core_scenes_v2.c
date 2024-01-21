@@ -10,7 +10,7 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_methods.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_meshbot_service.h"
+#include "ezlopi_service_meshbot.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"

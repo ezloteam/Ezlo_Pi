@@ -85,7 +85,7 @@ idf_component_register(SRCS "${config_src}"
                                 sensor_0063_other_MQ9_LPG_flameable_detector
                                 sensor_0065_digitalIn_float_switch
                                 sensor_0066_other_R307_FingerPrint
-                                sensor_0067_hilink_presence_sensor
+                                sensor_0067_UART_hilink_presence_sensor
                                 )
 
 

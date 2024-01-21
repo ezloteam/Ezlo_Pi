@@ -1,4 +1,4 @@
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_status_changed.h"

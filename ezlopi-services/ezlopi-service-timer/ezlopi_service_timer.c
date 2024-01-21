@@ -7,7 +7,7 @@
 #include "freertos/queue.h"
 
 #include "trace.h"
-#include "timer_service.h"
+#include "ezlopi_service_timer.h"
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_event_queue.h"

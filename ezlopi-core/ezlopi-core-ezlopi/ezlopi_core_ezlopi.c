@@ -4,7 +4,7 @@
 #include "trace.h"
 
 #include "ezlopi_sntp.h"
-#include "ezlopi.h"
+#include "ezlopi_core_ezlopi.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_factory_info.h"

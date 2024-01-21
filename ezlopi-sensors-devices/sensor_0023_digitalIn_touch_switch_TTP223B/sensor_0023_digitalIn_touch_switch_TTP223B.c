@@ -11,7 +11,7 @@
 
 #include "ezlopi_cloud_items.h"
 #include "trace.h"
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 
 #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"
 

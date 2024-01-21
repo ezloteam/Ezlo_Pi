@@ -9,7 +9,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_methods_str.h"
 
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 
 void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
 {

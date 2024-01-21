@@ -12,7 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
 
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 #include "sensor_0060_digitalIn_vibration_detector.h"
 
 //---------------------------------------------------------------------------------------------------------

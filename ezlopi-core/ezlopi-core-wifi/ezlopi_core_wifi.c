@@ -22,7 +22,7 @@
 // #include "esp_netif_lwip_internal.h"
 
 #include "trace.h"
-#include "qt_serial.h"
+#include "ezlopi_service_uart.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"

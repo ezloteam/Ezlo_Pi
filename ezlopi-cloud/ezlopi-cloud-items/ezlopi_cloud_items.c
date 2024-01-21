@@ -6,7 +6,7 @@
 #include "trace.h"
 #include "sdkconfig.h"
 
-// #include "web_provisioning.h"
+// #include "ezlopi_service_webprov.h"
 
 #include "cJSON.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -14,7 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_methods_str.h"
 
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 
 static cJSON *ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t *item_properties)
 {

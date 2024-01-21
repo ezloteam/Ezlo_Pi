@@ -11,7 +11,7 @@
 
 #include "ezlopi_cloud_items.h"
 #include "trace.h"
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);

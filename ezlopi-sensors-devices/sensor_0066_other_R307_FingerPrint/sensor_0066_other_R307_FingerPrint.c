@@ -4,7 +4,7 @@
 #include "stdint.h"
 #include "string.h"
 #include "time.h"
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 #include "esp_timer.h"
 
 #include "ezlopi_core_timer.h"

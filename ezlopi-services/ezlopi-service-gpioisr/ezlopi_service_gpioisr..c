@@ -7,7 +7,7 @@
 #include "freertos/queue.h"
 
 #include "trace.h"
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_core_devices_list.h"
 

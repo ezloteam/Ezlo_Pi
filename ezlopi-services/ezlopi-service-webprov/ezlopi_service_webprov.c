@@ -28,7 +28,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_event_group.h"
 
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 #include "ezlopi_core_websocket_client.h"
 
 static uint32_t message_counter = 0;
@@ -54,7 +54,7 @@ typedef struct s_method_list_v2
 
 static const s_method_list_v2_t method_list_v2[] = {
 #define CLOUD_METHOD(name, func, updater_func) {.method_name = name, .method = func, .updater = updater_func},
-#include "web_provisioning_macro.h"
+#include "ezlopi_api_url_macros.h"
 #undef CLOUD_METHOD
     {.method_name = NULL, .method = NULL, .updater = NULL},
 };

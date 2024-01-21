@@ -3,7 +3,7 @@
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 
-#include "gpio_isr_service.h"
+#include "ezlopi_service_gpioisr.h"
 #include "sensor_0034_digitalIn_proximity.h"
 
 static int proximity_sensor_prepare(void *args);

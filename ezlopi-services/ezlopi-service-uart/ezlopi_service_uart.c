@@ -23,7 +23,7 @@
 
 #include "trace.h"
 #include "version.h"
-#include "qt_serial.h"
+#include "ezlopi_service_uart.h"
 #include "sdkconfig.h"
 
 #include "ezlopi_core_nvs.h"

@@ -10,14 +10,14 @@
 
 #include "trace.h"
 
-#include "ezlopi.h"
-#include "qt_serial.h"
-#include "ota_service.h"
-#include "timer_service.h"
-#include "web_provisioning.h"
-#include "gpio_isr_service.h"
-#include "ezlopi_ble_service.h"
-#include "ezlopi_meshbot_service.h"
+#include "ezlopi_core_ezlopi.h"
+#include "ezlopi_service_uart.h"
+#include "ezlopi_service_ota.h"
+#include "ezlopi_service_timer.h"
+#include "ezlopi_service_webprov.h"
+#include "ezlopi_service_gpioisr.h"
+#include "ezlopi_service_ble.h"
+#include "ezlopi_service_meshbot.h"
 
 #define ENABLE_HEARTBIT_LED 0
 

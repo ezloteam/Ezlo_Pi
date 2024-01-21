@@ -8,8 +8,8 @@
 
 #include "trace.h"
 #include "ezlopi_cloud_ota.h"
-#include "ota_service.h"
-#include "web_provisioning.h"
+#include "ezlopi_service_ota.h"
+#include "ezlopi_service_webprov.h"
 
 static void ota_service_process(void *pv);
 

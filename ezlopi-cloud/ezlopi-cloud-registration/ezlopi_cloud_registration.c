@@ -7,7 +7,7 @@
 #include "trace.h"
 #include "version.h"
 #include "ezlopi_cloud_registration.h"
-#include "web_provisioning.h"
+#include "ezlopi_service_webprov.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_event_group.h"

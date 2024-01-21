@@ -23,7 +23,7 @@
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_profile.h"
 
-#include "ezlopi_ble_service.h"
+#include "ezlopi_service_ble.h"
 #include "ezlopi_core_ble_buffer.h"
 
 extern void ezlopi_ble_service_security_init(void);
