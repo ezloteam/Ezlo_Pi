@@ -1,8 +1,8 @@
 #include "cJSON.h"
 #include "trace.h"
 
-#include "ezlopi_nvs.h"
-#include "ezlopi_room.h"
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_room.h"
 #include "ezlopi_core_cloud.h"
 #include "web_provisioning.h"
 #include "ezlopi_core_cjson_macros.h"

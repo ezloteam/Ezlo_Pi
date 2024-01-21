@@ -4,7 +4,7 @@
 #include "driver/spi_master.h"
 #include "esp_intr_alloc.h"
 
-#include "ezlopi_spi_master.h"
+#include "ezlopi_hal_spi_master.h"
 #include "trace.h"
 
 typedef enum e_spi_state
@@ -48,7 +48,7 @@ int ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config)
             spi_device_interface_config_t devcfg = {
                 .command_bits = spi_config->command_bits,
                 .address_bits = spi_config->addr_bits,
-                .mode = spi_config->mode,       // SPI mode 0
+                .mode = spi_config->mode, // SPI mode 0
                 .clock_speed_hz = spi_config->clock_speed_mhz * 1000000,
                 .queue_size = spi_config->queue_size,
                 .pre_cb = NULL,

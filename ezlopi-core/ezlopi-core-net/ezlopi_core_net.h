@@ -3,9 +3,9 @@
 
 #include <string.h>
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_ethernet.h"
-#include "ezlopi_ping.h"
-#include "ezlopi_websocket_client.h"
+#include "ezlopi_core_ethernet.h"
+#include "ezlopi_core_ping.h"
+#include "ezlopi_core_websocket_client.h"
 
 typedef struct s_ezlopi_net_status
 {

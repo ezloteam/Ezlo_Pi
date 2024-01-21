@@ -11,7 +11,7 @@
  *
  */
 #include "ld2410_driver.h"
-#include "ezlopi_uart.h"
+#include "ezlopi_hal_uart.h"
 
 s_ezlopi_uart_object_handle_t ezlo_ld2410_uart_handle = NULL;
 

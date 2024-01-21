@@ -4,9 +4,9 @@
 #include "trace.h"
 
 #include "ezlopi_core_devices.h"
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_scenes_operators.h"
+#include "ezlopi_core_scenes_operators.h"
 
 /************* Numeric ************/
 static const char *const ezlopi_scenes_num_cmp_operators_op[] = {

@@ -9,8 +9,8 @@
 
 #include "trace.h"
 
-#include "ezlopi_ethernet.h"
-#include "ezlopi_spi_master.h"
+#include "ezlopi_core_ethernet.h"
+#include "ezlopi_hal_spi_master.h"
 
 static const char *eth_key_desc_str = "ezlopi_eth";
 static esp_netif_t *eth_netif_spi = NULL;

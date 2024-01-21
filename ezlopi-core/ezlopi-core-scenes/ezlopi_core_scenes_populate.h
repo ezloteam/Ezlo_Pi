@@ -4,7 +4,7 @@
 #include <cJSON.h>
 #include <stdint.h>
 
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 
 l_when_block_v2_t *ezlopi_scenes_populate_new_when_block(cJSON *cj_when_block);
 

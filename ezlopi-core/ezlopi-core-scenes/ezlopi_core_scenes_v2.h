@@ -9,7 +9,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include "ezlopi_scenes_methods.h"
+#include "ezlopi_core_scenes_methods.h"
 
 typedef enum e_scenes_block_type_v2
 {
@@ -33,7 +33,7 @@ typedef enum e_scene_status_v2
 typedef enum e_scene_value_type_v2
 {
 #define EZLOPI_VALUE_TYPE(type, name) EZLOPI_VALUE_TYPE_##type,
-#include "ezlopi_scenes_value_types.h"
+#include "ezlopi_core_scenes_value_types.h"
 #undef EZLOPI_VALUE_TYPE
 } e_scene_value_type_v2_t;
 

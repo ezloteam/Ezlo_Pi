@@ -1,7 +1,7 @@
 #include "cJSON.h"
 #include "trace.h"
 
-#include "ezlopi_pwm.h"
+#include "ezlopi_hal_pwm.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_devices_list.h"

@@ -2,7 +2,7 @@
 #define __EZLOPI_SCENES_OPERATORS_H__
 
 #include <string.h>
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 
 typedef enum e_scene_num_cmp_operators
 {

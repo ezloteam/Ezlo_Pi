@@ -5,13 +5,13 @@
 #include "cJSON.h"
 #include "ezlopi_cloud_scenes.h"
 
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_scenes_cjson.h"
+#include "ezlopi_core_scenes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_meshbot_service.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_scenes_operators.h"
+#include "ezlopi_core_scenes_operators.h"
 
 static cJSON *__create_when_block_cjson(l_when_block_v2_t *when_block);
 

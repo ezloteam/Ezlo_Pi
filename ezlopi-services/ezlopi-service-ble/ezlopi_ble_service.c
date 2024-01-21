@@ -15,16 +15,16 @@
 
 #include "trace.h"
 #include "sdkconfig.h"
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_factory_info.h"
 
-#include "ezlopi_ble_gap.h"
-#include "ezlopi_ble_gatt.h"
-#include "ezlopi_ble_profile.h"
+#include "ezlopi_core_ble_gap.h"
+#include "ezlopi_core_ble_gatt.h"
+#include "ezlopi_core_ble_profile.h"
 
 #include "ezlopi_ble_service.h"
-#include "ezlopi_ble_buffer.h"
+#include "ezlopi_core_ble_buffer.h"
 
 extern void ezlopi_ble_service_security_init(void);
 extern void ezlopi_ble_service_wifi_profile_init(void);

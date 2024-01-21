@@ -7,8 +7,8 @@
 #include "esp_netif.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
-#include "ezlopi_factory_info.h"
-#include "ezlopi_wifi_ap.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_wifi_ap.h"
 
 static esp_netif_t *ezlopi_ap_netif = NULL;
 

@@ -4,7 +4,7 @@
 #include "freertos/task.h"
 
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_event_group.h"
+#include "ezlopi_core_event_group.h"
 
 #include "trace.h"
 #include "ezlopi_cloud_ota.h"

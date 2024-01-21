@@ -2,7 +2,7 @@
 #define __EZLOPI_SCENES_CJSON_H__
 
 #include "cJSON.h"
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 
 cJSON *ezlopi_scenes_cjson_create_then_block(l_action_block_v2_t *then_block);
 cJSON *ezlopi_scenes_cjson_create_when_block(l_when_block_v2_t *when_block);

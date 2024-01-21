@@ -3,7 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_core_i2c_master.h"
+#include "ezlopi_hal_i2c_master.h"
 
 //-----------------------------------------------------------------
 // Definations

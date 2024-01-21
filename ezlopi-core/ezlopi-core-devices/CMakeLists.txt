@@ -17,7 +17,10 @@ idf_component_register(SRCS "${config_src}"
                                 ezlopi-core-nvs 
                                  
                                 ezlopi-core-cloud 
-                                ezlopi-core-actions                              
+                                ezlopi-core-actions
+                                ezlopi-core-devices 
+                                
+                                ezlopi-cloud-settings
                                 
                                 device_0001_digitalOut_generic
                                 device_0002_digitalOut_relay

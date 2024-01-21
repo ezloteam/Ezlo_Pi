@@ -5,7 +5,7 @@
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
 
-#include "ezlopi_event_group.h"
+#include "ezlopi_core_event_group.h"
 
 static EventGroupHandle_t ezlopi_event_group_handle = NULL;
 

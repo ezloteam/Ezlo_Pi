@@ -3,7 +3,7 @@
 #include "lua/lauxlib.h"
 #include "lua/lstate.h"
 
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_factory_info.h"
 
 #include "corelib.h"
 #include "trace.h"

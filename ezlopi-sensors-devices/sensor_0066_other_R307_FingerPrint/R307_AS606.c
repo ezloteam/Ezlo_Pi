@@ -1,6 +1,6 @@
 #include "string.h"
 #include "trace.h"
-#include "ezlopi_uart.h"
+#include "ezlopi_hal_uart.h"
 #include "sensor_0066_other_R307_FingerPrint.h"
 
 //----------------------------------------------------------------------------------------------------------------

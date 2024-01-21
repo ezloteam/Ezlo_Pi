@@ -8,7 +8,7 @@ idf_component_register(SRCS "${config_src}"
              trace 
              json 
              esp_http_client 
-             ezlopi-core-factory_info 
+             ezlopi-core-factory-info 
              ezlopi-cloud-constants
              esp-tls 
              app_update 

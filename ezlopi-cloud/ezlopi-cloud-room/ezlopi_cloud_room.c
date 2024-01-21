@@ -2,8 +2,8 @@
 #include "trace.h"
 
 #include "cJSON.h"
-#include "ezlopi_nvs.h"
-#include "ezlopi_room.h"
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_room.h"
 #include "ezlopi_cloud_room.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_keywords.h"

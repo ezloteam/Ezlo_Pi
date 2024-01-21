@@ -2,7 +2,6 @@
 #define __NVS_STORAGE_H__
 
 #include "nvs_flash.h"
-#include "ezlopi_settings.h"
 
 #ifdef __cplusplus
 extern "C"

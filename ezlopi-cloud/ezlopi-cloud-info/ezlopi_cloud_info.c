@@ -5,7 +5,7 @@
 #include "freertos/FreeRTOS.h"
 
 #include "sdkconfig.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_info.h"
 #include "trace.h"
 
@@ -14,7 +14,7 @@
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_factory_info.h"
 
 char *ezlopi_tick_to_time(uint32_t ms)
 {

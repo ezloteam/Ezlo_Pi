@@ -3,7 +3,7 @@
 #include "ezlopi_cloud_items.h"
 #include "driver/gpio.h"
 
-#include "ezlopi_pwm.h"
+#include "ezlopi_hal_pwm.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_cjson_macros.h"

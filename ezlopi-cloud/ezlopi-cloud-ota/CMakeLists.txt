@@ -5,7 +5,7 @@ idf_component_register(SRCS "${src_files}"
              trace
              json
              version
-             ezlopi-core-factory_info
+             ezlopi-core-factory-info
              ezlopi-core-devices
-             ezlopi-core-event_group
+             ezlopi-core-event-group
              ezlopi-core-ota )

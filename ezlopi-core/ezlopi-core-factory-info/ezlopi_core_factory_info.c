@@ -9,8 +9,8 @@
 
 #include "trace.h"
 
-#include "ezlopi_nvs.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)

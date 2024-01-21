@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "scenes_scripts.h"
-#include "ezlopi_scenes_scripts.h"
+#include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_cloud_constants.h"
 
 void scenes_scripts_list(cJSON *cj_request, cJSON *cj_response)

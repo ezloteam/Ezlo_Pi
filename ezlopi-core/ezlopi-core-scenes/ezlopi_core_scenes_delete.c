@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 
 void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications)
 {

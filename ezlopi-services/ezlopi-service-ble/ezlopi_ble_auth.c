@@ -2,7 +2,7 @@
 
 #include "trace.h"
 
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_ble_auth.h"
 
 static e_auth_status_t sg_last_auth_status = BLE_AUTH_STATUS_UNKNOWN;

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 17)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
-idf_build_set_property(COMPILE_OPTIONS "-Wno-error" APPEND)
+# idf_build_set_property(COMPILE_OPTIONS "-Wno-error" APPEND)
 
 # message(STATUS "current dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/update_device_list.sh"

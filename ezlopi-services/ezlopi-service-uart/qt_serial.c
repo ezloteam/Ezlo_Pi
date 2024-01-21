@@ -26,13 +26,13 @@
 #include "qt_serial.h"
 #include "sdkconfig.h"
 
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_reboot.h"
-#include "ezlopi_system_info.h"
+#include "ezlopi_core_reboot.h"
+#include "ezlopi_hal_system_info.h"
 #include "ezlopi_cloud_info.h"
-#include "ezlopi_net.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_net.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 
 static const int RX_BUF_SIZE = 3096;

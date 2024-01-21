@@ -14,7 +14,7 @@
 #include "ezlopi_core_valueformatter.h"
 
 #include "trace.h"
-#include "ezlopi_adc.h"
+#include "ezlopi_hal_adc.h"
 
 #include "sensor_0020_ADC_2axis_joystick.h"
 

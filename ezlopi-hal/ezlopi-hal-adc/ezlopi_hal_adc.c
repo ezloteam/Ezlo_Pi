@@ -1,7 +1,7 @@
     
 
 #include "trace.h"
-#include "ezlopi_adc.h"
+#include "ezlopi_hal_adc.h"
 #include "string.h"
 #include "stdlib.h"
 #include "esp_check.h"

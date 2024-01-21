@@ -9,8 +9,8 @@
 #include "ezlopi_cloud_registration.h"
 #include "web_provisioning.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_websocket_client.h"
-#include "ezlopi_event_group.h"
+#include "ezlopi_core_websocket_client.h"
+#include "ezlopi_core_event_group.h"
 
 static void registration_process(void *pv);
 

@@ -3,8 +3,8 @@
 
 #include "esp_netif.h"
 
-#include "ezlopi_boards.h"
-#include "ezlopi_spi_master.h"
+#include "ezlopi_core_boards.h"
+#include "ezlopi_hal_spi_master.h"
 
 #if (EZLOPI_AMBIENT_TRACKER_PRO_REV_A == EZLOPI_BOARD_TYPE)
 #define EZLOPI_ETHERNET_W5500_EN_PIN 13

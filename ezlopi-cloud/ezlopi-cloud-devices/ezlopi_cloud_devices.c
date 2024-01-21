@@ -3,7 +3,7 @@
 #include "ezlopi_cloud_devices.h"
 #include "trace.h"
 
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_keywords.h"

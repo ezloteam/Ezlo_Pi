@@ -1,7 +1,7 @@
 #ifndef __EZLOPI_SCENES_THEN_METHODS_H__
 #define __EZLOPI_SCENES_THEN_METHODS_H__
 
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t *scene_node, void *arg);

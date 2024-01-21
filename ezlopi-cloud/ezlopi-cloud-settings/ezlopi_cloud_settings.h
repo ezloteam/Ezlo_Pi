@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include "cJSON.h"
+
 #include "ezlopi_core_settings.h"
 #include "ezlopi_core_devices.h"
 

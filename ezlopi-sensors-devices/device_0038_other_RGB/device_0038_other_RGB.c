@@ -2,7 +2,7 @@
 #include "trace.h"
 #include "ezlopi_cloud_items.h"
 
-#include "ezlopi_pwm.h"
+#include "ezlopi_hal_pwm.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
@@ -226,7 +226,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
     // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-    
+
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;

@@ -1,9 +1,9 @@
 #include <string.h>
-#include "stdint.h"
-#include "ezlopi_cloud_settings.h"
+#include <stdint.h>
+
 #include "trace.h"
 
-#include "cJSON.h"
+#include "ezlopi_cloud_settings.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"

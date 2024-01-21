@@ -1,7 +1,8 @@
-#ifndef __EZLOPI_DEVICES_H__
-#define __EZLOPI_DEVICES_H__
+#ifndef EZLOPI_CORE_DEVICES_H
+#define EZLOPI_CORE_DEVICES_H
 
 #include <cJSON.h>
+
 #include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_hal_uart.h"
 #include "ezlopi_hal_onewire.h"
@@ -9,9 +10,11 @@
 #include "ezlopi_hal_pwm.h"
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_spi_master.h"
+
+#include "ezlopi_core_settings.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
-#include "ezlopi_cloud_settings.h"
+// #include "ezlopi_cloud_settings.h"
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
     {                                                         \
@@ -19,30 +22,6 @@
         if (o_item)                                           \
         {                                                     \
             item_val = o_item->valuedouble;                   \
-        }                                                     \
-        else                                                  \
-        {                                                     \
-            item_val = 0;                                     \
-            TRACE_E("%s not found!", item_name);              \
-        }                                                     \
-    }
-
-// TRACE_B("%s: %f", item_name, (double)item_val);
-
-#define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            if (o_item->type == cJSON_False)                  \
-            {                                                 \
-                item_val = 0;                                 \
-            }                                                 \
-            else                                              \
-            {                                                 \
-                item_val = 1;                                 \
-            }                                                 \
-            item_val = o_item->valueint;                      \
         }                                                     \
         else                                                  \
         {                                                     \
@@ -207,4 +186,4 @@ cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_pro
 s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void);
 void ezlopi_device_name_set_by_device_id(uint32_t device_id, cJSON *cj_new_name);
 
-#endif // __EZLOPI_DEVICE_H__
+#endif // EZLOPI_CORE_DEVICES_H

@@ -1,10 +1,10 @@
 #include <string.h>
 
 #include "trace.h"
-#include "ezlopi_ble_gap.h"
-#include "ezlopi_ble_gatt.h"
-#include "ezlopi_ble_config.h"
-#include "ezlopi_ble_profile.h"
+#include "ezlopi_core_ble_gap.h"
+#include "ezlopi_core_ble_gatt.h"
+#include "ezlopi_core_ble_config.h"
+#include "ezlopi_core_ble_profile.h"
 #include "esp_gatt_common_api.h"
 
 static uint16_t g_mtu_size = ESP_GATT_DEF_BLE_MTU_SIZE;

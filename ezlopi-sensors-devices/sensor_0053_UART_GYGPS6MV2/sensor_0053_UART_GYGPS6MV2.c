@@ -4,7 +4,7 @@
 #include "stdint.h"
 #include "string.h"
 
-#include "ezlopi_uart.h"
+#include "ezlopi_hal_uart.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"

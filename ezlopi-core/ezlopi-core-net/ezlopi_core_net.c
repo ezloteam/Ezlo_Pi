@@ -1,4 +1,4 @@
-#include "ezlopi_net.h"
+#include "ezlopi_core_net.h"
 
 static s_ezlopi_net_status_t net_stat;
 

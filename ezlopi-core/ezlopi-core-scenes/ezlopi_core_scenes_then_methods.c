@@ -1,9 +1,9 @@
 #include "trace.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_scenes_then_methods.h"
+#include "ezlopi_core_scenes_then_methods.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 {

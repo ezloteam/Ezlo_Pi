@@ -2,7 +2,7 @@
 
 #include "trace.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_gateway.h"
+#include "ezlopi_core_gateway.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_cloud_gateways.h"

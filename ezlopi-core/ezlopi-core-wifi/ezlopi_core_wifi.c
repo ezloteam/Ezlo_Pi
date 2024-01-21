@@ -24,11 +24,11 @@
 #include "trace.h"
 #include "qt_serial.h"
 
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_factory_info.h"
-#include "ezlopi_wifi_err_reason.h"
-#include "ezlopi_event_group.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_wifi_err_reason.h"
+#include "ezlopi_core_event_group.h"
 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 

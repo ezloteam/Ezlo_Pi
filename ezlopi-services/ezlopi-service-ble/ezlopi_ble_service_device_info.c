@@ -11,14 +11,14 @@
 #include "version.h"
 #include "ezlopi_core_wifi.h"
 
-#include "ezlopi_nvs.h"
-#include "ezlopi_ping.h"
-#include "ezlopi_ble_gatt.h"
-#include "ezlopi_ble_buffer.h"
-#include "ezlopi_ble_profile.h"
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_ping.h"
+#include "ezlopi_core_ble_gatt.h"
+#include "ezlopi_core_ble_buffer.h"
+#include "ezlopi_core_ble_profile.h"
 #include "ezlopi_ble_service.h"
-#include "ezlopi_system_info.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_hal_system_info.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 
 static s_gatt_service_t *g_device_info_service = NULL;

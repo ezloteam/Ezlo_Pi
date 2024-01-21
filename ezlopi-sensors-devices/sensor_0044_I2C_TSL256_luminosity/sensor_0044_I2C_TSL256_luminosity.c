@@ -7,7 +7,7 @@
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
-#include "ezlopi_core_i2c_master.h"
+#include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"

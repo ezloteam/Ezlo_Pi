@@ -3,7 +3,7 @@
 #include "cJSON.h"
 #include "math.h"
 #include "gpio_isr_service.h"
-#include "ezlopi_adc.h"
+#include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_gpio.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_devices_list.h"

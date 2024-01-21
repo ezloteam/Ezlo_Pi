@@ -5,9 +5,9 @@
 #include "trace.h"
 #include "version.h"
 #include "core_getters_api.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_gateway.h"
+#include "ezlopi_core_gateway.h"
 #include "ezlopi_cloud_constants.h"
 #include "lua_helper_functions.h"
 

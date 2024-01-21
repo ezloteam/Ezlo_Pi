@@ -23,13 +23,13 @@
 #include "scenes_expressions.h"
 
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_http.h"
-#include "ezlopi_factory_info.h"
+#include "ezlopi_core_http.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_event_group.h"
+#include "ezlopi_core_event_group.h"
 
 #include "web_provisioning.h"
-#include "ezlopi_websocket_client.h"
+#include "ezlopi_core_websocket_client.h"
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;

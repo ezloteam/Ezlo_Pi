@@ -1,7 +1,7 @@
 #include "trace.h"
 #include "cJSON.h"
 #include "math.h"
-#include "ezlopi_adc.h"
+#include "ezlopi_hal_adc.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_valueformatter.h"

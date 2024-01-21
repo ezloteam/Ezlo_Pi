@@ -1,4 +1,4 @@
-#include "ezlopi_uart.h"
+#include "ezlopi_hal_uart.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"

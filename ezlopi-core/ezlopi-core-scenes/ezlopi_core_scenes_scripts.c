@@ -11,11 +11,11 @@
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
 
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_scenes_scripts.h"
+#include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_scenes_scripts_custom_libs_includes.h"
+#include "ezlopi_core_scenes_scripts_custom_libs_includes.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;
 
@@ -492,7 +492,7 @@ static char *__script_report(lua_State *lua_state, int status)
 
 static s_lua_scripts_modules_t lua_scripts_modules[] = {
 #define SCRIPTS_CUSTOM_LIB(module_name, module_func) {.name = module_name, .func = module_func},
-#include "ezlopi_scenes_scripts_custom_libs.h"
+#include "ezlopi_core_scenes_scripts_custom_libs.h"
 #undef SCRIPTS_CUSTOM_LIB
     {.name = NULL, .func = NULL},
 };

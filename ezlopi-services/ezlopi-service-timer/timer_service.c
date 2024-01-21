@@ -10,7 +10,7 @@
 #include "timer_service.h"
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices_list.h"
-#include "ezlopi_event_queue.h"
+#include "ezlopi_core_event_queue.h"
 
 static void event_process_v3(void *pv);
 

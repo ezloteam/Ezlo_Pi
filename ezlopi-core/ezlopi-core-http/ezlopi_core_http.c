@@ -3,7 +3,7 @@
 #include "esp_tls.h"
 #include "esp_http_client.h"
 #include "trace.h"
-#include "ezlopi_http.h"
+#include "ezlopi_core_http.h"
 #include "cJSON.h"
 
 static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
@@ -70,7 +70,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
                             TRACE_D("%.*s", cur_d->len, cur_d->ptr);
                             cur_d = cur_d->next;
                         }
-                        
+
                         http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
                         if (http_get_data)
                         {

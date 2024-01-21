@@ -3,10 +3,10 @@
 #include "trace.h"
 
 #include "ezlopi_core_devices.h"
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_scenes_operators.h"
-#include "ezlopi_scenes_when_methods.h"
+#include "ezlopi_core_scenes_operators.h"
+#include "ezlopi_core_scenes_when_methods.h"
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t *scene_node, void *arg)
 {

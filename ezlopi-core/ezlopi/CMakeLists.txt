@@ -7,9 +7,9 @@ idf_component_register(SRCS "ezlopi.c" "${config_src}"
     REQUIRES    trace 
                 ezlopi-sntp
                 ezlopi-core-devices 
-                ezlopi-core-factory_info 
+                ezlopi-core-factory-info 
                 ezlopi-core-nvs ezlopi-core-wifi
                 ezlopi-core-ethernet
-                ezlopi-core-event_queue 
+                ezlopi-core-event-queue 
                 ezlopi-core-ping 
                 ezlopi-core-room )

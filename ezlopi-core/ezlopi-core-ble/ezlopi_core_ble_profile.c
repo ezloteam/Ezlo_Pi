@@ -1,8 +1,8 @@
 #include <string.h>
 #include "trace.h"
-#include "ezlopi_ble_gatt.h"
-#include "ezlopi_ble_config.h"
-#include "ezlopi_ble_profile.h"
+#include "ezlopi_core_ble_gatt.h"
+#include "ezlopi_core_ble_config.h"
+#include "ezlopi_core_ble_profile.h"
 #include "ezlopi_cloud_constants.h"
 
 static s_gatt_service_t *gatt_head_service = NULL;

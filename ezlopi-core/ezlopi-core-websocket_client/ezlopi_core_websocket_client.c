@@ -24,8 +24,8 @@
 
 #include "esp_websocket_client.h"
 
-#include "ezlopi_factory_info.h"
-#include "ezlopi_websocket_client.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_websocket_client.h"
 #include "trace.h"
 
 static esp_websocket_client_handle_t client = NULL;

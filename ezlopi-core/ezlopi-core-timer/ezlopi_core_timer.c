@@ -35,7 +35,7 @@
  *******************************************************************************/
 #include "ezlopi_core_timer.h"
 #include "trace.h"
-#include "ezlopi_event_queue.h"
+#include "ezlopi_core_event_queue.h"
 
 typedef struct s_ezlopi_timer
 {

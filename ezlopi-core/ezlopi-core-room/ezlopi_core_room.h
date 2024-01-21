@@ -11,7 +11,7 @@ typedef enum e_room_subtype
 {
 #ifndef ROOM_SUBTYPE
 #define ROOM_SUBTYPE(name, e_num) ROOM_SUBTYPE_##e_num,
-#include "ezlopi_room_subtype_macro.h"
+#include "ezlopi_core_room_subtype_macro.h"
 #undef ROOM_SUBTYPE
 #endif
 } e_room_subtype_t;

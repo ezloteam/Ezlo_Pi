@@ -2,7 +2,7 @@
 #include "cJSON.h"
 #include "ezlopi_cloud_items.h"
 
-#include "ezlopi_adc.h"
+#include "ezlopi_hal_adc.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_cjson_macros.h"

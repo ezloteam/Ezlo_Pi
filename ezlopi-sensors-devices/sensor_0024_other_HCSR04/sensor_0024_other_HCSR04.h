@@ -5,7 +5,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_uart.h"
+#include "ezlopi_hal_uart.h"
 
 #include <driver/gpio.h>
 #include <esp_err.h>

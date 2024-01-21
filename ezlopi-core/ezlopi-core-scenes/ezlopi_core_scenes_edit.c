@@ -1,4 +1,4 @@
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_cloud_constants.h"
 

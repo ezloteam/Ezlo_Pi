@@ -2,31 +2,31 @@
 
 #include "trace.h"
 
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_factory_info.h"
-#include "ezlopi_scenes_methods.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_scenes_methods.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_meshbot_service.h"
-#include "ezlopi_scenes_when_methods.h"
-#include "ezlopi_scenes_then_methods.h"
-#include "ezlopi_scenes_status_changed.h"
-#include "ezlopi_scenes_cjson.h"
+#include "ezlopi_core_scenes_when_methods.h"
+#include "ezlopi_core_scenes_then_methods.h"
+#include "ezlopi_core_scenes_status_changed.h"
+#include "ezlopi_core_scenes_cjson.h"
 
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
 
 static const char *scenes_value_type_name[] = {
 #define EZLOPI_VALUE_TYPE(type, name) name,
-#include "ezlopi_scenes_value_types.h"
+#include "ezlopi_core_scenes_value_types.h"
 #undef EZLOPI_VALUE_TYPE
 };
 
-static const f_scene_method_v2_t ezlopi_scenes_methods[] = {
+static const f_scene_method_v2_t ezlopi_core_scenes_methods[] = {
 #define EZLOPI_SCENE(method_type, name, func) func,
-#include "ezlopi_scenes_method_types.h"
+#include "ezlopi_core_scenes_method_types.h"
 #undef EZLOPI_SCENE
 };
 
@@ -303,7 +303,7 @@ f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_metho
     f_scene_method_v2_t method_ptr = NULL;
     if ((scene_method_type > EZLOPI_SCENE_METHOD_TYPE_NONE) && (scene_method_type < EZLOPI_SCENE_METHOD_TYPE_MAX))
     {
-        method_ptr = ezlopi_scenes_methods[scene_method_type];
+        method_ptr = ezlopi_core_scenes_methods[scene_method_type];
     }
     return method_ptr;
 }

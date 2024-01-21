@@ -15,7 +15,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
 
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_hal_gpio.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_devices_list.h"

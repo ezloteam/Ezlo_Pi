@@ -9,7 +9,7 @@
 #include "lwip/sockets.h"
 
 #include "trace.h"
-#include "ezlopi_ping.h"
+#include "ezlopi_core_ping.h"
 
 static esp_ping_handle_t ping_handle = NULL;
 static uint32_t __ping_fail_count = 0;

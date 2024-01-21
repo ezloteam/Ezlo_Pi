@@ -1,7 +1,7 @@
 #include "web_provisioning.h"
-#include "ezlopi_scenes_v2.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_scenes_status_changed.h"
+#include "ezlopi_core_scenes_status_changed.h"
 
 int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
 {

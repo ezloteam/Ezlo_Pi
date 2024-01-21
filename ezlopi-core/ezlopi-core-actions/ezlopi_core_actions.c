@@ -2,7 +2,7 @@
 
 char *ezlopi_action_names[] = {
 #define EZLOPI_ACTION(action, name) name,
-#include "ezlopi_actions_list.h"
+#include "ezlopi_core_actions_list.h"
 };
 
 char *ezlopi_actions_to_string(e_ezlopi_actions_t action)

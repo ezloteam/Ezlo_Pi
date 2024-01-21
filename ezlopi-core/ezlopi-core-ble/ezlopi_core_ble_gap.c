@@ -7,8 +7,8 @@
 
 #include <string.h>
 #include "trace.h"
-#include "ezlopi_ble_gap.h"
-#include "ezlopi_ble_profile.h"
+#include "ezlopi_core_ble_gap.h"
+#include "ezlopi_core_ble_profile.h"
 #include "ezlopi_cloud_constants.h"
 
 static uint8_t adv_config_done = 0;

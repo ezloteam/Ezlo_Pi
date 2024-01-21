@@ -6,7 +6,7 @@
 #include "freertos/task.h"
 
 #include "trace.h"
-#include "ezlopi_nvs.h"
+#include "ezlopi_core_nvs.h"
 // #include "interface_common.h"
 
 static nvs_handle_t ezlopi_nvs_handle = 0;
