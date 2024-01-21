@@ -9,7 +9,7 @@
 
 static void _edit_scene(l_scenes_list_v2_t *scene_node, cJSON *cj_scene);
 
-int ezlopi_scene_edit_store_to_nvs(cJSON *cj_updated_scene)
+int ezlopi_scene_edit_store_updated_to_nvs(cJSON *cj_updated_scene)
 {
     int ret = 0;
     if (cj_updated_scene)
@@ -32,7 +32,7 @@ int ezlopi_scene_edit_store_to_nvs(cJSON *cj_updated_scene)
     return ret;
 }
 
-int ezlopi_scenes_edit_by_id(uint32_t scene_id, cJSON *cj_updated_scene)
+int ezlopi_scenes_edit_update_id(uint32_t scene_id, cJSON *cj_updated_scene)
 {
     int ret = 0;
     CJSON_TRACE("cj_updated_scene", cj_updated_scene);

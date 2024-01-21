@@ -6,15 +6,17 @@
 #include "ezlopi_cloud.h"
 #include "ezlopi_devices.h"
 #include "ezlopi_scenes_v2.h"
+#include "ezlopi_scenes_edit.h"
 #include "ezlopi_cjson_macros.h"
 #include "ezlopi_factory_info.h"
+#include "ezlopi_scenes_cjson.h"
 #include "ezlopi_scenes_methods.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_meshbot_service.h"
 #include "ezlopi_scenes_when_methods.h"
 #include "ezlopi_scenes_then_methods.h"
 #include "ezlopi_scenes_status_changed.h"
-#include "ezlopi_scenes_cjson.h"
+#include "ezlopi_scenes_methods.h"
 
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
 
@@ -51,6 +53,21 @@ static l_user_notification_v2_t *___user_notifications_populate(cJSON *cj_user_n
 
 static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_id);
 static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id);
+
+int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene)
+{
+    int ret = 0;
+
+    if (1 == ezlopi_scenes_edit_update_id(scene_id, cj_scene))
+    {
+        if (1 == ezlopi_scene_edit_store_updated_to_nvs(cj_scene);)
+        {
+            ret = 1;
+        }
+    }
+
+    return ret;
+}
 
 e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field)
 {
