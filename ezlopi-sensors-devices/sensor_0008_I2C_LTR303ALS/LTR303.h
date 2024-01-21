@@ -34,7 +34,7 @@ version 0.1
 #include <stdio.h>
 #include <math.h>
 #include "esp_log.h"
-#include "ezlopi_i2c_master.h"
+#include "ezlopi_core_i2c_master.h"
 #include <string.h>
 
 typedef uint8_t byte;

@@ -9,8 +9,8 @@
 
 #include "sdkconfig.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices_list.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_constants.h"
 
 typedef enum

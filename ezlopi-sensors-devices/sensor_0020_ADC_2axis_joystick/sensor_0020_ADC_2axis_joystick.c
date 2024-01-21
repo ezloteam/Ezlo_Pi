@@ -3,15 +3,15 @@
 #if 0
 
 #include "cJSON.h"
-#include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_cloud.h"
+#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 #include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_valueformatter.h"
+#include "ezlopi_core_valueformatter.h"
 
 #include "trace.h"
 #include "ezlopi_adc.h"

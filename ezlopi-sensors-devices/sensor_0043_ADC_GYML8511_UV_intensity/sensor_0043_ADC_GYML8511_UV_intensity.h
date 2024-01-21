@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0043_ADC_UV_INTENSITY_H_
 #define _SENSOR_0043_ADC_UV_INTENSITY_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 /**
  *  -> GYML_8511 - UV sensor operates in 3.3V
  *

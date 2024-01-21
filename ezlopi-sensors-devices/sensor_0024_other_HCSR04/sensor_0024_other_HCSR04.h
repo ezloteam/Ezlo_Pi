@@ -3,8 +3,8 @@
 #ifndef _ULTRASONIC_HC_SR04_H_
 #define _ULTRASONIC_HC_SR04_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 #include "ezlopi_uart.h"
 
 #include <driver/gpio.h>

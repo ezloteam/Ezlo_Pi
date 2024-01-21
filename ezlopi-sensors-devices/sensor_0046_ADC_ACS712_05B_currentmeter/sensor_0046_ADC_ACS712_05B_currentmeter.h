@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0046_ADC_ACS712_05B_CURRENTMETER_H_
 #define _SENSOR_0046_ADC_ACS712_05B_CURRENTMETER_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /**
  * Chip model : ACS712ELCTR-05B-T

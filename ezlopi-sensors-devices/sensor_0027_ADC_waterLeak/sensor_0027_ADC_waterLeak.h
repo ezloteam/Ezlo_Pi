@@ -2,8 +2,8 @@
 #ifndef SENSOR_0027_ADC_WATERLEAK_H
 #define SENSOR_0027_ADC_WATERLEAK_H
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 typedef enum
 {

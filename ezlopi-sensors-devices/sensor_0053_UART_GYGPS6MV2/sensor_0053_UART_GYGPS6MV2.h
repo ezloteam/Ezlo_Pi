@@ -2,8 +2,8 @@
 #ifndef _SENSOR_0053_UART_GYGPS6MV2_H_
 #define _SENSOR_0053_UART_GYGPS6MV2_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /* 3.3V operating voltage */
 //-----------------------------------------------------------------------------------------

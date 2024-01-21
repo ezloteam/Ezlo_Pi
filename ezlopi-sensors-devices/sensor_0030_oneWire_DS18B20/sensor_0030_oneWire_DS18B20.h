@@ -3,8 +3,8 @@
 #ifndef SENSOR_0030_ONEWIRE_DS18B20_H
 #define SENSOR_0030_ONEWIRE_DS18B20_H
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 #include "stdbool.h"
 
 #define DS18B20_TEMPERATURE_LSB 0

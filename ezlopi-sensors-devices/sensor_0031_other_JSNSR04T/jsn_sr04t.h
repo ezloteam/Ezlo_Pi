@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include "driver/gpio.h"
 #include "driver/rmt.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_actions.h"
+#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_actions.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "ezlopi_cloud_category_str.h"

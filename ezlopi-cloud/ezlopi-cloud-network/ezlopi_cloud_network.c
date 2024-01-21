@@ -2,7 +2,7 @@
 #include "esp_wifi.h"
 #include "esp_netif_types.h"
 #include "ezlopi_cloud_network.h"
-#include "ezlopi_wifi.h"
+#include "ezlopi_core_wifi.h"
 #include "trace.h"
 
 #include "cJSON.h"

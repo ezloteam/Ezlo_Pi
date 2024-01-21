@@ -1,9 +1,9 @@
 #ifndef _0066_SENSOR_UART_R307_FINGERPRINT_H_
 #define _0066_SENSOR_UART_R307_FINGERPRINT_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
-#include "ezlopi_gpio.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_hal_gpio.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

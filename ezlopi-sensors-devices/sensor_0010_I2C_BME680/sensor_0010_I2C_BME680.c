@@ -2,11 +2,11 @@
 #include "math.h"
 #include "cJSON.h"
 
-#include "ezlopi_cloud.h"
-#include "ezlopi_timer.h"
-#include "ezlopi_valueformatter.h"
+#include "ezlopi_core_cloud.h"
+#include "ezlopi_core_timer.h"
+#include "ezlopi_core_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_device_value_updated.h"
 
 #include "bme680_bsec.h"
 #include "sensor_0010_I2C_BME680.h"

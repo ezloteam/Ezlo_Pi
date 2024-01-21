@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR_H_
 #define _SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /**
  *  NOTE : 1) FSR - works with [3.3V]. {Don't use 5V. The pins are only 3.3V tolerant}

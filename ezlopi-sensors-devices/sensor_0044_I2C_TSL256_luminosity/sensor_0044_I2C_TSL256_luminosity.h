@@ -1,9 +1,9 @@
 #ifndef _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
 #define _SENSOR_0044_I2C_TSL256_LUMINOSITY_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
-#include "ezlopi_i2c_master.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_i2c_master.h"
 
 //-----------------------------------------------------------------
 // Definations

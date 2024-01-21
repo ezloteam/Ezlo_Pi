@@ -2,7 +2,7 @@
 #include "math.h"
 #include "trace.h"
 #include "time.h"
-#include "ezlopi_i2c_master.h"
+#include "ezlopi_hal_i2c_master.h"
 #include "sensor_0007_I2C_GY271.h"
 
 static esp_err_t activate_set_reset_period(l_ezlopi_item_t *item)

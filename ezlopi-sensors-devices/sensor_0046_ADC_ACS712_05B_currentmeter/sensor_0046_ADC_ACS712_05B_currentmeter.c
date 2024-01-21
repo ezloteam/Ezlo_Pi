@@ -2,11 +2,11 @@
 #include "cJSON.h"
 #include "math.h"
 #include "ezlopi_adc.h"
-#include "ezlopi_timer.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_valueformatter.h"
+#include "ezlopi_core_timer.h"
+#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_device_value_updated.h"
 
 #include "sensor_0046_ADC_ACS712_05B_currentmeter.h"
 

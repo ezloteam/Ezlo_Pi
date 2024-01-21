@@ -10,10 +10,10 @@
 #include "cJSON.h"
 #include "math.h"
 
-#include "ezlopi_timer.h"
-#include "ezlopi_cloud.h"
+#include "ezlopi_core_timer.h"
+#include "ezlopi_core_cloud.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_device_value_updated.h"
 
 #include "sensor_0018_other_internal_hall_effect.h"
 

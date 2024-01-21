@@ -42,7 +42,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <esp_err.h>
-#include "ezlopi_i2c_master.h"
+#include "ezlopi_core_i2c_master.h"
 
 #ifdef __cplusplus
 extern "C" {

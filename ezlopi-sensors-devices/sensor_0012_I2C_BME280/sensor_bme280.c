@@ -39,7 +39,7 @@
 #include <inttypes.h>
 #include "esp_err.h"
 #include "esp_log.h"
-#include "ezlopi_i2c_master.h"
+#include "ezlopi_core_i2c_master.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 

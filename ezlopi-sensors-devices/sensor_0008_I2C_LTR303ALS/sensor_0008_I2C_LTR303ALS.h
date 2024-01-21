@@ -3,8 +3,8 @@
 #ifndef __SENSOR_0008_I2C_LTR303ALS_H__
 #define __SENSOR_0008_I2C_LTR303ALS_H__
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 #define LTR303_I2C_CHANNEL I2C_NUM_0
 

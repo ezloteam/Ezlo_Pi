@@ -3,4 +3,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "sensor_0008_I2C_LTR303ALS.c" "LTR303.c" "ALS_LTR303.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES ezlopi-cloud-items trace ezlopi_actions ezlopi_hal ezlopi_timer ezlopi_devices ezlopi-cloud-constants gpio_isr_service ezlopi_cloud)
+    REQUIRES ezlopi-cloud-items trace ezlopi-core-actions  ezlopi-core-timer ezlopi-core-devices ezlopi-cloud-constants ezlopi-service-gpioisr ezlopi-core-cloud)

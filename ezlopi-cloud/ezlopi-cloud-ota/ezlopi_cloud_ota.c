@@ -7,8 +7,8 @@
 
 #include "ezlopi_ota.h"
 #include "ezlopi_event_group.h"
-#include "ezlopi_cjson_macros.h"
-#include "ezlopi_devices_list.h"
+#include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_devices_list.h"
 #include "ezlopi_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 

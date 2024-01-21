@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0042_ADC_SHUNT_VOLTMETER_H_
 #define _SENSOR_0042_ADC_SHUNT_VOLTMETER_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 /**
  * SHUNT VOLTAGE -> measures DC voltage [0V - 25V]
  *

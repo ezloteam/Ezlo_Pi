@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0007_I2C_GY271_H_
 #define _SENSOR_0007_I2C_GY271_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 #include "stdbool.h"
 #include "esp_err.h"
 

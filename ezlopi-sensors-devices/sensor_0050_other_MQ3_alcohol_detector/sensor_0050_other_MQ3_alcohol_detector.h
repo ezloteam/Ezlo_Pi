@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0050_OTHER_MQ3_ALCOHOL_DETECTOR_H_
 #define _SENSOR_0050_OTHER_MQ3_ALCOHOL_DETECTOR_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 /**
  *  NOTE : MQ3_alcohol_gas - module gives (0V - 4.2V) as analog output .
  *  But ESP32- only allows upto 2.4V max input.

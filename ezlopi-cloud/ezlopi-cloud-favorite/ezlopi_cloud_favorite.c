@@ -6,7 +6,7 @@
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
-#include "ezlopi_devices_list.h"
+#include "ezlopi_core_devices_list.h"
 
 void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
 {

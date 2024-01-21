@@ -6,9 +6,9 @@
 #include "ezlopi_cloud_scenes.h"
 
 #include "ezlopi_nvs.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_devices.h"
 #include "ezlopi_scenes_v2.h"
-#include "ezlopi_cjson_macros.h"
+#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_meshbot_service.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_scenes_operators.h"

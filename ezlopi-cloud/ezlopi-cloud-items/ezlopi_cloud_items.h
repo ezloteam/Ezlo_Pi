@@ -4,7 +4,7 @@
 #include "string.h"
 
 #include "cJSON.h"
-#include "ezlopi_devices_list.h"
+#include "ezlopi_core_devices_list.h"
 
 #ifdef __cplusplus
 extern "C"

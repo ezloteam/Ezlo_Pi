@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0028_OTHER_GY61_H_
 #define _SENSOR_0028_OTHER_GY61_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 // 1g = 9.80665 m/s^2
 #define GY61_STANDARD_G_TO_ACCEL_CONVERSION_VALUE 9.80665f

@@ -1,8 +1,8 @@
 #ifndef _DEVICE_0022_PWM_DIMMABLE_BULB_H_
 #define _DEVICE_0022_PWM_DIMMABLE_BULB_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 typedef struct ezlopi_dimmable_bulb_state_struct
 {

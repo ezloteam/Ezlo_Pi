@@ -3,8 +3,8 @@
 
 #include "driver/i2c.h"
 #include "sensor_bme280.h"
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 #define CHIP_ID 0x76
 #define ACK_CHECK_EN 0x1

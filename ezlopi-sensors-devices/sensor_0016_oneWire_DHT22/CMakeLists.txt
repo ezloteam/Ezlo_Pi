@@ -4,10 +4,10 @@ idf_component_register(SRCS "dht22.c" "sensor_0016_oneWire_DHT22.c" "${config_sr
                         INCLUDE_DIRS "."
                         REQUIRES trace 
                                 driver 
-                                ezlopi_actions 
-                                ezlopi_hal 
-                                ezlopi_timer 
-                                ezlopi_devices 
+                                ezlopi-core-actions 
+                                 
+                                ezlopi-core-timer 
+                                ezlopi-core-devices 
                                 ezlopi-cloud-constants 
-                                gpio_isr_service
-                                ezlopi_valueformatter)
+                                ezlopi-service-gpioisr
+                                ezlopi-core-valueformatter)

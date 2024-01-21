@@ -5,9 +5,9 @@ idf_component_register(SRCS "bme680_bsec.c" "sensor_0010_I2C_BME680.c" "${config
     REQUIRES    trace  
                 Bosch_BSEC2
                 BME68x_Sensor_library
-                ezlopi_hal 
-                ezlopi_timer 
-                ezlopi_actions 
-                ezlopi_devices 
+                 
+                ezlopi-core-timer 
+                ezlopi-core-actions 
+                ezlopi-core-devices 
                 ezlopi-cloud-constants 
-                ezlopi_valueformatter)
+                ezlopi-core-valueformatter)

@@ -4,4 +4,4 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "sensor_0032_ADC_soilMoisture.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES trace  ezlopi_actions ezlopi_hal ezlopi_timer ezlopi_devices ezlopi-cloud-constants gpio_isr_service)
+    REQUIRES trace  ezlopi-core-actions  ezlopi-core-timer ezlopi-core-devices ezlopi-cloud-constants ezlopi-service-gpioisr)

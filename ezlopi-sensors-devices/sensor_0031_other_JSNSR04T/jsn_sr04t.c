@@ -1,7 +1,7 @@
 #include "jsn_sr04t.h"
 #include "trace.h"
 #include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_device_value_updated.h"
 
 /**
  * @brief Default configuration for RX channel

@@ -7,10 +7,10 @@ idf_component_register(SRCS "device_0002_digitalOut_relay.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES 
                 trace 
-                gpio_isr_service
-                ezlopi_actions
-                ezlopi_timer 
-                ezlopi_devices 
-                ezlopi_cloud 
+                ezlopi-service-gpioisr
+                ezlopi-core-actions
+                ezlopi-core-timer 
+                ezlopi-core-devices 
+                ezlopi-core-cloud 
                 ezlopi-cloud-constants
-                ezlopi_valueformatter)
+                ezlopi-core-valueformatter)

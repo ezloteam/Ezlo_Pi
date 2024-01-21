@@ -1,6 +1,6 @@
-#include "ezlopi_cloud.h"
-#include "ezlopi_cjson_macros.h"
-#include "ezlopi_valueformatter.h"
+#include "ezlopi_core_cloud.h"
+#include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "gpio_isr_service.h"

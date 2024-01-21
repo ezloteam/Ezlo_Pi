@@ -4,10 +4,10 @@ idf_component_register(SRCS "sensor_0043_ADC_GYML8511_UV_intensity.c" "${config_
     INCLUDE_DIRS "."
     REQUIRES  
                 trace 
-                gpio_isr_service
-                ezlopi_actions 
-                ezlopi_hal 
-                ezlopi_timer 
-                ezlopi_devices 
+                ezlopi-service-gpioisr
+                ezlopi-core-actions 
+                 
+                ezlopi-core-timer 
+                ezlopi-core-devices 
                 ezlopi-cloud-constants
-                ezlopi_valueformatter)
+                ezlopi-core-valueformatter)

@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0055_ADC_FLEXRESISTOR_H_
 #define _SENSOR_0055_ADC_FLEXRESISTOR_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /**
  *  NOTE : FlexResistor module gives (0V - 5V) as analog output .

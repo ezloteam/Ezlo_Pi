@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR_H_
 #define _SENSOR_0060_DIGITALIN_VIBRATION_DETECTOR_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 typedef enum
 {
     SW420_VIBRATION_ACTIVITY_NO_ACTIVITY,

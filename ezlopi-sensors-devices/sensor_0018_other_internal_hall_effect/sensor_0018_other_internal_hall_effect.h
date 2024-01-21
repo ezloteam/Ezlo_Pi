@@ -2,8 +2,8 @@
 #define _SENSOR_0018_OTHER_INTERNAL_HALL_EFFECT_H_
 
 #include "driver/adc.h"
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 typedef enum
 {

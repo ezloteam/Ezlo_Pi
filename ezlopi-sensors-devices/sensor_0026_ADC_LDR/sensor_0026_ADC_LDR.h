@@ -3,8 +3,8 @@
 #ifndef SENSOR_0026_ADC_LDR_H
 #define SENSOR_0026_ADC_LDR_H
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /**
  *

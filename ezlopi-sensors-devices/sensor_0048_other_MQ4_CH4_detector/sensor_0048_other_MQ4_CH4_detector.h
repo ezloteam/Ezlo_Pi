@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0048_OTHER_MQ4_CH4_DETECTOR_H_
 #define _SENSOR_0048_OTHER_MQ4_CH4_DETECTOR_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /**
  *  NOTE : MQ4_methane_gas - module gives (0V - 4.2V) as analog output .

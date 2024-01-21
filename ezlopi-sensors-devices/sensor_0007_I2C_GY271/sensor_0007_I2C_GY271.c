@@ -1,12 +1,12 @@
 #include "cJSON.h"
 #include "math.h"
 #include "trace.h"
-#include "ezlopi_timer.h"
-#include "ezlopi_i2c_master.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_valueformatter.h"
+#include "ezlopi_core_timer.h"
+#include "ezlopi_core_i2c_master.h"
+#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_valueformatter.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_device_value_updated.h"
 #include "sensor_0007_I2C_GY271.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------

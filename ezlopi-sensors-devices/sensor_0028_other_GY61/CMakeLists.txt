@@ -4,11 +4,11 @@ idf_component_register(SRCS "sensor_0028_other_GY61.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES  
                 trace 
-                gpio_isr_service
-                ezlopi_actions 
-                ezlopi_hal 
-                ezlopi_timer 
-                ezlopi_devices 
+                ezlopi-service-gpioisr
+                ezlopi-core-actions 
+                 
+                ezlopi-core-timer 
+                ezlopi-core-devices 
                 ezlopi-cloud-constants
-                ezlopi_valueformatter)
+                ezlopi-core-valueformatter)
 

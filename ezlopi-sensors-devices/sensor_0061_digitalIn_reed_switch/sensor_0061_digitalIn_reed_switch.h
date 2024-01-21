@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0061_DIGITALIN_REED_SWITCH_H_
 #define _SENSOR_0061_DIGITALIN_REED_SWITCH_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 /**
  *                          REED switch setup
  * [3.3V] +Vin ------->-----+

@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0057_OTHER_KY026_FLAMEDETECTOR_H_
 #define _SENSOR_0057_OTHER_KY026_FLAMEDETECTOR_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /**
  *  NOTE : Flame Sensor [KY-026 module] gives (0V - 5V) analog output .

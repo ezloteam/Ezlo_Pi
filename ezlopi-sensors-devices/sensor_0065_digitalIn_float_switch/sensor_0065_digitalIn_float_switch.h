@@ -1,8 +1,8 @@
 #ifndef _SENSOR_0065_DIGITALIN_FLOAT_SWITCH_H_
 #define _SENSOR_0065_DIGITALIN_FLOAT_SWITCH_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
 /**
  *   5v/3v+-------------------------------+------< (+) float s/w (-) >----+ 5v/3v

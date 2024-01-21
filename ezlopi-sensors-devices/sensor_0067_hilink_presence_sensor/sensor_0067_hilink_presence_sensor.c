@@ -3,13 +3,13 @@
 
 #include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_timer.h"
+#include "ezlopi_core_timer.h"
 #include "ezlopi_cloud_items.h"
 
-#include "ezlopi_cloud.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_devices.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_cloud.h"
+#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_item_name_str.h"
 #include "ld2410.h"

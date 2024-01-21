@@ -3,8 +3,8 @@
 #ifndef _SENSOR_0020_OTHER_2AXIS_JOYSTICK_H_
 #define _SENSOR_0020_OTHER_2AXIS_JOYSTICK_H_
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 #include "stdbool.h"
 
 typedef enum e_joystick_item_id

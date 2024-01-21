@@ -9,10 +9,10 @@
 #include "trace.h"
 #include "cJSON.h"
 
-#include "ezlopi_actions.h"
-#include "ezlopi_devices.h"
-#include "ezlopi_devices_list.h"
-#include "ezlopi_device_value_updated.h"
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_device_value_updated.h"
 
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
