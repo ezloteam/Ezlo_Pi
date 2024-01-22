@@ -1,9 +1,6 @@
 #ifndef _EZLOPI_CORE_EVENT_GROUP_H_
 #define _EZLOPI_CORE_EVENT_GROUP_H_
 
-#include "ctype.h"
-#include "string.h"
-#include "esp_bit_defs.h"
 
 #define EZLOPI_EVENT_BASE 0x10
 

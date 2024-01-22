@@ -7,26 +7,14 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 #include <stdio.h>
-#include "esp_log.h"
-#include "esp_wifi.h"
-#include "nvs_flash.h"
-#include "esp_event.h"
-#include "esp_event.h"
-#include "sdkconfig.h"
-#include "esp_system.h"
 
 #include "freertos/FreeRTOS.h"
-#include "freertos/event_groups.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
 #include "freertos/queue.h"
-#include "cJSON.h"
 
-#include "esp_websocket_client.h"
+#include "trace.h"
 
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_websocket_client.h"
-#include "trace.h"
 
 static esp_websocket_client_handle_t client = NULL;
 static void (*__msg_upcall)(const char *, uint32_t) = NULL;

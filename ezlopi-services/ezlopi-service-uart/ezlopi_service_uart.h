@@ -2,6 +2,7 @@
 #define _EZLOPI_SERVICE_UART_H_
 
 #include <string.h>
+
 #include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

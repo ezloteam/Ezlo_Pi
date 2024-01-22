@@ -1,7 +1,11 @@
 #ifndef EZLOPI_CORE_DEVICES_H
 #define EZLOPI_CORE_DEVICES_H
 
-#include <cJSON.h>
+// #include "cJSON.h"
+
+#include "ezlopi_core_settings.h"
+#include "ezlopi_core_cloud.h"
+#include "ezlopi_core_actions.h"
 
 #include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_hal_uart.h"
@@ -11,9 +15,7 @@
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_spi_master.h"
 
-#include "ezlopi_core_settings.h"
-#include "ezlopi_core_cloud.h"
-#include "ezlopi_core_actions.h"
+
 // #include "ezlopi_cloud_settings.h"
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \

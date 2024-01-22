@@ -1,12 +1,13 @@
 #ifndef _EZLOPI_HAL_UART_H_
 #define _EZLOPI_HAL_UART_H_
 
-#include "stdbool.h"
-#include "stdint.h"
-#include "driver/uart.h"
-#include "esp_err.h"
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+#include "driver/uart.h"
+#include "esp_err.h"
 
 typedef int ezlo_uart_channel_t;
 

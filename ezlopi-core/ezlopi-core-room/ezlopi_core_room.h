@@ -1,9 +1,9 @@
 #ifndef _EZLOPI_CORE_ROOM_H_
 #define _EZLOPI_CORE_ROOM_H_
 
-#include "string.h"
-#include "stdlib.h"
-#include "stdio.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "cJSON.h"
 

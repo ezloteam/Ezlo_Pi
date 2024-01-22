@@ -2,6 +2,16 @@
 
 file(GLOB_RECURSE config_src "./*.c*")
 
+set(ESP_IDF_COMPONENTS 
+        esp_https_ota 
+        app_update
+)
+set(EZLOPI_CORE_COMPONENTS
+        ezlopi-core-reboot
+)
+
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES nvs_flash trace json esp_http_client ezlopi-core-factory-info esp-tls app_update esp_https_ota app_update ezlopi-core-reboot version)
+    REQUIRES    ${ESP_IDF_COMPONENTS}
+                ${EZLOPI_CORE_COMPONENTS} 
+            )

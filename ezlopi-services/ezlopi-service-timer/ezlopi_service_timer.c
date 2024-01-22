@@ -1,16 +1,19 @@
-#include "string.h"
-#include "stdint.h"
-#include "time.h"
+#include <string.h>
+#include <stdint.h>
+#include <time.h>
+
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
 #include "trace.h"
-#include "ezlopi_service_timer.h"
+
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_event_queue.h"
+
+#include "ezlopi_service_timer.h"
 
 static void event_process_v3(void *pv);
 

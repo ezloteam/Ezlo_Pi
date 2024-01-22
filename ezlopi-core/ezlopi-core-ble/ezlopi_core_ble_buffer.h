@@ -1,14 +1,13 @@
 #ifndef _EZLOPI_CORE_BLE_BUFFER_H_
 #define _EZLOPI_CORE_BLE_BUFFER_H_
 
-#include <stdint.h>
 #include "esp_gatts_api.h"
 
 typedef struct s_linked_buffer
 {
     struct s_linked_buffer *next;
     uint32_t len;
-    uint8_t *buffer; 
+    uint8_t *buffer;
 } s_linked_buffer_t;
 
 s_linked_buffer_t *ezlopi_ble_buffer_create(esp_ble_gatts_cb_param_t *param);

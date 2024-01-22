@@ -1,9 +1,9 @@
 #ifndef _EZLOPI_HAL_ONEWIRE_H_
 #define _EZLOPI_HAL_ONEWIRE_H_
 
-#include "stdio.h"
-#include "stdbool.h"
-#include "stdint.h"
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef struct s_ezlopi_onewire
 {

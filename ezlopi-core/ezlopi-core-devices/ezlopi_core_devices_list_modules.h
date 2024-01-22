@@ -1,5 +1,4 @@
 
-#include "sdkconfig.h"
 
 EZLOPI_DEVICE_LIST("digital-out generic", 1, device_0001_digitalOut_generic)
 EZLOPI_DEVICE_LIST("digital-out relay", 2, device_0002_digitalOut_relay)

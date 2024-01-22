@@ -2,7 +2,6 @@
 #define _EZLOPI_CORE_BLE_GAP_H_
 
 #include "esp_gap_ble_api.h"
-#include "esp_bt_defs.h"
 #include "ezlopi_core_ble_config.h"
 
 #define EZLOPI_BLE_ENALBE_PASSKEY 0

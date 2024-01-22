@@ -1,15 +1,15 @@
-#include <cJSON.h>
+// #include "cJSON.h"
 #include <string.h>
 #include <sys/socket.h>
-#include <esp_ota_ops.h>
-#include <esp_https_ota.h>
-#include <esp_http_client.h>
 
-#include <esp_tls.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/queue.h>
-#include <esp_http_client.h>
+#include "esp_http_client.h"
+#include "esp_tls.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "esp_ota_ops.h"
+#include "esp_https_ota.h"
+#include "esp_crt_bundle.h"
 
 #include "trace.h"
 
@@ -17,15 +17,6 @@
 #include "ezlopi_core_reboot.h"
 #include "ezlopi_core_factory_info.h"
 
-// #include "esp_system.h"
-// #include "esp_event.h"
-// #include "esp_log.h"
-#include "esp_ota_ops.h"
-#include "esp_http_client.h"
-#include "esp_https_ota.h"
-#include <sys/socket.h>
-
-#include "esp_crt_bundle.h"
 
 // #include "nvs.h"
 // #include "nvs_flash.h"

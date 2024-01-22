@@ -1,9 +1,7 @@
-#include <string.h>
 
 #include "trace.h"
 
 #include "ezlopi_core_devices.h"
-#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_when_methods.h"

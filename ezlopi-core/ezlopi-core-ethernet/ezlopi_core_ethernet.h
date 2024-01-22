@@ -1,11 +1,6 @@
 #ifndef _EZLOPI_CORE_ETHERNET_H_
 #define _EZLOPI_CORE_ETHERNET_H_
 
-#include "esp_netif.h"
-
-#include "ezlopi_core_boards.h"
-#include "ezlopi_hal_spi_master.h"
-
 #if (EZLOPI_AMBIENT_TRACKER_PRO_REV_A == EZLOPI_BOARD_TYPE)
 #define EZLOPI_ETHERNET_W5500_EN_PIN 13
 #define EZLOPI_ETHERNET_W5500_RST_PIN 11

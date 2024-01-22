@@ -1,9 +1,9 @@
 #ifndef _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 #define _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 
-#include "string.h"
-#include "inttypes.h"
-#include "stdbool.h"
+#include <string.h>
+#include <inttypes.h>
+#include <stdbool.h>
 
 #include "ezlopi_core_scenes_v2.h"
 

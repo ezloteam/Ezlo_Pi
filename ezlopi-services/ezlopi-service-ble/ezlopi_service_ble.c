@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "esp_system.h"
 #include "esp_log.h"
 #include "cJSON.h"
 #include "lwip/ip_addr.h"
+#include "trace.h"
+#include "sdkconfig.h"
 
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
@@ -13,18 +16,15 @@
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
 
-#include "trace.h"
-#include "sdkconfig.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_factory_info.h"
-
 #include "ezlopi_core_ble_gap.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_profile.h"
+#include "ezlopi_core_ble_buffer.h"
 
 #include "ezlopi_service_ble.h"
-#include "ezlopi_core_ble_buffer.h"
 
 extern void ezlopi_ble_service_security_init(void);
 extern void ezlopi_ble_service_wifi_profile_init(void);

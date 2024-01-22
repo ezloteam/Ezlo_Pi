@@ -1,7 +1,8 @@
 #ifndef _EZLOPI_SERVICE_MESHBOT_H_
 #define _EZLOPI_SERVICE_MESHBOT_H_
 
-#include "stdint.h"
+#include <stdint.h>
+
 #include "ezlopi_core_scenes_v2.h"
 
 void ezlopi_scenes_meshbot_init(void);

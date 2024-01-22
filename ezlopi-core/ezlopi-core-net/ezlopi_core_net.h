@@ -2,6 +2,7 @@
 #define _EZLOPI_CORE_NET_H_
 
 #include <string.h>
+
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_ethernet.h"
 #include "ezlopi_core_ping.h"

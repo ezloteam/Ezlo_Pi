@@ -1,14 +1,15 @@
 
+#include <string.h>
+
+#include "nvs_flash.h"
+#include "esp_spiffs.h"
+#include "esp_wifi.h"
+#include "cJSON.h"
+
+#include "trace.h"
+#include "dns_hijacking.h"
 
 #include "ezlopi_service_uri.h"
-#include "trace.h"
-#include "esp_http_server.h"
-#include "esp_spiffs.h"
-#include "string.h"
-#include "dns_hijacking.h"
-#include "nvs_flash.h"
-#include "cJSON.h"
-#include "esp_wifi.h"
 
 static const char *error_page_data = "\
     <!DOCTYPE html>\

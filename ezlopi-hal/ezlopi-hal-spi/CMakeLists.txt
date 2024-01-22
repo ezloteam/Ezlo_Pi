@@ -1,7 +1,13 @@
 
 file(GLOB_RECURSE SOURCES "./*.c*")
 
+
+set(EZLOPI_CORE_COMPONENTS 
+        ezlopi-core-nvs 
+)
+
 idf_component_register(SRCS ${SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES trace esp_adc_cal ezlopi-core-nvs driver esp_hw_support)
+    REQUIRES    ${EZLOPI_CORE_COMPONENTS} 
+    )
 

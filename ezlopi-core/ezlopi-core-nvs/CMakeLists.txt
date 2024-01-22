@@ -2,6 +2,20 @@
 
 file(GLOB_RECURSE config_src "./*.c*")
 
+set(ESP_IDF_COMPONENTS 
+        nvs_flash 
+)
+
+set(EZLOPI_COMPONENTS 
+        trace
+)
+set(EZLOPI_CORE_COMPONENTS 
+        ezlopi-core-settings
+)
+
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES nvs_flash ezlopi-core-settings trace)
+    REQUIRES    ${ESP_IDF_COMPONENTS}
+                ${EZLOPI_COMPONENTS}
+                ${EZLOPI_CORE_COMPONENTS}
+    )

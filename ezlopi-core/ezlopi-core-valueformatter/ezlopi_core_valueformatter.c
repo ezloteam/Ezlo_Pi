@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_core_valueformatter.h"
 
 char *ezlopi_valueformatter_bool(bool val)
 {

@@ -1,12 +1,7 @@
 #ifndef _EZLOPI_CORE_DEVICES_LIST_H_
 #define _EZLOPI_CORE_DEVICES_LIST_H_
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <cJSON.h>
-#include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "sdkconfig.h"
 
 typedef int (*f_sensor_call_v3_t)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 

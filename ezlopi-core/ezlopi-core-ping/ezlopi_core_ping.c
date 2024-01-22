@@ -1,4 +1,5 @@
 #include <string.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "ping/ping_sock.h"
@@ -9,6 +10,7 @@
 #include "lwip/sockets.h"
 
 #include "trace.h"
+
 #include "ezlopi_core_ping.h"
 
 static esp_ping_handle_t ping_handle = NULL;

@@ -1,8 +1,6 @@
 #ifndef _EZLOPI_CORE_BLE_PROFILE_H_
 #define _EZLOPI_CORE_BLE_PROFILE_H_
-#include "esp_gatts_api.h"
-#include "esp_bt_defs.h"
-#include "ezlopi_core_ble_config.h"
+
 
 s_gatt_service_t *ezlopi_ble_profile_get_by_app_id(uint16_t app_id);
 s_gatt_service_t *ezlopi_ble_profile_get_service_by_gatts_if(uint16_t gatts_if);

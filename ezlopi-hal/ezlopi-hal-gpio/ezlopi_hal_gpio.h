@@ -1,9 +1,8 @@
 #ifndef _EZLOPI_HAL_GPIO_H_
 #define _EZLOPI_HAL_GPIO_H_
 
-#include "stdio.h"
+#include <stdio.h>
 #include "driver/gpio.h"
-// #include "ezlopi_core_devices.h"
 
 typedef gpio_num_t e_ezlopi_gpio_num_t;
 typedef gpio_mode_t e_ezlopi_gpio_mode_t;

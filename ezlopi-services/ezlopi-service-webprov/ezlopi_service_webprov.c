@@ -1,11 +1,16 @@
-#include <string.h>
 
-#include "cJSON.h"
 #include "esp_mac.h"
 #include "esp_wifi_types.h"
 #include "esp_idf_version.h"
 
 #include "trace.h"
+
+#include "ezlopi_core_wifi.h"
+#include "ezlopi_core_http.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_event_group.h"
+#include "ezlopi_core_websocket_client.h"
+
 #include "ezlopi_cloud_data.h"
 #include "ezlopi_cloud_devices.h"
 #include "ezlopi_cloud_scenes.h"
@@ -19,17 +24,11 @@
 #include "ezlopi_cloud_network.h"
 #include "ezlopi_cloud_ota.h"
 #include "ezlopi_cloud_settings.h"
+#include "ezlopi_cloud_constants.h"
 #include "scenes_scripts.h"
 #include "scenes_expressions.h"
 
-#include "ezlopi_core_wifi.h"
-#include "ezlopi_core_http.h"
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_core_event_group.h"
-
 #include "ezlopi_service_webprov.h"
-#include "ezlopi_core_websocket_client.h"
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;

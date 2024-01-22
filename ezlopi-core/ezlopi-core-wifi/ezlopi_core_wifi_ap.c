@@ -1,12 +1,14 @@
 
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "trace.h"
-#include "string.h"
-#include "dns_hijacking.h"
-#include "esp_netif.h"
+#include <string.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_netif.h"
+
+#include "trace.h"
+#include "dns_hijacking.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_wifi_ap.h"
 

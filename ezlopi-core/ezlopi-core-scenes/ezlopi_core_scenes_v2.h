@@ -1,13 +1,10 @@
 #ifndef _EZLOPI_CORE_SCENES_V2_H_
 #define _EZLOPI_CORE_SCENES_V2_H_
 
-#include <string.h>
-#include <ctype.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <cJSON.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include "ctype.h"
+#include "cJSON.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "ezlopi_core_scenes_methods.h"
 

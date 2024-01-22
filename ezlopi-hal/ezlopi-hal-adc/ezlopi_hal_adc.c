@@ -1,12 +1,13 @@
     
+#include <string.h>
+#include <stdlib.h>
 
-#include "trace.h"
-#include "ezlopi_hal_adc.h"
-#include "string.h"
-#include "stdlib.h"
 #include "esp_check.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+#include "trace.h"
+#include "ezlopi_hal_adc.h"
 
 
 typedef struct s_ezlopi_analog_object {

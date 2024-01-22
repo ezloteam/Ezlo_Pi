@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "cJSON.h"
 
 typedef struct s_ezlopi_cloud_controller

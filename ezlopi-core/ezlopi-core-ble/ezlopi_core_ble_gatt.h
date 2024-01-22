@@ -1,8 +1,6 @@
 #ifndef _EZLOPI_CORE_BLE_GATT_H_
 #define _EZLOPI_CORE_BLE_GATT_H_
 
-#include "esp_gatts_api.h"
-#include "esp_bt_defs.h"
 #include "ezlopi_core_ble_config.h"
 
 uint16_t ezlopi_ble_gatt_get_max_data_size(void);

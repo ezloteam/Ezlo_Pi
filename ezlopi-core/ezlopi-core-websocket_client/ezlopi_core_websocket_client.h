@@ -1,21 +1,19 @@
 #ifndef _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
 #define _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "freertos/event_groups.h"
 #include "esp_wifi.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "esp_event.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
-
 #include "cJSON.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
-#include "freertos/event_groups.h"
 
 #include "esp_websocket_client.h"
-#include "esp_event.h"
 
 int ezlopi_websocket_client_send(char *data, uint32_t len);
 esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connection));

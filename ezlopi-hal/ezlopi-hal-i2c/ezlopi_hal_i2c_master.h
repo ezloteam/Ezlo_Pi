@@ -2,6 +2,7 @@
 #define _EZLOPI_HAL_I2C_MASTER_H_
 
 #include <stdio.h>
+
 #include "driver/i2c.h"
 
 typedef enum e_ezlopi_i2c_channel
