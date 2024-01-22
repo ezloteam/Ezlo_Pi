@@ -148,4 +148,4 @@ int sensor_0048_other_MQ4_CH4_detector(e_ezlopi_actions_t action, l_ezlopi_item_
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0048_OTHER_MQ4_CH4_DETECTOR_H_

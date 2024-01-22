@@ -162,4 +162,4 @@ int sensor_0050_other_MQ3_alcohol_detector(e_ezlopi_actions_t action, l_ezlopi_i
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0050_OTHER_MQ3_ALCOHOL_DETECTOR_H_

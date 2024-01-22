@@ -148,4 +148,4 @@ int sensor_0049_other_MQ2_LPG_detector(e_ezlopi_actions_t action, l_ezlopi_item_
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0049_OTHER_MQ2_LPG_DETECTOR_H_
