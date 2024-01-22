@@ -5,7 +5,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include <stdbool.h>
+// #include <stdbool.h>
 
 typedef enum e_joystick_item_id
 {
