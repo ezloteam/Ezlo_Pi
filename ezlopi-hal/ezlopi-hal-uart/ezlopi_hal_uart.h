@@ -1,7 +1,7 @@
 #ifndef __EZLOPI_UART_H__
 #define __EZLOPI_UART_H__
 
-#include "stdbool.h"
+#include <stdbool.h>
 #include "stdint.h"
 #include "driver/uart.h"
 #include "esp_err.h"

@@ -1,5 +1,5 @@
 #include "cJSON.h"
-#include "math.h"
+#include <math.h>
 #include "trace.h"
 
 #include "ezlopi_hal_adc.h"

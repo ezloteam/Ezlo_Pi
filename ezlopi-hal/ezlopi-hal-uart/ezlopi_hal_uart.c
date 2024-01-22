@@ -4,7 +4,7 @@
 #include "freertos/task.h"
 #include "esp_err.h"
 #include "trace.h"
-#include "string.h"
+#include <string.h>
 #include "esp_check.h"
 
 static void ezlopi_uart_channel_task(void *args);

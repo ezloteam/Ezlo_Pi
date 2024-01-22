@@ -3,7 +3,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "stdbool.h"
+#include <stdbool.h>
 #include "esp_err.h"
 
 // Calculation parameters

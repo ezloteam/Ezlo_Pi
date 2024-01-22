@@ -1,7 +1,7 @@
 #include "stdlib.h"
 #include <string.h>
 #include "sdkconfig.h"
-#include "math.h"
+#include <math.h>
 
 #include "cJSON.h"
 #include "trace.h"

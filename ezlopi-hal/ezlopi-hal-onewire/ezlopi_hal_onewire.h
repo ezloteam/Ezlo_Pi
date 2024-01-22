@@ -2,7 +2,7 @@
 #define __EZLOPI_ONEWIRE_H__
 
 #include "stdio.h"
-#include "stdbool.h"
+#include <stdbool.h>
 #include "stdint.h"
 
 typedef struct s_ezlopi_onewire

@@ -1,7 +1,7 @@
 #ifndef __EZLOPI_ROOM_H__
 #define __EZLOPI_ROOM_H__
 
-#include "string.h"
+#include <string.h>
 #include "stdlib.h"
 #include "stdio.h"
 

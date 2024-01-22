@@ -1,20 +1,23 @@
-#include "cJSON.h"
-#include <string.h>
+// #include <string.h>
 #include "sdkconfig.h"
-
 #include "trace.h"
-#include "ezlopi_cloud_items.h"
-#include "ezlopi_service_gpioisr.h"
+// #include "cJSON.h"
 
-#include "ezlopi_hal_gpio.h"
-#include "ezlopi_core_cloud.h"
 #include "ezlopi_core_timer.h"
-#include "ezlopi_core_actions.h"
+#include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_valueformatter.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
+
+#include "ezlopi_hal_gpio.h"
+
+#include "ezlopi_cloud_items.h"
+#include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_service_gpioisr.h"
+
+#include "device_0002_digitalOut_relay.h"
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);

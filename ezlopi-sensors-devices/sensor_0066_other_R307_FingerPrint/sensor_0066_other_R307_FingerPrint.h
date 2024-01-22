@@ -1,54 +1,23 @@
-#ifndef _0066_SENSOR_UART_R307_FINGERPRINT_H_
-#define _0066_SENSOR_UART_R307_FINGERPRINT_H_
+#ifndef _SENSOR_0066_OTHER_R307_FINGERPRINT_H_
+#define _SENSOR_0066_OTHER_R307_FINGERPRINT_H_
 
-#include "ezlopi_core_actions.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_hal_gpio.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "stdbool.h"
-#include "stdint.h"
-/**
- * @brief tasks such as configuring peripherals , setting flags and controlling IO
- *
- * @paragraph 1. Set the least significant bit(LSB) of 8-bit reg without  effecting other
- * @paragraph uint8_t reg = 0xA5;  mask = 0x01                  => reg |= mask // set the LSB and assign
- *
- * @paragraph 2. Clear the Most significant bit(MSB) of 16-bit reg without  effecting other
- * @paragraph uint16_t var = 0xBEEF;  mask = 0x7FFF             => var &= mask // clear the MSB and assign
- *
- * @paragraph 3. check if bit4 is clear in 16-bit reg and return a boolean result
- * @paragraph uint16_t reg = 0x3704;  mask = 0x10                 => bool res = (reg & mask == 0); // check if bit4 is clear and assign bool val
- *
- * @paragraph 4. toggle all even bits (0,2,4,6) of 8-bit reg without effecting other
- * @paragraph uint8_t reg = 0xAA;  mask = 0x55                  => reg ^= mask // toggles even number bits only
- * @paragraph uint8_t reg = 0xAA;                               => reg ~= reg // toggles all bits
- *
- * @paragraph 5. extract 8-12bit from 16-bit variable
- * @paragraph uint16_t var = 0xFEDC; mask = 0x1F00              => uint16_t extracted_var = (var & mask >> 8); // check if bit4 is clear and assign bool val
- *
- * @paragraph 7. filter 3 LSB bits of 8-bit reg and rest is reset
- * @paragraph uint8_t reg = 0xA5;  mask = 0x07                  => reg &= mask // filter 3 LSB bits and assign
- *
- * @paragraph 8. swap two 8bits without using extra temp variable
- * @paragraph uin8_t a = 0x5A; b = 0x3C                         => 1st. a^=b  |  2nd.b^=a  |   3rd.a^=b
- *
- * @paragraph 9. replace the 4-7bits of 16-bit register with specific values
- * @paragraph uin16_t var = 0x8A35;  uint16_t mask = 0x00F0     => var = (var & ~mask) | (newValue << 4) ; //Set upper 4 bits to 'newValue'
- *
- * @paragraph 10. Check if exactly one of the two LSB in 8-bit reg is set (either bit-0 or bit-1, but not both) and return a boolean result
- * @paragraph uint8_t reg = 0x03;  mask = 0x03                  => bool res = ( [(reg & mask)==1] || [(reg & mask)==2] ) // check and convert to bool
- *
- */
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
 
-//---------------------------------------------------------------------------------------------------------------
+#include "ezlopi_hal_gpio.h"
+
+//-----------------------------------------------------------------------------------------------------------
 #define FINGERPRINT_MAX_CAPACITY_LIMIT 5                                   // !< Setting the max quantity of fingerprints allowed to be stored >
 #define FINGERPRINT_STARTING_USER_PAGE_ID 1                                // !< Setting the starting USER/PAGE ID >
 #define MAX_PACKET_LENGTH_VAL 64                                           // !< Setting the max length of the transferring data package >
 #define FINGERPRINT_UART_BAUDRATE ((int)FINGERPRINT_BAUDRATE_57600 * 9600) // !< Setting Baudrate for transferring data via uart >
-//----------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------
 // Step 1: List the instructions cmds
 #define FINGERPRINT_GETIMAGE 0x01       //!< Collect finger image
 #define FINGERPRINT_IMAGE2TZ 0x02       //!< Generate character file from image
@@ -488,4 +457,4 @@ bool r307_as606_wait_till_system_free(l_ezlopi_item_t *item, uint32_t timeout);
 //-------------------------------------------------------------------------------------------------------------------
 int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif
+#endif //_SENSOR_0066_OTHER_R307_FINGERPRINT_H_

@@ -1,5 +1,6 @@
+#include "trace.h"
 
-#include "math.h"
+#include <math.h>
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -8,7 +9,6 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
 
-#include "trace.h"
 #include "sensor_0029_I2C_GXHTC3.h"
 
 static const float ideal_value = 65536.0f;

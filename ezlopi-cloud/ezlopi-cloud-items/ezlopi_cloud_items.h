@@ -1,7 +1,7 @@
 #ifndef __HUB_ITEMS_LIST_H__
 #define __HUB_ITEMS_LIST_H__
 
-#include "string.h"
+#include <string.h>
 
 #include "cJSON.h"
 #include "ezlopi_core_devices_list.h"

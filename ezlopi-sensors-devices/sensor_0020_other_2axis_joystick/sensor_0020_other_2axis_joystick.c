@@ -1,7 +1,7 @@
 
 #include "trace.h"
 #include "cJSON.h"
-#include "math.h"
+#include <math.h>
 #include "ezlopi_service_gpioisr.h"
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_gpio.h"

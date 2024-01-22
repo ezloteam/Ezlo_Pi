@@ -2,7 +2,7 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "trace.h"
-#include "string.h"
+#include <string.h>
 #include "dns_hijacking.h"
 #include "esp_netif.h"
 #include "freertos/FreeRTOS.h"

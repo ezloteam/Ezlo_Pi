@@ -3,9 +3,9 @@
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_cloud_items.h"
-#include "math.h"
-#include "stdbool.h"
-#include "string.h"
+#include <math.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_core_devices_list.h"

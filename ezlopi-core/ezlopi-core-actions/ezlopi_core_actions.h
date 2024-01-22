@@ -1,7 +1,7 @@
 #ifndef __EZLOPI_ACTIONS_H__
 #define __EZLOPI_ACTIONS_H__
 
-#include "string.h"
+#include <string.h>
 
 typedef enum e_ezlopi_actions
 {

@@ -1,5 +1,5 @@
+#include <string.h>
 #include "trace.h"
-#include "string.h"
 #include "gyGPS6MV2.h"
 
 //-------------------------------------------------------------------------

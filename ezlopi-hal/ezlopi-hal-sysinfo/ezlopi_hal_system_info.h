@@ -1,6 +1,6 @@
 #ifndef __EZLOPI_SYSTEM_INFO_H__
 #define __EZLOPI_SYSTEM_INFO_H__
-#include "string.h"
+#include <string.h>
 #include "stdint.h"
 #include "stdio.h"
 

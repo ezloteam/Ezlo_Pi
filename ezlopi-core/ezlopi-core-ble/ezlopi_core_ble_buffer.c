@@ -1,5 +1,5 @@
 #include "trace.h"
-#include "string.h"
+#include <string.h>
 #include "ezlopi_core_ble_buffer.h"
 #include "esp_gatts_api.h"
 

@@ -137,9 +137,9 @@ typedef enum
 
 typedef struct mq7_value_t
 {
-    float _CO_ppm;
-    float MQ7_R0_constant;  
-}mq7_value_t;
+	float _CO_ppm;
+	float MQ7_R0_constant;
+} mq7_value_t;
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------
@@ -148,4 +148,4 @@ int sensor_0062_other_MQ7_CO_detector(e_ezlopi_actions_t action, l_ezlopi_item_t
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0062_OTHER_MQ7_CO_DETECTOR_H_

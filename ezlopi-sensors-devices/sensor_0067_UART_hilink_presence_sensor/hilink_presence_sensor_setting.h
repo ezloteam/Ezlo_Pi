@@ -1,10 +1,10 @@
 
-#ifndef __HILINK_PRESENCE_SENSOR_SETTINGS_H__
-#define __HILINK_PRESENCE_SENSOR_SETTINGS_H__
+#ifndef _HILINK_PRESENCE_SENSOR_SETTINGS_H_
+#define _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 
-#include "ezlopi_core_devices.h"
-#include "cJSON.h"
 #include "trace.h"
+#include "cJSON.h"
+#include "ezlopi_core_devices.h"
 
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_TEXT "Pre-defined operation mode"
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_DESCRIPTION_TEXT "Pre-Defined Operation mode, there will be different operation mode for different use cases"
@@ -55,12 +55,12 @@ typedef struct s_hilink_userdefined_setting_value
     float max_still_distance;
     uint8_t timeout;
     bool is_active;
-}s_hilink_userdefined_setting_value_t;
+} s_hilink_userdefined_setting_value_t;
 
 typedef struct s_hilink_radar_distance_sensitivity_value
 {
     int distance_sensitivity_value;
-}s_hilink_radar_distance_sensitivity_value_t;
+} s_hilink_radar_distance_sensitivity_value_t;
 
 int hilink_presence_sensor_initialize_settings(l_ezlopi_device_t *device);
 int hilink_presence_sensor_apply_settings();
@@ -148,35 +148,35 @@ static inline char *__prepare_user_defined_setting_str(s_hilink_userdefined_sett
 static inline distance_t __setting_user_defined_setting_get_enum(float val)
 {
     distance_t dist = DISTANCE_0CM;
-    if(val == 0.75)
+    if (val == 0.75)
     {
         dist = DISTANCE_75CM;
     }
-    else if(val == 1.5)
+    else if (val == 1.5)
     {
         dist = DISTANCE_150CM;
     }
-    else if(val == 2.25)
+    else if (val == 2.25)
     {
         dist = DISTANCE_225CM;
     }
-    else if(val == 3.0)
+    else if (val == 3.0)
     {
         dist = DISTANCE_300CM;
     }
-    else if(val == 3.75)
+    else if (val == 3.75)
     {
         dist = DISTANCE_375CM;
     }
-    else if(val == 4.5)
+    else if (val == 4.5)
     {
         dist = DISTANCE_450CM;
     }
-    else if(val ==5.25)
+    else if (val == 5.25)
     {
         dist = DISTANCE_525CM;
     }
-    else if(val == 6.0)
+    else if (val == 6.0)
     {
         dist = DISTANCE_600CM;
     }
@@ -187,5 +187,4 @@ static inline distance_t __setting_user_defined_setting_get_enum(float val)
     return dist;
 }
 
-
-#endif // __HILINK_PRESENCE_SENSOR_SETTINGS_H__
+#endif // _HILINK_PRESENCE_SENSOR_SETTINGS_H_

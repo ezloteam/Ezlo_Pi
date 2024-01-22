@@ -8,7 +8,7 @@
 #include "esp_err.h"
 #include "ezlopi_cloud_items.h"
 #include "cJSON.h"
-#include "math.h"
+#include <math.h>
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"

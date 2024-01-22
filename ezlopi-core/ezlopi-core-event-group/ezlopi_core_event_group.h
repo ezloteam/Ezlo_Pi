@@ -2,7 +2,7 @@
 #define __EZLOPI_EVENT_GROUP_H__
 
 #include "ctype.h"
-#include "string.h"
+#include <string.h>
 #include "esp_bit_defs.h"
 
 #define EZLOPI_EVENT_BASE 0x10

@@ -1,20 +1,17 @@
-
 #include <string.h>
 #include <stdlib.h>
-
 #include "trace.h"
-#include "cJSON.h"
+// #include "cJSON.h"
 #include "ld2410.h"
 
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_cloud.h"
+#include "ezlopi_core_device_value_updated.h"
+
 #include "ezlopi_cloud_settings.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "hilink_presence_sensor_setting.h"
-#include "ezlopi_core_nvs.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_cloud.h"
-#include "ezlopi_core_devices.h"
-
 #include "sensor_0067_hilink_presence_sensor.h"
 
 static const char *nvs_key_hilink_presence_sensor_predefined_setting = "predef";

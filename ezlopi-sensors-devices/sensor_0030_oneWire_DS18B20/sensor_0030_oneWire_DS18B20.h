@@ -5,7 +5,7 @@
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "stdbool.h"
+#include <stdbool.h>
 
 #define DS18B20_TEMPERATURE_LSB 0
 #define DS18B20_TEMPERATURE_HSB 1

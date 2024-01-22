@@ -1,9 +1,9 @@
 #include "trace.h"
 #include "cJSON.h"
 #include "ezlopi_cloud_items.h"
-#include "math.h"
-#include "stdbool.h"
-#include "string.h"
+#include <math.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "freertos/task.h"
 #include "ezlopi_hal_adc.h"

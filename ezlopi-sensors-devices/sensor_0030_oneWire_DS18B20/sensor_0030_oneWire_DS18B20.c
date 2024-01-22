@@ -8,7 +8,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
 
-#include "math.h"
+#include <math.h>
 #include "esp_err.h"
 #include "ezlopi_cloud_items.h"
 #include "trace.h"
