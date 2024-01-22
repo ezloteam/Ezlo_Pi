@@ -1,18 +1,16 @@
+#include <math.h>
+#include "trace.h"
+// #include "cJSON.h"
 
-
-#include "ezlopi_hal_adc.h"
+#include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
 
-#include <math.h>
-#include "esp_err.h"
 #include "ezlopi_cloud_items.h"
-#include "trace.h"
-#include "cJSON.h"
+#include "ezlopi_cloud_constants.h"
+
 #include "ds18b20_onewire.h"
 #include "sensor_0030_oneWire_DS18B20.h"
 

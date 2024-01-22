@@ -1,5 +1,4 @@
 #include <string.h>
-// #include <stdbool.h>
 #include <math.h>
 #include "trace.h"
 // #include "cJSON.h"

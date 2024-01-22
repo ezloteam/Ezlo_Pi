@@ -2,16 +2,13 @@
 #define SENSOR_0033_ADC_TURBIDITY_H
 
 #include <stdio.h>
-#include "cJSON.h"
-#include "driver/gpio.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 #include "sdkconfig.h"
+// #include "driver/gpio.h"
+// #include "freertos/FreeRTOS.h"
+// #include "freertos/task.h"
 
 #include "ezlopi_core_actions.h"
-#include "ezlopi_core_devices_list.h"
-#include "ezlopi_cloud_constants.h"
+#include "ezlopi_core_devices.h"
 
 typedef enum
 {

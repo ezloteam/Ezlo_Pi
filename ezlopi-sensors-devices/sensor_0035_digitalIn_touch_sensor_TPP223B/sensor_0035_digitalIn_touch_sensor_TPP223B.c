@@ -1,5 +1,5 @@
 #include "trace.h"
-#include "cJSON.h"
+// #include "cJSON.h"
 #include "esp_err.h"
 #include "driver/gpio.h"
 
