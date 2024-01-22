@@ -31,11 +31,10 @@ extern "C"
 
     } s_ezlopi_http_data_t;
 
-#warning "'s_ezlopi_scenes_then_methods_send_http_t' its size look too big"
     typedef struct s_ezlopi_scenes_then_methods_send_http
     {
         bool skip_cert_common_name_check;
-        uint16_t web_port;
+        int web_port;
         uint16_t url_maxlen; // cap to 65536
         uint16_t web_server_maxlen;
         uint16_t header_maxlen;
