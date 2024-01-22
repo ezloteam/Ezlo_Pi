@@ -1,14 +1,10 @@
 
 
-#ifndef _ULTRASONIC_HC_SR04_H_
-#define _ULTRASONIC_HC_SR04_H_
+#ifndef _SENSOR_0024_OTHER_HCSR04_H_
+#define _SENSOR_0024_OTHER_HCSR04_H_
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_hal_uart.h"
-
-#include <driver/gpio.h>
-#include <esp_err.h>
 
 #define ESP_ERR_ULTRASONIC_PING 0x200
 #define ESP_ERR_ULTRASONIC_PING_TIMEOUT 0x201
@@ -48,4 +44,4 @@
 
 int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif //_ULTRASONIC_HC_SR04_H_
+#endif //_SENSOR_0024_OTHER_HCSR04_H_
