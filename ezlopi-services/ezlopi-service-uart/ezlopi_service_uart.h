@@ -1,5 +1,5 @@
-#ifndef __QT_SERIAL_H__
-#define __QT_SERIAL_H__
+#ifndef _EZLOPI_SERVICE_UART_H_
+#define _EZLOPI_SERVICE_UART_H_
 
 #include <string.h>
 #include "driver/uart.h"
@@ -34,4 +34,4 @@ extern "C"
 }
 #endif
 
-#endif // __QT_SERIAL_H__
+#endif // _EZLOPI_SERVICE_UART_H_

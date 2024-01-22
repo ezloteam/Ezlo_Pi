@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_ETHERNET_H__
-#define __EZLOPI_ETHERNET_H__
+#ifndef _EZLOPI_CORE_ETHERNET_H_
+#define _EZLOPI_CORE_ETHERNET_H_
 
 #include "esp_netif.h"
 
@@ -38,4 +38,4 @@ void ezlopi_ethernet_deinit(void);
 e_ethernet_status_t ezlopi_ethernet_get_status(void);
 esp_netif_ip_info_t *ezlopi_ethernet_get_ip_info(void);
 
-#endif // __EZLOPI_ETHERNET_H__
+#endif // _EZLOPI_CORE_ETHERNET_H_

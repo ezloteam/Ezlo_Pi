@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_EVENT_GROUP_H__
-#define __EZLOPI_EVENT_GROUP_H__
+#ifndef _EZLOPI_CORE_EVENT_GROUP_H_
+#define _EZLOPI_CORE_EVENT_GROUP_H_
 
 #include "ctype.h"
 #include "string.h"
@@ -22,4 +22,4 @@ void ezlopi_event_group_set_event(e_ezlopi_event_t event);
 void ezlopi_event_group_clear_event(e_ezlopi_event_t event);
 int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time_ms, uint32_t clear_on_exit);
 
-#endif // __EZLOPI_EVENT_GROUP_H__
+#endif // _EZLOPI_CORE_EVENT_GROUP_H_

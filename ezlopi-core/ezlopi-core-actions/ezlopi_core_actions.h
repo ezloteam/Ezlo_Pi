@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_ACTIONS_H__
-#define __EZLOPI_ACTIONS_H__
+#ifndef _EZLOPI_CORE_ACTIONS_H_
+#define _EZLOPI_CORE_ACTIONS_H_
 
 #include "string.h"
 
@@ -11,4 +11,4 @@ typedef enum e_ezlopi_actions
 
 char *ezlopi_actions_to_string(e_ezlopi_actions_t action);
 
-#endif //
+#endif // _EZLOPI_CORE_ACTIONS_H_

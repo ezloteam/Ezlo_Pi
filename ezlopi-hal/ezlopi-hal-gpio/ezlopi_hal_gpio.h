@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_GPIO_H__
-#define __EZLOPI_GPIO_H__
+#ifndef _EZLOPI_HAL_GPIO_H_
+#define _EZLOPI_HAL_GPIO_H_
 
 #include "stdio.h"
 #include "driver/gpio.h"
@@ -43,4 +43,4 @@ typedef struct s_ezlopi_gpios
 
 // int ezlopi_gpio_init(s_ezlopi_device_properties_t *properties);
 
-#endif // __EZLOPI_GPIO_H__
+#endif // _EZLOPI_HAL_GPIO_H_

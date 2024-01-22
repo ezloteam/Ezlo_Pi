@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_SCENES_EXPRESSIONS_H__
-#define __EZLOPI_SCENES_EXPRESSIONS_H__
+#ifndef _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
+#define _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 
 #include "string.h"
 #include "inttypes.h"
@@ -134,4 +134,4 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
  */
 int ezlopi_scenes_expressions_delete_by_name(char *expression_name);
 
-#endif // __EZLOPI_SCENES_EXPRESSIONS_H__
+#endif // _EZLOPI_CORE_SCENES_EXPRESSIONS_H_

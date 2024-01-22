@@ -1,5 +1,5 @@
-#ifndef __WEBSOCKET_CLIENT_H__
-#define __WEBSOCKET_CLIENT_H__
+#ifndef _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
+#define _EZLOPI_CORE_WEBSOCKET_CLIENT_H_
 
 #include "esp_wifi.h"
 #include "esp_system.h"
@@ -57,4 +57,4 @@ public:
 };
 #endif
 
-#endif // __WEBSOCKET_CLIENT_H__
+#endif // _EZLOPI_CORE_WEBSOCKET_CLIENT_H_

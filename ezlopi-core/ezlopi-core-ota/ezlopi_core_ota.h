@@ -1,5 +1,5 @@
-#ifndef __NVS_STORAGE_H__
-#define __NVS_STORAGE_H__
+#ifndef _EZLOPI_CORE_OTA_H_
+#define _EZLOPI_CORE_OTA_H_
 
 #include "cJSON.h"
 #include "nvs_flash.h"
@@ -15,4 +15,4 @@ extern "C"
 }
 #endif
 
-#endif // __NVS_STORAGE_H__
+#endif // _EZLOPI_CORE_OTA_H_

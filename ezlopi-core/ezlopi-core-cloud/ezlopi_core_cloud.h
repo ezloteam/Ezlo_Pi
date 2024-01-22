@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_CLOUD_H__
-#define __EZLOPI_CLOUD_H__
+#ifndef _EZLOPI_CORE_CLOUD_H_
+#define _EZLOPI_CORE_CLOUD_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -109,4 +109,4 @@ void ezlopi_cloud_update_expression_id(uint32_t a_expression_id);
 uint32_t ezlopi_cloud_generate_room_id(void);
 void ezlopi_cloud_update_room_id(uint32_t a_room_id);
 
-#endif // __EZLOPI_CLOUD_H__
+#endif // _EZLOPI_CORE_CLOUD_H_

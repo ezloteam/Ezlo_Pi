@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_ONEWIRE_H__
-#define __EZLOPI_ONEWIRE_H__
+#ifndef _EZLOPI_HAL_ONEWIRE_H_
+#define _EZLOPI_HAL_ONEWIRE_H_
 
 #include "stdio.h"
 #include "stdbool.h"
@@ -11,4 +11,4 @@ typedef struct s_ezlopi_onewire
     uint32_t onewire_pin;
 } s_ezlopi_onewire_t;
 
-#endif // __EZLOPI_ONEWIRE_H__
+#endif // _EZLOPI_HAL_ONEWIRE_H_

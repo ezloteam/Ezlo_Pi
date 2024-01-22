@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_DEVICES_INCLUDES_H__
-#define __EZLOPI_DEVICES_INCLUDES_H__
+#ifndef _EZLOPI_CORE_DEVICES_LIST_INCLUDES_H_
+#define _EZLOPI_CORE_DEVICES_LIST_INCLUDES_H_
 
 #include "device_0001_digitalOut_generic.h"
 #include "device_0002_digitalOut_relay.h"
@@ -69,4 +69,4 @@
 #include "sensor_0066_other_R307_FingerPrint.h"
 #include "sensor_0067_hilink_presence_sensor.h"
 
-#endif // __EZLOPI_DEVICES_INCLUDES_H__
+#endif // _EZLOPI_CORE_DEVICES_LIST_INCLUDES_H_

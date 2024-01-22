@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_SCENES_OPERATORS_H__
-#define __EZLOPI_SCENES_OPERATORS_H__
+#ifndef _EZLOPI_CORE_SCENES_OPERATORS_H_
+#define _EZLOPI_CORE_SCENES_OPERATORS_H_
 
 #include <string.h>
 #include "ezlopi_core_scenes_v2.h"
@@ -64,4 +64,4 @@ const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_s
 
 int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
 
-#endif // __EZLOPI_SCENES_OPERATORS_H__
+#endif // _EZLOPI_CORE_SCENES_OPERATORS_H_

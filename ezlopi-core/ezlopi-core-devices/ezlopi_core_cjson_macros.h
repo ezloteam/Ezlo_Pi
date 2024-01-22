@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_CJSON_MACROS_H__
-#define __EZLOPI_CJSON_MACROS_H__
+#ifndef _EZLOPI_CORE_CJSON_MACROS_H_
+#define _EZLOPI_CORE_CJSON_MACROS_H_
 
 #include "trace.h"
 #include <stdio.h>
@@ -150,4 +150,4 @@
         }                                                        \
     }
 
-#endif // __EZLOPI_CJSON_MACROS_H__
+#endif // _EZLOPI_CORE_CJSON_MACROS_H_

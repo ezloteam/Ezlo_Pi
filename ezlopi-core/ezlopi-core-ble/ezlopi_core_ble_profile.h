@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_BLE_PROFILE_H__
-#define __EZLOPI_BLE_PROFILE_H__
+#ifndef _EZLOPI_CORE_BLE_PROFILE_H_
+#define _EZLOPI_CORE_BLE_PROFILE_H_
 #include "esp_gatts_api.h"
 #include "esp_bt_defs.h"
 #include "ezlopi_core_ble_config.h"
@@ -30,4 +30,4 @@ void ezlopi_ble_gatt_print_service(s_gatt_service_t *service);
 void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg);
 void ezlopi_ble_profile_print(void);
 
-#endif // __EZLOPI_BLE_PROFILE_H__
+#endif // _EZLOPI_CORE_BLE_PROFILE_H_

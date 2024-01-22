@@ -1,6 +1,6 @@
-#ifndef __EZLOPI_REBOOT_H__
-#define __EZLOPI_REBOOT_H__
+#ifndef _EZLOPI_CORE_REBOOT_H_
+#define _EZLOPI_CORE_REBOOT_H_
 
 void ezlopi_reboot(void);
 
-#endif // __EZLOPI_REBOOT_H__
+#endif // _EZLOPI_CORE_REBOOT_H_

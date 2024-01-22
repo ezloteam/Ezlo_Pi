@@ -1,5 +1,5 @@
-#ifndef __HTTP_H__
-#define __HTTP_H__
+#ifndef _EZLOPI_CORE_HTTP_H_
+#define _EZLOPI_CORE_HTTP_H_
 
 #include "stdio.h"
 #include "string.h"
@@ -37,4 +37,4 @@ extern "C"
 }
 #endif
 
-#endif // __HTTP_H__
+#endif // _EZLOPI_CORE_HTTP_H_

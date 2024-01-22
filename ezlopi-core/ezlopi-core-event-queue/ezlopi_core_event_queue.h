@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_EVENT_QUEUE_H__
-#define __EZLOPI_EVENT_QUEUE_H__
+#ifndef _EZLOPI_CORE_EVENT_QUEUE_H_
+#define _EZLOPI_CORE_EVENT_QUEUE_H_
 
 #include "ezlopi_core_actions.h"
 
@@ -13,4 +13,4 @@ void ezlopi_event_queue_init(void);
 int ezlopi_event_queue_send(s_ezlo_event_t *event_data, int from_isr);
 int ezlopi_event_queue_receive(s_ezlo_event_t **event_data, int time_out_ms);
 
-#endif // __EZLOPI_EVENT_QUEUE_H__
+#endif // _EZLOPI_CORE_EVENT_QUEUE_H_
