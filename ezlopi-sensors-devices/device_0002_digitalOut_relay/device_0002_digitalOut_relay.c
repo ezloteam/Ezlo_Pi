@@ -1,7 +1,5 @@
-// #include <string.h>
 #include "sdkconfig.h"
 #include "trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"

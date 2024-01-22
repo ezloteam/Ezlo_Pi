@@ -1,28 +1,25 @@
 #include <math.h>
-#include "cJSON.h"
-#include <string.h>
 #include "sdkconfig.h"
 #include "driver/gpio.h"
-
 #include "trace.h"
-#include "ezlopi_cloud_items.h"
+// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_hal_i2c_master.h"
-#include "ezlopi_hal_spi_master.h"
-#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
+
+// #include "ezlopi_hal_i2c_master.h"
+// #include "ezlopi_hal_spi_master.h"
+
+#include "ezlopi_cloud_items.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "led_strip.h"
 #include "color_codes.h"
-#include "device_0009_other_RMT_SK6812.h"
-#include "led_strip.h"
 
+#include "device_0009_other_RMT_SK6812.h"
 typedef struct s_dimmer_args
 {
     led_strip_t sk6812_strip;

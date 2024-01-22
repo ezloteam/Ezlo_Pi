@@ -1,22 +1,19 @@
-#include "stdlib.h"
-#include <string.h>
+
 #include "sdkconfig.h"
 #include <math.h>
-
-#include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_cloud_items.h"
+// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_hal_i2c_master.h"
-#include "ezlopi_hal_spi_master.h"
-#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
+
+#include "ezlopi_hal_i2c_master.h"
+
+#include "ezlopi_cloud_items.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "ALS_LTR303.h"
 #include "sensor_0008_I2C_LTR303ALS.h"

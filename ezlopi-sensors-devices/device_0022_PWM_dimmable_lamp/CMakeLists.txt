@@ -10,6 +10,11 @@ idf_component_register(SRCS "device_0022_PWM_dimmable_lamp.c" "${config_src}"
                 ezlopi-core-actions 
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter 
+
+                ezlopi-hal-pwm
+
+                ezlopi-cloud-items 
                 ezlopi-cloud-constants 
+
                 ezlopi-service-gpioisr
                 )

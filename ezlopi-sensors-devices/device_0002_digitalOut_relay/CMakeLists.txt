@@ -12,6 +12,11 @@ idf_component_register(SRCS "device_0002_digitalOut_relay.c" "${config_src}"
                 ezlopi-core-actions
                 ezlopi-core-devices 
                 ezlopi-core-valueformatter
-                ezlopi-cloud-constants
+
+                ezlopi-hal-gpio
+                
+                ezlopi-cloud-items 
+                ezlopi-cloud-constants 
+
                 ezlopi-service-gpioisr
                 )

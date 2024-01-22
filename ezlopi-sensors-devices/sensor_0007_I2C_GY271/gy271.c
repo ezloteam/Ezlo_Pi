@@ -1,5 +1,5 @@
-#include "esp_err.h"
 #include <math.h>
+#include "esp_err.h"
 #include "trace.h"
 #include "time.h"
 #include "ezlopi_hal_i2c_master.h"

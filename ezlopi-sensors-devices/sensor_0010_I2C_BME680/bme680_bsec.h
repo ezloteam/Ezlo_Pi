@@ -1,8 +1,8 @@
 #pragma once
 
+#include <math.h>
 #include "bme68xLibrary.h"
 #include "bsec2.h"
-#include <math.h>
 
 #define BME680_SDA GPIO_NUM_18
 #define BME680_SCL GPIO_NUM_17

@@ -11,7 +11,7 @@
 #include "ezlopi_hal_i2c_master.h"
 
 #include "ezlopi_cloud_items.h"
-#include "ezlopi_cloud_constants.h""
+#include "ezlopi_cloud_constants.h"
 
 #include "sensor_0012_I2C_BME280.h"
 

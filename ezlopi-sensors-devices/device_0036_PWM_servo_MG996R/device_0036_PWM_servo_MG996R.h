@@ -1,7 +1,6 @@
 #ifndef _DEVICE_0036_PWM_SERVO_MG996R_H_
 #define _DEVICE_0036_PWM_SERVO_MG996R_H_
 
-
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 

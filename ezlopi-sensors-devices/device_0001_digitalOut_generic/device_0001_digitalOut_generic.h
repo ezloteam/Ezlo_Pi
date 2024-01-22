@@ -2,7 +2,7 @@
 #define _DEVICE_0001_DIGITALOUT_GENERIC_H_
 
 #include "ezlopi_core_actions.h"
-// #include "driver/gpio.h"
+#include "ezlopi_core_devices.h"
 
 typedef struct s_digio_settings
 {
