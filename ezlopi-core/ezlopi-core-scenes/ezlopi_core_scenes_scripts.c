@@ -31,7 +31,7 @@ static void __scripts_process_runner(void);
 static void __load_custom_libs(lua_State *lua_state);
 static void __run_script(l_ezlopi_scenes_script_t *script_node);
 static void __scripts_remove_id_and_update_list(uint32_t script_id);
-static char *__script_report(lua_State *lua_state, int status);
+static const char *__script_report(lua_State *lua_state, int status);
 static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar);
 static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script);
 
@@ -251,7 +251,8 @@ static void __script_process(void *arg)
         int tmp_ret = luaL_loadstring(lua_state, script_node->code);
         if (tmp_ret)
         {
-            char *script_report = __script_report(lua_state, tmp_ret);
+#warning "Krishna needs to check this."
+            const char *script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
                 TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
@@ -261,7 +262,7 @@ static void __script_process(void *arg)
         tmp_ret = lua_pcall(lua_state, 0, 1, 0);
         if (tmp_ret)
         {
-            char *script_report = __script_report(lua_state, tmp_ret);
+            const char *script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
                 TRACE_E("Error in '%s' -> %s", script_node->name, script_report);
@@ -478,7 +479,7 @@ static void __exit_script_hook(lua_State *lua_state, lua_Debug *ar)
     luaL_error(lua_state, "Exited from software call");
 }
 
-static char *__script_report(lua_State *lua_state, int status)
+static const char *__script_report(lua_State *lua_state, int status)
 {
     if (status == LUA_OK)
     {

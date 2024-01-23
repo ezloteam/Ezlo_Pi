@@ -35,7 +35,7 @@ void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
             if (cj_block_type && cj_block_type->valuestring)
             {
                 char *block_type_name = NULL;
-                e_scenes_block_type_v2_t block_type = __get_block_type_and_create_block_array(cj_result, &block_type_name, cj_block_type);
+                e_scenes_block_type_v2_t block_type = __get_block_type_and_create_block_array(cj_result, (const char **)&block_type_name, cj_block_type);
 
                 if (block_type)
                 {

@@ -24,7 +24,8 @@ static int __free_room_from_list_by_id(uint32_t room_id);
 static void __update_cloud_room_deleted(uint32_t room_id);
 static int __remove_room_from_nvs_by_id(uint32_t a_room_id);
 static e_room_subtype_t __get_subtype_enum(char *subtype_str);
-static const char *__get_subtype_name(e_room_subtype_t subtype);
+
+// static const char *__get_subtype_name(e_room_subtype_t subtype);
 
 s_ezlopi_room_t *ezlopi_room_get_room_head(void)
 {
@@ -481,16 +482,16 @@ static void __sort_by_pos(void)
     }
 }
 
-static const char *__get_subtype_name(e_room_subtype_t subtype)
-{
-    const char *ret = ezlopi__str;
-    if ((subtype > ROOM_SUBTYPE_NONE) && (subtype < ROOM_SUBTYPE_MAX))
-    {
-        ret = sc_room_subtype_name[subtype];
-    }
+// static const char *__get_subtype_name(e_room_subtype_t subtype)
+// {
+//     const char *ret = ezlopi__str;
+//     if ((subtype > ROOM_SUBTYPE_NONE) && (subtype < ROOM_SUBTYPE_MAX))
+//     {
+//         ret = sc_room_subtype_name[subtype];
+//     }
 
-    return ret;
-}
+//     return ret;
+// }
 
 static e_room_subtype_t __get_subtype_enum(char *subtype_str)
 {

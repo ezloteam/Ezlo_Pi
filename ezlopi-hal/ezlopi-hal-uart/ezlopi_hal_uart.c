@@ -101,7 +101,7 @@ static void ezlopi_uart_channel_task(void *args)
             case UART_DATA:
             {
                 uint32_t bufferred_data_len = 0;
-                esp_err_t error = uart_get_buffered_data_len(ezlopi_uart_object->ezlopi_uart.channel, &bufferred_data_len);
+                uart_get_buffered_data_len(ezlopi_uart_object->ezlopi_uart.channel, &bufferred_data_len);
                 if (bufferred_data_len)
                 {
                     buffer = malloc(bufferred_data_len);

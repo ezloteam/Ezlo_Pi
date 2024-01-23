@@ -267,6 +267,7 @@ static int __0066_init(l_ezlopi_item_t *item)
         if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO(user_data->intr_pin) && GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
         {
             gpio_num_t intr_pin = user_data->intr_pin;
+#warning "Riken needs to fix this warning, compile and check about the warning details !"
             s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_0066_fingerprint_upcall, item);
             item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
 

@@ -117,7 +117,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         {
             item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
             cJSON_AddBoolToObject(cjson_properties, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-            char *formatted_val = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
+            const char *formatted_val = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
             cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
         }
     }

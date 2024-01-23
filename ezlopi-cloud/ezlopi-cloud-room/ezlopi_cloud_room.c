@@ -91,7 +91,6 @@ void room_name_set(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    uint32_t room_id = 0;
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {

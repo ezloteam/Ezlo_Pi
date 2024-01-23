@@ -25,16 +25,11 @@ void timer_service_init(void)
 
 static void event_process_v3(void *pv)
 {
-    TickType_t old_tick = xTaskGetTickCount();
-
     while (1)
     {
         s_ezlo_event_t *event = NULL;
         if (pdTRUE == ezlopi_event_queue_receive(&event, 2000 / portTICK_PERIOD_MS))
         {
-            TRACE_D("event tick: %d", xTaskGetTickCount() - old_tick);
-            old_tick = xTaskGetTickCount();
-
             if (NULL != event)
             {
                 l_ezlopi_device_t *curr_device = ezlopi_device_get_head();

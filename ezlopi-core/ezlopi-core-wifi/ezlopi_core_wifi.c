@@ -306,6 +306,7 @@ static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_w
     if (_upcall)
     {
         _upcall->arg = arg;
+#warning "Krishna needs to test and fix it"
         _upcall->upcall = upcall;
         _upcall->next = NULL;
     }

@@ -121,10 +121,10 @@ static char *device_info_jsonify(void)
         cJSON_AddStringToObject(root, ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
 
         cJSON_AddStringToObject(root, ezlopi_ezlopi_device_type_str, ezlopi_factory_info_v3_get_device_type());
-        __add_factory_info_to_root(root, ezlopi_model_str, ezlopi_factory_info_v3_get_model());
-        __add_factory_info_to_root(root, ezlopi_device_name_str, ezlopi_factory_info_v3_get_name());
-        __add_factory_info_to_root(root, ezlopi_brand_str, ezlopi_factory_info_v3_get_brand());
-        __add_factory_info_to_root(root, ezlopi_manufacturer_str, ezlopi_factory_info_v3_get_manufacturer());
+        __add_factory_info_to_root(root, (char *)ezlopi_model_str, ezlopi_factory_info_v3_get_model());
+        __add_factory_info_to_root(root, (char *)ezlopi_device_name_str, ezlopi_factory_info_v3_get_name());
+        __add_factory_info_to_root(root, (char *)ezlopi_brand_str, ezlopi_factory_info_v3_get_brand());
+        __add_factory_info_to_root(root, (char *)ezlopi_manufacturer_str, ezlopi_factory_info_v3_get_manufacturer());
         cJSON_AddNumberToObject(root, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
 
         char *ssid = ezlopi_factory_info_v3_get_ssid();

@@ -411,7 +411,7 @@ static int __setting_get_user_defined_setting(void *arg, l_ezlopi_device_setting
         cJSON *cj_value_default = cJSON_AddObjectToObject(cj_properties, "valueDefault");
         if (cj_value_default)
         {
-            ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_value_default, &hilink_user_defined_setting_default_value));
+            ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_value_default, (s_hilink_userdefined_setting_value_t *)&hilink_user_defined_setting_default_value));
         }
     }
     else

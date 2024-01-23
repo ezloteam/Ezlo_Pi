@@ -391,7 +391,7 @@ static void qt_serial_set_wifi(const char *data)
                 uint8_t attempt = 1;
                 while (attempt <= EZLOPI_WIFI_CONN_RETRY_ATTEMPT)
                 {
-                    esp_err_t wifi_error = ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
+                    ezlopi_wifi_connect((const char *)ssid, (const char *)pass);
                     ezlopi_wait_for_wifi_to_connect((uint32_t)EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL);
                     s_ezlopi_net_status_t *net_stat = ezlopi_get_net_status();
                     if (net_stat)

@@ -42,9 +42,8 @@ static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t
 
 static s_gatt_char_t *factory_reset_characterstic = NULL;
 static void __process_auth_command(cJSON *root);
-static void __process_soft_reset_command(void);
 static void __process_hard_reset_command(void);
-static void __process_factory_reset_command(void);
+// static void __process_factory_reset_command(void);
 
 static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
 
@@ -114,7 +113,7 @@ static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_p
             }
             case BLE_CMD_FACTORY_RESET: // factory reset command
             {
-                __process_factory_reset_command();
+                // __process_factory_reset_command();
                 break;
             }
             case BLE_CMD_HARDREST:
@@ -171,14 +170,6 @@ static void __process_hard_reset_command(void)
         TRACE_W("Not authenticated for factory-reset!");
     }
 #endif
-}
-
-static void __process_soft_reset_command(void)
-{
-}
-
-static void __process_factory_reset_command(void)
-{
 }
 
 static void __process_auth_command(cJSON *root)

@@ -152,8 +152,6 @@ static int __add_array_to_object(cJSON *cj_params, const char *const *arr, const
 static int __add_value_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool is_hub_request)
 {
     int ret = 0;
-
-    char *valueFormatted[20];
     ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
 
     if (item && cj_params && hilink_data)

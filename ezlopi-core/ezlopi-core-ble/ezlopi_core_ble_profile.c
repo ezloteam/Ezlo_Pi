@@ -396,7 +396,7 @@ void ezlopi_ble_gatt_print_service(s_gatt_service_t *service)
 
 void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
 {
-    msg = msg ? msg : ezlopi__str;
+    msg = msg ? msg : (char *)ezlopi__str;
 
     if (uuid)
     {

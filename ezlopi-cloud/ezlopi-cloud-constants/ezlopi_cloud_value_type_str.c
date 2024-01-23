@@ -69,6 +69,6 @@ const char *value_type_temperature = "temperature";
 // const  char *value_manual_not_fully_locked_operation = "manual_not_fully_locked_operation";
 
 const char *value_type_fingerprint_action = "fingerprint_action";
-static const char *value_type_presence_operation_mode = "presence_operation_mode";
+const char *value_type_presence_operation_mode = "presence_operation_mode";
 
 #endif // __EZLOPI_VLAUES_STR_H__

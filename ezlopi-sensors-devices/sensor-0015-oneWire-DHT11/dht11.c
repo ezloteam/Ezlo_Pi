@@ -42,9 +42,6 @@
 
 #include "dht11.h"
 
-// == global defines =============================================
-static const char *TAG = "DHT";
-
 static int DHT11gpio = GPIO_NUM_4; // my default DHT pin = 4
 static float humidity_dht11 = 0.;
 static float temperature_dht11 = 0.;

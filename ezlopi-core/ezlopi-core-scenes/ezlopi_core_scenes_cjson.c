@@ -494,7 +494,7 @@ void ezlopi_scenes_cjson_add_action_blocks(cJSON *root, l_action_block_v2_t *act
         {
             while (action_blocks)
             {
-                cJSON *cj_then_block = ezlopi_scenes_cjson_create_action_block(action_blocks, block_type_str);
+                cJSON *cj_then_block = ezlopi_scenes_cjson_create_action_block(action_blocks, (char *)block_type_str);
                 if (cj_then_block)
                 {
                     if (!cJSON_AddItemToArray(cj_then_block_array, cj_then_block))

@@ -6,19 +6,20 @@
 #include "ezlopi_hal_i2c_master.h"
 
 static s_ezlopi_i2c_master_t *i2c_master_conf_ptr[I2C_NUM_MAX] = {NULL, NULL};
-static int ezlopi_i2c_check_channel(s_ezlopi_i2c_master_t *i2c_master_conf)
-{
-    int ret = 0;
 
-    for (int idx = 0; idx < I2C_NUM_MAX; idx++)
-    {
-        if (NULL != i2c_master_conf_ptr)
-        {
-        }
-    }
+// static int ezlopi_i2c_check_channel(s_ezlopi_i2c_master_t *i2c_master_conf)
+// {
+//     int ret = 0;
 
-    return ret;
-}
+//     for (int idx = 0; idx < I2C_NUM_MAX; idx++)
+//     {
+//         if (NULL != i2c_master_conf_ptr)
+//         {
+//         }
+//     }
+
+//     return ret;
+// }
 
 int ezlopi_i2c_master_init(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
@@ -65,7 +66,7 @@ void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
     if (NULL != i2c_master_conf)
     {
-        if (1 == i2c_master_conf_ptr[i2c_master_conf->channel])
+        if (1 == i2c_master_conf_ptr[i2c_master_conf->channel]->channel)
         {
             i2c_driver_delete(i2c_master_conf->channel);
             i2c_master_conf_ptr[i2c_master_conf->channel] = NULL;

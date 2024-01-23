@@ -33,7 +33,11 @@ extern void ezlopi_ble_service_device_info_init(void);
 extern void ezlopi_ble_service_dynamic_config_init(void);
 
 static void ezlopi_ble_basic_init(void);
+
+#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void);
+#endif
+
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 
 void ezlopi_ble_service_init(void)
@@ -75,17 +79,17 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
     const uint8_t init_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
     const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t)),
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void *)&auth_req, sizeof(uint8_t)),
                       "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t)),
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void *)&iocap, sizeof(uint8_t)),
                       "failed -set - ESP_BLE_SM_IOCAP_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, &auth_option, sizeof(uint8_t)),
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void *)&auth_option, sizeof(uint8_t)),
                       "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, &oob_support, sizeof(uint8_t)),
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void *)&oob_support, sizeof(uint8_t)),
                       "failed -set - ESP_BLE_SM_OOB_SUPPORT");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t)),
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void *)&init_key, sizeof(uint8_t)),
                       "failed -set - ESP_BLE_SM_SET_INIT_KEY");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t)),
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void *)&rsp_key, sizeof(uint8_t)),
                       "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
 
