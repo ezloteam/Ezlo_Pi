@@ -1,4 +1,4 @@
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "esp_err.h"
 #include "ezlopi_cloud_item_name_str.h"
 #include "sensor_0006_I2C_ADXL345.h"

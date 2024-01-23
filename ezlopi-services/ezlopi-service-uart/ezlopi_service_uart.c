@@ -15,10 +15,10 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
-#include "version.h"
+#include "ezlopi_util_version.h"
 #include "sdkconfig.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"

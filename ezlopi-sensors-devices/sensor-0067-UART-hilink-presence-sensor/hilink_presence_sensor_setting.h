@@ -2,7 +2,7 @@
 #ifndef _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 #define _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "cJSON.h"
 #include "ezlopi_core_devices.h"
 

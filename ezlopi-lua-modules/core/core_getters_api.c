@@ -2,8 +2,8 @@
 #include "lua/lua.h"
 #include "lua/lauxlib.h"
 
-#include "trace.h"
-#include "version.h"
+#include "ezlopi_util_trace.h"
+#include "ezlopi_util_version.h"
 #include "core_getters_api.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_devices.h"

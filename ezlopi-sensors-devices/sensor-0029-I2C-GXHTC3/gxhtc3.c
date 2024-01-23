@@ -1,7 +1,7 @@
 
 #include "gxhtc3.h"
 #include "driver/i2c.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 static uint8_t gxhtc3_get_crc8(uint8_t *data, int len)
 {

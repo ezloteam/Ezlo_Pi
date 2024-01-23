@@ -3,7 +3,7 @@ file(GLOB_RECURSE src_files "*.c*")
 
 idf_component_register(SRCS "sensor_0067_hilink_presence_sensor.c" "${src_files}"
                     INCLUDE_DIRS .
-                    REQUIRES    trace 
+                    REQUIRES    ezlopi-util-trace 
                                 ld2410
                                 ezlopi-core-timer 
                                 ezlopi-core-cloud 

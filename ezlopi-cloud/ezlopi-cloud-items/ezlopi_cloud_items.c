@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "ezlopi_cloud_items.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "sdkconfig.h"
 
 // #include "ezlopi_service_webprov.h"

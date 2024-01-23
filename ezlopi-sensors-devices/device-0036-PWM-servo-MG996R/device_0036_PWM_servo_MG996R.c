@@ -1,4 +1,4 @@
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 // #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
@@ -197,7 +197,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 #if 0 // v2.x
 #include "cJSON.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_items.h"
 
 #include "ezlopi_core_cloud.h"

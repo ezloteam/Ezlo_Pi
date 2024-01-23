@@ -6,7 +6,7 @@
 #include "ezlopi_core_factory_info.h"
 
 #include "corelib.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "core_getters_api.h"
 #include "core_adders_api.h"

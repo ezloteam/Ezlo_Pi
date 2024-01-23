@@ -1,5 +1,5 @@
 #include "ld2410.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 static const char *TAG = "ld2410";
 

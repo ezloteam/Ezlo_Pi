@@ -1,6 +1,6 @@
 
 #include "sensor_0044_I2C_TSL256_luminosity.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t conv_time, gain_t gain)
 {

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_gateway.h"
 #include "ezlopi_cloud_constants.h"

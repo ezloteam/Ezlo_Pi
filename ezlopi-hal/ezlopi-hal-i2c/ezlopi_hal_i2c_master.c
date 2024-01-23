@@ -1,7 +1,7 @@
 
 #include <stdint.h>
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_hal_i2c_master.h"
 

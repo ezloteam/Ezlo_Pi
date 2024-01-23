@@ -3,9 +3,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "version.h"
-#include "trace.h"
-#include "version.h"
+#include "ezlopi_util_version.h"
+#include "ezlopi_util_trace.h"
+#include "ezlopi_util_version.h"
 #include "ezlopi_cloud_registration.h"
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_cloud_constants.h"

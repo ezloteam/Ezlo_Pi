@@ -3,7 +3,7 @@
 #include "esp_event.h"
 #include "driver/gpio.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ethernet.h"
 

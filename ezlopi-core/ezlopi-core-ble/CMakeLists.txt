@@ -4,7 +4,7 @@ set(ESP_IDF_COMPONENTS
         bt 
 )
 set(EZLOPI_COMPONENTS 
-        trace
+        ezlopi-util-trace
 )
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-nvs 

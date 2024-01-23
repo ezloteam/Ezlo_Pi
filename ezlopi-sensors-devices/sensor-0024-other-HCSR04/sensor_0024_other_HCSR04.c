@@ -1,7 +1,7 @@
 #include "soc/rtc.h"
 #include "driver/gpio.h"
 #include "driver/mcpwm.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"

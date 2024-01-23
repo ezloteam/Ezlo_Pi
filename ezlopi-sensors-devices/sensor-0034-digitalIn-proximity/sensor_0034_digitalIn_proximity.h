@@ -4,7 +4,7 @@
 #include "esp_err.h"
 #include "driver/gpio.h"
 #include "ezlopi_cloud_items.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "cJSON.h"
 
 #include "ezlopi_core_actions.h"

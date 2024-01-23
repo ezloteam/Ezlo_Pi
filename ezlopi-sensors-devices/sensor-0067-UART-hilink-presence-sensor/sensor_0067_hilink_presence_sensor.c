@@ -1,6 +1,6 @@
 #include <string.h>
 #include "sdkconfig.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 // #include "cJSON.h"
 #include "ld2410.h"
 

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "ezlopi_hal_pwm.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 struct s_ezlopi_pwm_object
 {

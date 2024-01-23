@@ -2,7 +2,7 @@
 
 #include "esp_gatt_common_api.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ble_gap.h"
 #include "ezlopi_core_ble_profile.h"

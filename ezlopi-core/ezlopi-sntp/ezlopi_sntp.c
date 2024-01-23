@@ -5,7 +5,7 @@
 
 #include "esp_sntp.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "core_sntp.h"
 #include "../../build/config/sdkconfig.h"
 

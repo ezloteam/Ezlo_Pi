@@ -9,7 +9,7 @@ set(ESP_IDF_COMPONENTS
         spiffs
 )
 set(EZLOPI_COMPONENTS 
-        trace
+        ezlopi-util-trace
         dns_hijacking
 )
 

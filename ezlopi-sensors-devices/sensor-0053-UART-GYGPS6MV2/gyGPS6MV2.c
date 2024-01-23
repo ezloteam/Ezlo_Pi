@@ -1,5 +1,5 @@
 #include <string.h>
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "gyGPS6MV2.h"
 
 //-------------------------------------------------------------------------

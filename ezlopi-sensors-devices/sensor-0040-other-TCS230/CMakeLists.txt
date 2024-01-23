@@ -3,7 +3,7 @@ file(GLOB_RECURSE config_src "*.c")
 idf_component_register(SRCS "sensor_0040_other_TCS230.c" "${config_src}"
                     INCLUDE_DIRS "."
                     REQUIRES   
-                                trace 
+                                ezlopi-util-trace 
                                 freertos
                                 ezlopi-core-timer 
                                 ezlopi-core-cloud 

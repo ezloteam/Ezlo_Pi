@@ -2,7 +2,7 @@
 #include "sdkconfig.h"
 #include "esp_intr_alloc.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_hal_spi_master.h"
 

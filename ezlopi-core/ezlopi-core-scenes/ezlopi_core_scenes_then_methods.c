@@ -1,4 +1,4 @@
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_then_methods.h"

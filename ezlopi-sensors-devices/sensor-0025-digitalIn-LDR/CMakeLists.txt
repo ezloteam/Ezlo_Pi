@@ -3,7 +3,7 @@ file(GLOB_RECURSE config_src "*.c")
 
 idf_component_register(SRCS "sensor_0025_digitalIn_LDR.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES    trace
+    REQUIRES    ezlopi-util-trace
                 driver
                 ezlopi-core-timer 
                 ezlopi-core-cloud 

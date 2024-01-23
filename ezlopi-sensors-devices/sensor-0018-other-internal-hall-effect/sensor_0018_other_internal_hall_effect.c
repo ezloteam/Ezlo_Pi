@@ -5,7 +5,7 @@
 #ifdef CONFIG_IDF_TARGET_ESP32
 
 #include <math.h>
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 // #include "esp_err.h"
 // #include "cJSON.h"
 

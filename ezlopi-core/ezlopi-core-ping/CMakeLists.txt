@@ -3,7 +3,7 @@
 file(GLOB_RECURSE config_src "./*.c*")
 
 set(EZLOPI_COMPONENTS 
-        trace
+        ezlopi-util-trace
 )
 
 

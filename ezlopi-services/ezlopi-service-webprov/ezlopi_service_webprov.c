@@ -3,7 +3,7 @@
 #include "esp_wifi_types.h"
 #include "esp_idf_version.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_http.h"

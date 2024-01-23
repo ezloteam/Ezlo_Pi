@@ -6,9 +6,9 @@
 #include "esp_event_base.h"
 #include "esp_chip_info.h"
 #include "mbedtls/base64.h"
-#include "version.h"
+#include "ezlopi_util_version.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_nvs.h"
