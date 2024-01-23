@@ -1,6 +1,0 @@
-#ifndef __EZLOPI_CONTROLLER_H__
-#define __EZLOPI_CONTROLLER_H__
-
-
-
-#endif // __EZLOPI_CONTROLLER_H__

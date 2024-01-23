@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 17)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
+# idf_build_set_property(COMPILE_OPTIONS "-Wno-error" APPEND)
+
 # message(STATUS "current dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 execute_process(COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/update_device_list.sh"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/xyz.txt"
@@ -29,7 +31,16 @@ MACRO(SUBDIRLIST result curdir)
     SET(${result} ${dirlist}) # copy the components of 'dirlist' into 'result'(return variable)
 ENDMACRO()
 
-set(external_components_list sensors devices_old devices protocols interface ezlopi-cloud ezlopi-core services lua_modules third-party/bosch-semiconductor) # list of external components
+# list of external components
+set(external_components_list 
+                                ezlopi-components 
+                                ezlopi-sensors-devices 
+                                ezlopi-lua-modules 
+                                ezlopi-services 
+                                ezlopi-cloud 
+                                ezlopi-core 
+                                ezlopi-hal
+                                ezlopi-util) 
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'
 set(ALL_COMPONENTS "") # clearing 'ALL_COMPONENTS' variable
@@ -41,8 +52,6 @@ foreach(component ${external_components_list})
     SUBDIRLIST(SUBDIRS ${component}) # scans and gets the list of directories from 'services' in 'SUBDIRS'
     LIST(APPEND ALL_COMPONENTS ${SUBDIRS})
 endforeach()
-
-LIST(APPEND ALL_COMPONENTS library)
 
 set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS}) # add the list of directories 'SUBDIRS' to 'EXTRA_COMPONENT_DIRS'(ESP32 VARIABLES), links the external components
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENTS_DIRS}\r\n")

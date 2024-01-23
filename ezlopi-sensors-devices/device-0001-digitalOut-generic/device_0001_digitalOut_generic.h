@@ -1,0 +1,14 @@
+#ifndef _DEVICE_0001_DIGITALOUT_GENERIC_H_
+#define _DEVICE_0001_DIGITALOUT_GENERIC_H_
+
+#include "ezlopi_core_actions.h"
+#include "ezlopi_core_devices.h"
+
+typedef struct s_digio_settings
+{
+    int32_t settings_int_data;
+} s_digio_settings_t;
+
+int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+
+#endif // _DEVICE_0001_DIGITALOUT_GENERIC_H_
