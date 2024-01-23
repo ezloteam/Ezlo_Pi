@@ -37,6 +37,7 @@ const char *scales_ohm_meter = "ohm_meter";
 /// @brief substance_amount
 const char *scales_micro_gram_per_cubic_meter = "micro_gram_per_cubic_meter";
 const char *scales_mole_per_cubic_meter = "mole_per_cubic_meter";
+const char *scales_particles_per_deciliter = "particles_per_deciliter";
 const char *scales_parts_per_million = "parts_per_million";
 const char *scales_milli_gram_per_liter = "milli_gram_per_liter";
 

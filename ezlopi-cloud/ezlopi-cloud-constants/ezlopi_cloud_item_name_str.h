@@ -178,8 +178,8 @@ extern const char *ezlopi_item_name_water_flow;
 // extern const  char *ezlopi_item_name_outside_temperature;
 // // extern const  char *ezlopi_item_name_water_chlorine_level;
 // extern const  char *ezlopi_item_name_water_acidity;
-// extern const  char *ezlopi_item_name_particulate_matter_10;
-// extern const  char *ezlopi_item_name_particulate_matter_2_dot_5;
+extern const  char *ezlopi_item_name_particulate_matter_10;
+extern const  char *ezlopi_item_name_particulate_matter_2_dot_5;
 // extern const  char *ezlopi_item_name_program_status;
 // extern const  char *ezlopi_item_name_program_failures;
 // extern const  char *ezlopi_item_name_position;
@@ -223,7 +223,7 @@ extern const char *ezlopi_item_name_applied_force_on_sensor;
 extern const  char *ezlopi_item_name_motion_direction;
 // extern const  char *ezlopi_item_name_nitrogen_dioxide;
 // extern const  char *ezlopi_item_name_ozone;
-// extern const  char *ezlopi_item_name_particulate_matter_1;
+extern const  char *ezlopi_item_name_particulate_matter_1;
 // extern const  char *ezlopi_item_name_return_air_temperature;
 // extern const  char *ezlopi_item_name_suction_pressure;
 // extern const  char *ezlopi_item_name_sulfur_dioxide;
@@ -243,5 +243,12 @@ extern const char *ezlopi_item_name_gyroscope_z_axis;
 extern const char *ezlopi_item_name_learn_fingerprint;
 extern const char *ezlopi_item_name_fingerprint_action;
 extern const char *ezlopi_item_name_fingerprint_ids;
+
+extern const char *ezlopi_item_name_particles_0_dot_3_um;
+extern const char *ezlopi_item_name_particles_0_dot_5_um;
+extern const char *ezlopi_item_name_particles_1_um;
+extern const char *ezlopi_item_name_particles_2_dot_5_um;
+extern const char *ezlopi_item_name_particles_5_um;
+extern const char *ezlopi_item_name_particles_10_um;
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

@@ -37,6 +37,7 @@ extern const char *scales_ohm_meter;
 /// @brief substance_amount
 extern const char *scales_micro_gram_per_cubic_meter;
 extern const char *scales_mole_per_cubic_meter;
+extern const char *scales_particles_per_deciliter;
 extern const char *scales_parts_per_million;
 extern const char *scales_milli_gram_per_liter;
 
@@ -80,5 +81,7 @@ const static char *scales_beats_per_minute = "beats_per_minute";
 const static char *scales_guass = "guass";
 const static char *scales_tesla = "tesla";
 const static char *scales_weber_per_square_meter = "weber_per_square_meter";
+
+
 
 #endif // __EZLOPI_SCALES_STR_H__
