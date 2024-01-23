@@ -1,6 +1,6 @@
 #include "esp_err.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_devices.h"

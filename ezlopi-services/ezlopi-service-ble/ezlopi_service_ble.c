@@ -6,7 +6,7 @@
 #include "esp_log.h"
 #include "cJSON.h"
 #include "lwip/ip_addr.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "sdkconfig.h"
 
 #include "esp_bt.h"

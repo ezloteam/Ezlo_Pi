@@ -7,7 +7,7 @@
 #include "esp_err.h"
 #include "esp_check.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_hal_uart.h"
 

@@ -3,7 +3,7 @@
 #include "lua/lua.h"
 #include "lua/lauxlib.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_cloud_constants.h"
 

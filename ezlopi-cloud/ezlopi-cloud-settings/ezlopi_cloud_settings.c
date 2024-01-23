@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_settings.h"
 #include "ezlopi_core_devices_list.h"

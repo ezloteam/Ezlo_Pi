@@ -5,7 +5,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "lua/lua.h"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"

@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "ezlopi_cloud_favorite.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"

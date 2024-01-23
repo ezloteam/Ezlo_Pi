@@ -7,7 +7,7 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "dns_hijacking.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_wifi_ap.h"

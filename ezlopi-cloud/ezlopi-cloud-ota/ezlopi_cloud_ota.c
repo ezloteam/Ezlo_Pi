@@ -3,7 +3,7 @@
 
 #include "cJSON.h"
 #include "ezlopi_cloud_data.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ota.h"
 #include "ezlopi_core_event_group.h"
@@ -12,7 +12,7 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_cloud_constants.h"
 
-#include "version.h"
+#include "ezlopi_util_version.h"
 
 void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 {

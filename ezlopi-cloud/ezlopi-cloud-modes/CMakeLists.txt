@@ -3,4 +3,4 @@ idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES 
     ezlopi-core-factory-info
-    trace json ezlopi-cloud-constants)
+    ezlopi-util-trace json ezlopi-cloud-constants)

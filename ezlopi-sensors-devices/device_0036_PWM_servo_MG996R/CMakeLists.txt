@@ -1,6 +1,6 @@
 idf_component_register(SRCS "device_0036_PWM_servo_MG996R.c"
                         INCLUDE_DIRS .
-                        REQUIRES trace 
+                        REQUIRES ezlopi-util-trace 
                                 ezlopi-core-timer 
                                 ezlopi-core-cloud 
                                 ezlopi-core-actions 

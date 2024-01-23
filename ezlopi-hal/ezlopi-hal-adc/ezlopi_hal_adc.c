@@ -6,7 +6,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "ezlopi_hal_adc.h"
 
 typedef struct s_ezlopi_analog_object

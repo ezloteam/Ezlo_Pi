@@ -3,7 +3,7 @@ idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES
     
-    trace
+    ezlopi-util-trace
     json  
     ezlopi-core-devices
     ezlopi-core-factory-info

@@ -1,9 +1,11 @@
-#ifndef __VERSION_H__
-#define __VERSION_H__
+#ifndef _EZLOPI_UTIL_VERSION_H_
+#define _EZLOPI_UTIL_VERSION_H_
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
 #define V_TYPE 2
 #define BUILD_DATE 1704990285
 #define MAJOR 3
@@ -15,7 +17,9 @@ extern "C"
 #define COMPILE_TIME "Thu 11 Jan 2024 10:09:36 PM +0545"
 #define CURRENT_BRANCH "dev_v3"
 #define COMMIT_HASH "fd190843f60c1e5a93c738b3b0757e58870a01c2"
+
 #ifdef __cplusplus
 }
 #endif
-#endif // __VERSION_H__
+
+#endif // _EZLOPI_UTIL_VERSION_H_

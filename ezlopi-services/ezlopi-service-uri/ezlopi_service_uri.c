@@ -6,7 +6,7 @@
 #include "esp_wifi.h"
 #include "cJSON.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "dns_hijacking.h"
 
 #include "ezlopi_service_uri.h"

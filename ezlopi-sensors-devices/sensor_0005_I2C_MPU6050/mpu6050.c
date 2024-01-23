@@ -1,5 +1,5 @@
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "esp_err.h"
 #include "sensor_0005_I2C_MPU6050.h"
 

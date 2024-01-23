@@ -11,7 +11,7 @@
 #include "esp_https_ota.h"
 #include "esp_crt_bundle.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ota.h"
 #include "ezlopi_core_reboot.h"

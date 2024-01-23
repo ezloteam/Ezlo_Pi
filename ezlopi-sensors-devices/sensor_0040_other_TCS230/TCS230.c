@@ -1,4 +1,4 @@
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "freertos/queue.h"
 #include "sensor_0040_other_TCS230.h"
 

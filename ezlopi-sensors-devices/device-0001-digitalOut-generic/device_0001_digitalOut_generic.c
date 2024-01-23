@@ -1,5 +1,5 @@
 #include "sdkconfig.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_timer.h"

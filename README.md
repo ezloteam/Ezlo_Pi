@@ -34,6 +34,15 @@ Navigate to your terminal or bash shell and execute the following commands:
 git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
 cd ezlopi/firmware/ezlopi
 ```
+### 3. Configure the Projec
+You need to configure the project as per the chip type you are using. It needs to be modified the file ```sdkconfig``` , equivalent to making changes with ```idf.py menuconfig```.
+EzloPi needs to have constant set of configurations which are defined for different variants of chips and saved in the file such that ```sdkconfig.<chip type>.<flash size>```. Copy the content of the chip you are using and paste it into ```sdkconfig```. For example if I want to build and run this firmware on ESP32C3 with 4MB of memory, I need to copy content of ```[sdkconfig.esp32c3.4mb](sdkconfig.esp32c3.4mb)``` into ```sdkconfig``` or rename the file ```sdkconfig.esp32c3.4mb``` to ```sdkconfig```, clean the existing build with ```idf.py fullclean``` and then build as mentioned at #2. The list of pre-defined ```sdkconfig``` for different varients of ESP32 are listed as : 
+
+* __[ESP32 4MB Standard](sdkconfig.esp32.4mb)__
+* __[ESP32-S3 4MB ](sdkconfig.esp32s3.4mb)__
+* __[ESP32-S3 8MB](sdkconfig.esp32s3.8mb)__
+* __[ESP32-C3 4MB](sdkconfig.esp32c3.4mb)__
+
 
 ### 2. Build the Project
 

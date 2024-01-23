@@ -1,7 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_factory_info.h"
 

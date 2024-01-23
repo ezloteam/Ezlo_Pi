@@ -39,7 +39,8 @@ set(external_components_list
                                 ezlopi-services 
                                 ezlopi-cloud 
                                 ezlopi-core 
-                                ezlopi-hal) 
+                                ezlopi-hal
+                                ezlopi-util) 
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'
 set(ALL_COMPONENTS "") # clearing 'ALL_COMPONENTS' variable

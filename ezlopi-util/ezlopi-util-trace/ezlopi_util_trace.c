@@ -1,4 +1,4 @@
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include <stdio.h>
 #include <string.h>

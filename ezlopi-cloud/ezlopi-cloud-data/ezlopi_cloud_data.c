@@ -2,7 +2,7 @@
 
 #include "cJSON.h"
 #include "ezlopi_cloud_data.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_keywords.h"

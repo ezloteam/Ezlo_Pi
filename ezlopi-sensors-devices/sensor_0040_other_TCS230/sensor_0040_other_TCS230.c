@@ -1,6 +1,6 @@
 #include <string.h>
 #include <math.h>
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 // #include "cJSON.h"
 #include "freertos/task.h"
 

@@ -1,6 +1,6 @@
 #include <math.h>
 #include "esp_err.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 #include "time.h"
 #include "ezlopi_hal_i2c_master.h"
 #include "sensor_0007_I2C_GY271.h"

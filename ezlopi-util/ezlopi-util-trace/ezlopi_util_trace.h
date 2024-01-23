@@ -1,7 +1,7 @@
-#ifndef __TRACE_H__
-#define __TRACE_H__
+#ifndef _EZLOPI_UTIL_H_
+#define _EZLOPI_UTIL_H_
 
-#include "../../build/config/sdkconfig.h"
+#include "sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
@@ -83,4 +83,4 @@ public:
 }
 #endif
 
-#endif // __TRACE_H__
+#endif // _EZLOPI_UTIL_H_

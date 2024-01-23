@@ -2,9 +2,9 @@ file(GLOB_RECURSE src_files "*.c*")
 idf_component_register(SRCS "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES ezlopi-cloud-data
-             trace
+             ezlopi-util-trace
              json
-             version
+             ezlopi-util-version
              ezlopi-core-factory-info
              ezlopi-core-devices
              ezlopi-core-event-group

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_scenes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"

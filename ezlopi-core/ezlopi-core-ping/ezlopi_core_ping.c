@@ -9,7 +9,7 @@
 #include "lwip/netdb.h"
 #include "lwip/sockets.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ping.h"
 

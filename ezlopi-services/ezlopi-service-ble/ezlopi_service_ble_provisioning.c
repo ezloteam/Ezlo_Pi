@@ -7,7 +7,7 @@
 #include "mbedtls/base64.h"
 #include "esp_gatt_common_api.h"
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"

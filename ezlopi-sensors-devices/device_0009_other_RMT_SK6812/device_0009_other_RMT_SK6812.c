@@ -1,7 +1,7 @@
 #include <math.h>
 #include "sdkconfig.h"
 #include "driver/gpio.h"
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 // #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"

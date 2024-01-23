@@ -2,7 +2,7 @@
 #define _EZLOPI_CORE_CJSON_MACROS_H_
 
 
-#include "trace.h"
+#include "ezlopi_util_trace.h"
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
     {                                                         \

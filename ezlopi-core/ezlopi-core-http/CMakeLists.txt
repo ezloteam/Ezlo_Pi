@@ -9,7 +9,7 @@ set(ESP_IDF_COMPONENTS
 )
 
 set(EZLOPI_COMPONENTS 
-        trace
+        ezlopi-util-trace
 )
 
 idf_component_register(SRCS "${config_src}"

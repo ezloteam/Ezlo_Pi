@@ -2,7 +2,7 @@
 
 idf_component_register(SRCS "sensor_0054_PWM_YFS201_flowmeter.c" 
     INCLUDE_DIRS "."
-    REQUIRES    trace 
+    REQUIRES    ezlopi-util-trace 
                 driver
                 ezlopi-core-timer 
                 ezlopi-core-cloud 
