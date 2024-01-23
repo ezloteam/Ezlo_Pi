@@ -7,6 +7,7 @@
         lua_pushstring(lua_state, value ? value : ezlopi__str); \
         lua_settable(lua_state, -3);                            \
     }
+#warning "Compile and check the warning details, Krishna needs to resolve it."
 #define lua_create_table_bool_key_value(key, value) \
     {                                               \
         lua_pushstring(lua_state, key);             \

@@ -287,11 +287,11 @@ typedef struct s_basic_factory_info
     int ezlopi_factory_info_v3_set_wifi(char *ssid, char *password);
 
     int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t *ezlopi_config_basic);
-    int ezlopi_factory_info_v3_set_ezlopi_config(char *data);
-    int ezlopi_factory_info_v3_set_ca_cert(char *data);
-    int ezlopi_factory_info_v3_set_ssl_shared_key(char *data);
-    int ezlopi_factory_info_v3_set_ssl_public_key(char *data);
-    int ezlopi_factory_info_v3_set_ssl_private_key(char *data);
+    int ezlopi_factory_info_v3_set_ezlopi_config(const char *data);
+    int ezlopi_factory_info_v3_set_ca_cert(const char *data);
+    int ezlopi_factory_info_v3_set_ssl_shared_key(const char *data);
+    int ezlopi_factory_info_v3_set_ssl_public_key(const char *data);
+    int ezlopi_factory_info_v3_set_ssl_private_key(const char *data);
 
     void ezlopi_factory_info_v3_free(void *arg);
     int ezlopi_factory_info_v3_factory_reset(void);

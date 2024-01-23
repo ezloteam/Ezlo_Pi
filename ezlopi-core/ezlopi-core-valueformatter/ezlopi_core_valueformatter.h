@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-char *ezlopi_valueformatter_bool(bool val);
+const char *ezlopi_valueformatter_bool(bool val);
 char *ezlopi_valueformatter_float(float val);
 char *ezlopi_valueformatter_double(double val);
 char *ezlopi_valueformatter_int(int val);

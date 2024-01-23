@@ -88,7 +88,7 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
             {
                 if (cj_id && cj_id->valuestring)
                 {
-                    uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
+                    // uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
                     // ezlopi_scenes_edit_by_id(u_id, cj_eo);
                 }
             }

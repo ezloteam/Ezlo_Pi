@@ -302,7 +302,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
         {
 
             cJSON_AddBoolToObject(cj_result, "value", ((0 == item->interface.gpio.gpio_in.value) ? true : false));
-            char *valueFormatted = ezlopi_valueformatter_bool((0 == item->interface.gpio.gpio_in.value) ? true : false);
+            const char *valueFormatted = ezlopi_valueformatter_bool((0 == item->interface.gpio.gpio_in.value) ? true : false);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         }
         ret = 1;

@@ -65,28 +65,30 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
         cJSON *version = NULL;
         version = cJSON_GetObjectItem(result, ezlopi_version_str);
         if (version != NULL)
-            TRACE_I("version: %s", version->valuestring);
-        TRACE_D("Upgrading to version: %s", (version && version->valuestring) ? version->valuestring : ezlopi_null_str);
-
-        cJSON *source_urls = NULL;
-        source_urls = cJSON_GetObjectItem(result, "urls");
-        if (source_urls)
         {
-            cJSON *firmware_url = cJSON_GetObjectItem(source_urls, ezlopi_firmware_str);
-            TRACE_D("OTA - source: %s", (source_urls && source_urls->valuestring) ? source_urls->valuestring : ezlopi_null_str);
+            TRACE_I("version: %s", version->valuestring);
+            TRACE_D("Upgrading to version: %s", (version && version->valuestring) ? version->valuestring : ezlopi_null_str);
 
-            if (firmware_url)
+            cJSON *source_urls = NULL;
+            source_urls = cJSON_GetObjectItem(result, "urls");
+            if (source_urls)
             {
-                ezlopi_ota_start(firmware_url);
-            }
+                cJSON *firmware_url = cJSON_GetObjectItem(source_urls, ezlopi_firmware_str);
+                TRACE_D("OTA - source: %s", (source_urls && source_urls->valuestring) ? source_urls->valuestring : ezlopi_null_str);
+
+                if (firmware_url)
+                {
+                    ezlopi_ota_start(firmware_url);
+                }
 
 #warning "Checksum logic is not provided in document, needs to find it and implement it!"
-            // https://confluence.mios.com/display/EPD/EzloPI+Firmware+Update+Support+v.0
-        }
-        else
-        {
-            // send "cloud.firmware.info.get"
-            // ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
+                // https://confluence.mios.com/display/EPD/EzloPI+Firmware+Update+Support+v.0
+            }
+            else
+            {
+                // send "cloud.firmware.info.get"
+                // ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
+            }
         }
     }
 }

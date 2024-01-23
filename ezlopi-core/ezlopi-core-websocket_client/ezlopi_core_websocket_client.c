@@ -34,9 +34,10 @@ typedef struct s_ws_data_buffer
     struct s_ws_data_buffer *next;
 } s_ws_data_buffer_t;
 
-static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer);
-static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len);
-static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer);
+// static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer);
+// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len);
+// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer);
+
 static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
 int ezlopi_websocket_client_send(char *data, uint32_t len)
@@ -149,61 +150,61 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
 }
 
-static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len)
-{
-    s_ws_data_buffer_t *new_buffer = malloc(sizeof(s_ws_data_buffer_t));
-    if (new_buffer)
-    {
-        memset(new_buffer, 0, sizeof(s_ws_data_buffer_t));
-        new_buffer->buffer = malloc(len + 1);
+// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len)
+// {
+//     s_ws_data_buffer_t *new_buffer = malloc(sizeof(s_ws_data_buffer_t));
+//     if (new_buffer)
+//     {
+//         memset(new_buffer, 0, sizeof(s_ws_data_buffer_t));
+//         new_buffer->buffer = malloc(len + 1);
 
-        if (new_buffer->buffer)
-        {
-            new_buffer->len = len;
-            memcpy(new_buffer->buffer, data, len);
-            new_buffer->buffer[len] = '\0';
-        }
-        else
-        {
-            free(new_buffer);
-            new_buffer = NULL;
-        }
-    }
+//         if (new_buffer->buffer)
+//         {
+//             new_buffer->len = len;
+//             memcpy(new_buffer->buffer, data, len);
+//             new_buffer->buffer[len] = '\0';
+//         }
+//         else
+//         {
+//             free(new_buffer);
+//             new_buffer = NULL;
+//         }
+//     }
 
-    return new_buffer;
-}
+//     return new_buffer;
+// }
 
-static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer)
-{
-    if (data_buffer)
-    {
-        if (head_buffer)
-        {
-            s_ws_data_buffer_t *curr_head = head_buffer;
-            while (curr_head->next)
-            {
-                curr_head = curr_head->next;
-            }
-            curr_head->next = data_buffer;
-        }
-        else
-        {
-            head_buffer = data_buffer;
-        }
-    }
+// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer)
+// {
+//     if (data_buffer)
+//     {
+//         if (head_buffer)
+//         {
+//             s_ws_data_buffer_t *curr_head = head_buffer;
+//             while (curr_head->next)
+//             {
+//                 curr_head = curr_head->next;
+//             }
+//             curr_head->next = data_buffer;
+//         }
+//         else
+//         {
+//             head_buffer = data_buffer;
+//         }
+//     }
 
-    return head_buffer;
-}
+//     return head_buffer;
+// }
 
-static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer)
-{
-    if (buffer)
-    {
-        ezlopi_ws_data_buffer_free(buffer->next);
-        if (buffer->buffer)
-        {
-            free(buffer->buffer);
-        }
-        free(buffer);
-    }
-}
+// static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer)
+// {
+//     if (buffer)
+//     {
+//         ezlopi_ws_data_buffer_free(buffer->next);
+//         if (buffer->buffer)
+//         {
+//             free(buffer->buffer);
+//         }
+//         free(buffer);
+//     }
+// }

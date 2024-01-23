@@ -6,7 +6,7 @@
 
 #include "ezlopi_core_valueformatter.h"
 
-char *ezlopi_valueformatter_bool(bool val)
+const char *ezlopi_valueformatter_bool(bool val)
 {
     return val ? ezlopi_true_str : ezlopi_false_str;
 }

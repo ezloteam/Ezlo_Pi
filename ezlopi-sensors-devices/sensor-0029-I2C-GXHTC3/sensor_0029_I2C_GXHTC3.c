@@ -17,8 +17,6 @@
 static const float ideal_value = 65536.0f;
 
 static int __prepare(void *arg);
-static int __init(l_ezlopi_item_t *item);
-static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __get_cjson_update_value(l_ezlopi_item_t *item);
 
@@ -71,27 +69,27 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
 
     return ret;
 }
-static int gxhtc3_sensor_get_cjson_value_temp(l_ezlopi_item_t *item, void *arg)
-{
-    int ret = 0;
+// static int gxhtc3_sensor_get_cjson_value_temp(l_ezlopi_item_t *item, void *arg)
+// {
+//     int ret = 0;
 
-    if (item && arg)
-    {
-        cJSON *cj_result = (cJSON *)arg;
-        s_gxhtc3_value_t *value_ptr = (s_gxhtc3_value_t *)item->user_arg;
+//     if (item && arg)
+//     {
+//         cJSON *cj_result = (cJSON *)arg;
+//         s_gxhtc3_value_t *value_ptr = (s_gxhtc3_value_t *)item->user_arg;
 
-        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, value_ptr->temperature);
-        char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
-        if (valueFormatted)
-        {
-            cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
-            free(valueFormatted);
-        }
-        cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
-    }
+//         cJSON_AddNumberToObject(cj_result, ezlopi_value_str, value_ptr->temperature);
+//         char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
+//         if (valueFormatted)
+//         {
+//             cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+//             free(valueFormatted);
+//         }
+//         cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
+//     }
 
-    return ret;
-}
+//     return ret;
+// }
 
 int sensor_0029_I2C_GXHTC3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {

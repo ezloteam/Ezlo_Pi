@@ -107,8 +107,8 @@ void device_updated(cJSON *cj_request, cJSON *cj_response)
 
                             if (controller_info)
                             {
-                                cJSON_AddBoolToObject(cj_result, ezlopi_armed_str, controller_info->armed ? ezlopi_true_str : ezlopi_false_str);
-                                cJSON_AddBoolToObject(cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? ezlopi_true_str : ezlopi_false_str);
+                                cJSON_AddBoolToObject(cj_result, ezlopi_armed_str, controller_info->armed ? cJSON_True : cJSON_False);
+                                cJSON_AddBoolToObject(cj_result, ezlopi_serviceNotification_str, controller_info->service_notification ? cJSON_True : cJSON_False);
                             }
 
                             break;

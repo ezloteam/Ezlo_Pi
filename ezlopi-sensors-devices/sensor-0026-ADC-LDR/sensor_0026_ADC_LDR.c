@@ -193,11 +193,11 @@ static int __notify(l_ezlopi_item_t *item)
         char *curr_ldr_state = NULL;
         if (((float)(4096 - ezlopi_analog_data.value) / 4096.0f) > 0.5f) // pot_val : [100% - 30%]
         {
-            curr_ldr_state = light_alarm_states[0]; // no light
+            curr_ldr_state = (char *)light_alarm_states[0]; // no light
         }
         else
         {
-            curr_ldr_state = light_alarm_states[1]; // light detected
+            curr_ldr_state = (char *)light_alarm_states[1]; // light detected
         }
         if (curr_ldr_state != (char *)item->user_arg)
         {

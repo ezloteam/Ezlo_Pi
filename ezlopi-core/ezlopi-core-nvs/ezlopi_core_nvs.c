@@ -20,7 +20,6 @@ static const char *provisioning_status_nvs_name = "prov_stat";
 static const char *ezlopi_scenes_nvs_name = "ezlopi_scenes";
 static const char *ezlopi_scenes_v2_nvs_name = "ez_scenes_v2";
 static const char *ezlopi_scripts_nvs_ids = "ezlopi_scripts";
-static const char *settings_initialized_status_name = "settings_magic";
 static const char *config_info_update_time_name = "config_time";
 static const char *config_info_version_number = "conf_ver_no";
 static const char *ezlopi_scenes_expression_ids = "ezlopi_exp";
@@ -483,7 +482,7 @@ uint8_t ezlopi_nvs_read_bool(bool *b, const char *key_name)
     return ret;
 }
 
-int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
+int ezlopi_nvs_write_str(char *data, uint32_t len, const char *nvs_name)
 {
     int ret = 0;
 
@@ -515,7 +514,7 @@ int ezlopi_nvs_write_str(char *data, uint32_t len, char *nvs_name)
     return ret;
 }
 
-char *ezlopi_nvs_read_str(char *nvs_name)
+char *ezlopi_nvs_read_str(const char *nvs_name)
 {
     char *return_str = NULL;
 

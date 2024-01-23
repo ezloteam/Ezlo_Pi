@@ -98,7 +98,7 @@ static bool gxhtc3_read_id(s_gxhtc3_sensor_handler_t *handler)
             vTaskDelay(5 / portTICK_PERIOD_MS);
             if (gxhtc3_read_data(handler, reg_id, GXHTC3_I2C_REG_ID_READ_LEN))
             {
-                if (gxhtc3_check_crc8(reg_id, 2), reg_id[2])
+                if (gxhtc3_check_crc8(gxhtc3_get_crc8(reg_id, 2), reg_id[2]))
                 {
                     uint16_t id_val_raw = (reg_id[1] << 8) | reg_id[0];
                     uint16_t bit_11 = (id_val_raw >> 11) & 0x01;

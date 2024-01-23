@@ -4,6 +4,7 @@
 
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -96,7 +97,7 @@ static int __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cJ
         }
         else
         {
-            ezlopi_device_free_device(particles_0_dot_5_um_item);
+            ezlopi_device_free_device(particles_0_dot_5_um_device);
         }
     }
     else
@@ -144,7 +145,7 @@ static int __prepare_particulate_matter_particles_1_um_device_and_items(cJSON *c
         }
         else
         {
-            ezlopi_device_free_device(particles_1_um_item);
+            ezlopi_device_free_device(particles_1_um_device);
         }
     }
     else
@@ -192,7 +193,7 @@ static int __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cJ
         }
         else
         {
-            ezlopi_device_free_device(particles_2_dot_5_um_item);
+            ezlopi_device_free_device(particles_2_dot_5_um_device);
         }
     }
     else
@@ -240,7 +241,7 @@ static int __prepare_particulate_matter_particles_5_um_device_and_items(cJSON *c
         }
         else
         {
-            ezlopi_device_free_device(particles_5_um_item);
+            ezlopi_device_free_device(particles_5_um_device);
         }
     }
     else
@@ -288,7 +289,7 @@ static int __prepare_particulate_matter_particles_10_um_device_and_items(cJSON *
         }
         else
         {
-            ezlopi_device_free_device(particles_10_um_item);
+            ezlopi_device_free_device(particles_10_um_device);
         }
     }
     else
@@ -336,7 +337,7 @@ static int __prepare_particulate_matter_standard_particles_1_um_device_and_items
         }
         else
         {
-            ezlopi_device_free_device(standard_particles_1_um_item);
+            ezlopi_device_free_device(standard_particles_1_um_device);
         }
     }
     else
@@ -384,7 +385,7 @@ static int __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and
         }
         else
         {
-            ezlopi_device_free_device(standard_particles_2_dot_5_um_item);
+            ezlopi_device_free_device(standard_particles_2_dot_5_um_device);
         }
     }
     else
@@ -432,7 +433,7 @@ static int __prepare_particulate_matter_standard_particles_10_um_device_and_item
         }
         else
         {
-            ezlopi_device_free_device(standard_particles_10_um_item);
+            ezlopi_device_free_device(standard_particles_10_um_device);
         }
     }
     else

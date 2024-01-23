@@ -12,7 +12,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON *cj_devices_req = NULL;
     cJSON *cj_items_req = NULL;
-    cJSON *cj_rules_req = NULL;
+    // cJSON *cj_rules_req = NULL;
 
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
@@ -41,7 +41,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
                     }
                     else if (strstr("rules", elem->valuestring))
                     {
-                        cj_rules_req = elem;
+                        // cj_rules_req = elem;
                     }
                 }
             }
@@ -54,8 +54,8 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
         if (cj_favorites)
         {
             cJSON *cj_device_list = cj_devices_req ? cJSON_AddArrayToObject(cj_favorites, "devices") : NULL;
-            cJSON *cj_items_list = cj_items_req ? cJSON_AddArrayToObject(cj_favorites, ezlopi_items_str) : NULL;
-            cJSON *cj_rules_list = cj_rules_req ? cJSON_AddArrayToObject(cj_favorites, "rules") : NULL;
+            // cJSON *cj_items_list = cj_items_req ? cJSON_AddArrayToObject(cj_favorites, ezlopi_items_str) : NULL;
+            // cJSON *cj_rules_list = cj_rules_req ? cJSON_AddArrayToObject(cj_favorites, "rules") : NULL;
 
             l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
             while (curr_device)

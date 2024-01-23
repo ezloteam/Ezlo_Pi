@@ -516,7 +516,7 @@ static void ezlopi_device_parse_json_v3(cJSON *cjson_config)
         }
     }
 
-    // ezlopi_device_print_controller_cloud_information_v3();
+    ezlopi_device_print_controller_cloud_information_v3();
 
     int device_count = 0;
     l_ezlopi_device_t *tm_device_l_list = l_device_head;

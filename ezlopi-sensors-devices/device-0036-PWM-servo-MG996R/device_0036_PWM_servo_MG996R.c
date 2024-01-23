@@ -22,7 +22,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg);
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
 
-int device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_device_t *item, void *arg, void *user_arg)
+int device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
 

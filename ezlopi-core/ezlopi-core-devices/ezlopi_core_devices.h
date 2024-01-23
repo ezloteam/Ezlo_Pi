@@ -15,7 +15,6 @@
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_spi_master.h"
 
-
 // #include "ezlopi_cloud_settings.h"
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
@@ -86,22 +85,6 @@
                      sizeof(digital_io_device_properties->ezlopi_cloud.device_name),              \
                      "dev-%d:digital_out", digital_io_device_properties->ezlopi_cloud.device_id); \
         }                                                                                         \
-    }
-
-#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                        \
-    {                                                                  \
-        if ((NULL != dev_name) && ('\0' != dev_name[0]))               \
-        {                                                              \
-            snprintf(device->cloud_properties.device_name,             \
-                     sizeof(device->cloud_properties.device_name),     \
-                     "%s", dev_name);                                  \
-        }                                                              \
-        else                                                           \
-        {                                                              \
-            snprintf(device->cloud_properties.device_name,             \
-                     sizeof(device->cloud_properties.device_name),     \
-                     "device-%d", device->cloud_properties.device_id); \
-        }                                                              \
     }
 
 // typedef int (*f_item_func_t)(e_ezlopi_actions_t action, s_ezlopi_device_properties_t *properties, void *arg, void *user_arg);

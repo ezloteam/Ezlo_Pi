@@ -158,7 +158,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
             CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
-            if (NULL == item->interface.i2c_master.address)
+            if (0 == item->interface.i2c_master.address)
             {
                 item->interface.i2c_master.address = GY271_ADDR;
             }

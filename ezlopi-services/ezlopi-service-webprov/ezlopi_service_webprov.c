@@ -151,13 +151,13 @@ static uint8_t web_provisioning_config_update(void *arg)
         cJSON *cJSON_cloud_uuid = cJSON_GetObjectItem(root_prov_data, "cloud_uuid");
         cJSON *cJSON_order_uuid = cJSON_GetObjectItem(root_prov_data, "order_uuid");
         cJSON *cJSON_config_version = cJSON_GetObjectItem(root_prov_data, "config_version");
-        cJSON *cJSON_zwave_region_aary = cJSON_GetObjectItem(root_prov_data, "zwave_region");
+        // cJSON *cJSON_zwave_region_aary = cJSON_GetObjectItem(root_prov_data, "zwave_region");
         cJSON *cJSON_provision_server = cJSON_GetObjectItem(root_prov_data, "provision_server");
         cJSON *cJSON_cloud_server = cJSON_GetObjectItem(root_prov_data, "cloud_server");
         cJSON *cJSON_provision_token = cJSON_GetObjectItem(root_prov_data, "provision_token");
-        cJSON *cJSON_provision_order = cJSON_GetObjectItem(root_prov_data, "provision_order");
+        // cJSON *cJSON_provision_order = cJSON_GetObjectItem(root_prov_data, "provision_order");
         cJSON *cJSON_ssl_private_key = cJSON_GetObjectItem(root_prov_data, "ssl_private_key");
-        cJSON *cJSON_ssl_public_key = NULL; // cJSON_GetObjectItem(root_prov_data, "ssl_public_key");
+        // cJSON *cJSON_ssl_public_key = NULL; // cJSON_GetObjectItem(root_prov_data, "ssl_public_key");
         cJSON *cJSON_ssl_shared_key = cJSON_GetObjectItem(root_prov_data, "ssl_shared_key");
         cJSON *cJSON_signing_ca_certificate = cJSON_GetObjectItem(root_prov_data, "signing_ca_certificate");
 
@@ -178,7 +178,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         {
             const char *uuid = cJSON_uuid->valuestring;
             TRACE_I("uuid: %s", uuid);
-            config_check_factoryInfo->device_uuid = uuid;
+            config_check_factoryInfo->device_uuid = (char *)uuid;
         }
         else
         {
@@ -187,16 +187,16 @@ static uint8_t web_provisioning_config_update(void *arg)
 
         if (NULL != cJSON_cloud_uuid)
         {
-            const char *cloud_uuid = cJSON_cloud_uuid->valuestring;
-            TRACE_I("cloud_uuid: %s", cloud_uuid);
+            // const char *cloud_uuid = cJSON_cloud_uuid->valuestring;
+            // TRACE_I("cloud_uuid: %s", cloud_uuid);
         }
         else
         {
         }
         if (NULL != cJSON_order_uuid)
         {
-            const char *order_uuid = cJSON_order_uuid->valuestring;
-            TRACE_I("order_uuid: %s", order_uuid);
+            // const char *order_uuid = cJSON_order_uuid->valuestring;
+            // TRACE_I("order_uuid: %s", order_uuid);
         }
 
         if (NULL != cJSON_config_version)
@@ -210,22 +210,23 @@ static uint8_t web_provisioning_config_update(void *arg)
             config_check_factoryInfo->config_version = 0;
         }
 
-        if (NULL != cJSON_zwave_region_aary)
-        {
-            if (cJSON_IsArray(cJSON_zwave_region_aary))
-            {
-                cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
-                if (cJSON_zwave_region)
-                {
-                    const char *zwave_region = cJSON_zwave_region->valuestring;
-                }
-            }
-        }
+        // TODO  Decide if needs parsing and storing to flash
+        // if (NULL != cJSON_zwave_region_aary)
+        // {
+        //     if (cJSON_IsArray(cJSON_zwave_region_aary))
+        //     {
+        //         cJSON *cJSON_zwave_region = cJSON_GetArrayItem(cJSON_zwave_region_aary, 0); // Get the first item
+        //         if (cJSON_zwave_region)
+        //         {
+        //             const char *zwave_region = cJSON_zwave_region->valuestring;
+        //         }
+        //     }
+        // }
         if (NULL != cJSON_provision_server)
         {
             const char *provision_server = cJSON_provision_server->valuestring;
             TRACE_I("provision_server: %s", provision_server);
-            config_check_factoryInfo->provision_server = provision_server;
+            config_check_factoryInfo->provision_server = (char *)provision_server;
         }
         else
         {
@@ -235,7 +236,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         {
             const char *cloud_server = cJSON_cloud_server->valuestring;
             TRACE_I("cloud_server: %s", cloud_server);
-            config_check_factoryInfo->cloud_server = cloud_server;
+            config_check_factoryInfo->cloud_server = (char *)cloud_server;
         }
         else
         {
@@ -246,18 +247,19 @@ static uint8_t web_provisioning_config_update(void *arg)
         {
             const char *provision_token = cJSON_provision_token->valuestring;
             TRACE_I("provision_token: %s", provision_token);
-            config_check_factoryInfo->provision_token = provision_token;
+            config_check_factoryInfo->provision_token = (char *)provision_token;
         }
         else
         {
             config_check_factoryInfo->provision_token = NULL;
         }
 
-        if (NULL != cJSON_provision_order)
-        {
-            const uint32_t provision_order = cJSON_provision_order->valueint;
-            TRACE_I("provision_order: %d", provision_order);
-        }
+        // TODO Decide about its usefulness
+        // if (NULL != cJSON_provision_order)
+        // {
+        //     const uint32_t provision_order = cJSON_provision_order->valueint;
+        //     TRACE_I("provision_order: %d", provision_order);
+        // }
         if (NULL != cJSON_ssl_private_key)
         {
             const char *ssl_private_key = cJSON_ssl_private_key->valuestring;
@@ -315,7 +317,6 @@ static uint8_t web_provisioning_config_update(void *arg)
 
 static void web_provisioning_config_check(void *pv)
 {
-    char *ws_endpoint = NULL;
     s_ezlopi_http_data_t *response = malloc(sizeof(s_ezlopi_http_data_t));
     char *ca_certificate = NULL;
     char *provision_token = NULL;
@@ -331,9 +332,8 @@ static void web_provisioning_config_check(void *pv)
     while (1)
     {
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-        UBaseType_t water_mark = uxTaskGetStackHighWaterMark(NULL);
 
-        TRACE_D("water_mark: %d", water_mark);
+        TRACE_D("water_mark: %d", uxTaskGetStackHighWaterMark(NULL));
 
         cJSON *root_header_prov_token = cJSON_CreateObject();
 
@@ -357,7 +357,6 @@ static void web_provisioning_config_check(void *pv)
         {
             char http_request_location[200];
             snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
-            uint16_t http_status;
             response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
             if (NULL != response)
             {

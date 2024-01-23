@@ -278,7 +278,7 @@ static int __0053_get_value_cjson(l_ezlopi_item_t *item, void *arg)
 
             if ((sensor_0053_UART_gps6mv2_data->Fix_item_id) == item->cloud_properties.item_id)
             {
-                char *valueFormatted = ezlopi_valueformatter_bool(sensor_0053_UART_gps6mv2_data->prev_GPS_FIX);
+                const char *valueFormatted = ezlopi_valueformatter_bool(sensor_0053_UART_gps6mv2_data->prev_GPS_FIX);
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 cJSON_AddBoolToObject(cj_result, ezlopi_value_str, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX);
             }

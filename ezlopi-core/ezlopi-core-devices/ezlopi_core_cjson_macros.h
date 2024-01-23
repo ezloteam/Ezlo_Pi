@@ -1,7 +1,6 @@
 #ifndef _EZLOPI_CORE_CJSON_MACROS_H_
 #define _EZLOPI_CORE_CJSON_MACROS_H_
 
-
 #include "ezlopi_util_trace.h"
 
 #define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
@@ -111,20 +110,20 @@
         }                                                                                         \
     }
 
-#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                                   \
-    {                                                                             \
-        if ((NULL != dev_name) && ('\0' != dev_name[0]))                          \
-        {                                                                         \
-            snprintf(device->cloud_properties.device_name,                        \
-                     sizeof(device->cloud_properties.device_name),                \
-                     "%s", dev_name);                                             \
-        }                                                                         \
-        else                                                                      \
-        {                                                                         \
-            snprintf(device->cloud_properties.device_name,                        \
-                     sizeof(device->cloud_properties.device_name),                \
-                     "device-%d:digital_io", device->cloud_properties.device_id); \
-        }                                                                         \
+#define ASSIGN_DEVICE_NAME_V2(device, dev_name)                        \
+    {                                                                  \
+        if ((NULL != dev_name) && ('\0' != dev_name[0]))               \
+        {                                                              \
+            snprintf(device->cloud_properties.device_name,             \
+                     sizeof(device->cloud_properties.device_name),     \
+                     "%s", dev_name);                                  \
+        }                                                              \
+        else                                                           \
+        {                                                              \
+            snprintf(device->cloud_properties.device_name,             \
+                     sizeof(device->cloud_properties.device_name),     \
+                     "device-%d", device->cloud_properties.device_id); \
+        }                                                              \
     }
 
 #define CJSON_GET_ID(id, cj_id)                         \
