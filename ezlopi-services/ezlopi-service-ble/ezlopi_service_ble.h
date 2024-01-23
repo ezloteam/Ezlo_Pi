@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_BLE_SERVICE_H__
-#define __EZLOPI_BLE_SERVICE_H__
+#ifndef _EZLOPI_SERVICE_BLE_H_
+#define _EZLOPI_SERVICE_BLE_H_
 
 #define CHECK_PRINT_ERROR(x, msg)                                    \
     {                                                                \
@@ -36,4 +36,4 @@
 
 void ezlopi_ble_service_init(void);
 
-#endif //  __EZLOPI_BLE_SERVICE_H__
+#endif //  _EZLOPI_SERVICE_BLE_H_

@@ -1,13 +1,16 @@
-#include "string.h"
+#include <string.h>
+
 #include "cJSON.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "trace.h"
+
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_event_group.h"
 
-#include "trace.h"
 #include "ezlopi_cloud_ota.h"
+
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_webprov.h"
 

@@ -1,25 +1,28 @@
-#include "string.h"
-#include "ctype.h"
+#include <string.h>
+#include <ctype.h>
 
 #include "cJSON.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 #include "esp_chip_info.h"
 #include "mbedtls/base64.h"
+#include "version.h"
 
 #include "trace.h"
-#include "version.h"
-#include "ezlopi_core_wifi.h"
 
+#include "ezlopi_core_wifi.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
-#include "ezlopi_service_ble.h"
-#include "ezlopi_hal_system_info.h"
 #include "ezlopi_core_factory_info.h"
+
+#include "ezlopi_hal_system_info.h"
+
 #include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_service_ble.h"
 
 static s_gatt_service_t *g_device_info_service = NULL;
 

@@ -1,8 +1,9 @@
 
-#include "stdint.h"
-#include "driver/i2c.h"
-#include "ezlopi_hal_i2c_master.h"
+#include <stdint.h>
+
 #include "trace.h"
+
+#include "ezlopi_hal_i2c_master.h"
 
 static s_ezlopi_i2c_master_t *i2c_master_conf_ptr[I2C_NUM_MAX] = {NULL, NULL};
 static int ezlopi_i2c_check_channel(s_ezlopi_i2c_master_t *i2c_master_conf)

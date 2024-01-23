@@ -1,14 +1,14 @@
-#ifndef __HTTP_H__
-#define __HTTP_H__
+#ifndef _EZLOPI_CORE_HTTP_H_
+#define _EZLOPI_CORE_HTTP_H_
 
-#include "stdio.h"
+#include <stdio.h>
 #include <string.h>
+
 #include "esp_err.h"
 #include "esp_log.h"
-#include "cJSON.h"
-// #include "esp_tls.h"
 #include "esp_event.h"
 #include "esp_http_client.h"
+#include "cJSON.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -37,4 +37,4 @@ extern "C"
 }
 #endif
 
-#endif // __HTTP_H__
+#endif // _EZLOPI_CORE_HTTP_H_

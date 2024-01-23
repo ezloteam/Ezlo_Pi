@@ -1,11 +1,15 @@
-#include "ezlopi_hal_uart.h"
+
+#include <string.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
-#include "freertos/task.h"
+
 #include "esp_err.h"
-#include "trace.h"
-#include <string.h>
 #include "esp_check.h"
+
+#include "trace.h"
+
+#include "ezlopi_hal_uart.h"
 
 static void ezlopi_uart_channel_task(void *args);
 static ezlo_uart_channel_t get_available_channel();

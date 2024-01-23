@@ -1,9 +1,8 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdint.h>
+
 #include <stdbool.h>
 
 #include "ezlopi_core_gateway.h"
+
 #include "ezlopi_cloud_constants.h"
 
 static s_ezlopi_gateway_t ezlopi_gateway = {

@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_SCENES_POPULATE_H__
-#define __EZLOPI_SCENES_POPULATE_H__
+#ifndef _EZLOPI_CORE_SCENES_POPULATE_H_
+#define _EZLOPI_CORE_SCENES_POPULATE_H_
 
 #include <cJSON.h>
 #include <stdint.h>
@@ -30,4 +30,4 @@ l_user_notification_v2_t *ezlopi_scenes_populate_user_notifications(cJSON *cj_us
 l_scenes_list_v2_t *ezlopi_scenes_populate_new_scene(cJSON *cj_scene, uint32_t scene_id);
 l_scenes_list_v2_t *ezlopi_scenes_populate_scenes(cJSON *cj_scene, uint32_t scene_id);
 
-#endif // __EZLOPI_SCENES_POPULATE_H__
+#endif // _EZLOPI_CORE_SCENES_POPULATE_H_

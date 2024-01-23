@@ -1,6 +1,6 @@
-#ifndef __OTA_SERVICE_H__
-#define __OTA_SERVICE_H__
+#ifndef _EZLOPI_SERVICE_OTA_H_
+#define _EZLOPI_SERVICE_OTA_H_
 
 void ota_service_init(void);
 
-#endif // __OTA_SERVICE_H__
+#endif // _EZLOPI_SERVICE_OTA_H_

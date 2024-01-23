@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_SPI_MASTER_H__
-#define __EZLOPI_SPI_MASTER_H__
+#ifndef _EZLOPI_HAL_SPI_MASTER_H_
+#define _EZLOPI_HAL_SPI_MASTER_H_
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -44,4 +44,4 @@ typedef struct s_ezlopi_spi_master
 
 int ezlopi_spi_master_init(s_ezlopi_spi_master_t *spi_config);
 
-#endif // __EZLOPI_SPI_MASTER_H__
+#endif // _EZLOPI_HAL_SPI_MASTER_H_

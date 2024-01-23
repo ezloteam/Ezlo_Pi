@@ -1,25 +1,20 @@
-#include "esp_netif.h"
 #include "esp_event.h"
 
 #include "trace.h"
 
-#include "ezlopi_sntp.h"
-#include "ezlopi_core_ezlopi.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_core_devices.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_devices_list.h"
-#include "ezlopi_hal_system_info.h"
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_event_group.h"
-#include "ezlopi_core_ethernet.h"
-#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_room.h"
+
+#include "ezlopi_hal_system_info.h"
 
 static void ezlopi_initialize_devices_v3(void);
 

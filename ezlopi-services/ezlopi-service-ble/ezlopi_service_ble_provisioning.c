@@ -1,10 +1,11 @@
-#include "string.h"
-#include "time.h"
+#include <string.h>
+#include <time.h>
 
 #include "cJSON.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 #include "mbedtls/base64.h"
+#include "esp_gatt_common_api.h"
 
 #include "trace.h"
 
@@ -12,15 +13,15 @@
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_ble_gatt.h"
-#include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
-#include "ezlopi_service_ble.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
+
 #include "ezlopi_cloud_constants.h"
 
-#include "esp_gatt_common_api.h"
+#include "ezlopi_service_ble_ble_auth.h"
+#include "ezlopi_service_ble.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))

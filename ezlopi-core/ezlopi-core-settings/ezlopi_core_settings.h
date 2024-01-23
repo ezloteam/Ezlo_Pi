@@ -1,5 +1,5 @@
-#ifndef EZLOPI_SETTINGS_H
-#define EZLOPI_SETTINGS_H
+#ifndef _EZLOPI_SETTINGS_H_
+#define _EZLOPI_SETTINGS_H_
 
 #include <stdbool.h>
 
@@ -12,4 +12,4 @@ typedef enum
     EZLOPI_SETTINGS_ACTION_MAX
 } e_ezlopi_settings_action_t;
 
-#endif // EZLOPI_SETTINGS_H
+#endif // _EZLOPI_SETTINGS_H_

@@ -1,11 +1,10 @@
-#include <stdbool.h>
+
 #include "sdkconfig.h"
-#include "driver/spi_common.h"
-#include "driver/spi_master.h"
 #include "esp_intr_alloc.h"
 
-#include "ezlopi_hal_spi_master.h"
 #include "trace.h"
+
+#include "ezlopi_hal_spi_master.h"
 
 typedef enum e_spi_state
 {

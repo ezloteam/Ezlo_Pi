@@ -1,8 +1,8 @@
-#ifndef __EZLOPI_SCENES_EXPRESSIONS_H__
-#define __EZLOPI_SCENES_EXPRESSIONS_H__
+#ifndef _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
+#define _EZLOPI_CORE_SCENES_EXPRESSIONS_H_
 
 #include <string.h>
-#include "inttypes.h"
+#include <inttypes.h>
 #include <stdbool.h>
 
 #include "ezlopi_core_scenes_v2.h"
@@ -103,8 +103,6 @@ void ezlopi_scenes_expressions_delete_exp_item(s_exp_items_t *exp_items);
  */
 void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_names_t *exp_device_item_names);
 
-
-
 /**
  * @brief construct expressions in cJSON and add it to cj_expression_array
  *
@@ -134,4 +132,4 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t *exp_node);
  */
 int ezlopi_scenes_expressions_delete_by_name(char *expression_name);
 
-#endif // __EZLOPI_SCENES_EXPRESSIONS_H__
+#endif // _EZLOPI_CORE_SCENES_EXPRESSIONS_H_

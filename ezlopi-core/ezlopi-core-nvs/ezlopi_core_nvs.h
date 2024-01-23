@@ -1,5 +1,5 @@
-#ifndef __NVS_STORAGE_H__
-#define __NVS_STORAGE_H__
+#ifndef _EZLOPI_CORE_NVS_H_
+#define _EZLOPI_CORE_NVS_H_
 
 #include "nvs_flash.h"
 
@@ -79,4 +79,4 @@ extern "C"
 }
 #endif
 
-#endif // __NVS_STORAGE_H__
+#endif // _EZLOPI_CORE_NVS_H_

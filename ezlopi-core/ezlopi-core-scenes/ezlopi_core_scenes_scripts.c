@@ -2,11 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "trace.h"
-
 #include "lua/lua.h"
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
@@ -14,8 +13,9 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_scenes_scripts.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_scripts_custom_libs_includes.h"
+
+#include "ezlopi_cloud_constants.h"
 
 static l_ezlopi_scenes_script_t *script_head = NULL;
 

@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_SCENES_METHODS_H__
-#define __EZLOPI_SCENES_METHODS_H__
+#ifndef _EZLOPI_CORE_SCENES_METHODS_H_
+#define _EZLOPI_CORE_SCENES_METHODS_H_
 
 #include <string.h>
 
@@ -15,4 +15,4 @@ const char *ezlopi_scene_get_scene_method_name(e_scene_method_type_t method_type
 
 /* then methods */
 
-#endif // __EZLOPI_SCENES_METHODS_H__
+#endif // _EZLOPI_CORE_SCENES_METHODS_H_

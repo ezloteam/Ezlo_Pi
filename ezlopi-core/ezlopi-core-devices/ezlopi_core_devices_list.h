@@ -1,12 +1,7 @@
-#ifndef __EZLOPI_DEVICES_LIST_H__
-#define __EZLOPI_DEVICES_LIST_H__
+#ifndef _EZLOPI_CORE_DEVICES_LIST_H_
+#define _EZLOPI_CORE_DEVICES_LIST_H_
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <cJSON.h>
-#include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
-#include "sdkconfig.h"
 
 typedef int (*f_sensor_call_v3_t)(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
@@ -25,4 +20,4 @@ typedef struct s_ezlopi_prep_arg
 
 s_ezlopi_device_v3_t *ezlopi_devices_list_get_list_v3(void);
 
-#endif // __EZLOPI_DEVICES_LIST_H__
+#endif // _EZLOPI_CORE_DEVICES_LIST_H_

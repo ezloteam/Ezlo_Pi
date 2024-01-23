@@ -1,6 +1,6 @@
-#ifndef __EZLOPI_H__
-#define __EZLOPI_H__
+#ifndef _EZLOPI_CORE_EZLOPI_H_
+#define _EZLOPI_CORE_EZLOPI_H_
 
 void ezlopi_init(void);
 
-#endif // __EZLOPI_H__
+#endif // _EZLOPI_CORE_EZLOPI_H_

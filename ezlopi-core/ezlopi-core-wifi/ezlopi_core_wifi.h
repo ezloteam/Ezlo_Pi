@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_WIFI_H__
-#define __EZLOPI_WIFI_H__
+#ifndef _EZLOPI_CORE_WIFI_H_
+#define _EZLOPI_CORE_WIFI_H_
 
 #include "esp_netif_types.h"
 #include "esp_wifi_types.h"
@@ -42,4 +42,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-#endif // __EZLOPI_WIFI_H__
+#endif // _EZLOPI_CORE_WIFI_H_

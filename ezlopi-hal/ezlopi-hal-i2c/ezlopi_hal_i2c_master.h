@@ -1,7 +1,8 @@
-#ifndef __EZLOPI_HAL_H__
-#define __EZLOPI_HAL_H__
+#ifndef _EZLOPI_HAL_I2C_MASTER_H_
+#define _EZLOPI_HAL_I2C_MASTER_H_
 
 #include <stdio.h>
+
 #include "driver/i2c.h"
 
 typedef enum e_ezlopi_i2c_channel
@@ -32,4 +33,4 @@ void ezlopi_i2c_master_deinit(s_ezlopi_i2c_master_t *i2c_master_conf);
 esp_err_t ezlopi_i2c_master_write_to_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *write_buffer, uint32_t write_len);
 esp_err_t ezlopi_i2c_master_read_from_device(s_ezlopi_i2c_master_t *i2c_master_conf, uint8_t *read_buffer, uint32_t read_len);
 
-#endif // __EZLOPI_HAL_H__
+#endif // _EZLOPI_HAL_I2C_MASTER_H_

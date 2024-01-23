@@ -1,17 +1,9 @@
 #include <string.h>
 #include <ctype.h>
-#include "esp_log.h"
-#include "esp_system.h"
-#include "esp_partition.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
 #include "trace.h"
 
-#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
-#include "ezlopi_cloud_constants.h"
 
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
 static char *g_ca_certificate = NULL;

@@ -1,9 +1,9 @@
-#ifndef __EZLOPI_ROOM_H__
-#define __EZLOPI_ROOM_H__
+#ifndef _EZLOPI_CORE_ROOM_H_
+#define _EZLOPI_CORE_ROOM_H_
 
 #include <string.h>
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "cJSON.h"
 
@@ -36,4 +36,4 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room);
 int ezlopi_room_reorder(cJSON *cj_rooms_ids);
 s_ezlopi_room_t *ezlopi_room_add_to_list(cJSON *cj_room);
 
-#endif // __EZLOPI_ROOM_H__
+#endif // _EZLOPI_CORE_ROOM_H_

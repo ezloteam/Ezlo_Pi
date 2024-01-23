@@ -1,5 +1,7 @@
 #include "trace.h"
+
 #include "ezlopi_core_scenes_v2.h"
+
 #include "ezlopi_cloud_constants.h"
 
 void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks);

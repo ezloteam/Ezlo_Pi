@@ -1,14 +1,10 @@
-#include "esp_bt.h"
-#include "esp_gap_ble_api.h"
-#include "esp_gatts_api.h"
-#include "esp_bt_defs.h"
-#include "esp_bt_main.h"
-#include "esp_gatt_common_api.h"
-
 #include <string.h>
+
 #include "trace.h"
+
 #include "ezlopi_core_ble_gap.h"
 #include "ezlopi_core_ble_profile.h"
+
 #include "ezlopi_cloud_constants.h"
 
 static uint8_t adv_config_done = 0;

@@ -1,4 +1,3 @@
-#include <cJSON.h>
 
 #include "trace.h"
 
@@ -8,13 +7,14 @@
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_scenes_methods.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_service_meshbot.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_core_scenes_cjson.h"
+
+#include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_service_meshbot.h"
 
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
 

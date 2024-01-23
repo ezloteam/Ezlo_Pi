@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_LUA_H__
-#define __EZLOPI_LUA_H__
+#ifndef _EZLOPI_CORE_SCENES_SCRIPTS_H_
+#define _EZLOPI_CORE_SCENES_SCRIPTS_H_
 
 #include <inttypes.h>
 
@@ -36,4 +36,4 @@ void ezlopi_scenes_scripts_stop(l_ezlopi_scenes_script_t *script_node);
 void ezlopi_scenes_scripts_run_by_id(uint32_t script_id);
 void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id);
 
-#endif // __EZLOPI_LUA_H__
+#endif // _EZLOPI_CORE_SCENES_SCRIPTS_H_

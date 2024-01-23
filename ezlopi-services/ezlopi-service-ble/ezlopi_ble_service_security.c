@@ -1,4 +1,4 @@
-#include "string.h"
+#include <string.h>
 
 #include "lwip/ip_addr.h"
 #include "cJSON.h"
@@ -11,10 +11,12 @@
 #include "ezlopi_core_ble_gap.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
-#include "ezlopi_service_ble.h"
 #include "ezlopi_core_ble_profile.h"
 #include "ezlopi_core_factory_info.h"
+
 #include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_service_ble.h"
 
 typedef enum e_ble_security_commands
 {

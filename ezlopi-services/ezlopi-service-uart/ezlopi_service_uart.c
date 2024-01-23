@@ -6,34 +6,32 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include "freertos/FreeRTOSConfig.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
-#include "nvs.h"
+#include "freertos/FreeRTOSConfig.h"
 #include "cJSON.h"
-#include "string.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_netif.h"
 #include "esp_system.h"
-#include "driver/uart.h"
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
+#include "version.h"
+#include "sdkconfig.h"
 
 #include "trace.h"
-#include "version.h"
-#include "ezlopi_service_uart.h"
-#include "sdkconfig.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_reboot.h"
-#include "ezlopi_hal_system_info.h"
-#include "ezlopi_cloud_info.h"
 #include "ezlopi_core_net.h"
 #include "ezlopi_core_factory_info.h"
+
+#include "ezlopi_hal_system_info.h"
+
+#include "ezlopi_cloud_info.h"
 #include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_service_uart.h"
 
 static const int RX_BUF_SIZE = 3096;
 

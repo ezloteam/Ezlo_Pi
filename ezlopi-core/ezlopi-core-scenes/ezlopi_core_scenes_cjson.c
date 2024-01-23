@@ -1,9 +1,10 @@
 #include <string.h>
-#include "cJSON.h"
 
 #include "trace.h"
+
 #include "ezlopi_core_scenes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
+
 #include "ezlopi_cloud_constants.h"
 
 static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields);

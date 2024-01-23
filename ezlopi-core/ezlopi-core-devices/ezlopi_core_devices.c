@@ -1,16 +1,10 @@
-#include "ctype.h"
-#include "cJSON.h"
+#include <ctype.h>
 
-#include "ezlopi_cloud_items.h"
-#include "trace.h"
-
-#include "ezlopi_core_nvs.h"
-#include "ezlopi_core_devices.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_cloud_constants.h"
 
-#include "ezlopi_service_webprov.h"
+#include "ezlopi_cloud_items.h"
+#include "ezlopi_cloud_constants.h"
 
 static l_ezlopi_device_t *l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;

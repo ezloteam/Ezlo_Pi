@@ -2,14 +2,14 @@
 
 
 
-#ifndef __EZLOPI_WIFI_AP_H__
-#define __EZLOPI_WIFI_AP_H__
+#ifndef _EZLOPI_CORE_WIFI_AP_H_
+#define _EZLOPI_CORE_WIFI_AP_H_
 
 void ezlopi_configure_wifi_ap();
 void ezlopi_deconfigure_wifi_ap();
 void ezlopi_start_dns_server();
 
-#endif // __EZLOPI_WIFI_AP_H__
+#endif // _EZLOPI_CORE_WIFI_AP_H_
 
 
 

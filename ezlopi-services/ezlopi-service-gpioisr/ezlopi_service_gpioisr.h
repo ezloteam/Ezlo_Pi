@@ -1,5 +1,5 @@
-#ifndef __GPIO_ISR_SERVICE_H__
-#define __GPIO_ISR_SERVICE_H__
+#ifndef _EZLOPI_SERVICE_GPIOISR_H_
+#define _EZLOPI_SERVICE_GPIOISR_H_
 
 #include "ezlopi_core_devices_list.h"
 
@@ -12,4 +12,4 @@ void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __
 void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_interrupt_upcall_t __upcall, TickType_t debounce_ms);
 #endif
 
-#endif // __GPIO_ISR_SERVICE_H__
+#endif // _EZLOPI_SERVICE_GPIOISR_H_
