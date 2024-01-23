@@ -18,10 +18,10 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-settings
 )
 set(EZLOPI_SENSOR_DEVICE_COMPONENTS 
-        device_0001_digitalOut_generic
-        device_0002_digitalOut_relay
-        device_0003_digitalOut_plug
-        device_0004_digitalIn_generic
+        device-0001-digitalOut-generic
+        device-0002-digitalOut-relay
+        device-0003-digitalOut-plug
+        device-0004-digitalIn-generic
 
         sensor_0005_I2C_MPU6050
         sensor_0007_I2C_GY271

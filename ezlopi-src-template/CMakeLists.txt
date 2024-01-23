@@ -26,7 +26,7 @@ set(EZLOPI_CLOUD_COMPONENTS
 
 # Define sensor device components
 set(EZLOPI_SENSOR_DEVICE_COMPONENTS 
-        device_0001_digitalOut_generic
+        device-0001-digitalOut-generic
         # Add other sensor device components here
 )
 
