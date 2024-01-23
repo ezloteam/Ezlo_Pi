@@ -6,7 +6,8 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include "string.h"
+#include <string.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -18,17 +19,16 @@
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
-#include "esp_netif_types.h"
-// #include "esp_netif_lwip_internal.h"
 
 #include "trace.h"
-#include "ezlopi_service_uart.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_wifi_err_reason.h"
 #include "ezlopi_core_event_group.h"
+
+#include "ezlopi_service_uart.h"
 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 

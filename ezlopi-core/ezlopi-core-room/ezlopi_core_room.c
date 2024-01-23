@@ -1,12 +1,13 @@
-#include "cJSON.h"
 #include "trace.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_service_webprov.h"
 #include "ezlopi_core_cjson_macros.h"
+
 #include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_service_webprov.h"
 
 static s_ezlopi_room_t *l_room_head = NULL;
 

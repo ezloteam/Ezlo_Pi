@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_SCENES_THEN_METHODS_H__
-#define __EZLOPI_SCENES_THEN_METHODS_H__
+#ifndef _EZLOPI_CORE_SCENES_THEN_METHODS_H_
+#define _EZLOPI_CORE_SCENES_THEN_METHODS_H_
 
 #include "ezlopi_core_scenes_v2.h"
 
@@ -21,4 +21,4 @@ int ezlopi_scene_then_set_expression(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_then_set_variable(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *scene_node, void *arg);
 
-#endif // __EZLOPI_SCENES_THEN_METHODS_H__
+#endif // _EZLOPI_CORE_SCENES_THEN_METHODS_H_

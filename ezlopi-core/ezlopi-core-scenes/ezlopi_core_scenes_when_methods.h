@@ -1,5 +1,5 @@
-#ifndef __EZLOPI_SCENES_WHEN_METHODS_H__
-#define __EZLOPI_SCENES_WHEN_METHODS_H__
+#ifndef _EZLOPI_CORE_SCENES_WHEN_METHODS_H_
+#define _EZLOPI_CORE_SCENES_WHEN_METHODS_H_
 #include "ezlopi_core_scenes_v2.h"
 
 /* When methods */
@@ -36,4 +36,4 @@ int ezlopi_scene_when_not(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_or(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_xor(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_function(l_scenes_list_v2_t *scene_node, void *arg);
-#endif // __EZLOPI_SCENES_WHEN_METHODS_H__
+#endif // _EZLOPI_CORE_SCENES_WHEN_METHODS_H_

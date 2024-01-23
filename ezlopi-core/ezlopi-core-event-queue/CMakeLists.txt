@@ -2,6 +2,11 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
+set(EZLOPI_CORE_COMPONENTS 
+        ezlopi-core-actions 
+)
+
+
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES trace ezlopi-core-actions)
+    REQUIRES ${EZLOPI_CORE_COMPONENTS})

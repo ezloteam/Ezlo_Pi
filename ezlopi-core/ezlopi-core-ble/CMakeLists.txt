@@ -1,6 +1,20 @@
 file( GLOB_RECURSE src_files "*.c*" )
 
+set(ESP_IDF_COMPONENTS 
+        bt 
+)
+set(EZLOPI_COMPONENTS 
+        trace
+)
+set(EZLOPI_CORE_COMPONENTS 
+        ezlopi-core-nvs 
+)
+
+
 idf_component_register(SRCS  "${src_files}"
                        INCLUDE_DIRS "."
-                       REQUIRES bt trace json ezlopi-core-nvs ezlopi-core-wifi)
+                       REQUIRES     ${ESP_IDF_COMPONENTS}
+                                    ${EZLOPI_COMPONENTS}
+                                    ${EZLOPI_CORE_COMPONENTS}
+                        )
 

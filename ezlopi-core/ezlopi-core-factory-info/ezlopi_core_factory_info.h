@@ -1,5 +1,5 @@
-#ifndef __FACTORY_INFO_H__
-#define __FACTORY_INFO_H__
+#ifndef _EZLOPI_CORE_FACTORY_INFO_H_
+#define _EZLOPI_CORE_FACTORY_INFO_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -365,4 +365,4 @@ static const char *ezlopi_config_test =
 }
 #endif
 
-#endif // __FACTORY_INFO_H__
+#endif // _EZLOPI_CORE_FACTORY_INFO_H_

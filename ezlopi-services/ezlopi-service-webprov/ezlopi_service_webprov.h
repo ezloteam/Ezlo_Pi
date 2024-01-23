@@ -1,5 +1,5 @@
-#ifndef __WEB_PROVISIONING_H__
-#define __WEB_PROVISIONING_H__
+#ifndef _EZLOPI_SERVICE_WEBPROV_H_
+#define _EZLOPI_SERVICE_WEBPROV_H_
 
 #include <string.h>
 
@@ -31,4 +31,4 @@ extern "C"
 }
 #endif
 
-#endif // __WEB_PROVISIONING_H__
+#endif // _EZLOPI_SERVICE_WEBPROV_H_

@@ -1,9 +1,7 @@
-#include "trace.h"
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_settings.h"
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_core_devices_list.h"
-#include "ezlopi_core_device_value_updated.h"
 
 int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item)
 {

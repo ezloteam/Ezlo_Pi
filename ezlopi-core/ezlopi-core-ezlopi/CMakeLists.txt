@@ -2,14 +2,10 @@
 
 file(GLOB_RECURSE config_src "*.c")
 
+set(EZLOPI_CORE_COMPONENTS 
+        ezlopi-core-wifi
+)
+
 idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES    trace 
-                ezlopi-sntp
-                ezlopi-core-devices 
-                ezlopi-core-factory-info 
-                ezlopi-core-nvs ezlopi-core-wifi
-                ezlopi-core-ethernet
-                ezlopi-core-event-queue 
-                ezlopi-core-ping 
-                ezlopi-core-room )
+    REQUIRES ${EZLOPI_CORE_COMPONENTS})

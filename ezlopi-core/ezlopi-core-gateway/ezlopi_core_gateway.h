@@ -1,8 +1,8 @@
-#ifndef __EZLOPI_GATEWAY_H__
-#define __EZLOPI_GATEWAY_H__
+#ifndef _EZLOPI_CORE_GATEWAY_H_
+#define _EZLOPI_CORE_GATEWAY_H_
 
-#include "stdlib.h"
-#include "stdint.h"
+#include <stdlib.h>
+#include <stdint.h>
 
 typedef struct s_ezlopi_gateway
 {
@@ -35,4 +35,4 @@ typedef struct s_ezlopi_gateway
 
 s_ezlopi_gateway_t *ezlopi_gateway_get(void);
 
-#endif // __EZLOPI_GATEWAY_H__
+#endif // _EZLOPI_CORE_GATEWAY_H_

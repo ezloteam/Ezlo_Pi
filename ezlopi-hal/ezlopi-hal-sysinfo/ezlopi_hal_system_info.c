@@ -1,6 +1,7 @@
+#include "../../build/config/sdkconfig.h"
+
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_hal_system_info.h"
-#include "../../build/config/sdkconfig.h"
 
 static uint32_t boot_count = 0;
 

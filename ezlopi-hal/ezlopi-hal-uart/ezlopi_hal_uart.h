@@ -1,12 +1,13 @@
-#ifndef __EZLOPI_UART_H__
-#define __EZLOPI_UART_H__
+#ifndef _EZLOPI_HAL_UART_H_
+#define _EZLOPI_HAL_UART_H_
 
-#include "stdbool.h"
-#include "stdint.h"
-#include "driver/uart.h"
-#include "esp_err.h"
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+#include "driver/uart.h"
+#include "esp_err.h"
 
 typedef int ezlo_uart_channel_t;
 
@@ -45,4 +46,4 @@ struct s_ezlopi_uart_object
 s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, uint32_t rx, __uart_upcall upcall, void *arg);
 ezlo_uart_channel_t ezlopi_uart_get_channel(s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle);
 
-#endif // __EZLOPI_UART_H__
+#endif // _EZLOPI_HAL_UART_H_

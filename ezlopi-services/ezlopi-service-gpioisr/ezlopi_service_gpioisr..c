@@ -1,15 +1,16 @@
 #include <string.h>
-#include "sdkconfig.h"
 
+#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
 #include "trace.h"
-#include "ezlopi_service_gpioisr.h"
+
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_core_devices_list.h"
+
+#include "ezlopi_service_gpioisr.h"
 
 static QueueHandle_t gpio_evt_queue = NULL;
 static const uint32_t default_debounce_time = 1000;

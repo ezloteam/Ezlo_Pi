@@ -1,6 +1,7 @@
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_populate.h"
+
+#include "ezlopi_cloud_constants.h"
 
 l_scenes_list_v2_t *ezlopi_scenes_populate_new_scene(cJSON *cj_scene, uint32_t scene_id)
 {

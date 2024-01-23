@@ -1,13 +1,10 @@
-#ifndef __EZLOPI_SCENES_V2_H__
-#define __EZLOPI_SCENES_V2_H__
+#ifndef _EZLOPI_CORE_SCENES_V2_H_
+#define _EZLOPI_CORE_SCENES_V2_H_
 
-#include <string.h>
-#include <ctype.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <cJSON.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include "ctype.h"
+#include "cJSON.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "ezlopi_core_scenes_methods.h"
 
@@ -182,4 +179,4 @@ void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list);
 void ezlopi_scenes_notifications_add(cJSON *cj_notifications);
 int ezlopi_scenes_edit_by_id(uint32_t scene_id, cJSON *cj_updated_scene);
 
-#endif // __EZLOPI_SCENES_V2_H__
+#endif // _EZLOPI_CORE_SCENES_V2_H_

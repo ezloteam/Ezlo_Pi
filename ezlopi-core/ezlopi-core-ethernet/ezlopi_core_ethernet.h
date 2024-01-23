@@ -1,10 +1,5 @@
-#ifndef __EZLOPI_ETHERNET_H__
-#define __EZLOPI_ETHERNET_H__
-
-#include "esp_netif.h"
-
-#include "ezlopi_core_boards.h"
-#include "ezlopi_hal_spi_master.h"
+#ifndef _EZLOPI_CORE_ETHERNET_H_
+#define _EZLOPI_CORE_ETHERNET_H_
 
 #if (EZLOPI_AMBIENT_TRACKER_PRO_REV_A == EZLOPI_BOARD_TYPE)
 #define EZLOPI_ETHERNET_W5500_EN_PIN 13
@@ -38,4 +33,4 @@ void ezlopi_ethernet_deinit(void);
 e_ethernet_status_t ezlopi_ethernet_get_status(void);
 esp_netif_ip_info_t *ezlopi_ethernet_get_ip_info(void);
 
-#endif // __EZLOPI_ETHERNET_H__
+#endif // _EZLOPI_CORE_ETHERNET_H_

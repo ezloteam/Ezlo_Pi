@@ -1,15 +1,12 @@
-#include <stdio.h>
 #include <string.h>
 
-#include "esp_netif.h"
-#include "esp_eth.h"
 #include "esp_event.h"
 #include "driver/gpio.h"
-#include "esp_eth_mac.h"
 
 #include "trace.h"
 
 #include "ezlopi_core_ethernet.h"
+
 #include "ezlopi_hal_spi_master.h"
 
 static const char *eth_key_desc_str = "ezlopi_eth";
