@@ -30,4 +30,4 @@ typedef enum
 //-------------------------------------------------------------------
 int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif
+#endif //_SENSOR_0061_DIGITALIN_REED_SWITCH_H_

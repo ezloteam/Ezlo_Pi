@@ -1,7 +1,5 @@
-
-
-#ifndef SENSOR_0026_ADC_LDR_H
-#define SENSOR_0026_ADC_LDR_H
+#ifndef _SENSOR_0026_ADC_LDR_H_
+#define _SENSOR_0026_ADC_LDR_H_
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
@@ -32,4 +30,4 @@ typedef enum
 
 int sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif // SENSOR_0026_ADC_LDR_H
+#endif // _SENSOR_0026_ADC_LDR_H_

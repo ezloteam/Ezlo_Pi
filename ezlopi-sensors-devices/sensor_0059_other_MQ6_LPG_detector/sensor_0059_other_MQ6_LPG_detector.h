@@ -137,8 +137,8 @@ typedef enum
 typedef struct mq6_value_t
 {
     float _LPG_ppm;
-    float MQ6_R0_constant;  
-}mq6_value_t;
+    float MQ6_R0_constant;
+} mq6_value_t;
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------
@@ -147,4 +147,4 @@ int sensor_0059_other_MQ6_LPG_detector(e_ezlopi_actions_t action, l_ezlopi_item_
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0059_OTHER_MQ6_LPG_DETECTOR_H_

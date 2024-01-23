@@ -146,4 +146,4 @@ int sensor_0051_other_MQ8_H2_detector(e_ezlopi_actions_t action, l_ezlopi_item_t
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0051_OTHER_MQ8_H2_DETECTOR_H_

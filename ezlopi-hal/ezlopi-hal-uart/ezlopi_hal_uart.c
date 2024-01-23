@@ -11,7 +11,6 @@
 
 #include "ezlopi_hal_uart.h"
 
-
 static void ezlopi_uart_channel_task(void *args);
 static ezlo_uart_channel_t get_available_channel();
 

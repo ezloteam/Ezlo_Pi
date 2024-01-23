@@ -1,5 +1,5 @@
-#ifndef SENSOR_0029_I2C_GXHTC3_H
-#define SENSOR_0029_I2C_GXHTC3_H
+#ifndef _SENSOR_0029_I2C_GXHTC3_H_
+#define _SENSOR_0029_I2C_GXHTC3_H_
 
 #include "gxhtc3.h"
 
@@ -14,4 +14,4 @@ typedef struct s_gxhtc3_value
 
 int sensor_0029_I2C_GXHTC3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif // SENSOR_0029_I2C_GXHTC3_H
+#endif // _SENSOR_0029_I2C_GXHTC3_H_

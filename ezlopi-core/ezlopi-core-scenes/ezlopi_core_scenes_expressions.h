@@ -103,8 +103,6 @@ void ezlopi_scenes_expressions_delete_exp_item(s_exp_items_t *exp_items);
  */
 void ezlopi_scenes_expressions_delete_exp_device_item_names(s_exp_device_item_names_t *exp_device_item_names);
 
-
-
 /**
  * @brief construct expressions in cJSON and add it to cj_expression_array
  *

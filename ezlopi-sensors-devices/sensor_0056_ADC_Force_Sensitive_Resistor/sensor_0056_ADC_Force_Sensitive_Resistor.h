@@ -98,4 +98,4 @@ typedef struct fsr_t
 //-----------------------------------------------------------------------------------------------------------------------------
 int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif
+#endif //_SENSOR_0056_ADC_FORCE_SENSITIVE_RESISTOR_H_

@@ -1,9 +1,16 @@
+#include "trace.h"
+
+#include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
+#include "ezlopi_core_device_value_updated.h"
+
+#include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_gpioisr.h"
+
 #include "sensor_0034_digitalIn_proximity.h"
 
 static int proximity_sensor_prepare(void *args);

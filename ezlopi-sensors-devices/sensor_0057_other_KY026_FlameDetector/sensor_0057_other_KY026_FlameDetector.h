@@ -53,4 +53,4 @@ typedef struct flame_t
 //----------------------------------------------------
 int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif
+#endif //_SENSOR_0057_OTHER_KY026_FLAMEDETECTOR_H_

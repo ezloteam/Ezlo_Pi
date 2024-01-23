@@ -1,24 +1,21 @@
-#include "cJSON.h"
+#include <string.h>
+#include <time.h>
+// #include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_cloud_items.h"
-#include "stdint.h"
-#include "string.h"
-#include "time.h"
-#include "ezlopi_service_gpioisr.h"
 #include "esp_timer.h"
 
 #include "ezlopi_core_timer.h"
-#include "ezlopi_hal_uart.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_core_devices_list.h"
-#include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_cloud_category_str.h"
-#include "ezlopi_cloud_subcategory_str.h"
-#include "ezlopi_cloud_device_types_str.h"
-#include "ezlopi_cloud_item_name_str.h"
-#include "ezlopi_cloud_value_type_str.h"
-#include "ezlopi_cloud_scales_str.h"
+#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
+#include "ezlopi_core_device_value_updated.h"
+
+#include "ezlopi_hal_uart.h"
+
+#include "ezlopi_cloud_items.h"
+#include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_service_gpioisr.h"
 
 #include "sensor_0066_other_R307_FingerPrint.h"
 //---------------------------------------------------------------------------------------------------------------

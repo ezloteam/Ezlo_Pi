@@ -138,9 +138,9 @@ typedef enum
 
 typedef struct mq9_value_t
 {
-    float _LPG_flameable_ppm;
-    float MQ9_R0_constant;  
-}mq9_value_t;
+	float _LPG_flameable_ppm;
+	float MQ9_R0_constant;
+} mq9_value_t;
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION
 //--------------------------------------------------------------------------------------------------------
@@ -149,4 +149,4 @@ int sensor_0063_other_MQ9_LPG_flameable_detector(e_ezlopi_actions_t action, l_ez
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0063_OTHER_MQ9_LPG_FLAMEABLE_DETECTOR_H_

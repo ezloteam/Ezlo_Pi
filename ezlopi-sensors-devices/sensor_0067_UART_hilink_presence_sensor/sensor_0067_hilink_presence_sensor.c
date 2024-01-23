@@ -1,18 +1,16 @@
 #include <string.h>
 #include "sdkconfig.h"
-
-#include "cJSON.h"
 #include "trace.h"
-#include "ezlopi_core_timer.h"
-#include "ezlopi_cloud_items.h"
-
-#include "ezlopi_core_cloud.h"
-#include "ezlopi_core_devices_list.h"
-#include "ezlopi_core_devices.h"
-#include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
-#include "ezlopi_cloud_item_name_str.h"
+// #include "cJSON.h"
 #include "ld2410.h"
+
+#include "ezlopi_core_timer.h"
+#include "ezlopi_core_cloud.h"
+#include "ezlopi_core_device_value_updated.h"
+
+#include "ezlopi_cloud_items.h"
+#include "ezlopi_cloud_constants.h"
+
 #include "sensor_0067_hilink_presence_sensor.h"
 #include "hilink_presence_sensor_setting.h"
 

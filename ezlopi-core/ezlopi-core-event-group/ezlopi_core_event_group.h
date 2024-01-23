@@ -1,7 +1,6 @@
 #ifndef _EZLOPI_CORE_EVENT_GROUP_H_
 #define _EZLOPI_CORE_EVENT_GROUP_H_
 
-
 #define EZLOPI_EVENT_BASE 0x10
 
 typedef enum e_ezlopi_event

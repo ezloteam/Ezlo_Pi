@@ -26,4 +26,4 @@ typedef enum
 
 int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif
+#endif //_SENSOR_0065_DIGITALIN_FLOAT_SWITCH_H_

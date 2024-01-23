@@ -248,4 +248,4 @@ typedef struct GPS6MV2_t
 //--------------------------------------------------------------------------------------------------------------------
 int sensor_0053_UART_GYGPS6MV2(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif //_0053_UART_GYGPS6MV2_H_
+#endif //_SENSOR_0053_UART_GYGPS6MV2_H_

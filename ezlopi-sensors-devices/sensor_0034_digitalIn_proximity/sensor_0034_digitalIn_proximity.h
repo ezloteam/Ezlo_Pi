@@ -1,5 +1,5 @@
-#ifndef SENSOR_0034_DIGITALIN_PROXIMITY_H
-#define SENSOR_0034_DIGITALIN_PROXIMITY_H
+#ifndef _SENSOR_0034_DIGITALIN_PROXIMITY_H_
+#define _SENSOR_0034_DIGITALIN_PROXIMITY_H_
 
 #include "esp_err.h"
 #include "driver/gpio.h"
@@ -19,4 +19,4 @@
 
 int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg);
 
-#endif // SENSOR_0034_DIGITALIN_PROXIMITY_H
+#endif // _SENSOR_0034_DIGITALIN_PROXIMITY_H_

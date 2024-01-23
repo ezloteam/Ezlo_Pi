@@ -1,16 +1,15 @@
-#include "esp_err.h"
 #include "driver/gpio.h"
-#include "cJSON.h"
+#include "trace.h"
 
+#include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
-#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_device_value_updated.h"
 
 #include "ezlopi_cloud_items.h"
-#include "trace.h"
+#include "ezlopi_cloud_constants.h"
+
 #include "ezlopi_service_gpioisr.h"
 
 static int __prepare(void *arg);

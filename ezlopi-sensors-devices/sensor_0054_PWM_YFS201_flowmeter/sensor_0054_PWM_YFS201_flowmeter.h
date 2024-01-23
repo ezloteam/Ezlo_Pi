@@ -37,4 +37,4 @@ typedef struct yfs201_t
 //-----------------------------------------------------------------------------------------------
 int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
-#endif
+#endif //_SENSOR_0054_PWM_YFS201_FLOWMETER_H_

@@ -7,10 +7,16 @@ idf_component_register(SRCS "device_0003_digitalOut_plug.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES 
                 trace 
-                ezlopi-service-gpioisr
-                ezlopi-core-actions
                 ezlopi-core-timer 
-                ezlopi-core-devices 
                 ezlopi-core-cloud 
-                ezlopi-cloud-constants
-                ezlopi-core-valueformatter)
+                ezlopi-core-actions
+                ezlopi-core-devices 
+                ezlopi-core-valueformatter
+
+                ezlopi-hal-gpio
+                
+                ezlopi-cloud-items 
+                ezlopi-cloud-constants 
+
+                ezlopi-service-gpioisr
+                )

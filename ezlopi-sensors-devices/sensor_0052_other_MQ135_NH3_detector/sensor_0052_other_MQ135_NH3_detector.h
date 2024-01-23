@@ -146,4 +146,4 @@ int sensor_0052_other_MQ135_NH3_detector(e_ezlopi_actions_t action, l_ezlopi_ite
 
 //--------------------------------------------------------------------------------------------------------
 
-#endif
+#endif //_SENSOR_0052_OTHER_MQ135_NH3_DETECTOR_H_
