@@ -178,8 +178,8 @@ const char *ezlopi_item_name_water_flow = "water_flow";
 // const  char *ezlopi_item_name_outside_temperature = "outside_temperature";
 // // const  char *ezlopi_item_name_water_chlorine_level = "water_chlorine_level";
 // const  char *ezlopi_item_name_water_acidity = "water_acidity";
-// const  char *ezlopi_item_name_particulate_matter_10 = "particulate_matter_10";
-// const  char *ezlopi_item_name_particulate_matter_2_dot_5 = "particulate_matter_2_dot_5";
+const  char *ezlopi_item_name_particulate_matter_10 = "particulate_matter_10";
+const  char *ezlopi_item_name_particulate_matter_2_dot_5 = "particulate_matter_2_dot_5";
 // const  char *ezlopi_item_name_program_status = "program_status";
 // const  char *ezlopi_item_name_program_failures = "program_failures";
 // const  char *ezlopi_item_name_position = "position";
@@ -223,7 +223,7 @@ const char *ezlopi_item_name_applied_force_on_sensor = "applied_force_on_sensor"
 const  char *ezlopi_item_name_motion_direction = "motion_direction";
 // const  char *ezlopi_item_name_nitrogen_dioxide = "nitrogen_dioxide";
 // const  char *ezlopi_item_name_ozone = "ozone";
-// const  char *ezlopi_item_name_particulate_matter_1 = "particulate_matter_1";
+const  char *ezlopi_item_name_particulate_matter_1 = "particulate_matter_1";
 // const  char *ezlopi_item_name_return_air_temperature = "return_air_temperature";
 // const  char *ezlopi_item_name_suction_pressure = "suction_pressure";
 // const  char *ezlopi_item_name_sulfur_dioxide = "sulfur_dioxide";
@@ -243,5 +243,12 @@ const char *ezlopi_item_name_gyroscope_z_axis = "gyroscope_z_axis";
 const char *ezlopi_item_name_learn_fingerprint = "learn_fingerprint";
 const char *ezlopi_item_name_fingerprint_action = "fingerprint_action";
 const char *ezlopi_item_name_fingerprint_ids = "fingerprint_ids";
+
+const char *ezlopi_item_name_particles_0_dot_3_um = "particles_0_dot_3_um";
+const char *ezlopi_item_name_particles_0_dot_5_um = "particles_0_dot_5_um";
+const char *ezlopi_item_name_particles_1_um = "particles_1_um";
+const char *ezlopi_item_name_particles_2_dot_5_um = "particles_2_dot_5_um";
+const char *ezlopi_item_name_particles_5_um = "particles_5_um";
+const char *ezlopi_item_name_particles_10_um = "particles_10_um";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

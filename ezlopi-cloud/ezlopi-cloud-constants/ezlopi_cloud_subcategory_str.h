@@ -48,7 +48,7 @@ extern const char *subcategory_moisture;
 // extern const  char *subcategory_velocity;
 // extern const  char *subcategory_capacity;
 extern const char *subcategory_water;
-// extern const  char *subcategory_particulate_matter;
+extern const  char *subcategory_particulate_matter;
 // extern const  char *subcategory_frequency;
 // extern const  char *subcategory_health;
 // extern const  char *subcategory_modulation;

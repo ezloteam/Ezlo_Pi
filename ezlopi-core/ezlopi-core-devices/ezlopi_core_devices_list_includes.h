@@ -39,7 +39,7 @@
 #include "sensor_0034_digitalIn_proximity.h"
 #include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
 #include "device_0036_PWM_servo_MG996R.h"
-
+#include "sensor_0037_pms5003_sensor.h"
 #include "device_0038_other_RGB.h"
 
 #include "sensor_0040_other_TCS230.h"

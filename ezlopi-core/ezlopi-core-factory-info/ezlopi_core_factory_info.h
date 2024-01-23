@@ -306,12 +306,14 @@ static const char *ezlopi_config_test =
         [\
 {\
         \"dev_type\":6,\
-        \"dev_name\":\"Hilink Presence Sensor\",\
+        \"dev_name\":\"PMS5003\",\
         \"id_room\":\"\",\
-        \"id_item\":67,\
-        \"tx\":12,\
-        \"rx\":13,\
-        \"baudrate\":256000\
+        \"id_item\":37,\
+        \"gpio1\":40,\
+        \"gpio2\":41,\
+        \"gpio3\":39,\
+        \"gpio4\":42,\
+        \"baudrate\":9600\
         }\
         ],\
     \"dev_total\": 1}";

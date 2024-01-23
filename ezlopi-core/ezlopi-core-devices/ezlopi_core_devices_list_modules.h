@@ -49,7 +49,7 @@ EZLOPI_DEVICE_LIST("sensor-soilMoisture-ADC             ", 32, sensor_0032_ADC_s
 EZLOPI_DEVICE_LIST("sensor-turbidity-ADC                ", 33, sensor_0033_ADC_turbidity)
 EZLOPI_DEVICE_LIST("sensor-proximity-digital            ", 34, sensor_0034_digitalIn_proximity)
 EZLOPI_DEVICE_LIST("sensor-TPP223B-digital-touch        ", 35, sensor_0035_digitalIn_touch_sensor_TPP223B)
-
+EZLOPI_DEVICE_LIST("sensor-PMS5003", 37, sensor_pms5003_v3)
 EZLOPI_DEVICE_LIST("device-other-RGB-LED                ", 38, device_0038_other_RGB)
 
 EZLOPI_DEVICE_LIST("device-PWM-servo-MG996R", 36, device_0036_PWM_servo_MG996R)

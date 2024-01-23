@@ -54,6 +54,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         sensor_0034_digitalIn_proximity 
         sensor_0035_digitalIn_touch_sensor_TPP223B                                                         
         device_0036_PWM_servo_MG996R
+        sensor_0037_pms5003_sensor
         device_0038_other_RGB
                 
         sensor_0040_other_TCS230           
