@@ -1,73 +1,84 @@
-
 [![N|Ezlo-Pi](https://www.ezlopi.com/wp-content/uploads/2022/07/Logo.svg)](https://www.ezlopi.com/)
 
-[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network) [![GitHub stars](https://img.shields.io/github/stars/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/stargazers) [![License](https://img.shields.io/github/license/ezloteam/Ezlo_Pi/)](https://github.com/ezloteam/Ezlo_Pi/blob/master/LICENCE.txt)
+[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network)
 
 # ezlopi
-EzloPi is an open-source project contributed by Ezlo Innovation to extend the capabilities of ESP32 chipset-based devices and platforms. It provides unparalleled capabilities to configure and control your ESP-based devices and bring any of your automation ideas to life.
-
+EzloPi is a collaborative open-source project developed by Ezlo Innovation to enhance the functionalities of devices and platforms powered by the ESP32 chipset. It offers exceptional features that allow seamless configuration and control of ESP-based devices, empowering you to transform your automation concepts into reality.
 Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 
 ## supported features
 * __GPIO__
 * __Analog Input__
 * __Digital Input__
-* __I2C__
+* __PWM__
+* __UART__
 * __One Wire__
+* __I2C__
+* __SPI__
+* __Other__
 
 # 1. Getting started
-EzloPi has a windows based configurator application to configure the ESP32 for any of the feature mentioned above at supported features. The desktop application can be used to configure the ESP32 device for interfacing Relay, and analog input, digital input, an I2C based sensor etc in no time. After the device has been configured using the desktop app, anyone can use our cloud and mobile app serviece to get control of device from anywhere in real-time.
+EzloPi features a [web-based configurator](https://config.ezlopi.com/) that allows you to easily configure your ESP32 device for various supported features. The web interface provides a user-friendly platform to set up relays, analog inputs, digital inputs, and I2C-based sensors on your ESP32 device with ease. Once configured, you can leverage our cloud and mobile app services to remotely control your device in real-time.
 
-![EzloPi Desktop UI](https://github.com/ezloteam/Ezlo_Pi/blob/master/ezlopi_screenshot.png)
+![EzloPi web configurator](ezlop-doc/ezlopi_web_flasher.png)
 
 # 2. Customizing and building EzloPi firmware in your local setup
-It is required to have [ESP-IDF](https://www.espressif.com/en/products/sdks/esp-idf) installed in your machine.
-Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/get-started/index.html). IDF version in this project : 4.4.1.
+It is required to have [ESP-IDF](https://github.com/espressif/esp-idf) installed in your machine.
+Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/). ESP-IDF version [v4.4.4-292-g7894f032f6-dirty](https://github.com/espressif/esp-idf/releases/tag/v4.4.4).
 
-#### 1. Clone Ezlo-Pi repository from github
-Open terminal or bash-shell and run the below commands
+### 1. Clone the Ezlo-Pi Repository from GitHub
+
+Navigate to your terminal or bash shell and execute the following commands:
+
 ```bash
 git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
 cd ezlopi/firmware/ezlopi
 ```
-#### 2. Build
-using ```idf.py```
+### 3. Configure the Projec
+You need to configure the project as per the chip type you are using. It needs to be modified the file ```sdkconfig``` , equivalent to making changes with ```idf.py menuconfig```.
+EzloPi needs to have constant set of configurations which are defined for different variants of chips and saved in the file such that ```sdkconfig.<chip type>.<flash size>```. Copy the content of the chip you are using and paste it into ```sdkconfig```. For example if I want to build and run this firmware on ESP32C3 with 4MB of memory, I need to copy content of ```[sdkconfig.esp32c3.4mb](sdkconfig.esp32c3.4mb)``` into ```sdkconfig``` or rename the file ```sdkconfig.esp32c3.4mb``` to ```sdkconfig```, clean the existing build with ```idf.py fullclean``` and then build as mentioned at #2. The list of pre-defined ```sdkconfig``` for different varients of ESP32 are listed as : 
+
+* __[ESP32 4MB Standard](sdkconfig.esp32.4mb)__
+* __[ESP32-S3 4MB ](sdkconfig.esp32s3.4mb)__
+* __[ESP32-S3 8MB](sdkconfig.esp32s3.8mb)__
+* __[ESP32-C3 4MB](sdkconfig.esp32c3.4mb)__
+
+
+### 2. Build the Project
+
+Execute the following command to build the project:
+
 ```bash
 idf.py build
 ```
-Using custom command
-###### a. To generate test release firmware:
-Generates .bin files in firmware/[version] folder. The below command also increases the build number.
-```bash
-./build.sh test
-```
-###### b. To only build:
-Does not generate any .bin files in firmware/[version] folder. This command will only increase the build number in version.
-```bash
-./build.sh build
-```
-###### c. Build for release firmware:
-Generates .bin files in firmware/[version] folder. The below command also creates the .bin files in firmware/[version] folder
-```bash
-./build.sh release
-```
-#### 3. flash the firmware
-using usb port and baudrate
+
+### 3. Flash the Firmware
+
+To flash the firmware, use the following command:
+
 ```bash
 idf.py -p <COM Port Name> -b <baud> flash
 ```
-Monitor
+
+### 4. Open Serial Monitor
+
+To open the serial monitor, use the following command:
+
 ```bash
 idf.py -p <COM Port Name> monitor
 ```
 
-# 3. Customizing Desktop app:
-The desktop application has been build under QT V 5.15. QT creator with necessary compiler should be set in your local machine. 
-The installer script is under _deploy_ directory.
+Replace `<COM Port Name>` with the appropriate port name and `<baud>` with the desired baud rate.
 
-# 4. Working with examples
+# 3. Working with examples
 
-[Fllow from the examples](https://www.ezlopi.com/examples/)
+[Follow from the examples](https://www.ezlopi.com/examples/)
 1. [EzloPi AC Lamp setup with Relay interfacing​](https://www.ezlopi.com/examples/relay-circuitry-and-lamp-circuit-setup/)
 2. [EzloPi AC lamp setup with relay and a momentary switch](https://www.ezlopi.com/examples/ezlopi-ac-lamp-setup-with-relay-and-a-momentary-switch/)
 3. [EzloPi I2C MPU6050 Example](https://www.ezlopi.com/examples/ezlopi-i2c-mpu6050-example/)
+4. [HCSR04 ultrasonic sensor example](https://www.ezlopi.com/examples/hcsr04-ultrasonic-sensor-example/)
+5. [HRLV Maxsonar-EZ MB1013 sonar sensor example](https://www.ezlopi.com/examples/hrlv-maxsonar-ez-mb1013-sonar-sensor-uart-example/)
+6. [LDR digital module example](https://www.ezlopi.com/examples/ldr-digital-module-example/)
+7. [EzloPi Dimmable LED Example](https://www.ezlopi.com/examples/ezlopi-dimmable-led-example/)
+8. [TTP223b touch sensor example](https://www.ezlopi.com/examples/ttp223b-touch-sensor-example/)
+9. [Custom device/sensor integration guide](https://www.ezlopi.com/examples/ezlopi-v2-x-custom-device-sensorintegration-guide/)
