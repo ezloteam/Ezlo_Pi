@@ -60,7 +60,7 @@ int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene)
 
     if (1 == ezlopi_scenes_edit_update_id(scene_id, cj_scene))
     {
-        if (1 == ezlopi_scene_edit_store_updated_to_nvs(cj_scene);)
+        if (1 == ezlopi_scene_edit_store_updated_to_nvs(cj_scene))
         {
             ret = 1;
         }

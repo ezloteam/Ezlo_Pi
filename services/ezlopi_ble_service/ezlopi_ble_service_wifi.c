@@ -37,8 +37,8 @@ void ezlopi_ble_service_wifi_profile_init(void)
     uuid.uuid.uuid16 = BLE_WIFI_SERVICE_UUID;
     wifi_ble_service = ezlopi_ble_gatt_create_service(BLE_WIFI_SERVICE_HANDLE, &uuid);
 
-    uuid.uuid.uuid16 = BLE_WIFI_CHAR_CREDS_UUID;
     uuid.len = ESP_UUID_LEN_16;
+    uuid.uuid.uuid16 = BLE_WIFI_CHAR_CREDS_UUID;
     permission = ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE;
     ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, NULL, wifi_creds_write_func, wifi_creds_write_exec_func);
@@ -84,11 +84,11 @@ static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
         cJSON *root = cJSON_Parse((const char *)value);
         if (root)
         {
-            cJSON *cj_user_id = cJSON_GetObjectItemCaseSensitive(root, ezlopi_user_id_str);
             cJSON *cj_ssid = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_ssid_str);
+            cJSON *cj_user_id = cJSON_GetObjectItemCaseSensitive(root, ezlopi_user_id_str);
             cJSON *cj_password = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_password_str);
 
-            if (cj_user_id && cj_password && cj_ssid)
+            if (cj_user_id && cj_user_id->valuestring && cj_password && cj_password->valuestring && cj_ssid && cj_ssid->valuestring)
             {
                 char *ssid = cj_ssid->valuestring;
                 char *password = cj_password->valuestring;
