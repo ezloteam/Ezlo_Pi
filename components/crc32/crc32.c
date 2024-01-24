@@ -199,13 +199,14 @@ static const uint32_t crc32Table[256] = {
     0x79B737BAL, 0x8BDCB4B9L, 0x988C474DL, 0x6AE7C44EL,
     0xBE2DA0A5L, 0x4C4623A6L, 0x5F16D052L, 0xAD7D5351L};
 
-static uint32_t
-singletable_crc32c(uint32_t crc, const void *buf, size_t size)
+static uint32_t singletable_crc32c(uint32_t crc, const void *buf, size_t size)
 {
     const uint8_t *p = buf;
 
     while (size--)
+    {
         crc = crc32Table[(crc ^ *p++) & 0xff] ^ (crc >> 8);
+    }
 
     return crc;
 }
@@ -646,11 +647,7 @@ static const uint32_t sctp_crc_tableil8_o88[256] =
  * end of the CRC lookup table crc_tableil8_o88
  */
 
-static uint32_t
-crc32c_sb8_64_bit(uint32_t crc,
-                  const unsigned char *p_buf,
-                  uint32_t length,
-                  uint32_t init_bytes)
+static uint32_t crc32c_sb8_64_bit(uint32_t crc, const unsigned char *p_buf, uint32_t length, uint32_t init_bytes)
 {
     uint32_t li;
     uint32_t term1, term2;
@@ -704,10 +701,7 @@ crc32c_sb8_64_bit(uint32_t crc,
     return crc;
 }
 
-static uint32_t
-multitable_crc32c(uint32_t crc32c,
-                  const unsigned char *buffer,
-                  unsigned int length)
+static uint32_t multitable_crc32c(uint32_t crc32c, const unsigned char *buffer, unsigned int length)
 {
     uint32_t to_even_word;
 
@@ -719,10 +713,7 @@ multitable_crc32c(uint32_t crc32c,
     return (crc32c_sb8_64_bit(crc32c, buffer, length, to_even_word));
 }
 
-uint32_t
-calculate_crc32c(uint32_t crc32c,
-                 const unsigned char *buffer,
-                 unsigned int length)
+uint32_t calculate_crc32c(uint32_t crc32c, const unsigned char *buffer, unsigned int length)
 {
     if (length < 4)
     {

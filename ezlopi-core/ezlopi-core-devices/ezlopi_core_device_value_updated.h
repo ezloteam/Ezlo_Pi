@@ -1,0 +1,10 @@
+#ifndef _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
+#define _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_
+#include "ezlopi_core_devices_list.h"
+
+int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t *item);
+int ezlopi_device_value_updated_from_device_item_id_v3(uint32_t item_id);
+int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_v3_t *setting);
+int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id);
+
+#endif // _EZLOPI_CORE_DEVICE_VALUE_UPDATED_H_

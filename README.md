@@ -1,88 +1,84 @@
-# Wi-Fi Scan Example
+[![N|Ezlo-Pi](https://www.ezlopi.com/wp-content/uploads/2022/07/Logo.svg)](https://www.ezlopi.com/)
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+[![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network)
 
-This example shows how to scan for available set of APs.
+# ezlopi
+EzloPi is a collaborative open-source project developed by Ezlo Innovation to enhance the functionalities of devices and platforms powered by the ESP32 chipset. It offers exceptional features that allow seamless configuration and control of ESP-based devices, empowering you to transform your automation concepts into reality.
+Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 
-## How to use example
+## supported features
+* __GPIO__
+* __Analog Input__
+* __Digital Input__
+* __PWM__
+* __UART__
+* __One Wire__
+* __I2C__
+* __SPI__
+* __Other__
 
-Before project configuration and build, be sure to set the correct chip target using `idf.py set-target <chip_name>`.
+# 1. Getting started
+EzloPi features a [web-based configurator](https://config.ezlopi.com/) that allows you to easily configure your ESP32 device for various supported features. The web interface provides a user-friendly platform to set up relays, analog inputs, digital inputs, and I2C-based sensors on your ESP32 device with ease. Once configured, you can leverage our cloud and mobile app services to remotely control your device in real-time.
 
-### Hardware Required
+![EzloPi web configurator](ezlop-doc/ezlopi_web_flasher.png)
 
-* A development board with ESP32/ESP32-S2/ESP32-C3 SoC (e.g., ESP32-DevKitC, ESP-WROVER-KIT, etc.).
-* A USB cable for Power supply and programming.
+# 2. Customizing and building EzloPi firmware in your local setup
+It is required to have [ESP-IDF](https://github.com/espressif/esp-idf) installed in your machine.
+Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/). ESP-IDF version [v4.4.4-292-g7894f032f6-dirty](https://github.com/espressif/esp-idf/releases/tag/v4.4.4).
 
-### Configure the project
+### 1. Clone the Ezlo-Pi Repository from GitHub
 
-Open the project configuration menu (`idf.py menuconfig`). 
+Navigate to your terminal or bash shell and execute the following commands:
 
-In the `Example Configuration` menu:
-
-* Set the Example configuration.
-    * Use `Max size of scan list` to set the maximum nunber of access points in the list.
-
-### Build and Flash
-
-Build the project and flash it to the board, then run the monitor tool to view the serial output:
-
-Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
-
-(To exit the serial monitor, type ``Ctrl-]``.)
-
-See the Getting Started Guide for all the steps to configure and use the ESP-IDF to build projects.
-
-* [ESP-IDF Getting Started Guide on ESP32](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html)
-* [ESP-IDF Getting Started Guide on ESP32-S2](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/get-started/index.html)
-* [ESP-IDF Getting Started Guide on ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/get-started/index.html)
-
-## Example Output
-
-As you run the example, you will see the following log:
-
+```bash
+git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
+cd ezlopi/firmware/ezlopi
 ```
-I (443) wifi:wifi firmware version: 6bff005
-I (443) wifi:wifi certification version: v7.0
-I (443) wifi:config NVS flash: enabled
-I (443) wifi:config nano formating: disabled
-I (453) wifi:Init data frame dynamic rx buffer num: 32
-I (453) wifi:Init management frame dynamic rx buffer num: 32
-I (463) wifi:Init management short buffer num: 32
-I (463) wifi:Init dynamic tx buffer num: 32
-I (473) wifi:Init static tx FG buffer num: 2
-I (473) wifi:Init static rx buffer size: 1600
-I (473) wifi:Init static rx buffer num: 10
-I (483) wifi:Init dynamic rx buffer num: 32
-I (483) wifi_init: rx ba win: 6
-I (493) wifi_init: tcpip mbox: 32
-I (493) wifi_init: udp mbox: 6
-I (493) wifi_init: tcp mbox: 6
-I (503) wifi_init: tcp tx win: 5744
-I (503) wifi_init: tcp rx win: 5744
-I (513) wifi_init: tcp mss: 1440
-I (513) wifi_init: WiFi IRAM OP enabled
-I (513) wifi_init: WiFi RX IRAM OP enabled
-I (533) phy_init: phy_version 300,6e46ba7,Jan 25 2021
-I (683) wifi:set rx active PTI: 0, rx ack PTI: 0, and default PTI: 0
-I (683) wifi:mode : sta (7c:df:a1:40:23:84)
-I (683) wifi:enable tsf
-I (2783) scan: Total APs scanned = 17
-I (2783) scan: SSID 		IoTNetwork
-I (2783) scan: RSSI 		-50
-I (2783) scan: Authmode 	WIFI_AUTH_WPA2_PSK
-I (2783) scan: Pairwise Cipher 	WIFI_CIPHER_TYPE_CCMP
-I (2793) scan: Group Cipher 	WIFI_CIPHER_TYPE_CCMP
-I (2793) scan: Channel 		5
+### 3. Configure the Projec
+You need to configure the project as per the chip type you are using. It needs to be modified the file ```sdkconfig``` , equivalent to making changes with ```idf.py menuconfig```.
+EzloPi needs to have constant set of configurations which are defined for different variants of chips and saved in the file such that ```sdkconfig.<chip type>.<flash size>```. Copy the content of the chip you are using and paste it into ```sdkconfig```. For example if I want to build and run this firmware on ESP32C3 with 4MB of memory, I need to copy content of ```[sdkconfig.esp32c3.4mb](sdkconfig.esp32c3.4mb)``` into ```sdkconfig``` or rename the file ```sdkconfig.esp32c3.4mb``` to ```sdkconfig```, clean the existing build with ```idf.py fullclean``` and then build as mentioned at #2. The list of pre-defined ```sdkconfig``` for different varients of ESP32 are listed as : 
 
-I (2883) scan: SSID 		TP-Link_6872
-I (2883) scan: RSSI 		-70
-I (2883) scan: Authmode 	WIFI_AUTH_WPA_WPA2_PSK
-I (2893) scan: Pairwise Cipher 	WIFI_CIPHER_TYPE_CCMP
-I (2893) scan: Group Cipher 	WIFI_CIPHER_TYPE_CCMP
-I (2903) scan: Channel 		11
-...
+* __[ESP32 4MB Standard](sdkconfig.esp32.4mb)__
+* __[ESP32-S3 4MB ](sdkconfig.esp32s3.4mb)__
+* __[ESP32-S3 8MB](sdkconfig.esp32s3.8mb)__
+* __[ESP32-C3 4MB](sdkconfig.esp32c3.4mb)__
+
+
+### 2. Build the Project
+
+Execute the following command to build the project:
+
+```bash
+idf.py build
 ```
 
-## Troubleshooting
+### 3. Flash the Firmware
 
-For any technical queries, please open an [issue](https://github.com/espressif/esp-idf/issues) on GitHub. We will get back to you soon.
+To flash the firmware, use the following command:
+
+```bash
+idf.py -p <COM Port Name> -b <baud> flash
+```
+
+### 4. Open Serial Monitor
+
+To open the serial monitor, use the following command:
+
+```bash
+idf.py -p <COM Port Name> monitor
+```
+
+Replace `<COM Port Name>` with the appropriate port name and `<baud>` with the desired baud rate.
+
+# 3. Working with examples
+
+[Follow from the examples](https://www.ezlopi.com/examples/)
+1. [EzloPi AC Lamp setup with Relay interfacing​](https://www.ezlopi.com/examples/relay-circuitry-and-lamp-circuit-setup/)
+2. [EzloPi AC lamp setup with relay and a momentary switch](https://www.ezlopi.com/examples/ezlopi-ac-lamp-setup-with-relay-and-a-momentary-switch/)
+3. [EzloPi I2C MPU6050 Example](https://www.ezlopi.com/examples/ezlopi-i2c-mpu6050-example/)
+4. [HCSR04 ultrasonic sensor example](https://www.ezlopi.com/examples/hcsr04-ultrasonic-sensor-example/)
+5. [HRLV Maxsonar-EZ MB1013 sonar sensor example](https://www.ezlopi.com/examples/hrlv-maxsonar-ez-mb1013-sonar-sensor-uart-example/)
+6. [LDR digital module example](https://www.ezlopi.com/examples/ldr-digital-module-example/)
+7. [EzloPi Dimmable LED Example](https://www.ezlopi.com/examples/ezlopi-dimmable-led-example/)
+8. [TTP223b touch sensor example](https://www.ezlopi.com/examples/ttp223b-touch-sensor-example/)
+9. [Custom device/sensor integration guide](https://www.ezlopi.com/examples/ezlopi-v2-x-custom-device-sensorintegration-guide/)
