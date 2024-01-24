@@ -4,7 +4,7 @@
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 
-#define REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
+#define MPU6050_REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
 // #define RECALIBRATE_ITERAION_COUNT 1000
 #define CALIBRATION_SAMPLES 200
 

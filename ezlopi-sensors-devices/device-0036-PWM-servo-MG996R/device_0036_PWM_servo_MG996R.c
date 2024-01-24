@@ -1,5 +1,4 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -110,11 +109,8 @@ static int __prepare(void *arg)
             else
             {
                 ezlopi_device_free_device(servo_device);
+                ret = -1;
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(servo_device);
         }
     }
     return ret;
@@ -132,8 +128,17 @@ static int __init(l_ezlopi_item_t *item)
                                          item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
             item->interface.pwm.channel = servo_item->channel;
             item->interface.pwm.speed_mode = servo_item->speed_mode;
+            ret = 1;
         }
-        ret = 1;
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
     return ret;
 }

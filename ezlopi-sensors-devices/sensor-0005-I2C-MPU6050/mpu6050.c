@@ -166,7 +166,7 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
     {
         e_mpu6050_err_t err = MPU6050_ERR_OK;
         s_raw_mpu6050_data_t RAW_DATA = {0};
-        uint8_t tmp_buf[REG_COUNT_LEN] = {0}; // 0 - 13
+        uint8_t tmp_buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
         uint8_t Check_Register = 0;
         uint8_t address_val = 0;
 
@@ -177,7 +177,7 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
             {
                 address_val = (ACCEL_X_H);
                 ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), REG_COUNT_LEN); //(tmp_buf+i), 1);
+                ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), MPU6050_REG_COUNT_LEN); //(tmp_buf+i), 1);
             }
             // user_data->extract_counts++;
             // TRACE_I("Total Extracted : [%d]", user_data->extract_counts);

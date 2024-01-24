@@ -17,8 +17,13 @@
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
-#warning "use of static variable"
-static bool Calibration_complete_CH4 = false; // flag to activate calibration phase
+
+typedef struct mq4_value_t
+{
+    float _CH4_ppm;
+    float MQ4_R0_constant;
+    bool Calibration_complete_CH4
+} mq4_value_t;
 
 static const char *mq4_sensor_gas_alarm_token[] = {
     "no_gas",
@@ -69,9 +74,13 @@ int sensor_0048_other_MQ4_CH4_detector(e_ezlopi_actions_t action, l_ezlopi_item_
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (Calibration_complete_CH4)
+        if (item)
         {
-            __0048_notify(item);
+            mq4_value_t *MQ4_value = (mq4_value_t *)item->user_arg;
+            if (true == MQ4_value->Calibration_complete_CH4)
+            {
+                __0048_notify(item);
+            }
         }
         break;
     }
@@ -161,11 +170,21 @@ static int __0048_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             // calibrate if not done
-            if (!Calibration_complete_CH4)
+            mq4_value_t *MQ4_value = (mq4_value_t *)item->user_arg;
+            if (false == MQ4_value->Calibration_complete_CH4)
             {
                 xTaskCreate(__calibrate_MQ4_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
             }
             ret = 2;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
@@ -443,7 +462,7 @@ static void __calibrate_MQ4_R0_resistance(void *params)
             (MQ4_value->MQ4_R0_constant) = 0; // No negative values accepted.
         }
         // Set calibration_complete_CH4 flag
-        Calibration_complete_CH4 = true;
+        MQ4_value->Calibration_complete_CH4 = true;
     }
     vTaskDelete(NULL);
 }

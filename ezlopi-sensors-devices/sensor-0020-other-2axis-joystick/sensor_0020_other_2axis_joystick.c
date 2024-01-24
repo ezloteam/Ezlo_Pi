@@ -171,10 +171,12 @@ static int __prepare(void *arg)
                         joystick_x_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X];
                         __setup_item_cloud_properties(joystick_x_item, user_data);
                         __setup_item_interface_properties(joystick_x_item, cj_device);
+                        ret = 1;
                     }
                     else
                     {
                         ezlopi_device_free_device(joystick_x_device);
+                        ret = -1;
                     }
                 }
                 l_ezlopi_device_t *joystick_y_device = ezlopi_device_add_device(cj_device);
@@ -190,10 +192,12 @@ static int __prepare(void *arg)
                         joystick_y_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y];
                         __setup_item_cloud_properties(joystick_y_item, user_data);
                         __setup_item_interface_properties(joystick_y_item, cj_device);
+                        ret = 1;
                     }
                     else
                     {
                         ezlopi_device_free_device(joystick_y_device);
+                        ret = -1;
                     }
                 }
                 l_ezlopi_device_t *joystick_sw_device = ezlopi_device_add_device(cj_device);
@@ -209,13 +213,14 @@ static int __prepare(void *arg)
                         joystick_sw_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH];
                         __setup_item_cloud_properties(joystick_sw_item, user_data);
                         __setup_item_interface_properties(joystick_sw_item, cj_device);
+                        ret = 1;
                     }
                     else
                     {
                         ezlopi_device_free_device(joystick_sw_device);
+                        ret = -1;
                     }
                 }
-                ret = 1;
             }
         }
     }
@@ -235,6 +240,7 @@ static int __init(l_ezlopi_item_t *item)
             {
                 TRACE_E("adc GPIO_NUM is %d", item->interface.adc.gpio_num);
                 ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
+                ret = 1;
             }
         }
         if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH])
@@ -257,6 +263,7 @@ static int __init(l_ezlopi_item_t *item)
                 ret = gpio_config(&io_conf);
                 if (ret)
                 {
+                    ret = 0;
                     TRACE_E("Error initializing joystick switch");
                 }
                 else
@@ -265,10 +272,19 @@ static int __init(l_ezlopi_item_t *item)
                     item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                     TRACE_B("Value is %d", item->interface.gpio.gpio_in.value);
                     gpio_isr_service_register_v3(item, __joystick_intr_callback, 200);
+                    ret = 1;
                 }
             }
         }
-        ret = 1;
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
     return ret;
 }

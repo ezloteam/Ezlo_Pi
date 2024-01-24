@@ -146,20 +146,21 @@ static int __0040_prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(tcs230_item, user_data);
                     __prepare_item_interface_properties(tcs230_item, cj_device);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(tcs230_device);
                     free(user_data);
                 }
             }
             else
             {
-                ezlopi_device_free_device(tcs230_device);
+                ret = -1;
                 free(user_data);
             }
         }
-        ret = 1;
     }
     return ret;
 }
@@ -190,8 +191,17 @@ static int __0040_init(l_ezlopi_item_t *item)
 
             // activate a task to calibrate data
             xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
+            ret = 1;
         }
-        ret = 1;
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
     return ret;
 }

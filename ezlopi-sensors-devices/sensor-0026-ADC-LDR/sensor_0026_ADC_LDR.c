@@ -117,10 +117,12 @@ static int __prepare(void *arg)
                 if (item)
                 {
                     __setup_item_cloud_properties(item, cj_device);
+                    ret = 1;
                 }
                 else
                 {
                     ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }
@@ -137,6 +139,15 @@ static int __init(l_ezlopi_item_t *item)
         {
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;

@@ -110,12 +110,13 @@ static int __0017_prepare(void *arg)
                 {
                     ezlopi_device_free_device(potentiometer_device);
                     free(user_data);
+                    ret = -1;
                 }
             }
             else
             {
-                ezlopi_device_free_device(potentiometer_device);
                 free(user_data);
+                ret = -1;
             }
             ret = 1;
         }
@@ -126,12 +127,21 @@ static int __0017_prepare(void *arg)
 static int __0017_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (NULL != item)
+    if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;

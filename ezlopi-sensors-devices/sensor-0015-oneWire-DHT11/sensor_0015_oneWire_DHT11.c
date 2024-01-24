@@ -88,6 +88,11 @@ static int __0015_prepare(void *arg)
                         item_temperature->cloud_properties.device_id = device_temperature->cloud_properties.device_id;
                         __dht11_setup_item_properties_temperature(item_temperature, cjson_device, dht11_sensor_data);
                     }
+                    else
+                    {
+                        ezlopi_device_free_device(device_temperature);
+                        ret = -1;
+                    }
                 }
                 l_ezlopi_device_t *device_humidity = ezlopi_device_add_device(cjson_device);
                 if (device_humidity)
@@ -99,6 +104,15 @@ static int __0015_prepare(void *arg)
                         item_humidity->cloud_properties.device_id = device_humidity->cloud_properties.device_id;
                         __dht11_setup_item_properties_humidity(item_humidity, cjson_device, dht11_sensor_data);
                     }
+                    else
+                    {
+                        ezlopi_device_free_device(device_humidity);
+                        ret = -1;
+                    }
+                }
+                if ((NULL == device_temperature) && (NULL == device_humidity))
+                {
+                    free(dht11_sensor_data);
                 }
             }
         }
@@ -193,7 +207,23 @@ static int __dht11_setup_item_properties_humidity(l_ezlopi_item_t *item, cJSON *
 static int __0015_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    setDHT11gpio(item->interface.onewire_master.onewire_pin);
+    if (item)
+    {
+        if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
+        {
+            setDHT11gpio(item->interface.onewire_master.onewire_pin);
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
+    }
     return ret;
 }
 
