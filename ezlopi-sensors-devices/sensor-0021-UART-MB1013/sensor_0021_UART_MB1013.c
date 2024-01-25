@@ -102,7 +102,6 @@ static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_ua
                     }
                     idx++;
                 }
-#warning "use ring buffer"
             }
         }
     }
