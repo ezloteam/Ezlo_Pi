@@ -1,7 +1,5 @@
 
 #include "ezlopi_util_trace.h"
-// #include <stdlib.h>
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -104,7 +102,6 @@ static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_ua
                     }
                     idx++;
                 }
-
 #warning "use ring buffer"
             }
         }

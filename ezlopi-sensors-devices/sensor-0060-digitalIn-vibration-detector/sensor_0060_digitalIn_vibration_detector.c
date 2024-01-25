@@ -1,5 +1,4 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -120,14 +119,15 @@ static int __0060_prepare(void *arg)
                 {
                     vibration_item->cloud_properties.device_id = vibration_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(vibration_item, dev_prep_arg->cjson_device);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(vibration_device);
                 }
             }
         }
-        ret = 1;
     }
     return ret;
 }
@@ -152,14 +152,19 @@ static int __0060_init(l_ezlopi_item_t *item)
                                   : GPIO_PULLUP_DISABLE,
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
-            ret = gpio_config(&io_config);
-            if (ret)
-            {
-                TRACE_E("Error initializing Vibration sensor");
-            }
-            else
+            if (0 == gpio_config(&io_config))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                ret = 1;
+            }
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
             }
         }
     }
@@ -221,11 +226,11 @@ static int __0060_notify(l_ezlopi_item_t *item)
 
     if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
     {
-        curret_value = Sw420_vibration_activity_state_token[0]; //"no_activity";
+        curret_value = "no_activity";
     }
     else
     {
-        curret_value = Sw420_vibration_activity_state_token[1]; //"shake";
+        curret_value = "shake";
     }
 
     if (curret_value != (char *)item->user_arg) // calls update only if there is change in state

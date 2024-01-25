@@ -1,5 +1,5 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
+
 #include "driver/gpio.h"
 
 #include "ezlopi_core_timer.h"
@@ -17,6 +17,21 @@
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
+#define YFS201_QUEUE_SIZE 5
+typedef enum YFS201_queue_enum
+{
+    YFS201_QUEUE_RESET = 0,
+    YFS201_QUEUE_AVAILABLE,
+    YFS201_QUEUE_FULL,
+} YFS201_queue_enum_t;
+
+typedef struct yfs201_t
+{
+    uint32_t _pulses_yfs201;
+    uint32_t yfs201_dominant_pulse_count;
+    YFS201_queue_enum_t yfs201_QueueFlag;
+} yfs201_t;
+
 static QueueHandle_t yfs201_queue = NULL;
 //------------------------------------------------------------------------------
 static void IRAM_ATTR gpio_isr_handler(void *arg) // argument => time_us
@@ -124,19 +139,20 @@ static int __0054_prepare(void *arg)
                 {
                     flowmeter_item->cloud_properties.device_id = flowmeter_device->cloud_properties.device_id;
                     __prepare_item_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(flowmeter_device);
                     free(yfs201_data);
                 }
             }
             else
             {
+                ret = -1;
                 free(yfs201_data);
             }
-
-            ret = 1;
         }
     }
     return ret;
@@ -147,15 +163,27 @@ static int __0054_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     { // intialize digital_pin
-        gpio_config_t input_conf = {
-            .pin_bit_mask = (1ULL << item->interface.pwm.gpio_num),
-            .intr_type = GPIO_INTR_POSEDGE,
-            .mode = GPIO_MODE_INPUT,
-            .pull_down_en = GPIO_PULLDOWN_DISABLE,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-        };
-        gpio_config(&input_conf);
-        ret = 1;
+        if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.pwm.gpio_num))
+        {
+            gpio_config_t input_conf = {
+                .pin_bit_mask = (1ULL << item->interface.pwm.gpio_num),
+                .intr_type = GPIO_INTR_POSEDGE,
+                .mode = GPIO_MODE_INPUT,
+                .pull_down_en = GPIO_PULLDOWN_DISABLE,
+                .pull_up_en = GPIO_PULLUP_DISABLE,
+            };
+            gpio_config(&input_conf);
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
     return ret;
 }

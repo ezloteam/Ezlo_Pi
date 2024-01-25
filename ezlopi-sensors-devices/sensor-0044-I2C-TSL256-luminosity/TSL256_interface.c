@@ -47,8 +47,7 @@ static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t c
     // is ratio <= eachBreak ?
     unsigned int b, m;
 
-#warning "Nabin needs to check this!, Note: Unsigned value type is always true for (ratio >= 0)."
-    if ((ratio >= 0) && (ratio <= TSL2561_LUX_K1T))
+   if (ratio <= TSL2561_LUX_K1T)
     {
         b = TSL2561_LUX_B1T;
         m = TSL2561_LUX_M1T;
@@ -92,13 +91,6 @@ static uint32_t TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1, integration_t c
     // now calculation of final lux_value
     unsigned long temp;
     temp = ((channel0 * b) - (channel1 * m));
-
-    // do not allow negative lux value
-#warning "Nabin needs to check this!, Note: Unsigned value type is always false for (temp < 0)."
-    if (temp < 0)
-    {
-        temp = 0;
-    }
 
     // round lsb (2^(LUX_SCALE-1))
     temp += (1 << (TSL2561_LUX_LUXSCALE - 1));

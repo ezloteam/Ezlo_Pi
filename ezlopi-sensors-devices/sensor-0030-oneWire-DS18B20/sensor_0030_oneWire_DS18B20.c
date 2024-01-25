@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -13,9 +12,6 @@
 
 #include "ds18b20_onewire.h"
 #include "sensor_0030_oneWire_DS18B20.h"
-
-#warning "static  ideal_value"
-// static const double ideal_value = 65536.0f;
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);

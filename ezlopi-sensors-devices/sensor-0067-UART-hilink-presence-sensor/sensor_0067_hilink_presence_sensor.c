@@ -1,7 +1,7 @@
 #include <string.h>
 #include "sdkconfig.h"
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
+
 #include "ld2410.h"
 
 #include "ezlopi_core_timer.h"
@@ -223,30 +223,42 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *args)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
-    if (item->interface.uart.enable && hilink_data)
+    if (item)
     {
-        s_ezlopi_uart_t uart_settings = {
-            .baudrate = LD2410_BAUDRATE,
-            .tx = item->interface.uart.tx,
-            .rx = item->interface.uart.rx,
-        };
-        if (ESP_OK == ld2410_setup(uart_settings))
+        ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
+        if (item->interface.uart.enable && hilink_data)
         {
-            ESP_ERROR_CHECK(hilink_presence_sensor_apply_settings());
-            ESP_ERROR_CHECK(ld2410_get_data(hilink_data));
+            s_ezlopi_uart_t uart_settings = {
+                .baudrate = LD2410_BAUDRATE,
+                .tx = item->interface.uart.tx,
+                .rx = item->interface.uart.rx,
+            };
+            if (ESP_OK == ld2410_setup(uart_settings))
+            {
+                ESP_ERROR_CHECK(hilink_presence_sensor_apply_settings());
+                ESP_ERROR_CHECK(ld2410_get_data(hilink_data));
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
         }
         else
         {
-            ret = 1;
+            ret = -1;
+        }
+
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
-    else
-    {
-        ret = 1;
-    }
-
     return ret;
 }
 
@@ -329,43 +341,47 @@ static int __prepare(void *arg, void *user_arg)
     if (prep_arg)
     {
         ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)malloc(sizeof(ld2410_outputs_t));
-        l_ezlopi_device_t *hilink_device = ezlopi_device_add_device(prep_arg->cjson_device);
-        if (hilink_device && hilink_data)
+        if (hilink_data)
         {
-            memset(hilink_data, 0, sizeof(ld2410_outputs_t));
-            __perare_hilink_device_cloud_properties(hilink_device);
+            l_ezlopi_device_t *hilink_device = ezlopi_device_add_device(prep_arg->cjson_device);
+            if (hilink_device)
+            {
+                memset(hilink_data, 0, sizeof(ld2410_outputs_t));
+                __perare_hilink_device_cloud_properties(hilink_device);
 
-            motion_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
-            if (motion_item)
-            {
-                __prepare_hilink_motion_item_cloud_properties(motion_item, prep_arg->cjson_device, (void *)hilink_data);
-            }
+                motion_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
+                if (motion_item)
+                {
+                    __prepare_hilink_motion_item_cloud_properties(motion_item, prep_arg->cjson_device, (void *)hilink_data);
+                }
 
-            motion_direction_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
-            if (motion_direction_item)
-            {
-                __prepare_hilink_motion_direction_item_cloud_properties(motion_direction_item, prep_arg->cjson_device, (void *)hilink_data);
-            }
-            distance_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
-            if (distance_item)
-            {
-                __prepare_hilink_distance_item_cloud_properties(distance_item, prep_arg->cjson_device, (void *)hilink_data);
-            }
-            if (!motion_item && !motion_direction_item && !distance_item)
-            {
-                ezlopi_device_free_device(hilink_device);
-                ret = 1;
+                motion_direction_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
+                if (motion_direction_item)
+                {
+                    __prepare_hilink_motion_direction_item_cloud_properties(motion_direction_item, prep_arg->cjson_device, (void *)hilink_data);
+                }
+                distance_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
+                if (distance_item)
+                {
+                    __prepare_hilink_distance_item_cloud_properties(distance_item, prep_arg->cjson_device, (void *)hilink_data);
+                }
+                if (!motion_item && !motion_direction_item && !distance_item)
+                {
+                    ezlopi_device_free_device(hilink_device);
+                    free(hilink_data);
+                    ret = -1;
+                }
+                else
+                {
+                    ret = hilink_presence_sensor_initialize_settings(hilink_device);
+                }
             }
             else
             {
-                ret = hilink_presence_sensor_initialize_settings(hilink_device);
+                ezlopi_device_free_device(hilink_device);
+                free(hilink_data);
+                ret = -1;
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(hilink_device);
-            free(hilink_data);
-            ret = 1;
         }
     }
     return ret;

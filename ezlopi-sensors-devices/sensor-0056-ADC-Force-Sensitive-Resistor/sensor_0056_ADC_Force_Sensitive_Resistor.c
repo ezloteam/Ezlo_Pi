@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -110,18 +109,20 @@ static int __0056_prepare(void *arg)
                 {
                     FSR_item->cloud_properties.device_id = FSR_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(FSR_item, device_prep_arg->cjson_device, FSR_struct);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(FSR_device);
                     free(FSR_struct);
                 }
             }
             else
             {
+                ret = -1;
                 free(FSR_struct);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -137,6 +138,15 @@ static int __0056_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
