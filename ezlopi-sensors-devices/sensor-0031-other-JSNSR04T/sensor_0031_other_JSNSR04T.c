@@ -189,6 +189,12 @@ static int __prepare(void *arg)
             {
                 __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
                 __prepare_item_interface_properties(item_temperature, prep_arg->cjson_device);
+                ret = 1;
+            }
+            else
+            {
+                ezlopi_device_free_device(device);
+                ret = -1;
             }
         }
     }

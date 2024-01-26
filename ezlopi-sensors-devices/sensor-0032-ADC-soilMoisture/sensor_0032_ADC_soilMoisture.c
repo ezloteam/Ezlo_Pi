@@ -1,4 +1,4 @@
-// #include "cJSON.h"
+
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
@@ -93,10 +93,22 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+    if (item)
     {
-        ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-        ret = 1;
+        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        {
+            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
     return ret;
 }
@@ -159,6 +171,12 @@ static int __prepare(void *arg)
                     memset(soil_moisture_data, 0, sizeof(s_ezlopi_analog_data_t));
                     __prepare_item_properties(item_temperature, prep_arg->cjson_device, (void *)soil_moisture_data);
                 }
+                ret = 1;
+            }
+            else
+            {
+                ezlopi_device_free_device(device);
+                ret = -1;
             }
         }
     }

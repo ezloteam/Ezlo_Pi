@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -246,18 +245,16 @@ static int __init(l_ezlopi_item_t *item)
             ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
             ret = 1;
         }
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        if (0 == ret)
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
-
     return ret;
 }
 
@@ -423,16 +420,19 @@ static int __prepare(void *arg)
                     __prepare_dimmer_switch_item_properties(dimmable_bulb_arg->item_dimmer_switch, prep_arg->cjson_device);
                 }
 
+                ret = 1;
                 if ((NULL == dimmable_bulb_arg->item_dimmer) || (NULL == dimmable_bulb_arg->item_dimmer_up) || (NULL == dimmable_bulb_arg->item_dimmer_down) || (NULL == dimmable_bulb_arg->item_dimmer_stop) || (NULL == dimmable_bulb_arg->item_dimmer_switch))
                 {
-                    ret = -1;
+                    ezlopi_device_free_device(device);
                     free(dimmable_bulb_arg);
+                    ret = -1;
                 }
             }
-        }
-        else
-        {
-            free(device);
+            else
+            {
+                ezlopi_device_free_device(device);
+                ret = -1;
+            }
         }
     }
 

@@ -1,5 +1,4 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -90,9 +89,11 @@ static int __0057_prepare(void *arg)
             {
                 flame_item_digi->cloud_properties.device_id = flame_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(flame_item_digi, device_prep_arg->cjson_device);
+                ret = 1;
             }
             else
             {
+                ret = -1;
                 ezlopi_device_free_device(flame_device_digi);
             }
         }
@@ -111,18 +112,20 @@ static int __0057_prepare(void *arg)
                 {
                     flame_item_adc->cloud_properties.device_id = flame_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, FLAME_struct);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(flame_device_adc);
                     free(FLAME_struct);
                 }
             }
             else
             {
+                ret = -1;
                 free(FLAME_struct);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -150,6 +153,15 @@ static int __0057_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
@@ -295,11 +307,11 @@ static int __0057_notify(l_ezlopi_item_t *item)
             const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = ky206_sensor_heat_alarm_token[0]; // heat_ok
+                curret_value = "heat_ok";
             }
             else
             {
-                curret_value = ky206_sensor_heat_alarm_token[1]; // overheat
+                curret_value = "overheat_detected";
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {

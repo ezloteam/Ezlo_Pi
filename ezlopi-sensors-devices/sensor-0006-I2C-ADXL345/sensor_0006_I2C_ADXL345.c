@@ -1,5 +1,4 @@
 #include <math.h>
-// #include "cJSON.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"
@@ -143,18 +142,19 @@ static int __prepare(void *arg)
                     __prepare_item_interface_properties(z_item, cj_device);
                 }
 
+                ret = 1;
                 if ((NULL == x_item) && (NULL == y_item) && (NULL == z_item))
                 {
                     ezlopi_device_free_device(adxl345_device);
                     free(user_data);
+                    ret = -1;
                 }
             }
             else
             {
-                ezlopi_device_free_device(adxl345_device);
                 free(user_data);
+                ret = -1;
             }
-            ret = 1;
         }
     }
 
@@ -173,8 +173,19 @@ static int __init(l_ezlopi_item_t *item)
             {
                 TRACE_I("Configuration Complete...");
             }
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
+
     return ret;
 }
 
