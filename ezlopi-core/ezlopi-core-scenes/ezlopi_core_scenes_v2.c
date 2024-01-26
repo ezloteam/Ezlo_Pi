@@ -5,15 +5,15 @@
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_scenes_edit.h"
+#include "ezlopi_core_scenes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
-#include "ezlopi_core_scenes_cjson.h"
 
 #include "ezlopi_cloud_constants.h"
-
 #include "ezlopi_service_meshbot.h"
 
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
@@ -30,29 +30,81 @@ static const f_scene_method_v2_t ezlopi_core_scenes_methods[] = {
 #undef EZLOPI_SCENE
 };
 
-static l_when_block_v2_t *__new_when_block_populate(cJSON *cj_when_block);
+static l_fields_v2_t *______new_field_populate(cJSON *cj_field);
+static l_fields_v2_t *_____fields_populate(cJSON *cj_fields);
 
-static l_fields_v2_t *__new_field_populate(cJSON *cj_field);
-static l_fields_v2_t *__fields_populate(cJSON *cj_fields);
-
-static void __new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay);
-static void __new_block_options_populate(s_block_options_v2_t *p_block_options, cJSON *cj_block_options);
+static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay);
+static void _____new_block_options_populate(s_block_options_v2_t *p_block_options, cJSON *cj_block_options);
 static void __new_method_populate(s_method_v2_t *p_method, cJSON *cj_method);
 
-static l_when_block_v2_t *__new_when_block_populate(cJSON *cj_when_block);
-static l_when_block_v2_t *__when_blocks_populate(cJSON *cj_when_blocks);
+static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block);
+static l_when_block_v2_t *___when_blocks_populate(cJSON *cj_when_blocks);
 
-static l_action_block_v2_t *__new_action_block_populate(cJSON *cj_then_block, e_scenes_block_type_v2_t block_type);
-static l_action_block_v2_t *__action_blocks_populate(cJSON *cj_then_blocks, e_scenes_block_type_v2_t block_type);
+static l_action_block_v2_t *____new_action_block_populate(cJSON *cj_then_block, e_scenes_block_type_v2_t block_type);
+static l_action_block_v2_t *___action_blocks_populate(cJSON *cj_then_blocks, e_scenes_block_type_v2_t block_type);
 
-static l_house_modes_v2_t *__new_house_mode_populate(cJSON *cj_house_mode);
-static l_house_modes_v2_t *__house_modes_populate(cJSON *cj_house_modes);
+static l_house_modes_v2_t *____new_house_mode_populate(cJSON *cj_house_mode);
+static l_house_modes_v2_t *___house_modes_populate(cJSON *cj_house_modes);
 
-static l_user_notification_v2_t *__new_user_notification_populate(cJSON *cj_user_notification);
-static l_user_notification_v2_t *__user_notifications_populate(cJSON *cj_user_notifications);
+static l_user_notification_v2_t *____new_user_notification_populate(cJSON *cj_user_notification);
+static l_user_notification_v2_t *___user_notifications_populate(cJSON *cj_user_notifications);
 
 static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_id);
-static l_scenes_list_v2_t *__scenes_populate(cJSON *cj_scene, uint32_t scene_id);
+static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id);
+
+int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene)
+{
+    int ret = 0;
+
+    if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene))
+    {
+        if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
+        {
+            ret = 1;
+        }
+    }
+
+    return ret;
+}
+
+e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field)
+{
+    e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
+    if (cj_field)
+    {
+        char *type_str = NULL;
+        CJSON_GET_VALUE_STRING(cj_field, ezlopi_type_str, type_str);
+        if (type_str)
+        {
+            for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
+            {
+                if (0 == strcmp(scenes_value_type_name[i], type_str))
+                {
+                    ret = i;
+                    break;
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type)
+{
+    e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
+    if (cj_value_type && cj_value_type->valuestring)
+    {
+        for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
+        {
+            if (0 == strcmp(scenes_value_type_name[i], cj_value_type->valuestring))
+            {
+                ret = i;
+                break;
+            }
+        }
+    }
+    return ret;
+}
 
 void ezlopi_scene_add_users_in_notifications(l_scenes_list_v2_t *scene_node, cJSON *cj_user)
 {
@@ -65,11 +117,11 @@ void ezlopi_scene_add_users_in_notifications(l_scenes_list_v2_t *scene_node, cJS
             {
                 user_node = user_node->next;
             }
-            user_node->next = __new_user_notification_populate(cj_user);
+            user_node->next = ____new_user_notification_populate(cj_user);
         }
         else
         {
-            scene_node->user_notifications = __new_user_notification_populate(cj_user);
+            scene_node->user_notifications = ____new_user_notification_populate(cj_user);
         }
     }
 }
@@ -247,7 +299,7 @@ l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id)
 
 l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32_t scene_id)
 {
-    return __scenes_populate(cj_new_scene, scene_id);
+    return _scenes_populate(cj_new_scene, scene_id);
 }
 
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
@@ -348,7 +400,7 @@ void ezlopi_scenes_init_v2(void)
                         cJSON *cj_scene = cJSON_Parse(scene_str);
                         if (cj_scene)
                         {
-                            l_scenes_list_v2_t *new_scene = __scenes_populate(cj_scene, scene_id);
+                            l_scenes_list_v2_t *new_scene = _scenes_populate(cj_scene, scene_id);
                             cJSON_Delete(cj_scene);
 
                             if (new_scene)
@@ -377,7 +429,7 @@ void ezlopi_scenes_init_v2(void)
     ezlopi_scenes_print(scenes_list_head_v2);
 }
 
-static l_scenes_list_v2_t *__scenes_populate(cJSON *cj_scene, uint32_t scene_id)
+static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id)
 {
     l_scenes_list_v2_t *new_scene_node = NULL;
     if (scenes_list_head_v2)
@@ -431,7 +483,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
                 cJSON *cj_user_notifications = cJSON_GetObjectItem(cj_scene, ezlopi_user_notifications_str);
                 if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
                 {
-                    new_scene->user_notifications = __user_notifications_populate(cj_user_notifications);
+                    new_scene->user_notifications = ___user_notifications_populate(cj_user_notifications);
                 }
             }
 
@@ -439,7 +491,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
                 cJSON *cj_house_modes = cJSON_GetObjectItem(cj_scene, ezlopi_house_modes_str);
                 if (cj_house_modes && (cJSON_Array == cj_house_modes->type))
                 {
-                    new_scene->house_modes = __house_modes_populate(cj_house_modes);
+                    new_scene->house_modes = ___house_modes_populate(cj_house_modes);
                 }
             }
 
@@ -447,7 +499,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
                 cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, ezlopi_then_str);
                 if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
                 {
-                    new_scene->then_block = __action_blocks_populate(cj_then_blocks, SCENE_BLOCK_TYPE_THEN);
+                    new_scene->then_block = ___action_blocks_populate(cj_then_blocks, SCENE_BLOCK_TYPE_THEN);
                 }
             }
 
@@ -455,7 +507,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
                 cJSON *cj_then_blocks = cJSON_GetObjectItem(cj_scene, ezlopi_when_str);
                 if (cj_then_blocks && (cJSON_Array == cj_then_blocks->type))
                 {
-                    new_scene->when_block = __when_blocks_populate(cj_then_blocks);
+                    new_scene->when_block = ___when_blocks_populate(cj_then_blocks);
                 }
             }
 
@@ -463,7 +515,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
                 cJSON *cj_else_blocks = cJSON_GetObjectItem(cj_scene, ezlopi_else_str);
                 if (cj_else_blocks && (cJSON_Array == cj_else_blocks->type))
                 {
-                    new_scene->else_block = __action_blocks_populate(cj_else_blocks, SCENE_BLOCK_TYPE_ELSE);
+                    new_scene->else_block = ___action_blocks_populate(cj_else_blocks, SCENE_BLOCK_TYPE_ELSE);
                 }
             }
 
@@ -477,7 +529,7 @@ static l_scenes_list_v2_t *__new_scene_populate(cJSON *cj_scene, uint32_t scene_
     return new_scene;
 }
 
-static l_user_notification_v2_t *__user_notifications_populate(cJSON *cj_user_notifications)
+static l_user_notification_v2_t *___user_notifications_populate(cJSON *cj_user_notifications)
 {
     l_user_notification_v2_t *tmp_user_notifications_head = NULL;
     if (cj_user_notifications && (cJSON_Array == cj_user_notifications->type))
@@ -494,11 +546,11 @@ static l_user_notification_v2_t *__user_notifications_populate(cJSON *cj_user_no
                 {
                     curr_user_notification = curr_user_notification->next;
                 }
-                curr_user_notification->next = __new_user_notification_populate(cj_user_notification);
+                curr_user_notification->next = ____new_user_notification_populate(cj_user_notification);
             }
             else
             {
-                tmp_user_notifications_head = __new_user_notification_populate(cj_user_notification);
+                tmp_user_notifications_head = ____new_user_notification_populate(cj_user_notification);
             }
         }
     }
@@ -506,7 +558,7 @@ static l_user_notification_v2_t *__user_notifications_populate(cJSON *cj_user_no
     return tmp_user_notifications_head;
 }
 
-static l_user_notification_v2_t *__new_user_notification_populate(cJSON *cj_user_notification)
+static l_user_notification_v2_t *____new_user_notification_populate(cJSON *cj_user_notification)
 {
     l_user_notification_v2_t *new_user_notification = NULL;
 
@@ -524,7 +576,7 @@ static l_user_notification_v2_t *__new_user_notification_populate(cJSON *cj_user
     return new_user_notification;
 }
 
-static l_house_modes_v2_t *__house_modes_populate(cJSON *cj_house_modes)
+static l_house_modes_v2_t *___house_modes_populate(cJSON *cj_house_modes)
 {
     l_house_modes_v2_t *tmp_house_mode_head = NULL;
     if (cj_house_modes)
@@ -542,11 +594,11 @@ static l_house_modes_v2_t *__house_modes_populate(cJSON *cj_house_modes)
                     tmp_house_mode = tmp_house_mode->next;
                 }
 
-                tmp_house_mode->next = __new_house_mode_populate(cj_house_mode);
+                tmp_house_mode->next = ____new_house_mode_populate(cj_house_mode);
             }
             else
             {
-                tmp_house_mode_head = __new_house_mode_populate(cj_house_mode);
+                tmp_house_mode_head = ____new_house_mode_populate(cj_house_mode);
             }
         }
     }
@@ -554,7 +606,7 @@ static l_house_modes_v2_t *__house_modes_populate(cJSON *cj_house_modes)
     return tmp_house_mode_head;
 }
 
-static l_house_modes_v2_t *__new_house_mode_populate(cJSON *cj_house_mode)
+static l_house_modes_v2_t *____new_house_mode_populate(cJSON *cj_house_mode)
 {
     l_house_modes_v2_t *new_house_mode = NULL;
 
@@ -572,7 +624,7 @@ static l_house_modes_v2_t *__new_house_mode_populate(cJSON *cj_house_mode)
     return new_house_mode;
 }
 
-static l_action_block_v2_t *__action_blocks_populate(cJSON *cj_action_blocks, e_scenes_block_type_v2_t block_type)
+static l_action_block_v2_t *___action_blocks_populate(cJSON *cj_action_blocks, e_scenes_block_type_v2_t block_type)
 {
     l_action_block_v2_t *tmp_action_block_head = NULL;
     if (cj_action_blocks)
@@ -590,11 +642,11 @@ static l_action_block_v2_t *__action_blocks_populate(cJSON *cj_action_blocks, e_
                     tmp_then_block = tmp_then_block->next;
                 }
 
-                tmp_then_block->next = __new_action_block_populate(cj_action_block, block_type);
+                tmp_then_block->next = ____new_action_block_populate(cj_action_block, block_type);
             }
             else
             {
-                tmp_action_block_head = __new_action_block_populate(cj_action_block, block_type);
+                tmp_action_block_head = ____new_action_block_populate(cj_action_block, block_type);
             }
         }
     }
@@ -602,7 +654,7 @@ static l_action_block_v2_t *__action_blocks_populate(cJSON *cj_action_blocks, e_
     return tmp_action_block_head;
 }
 
-static l_action_block_v2_t *__new_action_block_populate(cJSON *cj_action_block, e_scenes_block_type_v2_t block_type)
+static l_action_block_v2_t *____new_action_block_populate(cJSON *cj_action_block, e_scenes_block_type_v2_t block_type)
 {
     l_action_block_v2_t *new_then_block = malloc(sizeof(l_action_block_v2_t));
     if (new_then_block)
@@ -611,20 +663,20 @@ static l_action_block_v2_t *__new_action_block_populate(cJSON *cj_action_block, 
         cJSON *cj_block_options = cJSON_GetObjectItem(cj_action_block, ezlopi_blockOptions_str);
         if (cj_block_options)
         {
-            __new_block_options_populate(&new_then_block->block_options, cj_block_options);
+            _____new_block_options_populate(&new_then_block->block_options, cj_block_options);
         }
 
         new_then_block->block_type = block_type;
         cJSON *cj_delay = cJSON_GetObjectItem(cj_action_block, ezlopi_delay_str);
         if (cj_delay)
         {
-            __new_action_delay(&new_then_block->delay, cj_delay);
+            _____new_action_delay(&new_then_block->delay, cj_delay);
         }
 
         cJSON *cj_fields = cJSON_GetObjectItem(cj_action_block, ezlopi_fields_str);
         if (cj_fields)
         {
-            new_then_block->fields = __fields_populate(cj_fields);
+            new_then_block->fields = _____fields_populate(cj_fields);
         }
 
         cJSON *cj__temp_id = cJSON_GetObjectItem(cj_action_block, "_tempId");
@@ -637,7 +689,7 @@ static l_action_block_v2_t *__new_action_block_populate(cJSON *cj_action_block, 
     return new_then_block;
 }
 
-static l_when_block_v2_t *__when_blocks_populate(cJSON *cj_when_blocks)
+static l_when_block_v2_t *___when_blocks_populate(cJSON *cj_when_blocks)
 {
     l_when_block_v2_t *tmp_when_block_head = NULL;
     if (cj_when_blocks)
@@ -655,11 +707,11 @@ static l_when_block_v2_t *__when_blocks_populate(cJSON *cj_when_blocks)
                     tmp_when_block = tmp_when_block->next;
                 }
 
-                tmp_when_block->next = __new_when_block_populate(cj_when_block);
+                tmp_when_block->next = ____new_when_block_populate(cj_when_block);
             }
             else
             {
-                tmp_when_block_head = __new_when_block_populate(cj_when_block);
+                tmp_when_block_head = ____new_when_block_populate(cj_when_block);
             }
         }
     }
@@ -667,7 +719,7 @@ static l_when_block_v2_t *__when_blocks_populate(cJSON *cj_when_blocks)
     return tmp_when_block_head;
 }
 
-static l_when_block_v2_t *__new_when_block_populate(cJSON *cj_when_block)
+static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
 {
     l_when_block_v2_t *new_when_block = malloc(sizeof(l_when_block_v2_t));
     if (new_when_block)
@@ -676,7 +728,7 @@ static l_when_block_v2_t *__new_when_block_populate(cJSON *cj_when_block)
         cJSON *cj_block_options = cJSON_GetObjectItem(cj_when_block, ezlopi_blockOptions_str);
         if (cj_block_options)
         {
-            __new_block_options_populate(&new_when_block->block_options, cj_block_options);
+            _____new_block_options_populate(&new_when_block->block_options, cj_block_options);
         }
 
         new_when_block->block_type = SCENE_BLOCK_TYPE_WHEN;
@@ -684,14 +736,14 @@ static l_when_block_v2_t *__new_when_block_populate(cJSON *cj_when_block)
         cJSON *cj_fields = cJSON_GetObjectItem(cj_when_block, ezlopi_fields_str);
         if (cj_fields)
         {
-            new_when_block->fields = __fields_populate(cj_fields);
+            new_when_block->fields = _____fields_populate(cj_fields);
         }
     }
 
     return new_when_block;
 }
 
-static void __new_block_options_populate(s_block_options_v2_t *p_block_options, cJSON *cj_block_options)
+static void _____new_block_options_populate(s_block_options_v2_t *p_block_options, cJSON *cj_block_options)
 {
     cJSON *cj_method = cJSON_GetObjectItem(cj_block_options, ezlopi_key_method_str);
     if (cj_method)
@@ -706,7 +758,7 @@ static void __new_method_populate(s_method_v2_t *p_method, cJSON *cj_method)
     p_method->type = ezlopi_scenes_method_get_type_enum(p_method->name);
 }
 
-static void __new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay)
+static void _____new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_delay)
 {
     if (action_delay && cj_delay)
     {
@@ -717,7 +769,7 @@ static void __new_action_delay(s_action_delay_v2_t *action_delay, cJSON *cj_dela
     }
 }
 
-static l_fields_v2_t *__fields_populate(cJSON *cj_fields)
+static l_fields_v2_t *_____fields_populate(cJSON *cj_fields)
 {
     l_fields_v2_t *tmp_fields_head = NULL;
     if (cj_fields)
@@ -734,11 +786,11 @@ static l_fields_v2_t *__fields_populate(cJSON *cj_fields)
                     tmp_flield = tmp_flield->next;
                 }
 
-                tmp_flield->next = __new_field_populate(cj_field);
+                tmp_flield->next = ______new_field_populate(cj_field);
             }
             else
             {
-                tmp_fields_head = __new_field_populate(cj_field);
+                tmp_fields_head = ______new_field_populate(cj_field);
             }
         }
     }
@@ -746,7 +798,7 @@ static l_fields_v2_t *__fields_populate(cJSON *cj_fields)
     return tmp_fields_head;
 }
 
-static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
+static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
 {
     if (field && cj_value)
     {
@@ -813,11 +865,11 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
                     {
                         curr_when_block = curr_when_block->next;
                     }
-                    curr_when_block->next = __new_when_block_populate(cj_block);
+                    curr_when_block->next = ____new_when_block_populate(cj_block);
                 }
                 else
                 {
-                    field->value.when_block = __new_when_block_populate(cj_block);
+                    field->value.when_block = ____new_when_block_populate(cj_block);
                 }
             }
             break;
@@ -832,7 +884,7 @@ static void __fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
     }
 }
 
-static l_fields_v2_t *__new_field_populate(cJSON *cj_field)
+static l_fields_v2_t *______new_field_populate(cJSON *cj_field)
 {
     l_fields_v2_t *field = NULL;
     if (cj_field)
@@ -844,54 +896,9 @@ static l_fields_v2_t *__new_field_populate(cJSON *cj_field)
             CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, field->name);
 
             field->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_field, ezlopi_type_str));
-            __fields_get_value(field, cJSON_GetObjectItem(cj_field, ezlopi_value_str));
+            _______fields_get_value(field, cJSON_GetObjectItem(cj_field, ezlopi_value_str));
         }
     }
 
     return field;
-}
-
-e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field)
-{
-    e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
-    if (cj_field)
-    {
-        char *type_str = NULL;
-        CJSON_GET_VALUE_STRING(cj_field, ezlopi_type_str, type_str);
-        if (type_str)
-        {
-            uint32_t type_str_len = strlen(type_str);
-            for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
-            {
-                uint32_t check_str_len = strlen(scenes_value_type_name[i]);
-                uint32_t check_len = (check_str_len < type_str_len) ? type_str_len : check_str_len;
-                if (0 == strncmp(scenes_value_type_name[i], type_str, check_len))
-                {
-                    ret = i;
-                    break;
-                }
-            }
-        }
-    }
-    return ret;
-}
-
-e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type)
-{
-    e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
-    if (cj_value_type && cj_value_type->valuestring)
-    {
-        uint32_t type_str_len = strlen(cj_value_type->valuestring);
-        for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
-        {
-            uint32_t check_str_len = strlen(scenes_value_type_name[i]);
-            uint32_t check_len = (check_str_len < type_str_len) ? type_str_len : check_str_len;
-            if (0 == strncmp(scenes_value_type_name[i], cj_value_type->valuestring, check_len))
-            {
-                ret = i;
-                break;
-            }
-        }
-    }
-    return ret;
 }

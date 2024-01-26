@@ -22,7 +22,7 @@ extern "C"
     int ezlopi_nvs_factory_reset(void);
 
     char *ezlopi_nvs_read_str(const char *nvs_name);
-    int ezlopi_nvs_write_str(char *data, uint32_t len, const char *nvs_name);
+    int ezlopi_nvs_write_str(const char *data, uint32_t len, const char *nvs_name);
 
     // void ezlopi_nvs_delete_stored_data(char *nvs_name);
 
@@ -67,6 +67,7 @@ extern "C"
 
     char *ezlopi_nvs_read_scenes_scripts(void);
     int ezlopi_nvs_write_scenes_scripts(char *data);
+    void ezlopi_nvs_delete_stored_data_by_name(char *nvs_name);
     void ezlopi_nvs_delete_stored_data_by_id(uint32_t script_id);
 
     char *ezlopi_nvs_read_scenes_expressions(void);

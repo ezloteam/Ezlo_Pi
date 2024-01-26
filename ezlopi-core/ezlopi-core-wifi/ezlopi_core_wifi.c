@@ -43,9 +43,9 @@ static const char *last_disconnect_reason = wifi_no_error_str;
 static ll_ezlopi_wifi_event_upcall_t *__event_upcall_head = NULL;
 static volatile bool ezlopi_flag_wifi_status = false;
 
-static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg);
+static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void *arg);
 
-void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall *upcall, void *arg)
+void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void *arg)
 {
     if (__event_upcall_head)
     {
@@ -300,7 +300,7 @@ int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
     return ret;
 }
 
-static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall *upcall, void *arg)
+static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void *arg)
 {
     ll_ezlopi_wifi_event_upcall_t *_upcall = malloc(sizeof(ll_ezlopi_wifi_event_upcall_t));
     if (_upcall)

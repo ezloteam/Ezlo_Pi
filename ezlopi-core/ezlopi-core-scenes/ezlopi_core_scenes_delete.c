@@ -6,7 +6,6 @@ void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_noti
 {
     if (user_notifications)
     {
-
         ezlopi_scenes_delete_user_notifications(user_notifications->next);
         user_notifications->next = NULL;
         free(user_notifications);
@@ -27,24 +26,10 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
 {
     if (fields)
     {
-        switch (fields->value_type)
-        {
-        case EZLOPI_VALUE_TYPE_TOKEN:
-        {
-            if (fields->value.cj_value)
-            {
-                cJSON_Delete(fields->value.cj_value);
-                fields->value.cj_value = NULL;
-            }
-            break;
-        }
-        default:
-        {
-            break;
-        }
-        }
+
         ezlopi_scenes_delete_fields(fields->next);
         fields->next = NULL;
+        ezlopi_scenes_delete_field_value(fields);
         free(fields);
     }
 }
@@ -91,3 +76,51 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list)
 // {
 //     ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
 // }
+
+void ezlopi_scenes_delete_field_value(l_fields_v2_t *field)
+{
+    switch (field->value.type)
+    {
+    case VALUE_TYPE_NUMBER:
+    {
+        field->value.value_double = 0;
+        break;
+    }
+    case VALUE_TYPE_STRING:
+    {
+        if (field->value.value_string)
+        {
+            free(field->value.value_string);
+            field->value.value_string = NULL;
+        }
+        break;
+    }
+    case VALUE_TYPE_BOOL:
+    {
+        field->value.value_bool = false;
+        break;
+    }
+    case VALUE_TYPE_CJSON:
+    {
+        if (field->value.cj_value)
+        {
+            cJSON_Delete(field->value.cj_value);
+            field->value.cj_value = NULL;
+        }
+        break;
+    }
+    case VALUE_TYPE_BLOCK:
+    {
+        if (field->value.when_block)
+        {
+            ezlopi_scenes_delete_when_blocks(field->value.when_block);
+            field->value.when_block = NULL;
+        }
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+}

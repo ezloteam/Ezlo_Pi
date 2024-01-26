@@ -37,7 +37,7 @@ extern "C"
 
     ezlopi_wifi_status_t *ezlopi_wifi_status(void);
 
-    void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall *upcall, void *arg);
+    void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void *arg);
 
 #ifdef __cplusplus
 }

@@ -268,7 +268,7 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
 static int __create_lua_table_for_item(lua_State *lua_state, l_ezlopi_item_t *item_prop, uint32_t device_id)
 {
     char tmp_str[32];
-    s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+    // s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
 
     lua_newtable(lua_state);
 

@@ -42,8 +42,7 @@ extern "C"
 #define TRACE_I trace_imp
 #define TRACE_D trace
 #define TRACE_B trace_info
-#define dump(buffer_name, buffer, offset, count) __dump(__FILE__, __LINE__, buffer_name, buffer, offset, count) // ESP_LOG_BUFFER_HEX_LEVEL(__FILENAME__, (char *)((uint32_t)X + Y), Z, ESP_LOG_WARN)
-    // #define dump(a, b, c, d)
+#define dump(buffer_name, buffer, offset, count) __dump(__FILE__, __LINE__, buffer_name, buffer, offset, count)
 
 #else
 
@@ -54,29 +53,6 @@ extern "C"
 #define TRACE_B(x, ...)
 #define dump(name, X, Y, Z)
 
-#endif
-
-#if 0
-class trace
-{
-private:
-    int trace_level = 0;
-    void trace();
-
-public:
-    void set_trace(int level);
-
-    void error();
-    void warning();
-    void info();
-    void trace();
-
-    void red();
-    void green();
-    void blue();
-    void orange();
-    void white();
-};
 #endif
 
 #ifdef __cplusplus

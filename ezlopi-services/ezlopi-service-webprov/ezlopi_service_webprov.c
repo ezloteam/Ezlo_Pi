@@ -360,10 +360,12 @@ static void web_provisioning_config_check(void *pv)
             response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
             if (NULL != response)
             {
+                TRACE_I("Statuc Code : %d", response->status_code);
+
                 switch (response->status_code)
                 {
-                    TRACE_I("Statuc Code : %d", response->status_code);
                 case HttpStatus_Ok:
+                {
                     // re-write all the info into the flash region
                     TRACE_I("Data : %s", response->response);
                     if (0 == web_provisioning_config_update(response->response))
@@ -379,12 +381,16 @@ static void web_provisioning_config_check(void *pv)
                         flag_break_loop = 1;
                     }
                     break;
-                case 304: // HTTP Status not modified
-                    TRACE_I("Config data not changed !");
-                    flag_break_loop = 1;
-                    break;
+                }
                 default:
+                {
+                    if (304 == response->status_code) // HTTP Status not modified
+                    {
+                        TRACE_I("Config data not changed !");
+                        flag_break_loop = 1;
+                    }
                     break;
+                }
                 }
                 free(response->response);
                 free(response);

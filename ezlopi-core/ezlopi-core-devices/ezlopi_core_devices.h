@@ -3,16 +3,16 @@
 
 // #include "cJSON.h"
 
-#include "ezlopi_core_settings.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
+#include "ezlopi_core_settings.h"
 
-#include "ezlopi_hal_i2c_master.h"
-#include "ezlopi_hal_uart.h"
-#include "ezlopi_hal_onewire.h"
-#include "ezlopi_hal_gpio.h"
-#include "ezlopi_hal_pwm.h"
 #include "ezlopi_hal_adc.h"
+#include "ezlopi_hal_pwm.h"
+#include "ezlopi_hal_uart.h"
+#include "ezlopi_hal_gpio.h"
+#include "ezlopi_hal_onewire.h"
+#include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_hal_spi_master.h"
 
 // #include "ezlopi_cloud_settings.h"
