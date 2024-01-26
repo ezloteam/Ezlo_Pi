@@ -1,6 +1,3 @@
-#ifndef __EZLOPI_VALUES_STR_H__
-#define __EZLIPI_VALUES_STR_H__
-#pragma once
 /// @brief https://api.ezlo.com/devices/item_value_types/index.html
 const char *value_type_int = "int";
 // const  char *value_type_int64 = "int64";
@@ -71,4 +68,3 @@ const char *value_type_temperature = "temperature";
 const char *value_type_fingerprint_action = "fingerprint_action";
 const char *value_type_presence_operation_mode = "presence_operation_mode";
 
-#endif // __EZLOPI_VLAUES_STR_H__

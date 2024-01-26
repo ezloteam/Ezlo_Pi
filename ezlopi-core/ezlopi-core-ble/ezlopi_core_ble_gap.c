@@ -840,5 +840,5 @@ static void ezlopi_ble_setup_service_uuid(void)
         }
     }
 
-    dump("complete-uuid", (all_service_uuid ? all_service_uuid : ezlopi__str), 0, all_service_uuid_len);
+    dump("complete-uuid", (all_service_uuid ? (void *)all_service_uuid : (void *)ezlopi__str), 0, all_service_uuid_len);
 }

@@ -26,7 +26,7 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
 {
     if (fields)
     {
-        
+
         ezlopi_scenes_delete_fields(fields->next);
         fields->next = NULL;
         ezlopi_scenes_delete_field_value(fields);
@@ -113,7 +113,7 @@ void ezlopi_scenes_delete_field_value(l_fields_v2_t *field)
     {
         if (field->value.when_block)
         {
-            ezlopi_scenes_delete(field->value.when_block);
+            ezlopi_scenes_delete_when_blocks(field->value.when_block);
             field->value.when_block = NULL;
         }
         break;

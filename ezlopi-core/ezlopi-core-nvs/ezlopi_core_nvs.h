@@ -22,7 +22,7 @@ extern "C"
     int ezlopi_nvs_factory_reset(void);
 
     char *ezlopi_nvs_read_str(const char *nvs_name);
-    int ezlopi_nvs_write_str(char *data, uint32_t len, const char *nvs_name);
+    int ezlopi_nvs_write_str(const char *data, uint32_t len, const char *nvs_name);
 
     // void ezlopi_nvs_delete_stored_data(char *nvs_name);
 

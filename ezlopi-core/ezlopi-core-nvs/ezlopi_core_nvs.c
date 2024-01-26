@@ -482,7 +482,7 @@ uint8_t ezlopi_nvs_read_bool(bool *b, const char *key_name)
     return ret;
 }
 
-int ezlopi_nvs_write_str(char *data, uint32_t len, const char *nvs_name)
+int ezlopi_nvs_write_str(const char *data, uint32_t len, const char *nvs_name)
 {
     int ret = 0;
 
