@@ -1,5 +1,4 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -111,18 +110,20 @@ static int __0055_prepare(void *arg)
                 {
                     item_adc->cloud_properties.device_id = device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device, FLEX_value);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(device_adc);
                     free(FLEX_value);
                 }
             }
             else
             {
+                ret = -1;
                 free(FLEX_value);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -138,6 +139,15 @@ static int __0055_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;

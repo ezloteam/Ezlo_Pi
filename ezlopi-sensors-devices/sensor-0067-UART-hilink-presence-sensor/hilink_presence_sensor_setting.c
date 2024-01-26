@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
+
 #include "ld2410.h"
 
 #include "ezlopi_core_nvs.h"

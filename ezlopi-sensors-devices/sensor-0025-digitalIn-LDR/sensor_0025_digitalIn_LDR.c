@@ -90,7 +90,7 @@ static int __init(l_ezlopi_item_t *item)
             gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
             ret = 1;
         }
-        else
+        if (0 == ret)
         {
             ret = -1;
             if (item->user_arg)
@@ -129,6 +129,12 @@ static int __prepare(void *arg)
                 {
                     item->func = sensor_0025_digitalIn_LDR;
                     __setup_item_properties(item, cj_device);
+                    ret = 1;
+                }
+                else
+                {
+                    ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }

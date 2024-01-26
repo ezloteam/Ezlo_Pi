@@ -13,8 +13,6 @@
 
 #include "sensor_0027_ADC_waterLeak.h"
 
-const static char *_no_water_leak = "no_water_leak";
-const static char *_water_leak_detected = "water_leak_detected";
 
 const char *water_leak_alarm_states[] = {
     "no_water_leak",
@@ -120,6 +118,12 @@ static int __prepare(void *arg)
                     item->cloud_properties.device_id = device->cloud_properties.device_id;
                     prepare_item_cloud_properties(item, cj_device);
                     prepare_item_interface_properties(item, cj_device);
+                    ret = 1;
+                }
+                else
+                {
+                    ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }
@@ -148,8 +152,8 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
             cJSON_AddItemToObject(cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
 
-        cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
-        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_water_leak");
+        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_water_leak");
 
         ret = 1;
     }
@@ -164,8 +168,8 @@ static int __get_ezlopi_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : _no_water_leak);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_water_leak");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_water_leak");
             ret = 1;
         }
     }
@@ -186,11 +190,11 @@ static int __notify(l_ezlopi_item_t *item)
 
         if (1000 <= ezlopi_analog_data.voltage)
         {
-            curret_value = _water_leak_detected;
+            curret_value = "water_leak_detected";
         }
         else
         {
-            curret_value = _no_water_leak;
+            curret_value = "no_water_leak";
         }
 
         if (curret_value != (char *)item->user_arg)
@@ -213,7 +217,7 @@ static int __init(l_ezlopi_item_t *item)
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
         }
-        else
+        if (0 == ret)
         {
             ret = -1;
             if (item->user_arg)

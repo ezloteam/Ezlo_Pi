@@ -157,14 +157,25 @@ static int __cjson_get_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
-
-    if (item->interface.uart.enable && pms_object)
+    if (item)
     {
-        pms_init(pms_object);
-    }
+        s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
 
+        if (item->interface.uart.enable && pms_object)
+        {
+            pms_init(pms_object);
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
+    }
     return ret;
 }
 

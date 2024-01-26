@@ -1,7 +1,6 @@
 #ifndef SENSOR_0012_I2C_BME280_H
 #define SENSOR_0012_I2C_BME280_H
 
-// #include "driver/i2c.h"
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 #include "sensor_bme280.h"

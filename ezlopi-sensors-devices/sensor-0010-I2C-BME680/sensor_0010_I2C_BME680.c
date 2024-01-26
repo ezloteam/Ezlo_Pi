@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -96,7 +95,6 @@ static void __prepare_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, 
 static int __prepare(void *arg)
 {
     int ret = 0;
-
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
@@ -129,12 +127,10 @@ static int __prepare(void *arg)
                 if ((NULL == temperature_item) && (NULL == humidity_item))
                 {
                     ezlopi_device_free_device(temp_humid_device);
+                    ret = -1;
                 }
             }
-            else
-            {
-                ezlopi_device_free_device(temp_humid_device);
-            }
+
             l_ezlopi_device_t *pressure_device = ezlopi_device_add_device(cj_device);
             if (pressure_device)
             {
@@ -151,12 +147,10 @@ static int __prepare(void *arg)
                 else
                 {
                     ezlopi_device_free_device(pressure_device);
+                    ret = -1;
                 }
             }
-            else
-            {
-                ezlopi_device_free_device(pressure_device);
-            }
+
             l_ezlopi_device_t *aqi_device = ezlopi_device_add_device(cj_device);
             if (aqi_device)
             {
@@ -173,12 +167,10 @@ static int __prepare(void *arg)
                 else
                 {
                     ezlopi_device_free_device(aqi_device);
+                    ret = -1;
                 }
             }
-            else
-            {
-                ezlopi_device_free_device(aqi_device);
-            }
+
             l_ezlopi_device_t *altitude_device = ezlopi_device_add_device(cj_device);
             if (altitude_device)
             {
@@ -195,12 +187,10 @@ static int __prepare(void *arg)
                 else
                 {
                     ezlopi_device_free_device(altitude_device);
+                    ret = -1;
                 }
             }
-            else
-            {
-                ezlopi_device_free_device(altitude_device);
-            }
+
             l_ezlopi_device_t *co2_device = ezlopi_device_add_device(cj_device);
             if (co2_device)
             {
@@ -217,16 +207,19 @@ static int __prepare(void *arg)
                 else
                 {
                     ezlopi_device_free_device(co2_device);
+                    ret = -1;
                 }
             }
-            else
-            {
-                ezlopi_device_free_device(co2_device);
-            }
 
-            if (NULL == pressure_device)
+            ret = 1;
+            if ((NULL == temp_humid_device) &&
+                (NULL == pressure_device) &&
+                (NULL == aqi_device) &&
+                (NULL == altitude_device) &&
+                (NULL == co2_device))
             {
-                ezlopi_device_free_device(pressure_device);
+                free(user_data);
+                ret = -1;
             }
         }
     }
@@ -245,6 +238,15 @@ static int __init(l_ezlopi_item_t *item)
             bme680_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
         }
         ret = 1;
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
     return ret;
 }

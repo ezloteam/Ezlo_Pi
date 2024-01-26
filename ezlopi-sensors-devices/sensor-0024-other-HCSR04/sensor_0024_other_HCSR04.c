@@ -107,55 +107,57 @@ static int __notify(l_ezlopi_item_t *item)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+    if (item)
     {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
-            .mode = GPIO_MODE_OUTPUT,
-            .pull_up_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
-                           (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                              ? GPIO_PULLUP_ENABLE
-                              : GPIO_PULLUP_DISABLE,
-            .pull_down_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
-                             (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                                ? GPIO_PULLDOWN_ENABLE
-                                : GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_DISABLE,
-        };
-
-        gpio_config(&io_conf);
-        ret = 1;
-    }
-
-    if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
-    {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
-            .mode = GPIO_MODE_INPUT,
-            .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
-                           (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                              ? GPIO_PULLUP_ENABLE
-                              : GPIO_PULLUP_DISABLE,
-            .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
-                             (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                                ? GPIO_PULLDOWN_ENABLE
-                                : GPIO_PULLDOWN_DISABLE,
-            .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
-                             ? GPIO_INTR_POSEDGE
-                             : GPIO_INTR_NEGEDGE,
-        };
-
-        gpio_config(&io_conf);
-        ret = 1;
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            const gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
+                .mode = GPIO_MODE_OUTPUT,
+                .pull_up_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
+                               (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                  ? GPIO_PULLUP_ENABLE
+                                  : GPIO_PULLUP_DISABLE,
+                .pull_down_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
+                                 (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                    ? GPIO_PULLDOWN_ENABLE
+                                    : GPIO_PULLDOWN_DISABLE,
+                .intr_type = GPIO_INTR_DISABLE,
+            };
+
+            gpio_config(&io_conf);
+            ret = 1;
+        }
+
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        {
+            const gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                .mode = GPIO_MODE_INPUT,
+                .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
+                               (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                  ? GPIO_PULLUP_ENABLE
+                                  : GPIO_PULLUP_DISABLE,
+                .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
+                                 (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                    ? GPIO_PULLDOWN_ENABLE
+                                    : GPIO_PULLDOWN_DISABLE,
+                .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
+                                 ? GPIO_INTR_POSEDGE
+                                 : GPIO_INTR_NEGEDGE,
+            };
+
+            gpio_config(&io_conf);
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
 
@@ -230,6 +232,7 @@ static int __prepare(void *arg)
                         ultrasonic_sensor->trigger_pin = item->interface.gpio.gpio_out.gpio_num;
                         ultrasonic_sensor->echo_pin = item->interface.gpio.gpio_in.gpio_num;
                         item->user_arg = (void *)ultrasonic_sensor;
+                        ret = 1;
                     }
                 }
                 else
