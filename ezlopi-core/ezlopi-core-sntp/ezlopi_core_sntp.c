@@ -1,4 +1,4 @@
-#if 0
+
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -6,14 +6,25 @@
 #include "esp_sntp.h"
 
 #include "ezlopi_util_trace.h"
-#include "core_sntp.h"
-#include "../../build/config/sdkconfig.h"
+#include "ezlopi_core_sntp.h"
+#include "sdkconfig.h"
 
 static time_t start_time = 0;
 
 time_t sntp_core_get_up_time(void)
 {
     return start_time;
+}
+
+static void set_timezone(const char *continent_city)
+{
+    // Construct the full timezone string in the "Continent/City" format
+    char timezone_str[256];
+    snprintf(timezone_str, sizeof(timezone_str), "TZ=%s", continent_city);
+
+    // Set the timezone using setenv
+    putenv(timezone_str);
+    // tzset();
 }
 
 static void sntp_sync_time_call_back(struct timeval *tv)
@@ -30,7 +41,8 @@ static void sntp_sync_time_call_back(struct timeval *tv)
 
     char strftime_buf[64];
     struct tm timeinfo;
-    setenv("TZ", "UTC-5:45", 1);
+    // setenv("TZ", "UTC-5:45", 1);
+    set_timezone("Asia/Kathmandu");
     tzset();
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
@@ -49,5 +61,3 @@ void core_sntp_init(void)
     sntp_set_sync_interval(10 * 1000);
     esp_sntp_init();
 }
-
-#endif

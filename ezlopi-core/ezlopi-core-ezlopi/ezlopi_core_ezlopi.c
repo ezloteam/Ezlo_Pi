@@ -13,6 +13,7 @@
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_room.h"
+#include "ezlopi_core_sntp.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -56,7 +57,7 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
-    // core_sntp_init();
+    core_sntp_init();
 #endif
 }
 
