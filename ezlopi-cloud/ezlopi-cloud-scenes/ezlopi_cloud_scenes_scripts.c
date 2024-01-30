@@ -1,7 +1,7 @@
 #include "cJSON.h"
 #include <stdlib.h>
 
-#include "scenes_scripts.h"
+#include "ezlopi_cloud_scenes_scripts.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_cloud_constants.h"
 

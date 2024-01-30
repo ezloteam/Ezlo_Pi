@@ -225,4 +225,6 @@ const char *ezlopi_idle_str = "idle";
 const char *ezlopi_armed_str = "armed";
 const char *ezlopi_subtype_str = "subtype";
 
+const char *ezlopi_modeId_str = "modeId";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

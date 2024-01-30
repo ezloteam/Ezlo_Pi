@@ -1,5 +1,5 @@
 file(GLOB_RECURSE src_files "*.c*")
-idf_component_register(SRCS "${src_files}"
+idf_component_register(SRCS "ezlopi_cloud_modes_updaters.c" "ezlopi_cloud_modes.c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES 
     ezlopi-core-factory-info

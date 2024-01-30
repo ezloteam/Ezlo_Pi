@@ -1,10 +1,10 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_expressions.h"
 
-#include "scenes_expressions.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_cloud_scenes_expressions.h"
 
 void scenes_expressions_added(cJSON *cj_request, cJSON *cj_response)
 {

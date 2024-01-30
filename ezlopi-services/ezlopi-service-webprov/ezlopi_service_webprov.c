@@ -19,14 +19,15 @@
 #include "ezlopi_cloud_gateways.h"
 #include "ezlopi_cloud_info.h"
 #include "ezlopi_cloud_modes.h"
+#include "ezlopi_cloud_modes_updaters.h"
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_room.h"
 #include "ezlopi_cloud_network.h"
 #include "ezlopi_cloud_ota.h"
 #include "ezlopi_cloud_settings.h"
 #include "ezlopi_cloud_constants.h"
-#include "scenes_scripts.h"
-#include "scenes_expressions.h"
+#include "ezlopi_cloud_scenes_scripts.h"
+#include "ezlopi_cloud_scenes_expressions.h"
 
 #include "ezlopi_service_webprov.h"
 
