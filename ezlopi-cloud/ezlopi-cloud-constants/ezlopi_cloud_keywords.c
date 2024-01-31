@@ -226,5 +226,8 @@ const char *ezlopi_armed_str = "armed";
 const char *ezlopi_subtype_str = "subtype";
 
 const char *ezlopi_modeId_str = "modeId";
+const char *ezlopi_current_str = "current";
+const char *ezlopi_timeIsLeftToSwitch_str = "timeIsLeftToSwitch";
+const char *ezlopi_switchToDelay_str = "switchToDelay";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

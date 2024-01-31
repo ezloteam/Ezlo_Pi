@@ -232,5 +232,8 @@ extern const char *ezlopi_no_str;
 extern const char *ezlopi_idle_str;
 
 extern const char *ezlopi_modeId_str;
+extern const char *ezlopi_current_str;
+extern const char *ezlopi_timeIsLeftToSwitch_str;
+extern const char *ezlopi_switchToDelay_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

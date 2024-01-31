@@ -13,6 +13,7 @@
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_room.h"
+#include "ezlopi_core_modes.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -42,6 +43,7 @@ void ezlopi_init(void)
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
 
+    ezlopi_core_modes_init();
     ezlopi_room_init();
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();

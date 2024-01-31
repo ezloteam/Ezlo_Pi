@@ -24,6 +24,7 @@ static const char *config_info_update_time_name = "config_time";
 static const char *config_info_version_number = "conf_ver_no";
 static const char *ezlopi_scenes_expression_ids = "ezlopi_exp";
 static const char *ezlopi_room_ids_nvs_name = "ezlopi_room";
+static const char *ezlopi_modes_nvs_name = "ezlopi_modes";
 
 int ezlopi_nvs_init(void)
 {
@@ -171,6 +172,16 @@ char *ezlopi_nvs_read_rooms(void)
 int ezlopi_nvs_write_rooms(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_room_ids_nvs_name);
+}
+
+char *ezlopi_nvs_read_modes(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_modes_nvs_name);
+}
+
+int ezlopi_nvs_write_modes(char * data)
+{
+    return ezlopi_nvs_write_str(data, strlen(data), ezlopi_modes_nvs_name);
 }
 
 int ezlopi_nvs_write_config_data_str(char *data)

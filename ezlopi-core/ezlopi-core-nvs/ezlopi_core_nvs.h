@@ -76,6 +76,9 @@ extern "C"
     char *ezlopi_nvs_read_rooms(void);
     int ezlopi_nvs_write_rooms(char *data);
 
+    char *ezlopi_nvs_read_modes(void);
+    int ezlopi_nvs_write_modes(char *data);
+
 #ifdef __cplusplus
 }
 #endif
