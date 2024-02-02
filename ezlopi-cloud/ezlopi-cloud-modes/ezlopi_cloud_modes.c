@@ -2,6 +2,8 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_modes.h"
+
 #include "ezlopi_cloud_modes.h"
 #include "ezlopi_cloud_constants.h"
 
@@ -12,12 +14,7 @@ void ezlopi_cloud_modes_get(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        // cJSON_AddStringToObject(cj_result, "current", ezlopi__str);
-        // cJSON_AddStringToObject(cj_result, "switchTo", ezlopi__str);
-        // cJSON_AddStringToObject(cj_result, "timeIsLeftToSwitch", ezlopi__str);
-        // cJSON_AddStringToObject(cj_result, "switchToDelay", ezlopi__str);
-        // cJSON_AddStringToObject(cj_result, "alarmDelay", ezlopi__str);
-        // cJSON_AddArrayToObject(cj_result, "modes");
+        ezlopi_core_modes_add_to_result(cj_result);
     }
 }
 
@@ -47,7 +44,6 @@ void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
             if (cj_result)
             {
-                
             }
         }
         else
@@ -55,7 +51,6 @@ void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_mode_name = cJSON_GetObjectItem(cj_params, ezlopi_name_str);
             if (cj_mode_name && cj_mode_name->valuestring)
             {
-
             }
         }
     }

@@ -227,7 +227,29 @@ const char *ezlopi_subtype_str = "subtype";
 
 const char *ezlopi_modeId_str = "modeId";
 const char *ezlopi_current_str = "current";
+const char *ezlopi_switchTo_str = "switchTo";
 const char *ezlopi_timeIsLeftToSwitch_str = "timeIsLeftToSwitch";
 const char *ezlopi_switchToDelay_str = "switchToDelay";
+const char *ezlopi_alarmDelay_str = "alarmDelay";
+const char *ezlopi_entryDelay_str = "entryDelay";
+const char *ezlopi_normal_str = "normal";
+const char *ezlopi_short_str = "short";
+const char *ezlopi_extended_str = "extended";
+const char *ezlopi_instant_str = "instant";
+const char *ezlopi_modes_str = "modes";
+const char *ezlopi_disarmedDefault_str = "disarmedDefault";
+const char *ezlopi_disarmedDevices_str = "disarmedDevices";
+const char *ezlopi_alarmsOffDevices_str = "alarmsOffDevices";
+const char *ezlopi_camerasOffDevices_str = "camerasOffDevices";
+const char *ezlopi_protect_str = "protect";
+const char *ezlopi_devices_str = "devices";
+const char *ezlopi_alarams_str = "alarms";
+const char *ezlopi_cameras_str = "cameras";
+const char *ezlopi_protectButtons_str = "protectButtons";
+const char *ezlopi_service_str = "service";
+const char *ezlopi_alarmed_str = "alarmed";
+const char *ezlopi_timeIsLeft_str = "timeIsLeft";
+const char *ezlopi_sources_str = "sources";
+const char *ezlopi_timestamp_str = "timestamp";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

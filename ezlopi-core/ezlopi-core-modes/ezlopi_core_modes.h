@@ -21,11 +21,11 @@ typedef enum e_house_modes_type
 typedef struct s_house_modes
 {
     uint32_t _id;
-    uint32_t alarm_delay_ms;
-    uint32_t switch_to_delay_ms;
+    uint32_t alarm_delay_sec;
+    uint32_t switch_to_delay_sec;
 
     char name[32];
-    char description[128];
+    const char *description;
 
     bool armed;
     bool protect;
@@ -41,18 +41,18 @@ typedef struct s_house_modes
 
 typedef struct s_entry_delay
 {
-    uint32_t short_delay_ms;
-    uint32_t normal_delay_ms;
-    uint32_t extended_delay_ms;
-    uint32_t instant_delay_ms;
+    uint32_t short_delay_sec;
+    uint32_t normal_delay_sec;
+    uint32_t extended_delay_sec;
+    uint32_t instant_delay_sec;
 
 } s_entry_delay_t;
 
 typedef struct s_abort_window
 {
-    uint32_t default_delay_ms;
-    uint32_t minimum_delay_ms;
-    uint32_t maximum_delay_ms;
+    uint32_t default_delay_sec;
+    uint32_t minimum_delay_sec;
+    uint32_t maximum_delay_sec;
 
 } s_abort_window_t;
 
@@ -77,9 +77,9 @@ typedef struct s_sources
 typedef struct s_alarmed
 {
     char type[32]; // default is 'global'
-    uint32_t entry_delay_ms;
-    uint32_t time_is_left_ms;
-    s_sources_t *srouces;
+    uint32_t entry_delay_sec;
+    uint32_t time_is_left_sec;
+    s_sources_t *sources;
 
 } s_alarmed_t;
 
@@ -88,9 +88,9 @@ typedef struct s_ezlopi_modes
     uint32_t current_mode_id;
     uint32_t switch_to_mode_id;
 
-    double alarm_delay_ms;
-    double switch_to_delay_ms;
-    double time_is_left_to_switch_ms;
+    double alarm_delay_sec;
+    double switch_to_delay_sec;
+    double time_is_left_to_switch_sec;
 
     cJSON *cj_alarms;
     cJSON *cj_cameras;
@@ -113,5 +113,6 @@ void ezlopi_core_default_init(void);
 s_ezlopi_modes_t *ezlopi_core_default_mode_get(void);
 
 void ezlopi_core_modes_init(void);
+int ezlopi_core_modes_add_to_result(cJSON *cj_result);
 
 #endif // __EZLOPI_HOME_MODES_H__
