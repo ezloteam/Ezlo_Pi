@@ -224,5 +224,10 @@ const char *ezlopi_idle_str = "idle";
 
 const char *ezlopi_armed_str = "armed";
 const char *ezlopi_subtype_str = "subtype";
+const char *ezlopi_location_str = "location";
+const char *ezlopi_locations_str = "locations";
+const char *ezlopi_custom_timezone_str = "customTimezone";
+const char *ezlopi_default_str = "default";
+const char *ezlopi_gmt0_str = "GMT0";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

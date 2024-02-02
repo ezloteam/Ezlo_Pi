@@ -63,7 +63,7 @@ static void blinky(void *pv)
         if (count++ > 10)
         {
             TRACE_D("-----------------------------------------");
-            TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
+            TRACE_D("esp_get_free_heap_size: %d", esp_get_free_heap_size());
             TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
             TRACE_D("-----------------------------------------");
             count = 0;

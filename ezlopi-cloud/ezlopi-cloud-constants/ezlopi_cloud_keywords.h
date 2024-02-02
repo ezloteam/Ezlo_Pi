@@ -230,5 +230,9 @@ extern const char *ezlopi_value_min_str;
 extern const char *ezlopi_value_max_str;
 extern const char *ezlopi_no_str;
 extern const char *ezlopi_idle_str;
-
+extern const char *ezlopi_location_str;
+extern const char *ezlopi_locations_str;
+extern const char *ezlopi_custom_timezone_str;
+extern const char *ezlopi_default_str;
+extern const char *ezlopi_gmt0_str;
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

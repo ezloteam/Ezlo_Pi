@@ -1,81 +1,87 @@
 #include <string.h>
 #include <time.h>
 
-#if 0
-void info_get(cJSON *cj_request, cJSON *cj_response)
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#include "cJSON.h"
+#include "zones.h"
+
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_util_trace.h"
+#include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_sntp.h"
+
+void EZPI_CLOUD_location_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
     cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        char *device_uuid = ezlopi_factory_info_v3_get_device_uuid();
-        // #include "esp_app_format.h"
-        cJSON_AddStringToObject(cjson_result, ezlopi_model_str, ezlopi_factory_info_v3_get_device_type());
-        cJSON_AddStringToObject(cjson_result, "architecture", CONFIG_SDK_TOOLPREFIX);
-        cJSON_AddStringToObject(cjson_result, ezlopi_firmware_str, VERSION_STR);
-        cJSON_AddStringToObject(cjson_result, "kernel", "FreeRTOS");
-        cJSON_AddStringToObject(cjson_result, "hardware", CONFIG_IDF_TARGET);
-        cJSON_AddNumberToObject(cjson_result, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
+        cJSON *json_array_tzs = cJSON_CreateArray();
 
-        cJSON_AddStringToObject(cjson_result, ezlopi_uuid_str, device_uuid ? device_uuid : ezlopi__str);
-        cJSON_AddBoolToObject(cjson_result, "offlineAnonymousAccess", true);
-        cJSON_AddBoolToObject(cjson_result, "offlineInsecureAccess", true);
-
-        cJSON *cjson_location = cJSON_AddObjectToObject(cjson_result, "location");
-        if (cjson_location)
+        if (NULL != json_array_tzs)
         {
-            cJSON_AddNumberToObject(cjson_location, "latitude", 0);
-            cJSON_AddNumberToObject(cjson_location, "longitude", 0);
-            cJSON_AddStringToObject(cjson_location, "timezone", ezlopi__str);
-            cJSON_AddStringToObject(cjson_location, "state", ezlopi__str);
+            const micro_tz_db_pair *tz_list = get_tz_db();
+            uint32_t i = 0;
+            // while (tz_list[i].name != NULL)
+            while (i <= 50)
+            {
+                cJSON *json_location_name = cJSON_CreateString(tz_list[i].name);
+
+                if (NULL != json_location_name)
+                {
+                    cJSON_AddItemToArray(json_array_tzs, json_location_name);
+                }
+                // TRACE_E("Here !!! Looping %d : %s", i+1, tz_list[i].name);
+                vTaskDelay(1);
+                i++;
+            }
+            cJSON_AddItemToObject(cjson_result, ezlopi_locations_str, json_array_tzs);
         }
-
-        cJSON *cjson_build = cJSON_AddObjectToObject(cjson_result, "build");
-        if (cjson_build)
-        {
-            cJSON_AddStringToObject(cjson_build, "time", COMPILE_TIME);
-            cJSON_AddStringToObject(cjson_build, "builder", DEVELOPER);
-            cJSON_AddStringToObject(cjson_build, "branch", CURRENT_BRANCH);
-            cJSON_AddStringToObject(cjson_build, "commit", COMMIT_HASH);
-        }
-
-        cJSON *cjson_battery = cJSON_AddObjectToObject(cjson_result, "battery");
-        if (cjson_battery)
-        {
-            cJSON_AddNumberToObject(cjson_battery, "stateOfCharge", 0);
-            cJSON_AddNumberToObject(cjson_battery, "remainingTime", 0);
-            cJSON_AddNumberToObject(cjson_battery, "health", 0);
-            cJSON_AddStringToObject(cjson_battery, ezlopi_status_str, ezlopi__str);
-        }
-
-        // time_t now;
-        // char strftime_buf[64];
-        // struct tm timeinfo;
-
-        // time(&now);
-        // setenv("TZ", "UTC-5:45", 1);
-        // tzset();
-        // localtime_r(&now, &timeinfo);
-        // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-
-        cJSON_AddStringToObject(cjson_result, "localtime", ezlopi__str);
-
-        // now = sntp_core_get_up_time();
-        // localtime_r(&now, &timeinfo);
-        // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-        char *time_string = ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
-        if (time_string)
-        {
-            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
-            free(time_string);
-        }
-        else
-        {
-            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, ezlopi__str);
-        }
-        ezlopi_factory_info_v3_free(device_uuid);
     }
 }
 
-#endif
+void EZPI_CLOUD_location_get(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cjson_result)
+    {
+        char *location = EZPI_CORE_sntp_get_location();
+        if (location)
+        {
+            cJSON_AddStringToObject(cjson_result, ezlopi_location_str, location);
+            free(location);
+        }
+        else
+        {
+            cJSON_AddStringToObject(cjson_result, ezlopi_location_str, ezlopi__str);
+        }
+    }
+}
+
+void EZPI_CLOUD_location_set(cJSON *cj_request, cJSON *cj_response)
+{
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+
+    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    if (cj_params)
+    {
+        char *location_str = NULL;
+        CJSON_GET_VALUE_STRING(cj_params, ezlopi_location_str, location_str);
+        if (location_str)
+        {
+            TRACE_I("Location: %s", location_str);
+            EZPI_CORE_sntp_set_location(location_str);
+            cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+            if (cjson_result)
+            {
+                cJSON_AddStringToObject(cjson_result, ezlopi_location_str, location_str);
+            }
+        }
+    }
+}
