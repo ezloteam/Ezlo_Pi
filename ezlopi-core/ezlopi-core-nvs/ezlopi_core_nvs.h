@@ -76,6 +76,9 @@ extern "C"
     char *ezlopi_nvs_read_rooms(void);
     int ezlopi_nvs_write_rooms(char *data);
 
+    int EZPI_CORE_nvs_write_time_location(const char *time_loc, uint32_t len);
+    char *EZPI_CORE_nvs_read_time_location(void);
+
 #ifdef __cplusplus
 }
 #endif

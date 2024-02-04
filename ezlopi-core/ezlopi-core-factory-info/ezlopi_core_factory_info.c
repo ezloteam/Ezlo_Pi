@@ -230,7 +230,6 @@ char *ezlopi_factory_info_v3_get_name(void)
         }
     }
     return read_data;
-    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_manufacturer(void)

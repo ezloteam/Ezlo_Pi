@@ -27,6 +27,7 @@
 #include "ezlopi_cloud_constants.h"
 #include "scenes_scripts.h"
 #include "scenes_expressions.h"
+#include "ezlopi_cloud_location.h"
 
 #include "ezlopi_service_webprov.h"
 

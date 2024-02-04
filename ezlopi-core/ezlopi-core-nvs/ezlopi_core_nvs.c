@@ -24,6 +24,7 @@ static const char *config_info_update_time_name = "config_time";
 static const char *config_info_version_number = "conf_ver_no";
 static const char *ezlopi_scenes_expression_ids = "ezlopi_exp";
 static const char *ezlopi_room_ids_nvs_name = "ezlopi_room";
+static const char *ezlopi_time_location_nvs_name = "timne.local";
 
 int ezlopi_nvs_init(void)
 {
@@ -578,4 +579,14 @@ void ezlopi_nvs_delete_stored_data_by_name(char *nvs_name)
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", nvs_name, esp_err_to_name(err));
         }
     }
+}
+
+int EZPI_CORE_nvs_write_time_location(const char *time_loc, uint32_t len)
+{
+    return ezlopi_nvs_write_str(time_loc, len, ezlopi_time_location_nvs_name);
+}
+
+char *EZPI_CORE_nvs_read_time_location(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_time_location_nvs_name);
 }
