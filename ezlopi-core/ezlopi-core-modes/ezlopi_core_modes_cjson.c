@@ -1,8 +1,11 @@
 #include <cJSON.h>
+
 #include "ezlopi_core_modes.h"
+#include "ezlopi_core_cloud.h"
 #include "ezlopi_core_modes_cjson.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_cjson_macros.h"
+
+#include "ezlopi_cloud_constants.h"
 
 static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed);
 static void __cjson_add_mode_to_array(cJSON *cj_modes_arr, s_house_modes_t *mode);
@@ -70,7 +73,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
             CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_switchToDelay_str, parsed_mode->switch_to_delay_sec);
             CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_alarmDelay_str, parsed_mode->alarm_delay_sec);
 
-            cJSON * cj_entry_delay = cJSON_GetObjectItem(cj_modes, ezlopi_entryDelay_str);
+            cJSON *cj_entry_delay = cJSON_GetObjectItem(cj_modes, ezlopi_entryDelay_str);
             if (cj_entry_delay)
             {
                 CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_normal_str, parsed_mode->entry_delay.normal_delay_sec);
@@ -78,14 +81,151 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                 CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_extended_str, parsed_mode->entry_delay.extended_delay_sec);
                 CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_instant_str, parsed_mode->entry_delay.normal_delay_sec);
             }
-            
-            cJSON * cj_house_modes = cJSON_GetObjectItem(cj_modes, ezlopi_modes_str);
+
+            cJSON *cj_house_modes = cJSON_GetObjectItem(cj_modes, ezlopi_modes_str);
             if (cj_house_modes)
             {
-                
-                CJSON_GET_ID(parsed_mode.)
+                uint32_t mode_idx = 0;
+                cJSON *cj_house_mod = NULL;
+
+                while (NULL != (cj_house_mod = cJSON_GetArrayItem(cj_house_modes, mode_idx)))
+                {
+                    uint32_t _mode_id = 0;
+                    uint32_t _init_id = ezlopi_cloud_get_modes_initial_id();
+                    CJSON_GET_ID(_mode_id, cJSON_GetObjectItem(cj_house_modes, ezlopi__id_str));
+
+                    if ((_mode_id & 0xffffff00) == _init_id)
+                    {
+                        _mode_id &= 0x000000ff;
+                        s_house_modes_t *cur_house_mode = NULL;
+
+                        switch (_mode_id)
+                        {
+                        case EZLOPI_HOUSE_MODE_REF_ID_HOME:
+                        {
+                            cur_house_mode = parsed_mode->mode_home;
+                            parsed_mode->mode_home->_id = _mode_id;
+                            parsed_mode->mode_home->name = ezlopi_Home_str;
+                            break;
+                        }
+                        case EZLOPI_HOUSE_MODE_REF_ID_AWAY:
+                        {
+                            cur_house_mode = parsed_mode->mode_away;
+                            parsed_mode->mode_home->_id = _mode_id;
+                            parsed_mode->mode_home->name = ezlopi_Away_str;
+                            break;
+                        }
+                        case EZLOPI_HOUSE_MODE_REF_ID_NIGHT:
+                        {
+                            cur_house_mode = parsed_mode->mode_night;
+                            parsed_mode->mode_home->_id = _mode_id;
+                            parsed_mode->mode_home->name = ezlopi_Night_str;
+                            break;
+                        }
+                        case EZLOPI_HOUSE_MODE_REF_ID_VACATION:
+                        {
+                            cur_house_mode = parsed_mode->mode_vacation;
+                            parsed_mode->mode_home->_id = _mode_id;
+                            parsed_mode->mode_home->name = ezlopi_Vacation_str;
+                            break;
+                        }
+                        default:
+                        {
+                            TRACE_E("Undefined house-mode-id!");
+                            break;
+                        }
+                        }
+
+                        {
+                            cJSON *cj_description = cJSON_GetObjectItem(cj_house_mod, ezlopi_description_str);
+                            if (cj_description && cj_description->valuestring)
+                            {
+                                uint32_t desc_len = strlen(cj_description->valuestring) + 1;
+                                cur_house_mode->description = (char *)malloc(desc_len);
+                                if (cur_house_mode->description)
+                                {
+                                    snprintf(cur_house_mode->description, desc_len, "%s", cj_description->valuestring);
+                                }
+                            }
+                        }
+                        {
+                            cJSON *cj_notification = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
+                            if (cj_notification)
+                            {
+                                cur_house_mode->cj_notifications = cJSON_Duplicate(cj_notification, cJSON_True);
+                            }
+                        }
+
+                        CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_disarmedDefault_str, cur_house_mode->disarmed_default);
+                        {
+                            cJSON *cj_disarmed_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
+                            if (cj_disarmed_devices)
+                            {
+                                cur_house_mode->cj_disarmed_devices = cJSON_Duplicate(cj_disarmed_devices, cJSON_True);
+                            }
+                        }
+                        {
+                            cJSON *cj_alarms_off_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_alarmsOffDevices_str);
+                            if (cj_alarms_off_devices)
+                            {
+                                cur_house_mode->cj_alarms_off_devices = cJSON_Duplicate(cj_alarms_off_devices, cJSON_True);
+                            }
+                        }
+                        {
+                            cJSON *cj_cameras_off_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_camerasOffDevices_str);
+                            if (cj_cameras_off_devices)
+                            {
+                                cur_house_mode->cj_cameras_off_devices = cJSON_Duplicate(cj_cameras_off_devices, cJSON_True);
+                            }
+                        }
+
+                        CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_protect_str, cur_house_mode->protect);
+                        CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_armed_str, cur_house_mode->armed);
+                    }
+
+                    mode_idx++;
+                }
             }
 
+            {
+                cJSON *cj_devices = cJSON_GetObjectItem(cj_modes, ezlopi_devices_str);
+                if (cj_devices)
+                {
+                    parsed_mode->cj_devices = cJSON_Duplicate(cj_devices, cJSON_True);
+                }
+            }
+
+            {
+                cJSON *cj_alarms = cJSON_GetObjectItem(cj_modes, ezlopi_alarms_str);
+                if (cj_alarms)
+                {
+                    parsed_mode->cj_alarms = cJSON_Duplicate(cj_alarms, cJSON_True);
+                }
+            }
+
+            {
+                cJSON *cj_cameras = cJSON_GetObjectItem(cj_modes, ezlopi_cameras_str);
+                if (cj_cameras)
+                {
+                    parsed_mode->cj_cameras = cJSON_Duplicate(cj_cameras, cJSON_True);
+                }
+            }
+
+            {
+                cJSON * cj_protect_buttons = cJSON_GetObjectItem(cj_modes, ezlopi_protectButtons_str);
+                if (cj_protect_buttons)
+                {
+                    uint32_t idx = 0;
+                    cJSON * cj_button = NULL;
+                    
+                    while (NULL != (cj_button = cJSON_GetArrayItem(cj_protect_buttons, idx)))
+                    {
+                        parsed_mode->l_protect_buttons = 
+
+                        idx++;
+                    }
+                }
+            }
         }
     }
 
@@ -192,3 +332,4 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
 }
 
 ///////////////////////////////
+static

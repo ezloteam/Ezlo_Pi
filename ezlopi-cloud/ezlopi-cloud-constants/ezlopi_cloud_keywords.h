@@ -249,7 +249,7 @@ extern const char *ezlopi_alarmsOffDevices_str;
 extern const char *ezlopi_camerasOffDevices_str;
 extern const char *ezlopi_protect_str;
 extern const char *ezlopi_devices_str;
-extern const char *ezlopi_alarams_str;
+extern const char *ezlopi_alarms_str;
 extern const char *ezlopi_cameras_str;
 extern const char *ezlopi_protectButtons_str;
 extern const char *ezlopi_service_str;
@@ -257,9 +257,9 @@ extern const char *ezlopi_alarmed_str;
 extern const char *ezlopi_timeIsLeft_str;
 extern const char *ezlopi_sources_str;
 extern const char *ezlopi_timestamp_str;
-extern const char *ezlopi_mode_home_str;
-extern const char *ezlopi_mode_away_str;
-extern const char *ezlopi_mode_night_str;
-extern const char *ezlopi_mode_vacation_str;
+extern const char *ezlopi_Home_str;
+extern const char *ezlopi_Away_str;
+extern const char *ezlopi_Night_str;
+extern const char *ezlopi_Vacation_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

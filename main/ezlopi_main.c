@@ -29,7 +29,7 @@ void app_main(void)
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();
-    ezlopi_ble_service_init();
+    // ezlopi_ble_service_init();
     timer_service_init();
     ezlopi_scenes_meshbot_init();
     web_provisioning_init();
@@ -60,11 +60,11 @@ static void blinky(void *pv)
         gpio_set_level(GPIO_NUM_2, state);
 #endif
 
-        if (count++ > 10)
+        if (count++ > 1)
         {
             TRACE_D("-----------------------------------------");
-            TRACE_D("esp_get_free_heap_size - %d", esp_get_free_heap_size());
-            TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
+            TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+            TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
             TRACE_D("-----------------------------------------");
             count = 0;
         }

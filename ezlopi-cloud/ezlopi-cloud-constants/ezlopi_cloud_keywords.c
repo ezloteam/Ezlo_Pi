@@ -243,7 +243,7 @@ const char *ezlopi_alarmsOffDevices_str = "alarmsOffDevices";
 const char *ezlopi_camerasOffDevices_str = "camerasOffDevices";
 const char *ezlopi_protect_str = "protect";
 const char *ezlopi_devices_str = "devices";
-const char *ezlopi_alarams_str = "alarms";
+const char *ezlopi_alarms_str = "alarms";
 const char *ezlopi_cameras_str = "cameras";
 const char *ezlopi_protectButtons_str = "protectButtons";
 const char *ezlopi_service_str = "service";
@@ -251,9 +251,9 @@ const char *ezlopi_alarmed_str = "alarmed";
 const char *ezlopi_timeIsLeft_str = "timeIsLeft";
 const char *ezlopi_sources_str = "sources";
 const char *ezlopi_timestamp_str = "timestamp";
-const char *ezlopi_mode_home_str = "Home";
-const char *ezlopi_mode_away_str = "Away";
-const char *ezlopi_mode_night_str = "Night";
-const char *ezlopi_mode_vacation_str = "Vacation";
+const char *ezlopi_Home_str = "Home";
+const char *ezlopi_Away_str = "Away";
+const char *ezlopi_Night_str = "Night";
+const char *ezlopi_Vacation_str = "Vacation";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

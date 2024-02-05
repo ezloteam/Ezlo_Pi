@@ -6,6 +6,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef enum e_modes_ref_id_idx
+{
+    EZLOPI_HOUSE_MODE_REF_ID_NONE = 0,
+    EZLOPI_HOUSE_MODE_REF_ID_HOME,
+    EZLOPI_HOUSE_MODE_REF_ID_AWAY,
+    EZLOPI_HOUSE_MODE_REF_ID_NIGHT,
+    EZLOPI_HOUSE_MODE_REF_ID_VACATION,
+    EZLOPI_HOUSE_MODE_REF_ID_MAX
+} e_modes_ref_id_idx_t;
 
 // https://api.ezlo.com/hub/house_modes_manager/index.html
 
@@ -25,7 +34,7 @@ typedef struct s_house_modes
     uint32_t alarm_delay_sec;
     uint32_t switch_to_delay_sec;
 
-    char name[32];
+    const char *name;
     const char *description;
 
     bool armed;
