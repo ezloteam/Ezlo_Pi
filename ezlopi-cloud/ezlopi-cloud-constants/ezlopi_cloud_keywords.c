@@ -128,7 +128,6 @@ const char *ezlopi_valueFormatted_str = "valueFormatted";
 const char *ezlopi_gpio_scl_str = "gpio_scl";
 const char *ezlopi_gpio_sda_str = "gpio_sda";
 const char *ezlopi_dev_type_str = "dev_type";
-const char *ezlopi_dev_name_str = "dev_name";
 const char *ezlopi_gpio_str = "gpio";
 const char *ezlopi_false_str = "false";
 const char *ezlopi_true_str = "true";

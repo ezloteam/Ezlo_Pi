@@ -16,7 +16,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-info
 )
 
-idf_component_register(SRCS "${src_files}"
+idf_component_register(SRCS "ezlopi_service_uart.c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_HAL_COMPONENTS}
