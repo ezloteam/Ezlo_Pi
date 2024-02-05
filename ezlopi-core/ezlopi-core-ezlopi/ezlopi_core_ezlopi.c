@@ -1,7 +1,7 @@
 #include "esp_event.h"
 
+#include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_util_trace.h"
-
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_event_queue.h"
@@ -15,6 +15,18 @@
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_sntp.h"
 
+#ifdef EZPI_CORE_ENABLE_ETH
+#include "ezlopi_core_ethernet.h"
+#endif // EZPI_CORE_ENABLE_ETH
+
+#include "ezlopi_service_uart.h"
+#include "ezlopi_service_ota.h"
+#include "ezlopi_service_timer.h"
+#include "ezlopi_service_webprov.h"
+#include "ezlopi_service_gpioisr.h"
+#include "ezlopi_service_ble.h"
+#include "ezlopi_service_meshbot.h"
+
 #include "ezlopi_hal_system_info.h"
 
 static void ezlopi_initialize_devices_v3(void);
@@ -22,9 +34,13 @@ static void ezlopi_initialize_devices_v3(void);
 void ezlopi_init(void)
 {
 
+    gpio_install_isr_service(0);
+
+    EZPI_SERVICE_uart_init();
+    gpio_isr_service_init();
+
     // Init memories
     ezlopi_nvs_init();
-    TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -36,7 +52,6 @@ void ezlopi_init(void)
     ezlopi_wifi_initialize();
     vTaskDelay(10);
 
-#if 1
     // Init devices
     ezlopi_device_prepare();
     vTaskDelay(10);
@@ -44,10 +59,17 @@ void ezlopi_init(void)
     vTaskDelay(10);
 
     ezlopi_room_init();
+
+#ifdef EZPI_SERV_ENABLE_MESHBOTS
+    ezlopi_scenes_meshbot_init();
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-    // ezlopi_ethernet_init();
+#endif // EZPI_SERV_ENABLE_MESHBOTS
+
+#ifdef EZPI_CORE_ENABLE_ETH
+    ezlopi_ethernet_init();
+#endif // EZPI_CORE_ENABLE_ETH
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
@@ -57,8 +79,16 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
+
     EZPI_CORE_sntp_init();
-#endif
+
+    timer_service_init();
+
+    web_provisioning_init();
+
+    ezlopi_ble_service_init();
+
+    ota_service_init();
 }
 
 static void ezlopi_initialize_devices_v3(void)

@@ -1,0 +1,31 @@
+#ifndef _EZLOPI_USER_CONFIG_H_
+#define _EZLOPI_USER_CONFIG_H_
+
+/////////////////////////////////////////////////////////////
+/////////////// Do not change here //////////////////
+////////////////////////////////////////////////////////////
+
+// User Configs
+#define EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
+#define EZPI_USR_CONFIG_ENABLE_LOG
+
+// Util
+#define EZPI_UTIL_ENABLE_TRACE
+
+// Core
+#define EZPI_CORE_ENABLE_ETH
+
+// Cloud
+
+// Service
+#define EZPI_SERV_ENABLE_MESHBOTS
+
+/////////////////////////////////////////////////////////////
+/////////////// Disable user configs here //////////////////
+////////////////////////////////////////////////////////////
+
+#undef EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
+#undef EZPI_CORE_ENABLE_ETH
+// #undef EZPI_SERV_ENABLE_MESHBOTS
+
+#endif // _EZLOPI_USER_CONFIG_H_

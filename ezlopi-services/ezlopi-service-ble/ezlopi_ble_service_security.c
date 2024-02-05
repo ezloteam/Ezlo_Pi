@@ -7,7 +7,7 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_core_reboot.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_ble_gap.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
@@ -108,8 +108,7 @@ static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_p
             {
             case BLE_CMD_REBOOT:
             {
-                ezlopi_reboot();
-                // esp_restart();
+                EZPI_CORE_reboot();
                 break;
             }
             case BLE_CMD_FACTORY_RESET: // factory reset command
@@ -161,8 +160,7 @@ static void __process_hard_reset_command(void)
 
         TRACE_B("factory reset done, rebooting now .............................................");
         vTaskDelay(2000 / portTICK_RATE_MS);
-        // esp_restart();
-        ezlopi_reboot();
+        EZPI_CORE_reboot();
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     }
     else

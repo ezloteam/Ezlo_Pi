@@ -4,13 +4,16 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+#ifdef EZPI_UTIL_ENABLE_TRACE
 #define ENABLE_TRACE 1
+#endif // EZPI_UTIL_ENABLE_TRACE
 
     void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
 
@@ -22,10 +25,32 @@ extern "C"
     {                                                            \
         printf("%s (%d): " X "\r\n", __FILE__, __LINE__, ##reg); \
     }
-#define trace_dbg(X, ...) ESP_LOGD(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
-#define trace_imp(X, ...) ESP_LOGI(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
-#define trace_err(X, ...) ESP_LOGE(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
-#define trace_war(X, ...) ESP_LOGW(__FILE__, "[%d]: " X, __LINE__, ##__VA_ARGS__)
+
+#define trace_dbg(X, ...)                               \
+    {                                                   \
+        printf("\x1B[37m %s[%d]:", __FILE__, __LINE__); \
+        printf(X, ##__VA_ARGS__);                       \
+        printf("\x1B[0m\r\n");                          \
+    }
+
+#define trace_imp(X, ...)                               \
+    {                                                   \
+        printf("\x1B[32m %s[%d]:", __FILE__, __LINE__); \
+        printf(X, ##__VA_ARGS__);                       \
+        printf("\x1B[0m\r\n");                          \
+    }
+#define trace_err(X, ...)                               \
+    {                                                   \
+        printf("\x1B[31m %s[%d]:", __FILE__, __LINE__); \
+        printf(X, ##__VA_ARGS__);                       \
+        printf("\x1B[0m\r\n");                          \
+    }
+#define trace_war(X, ...)                               \
+    {                                                   \
+        printf("\x1B[33m %s[%d]:", __FILE__, __LINE__); \
+        printf(X, ##__VA_ARGS__);                       \
+        printf("\x1B[0m\r\n");                          \
+    }
 #define trace_info(X, ...)                              \
     {                                                   \
         printf("\x1B[34m %s[%d]:", __FILE__, __LINE__); \

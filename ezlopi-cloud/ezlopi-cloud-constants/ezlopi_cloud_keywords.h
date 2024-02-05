@@ -116,6 +116,7 @@ extern const char *ezlopi_manufacturer_str;
 extern const char *ezlopi_ezlopi_device_type_str;
 extern const char *ezlopi_model_str;
 extern const char *ezlopi_device_name_str;
+extern const char *ezlopi_dev_name_str;
 extern const char *ezlopi_brand_str;
 extern const char *ezlopi_build__date_str;
 extern const char *ezlopi_hash_str;

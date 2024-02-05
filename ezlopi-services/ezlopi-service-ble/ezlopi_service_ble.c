@@ -46,6 +46,7 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_service_security_init();
     ezlopi_ble_service_provisioning_init();
     ezlopi_ble_service_device_info_init();
+
     ezlopi_ble_service_dynamic_config_init();
 
     // ezlopi_ble_profile_print();
@@ -145,7 +146,7 @@ static void ezlopi_ble_basic_init(void)
                  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
-    dump("ble_device_name", ble_device_name, 0, 32);
+    // dump("ble_device_name", ble_device_name, 0, 32);
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));

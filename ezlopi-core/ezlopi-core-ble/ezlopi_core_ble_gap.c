@@ -139,7 +139,7 @@ void ezlopi_ble_gap_dissociate_bonded_devices(void)
         TRACE_I("Bonded devices list : %d\n", dev_num);
         for (int i = 0; i < dev_num; i++)
         {
-            dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
+            // dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
             esp_ble_gap_disconnect(dev_list[i].bd_addr);
             esp_ble_remove_bond_device(dev_list[i].bd_addr);
         }
@@ -254,7 +254,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     {
         esp_bd_addr_t bd_addr;
         memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
-        dump("remote BD_ADDR", bd_addr, 0, 6);
+        // dump("remote BD_ADDR", bd_addr, 0, 6);
         TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
         if (!param->ble_security.auth_cmpl.success)
         {
@@ -275,7 +275,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
         TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
         TRACE_I("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
-        dump("bd_adrr", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
+        // dump("bd_adrr", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
         TRACE_I("------------------------------------");
         break;
     }
@@ -808,7 +808,7 @@ static void show_bonded_devices(void)
         TRACE_I("Bonded devices list : %d\n", dev_num);
         for (int i = 0; i < dev_num; i++)
         {
-            dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
+            // dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
         }
 
         free(dev_list);
@@ -840,5 +840,5 @@ static void ezlopi_ble_setup_service_uuid(void)
         }
     }
 
-    dump("complete-uuid", (all_service_uuid ? (void *)all_service_uuid : (void *)ezlopi__str), 0, all_service_uuid_len);
+    // dump("complete-uuid", (all_service_uuid ? (void *)all_service_uuid : (void *)ezlopi__str), 0, all_service_uuid_len);
 }

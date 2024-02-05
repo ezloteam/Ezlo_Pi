@@ -7,12 +7,13 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_core_reboot.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_ble_gap.h"
 #include "ezlopi_core_ble_gatt.h"
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_reset.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -107,8 +108,7 @@ static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_p
             {
             case BLE_CMD_REBOOT:
             {
-                ezlopi_reboot();
-                // esp_restart();
+                EZPI_CORE_reboot();
                 break;
             }
             case BLE_CMD_FACTORY_RESET: // factory reset command
@@ -146,22 +146,7 @@ static void __process_hard_reset_command(void)
     if ((1 == authenticated_flag) && (current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS)) // once authenticated, valid for 30 seconds only
     {
 #endif
-        int ret = ezlopi_factory_info_v3_factory_reset();
-        if (ret)
-        {
-            TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
-        }
-
-        ret = ezlopi_nvs_factory_reset();
-        if (ret)
-        {
-            TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
-        }
-
-        TRACE_B("factory reset done, rebooting now .............................................");
-        vTaskDelay(2000 / portTICK_RATE_MS);
-        // esp_restart();
-        ezlopi_reboot();
+        EZPI_CORE_factory_restore();
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     }
     else

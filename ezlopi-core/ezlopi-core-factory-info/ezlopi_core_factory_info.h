@@ -275,7 +275,7 @@ typedef struct s_basic_factory_info
     char *ezlopi_factory_info_v3_get_password(void);
     char *ezlopi_factory_info_v3_get_ezlopi_mac(void);
     char *ezlopi_factory_info_v3_get_cloud_server(void);
-    char *ezlopi_factory_info_v3_get_device_type(void);
+    const char *ezlopi_factory_info_v3_get_device_type(void);
     char *ezlopi_factory_info_v3_get_ca_certificate(void);
     char *ezlopi_factory_info_v3_get_ssl_private_key(void);
     char *ezlopi_factory_info_v3_get_ssl_shared_key(void);

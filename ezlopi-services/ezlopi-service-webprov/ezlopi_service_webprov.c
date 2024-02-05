@@ -330,6 +330,11 @@ static void web_provisioning_config_check(void *pv)
     provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
 
+    // TRACE_E("-----------------------------------------");
+    // TRACE_E("esp_get_free_heap_size: %.2fKB", (float)(esp_get_free_heap_size() / 1024.0));
+    // TRACE_E("esp_get_minimum_free_heap_size: %.2fKB", (float)(esp_get_minimum_free_heap_size() / 1024.0));
+    // TRACE_E("-----------------------------------------");
+
     while (1)
     {
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
@@ -418,6 +423,12 @@ static void web_provisioning_config_check(void *pv)
     free(ca_certificate);
     free(provision_token);
     free(provisioning_server);
+
+    // TRACE_E("-----------------------------------------");
+    // TRACE_E("esp_get_free_heap_size: %.2fKB", (float)(esp_get_free_heap_size() / 1024.0));
+    // TRACE_E("esp_get_minimum_free_heap_size: %.2fKB", (float)(esp_get_minimum_free_heap_size() / 1024.0));
+    // TRACE_E("-----------------------------------------");
+
     vTaskDelete(NULL);
 }
 

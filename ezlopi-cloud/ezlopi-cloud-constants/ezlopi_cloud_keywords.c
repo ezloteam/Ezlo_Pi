@@ -137,6 +137,7 @@ const char *ezlopi_dev_detail_str = "dev_detail";
 const char *ezlopi_id_item_str = "id_item";
 const char *ezlopi_showCode_str = "showCode";
 const char *ezlopi_deviceName_str = "deviceName";
+const char *ezlopi_dev_name_str = "dev_name";
 const char *ezlopi_items_str = "items";
 const char *ezlopi_itemName_str = "itemName";
 const char *ezlopi_device_item_names_str = "device_item_names";
