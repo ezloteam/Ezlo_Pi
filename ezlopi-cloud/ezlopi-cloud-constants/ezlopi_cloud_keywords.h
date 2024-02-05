@@ -128,7 +128,6 @@ extern const char *ezlopi_valueFormatted_str;
 extern const char *ezlopi_gpio_scl_str;
 extern const char *ezlopi_gpio_sda_str;
 extern const char *ezlopi_dev_type_str;
-extern const char *ezlopi_dev_name_str;
 extern const char *ezlopi_gpio_str;
 extern const char *ezlopi_false_str;
 extern const char *ezlopi_true_str;

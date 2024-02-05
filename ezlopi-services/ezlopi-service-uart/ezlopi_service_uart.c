@@ -282,8 +282,8 @@ static void qt_serial_get_info()
         cJSON_AddNumberToObject(get_info, ezlopi_serial_str, serial_id);
 
         cJSON_AddStringToObject(get_info, ezlopi_ssid_str, wifi_ssid ? wifi_ssid : "");
-        cJSON_AddStringToObject(get_info, ezlopi_dev_name_str, device_name ? device_name : "");
-        cJSON_AddStringToObject(get_info, "ezlopi_device_type", device_type ? device_type : "");
+        cJSON_AddStringToObject(get_info, ezlopi_device_name_str, device_name ? device_name : "");
+        cJSON_AddStringToObject(get_info, ezlopi_ezlopi_device_type_str, device_type ? device_type : "");
         cJSON_AddStringToObject(get_info, ezlopi_dev_flash_str, CONFIG_ESPTOOLPY_FLASHSIZE);
         // cJSON_AddStringToObject(get_info, "device_free_flash", ""); // TODO
         cJSON_AddStringToObject(get_info, ezlopi_brand_str, device_brand ? device_brand : "");
