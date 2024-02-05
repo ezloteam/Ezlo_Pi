@@ -257,5 +257,9 @@ extern const char *ezlopi_alarmed_str;
 extern const char *ezlopi_timeIsLeft_str;
 extern const char *ezlopi_sources_str;
 extern const char *ezlopi_timestamp_str;
+extern const char *ezlopi_mode_home_str;
+extern const char *ezlopi_mode_away_str;
+extern const char *ezlopi_mode_night_str;
+extern const char *ezlopi_mode_vacation_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

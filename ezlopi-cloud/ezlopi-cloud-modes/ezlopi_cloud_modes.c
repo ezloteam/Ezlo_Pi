@@ -3,6 +3,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_modes.h"
+#include "ezlopi_core_modes_cjson.h"
 
 #include "ezlopi_cloud_modes.h"
 #include "ezlopi_cloud_constants.h"
@@ -14,7 +15,7 @@ void ezlopi_cloud_modes_get(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        ezlopi_core_modes_add_to_result(cj_result);
+        ezlopi_core_modes_get_modes(cj_result);
     }
 }
 

@@ -251,5 +251,9 @@ const char *ezlopi_alarmed_str = "alarmed";
 const char *ezlopi_timeIsLeft_str = "timeIsLeft";
 const char *ezlopi_sources_str = "sources";
 const char *ezlopi_timestamp_str = "timestamp";
+const char *ezlopi_mode_home_str = "Home";
+const char *ezlopi_mode_away_str = "Away";
+const char *ezlopi_mode_night_str = "Night";
+const char *ezlopi_mode_vacation_str = "Vacation";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

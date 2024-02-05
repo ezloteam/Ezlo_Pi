@@ -18,6 +18,26 @@ extern "C"
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
+#if (1 == ENABLE_TRACE)
+
+#define DBG_FONT_COLOR_BLACK "30"
+#define DBG_FONT_COLOR_RED "31"
+#define DBG_FONT_COLOR_GREEN "32"
+#define DBG_FONT_COLOR_YELLOW "33"
+#define DBG_FONT_COLOR_BLUE "34"
+#define DBG_FONT_COLOR_MAGENTA "35"
+#define DBG_FONT_COLOR_CYAN "36"
+#define DBG_FONT_COLOR_WHITE "37"
+
+#define DBG_BG_COLOR_BLACK "40"
+#define DBG_BG_COLOR_RED "41"
+#define DBG_BG_COLOR_GREEN "42"
+#define DBG_BG_COLOR_YELLOW "43"
+#define DBG_BG_COLOR_BLUE "44"
+#define DBG_BG_COLOR_MAGENTA "45"
+#define DBG_BG_COLOR_CYAN "46"
+#define DBG_BG_COLOR_WHITE "47"
+
 #define trace(X, reg...)                                         \
     {                                                            \
         printf("%s (%d): " X "\r\n", __FILE__, __LINE__, ##reg); \
@@ -33,7 +53,7 @@ extern "C"
         printf("\x1B[0m\r\n");                          \
     }
 
-#if (1 == ENABLE_TRACE)
+#define trace_bg(bg, txt, X, ...)
 
 #define F(X) (flash_attr) X
 

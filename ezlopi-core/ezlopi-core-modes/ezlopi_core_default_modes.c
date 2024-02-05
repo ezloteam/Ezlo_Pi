@@ -4,6 +4,8 @@
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_cloud.h"
 
+#include "ezlopi_cloud_constants.h"
+
 static s_ezlopi_modes_t sg_default_mode = {
     .current_mode_id = 0,
     .switch_to_mode_id = 0,
@@ -67,11 +69,6 @@ s_ezlopi_modes_t *ezlopi_core_default_mode_get(void)
     return &sg_default_mode;
 }
 
-static const char *mode_home_str = "Home";
-static const char *mode_away_str = "Away";
-static const char *mode_night_str = "Night";
-static const char *mode_vacation_str = "Vacation";
-
 void ezlopi_core_default_init(void)
 {
     cJSON *cj_empty_array = cJSON_CreateArray();
@@ -93,7 +90,7 @@ void ezlopi_core_default_init(void)
         memcpy(sg_default_mode.mode_home, &sg_default_house_mode, sizeof(s_house_modes_t));
 
         sg_default_mode.mode_home->_id = initial_id + 1;
-        sg_default_mode.mode_home->description = mode_home_str;
+        sg_default_mode.mode_home->description = ezlopi_mode_home_str;
         snprintf(sg_default_mode.mode_home->name, sizeof(sg_default_mode.mode_vacation->name), "Home");
     }
 
@@ -103,7 +100,7 @@ void ezlopi_core_default_init(void)
         memcpy(sg_default_mode.mode_away, &sg_default_house_mode, sizeof(s_house_modes_t));
 
         sg_default_mode.mode_away->_id = initial_id + 2;
-        sg_default_mode.mode_away->description = mode_away_str;
+        sg_default_mode.mode_away->description = ezlopi_mode_away_str;
         snprintf(sg_default_mode.mode_away->name, sizeof(sg_default_mode.mode_vacation->name), "Away");
     }
 
@@ -113,7 +110,7 @@ void ezlopi_core_default_init(void)
         memcpy(sg_default_mode.mode_night, &sg_default_house_mode, sizeof(s_house_modes_t));
 
         sg_default_mode.mode_night->_id = initial_id + 3;
-        sg_default_mode.mode_night->description = mode_night_str;
+        sg_default_mode.mode_night->description = ezlopi_mode_night_str;
         snprintf(sg_default_mode.mode_night->name, sizeof(sg_default_mode.mode_vacation->name), "Night");
     }
 
@@ -123,7 +120,7 @@ void ezlopi_core_default_init(void)
         memcpy(sg_default_mode.mode_vacation, &sg_default_house_mode, sizeof(s_house_modes_t));
 
         sg_default_mode.mode_vacation->_id = initial_id + 4;
-        sg_default_mode.mode_vacation->description = mode_vacation_str;
+        sg_default_mode.mode_vacation->description = ezlopi_mode_vacation_str;
         snprintf(sg_default_mode.mode_vacation->name, sizeof(sg_default_mode.mode_vacation->name), "Vacation");
     }
 }

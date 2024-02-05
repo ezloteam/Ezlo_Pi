@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
 // https://api.ezlo.com/hub/house_modes_manager/index.html
 
 typedef enum e_house_modes_type
@@ -109,10 +110,13 @@ typedef struct s_ezlopi_modes
 
 } s_ezlopi_modes_t;
 
+void ezlopi_core_modes_init(void);
 void ezlopi_core_default_init(void);
 s_ezlopi_modes_t *ezlopi_core_default_mode_get(void);
 
-void ezlopi_core_modes_init(void);
-int ezlopi_core_modes_add_to_result(cJSON *cj_result);
+s_house_modes_t *ezlopi_core_modes_get_current_mode(void);
+s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void);
+
+int ezlopi_core_modes_get_modes(cJSON *cj_result);
 
 #endif // __EZLOPI_HOME_MODES_H__
