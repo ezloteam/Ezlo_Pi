@@ -385,7 +385,7 @@ char *ezlopi_factory_info_v3_get_password(void)
 char *ezlopi_factory_info_v3_get_ezlopi_mac(void)
 {
 
-    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
     if (read_data)
     {
         if (!isprint(read_data[0]))
