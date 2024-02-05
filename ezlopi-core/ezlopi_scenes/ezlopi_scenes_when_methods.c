@@ -282,180 +282,6 @@ int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg)
     }
     return ret;
 }
-//------------------------------- ezlopi_scene_when_is_SunState -----------------------------------------------------------
-static e_issunstate_trigger_modes_t __field_sunstate_check(const char *check_type_name)
-{
-    const char *field_type_name[] = {
-        "intime", // order according to enum
-        "before",
-        "after",
-    };
-
-    e_issunstate_trigger_modes_t ret = ISSUNSTATE_UNDEFINED;
-    for (uint8_t t = 0; t < 3; t++)
-    {
-        if (0 == strncmp(field_type_name[t], check_type_name, strlen(check_type_name) + 1))
-        {
-            ret = t; // intime , before , after // 0-2
-            break;
-        }
-    }
-    return ret;
-}
-static uint8_t __issunstate_time_check(e_issunstate_trigger_modes_t sunstate_type, struct tm *info, cJSON *cj_time_arr)
-{
-    uint8_t ret = 0;
-    if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
-    {
-        char field_hr_mm[10] = {0};
-        strftime(field_hr_mm, 10, "%H:%M", info);
-        field_hr_mm[10] = '\0';
-
-        int array_size = cJSON_GetArraySize(cj_time_arr);
-        for (int i = 0; i < array_size; i++)
-        {
-            cJSON *array_item = cJSON_GetArrayItem(cj_time_arr, i);
-            if (array_item && cJSON_IsString(array_item))
-            {
-                // TRACE_B("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
-                if (0 == strncmp(array_item->valuestring, field_hr_mm, 10))
-                {
-                    ret = (1 << 0); // One of the TIME-condition has been met.
-                    break;
-                }
-            }
-        }
-        if (!array_size) // if we are given : -"value" : []
-        {
-            TRACE_B("Time activate :- [00:00],  [field_hr_mm: %s]", field_hr_mm);
-            if (0 == strncmp(field_hr_mm, "00:00", 10)) // 24-hr format
-            {
-                ret = (1 << 0); // TIME-condition "00:00" has been met.
-            }
-        }
-    }
-    return ret;
-}
-
-int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
-{
-    int ret = 0;
-    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
-    if (when_block)
-    {
-        e_issunstate_trigger_modes_t sunstate_type = ISSUNSTATE_UNDEFINED;
-        l_fields_v2_t *curr_field = when_block->fields;
-
-        // calculate the rawtime
-        time_t rawtime = 0;
-        time(&rawtime);
-        struct tm *info;
-        info = localtime(&rawtime);
-
-        // temporary flags
-        uint8_t flag_check = 0;
-        const uint8_t TIME_FLAG = (1 << 0);
-        const uint8_t WEEKDAYS_FLAG = (1 << 1);
-        const uint8_t DAYS_FLAG = (1 << 2);
-        const uint8_t VALID_RANGE_FLAG = (1 << 3);
-        const uint8_t TIME_MASK = (1 << 4);
-        const uint8_t WEEKDAYS_MASK = (1 << 5);
-        const uint8_t DAYS_MASK = (1 << 6);
-        const uint8_t VALID_RANGE_MASK = (1 << 7);
-
-        // Condition checker
-        while (NULL != curr_field)
-        {
-            if ((0 == strncmp(curr_field->name, "sunrise", 8)) || (0 == strncmp(curr_field->name, "sunset", 7)))
-            {
-                if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
-                {
-                    sunstate_type = __field_sunstate_check(curr_field->value.value_string);
-                }
-            }
-            else
-            {
-                for (uint8_t i = 0; i < ((sizeof(field_isdate_filter_arr) / sizeof(field_isdate_filter_arr[i]))); i++)
-                {
-                    if (0 == strncmp(field_isdate_filter_arr[i].field_name, curr_field->name, strlen(curr_field->name) + 1))
-                    {
-                        flag_check |= (1 << (i + 4));                                                                             // bit4 - bit7
-                        flag_check |= (field_isdate_filter_arr[i].field_func)(sunstate_type, info, curr_field->value.value_json); // bit0 - bit3
-                        break;
-                    }
-                }
-            }
-            curr_field = curr_field->next;
-        }
-
-        // Output Filter based on date+time of activation
-        switch (sunstate_type)
-        {
-        case ISSUNSTATE_INTIME_MODE:
-        {
-            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", sunstate_type, flag_check);
-            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG))) //&&(0 != strncmp(buffer, prev_date_time, 20)))
-            {
-                if (57 == (int)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
-                {
-                    TRACE_W("here! time");
-                    ret = 1;
-                }
-                int _is_date_counter = (int)(scene_node->when_block->fields->user_arg);
-                TRACE_B("user_arg = [%d]", _is_date_counter);
-            }
-            else
-            {
-                (scene_node->when_block->fields->user_arg) = 0;
-            }
-            break;
-        }
-        case ISSUNSTATE_AFTER_MODE:
-        {
-            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", sunstate_type, flag_check);
-            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG))) //&&(0 != strncmp(buffer, prev_date_time, 20)))
-            {
-                if (57 == (int)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
-                {
-                    TRACE_W("here! time");
-                    ret = 1;
-                }
-                int _is_date_counter = (int)(scene_node->when_block->fields->user_arg);
-                TRACE_B("user_arg = [%d]", _is_date_counter);
-            }
-            else
-            {
-                (scene_node->when_block->fields->user_arg) = 0;
-            }
-            break;
-        }
-        case ISSUNSTATE_BEFORE_MODE:
-        {
-            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", sunstate_type, flag_check);
-            if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-                 ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
-            {
-                if (57 == (int)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
-                {
-                    TRACE_W("here! week_days and time");
-                    ret = 1;
-                }
-                int _is_date_counter = (int)(scene_node->when_block->fields->user_arg);
-                TRACE_B("user_arg = [%d]", _is_date_counter);
-            }
-            else
-            {
-                (scene_node->when_block->fields->user_arg) = 0;
-            }
-            break;
-        }
-
-        default:
-            break;
-        }
-    }
-    return ret;
-}
 
 //------------------------------- ezlopi_scene_when_is_date -----------------------------------------------------------
 static e_isdate_modes_t __field_type_check(const char *check_type_name)
@@ -889,6 +715,214 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             }
             break;
         }
+        default:
+            break;
+        }
+    }
+    return ret;
+}
+
+//------------------------------- ezlopi_scene_when_is_SunState -----------------------------------------------------------
+static e_issunstate_trigger_modes_t __field_sunstate_check(const char *check_type_name)
+{
+    const char *field_type_name[] = {
+        "intime", // order according to enum
+        "before",
+        "after",
+    };
+
+    e_issunstate_trigger_modes_t ret = ISSUNSTATE_UNDEFINED;
+    for (uint8_t t = 0; t < 3; t++)
+    {
+        if (0 == strncmp(field_type_name[t], check_type_name, strlen(check_type_name) + 1))
+        {
+            ret = t; // intime , before , after // 0-2
+            break;
+        }
+    }
+    return ret;
+}
+static uint8_t __issunstate_time_diff_check(e_issunstate_trigger_modes_t sunstate_type, struct tm *sunstate_time, struct tm *current_time, const char *time_interval)
+{
+    uint8_t ret = 0;
+    if (time_interval)
+    {
+        // Default values to store start and end boundries
+        struct tm difference = {0};
+
+        char time_diff[10];
+        snprintf(time_diff, 10, "%s", time_interval);
+        time_diff[10] = '\0';
+
+        char *ptr1 = NULL;
+        char *ptr2 = NULL;
+        if (0 != strlen(time_diff))
+        {
+            difference.tm_hour = strtoul(time_diff, &ptr1, 10);
+            difference.tm_min = strtoul(ptr1 + 1, &ptr2, 10);
+            difference.tm_sec = strtoul(ptr2 + 1, NULL, 10);
+        }
+
+        if (current_time->tm_hour + difference.tm_hour)
+            ;
+        if (current_time->tm_min + difference.tm_min)
+            ;
+        if (current_time->tm_sec + difference.tm_sec)
+            ;
+    }
+    return ret;
+}
+// static uint8_t __issunstate_weekdays_check(e_isdate_modes_t mode_type, struct tm *curr_time, cJSON *cj_weekdays_arr)
+// {
+//     uint8_t ret = 0;
+//     if (cj_weekdays_arr && (cJSON_Array == cj_weekdays_arr->type))
+//     {
+//         // Only for comparisions dont change 'curr_time->tm_wday' -> 'sun:0,mon:1, ... , sat:6' to 'sun:7,mon:1, ... ,sat:6'
+//         int valid_weekdays = (0 == (curr_time->tm_wday)) ? 7 : (curr_time->tm_wday); // sunday => 0+1 ... saturday => 6+1
+//         int array_size = cJSON_GetArraySize(cj_weekdays_arr);
+//         for (int i = 0; i < array_size; i++)
+//         {
+//             cJSON *array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
+//             if (array_item && cJSON_IsNumber(array_item))
+//             {
+//                 // TRACE_B("Weekdays activate_%d: %d, [valid_weekdays: %d]", i, (int)(array_item->valuedouble), valid_weekdays);
+//                 if ((int)(array_item->valuedouble) == valid_weekdays)
+//                 {
+//                     ret = (1 << 1); // One of the WEEKDAYS-condition has been met.
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+//     return ret;
+// }
+// static uint8_t __issunstate_days_check(e_issunstate_trigger_modes_t sunstate_type, struct tm *curr_time, cJSON *cj_days_arr)
+// {
+//     uint8_t ret = 0;
+//     if (cj_days_arr && (cJSON_Array == cj_days_arr->type))
+//     {
+//         int array_size = cJSON_GetArraySize(cj_days_arr);
+//         int valid_days = curr_time->tm_mday; // 1-31
+//         for (int i = 0; i < array_size; i++)
+//         {
+//             cJSON *array_item = cJSON_GetArrayItem(cj_days_arr, i);
+//             if (array_item && cJSON_IsNumber(array_item))
+//             {
+//                 if ((int)(array_item->valuedouble) == valid_days)
+//                 {
+//                     ret = (1 << 2); // DAYS_FLAG
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+//     return ret;
+// }
+
+static void update_todays_sunset_time(struct tm *sunrise_sunset_time, const char *sunstate)
+{
+    if (0 == strncmp(sunstate, "sunrise", 8))
+    {
+        // send httprequest to weather api
+    }
+    else if (0 == strncmp(sunstate, "sunset", 7))
+    {
+        // send httprequest to weather api
+    }
+    else
+    {
+        TRACE_E("Wrong sunstate");
+    }
+}
+int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
+{
+    int ret = 0;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    if (when_block && scene_node)
+    {
+        static struct tm sunrise_sunset_time = {0};
+        e_issunstate_trigger_modes_t sunstate_type = ISSUNSTATE_UNDEFINED;
+        l_fields_v2_t *curr_field = when_block->fields;
+
+        // calculate the rawtime
+        time_t rawtime = 0;
+        time(&rawtime);
+        struct tm *info;
+        info = localtime(&rawtime);
+
+        // temporary flags
+        uint8_t flag_check = 0;
+        const uint8_t TIME_FLAG = (1 << 0);
+        const uint8_t WEEKDAYS_FLAG = (1 << 1);
+        const uint8_t DAYS_FLAG = (1 << 2);
+        const uint8_t VALID_RANGE_FLAG = (1 << 3);
+        const uint8_t MASK_TIME = (1 << 4);
+        const uint8_t MASK_WEEKDAYS = (1 << 5);
+        const uint8_t MASK_DAYS = (1 << 6);
+        const uint8_t MASK_VALID_RANGE = (1 << 7);
+
+        // Condition checker
+        while (NULL != curr_field)
+        {
+            if ((0 == strncmp(curr_field->name, "sunrise", 8)) || (0 == strncmp(curr_field->name, "sunset", 7)))
+            {
+                if ((NULL == (uint32_t)scene_node->when_block->fields->user_arg) || (info->tm_mday != (uint32_t)scene_node->when_block->fields->user_arg))
+                {
+                    scene_node->when_block->fields->user_arg = info->tm_mday;
+                    // calculate the sunrise time for today and store it into
+                    update_todays_sunset_time(&sunrise_sunset_time, curr_field->name);
+                }
+                if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
+                {
+                    sunstate_type = __field_sunstate_check(curr_field->value.value_string);
+                }
+            }
+            else if ((0 == strncmp(curr_field->name, "time", 5))) // string
+            {
+                flag_check |= MASK_TIME;
+                // extract time interval (hms_interval)
+            }
+            else if ((0 == strncmp(curr_field->name, "weekdays", 5))) // weekdays // int_array
+            {
+                flag_check |= MASK_WEEKDAYS;
+
+            }
+            else if ((0 == strncmp(curr_field->name, "days", 5))) // monthdays // int_array
+            {
+                flag_check |= MASK_DAYS;
+            }
+            else if ((0 == strncmp(curr_field->name, "range", 5)))
+            {
+                flag_check |= MASK_VALID_RANGE;
+            }
+
+            curr_field = curr_field->next;
+        }
+
+        // Output Filter based on date+time of activation
+        switch (sunstate_type)
+        {
+        case ISSUNSTATE_INTIME_MODE:
+        {
+            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)))
+            {
+            }
+        }
+        case ISSUNSTATE_AFTER_MODE:
+        {
+            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", sunstate_type, flag_check);
+            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG))) //&&(0 != strncmp(buffer, prev_date_time, 20)))
+            {
+            }
+            else
+            {
+            }
+            break;
+        }
+        case ISSUNSTATE_BEFORE_MODE:
+        {
+        }
+
         default:
             break;
         }
