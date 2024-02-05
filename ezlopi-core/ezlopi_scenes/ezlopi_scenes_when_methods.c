@@ -723,6 +723,23 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 }
 
 //------------------------------- ezlopi_scene_when_is_SunState -----------------------------------------------------------
+static int __update_todays_sunrise_sunset_time(struct tm *sunrise_time, struct tm *sunset_time)
+{
+    int ret = 0;
+    if ((NULL != sunrise_time) && (NULL != sunset_time))
+    {
+        // send httprequest to weather api
+
+        // fill the structures
+        ret = 1;
+    }
+    else
+    {
+        TRACE_E("Invalid 'sunrise_time' or 'sunset_time' Structures.");
+    }
+    return ret;
+}
+
 static e_issunstate_trigger_modes_t __field_sunstate_check(const char *check_type_name)
 {
     const char *field_type_name[] = {
@@ -742,105 +759,143 @@ static e_issunstate_trigger_modes_t __field_sunstate_check(const char *check_typ
     }
     return ret;
 }
-static uint8_t __issunstate_time_diff_check(e_issunstate_trigger_modes_t sunstate_type, struct tm *sunstate_time, struct tm *current_time, const char *time_interval)
+
+static uint8_t __issunstate_time_offset_check(e_issunstate_trigger_modes_t sunstate_type, struct tm *sunstate_time, struct tm *curr_time, struct tm *defined_moment, const char *time_offset)
 {
     uint8_t ret = 0;
-    if (time_interval)
+    if (sunstate_time && curr_time && defined_moment && time_offset) // sunstate_time => sunrise or sunset
     {
         // Default values to store start and end boundries
-        struct tm difference = {0};
-
+        struct tm tmp_time = {0};
         char time_diff[10];
-        snprintf(time_diff, 10, "%s", time_interval);
-        time_diff[10] = '\0';
 
+        // now to extract the time_offsets
+        snprintf(time_diff, 10, "%s", time_offset);
+        time_diff[10] = '\0';
         char *ptr1 = NULL;
         char *ptr2 = NULL;
         if (0 != strlen(time_diff))
         {
-            difference.tm_hour = strtoul(time_diff, &ptr1, 10);
-            difference.tm_min = strtoul(ptr1 + 1, &ptr2, 10);
-            difference.tm_sec = strtoul(ptr2 + 1, NULL, 10);
+            tmp_time.tm_hour = strtoul(time_diff, &ptr1, 10);
+            if (NULL != ptr1)
+            {
+                tmp_time.tm_min = strtoul(ptr1 + 1, &ptr2, 10);
+                if (NULL != ptr2)
+                {
+                    tmp_time.tm_sec = strtoul(ptr2 + 1, NULL, 10);
+                }
+                else // only has minutes and seconds
+                {
+                    tmp_time.tm_sec = tmp_time.tm_min;
+                    tmp_time.tm_min = tmp_time.tm_hour;
+                    tmp_time.tm_hour = 0;
+                }
+            }
+            else // only has seconds
+            {
+                tmp_time.tm_sec = tmp_time.tm_hour;
+                tmp_time.tm_min = 0;
+                tmp_time.tm_hour = 0;
+            }
         }
-
-        if (current_time->tm_hour + difference.tm_hour)
-            ;
-        if (current_time->tm_min + difference.tm_min)
-            ;
-        if (current_time->tm_sec + difference.tm_sec)
-            ;
+        // Combined the time_offset and sunrise/sunset timing
+        switch (sunstate_type)
+        {
+        case ISSUNSTATE_BEFORE_MODE:
+        {
+            ret = 1;
+            defined_moment->tm_hour = (sunstate_time->tm_hour - tmp_time.tm_hour);
+            defined_moment->tm_hour = (defined_moment->tm_hour < 0) ? (24 + defined_moment->tm_hour) : defined_moment->tm_hour; // check the hour-range
+            defined_moment->tm_min = (sunstate_time->tm_min - tmp_time.tm_min);
+            defined_moment->tm_min = (defined_moment->tm_min < 0) ? (60 + defined_moment->tm_min) : defined_moment->tm_min; // check the min-range
+            defined_moment->tm_sec = (sunstate_time->tm_sec - tmp_time.tm_sec);
+            defined_moment->tm_sec = (defined_moment->tm_sec < 0) ? (60 + defined_moment->tm_sec) : defined_moment->tm_sec; // check the sec-range
+            break;
+        }
+        case ISSUNSTATE_AFTER_MODE:
+        {
+            ret = 1;
+            defined_moment->tm_hour = (sunstate_time->tm_hour + tmp_time.tm_hour);
+            defined_moment->tm_hour = (defined_moment->tm_hour > 23) ? (defined_moment->tm_hour - 24) : defined_moment->tm_hour; // check the hour-range
+            defined_moment->tm_min = (sunstate_time->tm_min + tmp_time.tm_min);
+            defined_moment->tm_min = (defined_moment->tm_min > 59) ? (defined_moment->tm_min - 60) : defined_moment->tm_min; // check the min-range
+            defined_moment->tm_sec = (sunstate_time->tm_sec + tmp_time.tm_sec);
+            defined_moment->tm_sec = (defined_moment->tm_sec > 59) ? (defined_moment->tm_sec - 60) : defined_moment->tm_sec; // check the sec-range
+            break;
+        }
+        case ISSUNSTATE_INTIME_MODE:
+        {
+            ret = 1;
+            defined_moment->tm_hour = (sunstate_time->tm_hour);
+            defined_moment->tm_min = (sunstate_time->tm_min);
+            defined_moment->tm_sec = (sunstate_time->tm_sec);
+            break;
+        }
+        case ISSUNSTATE_UNDEFINED:
+        {
+            ret = 0;
+            break;
+        }
+        }
     }
     return ret;
 }
-// static uint8_t __issunstate_weekdays_check(e_isdate_modes_t mode_type, struct tm *curr_time, cJSON *cj_weekdays_arr)
-// {
-//     uint8_t ret = 0;
-//     if (cj_weekdays_arr && (cJSON_Array == cj_weekdays_arr->type))
-//     {
-//         // Only for comparisions dont change 'curr_time->tm_wday' -> 'sun:0,mon:1, ... , sat:6' to 'sun:7,mon:1, ... ,sat:6'
-//         int valid_weekdays = (0 == (curr_time->tm_wday)) ? 7 : (curr_time->tm_wday); // sunday => 0+1 ... saturday => 6+1
-//         int array_size = cJSON_GetArraySize(cj_weekdays_arr);
-//         for (int i = 0; i < array_size; i++)
-//         {
-//             cJSON *array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
-//             if (array_item && cJSON_IsNumber(array_item))
-//             {
-//                 // TRACE_B("Weekdays activate_%d: %d, [valid_weekdays: %d]", i, (int)(array_item->valuedouble), valid_weekdays);
-//                 if ((int)(array_item->valuedouble) == valid_weekdays)
-//                 {
-//                     ret = (1 << 1); // One of the WEEKDAYS-condition has been met.
-//                     break;
-//                 }
-//             }
-//         }
-//     }
-//     return ret;
-// }
-// static uint8_t __issunstate_days_check(e_issunstate_trigger_modes_t sunstate_type, struct tm *curr_time, cJSON *cj_days_arr)
-// {
-//     uint8_t ret = 0;
-//     if (cj_days_arr && (cJSON_Array == cj_days_arr->type))
-//     {
-//         int array_size = cJSON_GetArraySize(cj_days_arr);
-//         int valid_days = curr_time->tm_mday; // 1-31
-//         for (int i = 0; i < array_size; i++)
-//         {
-//             cJSON *array_item = cJSON_GetArrayItem(cj_days_arr, i);
-//             if (array_item && cJSON_IsNumber(array_item))
-//             {
-//                 if ((int)(array_item->valuedouble) == valid_days)
-//                 {
-//                     ret = (1 << 2); // DAYS_FLAG
-//                     break;
-//                 }
-//             }
-//         }
-//     }
-//     return ret;
-// }
 
-static void update_todays_sunset_time(struct tm *sunrise_sunset_time, const char *sunstate)
+static uint8_t __issunstate_midnight_time_range_check(uint8_t sunstate_mode, const char *range_type, struct tm *curr_time, struct tm *defined_moment)
 {
-    if (0 == strncmp(sunstate, "sunrise", 8))
+    uint8_t ret = 0;
+    if (sunstate_mode && range_type && curr_time && defined_moment)
     {
-        // send httprequest to weather api
+        if (0 == strncmp(range_type, "at", 3)) // at desired moment
+        {
+            if ((curr_time->tm_hour == defined_moment->tm_hour) &&
+                (curr_time->tm_min == defined_moment->tm_min) &&
+                (curr_time->tm_sec == defined_moment->tm_sec))
+            {
+                ret = (1 << 3);
+            }
+        }
+        else if (0 == strncmp(range_type, "after", 6)) // all time after defined moment till midnight of current day
+        {
+
+            if ((curr_time->tm_hour < 24) && (curr_time->tm_hour > defined_moment->tm_hour))
+            {
+                ret = (1 << 3);
+            }
+            else if (((curr_time->tm_hour < 24) && (curr_time->tm_hour == defined_moment->tm_hour)) &&
+                     ((curr_time->tm_min < 60) && (curr_time->tm_min >= defined_moment->tm_min)) &&
+                     ((curr_time->tm_sec < 60) && (curr_time->tm_sec > defined_moment->tm_sec)))
+            {
+                ret = (1 << 3);
+            }
+        }
+        else if (0 == strncmp(range_type, "before", 7)) // all time after midnight till defined moment;
+        {
+            if ((curr_time->tm_hour >= 0) && (curr_time->tm_hour < defined_moment->tm_hour))
+            {
+                ret = (1 << 3);
+            }
+            else if (((curr_time->tm_hour >= 0) && (curr_time->tm_hour == defined_moment->tm_hour)) &&
+                     ((curr_time->tm_min >= 0) && (curr_time->tm_min <= defined_moment->tm_min)) &&
+                     ((curr_time->tm_sec >= 0) && (curr_time->tm_sec <= defined_moment->tm_sec)))
+            {
+                ret = (1 << 3);
+            }
+        }
     }
-    else if (0 == strncmp(sunstate, "sunset", 7))
-    {
-        // send httprequest to weather api
-    }
-    else
-    {
-        TRACE_E("Wrong sunstate");
-    }
+    return ret;
 }
+
 int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
-        static struct tm sunrise_sunset_time = {0};
+        static struct tm sunrise_time = {0}; // store the sunrise_time
+        static struct tm sunset_time = {0};  // store the sunset_time
+        struct tm defined_moment = {0};      // the actual defined_moment after combining : 'sunrise/sunset_time' & 'time_offset'
+
         e_issunstate_trigger_modes_t sunstate_type = ISSUNSTATE_UNDEFINED;
         l_fields_v2_t *curr_field = when_block->fields;
 
@@ -861,70 +916,92 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
         const uint8_t MASK_DAYS = (1 << 6);
         const uint8_t MASK_VALID_RANGE = (1 << 7);
 
+        uint8_t sunstate_mode = 0;
         // Condition checker
         while (NULL != curr_field)
         {
-            if ((0 == strncmp(curr_field->name, "sunrise", 8)) || (0 == strncmp(curr_field->name, "sunset", 7)))
+            if ((sunstate_mode = (0 == strncmp(curr_field->name, "sunrise", 8)) ? 1 : 0) ||
+                (sunstate_mode = (0 == strncmp(curr_field->name, "sunset", 7) ? 2 : 0))) // first identify 'sunstate'
             {
-                if ((NULL == (uint32_t)scene_node->when_block->fields->user_arg) || (info->tm_mday != (uint32_t)scene_node->when_block->fields->user_arg))
+                if (((uint32_t)NULL == (uint32_t)scene_node->when_block->fields->user_arg) || (info->tm_mday != (uint32_t)scene_node->when_block->fields->user_arg))
                 {
-                    scene_node->when_block->fields->user_arg = info->tm_mday;
-                    // calculate the sunrise time for today and store it into
-                    update_todays_sunset_time(&sunrise_sunset_time, curr_field->name);
+                    scene_node->when_block->fields->user_arg = (void *)info->tm_mday;
+                    if ((0 == sunrise_time.tm_mday) || (0 == sunset_time.tm_mday))
+                    {
+                        if (__update_todays_sunrise_sunset_time(&sunrise_time, &sunset_time)) // activate once per_day;
+                        {
+                            defined_moment = (1 == sunstate_mode) ? sunrise_time : ((2 == sunstate_mode) ? sunset_time : defined_moment); // else {0}
+                        }
+                    }
                 }
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
                 {
-                    sunstate_type = __field_sunstate_check(curr_field->value.value_string);
+                    sunstate_type = __field_sunstate_check(curr_field->value.value_string); // calculate  and store it into 'sunrise_time & sunset_time'
                 }
             }
             else if ((0 == strncmp(curr_field->name, "time", 5))) // string
             {
                 flag_check |= MASK_TIME;
-                // extract time interval (hms_interval)
+                if (EZLOPI_VALUE_TYPE_HMS_INTERVAL == curr_field->value_type && (NULL != curr_field->value.value_string))
+                {
+                    TRACE_W("SunState_mode => [%d]", sunstate_mode);
+                    if (0 != sunstate_mode)
+                    { // extract time interval (hms_interval)
+                        flag_check |= __issunstate_time_offset_check(sunstate_type, ((1 == sunstate_mode) ? &sunrise_time : &sunset_time), info, &defined_moment, curr_field->value.value_string);
+                    }
+                }
             }
             else if ((0 == strncmp(curr_field->name, "weekdays", 5))) // weekdays // int_array
             {
-                flag_check |= MASK_WEEKDAYS;
-
+                if ((EZLOPI_VALUE_TYPE_INT_ARRAY == curr_field->value_type) && (cJSON_IsArray(curr_field->value.value_json)))
+                {
+                    flag_check |= MASK_WEEKDAYS;                                                                     // indicates : check for weekdays
+                    flag_check |= __field_weekdays_check(ISDATE_UNDEFINED_MODE, info, curr_field->value.value_json); // (1 << 1)
+                }
             }
             else if ((0 == strncmp(curr_field->name, "days", 5))) // monthdays // int_array
             {
-                flag_check |= MASK_DAYS;
+                if ((EZLOPI_VALUE_TYPE_INT_ARRAY == curr_field->value_type) && (cJSON_IsArray(curr_field->value.value_json)))
+                {
+                    flag_check |= MASK_DAYS;                                                                     // indicates : check for month_days
+                    flag_check |= __field_days_check(ISDATE_UNDEFINED_MODE, info, curr_field->value.value_json); // (1 << 2)
+                }
             }
-            else if ((0 == strncmp(curr_field->name, "range", 5)))
+            else if ((0 == strncmp(curr_field->name, "range", 5))) // till midnight
             {
-                flag_check |= MASK_VALID_RANGE;
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                {
+                    flag_check |= MASK_VALID_RANGE; // indicates : check for midnight-range
+                    flag_check |= __issunstate_midnight_time_range_check(sunstate_mode, curr_field->value.value_string, info, &defined_moment);
+                }
             }
 
             curr_field = curr_field->next;
         }
 
-        // Output Filter based on date+time of activation
-        switch (sunstate_type)
-        {
-        case ISSUNSTATE_INTIME_MODE:
-        {
-            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)))
+        if (0 != sunstate_mode)
+        { // Output Filter based on date+time of activation
+            TRACE_D("mode[%d], isSunState:- FLAG_STATUS: %#x", (sunstate_type), flag_check);
+            switch (flag_check)
             {
-            }
-        }
-        case ISSUNSTATE_AFTER_MODE:
-        {
-            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", sunstate_type, flag_check);
-            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG))) //&&(0 != strncmp(buffer, prev_date_time, 20)))
+            case ((MASK_DAYS | DAYS_FLAG) | (MASK_WEEKDAYS | WEEKDAYS_FLAG) | (MASK_VALID_RANGE | VALID_RANGE_FLAG)): // 0. mdays + weekdays + midnight time?
+            case ((MASK_DAYS | DAYS_FLAG) | (MASK_WEEKDAYS | WEEKDAYS_FLAG) | (MASK_TIME | TIME_FLAG)):               // 0. month_days + weekdays + exact time?
+            case ((MASK_WEEKDAYS | WEEKDAYS_FLAG) | (MASK_VALID_RANGE | VALID_RANGE_FLAG)):                           // 1. weekdays + midnight time?
+            case ((MASK_WEEKDAYS | WEEKDAYS_FLAG) | (MASK_TIME | TIME_FLAG)):                                         // 1. weekdays + exact time?
+            case ((MASK_DAYS | DAYS_FLAG) | (MASK_VALID_RANGE | VALID_RANGE_FLAG)):                                   // 2. month_days + midnight time?
+            case ((MASK_DAYS | DAYS_FLAG) | (MASK_TIME | TIME_FLAG)):                                                 // 2. month_days + exact time?
+            case ((MASK_VALID_RANGE | VALID_RANGE_FLAG)):                                                             // 3. Daily + midnight time?
+            case ((MASK_TIME) | (TIME_FLAG)):                                                                         // 3. Daily + exact time?
             {
+                ret = 1; // Activate intime option
+                break;
             }
-            else
+            default:
             {
+                ret = 0; // don't activate if above conditions aren't satisfied
+                break;
             }
-            break;
-        }
-        case ISSUNSTATE_BEFORE_MODE:
-        {
-        }
-
-        default:
-            break;
+            }
         }
     }
     return ret;
