@@ -35,7 +35,7 @@ typedef struct s_house_modes
     uint32_t switch_to_delay_sec;
 
     const char *name;
-    const char *description;
+    char *description;
 
     bool armed;
     bool protect;

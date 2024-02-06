@@ -1,5 +1,6 @@
 #include <cJSON.h>
 
+#include "ezlopi_util_trace.h"
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_modes_cjson.h"
@@ -40,7 +41,7 @@ int ezlopi_core_modes_cjson_get_modes(cJSON *cj_dest)
         }
 
         cJSON_AddItemReferenceToObject(cj_dest, ezlopi_devices_str, _modes->cj_devices);
-        cJSON_AddItemReferenceToObject(cj_dest, ezlopi_alarams_str, _modes->cj_alarms);
+        cJSON_AddItemReferenceToObject(cj_dest, ezlopi_alarms_str, _modes->cj_alarms);
         cJSON_AddItemReferenceToObject(cj_dest, ezlopi_cameras_str, _modes->cj_cameras);
 
         cJSON *cj_protect_buttons_arr = cJSON_AddArrayToObject(cj_dest, ezlopi_protectButtons_str);
@@ -212,17 +213,78 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
             }
 
             {
-                cJSON * cj_protect_buttons = cJSON_GetObjectItem(cj_modes, ezlopi_protectButtons_str);
+                cJSON *cj_protect_buttons = cJSON_GetObjectItem(cj_modes, ezlopi_protectButtons_str);
                 if (cj_protect_buttons)
                 {
                     uint32_t idx = 0;
-                    cJSON * cj_button = NULL;
-                    
+                    cJSON *cj_button = NULL;
+                    s_protect_buttons_t *curr_button = NULL;
+
                     while (NULL != (cj_button = cJSON_GetArrayItem(cj_protect_buttons, idx)))
                     {
-                        parsed_mode->l_protect_buttons = 
+                        if (parsed_mode->l_protect_buttons)
+                        {
+                            curr_button->next = (s_protect_buttons_t *)malloc(sizeof(s_protect_buttons_t));
+                            curr_button = curr_button->next;
+                        }
+                        else
+                        {
+                            parsed_mode->l_protect_buttons = (s_protect_buttons_t *)malloc(sizeof(s_protect_buttons_t));
+                            curr_button = parsed_mode->l_protect_buttons;
+                        }
+
+                        if (curr_button)
+                        {
+                            memset(curr_button, 0, sizeof(s_protect_buttons_t));
+                            CJSON_GET_ID(curr_button->device_id, cJSON_GetObjectItem(cj_modes, ezlopi_id_str));
+                            CJSON_GET_VALUE_STRING_BY_COPY(cj_modes, ezlopi_service_str, curr_button->service_name);
+                        }
 
                         idx++;
+                    }
+                }
+            }
+
+            {
+                cJSON *cj_alarmed = cJSON_GetObjectItem(cj_modes, ezlopi_alarmed_str);
+                if (cj_alarmed)
+                {
+                    CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_entryDelay_str, parsed_mode->alarmed.entry_delay_sec);
+                    CJSON_GET_VALUE_DOUBLE(cj_modes, ezlopi_timeIsLeft_str, parsed_mode->alarmed.time_is_left_sec);
+
+                    CJSON_GET_VALUE_STRING_BY_COPY(cj_modes, ezlopi_type_str, parsed_mode->alarmed.type);
+
+                    cJSON *cj_sources_arr = cJSON_GetObjectItem(cj_alarmed, ezlopi_sources_str);
+                    if (cj_sources_arr)
+                    {
+                        uint32_t src_idx = 0;
+                        cJSON *cj_source = NULL;
+                        s_sources_t *curr_source = NULL;
+
+                        while (NULL != (cj_source = cJSON_GetArrayItem(cj_sources_arr, src_idx)))
+                        {
+                            if (parsed_mode->alarmed.sources)
+                            {
+                                curr_source->next = (s_sources_t *)malloc(sizeof(s_sources_t));
+                                curr_source = curr_source->next;
+                            }
+                            else
+                            {
+                                parsed_mode->alarmed.sources = (s_sources_t *)malloc(sizeof(s_sources_t));
+                                curr_source = parsed_mode->alarmed.sources;
+                            }
+
+                            if (curr_source)
+                            {
+                                memset(curr_source, 0, sizeof(s_sources_t));
+
+                                CJSON_GET_ID(curr_source->device_id, cJSON_GetObjectItem(cj_source, ezlopi_deviceId_str));
+                                CJSON_GET_VALUE_DOUBLE(cj_source, ezlopi_timestamp_str, curr_source->time_stamp);
+                                CJSON_GET_VALUE_DOUBLE(cj_source, ezlopi_delay_str, curr_source->delay);
+                            }
+
+                            src_idx++;
+                        }
                     }
                 }
             }
@@ -332,4 +394,4 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
 }
 
 ///////////////////////////////
-static
+// static
