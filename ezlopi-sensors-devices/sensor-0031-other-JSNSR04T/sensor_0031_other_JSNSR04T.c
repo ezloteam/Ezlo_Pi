@@ -110,7 +110,7 @@ static int __init(l_ezlopi_item_t *item)
 
             if (ESP_OK == init_JSN_SR04T(jsn_sr04t_config))
             {
-                TRACE_I("JSN_SR04T initialized");
+                TRACE_S("JSN_SR04T initialized");
                 ret = 1;
             }
             else

@@ -53,7 +53,7 @@ void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
     if (cj_request && cj_response)
     {
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
@@ -270,7 +270,7 @@ static cJSON *__comparision_operators_numeric(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_numeric_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_numeric_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_numeric_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_numeric_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -304,7 +304,7 @@ static cJSON *__comparision_operators_strings(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_strings_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_strings_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_strings_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_strings_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -338,7 +338,7 @@ static cJSON *__comparision_operators_values_with_less(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_value_with_less_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_value_with_less_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_value_with_less_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_value_with_less_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -372,7 +372,7 @@ static cJSON *__comparision_operators_values_without_less(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_value_without_less_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_value_without_less_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_value_without_less_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_value_without_less_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {

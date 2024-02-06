@@ -12,7 +12,7 @@ extern const char *ezlopi_device_ids_str;
 extern const char *ezlopi_sender_str;
 extern const char *ezlopi_name_str;
 extern const char *ezlopi_value_str;
-extern const char *ezlopi_key_method_str;
+extern const char *ezlopi_method_str;
 extern const char *ezlopi_msg_id_str; // message counter, number of data transferred to ezlopi-cloud
 extern const char *ezlopi_msg_subclass_str;
 extern const char *ezlopi_ui_broadcast_str;

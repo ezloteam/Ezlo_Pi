@@ -24,7 +24,7 @@ void send_http_request(void)
         char *response = ezlopi_http_post_request(cloud_url, location, headers, private_key, shared_key, ca_cert);
         if (response)
         {
-            TRACE_B("Http post request response:\r\n%s", response);
+            TRACE_I("Http post request response:\r\n%s", response);
             free(response);
         }
     }

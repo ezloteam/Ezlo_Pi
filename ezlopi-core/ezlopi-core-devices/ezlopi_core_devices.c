@@ -332,18 +332,18 @@ void ezlopi_device_prepare(void)
 ///////// Print functions start here ////////////
 static void ezlopi_device_print_controller_cloud_information_v3(void)
 {
-    TRACE_B("Armed: %d", s_controller_information.armed);
-    TRACE_B("Battery Powered: %d", s_controller_information.battery_powered);
-    TRACE_B("Device Type Id: %.*s", sizeof(s_controller_information.device_type_id), s_controller_information.device_type_id);
-    TRACE_B("Gateway Id: %.*s", sizeof(s_controller_information.gateway_id), s_controller_information.gateway_id);
-    TRACE_B("Parent Device Id: %.*s", sizeof(s_controller_information.parent_device_id), s_controller_information.parent_device_id);
-    TRACE_B("Persistent: %d", s_controller_information.persistent);
-    TRACE_B("Reachable: %d", s_controller_information.reachable);
-    TRACE_B("Room Id: %.*s", sizeof(s_controller_information.room_id), s_controller_information.room_id);
-    TRACE_B("Security: %s", s_controller_information.security ? s_controller_information.security : ezlopi_null_str);
-    TRACE_B("Service Notification: %d", s_controller_information.service_notification);
-    TRACE_B("Ready: %d", s_controller_information.ready);
-    TRACE_B("Status: %s", s_controller_information.status ? s_controller_information.status : ezlopi_null_str);
+    TRACE_I("Armed: %d", s_controller_information.armed);
+    TRACE_I("Battery Powered: %d", s_controller_information.battery_powered);
+    TRACE_I("Device Type Id: %.*s", sizeof(s_controller_information.device_type_id), s_controller_information.device_type_id);
+    TRACE_I("Gateway Id: %.*s", sizeof(s_controller_information.gateway_id), s_controller_information.gateway_id);
+    TRACE_I("Parent Device Id: %.*s", sizeof(s_controller_information.parent_device_id), s_controller_information.parent_device_id);
+    TRACE_I("Persistent: %d", s_controller_information.persistent);
+    TRACE_I("Reachable: %d", s_controller_information.reachable);
+    TRACE_I("Room Id: %.*s", sizeof(s_controller_information.room_id), s_controller_information.room_id);
+    TRACE_I("Security: %s", s_controller_information.security ? s_controller_information.security : ezlopi_null_str);
+    TRACE_I("Service Notification: %d", s_controller_information.service_notification);
+    TRACE_I("Ready: %d", s_controller_information.ready);
+    TRACE_I("Status: %s", s_controller_information.status ? s_controller_information.status : ezlopi_null_str);
 }
 
 static void ezlopi_device_print_interface_digital_io(l_ezlopi_item_t *item)
@@ -485,10 +485,10 @@ static void ezlopi_device_parse_json_v3(cJSON *cjson_config)
         int config_dev_idx = 0;
         cJSON *cjson_device = NULL;
 
-        TRACE_B("---------------------------------------------");
+        TRACE_I("---------------------------------------------");
         while (NULL != (cjson_device = cJSON_GetArrayItem(cjson_device_list, config_dev_idx)))
         {
-            TRACE_B("Device-%d:", config_dev_idx);
+            TRACE_I("Device-%d:", config_dev_idx);
 
             int id_item = 0;
             CJSON_GET_VALUE_INT(cjson_device, ezlopi_id_item_str, id_item);
@@ -512,7 +512,7 @@ static void ezlopi_device_parse_json_v3(cJSON *cjson_config)
             }
 
             config_dev_idx++;
-            TRACE_B("---------------------------------------------");
+            TRACE_I("---------------------------------------------");
         }
     }
 
@@ -561,7 +561,7 @@ static void ezlopi_device_parse_json_v3(cJSON *cjson_config)
     while (NULL != current_head)
     {
         ezlopi_device_print_properties(current_head->properties);
-        TRACE_B("Device name: %.*s", sizeof(current_head->properties->ezlopi_cloud.device_name), current_head->properties->ezlopi_cloud.device_name);
+        TRACE_I("Device name: %.*s", sizeof(current_head->properties->ezlopi_cloud.device_name), current_head->properties->ezlopi_cloud.device_name);
         current_head = current_head->next;
     }
 #endif

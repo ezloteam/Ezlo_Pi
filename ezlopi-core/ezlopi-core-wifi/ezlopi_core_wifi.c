@@ -139,7 +139,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
         {
             s_retry_num++;
-            TRACE_I("retry to connect to the AP");
+            TRACE_S("retry to connect to the AP");
         }
         else
         {
@@ -153,9 +153,9 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
     {
         last_disconnect_reason = wifi_no_error_str;
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-        TRACE_I("got - ip:      " IPSTR, IP2STR(&event->ip_info.ip));
-        TRACE_I("      netmask: " IPSTR, IP2STR(&event->ip_info.netmask));
-        TRACE_I("      gw:      " IPSTR, IP2STR(&event->ip_info.gw));
+        TRACE_S("got - ip:      " IPSTR, IP2STR(&event->ip_info.ip));
+        TRACE_S("      netmask: " IPSTR, IP2STR(&event->ip_info.netmask));
+        TRACE_S("      gw:      " IPSTR, IP2STR(&event->ip_info.gw));
 
         station_got_ip = 1;
         s_retry_num = 0;

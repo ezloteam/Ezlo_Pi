@@ -238,7 +238,7 @@ static int __init(l_ezlopi_item_t *item)
         {
             s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln, item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
             item->interface.pwm.channel = ezlopi_dimmable_channel_speed->channel;
-            TRACE_B("Channel is %d", item->interface.pwm.channel);
+            TRACE_I("Channel is %d", item->interface.pwm.channel);
             item->interface.pwm.speed_mode = ezlopi_dimmable_channel_speed->speed_mode;
             dimmable_bulb_arg->current_brightness_value = item->interface.pwm.duty_cycle;
             dimmable_bulb_arg->previous_brightness_value = item->interface.pwm.duty_cycle;

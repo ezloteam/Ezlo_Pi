@@ -63,7 +63,7 @@ bool ezlopi_websocket_client_is_connected(void)
 void ezlopi_websocket_client_kill(void)
 {
     esp_websocket_client_stop(client);
-    TRACE_I("Websocket Stopped");
+    TRACE_S("Websocket Stopped");
     esp_websocket_client_destroy(client);
     client = NULL;
 }
@@ -91,7 +91,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
             .ping_interval_sec = 10,
         };
 
-        TRACE_I("Connecting to %s...", websocket_cfg.uri);
+        TRACE_S("Connecting to %s...", websocket_cfg.uri);
 
         client = esp_websocket_client_init(&websocket_cfg);
         esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
@@ -99,7 +99,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
     }
     else
     {
-        TRACE_I("Client already active!");
+        TRACE_S("Client already active!");
     }
 
     return client;
@@ -113,7 +113,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     {
     case WEBSOCKET_EVENT_CONNECTED:
     {
-        TRACE_I("WEBSOCKET_EVENT_CONNECTED");
+        TRACE_S("WEBSOCKET_EVENT_CONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
             event_arg->connection_upcall(1);
@@ -122,7 +122,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
-        TRACE_I("WEBSOCKET_EVENT_DISCONNECTED");
+        TRACE_S("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {
             event_arg->connection_upcall(0);
@@ -139,7 +139,7 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_ERROR:
     {
-        TRACE_I("WEBSOCKET_EVENT_ERROR");
+        TRACE_S("WEBSOCKET_EVENT_ERROR");
         break;
     }
     default:

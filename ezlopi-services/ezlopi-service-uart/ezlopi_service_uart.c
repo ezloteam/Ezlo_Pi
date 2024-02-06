@@ -228,7 +228,7 @@ static void qt_serial_rx_task(void *arg)
         if (rxBytes > 0)
         {
             data[rxBytes] = 0;
-            TRACE_I("%s", data);
+            TRACE_S("%s", data);
             qt_serial_parse_rx_data((const char *)data);
         }
     }
@@ -382,7 +382,7 @@ static void qt_serial_set_wifi(const char *data)
 
             if (strlen(pass) >= EZLOPI_WIFI_MIN_PASS_CHAR)
             {
-                // TRACE_I("SSID: %s\tPass : %s\r\n", ssid, pass);
+                // TRACE_S("SSID: %s\tPass : %s\r\n", ssid, pass);
                 if (ezlopi_factory_info_v3_set_wifi(ssid, pass))
                 {
                     status_write = 1;
@@ -455,10 +455,10 @@ static void qt_serial_save_config(const char *data)
 {
 
     uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
-    TRACE_B("ezlopi_factory_info_set_ezlopi_config: %d", ret);
+    TRACE_I("ezlopi_factory_info_set_ezlopi_config: %d", ret);
     if (ret)
     {
-        TRACE_B("Successfully wrote config data..");
+        TRACE_I("Successfully wrote config data..");
     }
 
     qt_serial_response(3, ret, 5);

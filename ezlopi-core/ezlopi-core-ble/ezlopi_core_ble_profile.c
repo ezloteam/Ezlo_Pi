@@ -324,7 +324,7 @@ static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t *service_obj
 
 void ezlopi_ble_profile_print(void)
 {
-    TRACE_I("BLE PROFILES: ");
+    TRACE_S("BLE PROFILES: ");
 
     s_gatt_service_t *cur_service = gatt_head_service;
 
@@ -341,15 +341,15 @@ void ezlopi_ble_profile_print(void)
             while (cur_descriptor)
             {
                 ezlopi_ble_gatt_print_descriptor(cur_descriptor);
-                TRACE_B("|    |    |----------------------------------------------------");
+                TRACE_I("|    |    |----------------------------------------------------");
                 cur_descriptor = cur_descriptor->next;
             }
 
-            TRACE_B("|    |---------------------------------------------------------");
+            TRACE_I("|    |---------------------------------------------------------");
             cur_character = cur_character->next;
         }
 
-        TRACE_B("---------------------------------------------------------------");
+        TRACE_I("---------------------------------------------------------------");
         cur_service = cur_service->next;
     }
 }
@@ -358,11 +358,11 @@ void ezlopi_ble_gatt_print_descriptor(s_gatt_descr_t *descriptor)
 {
     if (descriptor)
     {
-        TRACE_B("|    |    |--------------Descriptor----------------------------");
+        TRACE_I("|    |    |--------------Descriptor----------------------------");
         ezlopi_ble_gatt_print_uuid(&descriptor->uuid, "|    |    |-");
-        TRACE_B("|    |    |- handle: %d", descriptor->handle);
-        TRACE_B("|    |    |- permission: 0x%02x", descriptor->permission);
-        TRACE_B("|    |    |- status: 0x%02x", descriptor->status);
+        TRACE_I("|    |    |- handle: %d", descriptor->handle);
+        TRACE_I("|    |    |- permission: 0x%02x", descriptor->permission);
+        TRACE_I("|    |    |- status: 0x%02x", descriptor->status);
     }
 }
 
@@ -370,28 +370,28 @@ void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t *characteristic)
 {
     if (characteristic)
     {
-        TRACE_B("|    |--------------------Characteristic-----------------------");
+        TRACE_I("|    |--------------------Characteristic-----------------------");
         ezlopi_ble_gatt_print_uuid(&characteristic->uuid, "|    |-");
-        TRACE_B("|    |- handle: %d", characteristic->handle);
-        TRACE_B("|    |- permission: 0x%02x", characteristic->permission);
-        TRACE_B("|    |- property: 0x%02x", characteristic->property);
-        TRACE_B("|    |- status: 0x%02x", characteristic->status);
-        // TRACE_B("|    |- read_upcall: 0x%02x", (uint32_t)characteristic->read_upcall);
-        // TRACE_B("|    |- write_upcall: 0x%02x", (uint32_t)characteristic->write_upcall);
-        // TRACE_B("|    |- write_exce_upcall: 0x%02x", (uint32_t)characteristic->write_exce_upcall);
+        TRACE_I("|    |- handle: %d", characteristic->handle);
+        TRACE_I("|    |- permission: 0x%02x", characteristic->permission);
+        TRACE_I("|    |- property: 0x%02x", characteristic->property);
+        TRACE_I("|    |- status: 0x%02x", characteristic->status);
+        // TRACE_I("|    |- read_upcall: 0x%02x", (uint32_t)characteristic->read_upcall);
+        // TRACE_I("|    |- write_upcall: 0x%02x", (uint32_t)characteristic->write_upcall);
+        // TRACE_I("|    |- write_exce_upcall: 0x%02x", (uint32_t)characteristic->write_exce_upcall);
     }
 }
 
 void ezlopi_ble_gatt_print_service(s_gatt_service_t *service)
 {
-    TRACE_B("--------------------------Service-------------------------------");
+    TRACE_I("--------------------------Service-------------------------------");
     ezlopi_ble_gatt_print_uuid(&service->service_id.id.uuid, "|-");
-    TRACE_B("|- app-id: %d", service->app_id);
-    TRACE_B("|- conn-id: %d", service->conn_id);
-    TRACE_B("|- gatts-if: %d", service->gatts_if);
-    TRACE_B("|- num handles: %d", service->num_handles);
-    TRACE_B("|- service handle: %d", service->service_handle);
-    TRACE_B("|- status: %d", service->status);
+    TRACE_I("|- app-id: %d", service->app_id);
+    TRACE_I("|- conn-id: %d", service->conn_id);
+    TRACE_I("|- gatts-if: %d", service->gatts_if);
+    TRACE_I("|- num handles: %d", service->num_handles);
+    TRACE_I("|- service handle: %d", service->service_handle);
+    TRACE_I("|- status: %d", service->status);
 }
 
 void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
@@ -402,15 +402,15 @@ void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
     {
         if (ESP_UUID_LEN_16 == uuid->len)
         {
-            TRACE_B("%s uuid: 0x%04X", msg, uuid->uuid.uuid16);
+            TRACE_I("%s uuid: 0x%04X", msg, uuid->uuid.uuid16);
         }
         else if (ESP_UUID_LEN_32 == uuid->len)
         {
-            TRACE_B("%s uuid: 0x%08X", msg, uuid->uuid.uuid32);
+            TRACE_I("%s uuid: 0x%08X", msg, uuid->uuid.uuid32);
         }
         else
         {
-            TRACE_B("%s uuid: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", msg,
+            TRACE_I("%s uuid: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", msg,
                     uuid->uuid.uuid128[15], uuid->uuid.uuid128[14], uuid->uuid.uuid128[13], uuid->uuid.uuid128[12],
                     uuid->uuid.uuid128[11], uuid->uuid.uuid128[10],
                     uuid->uuid.uuid128[9], uuid->uuid.uuid128[8],

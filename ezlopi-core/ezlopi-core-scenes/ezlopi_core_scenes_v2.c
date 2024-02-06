@@ -421,10 +421,6 @@ void ezlopi_scenes_init_v2(void)
 
         free(scenes_id_list_str);
     }
-    else
-    {
-        TRACE_W("Scenes not available!");
-    }
 
     ezlopi_scenes_print(scenes_list_head_v2);
 }
@@ -745,7 +741,7 @@ static l_when_block_v2_t *____new_when_block_populate(cJSON *cj_when_block)
 
 static void _____new_block_options_populate(s_block_options_v2_t *p_block_options, cJSON *cj_block_options)
 {
-    cJSON *cj_method = cJSON_GetObjectItem(cj_block_options, ezlopi_key_method_str);
+    cJSON *cj_method = cJSON_GetObjectItem(cj_block_options, ezlopi_method_str);
     if (cj_method)
     {
         __new_method_populate(&p_block_options->method, cj_method);
@@ -809,7 +805,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         {
             field->value.type = VALUE_TYPE_NUMBER;
             field->value.value_double = cj_value->valuedouble;
-            TRACE_B("value: %f", field->value.value_double);
+            TRACE_I("value: %f", field->value.value_double);
             break;
         }
         case cJSON_String:
@@ -820,7 +816,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
             if (field->value.value_string)
             {
                 snprintf(field->value.value_string, value_len, "%s", cj_value->valuestring);
-                TRACE_B("value: %s", field->value.value_string);
+                TRACE_I("value: %s", field->value.value_string);
             }
             else
             {
@@ -832,14 +828,14 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         {
             field->value.type = VALUE_TYPE_BOOL;
             field->value.value_bool = true;
-            TRACE_B("value: true");
+            TRACE_I("value: true");
             break;
         }
         case cJSON_False:
         {
             field->value.type = VALUE_TYPE_BOOL;
             field->value.value_bool = false;
-            TRACE_B("value: false");
+            TRACE_I("value: false");
             break;
         }
         case cJSON_Object:

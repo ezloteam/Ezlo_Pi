@@ -426,7 +426,7 @@ static void __uart_gps6mv2_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi
         else
         {
             // TRACE_E("----------- 2. CIR_BUFF - FULL -------------");
-            // TRACE_I("CIRCULAR_BUFFER  => [%d] \n%s", strlen(gps_cir_buf), gps_cir_buf);
+            // TRACE_S("CIRCULAR_BUFFER  => [%d] \n%s", strlen(gps_cir_buf), gps_cir_buf);
             __retrieve_GPGGA_sentence(item);                                                                             // CALL a function that extracts the 'GPGGA_sentence' from gps_cir_buf[]
             memset((sensor_0053_UART_gps6mv2_data->gps_cir_buf), 0, sizeof(sensor_0053_UART_gps6mv2_data->gps_cir_buf)); // reset gps_cir_buf[]
         }

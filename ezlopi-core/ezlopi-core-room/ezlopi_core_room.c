@@ -117,12 +117,12 @@ int ezlopi_room_delete(cJSON *cj_room)
 
             if (room_id)
             {
-                TRACE_B("room_id: %8x", room_id);
+                TRACE_I("room_id: %8x", room_id);
 
                 int ret = __free_room_from_list_by_id(room_id);
-                TRACE_B("ret: %d", ret);
+                TRACE_I("ret: %d", ret);
                 ret = __remove_room_from_nvs_by_id(room_id);
-                TRACE_B("ret: %d", ret);
+                TRACE_I("ret: %d", ret);
             }
         }
     }
@@ -179,7 +179,7 @@ int ezlopi_room_add_to_nvs(cJSON *cj_room)
 
                     if (ezlopi_nvs_write_rooms(updated_rooms_str))
                     {
-                        TRACE_B("room saved");
+                        TRACE_I("room saved");
                         ret = 1;
                     }
 
@@ -420,7 +420,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
     {
         cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_deleted_str);
-        cJSON_AddStringToObject(cj_response, ezlopi_key_method_str, "hub.room.all.delete");
+        cJSON_AddStringToObject(cj_response, ezlopi_method_str, "hub.room.all.delete");
 
         cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
         if (cj_result)
@@ -518,7 +518,7 @@ static int __free_room_from_list_by_id(uint32_t room_id)
 
     if (l_room_head)
     {
-        TRACE_B("l_room_head->_id == room_id ->  %8x == %8x", l_room_head->_id, room_id);
+        TRACE_I("l_room_head->_id == room_id ->  %8x == %8x", l_room_head->_id, room_id);
 
         if (l_room_head->_id == room_id)
         {
@@ -534,7 +534,7 @@ static int __free_room_from_list_by_id(uint32_t room_id)
             while (room_node->next)
             {
                 s_ezlopi_room_t *free_node = room_node->next;
-                TRACE_B("free_node->_id == room_id -> %8x == %8x", free_node->_id, room_id);
+                TRACE_I("free_node->_id == room_id -> %8x == %8x", free_node->_id, room_id);
 
                 if (free_node->_id == room_id)
                 {
@@ -559,7 +559,7 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
 
     if (rooms_str)
     {
-        TRACE_B("rooms_str: %s", rooms_str);
+        TRACE_I("rooms_str: %s", rooms_str);
         cJSON *cj_rooms = cJSON_Parse(rooms_str);
         free(rooms_str);
 
@@ -582,7 +582,7 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
                     uint32_t tmp_room_id = strtoul(cj_room_tmp_id->valuestring, NULL, 16);
                     if (a_room_id == tmp_room_id)
                     {
-                        TRACE_B("tmp_room_id: %8x", tmp_room_id);
+                        TRACE_I("tmp_room_id: %8x", tmp_room_id);
                         cJSON_DeleteItemFromArray(cj_rooms, idx);
                         ret = 1;
                         break;

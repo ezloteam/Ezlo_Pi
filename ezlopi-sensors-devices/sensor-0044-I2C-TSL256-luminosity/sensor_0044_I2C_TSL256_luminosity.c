@@ -106,10 +106,10 @@ static int __init(l_ezlopi_item_t *item)
     if (item->interface.i2c_master.enable)
     {
         ezlopi_i2c_master_init(&item->interface.i2c_master);
-        TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
+        TRACE_I("I2C channel is %d", item->interface.i2c_master.channel);
         if (Check_PARTID(&item->interface.i2c_master))
         {
-            TRACE_B("TSL561 initialization finished.........");
+            TRACE_I("TSL561 initialization finished.........");
             sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
             ret = 1;
         }

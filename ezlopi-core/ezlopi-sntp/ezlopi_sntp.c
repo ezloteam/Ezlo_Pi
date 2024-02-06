@@ -19,7 +19,7 @@ time_t sntp_core_get_up_time(void)
 static void sntp_sync_time_call_back(struct timeval *tv)
 {
     sntp_set_sync_interval(60 * 60 * 1000);
-    TRACE_I("Notification of a time synchronization event");
+    TRACE_S("Notification of a time synchronization event");
 
     time_t now;
     time(&now);
@@ -34,12 +34,12 @@ static void sntp_sync_time_call_back(struct timeval *tv)
     tzset();
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    TRACE_B("Time now[%ld]: %s", now, strftime_buf);
+    TRACE_I("Time now[%ld]: %s", now, strftime_buf);
 }
 
 void core_sntp_init(void)
 {
-    TRACE_I("Initializing SNTP");
+    TRACE_S("Initializing SNTP");
     esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, "pool.ntp.org");
     esp_sntp_setservername(1, "ntp-b.nist.gov");

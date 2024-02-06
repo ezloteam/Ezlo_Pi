@@ -481,11 +481,11 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
             }
         }
 
-        TRACE_I("item_name: %s", item->cloud_properties.item_name);
-        TRACE_I("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
-        TRACE_I("item_id: 0x%08x", item->cloud_properties.item_id);
-        TRACE_I("prev value: %d", item->interface.gpio.gpio_out.value);
-        TRACE_I("cur value: %d", value);
+        TRACE_S("item_name: %s", item->cloud_properties.item_name);
+        TRACE_S("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
+        TRACE_S("item_id: 0x%08x", item->cloud_properties.item_id);
+        TRACE_S("prev value: %d", item->interface.gpio.gpio_out.value);
+        TRACE_S("cur value: %d", value);
 
         if (255 != item->interface.gpio.gpio_out.gpio_num)
         {

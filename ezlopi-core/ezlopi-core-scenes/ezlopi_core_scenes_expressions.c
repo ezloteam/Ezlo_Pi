@@ -397,10 +397,6 @@ void ezlopi_scenes_expressions_init(void)
 
         free(exp_id_list_str);
     }
-    else
-    {
-        TRACE_E("Expression's ids not found");
-    }
 }
 
 static s_exp_items_t *__expressions_items_create(cJSON *cj_item)
@@ -539,7 +535,7 @@ static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_
         {
             exp_node->exp_value.u_value.number_value = cj_value->valuedouble;
             exp_node->exp_value.type = EXPRESSION_VALUE_TYPE_NUMBER;
-            TRACE_B("value: %lf", exp_node->exp_value.u_value.number_value);
+            TRACE_I("value: %lf", exp_node->exp_value.u_value.number_value);
             break;
         }
         case cJSON_String:
@@ -550,7 +546,7 @@ static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_
             if (exp_node->exp_value.u_value.str_value)
             {
                 snprintf(exp_node->exp_value.u_value.str_value, value_len, "%s", cj_value->valuestring);
-                TRACE_B("value: %s", exp_node->exp_value.u_value.str_value);
+                TRACE_I("value: %s", exp_node->exp_value.u_value.str_value);
             }
             else
             {
@@ -562,14 +558,14 @@ static void __get_expressions_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_
         {
             exp_node->exp_value.type = EXPRESSION_VALUE_TYPE_BOOL;
             exp_node->exp_value.u_value.boolean_value = true;
-            TRACE_B("value: true");
+            TRACE_I("value: true");
             break;
         }
         case cJSON_False:
         {
             exp_node->exp_value.type = EXPRESSION_VALUE_TYPE_BOOL;
             exp_node->exp_value.u_value.boolean_value = false;
-            TRACE_B("value: false");
+            TRACE_I("value: false");
             break;
         }
         case cJSON_Array:

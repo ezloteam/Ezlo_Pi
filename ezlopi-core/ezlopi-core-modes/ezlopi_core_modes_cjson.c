@@ -63,11 +63,11 @@ int ezlopi_core_modes_cjson_get_modes(cJSON *cj_dest)
 int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_dest)
 {
     int ret = 0;
-    s_house_modes_t *current_mode = ezlopi_core_modes_get_current_mode();
-    if (current_mode)
+    s_ezlopi_modes_t *modes = ezlopi_core_modes_get_custom_modes();
+    if (modes)
     {
         ret = 1;
-        __cjson_add_number_as_hex_string(cj_dest, ezlopi_modeId_str, current_mode->_id);
+        __cjson_add_number_as_hex_string(cj_dest, ezlopi_modeId_str, modes->current_mode_id);
     }
 
     return ret;

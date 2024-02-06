@@ -4,7 +4,6 @@
 
 #include "ezlopi_cloud_constants.h"
 
-static s_house_modes_t *sg_current_mode = NULL;
 static s_ezlopi_modes_t *sg_custom_modes = NULL;
 
 s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void)
@@ -12,19 +11,20 @@ s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void)
     return sg_custom_modes;
 }
 
-s_house_modes_t *ezlopi_core_modes_get_current_mode(void)
-{
-    return sg_current_mode;
-}
-
-int ezlopi_core_modes_get_modes(cJSON *cj_result)
+int ezlopi_core_modes_api_get_modes(cJSON *cj_result)
 {
     return ezlopi_core_modes_cjson_get_modes(cj_result);
 }
 
-int ezlopi_core_modes_get_current_mode(cJSON *cj_result)
+int ezlopi_core_modes_api_get_current_mode(cJSON *cj_result)
 {
     return ezlopi_core_modes_cjson_get_current_mode(cj_result);
+}
+
+int ezlopi_core_modes_api_switch_mode(uint32_t switch_to_mode_id)
+{
+    sg_custom_modes->current_mode_id = switch_to_mode_id;
+    return 1;
 }
 
 void ezlopi_core_modes_init(void)

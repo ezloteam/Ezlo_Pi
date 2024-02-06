@@ -17,7 +17,7 @@
 void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddNullToObject(cj_response, ezlopi_error_str);
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
@@ -55,7 +55,7 @@ void firmware_update_start(cJSON *cj_request, cJSON *cj_response)
 void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddNullToObject(cj_response, ezlopi_error_str);
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
@@ -66,7 +66,7 @@ void firmware_info_get(cJSON *cj_request, cJSON *cj_response)
         version = cJSON_GetObjectItem(result, ezlopi_version_str);
         if (version != NULL)
         {
-            TRACE_I("version: %s", version->valuestring);
+            TRACE_S("version: %s", version->valuestring);
             TRACE_D("Upgrading to version: %s", (version && version->valuestring) ? version->valuestring : ezlopi_null_str);
 
             cJSON *source_urls = NULL;
@@ -98,7 +98,7 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
     cJSON *cj_request = cJSON_CreateObject();
     if (NULL != cj_request)
     {
-        cJSON_AddStringToObject(cj_request, ezlopi_key_method_str, "cloud.firmware.info.get");
+        cJSON_AddStringToObject(cj_request, ezlopi_method_str, "cloud.firmware.info.get");
         cJSON_AddNumberToObject(cj_request, "id", message_count);
         cJSON *cj_params = cJSON_AddObjectToObject(cj_request, ezlopi_params_str);
         if (cj_params)
@@ -130,7 +130,7 @@ cJSON *firmware_send_firmware_query_to_nma_server(uint32_t message_count)
         cJSON_Minify(str_request);
         if (str_request)
         {
-            TRACE_I("firmware status request: \n%s", str_request);
+            TRACE_S("firmware status request: \n%s", str_request);
             free(str_request);
         }
     }

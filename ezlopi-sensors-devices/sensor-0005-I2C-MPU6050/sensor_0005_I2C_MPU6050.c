@@ -215,7 +215,7 @@ static int __init(l_ezlopi_item_t *item)
             ezlopi_i2c_master_init(&item->interface.i2c_master);
             if (MPU6050_ERR_OK == __mpu6050_config_device(item))
             {
-                TRACE_I("Configuration Complete.... ");
+                TRACE_S("Configuration Complete.... ");
                 xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2048, item, 1, NULL);
             }
         }
@@ -233,7 +233,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Accel-x : %.2fm/s^2", user_data->ax);
+            TRACE_S("Accel-x : %.2fm/s^2", user_data->ax);
             cJSON_AddNumberToObject(cj_result, "value", user_data->ax);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->ax);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -241,7 +241,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Accel-y : %.2fm/s^2", user_data->ay);
+            TRACE_S("Accel-y : %.2fm/s^2", user_data->ay);
             cJSON_AddNumberToObject(cj_result, "value", user_data->ay);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->ay);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -249,7 +249,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Accel-z : %.2fm/s^2", user_data->az);
+            TRACE_S("Accel-z : %.2fm/s^2", user_data->az);
             cJSON_AddNumberToObject(cj_result, "value", user_data->az);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->az);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -257,7 +257,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
-            TRACE_I("Temp : %.2f*C", user_data->tmp);
+            TRACE_S("Temp : %.2f*C", user_data->tmp);
             cJSON_AddNumberToObject(cj_result, "value", user_data->tmp);
             char *valueFormatted = ezlopi_valueformatter_float(user_data->tmp);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -265,7 +265,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Gyro-x : %d rpm", (int)user_data->gx);
+            TRACE_S("Gyro-x : %d rpm", (int)user_data->gx);
             cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gx));
             char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gx);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -273,7 +273,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Gyro-y : %d rpm", (int)user_data->gy);
+            TRACE_S("Gyro-y : %d rpm", (int)user_data->gy);
             cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gy));
             char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gy);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -281,7 +281,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
         }
         if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
         {
-            TRACE_I("Gyro-z : %d rpm", (int)user_data->gz);
+            TRACE_S("Gyro-z : %d rpm", (int)user_data->gz);
             cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gz));
             char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gz);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
@@ -440,7 +440,7 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
         user_data->gyro_y_offset = calibrationData[1] / (CALIBRATION_SAMPLES);
         user_data->gyro_z_offset = calibrationData[2] / (CALIBRATION_SAMPLES);
 
-        TRACE_I("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
+        TRACE_S("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
                 user_data->gyro_x_offset,
                 user_data->gyro_y_offset,
                 user_data->gyro_z_offset);

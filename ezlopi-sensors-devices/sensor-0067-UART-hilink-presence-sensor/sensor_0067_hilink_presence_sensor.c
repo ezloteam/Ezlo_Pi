@@ -140,7 +140,7 @@ static int __add_array_to_object(cJSON *cj_params, const char *const *arr, const
     {
         cJSON *enum_array = cJSON_CreateStringArray(arr, count);
         cJSON_AddItemToObject(cj_params, "enum", enum_array);
-        TRACE_B("%s", cJSON_Print(cj_params));
+        TRACE_I("%s", cJSON_Print(cj_params));
     }
     else
     {

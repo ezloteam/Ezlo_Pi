@@ -167,7 +167,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         if (NULL != cJSON_id)
         {
             const uint64_t id = cJSON_id->valueint;
-            TRACE_I("id: %lld", id);
+            TRACE_S("id: %lld", id);
             config_check_factoryInfo->id = id;
         }
         else
@@ -178,7 +178,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         if (NULL != cJSON_uuid)
         {
             const char *uuid = cJSON_uuid->valuestring;
-            TRACE_I("uuid: %s", uuid);
+            TRACE_S("uuid: %s", uuid);
             config_check_factoryInfo->device_uuid = (char *)uuid;
         }
         else
@@ -189,7 +189,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         if (NULL != cJSON_cloud_uuid)
         {
             // const char *cloud_uuid = cJSON_cloud_uuid->valuestring;
-            // TRACE_I("cloud_uuid: %s", cloud_uuid);
+            // TRACE_S("cloud_uuid: %s", cloud_uuid);
         }
         else
         {
@@ -197,13 +197,13 @@ static uint8_t web_provisioning_config_update(void *arg)
         if (NULL != cJSON_order_uuid)
         {
             // const char *order_uuid = cJSON_order_uuid->valuestring;
-            // TRACE_I("order_uuid: %s", order_uuid);
+            // TRACE_S("order_uuid: %s", order_uuid);
         }
 
         if (NULL != cJSON_config_version)
         {
             const uint16_t config_version = cJSON_config_version->valueint;
-            TRACE_I("config_version: %d", config_version);
+            TRACE_S("config_version: %d", config_version);
             config_check_factoryInfo->config_version = config_version;
         }
         else
@@ -226,7 +226,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         if (NULL != cJSON_provision_server)
         {
             const char *provision_server = cJSON_provision_server->valuestring;
-            TRACE_I("provision_server: %s", provision_server);
+            TRACE_S("provision_server: %s", provision_server);
             config_check_factoryInfo->provision_server = (char *)provision_server;
         }
         else
@@ -236,7 +236,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         if (NULL != cJSON_cloud_server)
         {
             const char *cloud_server = cJSON_cloud_server->valuestring;
-            TRACE_I("cloud_server: %s", cloud_server);
+            TRACE_S("cloud_server: %s", cloud_server);
             config_check_factoryInfo->cloud_server = (char *)cloud_server;
         }
         else
@@ -247,7 +247,7 @@ static uint8_t web_provisioning_config_update(void *arg)
         if (NULL != cJSON_provision_token)
         {
             const char *provision_token = cJSON_provision_token->valuestring;
-            TRACE_I("provision_token: %s", provision_token);
+            TRACE_S("provision_token: %s", provision_token);
             config_check_factoryInfo->provision_token = (char *)provision_token;
         }
         else
@@ -259,32 +259,32 @@ static uint8_t web_provisioning_config_update(void *arg)
         // if (NULL != cJSON_provision_order)
         // {
         //     const uint32_t provision_order = cJSON_provision_order->valueint;
-        //     TRACE_I("provision_order: %d", provision_order);
+        //     TRACE_S("provision_order: %d", provision_order);
         // }
         if (NULL != cJSON_ssl_private_key)
         {
             const char *ssl_private_key = cJSON_ssl_private_key->valuestring;
-            TRACE_I("ssl_private_key: %s", ssl_private_key);
+            TRACE_S("ssl_private_key: %s", ssl_private_key);
             ezlopi_factory_info_v3_set_ssl_private_key(ssl_private_key);
         }
 
         // if (NULL != cJSON_ssl_public_key)
         // {
         //     const char *ssl_public_key = cJSON_ssl_public_key->valuestring;
-        //     TRACE_I("ssl_public_key: %s", ssl_public_key);
+        //     TRACE_S("ssl_public_key: %s", ssl_public_key);
         //     ezlopi_factory_info_v2_set_ssl_public_key(ssl_public_key);
         // }
         if (NULL != cJSON_ssl_shared_key)
         {
             const char *ssl_shared_key = cJSON_ssl_shared_key->valuestring;
-            TRACE_I("ssl_shared_key: %s", ssl_shared_key);
+            TRACE_S("ssl_shared_key: %s", ssl_shared_key);
             ezlopi_factory_info_v3_set_ssl_shared_key(ssl_shared_key);
         }
 
         if (NULL != cJSON_signing_ca_certificate)
         {
             const char *signing_ca_certificate = cJSON_signing_ca_certificate->valuestring;
-            TRACE_I("signing_ca_certificate: %s", signing_ca_certificate);
+            TRACE_S("signing_ca_certificate: %s", signing_ca_certificate);
             ezlopi_factory_info_v3_set_ca_cert(signing_ca_certificate);
         }
 
@@ -297,7 +297,7 @@ static uint8_t web_provisioning_config_update(void *arg)
 
         if (ezlopi_factory_info_v3_set_basic(config_check_factoryInfo))
         {
-            TRACE_I("Updated provisioning config");
+            TRACE_S("Updated provisioning config");
             ret = 1;
         }
         else
@@ -318,26 +318,18 @@ static uint8_t web_provisioning_config_update(void *arg)
 
 static void web_provisioning_config_check(void *pv)
 {
-    s_ezlopi_http_data_t *response = malloc(sizeof(s_ezlopi_http_data_t));
-    char *ca_certificate = NULL;
-    char *provision_token = NULL;
-    char *provisioning_server = NULL;
-    static uint8_t retry_count = 0;
     uint8_t flag_break_loop = 0;
-
-    ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-    provision_token = ezlopi_factory_info_get_v3_provision_token();
-    provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
+    static uint8_t retry_count = 0;
+    s_ezlopi_http_data_t *response = NULL;
+    char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+    char *provision_token = ezlopi_factory_info_get_v3_provision_token();
+    char *provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
 
     while (1)
     {
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-
-        TRACE_D("water_mark: %d", uxTaskGetStackHighWaterMark(NULL));
-
         cJSON *root_header_prov_token = cJSON_CreateObject();
-
         cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
 
         if (NULL != provisioning_server)
@@ -354,21 +346,25 @@ static void web_provisioning_config_check(void *pv)
             break;
             xTaskNotifyGive(ezlopi_update_config_notifier);
         }
+
         if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
         {
             char http_request_location[200];
-            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
+
+            // add config_version instead of 1
+            snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version);
             response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
+
             if (NULL != response)
             {
-                TRACE_I("Statuc Code : %d", response->status_code);
+                TRACE_S("Statuc Code : %d", response->status_code);
 
                 switch (response->status_code)
                 {
                 case HttpStatus_Ok:
                 {
                     // re-write all the info into the flash region
-                    TRACE_I("Data : %s", response->response);
+                    TRACE_S("Data : %s", response->response);
                     if (0 == web_provisioning_config_update(response->response))
                     {
                         retry_count++;
@@ -387,12 +383,13 @@ static void web_provisioning_config_check(void *pv)
                 {
                     if (304 == response->status_code) // HTTP Status not modified
                     {
-                        TRACE_I("Config data not changed !");
+                        TRACE_S("Config data not changed !");
                         flag_break_loop = 1;
                     }
                     break;
                 }
                 }
+
                 free(response->response);
                 free(response);
             }
@@ -400,6 +397,7 @@ static void web_provisioning_config_check(void *pv)
             {
                 free(response);
             }
+
             if (flag_break_loop)
             {
                 xTaskNotifyGive(ezlopi_update_config_notifier);
@@ -414,6 +412,8 @@ static void web_provisioning_config_check(void *pv)
 
         vTaskDelay(50000 / portTICK_RATE_MS);
     }
+
+    TRACE_D("water_mark: %d", uxTaskGetStackHighWaterMark(NULL));
 
     free(ca_certificate);
     free(provision_token);
@@ -433,20 +433,18 @@ void web_provisioning_deinit(void)
 
 static void __fetch_wss_endpoint(void *pv)
 {
+    uint32_t task_complete = 0;
     s_ezlopi_http_data_t *ws_endpoint = NULL;
+    char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+    char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+    char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
+    char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
 
     while (1)
     {
-
         ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-
         vTaskDelay(100 / portTICK_RATE_MS);
-
-        char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-        char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-        char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
-        char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
@@ -466,7 +464,7 @@ static void __fetch_wss_endpoint(void *pv)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
-                        break;
+                        task_complete = 1;
                     }
                 }
 
@@ -475,32 +473,38 @@ static void __fetch_wss_endpoint(void *pv)
 
             free(ws_endpoint);
         }
-        free(cloud_server);
-        free(ca_certificate);
-        free(ssl_shared_key);
-        free(ssl_private_key);
+
+        if (task_complete)
+        {
+            break;
+        }
+
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
+
+    free(cloud_server);
+    free(ca_certificate);
+    free(ssl_shared_key);
+    free(ssl_private_key);
 
     vTaskDelete(NULL);
 }
 
 static void __connection_upcall(bool connected)
 {
-    TRACE_D("connected: %d", connected);
+    TRACE_D("wss-connection: %s", connected ? "connected" : "failed to connect");
     static bool prev_status;
     if (connected)
     {
         if (prev_status != connected)
         {
-            TRACE_I("Web-socket re-connected.");
-            TRACE_B("Starting registration process....");
+            TRACE_S("Web-socket re-connected.");
+            TRACE_I("Starting registration process....");
             registration_init();
         }
     }
     else
     {
-        TRACE_E("Web-socket dis-connected!");
         ezlopi_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
     }
 
@@ -574,13 +578,13 @@ static void __message_upcall(const char *payload, uint32_t len)
     if (cj_request)
     {
         cJSON *cj_error = cJSON_GetObjectItem(cj_request, ezlopi_error_str);
-        cJSON *cj_method = cJSON_GetObjectItem(cj_request, ezlopi_key_method_str);
+        cJSON *cj_method = cJSON_GetObjectItem(cj_request, ezlopi_method_str);
 
         if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) || ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, ezlopi_null_str, 4))))
         {
             if ((NULL != cj_method) && (NULL != cj_method->valuestring))
             {
-                TRACE_I("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ezlopi__str), len, payload);
+                TRACE_S("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ezlopi__str), len, payload);
 
                 uint32_t method_idx = __search_method_in_list(cj_method);
 
@@ -609,7 +613,7 @@ static void __message_upcall(const char *payload, uint32_t len)
 static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, ezlopi_error_str);
     if (cjson_error)
     {
@@ -636,6 +640,10 @@ static void __print_sending_data(char *data_str, e_trace_type_t print_type)
         TRACE_W("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
         break;
     }
+    case TRACE_TYPE_B:
+    {
+        TRACE_I("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+    }
     case TRACE_TYPE_D:
     {
         TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
@@ -648,7 +656,7 @@ static void __print_sending_data(char *data_str, e_trace_type_t print_type)
     }
     case TRACE_TYPE_I:
     {
-        TRACE_I("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
+        TRACE_S("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
         break;
     }
     default:

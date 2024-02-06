@@ -147,7 +147,7 @@ static char *device_info_jsonify(void)
         if (device_info)
         {
             cJSON_Minify(device_info);
-            TRACE_I("Created device info: %s", device_info);
+            TRACE_S("Created device info: %s", device_info);
         }
     }
 

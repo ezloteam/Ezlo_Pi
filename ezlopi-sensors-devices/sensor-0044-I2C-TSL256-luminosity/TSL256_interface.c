@@ -248,9 +248,9 @@ uint32_t tsl2561_get_intensity_value(s_ezlopi_i2c_master_t *i2c_master)
                                                  IR,                            // CH1
                                                  TSL2561_INTEGRATIONTIME_101MS, // conv_time
                                                  TSL2561_GAIN_x1);              // adc_gain
-        // TRACE_B("IR : %d", IR);
-        // TRACE_B("Visible : %d", Visible_Ir - IR);
-        // TRACE_B("Lux : %d", Lux_intensity);
+        // TRACE_I("IR : %d", IR);
+        // TRACE_I("Visible : %d", Visible_Ir - IR);
+        // TRACE_I("Lux : %d", Lux_intensity);
         // TRACE_E(" Data update completed......");
     }
     else

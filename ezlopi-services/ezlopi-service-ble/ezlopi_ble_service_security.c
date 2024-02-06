@@ -150,16 +150,16 @@ static void __process_hard_reset_command(void)
         int ret = ezlopi_factory_info_v3_factory_reset();
         if (ret)
         {
-            TRACE_I("FLASH RESET WAS DONE SUCCESSFULLY");
+            TRACE_S("FLASH RESET WAS DONE SUCCESSFULLY");
         }
 
         ret = ezlopi_nvs_factory_reset();
         if (ret)
         {
-            TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
+            TRACE_S("NVS-RESET WAS DONE SUCCESSFULLY");
         }
 
-        TRACE_B("factory reset done, rebooting now .............................................");
+        TRACE_I("factory reset done, rebooting now .............................................");
         vTaskDelay(2000 / portTICK_RATE_MS);
         // esp_restart();
         ezlopi_reboot();

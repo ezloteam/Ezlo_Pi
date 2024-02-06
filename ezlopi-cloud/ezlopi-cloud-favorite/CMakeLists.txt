@@ -1,5 +1,5 @@
 file(GLOB_RECURSE dir_srcs "*.c*")
-idf_component_register(SRCS "${dir_srcs}"
+idf_component_register(SRCS "ezlopi_cloud_favorite.c" "${dir_srcs}"
     INCLUDE_DIRS "."
     REQUIRES    esp_common esp_http_client esp-tls esp_hw_support
                 ezlopi-core-factory-info ezlopi-core-wifi ezlopi-util-trace ezlopi-core-websocket_client ezlopi-core-http 

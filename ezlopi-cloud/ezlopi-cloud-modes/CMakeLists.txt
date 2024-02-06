@@ -31,7 +31,7 @@ set(EZLOPI_UTIL_COMPONENTS
 )
 
 # Register the components
-idf_component_register(SRCS "ezlopi_cloud_modes.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_cloud_modes_updaters.c" "ezlopi_cloud_modes.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${ESP_IDF_COMPONENTS}
                                         ${EZLOPI_CORE_COMPONENTS}

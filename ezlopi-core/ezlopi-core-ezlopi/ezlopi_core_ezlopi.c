@@ -24,7 +24,7 @@ void ezlopi_init(void)
 
     // Init memories
     ezlopi_nvs_init();
-    TRACE_B("Boot count: %d", ezlopi_system_info_get_boot_count());
+    TRACE_I("Boot count: %d", ezlopi_system_info_get_boot_count());
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());

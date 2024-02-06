@@ -17,7 +17,7 @@
         }                                                     \
     }
 
-// TRACE_B("%s: %f", item_name, (double)item_val);
+// TRACE_I("%s: %f", item_name, (double)item_val);
 
 #define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
     {                                                         \
@@ -54,7 +54,7 @@
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
-// TRACE_B("%s: %d", item_name, item_val);
+// TRACE_I("%s: %d", item_name, item_val);
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
     {                                                         \
@@ -69,7 +69,7 @@
             TRACE_E("%s: NULL", item_name);                   \
         }                                                     \
     }
-// TRACE_B("%s: %s", item_name, item_val ? item_val : ezlopi__str);
+// TRACE_I("%s: %s", item_name, item_val ? item_val : ezlopi__str);
 
 #define CJSON_TRACE(name, object)                                         \
     {                                                                     \

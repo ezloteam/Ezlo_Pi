@@ -241,7 +241,7 @@ static int __init(l_ezlopi_item_t *item)
         {
             if (item->interface.gpio.gpio_in.enable)
             {
-                TRACE_B("SW_GPIO_NUM is %d", item->interface.gpio.gpio_in.gpio_num);
+                TRACE_I("SW_GPIO_NUM is %d", item->interface.gpio.gpio_in.gpio_num);
 
                 const gpio_config_t io_conf = {
                     .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
@@ -261,9 +261,9 @@ static int __init(l_ezlopi_item_t *item)
                 }
                 else
                 {
-                    TRACE_I("Joystick switch initialize successfully.");
+                    TRACE_S("Joystick switch initialize successfully.");
                     item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-                    TRACE_B("Value is %d", item->interface.gpio.gpio_in.value);
+                    TRACE_I("Value is %d", item->interface.gpio.gpio_in.value);
                     gpio_isr_service_register_v3(item, __joystick_intr_callback, 200);
                 }
             }
@@ -326,7 +326,7 @@ static int __notify(l_ezlopi_item_t *item)
                 if (fabs(user_data->adc_x - ezlopi_analog_data.voltage) > 100)
                 {
                     user_data->adc_x = ezlopi_analog_data.voltage;
-                    // TRACE_I("X-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
+                    // TRACE_S("X-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
                     ezlopi_device_value_updated_from_device_item_id_v3(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X]);
                 }
             }
@@ -336,7 +336,7 @@ static int __notify(l_ezlopi_item_t *item)
                 if (fabs(user_data->adc_y - ezlopi_analog_data.voltage) > 100)
                 {
                     user_data->adc_y = ezlopi_analog_data.voltage;
-                    // TRACE_I("Y-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
+                    // TRACE_S("Y-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
                     ezlopi_device_value_updated_from_device_item_id_v3(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y]);
                 }
             }

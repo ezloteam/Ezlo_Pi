@@ -55,7 +55,7 @@ s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resl
         }
         else
         {
-            TRACE_I("LEDC timer configured successfully.");
+            TRACE_S("LEDC timer configured successfully.");
         }
 
         error = ledc_channel_config(&ezlopi_pwm_channel_cfg);
@@ -65,7 +65,7 @@ s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resl
         }
         else
         {
-            TRACE_I("LEDC channel configured successfully.");
+            TRACE_S("LEDC channel configured successfully.");
         }
         ezlopi_channel_speed->channel = channel;
         ezlopi_channel_speed->speed_mode = ezlopi_pwm_channel_cfg.speed_mode;
@@ -83,7 +83,7 @@ void ezlopi_pwm_change_duty(uint32_t channel, uint32_t speed_mode, uint32_t duty
     }
     else
     {
-        TRACE_I("LEDC duty set successfully.");
+        TRACE_S("LEDC duty set successfully.");
     }
 }
 

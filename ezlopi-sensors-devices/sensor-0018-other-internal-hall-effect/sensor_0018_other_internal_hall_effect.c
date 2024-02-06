@@ -160,7 +160,7 @@ static int __init(l_ezlopi_item_t *item)
         else
         {
             ret = 1;
-            TRACE_I("Width configuration was successfully done!");
+            TRACE_S("Width configuration was successfully done!");
             TRACE_W("Calibrating.....");
             s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
             user_data->hall_state = "dw_is_closed";

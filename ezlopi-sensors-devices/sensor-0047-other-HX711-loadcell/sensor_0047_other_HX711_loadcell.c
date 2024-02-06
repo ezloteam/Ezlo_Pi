@@ -113,9 +113,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio1", user_data->HX711_SCK_pin);
-    TRACE_I("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
+    TRACE_S("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
     CJSON_GET_VALUE_INT(cj_device, "gpio2", user_data->HX711_DT_pin);
-    TRACE_I("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
+    TRACE_S("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
 }
 
 static int __0047_prepare(void *arg)
@@ -225,7 +225,7 @@ static int __0047_notify(l_ezlopi_item_t *item)
                 weight_in_kg = 0;
             }
             user_data->weight = weight_in_kg;
-            // TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f kg ,", Mass, (user_data->HX711_tare_wt), weight_in_kg);
+            // TRACE_S("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f kg ,", Mass, (user_data->HX711_tare_wt), weight_in_kg);
             ezlopi_device_value_updated_from_device_v3(item);
         }
         ret = 1;
@@ -256,9 +256,9 @@ static void __Calculate_hx711_tare_wt(void *params)
             {
                 (user_data->HX711_tare_wt) = 0.2f * (user_data->HX711_tare_wt) + 0.8f * (RAW_tare);
             }
-            TRACE_I("Calibration_No : %d , Raw_data : %.2f", i, RAW_tare);
+            TRACE_S("Calibration_No : %d , Raw_data : %.2f", i, RAW_tare);
         }
-        TRACE_I("Calibration Stage ----------> Tare_Offset : %0.2f ", (user_data->HX711_tare_wt));
+        TRACE_S("Calibration Stage ----------> Tare_Offset : %0.2f ", (user_data->HX711_tare_wt));
         if ((user_data->HX711_tare_wt) > 3000)
         {
             user_data->HX711_initialized = true;

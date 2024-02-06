@@ -94,7 +94,7 @@ void ezlopi_ble_gap_config_adv_data(void)
     esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
     if (ESP_OK == ret)
     {
-        TRACE_I("Adv-data set complete");
+        TRACE_S("Adv-data set complete");
     }
     else
     {
@@ -121,7 +121,7 @@ void ezlopi_ble_gap_config_scan_rsp_data(void)
     }
     else
     {
-        TRACE_I("Scan response set complete");
+        TRACE_S("Scan response set complete");
     }
     adv_config_done |= SCAN_RSP_CONFIG_FLAG;
 }
@@ -134,9 +134,9 @@ void ezlopi_ble_gap_dissociate_bonded_devices(void)
     if (dev_list)
     {
         esp_ble_get_bond_device_list(&dev_num, dev_list);
-        TRACE_I("Bonded devices number : %d\n", dev_num);
+        TRACE_S("Bonded devices number : %d\n", dev_num);
 
-        TRACE_I("Bonded devices list : %d\n", dev_num);
+        TRACE_S("Bonded devices list : %d\n", dev_num);
         for (int i = 0; i < dev_num; i++)
         {
             dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));
@@ -183,7 +183,7 @@ void ezlopi_ble_setup_adv_config(void)
 
 void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
-    TRACE_B("BLE GAP Eevent: [%d]-%s", event, ezlopi_ble_gap_event_to_str(event));
+    TRACE_I("BLE GAP Eevent: [%d]-%s", event, ezlopi_ble_gap_event_to_str(event));
     switch (event)
     {
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT: // 0
@@ -213,7 +213,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         }
         else
         {
-            TRACE_I("Start adv success.");
+            TRACE_S("Start adv success.");
         }
         break;
     }
@@ -232,7 +232,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     case ESP_GAP_BLE_NC_REQ_EVT: // 16
     {
         esp_ble_confirm_reply(param->ble_security.ble_req.bd_addr, true);
-        TRACE_I("ESP_GAP_BLE_NC_REQ_EVT, the passkey Notify number: %d", param->ble_security.key_notif.passkey);
+        TRACE_S("ESP_GAP_BLE_NC_REQ_EVT, the passkey Notify number: %d", param->ble_security.key_notif.passkey);
         break;
     }
     case ESP_GAP_BLE_SEC_REQ_EVT: // 10
@@ -242,12 +242,12 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     }
     case ESP_GAP_BLE_PASSKEY_NOTIF_EVT: // 11
     {
-        TRACE_I("The passkey Notify number:%06d", param->ble_security.key_notif.passkey);
+        TRACE_S("The passkey Notify number:%06d", param->ble_security.key_notif.passkey);
         break;
     }
     case ESP_GAP_BLE_KEY_EVT: // 9
     {
-        TRACE_I("key type = %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
+        TRACE_S("key type = %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
         break;
     }
     case ESP_GAP_BLE_AUTH_CMPL_EVT: // 8
@@ -255,7 +255,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         esp_bd_addr_t bd_addr;
         memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
         dump("remote BD_ADDR", bd_addr, 0, 6);
-        TRACE_I("address type = %d", param->ble_security.auth_cmpl.addr_type);
+        TRACE_S("address type = %d", param->ble_security.auth_cmpl.addr_type);
         if (!param->ble_security.auth_cmpl.success)
         {
             TRACE_W("pair status = fail");
@@ -264,19 +264,19 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         }
         else
         {
-            TRACE_I("pair status = success");
-            TRACE_I("auth mode =  %s", esp_auth_req_to_str(param->ble_security.auth_cmpl.auth_mode));
+            TRACE_S("pair status = success");
+            TRACE_S("auth mode =  %s", esp_auth_req_to_str(param->ble_security.auth_cmpl.auth_mode));
         }
         show_bonded_devices();
         break;
     }
     case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: // 23
     {
-        TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
-        TRACE_I("ESP_GAP_BLE_REMOVE_BOND_DEV");
-        TRACE_I("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
+        TRACE_S("ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT status = %d", param->remove_bond_dev_cmpl.status);
+        TRACE_S("ESP_GAP_BLE_REMOVE_BOND_DEV");
+        TRACE_S("-----ESP_GAP_BLE_REMOVE_BOND_DEV----");
         dump("bd_adrr", param->remove_bond_dev_cmpl.bd_addr, 0, sizeof(esp_bd_addr_t));
-        TRACE_I("------------------------------------");
+        TRACE_S("------------------------------------");
         break;
     }
 #endif
@@ -288,13 +288,13 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
         }
         else
         {
-            TRACE_I("Stop adv successfully");
+            TRACE_S("Stop adv successfully");
         }
         break;
     }
     case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT: // 20
     {
-        TRACE_I("update connection params status = %d, min_int = %d, max_int = %d,conn_int = %d,latency = %d, timeout = %d",
+        TRACE_S("update connection params status = %d, min_int = %d, max_int = %d,conn_int = %d,latency = %d, timeout = %d",
                 param->update_conn_params.status,
                 param->update_conn_params.min_int,
                 param->update_conn_params.max_int,
@@ -803,9 +803,9 @@ static void show_bonded_devices(void)
     if (dev_list)
     {
         esp_ble_get_bond_device_list(&dev_num, dev_list);
-        TRACE_I("Bonded devices number : %d\n", dev_num);
+        TRACE_S("Bonded devices number : %d\n", dev_num);
 
-        TRACE_I("Bonded devices list : %d\n", dev_num);
+        TRACE_S("Bonded devices list : %d\n", dev_num);
         for (int i = 0; i < dev_num; i++)
         {
             dump("dev_list[i].bd_addr", dev_list[i].bd_addr, 0, sizeof(esp_bd_addr_t));

@@ -213,7 +213,7 @@ static void ezlopi_scenes_cjson_add_when_block_options(cJSON *cj_block_array, l_
         cJSON *cj_block_options = cJSON_AddObjectToObject(cj_block_array, ezlopi_blockOptions_str);
         if (cj_block_options)
         {
-            cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, ezlopi_key_method_str);
+            cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, ezlopi_method_str);
             if (cj_method)
             {
                 if ((when_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&
@@ -251,7 +251,7 @@ static void __cjson_add_action_block_options(cJSON *cj_block_array, l_action_blo
         if (cj_block_options)
         {
 
-            cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, ezlopi_key_method_str);
+            cJSON *cj_method = cJSON_AddObjectToObject(cj_block_options, ezlopi_method_str);
             if (cj_method)
             {
                 if ((action_block->block_options.method.type > EZLOPI_SCENE_METHOD_TYPE_NONE) &&

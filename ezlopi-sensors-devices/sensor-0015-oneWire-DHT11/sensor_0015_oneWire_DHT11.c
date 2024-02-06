@@ -237,7 +237,7 @@ static int __0015_notify(l_ezlopi_item_t *item)
             {
                 float temperature = getTemperature_dht11();
                 if (temperature > 15)
-                { // TRACE_I("Temperature: %.2f", temperature);
+                { // TRACE_S("Temperature: %.2f", temperature);
                     if (fabs(dht11_data->temperature - temperature) > 1)
                     {
                         dht11_data->temperature = temperature;
@@ -249,7 +249,7 @@ static int __0015_notify(l_ezlopi_item_t *item)
             {
                 float humidity = getHumidity_dht11();
                 if (humidity > 20)
-                { // TRACE_I("Humidity: %.2f", humidity);
+                { // TRACE_S("Humidity: %.2f", humidity);
                     if (fabs(dht11_data->humidity - humidity) > 1)
                     {
                         dht11_data->humidity = humidity;

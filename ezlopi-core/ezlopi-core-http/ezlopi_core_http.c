@@ -125,18 +125,22 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
         };
 
         esp_http_client_handle_t client = esp_http_client_init(&config);
+
         if (NULL != client)
         {
-            esp_http_client_set_method(client, HTTP_METHOD_POST);
             cJSON *header = headers->child;
+            esp_http_client_set_method(client, HTTP_METHOD_POST);
+
             while (header)
             {
-                // TRACE_B("%s: %s", header->string, header->valuestring);
+                // TRACE_I("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }
+
             esp_err_t err = esp_http_client_perform(client);
             status_code = esp_http_client_get_status_code(client);
+
             if (err == ESP_OK)
             {
                 while (!esp_http_client_is_complete_data_received(client))
@@ -160,9 +164,11 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(char *cloud_url, char *location, 
                             cur_d = cur_d->next;
                         }
                     }
+
                     http_get_data->response = ret;
                     http_get_data->status_code = status_code;
                 }
+
                 http_get_data->response = ret;
                 http_get_data->status_code = status_code;
             }

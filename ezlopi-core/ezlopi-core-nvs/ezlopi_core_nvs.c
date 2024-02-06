@@ -66,7 +66,7 @@ uint32_t ezlopi_nvs_config_info_update_time_get(void)
     if (ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_update_time_name, &ret);
-        TRACE_I("config-update-time-get: %d", ret);
+        TRACE_S("config-update-time-get: %d", ret);
         TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
         if (ESP_OK != err)
         {
@@ -83,7 +83,7 @@ uint32_t ezlopi_nvs_config_info_version_number_get(void)
     if (ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, config_info_version_number, &ret);
-        TRACE_I("config-version-number-get: %d", ret);
+        TRACE_S("config-version-number-get: %d", ret);
         TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
         if (ESP_OK != err)
         {
@@ -179,7 +179,7 @@ char *ezlopi_nvs_read_modes(void)
     return ezlopi_nvs_read_str(ezlopi_modes_nvs_name);
 }
 
-int ezlopi_nvs_write_modes(char * data)
+int ezlopi_nvs_write_modes(char *data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_modes_nvs_name);
 }
@@ -324,7 +324,7 @@ uint32_t ezlopi_nvs_get_provisioning_status(void)
     if (ezlopi_nvs_handle)
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, provisioning_status_nvs_name, &provisioning_status);
-        TRACE_I("Provisioning_Status: %d", provisioning_status);
+        TRACE_S("Provisioning_Status: %d", provisioning_status);
         if (ESP_OK != err)
         {
             provisioning_status = 0;
@@ -350,7 +350,7 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     if (ezlopi_nvs_init())
     {
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, boot_count_nvs_name, &boot_count);
-        TRACE_I("Boot count: %d", boot_count);
+        TRACE_S("Boot count: %d", boot_count);
         TRACE_D("Error nvs_get_blob: %s", esp_err_to_name(err));
         if (ESP_OK != err)
         {

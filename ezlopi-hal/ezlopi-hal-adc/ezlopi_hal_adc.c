@@ -133,7 +133,7 @@ static void ezlopi_adc_check_eFuse_support()
 #if CONFIG_IDF_TARGET_ESP32
     if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK)
     {
-        TRACE_I("eFuse Two Point support available.");
+        TRACE_S("eFuse Two Point support available.");
     }
     else
     {
@@ -141,7 +141,7 @@ static void ezlopi_adc_check_eFuse_support()
     }
     if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK)
     {
-        TRACE_I("eFuse Vref support available");
+        TRACE_S("eFuse Vref support available");
     }
     else
     {
@@ -150,7 +150,7 @@ static void ezlopi_adc_check_eFuse_support()
 #elif CONFIG_IDF_TARGET_ESP32S3
     if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP))
     {
-        TRACE_I("eFuse Two Point support available.");
+        TRACE_S("eFuse Two Point support available.");
     }
     else
     {
@@ -166,15 +166,15 @@ static esp_adc_cal_characteristics_t *ezlopi_adc_get_adc_characteristics(adc_uni
     esp_adc_cal_value_t value = esp_adc_cal_characterize(unit, attenuation, width, vRef, chars);
     if (value == ESP_ADC_CAL_VAL_EFUSE_TP)
     {
-        TRACE_I("Characterized using Two Point Value\n");
+        TRACE_S("Characterized using Two Point Value\n");
     }
     else if (value == ESP_ADC_CAL_VAL_EFUSE_VREF)
     {
-        TRACE_I("Characterized using eFuse Vref\n");
+        TRACE_S("Characterized using eFuse Vref\n");
     }
     else
     {
-        TRACE_I("Characterized using Default Vref\n");
+        TRACE_S("Characterized using Default Vref\n");
     }
     return chars;
 }

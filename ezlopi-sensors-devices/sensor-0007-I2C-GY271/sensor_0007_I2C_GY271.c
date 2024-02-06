@@ -296,10 +296,10 @@ static int __init(l_ezlopi_item_t *item)
     if (item->interface.i2c_master.enable)
     {
         ezlopi_i2c_master_init(&item->interface.i2c_master);
-        TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
+        TRACE_S("I2C initialized to channel %d", item->interface.i2c_master.channel);
         if (0 == __gy271_configure(item))
         {
-            TRACE_B(" CONFIGURATION  Compplete _____ Calibration Started _____");
+            TRACE_I(" CONFIGURATION  Compplete _____ Calibration Started _____");
             xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
         }
     }
@@ -470,18 +470,18 @@ static void __gy271_calibration_task(void *params) // calibrate task
         user_data->calib_factor.scale_axis[1] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[1]; // y-axis
         user_data->calib_factor.scale_axis[2] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[2]; // z-axis
 
-        TRACE_B("Bias :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
+        TRACE_I("Bias :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
                 user_data->calib_factor.bias_axis[0],
                 user_data->calib_factor.bias_axis[1],
                 user_data->calib_factor.bias_axis[2]);
 
-        TRACE_B("Delta :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
+        TRACE_I("Delta :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
                 user_data->calib_factor.delta_axis[0],
                 user_data->calib_factor.delta_axis[1],
                 user_data->calib_factor.delta_axis[2]);
-        TRACE_B("Delta_AVG :--- %6f", user_data->calib_factor.delta_avg);
+        TRACE_I("Delta_AVG :--- %6f", user_data->calib_factor.delta_avg);
 
-        TRACE_B("Scale :--- _Xaxis=%6f | _Yaxis=%6f | _Zaxis=%6f ",
+        TRACE_I("Scale :--- _Xaxis=%6f | _Yaxis=%6f | _Zaxis=%6f ",
                 user_data->calib_factor.scale_axis[0],
                 user_data->calib_factor.scale_axis[1],
                 user_data->calib_factor.scale_axis[0]);
