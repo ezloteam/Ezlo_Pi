@@ -60,6 +60,19 @@ int ezlopi_core_modes_cjson_get_modes(cJSON *cj_dest)
     return ret;
 }
 
+int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_dest)
+{
+    int ret = 0;
+    s_house_modes_t *current_mode = ezlopi_core_modes_get_current_mode();
+    if (current_mode)
+    {
+        ret = 1;
+        __cjson_add_number_as_hex_string(cj_dest, ezlopi_modeId_str, current_mode->_id);
+    }
+
+    return ret;
+}
+
 s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
 {
     s_ezlopi_modes_t *parsed_mode = NULL;

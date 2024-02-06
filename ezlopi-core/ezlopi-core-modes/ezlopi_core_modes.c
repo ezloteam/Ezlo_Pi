@@ -22,6 +22,11 @@ int ezlopi_core_modes_get_modes(cJSON *cj_result)
     return ezlopi_core_modes_cjson_get_modes(cj_result);
 }
 
+int ezlopi_core_modes_get_current_mode(cJSON *cj_result)
+{
+    return ezlopi_core_modes_cjson_get_current_mode(cj_result);
+}
+
 void ezlopi_core_modes_init(void)
 {
     uint32_t _is_custom_mode_ok = 0;

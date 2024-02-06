@@ -27,6 +27,7 @@ void ezlopi_cloud_modes_current_get(cJSON *cj_request, cJSON *cj_response)
 
     if (cj_result)
     {
+        ezlopi_core_modes_cjson_get_current_mode(cj_result);
     }
 }
 

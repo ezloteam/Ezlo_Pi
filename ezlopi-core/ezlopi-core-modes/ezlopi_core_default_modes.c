@@ -72,6 +72,8 @@ s_ezlopi_modes_t *ezlopi_core_default_mode_get(void)
 void ezlopi_core_default_init(void)
 {
     cJSON *cj_empty_array = cJSON_CreateArray();
+    uint32_t initial_id = ezlopi_cloud_get_modes_initial_id();
+
     sg_default_house_mode.cj_notifications = cj_empty_array;
     sg_default_house_mode.cj_bypass_devices = cj_empty_array;
     sg_default_house_mode.cj_disarmed_devices = cj_empty_array;
@@ -82,7 +84,7 @@ void ezlopi_core_default_init(void)
     sg_default_mode.cj_cameras = cj_empty_array;
     sg_default_mode.cj_devices = cj_empty_array;
 
-    uint32_t initial_id = ezlopi_cloud_get_modes_initial_id();
+    sg_default_mode.current_mode_id = initial_id + EZLOPI_HOUSE_MODE_REF_ID_HOME;
 
     sg_default_mode.mode_home = (s_house_modes_t *)malloc(sizeof(s_house_modes_t));
     if (sg_default_mode.mode_home)

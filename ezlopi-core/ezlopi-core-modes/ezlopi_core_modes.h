@@ -127,5 +127,6 @@ s_house_modes_t *ezlopi_core_modes_get_current_mode(void);
 s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void);
 
 int ezlopi_core_modes_get_modes(cJSON *cj_result);
+int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
 
 #endif // __EZLOPI_HOME_MODES_H__
