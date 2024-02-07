@@ -5,10 +5,29 @@
 
 #include "ezlopi_core_http.h"
 
+#ifdef CONFIG_ESP_TLS_USING_MBEDTLS
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+#include "lwip/netdb.h"
+#include "lwip/dns.h"
+
+#include "mbedtls/platform.h"
+#include "mbedtls/net_sockets.h"
+#include "mbedtls/esp_debug.h"
+#include "mbedtls/ssl.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/error.h"
+#include "mbedtls/certs.h"
+#endif
+
 static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 
 #define TAG __FILE__
+
+#define GET_STRING_SIZE(str) ((NULL != str) ? (1 + strlen(str)) : 0)
 
 #define FREE_IF_NOT_NULL(ptr) \
     {                         \
@@ -18,6 +37,603 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
             ptr = NULL;       \
         }                     \
     }
+
+//--------------- Scenes:- Sendhttp_request_method --------------------------
+/**
+ * @brief Frees an address => '*__dest_ptr', pointing to an occupied address in heap.
+ */
+static void __free_custom_ptr(char *__dest_ptr)
+{
+    if (NULL != __dest_ptr)
+    {
+        free(__dest_ptr);
+        TRACE_D("#freed [%p] : %d ==> %s ", __dest_ptr, GET_STRING_SIZE(__dest_ptr), (__dest_ptr));
+        __dest_ptr = NULL;
+    }
+}
+/**
+ * @brief This function returns New_malloced_size
+ *
+ * @param __dest_ptr [ Address of ptr which will point to (char*) block of memory. ]
+ * @param src_ptr    [ Address of the string literal you want to store/append. ]
+ * @return int [size_of_malloced block]
+ */
+static int __fresh_dynamic_alloc(char **__dest_ptr, const char *src_ptr)
+{
+    int ret = 0;
+    if (NULL != src_ptr)
+    {
+        __free_custom_ptr(*__dest_ptr);
+        // Now, do a fresh allocation
+        int dest_length = GET_STRING_SIZE(src_ptr);
+        char *tmp_ptr = malloc(sizeof(char) * dest_length);
+        if (tmp_ptr)
+        {
+            bzero(tmp_ptr, (sizeof(char) * dest_length));
+            snprintf(tmp_ptr, dest_length, "%s", src_ptr);
+            tmp_ptr[dest_length] = '\0';
+            TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, dest_length);
+            *__dest_ptr = tmp_ptr;
+            TRACE_D("2.__dest_ptr(%p) : size=> [%d]", *__dest_ptr, GET_STRING_SIZE(*__dest_ptr));
+            ret = dest_length; // return mallocated block size
+        }
+    }
+    else
+    {
+        TRACE_E(" Error !!, given 'src_string_literal' is NULL .... Allocation Aborted...");
+    }
+    return ret;
+}
+/**
+ * @brief This function creates new_memory_block(of 'reqSize') & Rellocates Original memory-block to new_memory_block_address
+ *
+ * @param Buf       [ Address of ptr which will point to (char*) original block of memory. ]
+ * @param reqSize   [ new-size to be allocated. ]
+ * @return int [0 ==> Fail ; 1 ==> Success]
+ */
+static int __dynamic_rellocation(char **Buf, int reqSize)
+{
+    int ret = 0;
+    if ((NULL != *Buf) && (reqSize > 0)) // strictly:  (new-size != 0)
+    {
+        char *NewBuf = (char *)realloc(*Buf, sizeof(char) * reqSize); // reqSize ≤ 1.6 * n
+        if (NewBuf != NULL)
+        {
+            TRACE_D("Relocating [%p] to [%p]: NewBuf[%d]", *Buf, NewBuf, reqSize);
+            *Buf = NewBuf;
+            ret = 1; // return success
+        }
+        else
+        {
+            TRACE_E("Reallocation failed");
+        }
+        TRACE_I("*Buf (new): %p", *Buf);
+    }
+    return ret;
+}
+/**
+ * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_scenes_then_methods_send_http_t'
+ *
+ * @param tmp_http_data     [ Pointer to (s_ezlopi_scenes_then_methods_send_http_t*) block of memory. ]
+ * @param prev_size         [ Original size of the '*header' memory-block. ]
+ * @param append_size       [ Size of 'string' to be appended. ]
+ * @param append_str        [ 'string_literal' to be appended. ]
+ * @return int [ Fail ==> returns Old-size / Success ==> returns New-size ]
+ */
+static int __relloc_header_mem_ptr(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, int prev_size, int append_size, const char *append_str)
+{
+    int ret = (int)(tmp_http_data->header_maxlen); // Assign Old-block size as default
+    int new_size = prev_size + append_size;        // this size count only :- 'characters' after combining them
+    int tmp_maxlen = (((int)tmp_http_data->header_maxlen > 16) ? tmp_http_data->header_maxlen : 16);
+    while (tmp_maxlen <= new_size)
+    {
+        tmp_maxlen += (tmp_http_data->header_maxlen); // possible constraint :- if(tmp_maxlen > (4096*sizeof(char))) break;
+    }
+    new_size = tmp_maxlen;
+    if (__dynamic_rellocation(&(tmp_http_data->header), new_size)) // now rellocate: 'tmp_http_data->header' with suitable 'new_size'
+    {
+        snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
+        TRACE_D("Append Successful: Header[%d]:\n%s[%d]", (tmp_http_data->header_maxlen), tmp_http_data->header, strlen(tmp_http_data->header));
+        ret = new_size; // return new memory-block size
+    }
+    return ret;
+}
+/**
+ * @brief Function to return remaining space in *dest_buffer.
+ */
+static int __ezlopi_http_get_empty_bufsize(char *dest_buff, int dest_size, int reqd_size)
+{
+    int limit = dest_size - (strlen(dest_buff) + 1);
+    limit = (limit < 0) ? 0 : limit;
+    if (limit > reqd_size)
+    {
+        return limit;
+    }
+    return 0;
+}
+/**
+ * @brief Function to extract "web_host" from "field_value_string".
+ */
+static void __parse_web_host_name(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    if (NULL != field_value_string)
+    {
+        const char *start = strstr(field_value_string, "://");
+        if (start != NULL)
+        {
+            TRACE_W("Here! fresh webserver");
+            start += 3;
+            int length = 0;
+            char *end = strchr(start, '/');
+            if (end != NULL)
+            {
+                length = end - start;
+                if (length > 0)
+                {
+                    char *tmp_string = malloc(sizeof(char) * (length + 1)); // tmp_string != NULL
+                    if (tmp_string)
+                    {
+                        bzero(tmp_string, sizeof(char) * (length + 1));
+                        snprintf(tmp_string, (length + 1), "%s", start);
+                        TRACE_I("web_host_name : %s", tmp_string);
+                        tmp_http_data->web_server_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->web_server), tmp_string);
+                        free(tmp_string);
+                    }
+                }
+            }
+            else
+            {
+                const char *ptr = field_value_string;
+                length = (int)strlen(field_value_string) - (int)(start - ptr);
+                if (length > 0)
+                {
+                    char *tmp_string = malloc(sizeof(char) * (length + 1)); // tmp_string != NULL
+                    if (tmp_string)
+                    {
+                        bzero(tmp_string, sizeof(char) * (length + 1));
+                        snprintf(tmp_string, (length + 1), "%s", (ptr + ((int)(start - ptr))));
+                        TRACE_I("web_host_name : %s", tmp_string);
+                        tmp_http_data->web_server_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->web_server), tmp_string);
+                        free(tmp_string);
+                    }
+                }
+            }
+        }
+    }
+}
+/**
+ * @brief Function Trigger http_requests via mbedTLS.
+ */
+static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req)
+{
+    int ret, flags, len;
+    uint32_t tmp_buf_size = 256;
+    char *tmp_buf = (char *)malloc(tmp_buf_size * sizeof(char));
+    if (tmp_buf)
+    {
+        char web_port[10] = {0};
+        snprintf(web_port, 10, "%d", web_port_num);
+        web_port[10] = '\0';
+
+        mbedtls_entropy_context entropy;
+        mbedtls_ctr_drbg_context ctr_drbg;
+        mbedtls_ssl_context ssl;
+        mbedtls_x509_crt cacert;
+        mbedtls_ssl_config conf;
+        mbedtls_net_context server_fd;
+
+        mbedtls_ssl_init(&ssl);
+        mbedtls_x509_crt_init(&cacert);
+        mbedtls_ctr_drbg_init(&ctr_drbg);
+        TRACE_I("Seeding the random number generator");
+        mbedtls_ssl_config_init(&conf);
+        mbedtls_entropy_init(&entropy);
+
+        if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
+                                         NULL, 0)) != 0)
+        {
+            TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
+            goto exit;
+        }
+        TRACE_I("Attaching the certificate bundle...");
+
+        ret = esp_crt_bundle_attach(&conf);
+
+        if (ret < 0)
+        {
+            TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
+            goto exit;
+        }
+        TRACE_I("Setting hostname for TLS session...");
+
+        /* Hostname set here should match CN in server certificate */
+        if ((ret = mbedtls_ssl_set_hostname(&ssl, web_server)) != 0)
+        {
+            TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
+            goto exit;
+        }
+
+        TRACE_I("Setting up the SSL/TLS structure...");
+
+        if ((ret = mbedtls_ssl_config_defaults(&conf,
+                                               MBEDTLS_SSL_IS_CLIENT,
+                                               MBEDTLS_SSL_TRANSPORT_STREAM,
+                                               MBEDTLS_SSL_PRESET_DEFAULT)) != 0)
+        {
+            TRACE_E("mbedtls_ssl_config_defaults returned %d", ret);
+            goto exit;
+        }
+
+        /* MBEDTLS_SSL_VERIFY_OPTIONAL is bad for security, in this example it will print
+           a warning if CA verification fails but it will continue to connect.
+           You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
+        */
+        // mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
+        mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
+        mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
+        mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
+#ifdef CONFIG_MBEDTLS_DEBUG
+        mbedtls_esp_enable_debug_log(&conf, CONFIG_MBEDTLS_DEBUG_LEVEL);
+#endif
+
+        if ((ret = mbedtls_ssl_setup(&ssl, &conf)) != 0)
+        {
+            TRACE_E("mbedtls_ssl_setup returned -0x%x\n\n", -ret);
+
+            goto exit;
+        }
+        mbedtls_net_init(&server_fd);
+
+        TRACE_I("Connecting to %s:%s...", web_server, web_port);
+
+        if ((ret = mbedtls_net_connect(&server_fd, web_server,
+                                       web_port, MBEDTLS_NET_PROTO_TCP)) != 0)
+        {
+            TRACE_E("mbedtls_net_connect returned -%x", -ret);
+            goto exit;
+        }
+        TRACE_I("Connected.");
+
+        mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
+
+        TRACE_I("Performing the SSL/TLS handshake...");
+        while ((ret = mbedtls_ssl_handshake(&ssl)) != 0)
+        {
+            if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
+            {
+                TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
+                goto exit;
+            }
+        }
+        TRACE_I("Verifying peer X.509 certificate...");
+
+        if ((flags = mbedtls_ssl_get_verify_result(&ssl)) != 0)
+        {
+            /* In real life, we probably want to close connection if ret != 0 */
+            TRACE_W("Failed to verify peer certificate!");
+            bzero(tmp_buf, tmp_buf_size);
+            mbedtls_x509_crt_verify_info(tmp_buf, tmp_buf_size, "  ! ", flags);
+            TRACE_W("verification info: %s", tmp_buf);
+        }
+        else
+        {
+            TRACE_I("Certificate verified.");
+        }
+        TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
+        TRACE_I("Writing HTTP request...");
+
+        size_t written_bytes = 0;
+        do
+        {
+            ret = mbedtls_ssl_write(&ssl, (const unsigned char *)url_req + written_bytes,
+                                    strlen(url_req) - written_bytes);
+            if (ret >= 0)
+            {
+                TRACE_I("%d bytes written", ret);
+                written_bytes += ret;
+            }
+            else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
+            {
+                TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
+                goto exit;
+            }
+        } while (written_bytes < strlen(url_req));
+
+        TRACE_I("Reading HTTP response...");
+        do
+        {
+            len = tmp_buf_size - 1;
+            bzero(tmp_buf, tmp_buf_size);
+            ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
+
+            if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
+            {
+                continue;
+            }
+            if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
+            {
+                ret = 0;
+                break;
+            }
+            if (ret < 0)
+            {
+                TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
+                break;
+            }
+            if (ret == 0)
+            {
+                TRACE_I("connection closed");
+                break;
+            }
+            len = ret;
+            TRACE_D(" [%d] bytes read :\n %s", len, tmp_buf);
+
+        } while (1);
+
+        mbedtls_ssl_close_notify(&ssl);
+    exit:
+        // mbedtls_ssl_session_reset(&ssl); // dont need this line
+        mbedtls_net_free(&server_fd);
+        if (ret != 0)
+        {
+            mbedtls_strerror(ret, tmp_buf, 100);
+            TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
+        }
+
+        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+        // Clearing used structures
+        mbedtls_ssl_free(&ssl);
+        mbedtls_ssl_config_free(&conf);
+        mbedtls_ctr_drbg_free(&ctr_drbg);
+        mbedtls_entropy_free(&entropy);
+        TRACE_I("Completed a request");
+        free(tmp_buf);
+    }
+}
+/**
+ * @brief Function to Clear and Malloc the header_member (within 's_ezlopi_scenes_then_methods_send_http_t') only.
+ */
+static int __create_fresh_header_mem(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data)
+{
+    int ret = GET_STRING_SIZE(tmp_http_data->header);
+    if (0 == ret)
+    {
+        TRACE_W("Here! fresh header");
+        tmp_http_data->header_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->header), "\0");
+        ret = GET_STRING_SIZE(tmp_http_data->header);
+    }
+    return ret;
+}
+/**
+ * @brief Function to append values to header_member (within 's_ezlopi_scenes_then_methods_send_http_t') only.
+ */
+static void __append_to_header_mem(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *str1, const char *str2, int prev_size)
+{
+    int append_size = (GET_STRING_SIZE(str1) + 2 + GET_STRING_SIZE(str2)) + 3;
+    int max_allowed = __ezlopi_http_get_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+    if (max_allowed > 0)
+    {
+        snprintf((tmp_http_data->header) + (strlen(tmp_http_data->header)), max_allowed, "%s: %s\r\n", str1, str2);
+    }
+    else // if there is no space left ; we reallocate:- 'tmp_http_data->header'
+    {
+        char *append_str = malloc(sizeof(char) * (append_size + 1)); // append_str != NULL
+        if (append_str)
+        {
+            bzero(append_str, sizeof(char) * (append_size + 1));
+            snprintf(append_str, (append_size + 1), "%s: %s\r\n", str1, str2);
+            append_str[append_size + 1] = '\0';
+            //-----------------------------------------------------------------------------------
+            TRACE_E("Here!");
+            tmp_http_data->header_maxlen = __relloc_header_mem_ptr(tmp_http_data, prev_size, append_size, append_str);
+            //-----------------------------------------------------------------------------------
+            free(append_str);
+        }
+    }
+}
+
+void ezlopi_http_scenes_then_parse_url(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    if (NULL != field_value_string)
+    {
+        TRACE_W("Here! fresh url");
+        tmp_http_data->url_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->url), field_value_string);
+        tmp_http_data->web_port = ((NULL != strstr(field_value_string, "https")) ? 443 : 80);
+
+        //--------------------------------------------
+        __parse_web_host_name(tmp_http_data, field_value_string);
+        //--------------------------------------------
+
+        int prev_size = __create_fresh_header_mem(tmp_http_data);
+        if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
+        {
+            // 1. adding 'host' to header-buffer
+            TRACE_W("Here! webserver -> header");
+            __append_to_header_mem(tmp_http_data, "Host", tmp_http_data->web_server, prev_size);
+        }
+    }
+}
+void ezlopi_http_scenes_then_parse_content_type(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    if (NULL != field_value_string)
+    {
+        TRACE_W("Here! content-type");
+        int prev_size = __create_fresh_header_mem(tmp_http_data);
+        if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
+        {
+            // 2. adding 'Content-Type' to header-buffer
+            TRACE_W("Here! content-type -> header");
+            __append_to_header_mem(tmp_http_data, "Content-Type", field_value_string, prev_size);
+        }
+    }
+}
+void ezlopi_http_scenes_then_parse_content(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string)
+{
+    if (NULL != field_value_string)
+    {
+        TRACE_W("Here! fresh content");
+        tmp_http_data->content_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->content), field_value_string);
+
+        int prev_size = __create_fresh_header_mem(tmp_http_data);
+        if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
+        {
+            TRACE_W("Here! content_length -> header");
+            uint16_t i = (int)strlen(field_value_string);
+            if (i > 0)
+            {
+                char str[10];
+                snprintf(str, 10, "%d", (int)i); // write length value in string
+                str[10] = '\0';
+                // 3. adding 'Content-Length' to header-buffer
+                __append_to_header_mem(tmp_http_data, "Content-Length", str, prev_size);
+            }
+        }
+    }
+}
+void ezlopi_http_scenes_then_parse_headers(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *cj_value)
+{
+    if (cJSON_IsObject(cj_value))
+    {
+        TRACE_W("Here! headers");
+        int prev_size = __create_fresh_header_mem(tmp_http_data);
+        if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
+        {
+            TRACE_W("Here! headers -> header");
+            cJSON *header = (cj_value->child);
+            while (header)
+            {
+                if ((NULL != header->string) && (NULL != header->valuestring))
+                {
+                    // 4. adding 'remaining' to header-buffer
+                    __append_to_header_mem(tmp_http_data, header->string, header->valuestring, prev_size);
+                }
+                header = header->next;
+            }
+        }
+    }
+}
+void ezlopi_http_scenes_then_parse_skipsecurity(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, bool value_bool)
+{
+    TRACE_W("Here! skipsecurity");
+    tmp_http_data->skip_cert_common_name_check = value_bool;
+    int prev_size = __create_fresh_header_mem(tmp_http_data);
+    if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
+    {
+        // 5. adding 'skip_security' to header-buffer
+        TRACE_W("Here! skipsecurity -> header");
+        __append_to_header_mem(tmp_http_data, "skipSecurity", ((value_bool) ? "true" : "false"), prev_size);
+    }
+}
+void ezlopi_http_scenes_then_parse_username_password(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *cj_value)
+{
+    if (cJSON_IsObject(cj_value))
+    {
+        cJSON *userItem = cJSON_GetObjectItem(cj_value, "user");
+        cJSON *passwordItem = cJSON_GetObjectItem(cj_value, "password");
+        if ((NULL != userItem) && (NULL != passwordItem))
+        {
+            const char *userValue = cJSON_GetStringValue(userItem);
+            const char *passValue = cJSON_GetStringValue(passwordItem);
+
+            TRACE_W("Here! fresh username");
+            tmp_http_data->username_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->username), userValue);
+            TRACE_W("Here! fresh password");
+            tmp_http_data->password_maxlen = __fresh_dynamic_alloc(&(tmp_http_data->password), passValue);
+        }
+    }
+}
+
+void ezlopi_http_scenes_then_clear_struct_ptr_mem(s_ezlopi_scenes_then_methods_send_http_t *config)
+{
+    __free_custom_ptr(config->url);
+    __free_custom_ptr(config->web_server);
+    __free_custom_ptr(config->header);
+    __free_custom_ptr(config->content);
+    __free_custom_ptr(config->username);
+    __free_custom_ptr(config->password);
+}
+void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config)
+{
+#if 0
+    // TRACE_D("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
+    // TRACE_D("[%d]WEB_PORT :- '%d'", sizeof(config->web_port), config->web_port);
+    // TRACE_D("[%d]URI :- [%d] '%s'", config->url_maxlen, GET_STRING_SIZE(config->url), config->url);
+    // TRACE_D("[%d]WEB_SERVER :- [%d] '%s'", config->web_server_maxlen, GET_STRING_SIZE(config->web_server), config->web_server);
+    // TRACE_D("[%d]Header : [%d] occupied", config->header_maxlen, GET_STRING_SIZE(config->header));
+    // TRACE_D("[%d]Username : [%d] occupied", config->username_maxlen, GET_STRING_SIZE(config->username));
+    // TRACE_D("[%d]Password : [%d] occupied", config->password_maxlen, GET_STRING_SIZE(config->password));
+    // TRACE_D("[%d]Content : [%d] occupied", config->content_maxlen, GET_STRING_SIZE(config->content));
+#endif
+    int REQUEST_LENGTH = 1 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
+    char *REQUEST = (char *)malloc(sizeof(char) * REQUEST_LENGTH);
+    if (REQUEST)
+    {
+        bzero(REQUEST, sizeof(char) * REQUEST_LENGTH);
+        switch (config->method)
+        {
+        case HTTP_METHOD_GET:
+        {
+            TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
+            if ((NULL != config->username) && (NULL != config->password))
+                snprintf(REQUEST, REQUEST_LENGTH, "GET %s?username=%s&password=%s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
+            else
+                snprintf(REQUEST, REQUEST_LENGTH, "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            break;
+        }
+        case HTTP_METHOD_POST:
+        {
+            TRACE_I("HTTP POST-METHOD [%d]", config->method);
+            snprintf(REQUEST, REQUEST_LENGTH, "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            break;
+        }
+        case HTTP_METHOD_PUT:
+        {
+            TRACE_I("HTTP PUT-METHOD [%d]", config->method);
+            snprintf(REQUEST, REQUEST_LENGTH, "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            break;
+        }
+        case HTTP_METHOD_DELETE:
+        {
+            TRACE_I("HTTP DELETE-METHOD [%d]", config->method);
+            snprintf(REQUEST, REQUEST_LENGTH, "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            break;
+        }
+        default:
+            break;
+        }
+        // adding 'Headers' to request_buffer
+        int max_allowed = 0;
+        if (NULL != config->header)
+        {
+            max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->header) + 3));
+            if (max_allowed > 0)
+            {
+                snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->header);
+            }
+        }
+        // adding content body to request
+        if (NULL != config->content)
+        {
+            if ((0 != config->method) && (NULL != config->username) && (NULL != config->password))
+                max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->username) + GET_STRING_SIZE(config->password) + GET_STRING_SIZE(config->content) + 3));
+            else
+                max_allowed = __ezlopi_http_get_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->content) + 3));
+
+            if (max_allowed > 0)
+            {
+                snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->content);
+            }
+        }
+
+        REQUEST[REQUEST_LENGTH] = '\0'; // null terminating array
+        TRACE_I("REQUEST[%d] : \n%s = [%d]\n", REQUEST_LENGTH, REQUEST, strlen(REQUEST));
+
+        // executing the request
+        __ezlopi_http_request_via_mbedTLS(config->web_server, (config->web_port), REQUEST);
+        free(REQUEST);
+    }
+}
+//---------------------------------------------------------------------------
 
 s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
 {

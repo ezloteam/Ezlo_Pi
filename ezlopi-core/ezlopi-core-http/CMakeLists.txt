@@ -6,13 +6,14 @@ set(ESP_IDF_COMPONENTS
         json 
         esp-tls
         esp_http_client
+        mbedtls
 )
 
 set(EZLOPI_COMPONENTS 
         ezlopi-util-trace
 )
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_http.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${ESP_IDF_COMPONENTS}
                 ${EZLOPI_COMPONENTS}

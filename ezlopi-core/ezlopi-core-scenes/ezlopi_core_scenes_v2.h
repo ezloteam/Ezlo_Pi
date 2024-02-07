@@ -171,6 +171,7 @@ void ezlopi_scene_add_users_in_notifications(l_scenes_list_v2_t *scene_node, cJS
 void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list);
 l_scenes_list_v2_t *ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
+void ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag);
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
 void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications);
 
