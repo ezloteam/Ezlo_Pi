@@ -8,7 +8,7 @@
 extern "C"
 {
 #endif
-
+     uint32_t __get_ota_state(void);
     void ezlopi_ota_start(cJSON *cj_url);
 
 #ifdef __cplusplus

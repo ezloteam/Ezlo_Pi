@@ -274,7 +274,6 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            vTaskDelay(1000 / portTICK_PERIOD_MS);
                             ezlopi_reboot();
                         }
                         else if (0 == strncmp(curr_field->value.value_string, "hard", 5))

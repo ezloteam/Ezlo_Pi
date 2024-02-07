@@ -9,9 +9,13 @@ set(ESP_IDF_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-reboot
 )
+set(EZLOPI_SERVICE_COMPONENTS
+        ezlopi-service-ota
+)
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_ota.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${ESP_IDF_COMPONENTS}
                 ${EZLOPI_CORE_COMPONENTS} 
+                ${EZLOPI_SERVICE_COMPONENTS}
             )

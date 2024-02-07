@@ -31,8 +31,8 @@ void app_main(void)
     ezlopi_init();
     ezlopi_ble_service_init();
     timer_service_init();
-    ezlopi_scenes_meshbot_init();
     web_provisioning_init();
+    ezlopi_scenes_meshbot_init();
     ota_service_init();
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }

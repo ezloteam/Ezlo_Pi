@@ -5,7 +5,7 @@
 
 #include "ezlopi_core_http.h"
 
-#ifdef CONFIG_ESP_TLS_USING_MBEDTLS
+// #ifdef CONFIG_ESP_TLS_USING_MBEDTLS
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
@@ -20,7 +20,7 @@
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/error.h"
 #include "mbedtls/certs.h"
-#endif
+// #endif
 
 static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
@@ -42,15 +42,15 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 /**
  * @brief Frees an address => '*__dest_ptr', pointing to an occupied address in heap.
  */
-static void __free_custom_ptr(char *__dest_ptr)
-{
-    if (NULL != __dest_ptr)
-    {
-        free(__dest_ptr);
-        TRACE_D("#freed [%p] : %d ==> %s ", __dest_ptr, GET_STRING_SIZE(__dest_ptr), (__dest_ptr));
-        __dest_ptr = NULL;
-    }
-}
+// static void __free_custom_ptr(char *__dest_ptr)
+// {
+//     if (NULL != __dest_ptr)
+//     {
+//         free(__dest_ptr);
+//         TRACE_D("#freed [%p] : %d ==> %s ", __dest_ptr, GET_STRING_SIZE(__dest_ptr), (__dest_ptr));
+//         __dest_ptr = NULL;
+//     }
+// }
 /**
  * @brief This function returns New_malloced_size
  *
@@ -63,7 +63,7 @@ static int __fresh_dynamic_alloc(char **__dest_ptr, const char *src_ptr)
     int ret = 0;
     if (NULL != src_ptr)
     {
-        __free_custom_ptr(*__dest_ptr);
+        FREE_IF_NOT_NULL(*__dest_ptr);
         // Now, do a fresh allocation
         int dest_length = GET_STRING_SIZE(src_ptr);
         char *tmp_ptr = malloc(sizeof(char) * dest_length);
@@ -207,7 +207,7 @@ static void __parse_web_host_name(s_ezlopi_scenes_then_methods_send_http_t *tmp_
 static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req)
 {
     int ret, flags, len;
-    uint32_t tmp_buf_size = 256;
+    uint32_t tmp_buf_size = 512;
     char *tmp_buf = (char *)malloc(tmp_buf_size * sizeof(char));
     if (tmp_buf)
     {
@@ -268,8 +268,8 @@ static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_po
            a warning if CA verification fails but it will continue to connect.
            You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
         */
-        // mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
-        mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
+        mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
+        // mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
         mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
         mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
 #ifdef CONFIG_MBEDTLS_DEBUG
@@ -387,7 +387,8 @@ static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_po
         mbedtls_ctr_drbg_free(&ctr_drbg);
         mbedtls_entropy_free(&entropy);
         TRACE_I("Completed a request");
-        free(tmp_buf);
+
+        FREE_IF_NOT_NULL(tmp_buf);
     }
 }
 /**
@@ -545,12 +546,12 @@ void ezlopi_http_scenes_then_parse_username_password(s_ezlopi_scenes_then_method
 
 void ezlopi_http_scenes_then_clear_struct_ptr_mem(s_ezlopi_scenes_then_methods_send_http_t *config)
 {
-    __free_custom_ptr(config->url);
-    __free_custom_ptr(config->web_server);
-    __free_custom_ptr(config->header);
-    __free_custom_ptr(config->content);
-    __free_custom_ptr(config->username);
-    __free_custom_ptr(config->password);
+    FREE_IF_NOT_NULL(config->url);
+    FREE_IF_NOT_NULL(config->web_server);
+    FREE_IF_NOT_NULL(config->header);
+    FREE_IF_NOT_NULL(config->content);
+    FREE_IF_NOT_NULL(config->username);
+    FREE_IF_NOT_NULL(config->password);
 }
 void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config)
 {
