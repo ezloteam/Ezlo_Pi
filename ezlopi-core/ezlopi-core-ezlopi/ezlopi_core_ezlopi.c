@@ -2,18 +2,19 @@
 
 #include "ezlopi_util_trace.h"
 
-#include "ezlopi_core_wifi.h"
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_nvs.h"
-#include "ezlopi_core_timer.h"
-#include "ezlopi_core_devices_list.h"
+#include "ezlopi_core_wifi.h"
 #include "ezlopi_core_ping.h"
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_room.h"
+#include "ezlopi_core_timer.h"
+#include "ezlopi_core_modes.h"
+#include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_event_group.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
-#include "ezlopi_core_room.h"
-#include "ezlopi_core_modes.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -56,9 +57,9 @@ void ezlopi_init(void)
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
-    ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
-    // core_sntp_init();
+    ezlopi_core_sntp_init();
+    ezlopi_timer_start_1000ms();
 #endif
 }
 

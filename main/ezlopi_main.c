@@ -60,7 +60,7 @@ static void blinky(void *pv)
         gpio_set_level(GPIO_NUM_2, state);
 #endif
 
-        if (count++ > 1)
+        if (count++ > 10)
         {
             trace_wb("-----------------------------------------");
             trace_wb("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
@@ -69,6 +69,6 @@ static void blinky(void *pv)
             count = 0;
         }
 
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

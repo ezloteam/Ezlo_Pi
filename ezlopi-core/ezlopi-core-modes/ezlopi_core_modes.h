@@ -112,10 +112,10 @@ typedef struct s_ezlopi_modes
 
     s_alarmed_t alarmed;
 
-    s_house_modes_t *mode_home;
-    s_house_modes_t *mode_away;
-    s_house_modes_t *mode_night;
-    s_house_modes_t *mode_vacation;
+    s_house_modes_t mode_home;
+    s_house_modes_t mode_away;
+    s_house_modes_t mode_night;
+    s_house_modes_t mode_vacation;
 
 } s_ezlopi_modes_t;
 
@@ -124,10 +124,11 @@ void ezlopi_core_default_init(void);
 s_ezlopi_modes_t *ezlopi_core_default_mode_get(void);
 
 s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void);
+s_house_modes_t *ezlopi_core_modes_get_current_house_modes(void);
 
 int ezlopi_core_modes_api_get_modes(cJSON *cj_result);
 int ezlopi_core_modes_api_get_current_mode(cJSON *cj_result);
-int ezlopi_core_modes_api_switch_mode(uint32_t switch_to_mode_id);
+int ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_house_mode);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
 

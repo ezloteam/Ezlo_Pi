@@ -4,6 +4,7 @@
 
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_modes_cjson.h"
+#include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_modes.h"
 #include "ezlopi_cloud_constants.h"
@@ -46,21 +47,25 @@ void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
         if (cj_mode_id && cj_mode_id->valuestring)
         {
             uint32_t mode_id = strtoul(cj_mode_id->valuestring, NULL, 16);
-            if (mode_id == modes->mode_home->_id)
+            if (mode_id == modes->mode_home._id)
             {
-                house_mode = modes->mode_home;
+                TRACE_D("here");
+                house_mode = &modes->mode_home;
             }
-            else if (mode_id == modes->mode_away->_id)
+            else if (mode_id == modes->mode_away._id)
             {
-                house_mode = modes->mode_away;
+                TRACE_D("here");
+                house_mode = &modes->mode_away;
             }
-            else if (mode_id == modes->mode_night->_id)
+            else if (mode_id == modes->mode_night._id)
             {
-                house_mode = modes->mode_night;
+                TRACE_D("here");
+                house_mode = &modes->mode_night;
             }
-            else if (mode_id == modes->mode_vacation->_id)
+            else if (mode_id == modes->mode_vacation._id)
             {
-                house_mode = modes->mode_vacation;
+                TRACE_D("here");
+                house_mode = &modes->mode_vacation;
             }
         }
         else
@@ -68,21 +73,25 @@ void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
             cJSON *cj_mode_name = cJSON_GetObjectItem(cj_params, ezlopi_name_str);
             if (cj_mode_name && cj_mode_name->valuestring)
             {
-                if (0 == strcmp(modes->mode_home->name, cj_mode_name->valuestring))
+                if (0 == strcmp(modes->mode_home.name, cj_mode_name->valuestring))
                 {
-                    house_mode = modes->mode_home;
+                    TRACE_D("here");
+                    house_mode = &modes->mode_home;
                 }
-                else if (0 == strcmp(modes->mode_away->name, cj_mode_name->valuestring))
+                else if (0 == strcmp(modes->mode_away.name, cj_mode_name->valuestring))
                 {
-                    house_mode = modes->mode_away;
+                    TRACE_D("here");
+                    house_mode = &modes->mode_away;
                 }
-                else if (0 == strcmp(modes->mode_night->name, cj_mode_name->valuestring))
+                else if (0 == strcmp(modes->mode_night.name, cj_mode_name->valuestring))
                 {
-                    house_mode = modes->mode_night;
+                    TRACE_D("here");
+                    house_mode = &modes->mode_night;
                 }
-                else if (0 == strcmp(modes->mode_vacation->name, cj_mode_name->valuestring))
+                else if (0 == strcmp(modes->mode_vacation.name, cj_mode_name->valuestring))
                 {
-                    house_mode = modes->mode_vacation;
+                    TRACE_D("here");
+                    house_mode = &modes->mode_vacation;
                 }
             }
         }
@@ -93,7 +102,7 @@ void ezlopi_cloud_modes_switch(cJSON *cj_request, cJSON *cj_response)
     {
         if (house_mode)
         {
-            ezlopi_core_modes_api_switch_mode(house_mode->_id);
+            ezlopi_core_modes_api_switch_mode(house_mode);
             cJSON_AddNumberToObject(cj_result, ezlopi_switchToDelay_str, house_mode->switch_to_delay_sec);
             cJSON_AddNumberToObject(cj_result, ezlopi_alarmDelay_str, house_mode->alarm_delay_sec);
         }
@@ -105,6 +114,9 @@ void ezlopi_cloud_modes_cancel_switch(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_entry_delay_cancel(cJSON *cj_request, cJSON *cj_response)
@@ -112,6 +124,9 @@ void ezlopi_cloud_modes_entry_delay_cancel(cJSON *cj_request, cJSON *cj_response
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_entry_delay_skip(cJSON *cj_request, cJSON *cj_response)
@@ -119,6 +134,9 @@ void ezlopi_cloud_modes_entry_delay_skip(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_switch_to_delay_set(cJSON *cj_request, cJSON *cj_response)
@@ -126,6 +144,9 @@ void ezlopi_cloud_modes_switch_to_delay_set(cJSON *cj_request, cJSON *cj_respons
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_alarm_delay_set(cJSON *cj_request, cJSON *cj_response)
@@ -133,6 +154,9 @@ void ezlopi_cloud_modes_alarm_delay_set(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_notifications_set(cJSON *cj_request, cJSON *cj_response)
@@ -140,6 +164,9 @@ void ezlopi_cloud_modes_notifications_set(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_disarmed_default_set(cJSON *cj_request, cJSON *cj_response)
@@ -147,6 +174,9 @@ void ezlopi_cloud_modes_disarmed_default_set(cJSON *cj_request, cJSON *cj_respon
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_disarmed_devices_add(cJSON *cj_request, cJSON *cj_response)
@@ -154,6 +184,9 @@ void ezlopi_cloud_modes_disarmed_devices_add(cJSON *cj_request, cJSON *cj_respon
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_disarmed_devices_remove(cJSON *cj_request, cJSON *cj_response)
@@ -161,6 +194,9 @@ void ezlopi_cloud_modes_disarmed_devices_remove(cJSON *cj_request, cJSON *cj_res
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_alarms_off_add(cJSON *cj_request, cJSON *cj_response)
@@ -168,6 +204,9 @@ void ezlopi_cloud_modes_alarms_off_add(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_alarms_off_remove(cJSON *cj_request, cJSON *cj_response)
@@ -175,6 +214,9 @@ void ezlopi_cloud_modes_alarms_off_remove(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_cameras_off_add(cJSON *cj_request, cJSON *cj_response)
@@ -182,6 +224,9 @@ void ezlopi_cloud_modes_cameras_off_add(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_cameras_off_remove(cJSON *cj_request, cJSON *cj_response)
@@ -189,6 +234,9 @@ void ezlopi_cloud_modes_cameras_off_remove(cJSON *cj_request, cJSON *cj_response
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_bypass_devices_add(cJSON *cj_request, cJSON *cj_response)
@@ -196,6 +244,9 @@ void ezlopi_cloud_modes_bypass_devices_add(cJSON *cj_request, cJSON *cj_response
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_bypass_devices_remove(cJSON *cj_request, cJSON *cj_response)
@@ -203,6 +254,9 @@ void ezlopi_cloud_modes_bypass_devices_remove(cJSON *cj_request, cJSON *cj_respo
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_protect_set(cJSON *cj_request, cJSON *cj_response)
@@ -210,6 +264,9 @@ void ezlopi_cloud_modes_protect_set(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_protect_buttons_set(cJSON *cj_request, cJSON *cj_response)
@@ -217,6 +274,9 @@ void ezlopi_cloud_modes_protect_buttons_set(cJSON *cj_request, cJSON *cj_respons
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_protect_devices_add(cJSON *cj_request, cJSON *cj_response)
@@ -224,6 +284,9 @@ void ezlopi_cloud_modes_protect_devices_add(cJSON *cj_request, cJSON *cj_respons
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_protect_devices_remove(cJSON *cj_request, cJSON *cj_response)
@@ -231,6 +294,9 @@ void ezlopi_cloud_modes_protect_devices_remove(cJSON *cj_request, cJSON *cj_resp
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_entry_delay_set(cJSON *cj_request, cJSON *cj_response)
@@ -238,6 +304,9 @@ void ezlopi_cloud_modes_entry_delay_set(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }
 
 void ezlopi_cloud_modes_entry_delay_reset(cJSON *cj_request, cJSON *cj_response)
@@ -245,4 +314,7 @@ void ezlopi_cloud_modes_entry_delay_reset(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    if (cj_result)
+    {
+    }
 }

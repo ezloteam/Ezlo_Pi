@@ -1,19 +1,41 @@
-#if 0
+#if 1
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
-#include "esp_sntp.h"
-
-#include "ezlopi_util_trace.h"
-#include "core_sntp.h"
+#include <esp_sntp.h>
 #include "../../build/config/sdkconfig.h"
 
+#include "ezlopi_util_trace.h"
+#include "ezlopi_core_sntp.h"
+
 static time_t start_time = 0;
+
+static void sntp_sync_time_call_back(struct timeval *tv);
 
 time_t sntp_core_get_up_time(void)
 {
     return start_time;
+}
+
+uint64_t ezlopi_sntp_core_get_current_time_ms(void)
+{
+    time_t now;
+    time(&now);
+    return (now * 1000LL);
+}
+
+void ezlopi_core_sntp_init(void)
+{
+    TRACE_S("Initializing SNTP");
+    esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
+    esp_sntp_setservername(0, "pool.ntp.org");
+    esp_sntp_setservername(1, "ntp-b.nist.gov");
+    esp_sntp_setservername(2, "ntp-wwv.nist.gov");
+    sntp_set_time_sync_notification_cb(sntp_sync_time_call_back);
+
+    sntp_set_sync_interval(10 * 1000);
+    esp_sntp_init();
 }
 
 static void sntp_sync_time_call_back(struct timeval *tv)
@@ -35,19 +57,6 @@ static void sntp_sync_time_call_back(struct timeval *tv)
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     TRACE_I("Time now[%ld]: %s", now, strftime_buf);
-}
-
-void core_sntp_init(void)
-{
-    TRACE_S("Initializing SNTP");
-    esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, "pool.ntp.org");
-    esp_sntp_setservername(1, "ntp-b.nist.gov");
-    esp_sntp_setservername(2, "ntp-wwv.nist.gov");
-    sntp_set_time_sync_notification_cb(sntp_sync_time_call_back);
-
-    sntp_set_sync_interval(10 * 1000);
-    esp_sntp_init();
 }
 
 #endif

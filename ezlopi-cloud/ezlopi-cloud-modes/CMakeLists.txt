@@ -11,6 +11,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-factory-info
         ezlopi-cloud-constants
         ezlopi-core-modes 
+        ezlopi-core-sntp
 )
 
 # Define HAL components

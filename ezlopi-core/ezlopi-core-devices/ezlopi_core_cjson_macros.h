@@ -82,6 +82,10 @@
                 free(obj_str);                                            \
             }                                                             \
         }                                                                 \
+        else                                                              \
+        {                                                                 \
+            TRACE_E("%s: Null", name ? name : "");                        \
+        }                                                                 \
     }
 
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \

@@ -99,10 +99,6 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
 
         cJSON_AddStringToObject(cjson_result, "localtime", ezlopi__str);
-
-        // now = sntp_core_get_up_time();
-        // localtime_r(&now, &timeinfo);
-        // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
         char *time_string = ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
         if (time_string)
         {
