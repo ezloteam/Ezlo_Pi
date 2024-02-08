@@ -9,6 +9,8 @@
 #include "ezlopi_util_trace.h"
 #include "sdkconfig.h"
 
+#include "EZLOPI_USER_CONFIG.h"
+
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
@@ -42,9 +44,13 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 
 void ezlopi_ble_service_init(void)
 {
-    ezlopi_ble_service_wifi_profile_init();
-    ezlopi_ble_service_security_init();
-    ezlopi_ble_service_provisioning_init();
+    
+    ezlopi_ble_service_wifi_profile_init();    
+    ezlopi_ble_service_security_init();  
+
+        
+    // ezlopi_ble_service_provisioning_init();
+#if 0 
     ezlopi_ble_service_device_info_init();
 
     ezlopi_ble_service_dynamic_config_init();
@@ -67,6 +73,7 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_start_secure_gatt_server_open_pairing();
 #endif
 #endif
+#endif 
 }
 
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)

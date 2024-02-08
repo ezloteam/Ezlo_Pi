@@ -111,7 +111,7 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char
         }
         else
         {
-            uri = cloud_url;
+            uri = (char *)cloud_url;
         }
 
         esp_http_client_config_t config = {
@@ -136,9 +136,10 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char
                 header = header->next;
             }
             esp_err_t err = esp_http_client_perform(client);
-            status_code = esp_http_client_get_status_code(client);
+           
             if (err == ESP_OK)
             {
+                status_code = esp_http_client_get_status_code(client);
                 while (!esp_http_client_is_complete_data_received(client))
                 {
                     vTaskDelay(50 / portTICK_RATE_MS);
@@ -163,8 +164,6 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char
                     http_get_data->response = ret;
                     http_get_data->status_code = status_code;
                 }
-                http_get_data->response = ret;
-                http_get_data->status_code = status_code;
             }
             else
             {
@@ -175,6 +174,10 @@ s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char
 
             ezlopi_http_free_rx_data(my_data);
             esp_http_client_cleanup(client);
+        }
+        if(uri)
+        {
+            free(uri);
         }
     }
     return http_get_data;
