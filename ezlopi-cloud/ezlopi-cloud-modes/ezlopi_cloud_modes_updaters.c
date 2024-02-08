@@ -22,9 +22,9 @@ void ezlopi_cloud_modes_switched(cJSON *cj_request, cJSON *cj_response)
         s_house_modes_t *curr_house_mode = ezlopi_core_modes_get_current_house_modes();
         if (curr_house_mode)
         {
-            // CJSON_ASSIGN_ID(cj_result, curr_house_mode->_id, ezlopi_modeId_str);
-            // cJSON_AddBoolToObject(cj_result, ezlopi_disarmedDefault_str, curr_house_mode->disarmed_default);
-            // cJSON_AddNumberToObject(cj_result, ezlopi_timestamp_str, ezlopi_sntp_core_get_current_time_ms());
+            CJSON_ASSIGN_ID(cj_result, curr_house_mode->_id, ezlopi_modeId_str);
+            cJSON_AddBoolToObject(cj_result, ezlopi_disarmedDefault_str, curr_house_mode->disarmed_default);
+            cJSON_AddNumberToObject(cj_result, ezlopi_timestamp_str, ezlopi_sntp_core_get_current_time_ms());
         }
     }
 }

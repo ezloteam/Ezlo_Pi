@@ -117,7 +117,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
 
                 if ((_mode_id & 0xffffff00) == _init_id)
                 {
-                    TRACE_D("here");
                     _mode_id &= 0x000000ff;
                     s_house_modes_t *cur_house_mode = NULL;
 
@@ -125,7 +124,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                     {
                     case EZLOPI_HOUSE_MODE_REF_ID_HOME:
                     {
-                        TRACE_D("here");
                         cur_house_mode = &parsed_mode->mode_home;
                         parsed_mode->mode_home._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_HOME);
                         parsed_mode->mode_home.name = ezlopi_Home_str;
@@ -133,7 +131,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                     }
                     case EZLOPI_HOUSE_MODE_REF_ID_AWAY:
                     {
-                        TRACE_D("here");
                         cur_house_mode = &parsed_mode->mode_away;
                         parsed_mode->mode_away._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_AWAY);
                         parsed_mode->mode_away.name = ezlopi_Away_str;
@@ -141,7 +138,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                     }
                     case EZLOPI_HOUSE_MODE_REF_ID_NIGHT:
                     {
-                        TRACE_D("here");
                         cur_house_mode = &parsed_mode->mode_night;
                         parsed_mode->mode_night._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_NIGHT);
                         parsed_mode->mode_night.name = ezlopi_Night_str;
@@ -149,7 +145,6 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                     }
                     case EZLOPI_HOUSE_MODE_REF_ID_VACATION:
                     {
-                        TRACE_D("here");
                         cur_house_mode = &parsed_mode->mode_vacation;
                         parsed_mode->mode_vacation._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_VACATION);
                         parsed_mode->mode_vacation.name = ezlopi_Vacation_str;
@@ -211,13 +206,14 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
                     CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_protect_str, cur_house_mode->protect);
                     CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_armed_str, cur_house_mode->armed);
 
-                    CJSON_TRACE("cur_house_mode->cj_notifications", cur_house_mode->cj_notifications);
-                    CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
-                    CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
-                    CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
+                    // CJSON_TRACE("cur_house_mode->cj_notifications", cur_house_mode->cj_notifications);
+                    // CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
+                    // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
+                    // CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
                 }
                 else
                 {
+                    TRACE_E("modes in NVS is corrupted!");
                     _parsing_status = -1;
                     break;
                 }
@@ -332,7 +328,7 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
     {
         char *empty_string = " ";
         ezlopi_nvs_write_modes(empty_string);
-        TRACE_W("Reseted modes");
+        TRACE_W("Reseted modes from NVS");
     }
 
     return parsed_mode;
