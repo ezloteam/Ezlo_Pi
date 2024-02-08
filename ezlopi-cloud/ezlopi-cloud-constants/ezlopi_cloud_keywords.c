@@ -194,6 +194,7 @@ const char *ezlopi_ip_nmask_str = "ip_nmask";
 const char *ezlopi_ip_gw_str = "ip_gw";
 const char *ezlopi_pass_str = "pass";
 const char *ezlopi_cmd_str = "cmd";
+const char *ezlopi_sub_cmd_str = "sub_cmd";
 const char *ezlopi_uuid_prov_str = "uuid_prov";
 const char *ezlopi_status_write_str = "status_write";
 const char *ezlopi_status_connect_str = "status_connect";
