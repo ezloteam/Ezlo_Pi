@@ -207,7 +207,8 @@ static void __parse_web_host_name(s_ezlopi_scenes_then_methods_send_http_t *tmp_
 static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req)
 {
     int ret, flags, len;
-    uint32_t tmp_buf_size = 512;
+    // char tmp_buf[512];
+    uint32_t tmp_buf_size = 512; // sizeof(tmp_buf);
     char *tmp_buf = (char *)malloc(tmp_buf_size * sizeof(char));
     if (tmp_buf)
     {
@@ -268,8 +269,8 @@ static void __ezlopi_http_request_via_mbedTLS(const char *web_server, int web_po
            a warning if CA verification fails but it will continue to connect.
            You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
         */
-        mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
-        // mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
+        // mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
+        mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
         mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
         mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
 #ifdef CONFIG_MBEDTLS_DEBUG
@@ -565,7 +566,7 @@ void ezlopi_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_
     // TRACE_D("[%d]Password : [%d] occupied", config->password_maxlen, GET_STRING_SIZE(config->password));
     // TRACE_D("[%d]Content : [%d] occupied", config->content_maxlen, GET_STRING_SIZE(config->content));
 #endif
-    int REQUEST_LENGTH = 1 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
+    int REQUEST_LENGTH = 10 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
     char *REQUEST = (char *)malloc(sizeof(char) * REQUEST_LENGTH);
     if (REQUEST)
     {

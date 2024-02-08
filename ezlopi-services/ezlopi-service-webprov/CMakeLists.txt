@@ -1,11 +1,20 @@
 
 file(GLOB_RECURSE provisioning_src "*.c*")
 
+set(ESP_IDF_COMPONENTS  
+        freertos
+    )
+
+set(EZLOPI_COMPONENTS 
+        ezlopi-util-trace
+    )
+
 set(EZLOPI_CORE_COMPONENTS  
         ezlopi-core-factory-info 
         ezlopi-core-wifi
         ezlopi-core-websocket_client 
         ezlopi-core-http
+       
 )
 
 set(EZLOPI_CLOUD_COMPONENTS 
@@ -28,6 +37,8 @@ set(EZLOPI_CLOUD_COMPONENTS
 
 idf_component_register(SRCS "${provisioning_src}"
     INCLUDE_DIRS "."
-    REQUIRES    ${EZLOPI_CORE_COMPONENTS} 
+    REQUIRES    ${EZLOPI_IDF_COMPONENTS} 
+                ${EZLOPI_COMPONENTS} 
+                ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_CLOUD_COMPONENTS} 
     )
