@@ -4,6 +4,7 @@ file(GLOB_RECURSE config_src "*.c")
 
 set(ESP_IDF_COMPONENTS 
         json 
+        lwip
         esp-tls
         esp_http_client
         mbedtls

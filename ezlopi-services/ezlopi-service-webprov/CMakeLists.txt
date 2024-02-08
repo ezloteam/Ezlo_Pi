@@ -38,7 +38,7 @@ set(EZLOPI_CLOUD_COMPONENTS
 
 idf_component_register(SRCS "ezlopi_service_webprov.c" "${provisioning_src}"
     INCLUDE_DIRS "."
-    REQUIRES    ${EZLOPI_IDF_COMPONENTS} 
+    REQUIRES    ${ESP_IDF_COMPONENTS} 
                 ${EZLOPI_COMPONENTS} 
                 ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_CLOUD_COMPONENTS} 

@@ -839,7 +839,7 @@ const char *ezlopi_scenes_value_with_less_comparator_operators_get_method(e_scen
     }
     return ret;
 }
-
+#if 0
 int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
@@ -922,7 +922,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
 
     return ret;
 }
-
+#endif
 /************* Values without less ************/
 
 static const char *const ezlopi_scenes_value_without_less_cmp_operators_op[] = {
@@ -991,7 +991,7 @@ const char *ezlopi_scenes_value_without_less_comparator_operators_get_method(e_s
     }
     return ret;
 }
-
+#if 0
 int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field)
 {
     int ret = 0;
@@ -1056,7 +1056,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
 
     return ret;
 }
-
+#endif
 /************* compareValues ************/
 
 int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *value_type_field, l_fields_v2_t *comparator_field)

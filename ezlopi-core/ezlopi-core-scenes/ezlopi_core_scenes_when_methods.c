@@ -273,10 +273,8 @@ static uint8_t __find_nth_week_of_curr_month(struct tm *info)
             tmp_weekday_of_curr_month = 6; // sunday -> saturday
         }
     }
-
     // TRACE_B("First day in current month = %d", tmp_weekday_of_curr_month);
     // TRACE_B("[1-7] : %dth_Day  lies in week[%dth] of the current month", (info->tm_wday), tmp_week_num);
-
     return tmp_week_num;
 }
 static uint8_t __field_weeks_check(e_isdate_modes_t mode_type, struct tm *info, cJSON *cj_weeks_arr)
@@ -357,7 +355,13 @@ static void __update_today_sunrise_sunset_time(int tm_mday, struct tm *sunrise_t
         };
 
         // must return 'true' if success
-        ezlopi_http_scenes_then_sendhttp_request(&tmp_config);
+        char *response = NULL;
+        ezlopi_core_http_scenes_then_sendhttp_request(&tmp_config, &response);
+        if (response)
+        {
+            TRACE_I("isSunState : [%p]response = [%d]%s.", response, strlen(response), response);
+            free(response);
+        }
         // get the time // for Example
         sunrise_time->tm_mday = sunset_time->tm_mday = tm_mday;
         sunrise_time->tm_hour = 6;
@@ -1516,7 +1520,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t *scene_node, void *arg)
     if (when_block && scene_node)
     {
         uint32_t item_id = 0;
-        l_fields_v2_t *expression_field = NULL;
+        // l_fields_v2_t *expression_field = NULL;
         l_fields_v2_t *value_field = NULL;
         l_fields_v2_t *comparator_field = NULL;
 
@@ -1533,15 +1537,15 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t *scene_node, void *arg)
             }
             else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
             {
-                if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && NULL != curr_field->value.value_string)
-                {
-                    expression_field = curr_field; // this field has expression_name
-                }
-                else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && NULL != curr_field->value.value_string)
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && NULL != curr_field->value.value_string)
                 {
 
                     value_field = curr_field; // this field has string
                 }
+                // else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && NULL != curr_field->value.value_string)
+                // {
+                //     expression_field = curr_field; // this field has expression_name
+                // }
             }
             curr_field = curr_field->next;
         }
@@ -1566,7 +1570,7 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg
     if (when_block && scene_node)
     {
         uint32_t item_id = 0;
-        l_fields_v2_t *expression_field = NULL;
+        // l_fields_v2_t *expression_field = NULL;
         l_fields_v2_t *value_field = NULL;
         l_fields_v2_t *comparator_field = NULL;
 
@@ -1583,11 +1587,7 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg
             }
             else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
             {
-                if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && NULL != curr_field->value.value_string)
-                {
-                    expression_field = curr_field; // this field has expression_name
-                }
-                else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && NULL != curr_field->value.value_string)
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && NULL != curr_field->value.value_string)
                 {
                     value_field = curr_field; // this field has string
                 }
@@ -1595,6 +1595,10 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t *scene_node, void *arg
                 {
                     value_field = curr_field; // this field has double/int value
                 }
+                // else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && NULL != curr_field->value.value_string)
+                // {
+                //     expression_field = curr_field; // this field has expression_name
+                // }
             }
             curr_field = curr_field->next;
         }
@@ -1619,7 +1623,7 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t *scene_node, void *arg)
     if (when_block && scene_node)
     {
         uint32_t item_id = 0;
-        l_fields_v2_t *expression_field = NULL;
+        // l_fields_v2_t *expression_field = NULL;
         l_fields_v2_t *value_field = NULL;
         l_fields_v2_t *comparator_field = NULL;
 
@@ -1666,7 +1670,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t *scene_node, void *arg)
         uint32_t item_id = 0;
         l_fields_v2_t *value_type_field = NULL;
         l_fields_v2_t *value_field = NULL;
-        l_fields_v2_t *expression_field = NULL;
+        // l_fields_v2_t *expression_field = NULL;
         l_fields_v2_t *comparator_field = NULL;
 
         // e_scene_value_type_v2_t value_type = EZLOPI_VALUE_TYPE_NONE;

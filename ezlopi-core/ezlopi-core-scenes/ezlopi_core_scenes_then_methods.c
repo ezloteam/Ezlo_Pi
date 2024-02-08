@@ -2,7 +2,7 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
-#include "ezlopi_core_reboot.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
@@ -138,49 +138,55 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 {
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
-                        ezlopi_http_scenes_then_parse_url(tmp_http_data, curr_field->value.value_string); // extracts : url, Host_name & Port_num.
+                        ezlopi_core_http_scenes_then_parse_url(tmp_http_data, curr_field->value.value_string); // extracts : url, Host_name & Port_num.
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "credential", 11))
                 {
                     if (cJSON_IsObject(curr_field->value.cj_value))
                     {
-                        ezlopi_http_scenes_then_parse_username_password(tmp_http_data, curr_field->value.cj_value);
+                        ezlopi_core_http_scenes_then_parse_username_password(tmp_http_data, curr_field->value.cj_value);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "contentType", 12))
                 {
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
-                        ezlopi_http_scenes_then_parse_content_type(tmp_http_data, curr_field->value.value_string);
+                        ezlopi_core_http_scenes_then_parse_content_type(tmp_http_data, curr_field->value.value_string);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "content", 8))
                 {
                     if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                     {
-                        ezlopi_http_scenes_then_parse_content(tmp_http_data, curr_field->value.value_string);
+                        ezlopi_core_http_scenes_then_parse_content(tmp_http_data, curr_field->value.value_string);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "headers", 8))
                 {
                     if ((EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type) && (cJSON_IsObject(curr_field->value.cj_value)))
                     {
-                        ezlopi_http_scenes_then_parse_headers(tmp_http_data, curr_field->value.cj_value);
+                        ezlopi_core_http_scenes_then_parse_headers(tmp_http_data, curr_field->value.cj_value);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, "skipSecurity", 12))
                 {
                     if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
-                        ezlopi_http_scenes_then_parse_skipsecurity(tmp_http_data, curr_field->value.value_bool);
+                        ezlopi_core_http_scenes_then_parse_skipsecurity(tmp_http_data, curr_field->value.value_bool);
                     }
                 }
                 curr_field = curr_field->next;
             }
 
-            ezlopi_http_scenes_then_sendhttp_request(tmp_http_data);
-            ezlopi_http_scenes_then_clear_struct_ptr_mem(tmp_http_data);
+            char *response_buffer = NULL;
+            ezlopi_core_http_scenes_then_sendhttp_request(tmp_http_data, &response_buffer); // Returns:- [response_buffer = &Memory_block]
+            if (response_buffer)
+            {
+                TRACE_I("sendHttp : [%p]response_buffer = [%d]%s.", response_buffer, strlen(response_buffer), response_buffer);
+                free(response_buffer);
+            }
+            ezlopi_core_http_scenes_then_clear_struct_ptr_mem(tmp_http_data);
 
             free(tmp_http_data);
         }
@@ -231,7 +237,7 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
         if (curr_then)
         {
             TRACE_E("Rebooting ESP......................... ");
-            ezlopi_reboot();
+            EZPI_CORE_reboot();
         }
 
         cJSON_Delete(cj_params);
@@ -266,7 +272,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
                             ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
-                            ezlopi_reboot();
+                            EZPI_CORE_reboot();
                         }
                         else if (0 == strncmp(curr_field->value.value_string, "soft", 5))
                         {
@@ -274,7 +280,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            ezlopi_reboot();
+                            EZPI_CORE_reboot();
                         }
                         else if (0 == strncmp(curr_field->value.value_string, "hard", 5))
                         {
