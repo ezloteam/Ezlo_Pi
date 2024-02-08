@@ -318,7 +318,7 @@ static uint8_t web_provisioning_config_update(void* arg)
 
 static void web_provisioning_config_check(void* pv)
 {
-    s_ezlopi_http_data_t* response = malloc(sizeof(s_ezlopi_http_data_t));
+    s_ezlopi_http_data_t* response = NULL;
     char* ca_certificate = NULL;
     char* provision_token = NULL;
     char* provisioning_server = NULL;
@@ -330,15 +330,14 @@ static void web_provisioning_config_check(void* pv)
     provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
 
+    cJSON* root_header_prov_token = cJSON_CreateObject();
+    cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
+
     while (1)
     {
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
 
         TRACE_D("water_mark: %d", uxTaskGetStackHighWaterMark(NULL));
-
-        cJSON* root_header_prov_token = cJSON_CreateObject();
-
-        cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
 
         if (NULL != provisioning_server)
         {
@@ -347,77 +346,82 @@ static void web_provisioning_config_check(void* pv)
             if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
             {
                 provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
-            }
-
-            if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
-            {
-                char http_request_location[200];
-                snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
-                response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
-                if (NULL != response)
+                if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
                 {
-                    TRACE_I("Statuc Code : %d", response->status_code);
+                    char http_request_location[200];
+                    snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
+                    response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
+                    if (NULL != response)
+                    {
+                        TRACE_I("Status Code : %d", response->status_code);
 
-                    switch (response->status_code)
-                    {
-                    case HttpStatus_Ok:
-                    {
-                        // re-write all the info into the flash region
-                        TRACE_I("Data : %s", response->response);
-                        if (0 == web_provisioning_config_update(response->response))
+                        switch (response->status_code)
                         {
-                            retry_count++;
-                            if (retry_count >= 5)
+                        case HttpStatus_Ok:
+                        {
+                            // re-write all the info into the flash region
+                            TRACE_I("Data : %s", response->response);
+                            if (0 == web_provisioning_config_update(response->response))
+                            {
+                                retry_count++;
+                                if (retry_count >= 5)
+                                {
+                                    flag_break_loop = 1;
+                                }
+                            }
+                            else
                             {
                                 flag_break_loop = 1;
                             }
+                            break;
                         }
-                        else
+                        default:
                         {
-                            flag_break_loop = 1;
+                            if (304 == response->status_code) // HTTP Status not modified
+                            {
+                                TRACE_I("Config data not changed !");
+                                flag_break_loop = 1;
+                            }
+                            break;
                         }
-                        break;
+                        }
+                        if (response->response)
+                        {
+                            free(response->response);
+                        }
+                        free(response);
                     }
-                    default:
+                    else
                     {
-                        if (304 == response->status_code) // HTTP Status not modified
-                        {
-                            TRACE_I("Config data not changed !");
-                            flag_break_loop = 1;
-                        }
-                        break;
+                        flag_break_loop = 1;
                     }
-                    }
-                    free(response->response);
-                    free(response);
                 }
-
-                if (flag_break_loop)
+                else
                 {
-                    xTaskNotifyGive(ezlopi_update_config_notifier);
-                    break;
+                    flag_break_loop = 1;
                 }
             }
             else
             {
-                xTaskNotifyGive(ezlopi_update_config_notifier);
-                break;
+                flag_break_loop = 1;
             }
         }
         else
         {
+            flag_break_loop = 1;
+        }
+        if (flag_break_loop)
+        {
             xTaskNotifyGive(ezlopi_update_config_notifier);
             break;
         }
-
-        vTaskDelay(50000 / portTICK_RATE_MS);
-        cJSON_Delete(root_header_prov_token);
+        vTaskDelay(10000 / portTICK_RATE_MS);
     }
 
+    cJSON_Delete(root_header_prov_token);
     free(ca_certificate);
     free(provision_token);
     free(provisioning_server);
-
     vTaskDelete(NULL);
 }
 
