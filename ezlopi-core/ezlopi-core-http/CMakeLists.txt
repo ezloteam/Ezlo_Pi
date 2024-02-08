@@ -6,6 +6,7 @@ set(ESP_IDF_COMPONENTS
         json 
         esp-tls
         esp_http_client
+        mbedtls
 )
 
 set(EZLOPI_COMPONENTS 

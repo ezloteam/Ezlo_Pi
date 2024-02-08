@@ -322,6 +322,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_INT:
+                    case EZLOPI_VALUE_TYPE_FLOAT:
                     {
                         cJSON_AddNumberToObject(cj_field, ezlopi_value_str, curr_field->value.value_double);
                         break;
@@ -338,21 +339,8 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                         }
                         break;
                     }
-                    case EZLOPI_VALUE_TYPE_FLOAT:
-                    {
-                        cJSON_AddNumberToObject(cj_field, ezlopi_value_str, curr_field->value.value_double);
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_STRING:
-                    {
-                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->value.value_string);
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_ITEM:
-                    {
-                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->value.value_string);
-                        break;
-                    }
                     case EZLOPI_VALUE_TYPE_INTERVAL:
                     {
                         __cjson_add_string(cj_field, ezlopi_value_str, curr_field->value.value_string);

@@ -15,6 +15,11 @@
 #include "ezlopi_service_webprov.h"
 
 static void ota_service_process(void *pv);
+static volatile bool __ota_busy = false;
+bool __get_ota_service_busy_state(void)
+{
+    return __ota_busy;
+}
 
 void ota_service_init(void)
 {
@@ -27,7 +32,7 @@ static void ota_service_process(void *pv)
     vTaskDelay(5000 / portTICK_RATE_MS);
     while (1)
     {
-
+        __ota_busy = true;
         int ret_nma_reg = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 60000, false);
         int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
         TRACE_D("Configuration Selection NMA Reg: %d", ret_nma_reg);
@@ -50,9 +55,11 @@ static void ota_service_process(void *pv)
                     free(data_to_send);
                 }
             }
+            __ota_busy = false; // must clear immediately ; if OTA-event is serviced
         }
         else
         {
+            __ota_busy = false; // must clear before the delay
             vTaskDelay(1000 / portTICK_RATE_MS);
         }
     }

@@ -1,4 +1,6 @@
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_mac.h"
 #include "esp_wifi_types.h"
 #include "esp_idf_version.h"

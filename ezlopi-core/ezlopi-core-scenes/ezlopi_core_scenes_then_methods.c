@@ -1,6 +1,11 @@
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_http.h"
+#include "ezlopi_core_reboot.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_then_methods.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -91,11 +96,99 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
+
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+
+    int ret = 0;
+    l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
+    if (curr_then)
+    {
+        s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data = (s_ezlopi_scenes_then_methods_send_http_t *)malloc(sizeof(s_ezlopi_scenes_then_methods_send_http_t));
+        if (tmp_http_data)
+        {
+            memset(tmp_http_data, 0, sizeof(s_ezlopi_scenes_then_methods_send_http_t));
+            l_fields_v2_t *curr_field = curr_then->fields;
+            while (NULL != curr_field) // fields
+            {
+                if (0 == strncmp(curr_field->name, "request", 8))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                    {
+                        if (0 == strncmp(curr_field->value.value_string, "GET", 4))
+                        {
+                            tmp_http_data->method = HTTP_METHOD_GET;
+                        }
+                        else if (0 == strncmp(curr_field->value.value_string, "POST", 5))
+                        {
+                            tmp_http_data->method = HTTP_METHOD_POST;
+                        }
+                        else if (0 == strncmp(curr_field->value.value_string, "PUT", 4))
+                        {
+                            tmp_http_data->method = HTTP_METHOD_PUT;
+                        }
+                        else if (0 == strncmp(curr_field->value.value_string, "DELETE", 7))
+                        {
+                            tmp_http_data->method = HTTP_METHOD_DELETE;
+                        }
+#warning "Some http-methods are still remaining" // Document mentions only four of them.
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "url", 4))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                    {
+                        ezlopi_http_scenes_then_parse_url(tmp_http_data, curr_field->value.value_string); // extracts : url, Host_name & Port_num.
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "credential", 11))
+                {
+                    if (cJSON_IsObject(curr_field->value.cj_value))
+                    {
+                        ezlopi_http_scenes_then_parse_username_password(tmp_http_data, curr_field->value.cj_value);
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "contentType", 12))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                    {
+                        ezlopi_http_scenes_then_parse_content_type(tmp_http_data, curr_field->value.value_string);
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "content", 8))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
+                    {
+                        ezlopi_http_scenes_then_parse_content(tmp_http_data, curr_field->value.value_string);
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "headers", 8))
+                {
+                    if ((EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type) && (cJSON_IsObject(curr_field->value.cj_value)))
+                    {
+                        ezlopi_http_scenes_then_parse_headers(tmp_http_data, curr_field->value.cj_value);
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, "skipSecurity", 12))
+                {
+                    if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                    {
+                        ezlopi_http_scenes_then_parse_skipsecurity(tmp_http_data, curr_field->value.value_bool);
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+
+            ezlopi_http_scenes_then_sendhttp_request(tmp_http_data);
+            ezlopi_http_scenes_then_clear_struct_ptr_mem(tmp_http_data);
+
+            free(tmp_http_data);
+        }
+    }
+
+    return ret;
 }
+
 int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");
@@ -126,16 +219,78 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
+
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    cJSON *cj_params = cJSON_CreateObject();
+
+    if (cj_params)
+    {
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
+        if (curr_then)
+        {
+            TRACE_E("Rebooting ESP......................... ");
+            ezlopi_reboot();
+        }
+
+        cJSON_Delete(cj_params);
+    }
+    return ret;
 }
+
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    cJSON *cj_params = cJSON_CreateObject();
+
+    if (cj_params)
+    {
+        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t *curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, "type", 5))
+                {
+                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                    {
+                        TRACE_I("value: %s", curr_field->value.value_string);
+                        if (0 == strncmp(curr_field->value.value_string, "factory", 8))
+                        {
+                            TRACE_E("Factory Reseting ESP......................... ");
+                            // clear the settings realated to scenes, devices, items, rooms,etc
+                            ezlopi_scenes_scripts_factory_info_reset();
+                            ezlopi_device_factory_info_reset();
+                            ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
+
+                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            ezlopi_reboot();
+                        }
+                        else if (0 == strncmp(curr_field->value.value_string, "soft", 5))
+                        {
+                            ezlopi_nvs_scenes_soft_reset();
+
+                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            TRACE_E("Rebooting ESP......................... ");
+                            ezlopi_reboot();
+                        }
+                        else if (0 == strncmp(curr_field->value.value_string, "hard", 5))
+                        {
+                        }
+                    }
+                }
+
+                curr_field = curr_field->next;
+            }
+        }
+
+        cJSON_Delete(cj_params);
+    }
+    return ret;
 }
+
 int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
 {
     TRACE_W("Warning: then-method not implemented!");

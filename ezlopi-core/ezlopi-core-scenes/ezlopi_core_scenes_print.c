@@ -30,18 +30,18 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         TRACE_D("\t\t\t|-- name: %s", fields->name);
 
         const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(fields->value_type);
-        TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : ezlopi__str);
+        TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : "");
 
         switch (fields->value_type)
         {
         case EZLOPI_VALUE_TYPE_INT:
         {
-            TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
+            TRACE_D("\t\t\t|-- value: %d", (int)(fields->value.value_double));
             break;
         }
         case EZLOPI_VALUE_TYPE_BOOL:
         {
-            TRACE_D("\t\t\t|-- value: [%d]%s", fields->value.value_bool, fields->value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+            TRACE_D("\t\t\t|-- value: [%d]%s", fields->value.value_bool, fields->value.value_bool ? "true" : "false");
             break;
         }
         case EZLOPI_VALUE_TYPE_FLOAT:
@@ -49,17 +49,12 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
             break;
         }
-        case EZLOPI_VALUE_TYPE_STRING:
-        {
-            TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
-            break;
-        }
         case EZLOPI_VALUE_TYPE_ITEM:
-        {
-            TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
-            break;
-        }
+        case EZLOPI_VALUE_TYPE_TOKEN:
+        case EZLOPI_VALUE_TYPE_STRING:
         case EZLOPI_VALUE_TYPE_INTERVAL:
+        case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
         {
             TRACE_D("\t\t\t|-- value: %s", fields->value.value_string);
             break;
@@ -69,14 +64,28 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
             ezlopi_print_when_blocks((l_when_block_v2_t *)fields->value.when_block);
             break;
         }
-        case EZLOPI_VALUE_TYPE_DICTIONARY:
         case EZLOPI_VALUE_TYPE_ARRAY:
+        case EZLOPI_VALUE_TYPE_INT_ARRAY:
+        case EZLOPI_VALUE_TYPE_DICTIONARY:
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+        {
+            char *fields_json_value = cJSON_PrintUnformatted(fields->value.cj_value);
+            if (fields_json_value)
+            {
+                TRACE_D("\t\t\t|-- value: %s", fields_json_value);
+                free(fields_json_value);
+            }
+            else
+            {
+                TRACE_E("Value type not matched!");
+            }
+            break;
+        }
         case EZLOPI_VALUE_TYPE_RGB:
         case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
         case EZLOPI_VALUE_TYPE_USER_CODE:
         case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
         case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-        case EZLOPI_VALUE_TYPE_TOKEN:
         case EZLOPI_VALUE_TYPE_BUTTON_STATE:
         case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
         case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
@@ -124,10 +133,6 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
         case EZLOPI_VALUE_TYPE_DEVICE:
         case EZLOPI_VALUE_TYPE_EXPRESSION:
-        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-        case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-        case EZLOPI_VALUE_TYPE_INT_ARRAY:
-        case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
         {
