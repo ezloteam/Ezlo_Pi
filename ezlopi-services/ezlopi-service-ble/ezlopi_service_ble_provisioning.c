@@ -26,21 +26,21 @@
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
 
-static s_gatt_service_t *g_provisioning_service;
-static s_linked_buffer_t *g_provisioning_linked_buffer = NULL;
+static s_gatt_service_t* g_provisioning_service;
+static s_linked_buffer_t* g_provisioning_linked_buffer = NULL;
 
-static char *__provisioning_info_jsonify(void);
-static char *__provisioning_info_base64(void);
-static char *__base64_decode_provisioning_info(uint32_t total_size);
+static char* __provisioning_info_jsonify(void);
+static char* __provisioning_info_base64(void);
+static char* __base64_decode_provisioning_info(uint32_t total_size);
 
-static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
-static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+static void __provisioning_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
 #if 0
-static void __process_provisioning_info(uint8_t *value, uint32_t len);
-static void __provisioning_info_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+static void __process_provisioning_info(uint8_t* value, uint32_t len);
+static void __provisioning_info_exec_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 #endif
 
 void ezlopi_ble_service_provisioning_init(void)
@@ -57,6 +57,7 @@ void ezlopi_ble_service_provisioning_init(void)
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
+    // ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, NULL, NULL, NULL);
     ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, __provisioning_info_read_func, __provisioning_info_write_func, NULL); // reliable-write is not implemented for now
 
     uuid.uuid.uuid16 = BLE_PROVISIONING_STATUS_CHAR_UUID;
@@ -64,12 +65,14 @@ void ezlopi_ble_service_provisioning_init(void)
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
     ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, __provisioning_status_read_func, NULL, NULL);
+
 }
 
-static char *__provisioning_status_jsonify(void)
+#if 1
+static char* __provisioning_status_jsonify(void)
 {
-    char *prov_status_jstr = NULL;
-    cJSON *root = cJSON_CreateObject();
+    char* prov_status_jstr = NULL;
+    cJSON* root = cJSON_CreateObject();
     if (root)
     {
         uint32_t prov_stat = ezlopi_nvs_get_provisioning_status();
@@ -101,11 +104,11 @@ static char *__provisioning_status_jsonify(void)
     return prov_status_jstr;
 }
 
-static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void __provisioning_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     if (value)
     {
-        static char *prov_status_jstr;
+        static char* prov_status_jstr;
         if (NULL == prov_status_jstr)
         {
             prov_status_jstr = __provisioning_status_jsonify();
@@ -119,7 +122,7 @@ static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gat
 
             if ((0 != total_data_len) && (total_data_len > param->read.offset))
             {
-                strncpy((char *)value->value, prov_status_jstr + param->read.offset, copy_size);
+                strncpy((char*)value->value, prov_status_jstr + param->read.offset, copy_size);
                 value->len = copy_size;
             }
             else
@@ -147,7 +150,7 @@ static void __provisioning_status_read_func(esp_gatt_value_t *value, esp_ble_gat
     }
 }
 
-static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     TRACE_D("Write function called!");
     TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
@@ -167,7 +170,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
     {
         if ((NULL != param->write.value) && (param->write.len > 0))
         {
-            cJSON *root = cJSON_ParseWithLength((const char *)param->write.value, param->write.len);
+            cJSON* root = cJSON_ParseWithLength((const char*)param->write.value, param->write.len);
             if (root)
             {
 
@@ -183,18 +186,18 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                 {
                     if (((sequence - 1) * 400 + len) >= tot_len)
                     {
-                        char *decoded_data = __base64_decode_provisioning_info(tot_len); // uncommente f
+                        char* decoded_data = __base64_decode_provisioning_info(tot_len); // uncommente f
                         if (decoded_data)
                         {
-                            cJSON *cj_config = cJSON_Parse(decoded_data);
+                            cJSON* cj_config = cJSON_Parse(decoded_data);
                             if (cj_config)
                             {
-                                char *user_id = NULL;
+                                char* user_id = NULL;
                                 CJSON_GET_VALUE_STRING(cj_config, ezlopi_user_id_str, user_id);
 
                                 if (user_id && (BLE_AUTH_SUCCESS == ezlopi_ble_auth_check_user_id(user_id)))
                                 {
-                                    s_basic_factory_info_t *ezlopi_config_basic = malloc(sizeof(s_basic_factory_info_t));
+                                    s_basic_factory_info_t* ezlopi_config_basic = malloc(sizeof(s_basic_factory_info_t));
                                     if (ezlopi_config_basic)
                                     {
                                         // ezlopi_config_basic->user_id = user_id;
@@ -227,9 +230,9 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                         free(ezlopi_config_basic);
                                     }
 
-                                    char *ca_certs = NULL;
-                                    char *ssl_shared_key = NULL;
-                                    char *ssl_private_key = NULL;
+                                    char* ca_certs = NULL;
+                                    char* ssl_shared_key = NULL;
+                                    char* ssl_private_key = NULL;
 
                                     CJSON_GET_VALUE_STRING(cj_config, ezlopi_ssl_private_key_str, ssl_private_key);
                                     // CJSON_GET_VALUE_STRING(cj_config, "ssl_public_key", ssl_public_key);
@@ -245,7 +248,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
                                 {
                                     TRACE_E("User varification failed!");
 
-                                    char *curr_user_id = ezlopi_nvs_read_user_id_str();
+                                    char* curr_user_id = ezlopi_nvs_read_user_id_str();
                                     if (curr_user_id)
                                     {
                                         TRACE_D("current user: %s", curr_user_id);
@@ -268,11 +271,11 @@ static void __provisioning_info_write_func(esp_gatt_value_t *value, esp_ble_gatt
     }
 }
 
-static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     TRACE_D("Read function called!");
 
-    static char *g_provisioning_info_base64;
+    static char* g_provisioning_info_base64;
     static uint32_t g_provisioning_sequence_no;
     static time_t g_provisioning_last_read_time;
     static uint32_t g_provisioning_number_of_sequence;
@@ -314,18 +317,18 @@ static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts
                 TRACE_B("copy_size: %d", copy_size);
                 TRACE_B("total_data_len: %d", total_data_len);
 
-                cJSON *cj_response = cJSON_CreateObject();
+                cJSON* cj_response = cJSON_CreateObject();
                 if (cj_response)
                 {
-                    static char data_buffer[400 + 1];
-                    snprintf(data_buffer, sizeof(data_buffer), "%.*s", copy_size, g_provisioning_info_base64 + (g_provisioning_sequence_no * 400));
+                    char* data_buffer = (char*)malloc(400 + 1);
+                    snprintf(data_buffer, 400, "%.*s", copy_size, g_provisioning_info_base64 + (g_provisioning_sequence_no * 400));
 
                     cJSON_AddNumberToObject(cj_response, ezlopi_len_str, copy_size);
                     cJSON_AddNumberToObject(cj_response, ezlopi_total_len_str, total_data_len);
                     cJSON_AddNumberToObject(cj_response, ezlopi_sequence_str, g_provisioning_sequence_no);
                     cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
-                    char *send_data = cJSON_Print(cj_response);
+                    char* send_data = cJSON_Print(cj_response);
                     if (send_data)
                     {
                         TRACE_D("data: %s", send_data);
@@ -334,9 +337,9 @@ static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts
                         if ((0 != total_data_len) && (total_data_len >= ((g_provisioning_sequence_no * 400) + copy_size)))
                         {
                             value->len = strlen(send_data);
-                            strncpy((char *)value->value, send_data, value->len + 1);
+                            strncpy((char*)value->value, send_data, value->len + 1);
 
-                            TRACE_B("data: %s", (char *)value->value);
+                            TRACE_B("data: %s", (char*)value->value);
 
                             g_provisioning_sequence_no += 1;
                             status = 0;
@@ -363,6 +366,7 @@ static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts
                     }
 
                     cJSON_Delete(cj_response);
+                    free(data_buffer);
                 }
                 else
                 {
@@ -408,87 +412,26 @@ static void __provisioning_info_read_func(esp_gatt_value_t *value, esp_ble_gatts
     }
 }
 
-#if 0
-static void __provisioning_info_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static char* __base64_decode_provisioning_info(uint32_t total_size)
 {
-    if (g_provisioning_linked_buffer)
-    {
-        TRACE_D("Write execute function called.");
-        ezlopi_ble_buffer_accumulate_to_start(g_provisioning_linked_buffer);
-        __process_provisioning_info(g_provisioning_linked_buffer->buffer, g_provisioning_linked_buffer->len);
-        ezlopi_ble_buffer_free_buffer(g_provisioning_linked_buffer);
-        g_provisioning_linked_buffer = NULL;
-    }
-}
-
-static void __process_provisioning_info(uint8_t *value, uint32_t len)
-{
-    if ((NULL != value) && (len > 0))
-    {
-        cJSON *root = cJSON_Parse((const char *)value);
-        if (root)
-        {
-            TRACE_D("value = %s", value);
-            char *user_id = cJSON_GetObjectItemCaseSensitive(root, ezlopi_user_id_str)->valuestring;
-            char *device_name = cJSON_GetObjectItemCaseSensitive(root, ezlopi_device_name_str)->valuestring;
-            char *brand = cJSON_GetObjectItemCaseSensitive(root, ezlopi_brand_str)->valuestring;
-            char *manufacturer_name = cJSON_GetObjectItemCaseSensitive(root, ezlopi_manufacturer_name_str)->valuestring;
-            char *model_number = cJSON_GetObjectItemCaseSensitive(root, ezlopi_model_number_str)->valuestring;
-            char *uuid = cJSON_GetObjectItemCaseSensitive(root, ezlopi_uuid_str)->valuestring;
-            char *uuid_provisioning = cJSON_GetObjectItemCaseSensitive(root, ezlopi_uuid_provisioning_str)->valuestring;
-            double serial = cJSON_GetObjectItemCaseSensitive(root, ezlopi_serial_str)->valuedouble;
-            char *cloud_server = cJSON_GetObjectItemCaseSensitive(root, ezlopi_cloud_server_str)->valuestring;
-            char *ssl_private_key = cJSON_GetObjectItemCaseSensitive(root, ezlopi_ssl_private_key_str)->valuestring;
-            char *ssl_public_key = cJSON_GetObjectItemCaseSensitive(root, "ssl_public_key")->valuestring;
-            char *ca_cert = cJSON_GetObjectItemCaseSensitive(root, ezlopi_ca_cert_str)->valuestring;
-            char *device_type_ezlopi = cJSON_GetObjectItemCaseSensitive(root, ezlopi_device_type_ezlopi_str)->valuestring;
-
-            TRACE_D("************************* BLE-PROVISIONING *************************");
-            TRACE_D("user_id:               %s", user_id ? user_id : ezlopi__str);
-            TRACE_D("device_name:           %s", device_name ? device_name : ezlopi__str);
-            TRACE_D("brand:                 %s", brand ? brand : ezlopi__str);
-            TRACE_D("manufacturer_name:     %s", manufacturer_name ? manufacturer_name : ezlopi__str);
-            TRACE_D("model_number:          %s", model_number ? model_number : ezlopi__str);
-            TRACE_D("uuid:                  %s", uuid ? uuid : ezlopi__str);
-            TRACE_D("uuid_provisioning:     %s", uuid_provisioning ? uuid_provisioning : ezlopi__str);
-            TRACE_D("serial:                %f", serial);
-            TRACE_D("cloud_server:          %s", cloud_server ? cloud_server : ezlopi__str);
-            TRACE_D("ssl_private_key:       %s", ssl_private_key ? ssl_private_key : ezlopi__str);
-            TRACE_D("ssl_public_key:        %s", ssl_public_key ? ssl_public_key : ezlopi__str);
-            TRACE_D("ca_cert:               %s", ca_cert ? ca_cert : ezlopi__str);
-            TRACE_D("device_type_ezlopi:    %s", device_type_ezlopi ? device_type_ezlopi : ezlopi__str);
-            TRACE_D("********************************************************************");
-
-            cJSON_Delete(root);
-        }
-        else
-        {
-            TRACE_E("Invalid json packet received!");
-        }
-    }
-}
-#endif
-
-static char *__base64_decode_provisioning_info(uint32_t total_size)
-{
-    char *decoded_config_json = NULL;
-    char *base64_buffer = malloc(total_size + 1);
+    char* decoded_config_json = NULL;
+    char* base64_buffer = malloc(total_size + 1);
 
     if (base64_buffer)
     {
         uint32_t pos = 0;
-        s_linked_buffer_t *tmp_prov_buffer = g_provisioning_linked_buffer;
+        s_linked_buffer_t* tmp_prov_buffer = g_provisioning_linked_buffer;
 
         while (tmp_prov_buffer)
         {
             // TRACE_W("tmp_prov_buffer->buffer[%d]: %.*s", tmp_prov_buffer->len, tmp_prov_buffer->len, (char *)tmp_prov_buffer->buffer);
-            cJSON *root = cJSON_ParseWithLength((const char *)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
+            cJSON* root = cJSON_ParseWithLength((const char*)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
             if (root)
             {
                 uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
                 // uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
                 // uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
-                char *data = CJ_GET_STRING(ezlopi_data_str);
+                char* data = CJ_GET_STRING(ezlopi_data_str);
                 if (data)
                 {
                     memcpy(base64_buffer + pos, data, len);
@@ -515,7 +458,7 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
         {
             size_t o_len = 0;
             bzero(decoded_config_json, total_size);
-            mbedtls_base64_decode((uint8_t *)decoded_config_json, (size_t)total_size, &o_len, (uint8_t *)base64_buffer, strlen(base64_buffer));
+            mbedtls_base64_decode((uint8_t*)decoded_config_json, (size_t)total_size, &o_len, (uint8_t*)base64_buffer, strlen(base64_buffer));
             TRACE_D("Decoded data: %s", decoded_config_json);
         }
         else
@@ -529,24 +472,24 @@ static char *__base64_decode_provisioning_info(uint32_t total_size)
     return decoded_config_json;
 }
 
-static char *__provisioning_info_jsonify(void)
+static char* __provisioning_info_jsonify(void)
 {
-    char *str_json_prov_info = NULL;
+    char* str_json_prov_info = NULL;
 
-    cJSON *cj_prov_info = cJSON_CreateObject();
+    cJSON* cj_prov_info = cJSON_CreateObject();
     if (cj_prov_info)
     {
         char tmp_buffer[32];
-        char *device_name = ezlopi_factory_info_v3_get_name();
-        char *brand = ezlopi_factory_info_v3_get_brand();
-        char *manufacturer_name = ezlopi_factory_info_v3_get_manufacturer();
-        char *model_number = ezlopi_factory_info_v3_get_model();
-        char *uuid = ezlopi_factory_info_v3_get_device_uuid();
-        char *uuid_provisioning = ezlopi_factory_info_v3_get_provisioning_uuid();
-        char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-        char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
-        char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
-        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char* device_name = ezlopi_factory_info_v3_get_name();
+        char* brand = ezlopi_factory_info_v3_get_brand();
+        char* manufacturer_name = ezlopi_factory_info_v3_get_manufacturer();
+        char* model_number = ezlopi_factory_info_v3_get_model();
+        char* uuid = ezlopi_factory_info_v3_get_device_uuid();
+        char* uuid_provisioning = ezlopi_factory_info_v3_get_provisioning_uuid();
+        char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+        char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+        char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
+        char* ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
 
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", ezlopi_nvs_config_info_version_number_get());
         cJSON_AddStringToObject(cj_prov_info, ezlopi_config_id_str, tmp_buffer);
@@ -587,19 +530,19 @@ static char *__provisioning_info_jsonify(void)
     return str_json_prov_info;
 }
 
-static char *__provisioning_info_base64(void)
+static char* __provisioning_info_base64(void)
 {
     const uint32_t base64_data_len = 5120;
-    char *base64_data = malloc(base64_data_len);
+    char* base64_data = malloc(base64_data_len);
     if (base64_data)
     {
         uint32_t out_put_len = 0;
-        char *str_provisioning_data = __provisioning_info_jsonify();
+        char* str_provisioning_data = __provisioning_info_jsonify();
         if (str_provisioning_data)
         {
             TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);
 
-            int ret = mbedtls_base64_encode((unsigned char *)base64_data, base64_data_len, &out_put_len, (const unsigned char *)str_provisioning_data, strlen(str_provisioning_data));
+            int ret = mbedtls_base64_encode((unsigned char*)base64_data, base64_data_len, &out_put_len, (const unsigned char*)str_provisioning_data, strlen(str_provisioning_data));
 
             TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
             free(str_provisioning_data);
@@ -617,3 +560,5 @@ static char *__provisioning_info_base64(void)
 
     return base64_data;
 }
+
+#endif 

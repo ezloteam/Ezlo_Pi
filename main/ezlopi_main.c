@@ -9,7 +9,7 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_ezlopi.h"
 
-static void blinky(void *pv);
+static void blinky(void* pv);
 
 void app_main(void)
 {
@@ -18,7 +18,7 @@ void app_main(void)
     ezlopi_init();
 }
 
-static void blinky(void *pv)
+static void blinky(void* pv)
 {
 
 #ifdef EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
@@ -42,8 +42,7 @@ static void blinky(void *pv)
         state ^= 1;
         gpio_set_level(GPIO_NUM_2, state);
 #endif
-
-        if (count++ > 1)
+        if (count++ > 5)
         {
             TRACE_D("-----------------------------------------");
             TRACE_D("esp_get_free_heap_size: %.2fKB", (float)(esp_get_free_heap_size() / 1024.0));
@@ -52,6 +51,6 @@ static void blinky(void *pv)
             count = 0;
         }
 
-        vTaskDelay(50 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 }

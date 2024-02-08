@@ -349,7 +349,7 @@ static void web_provisioning_config_check(void* pv)
                 if ((NULL != ca_certificate) && (NULL != provision_token) && (NULL != provisioning_server))
                 {
                     char http_request_location[200];
-                    snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version); // add config_version instead of 1
+                    snprintf(http_request_location, sizeof(http_request_location), "api/v1/controller/sync?version=%d", config_version);
                     response = ezlopi_http_post_request(provisioning_server, http_request_location, root_header_prov_token, NULL, NULL, ca_certificate);
                     if (NULL != response)
                     {
@@ -413,6 +413,7 @@ static void web_provisioning_config_check(void* pv)
         if (flag_break_loop)
         {
             xTaskNotifyGive(ezlopi_update_config_notifier);
+            TRACE_I("Breaking Config Check Loop !");
             break;
         }
         vTaskDelay(10000 / portTICK_RATE_MS);
