@@ -205,7 +205,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
                 {
                     flag_check |= MASK_TIME_FLAG; // indicates time has been set
-                    if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+                    if (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
                     {
                         TRACE_I("Waiting for nma registration completion..");
                         return 0;
@@ -894,18 +894,13 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg)
 
         if (value_field)
         {
-            switch (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
-            {
-            case 1:
+            if (ezlopi_websocket_client_is_connected())
             {
                 ret = (0 == strncmp(value_field->value.value_string, "connected", 10));
-                break;
             }
-            default:
+            else
             {
                 ret = (0 == strncmp(value_field->value.value_string, "disconnected", 14));
-                break;
-            }
             }
         }
     }
