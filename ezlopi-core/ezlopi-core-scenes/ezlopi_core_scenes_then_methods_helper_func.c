@@ -53,7 +53,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
         const char *start = strstr(field_value_string, "://");
         if (start != NULL)
         {
-            // TRACE_W("Here! fresh webserver");
+            TRACE_W("Here! fresh webserver");
             start += 3;
             int length = 0;
             char *end = strchr(start, '/');
@@ -101,7 +101,7 @@ static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbed
     int ret = STR_SIZE(tmp_http_data->header);
     if (0 == ret)
     {
-        // TRACE_W("Here! fresh header");
+        TRACE_W("Here! fresh header");
         tmp_http_data->header_maxlen = __ezlopi_core_http_mem_malloc(&(tmp_http_data->header), "\0");
         ret = STR_SIZE(tmp_http_data->header);
     }
@@ -140,7 +140,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *fie
 {
     if (NULL != field_value_string)
     {
-        // TRACE_W("Here! fresh url");
+        TRACE_W("Here! fresh url");
         tmp_http_data->url_maxlen = __ezlopi_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
         tmp_http_data->web_port = ((NULL != strstr(field_value_string, "https")) ? 443 : 80);
 
@@ -152,7 +152,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *fie
         if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
         {
             // 1. adding 'host' to header-buffer
-            // TRACE_W("Here! webserver -> header");
+            TRACE_W("Here! webserver -> header");
             __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "Host", tmp_http_data->web_server, prev_size);
         }
     }
@@ -161,12 +161,12 @@ void parse_http_content_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const 
 {
     if (NULL != field_value_string)
     {
-        // TRACE_W("Here! content-type");
+        TRACE_W("Here! content-type");
         int prev_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
         if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
         {
             // 2. adding 'Content-Type' to header-buffer
-            // TRACE_W("Here! content-type -> header");
+            TRACE_W("Here! content-type -> header");
             __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "Content-Type", field_value_string, prev_size);
         }
     }
@@ -175,13 +175,13 @@ void parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char 
 {
     if (NULL != field_value_string)
     {
-        // TRACE_W("Here! fresh content");
+        TRACE_W("Here! fresh content");
         tmp_http_data->content_maxlen = __ezlopi_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
 
         int prev_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
         if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
         {
-            // TRACE_W("Here! content_length -> header");
+            TRACE_W("Here! content_length -> header");
             uint16_t i = (int)strlen(field_value_string);
             if (i > 0)
             {
@@ -198,11 +198,11 @@ void parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, cJSON *cj_v
 {
     if (cJSON_IsObject(cj_value))
     {
-        // TRACE_W("Here! headers");
+        TRACE_W("Here! headers");
         int prev_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
         if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
         {
-            // TRACE_W("Here! headers -> header");
+            TRACE_W("Here! headers -> header");
             cJSON *header = (cj_value->child);
             while (header)
             {
@@ -218,13 +218,13 @@ void parse_http_headers(s_ezlopi_core_http_mbedtls_t *tmp_http_data, cJSON *cj_v
 }
 void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t *tmp_http_data, bool value_bool)
 {
-    // TRACE_W("Here! skipsecurity");
+    TRACE_W("Here! skipsecurity");
     tmp_http_data->skip_cert_common_name_check = value_bool;
     int prev_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
     if (prev_size > 0) // if this characters exsists in the 'tmp_http_data->header'
     {
         // 5. adding 'skip_security' to header-buffer
-        // TRACE_W("Here! skipsecurity -> header");
+        TRACE_W("Here! skipsecurity -> header");
         __ezlopi_core_scenes_then_append_to_header(tmp_http_data, "skipSecurity", ((value_bool) ? "true" : "false"), prev_size);
     }
 }
@@ -239,9 +239,9 @@ void parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, cJSON *cj_val
             const char *userValue = cJSON_GetStringValue(userItem);
             const char *passValue = cJSON_GetStringValue(passwordItem);
 
-            // TRACE_W("Here! fresh username");
+            TRACE_W("Here! fresh username");
             tmp_http_data->username_maxlen = __ezlopi_core_http_mem_malloc(&(tmp_http_data->username), userValue);
-            // TRACE_W("Here! fresh password");
+            TRACE_W("Here! fresh password");
             tmp_http_data->password_maxlen = __ezlopi_core_http_mem_malloc(&(tmp_http_data->password), passValue);
         }
     }

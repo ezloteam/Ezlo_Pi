@@ -86,7 +86,7 @@ void ezlopi_init(void)
 
     web_provisioning_init();
 
-    ezlopi_ble_service_init();
+    // ezlopi_ble_service_init();
 
     ota_service_init();
 }

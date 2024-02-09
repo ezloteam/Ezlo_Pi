@@ -6,6 +6,7 @@
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_operators.h"
+#include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
@@ -168,6 +169,7 @@ int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg)
 
 int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
+    TRACE_I("IsSunState triggered");
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
@@ -205,9 +207,9 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
                 {
                     flag_check |= MASK_TIME_FLAG; // indicates time has been set
-                    if (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+                    if (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 100, false))
                     {
-                        TRACE_I("Waiting for nma registration completion..");
+                        TRACE_I("Waiting for wifi connection ..");
                         return 0;
                     }
                     if (info->tm_mday != (uint32_t)scene_node->when_block->fields->user_arg)
@@ -216,7 +218,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                         issunsate_update_sunstate_tm(info->tm_mday, &sunrise_time, &sunset_time); // assign today's sunrise & sunset time
                         if ((0 == sunrise_time.tm_mday) || (0 == sunset_time.tm_mday))
                         {
-                            TRACE_I("............Erasing..& Waiting for NMA connection");
+                            TRACE_I("............Erasing..& Waiting for wifi connection");
                             scene_node->when_block->fields->user_arg = 0; // reset the day
                             sunrise_time.tm_mday = sunset_time.tm_mday = 0;
                             return 0;
@@ -731,6 +733,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node,
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
+    TRACE_I("isDevice_state.");
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
@@ -874,6 +877,7 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
 
 int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
+    TRACE_I("isCloud_state.");
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
