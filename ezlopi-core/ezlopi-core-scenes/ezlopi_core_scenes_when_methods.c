@@ -205,11 +205,11 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
                 {
                     flag_check |= MASK_TIME_FLAG; // indicates time has been set
-                    // if (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 900, false))
-                    // {
-                    //     TRACE_I("Failed ...Retry.....");
-                    //     return 0;
-                    // }
+                    if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+                    {
+                        TRACE_I("Waiting for nma registration completion..");
+                        return 0;
+                    }
                     if (info->tm_mday != (uint32_t)scene_node->when_block->fields->user_arg)
                     {
                         scene_node->when_block->fields->user_arg = (void *)(info->tm_mday);
@@ -762,7 +762,6 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
             }
             curr_field = curr_field->next;
         }
-#warning "need to add device_group condition"
         if (device_id)
         {
             l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
@@ -773,6 +772,8 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                     s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                     if (controller_info)
                     {
+                        /* we need to check device_id specific*/
+                        // This is controller specific
                         ret = ((value_armed == controller_info->armed) ? 1 : 0);
                         ret = ((value_reachable == controller_info->service_notification) ? 1 : 0);
                     }
@@ -781,6 +782,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                 curr_device = curr_device->next;
             }
         }
+#warning "need to check device_group condition"
     }
 
     return ret;
@@ -872,8 +874,43 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t *scene_node, void *arg)
 
 int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_W("Warning: when-method 'is_cloud_state' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    if (when_block && scene_node)
+    {
+        l_fields_v2_t *value_field = NULL;
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "state", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != curr_field->value.value_string))
+                {
+                    value_field = curr_field;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (value_field)
+        {
+            switch (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+            {
+            case 1:
+            {
+                ret = (0 == strncmp(value_field->value.value_string, "connected", 10));
+                break;
+            }
+            default:
+            {
+                ret = (0 == strncmp(value_field->value.value_string, "disconnected", 14));
+                break;
+            }
+            }
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_is_battery_state(l_scenes_list_v2_t *scene_node, void *arg)
