@@ -1,14 +1,18 @@
 #include <string.h>
 #include <stdint.h>
+#include <cJSON.h>
+
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_scenes.h"
-#include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "ezlopi_cloud_constants.h"
+
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_cloud_constants.h"
+#include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_operators.h"
+
 #include "ezlopi_service_meshbot.h"
 
 typedef struct s_data_source_n_target_object
@@ -213,7 +217,7 @@ static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
                 uint32_t idx = EZLOPI_VALUE_TYPE_NONE + 1;
                 while (idx < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    const char *type_name_str = ezlopi_scene_get_scene_value_type_name_v2(idx);
+                    const char *type_name_str = ezlopi_scene_get_scene_value_type_name(idx);
                     if (type_name_str)
                     {
                         cJSON *cj_string_val = cJSON_CreateString(type_name_str);

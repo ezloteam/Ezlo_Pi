@@ -113,9 +113,17 @@ void ezlopi_cloud_modes_cancel_switch(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
+
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
+        s_ezlopi_modes_t *custom_mode = ezlopi_core_modes_get_custom_modes();
+        if (custom_mode)
+        {
+            custom_mode->switch_to_mode_id = 0;
+        }
+
+        CJSON_ASSIGN_ID(cj_result, custom_mode->current_mode_id, ezlopi_modeId_str);
     }
 }
 

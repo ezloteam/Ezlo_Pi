@@ -9,6 +9,7 @@
 #include "ezlopi_core_scenes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
@@ -17,12 +18,6 @@
 #include "ezlopi_service_meshbot.h"
 
 static l_scenes_list_v2_t *scenes_list_head_v2 = NULL;
-
-static const char *scenes_value_type_name[] = {
-#define EZLOPI_VALUE_TYPE(type, name) name,
-#include "ezlopi_core_scenes_value_types.h"
-#undef EZLOPI_VALUE_TYPE
-};
 
 static const f_scene_method_v2_t ezlopi_core_scenes_methods[] = {
 #define EZLOPI_SCENE(method_type, name, func) func,
@@ -64,45 +59,6 @@ int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene)
         }
     }
 
-    return ret;
-}
-
-e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field)
-{
-    e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
-    if (cj_field)
-    {
-        char *type_str = NULL;
-        CJSON_GET_VALUE_STRING(cj_field, ezlopi_type_str, type_str);
-        if (type_str)
-        {
-            for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
-            {
-                if (0 == strcmp(scenes_value_type_name[i], type_str))
-                {
-                    ret = i;
-                    break;
-                }
-            }
-        }
-    }
-    return ret;
-}
-
-e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type)
-{
-    e_scene_value_type_v2_t ret = EZLOPI_VALUE_TYPE_NONE;
-    if (cj_value_type && cj_value_type->valuestring)
-    {
-        for (int i = EZLOPI_VALUE_TYPE_NONE; i < EZLOPI_VALUE_TYPE_MAX; i++)
-        {
-            if (0 == strcmp(scenes_value_type_name[i], cj_value_type->valuestring))
-            {
-                ret = i;
-                break;
-            }
-        }
-    }
     return ret;
 }
 
@@ -360,16 +316,6 @@ f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_metho
     return method_ptr;
 }
 
-const char *ezlopi_scene_get_scene_value_type_name_v2(e_scene_value_type_v2_t value_type)
-{
-    const char *ret = ezlopi__str;
-    if ((value_type >= EZLOPI_VALUE_TYPE_NONE) && (value_type < EZLOPI_VALUE_TYPE_MAX))
-    {
-        ret = scenes_value_type_name[value_type];
-    }
-    return ret;
-}
-
 /**
  * @brief main functions to initiated scenes-nodes
  *
@@ -441,6 +387,7 @@ static l_scenes_list_v2_t *_scenes_populate(cJSON *cj_scene, uint32_t scene_id)
     }
     else
     {
+        CJSON_TRACE("new-scene", cj_scene);
         scenes_list_head_v2 = __new_scene_populate(cj_scene, scene_id);
         new_scene_node = scenes_list_head_v2;
     }
@@ -798,7 +745,7 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
 {
     if (field && cj_value)
     {
-        trace("type: %s", ezlopi_scene_get_scene_value_type_name_v2(field->value_type));
+        trace("type: %s", ezlopi_scene_get_scene_value_type_name(field->value_type));
         switch (cj_value->type)
         {
         case cJSON_Number:
@@ -810,17 +757,25 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         }
         case cJSON_String:
         {
-            field->value.type = VALUE_TYPE_STRING;
-            uint32_t value_len = strlen(cj_value->valuestring) + 1;
-            field->value.value_string = malloc(value_len);
-            if (field->value.value_string)
+            if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID == field->value_type)
             {
-                snprintf(field->value.value_string, value_len, "%s", cj_value->valuestring);
-                TRACE_I("value: %s", field->value.value_string);
+                field->value.type = VALUE_TYPE_NUMBER;
+                field->value.value_double = strtoul(cj_value->valuestring, NULL, 16);
             }
             else
             {
-                TRACE_E("Malloc failed!");
+                field->value.type = VALUE_TYPE_STRING;
+                uint32_t value_len = strlen(cj_value->valuestring) + 1;
+                field->value.value_string = malloc(value_len);
+                if (field->value.value_string)
+                {
+                    snprintf(field->value.value_string, value_len, "%s", cj_value->valuestring);
+                    TRACE_I("value: %s", field->value.value_string);
+                }
+                else
+                {
+                    TRACE_E("Malloc failed!");
+                }
             }
             break;
         }
@@ -849,24 +804,43 @@ static void _______fields_get_value(l_fields_v2_t *field, cJSON *cj_value)
         {
             int block_idx = 0;
             cJSON *cj_block = NULL;
-            field->value.type = VALUE_TYPE_BLOCK;
             CJSON_TRACE("value", cj_value);
 
-            while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
+            switch (field->value_type)
             {
-                if (field->value.when_block)
+            case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
+            {
+                field->value.type = VALUE_TYPE_CJSON;
+                field->value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
+                break;
+            }
+            case EZLOPI_VALUE_TYPE_BLOCKS:
+            {
+                field->value.type = VALUE_TYPE_BLOCK;
+                while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 {
-                    l_when_block_v2_t *curr_when_block = field->value.when_block;
-                    while (curr_when_block->next)
+                    CJSON_TRACE("cj_block", cj_block);
+
+                    if (field->value.when_block)
                     {
-                        curr_when_block = curr_when_block->next;
+                        l_when_block_v2_t *curr_when_block = field->value.when_block;
+                        while (curr_when_block->next)
+                        {
+                            curr_when_block = curr_when_block->next;
+                        }
+                        curr_when_block->next = ____new_when_block_populate(cj_block);
                     }
-                    curr_when_block->next = ____new_when_block_populate(cj_block);
+                    else
+                    {
+                        field->value.when_block = ____new_when_block_populate(cj_block);
+                    }
                 }
-                else
-                {
-                    field->value.when_block = ____new_when_block_populate(cj_block);
-                }
+                break;
+            }
+            default:
+            {
+                TRACE_W("Value type not implemented");
+            }
             }
             break;
         }
@@ -891,7 +865,7 @@ static l_fields_v2_t *______new_field_populate(cJSON *cj_field)
             memset(field, 0, sizeof(l_fields_v2_t));
             CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, field->name);
 
-            field->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_field, ezlopi_type_str));
+            field->value_type = ezlopi_core_scenes_value_get_type(cj_field, ezlopi_type_str);
             _______fields_get_value(field, cJSON_GetObjectItem(cj_field, ezlopi_value_str));
         }
     }

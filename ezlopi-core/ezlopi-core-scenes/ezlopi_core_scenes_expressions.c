@@ -4,6 +4,7 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_expressions.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -157,7 +158,7 @@ void ezlopi_scenes_expressions_print(s_ezlopi_expressions_t *exp_node)
 
         CJSON_TRACE("meta-data", exp_node->meta_data);
         TRACE_D("Is variable: %s", exp_node->variable ? "True" : "False");
-        TRACE_D("value-type: %s", ezlopi_scene_get_scene_value_type_name_v2(exp_node->value_type));
+        TRACE_D("value-type: %s", ezlopi_scene_get_scene_value_type_name(exp_node->value_type));
 
         if (exp_node->exp_value.type > EXPRESSION_VALUE_TYPE_UNDEFINED && exp_node->exp_value.type < EXPRESSION_VALUE_TYPE_MAX)
         {
@@ -628,7 +629,7 @@ static s_ezlopi_expressions_t *__expressions_create_node(uint32_t exp_id, cJSON 
         CJSON_GET_VALUE_BOOL(cj_expression, ezlopi_variable_str, new_exp_node->variable);
 
         new_exp_node->meta_data = cJSON_DetachItemFromObject(cj_expression, ezlopi_metadata_str);
-        new_exp_node->value_type = ezlopi_scenes_get_expressions_value_type(cJSON_GetObjectItem(cj_expression, ezlopi_valueType_str));
+        new_exp_node->value_type = ezlopi_core_scenes_value_get_type(cj_expression, ezlopi_valueType_str);
         __get_expressions_value(new_exp_node, cJSON_GetObjectItem(cj_expression, ezlopi_value_str), new_exp_node->value_type);
 
         new_exp_node->exp_id = __expression_store_to_nvs(exp_id, cj_expression);
@@ -750,7 +751,7 @@ static e_scene_value_type_v2_t *__parse_expression_type_filter(cJSON *cj_params)
             cJSON *cj_type = NULL;
             while (NULL != (cj_type = cJSON_GetArrayItem(cj_types_filter_array, idx)))
             {
-                type_filter_array[idx] = ezlopi_scenes_get_expressions_value_type(cj_type);
+                type_filter_array[idx] = ezlopi_core_scenes_value_get_type(cj_type, NULL);
                 idx++;
             }
             type_filter_array[idx] = 0;
@@ -764,7 +765,7 @@ static void __add_expression_value(s_ezlopi_expressions_t *exp_node, cJSON *cj_e
 {
     if (EZLOPI_VALUE_TYPE_NONE < exp_node->value_type && EZLOPI_VALUE_TYPE_MAX > exp_node->value_type)
     {
-        cJSON_AddStringToObject(cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name_v2(exp_node->value_type));
+        cJSON_AddStringToObject(cj_expr, ezlopi_valueType_str, ezlopi_scene_get_scene_value_type_name(exp_node->value_type));
         switch (exp_node->exp_value.type)
         {
         case EXPRESSION_VALUE_TYPE_STRING:

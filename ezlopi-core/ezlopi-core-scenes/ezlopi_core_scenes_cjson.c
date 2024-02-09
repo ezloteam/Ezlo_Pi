@@ -4,6 +4,7 @@
 
 #include "ezlopi_core_scenes_cjson.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_scenes_value.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -19,7 +20,7 @@ cJSON *ezlopi_scene_cjson_get_field(l_fields_v2_t *field_node)
     {
         cj_field = cJSON_CreateObject();
         {
-            const char *value_type_str = ezlopi_scene_get_scene_value_type_name_v2(field_node->value_type);
+            const char *value_type_str = ezlopi_scene_get_scene_value_type_name(field_node->value_type);
             if (value_type_str)
             {
                 cJSON_AddStringToObject(cj_field, ezlopi_type_str, value_type_str);
@@ -149,7 +150,7 @@ cJSON *ezlopi_scene_cjson_get_field(l_fields_v2_t *field_node)
             }
             default:
             {
-                const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(field_node->value_type);
+                const char *value_type_name = ezlopi_scene_get_scene_value_type_name(field_node->value_type);
                 TRACE_E("Value type not matched!, curr-type[%d]: %s ", field_node->value_type, value_type_name ? value_type_name : ezlopi_null_str);
                 break;
             }
@@ -312,7 +313,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                 if (cj_field)
                 {
                     __cjson_add_string(cj_field, ezlopi_name_str, curr_field->name);
-                    const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(curr_field->value_type);
+                    const char *value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
                     __cjson_add_string(cj_field, ezlopi_type_str, value_type_name ? value_type_name : ezlopi__str);
 
                     switch (curr_field->value_type)
@@ -382,6 +383,17 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                         }
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
+                    {
+                        char id_str[32];
+                        snprintf(id_str, sizeof(id_str), "%x", curr_field->value.value_double);
+                        break;
+                    }
+                    case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
+                    {
+                        cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, curr_field->value.cj_value);
+                        break;
+                    }
                     case EZLOPI_VALUE_TYPE_DICTIONARY:
                     case EZLOPI_VALUE_TYPE_ARRAY:
                     case EZLOPI_VALUE_TYPE_RGB:
@@ -448,7 +460,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                     }
                     default:
                     {
-                        const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(curr_field->value_type);
+                        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
                         TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : ezlopi_null_str);
                         break;
                     }

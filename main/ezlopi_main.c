@@ -11,13 +11,14 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ezlopi.h"
-#include "ezlopi_service_uart.h"
 #include "ezlopi_service_ota.h"
-#include "ezlopi_service_timer.h"
-#include "ezlopi_service_webprov.h"
-#include "ezlopi_service_gpioisr.h"
 #include "ezlopi_service_ble.h"
+#include "ezlopi_service_uart.h"
+#include "ezlopi_service_timer.h"
+#include "ezlopi_service_modes.h"
 #include "ezlopi_service_meshbot.h"
+#include "ezlopi_service_gpioisr.h"
+#include "ezlopi_service_webprov.h"
 
 #define ENABLE_HEARTBIT_LED 0
 
@@ -34,6 +35,8 @@ void app_main(void)
     ezlopi_scenes_meshbot_init();
     web_provisioning_init();
     ota_service_init();
+    ezlopi_service_modes_init();
+
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 

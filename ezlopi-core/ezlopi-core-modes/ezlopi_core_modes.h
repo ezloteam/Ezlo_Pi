@@ -125,10 +125,12 @@ s_ezlopi_modes_t *ezlopi_core_default_mode_get(void);
 
 s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void);
 s_house_modes_t *ezlopi_core_modes_get_current_house_modes(void);
+int ezlopi_core_modes_set_current_house_mode(s_house_modes_t *new_house_mode);
 
 int ezlopi_core_modes_api_get_modes(cJSON *cj_result);
 int ezlopi_core_modes_api_get_current_mode(cJSON *cj_result);
 int ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_house_mode);
+int ezlopi_core_modes_api_cancel_switch(void);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
 
