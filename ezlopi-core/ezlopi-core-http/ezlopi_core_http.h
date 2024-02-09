@@ -31,7 +31,7 @@ extern "C"
 
     } s_ezlopi_http_data_t;
 
-    typedef struct s_ezlopi_scenes_then_methods_send_http
+    typedef struct s_ezlopi_core_http_mbedtls
     {
         bool skip_cert_common_name_check;
         int web_port;
@@ -41,23 +41,45 @@ extern "C"
         uint16_t content_maxlen;
         uint8_t username_maxlen; // cap to 256
         uint8_t password_maxlen;
-        char *url;
-        char *web_server;
+        char *url;        // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
+        char *web_server; // ptr =>
         char *header;
         char *content;
         char *username;
         char *password;
-        esp_http_client_method_t method;
-    } s_ezlopi_scenes_then_methods_send_http_t;
+        esp_http_client_method_t method; // default :- GET_METHOD
+    } s_ezlopi_core_http_mbedtls_t;
 
-    void ezlopi_core_http_scenes_then_parse_url(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string);
-    void ezlopi_core_http_scenes_then_parse_content(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string);
-    void ezlopi_core_http_scenes_then_parse_content_type(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, const char *field_value_string);
-    void ezlopi_core_http_scenes_then_parse_headers(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *cj_value);
-    void ezlopi_core_http_scenes_then_parse_skipsecurity(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, bool value_bool);
-    void ezlopi_core_http_scenes_then_parse_username_password(s_ezlopi_scenes_then_methods_send_http_t *tmp_http_data, cJSON *cj_value);
-    void ezlopi_core_http_scenes_then_clear_struct_ptr_mem(s_ezlopi_scenes_then_methods_send_http_t *config);
-    void ezlopi_core_http_scenes_then_sendhttp_request(s_ezlopi_scenes_then_methods_send_http_t *config, char **dest_buf_container);
+    /**
+     * @brief Function to return remaining space in *dest_buffer.
+     */
+    int __ezlopi_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size);
+
+    /**
+     * @brief This function :- mallocs fresh memory_block to '__dest_ptr' , copies content of 'src_ptr' to '__dest_ptr' and returns malloced_size.
+     *
+     * @param __dest_ptr [ Address of ptr which will point to (char*) block of memory. ]
+     * @param src_ptr    [ Address of the string literal you want to store/append. ]
+     * @return int [size_of_malloced block]
+     */
+    int __ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr);
+
+    /**
+     * @brief This function creates new_memory_block (size == 'reqSize') & Rellocates Original memory-block (*Buf) to new_memory_block_address
+     *
+     * @param Buf       [ Address of ptr which will point to (char*) original block of memory. ]
+     * @param reqSize   [ new-size to be allocated. ]
+     * @return int [0 ==> Fail ; 1 ==> Success]
+     */
+    int __ezlopi_core_http_mem_relloc(char **Buf, int reqSize);
+
+    /**
+     * @brief This function that generates a http request, by combining information contained in '*config'.
+     *
+     * @param config   : config_struct [ complete_url + webserver-name + web_port + headers + content + username + password ]
+     * @param dest_buf_container : Holds address of detination *ptr [ memory_block containing reply message ]
+     */
+    void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **dest_buf_container);
 
     s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate);
     s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char *location, cJSON *headers, const char *private_key, const char *shared_key, const char *ca_certificate);

@@ -594,7 +594,7 @@ static void ezlopi_device_free_single(l_ezlopi_device_t *device)
 
     if (device->settings)
     {
-        ezlopi_device_free_setting(device->settings); // recursive settings clearing
+        ezlopi_device_free_setting(device->settings);
         device->settings = NULL;
     }
     // if (device->cloud_properties.device_type_id)
@@ -614,8 +614,8 @@ static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t *curr_device
 {
     if (curr_device)
     {
-        ezlopi_device_free_all_device_setting(curr_device->next); // recursive call device_ll
-        ezlopi_device_free_setting(curr_device->settings);        // unlink settings from devices, items, rooms, etc.
+        ezlopi_device_free_all_device_setting(curr_device->next);
+        ezlopi_device_free_setting(curr_device->settings); // unlink settings from devices, items, rooms, etc.
     }
 }
 
