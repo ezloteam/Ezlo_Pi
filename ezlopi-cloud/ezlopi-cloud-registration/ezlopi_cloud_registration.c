@@ -39,7 +39,6 @@ static void registration_process(void *pv)
     {
         char mac_str[18];
         uint8_t mac_addr[6];
-        int nma_activity = 0;
 
         esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
         snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
@@ -65,13 +64,8 @@ static void registration_process(void *pv)
 
         while (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000, true))
         {
-            nma_activity = web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_B);
+            web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_B);
             // vTaskDelay(2000 / portTICK_RATE_MS);
-        }
-
-        if (ezlopi_websocket_client_is_connected() && (0 < nma_activity))
-        {
-            ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
         }
 
         cJSON_Delete(cj_register);
