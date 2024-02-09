@@ -1320,8 +1320,60 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node,
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_W("Warning: when-method 'is_device_state' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t device_id = 0;
+        bool value_armed = false;
+        bool value_reachable = false;
+
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "device", 7))
+            {
+                device_id = strtoul(curr_field->value.value_string, NULL, 16);
+            }
+            else if (0 == strncmp(curr_field->name, "armed", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                {
+                    value_armed = curr_field->value.value_bool;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "reachable", 10))
+            {
+                if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                {
+                    value_reachable = curr_field->value.value_bool;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+#warning "need to add device_group condition"
+        if (device_id)
+        {
+            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+            while (curr_device)
+            {
+                if (device_id == curr_device->cloud_properties.device_id)
+                {
+                    s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
+
+                    if (controller_info)
+                    {
+                        ret = ((value_armed == controller_info->armed) ? 1 : 0);
+                        ret = ((value_reachable == controller_info->service_notification) ? 1 : 0);
+                    }
+                }
+
+                curr_device = curr_device->next;
+            }
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t *scene_node, void *arg)
