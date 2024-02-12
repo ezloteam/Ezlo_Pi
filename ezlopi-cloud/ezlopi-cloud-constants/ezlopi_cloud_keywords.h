@@ -194,6 +194,7 @@ extern const char *ezlopi_ip_nmask_str;
 extern const char *ezlopi_ip_gw_str;
 extern const char *ezlopi_pass_str;
 extern const char *ezlopi_cmd_str;
+extern const char *ezlopi_sub_cmd_str;
 extern const char *ezlopi_uuid_prov_str;
 extern const char *ezlopi_status_write_str;
 extern const char *ezlopi_status_connect_str;

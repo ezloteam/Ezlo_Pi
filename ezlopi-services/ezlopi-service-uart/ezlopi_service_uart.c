@@ -150,6 +150,35 @@ static char *ezlopi_chip_type_str(int chip_type)
     }
 }
 
+static int ezlopi_service_uart_execute_command_0(uint8_t sub_cmd)
+{
+    int ret = 0;
+    switch (sub_cmd)
+    {
+    case 0:
+    {
+        TRACE_E("Factory restore command");
+        const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
+        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
+        EZPI_CORE_factory_restore();
+        break;
+    }
+    case 1:
+    {
+        TRACE_E("Reboot only command");
+        const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
+        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
+        EZPI_CORE_reboot();
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return ret;
+}
+
 static int qt_serial_parse_rx_data(const char *data)
 {
     cJSON *root = cJSON_Parse(data);
@@ -184,10 +213,7 @@ static int qt_serial_parse_rx_data(const char *data)
             }
             case 0:
             {
-                const static char *reboot_response = "{\"cmd\":0,\"status\":1}";
-                EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
-                vTaskDelay(20);
-                EZPI_CORE_reboot();
+                ezlopi_service_uart_execute_command_0(cJSON_GetObjectItem(root, ezlopi_sub_cmd_str)->valueint);
                 break;
             }
 
