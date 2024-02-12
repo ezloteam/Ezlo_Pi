@@ -70,8 +70,12 @@ void ezlopi_websocket_client_kill(void)
 
 esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
 {
+    
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
+        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char *ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+        char *ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
         __msg_upcall = msg_upcall;
 
         static s_ws_event_arg_t event_arg;
@@ -83,9 +87,9 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
             .uri = uri->valuestring,
             .task_stack = 8 * 1024,
             .buffer_size = 12 * 1024,
-            .cert_pem = ezlopi_factory_info_v3_get_ca_certificate(),
-            .client_cert = ezlopi_factory_info_v3_get_ssl_shared_key(),
-            .client_key = ezlopi_factory_info_v3_get_ssl_private_key(),
+            .cert_pem = ca_cert,
+            .client_cert = ssl_shared,
+            .client_key = ssl_priv,
             .pingpong_timeout_sec = 21,
             .keep_alive_enable = 1,
             .ping_interval_sec = 10,
@@ -94,8 +98,17 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*ms
         TRACE_I("Connecting to %s...", websocket_cfg.uri);
 
         client = esp_websocket_client_init(&websocket_cfg);
-        esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
-        esp_websocket_client_start(client);
+        if(client)
+        {
+            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
+            esp_websocket_client_start(client);
+        }
+        else 
+        {
+            free(ca_cert);
+            free(ssl_shared);
+            free(ssl_shared);
+        }
     }
     else
     {

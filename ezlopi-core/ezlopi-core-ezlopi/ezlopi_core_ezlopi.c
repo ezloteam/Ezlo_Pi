@@ -60,6 +60,8 @@ void ezlopi_init(void)
 
     ezlopi_room_init();
 
+    ezlopi_ble_service_init();
+
 #ifdef EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
     ezlopi_scenes_scripts_init();
@@ -85,8 +87,6 @@ void ezlopi_init(void)
     timer_service_init();
 
     web_provisioning_init();
-
-    ezlopi_ble_service_init();
 
     ota_service_init();
 }
