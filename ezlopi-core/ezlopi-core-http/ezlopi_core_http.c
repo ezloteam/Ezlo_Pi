@@ -1,4 +1,4 @@
-
+#include <string.h>
 #include "esp_tls.h"
 
 #include "ezlopi_util_trace.h"
@@ -6,12 +6,6 @@
 #include "ezlopi_core_http.h"
 
 // #ifdef CONFIG_ESP_TLS_USING_MBEDTLS
-// #include "lwip/err.h"
-// #include "lwip/sockets.h"
-// #include "lwip/sys.h"
-// #include "lwip/netdb.h"
-// #include "lwip/dns.h"
-
 #include "mbedtls/platform.h"
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/esp_debug.h"
@@ -27,7 +21,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 
 #define TAG __FILE__
 
-#define GET_STRING_SIZE(str) ((NULL != str) ? (1 + strlen(str)) : 0)
+#define GET_STRING_SIZE(str) ((NULL != str) ? (strlen(str)) : 0)
 
 #define FREE_IF_NOT_NULL(ptr) \
     {                         \
@@ -41,8 +35,8 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 //--------------- Scenes:- Sendhttp_request_method --------------------------
 int __ezlopi_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size)
 {
-    int limit = dest_size - (strlen(dest_buff) + 1);
-    limit = (limit < 0) ? 0 : limit;
+    int limit = dest_size - GET_STRING_SIZE(dest_buff);
+    limit = (limit > 0) ? limit : 0;
     if (limit > reqd_size)
     {
         return limit;
@@ -52,48 +46,52 @@ int __ezlopi_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int re
 
 int __ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr)
 {
-    int ret = 0;
+    int ret = GET_STRING_SIZE(src_ptr); // calculate the size of content to be stored
     if (NULL != src_ptr)
     {
         FREE_IF_NOT_NULL(*__dest_ptr);
         // Now, do a fresh allocation
-        int dest_length = GET_STRING_SIZE(src_ptr);
-        char *tmp_ptr = malloc(sizeof(char) * dest_length);
+        ret += 5;
+        char *tmp_ptr = malloc(sizeof(char) * ret);
         if (tmp_ptr)
         {
-            bzero(tmp_ptr, (sizeof(char) * dest_length));
-            snprintf(tmp_ptr, dest_length, "%s", src_ptr);
-            tmp_ptr[dest_length] = '\0';
-            TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, dest_length);
-            *__dest_ptr = tmp_ptr;
+            bzero(tmp_ptr, (sizeof(char) * ret));
+            snprintf(tmp_ptr, ret, "%s", src_ptr);
+            // tmp_ptr[ret] = '\0';
+            TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, ret);
+            *__dest_ptr = tmp_ptr; // old gets replaced by new address
             TRACE_D("2.__dest_ptr(%p) : size=> [%d]", *__dest_ptr, GET_STRING_SIZE(*__dest_ptr));
-            ret = dest_length; // return mallocated block size
         }
     }
     else
     {
-        TRACE_E(" Error !!, given 'src_string_literal' is NULL .... Allocation Aborted...");
+        TRACE_E(" Error !!, given 'src_ptr' is NULL or Zero .... Allocation Aborted...");
     }
     return ret;
 }
 
-int __ezlopi_core_http_mem_relloc(char **Buf, int reqSize)
+int __ezlopi_core_http_dyna_relloc(char **Buf, int reqSize)
 {
     int ret = 0;
+    TRACE_I("REQ_SIZE: %d", reqSize);
     if ((NULL != *Buf) && (reqSize > 0)) // strictly:  (new-size != 0)
     {
-        char *NewBuf = (char *)realloc(*Buf, sizeof(char) * reqSize); // reqSize ≤ 1.6 * n
-        if (NewBuf != NULL)
+        void *NewBuf = realloc(*Buf, sizeof(char) * reqSize); // reqSize ≤ 1.6 * n
+        if (NULL == NewBuf)
+        {
+            TRACE_E("Reallocation - failed");
+        }
+        else
         {
             TRACE_D("Relocating [%p] to [%p]: NewBuf[%d]", *Buf, NewBuf, reqSize);
             *Buf = NewBuf;
             ret = 1; // return success
         }
-        else
-        {
-            TRACE_E("Reallocation failed");
-        }
-        TRACE_I("*Buf (new): %p", *Buf);
+        // TRACE_I("*Buf (new): %p", *Buf);
+    }
+    else
+    {
+        TRACE_W("*BUF == NULL ; No address to relloc");
     }
     return ret;
 }
@@ -106,238 +104,230 @@ static char *__ezlopi_core_http_request_via_mbedTLS(const char *web_server, int 
 {
     char *resp_buf_ptr = NULL;
     int ret, flags, len;
-    uint32_t tmp_buf_size = 256; // sizeof(tmp_buf);
-    char *tmp_buf = (char *)malloc(tmp_buf_size * sizeof(char));
-    if (tmp_buf)
+    char tmp_buf[256];
+    uint32_t tmp_buf_size = 256;
+
+    uint32_t response_buff_size = tmp_buf_size;
+    char web_port[10] = {0};
+    snprintf(web_port, 10, "%d", web_port_num);
+    web_port[10] = '\0';
+
+    mbedtls_entropy_context entropy;
+    mbedtls_ctr_drbg_context ctr_drbg;
+    mbedtls_ssl_context ssl;
+    mbedtls_x509_crt cacert;
+    mbedtls_ssl_config conf;
+    mbedtls_net_context server_fd;
+
+    mbedtls_ssl_init(&ssl);
+    mbedtls_x509_crt_init(&cacert);
+    mbedtls_ctr_drbg_init(&ctr_drbg);
+    TRACE_I("Seeding the random number generator");
+    mbedtls_ssl_config_init(&conf);
+
+    mbedtls_entropy_init(&entropy);
+    if (0 != (ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
+                                          NULL, 0)))
     {
-        uint32_t max_allowed = 0;
-        uint32_t response_buff_size = tmp_buf_size;
-        char web_port[10] = {0};
-        snprintf(web_port, 10, "%d", web_port_num);
-        web_port[10] = '\0';
+        TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
+        // return NULL;
+        goto exit;
+    }
+    TRACE_I("Attaching the certificate bundle...");
 
-        mbedtls_entropy_context entropy;
-        mbedtls_ctr_drbg_context ctr_drbg;
-        mbedtls_ssl_context ssl;
-        mbedtls_x509_crt cacert;
-        mbedtls_ssl_config conf;
-        mbedtls_net_context server_fd;
+    ret = esp_crt_bundle_attach(&conf);
+    if (ret < 0)
+    {
+        TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
+        // return NULL;
+        goto exit;
+    }
+    TRACE_I("Setting hostname for TLS session...");
 
-        mbedtls_ssl_init(&ssl);
-        mbedtls_x509_crt_init(&cacert);
-        mbedtls_ctr_drbg_init(&ctr_drbg);
-        TRACE_I("Seeding the random number generator");
-        mbedtls_ssl_config_init(&conf);
+    /* Hostname set here should match CN in server certificate */
+    if (0 != (ret = mbedtls_ssl_set_hostname(&ssl, web_server)))
+    {
+        TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
+        // return NULL;
+        goto exit;
+    }
 
-        mbedtls_entropy_init(&entropy);
-        if (0 != (ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-                                              NULL, 0)))
-        {
-            TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
-            return NULL;
-            // goto exit;
-        }
-        TRACE_I("Attaching the certificate bundle...");
+    TRACE_I("Setting up the SSL/TLS structure...");
+    if (0 != (ret = mbedtls_ssl_config_defaults(&conf,
+                                                MBEDTLS_SSL_IS_CLIENT,
+                                                MBEDTLS_SSL_TRANSPORT_STREAM,
+                                                MBEDTLS_SSL_PRESET_DEFAULT)))
+    {
+        TRACE_E("mbedtls_ssl_config_defaults returned %d", ret);
+        goto exit;
+    }
 
-        ret = esp_crt_bundle_attach(&conf);
-        if (ret < 0)
-        {
-            TRACE_E("esp_crt_bundle_attach returned -0x%x\n\n", -ret);
-            return NULL;
-            // goto exit;
-        }
-        TRACE_I("Setting hostname for TLS session...");
-
-        /* Hostname set here should match CN in server certificate */
-        if (0 != (ret = mbedtls_ssl_set_hostname(&ssl, web_server)))
-        {
-            TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
-            return NULL;
-            // goto exit;
-        }
-
-        TRACE_I("Setting up the SSL/TLS structure...");
-        if (0 != (ret = mbedtls_ssl_config_defaults(&conf,
-                                                    MBEDTLS_SSL_IS_CLIENT,
-                                                    MBEDTLS_SSL_TRANSPORT_STREAM,
-                                                    MBEDTLS_SSL_PRESET_DEFAULT)))
-        {
-            TRACE_E("mbedtls_ssl_config_defaults returned %d", ret);
-            goto exit;
-        }
-
-        /* MBEDTLS_SSL_VERIFY_OPTIONAL is bad for security, in this example it will print
-           a warning if CA verification fails but it will continue to connect.
-           You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
-        */
-        // mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
-        mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
-        mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
-        mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
+    /* MBEDTLS_SSL_VERIFY_OPTIONAL is bad for security, in this example it will print
+       a warning if CA verification fails but it will continue to connect.
+       You should consider using MBEDTLS_SSL_VERIFY_REQUIRED in your own code.
+    */
+    // mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
+    mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
+    mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
+    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
 #ifdef CONFIG_MBEDTLS_DEBUG
-        mbedtls_esp_enable_debug_log(&conf, CONFIG_MBEDTLS_DEBUG_LEVEL);
+    mbedtls_esp_enable_debug_log(&conf, CONFIG_MBEDTLS_DEBUG_LEVEL);
 #endif
 
-        if (0 != (ret = mbedtls_ssl_setup(&ssl, &conf)))
+    if (0 != (ret = mbedtls_ssl_setup(&ssl, &conf)))
+    {
+        TRACE_E("mbedtls_ssl_setup returned -0x%x\n\n", -ret);
+        goto exit;
+    }
+
+    mbedtls_net_init(&server_fd);
+    TRACE_I("Connecting to %s:%s...", web_server, web_port);
+
+    if (0 != (ret = mbedtls_net_connect(&server_fd, web_server,
+                                        web_port, MBEDTLS_NET_PROTO_TCP)))
+    {
+        TRACE_E("mbedtls_net_connect returned -%x", -ret);
+        goto exit;
+    }
+    TRACE_I("Connected.");
+
+    mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
+
+    TRACE_I("Performing the SSL/TLS handshake...");
+    while (0 != (ret = mbedtls_ssl_handshake(&ssl)))
+    {
+        TRACE_W(" ret => %#x", ret);
+        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            TRACE_E("mbedtls_ssl_setup returned -0x%x\n\n", -ret);
+            TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
             goto exit;
         }
+    }
 
-        mbedtls_net_init(&server_fd);
-        TRACE_I("Connecting to %s:%s...", web_server, web_port);
+    TRACE_I("Verifying peer X.509 certificate...");
+    if (0 != (flags = mbedtls_ssl_get_verify_result(&ssl)))
+    {
+        /* In real life, we probably want to close connection if ret != 0 */
+        TRACE_E("Failed to verify peer certificate!");
+        bzero(tmp_buf, tmp_buf_size);
+        mbedtls_x509_crt_verify_info(tmp_buf, tmp_buf_size, "  ! ", flags);
+        TRACE_E("verification Error_info: %s", tmp_buf);
+        goto exit;
+    }
+    else
+    {
+        TRACE_I("Certificate verified.");
+    }
+    TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
+    TRACE_I("Writing HTTP request...");
 
-        if (0 != (ret = mbedtls_net_connect(&server_fd, web_server,
-                                            web_port, MBEDTLS_NET_PROTO_TCP)))
+    size_t written_bytes = 0;
+    do
+    {
+        ret = mbedtls_ssl_write(&ssl, (const unsigned char *)url_req + written_bytes,
+                                strlen(url_req) - written_bytes);
+        if (ret >= 0)
         {
-            TRACE_E("mbedtls_net_connect returned -%x", -ret);
+            TRACE_I("%d bytes written", ret);
+            written_bytes += ret;
+        }
+        else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
+        {
+            TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
             goto exit;
         }
-        TRACE_I("Connected.");
+    } while (written_bytes < strlen(url_req));
 
-        mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
+    TRACE_D("Creating Response Buffer ...");
 
-        TRACE_I("Performing the SSL/TLS handshake...");
-        while (0 != (ret = mbedtls_ssl_handshake(&ssl)))
-        {
-            if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
-            {
-                TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
-                goto exit;
-            }
-        }
-
-        TRACE_I("Verifying peer X.509 certificate...");
-        if (0 != (flags = mbedtls_ssl_get_verify_result(&ssl)))
-        {
-            /* In real life, we probably want to close connection if ret != 0 */
-            TRACE_E("Failed to verify peer certificate!");
-            bzero(tmp_buf, tmp_buf_size);
-            mbedtls_x509_crt_verify_info(tmp_buf, tmp_buf_size, "  ! ", flags);
-            TRACE_E("verification Error_info: %s", tmp_buf);
-            goto exit;
-        }
-        else
-        {
-            TRACE_I("Certificate verified.");
-        }
-        TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(&ssl));
-        TRACE_I("Writing HTTP request...");
-
-        size_t written_bytes = 0;
+    resp_buf_ptr = malloc(response_buff_size); // create a ptr ; points to a memory-block
+    if (resp_buf_ptr)
+    {
+        bzero(resp_buf_ptr, response_buff_size); // clear the buffer
+        TRACE_I("Reading HTTP response...");
         do
         {
-            ret = mbedtls_ssl_write(&ssl, (const unsigned char *)url_req + written_bytes,
-                                    strlen(url_req) - written_bytes);
-            if (ret >= 0)
+            len = tmp_buf_size - 1;
+            bzero(tmp_buf, tmp_buf_size); // clear the buffer
+            ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
+
+            if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
             {
-                TRACE_I("%d bytes written", ret);
-                written_bytes += ret;
+                TRACE_I("MBEDTLS_ERR_SSL_WANT_READ/WRITE");
+                continue;
             }
-            else if (ret != MBEDTLS_ERR_SSL_WANT_WRITE && ret != MBEDTLS_ERR_SSL_WANT_READ)
+            if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
             {
-                TRACE_E("mbedtls_ssl_write returned -0x%x", -ret);
-                goto exit;
+                TRACE_W("MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY");
+                ret = 0;
+                break;
             }
-        } while (written_bytes < strlen(url_req));
-
-        TRACE_D("Creating Response Buffer ...");
-
-        resp_buf_ptr = (char *)malloc(response_buff_size * sizeof(char)); // create a ptr ; points to a memory-block
-        if (resp_buf_ptr)
-        {
-            bzero(resp_buf_ptr, response_buff_size); // clear the buffer
-            resp_buf_ptr[response_buff_size] = '\0';
-            TRACE_I("Reading HTTP response...");
-            do
+            if (ret < 0)
             {
-                len = tmp_buf_size - 1;
-                bzero(tmp_buf, tmp_buf_size);
-                ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
+                TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
+                break;
+            }
+            if (ret == 0)
+            {
+                TRACE_I("connection closed");
+                break;
+            }
+            len = ret;
+            // TRACE_D("[%d] bytes read :\n%10s", len, tmp_buf);
+            if (ret > 0)
+            {
+                snprintf(resp_buf_ptr + GET_STRING_SIZE(resp_buf_ptr), (response_buff_size - GET_STRING_SIZE(resp_buf_ptr)), "%s ", tmp_buf);
 
-                if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
-                {
-                    continue;
-                }
-                if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
-                {
-                    ret = 0;
-                    break;
-                }
-                if (ret < 0)
-                {
-                    TRACE_E("mbedtls_ssl_read returned -0x%x", -ret);
-                    FREE_IF_NOT_NULL(resp_buf_ptr); // if error occurs during response ; return 'NULL';
-                    resp_buf_ptr = NULL;
-                    break;
-                }
-                if (ret == 0)
-                {
-                    TRACE_I("connection closed");
-                    break;
-                }
-                len = ret;
-                TRACE_D(" [%d] bytes read :\n %s", len, tmp_buf);
+                response_buff_size += tmp_buf_size;
 
-                // now copy to 'resp_buf_ptr'
-                max_allowed = __ezlopi_core_http_calc_empty_bufsize(resp_buf_ptr, response_buff_size, len);
-                if (max_allowed > 0)
+                void *tmp_addr = realloc(resp_buf_ptr, (sizeof(char) * response_buff_size));
+                if (NULL == tmp_addr)
                 {
-                    snprintf(resp_buf_ptr + (strlen(resp_buf_ptr)), max_allowed, "%s", tmp_buf);
+                    TRACE_E("mbedtls : Reallocation Failed...");
+                    response_buff_size = GET_STRING_SIZE(resp_buf_ptr) + 1;
+                    break;
                 }
                 else
                 {
-                    response_buff_size += len; // get new size
-                    if (__ezlopi_core_http_mem_relloc(&resp_buf_ptr, response_buff_size))
-                    {
-                        snprintf(resp_buf_ptr + (strlen(resp_buf_ptr)), max_allowed, "%s", tmp_buf);
-                    }
-                    else
-                    {
-                        response_buff_size -= len; // revert back to old size
-                    }
+                    TRACE_D("mbedtls : Reallocation Success...");
+                    resp_buf_ptr = tmp_addr;
                 }
-            } while (1);
-
-            // check if the 'resp_buf_ptr' is empty
-            if (0 == GET_STRING_SIZE(resp_buf_ptr))
-            {
-                FREE_IF_NOT_NULL(resp_buf_ptr);
-                resp_buf_ptr = NULL;
             }
-            // else
-            // {
-            //     TRACE_D(" [arr_size: %d] Response Buffer[%d] : %s \n", response_buff_size, GET_STRING_SIZE(resp_buf_ptr), resp_buf_ptr);
-            // }
-        }
+        } while (1);
+        // TRACE_D("[%d] bytes read :\n%10s[%d]", response_buff_size, resp_buf_ptr, GET_STRING_SIZE(resp_buf_ptr));
+    }
 
-        mbedtls_ssl_close_notify(&ssl);
-    exit:
-        mbedtls_ssl_session_reset(&ssl);
-        mbedtls_net_free(&server_fd);
-        if (0 != ret)
-        {
-            mbedtls_strerror(ret, tmp_buf, 100);
-            TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
-        }
+exit:
+    mbedtls_ssl_close_notify(&ssl);
+    // mbedtls_ssl_session_reset(&ssl);
+    mbedtls_net_free(&server_fd);
+    if (0 != ret)
+    {
+        mbedtls_strerror(ret, tmp_buf, 100);
+        TRACE_E("Last error was: -0x%x - %s", -ret, tmp_buf);
+    }
+    TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
-        TRACE_D("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-        // Clearing used structures
-        mbedtls_ssl_free(&ssl);
-        mbedtls_ssl_config_free(&conf);
-        mbedtls_ctr_drbg_free(&ctr_drbg);
-        mbedtls_entropy_free(&entropy);
-        TRACE_I("Completed a request");
+    // Clearing used structures
+    mbedtls_ssl_free(&ssl);
+    mbedtls_ssl_config_free(&conf);
+    mbedtls_ctr_drbg_free(&ctr_drbg);
+    mbedtls_entropy_free(&entropy);
+    TRACE_I("Completed a request");
 
-        FREE_IF_NOT_NULL(tmp_buf);
+    // check if the 'resp_buf_ptr' is empty
+    if (0 == GET_STRING_SIZE(resp_buf_ptr))
+    {
+        TRACE_W("Erasing 'resp_buf_ptr'...");
+        FREE_IF_NOT_NULL(resp_buf_ptr);
     }
     return resp_buf_ptr; // returns null ; if unsuccesful.
 }
 
 void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **dest_buf_container)
 {
-    int REQUEST_LENGTH = 10 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
-    char *REQUEST = (char *)malloc(sizeof(char) * REQUEST_LENGTH);
+    int REQUEST_LENGTH = 100 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
+    char *REQUEST = malloc(sizeof(char) * REQUEST_LENGTH);
     if (REQUEST)
     {
         bzero(REQUEST, sizeof(char) * REQUEST_LENGTH);
@@ -380,7 +370,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **d
             max_allowed = __ezlopi_core_http_calc_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->header) + 3));
             if (max_allowed > 0)
             {
-                snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->header);
+                snprintf(REQUEST + GET_STRING_SIZE(REQUEST), max_allowed, "%s\r\n", config->header);
             }
         }
         // adding content body to request
@@ -397,7 +387,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **d
 
             if (max_allowed > 0)
             {
-                snprintf(REQUEST + (strlen(REQUEST)), max_allowed, "%s\r\n", config->content);
+                snprintf(REQUEST + GET_STRING_SIZE(REQUEST), max_allowed, "%s\r\n", config->content);
             }
         }
         // Ready-Up 'REQUEST' buffer
@@ -408,7 +398,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **d
         FREE_IF_NOT_NULL(*dest_buf_container);
         if (NULL != (*dest_buf_container = __ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), REQUEST)))
         {
-            TRACE_I("*resp_buf=[%p]RESPONSE_ADDRESS : Success!! [ message_len:%d ]", *dest_buf_container, GET_STRING_SIZE(*dest_buf_container));
+            TRACE_I("*resp_buf=>[%p]\n%s\nRESPONSE_ADDRESS : Success!! [ message_len:%d ]", *dest_buf_container, *dest_buf_container, GET_STRING_SIZE(*dest_buf_container));
         }
         free(REQUEST);
     }

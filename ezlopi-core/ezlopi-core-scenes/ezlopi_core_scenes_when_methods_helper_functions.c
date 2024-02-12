@@ -308,7 +308,7 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
     {
         // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
         char tmp_url[] = "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140";
-        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: Close\r\n";
+        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
         s_ezlopi_core_http_mbedtls_t tmp_config = {
             .method = HTTP_METHOD_GET,

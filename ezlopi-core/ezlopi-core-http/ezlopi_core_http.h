@@ -69,9 +69,9 @@ extern "C"
      *
      * @param Buf       [ Address of ptr which will point to (char*) original block of memory. ]
      * @param reqSize   [ new-size to be allocated. ]
-     * @return int [0 ==> Fail ; 1 ==> Success]
+     * @return (int)  [0 ==> Fail ; 1 ==> Success]
      */
-    int __ezlopi_core_http_mem_relloc(char **Buf, int reqSize);
+    int __ezlopi_core_http_dyna_relloc(char **Buf, int reqSize);
 
     /**
      * @brief This function that generates a http request, by combining information contained in '*config'.

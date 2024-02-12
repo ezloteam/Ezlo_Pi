@@ -207,11 +207,11 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
                 {
                     flag_check |= MASK_TIME_FLAG; // indicates time has been set
-                    if (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 100, false))
-                    {
-                        TRACE_I("Waiting for wifi connection ..");
-                        return 0;
-                    }
+                    // if (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 100, false))
+                    // {
+                    //     TRACE_I("Waiting for wifi connection ..");
+                    //     return 0;
+                    // }
                     if (info->tm_mday != (uint32_t)scene_node->when_block->fields->user_arg)
                     {
                         scene_node->when_block->fields->user_arg = (void *)(info->tm_mday);
