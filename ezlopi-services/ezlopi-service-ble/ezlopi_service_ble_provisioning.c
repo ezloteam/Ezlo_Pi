@@ -38,10 +38,6 @@ static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts
 
 static void __provisioning_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
-#if 0
-static void __process_provisioning_info(uint8_t* value, uint32_t len);
-static void __provisioning_info_exec_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
-#endif
 
 void ezlopi_ble_service_provisioning_init(void)
 {
@@ -57,7 +53,6 @@ void ezlopi_ble_service_provisioning_init(void)
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_WRITE | ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE;
-    // ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, NULL, NULL, NULL);
     ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, __provisioning_info_read_func, __provisioning_info_write_func, NULL); // reliable-write is not implemented for now
 
     uuid.uuid.uuid16 = BLE_PROVISIONING_STATUS_CHAR_UUID;
@@ -152,7 +147,7 @@ static void __provisioning_status_read_func(esp_gatt_value_t* value, esp_ble_gat
 
 static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
-    TRACE_D("Write function called!");
+    // TRACE_D("Write function called!");
     TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
 
     ezlopi_nvs_set_provisioning_status();
@@ -273,7 +268,7 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
 
 static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
-    TRACE_D("Read function called!");
+    // TRACE_D("Read function called!");
 
     static char* g_provisioning_info_base64;
     static uint32_t g_provisioning_sequence_no;

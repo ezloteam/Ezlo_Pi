@@ -47,12 +47,8 @@ void ezlopi_ble_service_init(void)
 
     ezlopi_ble_service_wifi_profile_init();
     ezlopi_ble_service_security_init();
-
-
     ezlopi_ble_service_provisioning_init();
-
     ezlopi_ble_service_device_info_init();
-#if 1
     ezlopi_ble_service_dynamic_config_init();
 
     // ezlopi_ble_profile_print();
@@ -73,7 +69,6 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_start_secure_gatt_server_open_pairing();
 #endif
 #endif
-#endif 
 }
 
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
