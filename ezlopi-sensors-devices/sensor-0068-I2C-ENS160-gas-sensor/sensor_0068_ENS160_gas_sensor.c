@@ -19,6 +19,7 @@
 #include "ezlopi_cloud_value_type_str.h"
 
 #include "sensor_0068_ENS160_gas_sensor.h"
+#include "sensor_0068_ENS160_gas_sensor_settings.h"
 
 /*
 {\
@@ -124,10 +125,15 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 static int __notify(l_ezlopi_item_t* item)
 {
   int ret = 0;
-
   ens160_t* ens160_sensor = (ens160_t*)item->user_arg;
   if (ens160_sensor)
   {
+    if (has_setting_changed())
+    {
+      float ambient_temperature = get_ambient_temperature_setting();
+      float relative_humidity = get_relative_humidity_setting();
+      dfrobot_ens160_set_temp_and_hum(ens160_sensor, ambient_temperature, relative_humidity);
+    }
     ens160_t sensor_data;
     memcpy(&sensor_data, ens160_sensor, sizeof(ens160_t));
     dfrobot_ens160_get_data(&sensor_data);
@@ -181,7 +187,10 @@ static int __init(l_ezlopi_item_t* item)
       }
       TRACE_E("Begin ok!");
       dfrobot_ens160_set_pwr_mode(ens160_sensor, ENS160_STANDARD_MODE);
-      dfrobot_ens160_set_temp_and_hum(ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0); // These should be able to be changed froms settings.
+      float ambient_temperature = get_ambient_temperature_setting();
+      float relative_humidity = get_relative_humidity_setting();
+      // dfrobot_ens160_set_temp_and_hum(ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0); // These should be able to be changed froms settings.
+      dfrobot_ens160_set_temp_and_hum(ens160_sensor, ambient_temperature, relative_humidity);
     }
   }
   return ret;
@@ -307,6 +316,7 @@ static int __prepare(void* arg, void* user_arg)
       {
         ret = 1;
       }
+      sensor_0068_gas_sensor_settings_initialize(ens160_aqi_device, (void*)ens160_sensor);
     }
     else
     {

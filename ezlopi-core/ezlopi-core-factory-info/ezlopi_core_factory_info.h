@@ -305,13 +305,12 @@ extern "C"
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 6,\
-                \"dev_name\": \"ZE08CH02 gas sensor\",\
-                \"id_room\": 35,\
-                \"id_item\": 69,\
-                \"gpio_tx\": 48,\
-                \"gpio_rx\": 45,\
-                \"baud\": 9600\
+                \"dev_type\":8,\
+                \"dev_name\":\"ENS160\",\
+                \"id_room\":\"\",\
+                \"id_item\":68,\
+                \"gpio_scl\":17,\
+                \"gpio_sda\":18\
             }\
         ],\
     \"dev_total\": 1}";
