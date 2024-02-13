@@ -16,6 +16,13 @@
 #include "mbedtls/certs.h"
 // #endif
 
+typedef struct ll_resp_buf
+{
+    uint32_t len;
+    uint8_t *buffer;
+    struct ll_resp_buf *next;
+} ll_resp_buf_t;
+
 static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 
@@ -58,9 +65,9 @@ int __ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr)
             bzero(tmp_ptr, (sizeof(char) * ret));
             snprintf(tmp_ptr, ret, "%s", src_ptr);
             // tmp_ptr[ret] = '\0';
-            TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, ret);
+            // TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, ret);
             *__dest_ptr = tmp_ptr; // old gets replaced by new address
-            TRACE_D("2.__dest_ptr(%p) : size=> [%d]", *__dest_ptr, GET_STRING_SIZE(*__dest_ptr));
+            // TRACE_D("2.__dest_ptr(%p) : size=> [%d]", *__dest_ptr, GET_STRING_SIZE(*__dest_ptr));
         }
     }
     else
@@ -73,7 +80,7 @@ int __ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr)
 int __ezlopi_core_http_dyna_relloc(char **Buf, int reqSize)
 {
     int ret = 0;
-    TRACE_I("REQ_SIZE: %d", reqSize);
+    // TRACE_I("REQ_SIZE: %d", reqSize);
     if ((NULL != *Buf) && (reqSize > 0)) // strictly:  (new-size != 0)
     {
         void *NewBuf = realloc(*Buf, sizeof(char) * reqSize); // reqSize ≤ 1.6 * n
@@ -100,14 +107,14 @@ int __ezlopi_core_http_dyna_relloc(char **Buf, int reqSize)
  * @brief Function Trigger http_requests via mbedTLS.
  * @return Address of a memory_block ; (char*)malloc(...)
  */
-static char *__ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req)
-{
-    char *resp_buf_ptr = NULL;
-    int ret, flags, len;
-    char tmp_buf[256];
-    uint32_t tmp_buf_size = 256;
 
-    uint32_t response_buff_size = tmp_buf_size;
+void __ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req, char **resp_buf)
+{
+    TRACE_B("&result == resp_buf[%p] ", resp_buf);
+    int ret, flags, len;
+    uint32_t tmp_buf_size = 256;
+    char tmp_buf[tmp_buf_size];
+    uint32_t resp_buf_size = tmp_buf_size + 1;
     char web_port[10] = {0};
     snprintf(web_port, 10, "%d", web_port_num);
     web_port[10] = '\0';
@@ -196,7 +203,7 @@ static char *__ezlopi_core_http_request_via_mbedTLS(const char *web_server, int 
     TRACE_I("Performing the SSL/TLS handshake...");
     while (0 != (ret = mbedtls_ssl_handshake(&ssl)))
     {
-        TRACE_W(" ret => %#x", ret);
+        TRACE_W(" ret => %x", -ret);
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
             TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
@@ -238,19 +245,19 @@ static char *__ezlopi_core_http_request_via_mbedTLS(const char *web_server, int 
         }
     } while (written_bytes < strlen(url_req));
 
-    TRACE_D("Creating Response Buffer ...");
-
-    resp_buf_ptr = malloc(response_buff_size); // create a ptr ; points to a memory-block
-    if (resp_buf_ptr)
+    TRACE_I("Reading HTTP response...");
+    char *resp_buf_dummy = (char *)malloc(sizeof(char) * resp_buf_size); // points to a memory-block
+    if (resp_buf_dummy)
     {
-        bzero(resp_buf_ptr, response_buff_size); // clear the buffer
-        TRACE_I("Reading HTTP response...");
+        bzero(resp_buf_dummy, sizeof(char) * resp_buf_size); // clear the buffer
+        resp_buf_dummy[resp_buf_size - 1] = '\0';
+        TRACE_E("1.(At init)resp_buf_dummy => [%p]", resp_buf_dummy);
+        uint8_t reply_count = 0;
         do
         {
             len = tmp_buf_size - 1;
-            bzero(tmp_buf, tmp_buf_size); // clear the buffer
+            bzero(tmp_buf, tmp_buf_size);
             ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
-
             if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
             {
                 TRACE_I("MBEDTLS_ERR_SSL_WANT_READ/WRITE");
@@ -273,33 +280,45 @@ static char *__ezlopi_core_http_request_via_mbedTLS(const char *web_server, int 
                 break;
             }
             len = ret;
-            // TRACE_D("[%d] bytes read :\n%10s", len, tmp_buf);
             if (ret > 0)
             {
-                snprintf(resp_buf_ptr + GET_STRING_SIZE(resp_buf_ptr), (response_buff_size - GET_STRING_SIZE(resp_buf_ptr)), "%s ", tmp_buf);
-
-                response_buff_size += tmp_buf_size;
-
-                void *tmp_addr = realloc(resp_buf_ptr, (sizeof(char) * response_buff_size));
-                if (NULL == tmp_addr)
+                reply_count++;
+                if (reply_count > 1)
                 {
-                    TRACE_E("mbedtls : Reallocation Failed...");
-                    response_buff_size = GET_STRING_SIZE(resp_buf_ptr) + 1;
-                    break;
+                    resp_buf_size += (len + 2);
+                    if (__ezlopi_core_http_dyna_relloc(&resp_buf_dummy, resp_buf_size))
+                    {
+                        TRACE_E("x. (reallocation) resp_buf_dummy => [%p]", resp_buf_dummy);
+                        snprintf(resp_buf_dummy + GET_STRING_SIZE(resp_buf_dummy), len, "%s", tmp_buf);
+                    }
+                    else
+                    {
+                        resp_buf_size -= (len + 2);
+                    }
                 }
                 else
                 {
-                    TRACE_D("mbedtls : Reallocation Success...");
-                    resp_buf_ptr = tmp_addr;
+                    TRACE_E("First writing...");
+                    snprintf(resp_buf_dummy, len, "%s", tmp_buf); // 513
                 }
             }
         } while (1);
-        // TRACE_D("[%d] bytes read :\n%10s[%d]", response_buff_size, resp_buf_ptr, GET_STRING_SIZE(resp_buf_ptr));
+
+        // assign the dynamic content to *resp_buf.
+        if (GET_STRING_SIZE(resp_buf_dummy) > 0)
+        {
+            TRACE_D("Reply_count = [%d]", reply_count);
+            TRACE_E("2.(Finally)resp_buf_dummy => [%p]", resp_buf_dummy);
+            TRACE_D("[%p]*resp_buf->[%p] => mem_bock[%p]", resp_buf, *resp_buf, resp_buf_dummy);
+            resp_buf_dummy[resp_buf_size - 1] = '\0';
+            *resp_buf = resp_buf_dummy;
+            TRACE_I("&result==[%p] --> *resp_buf=>[%p]  ", resp_buf, *resp_buf);
+        }
     }
 
 exit:
     mbedtls_ssl_close_notify(&ssl);
-    // mbedtls_ssl_session_reset(&ssl);
+    mbedtls_ssl_session_reset(&ssl);
     mbedtls_net_free(&server_fd);
     if (0 != ret)
     {
@@ -314,14 +333,6 @@ exit:
     mbedtls_ctr_drbg_free(&ctr_drbg);
     mbedtls_entropy_free(&entropy);
     TRACE_I("Completed a request");
-
-    // check if the 'resp_buf_ptr' is empty
-    if (0 == GET_STRING_SIZE(resp_buf_ptr))
-    {
-        TRACE_W("Erasing 'resp_buf_ptr'...");
-        FREE_IF_NOT_NULL(resp_buf_ptr);
-    }
-    return resp_buf_ptr; // returns null ; if unsuccesful.
 }
 
 void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **dest_buf_container)
@@ -336,7 +347,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **d
         case HTTP_METHOD_GET:
         {
             TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
-            if ((NULL != config->username) && (NULL != config->password))
+            if ((NULL != config->username) && (GET_STRING_SIZE(config->username)) && (NULL != config->password) && (GET_STRING_SIZE(config->password)))
                 snprintf(REQUEST, REQUEST_LENGTH, "GET %s?username=%s&password=%s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
             else
                 snprintf(REQUEST, REQUEST_LENGTH, "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
@@ -365,7 +376,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **d
         }
         // adding 'Headers' to request_buffer
         int max_allowed = 0;
-        if (NULL != config->header)
+        if ((NULL != config->header) && (GET_STRING_SIZE(config->header) > 0))
         {
             max_allowed = __ezlopi_core_http_calc_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->header) + 3));
             if (max_allowed > 0)
@@ -374,7 +385,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **d
             }
         }
         // adding content body to request
-        if (NULL != config->content)
+        if ((NULL != config->content) && (GET_STRING_SIZE(config->content) > 0))
         {
             if ((HTTP_METHOD_GET != config->method) && (NULL != config->username) && (NULL != config->password))
             {
@@ -391,16 +402,19 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **d
             }
         }
         // Ready-Up 'REQUEST' buffer
-        REQUEST[REQUEST_LENGTH] = '\0'; // null terminating array
-        TRACE_I("REQUEST[%d] : \n%s = [%d]\n", REQUEST_LENGTH, REQUEST, strlen(REQUEST));
+        REQUEST[REQUEST_LENGTH - 1] = '\0'; // null terminating array
+        TRACE_I("REQUEST[%d]:\n\n%s=[%d]", REQUEST_LENGTH, REQUEST, GET_STRING_SIZE(REQUEST));
 
-        // executing the Request // [ *dest_ptr ==> Address_Ptr -> (char) &Memory. ]
-        FREE_IF_NOT_NULL(*dest_buf_container);
-        if (NULL != (*dest_buf_container = __ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), REQUEST)))
+        char *result = NULL;
+        TRACE_E("&result -> [%p]", &result);
+        __ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), REQUEST, &result);
+        if (result)
         {
-            TRACE_I("*resp_buf=>[%p]\n%s\nRESPONSE_ADDRESS : Success!! [ message_len:%d ]", *dest_buf_container, *dest_buf_container, GET_STRING_SIZE(*dest_buf_container));
+            TRACE_I("*resp_buf=>[%p] =>%s [%d]", result, result, GET_STRING_SIZE(result));
+            FREE_IF_NOT_NULL(result);
         }
-        free(REQUEST);
+
+        FREE_IF_NOT_NULL(REQUEST);
     }
 }
 //---------------------------------------------------------------------------
