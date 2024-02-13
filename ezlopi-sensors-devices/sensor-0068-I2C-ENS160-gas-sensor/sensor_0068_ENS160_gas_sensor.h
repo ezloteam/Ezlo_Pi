@@ -7,7 +7,7 @@
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 
-int sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t actuib, l_ezlopi_item_t *item, void *arg, void *user_arg);
+int sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0068_I2C_ENS160_GAS_SENSOR_H_
 

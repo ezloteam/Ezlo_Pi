@@ -20,6 +20,17 @@
 
 #include "sensor_0068_ENS160_gas_sensor.h"
 
+/*
+{\
+  \"dev_type\":8,\
+  \"dev_name\":\"ENS160\",\
+  \"id_room\":\"\",\
+  \"id_item\":68,\
+  \"gpio_scl\":17,\
+  \"gpio_sda\":18\
+}\
+*/
+
 static uint32_t parent_device_id = 0;
 static uint32_t aqi_item_id = 0;
 static uint32_t voc_item_id = 0;
