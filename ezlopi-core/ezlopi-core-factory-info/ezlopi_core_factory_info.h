@@ -16,8 +16,8 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
 
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
-    // #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
+// #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
 
 #include "esp_partition.h"
 
@@ -304,17 +304,14 @@ static const char *ezlopi_config_test =
         \"cmd\": 3,\
         \"dev_detail\":\
         [\
-{\
-        \"dev_type\":6,\
-        \"dev_name\":\"PMS5003\",\
-        \"id_room\":\"\",\
-        \"id_item\":37,\
-        \"gpio1\":40,\
-        \"gpio2\":41,\
-        \"gpio3\":39,\
-        \"gpio4\":42,\
-        \"baudrate\":9600\
-        }\
+            {\
+                \"dev_type\":8,\
+                \"dev_name\":\"ENS160\",\
+                \"id_room\":\"\",\
+                \"id_item\":68,\
+                \"gpio_scl\":17,\
+                \"gpio_sda\":18\
+            }\
         ],\
     \"dev_total\": 1}";
 #endif
