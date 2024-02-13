@@ -152,4 +152,14 @@
         }                                                        \
     }
 
+#define CJSON_ASSIGN_NUMBER_AS_STRING(cj_obj, num, name_str)         \
+    {                                                                \
+        if (cj_obj && name_str)                                      \
+        {                                                            \
+            char tmp_str[32];                                        \
+            snprintf(tmp_str, sizeof(tmp_str), "%u", (uint32_t)num); \
+            cJSON_AddStringToObject(cj_obj, name_str, tmp_str);      \
+        }                                                            \
+    }
+
 #endif // _EZLOPI_CORE_CJSON_MACROS_H_

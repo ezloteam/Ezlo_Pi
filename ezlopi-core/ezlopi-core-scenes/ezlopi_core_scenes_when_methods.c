@@ -1,8 +1,9 @@
 
 #include "ezlopi_util_trace.h"
-
-#include "ezlopi_core_devices.h"
 #include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_core_modes.h"
+#include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_when_methods.h"
 
@@ -193,8 +194,44 @@ int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, voi
 
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_W("Warning: when-method 'is_house_mode_changed_to' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+
+    if (when_block)
+    {
+        l_fields_v2_t *house_mode_id_array = NULL;
+        l_fields_v2_t *curr_field = when_block->fields;
+
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, ezlopi_houseMode_str, strlen(ezlopi_houseMode_str)))
+            {
+                house_mode_id_array = curr_field;
+            }
+
+            curr_field = curr_field->next;
+        }
+
+        uint32_t idx = 0;
+        cJSON *cj_house_mdoe_id = NULL;
+
+        while (NULL == (cj_house_mdoe_id = cJSON_GetArrayItem(house_mode_id_array->value.cj_value, idx++)))
+        {
+            if (cj_house_mdoe_id->valuestring)
+            {
+                uint32_t house_mode_id = strtoul(cj_house_mdoe_id->valuestring, NULL, 16);
+                s_ezlopi_modes_t *modes = ezlopi_core_modes_get_custom_modes();
+                if ((modes->current_mode_id == house_mode_id) && ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id))
+                {
+                    ret = 1;
+                    house_mode_id_array->user_arg = (void *)house_mode_id;
+                    TRACE_E("house-mode-changed-to: %d", house_mode_id);
+                }
+            }
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t *scene_node, void *arg)

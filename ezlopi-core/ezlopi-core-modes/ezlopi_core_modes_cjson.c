@@ -1,3 +1,4 @@
+#include <time.h>
 #include <cJSON.h>
 
 #include "ezlopi_util_trace.h"
@@ -25,8 +26,15 @@ int ezlopi_core_modes_cjson_get_modes(cJSON *cj_dest)
     s_ezlopi_modes_t *_modes = ezlopi_core_modes_get_custom_modes();
     if (_modes)
     {
-        CJSON_ASSIGN_ID(cj_dest, _modes->current_mode_id, ezlopi_current_str);
-        CJSON_ASSIGN_ID(cj_dest, _modes->switch_to_mode_id, ezlopi_switchTo_str);
+        CJSON_ASSIGN_NUMBER_AS_STRING(cj_dest, _modes->current_mode_id, ezlopi_current_str);
+        if (_modes->switch_to_mode_id)
+        {
+            CJSON_ASSIGN_NUMBER_AS_STRING(cj_dest, _modes->switch_to_mode_id, ezlopi_switchTo_str);
+        }
+        else
+        {
+            cJSON_AddStringToObject(cj_dest, ezlopi_switchTo_str, "");
+        }
 
         cJSON_AddNumberToObject(cj_dest, ezlopi_timeIsLeftToSwitch_str, _modes->time_is_left_to_switch_sec);
         cJSON_AddNumberToObject(cj_dest, ezlopi_switchToDelay_str, _modes->switch_to_delay_sec);
@@ -74,7 +82,7 @@ int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_dest)
     if (modes)
     {
         ret = 1;
-        CJSON_ASSIGN_ID(cj_dest, modes->current_mode_id, ezlopi_modeId_str);
+        CJSON_ASSIGN_NUMBER_AS_STRING(cj_dest, modes->current_mode_id, ezlopi_modeId_str);
     }
 
     return ret;
@@ -111,112 +119,103 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
 
             while (NULL != (cj_house_mod = cJSON_GetArrayItem(cj_house_modes, mode_idx)))
             {
+                CJSON_TRACE("cj_house_mod", cj_house_mod);
                 uint32_t _mode_id = 0;
-                uint32_t _init_id = ezlopi_cloud_get_modes_initial_id();
                 CJSON_GET_ID(_mode_id, cJSON_GetObjectItem(cj_house_mod, ezlopi__id_str));
+                TRACE_D("Mode-id: %d", _mode_id);
 
-                if ((_mode_id & 0xffffff00) == _init_id)
+                s_house_modes_t *cur_house_mode = NULL;
+
+                switch (_mode_id)
                 {
-                    _mode_id &= 0x000000ff;
-                    s_house_modes_t *cur_house_mode = NULL;
-
-                    switch (_mode_id)
-                    {
-                    case EZLOPI_HOUSE_MODE_REF_ID_HOME:
-                    {
-                        cur_house_mode = &parsed_mode->mode_home;
-                        parsed_mode->mode_home._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_HOME);
-                        parsed_mode->mode_home.name = ezlopi_Home_str;
-                        break;
-                    }
-                    case EZLOPI_HOUSE_MODE_REF_ID_AWAY:
-                    {
-                        cur_house_mode = &parsed_mode->mode_away;
-                        parsed_mode->mode_away._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_AWAY);
-                        parsed_mode->mode_away.name = ezlopi_Away_str;
-                        break;
-                    }
-                    case EZLOPI_HOUSE_MODE_REF_ID_NIGHT:
-                    {
-                        cur_house_mode = &parsed_mode->mode_night;
-                        parsed_mode->mode_night._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_NIGHT);
-                        parsed_mode->mode_night.name = ezlopi_Night_str;
-                        break;
-                    }
-                    case EZLOPI_HOUSE_MODE_REF_ID_VACATION:
-                    {
-                        cur_house_mode = &parsed_mode->mode_vacation;
-                        parsed_mode->mode_vacation._id = (_init_id | EZLOPI_HOUSE_MODE_REF_ID_VACATION);
-                        parsed_mode->mode_vacation.name = ezlopi_Vacation_str;
-                        break;
-                    }
-                    default:
-                    {
-                        TRACE_E("Undefined house-mode-id!");
-                        break;
-                    }
-                    }
-
-                    {
-                        cJSON *cj_description = cJSON_GetObjectItem(cj_house_mod, ezlopi_description_str);
-                        if (cj_description && cj_description->valuestring)
-                        {
-                            uint32_t desc_len = strlen(cj_description->valuestring) + 1;
-                            cur_house_mode->description = (char *)malloc(desc_len);
-                            if (cur_house_mode->description)
-                            {
-                                snprintf(cur_house_mode->description, desc_len, "%s", cj_description->valuestring);
-                            }
-                        }
-                    }
-
-                    {
-                        cJSON *cj_notification = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
-                        if (cj_notification)
-                        {
-                            cur_house_mode->cj_notifications = cJSON_Duplicate(cj_notification, cJSON_True);
-                        }
-                    }
-
-                    CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_disarmedDefault_str, cur_house_mode->disarmed_default);
-                    {
-                        cJSON *cj_disarmed_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
-                        if (cj_disarmed_devices)
-                        {
-                            cur_house_mode->cj_disarmed_devices = cJSON_Duplicate(cj_disarmed_devices, cJSON_True);
-                        }
-                    }
-
-                    {
-                        cJSON *cj_alarms_off_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_alarmsOffDevices_str);
-                        if (cj_alarms_off_devices)
-                        {
-                            cur_house_mode->cj_alarms_off_devices = cJSON_Duplicate(cj_alarms_off_devices, cJSON_True);
-                        }
-                    }
-
-                    {
-                        cJSON *cj_cameras_off_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_camerasOffDevices_str);
-                        if (cj_cameras_off_devices)
-                        {
-                            cur_house_mode->cj_cameras_off_devices = cJSON_Duplicate(cj_cameras_off_devices, cJSON_True);
-                        }
-                    }
-
-                    CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_protect_str, cur_house_mode->protect);
-                    CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_armed_str, cur_house_mode->armed);
-
-                    // CJSON_TRACE("cur_house_mode->cj_notifications", cur_house_mode->cj_notifications);
-                    // CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
-                    // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
-                    // CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
-                }
-                else
+                case EZLOPI_HOUSE_MODE_REF_ID_HOME:
                 {
-                    TRACE_E("modes in NVS is corrupted!");
-                    _parsing_status = -1;
+                    cur_house_mode = &parsed_mode->mode_home;
+                    parsed_mode->mode_home._id = EZLOPI_HOUSE_MODE_REF_ID_HOME;
+                    parsed_mode->mode_home.name = ezlopi_Home_str;
                     break;
                 }
+                case EZLOPI_HOUSE_MODE_REF_ID_AWAY:
+                {
+                    cur_house_mode = &parsed_mode->mode_away;
+                    parsed_mode->mode_away._id = EZLOPI_HOUSE_MODE_REF_ID_AWAY;
+                    parsed_mode->mode_away.name = ezlopi_Away_str;
+                    break;
+                }
+                case EZLOPI_HOUSE_MODE_REF_ID_NIGHT:
+                {
+                    cur_house_mode = &parsed_mode->mode_night;
+                    parsed_mode->mode_night._id = EZLOPI_HOUSE_MODE_REF_ID_NIGHT;
+                    parsed_mode->mode_night.name = ezlopi_Night_str;
+                    break;
+                }
+                case EZLOPI_HOUSE_MODE_REF_ID_VACATION:
+                {
+                    cur_house_mode = &parsed_mode->mode_vacation;
+                    parsed_mode->mode_vacation._id = EZLOPI_HOUSE_MODE_REF_ID_VACATION;
+                    parsed_mode->mode_vacation.name = ezlopi_Vacation_str;
+                    break;
+                }
+                default:
+                {
+                    TRACE_E("Undefined house-mode-id!");
+                    break;
+                }
+                }
+
+                {
+                    cJSON *cj_description = cJSON_GetObjectItem(cj_house_mod, ezlopi_description_str);
+                    if (cj_description && cj_description->valuestring)
+                    {
+                        uint32_t desc_len = strlen(cj_description->valuestring) + 1;
+                        cur_house_mode->description = (char *)malloc(desc_len);
+                        if (cur_house_mode->description)
+                        {
+                            snprintf(cur_house_mode->description, desc_len, "%s", cj_description->valuestring);
+                        }
+                    }
+                }
+
+                {
+                    cJSON *cj_notification = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
+                    if (cj_notification)
+                    {
+                        cur_house_mode->cj_notifications = cJSON_Duplicate(cj_notification, cJSON_True);
+                    }
+                }
+
+                CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_disarmedDefault_str, cur_house_mode->disarmed_default);
+                {
+                    cJSON *cj_disarmed_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_notifications_str);
+                    if (cj_disarmed_devices)
+                    {
+                        cur_house_mode->cj_disarmed_devices = cJSON_Duplicate(cj_disarmed_devices, cJSON_True);
+                    }
+                }
+
+                {
+                    cJSON *cj_alarms_off_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_alarmsOffDevices_str);
+                    if (cj_alarms_off_devices)
+                    {
+                        cur_house_mode->cj_alarms_off_devices = cJSON_Duplicate(cj_alarms_off_devices, cJSON_True);
+                    }
+                }
+
+                {
+                    cJSON *cj_cameras_off_devices = cJSON_GetObjectItem(cj_house_mod, ezlopi_camerasOffDevices_str);
+                    if (cj_cameras_off_devices)
+                    {
+                        cur_house_mode->cj_cameras_off_devices = cJSON_Duplicate(cj_cameras_off_devices, cJSON_True);
+                    }
+                }
+
+                CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_protect_str, cur_house_mode->protect);
+                CJSON_GET_VALUE_BOOL(cj_house_mod, ezlopi_armed_str, cur_house_mode->armed);
+
+                // CJSON_TRACE("cur_house_mode->cj_notifications", cur_house_mode->cj_notifications);
+                // CJSON_TRACE("cur_house_mode->cj_disarmed_devices", cur_house_mode->cj_disarmed_devices);
+                // CJSON_TRACE("cur_house_mode->cj_alarms_off_devices", cur_house_mode->cj_alarms_off_devices);
+                // CJSON_TRACE("cur_house_mode->cj_cameras_off_devices", cur_house_mode->cj_cameras_off_devices);
 
                 mode_idx++;
             }
@@ -334,6 +333,37 @@ s_ezlopi_modes_t *ezlopi_core_modes_cjson_parse_modes(cJSON *cj_modes)
     return parsed_mode;
 }
 
+cJSON *ezlopi_core_modes_cjson_changed(void)
+{
+    cJSON *cj_root = cJSON_CreateObject();
+    if (cj_root)
+    {
+        cJSON_AddStringToObject(cj_root, ezlopi_id_str, ezlopi_ui_broadcast_str);
+        cJSON_AddStringToObject(cj_root, ezlopi_msg_subclass_str, ezlopi_hub_modes_changed_str);
+        cJSON *cj_result = cJSON_AddObjectToObject(cj_root, ezlopi_result_str);
+        if (cj_result)
+        {
+            s_ezlopi_modes_t *_mode = ezlopi_core_modes_get_custom_modes();
+            s_house_modes_t *_current_mode = ezlopi_core_modes_get_current_house_modes();
+            if (_mode)
+            {
+                char tmp_str[32];
+                snprintf(tmp_str, sizeof(tmp_str), "%u", _mode->current_mode_id);
+                cJSON_AddStringToObject(cj_result, ezlopi_modeId_str, tmp_str);
+                cJSON_AddBoolToObject(cj_result, ezlopi_disarmedDefault_str, _current_mode->disarmed_default);
+
+                time_t now;
+                time(&now);
+                uint64_t time_now_ms = now * 1000LL;
+
+                cJSON_AddNumberToObject(cj_result, ezlopi_timestamp_str, time_now_ms);
+            }
+        }
+    }
+
+    return cj_root;
+}
+
 ////////////////////////////////
 
 static void __cjson_add_number_as_hex_string(cJSON *cj_dest, const char *obj_name, uint32_t number)
@@ -380,7 +410,7 @@ static void __cjson_add_mode_to_array(cJSON *cj_modes_arr, s_house_modes_t *hous
         cJSON *cj_house_mode = cJSON_CreateObject();
         if (cj_house_mode)
         {
-            CJSON_ASSIGN_ID(cj_house_mode, house_mode->_id, ezlopi__id_str);
+            CJSON_ASSIGN_NUMBER_AS_STRING(cj_house_mode, house_mode->_id, ezlopi__id_str);
 
             cJSON_AddStringToObject(cj_house_mode, ezlopi_name_str, house_mode->name);
             cJSON_AddStringToObject(cj_house_mode, ezlopi_description_str, house_mode->description ? house_mode->description : "");
@@ -388,11 +418,6 @@ static void __cjson_add_mode_to_array(cJSON *cj_modes_arr, s_house_modes_t *hous
             cJSON_AddBoolToObject(cj_house_mode, ezlopi_armed_str, house_mode->armed);
             cJSON_AddBoolToObject(cj_house_mode, ezlopi_protect_str, house_mode->protect);
             cJSON_AddBoolToObject(cj_house_mode, ezlopi_disarmedDefault_str, house_mode->disarmed_default);
-
-            CJSON_TRACE("house_mode->cj_notifications", house_mode->cj_notifications);
-            CJSON_TRACE("house_mode->cj_disarmed_devices", house_mode->cj_disarmed_devices);
-            CJSON_TRACE("house_mode->cj_alarms_off_devices", house_mode->cj_alarms_off_devices);
-            CJSON_TRACE("house_mode->cj_cameras_off_devices", house_mode->cj_cameras_off_devices);
 
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_disarmedDevices_str, house_mode->cj_disarmed_devices);
             __cjson_duplicate_add_reference(cj_house_mode, ezlopi_notifications_str, house_mode->cj_notifications);
@@ -445,7 +470,7 @@ static void __cjson_add_alarmed(cJSON *cj_alarmed, s_alarmed_t *alarmed)
                 if (cj_source)
                 {
 
-                    CJSON_ASSIGN_ID(cj_source, source_node->device_id, ezlopi_deviceId_str);
+                    CJSON_ASSIGN_NUMBER_AS_STRING(cj_source, source_node->device_id, ezlopi_deviceId_str);
                     cJSON_AddNumberToObject(cj_source, ezlopi_delay_str, source_node->delay);
                     cJSON_AddNumberToObject(cj_source, ezlopi_timestamp_str, source_node->time_stamp);
                 }

@@ -44,7 +44,8 @@ int ezlopi_core_modes_api_get_current_mode(cJSON *cj_result)
 int ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_house_mode)
 {
     ezlopi_service_modes_stop();
-    sg_custom_modes->switch_to_mode_id = sg_current_house_mode->_id;
+    sg_current_house_mode = switch_to_house_mode;
+    sg_custom_modes->switch_to_mode_id = switch_to_house_mode->_id;
     sg_custom_modes->time_is_left_to_switch_sec = sg_custom_modes->switch_to_delay_sec;
     ezlopi_service_modes_start();
 

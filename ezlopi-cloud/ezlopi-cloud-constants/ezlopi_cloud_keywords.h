@@ -261,5 +261,6 @@ extern const char *ezlopi_Home_str;
 extern const char *ezlopi_Away_str;
 extern const char *ezlopi_Night_str;
 extern const char *ezlopi_Vacation_str;
+extern const char *ezlopi_houseMode_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

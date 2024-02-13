@@ -78,25 +78,25 @@ void ezlopi_core_default_init(void)
     sg_default_mode.cj_cameras = NULL;
     sg_default_mode.cj_devices = NULL;
 
-    sg_default_mode.current_mode_id = (initial_id | EZLOPI_HOUSE_MODE_REF_ID_HOME);
+    sg_default_mode.current_mode_id = EZLOPI_HOUSE_MODE_REF_ID_HOME;
 
     memcpy(&sg_default_mode.mode_home, &sg_default_house_mode, sizeof(s_house_modes_t));
     sg_default_mode.mode_home.name = ezlopi_Home_str;
     sg_default_mode.mode_home.description = (char *)ezlopi_Home_str;
-    sg_default_mode.mode_home._id = (initial_id | EZLOPI_HOUSE_MODE_REF_ID_HOME);
+    sg_default_mode.mode_home._id = EZLOPI_HOUSE_MODE_REF_ID_HOME;
 
     memcpy(&sg_default_mode.mode_away, &sg_default_house_mode, sizeof(s_house_modes_t));
     sg_default_mode.mode_away.name = ezlopi_Away_str;
     sg_default_mode.mode_away.description = (char *)ezlopi_Away_str;
-    sg_default_mode.mode_away._id = (initial_id | EZLOPI_HOUSE_MODE_REF_ID_AWAY);
+    sg_default_mode.mode_away._id = EZLOPI_HOUSE_MODE_REF_ID_AWAY;
 
     memcpy(&sg_default_mode.mode_night, &sg_default_house_mode, sizeof(s_house_modes_t));
     sg_default_mode.mode_night.name = ezlopi_Night_str;
     sg_default_mode.mode_night.description = (char *)ezlopi_Night_str;
-    sg_default_mode.mode_night._id = (initial_id | EZLOPI_HOUSE_MODE_REF_ID_NIGHT);
+    sg_default_mode.mode_night._id = EZLOPI_HOUSE_MODE_REF_ID_NIGHT;
 
     memcpy(&sg_default_mode.mode_vacation, &sg_default_house_mode, sizeof(s_house_modes_t));
     sg_default_mode.mode_vacation.name = ezlopi_Vacation_str;
     sg_default_mode.mode_vacation.description = (char *)ezlopi_Vacation_str;
-    sg_default_mode.mode_vacation._id = (initial_id | EZLOPI_HOUSE_MODE_REF_ID_VACATION);
+    sg_default_mode.mode_vacation._id = EZLOPI_HOUSE_MODE_REF_ID_VACATION;
 }

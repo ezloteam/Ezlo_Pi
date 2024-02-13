@@ -241,14 +241,20 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
             switch (cj_value->type)
             {
             case cJSON_False:
+            {
                 value = 0;
                 break;
+            }
             case cJSON_True:
+            {
                 value = 1;
                 break;
+            }
             case cJSON_Number:
+            {
                 value = cj_value->valueint;
                 break;
+            }
 
             default:
                 break;
@@ -257,7 +263,7 @@ static int __set_value(l_ezlopi_item_t *item, void *arg)
 
         TRACE_S("item_name: %s", item->cloud_properties.item_name);
         TRACE_S("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
-        TRACE_S("item_id: 0x%08x", item->cloud_properties.item_id);
+        TRACE_S("item_id: %08x", item->cloud_properties.item_id);
         TRACE_S("prev value: %d", item->interface.gpio.gpio_out.value);
         TRACE_S("cur value: %d", value);
 

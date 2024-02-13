@@ -134,4 +134,7 @@ int ezlopi_core_modes_api_cancel_switch(void);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
 
+///
+cJSON *ezlopi_core_modes_cjson_changed(void);
+
 #endif // __EZLOPI_HOME_MODES_H__

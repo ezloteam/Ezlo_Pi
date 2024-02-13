@@ -255,5 +255,6 @@ const char *ezlopi_Home_str = "Home";
 const char *ezlopi_Away_str = "Away";
 const char *ezlopi_Night_str = "Night";
 const char *ezlopi_Vacation_str = "Vacation";
+const char *ezlopi_houseMode_str = "houseMode";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

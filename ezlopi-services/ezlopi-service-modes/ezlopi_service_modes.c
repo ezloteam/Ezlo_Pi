@@ -6,6 +6,8 @@
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_cloud_modes.h"
+#include "ezlopi_core_modes_cjson.h"
+#include "ezlopi_service_webprov.h"
 
 #include "ezlopi_service_modes.h"
 
@@ -19,6 +21,7 @@ int ezlopi_service_modes_stop(void)
     {
         vTaskDelete(sg_process_handle);
         sg_process_handle = NULL;
+        TRACE_W("Modes-service: Stopped!");
     }
 
     return 1;
@@ -32,6 +35,7 @@ int ezlopi_service_modes_start(void)
     {
         ret = 1;
         xTaskCreate(__modes_service, "modes-service", 1024 * 4, NULL, 3, &sg_process_handle);
+        TRACE_S("Starting modes-service");
     }
 
     return ret;
@@ -54,9 +58,12 @@ static void __modes_service(void *pv)
                 if (ez_mode->time_is_left_to_switch_sec)
                 {
                     ez_mode->time_is_left_to_switch_sec--;
+                    TRACE_D("time_is_left_to_switch_sec: %f", ez_mode->time_is_left_to_switch_sec);
                 }
                 else
                 {
+                    TRACE_I("switching-to-mode: %u", ez_mode->switch_to_mode_id);
+
                     s_house_modes_t *current_house_mode = NULL;
                     ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
                     ez_mode->switch_to_mode_id = 0;
@@ -100,7 +107,12 @@ static void __modes_service(void *pv)
 
                         TRACE_D("Switching to house-mode: '%s'", current_house_mode->name);
                         ezlopi_core_modes_set_current_house_mode(current_house_mode);
-#warning "broadcast - mode-changed here"
+
+                        cJSON *cj_response = ezlopi_core_modes_cjson_changed();
+                        if (cj_response)
+                        {
+                            web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
+                        }
                     }
                 }
             }

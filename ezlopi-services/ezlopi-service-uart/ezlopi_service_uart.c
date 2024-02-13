@@ -228,7 +228,7 @@ static void qt_serial_rx_task(void *arg)
         if (rxBytes > 0)
         {
             data[rxBytes] = 0;
-            TRACE_S("%s", data);
+            TRACE_I("%s", data);
             qt_serial_parse_rx_data((const char *)data);
         }
     }

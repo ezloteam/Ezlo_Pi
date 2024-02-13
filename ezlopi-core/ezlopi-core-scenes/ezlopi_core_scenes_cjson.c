@@ -386,7 +386,7 @@ static void __cjson_add_fields(cJSON *cj_block, l_fields_v2_t *fields)
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
                     {
                         char id_str[32];
-                        snprintf(id_str, sizeof(id_str), "%x", curr_field->value.value_double);
+                        snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->value.value_double);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
