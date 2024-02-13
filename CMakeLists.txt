@@ -35,13 +35,16 @@ ENDMACRO()
 set(external_components_list 
                                 ezlopi-components 
                                 ezlopi-sensors-devices 
-                                ezlopi-lua-modules 
+                                ezlopi-lua-modules
                                 ezlopi-services 
                                 ezlopi-cloud 
                                 ezlopi-core 
                                 ezlopi-hal
                                 ezlopi-util
-                                ) 
+                                )  
+
+                                # 
+# set_target_properties(your_subdir2 PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'
 set(ALL_COMPONENTS "") # clearing 'ALL_COMPONENTS' variable
