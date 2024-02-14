@@ -39,6 +39,7 @@ extern "C"
         uint16_t web_server_maxlen;
         uint16_t header_maxlen;
         uint16_t content_maxlen;
+        uint16_t response_maxlen;
         uint8_t username_maxlen; // cap to 256
         uint8_t password_maxlen;
         char *url;        // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
@@ -47,6 +48,7 @@ extern "C"
         char *content;
         char *username;
         char *password;
+        char *response;
         esp_http_client_method_t method; // default :- GET_METHOD
     } s_ezlopi_core_http_mbedtls_t;
 
@@ -74,12 +76,9 @@ extern "C"
     int __ezlopi_core_http_dyna_relloc(char **Buf, int reqSize);
 
     /**
-     * @brief This function that generates a http request, by combining information contained in '*config'.
-     *
-     * @param config   : config_struct [ complete_url + webserver-name + web_port + headers + content + username + password ]
-     * @param dest_buf_container : Holds address of detination *ptr [ memory_block containing reply message ]
+     * @brief Function to invoke mbedtls_https task
      */
-    void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **dest_buf_container);
+    void function_to_call_mbedtlshttp(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
 
     s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate);
     s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char *location, cJSON *headers, const char *private_key, const char *shared_key, const char *ca_certificate);

@@ -1,10 +1,4 @@
-#include <string.h>
 #include "esp_tls.h"
-
-#include "ezlopi_util_trace.h"
-
-#include "ezlopi_core_http.h"
-
 // #ifdef CONFIG_ESP_TLS_USING_MBEDTLS
 #include "mbedtls/platform.h"
 #include "mbedtls/net_sockets.h"
@@ -16,12 +10,15 @@
 #include "mbedtls/certs.h"
 // #endif
 
+#include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_http.h"
 typedef struct ll_resp_buf
 {
     uint32_t len;
     uint8_t *buffer;
     struct ll_resp_buf *next;
-} ll_resp_buf_t;
+} ll_resp_buf_t; // implementation for response
 
 static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
 static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
@@ -59,10 +56,10 @@ int __ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr)
         FREE_IF_NOT_NULL(*__dest_ptr);
         // Now, do a fresh allocation
         ret += 5;
-        char *tmp_ptr = malloc(sizeof(char) * ret);
+        char *tmp_ptr = malloc(ret);
         if (tmp_ptr)
         {
-            bzero(tmp_ptr, (sizeof(char) * ret));
+            bzero(tmp_ptr, (ret));
             snprintf(tmp_ptr, ret, "%s", src_ptr);
             // tmp_ptr[ret] = '\0';
             // TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, ret);
@@ -83,7 +80,7 @@ int __ezlopi_core_http_dyna_relloc(char **Buf, int reqSize)
     // TRACE_I("REQ_SIZE: %d", reqSize);
     if ((NULL != *Buf) && (reqSize > 0)) // strictly:  (new-size != 0)
     {
-        void *NewBuf = realloc(*Buf, sizeof(char) * reqSize); // reqSize ≤ 1.6 * n
+        void *NewBuf = realloc(*Buf, reqSize); // reqSize ≤ 1.6 * n
         if (NULL == NewBuf)
         {
             TRACE_E("Reallocation - failed");
@@ -246,11 +243,10 @@ void __ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port
     } while (written_bytes < strlen(url_req));
 
     TRACE_I("Reading HTTP response...");
-    char *resp_buf_dummy = (char *)malloc(sizeof(char) * resp_buf_size); // points to a memory-block
+    char *resp_buf_dummy = (char *)malloc(resp_buf_size); // points to a memory-block
     if (resp_buf_dummy)
     {
-        bzero(resp_buf_dummy, sizeof(char) * resp_buf_size); // clear the buffer
-        resp_buf_dummy[resp_buf_size - 1] = '\0';
+        bzero(resp_buf_dummy, resp_buf_size); // clear the buffer
         TRACE_E("1.(At init)resp_buf_dummy => [%p]", resp_buf_dummy);
         uint8_t reply_count = 0;
         do
@@ -289,7 +285,7 @@ void __ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port
                     if (__ezlopi_core_http_dyna_relloc(&resp_buf_dummy, resp_buf_size))
                     {
                         TRACE_E("x. (reallocation) resp_buf_dummy => [%p]", resp_buf_dummy);
-                        snprintf(resp_buf_dummy + GET_STRING_SIZE(resp_buf_dummy), len, "%s", tmp_buf);
+                        snprintf(resp_buf_dummy + strlen(resp_buf_dummy), len, "%s", tmp_buf);
                     }
                     else
                     {
@@ -298,14 +294,13 @@ void __ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port
                 }
                 else
                 {
-                    TRACE_E("First writing...");
                     snprintf(resp_buf_dummy, len, "%s", tmp_buf); // 513
                 }
             }
         } while (1);
 
         // assign the dynamic content to *resp_buf.
-        if (GET_STRING_SIZE(resp_buf_dummy) > 0)
+        if (strlen(resp_buf_dummy) > 0)
         {
             TRACE_D("Reply_count = [%d]", reply_count);
             TRACE_E("2.(Finally)resp_buf_dummy => [%p]", resp_buf_dummy);
@@ -316,8 +311,8 @@ void __ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port
         }
     }
 
-exit:
     mbedtls_ssl_close_notify(&ssl);
+exit:
     mbedtls_ssl_session_reset(&ssl);
     mbedtls_net_free(&server_fd);
     if (0 != ret)
@@ -335,89 +330,104 @@ exit:
     TRACE_I("Completed a request");
 }
 
-void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config, char **dest_buf_container)
+/**
+ * @brief This Task , generates a http request, by combining information contained in '*config'.
+ *
+ * @param params   : config_struct [ complete_url + webserver-name + web_port + headers + content + username + password + response]
+ */
+static void ezlopi_core_http_mbedtls_req(void *params)
 {
-    int REQUEST_LENGTH = 100 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
-    char *REQUEST = malloc(sizeof(char) * REQUEST_LENGTH);
-    if (REQUEST)
+    s_ezlopi_core_http_mbedtls_t *config = (s_ezlopi_core_http_mbedtls_t *)params;
+    if (config)
     {
-        bzero(REQUEST, sizeof(char) * REQUEST_LENGTH);
-        switch (config->method)
+        int request_len = 64 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
+        char *request = malloc(request_len);
+        if (request)
         {
-        case HTTP_METHOD_GET:
-        {
-            TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
-            if ((NULL != config->username) && (GET_STRING_SIZE(config->username)) && (NULL != config->password) && (GET_STRING_SIZE(config->password)))
-                snprintf(REQUEST, REQUEST_LENGTH, "GET %s?username=%s&password=%s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
-            else
-                snprintf(REQUEST, REQUEST_LENGTH, "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-            break;
-        }
-        case HTTP_METHOD_POST:
-        {
-            TRACE_I("HTTP POST-METHOD [%d]", config->method);
-            snprintf(REQUEST, REQUEST_LENGTH, "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-            break;
-        }
-        case HTTP_METHOD_PUT:
-        {
-            TRACE_I("HTTP PUT-METHOD [%d]", config->method);
-            snprintf(REQUEST, REQUEST_LENGTH, "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-            break;
-        }
-        case HTTP_METHOD_DELETE:
-        {
-            TRACE_I("HTTP DELETE-METHOD [%d]", config->method);
-            snprintf(REQUEST, REQUEST_LENGTH, "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
-            break;
-        }
-        default:
-            break;
-        }
-        // adding 'Headers' to request_buffer
-        int max_allowed = 0;
-        if ((NULL != config->header) && (GET_STRING_SIZE(config->header) > 0))
-        {
-            max_allowed = __ezlopi_core_http_calc_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->header) + 3));
-            if (max_allowed > 0)
+            bzero(request, request_len);
+            request[request_len - 1] = '\0';
+            switch (config->method)
             {
-                snprintf(REQUEST + GET_STRING_SIZE(REQUEST), max_allowed, "%s\r\n", config->header);
+            case HTTP_METHOD_GET:
+            {
+                TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
+                if ((NULL != config->username) && (GET_STRING_SIZE(config->username)) && (NULL != config->password) && (GET_STRING_SIZE(config->password)))
+                    snprintf(request, request_len, "GET %s?username=%s&password=%s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
+                else
+                    snprintf(request, request_len, "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+                break;
             }
-        }
-        // adding content body to request
-        if ((NULL != config->content) && (GET_STRING_SIZE(config->content) > 0))
-        {
-            if ((HTTP_METHOD_GET != config->method) && (NULL != config->username) && (NULL != config->password))
+            case HTTP_METHOD_POST:
             {
-                max_allowed = __ezlopi_core_http_calc_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->username) + GET_STRING_SIZE(config->password) + GET_STRING_SIZE(config->content) + 3));
+                TRACE_I("HTTP POST-METHOD [%d]", config->method);
+                snprintf(request, request_len, "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+                break;
             }
-            else
+            case HTTP_METHOD_PUT:
             {
-                max_allowed = __ezlopi_core_http_calc_empty_bufsize(REQUEST, REQUEST_LENGTH, (GET_STRING_SIZE(config->content) + 3));
+                TRACE_I("HTTP PUT-METHOD [%d]", config->method);
+                snprintf(request, request_len, "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+                break;
+            }
+            case HTTP_METHOD_DELETE:
+            {
+                TRACE_I("HTTP DELETE-METHOD [%d]", config->method);
+                snprintf(request, request_len, "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+                break;
+            }
+            default:
+                break;
+            }
+            // adding 'Headers' to request_buffer
+            int max_allowed = 0;
+            if ((NULL != config->header) && (GET_STRING_SIZE(config->header) > 0))
+            {
+                max_allowed = __ezlopi_core_http_calc_empty_bufsize(request, request_len, (strlen(config->header) + 3));
+                if (max_allowed > 0)
+                {
+                    snprintf(request + strlen(request), max_allowed, "%s\r\n", config->header);
+                }
+            }
+            // adding content body to request
+            if ((NULL != config->content) && (GET_STRING_SIZE(config->content) > 0))
+            {
+                if ((HTTP_METHOD_GET != config->method) && (NULL != config->username) && (NULL != config->password))
+                {
+                    max_allowed = __ezlopi_core_http_calc_empty_bufsize(request, request_len, (strlen(config->username) + strlen(config->password) + strlen(config->content) + 3));
+                }
+                else
+                {
+                    max_allowed = __ezlopi_core_http_calc_empty_bufsize(request, request_len, (strlen(config->content) + 3));
+                }
+
+                if (max_allowed > 0)
+                {
+                    snprintf(request + strlen(request), max_allowed, "%s\r\n", config->content);
+                }
+            }
+            // Ready-Up 'request' buffer
+            TRACE_I("request[capacity: %d]:\n\n%s[%d]", request_len, request, strlen(request));
+
+            char *result = NULL;
+            TRACE_E("&result -> [%p]", &result);
+            __ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &result);
+            if (result)
+            {
+                TRACE_I("*resp_buf=>[%p] =>%s [%d]", result, result, strlen(result));
+                free(result); // return to destination buffer
             }
 
-            if (max_allowed > 0)
-            {
-                snprintf(REQUEST + GET_STRING_SIZE(REQUEST), max_allowed, "%s\r\n", config->content);
-            }
+            free(request);
         }
-        // Ready-Up 'REQUEST' buffer
-        REQUEST[REQUEST_LENGTH - 1] = '\0'; // null terminating array
-        TRACE_I("REQUEST[%d]:\n\n%s=[%d]", REQUEST_LENGTH, REQUEST, GET_STRING_SIZE(REQUEST));
-
-        char *result = NULL;
-        TRACE_E("&result -> [%p]", &result);
-        __ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), REQUEST, &result);
-        if (result)
-        {
-            TRACE_I("*resp_buf=>[%p] =>%s [%d]", result, result, GET_STRING_SIZE(result));
-            FREE_IF_NOT_NULL(result);
-        }
-
-        FREE_IF_NOT_NULL(REQUEST);
     }
+    vTaskDelete(NULL);
 }
 //---------------------------------------------------------------------------
+
+void function_to_call_mbedtlshttp(s_ezlopi_core_http_mbedtls_t *tmp_http_data)
+{
+    xTaskCreate(ezlopi_core_http_mbedtls_req, "ezlopi_core_http_mbedtls_req", 2 * 2048, (void *)tmp_http_data, 1, NULL);
+}
 
 s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
 {

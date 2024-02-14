@@ -180,8 +180,10 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
                 curr_field = curr_field->next;
             }
 
-            char *response_buffer = NULL;
-            ezlopi_core_http_mbedtls_req(tmp_http_data, &response_buffer); // Returns:- [response_buffer = &Memory_block]
+#warning "call mbedtls function call here"
+            function_to_call_mbedtlshttp(tmp_http_data);
+            // char *response_buffer = NULL;
+            // ezlopi_core_http_mbedtls_req(tmp_http_data, &response_buffer); // Returns:- [response_buffer = &Memory_block]
             // if (response_buffer)
             // {
             //     TRACE_I("sendHttp : [%p]response_buffer = [%d]\n%s.", response_buffer, strlen(response_buffer), response_buffer);

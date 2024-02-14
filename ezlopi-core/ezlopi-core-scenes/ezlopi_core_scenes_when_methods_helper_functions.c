@@ -325,7 +325,8 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
 
         // must return 'true' if success
         char *response = NULL;
-        ezlopi_core_http_mbedtls_req(&tmp_config, &response);
+#warning "call mbedtls call function here"
+        function_to_call_mbedtlshttp(&tmp_config);
         if (response)
         {
             TRACE_I("isSunState : [%p]response = [%d]%s.", response, strlen(response), response);
