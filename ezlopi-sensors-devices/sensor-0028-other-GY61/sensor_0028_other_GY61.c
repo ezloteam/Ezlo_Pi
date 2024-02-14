@@ -104,17 +104,17 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
             CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.adc.gpio_num);
-            TRACE_I("Accel X-axis gpio1: %d ", item->interface.adc.gpio_num);
+            TRACE_S("Accel X-axis gpio1: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
             CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.adc.gpio_num);
-            TRACE_I("Accel Y-axis gpio2: %d ", item->interface.adc.gpio_num);
+            TRACE_S("Accel Y-axis gpio2: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
             CJSON_GET_VALUE_INT(cj_device, "gpio3", item->interface.adc.gpio_num);
-            TRACE_I("Accel Z-axis gpio3: %d ", item->interface.adc.gpio_num);
+            TRACE_S("Accel Z-axis gpio3: %d ", item->interface.adc.gpio_num);
         }
     }
 }
@@ -213,7 +213,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", (user_data->x_data));
-                // TRACE_I("x-axis-G : %.2f", user_data->x_data);
+                // TRACE_S("x-axis-G : %.2f", user_data->x_data);
                 free(valueFormatted);
             }
             if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
@@ -221,7 +221,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", (user_data->y_data));
-                // TRACE_I("y-axis-G : %.2f", user_data->y_data);
+                // TRACE_S("y-axis-G : %.2f", user_data->y_data);
                 free(valueFormatted);
             }
             if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
@@ -229,7 +229,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
                 cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", (user_data->z_data));
-                // TRACE_I("z-axis-G : %.2f", user_data->z_data);
+                // TRACE_S("z-axis-G : %.2f", user_data->z_data);
                 free(valueFormatted);
             }
             ret = 1;

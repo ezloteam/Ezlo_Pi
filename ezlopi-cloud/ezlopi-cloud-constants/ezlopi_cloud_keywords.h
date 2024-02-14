@@ -2,6 +2,7 @@
 #define __EZLOPI_CLOUD_KEYWORDS_H__
 
 #include "stdio.h"
+
 extern const char *ezlopi_ezlopi_str;
 extern const char *ezlopi__str;
 extern const char *ezlopi_id_str;
@@ -210,32 +211,61 @@ extern const char *ezlopi_baud_str;
 extern const char *ezlopi_baud_rate_str;
 extern const char *ezlopi_sceneId_str;
 extern const char *ezlopi_changed_by_str;
+extern const char* scene_status_started_str;
+extern const char* scene_status_finished_str;
+extern const char* scene_status_partially_finished_str;
+extern const char* scene_status_failed_str;
+extern const char* scene_status_stopped_str;
+extern const char* ezlopi_armed_str;
+extern const char* ezlopi_subtype_str;
+extern const char* ezlopi_scale_str;
+extern const char* ezlopi_enum_str;
+extern const char* ezlopi_valueformatted_str;
+extern const char* ezlopi_value_default_str;
+extern const char* ezlopi_text_str;
+extern const char* ezlopi_label_str;
+extern const char* ezlopi_lang_tag_str;
+extern const char* ezlopi_description_str;
+extern const char* ezlopi_value_type_str;
+extern const char* ezlopi_value_min_str;
+extern const char* ezlopi_value_max_str;
+extern const char* ezlopi_no_str;
+extern const char* ezlopi_idle_str;
+extern const char* ezlopi_location_str;
+extern const char* ezlopi_locations_str;
+extern const char* ezlopi_custom_timezone_str;
+extern const char* ezlopi_default_str;
+extern const char* ezlopi_gmt0_str;
+extern const char* ezlopi_modeId_str;
+extern const char* ezlopi_current_str;
+extern const char* ezlopi_switchTo_str;
+extern const char* ezlopi_timeIsLeftToSwitch_str;
+extern const char* ezlopi_switchToDelay_str;
+extern const char* ezlopi_alarmDelay_str;
+extern const char* ezlopi_entryDelay_str;
+extern const char* ezlopi_normal_str;
+extern const char* ezlopi_short_str;
+extern const char* ezlopi_extended_str;
+extern const char* ezlopi_instant_str;
+extern const char* ezlopi_modes_str;
+extern const char* ezlopi_disarmedDefault_str;
+extern const char* ezlopi_disarmedDevices_str;
+extern const char* ezlopi_alarmsOffDevices_str;
+extern const char* ezlopi_camerasOffDevices_str;
+extern const char* ezlopi_protect_str;
+extern const char* ezlopi_devices_str;
+extern const char* ezlopi_alarms_str;
+extern const char* ezlopi_cameras_str;
+extern const char* ezlopi_protectButtons_str;
+extern const char* ezlopi_service_str;
+extern const char* ezlopi_alarmed_str;
+extern const char* ezlopi_timeIsLeft_str;
+extern const char* ezlopi_sources_str;
+extern const char* ezlopi_timestamp_str;
+extern const char* ezlopi_Home_str;
+extern const char* ezlopi_Away_str;
+extern const char* ezlopi_Night_str;
+extern const char* ezlopi_Vacation_str;
+extern const char* ezlopi_houseMode_str;
 
-extern const char *scene_status_started_str;
-extern const char *scene_status_finished_str;
-extern const char *scene_status_partially_finished_str;
-extern const char *scene_status_failed_str;
-extern const char *scene_status_stopped_str;
-
-extern const char *ezlopi_armed_str;
-extern const char *ezlopi_subtype_str;
-
-extern const char *ezlopi_scale_str;
-extern const char *ezlopi_enum_str;
-extern const char *ezlopi_valueformatted_str;
-extern const char *ezlopi_value_default_str;
-extern const char *ezlopi_text_str;
-extern const char *ezlopi_label_str;
-extern const char *ezlopi_lang_tag_str;
-extern const char *ezlopi_description_str;
-extern const char *ezlopi_value_type_str;
-extern const char *ezlopi_value_min_str;
-extern const char *ezlopi_value_max_str;
-extern const char *ezlopi_no_str;
-extern const char *ezlopi_idle_str;
-extern const char *ezlopi_location_str;
-extern const char *ezlopi_locations_str;
-extern const char *ezlopi_custom_timezone_str;
-extern const char *ezlopi_default_str;
-extern const char *ezlopi_gmt0_str;
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

@@ -5,7 +5,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-devices
 )
 
-idf_component_register(SRCS "${src_files}"
+idf_component_register(SRCS "ezlopi_service_gpioisr..c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_CORE_COMPONENTS})
 

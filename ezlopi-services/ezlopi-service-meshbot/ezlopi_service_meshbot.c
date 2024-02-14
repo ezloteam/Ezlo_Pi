@@ -153,7 +153,7 @@ static void __scenes_process(void *arg)
 {
     l_scenes_list_v2_t *scene_node = (l_scenes_list_v2_t *)arg;
     scene_node->status = EZLOPI_SCENE_STATUS_RUN;
-    TRACE_B("task - '%s': Running", scene_node->name);
+    TRACE_I("task - '%s': Running", scene_node->name);
     uint32_t stopped_condition_count = 0;
     uint32_t started_condition_fired_count = 0;
 

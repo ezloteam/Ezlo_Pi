@@ -110,4 +110,6 @@ void ezlopi_cloud_update_expression_id(uint32_t a_expression_id);
 uint32_t ezlopi_cloud_generate_room_id(void);
 void ezlopi_cloud_update_room_id(uint32_t a_room_id);
 
+// uint32_t ezlopi_cloud_get_modes_initial_id(void);
+
 #endif // _EZLOPI_CORE_CLOUD_H_

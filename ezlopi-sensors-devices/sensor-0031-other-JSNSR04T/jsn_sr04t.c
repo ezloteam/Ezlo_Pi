@@ -135,7 +135,7 @@ esp_err_t raw_measeurement(jsn_sr04t_config_t *jsn_sr04t_config, jsn_sr04t_raw_d
     if (items)
     {
         length /= 4; // one RMT = 4 Bytes
-        TRACE_B("Received RMT words = %d", length);
+        TRACE_I("Received RMT words = %d", length);
         rmt_item32_t *temp_ptr = items; // Use a temporary pointer (=pointing to the beginning of the item array)
         for (uint8_t i = 0; i < length; i++)
         {

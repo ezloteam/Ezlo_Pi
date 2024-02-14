@@ -180,7 +180,7 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
                 ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), MPU6050_REG_COUNT_LEN); //(tmp_buf+i), 1);
             }
             // user_data->extract_counts++;
-            // TRACE_I("Total Extracted : [%d]", user_data->extract_counts);
+            // TRACE_S("Total Extracted : [%d]", user_data->extract_counts);
         }
         else
         {

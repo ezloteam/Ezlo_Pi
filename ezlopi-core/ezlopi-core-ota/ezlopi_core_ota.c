@@ -66,7 +66,7 @@ static void ezlopi_ota_process(void *pv)
     __ota_in_process = 1;
     char *url = (char *)pv;
 
-    TRACE_I("Starting OTA ");
+    TRACE_S("Starting OTA ");
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
     esp_netif_t *netif = get_example_netif_from_desc(bind_interface_name);
     if (netif == NULL)
@@ -76,7 +76,7 @@ static void ezlopi_ota_process(void *pv)
     }
     struct ifreq ifr;
     esp_netif_get_netif_impl_name(netif, ifr.ifr_name);
-    TRACE_I("Bind interface name is %s", ifr.ifr_name);
+    TRACE_S("Bind interface name is %s", ifr.ifr_name);
 #endif
 
     esp_http_client_config_t config = {

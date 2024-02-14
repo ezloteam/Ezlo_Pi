@@ -14,7 +14,7 @@ static void blinky(void* pv);
 void app_main(void)
 {
 
-    xTaskCreate(blinky, "blinky", 2048, NULL, configMAX_PRIORITIES - 1, NULL);
+    xTaskCreate(blinky, "blinky", 2048, NULL, tskIDLE_PRIORITY, NULL);
     ezlopi_init();
 }
 
@@ -42,7 +42,7 @@ static void blinky(void* pv)
         state ^= 1;
         gpio_set_level(GPIO_NUM_2, state);
 #endif
-        if (count++ > 5)
+        if (count++ > 10)
         {
             TRACE_D("-----------------------------------------");
             TRACE_D("esp_get_free_heap_size: %.2fKB", (float)(esp_get_free_heap_size() / 1024.0));
@@ -51,6 +51,6 @@ static void blinky(void* pv)
             count = 0;
         }
 
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }

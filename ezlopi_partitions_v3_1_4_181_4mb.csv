@@ -1,5 +1,5 @@
 # ESP32 Partition Table
-# Name,         Type,     SubType,    Offset,    Size,       Flags
+# Name,         Type,     SubType,    Offset,     Size,       Flags
 nvs,            data,     nvs,        0x9000,     0xC000,
 otadata,        data,     ota,        0x15000,    0x2000,
 phy_init,       data,     phy,        0x17000,    0x1000,

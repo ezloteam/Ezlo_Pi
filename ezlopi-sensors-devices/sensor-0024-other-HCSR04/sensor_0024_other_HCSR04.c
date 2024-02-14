@@ -252,28 +252,28 @@ static bool ezlopi_sensor_0024_other_HCSR04_get_from_sensor(l_ezlopi_item_t *ite
     {
         esp_err_t res = ultrasonic_measure(ultrasonic_HCSR04_sensor, MAX_DISTANCE_CM, &ultrasonic_HCSR04_sensor->distance);
 
-        TRACE_B("Error 0x%X: ", res);
+        TRACE_I("Error 0x%X: ", res);
         if (res != ESP_OK)
         {
             switch (res)
             {
             case ESP_ERR_ULTRASONIC_PING:
-                TRACE_B("Cannot ping (device is in invalid state)\n");
+                TRACE_I("Cannot ping (device is in invalid state)\n");
                 break;
             case ESP_ERR_ULTRASONIC_PING_TIMEOUT:
-                TRACE_B("Ping timeout (no device found)\n");
+                TRACE_I("Ping timeout (no device found)\n");
                 break;
             case ESP_ERR_ULTRASONIC_ECHO_TIMEOUT:
-                TRACE_B("Echo timeout (i.e. distance too big)\n");
+                TRACE_I("Echo timeout (i.e. distance too big)\n");
                 break;
             default:
-                TRACE_B("%s\n", esp_err_to_name(res));
+                TRACE_I("%s\n", esp_err_to_name(res));
             }
             ultrasonic_HCSR04_sensor->distance = 0;
         }
         else
         {
-            TRACE_B("Distance: %d cm\n", ultrasonic_HCSR04_sensor->distance);
+            TRACE_I("Distance: %d cm\n", ultrasonic_HCSR04_sensor->distance);
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
     }
@@ -288,7 +288,7 @@ static esp_err_t ultrasonic_measure(const s_ultrasonic_sensor_t *dev, uint32_t m
     uint32_t time_us;
     CHECK(ultrasonic_measure_raw(dev, max_distance * ROUNDTRIP_CM, &time_us));
     *distance = time_us / ROUNDTRIP_CM;
-    TRACE_B("time_us 2: %f cm\n", time_us / 58.0);
+    TRACE_I("time_us 2: %f cm\n", time_us / 58.0);
 
     return ESP_OK;
 }

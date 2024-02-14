@@ -79,7 +79,7 @@ static bool check_double_val_equal(double first, double second)
 {
     bool ret = true;
 
-    // TRACE_B("==> %f", fabs((first - second)));
+    // TRACE_I("==> %f", fabs((first - second)));
     if (fabs((first - second)) > 0.001)
     {
         ret = false;
@@ -98,7 +98,7 @@ static int __notify(l_ezlopi_item_t *item)
     float temperature, pressure, humidity;
     bool update_cloud = false;
     bmp280_read_float(&item->interface.i2c_master, &sensor_params->bmp280_dev, &temperature, &pressure, &humidity);
-    // TRACE_B("Temp: %f, Humidity: %f, pressure: %f", temperature, humidity, pressure);
+    // TRACE_I("Temp: %f, Humidity: %f, pressure: %f", temperature, humidity, pressure);
 
     if (ezlopi_item_name_temp == item->cloud_properties.item_name)
     {
