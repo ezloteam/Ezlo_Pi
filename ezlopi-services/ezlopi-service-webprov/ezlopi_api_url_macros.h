@@ -7,7 +7,7 @@ CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 
 CLOUD_METHOD("hub.modes.get", ezlopi_cloud_modes_get, NULL)
 CLOUD_METHOD("hub.modes.current.get", ezlopi_cloud_modes_current_get, NULL)
-CLOUD_METHOD("hub.modes.switch", ezlopi_cloud_modes_switch, ezlopi_cloud_modes_switched)
+CLOUD_METHOD("hub.modes.switch", ezlopi_cloud_modes_switch, NULL)
 CLOUD_METHOD("hub.modes.cancel_switch", ezlopi_cloud_modes_cancel_switch, NULL)
 CLOUD_METHOD("hub.modes.entry_delay.cancel", ezlopi_cloud_modes_entry_delay_cancel, NULL)
 CLOUD_METHOD("hub.modes.entry_delay.skip", ezlopi_cloud_modes_entry_delay_skip, NULL)

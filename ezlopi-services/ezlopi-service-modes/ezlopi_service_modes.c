@@ -31,11 +31,11 @@ int ezlopi_service_modes_start(void)
 {
     int ret = 0;
 
-    if (sg_process_handle && ezlopi_core_modes_get_custom_modes())
+    if ((NULL == sg_process_handle) && ezlopi_core_modes_get_custom_modes())
     {
         ret = 1;
         xTaskCreate(__modes_service, "modes-service", 1024 * 4, NULL, 3, &sg_process_handle);
-        TRACE_S("Starting modes-service");
+        TRACE_I("Starting modes-service");
     }
 
     return ret;
@@ -58,55 +58,28 @@ static void __modes_service(void *pv)
                 if (ez_mode->time_is_left_to_switch_sec)
                 {
                     ez_mode->time_is_left_to_switch_sec--;
-                    TRACE_D("time_is_left_to_switch_sec: %f", ez_mode->time_is_left_to_switch_sec);
+                    TRACE_D("time_is_left_to_switch_sec: %u", ez_mode->time_is_left_to_switch_sec);
                 }
                 else
                 {
-                    TRACE_I("switching-to-mode: %u", ez_mode->switch_to_mode_id);
+                    s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
 
-                    s_house_modes_t *current_house_mode = NULL;
-                    ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
-                    ez_mode->switch_to_mode_id = 0;
+                    if (new_house_mode)
+                    {
+                        TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
 
-                    switch (ez_mode->current_mode_id & 0x000000ff)
-                    {
-                    case EZLOPI_HOUSE_MODE_REF_ID_HOME:
-                    {
-                        current_house_mode = &ez_mode->mode_home;
-                        break;
-                    }
-                    case EZLOPI_HOUSE_MODE_REF_ID_AWAY:
-                    {
-                        current_house_mode = &ez_mode->mode_home;
-                        break;
-                    }
-                    case EZLOPI_HOUSE_MODE_REF_ID_NIGHT:
-                    {
-                        current_house_mode = &ez_mode->mode_home;
-                        break;
-                    }
-                    case EZLOPI_HOUSE_MODE_REF_ID_VACATION:
-                    {
-                        current_house_mode = &ez_mode->mode_home;
-                        break;
-                    }
-                    default:
-                    {
-                        TRACE_E("Undefined house-mode!");
-                        break;
-                    }
-                    }
+                        ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
+                        ez_mode->switch_to_mode_id = 0;
 
-                    if (current_house_mode)
-                    {
-                        if (current_house_mode->cj_bypass_devices)
+                        ezlopi_core_modes_set_current_house_mode(new_house_mode);
+
+                        if (new_house_mode->cj_bypass_devices)
                         {
-                            cJSON_Delete(current_house_mode->cj_bypass_devices);
-                            current_house_mode->cj_bypass_devices = NULL;
+                            cJSON_Delete(new_house_mode->cj_bypass_devices);
+                            new_house_mode->cj_bypass_devices = NULL;
                         }
 
-                        TRACE_D("Switching to house-mode: '%s'", current_house_mode->name);
-                        ezlopi_core_modes_set_current_house_mode(current_house_mode);
+                        ezlopi_core_modes_store_to_nvs();
 
                         cJSON *cj_response = ezlopi_core_modes_cjson_changed();
                         if (cj_response)
@@ -115,6 +88,10 @@ static void __modes_service(void *pv)
                         }
                     }
                 }
+            }
+            else
+            {
+                TRACE_D("MODE-SERVICE: Idle");
             }
         }
 

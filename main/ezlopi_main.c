@@ -14,7 +14,7 @@ static void blinky(void* pv);
 void app_main(void)
 {
 
-    xTaskCreate(blinky, "blinky", 2048, NULL, configMAX_PRIORITIES - 1, NULL);
+    xTaskCreate(blinky, "blinky", 1024, NULL, tskIDLE_PRIORITY, NULL);
     ezlopi_init();
 }
 

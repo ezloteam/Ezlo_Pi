@@ -146,7 +146,9 @@ uint32_t ezlopi_cloud_generate_room_id(void)
     return g_room_id;
 }
 
+#if 0
 uint32_t ezlopi_cloud_get_modes_initial_id(void)
 {
     return (MODES_ID_START | (0x00FFFF00 & ezlopi_get_mac_crc()));
 }
+#endif

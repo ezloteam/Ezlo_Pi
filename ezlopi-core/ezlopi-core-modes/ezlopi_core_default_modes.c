@@ -66,8 +66,6 @@ s_ezlopi_modes_t *ezlopi_core_default_mode_get(void)
 
 void ezlopi_core_default_init(void)
 {
-    uint32_t initial_id = ezlopi_cloud_get_modes_initial_id();
-
     sg_default_house_mode.cj_notifications = NULL;
     sg_default_house_mode.cj_bypass_devices = NULL;
     sg_default_house_mode.cj_disarmed_devices = NULL;

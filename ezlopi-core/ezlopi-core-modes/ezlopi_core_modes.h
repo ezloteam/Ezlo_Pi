@@ -98,9 +98,9 @@ typedef struct s_ezlopi_modes
     uint32_t current_mode_id;
     uint32_t switch_to_mode_id;
 
-    double alarm_delay_sec;
-    double switch_to_delay_sec;
-    double time_is_left_to_switch_sec;
+    uint32_t alarm_delay_sec;
+    uint32_t switch_to_delay_sec;
+    uint32_t time_is_left_to_switch_sec;
 
     cJSON *cj_alarms;
     cJSON *cj_cameras;
@@ -121,7 +121,10 @@ typedef struct s_ezlopi_modes
 
 void ezlopi_core_modes_init(void);
 void ezlopi_core_default_init(void);
+int ezlopi_core_modes_store_to_nvs(void);
 s_ezlopi_modes_t *ezlopi_core_default_mode_get(void);
+s_house_modes_t *ezlopi_core_modes_get_house_mode_by_id(uint32_t house_mode_id);
+s_house_modes_t *ezlopi_core_modes_get_house_mode_by_name(char *house_mode_name);
 
 s_ezlopi_modes_t *ezlopi_core_modes_get_custom_modes(void);
 s_house_modes_t *ezlopi_core_modes_get_current_house_modes(void);
@@ -131,6 +134,9 @@ int ezlopi_core_modes_api_get_modes(cJSON *cj_result);
 int ezlopi_core_modes_api_get_current_mode(cJSON *cj_result);
 int ezlopi_core_modes_api_switch_mode(s_house_modes_t *switch_to_house_mode);
 int ezlopi_core_modes_api_cancel_switch(void);
+int ezlopi_core_modes_api_cancel_entry_delay(void);
+int ezlopi_core_modes_set_switch_to_delay(uint32_t switch_to_delay);
+int ezlopi_core_modes_set_alarm_delay(uint32_t switch_to_delay);
 
 int ezlopi_core_modes_cjson_get_current_mode(cJSON *cj_result);
 
