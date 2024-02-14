@@ -51,7 +51,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_ambient_temperat
                 uint8_t error = ezlopi_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_ambient_temperature_setting);
                 if (1 == error)
                 {
-                    TRACE_B("Setting already exist");
+                    TRACE_D("Setting already exist");
                     ambient_temperature->ambient_temperature = read_value;
                 }
                 else
@@ -105,7 +105,7 @@ static int __settings_sensor_0068_gas_sensor_setting_initialize_relative_humidit
                 uint8_t error = ezlopi_nvs_read_float32(&read_value, nvs_key_ens160_gas_sensor_relative_humidity_setting);
                 if (1 == error)
                 {
-                    TRACE_B("Setting already exist");
+                    TRACE_D("Setting already exist");
                     relative_humidity->relative_humidity = read_value;
                 }
                 else
@@ -158,25 +158,25 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     {
     case EZLOPI_SETTINGS_ACTION_GET_SETTING:
     {
-        TRACE_B("EZLOPI_SETTINGS_ACTION_GET_SETTING");
+        TRACE_D("EZLOPI_SETTINGS_ACTION_GET_SETTING");
         __settings_get(arg, setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_SET_SETTING:
     {
-        TRACE_B("EZLOPI_SETTINGS_ACTION_SET_SETTING");
+        TRACE_D("EZLOPI_SETTINGS_ACTION_SET_SETTING");
         __settings_set(arg, setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_RESET_SETTING:
     {
-        TRACE_B("EZLOPI_SETTINGS_ACTION_RESET_SETTING");
+        TRACE_D("EZLOPI_SETTINGS_ACTION_RESET_SETTING");
         __settings_reset(arg, setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_UPDATE_SETTING:
     {
-        TRACE_B("EZLOPI_SETTINGS_ACTION_UPDATE_SETTING");
+        TRACE_D("EZLOPI_SETTINGS_ACTION_UPDATE_SETTING");
         __settings_update(arg, setting);
         break;
     }
@@ -472,7 +472,7 @@ float get_ambient_temperature_setting()
 {
     float ret = 0.0f;
     s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)ens160_gas_sensor_ambient_temperature_sensor_setting;
-    if(ambient_temperature)
+    if (ambient_temperature)
     {
         ret = ambient_temperature->ambient_temperature;
     }
@@ -482,11 +482,11 @@ float get_relative_humidity_setting()
 {
     float ret = 0.0f;
     s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)ens160_gas_sensor_relative_humidity_sensor_setting;
-    if(relative_humidity)
+    if (relative_humidity)
     {
         ret = relative_humidity->relative_humidity;
     }
-    return ret; 
+    return ret;
 }
 
 bool has_setting_changed()
