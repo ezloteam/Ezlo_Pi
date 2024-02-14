@@ -49,8 +49,8 @@ static void blinky(void* pv)
             TRACE_D("esp_get_minimum_free_heap_size: %.2fKB", (float)(esp_get_minimum_free_heap_size() / 1024.0));
             TRACE_D("-----------------------------------------");
             count = 0;
-    }
+        }
 
-        vTaskDelay(100 / portTICK_RATE_MS);
-}
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    }
 }

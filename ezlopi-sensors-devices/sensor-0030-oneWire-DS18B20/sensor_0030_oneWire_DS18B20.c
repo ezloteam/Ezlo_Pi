@@ -108,7 +108,7 @@ static int __init(l_ezlopi_item_t* item)
                 if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
                 {
                     double* temperature_prev_value = (double*)item->user_arg;
-                    TRACE_B("Providing initial settings to DS18B20");
+                    TRACE_S("Providing initial settings to DS18B20");
                     ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
                     ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                     ret = 1;

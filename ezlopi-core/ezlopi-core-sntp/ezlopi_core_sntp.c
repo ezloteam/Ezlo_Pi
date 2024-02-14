@@ -32,7 +32,7 @@ static void sntp_sync_time_call_back(struct timeval* tv)
     localtime_r(&now, &timeinfo);
 
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    TRACE_B("Time now[%ld]: %s", now, strftime_buf);
+    TRACE_I("Time now[%ld]: %s", now, strftime_buf);
 }
 
 void EZPI_CORE_sntp_init(void)
@@ -190,4 +190,11 @@ char* EZPI_CORE_sntp_epoch_to_iso8601(time_t t)
     {
         return NULL;
     }
+}
+
+uint64_t EZPI_CORE_sntp_get_current_time_ms(void)
+{
+    time_t now;
+    time(&now);
+    return (now * 1000LL);
 }

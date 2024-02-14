@@ -284,7 +284,7 @@ static int __init(l_ezlopi_item_t* item)
             TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
             if (0 == __gy271_configure(item))
             {
-                TRACE_B(" CONFIGURATION  Compplete _____ Calibration Started _____");
+                TRACE_S(" CONFIGURATION  Compplete _____ Calibration Started _____");
                 xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
             }
             ret = 1;

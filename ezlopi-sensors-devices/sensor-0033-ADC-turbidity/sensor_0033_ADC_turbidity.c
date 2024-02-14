@@ -86,7 +86,7 @@ static int __get_item_list(l_ezlopi_item_t* item, void* arg)
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
 
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
+        TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
         const char* ezlopi_water_present_turbidity_state = NULL;
         if (1000 > ezlopi_analog_data.voltage)
         {

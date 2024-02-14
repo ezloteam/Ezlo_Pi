@@ -28,7 +28,7 @@ void EZPI_CORE_factory_restore(void)
         TRACE_I("NVS-RESET WAS DONE SUCCESSFULLY");
     }
 
-    TRACE_B("factory reset done, rebooting now .............................................");
+    TRACE_S("factory reset done, rebooting now .............................................");
     vTaskDelay(2000 / portTICK_RATE_MS);
     EZPI_CORE_reboot();
 }

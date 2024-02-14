@@ -26,6 +26,7 @@ set(EZLOPI_SERVICE_COMPONENTS
         ezlopi-service-ota                 
         ezlopi-service-uart
         ezlopi-service-meshbot
+        ezlopi-service-modes
 
 )
 
