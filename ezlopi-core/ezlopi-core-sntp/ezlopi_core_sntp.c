@@ -13,7 +13,7 @@
 
 static time_t start_time = 0;
 
-static void sntp_sync_time_call_back(struct timeval *tv)
+static void sntp_sync_time_call_back(struct timeval* tv)
 {
 
     char strftime_buf[64];
@@ -32,7 +32,7 @@ static void sntp_sync_time_call_back(struct timeval *tv)
     localtime_r(&now, &timeinfo);
 
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    TRACE_B("Time now[%ld]: %s", now, strftime_buf);
+    TRACE_I("Time now[%ld]: %s", now, strftime_buf);
 }
 
 void EZPI_CORE_sntp_init(void)
@@ -59,7 +59,7 @@ void EZPI_CORE_sntp_init(void)
     }
 }
 
-int EZPI_CORE_sntp_set_location(const char *location)
+int EZPI_CORE_sntp_set_location(const char* location)
 {
     int ret = 1;
     if (location)
@@ -67,7 +67,7 @@ int EZPI_CORE_sntp_set_location(const char *location)
         if (EZPI_CORE_nvs_write_time_location(location, strlen(location)))
         {
 
-            const char *posix_str = micro_tz_db_get_posix_str(location);
+            const char* posix_str = micro_tz_db_get_posix_str(location);
 
             if (NULL == posix_str)
             {
@@ -87,9 +87,9 @@ int EZPI_CORE_sntp_set_location(const char *location)
     return ret;
 }
 
-char *EZPI_CORE_sntp_get_location(void)
+char* EZPI_CORE_sntp_get_location(void)
 {
-    char *location = EZPI_CORE_nvs_read_time_location();
+    char* location = EZPI_CORE_nvs_read_time_location();
     if (location)
     {
         return location;
@@ -100,10 +100,10 @@ char *EZPI_CORE_sntp_get_location(void)
     }
 }
 
-char *EZPI_CORE_sntp_get_local_time(void)
+char* EZPI_CORE_sntp_get_local_time(void)
 {
 
-    char *strftime_buf = (char *)malloc(100);
+    char* strftime_buf = (char*)malloc(100);
 
     if (!strftime_buf)
     {
@@ -111,8 +111,8 @@ char *EZPI_CORE_sntp_get_local_time(void)
         return NULL;
     }
 
-    char *location = EZPI_CORE_nvs_read_time_location();
-    const char *posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
+    char* location = EZPI_CORE_nvs_read_time_location();
+    const char* posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
 
     if (!posix_str)
     {
@@ -154,9 +154,9 @@ char *EZPI_CORE_sntp_get_local_time(void)
     return strftime_buf;
 }
 
-char *EZPI_CORE_sntp_get_up_time(void)
+char* EZPI_CORE_sntp_get_up_time(void)
 {
-    char *strftime_buf = (char *)malloc(64);
+    char* strftime_buf = (char*)malloc(64);
 
     if (strftime_buf)
     {
@@ -173,14 +173,14 @@ char *EZPI_CORE_sntp_get_up_time(void)
     }
 }
 
-char *EZPI_CORE_sntp_epoch_to_iso8601(time_t t)
+char* EZPI_CORE_sntp_epoch_to_iso8601(time_t t)
 {
 
-    char *strftime_buf = (char *)malloc(64);
+    char* strftime_buf = (char*)malloc(64);
 
     if (strftime_buf)
     {
-        struct tm *timeinfo;
+        struct tm* timeinfo;
         timeinfo = gmtime(&t);
         strftime(strftime_buf, 64, "%Y-%m-%dT%H:%M:%S+545", timeinfo);
         TRACE_E("Build Time: %s", strftime_buf);
@@ -190,4 +190,11 @@ char *EZPI_CORE_sntp_epoch_to_iso8601(time_t t)
     {
         return NULL;
     }
+}
+
+uint64_t EZPI_CORE_sntp_get_current_time_ms(void)
+{
+    time_t now;
+    time(&now);
+    return (now * 1000LL);
 }

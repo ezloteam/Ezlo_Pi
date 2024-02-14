@@ -17,7 +17,7 @@
         }                                                     \
     }
 
-// TRACE_B("%s: %f", item_name, (double)item_val);
+// TRACE_I("%s: %f", item_name, (double)item_val);
 
 #define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
     {                                                         \
@@ -54,7 +54,7 @@
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
-// TRACE_B("%s: %d", item_name, item_val);
+// TRACE_I("%s: %d", item_name, item_val);
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
     {                                                         \
@@ -69,7 +69,7 @@
             TRACE_E("%s: NULL", item_name);                   \
         }                                                     \
     }
-// TRACE_B("%s: %s", item_name, item_val ? item_val : ezlopi__str);
+// TRACE_I("%s: %s", item_name, item_val ? item_val : ezlopi__str);
 
 #define CJSON_TRACE(name, object)                                         \
     {                                                                     \
@@ -81,6 +81,10 @@
                 TRACE_D("%s:\r\n%s", name ? name : ezlopi__str, obj_str); \
                 free(obj_str);                                            \
             }                                                             \
+        }                                                                 \
+        else                                                              \
+        {                                                                 \
+            TRACE_E("%s: Null", name ? name : "");                        \
         }                                                                 \
     }
 
@@ -146,6 +150,16 @@
             snprintf(tmp_str, sizeof(tmp_str), "%08x", id);      \
             cJSON_AddStringToObject(cj_object, id_str, tmp_str); \
         }                                                        \
+    }
+
+#define CJSON_ASSIGN_NUMBER_AS_STRING(cj_obj, num, name_str)         \
+    {                                                                \
+        if (cj_obj && name_str)                                      \
+        {                                                            \
+            char tmp_str[32];                                        \
+            snprintf(tmp_str, sizeof(tmp_str), "%u", (uint32_t)num); \
+            cJSON_AddStringToObject(cj_obj, name_str, tmp_str);      \
+        }                                                            \
     }
 
 #endif // _EZLOPI_CORE_CJSON_MACROS_H_

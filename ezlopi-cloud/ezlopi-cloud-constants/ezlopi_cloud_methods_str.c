@@ -126,4 +126,6 @@ const char *ezlopi_hub_room_edited_str = "hub.room.edited";
 const char *ezlopi_hub_room_deleted_str = "hub.room.deleted";
 const char *ezlopi_hub_room_reordered_str = "hub.room.reordered";
 
+const char *ezlopi_hub_modes_changed_str = "hub.modes.changed";
+
 #endif // __EZLOPI_METHODS_STR_H__

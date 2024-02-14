@@ -97,7 +97,7 @@ static int __cjson_get_value(l_ezlopi_item_t *item, void *arg)
         if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
         {
             snprintf(valueFormatted, 20, "%d", pms_object->pms_data.pm10_standard);
-            TRACE_I("Dust particle 1 : %s", valueFormatted);
+            TRACE_S("Dust particle 1 : %s", valueFormatted);
             cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.pm10_standard);
         }

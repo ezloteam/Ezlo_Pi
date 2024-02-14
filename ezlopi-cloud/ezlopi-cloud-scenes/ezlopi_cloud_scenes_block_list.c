@@ -23,7 +23,7 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON *c
 void scenes_blocks_list(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi__id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
@@ -63,7 +63,7 @@ static void __add_block_options_and_fields_cjson(cJSON *cj_block, s_block_option
     cJSON *cj_fields = cJSON_AddArrayToObject(cj_block, ezlopi_fields_str);
     if (cj_block_opt && cj_fields)
     {
-        cJSON *cj_method = cJSON_AddObjectToObject(cj_block_opt, ezlopi_key_method_str);
+        cJSON *cj_method = cJSON_AddObjectToObject(cj_block_opt, ezlopi_method_str);
         if (cj_method)
         {
             cJSON_AddStringToObject(cj_method, ezlopi_name_str, block_options->method.name);

@@ -29,7 +29,7 @@ static void IRAM_ATTR __gpio_isr_handler(void *arg);
 
 void gpio_isr_service_init(void)
 {
-    TRACE_I("Started gpio-isr service");
+    TRACE_S("Started gpio-isr service");
     gpio_evt_queue = xQueueCreate(20, sizeof(s_event_arg_t *));
     xTaskCreate(gpio_isr_process_v3, "gpio_isr_process_v3", 2 * 2048, NULL, 3, NULL);
     // xTaskCreate(gpio_isr_process, "digital-io-isr-service", 2 * 2048, NULL, 3, NULL);
@@ -55,7 +55,7 @@ void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __
         }
         else
         {
-            TRACE_I("Successfully added GPIO ISR handler.");
+            TRACE_S("Successfully added GPIO ISR handler.");
         }
     }
 }
@@ -111,7 +111,7 @@ void gpio_isr_service_register(s_ezlopi_device_properties_t *properties, f_inter
         }
         else
         {
-            TRACE_I("Successfully added GPIO ISR handler.");
+            TRACE_S("Successfully added GPIO ISR handler.");
         }
     }
 }

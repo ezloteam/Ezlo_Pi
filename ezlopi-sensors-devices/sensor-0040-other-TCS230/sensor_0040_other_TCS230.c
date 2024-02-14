@@ -79,11 +79,11 @@ static void __tcs230_setup_gpio(gpio_num_t s0_pin,
     ret |= gpio_config(&input_conf);
     if (ESP_OK == ret)
     {
-        TRACE_B("GPIO setup..... complete");
+        TRACE_I("GPIO setup..... complete");
     }
     else
     {
-        TRACE_B("GPIO setup..... failed");
+        TRACE_I("GPIO setup..... failed");
     }
 }
 
@@ -244,11 +244,11 @@ static int __0040_notify(l_ezlopi_item_t *item)
                 fabs(green - user_data->green_mapped) > 10 ||
                 fabs(blue - user_data->blue_mapped) > 10)
             {
-                TRACE_I("---------------------------------------");
-                TRACE_I("Red : %d", user_data->red_mapped);
-                TRACE_I("Green :%d", user_data->green_mapped);
-                TRACE_I("Blue : %d", user_data->blue_mapped);
-                TRACE_I("---------------------------------------");
+                TRACE_S("---------------------------------------");
+                TRACE_S("Red : %d", user_data->red_mapped);
+                TRACE_S("Green :%d", user_data->green_mapped);
+                TRACE_S("Blue : %d", user_data->blue_mapped);
+                TRACE_S("---------------------------------------");
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
@@ -282,10 +282,10 @@ static void __tcs230_calibration_task(void *params) // calibration task
 
 			    //--------------------------------------------------
 			    // calculate green min-max periods for each colour
-			    TRACE_I("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
+			    TRACE_S("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
 			    for (uint8_t j = 5; j > 0; j--)
 			    {
-				TRACE_I("....................................................... {%d} ", j);
+				TRACE_S("....................................................... {%d} ", j);
 				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
 			    }
 			    // choose GREEN filter
@@ -297,10 +297,10 @@ static void __tcs230_calibration_task(void *params) // calibration task
 
 			    //--------------------------------------------------
 			    // calculate blue min-max periods for each colour
-			    TRACE_B("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
+			    TRACE_I("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
 			    for (uint8_t j = 5; j > 0; j--)
 			    {
-				TRACE_B("....................................................... {%d} ", j);
+				TRACE_I("....................................................... {%d} ", j);
 				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
 			    }
 			    // choose BLUE filter
@@ -321,9 +321,9 @@ static void __tcs230_calibration_task(void *params) // calibration task
         user_data->calib_data.least_blue_timeP = 120;
         user_data->calib_data.most_blue_timeP = 78;
 
-        TRACE_B("red(Least,Most) => red(%d,%d)", user_data->calib_data.least_red_timeP, user_data->calib_data.most_red_timeP);
-        TRACE_B("green(Least,Most) => green(%d,%d)", user_data->calib_data.least_green_timeP, user_data->calib_data.most_green_timeP);
-        TRACE_B("blue(Least,Most) => blue(%d,%d)", user_data->calib_data.least_blue_timeP, user_data->calib_data.most_blue_timeP);
+        TRACE_I("red(Least,Most) => red(%d,%d)", user_data->calib_data.least_red_timeP, user_data->calib_data.most_red_timeP);
+        TRACE_I("green(Least,Most) => green(%d,%d)", user_data->calib_data.least_green_timeP, user_data->calib_data.most_green_timeP);
+        TRACE_I("blue(Least,Most) => blue(%d,%d)", user_data->calib_data.least_blue_timeP, user_data->calib_data.most_blue_timeP);
         //--------------------------------------------------
         // set the calib flag
         user_data->calibration_complete = true;

@@ -171,7 +171,7 @@ static int __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_uint32(user_data->hum_val);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", (user_data->hum_val));
-            // TRACE_I("soil moisture  : %d", user_data->hum_val);
+            // TRACE_S("soil moisture  : %d", user_data->hum_val);
             free(valueFormatted);
             ret = 1;
         }
@@ -188,7 +188,7 @@ static int __0041_notify(l_ezlopi_item_t *item)
         s_ezlopi_analog_data_t ezlopi_adc_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_adc_data);
         uint32_t new_hum = ((4095.0f - (ezlopi_adc_data.value)) / 4095.0f) * 100;
-        TRACE_I("[%dmv] soil moisture  : %d", ezlopi_adc_data.voltage, new_hum);
+        TRACE_S("[%dmv] soil moisture  : %d", ezlopi_adc_data.voltage, new_hum);
 
         if (fabs((user_data->hum_val) - new_hum) > 0.5) // percent
         {

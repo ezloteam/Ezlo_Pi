@@ -54,7 +54,7 @@ static int bytes_read = 0;
 void ezlopi_begin_ap_server_service()
 {
     httpd_config_t httpd_configuration = HTTPD_DEFAULT_CONFIG();
-    TRACE_B("Starting HTTP server");
+    TRACE_I("Starting HTTP server");
     ESP_ERROR_CHECK(httpd_start(&httpd_server_handle, &httpd_configuration));
     ESP_ERROR_CHECK(httpd_register_uri_handler(httpd_server_handle, &ezlopi_capture_base_uri));
     ESP_ERROR_CHECK(httpd_register_uri_handler(httpd_server_handle, &ezlopi_capture_config_uri));
@@ -65,7 +65,7 @@ void ezlopi_begin_ap_server_service()
 static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t *req)
 {
     esp_err_t error = ESP_OK;
-    TRACE_B("%s", __func__);
+    TRACE_I("%s", __func__);
 
     ESP_LOGI("ESP_SERVER", "URL:- %s", req->uri);
     char host[50];
@@ -83,15 +83,15 @@ static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t *req)
     size_t total_used = 0;
     size_t total_available = 0;
     ESP_ERROR_CHECK(esp_spiffs_info(NULL, &total_available, &total_used));
-    TRACE_B("Partition size: total available = %d, total used = %d", total_available, total_used);
-    TRACE_B("Reading spiffs content.");
+    TRACE_I("Partition size: total available = %d, total used = %d", total_available, total_used);
+    TRACE_I("Reading spiffs content.");
 
     FILE *f = fopen("/spiffs/login.html", "r");
     if (NULL != f)
     {
         fseek(f, 0, SEEK_END);
         size_t file_size = ftell(f);
-        TRACE_B("file size is %d", file_size);
+        TRACE_I("file size is %d", file_size);
         fseek(f, 0, SEEK_SET);
         char *login_data = (char *)malloc(file_size);
         if (NULL != login_data)
@@ -120,18 +120,18 @@ static esp_err_t ezlopi_capture_base_uri_handler(httpd_req_t *req)
 static esp_err_t ezlopi_capture_config_uri_handle(httpd_req_t *req)
 {
     esp_err_t error = ESP_OK;
-    TRACE_B("%s", __func__);
+    TRACE_I("%s", __func__);
 
     ESP_LOGI("ESP_SERVER", "URL:- %s", req->uri);
     char host[50];
     error = httpd_req_get_hdr_value_str(req, "Host", host, sizeof(host) - 1);
     ESP_LOGE("HOST_TAG", "Incoming header : %s", host);
-    TRACE_B("content len is %d", req->content_len);
+    TRACE_I("content len is %d", req->content_len);
 
     bytes_read = httpd_req_recv(req, buffer, req->content_len);
     buffer[bytes_read] = '\0';
 
-    TRACE_B("Data bytes read is %d", bytes_read);
+    TRACE_I("Data bytes read is %d", bytes_read);
     TRACE_E("Received data is: %s", buffer);
 
     wifi_cred_available = true;
@@ -152,13 +152,13 @@ esp_err_t ezlopi_http_404_error_handler(httpd_req_t *req, httpd_err_code_t err)
     // iOS requires content in the response to detect a captive portal, simply redirecting is not sufficient.
     httpd_resp_send(req, "Redirect to the captive portal", HTTPD_RESP_USE_STRLEN);
 
-    TRACE_B("Redirecting to root");
+    TRACE_I("Redirecting to root");
     return ESP_OK;
 }
 
 void ezlopi_end_ap_server_service()
 {
-    TRACE_B("Stopping HTTP server.");
+    TRACE_I("Stopping HTTP server.");
     ESP_ERROR_CHECK(httpd_stop(httpd_server_handle));
 }
 
