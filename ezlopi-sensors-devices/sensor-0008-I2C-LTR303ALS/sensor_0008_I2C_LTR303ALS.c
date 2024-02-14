@@ -98,21 +98,20 @@ static int __notify(l_ezlopi_item_t *item)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
     if (item)
     {
-        if ((item->interface.i2c_master.enable) && (NULL != als_ltr303_data))
+        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
+        if (als_ltr303_data)
         {
-            ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
-            ltr303_get_val(als_ltr303_data);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (item->interface.i2c_master.enable)
             {
+                ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+                ltr303_get_val(als_ltr303_data);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
                 free(item->user_arg);
                 item->user_arg = NULL;
             }

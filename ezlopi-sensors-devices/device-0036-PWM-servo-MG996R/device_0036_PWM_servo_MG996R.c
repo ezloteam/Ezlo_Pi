@@ -130,7 +130,7 @@ static int __init(l_ezlopi_item_t *item)
             item->interface.pwm.speed_mode = servo_item->speed_mode;
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

@@ -1,7 +1,7 @@
 file(GLOB_RECURSE config_src "*.c")
 # set(config_src)
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "sensor_0020_other_2axis_joystick.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ezlopi-util-trace 
                 ezlopi-core-timer 

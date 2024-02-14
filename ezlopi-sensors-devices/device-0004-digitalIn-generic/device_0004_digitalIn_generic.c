@@ -153,7 +153,7 @@ static int __init(l_ezlopi_item_t *item)
 
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

@@ -172,10 +172,9 @@ static int __0054_init(l_ezlopi_item_t *item)
                 .pull_down_en = GPIO_PULLDOWN_DISABLE,
                 .pull_up_en = GPIO_PULLUP_DISABLE,
             };
-            gpio_config(&input_conf);
-            ret = 1;
+            ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

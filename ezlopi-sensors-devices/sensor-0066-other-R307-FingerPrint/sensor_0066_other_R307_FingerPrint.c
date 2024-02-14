@@ -266,72 +266,73 @@ static int __0066_init(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO((gpio_num_t)user_data->intr_pin) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.tx) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.rx))
+        if (user_data)
         {
-            gpio_num_t intr_pin = user_data->intr_pin;
-            // #warning "Riken needs to fix this warning, compile and check about the warning details !"
-            s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_0066_fingerprint_upcall, item);
-            item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
-
-            const gpio_config_t FingerPrint_intr_gpio_config = {
-                .pin_bit_mask = (1ULL << (intr_pin)),
-                .intr_type = GPIO_INTR_NEGEDGE,
-                .mode = GPIO_MODE_INPUT,
-                .pull_up_en = GPIO_PULLUP_DISABLE,
-                .pull_down_en = GPIO_PULLDOWN_DISABLE,
-            };
-
-            if (0 == gpio_config(&FingerPrint_intr_gpio_config))
+            if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO((gpio_num_t)user_data->intr_pin) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.tx) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.rx))
             {
-                if (FINGERPRINT_OK == r307_as606_fingerprint_config(item))
-                {
-                    if (0 == gpio_isr_handler_add(intr_pin, gpio_notify_isr, item))
-                    {
-                        if (NULL == (user_data->notifyHandler))
-                        {
-                            TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
-                            xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", 2048 * 2, item, 1, &(user_data->notifyHandler));
-                        }
+                gpio_num_t intr_pin = user_data->intr_pin;
+                // #warning "Riken needs to fix this warning, compile and check about the warning details !"
+                s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_0066_fingerprint_upcall, item);
+                item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
 
-                        const esp_timer_create_args_t esp_timer_create_args = {
-                            .callback = __timer_callback,
-                            .arg = (void *)item,
-                            .name = "Enrollment timer"};
-                        if (0 == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
+                const gpio_config_t FingerPrint_intr_gpio_config = {
+                    .pin_bit_mask = (1ULL << (intr_pin)),
+                    .intr_type = GPIO_INTR_NEGEDGE,
+                    .mode = GPIO_MODE_INPUT,
+                    .pull_up_en = GPIO_PULLUP_DISABLE,
+                    .pull_down_en = GPIO_PULLDOWN_DISABLE,
+                };
+
+                if (0 == gpio_config(&FingerPrint_intr_gpio_config))
+                {
+                    if (FINGERPRINT_OK == r307_as606_fingerprint_config(item))
+                    {
+                        if (0 == gpio_isr_handler_add(intr_pin, gpio_notify_isr, item))
                         {
-                            TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
+                            if (NULL == (user_data->notifyHandler))
+                            {
+                                TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
+                                xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", 2048 * 2, item, 1, &(user_data->notifyHandler));
+                            }
+
+                            const esp_timer_create_args_t esp_timer_create_args = {
+                                .callback = __timer_callback,
+                                .arg = (void *)item,
+                                .name = "Enrollment timer"};
+                            if (0 == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
+                            {
+                                TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
+                            }
+                            ret = 1;
                         }
-                        ret = 1;
+                        else
+                        {
+                            ret = -1;
+                            gpio_isr_handler_remove(intr_pin);
+                            free(item->user_arg);
+                            item->user_arg = NULL;
+                            TRACE_E("Error!! : Failed to add GPIO ISR handler.");
+                        }
                     }
                     else
                     {
                         ret = -1;
-                        TRACE_E("Error!! : Failed to add GPIO ISR handler.");
-                        gpio_isr_handler_remove(intr_pin);
+                        free(item->user_arg);
+                        item->user_arg = NULL;
+                        TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
                     }
                 }
                 else
                 {
                     ret = -1;
-                    TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                    TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
                 }
             }
             else
             {
                 ret = -1;
-                TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
-            }
-        }
-        else
-        {
-            ret = -1;
-        }
-
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
                 free(item->user_arg);
                 item->user_arg = NULL;
             }

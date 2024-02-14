@@ -99,10 +99,10 @@ static int __0057_prepare(void *arg)
         }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        flame_t *FLAME_struct = (flame_t *)malloc(sizeof(flame_t));
-        if (NULL != FLAME_struct)
+        flame_t *flame_struct = (flame_t *)malloc(sizeof(flame_t));
+        if (NULL != flame_struct)
         {
-            memset(FLAME_struct, 0, sizeof(flame_t));
+            memset(flame_struct, 0, sizeof(flame_t));
             l_ezlopi_device_t *flame_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (flame_device_adc)
             {
@@ -111,20 +111,20 @@ static int __0057_prepare(void *arg)
                 if (flame_item_adc)
                 {
                     flame_item_adc->cloud_properties.device_id = flame_device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, FLAME_struct);
+                    __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, flame_struct);
                     ret = 1;
                 }
                 else
                 {
                     ret = -1;
                     ezlopi_device_free_device(flame_device_adc);
-                    free(FLAME_struct);
+                    free(flame_struct);
                 }
             }
             else
             {
                 ret = -1;
-                free(FLAME_struct);
+                free(flame_struct);
             }
         }
     }
@@ -145,16 +145,15 @@ static int __0057_init(l_ezlopi_item_t *item)
             input_conf.mode = GPIO_MODE_INPUT;
             input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
             input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-            gpio_config(&input_conf);
-            ret = 1;
+            ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
         }
-        if ((ezlopi_item_name_temperature_changes == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        else if ((ezlopi_item_name_temperature_changes == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)
@@ -257,11 +256,11 @@ static int __0057_get_item(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
-                flame_t *FLAME_struct = (flame_t *)item->user_arg;
+                flame_t *flame_struct = (flame_t *)item->user_arg;
 
-                char *valueFormatted = ezlopi_valueformatter_float(FLAME_struct->_absorbed_percent);
+                char *valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLAME_struct->_absorbed_percent);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
                 free(valueFormatted);
             }
             ret = 1;
@@ -285,10 +284,10 @@ static int __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
-                flame_t *FLAME_struct = (flame_t *)item->user_arg;
-                char *valueFormatted = ezlopi_valueformatter_float(FLAME_struct->_absorbed_percent);
+                flame_t *flame_struct = (flame_t *)item->user_arg;
+                char *valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLAME_struct->_absorbed_percent);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
                 free(valueFormatted);
             }
             ret = 1;
@@ -321,16 +320,16 @@ static int __0057_notify(l_ezlopi_item_t *item)
         }
         if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
         {
-            flame_t *FLAME_struct = (flame_t *)item->user_arg;
+            flame_t *flame_struct = (flame_t *)item->user_arg;
             float analog_sensor_volt = 0, max_volt_reading = 0;
             // extract the sensor_output_values
             __extract_KY026_sensor_value(item->interface.adc.gpio_num, &analog_sensor_volt, &max_volt_reading);
             float new_percent = ((1 - (analog_sensor_volt / max_volt_reading)) * 100.0f);
-            // TRACE_E("Heat-detected: %.2f percent", _absorbed_percent);
-            if (new_percent != FLAME_struct->_absorbed_percent)
+            // TRACE_E("Heat-detected: %.2f percent", absorbed_percent);
+            if (new_percent != flame_struct->absorbed_percent)
             {
                 ezlopi_device_value_updated_from_device_v3(item);
-                FLAME_struct->_absorbed_percent = new_percent;
+                flame_struct->absorbed_percent = new_percent;
             }
         }
         ret = 1;

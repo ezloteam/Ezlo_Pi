@@ -217,10 +217,19 @@ static int __init(l_ezlopi_item_t *item)
             {
                 TRACE_I("Configuration Complete.... ");
                 xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2048, item, 1, NULL);
+                ret = 1;
             }
-            ret = 1;
+            else
+            {
+                ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                }
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

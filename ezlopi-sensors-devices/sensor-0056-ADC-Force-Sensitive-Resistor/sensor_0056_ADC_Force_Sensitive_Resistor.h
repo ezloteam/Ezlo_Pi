@@ -93,7 +93,7 @@
 
 typedef struct fsr_t
 {
-    float FSR_value;
+    float fsr_value;
 } fsr_t;
 //-----------------------------------------------------------------------------------------------------------------------------
 int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);

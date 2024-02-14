@@ -188,8 +188,8 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
             {
                 if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set'
                 {
-                    // checking if mbed_task is occupied ;
                     function_to_call_mbedtlshttp(tmp_http_data);
+
                     uint8_t retry = 0;
                     while (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0))
                     {

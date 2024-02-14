@@ -86,11 +86,22 @@ static int __init(l_ezlopi_item_t *item)
                 .intr_type = GPIO_INTR_POSEDGE,
             };
 
-            ESP_ERROR_CHECK(gpio_config(&touch_switch_config));
-            gpio_isr_service_register_v3(item, touch_switch_callback, 200);
-            ret = 1;
+            if (0 == gpio_config(&touch_switch_config)) // ESP_OK
+            {
+                gpio_isr_service_register_v3(item, touch_switch_callback, 200);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                }
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

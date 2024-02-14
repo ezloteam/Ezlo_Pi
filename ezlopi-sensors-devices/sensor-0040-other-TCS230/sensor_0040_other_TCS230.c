@@ -171,33 +171,33 @@ static int __0040_init(l_ezlopi_item_t *item)
     if (item)
     {
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
-        if (GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s0) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s1) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s2) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s3) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_output_en) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
+        if (user_data)
         {
-            __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
-                                user_data->TCS230_pin.gpio_s1,
-                                user_data->TCS230_pin.gpio_s2,
-                                user_data->TCS230_pin.gpio_s3,
-                                user_data->TCS230_pin.gpio_output_en,
-                                user_data->TCS230_pin.gpio_pulse_output);
-            TRACE_W("Entering Calibration Phase for 30 seconds.....");
-
-            // configure Freq_scale at 20%
-            tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
-
-            // activate a task to calibrate data
-            xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s0) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s1) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s2) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s3) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_output_en) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
             {
+                __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
+                                    user_data->TCS230_pin.gpio_s1,
+                                    user_data->TCS230_pin.gpio_s2,
+                                    user_data->TCS230_pin.gpio_s3,
+                                    user_data->TCS230_pin.gpio_output_en,
+                                    user_data->TCS230_pin.gpio_pulse_output);
+                TRACE_W("Entering Calibration Phase for 30 seconds.....");
+
+                // configure Freq_scale at 20%
+                tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
+
+                // activate a task to calibrate data
+                xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
                 free(item->user_arg);
                 item->user_arg = NULL;
             }

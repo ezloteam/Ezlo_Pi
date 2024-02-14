@@ -1,5 +1,5 @@
 #include <math.h>
- 
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"
@@ -214,7 +214,7 @@ static int __0015_init(l_ezlopi_item_t *item)
             setDHT11gpio(item->interface.onewire_master.onewire_pin);
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

@@ -166,10 +166,10 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (item->interface.i2c_master.enable)
+        s_ezlopi_bmp280_t *bmp280_sensor_params = (s_ezlopi_bmp280_t *)item->user_arg;
+        if (bmp280_sensor_params)
         {
-            s_ezlopi_bmp280_t *bmp280_sensor_params = (s_ezlopi_bmp280_t *)item->user_arg;
-            if (bmp280_sensor_params)
+            if ((item->interface.i2c_master.enable))
             {
                 ezlopi_i2c_master_init(&item->interface.i2c_master);
                 bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
@@ -177,12 +177,9 @@ static int __init(l_ezlopi_item_t *item)
                 bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
                 ret = 1;
             }
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
+                ret = -1;
                 free(item->user_arg);
                 item->user_arg = NULL;
             }

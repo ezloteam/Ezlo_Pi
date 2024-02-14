@@ -159,26 +159,23 @@ static int __init(l_ezlopi_item_t *item)
 #else
         esp_err_t error = ESP_ERR_NOT_FOUND;
 #endif
-        if (error)
+        s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
+        if (user_data)
         {
-            TRACE_E("Error 'sensor_door_init'. error: %s)", esp_err_to_name(error));
-        }
-        else
-        {
-            TRACE_I("Width configuration was successfully done!");
-            TRACE_W("Calibrating.....");
-            s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
-            user_data->hall_state = "dw_is_closed";
-            xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", 2048, item, 1, NULL);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (ESP_OK == error)
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                TRACE_I("Width configuration was successfully done!");
+                TRACE_W("Calibrating.....");
+                user_data->hall_state = "dw_is_closed";
+                xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", 2048, item, 1, NULL);
+                ret = 1;
+            }
+            else
+            {
+                TRACE_E("Error 'sensor_door_init'. error: %s)", esp_err_to_name(error));
+                ret = -1;
+                free(user_data);
+                user_data = NULL;
             }
         }
     }

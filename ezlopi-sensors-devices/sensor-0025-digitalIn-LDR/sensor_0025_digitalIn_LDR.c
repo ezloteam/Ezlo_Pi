@@ -85,18 +85,12 @@ static int __init(l_ezlopi_item_t *item)
             if (ESP_OK == gpio_config(&io_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
+                ret = 1;
             }
-
-            gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                ret = -1;
             }
         }
     }

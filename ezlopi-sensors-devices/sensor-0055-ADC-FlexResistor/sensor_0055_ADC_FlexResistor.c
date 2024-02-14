@@ -96,10 +96,10 @@ static int __0055_prepare(void *arg)
     s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        flex_t *FLEX_value = (flex_t *)malloc(sizeof(flex_t));
-        if (NULL != FLEX_value)
+        flex_t *flex_res_value = (flex_t *)malloc(sizeof(flex_t));
+        if (NULL != flex_res_value)
         {
-            memset(FLEX_value, 0, sizeof(flex_t));
+            memset(flex_res_value, 0, sizeof(flex_t));
 
             l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (device_adc)
@@ -109,20 +109,20 @@ static int __0055_prepare(void *arg)
                 if (item_adc)
                 {
                     item_adc->cloud_properties.device_id = device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device, FLEX_value);
+                    __prepare_item_adc_cloud_properties(item_adc, device_prep_arg->cjson_device, flex_res_value);
                     ret = 1;
                 }
                 else
                 {
                     ret = -1;
                     ezlopi_device_free_device(device_adc);
-                    free(FLEX_value);
+                    free(flex_res_value);
                 }
             }
             else
             {
                 ret = -1;
-                free(FLEX_value);
+                free(flex_res_value);
             }
         }
     }
@@ -136,11 +136,10 @@ static int __0055_init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)
@@ -160,10 +159,10 @@ static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         cJSON *cj_result = (cJSON *)arg;
         if (cj_result)
         {
-            flex_t *FLEX_value = (flex_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_int(FLEX_value->RS_0055);
+            flex_t *flex_res_value = (flex_t *)item->user_arg;
+            char *valueFormatted = ezlopi_valueformatter_int(flex_res_value->rs_0055);
             cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLEX_value->RS_0055);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flex_res_value->rs_0055);
             free(valueFormatted);
             ret = 1;
         }
@@ -175,8 +174,8 @@ static int __0055_notify(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        flex_t *FLEX_value = (flex_t *)item->user_arg;
-        if (FLEX_value)
+        flex_t *flex_res_value = (flex_t *)item->user_arg;
+        if (flex_res_value)
         {
             s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0,
                                                          .voltage = 0};
@@ -184,12 +183,12 @@ static int __0055_notify(l_ezlopi_item_t *item)
             ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
             float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 
-            // calculate the 'RS_0055' resistance value using [voltage divider rule]
-            int new_RS_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
-            if (new_RS_0055 != FLEX_value->RS_0055)
+            // calculate the 'rs_0055' resistance value using [voltage divider rule]
+            int new_rs_0055 = (int)(((flex_Vin / Vout) - 1) * flex_Rout);
+            if (new_rs_0055 != flex_res_value->rs_0055)
             {
                 ezlopi_device_value_updated_from_device_v3(item);
-                FLEX_value->RS_0055 = new_RS_0055;
+                flex_res_value->rs_0055 = new_rs_0055;
             }
             ret = 1;
         }

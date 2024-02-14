@@ -161,39 +161,40 @@ static int __0047_init(l_ezlopi_item_t *item)
     if (item)
     {
         s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-        if (user_data && GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
+        if (user_data)
         {
-            // Configure 'CLOCK_PIN' -> GPIO output pins for HX711.
-            gpio_config_t output_conf;
-            output_conf.pin_bit_mask = (1ULL << (user_data->HX711_SCK_pin));
-            output_conf.intr_type = GPIO_INTR_DISABLE;
-            output_conf.mode = GPIO_MODE_OUTPUT;
-            output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
-            output_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-            ret |= gpio_config(&output_conf);
-
-            // Configure 'DATA_PIN' ->  GPIO input pins for HX711.
-            gpio_config_t input_conf;
-            input_conf.pin_bit_mask = (1ULL << (user_data->HX711_DT_pin));
-            input_conf.intr_type = GPIO_INTR_DISABLE;
-            input_conf.mode = GPIO_MODE_INPUT;
-            input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
-            input_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-            ret |= gpio_config(&input_conf);
-
-            // then initiate calibration task
-            if (false == (user_data->HX711_initialized))
+            if (GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
             {
-                __hx711_power_reset(item);
-                xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", 2 * 2048, item, 1, NULL);
+                // Configure 'CLOCK_PIN' -> GPIO output pins for HX711.
+                gpio_config_t output_conf;
+                output_conf.pin_bit_mask = (1ULL << (user_data->HX711_SCK_pin));
+                output_conf.intr_type = GPIO_INTR_DISABLE;
+                output_conf.mode = GPIO_MODE_OUTPUT;
+                output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+                output_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+
+                ret = (0 == gpio_config(&output_conf)) ? 1 : -1;
+
+                // Configure 'DATA_PIN' ->  GPIO input pins for HX711.
+                gpio_config_t input_conf;
+                input_conf.pin_bit_mask = (1ULL << (user_data->HX711_DT_pin));
+                input_conf.intr_type = GPIO_INTR_DISABLE;
+                input_conf.mode = GPIO_MODE_INPUT;
+                input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+                input_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
+
+                // then initiate calibration task
+                if ((1 == ret) && (false == (user_data->HX711_initialized)))
+                {
+                    __hx711_power_reset(item);
+                    xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", 2 * 2048, item, 1, NULL);
+                    ret = 1;
+                }
             }
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
+                ret = -1;
                 free(item->user_arg);
                 item->user_arg = NULL;
             }

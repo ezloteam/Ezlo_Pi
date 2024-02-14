@@ -53,7 +53,7 @@ extern "C"
         uint16_t header_maxlen;
         uint16_t content_maxlen;
         uint16_t response_maxlen;
-        volatile TaskHandle_t mbedtls_task_handle;
+        TaskHandle_t mbedtls_task_handle;
     } s_ezlopi_core_http_mbedtls_t;
 
     /**

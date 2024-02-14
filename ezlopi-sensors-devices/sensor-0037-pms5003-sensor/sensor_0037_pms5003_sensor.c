@@ -160,17 +160,16 @@ static int __init(l_ezlopi_item_t *item)
     if (item)
     {
         s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
-
-        if (item->interface.uart.enable && pms_object)
+        if (pms_object)
         {
-            pms_init(pms_object);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (item->interface.uart.enable)
             {
+                pms_init(pms_object);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
                 free(item->user_arg);
                 item->user_arg = NULL;
             }

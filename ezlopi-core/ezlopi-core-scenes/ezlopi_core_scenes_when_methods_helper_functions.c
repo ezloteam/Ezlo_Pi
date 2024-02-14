@@ -308,41 +308,44 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
     if (tm_mday && sunrise_time && sunset_time)
     {
         // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
-        char tmp_url[] = "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140";
-        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: close\r\n";
-        char tmp_web_server[] = "api.sunrisesunset.io";
+        // char tmp_url[] = "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140";
+        // char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: close\r\n";
+        // char tmp_web_server[] = "api.sunrisesunset.io";
 
-        // char tmp_url[] = "https://official-joke-api.appspot.com/random_joke";
-        // char tmp_headers[] = "Host: official-joke-api.appspot.com\r\nAccept: */*\r\nConnection: close\r\n";
-        // char tmp_web_server[] = "official-joke-api.appspot.com";
+        char tmp_url[] = "https://official-joke-api.appspot.com/random_joke";
+        char tmp_headers[] = "Host: official-joke-api.appspot.com\r\nAccept: */*\r\nConnection: close\r\n";
+        char tmp_web_server[] = "official-joke-api.appspot.com";
 
         s_ezlopi_core_http_mbedtls_t tmp_config = {
             .method = HTTP_METHOD_GET,
             .url = tmp_url,
+            .url_maxlen = sizeof(tmp_url),
             .web_port = 443,
-            .web_server = tmp_web_server,
             .header = tmp_headers,
+            .header_maxlen = sizeof(tmp_headers),
+            .web_server = tmp_web_server,
+            .web_server_maxlen = sizeof(tmp_web_server),
             .response = NULL,
+            .response_maxlen = 0,
         };
 
         // must return 'true' if success
         if (NULL == tmp_config.mbedtls_task_handle)
         {
-            if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set'
+            if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set' // checking if mbed_task is occupied
             {
-
-                // checking if mbed_task is occupied ;
                 function_to_call_mbedtlshttp(&tmp_config);
+                
                 uint8_t retry = 0;
                 while (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // wait till 10sec
                 {
-                    TRACE_I("MbedTask is busy...mbedtls_task_handle => %d", (int)tmp_config.mbedtls_task_handle);
+                    TRACE_I("MbedTask is busy...mbedtls_task_handle => %d\n", (int)tmp_config.mbedtls_task_handle);
                     if (retry++ > 10)
                     {
                         if (NULL != tmp_config.mbedtls_task_handle)
                         {
                             vTaskDelete(tmp_config.mbedtls_task_handle);
-                            TRACE_E("Deleted the mbedtls_task_handle => %d", (int)tmp_config.mbedtls_task_handle);
+                            TRACE_E("Deleted the mbedtls_task_handle => %d\n", (int)tmp_config.mbedtls_task_handle);
                             ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
                         }
                         break;
@@ -352,15 +355,23 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
             }
             else
             {
-                TRACE_E("+++++ ERR : MbedTask is already active +++++");
+                TRACE_E("+++++ ERR : MbedTask is already active +++++\n");
             }
         }
-
+#if 0
         if (tmp_config.response)
         {
+            // sunrise_time->tm_mday = sunset_time->tm_mday = tm_mday;
+            // sunrise_time->tm_hour = 6;
+            // sunset_time->tm_hour = 5 + 12; // 24-hr
+            // sunrise_time->tm_min = 49;
+            // sunset_time->tm_min = 48;
+            // sunrise_time->tm_sec = 31;
+            // sunset_time->tm_sec = 42;
             TRACE_I("isSunState : [%p]response = [%d]%s.", tmp_config.response, strlen(tmp_config.response), tmp_config.response);
             free(tmp_config.response);
         }
+#endif
         // get the time // for Example
         sunrise_time->tm_mday = sunset_time->tm_mday = tm_mday;
         sunrise_time->tm_hour = 6;

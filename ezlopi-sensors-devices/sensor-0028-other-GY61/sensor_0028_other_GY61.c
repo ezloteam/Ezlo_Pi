@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
- 
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -186,7 +185,7 @@ static int __0028_init(l_ezlopi_item_t *item)
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

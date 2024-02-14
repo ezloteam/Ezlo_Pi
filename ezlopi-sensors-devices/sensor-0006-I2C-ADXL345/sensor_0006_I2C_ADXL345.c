@@ -169,13 +169,22 @@ static int __init(l_ezlopi_item_t *item)
         if (item->interface.i2c_master.enable)
         {
             ezlopi_i2c_master_init(&item->interface.i2c_master);
-            if (0 == __adxl345_configure_device(item))
+            if (0 == __adxl345_configure_device(item)) // ESP_OK
             {
                 TRACE_I("Configuration Complete...");
+                ret = 1;
             }
-            ret = 1;
+            else
+            {
+                ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                }
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

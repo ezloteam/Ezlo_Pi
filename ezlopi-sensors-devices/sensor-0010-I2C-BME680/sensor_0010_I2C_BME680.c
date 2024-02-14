@@ -236,9 +236,9 @@ static int __init(l_ezlopi_item_t *item)
         {
             ezlopi_i2c_master_init(&item->interface.i2c_master);
             bme680_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+            ret = 1;
         }
-        ret = 1;
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

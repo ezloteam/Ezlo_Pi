@@ -125,11 +125,9 @@ static int __init(l_ezlopi_item_t *item)
                 .intr_type = GPIO_INTR_DISABLE,
             };
 
-            gpio_config(&io_conf);
-            ret = 1;
+            ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
         }
-
-        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
         {
             const gpio_config_t io_conf = {
                 .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
@@ -147,12 +145,10 @@ static int __init(l_ezlopi_item_t *item)
                                  : GPIO_INTR_NEGEDGE,
             };
 
-            gpio_config(&io_conf);
-            ret = 1;
+            ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
         }
-        if (0 == ret)
+        if (1 != ret)
         {
-            ret = -1;
             if (item->user_arg)
             {
                 free(item->user_arg);

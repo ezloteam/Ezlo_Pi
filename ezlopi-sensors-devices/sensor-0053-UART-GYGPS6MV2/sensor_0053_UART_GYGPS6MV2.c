@@ -248,7 +248,7 @@ static int __0053_init(l_ezlopi_item_t *item)
             // TRACE_W(" Initailization complete......");
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

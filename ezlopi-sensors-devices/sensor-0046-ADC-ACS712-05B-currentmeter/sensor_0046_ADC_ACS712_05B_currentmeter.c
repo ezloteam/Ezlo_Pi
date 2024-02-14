@@ -140,7 +140,7 @@ static int __0046_init(l_ezlopi_item_t *item)
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

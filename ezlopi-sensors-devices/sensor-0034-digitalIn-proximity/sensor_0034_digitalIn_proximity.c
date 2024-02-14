@@ -135,8 +135,7 @@ static int proximity_sensor_init(l_ezlopi_item_t *item)
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
 
-            ret = gpio_config(&io_conf);
-            if (ESP_OK == ret)
+            if (ESP_OK == gpio_config(&io_conf))
             {
                 gpio_isr_service_register_v3(item, proximity_sensor_value_updated_from_device, 200);
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
@@ -145,16 +144,8 @@ static int proximity_sensor_init(l_ezlopi_item_t *item)
             }
             else
             {
+                ret = -1;
                 TRACE_E("Error initializing Proximity sensor");
-            }
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
             }
         }
     }

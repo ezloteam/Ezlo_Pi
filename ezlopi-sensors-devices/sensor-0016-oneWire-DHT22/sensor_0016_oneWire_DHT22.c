@@ -75,7 +75,7 @@ static int dht22_sensor_init_v3(l_ezlopi_item_t *item)
             setDHT22gpio(item->interface.onewire_master.onewire_pin);
             ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

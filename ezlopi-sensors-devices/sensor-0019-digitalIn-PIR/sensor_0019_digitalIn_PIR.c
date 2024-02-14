@@ -98,14 +98,20 @@ static int sensor_pir_init_v3(l_ezlopi_item_t *item)
                 TRACE_I("PIR sensor initialize successfully.");
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
+                ret = 1;
             }
             else
             {
                 TRACE_E("Error initializing PIR sensor, error: %s", esp_err_to_name(ret));
+                ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                }
             }
-            ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
             if (item->user_arg)

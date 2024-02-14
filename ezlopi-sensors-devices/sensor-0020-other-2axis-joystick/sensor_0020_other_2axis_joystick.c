@@ -233,19 +233,22 @@ static int __init(l_ezlopi_item_t *item)
     if (item)
     {
         s_joystick_data_t *user_data = (s_joystick_data_t *)item->user_arg;
-        if ((item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X]) || (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y]))
+        if (user_data)
         {
-            if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+            if ((item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X]) ||
+                (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y]))
             {
-                TRACE_E("adc GPIO_NUM is %d", item->interface.adc.gpio_num);
-                ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-                ret = 1;
+                if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+                {
+                    TRACE_E("adc GPIO_NUM is %d", item->interface.adc.gpio_num);
+                    ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
+                    ret = 1;
+                }
             }
-        }
-        if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH])
-        {
-            if (item->interface.gpio.gpio_in.enable)
+            else if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] &&
+                     (item->interface.gpio.gpio_in.enable))
             {
+
                 TRACE_B("SW_GPIO_NUM is %d", item->interface.gpio.gpio_in.gpio_num);
 
                 const gpio_config_t io_conf = {
@@ -259,13 +262,7 @@ static int __init(l_ezlopi_item_t *item)
                     .intr_type = item->interface.gpio.gpio_in.interrupt,
                 };
 
-                ret = gpio_config(&io_conf);
-                if (ret)
-                {
-                    ret = 0;
-                    TRACE_E("Error initializing joystick switch");
-                }
-                else
+                if (ESP_OK == gpio_config(&io_conf))
                 {
                     TRACE_I("Joystick switch initialize successfully.");
                     item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
@@ -273,13 +270,17 @@ static int __init(l_ezlopi_item_t *item)
                     gpio_isr_service_register_v3(item, __joystick_intr_callback, 200);
                     ret = 1;
                 }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                    TRACE_E("Error initializing joystick switch");
+                }
             }
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
+                ret = -1;
                 free(item->user_arg);
                 item->user_arg = NULL;
             }
