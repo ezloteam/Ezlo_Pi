@@ -134,11 +134,7 @@ typedef enum
     MQ4_GAS_ALARM_MAX
 } e_mq4_gas_alarm_states_t;
 
-typedef struct mq4_value_t
-{
-    float _CH4_ppm;
-    float MQ4_R0_constant;  
-}mq4_value_t;
+
 
 //--------------------------------------------------------------------------------------------------------
 //      ACTION FUNCTION

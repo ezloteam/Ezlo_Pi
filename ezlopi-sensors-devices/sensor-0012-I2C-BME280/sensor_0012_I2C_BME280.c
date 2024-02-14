@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -165,27 +164,28 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    if (item->interface.i2c_master.enable)
+    if (item)
     {
-        s_ezlopi_bmp280_t *bmp280_sensor_params = (s_ezlopi_bmp280_t *)item->user_arg;
-        if (bmp280_sensor_params)
+        if (item->interface.i2c_master.enable)
         {
-            ezlopi_i2c_master_init(&item->interface.i2c_master);
-            bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
-            bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
-            bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
-            ret = 1;
+            s_ezlopi_bmp280_t *bmp280_sensor_params = (s_ezlopi_bmp280_t *)item->user_arg;
+            if (bmp280_sensor_params)
+            {
+                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                bmp280_init_default_params(&bmp280_sensor_params->bmp280_params);
+                bmp280_init(&bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->bmp280_params, &item->interface.i2c_master);
+                bmp280_read_float(&item->interface.i2c_master, &bmp280_sensor_params->bmp280_dev, &bmp280_sensor_params->temperature, &bmp280_sensor_params->pressure, &bmp280_sensor_params->humidity);
+                ret = 1;
+            }
         }
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        if (0 == ret)
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
 
@@ -199,8 +199,8 @@ static int __prepare(void *arg)
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *pressure_deivce = ezlopi_device_add_device(prep_arg->cjson_device);
         l_ezlopi_device_t *temp_humid_device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t *pressure_deivce = ezlopi_device_add_device(prep_arg->cjson_device);
 
         s_ezlopi_bmp280_t *bme280_sensor_params = (s_ezlopi_bmp280_t *)malloc(sizeof(s_ezlopi_bmp280_t));
 
@@ -244,25 +244,22 @@ static int __prepare(void *arg)
             {
                 ret = -1;
             }
-        }
 
-        if (-1 == ret)
-        {
-            if (temp_humid_device)
+            if (-1 == ret)
             {
-                ezlopi_device_free_device(temp_humid_device);
+                if (temp_humid_device)
+                {
+                    ezlopi_device_free_device(temp_humid_device);
+                }
+                if (pressure_deivce)
+                {
+                    ezlopi_device_free_device(pressure_deivce);
+                }
+                if (bme280_sensor_params)
+                {
+                    free(bme280_sensor_params);
+                }
             }
-            if (pressure_deivce)
-            {
-                ezlopi_device_free_device(pressure_deivce);
-            }
-            if (bme280_sensor_params)
-            {
-                free(bme280_sensor_params);
-            }
-        }
-        else
-        {
             ret = 1;
         }
     }

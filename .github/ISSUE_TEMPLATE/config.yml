@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: EzloPi Docs
+    url: https://www.ezlopi.com/docs/
+    about: Information related to EzloPi.
+  - name: EzloPi Discussions and Support
+    url: https://community.ezlo.com/c/ezlopi/249
+    about: EzloPi discussion forum, Feature Requests, example projects etc.

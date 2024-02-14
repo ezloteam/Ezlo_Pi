@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cjson_macros.h"
@@ -112,19 +111,20 @@ static int __0046_prepare(void *arg)
                 if (currentmeter_item)
                 {
                     __prepare_item_cloud_properties(currentmeter_item, device_prep_arg->cjson_device, user_data);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(currentmeter_device);
                     free(user_data);
                 }
             }
             else
             {
-                ezlopi_device_free_device(currentmeter_device);
+                ret = -1;
                 free(user_data);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -139,6 +139,15 @@ static int __0046_init(l_ezlopi_item_t *item)
         {
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;

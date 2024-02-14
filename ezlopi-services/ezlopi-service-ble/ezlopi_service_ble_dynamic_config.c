@@ -175,9 +175,12 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
         {
             g_dynamic_config_base64 = __dynamic_config_base64();
 
-            g_dynamic_config_sequence_no = 0;
-            g_dynamic_config_number_of_sequence = strlen(g_dynamic_config_base64) / ezlopi_ble_gatt_get_max_data_size();
-            g_dynamic_config_number_of_sequence = (strlen(g_dynamic_config_base64) % ezlopi_ble_gatt_get_max_data_size()) ? (g_dynamic_config_number_of_sequence + 1) : g_dynamic_config_number_of_sequence;
+            if (g_dynamic_config_base64)
+            {
+                g_dynamic_config_sequence_no = 0;
+                g_dynamic_config_number_of_sequence = strlen(g_dynamic_config_base64) / ezlopi_ble_gatt_get_max_data_size();
+                g_dynamic_config_number_of_sequence = (strlen(g_dynamic_config_base64) % ezlopi_ble_gatt_get_max_data_size()) ? (g_dynamic_config_number_of_sequence + 1) : g_dynamic_config_number_of_sequence;
+            }
         }
 
         if (NULL != g_dynamic_config_base64)

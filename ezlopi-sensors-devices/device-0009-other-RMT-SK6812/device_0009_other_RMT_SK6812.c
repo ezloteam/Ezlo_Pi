@@ -2,7 +2,6 @@
 #include "sdkconfig.h"
 #include "driver/gpio.h"
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -227,16 +226,15 @@ static int __init(l_ezlopi_item_t *item)
                 TRACE_E("Couldn't initiate device!, error: %d", err);
             }
         }
-    }
-
-    if (0 == ret)
-    {
-        TRACE_E("Here");
-        ret = -1;
-        if (item->user_arg)
+        if (0 == ret)
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            TRACE_E("Here");
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
 
@@ -410,18 +408,19 @@ static int __prepare(void *arg)
                     __prepare_SK6812_RGB_dimmer_down_item(dimmer_args->dimmer_down_item, prep_arg->cjson_device);
                     __prepare_SK6812_RGB_dimmer_stop_item(dimmer_args->dimmer_stop_item, prep_arg->cjson_device);
                     __prepare_SK6812_LED_onoff_switch_item(dimmer_args->switch_item, prep_arg->cjson_device);
+                    ret = 1;
                 }
                 else
                 {
-                    TRACE_E("Here");
-
                     free(dimmer_args);
                     ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
             else
             {
                 ezlopi_device_free_device(device);
+                ret = -1;
             }
         }
     }

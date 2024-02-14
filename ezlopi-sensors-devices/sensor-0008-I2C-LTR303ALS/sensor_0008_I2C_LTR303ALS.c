@@ -2,7 +2,6 @@
 #include "sdkconfig.h"
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -101,20 +100,22 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
 
     ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
-
-    if ((item->interface.i2c_master.enable) && (NULL != als_ltr303_data))
+    if (item)
     {
-        ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
-        ltr303_get_val(als_ltr303_data);
-        ret = 1;
-    }
-    else
-    {
-        ret = -1;
-        if (item->user_arg)
+        if ((item->interface.i2c_master.enable) && (NULL != als_ltr303_data))
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+            ltr303_get_val(als_ltr303_data);
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
 
@@ -180,6 +181,7 @@ static int __prepare(void *arg)
             else
             {
                 ezlopi_device_free_device(als_ltr303_device);
+                ret = -1;
             }
         }
     }

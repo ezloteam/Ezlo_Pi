@@ -1,7 +1,5 @@
 
 #include "ezlopi_util_trace.h"
-// #include <stdlib.h>
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -95,7 +93,7 @@ static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_ua
                 TRACE_D("BUFFER-DATA-LEN: %d", output_len);
                 while (idx < output_len)
                 {
-                    dump("rx-buffer", buffer, idx, 6);
+                    // dump("rx-buffer", buffer, idx, 6);
                     if ('R' == buffer[idx] && '\r' == buffer[idx + 5])
                     {
                         s_mb1013_args->current_value = atoi((const char *)&buffer[idx + 1]) / 10.0;
@@ -104,8 +102,6 @@ static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_ua
                     }
                     idx++;
                 }
-
-#warning "use ring buffer"
             }
         }
     }
@@ -122,15 +118,14 @@ static int __init(l_ezlopi_item_t *item)
             item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
             ret = 1;
         }
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        if (0 == ret)
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
 
@@ -189,7 +184,6 @@ static int __prepare(void *arg)
                     item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
-                    ret = 1;
 
                     s_mb1013_args_t *mb1030_args = malloc(sizeof(s_mb1013_args_t));
                     if (mb1030_args)
@@ -197,10 +191,12 @@ static int __prepare(void *arg)
                         mb1030_args->current_value = 0.0;
                         mb1030_args->previous_value = 0.0;
                         item->user_arg = mb1030_args;
+                        ret = 1;
                     }
                 }
                 else
                 {
+                    ezlopi_device_free_device(device);
                     ret = -1;
                 }
             }

@@ -22,7 +22,7 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_core_reboot.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_net.h"
 #include "ezlopi_core_factory_info.h"
 
@@ -49,13 +49,13 @@ static const int RX_BUF_SIZE = 3096;
 
 // cJson Types
 
-static void qt_serial_get_info();
-static void qt_serial_set_wifi(const char *data);
-static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
-static void qt_serial_save_config(const char *data);
-static void qt_serial_read_config(void);
+static void ezlopi_service_uart_get_info();
+static void ezlopi_service_uart_set_wifi(const char *data);
+static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect);
+static void ezlopi_service_uart_save_config(const char *data);
+static void ezlopi_service_uart_read_config(void);
 
-int qt_serial_tx_data(int len, uint8_t *data)
+int EZPI_SERVICE_uart_tx_data(int len, uint8_t *data)
 {
     int ret = 0;
     // char start_bytes[] = {0x80, '\r', '\n'};
@@ -150,6 +150,35 @@ static char *ezlopi_chip_type_str(int chip_type)
     }
 }
 
+static int ezlopi_service_uart_execute_command_0(uint8_t sub_cmd)
+{
+    int ret = 0;
+    switch (sub_cmd)
+    {
+    case 0:
+    {
+        TRACE_E("Factory restore command");
+        const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
+        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
+        EZPI_CORE_factory_restore();
+        break;
+    }
+    case 1:
+    {
+        TRACE_E("Reboot only command");
+        const static char *reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
+        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
+        EZPI_CORE_reboot();
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return ret;
+}
+
 static int qt_serial_parse_rx_data(const char *data)
 {
     cJSON *root = cJSON_Parse(data);
@@ -164,31 +193,27 @@ static int qt_serial_parse_rx_data(const char *data)
             {
             case 1:
             {
-                qt_serial_get_info();
+                ezlopi_service_uart_get_info();
                 break;
             }
             case 2:
             {
-                qt_serial_set_wifi(data);
+                ezlopi_service_uart_set_wifi(data);
                 break;
             }
             case 3:
             {
-                qt_serial_save_config(data);
+                ezlopi_service_uart_save_config(data);
                 break;
             }
             case 4:
             {
-                qt_serial_read_config();
+                ezlopi_service_uart_read_config();
                 break;
             }
             case 0:
             {
-                const static char *reboot_response = "{\"cmd\":0,\"status\":1}";
-                qt_serial_tx_data(strlen(reboot_response), (uint8_t *)reboot_response);
-                vTaskDelay(20);
-                // esp_restart();
-                ezlopi_reboot();
+                ezlopi_service_uart_execute_command_0(cJSON_GetObjectItem(root, ezlopi_sub_cmd_str)->valueint);
                 break;
             }
 
@@ -214,7 +239,7 @@ static int qt_serial_parse_rx_data(const char *data)
     return 1;
 }
 
-static void qt_serial_rx_task(void *arg)
+static void ezlopi_service_uart_rx_task(void *arg)
 {
     static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
@@ -237,7 +262,7 @@ static void qt_serial_rx_task(void *arg)
     vTaskDelete(NULL);
 }
 
-static void qt_serial_get_info()
+static void ezlopi_service_uart_get_info()
 {
     cJSON *get_info = cJSON_CreateObject();
 
@@ -282,8 +307,8 @@ static void qt_serial_get_info()
         cJSON_AddNumberToObject(get_info, ezlopi_serial_str, serial_id);
 
         cJSON_AddStringToObject(get_info, ezlopi_ssid_str, wifi_ssid ? wifi_ssid : "");
-        cJSON_AddStringToObject(get_info, ezlopi_dev_name_str, device_name ? device_name : "");
-        cJSON_AddStringToObject(get_info, "ezlopi_device_type", device_type ? device_type : "");
+        cJSON_AddStringToObject(get_info, ezlopi_device_name_str, device_name ? device_name : "");
+        cJSON_AddStringToObject(get_info, ezlopi_ezlopi_device_type_str, device_type ? device_type : "");
         cJSON_AddStringToObject(get_info, ezlopi_dev_flash_str, CONFIG_ESPTOOLPY_FLASHSIZE);
         // cJSON_AddStringToObject(get_info, "device_free_flash", ""); // TODO
         cJSON_AddStringToObject(get_info, ezlopi_brand_str, device_brand ? device_brand : "");
@@ -357,7 +382,7 @@ static void qt_serial_get_info()
         if (serial_data_json_string)
         {
             cJSON_Minify(serial_data_json_string);
-            qt_serial_tx_data(strlen(serial_data_json_string), (uint8_t *)serial_data_json_string);
+            EZPI_SERVICE_uart_tx_data(strlen(serial_data_json_string), (uint8_t *)serial_data_json_string);
             cJSON_free(serial_data_json_string);
         }
 
@@ -365,7 +390,7 @@ static void qt_serial_get_info()
     }
 }
 
-static void qt_serial_set_wifi(const char *data)
+static void ezlopi_service_uart_set_wifi(const char *data)
 {
     uint32_t status = 0;
     cJSON *root = cJSON_Parse(data);
@@ -414,13 +439,13 @@ static void qt_serial_set_wifi(const char *data)
                     // vTaskDelay(EZLOPI_WIFI_CONNECT_ATTEMPT_INTERVAL / portTICK_PERIOD_MS);
                 }
 
-                qt_serial_response(2, status_write, status);
+                ezlopi_service_uart_response(2, status_write, status);
             }
             else
             {
                 TRACE_E("Invalid WiFi SSID or Password, aborting!");
                 // printf("Invalid WiFi SSID or Password, aborting!\r\n");
-                qt_serial_response(2, 0, 0);
+                ezlopi_service_uart_response(2, 0, 0);
             }
         }
 
@@ -428,7 +453,7 @@ static void qt_serial_set_wifi(const char *data)
     }
 }
 
-static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
+static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint8_t status_connect)
 {
     cJSON *response = NULL;
     response = cJSON_CreateObject();
@@ -445,13 +470,13 @@ static void qt_serial_response(uint8_t cmd, uint8_t status_write, uint8_t status
         if (my_json_string)
         {
             cJSON_Minify(my_json_string);
-            qt_serial_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
+            EZPI_SERVICE_uart_tx_data(strlen(my_json_string), (uint8_t *)my_json_string);
             cJSON_free(my_json_string);
         }
     }
 }
 
-static void qt_serial_save_config(const char *data)
+static void ezlopi_service_uart_save_config(const char *data)
 {
 
     uint8_t ret = ezlopi_nvs_write_config_data_str((char *)data);
@@ -461,10 +486,10 @@ static void qt_serial_save_config(const char *data)
         TRACE_I("Successfully wrote config data..");
     }
 
-    qt_serial_response(3, ret, 5);
+    ezlopi_service_uart_response(3, ret, 5);
 }
 
-static void qt_serial_read_config(void)
+static void ezlopi_service_uart_read_config(void)
 {
     cJSON *root = NULL;
     char *buf = ezlopi_factory_info_v3_get_ezlopi_config();
@@ -513,15 +538,15 @@ static void qt_serial_read_config(void)
             cJSON_Minify(my_json_string);
             cJSON_Delete(root); // free Json string
             const int len = strlen(my_json_string);
-            qt_serial_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
+            EZPI_SERVICE_uart_tx_data(len, (uint8_t *)my_json_string); // Send the data over uart
             // TRACE_D("Sending: %s", my_json_string);
             cJSON_free(my_json_string);
         }
     }
 }
 
-void qt_serial_init(void)
+void EZPI_SERVICE_uart_init(void)
 {
     serial_init();
-    xTaskCreate(qt_serial_rx_task, "qt_serial_rx_task", 1024 * 10, NULL, configMAX_PRIORITIES, NULL);
+    xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", 1024 * 10, NULL, configMAX_PRIORITIES, NULL);
 }

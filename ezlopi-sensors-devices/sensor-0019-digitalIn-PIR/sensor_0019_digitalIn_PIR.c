@@ -103,6 +103,16 @@ static int sensor_pir_init_v3(l_ezlopi_item_t *item)
             {
                 TRACE_E("Error initializing PIR sensor, error: %s", esp_err_to_name(ret));
             }
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
@@ -124,14 +134,14 @@ static int sensor_pir_prepare_v3(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
                 if (item)
                 {
-
                     item->func = sensor_0019_digitalIn_PIR;
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // item->cloud_properties.device_id = device->cloud_properties.device_id;
                     sensor_pir_setup_item_properties_v3(item, cj_device);
                     ret = 1;
                 }
                 else
                 {
+                    ezlopi_device_free_device(device);
                     ret = -1;
                 }
             }

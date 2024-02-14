@@ -7,7 +7,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-nvs
         ezlopi-core-factory-info
         ezlopi-core-net
-        ezlopi-core-reboot
+        ezlopi-core-reset
 )
 set(EZLOPI_HAL_COMPONENTS 
         ezlopi-hal-sysinfo

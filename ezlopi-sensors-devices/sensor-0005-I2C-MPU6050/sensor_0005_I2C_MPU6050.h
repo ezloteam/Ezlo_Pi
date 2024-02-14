@@ -4,8 +4,8 @@
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
 
-#warning "riken needs to fix this. issue double defination of 'REG_COUNT_LEN', also defined in 'sensor_0007_I2C_GY271.h:11"
-#define REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
+#define MPU6050_REG_COUNT_LEN 14 // the accelerometer , temperature and gyrodata is to be in one go .
+
 // #define RECALIBRATE_ITERAION_COUNT 1000
 #define CALIBRATION_SAMPLES 200
 

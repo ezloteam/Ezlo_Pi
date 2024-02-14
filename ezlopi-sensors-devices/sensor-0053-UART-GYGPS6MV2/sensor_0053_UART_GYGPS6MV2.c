@@ -1,5 +1,4 @@
 #include <string.h>
-// #include "cJSON.h"
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"
@@ -217,18 +216,20 @@ static int __0053_prepare(void *arg)
                         __prepare_geiod_item_cloud_properties(geiod_item, cjson_device, sensor_0053_UART_gps6mv2_data);
                         __prepare_item_interface_properties(geiod_item, cjson_device);
                     }
+                    ret = 1;
                     if ((NULL == lat_item) && (NULL == long_item) && (NULL == fix_item) && (NULL == sea_level_item) && (NULL == geiod_item))
                     {
+                        ret = -1;
                         ezlopi_device_free_device(gps_device);
                         free(sensor_0053_UART_gps6mv2_data);
                     }
                 }
                 else
                 {
+                    ret = -1;
                     free(sensor_0053_UART_gps6mv2_data);
                 }
             }
-            ret = 1;
         }
     }
 
@@ -246,6 +247,15 @@ static int __0053_init(l_ezlopi_item_t *item)
             item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
             // TRACE_W(" Initailization complete......");
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;

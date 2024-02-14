@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -17,9 +16,13 @@
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
+typedef struct s_mq135_value
+{
+    float _NH3_ppm;
+    float MQ135_R0_constant;
+    bool Calibration_complete_NH3;
+} s_mq135_value_t;
 
-#warning "use of static variable"
-static bool Calibration_complete_NH3 = false; // flag to activate calibration phase
 const char *mq135_sensor_gas_alarm_token[] = {
     "no_gas",
     "combustible_gas_detected",
@@ -68,9 +71,13 @@ int sensor_0052_other_MQ135_NH3_detector(e_ezlopi_actions_t action, l_ezlopi_ite
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (Calibration_complete_NH3)
+        if (item)
         {
-            __0052_notify(item);
+            s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
+            if (true == MQ135_value->Calibration_complete_NH3)
+            {
+                __0052_notify(item);
+            }
         }
         break;
     }
@@ -107,10 +114,10 @@ static int __0052_prepare(void *arg)
         }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        mq135_value_t *MQ135_value = (mq135_value_t *)malloc(sizeof(mq135_value_t));
+        s_mq135_value_t *MQ135_value = (s_mq135_value_t *)malloc(sizeof(s_mq135_value_t));
         if (NULL != MQ135_value)
         {
-            memset(MQ135_value, 0, sizeof(mq135_value_t));
+            memset(MQ135_value, 0, sizeof(s_mq135_value_t));
             l_ezlopi_device_t *MQ135_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (MQ135_device_adc)
             {
@@ -159,11 +166,21 @@ static int __0052_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             // calibrate if not done
-            if (!Calibration_complete_NH3)
+            s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
+            if (false == MQ135_value->Calibration_complete_NH3)
             {
                 xTaskCreate(__calibrate_MQ135_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
             }
-            ret = 2;
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
@@ -261,7 +278,7 @@ static int __0052_get_item(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq135_value_t *MQ135_value = ((mq135_value_t *)item->user_arg);
+                s_mq135_value_t *MQ135_value = ((s_mq135_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ135_value->_NH3_ppm);
                 if (valueFormatted)
                 {
@@ -291,7 +308,7 @@ static int __0052_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq135_value_t *MQ135_value = ((mq135_value_t *)item->user_arg);
+                s_mq135_value_t *MQ135_value = ((s_mq135_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ135_value->_NH3_ppm);
                 if (valueFormatted)
                 {
@@ -316,13 +333,11 @@ static int __0052_notify(l_ezlopi_item_t *item)
             const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                // curret_value = "combustible_gas_detected";
-                curret_value = mq135_sensor_gas_alarm_token[1];
+                curret_value = "combustible_gas_detected";
             }
             else
             {
-                // curret_value = "no_gas";
-                curret_value = mq135_sensor_gas_alarm_token[0];
+                curret_value = "no_gas";
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
@@ -334,7 +349,7 @@ static int __0052_notify(l_ezlopi_item_t *item)
         {
             // extract the sensor_output_values
             double new_value = (double)__extract_MQ135_sensor_ppm(item);
-            mq135_value_t *MQ135_value = (mq135_value_t *)item->user_arg;
+            s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
             if (fabs((double)(MQ135_value->_NH3_ppm) - new_value) > 0.0001)
             {
                 MQ135_value->_NH3_ppm = (float)new_value;
@@ -349,7 +364,7 @@ static int __0052_notify(l_ezlopi_item_t *item)
 static float __extract_MQ135_sensor_ppm(l_ezlopi_item_t *item)
 {
     uint32_t mq135_adc_pin = item->interface.adc.gpio_num;
-    mq135_value_t *MQ135_value = (mq135_value_t *)item->user_arg;
+    s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
     // calculation process
     //-------------------------------------------------
     s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
@@ -398,7 +413,7 @@ static void __calibrate_MQ135_R0_resistance(void *params)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)
     {
-        mq135_value_t *MQ135_value = (mq135_value_t *)item->user_arg;
+        s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
 
         uint32_t mq135_adc_pin = item->interface.adc.gpio_num;
         //-------------------------------------------------
@@ -447,7 +462,7 @@ static void __calibrate_MQ135_R0_resistance(void *params)
             MQ135_value->MQ135_R0_constant = 0; // No negative values accepted.
         }
         // Set calibration_complete_NH3 flag
-        Calibration_complete_NH3 = true;
+        MQ135_value->Calibration_complete_NH3 = true;
     }
     vTaskDelete(NULL);
 }

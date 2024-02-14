@@ -1,4 +1,3 @@
-// #include "cJSON.h"
 #include <math.h>
 #include "ezlopi_util_trace.h"
 
@@ -187,19 +186,20 @@ static int __prepare(void *arg)
                     mpu6050_gyro_z_item->cloud_properties.scale = scales_revolutions_per_minute;
                     __prepare_item_interface_properties(mpu6050_gyro_z_item, cj_device);
                 }
+                ret = 1;
 
                 if ((NULL == mpu6050_acc_x_item) && (NULL == mpu6050_acc_y_item) && (NULL == mpu6050_acc_z_item) && (NULL == mpu6050_temp_item) && (NULL == mpu6050_gyro_x_item) && (NULL == mpu6050_gyro_y_item) && (NULL == mpu6050_gyro_z_item))
                 {
                     ezlopi_device_free_device(mpu6050_device);
                     free(user_data);
+                    ret = -1;
                 }
             }
             else
             {
-                ezlopi_device_free_device(mpu6050_device);
                 free(user_data);
+                ret = -1;
             }
-            ret = 1;
         }
     }
 
@@ -218,8 +218,17 @@ static int __init(l_ezlopi_item_t *item)
                 TRACE_S("Configuration Complete.... ");
                 xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2048, item, 1, NULL);
             }
+            ret = 1;
         }
-        ret = 1;
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
+        }
     }
     return ret;
 }
@@ -382,8 +391,9 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
     if (item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        uint8_t buf[REG_COUNT_LEN] = {0}; // 0 - 13
-        uint8_t dummy[REG_COUNT_LEN] = {0};
+
+        uint8_t buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
+        uint8_t dummy[MPU6050_REG_COUNT_LEN] = {0};
 
         float calibrationData[3] = {0};
         uint8_t Check_Register = 0;
@@ -403,7 +413,7 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
                 if (Check_Register & DATA_RDY_INT_FLAG)
                 {
                     err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (buf), REG_COUNT_LEN);
+                    err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (buf), MPU6050_REG_COUNT_LEN);
                 }
                 if (i <= CALIBRATION_SAMPLES)
                 {

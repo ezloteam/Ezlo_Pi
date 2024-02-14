@@ -1,7 +1,6 @@
 // #include <string.h>
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_actions.h"
@@ -20,8 +19,12 @@
 //                          Declaration
 //*************************************************************************
 
-#warning "use of static variable"
-static bool Calibration_complete_CO = false; // flag to activate calibration phase
+typedef struct s_mq7_value
+{
+    float _CO_ppm;
+    float MQ7_R0_constant;
+    bool Calibration_complete_CO;
+} s_mq7_value_t;
 
 const char *mq7_sensor_gas_alarm_token[] = {
     "no_gas",
@@ -72,9 +75,13 @@ int sensor_0062_other_MQ7_CO_detector(e_ezlopi_actions_t action, l_ezlopi_item_t
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (Calibration_complete_CO)
+        if (item)
         {
-            __0062_notify(item);
+            s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
+            if (true == MQ7_value->Calibration_complete_CO)
+            {
+                __0062_notify(item);
+            }
         }
         break;
     }
@@ -85,7 +92,6 @@ int sensor_0062_other_MQ7_CO_detector(e_ezlopi_actions_t action, l_ezlopi_item_t
     }
     return ret;
 }
-
 //----------------------------------------------------
 static int __0062_prepare(void *arg)
 {
@@ -103,18 +109,20 @@ static int __0062_prepare(void *arg)
             {
                 MQ7_item_digi->cloud_properties.device_id = MQ7_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ7_item_digi, device_prep_arg->cjson_device);
+                ret = 1;
             }
             else
             {
+                ret = -1;
                 ezlopi_device_free_device(MQ7_device_digi);
             }
         }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        mq7_value_t *MQ7_value = (mq7_value_t *)malloc(sizeof(mq7_value_t));
+        s_mq7_value_t *MQ7_value = (s_mq7_value_t *)malloc(sizeof(s_mq7_value_t));
         if (NULL != MQ7_value)
         {
-            memset(MQ7_value, 0, sizeof(mq7_value_t));
+            memset(MQ7_value, 0, sizeof(s_mq7_value_t));
             l_ezlopi_device_t *MQ7_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (MQ7_device_adc)
             {
@@ -124,18 +132,20 @@ static int __0062_prepare(void *arg)
                 {
                     MQ7_item_adc->cloud_properties.device_id = MQ7_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ7_item_adc, device_prep_arg->cjson_device, MQ7_value);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(MQ7_device_adc);
                     free(MQ7_value);
                 }
             }
             else
             {
+                ret = -1;
                 free(MQ7_value);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -163,11 +173,21 @@ static int __0062_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             // calibrate if not done
-            if (!Calibration_complete_CO)
+            s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
+            if (false == MQ7_value->Calibration_complete_CO)
             {
                 xTaskCreate(__calibrate_MQ7_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
             }
-            ret = 2;
+            ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;
@@ -265,7 +285,7 @@ static int __0062_get_item(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq7_value_t *MQ7_value = ((mq7_value_t *)item->user_arg);
+                s_mq7_value_t *MQ7_value = ((s_mq7_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ7_value->_CO_ppm);
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ7_value->_CO_ppm);
@@ -292,7 +312,7 @@ static int __0062_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq7_value_t *MQ7_value = ((mq7_value_t *)item->user_arg);
+                s_mq7_value_t *MQ7_value = ((s_mq7_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ7_value->_CO_ppm);
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ7_value->_CO_ppm);
@@ -314,13 +334,11 @@ static int __0062_notify(l_ezlopi_item_t *item)
             const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                // curret_value = "combustible_gas_detected";
-                curret_value = mq7_sensor_gas_alarm_token[1];
+                curret_value = "combustible_gas_detected";
             }
             else
             {
-                // curret_value = "no_gas";
-                curret_value = mq7_sensor_gas_alarm_token[0];
+                curret_value = "no_gas";
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
@@ -332,7 +350,7 @@ static int __0062_notify(l_ezlopi_item_t *item)
         {
             // extract the sensor_output_values
             double new_value = (double)__extract_MQ7_sensor_ppm(item);
-            mq7_value_t *MQ7_value = (mq7_value_t *)item->user_arg;
+            s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
             if (fabs((double)(MQ7_value->_CO_ppm) - new_value) > 0.0001)
             {
                 MQ7_value->_CO_ppm = (float)new_value;
@@ -347,7 +365,7 @@ static int __0062_notify(l_ezlopi_item_t *item)
 static float __extract_MQ7_sensor_ppm(l_ezlopi_item_t *item)
 {
     uint32_t mq7_adc_pin = item->interface.adc.gpio_num;
-    mq7_value_t *MQ7_value = (mq7_value_t *)item->user_arg;
+    s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
     // calculation process
     //-------------------------------------------------
     s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
@@ -396,7 +414,7 @@ static void __calibrate_MQ7_R0_resistance(void *params)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)
     {
-        mq7_value_t *MQ7_value = (mq7_value_t *)item->user_arg;
+        s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
 
         uint32_t mq7_adc_pin = item->interface.adc.gpio_num;
         //-------------------------------------------------
@@ -445,7 +463,7 @@ static void __calibrate_MQ7_R0_resistance(void *params)
             MQ7_value->MQ7_R0_constant = 0; // No negative values accepted.
         }
         // Set calibration_complete_CO flag
-        Calibration_complete_CO = true;
+        MQ7_value->Calibration_complete_CO = true;
     }
     vTaskDelete(NULL);
 }

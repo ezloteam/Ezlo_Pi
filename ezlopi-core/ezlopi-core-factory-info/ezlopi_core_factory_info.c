@@ -70,8 +70,15 @@ static char *ezlopi_factory_info_v3_read_string(e_ezlopi_factory_info_v3_offset_
                 // dump("tmp_buffer", tmp_buffer, 0, length);
                 // vTaskDelay(1);
 
+                // TRACE_D("esp_get_free_heap_size: %d", esp_get_free_heap_size());
+                // TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
+
                 int s_length = (strlen(tmp_buffer) < length) ? strlen(tmp_buffer) : length;
                 read_string = (char *)malloc(s_length + 1);
+
+                // TRACE_D("esp_get_free_heap_size: %d", esp_get_free_heap_size());
+                // TRACE_D("esp_get_minimum_free_heap_size: %u", esp_get_minimum_free_heap_size());
+
                 if (NULL != read_string)
                 {
                     if (1) // (isprint(tmp_buffer[0]))
@@ -231,7 +238,6 @@ char *ezlopi_factory_info_v3_get_name(void)
         }
     }
     return read_data;
-    return read_data;
 }
 
 char *ezlopi_factory_info_v3_get_manufacturer(void)
@@ -387,7 +393,7 @@ char *ezlopi_factory_info_v3_get_password(void)
 char *ezlopi_factory_info_v3_get_ezlopi_mac(void)
 {
 
-    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
+    char *read_data = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_MAC, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_MAC);
     if (read_data)
     {
         if (!isprint(read_data[0]))
@@ -422,7 +428,7 @@ char *ezlopi_factory_info_v3_get_provisioning_server(void)
     }
 }
 
-char *ezlopi_factory_info_v3_get_device_type(void)
+const char *ezlopi_factory_info_v3_get_device_type(void)
 {
     return "ezlopi_generic";
 }

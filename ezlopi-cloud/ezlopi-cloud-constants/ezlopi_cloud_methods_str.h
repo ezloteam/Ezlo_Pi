@@ -104,7 +104,7 @@ extern const char *method_hub_room_name_set;
 // extern const  char *method_hub_server_request;
 // extern const  char *method_hub_time_location_get;
 // extern const  char *method_hub_time_location_set;
-// extern const  char *method_hub_time_location_list;
+extern const char *method_hub_time_location_list;
 // extern const  char *method_hub_software_info_get;
 extern const char *method_register;
 extern const char *method_registered;

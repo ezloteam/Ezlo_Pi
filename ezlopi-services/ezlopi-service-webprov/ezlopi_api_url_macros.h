@@ -45,6 +45,10 @@ CLOUD_METHOD("hub.device.settings.list", ezlopi_device_settings_list_v3, NULL)
 CLOUD_METHOD("hub.device.setting.value.set", ezlopi_device_settings_value_set_v3, NULL)
 CLOUD_METHOD("hub.device.setting.reset", ezlopi_device_settings_reset_v3, NULL)
 
+CLOUD_METHOD("hub.time.location.list", EZPI_CLOUD_location_list, NULL)
+CLOUD_METHOD("hub.time.location.set", EZPI_CLOUD_location_set, NULL)
+CLOUD_METHOD("hub.time.location.get", EZPI_CLOUD_location_get, NULL)
+
 CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
 CLOUD_METHOD("hub.scenes.run", scenes_run, NULL)

@@ -10,21 +10,22 @@
 #include "ezlopi_core_nvs.h"
 
 static nvs_handle_t ezlopi_nvs_handle = 0;
-static const char *storage_name = "storage";
-static const char *config_nvs_name = "config_data";
-static const char *passkey_nvs_name = "passkey";
-static const char *user_id_nvs_name = "user_id";
-static const char *wifi_info_nvs_name = "wifi_info";
-static const char *boot_count_nvs_name = "boot_count";
-static const char *provisioning_status_nvs_name = "prov_stat";
-static const char *ezlopi_scenes_nvs_name = "ezlopi_scenes";
-static const char *ezlopi_scenes_v2_nvs_name = "ez_scenes_v2";
-static const char *ezlopi_scripts_nvs_ids = "ezlopi_scripts";
-static const char *config_info_update_time_name = "config_time";
-static const char *config_info_version_number = "conf_ver_no";
-static const char *ezlopi_scenes_expression_ids = "ezlopi_exp";
-static const char *ezlopi_room_ids_nvs_name = "ezlopi_room";
-static const char *ezlopi_modes_nvs_name = "ezlopi_modes";
+static const char* storage_name = "storage";
+static const char* config_nvs_name = "config_data";
+static const char* passkey_nvs_name = "passkey";
+static const char* user_id_nvs_name = "user_id";
+static const char* wifi_info_nvs_name = "wifi_info";
+static const char* boot_count_nvs_name = "boot_count";
+static const char* provisioning_status_nvs_name = "prov_stat";
+static const char* ezlopi_scenes_nvs_name = "ezlopi_scenes";
+static const char* ezlopi_scenes_v2_nvs_name = "ez_scenes_v2";
+static const char* ezlopi_scripts_nvs_ids = "ezlopi_scripts";
+static const char* config_info_update_time_name = "config_time";
+static const char* config_info_version_number = "conf_ver_no";
+static const char* ezlopi_scenes_expression_ids = "ezlopi_exp";
+static const char* ezlopi_room_ids_nvs_name = "ezlopi_room";
+static const char* ezlopi_time_location_nvs_name = "timne.local";
+static const char* ezlopi_modes_nvs_name = "ezlopi_modes";
 
 int ezlopi_nvs_init(void)
 {
@@ -113,22 +114,22 @@ void ezlopi_nvs_config_info_version_number_set(uint32_t value)
     }
 }
 
-int ezlopi_nvs_scene_set_v2(char *scene)
+int ezlopi_nvs_scene_set_v2(char* scene)
 {
     return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_v2_nvs_name);
 }
 
-char *ezlopi_nvs_scene_get_v2(void)
+char* ezlopi_nvs_scene_get_v2(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_v2_nvs_name);
 }
 
-int ezlopi_nvs_scene_set(char *scene)
+int ezlopi_nvs_scene_set(char* scene)
 {
     return ezlopi_nvs_write_str(scene, strlen(scene) + 1, ezlopi_scenes_nvs_name);
 }
 
-char *ezlopi_nvs_scene_get(void)
+char* ezlopi_nvs_scene_get(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_nvs_name);
 }
@@ -144,57 +145,57 @@ int ezlopi_nvs_factory_reset(void)
     return ret;
 }
 
-int ezlopi_nvs_write_scenes_scripts(char *data)
+int ezlopi_nvs_write_scenes_scripts(char* data)
 {
-    return ezlopi_nvs_write_str(data, strlen(data), (char *)ezlopi_scripts_nvs_ids);
+    return ezlopi_nvs_write_str(data, strlen(data), (char*)ezlopi_scripts_nvs_ids);
 }
 
-char *ezlopi_nvs_read_scenes_scripts(void)
+char* ezlopi_nvs_read_scenes_scripts(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scripts_nvs_ids);
 }
 
-int ezlopi_nvs_write_scenes_expressions(char *data)
+int ezlopi_nvs_write_scenes_expressions(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_scenes_expression_ids);
 }
 
-char *ezlopi_nvs_read_scenes_expressions(void)
+char* ezlopi_nvs_read_scenes_expressions(void)
 {
     return ezlopi_nvs_read_str(ezlopi_scenes_expression_ids);
 }
 
-char *ezlopi_nvs_read_rooms(void)
+char* ezlopi_nvs_read_rooms(void)
 {
     return ezlopi_nvs_read_str(ezlopi_room_ids_nvs_name);
 }
 
-int ezlopi_nvs_write_rooms(char *data)
+int ezlopi_nvs_write_rooms(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_room_ids_nvs_name);
 }
 
-char *ezlopi_nvs_read_modes(void)
+char* ezlopi_nvs_read_modes(void)
 {
     return ezlopi_nvs_read_str(ezlopi_modes_nvs_name);
 }
 
-int ezlopi_nvs_write_modes(char *data)
+int ezlopi_nvs_write_modes(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), ezlopi_modes_nvs_name);
 }
 
-int ezlopi_nvs_write_config_data_str(char *data)
+int ezlopi_nvs_write_config_data_str(char* data)
 {
     return ezlopi_nvs_write_str(data, strlen(data), config_nvs_name);
 }
 
-char *ezlopi_nvs_read_config_data_str(void)
+char* ezlopi_nvs_read_config_data_str(void)
 {
     return ezlopi_nvs_read_str(config_nvs_name);
 }
 
-int ezlopi_nvs_read_ble_passkey(uint32_t *passkey)
+int ezlopi_nvs_read_ble_passkey(uint32_t* passkey)
 {
     const uint32_t default_passkey = 123456;
     int ret = 0;
@@ -241,12 +242,12 @@ int ezlopi_nvs_write_ble_passkey(uint32_t passkey)
     return ret;
 }
 
-int ezlopi_nvs_write_wifi(const char *wifi_info, uint32_t len)
+int ezlopi_nvs_write_wifi(const char* wifi_info, uint32_t len)
 {
     return ezlopi_nvs_write_str(wifi_info, len, wifi_info_nvs_name);
 }
 
-int ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
+int ezlopi_nvs_read_wifi(char* wifi_info, uint32_t len)
 {
     int ret = 0;
     if (1 == ezlopi_nvs_init())
@@ -271,7 +272,7 @@ int ezlopi_nvs_read_wifi(char *wifi_info, uint32_t len)
     return ret;
 }
 
-int ezlopi_nvs_write_user_id_str(char *data)
+int ezlopi_nvs_write_user_id_str(char* data)
 {
     int ret = 0;
     if (1 == ezlopi_nvs_init())
@@ -298,7 +299,7 @@ int ezlopi_nvs_write_user_id_str(char *data)
     return ret;
 }
 
-char *ezlopi_nvs_read_user_id_str(void)
+char* ezlopi_nvs_read_user_id_str(void)
 {
     return ezlopi_nvs_read_str(user_id_nvs_name);
 }
@@ -362,7 +363,7 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     return boot_count;
 }
 
-uint8_t ezlopi_nvs_write_int32(int32_t i, const char *key_name)
+uint8_t ezlopi_nvs_write_int32(int32_t i, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -380,7 +381,7 @@ uint8_t ezlopi_nvs_write_int32(int32_t i, const char *key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_read_int32(int32_t *i, const char *key_name)
+uint8_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -398,7 +399,7 @@ uint8_t ezlopi_nvs_read_int32(int32_t *i, const char *key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_write_float32(float f, const char *key_name)
+uint8_t ezlopi_nvs_write_float32(float f, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -419,7 +420,7 @@ uint8_t ezlopi_nvs_write_float32(float f, const char *key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_read_float32(float *f, const char *key_name)
+uint8_t ezlopi_nvs_read_float32(float* f, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -440,7 +441,7 @@ uint8_t ezlopi_nvs_read_float32(float *f, const char *key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_write_bool(bool b, const char *key_name)
+uint8_t ezlopi_nvs_write_bool(bool b, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -470,7 +471,7 @@ uint8_t ezlopi_nvs_write_bool(bool b, const char *key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_read_bool(bool *b, const char *key_name)
+uint8_t ezlopi_nvs_read_bool(bool* b, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -493,7 +494,7 @@ uint8_t ezlopi_nvs_read_bool(bool *b, const char *key_name)
     return ret;
 }
 
-int ezlopi_nvs_write_str(const char *data, uint32_t len, const char *nvs_name)
+int ezlopi_nvs_write_str(const char* data, uint32_t len, const char* nvs_name)
 {
     int ret = 0;
 
@@ -525,9 +526,9 @@ int ezlopi_nvs_write_str(const char *data, uint32_t len, const char *nvs_name)
     return ret;
 }
 
-char *ezlopi_nvs_read_str(const char *nvs_name)
+char* ezlopi_nvs_read_str(const char* nvs_name)
 {
-    char *return_str = NULL;
+    char* return_str = NULL;
 
     if (nvs_name)
     {
@@ -579,7 +580,7 @@ void ezlopi_nvs_delete_stored_data_by_id(uint32_t script_id)
     ezlopi_nvs_delete_stored_data_by_name(script_id_str);
 }
 
-void ezlopi_nvs_delete_stored_data_by_name(char *nvs_name)
+void ezlopi_nvs_delete_stored_data_by_name(char* nvs_name)
 {
     if (1 == ezlopi_nvs_init())
     {
@@ -589,4 +590,14 @@ void ezlopi_nvs_delete_stored_data_by_name(char *nvs_name)
             TRACE_E("Erasing nvs-key '%s' failed!, error: %s", nvs_name, esp_err_to_name(err));
         }
     }
+}
+
+int EZPI_CORE_nvs_write_time_location(const char* time_loc, uint32_t len)
+{
+    return ezlopi_nvs_write_str(time_loc, len, ezlopi_time_location_nvs_name);
+}
+
+char* EZPI_CORE_nvs_read_time_location(void)
+{
+    return ezlopi_nvs_read_str(ezlopi_time_location_nvs_name);
 }

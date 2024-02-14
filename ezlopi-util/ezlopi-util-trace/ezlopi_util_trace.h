@@ -4,15 +4,18 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+#ifdef EZPI_UTIL_ENABLE_TRACE
 #define ENABLE_TRACE 1
+#endif // EZPI_UTIL_ENABLE_TRACE
 
-    void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
+    void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 
 #ifndef __FILENAME__
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

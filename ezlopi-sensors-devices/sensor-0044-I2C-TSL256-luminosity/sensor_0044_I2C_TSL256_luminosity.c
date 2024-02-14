@@ -12,7 +12,6 @@
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
 
-
 #include "sensor_0044_I2C_TSL256_luminosity.h"
 //-----------------------------------------------------------------------
 
@@ -187,18 +186,20 @@ static int __prepare(void *arg)
                 {
                     tsl256_item->cloud_properties.device_id = tsl256_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(tsl256_item, prep_arg->cjson_device, TSL2561_lux_data);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(tsl256_device);
                     free(TSL2561_lux_data);
                 }
             }
             else
             {
+                ret = -1;
                 free(TSL2561_lux_data);
             }
-            ret = 1;
         }
     }
 

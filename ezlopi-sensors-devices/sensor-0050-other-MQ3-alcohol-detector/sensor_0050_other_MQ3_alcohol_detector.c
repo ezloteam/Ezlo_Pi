@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -18,8 +17,12 @@
 //                          Declaration
 //*************************************************************************
 
-#warning "use of static variable"
-static bool Calibration_complete_alcohol = false; // flag to activate calibration phase
+typedef struct s_mq3_value
+{
+    float _alcohol_ppm;
+    float MQ3_R0_constant;
+    bool Calibration_complete_alcohol;
+} s_mq3_value_t;
 
 const char *mq3_sensor_gas_alarm_token[] = {
     "no_gas",
@@ -69,9 +72,13 @@ int sensor_0050_other_MQ3_alcohol_detector(e_ezlopi_actions_t action, l_ezlopi_i
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (Calibration_complete_alcohol)
+        if (item)
         {
-            __0050_notify(item);
+            s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
+            if (true == MQ3_value->Calibration_complete_alcohol)
+            {
+                __0050_notify(item);
+            }
         }
         break;
     }
@@ -100,18 +107,20 @@ static int __0050_prepare(void *arg)
             {
                 MQ3_item_digi->cloud_properties.device_id = MQ3_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ3_item_digi, device_prep_arg->cjson_device);
+                ret = 1;
             }
             else
             {
+                ret = -1;
                 ezlopi_device_free_device(MQ3_device_digi);
             }
         }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        mq3_value_t *MQ3_value = (mq3_value_t *)malloc(sizeof(mq3_value_t));
+        s_mq3_value_t *MQ3_value = (s_mq3_value_t *)malloc(sizeof(s_mq3_value_t));
         if (NULL != MQ3_value)
         {
-            memset(MQ3_value, 0, sizeof(mq3_value_t));
+            memset(MQ3_value, 0, sizeof(s_mq3_value_t));
             l_ezlopi_device_t *MQ3_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (MQ3_device_adc)
             {
@@ -121,18 +130,20 @@ static int __0050_prepare(void *arg)
                 {
                     MQ3_item_adc->cloud_properties.device_id = MQ3_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ3_item_adc, device_prep_arg->cjson_device, MQ3_value);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(MQ3_device_adc);
                     free(MQ3_value);
                 }
             }
             else
             {
+                ret = -1;
                 free(MQ3_value);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -160,13 +171,24 @@ static int __0050_init(l_ezlopi_item_t *item)
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             // calibrate if not done
-            if (!Calibration_complete_alcohol)
+            s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
+            if (false == MQ3_value->Calibration_complete_alcohol)
             {
                 xTaskCreate(__calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
             }
-            ret = 2;
+        }
+        ret = 1;
+    }
+    if (0 == ret)
+    {
+        ret = -1;
+        if (item->user_arg)
+        {
+            free(item->user_arg);
+            item->user_arg = NULL;
         }
     }
+
     return ret;
 }
 
@@ -262,7 +284,7 @@ static int __0050_get_item(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq3_value_t *MQ3_value = ((mq3_value_t *)item->user_arg);
+                s_mq3_value_t *MQ3_value = ((s_mq3_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ3_value->_alcohol_ppm);
@@ -289,7 +311,7 @@ static int __0050_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq3_value_t *MQ3_value = ((mq3_value_t *)item->user_arg);
+                s_mq3_value_t *MQ3_value = ((s_mq3_value_t *)item->user_arg);
                 char *valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ3_value->_alcohol_ppm);
@@ -311,13 +333,11 @@ static int __0050_notify(l_ezlopi_item_t *item)
             const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                // curret_value = "combustible_gas_detected";
-                curret_value = mq3_sensor_gas_alarm_token[1];
+                curret_value = "combustible_gas_detected";
             }
             else
             {
-                // curret_value = "no_gas";
-                curret_value = mq3_sensor_gas_alarm_token[0];
+                curret_value = "no_gas";
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
@@ -329,7 +349,7 @@ static int __0050_notify(l_ezlopi_item_t *item)
         {
             // extract the sensor_output_values
             double new_value = (double)__extract_MQ3_sensor_ppm(item);
-            mq3_value_t *MQ3_value = (mq3_value_t *)item->user_arg;
+            s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
             if (fabs((double)(MQ3_value->_alcohol_ppm) - new_value) > 0.0001)
             {
                 MQ3_value->_alcohol_ppm = (float)new_value;
@@ -344,7 +364,7 @@ static int __0050_notify(l_ezlopi_item_t *item)
 static float __extract_MQ3_sensor_ppm(l_ezlopi_item_t *item)
 {
     uint32_t mq3_adc_pin = item->interface.adc.gpio_num;
-    mq3_value_t *MQ3_value = (mq3_value_t *)item->user_arg;
+    s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
     // calculation process
     //-------------------------------------------------
     s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
@@ -393,7 +413,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)
     {
-        mq3_value_t *MQ3_value = (mq3_value_t *)item->user_arg;
+        s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
 
         uint32_t mq3_adc_pin = item->interface.adc.gpio_num;
         //-------------------------------------------------
@@ -442,7 +462,7 @@ static void __calibrate_MQ3_R0_resistance(void *params)
             MQ3_value->MQ3_R0_constant = 0; // No negative values accepted.
         }
         // Set calibration_complete_alcohol flag
-        Calibration_complete_alcohol = true;
+        MQ3_value->Calibration_complete_alcohol = true;
     }
     vTaskDelete(NULL);
 }

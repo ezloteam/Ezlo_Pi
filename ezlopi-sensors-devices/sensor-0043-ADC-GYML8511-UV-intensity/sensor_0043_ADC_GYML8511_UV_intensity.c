@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -119,19 +118,20 @@ static int __0043_prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(gyml8511_item, gyml8511_value);
                     __prepare_item_interface_properties(gyml8511_item, cj_device);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(gyml8511_device);
                     free(gyml8511_value);
                 }
             }
             else
             {
-                ezlopi_device_free_device(gyml8511_device);
+                ret = -1;
                 free(gyml8511_value);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -146,6 +146,15 @@ static int __0043_init(l_ezlopi_item_t *item)
         {
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             ret = 1;
+        }
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
+            }
         }
     }
     return ret;

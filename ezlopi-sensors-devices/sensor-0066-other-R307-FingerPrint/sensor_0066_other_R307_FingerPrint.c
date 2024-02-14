@@ -1,6 +1,6 @@
 #include <string.h>
 #include <time.h>
-// #include "cJSON.h"
+
 #include "ezlopi_util_trace.h"
 #include "esp_timer.h"
 
@@ -38,7 +38,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg);
 static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg);
 
 static void __fingerprint_operation_task(void *params);
-static void __uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle);
+static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
@@ -245,12 +245,14 @@ static int __0066_prepare(void *arg)
 
                 if ((NULL == fingerprint_item_enroll) && (NULL == fingerprint_item_action) && (NULL == fingerprint_item_ids))
                 {
+                    ret = -1;
                     ezlopi_device_free_device(fingerprint_device);
                     free(user_data);
                 }
             }
             else
             {
+                ret = -1;
                 ezlopi_device_free_device(fingerprint_device);
             }
         }
@@ -264,10 +266,10 @@ static int __0066_init(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
-        if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO(user_data->intr_pin) && GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
+        if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO((gpio_num_t)user_data->intr_pin) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.tx) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.rx))
         {
             gpio_num_t intr_pin = user_data->intr_pin;
-#warning "Riken needs to fix this warning, compile and check about the warning details !"
+            // #warning "Riken needs to fix this warning, compile and check about the warning details !"
             s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_0066_fingerprint_upcall, item);
             item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
 
@@ -281,11 +283,7 @@ static int __0066_init(l_ezlopi_item_t *item)
 
             if (0 == gpio_config(&FingerPrint_intr_gpio_config))
             {
-                if (FINGERPRINT_OK != r307_as606_fingerprint_config(item))
-                {
-                    TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
-                }
-                else
+                if (FINGERPRINT_OK == r307_as606_fingerprint_config(item))
                 {
                     if (0 == gpio_isr_handler_add(intr_pin, gpio_notify_isr, item))
                     {
@@ -303,18 +301,39 @@ static int __0066_init(l_ezlopi_item_t *item)
                         {
                             TRACE_S(" ---->>> Creating Enrollment Timer <<<----");
                         }
+                        ret = 1;
                     }
                     else
                     {
+                        ret = -1;
                         TRACE_E("Error!! : Failed to add GPIO ISR handler.");
                         gpio_isr_handler_remove(intr_pin);
                     }
-                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
                 }
             }
             else
             {
+                ret = -1;
                 TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
+            }
+        }
+        else
+        {
+            ret = -1;
+        }
+
+        if (0 == ret)
+        {
+            ret = -1;
+            if (item->user_arg)
+            {
+                free(item->user_arg);
+                item->user_arg = NULL;
             }
         }
     }
@@ -451,16 +470,17 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static void __uart_0066_fingerprint_upcall(uint8_t *buffer, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
     char *temp_buf = (char *)malloc(256);
     if (NULL != temp_buf)
     {
         memset(temp_buf, 0, 256);
 
-        if ((NULL != buffer) && (uart_object_handle->arg))
+        if ((NULL != buffer) && (output_len) && (uart_object_handle->arg))
         {
             memcpy(temp_buf, buffer, 256);
+            TRACE_D("BUFFER-DATA-LEN: %d", output_len);
 
             l_ezlopi_item_t *item = (l_ezlopi_item_t *)uart_object_handle->arg;
             server_packet_t *user_data = (server_packet_t *)item->user_arg;
