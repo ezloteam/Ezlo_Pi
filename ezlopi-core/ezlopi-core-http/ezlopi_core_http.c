@@ -1,3 +1,4 @@
+#include <time.h>
 #include "esp_tls.h"
 // #ifdef CONFIG_ESP_TLS_USING_MBEDTLS
 #include "mbedtls/platform.h"
@@ -13,6 +14,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_event_group.h"
 typedef struct ll_resp_buf
 {
     uint32_t len;
@@ -61,7 +63,7 @@ int __ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr)
         {
             bzero(tmp_ptr, (ret));
             snprintf(tmp_ptr, ret, "%s", src_ptr);
-            // tmp_ptr[ret] = '\0';
+            // tmp_ptr[ret - 1] = '\0';
             // TRACE_D("1. *Malloc_New_buffer : (%p)->(%p) : [%d]", *__dest_ptr, tmp_ptr, ret);
             *__dest_ptr = tmp_ptr; // old gets replaced by new address
             // TRACE_D("2.__dest_ptr(%p) : size=> [%d]", *__dest_ptr, GET_STRING_SIZE(*__dest_ptr));
@@ -130,6 +132,7 @@ void __ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port
     mbedtls_ssl_config_init(&conf);
 
     mbedtls_entropy_init(&entropy);
+
     if (0 != (ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
                                           NULL, 0)))
     {
@@ -198,12 +201,20 @@ void __ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port
     mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
 
     TRACE_I("Performing the SSL/TLS handshake...");
+    time_t start_tm = 0, now = 0; // now keeping track of time
+    time(&start_tm);
+    time(&now);
     while (0 != (ret = mbedtls_ssl_handshake(&ssl)))
     {
-        TRACE_W(" ret => %x", -ret);
+        TRACE_W(" ret => %x", -ret); // mbedtls_ssl_conf_async_private_cb()
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
             TRACE_E("mbedtls_ssl_handshake returned -0x%x", -ret);
+            goto exit;
+        }
+        time(&now);
+        if ((now - start_tm) <= (time_t)5) // 5sec
+        {
             goto exit;
         }
     }
@@ -340,8 +351,20 @@ static void ezlopi_core_http_mbedtls_req(void *params)
     s_ezlopi_core_http_mbedtls_t *config = (s_ezlopi_core_http_mbedtls_t *)params;
     if (config)
     {
-        int request_len = 64 + GET_STRING_SIZE(config->url) + GET_STRING_SIZE(config->header) + GET_STRING_SIZE(config->content);
-        char *request = malloc(request_len);
+        // #if 0
+        TRACE_W("HTTP GET-METHOD [%d]", config->method);
+        TRACE_D("skip_cert : %s", (config->skip_cert_common_name_check) ? "true" : "false");
+        TRACE_D("[%d]WEB_PORT :- '%d'", sizeof(config->web_port), config->web_port);
+        TRACE_D("[%d]URI :- [%d] '%s'", config->url_maxlen, GET_STRING_SIZE(config->url), config->url);
+        TRACE_D("[%d]WEB_SERVER :- [%d] '%s'", config->web_server_maxlen, GET_STRING_SIZE(config->web_server), config->web_server);
+        TRACE_D("[%d]Header : [%d] occupied", config->header_maxlen, GET_STRING_SIZE(config->header));
+        TRACE_D("[%d]Username : [%d] occupied", config->username_maxlen, GET_STRING_SIZE(config->username));
+        TRACE_D("[%d]Password : [%d] occupied", config->password_maxlen, GET_STRING_SIZE(config->password));
+        TRACE_D("[%d]Content : [%d] occupied", config->content_maxlen, GET_STRING_SIZE(config->content));
+        TRACE_D("[%d]Response : [%d] occupied", config->response_maxlen, GET_STRING_SIZE(config->response));
+        // #endif
+        int request_len = 100 + (config->url_maxlen) + (config->header_maxlen) + (config->content_maxlen);
+        char *request = malloc(sizeof(char) * request_len);
         if (request)
         {
             bzero(request, request_len);
@@ -351,10 +374,15 @@ static void ezlopi_core_http_mbedtls_req(void *params)
             case HTTP_METHOD_GET:
             {
                 TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
-                if ((NULL != config->username) && (GET_STRING_SIZE(config->username)) && (NULL != config->password) && (GET_STRING_SIZE(config->password)))
+                if (((NULL != config->username) && (GET_STRING_SIZE(config->username) > 0)) &&
+                    ((NULL != config->password) && (GET_STRING_SIZE(config->password) > 0)))
+                {
                     snprintf(request, request_len, "GET %s?username=%s&password=%s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
+                }
                 else
+                {
                     snprintf(request, request_len, "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+                }
                 break;
             }
             case HTTP_METHOD_POST:
@@ -376,8 +404,15 @@ static void ezlopi_core_http_mbedtls_req(void *params)
                 break;
             }
             default:
+            {
+                TRACE_W("METHOD NOT FOUND.. {%d} Freeing the event bit {%d}", config->method, (int)EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
+                ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
+                vTaskDelete(config->mbedtls_task_handle);
+                // vTaskDelete(NULL);
                 break;
             }
+            }
+
             // adding 'Headers' to request_buffer
             int max_allowed = 0;
             if ((NULL != config->header) && (GET_STRING_SIZE(config->header) > 0))
@@ -391,7 +426,8 @@ static void ezlopi_core_http_mbedtls_req(void *params)
             // adding content body to request
             if ((NULL != config->content) && (GET_STRING_SIZE(config->content) > 0))
             {
-                if ((HTTP_METHOD_GET != config->method) && (NULL != config->username) && (NULL != config->password))
+                if ((HTTP_METHOD_GET != config->method) &&
+                    ((NULL != config->username) && (NULL != config->password)))
                 {
                     max_allowed = __ezlopi_core_http_calc_empty_bufsize(request, request_len, (strlen(config->username) + strlen(config->password) + strlen(config->content) + 3));
                 }
@@ -420,13 +456,24 @@ static void ezlopi_core_http_mbedtls_req(void *params)
             free(request);
         }
     }
-    vTaskDelete(NULL);
+    ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
+    vTaskDelete(config->mbedtls_task_handle);
+    // vTaskDelete(NULL);
 }
 //---------------------------------------------------------------------------
 
 void function_to_call_mbedtlshttp(s_ezlopi_core_http_mbedtls_t *tmp_http_data)
 {
-    xTaskCreate(ezlopi_core_http_mbedtls_req, "ezlopi_core_http_mbedtls_req", 2 * 2048, (void *)tmp_http_data, 1, NULL);
+    // static TaskHandle_t http_handle = NULL;
+    if (NULL == tmp_http_data->mbedtls_task_handle)
+    {
+        ezlopi_event_group_set_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
+        xTaskCreate(ezlopi_core_http_mbedtls_req, "ezlopi_core_http_mbedtls_req", 4 * 2048, tmp_http_data, 2, &(tmp_http_data->mbedtls_task_handle));
+    }
+    else
+    {
+        TRACE_E("Mbedtls_Task is Active... try again later & TASK_EVENT_BIT => 1");
+    }
 }
 
 s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate)
@@ -448,10 +495,7 @@ s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
-        // TRACE_E("cloud_url: %s", cloud_url);
-        // TRACE_E("ca_certificate: %s", ca_certificate);
-        // TRACE_E("shared_key: %s", shared_key);
-        // TRACE_E("private_key: %s", private_key);
+
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)
         {

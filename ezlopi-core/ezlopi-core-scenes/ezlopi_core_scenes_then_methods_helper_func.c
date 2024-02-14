@@ -17,15 +17,6 @@
         }                         \
     }
 
-// static void __free_custom_ptr(char *__dest_ptr)
-// {
-//     if (NULL != __dest_ptr)
-//     {
-//         free(__dest_ptr);
-//         // TRACE_D("#freed [%p] : %d ==> %s ", __dest_ptr, STR_SIZE(__dest_ptr), (__dest_ptr));
-//         __dest_ptr = NULL;
-//     }
-// }
 /**
  * @brief This funtion is called, only to reallocate a '*header' of custom_structure 's_ezlopi_core_http_mbedtls_t'
  *
@@ -42,7 +33,6 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
     uint8_t retry = 5;
     do
     {
-        // TRACE_D("NEW_SIZE[%d]", new_size);
         if (1 == __ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
         {
             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
@@ -56,7 +46,6 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
             retry--;
         }
     } while (retry > 0);
-    // TRACE_D("RETURNING_SIZE[%d]", ret);
     return ret;
 }
 /**
@@ -118,6 +107,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
 static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data)
 {
     int ret = STR_SIZE(tmp_http_data->header);
+    
     if ((NULL == tmp_http_data->header) && (0 == ret))
     {
         // TRACE_W("Here! fresh header init");
@@ -125,10 +115,6 @@ static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbed
         ret = STR_SIZE(tmp_http_data->header);
         // TRACE_W("Here!! Created fresh header-> [capacity: %d] , [occupied: %d]", tmp_http_data->header_maxlen, ret);
     }
-    // else
-    // {
-    //     TRACE_I("Header member already Exists !!... [capacity: %d] , [occupied: %d]", tmp_http_data->header_maxlen, ret);
-    // }
     return ret;
 }
 /**
@@ -229,7 +215,6 @@ void parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char 
                 uint16_t i = (int)strlen(field_value_string);
                 if (i > 0)
                 {
-                    // TRACE_I("size:%d", i);
                     char str[10];
                     snprintf(str, 10, "%d", (int)i); // write length value in string
                     str[10] = '\0';
@@ -312,4 +297,5 @@ void free_http_mbedtls_struct(s_ezlopi_core_http_mbedtls_t *config)
     FREE_PTR_IF_NOT_NULL(config->content);
     FREE_PTR_IF_NOT_NULL(config->username);
     FREE_PTR_IF_NOT_NULL(config->password);
+    FREE_PTR_IF_NOT_NULL(config->response);
 }

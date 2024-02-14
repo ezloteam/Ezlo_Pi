@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_event.h"
@@ -33,23 +36,24 @@ extern "C"
 
     typedef struct s_ezlopi_core_http_mbedtls
     {
+        esp_http_client_method_t method; // default :- GET_METHOD
         bool skip_cert_common_name_check;
         int web_port;
-        uint16_t url_maxlen; // cap to 65536
-        uint16_t web_server_maxlen;
-        uint16_t header_maxlen;
-        uint16_t content_maxlen;
-        uint16_t response_maxlen;
-        uint8_t username_maxlen; // cap to 256
-        uint8_t password_maxlen;
         char *url;        // ptr => complete_url [.eg. https://www.google.com/json?username=qqqq&password=zzzz ]
-        char *web_server; // ptr =>
-        char *header;
+        char *web_server; // ptr => web_sever_name [.eg. www.google.com]
+        char *header;     // ptr => headers [.eg. {"Accept" : "*/*", ....}]
         char *content;
         char *username;
         char *password;
         char *response;
-        esp_http_client_method_t method; // default :- GET_METHOD
+        uint8_t username_maxlen; // max @ 256 bytes
+        uint8_t password_maxlen;
+        uint16_t url_maxlen; // max @ 65536 = 60Kb
+        uint16_t web_server_maxlen;
+        uint16_t header_maxlen;
+        uint16_t content_maxlen;
+        uint16_t response_maxlen;
+        volatile TaskHandle_t mbedtls_task_handle;
     } s_ezlopi_core_http_mbedtls_t;
 
     /**

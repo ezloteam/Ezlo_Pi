@@ -4,6 +4,7 @@
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_then_methods.h"
@@ -181,7 +182,38 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
             }
 
 #warning "call mbedtls function call here"
-            function_to_call_mbedtlshttp(tmp_http_data);
+            tmp_http_data->response = NULL;
+            tmp_http_data->response_maxlen = 0;
+            if (NULL == tmp_http_data->mbedtls_task_handle)
+            {
+                if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set'
+                {
+                    // checking if mbed_task is occupied ;
+                    function_to_call_mbedtlshttp(tmp_http_data);
+                    uint8_t retry = 0;
+                    while (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0))
+                    {
+                        TRACE_I("MbedTask is busy...mbedtls_task_handle => %d", (int)tmp_http_data->mbedtls_task_handle);
+                        if (retry++ > 10)
+                        {
+                            if (NULL != tmp_http_data->mbedtls_task_handle)
+                            {
+                                vTaskDelete(tmp_http_data->mbedtls_task_handle);
+                                TRACE_E("Deleted the mbedtls_task_handle => %d", (int)tmp_http_data->mbedtls_task_handle);
+                                ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
+                            }
+                            break;
+                        }
+                        vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    }
+                }
+                else
+                {
+                    TRACE_E("+++++ ERR : MbedTask is already active [state = %d]+++++", ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0));
+                }
+            }
+            // wait till the event bit is NULL
+
             // char *response_buffer = NULL;
             // ezlopi_core_http_mbedtls_req(tmp_http_data, &response_buffer); // Returns:- [response_buffer = &Memory_block]
             // if (response_buffer)

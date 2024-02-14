@@ -1,5 +1,6 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 //------------------------------- ezlopi_scene_when_is_date -----------------------------------------------------------
@@ -321,16 +322,44 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
             .web_port = 443,
             .web_server = tmp_web_server,
             .header = tmp_headers,
+            .response = NULL,
         };
 
         // must return 'true' if success
-        char *response = NULL;
-#warning "call mbedtls call function here"
-        function_to_call_mbedtlshttp(&tmp_config);
-        if (response)
+        if (NULL == tmp_config.mbedtls_task_handle)
         {
-            TRACE_I("isSunState : [%p]response = [%d]%s.", response, strlen(response), response);
-            free(response);
+            if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set'
+            {
+
+                // checking if mbed_task is occupied ;
+                function_to_call_mbedtlshttp(&tmp_config);
+                uint8_t retry = 0;
+                while (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // wait till 10sec
+                {
+                    TRACE_I("MbedTask is busy...mbedtls_task_handle => %d", (int)tmp_config.mbedtls_task_handle);
+                    if (retry++ > 10)
+                    {
+                        if (NULL != tmp_config.mbedtls_task_handle)
+                        {
+                            vTaskDelete(tmp_config.mbedtls_task_handle);
+                            TRACE_E("Deleted the mbedtls_task_handle => %d", (int)tmp_config.mbedtls_task_handle);
+                            ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
+                        }
+                        break;
+                    }
+                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                }
+            }
+            else
+            {
+                TRACE_E("+++++ ERR : MbedTask is already active +++++");
+            }
+        }
+
+        if (tmp_config.response)
+        {
+            TRACE_I("isSunState : [%p]response = [%d]%s.", tmp_config.response, strlen(tmp_config.response), tmp_config.response);
+            free(tmp_config.response);
         }
         // get the time // for Example
         sunrise_time->tm_mday = sunset_time->tm_mday = tm_mday;
@@ -352,6 +381,8 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
             TRACE_E(" Failed... clearing 'sunrise/sunset tm_mday'.. ");
             sunrise_time->tm_mday = sunset_time->tm_mday = 0;
         }
+        /*Note : no need to free ; since the structure is static*/
+        // free_http_mbedtls_struct(tmp_http_data);
     }
     else
     {
