@@ -14,7 +14,7 @@ static void blinky(void* pv);
 void app_main(void)
 {
 
-    xTaskCreate(blinky, "blinky", 2048, NULL, configMAX_PRIORITIES - 1, NULL);
+    xTaskCreate(blinky, "blinky", 1024, NULL, tskIDLE_PRIORITY, NULL);
     ezlopi_init();
 }
 
@@ -51,6 +51,6 @@ static void blinky(void* pv)
             count = 0;
         }
 
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }

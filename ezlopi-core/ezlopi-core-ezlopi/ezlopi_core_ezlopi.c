@@ -3,17 +3,18 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_wifi.h"
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_event_queue.h"
-#include "ezlopi_core_nvs.h"
-#include "ezlopi_core_timer.h"
-#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_ping.h"
+#include "ezlopi_core_sntp.h"
+#include "ezlopi_core_room.h"
+#include "ezlopi_core_timer.h"
+#include "ezlopi_core_modes.h"
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_event_group.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
-#include "ezlopi_core_room.h"
-#include "ezlopi_core_sntp.h"
 
 #ifdef EZPI_CORE_ENABLE_ETH
 #include "ezlopi_core_ethernet.h"
@@ -26,6 +27,7 @@
 #include "ezlopi_service_gpioisr.h"
 #include "ezlopi_service_ble.h"
 #include "ezlopi_service_meshbot.h"
+#include "ezlopi_service_modes.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -58,6 +60,7 @@ void ezlopi_init(void)
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
 
+    ezlopi_core_modes_init();
     ezlopi_room_init();
 
     ezlopi_ble_service_init();
@@ -79,6 +82,7 @@ void ezlopi_init(void)
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
     ezlopi_event_queue_init();
+    ezlopi_ping_init();
     ezlopi_timer_start_1000ms();
     ezlopi_ping_init();
 
@@ -89,15 +93,17 @@ void ezlopi_init(void)
     web_provisioning_init();
 
     ota_service_init();
+
+    ezlopi_service_modes_init();
 }
 
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
-    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
     while (curr_device)
     {
-        l_ezlopi_item_t *curr_item = curr_device->items;
+        l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)
         {
             if (curr_item->func)
@@ -117,7 +123,7 @@ static void ezlopi_initialize_devices_v3(void)
 
         if (device_init_ret < 0)
         {
-            l_ezlopi_device_t *device_to_free = curr_device;
+            l_ezlopi_device_t* device_to_free = curr_device;
             curr_device = curr_device->next;
             device_to_free->next = NULL;
             ezlopi_device_free_device(device_to_free);

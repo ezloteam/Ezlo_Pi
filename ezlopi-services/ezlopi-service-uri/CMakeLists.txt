@@ -14,7 +14,7 @@ set(EZLOPI_COMPONENTS
 )
 
 
-idf_component_register(SRCS "${src_files}"
+idf_component_register(SRCS "ezlopi_service_uri.c" "${src_files}"
                         INCLUDE_DIRS "."
                         REQUIRES    ${ESP_IDF_COMPONENTS} 
                                     ${EZLOPI_COMPONENTS}

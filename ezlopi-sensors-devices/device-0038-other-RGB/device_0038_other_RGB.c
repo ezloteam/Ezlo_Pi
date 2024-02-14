@@ -72,7 +72,7 @@ static int RGB_LED_change_color_value(s_rgb_args_t *rgb_args)
 {
     int ret = 0;
 
-    TRACE_B("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
+    TRACE_I("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
             (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
 
     ezlopi_pwm_change_duty(rgb_args->red_struct.channel, rgb_args->red_struct.speed_mode, (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness));
@@ -148,7 +148,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, led_state);
             rgb_args->previous_dim_factor = ((0 == led_state) ? rgb_args->brightness : rgb_args->previous_dim_factor);
             rgb_args->brightness = ((0 == led_state) ? 0.0 : ((0 == rgb_args->previous_dim_factor) ? 1.0 : rgb_args->previous_dim_factor));
-            TRACE_B("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
+            TRACE_I("Brightness value is %d, %d, %d", (uint8_t)(rgb_args->red_struct.value * rgb_args->brightness), (uint8_t)(rgb_args->green_struct.value * rgb_args->brightness),
                     (uint8_t)(rgb_args->blue_struct.value * rgb_args->brightness));
             RGB_LED_change_color_value(rgb_args);
             ezlopi_device_value_updated_from_device_v3(rgb_args->RGB_LED_dimmer_item);
@@ -158,7 +158,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             int dim_percent = 0;
             CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, dim_percent);
             float dim_brightness_factor = dim_percent / 100.0;
-            TRACE_B("dim_percent %d, dim_brightness_factor is %f", dim_percent, dim_brightness_factor);
+            TRACE_I("dim_percent %d, dim_brightness_factor is %f", dim_percent, dim_brightness_factor);
             rgb_args->brightness = dim_brightness_factor;
             RGB_LED_change_color_value(rgb_args);
             ezlopi_device_value_updated_from_device_v3(rgb_args->RGB_LED_onoff_switch_item);
@@ -183,15 +183,15 @@ static int __init(l_ezlopi_item_t *item)
 
             rgb_args->red_struct.channel = RGB_LED_red_channel_speed->channel;
             rgb_args->red_struct.speed_mode = RGB_LED_red_channel_speed->speed_mode;
-            TRACE_B("red channel is %d", rgb_args->red_struct.channel);
+            TRACE_I("red channel is %d", rgb_args->red_struct.channel);
 
             rgb_args->green_struct.channel = RGB_LED_green_channel_speed->channel;
             rgb_args->green_struct.speed_mode = RGB_LED_green_channel_speed->speed_mode;
-            TRACE_B("green channel is %d", rgb_args->green_struct.channel);
+            TRACE_I("green channel is %d", rgb_args->green_struct.channel);
 
             rgb_args->blue_struct.channel = RGB_LED_blue_channel_speed->channel;
             rgb_args->blue_struct.speed_mode = RGB_LED_blue_channel_speed->speed_mode;
-            TRACE_B("blue channel is %d", rgb_args->blue_struct.channel);
+            TRACE_I("blue channel is %d", rgb_args->blue_struct.channel);
 
             free(RGB_LED_red_channel_speed);
             free(RGB_LED_green_channel_speed);

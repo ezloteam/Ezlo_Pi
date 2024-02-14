@@ -173,7 +173,7 @@ static int __0043_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             char *valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
             cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-            // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
+            // TRACE_S("UV_intensity : %.2f", user_data->uv_data);
             free(valueFormatted);
 
             ret = 1;
@@ -191,7 +191,7 @@ static int __0043_notify(l_ezlopi_item_t *item)
         s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
         float new_uvIntensity = mapfloat(((float)(adc_data.voltage) / 1000), 0.97, 2.7, 0.0, 15.0);
-        TRACE_I("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
+        TRACE_S("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
         if (fabs((user_data->uv_data) - new_uvIntensity) > 0.01)
         {
             user_data->uv_data = new_uvIntensity;

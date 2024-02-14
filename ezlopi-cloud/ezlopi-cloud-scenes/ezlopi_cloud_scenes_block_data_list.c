@@ -1,14 +1,18 @@
 #include <string.h>
 #include <stdint.h>
+#include <cJSON.h>
+
+#include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_scenes.h"
-#include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "ezlopi_cloud_constants.h"
+
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_cloud_constants.h"
+#include "ezlopi_core_scenes_value.h"
 #include "ezlopi_core_scenes_operators.h"
+
 #include "ezlopi_service_meshbot.h"
 
 typedef struct s_data_source_n_target_object
@@ -53,7 +57,7 @@ void scenes_block_data_list(cJSON *cj_request, cJSON *cj_response)
     if (cj_request && cj_response)
     {
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
@@ -213,7 +217,7 @@ static void __scenes_value_types_list(char *list_name, cJSON *cj_result)
                 uint32_t idx = EZLOPI_VALUE_TYPE_NONE + 1;
                 while (idx < EZLOPI_VALUE_TYPE_MAX)
                 {
-                    const char *type_name_str = ezlopi_scene_get_scene_value_type_name_v2(idx);
+                    const char *type_name_str = ezlopi_scene_get_scene_value_type_name(idx);
                     if (type_name_str)
                     {
                         cJSON *cj_string_val = cJSON_CreateString(type_name_str);
@@ -270,7 +274,7 @@ static cJSON *__comparision_operators_numeric(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_numeric_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_numeric_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_numeric_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_numeric_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -304,7 +308,7 @@ static cJSON *__comparision_operators_strings(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_strings_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_strings_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_strings_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_strings_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -338,7 +342,7 @@ static cJSON *__comparision_operators_values_with_less(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_value_with_less_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_value_with_less_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_value_with_less_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_value_with_less_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {
@@ -372,7 +376,7 @@ static cJSON *__comparision_operators_values_without_less(void)
                 {
                     cJSON_AddStringToObject(cj_method, "op", ezlopi_scenes_value_without_less_comparator_operators_get_op(op_idx));
                     cJSON_AddStringToObject(cj_method, ezlopi_name_str, ezlopi_scenes_value_without_less_comparator_operators_get_name(op_idx));
-                    cJSON_AddStringToObject(cj_method, ezlopi_key_method_str, ezlopi_scenes_value_without_less_comparator_operators_get_method(op_idx));
+                    cJSON_AddStringToObject(cj_method, ezlopi_method_str, ezlopi_scenes_value_without_less_comparator_operators_get_method(op_idx));
 
                     if (!cJSON_AddItemToArray(cj_methods_array, cj_method))
                     {

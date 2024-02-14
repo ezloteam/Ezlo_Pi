@@ -11,6 +11,7 @@ const uint32_t SETTINGS_ID_START = 0x50000000;
 const uint32_t SCENE_ID_START = 0x60000000;
 const uint32_t SCRIPT_ID_START = 0x70000000;
 const uint32_t EXPRESSION_ID_START = 0x80000000;
+const uint32_t MODES_ID_START = 0x90000000;
 
 static uint32_t g_device_id = 0;
 static uint32_t g_item_id = 0;
@@ -144,3 +145,10 @@ uint32_t ezlopi_cloud_generate_room_id(void)
     g_room_id = (0 == g_room_id) ? (ROOM_ID_START + ezlopi_get_mac_crc()) : (g_room_id + 1);
     return g_room_id;
 }
+
+#if 0
+uint32_t ezlopi_cloud_get_modes_initial_id(void)
+{
+    return (MODES_ID_START | (0x00FFFF00 & ezlopi_get_mac_crc()));
+}
+#endif

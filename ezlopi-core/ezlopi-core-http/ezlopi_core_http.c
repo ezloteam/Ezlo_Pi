@@ -95,7 +95,6 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
 s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char* location, cJSON* headers, const char* private_key, const char* shared_key, const char* ca_certificate)
 {
     char* ret = NULL;
-    int status_code = 0;
     s_rx_data_t* my_data = (s_rx_data_t*)malloc(sizeof(s_rx_data_t));
     s_ezlopi_http_data_t* http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
     memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
@@ -126,21 +125,23 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
         };
 
         esp_http_client_handle_t client = esp_http_client_init(&config);
+
         if (NULL != client)
         {
             esp_http_client_set_method(client, HTTP_METHOD_POST);
             cJSON* header = headers->child;
             while (header)
             {
-                // TRACE_B("%s: %s", header->string, header->valuestring);
+                // TRACE_I("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }
+
             esp_err_t err = esp_http_client_perform(client);
 
             if (err == ESP_OK)
             {
-                status_code = esp_http_client_get_status_code(client);
+                http_get_data->status_code = esp_http_client_get_status_code(client);;
                 while (!esp_http_client_is_complete_data_received(client))
                 {
                     vTaskDelay(10 / portTICK_RATE_MS);
@@ -162,8 +163,8 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
                             cur_d = cur_d->next;
                         }
                     }
+
                     http_get_data->response = ret;
-                    http_get_data->status_code = status_code;
                 }
             }
             else

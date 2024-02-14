@@ -191,8 +191,8 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
                 uint32_t copy_size = total_data_len - (g_dynamic_config_sequence_no * 400);
                 copy_size = (copy_size > 400) ? 400 : copy_size;
 
-                TRACE_B("copy_size: %d", copy_size);
-                TRACE_B("total_data_len: %d", total_data_len);
+                TRACE_I("copy_size: %d", copy_size);
+                TRACE_I("total_data_len: %d", total_data_len);
 
                 cJSON *cj_response = cJSON_CreateObject();
                 if (cj_response)
@@ -216,7 +216,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
                             value->len = strlen(send_data);
                             strncpy((char *)value->value, send_data, value->len + 1);
 
-                            TRACE_B("data: %s", (char *)value->value);
+                            TRACE_I("data: %s", (char *)value->value);
 
                             g_dynamic_config_sequence_no += 1;
                             status = 0;
@@ -269,7 +269,7 @@ static void __dynamic_config_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb
             }
             else
             {
-                TRACE_I("Done Transmitting.");
+                TRACE_S("Done Transmitting.");
             }
 
             g_dynamic_config_sequence_no = 0;

@@ -34,19 +34,19 @@ typedef enum e_ble_security_commands
 static uint32_t start_tick = 0;
 static uint32_t authenticated_flag = 0;
 #endif
-static s_gatt_service_t *security_service = NULL;
+static s_gatt_service_t* security_service = NULL;
 
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
-s_gatt_char_t *passkey_characterstic = NULL;
-static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+s_gatt_char_t* passkey_characterstic = NULL;
+static void passkey_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 #endif
 
-static s_gatt_char_t *factory_reset_characterstic = NULL;
-static void __process_auth_command(cJSON *root);
+static s_gatt_char_t* factory_reset_characterstic = NULL;
+static void __process_auth_command(cJSON* root);
 static void __process_hard_reset_command(void);
 // static void __process_factory_reset_command(void);
 
-static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
 
@@ -76,11 +76,11 @@ void ezlopi_ble_service_security_init(void)
 }
 
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
-static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void passkey_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     if (param->write.len == 4)
     {
-        uint32_t passkey = *((uint32_t *)param->write.value);
+        uint32_t passkey = *((uint32_t*)param->write.value);
         if (passkey < 1000000)
         {
             TRACE_D("New passkey: %d", passkey);
@@ -92,11 +92,11 @@ static void passkey_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t
 }
 #endif
 
-static void factory_reset_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     if (param && param->write.len && param->write.value)
     {
-        cJSON *root = cJSON_ParseWithLength((const char *)param->write.value, param->write.len);
+        cJSON* root = cJSON_ParseWithLength((const char*)param->write.value, param->write.len);
         if (root)
         {
 
@@ -157,7 +157,7 @@ static void __process_hard_reset_command(void)
 #endif
 }
 
-static void __process_auth_command(cJSON *root)
+static void __process_auth_command(cJSON* root)
 {
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
     uint32_t passkey = CJ_GET_NUMBER("passkey");

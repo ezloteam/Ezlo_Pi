@@ -52,7 +52,7 @@ static cJSON *ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t *item_pr
 void items_list_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
@@ -141,7 +141,7 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
 void items_set_value_v3(cJSON *cj_request, cJSON *cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
     cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
@@ -150,7 +150,7 @@ void items_set_value_v3(cJSON *cj_request, cJSON *cj_response)
         char *item_id_str = 0;
         CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, item_id_str);
         int item_id = strtol(item_id_str, NULL, 16);
-        TRACE_I("item_id: %X", item_id);
+        TRACE_S("item_id: %X", item_id);
 
         l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
         uint32_t found_item = 0;

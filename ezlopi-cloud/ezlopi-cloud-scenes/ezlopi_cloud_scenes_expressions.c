@@ -1,10 +1,10 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_scenes_expressions.h"
 
-#include "scenes_expressions.h"
+#include "ezlopi_cloud_constants.h"
+#include "ezlopi_cloud_scenes_expressions.h"
 
 void scenes_expressions_added(cJSON *cj_request, cJSON *cj_response)
 {
@@ -16,7 +16,7 @@ void scenes_expressions_delete(cJSON *cj_request, cJSON *cj_response)
     if (cj_request && cj_response)
     {
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
         cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
@@ -36,7 +36,7 @@ void scenes_expressions_list(cJSON *cj_request, cJSON *cj_response)
     if (cj_request && cj_response)
     {
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
@@ -61,7 +61,7 @@ void scenes_expressions_set(cJSON *cj_request, cJSON *cj_response)
     if (cj_request && cj_response)
     {
         cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-        cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+        cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
         cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
         cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
