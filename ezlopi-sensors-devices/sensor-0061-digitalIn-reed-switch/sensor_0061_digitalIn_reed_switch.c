@@ -149,25 +149,16 @@ static int __0061_init(l_ezlopi_item_t *item)
                                   : GPIO_PULLUP_DISABLE,
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
-            ret = gpio_config(&input_conf);
-            if (ret)
-            {
-                TRACE_E("Error initializing Reed switch");
-            }
-            else
+            if (ESP_OK == gpio_config(&input_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, _0061_update_from_device, 200);
                 ret = 1;
             }
-            if (0 == ret)
+            else
             {
                 ret = -1;
-                if (item->user_arg)
-                {
-                    free(item->user_arg);
-                    item->user_arg = NULL;
-                }
+                TRACE_E("Error initializing Reed switch");
             }
         }
     }

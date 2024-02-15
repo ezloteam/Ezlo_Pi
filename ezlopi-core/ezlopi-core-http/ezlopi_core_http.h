@@ -59,28 +59,32 @@ extern "C"
     /**
      * @brief Function to return remaining space in *dest_buffer.
      */
-    int __ezlopi_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size);
+    int ezlopi_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size);
 
     /**
      * @brief This function :- mallocs fresh memory_block to '__dest_ptr' , copies content of 'src_ptr' to '__dest_ptr' and returns malloced_size.
      *
      * @param __dest_ptr [ Address of ptr which will point to (char*) block of memory. ]
      * @param src_ptr    [ Address of the string literal you want to store/append. ]
-     * @return int [size_of_malloced block]
+     *
+     * @return (int) [size_of_malloced block]
      */
-    int __ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr);
+    int ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr);
 
     /**
      * @brief This function creates new_memory_block (size == 'reqSize') & Rellocates Original memory-block (*Buf) to new_memory_block_address
      *
      * @param Buf       [ Address of ptr which will point to (char*) original block of memory. ]
      * @param reqSize   [ new-size to be allocated. ]
-     * @return (int)  [0 ==> Fail ; 1 ==> Success]
+     *
+     * @return (int) [0 ==> Fail ; 1 ==> Success]
      */
-    int __ezlopi_core_http_dyna_relloc(char **Buf, int reqSize);
+    int ezlopi_core_http_dyna_relloc(char **Buf, int reqSize);
 
     /**
      * @brief Function to invoke mbedtls_https task
+     *
+     * @param tmp_http_data [ custom structure 's_ezlopi_core_http_mbedtls_t' with necessary info for invoking a http request. ]
      */
     void function_to_call_mbedtlshttp(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
 

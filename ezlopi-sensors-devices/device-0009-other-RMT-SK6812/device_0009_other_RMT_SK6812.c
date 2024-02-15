@@ -190,50 +190,50 @@ static int __init(l_ezlopi_item_t *item)
     if (item)
     {
         s_dimmer_args_t *dimmer_args = (s_dimmer_args_t *)item->user_arg;
-
-        if (0 == dimmer_args->sk6812_led_strip_initialized)
+        if (dimmer_args)
         {
-            dimmer_args->sk6812_strip.type = LED_STRIP_SK6812;
-            dimmer_args->sk6812_strip.length = 1;
-            dimmer_args->sk6812_strip.gpio = item->interface.pwm.gpio_num;
-            dimmer_args->sk6812_strip.buf = NULL;
-            dimmer_args->sk6812_strip.brightness = 255;
-            dimmer_args->sk6812_strip.channel = RMT_CHANNEL_0;
-
-            led_strip_install();
-            esp_err_t err = led_strip_init(&dimmer_args->sk6812_strip);
-            if (ESP_OK == err)
+            if (0 == dimmer_args->sk6812_led_strip_initialized)
             {
-                rgb_t color = {
-                    .red = 255,
-                    .green = 255,
-                    .blue = 255,
-                };
+                dimmer_args->sk6812_strip.type = LED_STRIP_SK6812;
+                dimmer_args->sk6812_strip.length = 1;
+                dimmer_args->sk6812_strip.gpio = item->interface.pwm.gpio_num;
+                dimmer_args->sk6812_strip.buf = NULL;
+                dimmer_args->sk6812_strip.brightness = 255;
+                dimmer_args->sk6812_strip.channel = RMT_CHANNEL_0;
 
-                err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, dimmer_args->sk6812_strip.length, color);
-                if (ESP_OK == (err = led_strip_set_brightness(&dimmer_args->sk6812_strip, 255)))
+                led_strip_install();
+                esp_err_t err = led_strip_init(&dimmer_args->sk6812_strip);
+                if (ESP_OK == err)
                 {
-                    if (ESP_OK == (err = led_strip_flush(&dimmer_args->sk6812_strip)))
+                    rgb_t color = {
+                        .red = 255,
+                        .green = 255,
+                        .blue = 255,
+                    };
+
+                    err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, dimmer_args->sk6812_strip.length, color);
+                    if (ESP_OK == (err = led_strip_set_brightness(&dimmer_args->sk6812_strip, 255)))
                     {
-                        ret = 1;
-                        dimmer_args->sk6812_led_strip_initialized = true;
+                        if (ESP_OK == (err = led_strip_flush(&dimmer_args->sk6812_strip)))
+                        {
+                            ret = 1;
+                            dimmer_args->sk6812_led_strip_initialized = true;
+                        }
                     }
                 }
-            }
 
-            if (ESP_OK != err)
-            {
-                TRACE_E("Couldn't initiate device!, error: %d", err);
+                if (ESP_OK != err)
+                {
+                    TRACE_E("Couldn't initiate device!, error: %d", err);
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                }
             }
-        }
-        if (0 == ret)
-        {
-            TRACE_E("Here");
-            ret = -1;
-            if (item->user_arg)
+            else
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                TRACE_E("Here");
+                ret = -1;
             }
         }
     }

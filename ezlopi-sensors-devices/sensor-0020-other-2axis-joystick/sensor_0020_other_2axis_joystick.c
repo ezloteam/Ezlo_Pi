@@ -220,6 +220,10 @@ static int __prepare(void *arg)
                         ret = -1;
                     }
                 }
+                if (NULL == joystick_x_device && NULL == joystick_y_device && NULL == joystick_sw_device)
+                {
+                    free(user_data);
+                }
             }
         }
     }
@@ -243,6 +247,12 @@ static int __init(l_ezlopi_item_t *item)
                     TRACE_E("adc GPIO_NUM is %d", item->interface.adc.gpio_num);
                     ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
                     ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    // free(item->user_arg); // this will free ; memory address linked to all items
+                    // item->user_arg = NULL;
                 }
             }
             else if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] &&
@@ -273,16 +283,8 @@ static int __init(l_ezlopi_item_t *item)
                 else
                 {
                     ret = -1;
-                    free(item->user_arg);
-                    item->user_arg = NULL;
                     TRACE_E("Error initializing joystick switch");
                 }
-            }
-            else
-            {
-                ret = -1;
-                free(item->user_arg);
-                item->user_arg = NULL;
             }
         }
     }

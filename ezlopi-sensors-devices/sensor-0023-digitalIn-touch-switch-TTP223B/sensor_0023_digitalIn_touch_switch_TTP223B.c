@@ -94,21 +94,11 @@ static int __init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
-                if (item->user_arg)
-                {
-                    free(item->user_arg);
-                    item->user_arg = NULL;
-                }
             }
         }
         else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
         }
     }
 

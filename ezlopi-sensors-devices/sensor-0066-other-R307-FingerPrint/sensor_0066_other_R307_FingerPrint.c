@@ -263,12 +263,12 @@ static int __0066_prepare(void *arg)
 static int __0066_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (NULL != item)
+    if ((NULL != item) && (true == item->interface.uart.enable))
     {
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         if (user_data)
         {
-            if ((true == (item->interface.uart.enable)) && GPIO_IS_VALID_GPIO((gpio_num_t)user_data->intr_pin) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.tx) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.rx))
+            if (GPIO_IS_VALID_GPIO((gpio_num_t)user_data->intr_pin) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.tx) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.rx))
             {
                 gpio_num_t intr_pin = user_data->intr_pin;
                 // #warning "Riken needs to fix this warning, compile and check about the warning details !"
@@ -309,7 +309,7 @@ static int __0066_init(l_ezlopi_item_t *item)
                         {
                             ret = -1;
                             gpio_isr_handler_remove(intr_pin);
-                            free(item->user_arg);
+                            free(item->user_arg); // this will free ; memory address linked to all items
                             item->user_arg = NULL;
                             TRACE_E("Error!! : Failed to add GPIO ISR handler.");
                         }
@@ -317,7 +317,7 @@ static int __0066_init(l_ezlopi_item_t *item)
                     else
                     {
                         ret = -1;
-                        free(item->user_arg);
+                        free(item->user_arg); // this will free ; memory address linked to all items
                         item->user_arg = NULL;
                         TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
                     }
@@ -325,7 +325,7 @@ static int __0066_init(l_ezlopi_item_t *item)
                 else
                 {
                     ret = -1;
-                    free(item->user_arg);
+                    free(item->user_arg); // this will free ; memory address linked to all items
                     item->user_arg = NULL;
                     TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
                 }
@@ -333,7 +333,7 @@ static int __0066_init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
-                free(item->user_arg);
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
         }

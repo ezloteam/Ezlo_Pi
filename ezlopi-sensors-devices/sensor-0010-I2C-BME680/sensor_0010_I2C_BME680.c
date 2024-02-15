@@ -230,23 +230,11 @@ static int __prepare(void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    if (item && item->interface.i2c_master.enable)
     {
-        if (true == item->interface.i2c_master.enable)
-        {
-            ezlopi_i2c_master_init(&item->interface.i2c_master);
-            bme680_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
-        }
+        ezlopi_i2c_master_init(&item->interface.i2c_master);
+        bme680_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+        ret = 1;
     }
     return ret;
 }

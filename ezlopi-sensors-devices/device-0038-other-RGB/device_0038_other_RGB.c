@@ -174,41 +174,38 @@ static int __init(l_ezlopi_item_t *item)
     if (item)
     {
         s_rgb_args_t *rgb_args = (s_rgb_args_t *)item->user_arg;
-
-        if ((NULL != rgb_args) && (!rgb_args->RGB_LED_initialized))
+        if (rgb_args)
         {
-            s_ezlopi_channel_speed_t *RGB_LED_red_channel_speed = ezlopi_pwm_init(rgb_args->red_struct.gpio_num, rgb_args->red_struct.pwm_resln, rgb_args->red_struct.freq_hz, rgb_args->red_struct.duty_cycle);
-            s_ezlopi_channel_speed_t *RGB_LED_green_channel_speed = ezlopi_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
-            s_ezlopi_channel_speed_t *RGB_LED_blue_channel_speed = ezlopi_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
-
-            rgb_args->red_struct.channel = RGB_LED_red_channel_speed->channel;
-            rgb_args->red_struct.speed_mode = RGB_LED_red_channel_speed->speed_mode;
-            TRACE_B("red channel is %d", rgb_args->red_struct.channel);
-
-            rgb_args->green_struct.channel = RGB_LED_green_channel_speed->channel;
-            rgb_args->green_struct.speed_mode = RGB_LED_green_channel_speed->speed_mode;
-            TRACE_B("green channel is %d", rgb_args->green_struct.channel);
-
-            rgb_args->blue_struct.channel = RGB_LED_blue_channel_speed->channel;
-            rgb_args->blue_struct.speed_mode = RGB_LED_blue_channel_speed->speed_mode;
-            TRACE_B("blue channel is %d", rgb_args->blue_struct.channel);
-
-            free(RGB_LED_red_channel_speed);
-            free(RGB_LED_green_channel_speed);
-            free(RGB_LED_blue_channel_speed);
-
-            RGB_LED_change_color_value(rgb_args);
-
-            rgb_args->RGB_LED_initialized = true;
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
+            if ((false == rgb_args->RGB_LED_initialized))
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                s_ezlopi_channel_speed_t *RGB_LED_red_channel_speed = ezlopi_pwm_init(rgb_args->red_struct.gpio_num, rgb_args->red_struct.pwm_resln, rgb_args->red_struct.freq_hz, rgb_args->red_struct.duty_cycle);
+                s_ezlopi_channel_speed_t *RGB_LED_green_channel_speed = ezlopi_pwm_init(rgb_args->green_struct.gpio_num, rgb_args->green_struct.pwm_resln, rgb_args->green_struct.freq_hz, rgb_args->green_struct.duty_cycle);
+                s_ezlopi_channel_speed_t *RGB_LED_blue_channel_speed = ezlopi_pwm_init(rgb_args->blue_struct.gpio_num, rgb_args->blue_struct.pwm_resln, rgb_args->blue_struct.freq_hz, rgb_args->blue_struct.duty_cycle);
+
+                rgb_args->red_struct.channel = RGB_LED_red_channel_speed->channel;
+                rgb_args->red_struct.speed_mode = RGB_LED_red_channel_speed->speed_mode;
+                TRACE_B("red channel is %d", rgb_args->red_struct.channel);
+
+                rgb_args->green_struct.channel = RGB_LED_green_channel_speed->channel;
+                rgb_args->green_struct.speed_mode = RGB_LED_green_channel_speed->speed_mode;
+                TRACE_B("green channel is %d", rgb_args->green_struct.channel);
+
+                rgb_args->blue_struct.channel = RGB_LED_blue_channel_speed->channel;
+                rgb_args->blue_struct.speed_mode = RGB_LED_blue_channel_speed->speed_mode;
+                TRACE_B("blue channel is %d", rgb_args->blue_struct.channel);
+
+                free(RGB_LED_red_channel_speed);
+                free(RGB_LED_green_channel_speed);
+                free(RGB_LED_blue_channel_speed);
+
+                RGB_LED_change_color_value(rgb_args);
+
+                rgb_args->RGB_LED_initialized = true;
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }

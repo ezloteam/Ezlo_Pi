@@ -389,10 +389,16 @@ static int __init(l_ezlopi_item_t *item)
                 .intr_type = GPIO_INTR_DISABLE,
             };
 
-            gpio_config(&io_conf);
-            // digital_io_write_gpio_value(item);
-            __write_gpio_value(item);
-            ret = 1;
+            if (0 == gpio_config(&io_conf))
+            {
+                // digital_io_write_gpio_value(item);
+                __write_gpio_value(item);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
         }
         else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
                  (-1 != item->interface.gpio.gpio_in.gpio_num) &&
@@ -414,18 +420,19 @@ static int __init(l_ezlopi_item_t *item)
                                  : GPIO_INTR_NEGEDGE,
             };
 
-            gpio_config(&io_conf);
-            gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
-            ret = 1;
+            if (0 == gpio_config(&io_conf))
+            {
+                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
         }
         else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
         }
     }
 

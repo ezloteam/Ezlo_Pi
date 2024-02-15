@@ -164,9 +164,10 @@ static int __prepare(void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    if (item && item->interface.i2c_master.enable)
     {
-        if (item->interface.i2c_master.enable)
+        s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
+        if (user_data)
         {
             ezlopi_i2c_master_init(&item->interface.i2c_master);
             if (0 == __adxl345_configure_device(item)) // ESP_OK
@@ -177,19 +178,7 @@ static int __init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
-                if (item->user_arg)
-                {
-                    free(item->user_arg);
-                    item->user_arg = NULL;
-                }
-            }
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
         }

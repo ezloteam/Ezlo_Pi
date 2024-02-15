@@ -208,9 +208,10 @@ static int __prepare(void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    if (item && item->interface.i2c_master.enable)
     {
-        if (true == item->interface.i2c_master.enable)
+        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
+        if (user_data)
         {
             ezlopi_i2c_master_init(&item->interface.i2c_master);
             if (MPU6050_ERR_OK == __mpu6050_config_device(item))
@@ -222,19 +223,7 @@ static int __init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
-                if (item->user_arg)
-                {
-                    free(item->user_arg);
-                    item->user_arg = NULL;
-                }
-            }
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
         }
@@ -344,43 +333,42 @@ static int __notify(l_ezlopi_item_t *item)
                 }
                 // }
             }
-            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[1] - user_data->ay) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[2] - user_data->az) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[3] - user_data->tmp) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-
-            if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[4] - user_data->gx) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[5] - user_data->gy) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[6] - user_data->gz) > 0.5)
                 {

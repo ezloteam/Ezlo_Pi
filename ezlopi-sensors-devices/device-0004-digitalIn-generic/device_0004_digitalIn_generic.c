@@ -148,19 +148,19 @@ static int __init(l_ezlopi_item_t *item)
                                  : GPIO_INTR_NEGEDGE,
             };
 
-            gpio_config(&io_conf);
-            gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
-
-            ret = 1;
+            if (0 == gpio_config(&io_conf))
+            {
+                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
         }
         else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
         }
     }
 

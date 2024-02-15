@@ -178,20 +178,21 @@ static int __0028_prepare(void *arg)
 static int __0028_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (NULL != item)
+    if (item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                // free(item->user_arg); // this will free ; memory address linked to all items
+                // item->user_arg = NULL;
             }
         }
     }

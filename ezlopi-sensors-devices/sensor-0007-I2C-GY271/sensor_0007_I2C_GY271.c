@@ -275,34 +275,23 @@ static int __prepare(void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    if (item && item->interface.i2c_master.enable)
     {
-        if (item->interface.i2c_master.enable)
+        s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
+        if (user_data)
         {
             ezlopi_i2c_master_init(&item->interface.i2c_master);
             TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
             if (0 == __gy271_configure(item)) // ESP_OK
             {
-                TRACE_B(" CONFIGURATION  Compplete _____ Calibration Started _____");
+                // TRACE_B(" CONFIGURATION  Compplete _____ Calibration Started _____");
                 xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
                 ret = 1;
             }
             else
             {
                 ret = -1;
-                if (item->user_arg)
-                {
-                    free(item->user_arg);
-                    item->user_arg = NULL;
-                }
-            }
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
         }

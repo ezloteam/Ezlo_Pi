@@ -239,21 +239,22 @@ static int __0053_prepare(void *arg)
 static int __0053_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    if ((item) && (true == item->interface.uart.enable))
     {
-        if ((true == item->interface.uart.enable) && GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
+        GPS6MV2_t *sensor_0053_UART_gps6mv2_data = (GPS6MV2_t *)item->user_arg;
+        if (sensor_0053_UART_gps6mv2_data)
         {
-            s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_gps6mv2_upcall, item);
-            item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
-            // TRACE_W(" Initailization complete......");
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
             {
-                free(item->user_arg);
+                s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_gps6mv2_upcall, item);
+                item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
+                // TRACE_W(" Initailization complete......");
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
         }

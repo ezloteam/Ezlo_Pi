@@ -33,7 +33,7 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
     uint8_t retry = 5;
     do
     {
-        if (1 == __ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
+        if (1 == ezlopi_core_http_dyna_relloc(&(tmp_http_data->header), new_size)) // rellocate: 'tmp_http_data->header' with  'new_size'
         {
             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
             ret = new_size; // return new memory-block size
@@ -74,7 +74,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                         bzero(tmp_string, sizeof(char) * length);
                         snprintf(tmp_string, length, "%s", start);
                         TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)__ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         free(tmp_string);
                     }
                 }
@@ -92,7 +92,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                         bzero(tmp_string, sizeof(char) * length);
                         snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
                         TRACE_I("web_host_name : %s", tmp_string);
-                        tmp_http_data->web_server_maxlen = (uint16_t)__ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
+                        tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         free(tmp_string);
                     }
                 }
@@ -111,7 +111,7 @@ static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbed
     if ((NULL == tmp_http_data->header) && (0 == ret))
     {
         // TRACE_W("Here! fresh header init");
-        tmp_http_data->header_maxlen = (uint16_t)__ezlopi_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
+        tmp_http_data->header_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->header), "\r\0");
         ret = STR_SIZE(tmp_http_data->header);
         // TRACE_W("Here!! Created fresh header-> [capacity: %d] , [occupied: %d]", tmp_http_data->header_maxlen, ret);
     }
@@ -123,7 +123,7 @@ static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbed
 static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *str1, const char *str2)
 {
     int append_size = (STR_SIZE(str1) + 4 + STR_SIZE(str2)) + 6;
-    int max_allowed = __ezlopi_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
+    int max_allowed = ezlopi_core_http_calc_empty_bufsize(tmp_http_data->header, (tmp_http_data->header_maxlen), append_size);
     if (max_allowed > 0)
     {
         snprintf(tmp_http_data->header + STR_SIZE(tmp_http_data->header), max_allowed, "%s: %s\r\n", str1, str2);
@@ -153,7 +153,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char *fie
     if (NULL != field_value_string)
     {
         // TRACE_W("Here! fresh url");
-        tmp_http_data->url_maxlen = (uint16_t)__ezlopi_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
+        tmp_http_data->url_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
         if (tmp_http_data->url_maxlen > 0)
         {
             tmp_http_data->web_port = ((NULL != strstr(field_value_string, "https")) ? 443 : 80);
@@ -205,7 +205,7 @@ void parse_http_content(s_ezlopi_core_http_mbedtls_t *tmp_http_data, const char 
     if (NULL != field_value_string)
     {
         // TRACE_W("Here! fresh content");
-        tmp_http_data->content_maxlen = (uint16_t)__ezlopi_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
+        tmp_http_data->content_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
         if (tmp_http_data->content_maxlen > 0)
         {
             int content_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
@@ -283,9 +283,9 @@ void parse_http_creds(s_ezlopi_core_http_mbedtls_t *tmp_http_data, cJSON *cj_val
             const char *passValue = cJSON_GetStringValue(passwordItem);
 
             // TRACE_W("Here! fresh username");
-            tmp_http_data->username_maxlen = (uint16_t)__ezlopi_core_http_mem_malloc(&(tmp_http_data->username), userValue);
+            tmp_http_data->username_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->username), userValue);
             // TRACE_W("Here! fresh password");
-            tmp_http_data->password_maxlen = (uint16_t)__ezlopi_core_http_mem_malloc(&(tmp_http_data->password), passValue);
+            tmp_http_data->password_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->password), passValue);
         }
     }
 }

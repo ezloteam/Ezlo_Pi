@@ -102,7 +102,7 @@ static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
 
-    if (item->interface.i2c_master.enable)
+    if (item && item->interface.i2c_master.enable)
     {
         ezlopi_i2c_master_init(&item->interface.i2c_master);
         TRACE_B("I2C channel is %d", item->interface.i2c_master.channel);
@@ -117,7 +117,7 @@ static int __init(l_ezlopi_item_t *item)
             ret = -1;
             if (item->user_arg)
             {
-                free(item->user_arg);
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
             TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");

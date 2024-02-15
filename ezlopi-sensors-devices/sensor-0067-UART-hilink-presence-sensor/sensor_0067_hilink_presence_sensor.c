@@ -223,35 +223,27 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *args)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item)
+    if ((item) && (item->interface.uart.enable))
     {
         ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
         if (hilink_data)
         {
-            if (item->interface.uart.enable)
+
+            s_ezlopi_uart_t uart_settings = {
+                .baudrate = LD2410_BAUDRATE,
+                .tx = item->interface.uart.tx,
+                .rx = item->interface.uart.rx,
+            };
+            if (ESP_OK == ld2410_setup(uart_settings))
             {
-                s_ezlopi_uart_t uart_settings = {
-                    .baudrate = LD2410_BAUDRATE,
-                    .tx = item->interface.uart.tx,
-                    .rx = item->interface.uart.rx,
-                };
-                if (ESP_OK == ld2410_setup(uart_settings))
-                {
-                    ESP_ERROR_CHECK(hilink_presence_sensor_apply_settings());
-                    ESP_ERROR_CHECK(ld2410_get_data(hilink_data));
-                    ret = 1;
-                }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg);
-                    item->user_arg = NULL;
-                }
+                ESP_ERROR_CHECK(hilink_presence_sensor_apply_settings());
+                ESP_ERROR_CHECK(ld2410_get_data(hilink_data));
+                ret = 1;
             }
             else
             {
                 ret = -1;
-                free(item->user_arg);
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
         }

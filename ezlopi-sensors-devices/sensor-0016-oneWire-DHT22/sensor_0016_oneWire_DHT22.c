@@ -80,7 +80,7 @@ static int dht22_sensor_init_v3(l_ezlopi_item_t *item)
             ret = -1;
             if (item->user_arg)
             {
-                free(item->user_arg);
+                free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
             }
         }

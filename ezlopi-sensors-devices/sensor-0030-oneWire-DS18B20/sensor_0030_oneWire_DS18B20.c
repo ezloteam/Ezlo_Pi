@@ -99,38 +99,31 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = -1;
-    if (item)
+    if ((item) && (item->interface.onewire_master.enable))
     {
-        if (item->interface.onewire_master.enable)
+        if (ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
         {
-            if (ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
+            if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
             {
-                if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
-                {
-                    double *temperature_prev_value = (double *)item->user_arg;
-                    TRACE_B("Providing initial settings to DS18B20");
-                    ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
-                    ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
-                    ret = 1;
-                }
-                else
-                {
-                    ret = -1;
-                }
+                double *temperature_prev_value = (double *)item->user_arg;
+                TRACE_B("Providing initial settings to DS18B20");
+                ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
+                ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
+                ret = 1;
             }
             else
             {
                 ret = -1;
-            }
-
-            if (-1 == ret)
-            {
                 if (item->user_arg)
                 {
-                    free(item->user_arg);
+                    free(item->user_arg); // this will free ; memory address linked to all items
                     item->user_arg = NULL;
                 }
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;

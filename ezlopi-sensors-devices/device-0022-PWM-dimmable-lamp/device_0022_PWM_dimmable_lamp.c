@@ -233,25 +233,23 @@ static int __init(l_ezlopi_item_t *item)
     if (item)
     {
         s_dimmable_bulb_properties_t *dimmable_bulb_arg = (s_dimmable_bulb_properties_t *)item->user_arg;
-        if ((NULL != dimmable_bulb_arg) && (0 == dimmable_bulb_arg->dimmable_bulb_initialized))
+        if (dimmable_bulb_arg)
         {
-            s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln, item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
-            item->interface.pwm.channel = ezlopi_dimmable_channel_speed->channel;
-            TRACE_B("Channel is %d", item->interface.pwm.channel);
-            item->interface.pwm.speed_mode = ezlopi_dimmable_channel_speed->speed_mode;
-            dimmable_bulb_arg->current_brightness_value = item->interface.pwm.duty_cycle;
-            dimmable_bulb_arg->previous_brightness_value = item->interface.pwm.duty_cycle;
-            dimmable_bulb_arg->dimmable_bulb_initialized = true;
-            ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (0 == dimmable_bulb_arg->dimmable_bulb_initialized)
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                s_ezlopi_channel_speed_t *ezlopi_dimmable_channel_speed = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln, item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
+                item->interface.pwm.channel = ezlopi_dimmable_channel_speed->channel;
+                TRACE_B("Channel is %d", item->interface.pwm.channel);
+                item->interface.pwm.speed_mode = ezlopi_dimmable_channel_speed->speed_mode;
+                dimmable_bulb_arg->current_brightness_value = item->interface.pwm.duty_cycle;
+                dimmable_bulb_arg->previous_brightness_value = item->interface.pwm.duty_cycle;
+                dimmable_bulb_arg->dimmable_bulb_initialized = true;
+                ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, item->interface.pwm.duty_cycle);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }
