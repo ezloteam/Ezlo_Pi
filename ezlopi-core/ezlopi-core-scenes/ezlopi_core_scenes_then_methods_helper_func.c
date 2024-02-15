@@ -37,7 +37,7 @@ static int __ezlopi_core_scenes_then_sendhttp_relloc_header(s_ezlopi_core_http_m
         {
             snprintf((tmp_http_data->header) + strlen(tmp_http_data->header), append_size, "%s", append_str);
             ret = new_size; // return new memory-block size
-            TRACE_I("Append Successful: Header[size: %d , occupied: %d]", ret, STR_SIZE(tmp_http_data->header));
+            // TRACE_I("Append Successful: Header[size: %d , occupied: %d]", ret, STR_SIZE(tmp_http_data->header));
             break;
         }
         else
@@ -73,7 +73,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                     {
                         bzero(tmp_string, sizeof(char) * length);
                         snprintf(tmp_string, length, "%s", start);
-                        TRACE_I("web_host_name : %s", tmp_string);
+                        // TRACE_I("web_host_name : %s", tmp_string);
                         tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         free(tmp_string);
                     }
@@ -91,7 +91,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                     {
                         bzero(tmp_string, sizeof(char) * length);
                         snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
-                        TRACE_I("web_host_name : %s", tmp_string);
+                        // TRACE_I("web_host_name : %s", tmp_string);
                         tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
                         free(tmp_string);
                     }
@@ -107,7 +107,7 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
 static int __ezlopi_core_scenes_then_create_fresh_header(s_ezlopi_core_http_mbedtls_t *tmp_http_data)
 {
     int ret = STR_SIZE(tmp_http_data->header);
-    
+
     if ((NULL == tmp_http_data->header) && (0 == ret))
     {
         // TRACE_W("Here! fresh header init");

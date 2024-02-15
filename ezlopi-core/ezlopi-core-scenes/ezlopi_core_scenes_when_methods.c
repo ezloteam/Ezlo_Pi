@@ -169,7 +169,6 @@ int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t *scene_node, void *arg)
 
 int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
 {
-    TRACE_I("IsSunState triggered");
     int ret = 0;
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
@@ -228,7 +227,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                     defined_moment = (1 == sunstate_mode) ? sunrise_time : ((2 == sunstate_mode) ? sunset_time : defined_moment);
                     sunstate_offset = issunstate_offset_type(curr_field->value.value_string);
 
-                    TRACE_D("update_day = [%dth] , sunrise/sunset_hour = [%d] ", (uint32_t)scene_node->when_block->fields->user_arg, defined_moment.tm_hour);
+                    TRACE_D("update_day = [%dth] , sunrise/sunset_hour = [%d] , offset = [%d]", (uint32_t)scene_node->when_block->fields->user_arg, defined_moment.tm_hour, sunstate_offset);
                 }
             }
             else if ((0 == strncmp(curr_field->name, "time", 5))) // string
@@ -237,11 +236,12 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 {
                     if (0 != sunstate_mode)
                     {
+                        TRACE_D("Adding offset");
                         issunstate_add_tm_offset(sunstate_offset, ((1 == sunstate_mode) ? &sunrise_time : &sunset_time), &defined_moment, curr_field->value.value_string);
                     }
                 }
             }
-            else if ((0 == strncmp(curr_field->name, "weekdays", 5))) // weekdays // int_array
+            else if ((0 == strncmp(curr_field->name, "weekdays", 9))) // weekdays // int_array
             {
                 if ((EZLOPI_VALUE_TYPE_INT_ARRAY == curr_field->value_type) && (cJSON_IsArray(curr_field->value.cj_value)))
                 {
@@ -257,10 +257,11 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                     flag_check |= isdate_mdays_check(ISDATE_UNDEFINED_MODE, info, curr_field->value.cj_value); // (1 << 2)
                 }
             }
-            else if ((0 == strncmp(curr_field->name, "range", 5))) // till midnight
+            else if ((0 == strncmp(curr_field->name, "range", 6))) // till midnight
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
                 {
+                    TRACE_D("checking midnight range offset");
                     flag_check |= MASK_MIDNIGHT_FLAG; // indicates : midnight-range
                     flag_check |= issunstate_midnight_check(sunstate_mode, curr_field->value.value_string, info, &defined_moment);
                 }
@@ -319,7 +320,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                 }
             }
         }
-        TRACE_I("offset[%d] : intime=0,before=1,after=2 , SunState => [%d] : sunrise=1,sunset=2  :- FLAG_STATUS: %#x", sunstate_offset, sunstate_mode, flag_check);
+        TRACE_B("offset[%d] : intime=0,before=1,after=2 , SunState => [%d] : sunrise=1,sunset=2  :- FLAG_STATUS: %#x", sunstate_offset, sunstate_mode, flag_check);
     }
     return ret;
 }

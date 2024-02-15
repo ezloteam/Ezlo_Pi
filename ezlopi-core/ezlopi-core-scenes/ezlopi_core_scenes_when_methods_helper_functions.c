@@ -335,7 +335,7 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
             if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set' // checking if mbed_task is occupied
             {
                 function_to_call_mbedtlshttp(&tmp_config);
-                
+
                 uint8_t retry = 0;
                 while (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // wait till 10sec
                 {
@@ -440,8 +440,17 @@ void issunstate_add_tm_offset(e_issunstate_offset_type_t sunstate_offset, struct
         // Combined the time_offset and sunrise/sunset timing
         switch (sunstate_offset)
         {
+        case ISSUNSTATE_INTIME_MODE:
+        {
+            TRACE_B("offset : Intime");
+            defined_moment->tm_hour = sunstate_time->tm_hour;
+            defined_moment->tm_min = sunstate_time->tm_min;
+            defined_moment->tm_sec = sunstate_time->tm_sec;
+            break;
+        }
         case ISSUNSTATE_BEFORE_MODE:
         {
+            TRACE_B("offset : Before");
             defined_moment->tm_hour = (sunstate_time->tm_hour - tmp_time.tm_hour);
             defined_moment->tm_hour = (defined_moment->tm_hour < 0) ? (24 + defined_moment->tm_hour) : defined_moment->tm_hour; // check the hour-range
             defined_moment->tm_min = (sunstate_time->tm_min - tmp_time.tm_min);
@@ -452,19 +461,13 @@ void issunstate_add_tm_offset(e_issunstate_offset_type_t sunstate_offset, struct
         }
         case ISSUNSTATE_AFTER_MODE:
         {
+            TRACE_B("offset : After");
             defined_moment->tm_hour = (sunstate_time->tm_hour + tmp_time.tm_hour);
             defined_moment->tm_hour = (defined_moment->tm_hour > 23) ? (defined_moment->tm_hour - 24) : defined_moment->tm_hour; // check the hour-range
             defined_moment->tm_min = (sunstate_time->tm_min + tmp_time.tm_min);
             defined_moment->tm_min = (defined_moment->tm_min > 59) ? (defined_moment->tm_min - 60) : defined_moment->tm_min; // check the min-range
             defined_moment->tm_sec = (sunstate_time->tm_sec + tmp_time.tm_sec);
             defined_moment->tm_sec = (defined_moment->tm_sec > 59) ? (defined_moment->tm_sec - 60) : defined_moment->tm_sec; // check the sec-range
-            break;
-        }
-        case ISSUNSTATE_INTIME_MODE:
-        {
-            defined_moment->tm_hour = sunstate_time->tm_hour;
-            defined_moment->tm_min = sunstate_time->tm_min;
-            defined_moment->tm_sec = sunstate_time->tm_sec;
             break;
         }
         case ISSUNSTATE_UNDEFINED:

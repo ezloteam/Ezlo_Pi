@@ -87,14 +87,10 @@ int ezlopi_core_http_dyna_relloc(char **Buf, int reqSize)
         }
         else
         {
-            TRACE_D("Relocating [%p] to [%p]: NewBuf[%d]", *Buf, NewBuf, reqSize);
+            // TRACE_D("Relocating [%p] to [%p]: NewBuf[%d]", *Buf, NewBuf, reqSize);
             *Buf = NewBuf;
             ret = 1; // return success
         }
-    }
-    else
-    {
-        TRACE_W("*BUF == NULL ; No address to relloc");
     }
     return ret;
 }
@@ -107,7 +103,7 @@ int ezlopi_core_http_dyna_relloc(char **Buf, int reqSize)
 
 void ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req, char **resp_buf)
 {
-    TRACE_B("&result == resp_buf[%p] ", resp_buf);
+    TRACE_B("&result==[%p] --> *resp_buf=>[%p]", resp_buf, *resp_buf);
     int ret, flags, len;
     uint32_t tmp_buf_size = 256;
     char tmp_buf[tmp_buf_size];
@@ -357,7 +353,7 @@ static void ezlopi_core_http_mbedtls_req(void *params)
             {
             case HTTP_METHOD_GET:
             {
-                TRACE_I("HTTP GET-METHOD [%d] : ", config->method);
+                TRACE_B("HTTP GET-METHOD [%d]", config->method);
                 if (((NULL != config->username) && (GET_STRING_SIZE(config->username) > 0)) &&
                     ((NULL != config->password) && (GET_STRING_SIZE(config->password) > 0)))
                 {
@@ -371,25 +367,25 @@ static void ezlopi_core_http_mbedtls_req(void *params)
             }
             case HTTP_METHOD_POST:
             {
-                TRACE_I("HTTP POST-METHOD [%d]", config->method);
+                TRACE_B("HTTP POST-METHOD [%d]", config->method);
                 snprintf(request, request_len, "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
                 break;
             }
             case HTTP_METHOD_PUT:
             {
-                TRACE_I("HTTP PUT-METHOD [%d]", config->method);
+                TRACE_B("HTTP PUT-METHOD [%d]", config->method);
                 snprintf(request, request_len, "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
                 break;
             }
             case HTTP_METHOD_DELETE:
             {
-                TRACE_I("HTTP DELETE-METHOD [%d]", config->method);
+                TRACE_B("HTTP DELETE-METHOD [%d]", config->method);
                 snprintf(request, request_len, "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
                 break;
             }
             default:
             {
-                TRACE_W("METHOD NOT FOUND.. {%d} Freeing the event bit {%d}", config->method, (int)EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
+                TRACE_E("METHOD NOT FOUND.. {%d} Freeing the event bit {%d}", config->method, (int)EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
                 ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
                 vTaskDelete(config->mbedtls_task_handle);
                 break;
@@ -432,7 +428,7 @@ static void ezlopi_core_http_mbedtls_req(void *params)
             ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response));
             if (config->response)
             {
-                TRACE_I("*resp_buf=>[%p] =>\n%s[%d]", config->response, config->response, strlen(config->response));
+                TRACE_I("TASK:- *resp_buf=>[%p] =>\n%s[%d]", config->response, config->response, strlen(config->response));
                 free(config->response); // return to destination buffer
                 config->response = NULL;
             }
@@ -449,7 +445,7 @@ void function_to_call_mbedtlshttp(s_ezlopi_core_http_mbedtls_t *tmp_http_data)
     if (NULL == tmp_http_data->mbedtls_task_handle)
     {
         ezlopi_event_group_set_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
-        xTaskCreate(ezlopi_core_http_mbedtls_req, "ezlopi_core_http_mbedtls_req", 2 * 2048, tmp_http_data, 2, &(tmp_http_data->mbedtls_task_handle));
+        xTaskCreate(ezlopi_core_http_mbedtls_req, "ezlopi_core_http_mbedtls_req", 3 * 2048, tmp_http_data, 2, &(tmp_http_data->mbedtls_task_handle));
     }
     else
     {
