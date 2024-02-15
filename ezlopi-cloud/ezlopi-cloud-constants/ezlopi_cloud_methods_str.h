@@ -86,6 +86,7 @@ extern const char *method_hub_modes_get;
 // extern const  char *method_hub_network_reset ;
 // extern const  char *method_hub_network_wifi_scan_start ;
 // extern const  char *method_hub_network_wifi_scan_stop ;
+extern const char *method_hub_network_wifi_scan_progress;
 extern const char *method_hub_reset;
 // extern const  char *method_hub_log_remote_set;
 // extern const  char *method_hub_log_local_set;

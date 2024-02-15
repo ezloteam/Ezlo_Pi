@@ -9,7 +9,6 @@ typedef enum e_ezlopi_event
     EZLOPI_EVENT_WIFI_CONNECTED = BIT1,
     EZLOPI_EVENT_WIFI_FAIL = BIT2,
     EZLOPI_EVENT_NMA_REG = BIT3,
-
     // can not be more than BIT31
 } e_ezlopi_event_t;
 
