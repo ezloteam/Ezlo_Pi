@@ -4,6 +4,7 @@ file(GLOB_RECURSE config_src "*.c")
 # Define SDK components
 set(EZLOPI_SDK_COMPONENTS
         driver
+        esp_https_server
 )
 
 # Define ezlopi-components
