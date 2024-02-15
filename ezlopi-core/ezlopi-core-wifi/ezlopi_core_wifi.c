@@ -45,6 +45,7 @@ static const char* last_disconnect_reason = wifi_no_error_str;
 static ll_ezlopi_wifi_event_upcall_t* __event_upcall_head = NULL;
 static volatile bool ezlopi_flag_wifi_status = false;
 
+// This task name is used to get the task handle while deleting the scanner task. Also, the task name should be < 16 to get handle using the freeRTOS API.
 static const char* wifi_scanner_task_name = "scanner_task";
 static uint16_t total_wifi_APs_available = 0;
 static wifi_ap_record_t* ap_record = NULL;
@@ -222,35 +223,38 @@ static void __event_handler(void* arg, esp_event_base_t event_base, int32_t even
     {
         wifi_event_sta_scan_done_t* scan_event_param = (wifi_event_sta_scan_done_t*)event_data;
         TRACE_B("status: %d, event data: %d", scan_event_param->status, scan_event_param->number);
-        total_wifi_APs_available = scan_event_param->number;
-        ap_record = (wifi_ap_record_t*)malloc(total_wifi_APs_available * sizeof(wifi_ap_record_t));
-        ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&total_wifi_APs_available, ap_record));
-        cJSON* network_array = cJSON_CreateArray();
-        if (network_array)
+        if (scan_event_param->status == 0)
         {
-            char temporary[50];
-            for (int i = 0; i < total_wifi_APs_available; i++)
+            total_wifi_APs_available = scan_event_param->number;
+            ap_record = (wifi_ap_record_t*)malloc(total_wifi_APs_available * sizeof(wifi_ap_record_t));
+            ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&total_wifi_APs_available, ap_record));
+            cJSON* network_array = cJSON_CreateArray();
+            if (network_array)
             {
-                cJSON* network_data = cJSON_CreateObject();
-                if (network_data)
+                char temporary[50];
+                for (int i = 0; i < total_wifi_APs_available; i++)
                 {
-                    memset(temporary, 0, 50);
-                    memcpy(temporary, ap_record[i].ssid, 33);
-                    cJSON_AddStringToObject(network_data, "ssid", temporary);
-                    memset(temporary, 0, 50);
-                    snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_record[i].bssid[0], ap_record[i].bssid[1], ap_record[i].bssid[2],
-                        ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
-                    cJSON_AddStringToObject(network_data, "bssid", temporary);
-                    cJSON_AddNumberToObject(network_data, "rssi", ap_record[i].rssi);
-                    get_auth_mode_str(temporary, ap_record[i].authmode);
-                    cJSON_AddStringToObject(network_data, "security", temporary);
-                    cJSON_AddItemToArray(network_array, network_data);
+                    cJSON* network_data = cJSON_CreateObject();
+                    if (network_data)
+                    {
+                        memset(temporary, 0, 50);
+                        memcpy(temporary, ap_record[i].ssid, 33);
+                        cJSON_AddStringToObject(network_data, "ssid", temporary);
+                        memset(temporary, 0, 50);
+                        snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_record[i].bssid[0], ap_record[i].bssid[1], ap_record[i].bssid[2],
+                            ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
+                        cJSON_AddStringToObject(network_data, "bssid", temporary);
+                        cJSON_AddNumberToObject(network_data, "rssi", ap_record[i].rssi);
+                        get_auth_mode_str(temporary, ap_record[i].authmode);
+                        cJSON_AddStringToObject(network_data, "security", temporary);
+                        cJSON_AddItemToArray(network_array, network_data);
+                    }
                 }
+                ezlopi_network_update_wifi_scan_process(network_array);
             }
-            ezlopi_network_update_wifi_scan_process(network_array);
+            free(ap_record);
+            ap_record = NULL;
         }
-        free(ap_record);
-        ap_record = NULL;
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
