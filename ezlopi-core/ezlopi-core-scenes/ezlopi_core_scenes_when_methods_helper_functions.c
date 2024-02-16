@@ -1,9 +1,9 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_http.h"
-#include "ezlopi_core_event_group.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
-//------------------------------- ezlopi_scene_when_is_date -----------------------------------------------------------
+//------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
 e_isdate_modes_t isdate_field_type_check(const char *check_type_name)
 {
     const char *field_type_name[] = {
@@ -291,21 +291,231 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t mode_type, struct tm *info, cJS
     }
     return ret;
 }
-
-//------------------------------- ezlopi_scene_when_is_SunState -----------------------------------------------------------
-e_issunstate_offset_type_t issunstate_offset_type(const char *check_type_name)
+int isdate_check_flag_result(l_scenes_list_v2_t *scene_node, e_isdate_modes_t mode_type, uint8_t flag_check)
 {
-    e_issunstate_offset_type_t ret = ISSUNSTATE_UNDEFINED;
-    ret = (0 == strncmp(check_type_name, "intime", 7))   ? ISSUNSTATE_INTIME_MODE
-          : (0 == strncmp(check_type_name, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
-          : (0 == strncmp(check_type_name, "after", 6))  ? ISSUNSTATE_AFTER_MODE
-                                                         : ISSUNSTATE_UNDEFINED;
-
+    int ret = 0;
+    const uint8_t TIME_FLAG = (1 << 0);
+    const uint8_t WEEKDAYS_FLAG = (1 << 1);
+    const uint8_t DAYS_FLAG = (1 << 2);
+    const uint8_t WEEKS_FLAG = (1 << 3);
+    const uint8_t MASK_FOR_TIME_ARG = (1 << 4);
+    const uint8_t MASK_FOR_WEEKDAYS_ARG = (1 << 5);
+    const uint8_t MASK_FOR_DAYS_ARG = (1 << 6);
+    const uint8_t MASK_FOR_WEEKS_ARG = (1 << 7);
+    switch (mode_type)
+    {
+    case ISDATE_DAILY_MODE:
+    {
+        if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)))
+        {
+            if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
+            {
+                // TRACE_W("here! daily-time");
+                ret = 1;
+            }
+        }
+        else
+        {
+            (scene_node->when_block->fields->user_arg) = 0;
+        }
+        break;
+    }
+    case ISDATE_WEEKLY_MODE:
+    {
+        if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
+             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
+        {
+            if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
+            {
+                // TRACE_W("here! week_days and time");
+                ret = 1;
+            }
+        }
+        else
+        {
+            (scene_node->when_block->fields->user_arg) = 0;
+        }
+        break;
+    }
+    case ISDATE_MONTHLY_MODE:
+    {
+        if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
+             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
+        {
+            if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
+            {
+                // TRACE_W("here! month_days and time");
+                ret = 1;
+            }
+        }
+        else
+        {
+            (scene_node->when_block->fields->user_arg) = 0;
+        }
+        break;
+    }
+    case ISDATE_WEEKS_MODE:
+    case ISDATE_YEAR_WEEKS_MODE:
+    {
+        if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
+            ((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG)))
+        {
+            if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
+            {
+                // TRACE_W("here! week and time");
+                ret = 1;
+            }
+        }
+        else
+        {
+            (scene_node->when_block->fields->user_arg) = 0;
+        }
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
     return ret;
 }
-void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct tm *sunset_time)
+
+//------------------------------- ezlopi_scene_when_is_once ------------------------------------------
+uint8_t isonce_tm_check(l_fields_v2_t *curr_field, struct tm *info)
 {
-    if (tm_mday && sunrise_time && sunset_time)
+    uint8_t flag_check = 0;
+    if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
+    {
+        char field_hr_mm[10] = {0};
+        strftime(field_hr_mm, 10, "%H:%M", info);
+        field_hr_mm[10] = '\0';
+
+        if (0 == strncmp(curr_field->value.value_string, field_hr_mm, 10))
+        {
+            flag_check |= (1 << 0); // One of the TIME-condition has been met.
+        }
+    }
+    return flag_check;
+}
+uint8_t isonce_day_check(l_fields_v2_t *curr_field, struct tm *info)
+{
+    uint8_t flag_check = 0;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        if ((int)(curr_field->value.value_double) == info->tm_mday)
+        {
+            flag_check |= (1 << 1);
+        }
+    }
+    return flag_check;
+}
+uint8_t isonce_month_check(l_fields_v2_t *curr_field, struct tm *info)
+{
+    uint8_t flag_check = 0;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        if ((int)(curr_field->value.value_double) == (info->tm_mon + 1))
+        {
+            flag_check |= (1 << 2);
+        }
+    }
+    return flag_check;
+}
+uint8_t isonce_year_check(l_fields_v2_t *curr_field, struct tm *info)
+{
+    uint8_t flag_check = 0;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        if ((int)(curr_field->value.value_double) == (info->tm_year + 1900))
+        {
+            flag_check |= (1 << 3);
+        }
+    }
+    return flag_check;
+}
+int isonce_check_flag_result(l_scenes_list_v2_t *scene_node, uint8_t flag_check)
+{
+    int ret = 0;
+    const uint8_t TIME_FLAG = (1 << 0);
+    const uint8_t DAY_FLAG = (1 << 1);
+    const uint8_t MONTH_FLAG = (1 << 2);
+    const uint8_t YEAR_FLAG = (1 << 3);
+
+    if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
+    {
+        // now to disable the scene and also store in ezlopi_nvs
+        if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++)
+        {
+            // TRACE_W("here! once and time");
+            scene_node->enabled = false;
+            ezlopi_scenes_enable_disable_id_from_list_v2(scene_node->_id, false);
+            ret = 1;
+        }
+    }
+    else
+    {
+        (scene_node->when_block->fields->user_arg) = 0;
+    }
+    return ret;
+}
+
+//------------------------------- ezlopi_scene_when_is_SunState ---------------------------------------
+typedef struct s_sunstate_data
+{
+    uint8_t sunstate_mode;     // unique for each meshbot
+    int curr_tm_day;           // today's day number
+    struct tm choosen_suntime; // unique suntime
+    struct tm defined_moment;
+} s_sunstate_data_t;
+
+uint8_t issunstate_extract_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, e_issunstate_offset_t *sunstate_offset, struct tm *defined_moment, uint8_t *sunstate_mode)
+{
+    uint8_t flag_check = 0;
+    /*Extract today's suntime via API call*/
+    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
+    {
+        flag_check |= (1 << 4); // indicates 'MASK_TIME_FLAG'
+
+        // 1. check for valid data within 'user_arg'
+        s_sunstate_data_t *user_data = (s_sunstate_data_t *)scene_node->when_block->fields->user_arg;
+        if (NULL == user_data)
+        {
+            if (NULL != (user_data = (s_sunstate_data_t *)malloc(sizeof(s_sunstate_data_t))))
+            {
+                memset(user_data, 0, sizeof(s_sunstate_data_t));
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        // 2. Recalculate suntime for new-day or null
+        if (user_data && (info->tm_mday != user_data->curr_tm_day))
+        {
+            issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign today's sunrise / sunset time
+            if (0 == user_data->curr_tm_day)
+            {
+                TRACE_I(" API extraction unsuccesful..");
+                free(scene_node->when_block->fields->user_arg); // reset the day
+                return 0;
+            }
+            // 3. check if, curr_tm_day has been updated successfully
+
+            // extract  'sunstate_offset_type'
+            *sunstate_offset = (0 == strncmp(curr_field->value.value_string, "intime", 7))   ? ISSUNSTATE_INTIME_MODE
+                               : (0 == strncmp(curr_field->value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
+                               : (0 == strncmp(curr_field->value.value_string, "after", 6))  ? ISSUNSTATE_AFTER_MODE
+                                                                                             : ISSUNSTATE_UNDEFINED;
+        }
+
+        TRACE_D("update_day = [%dth] , sunrise/sunset_hour = [%d] , offset = [%d]", user_data->curr_tm_day, defined_moment->tm_hour, *sunstate_offset);
+    }
+    return flag_check;
+}
+
+void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_data)
+{
+    if (tm_mday && user_data)
     {
         // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
         // char tmp_url[] = "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140";
@@ -329,78 +539,23 @@ void issunsate_update_sunstate_tm(int tm_mday, struct tm *sunrise_time, struct t
             .response_maxlen = 0,
         };
 
-        // must return 'true' if success
-        if (NULL == tmp_config.mbedtls_task_handle)
-        {
-            if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set' // checking if mbed_task is occupied
-            {
-                function_to_call_mbedtlshttp(&tmp_config);
-
-                uint8_t retry = 0;
-                while (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // wait till 10sec
-                {
-                    TRACE_I("MbedTask is busy...mbedtls_task_handle => %d\n", (int)tmp_config.mbedtls_task_handle);
-                    if (retry++ > 10)
-                    {
-                        if (NULL != tmp_config.mbedtls_task_handle)
-                        {
-                            vTaskDelete(tmp_config.mbedtls_task_handle);
-                            TRACE_E("Deleted the mbedtls_task_handle => %d\n", (int)tmp_config.mbedtls_task_handle);
-                            ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
-                        }
-                        break;
-                    }
-                    vTaskDelay(1000 / portTICK_PERIOD_MS);
-                }
-            }
-            else
-            {
-                TRACE_E("+++++ ERR : MbedTask is already active +++++\n");
-            }
-        }
-#if 0
-        if (tmp_config.response)
-        {
-            // sunrise_time->tm_mday = sunset_time->tm_mday = tm_mday;
-            // sunrise_time->tm_hour = 6;
-            // sunset_time->tm_hour = 5 + 12; // 24-hr
-            // sunrise_time->tm_min = 49;
-            // sunset_time->tm_min = 48;
-            // sunrise_time->tm_sec = 31;
-            // sunset_time->tm_sec = 42;
-            TRACE_I("isSunState : [%p]response = [%d]%s.", tmp_config.response, strlen(tmp_config.response), tmp_config.response);
-            free(tmp_config.response);
-        }
-#endif
-        // get the time // for Example
-        sunrise_time->tm_mday = sunset_time->tm_mday = tm_mday;
-        sunrise_time->tm_hour = 6;
-        sunset_time->tm_hour = 5 + 12; // 24-hr
-        sunrise_time->tm_min = 49;
-        sunset_time->tm_min = 48;
-        sunrise_time->tm_sec = 31;
-        sunset_time->tm_sec = 42;
+        // e.g. after valid extraction
+        user_data->choosen_suntime.tm_mday = user_data->curr_tm_day = tm_mday;
+        user_data->choosen_suntime.tm_hour = 5 + 12; // 24-hr
+        user_data->choosen_suntime.tm_min = 48;
+        user_data->choosen_suntime.tm_sec = 42;
 
         // now check if sunset and sunrise time are not zero
-        if ((0 == sunrise_time->tm_hour) &&
-            (0 == sunset_time->tm_hour) &&
-            (0 == sunrise_time->tm_min) &&
-            (0 == sunset_time->tm_min) &&
-            (0 == sunrise_time->tm_sec) &&
-            (0 == sunset_time->tm_sec))
+        if ((0 == user_data->choosen_suntime.tm_hour) &&
+            (0 == user_data->choosen_suntime.tm_min) &&
+            (0 == user_data->choosen_suntime.tm_sec))
         {
             TRACE_E(" Failed... clearing 'sunrise/sunset tm_mday'.. ");
-            sunrise_time->tm_mday = sunset_time->tm_mday = 0;
+            user_data->choosen_suntime.tm_mday = user_data->curr_tm_day = 0;
         }
-        /*Note : no need to free ; since the structure is static*/
-        // free_http_mbedtls_struct(tmp_http_data);
-    }
-    else
-    {
-        TRACE_E("NULL -> 'sunrise_time' or 'sunset_time' Structs.");
     }
 }
-void issunstate_add_tm_offset(e_issunstate_offset_type_t sunstate_offset, struct tm *sunstate_time, struct tm *defined_moment, const char *time_offset)
+void issunstate_add_tm_offset(e_issunstate_offset_t sunstate_offset, struct tm *sunstate_time, struct tm *defined_moment, const char *time_offset)
 {
     if (sunstate_time && defined_moment && time_offset) // sunstate_time => sunrise or sunset
     {
@@ -523,7 +678,47 @@ uint8_t issunstate_midnight_check(uint8_t sunstate_mode, const char *range_type,
     return ret;
 }
 
-//--------------------------- ezlopi_scene_when_is_date_range --------------------------------------------------------
+//--------------------------- ezlopi_scene_when_is_date_range ----------------------------------------
+void isdate_range_get_tm(l_fields_v2_t *curr_field, struct tm *tmp_tm)
+{
+    if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
+    {
+        char time[10];
+        snprintf(time, 10, "%s", curr_field->value.value_string);
+        time[10] = '\0';
+        char *ptr = NULL;
+        if (0 != strlen(time))
+        {
+            tmp_tm->tm_hour = strtoul(time, &ptr, 10);
+            tmp_tm->tm_min = strtoul(ptr + 1, NULL, 10);
+        }
+    }
+}
+void isdate_range_get_startday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
+{
+    tmp_tm->tm_mday = (curr_field->value.value_double) ? (int)(curr_field->value.value_double) : 1;
+}
+void isdate_range_get_endday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
+{
+    tmp_tm->tm_mday = (curr_field->value.value_double) ? (int)(curr_field->value.value_double) : 31;
+}
+void isdate_range_get_startmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
+{
+    tmp_tm->tm_mon = (curr_field->value.value_double) ? (int)(curr_field->value.value_double) : 1;
+}
+void isdate_range_get_endmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
+{
+    tmp_tm->tm_mon = (curr_field->value.value_double) ? (int)(curr_field->value.value_double) : 12;
+}
+void isdate_range_get_startyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
+{
+    tmp_tm->tm_year = (curr_field->value.value_double) ? (int)(curr_field->value.value_double) : 1;
+}
+void isdate_range_get_endyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
+{
+    tmp_tm->tm_year = (curr_field->value.value_double) ? (int)(curr_field->value.value_double) : 2147483647;
+}
+
 uint8_t isdate_range_check_tm(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
@@ -602,5 +797,25 @@ uint8_t isdate_range_check_year(struct tm *start, struct tm *end, struct tm *inf
     }
     return ret;
 }
+int isdate_range_check_flag_result(l_scenes_list_v2_t *scene_node, uint8_t flag_check)
+{
+    const uint8_t TIME_FLAG = (1 << 0);
+    const uint8_t DAY_FLAG = (1 << 1);
+    const uint8_t MONTH_FLAG = (1 << 2);
+    const uint8_t YEAR_FLAG = (1 << 3);
 
+    int ret = 0;
+    if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
+    {
+        if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++)
+        {
+            ret = 1;
+        }
+    }
+    else
+    {
+        (scene_node->when_block->fields->user_arg) = 0;
+    }
+    return ret;
+}
 //-------------------------------------------------------------------------------------------------------------------

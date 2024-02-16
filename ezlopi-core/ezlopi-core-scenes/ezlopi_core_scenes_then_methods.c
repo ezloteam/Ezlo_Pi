@@ -101,7 +101,6 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *ar
 
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
 {
-
     int ret = 0;
     l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
     if (curr_then)
@@ -111,116 +110,34 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *ar
         {
             memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
             l_fields_v2_t *curr_field = curr_then->fields;
+
+            const s_sendhttp_method_t __sendhttp_method[] = {
+                {.field_name = "request", .field_func = parse_http_request_type}, 
+                {.field_name = "url", .field_func = parse_http_url},              
+                {.field_name = "credential", .field_func = parse_http_creds},     
+                {.field_name = "contentType", .field_func = parse_http_content_type},
+                {.field_name = "content", .field_func = parse_http_content},
+                {.field_name = "headers", .field_func = parse_http_headers},
+                {.field_name = "skipSecurity", .field_func = parse_http_skipsecurity},
+                {.field_name = NULL, .field_func = NULL},
+            };
+
             while (NULL != curr_field) // fields
             {
-                if (0 == strncmp(curr_field->name, "request", 8))
+                for (uint8_t i = 0; i < ((sizeof(__sendhttp_method) / sizeof(__sendhttp_method[i]))); i++)
                 {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                    if (0 == strncmp(__sendhttp_method[i].field_name, curr_field->name, strlen(__sendhttp_method[i].field_name) + 1))
                     {
-                        if (0 == strncmp(curr_field->value.value_string, "GET", 4))
-                        {
-                            tmp_http_data->method = HTTP_METHOD_GET;
-                        }
-                        else if (0 == strncmp(curr_field->value.value_string, "POST", 5))
-                        {
-                            tmp_http_data->method = HTTP_METHOD_POST;
-                        }
-                        else if (0 == strncmp(curr_field->value.value_string, "PUT", 4))
-                        {
-                            tmp_http_data->method = HTTP_METHOD_PUT;
-                        }
-                        else if (0 == strncmp(curr_field->value.value_string, "DELETE", 7))
-                        {
-                            tmp_http_data->method = HTTP_METHOD_DELETE;
-                        }
-#warning "Some http-methods are still remaining" // Document mentions only four of them.
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "url", 4))
-                {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                    {
-                        parse_http_url(tmp_http_data, curr_field->value.value_string); // extracts : url, Host_name & Port_num.
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "credential", 11))
-                {
-                    if (cJSON_IsObject(curr_field->value.cj_value))
-                    {
-                        parse_http_creds(tmp_http_data, curr_field->value.cj_value);
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "contentType", 12))
-                {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                    {
-                        parse_http_content_type(tmp_http_data, curr_field->value.value_string);
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "content", 8))
-                {
-                    if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->value.value_string))
-                    {
-                        parse_http_content(tmp_http_data, curr_field->value.value_string);
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "headers", 8))
-                {
-                    if ((EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type) && (cJSON_IsObject(curr_field->value.cj_value)))
-                    {
-                        parse_http_headers(tmp_http_data, curr_field->value.cj_value);
-                    }
-                }
-                else if (0 == strncmp(curr_field->name, "skipSecurity", 12))
-                {
-                    if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
-                    {
-                        parse_http_skipsecurity(tmp_http_data, curr_field->value.value_bool);
+                        (__sendhttp_method[i].field_func)(tmp_http_data, curr_field);
+                        break;
                     }
                 }
                 curr_field = curr_field->next;
             }
-
-#warning "call mbedtls function call here"
+            // now to trigger http_request and extract the response.
             tmp_http_data->response = NULL;
             tmp_http_data->response_maxlen = 0;
-            if (NULL == tmp_http_data->mbedtls_task_handle)
-            {
-                if (0 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0)) // required 'not_set'
-                {
-                    function_to_call_mbedtlshttp(tmp_http_data);
-
-                    uint8_t retry = 0;
-                    while (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0))
-                    {
-                        TRACE_I("MbedTask is busy...mbedtls_task_handle => %d", (int)tmp_http_data->mbedtls_task_handle);
-                        if (retry++ > 10)
-                        {
-                            if (NULL != tmp_http_data->mbedtls_task_handle)
-                            {
-                                vTaskDelete(tmp_http_data->mbedtls_task_handle);
-                                TRACE_E("Deleted the mbedtls_task_handle => %d", (int)tmp_http_data->mbedtls_task_handle);
-                                ezlopi_event_group_clear_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY);
-                            }
-                            break;
-                        }
-                        vTaskDelay(1000 / portTICK_PERIOD_MS);
-                    }
-                }
-                else
-                {
-                    TRACE_E("+++++ ERR : MbedTask is already active [state = %d]+++++", ezlopi_event_group_wait_for_event(EZLOPI_EVENT_MBEDTLS_TASK_BUSY, 100, 0));
-                }
-            }
-            // wait till the event bit is NULL
-
-            // char *response_buffer = NULL;
-            // ezlopi_core_http_mbedtls_req(tmp_http_data, &response_buffer); // Returns:- [response_buffer = &Memory_block]
-            // if (response_buffer)
-            // {
-            //     TRACE_I("sendHttp : [%p]response_buffer = [%d]\n%s.", response_buffer, strlen(response_buffer), response_buffer);
-            //     (response_buffer);
-            // }
+            ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
             free_http_mbedtls_struct(tmp_http_data);
 
             free(tmp_http_data);

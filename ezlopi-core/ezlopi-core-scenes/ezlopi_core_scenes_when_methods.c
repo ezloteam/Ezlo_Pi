@@ -4,7 +4,6 @@
 #include "ezlopi_core_ota.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_scenes_when_methods.h"
@@ -173,12 +172,8 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
-        static struct tm sunrise_time = {0}; // (must be static) store the sunrise_time
-        static struct tm sunset_time = {0};  // (must be static) store the sunset_time
-        struct tm defined_moment = {0};      // Defined_moment (after combining : 'sunrise/sunset_time' & 'time_offset')
-
-        e_issunstate_offset_type_t sunstate_offset = ISSUNSTATE_UNDEFINED; // what type of offset to use
-        l_fields_v2_t *curr_field = when_block->fields;
+        static struct tm choosen_suntime = {0}; // (must be static) store the choosen_suntime
+        struct tm defined_moment = {0};         // Defined_moment (after combining : 'sunrise/sunset_time' & 'time_offset')
 
         time_t rawtime = 0;
         time(&rawtime);
@@ -196,39 +191,29 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
         const uint8_t MASK_DAYS_FLAG = (1 << 6);
         const uint8_t MASK_MIDNIGHT_FLAG = (1 << 7);
 
+        // list of function for extracting field parameter
+        const s_issunstate_method_t __issunstate_field[] = {
+            {.field_name = "sunrise", .field_func = issunstate_extract_suntime},
+            {.field_name = "sunset", .field_func = issunstate_extract_suntime},
+            {.field_name = "days", .field_func = isdate_mdays_check},
+            {.field_name = "weeks", .field_func = isdate_year_weeks_check},
+            {.field_name = NULL, .field_func = NULL},
+        };
+
         // Condition checker
+        e_issunstate_offset_t sunstate_offset = ISSUNSTATE_UNDEFINED; // what type of offset to use
         uint8_t sunstate_mode = 0;
+        l_fields_v2_t *curr_field = when_block->fields;
         while (NULL != curr_field)
         {
             if ((0 == strncmp(curr_field->name, "sunrise", 8)) || (0 == strncmp(curr_field->name, "sunset", 7))) // first identify 'sunstate'
             {
-                sunstate_mode = (0 == strncmp(curr_field->name, "sunrise", 8)) ? 1 : (0 == strncmp(curr_field->name, "sunset", 7) ? 2 : 0);
-                if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->value.value_string))
-                {
-                    flag_check |= MASK_TIME_FLAG; // indicates time has been set
-                    // if (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 100, false))
-                    // {
-                    //     TRACE_I("Waiting for wifi connection ..");
-                    //     return 0;
-                    // }
-                    if (info->tm_mday != (uint32_t)scene_node->when_block->fields->user_arg)
-                    {
-                        scene_node->when_block->fields->user_arg = (void *)(info->tm_mday);
-                        issunsate_update_sunstate_tm(info->tm_mday, &sunrise_time, &sunset_time); // assign today's sunrise & sunset time
-                        if ((0 == sunrise_time.tm_mday) || (0 == sunset_time.tm_mday))
-                        {
-                            TRACE_I("............Erasing..& Waiting for wifi connection");
-                            scene_node->when_block->fields->user_arg = 0; // reset the day
-                            sunrise_time.tm_mday = sunset_time.tm_mday = 0;
-                            return 0;
-                        }
-                    }
+                // determine 'meshbot_sunstate'
+                sunstate_mode = (0 == strncmp(curr_field->name, "sunrise", 8))  ? 1
+                                : (0 == strncmp(curr_field->name, "sunset", 7)) ? 2
+                                                                                : 0;
 
-                    defined_moment = (1 == sunstate_mode) ? sunrise_time : ((2 == sunstate_mode) ? sunset_time : defined_moment);
-                    sunstate_offset = issunstate_offset_type(curr_field->value.value_string);
-
-                    TRACE_D("update_day = [%dth] , sunrise/sunset_hour = [%d] , offset = [%d]", (uint32_t)scene_node->when_block->fields->user_arg, defined_moment.tm_hour, sunstate_offset);
-                }
+                // function call
             }
             else if ((0 == strncmp(curr_field->name, "time", 5))) // string
             {
@@ -237,7 +222,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t *scene_node, void *arg)
                     if (0 != sunstate_mode)
                     {
                         TRACE_D("Adding offset");
-                        issunstate_add_tm_offset(sunstate_offset, ((1 == sunstate_mode) ? &sunrise_time : &sunset_time), &defined_moment, curr_field->value.value_string);
+                        issunstate_add_tm_offset(sunstate_offset, (&choosen_suntime), &defined_moment, curr_field->value.value_string);
                     }
                 }
             }
@@ -331,34 +316,23 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block)
     {
-        e_isdate_modes_t mode_type = ISDATE_UNDEFINED_MODE;
-        l_fields_v2_t *curr_field = when_block->fields;
-
         time_t rawtime = 0;
         time(&rawtime);
         struct tm *info;
         info = localtime(&rawtime);
 
-        // temporary flags
-        uint8_t flag_check = 0;
-        const uint8_t TIME_FLAG = (1 << 0);
-        const uint8_t WEEKDAYS_FLAG = (1 << 1);
-        const uint8_t DAYS_FLAG = (1 << 2);
-        const uint8_t WEEKS_FLAG = (1 << 3);
-        const uint8_t MASK_FOR_TIME_ARG = (1 << 4);
-        const uint8_t MASK_FOR_WEEKDAYS_ARG = (1 << 5);
-        const uint8_t MASK_FOR_DAYS_ARG = (1 << 6);
-        const uint8_t MASK_FOR_WEEKS_ARG = (1 << 7);
-
-        const s_isdate_func_t __isdate_func[] = {
-            {.field_name = "time", .field_func = isdate_tm_check},           // func process ["hh:mm"]
-            {.field_name = "weekdays", .field_func = isdate_weekdays_check}, // func process days in a week [1-7]
-            {.field_name = "days", .field_func = isdate_mdays_check},        //
+        // list of field function to extract the respective parameters
+        const s_isdate_method_t __isdate_func[] = {
+            {.field_name = "time", .field_func = isdate_tm_check},
+            {.field_name = "weekdays", .field_func = isdate_weekdays_check},
+            {.field_name = "days", .field_func = isdate_mdays_check},
             {.field_name = "weeks", .field_func = isdate_year_weeks_check},
             {.field_name = NULL, .field_func = NULL},
         };
 
-        // Condition checker
+        uint8_t flag_check = 0;
+        e_isdate_modes_t mode_type = ISDATE_UNDEFINED_MODE;
+        l_fields_v2_t *curr_field = when_block->fields;
         while (NULL != curr_field)
         {
             if (0 == strncmp(curr_field->name, "type", 5))
@@ -372,7 +346,7 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             {
                 for (uint8_t i = 0; i < ((sizeof(__isdate_func) / sizeof(__isdate_func[i]))); i++)
                 {
-                    if (0 == strncmp(__isdate_func[i].field_name, curr_field->name, strlen(curr_field->name) + 1))
+                    if (0 == strncmp(__isdate_func[i].field_name, curr_field->name, strlen(__isdate_func[i].field_name) + 1))
                     {
                         flag_check |= (1 << (i + 4));                                                             // bit4 - bit7
                         flag_check |= (__isdate_func[i].field_func)(mode_type, info, curr_field->value.cj_value); // bit0 - bit3
@@ -382,83 +356,9 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
             }
             curr_field = curr_field->next;
         }
+        ret = isdate_check_flag_result(scene_node, mode_type, flag_check);
 
         // Output Filter based on date+time of activation
-        switch (mode_type)
-        {
-        case ISDATE_DAILY_MODE:
-        {
-            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)))
-            {
-                if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
-                {
-                    // TRACE_W("here! daily-time");
-                    ret = 1;
-                }
-            }
-            else
-            {
-                (scene_node->when_block->fields->user_arg) = 0;
-            }
-            break;
-        }
-        case ISDATE_WEEKLY_MODE:
-        {
-            if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-                 ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
-            {
-                if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
-                {
-                    // TRACE_W("here! week_days and time");
-                    ret = 1;
-                }
-            }
-            else
-            {
-                (scene_node->when_block->fields->user_arg) = 0;
-            }
-            break;
-        }
-        case ISDATE_MONTHLY_MODE:
-        {
-            if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-                 ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
-            {
-                if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
-                {
-                    // TRACE_W("here! month_days and time");
-                    ret = 1;
-                }
-            }
-            else
-            {
-                (scene_node->when_block->fields->user_arg) = 0;
-            }
-            break;
-        }
-        case ISDATE_WEEKS_MODE:
-        case ISDATE_YEAR_WEEKS_MODE:
-        {
-            if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-                ((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG)))
-            {
-                if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++) // 57 sec mark
-                {
-                    // TRACE_W("here! week and time");
-                    ret = 1;
-                }
-            }
-            else
-            {
-                (scene_node->when_block->fields->user_arg) = 0;
-            }
-            break;
-        }
-        default:
-        {
-            break;
-        }
-        }
         TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
         TRACE_B("user_arg = [%d]", (uint32_t)(scene_node->when_block->fields->user_arg));
     }
@@ -468,7 +368,6 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t *scene_node, void *arg)
 int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
 {
     int ret = 0;
-
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
@@ -477,86 +376,34 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
         struct tm *info;
         info = localtime(&rawtime);
 
-        // temporary flags
-        uint8_t flag_check = 0;
-        const uint8_t TIME_FLAG = (1 << 0);
-        const uint8_t DAY_FLAG = (1 << 1);
-        const uint8_t MONTH_FLAG = (1 << 2);
-        const uint8_t YEAR_FLAG = (1 << 3);
+        // list of funciton to check validity of each field values
+        const s_isonce_method_t __isonce_method[] = {
+            {.field_name = "time", .field_func = isonce_tm_check},
+            {.field_name = "day", .field_func = isonce_day_check},
+            {.field_name = "month", .field_func = isonce_month_check},
+            {.field_name = "year", .field_func = isonce_year_check},
+            {.field_name = NULL, .field_func = NULL},
+        };
 
+        uint8_t flag_check = 0;
         l_fields_v2_t *curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "time", 5))
+            for (uint8_t i = 0; i < ((sizeof(__isonce_method) / sizeof(__isonce_method[i]))); i++)
             {
-                if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
+                if (0 == strncmp(__isonce_method[i].field_name, curr_field->name, strlen(__isonce_method[i].field_name) + 1))
                 {
-                    char field_hr_mm[10] = {0};
-                    strftime(field_hr_mm, 10, "%H:%M", info);
-                    field_hr_mm[10] = '\0';
-
-                    if (0 == strncmp(curr_field->value.value_string, field_hr_mm, 10))
-                    {
-                        flag_check |= TIME_FLAG; // One of the TIME-condition has been met.
-                    }
+                    flag_check |= (__isonce_method[i].field_func)(curr_field, info);
+                    break;
                 }
-                goto next;
             }
-            else if (0 == strncmp(curr_field->name, "day", 4))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    if ((int)(curr_field->value.value_double) == info->tm_mday)
-                    {
-                        flag_check |= DAY_FLAG;
-                    }
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "month", 6))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    if ((int)(curr_field->value.value_double) == (info->tm_mon + 1))
-                    {
-                        flag_check |= MONTH_FLAG;
-                    }
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "year", 5))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    if ((int)(curr_field->value.value_double) == (info->tm_year + 1900))
-                    {
-                        flag_check |= YEAR_FLAG;
-                    }
-                }
-                goto next;
-            }
-        next:
             curr_field = curr_field->next;
         }
 
         // Output Filter based on date & time
+        ret = isonce_check_flag_result(scene_node, flag_check);
         TRACE_D("isOnce :- FLAG_STATUS: 0x0%x", flag_check);
-        if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
-        {
-            // now to disable the scene and also store in ezlopi_nvs
-            if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++)
-            {
-                // TRACE_W("here! once and time");
-                scene_node->enabled = false;
-                ezlopi_scenes_enable_disable_id_from_list_v2(scene_node->_id, false);
-                ret = 1;
-            }
-            TRACE_B("user_arg = [%d]", (uint32_t)(scene_node->when_block->fields->user_arg));
-        }
-        else
-        {
-            (scene_node->when_block->fields->user_arg) = 0;
-        }
+        TRACE_B("user_arg = [%d]", (uint32_t)(scene_node->when_block->fields->user_arg));
     }
     return ret;
 }
@@ -567,149 +414,64 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg)
     l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
     if (when_block && scene_node)
     {
-        // temporary flags
-        uint8_t flag_check = 0;
-        const uint8_t TIME_FLAG = (1 << 0);
-        const uint8_t DAY_FLAG = (1 << 1);
-        const uint8_t MONTH_FLAG = (1 << 2);
-        const uint8_t YEAR_FLAG = (1 << 3);
-
-        // Default values to store start and end boundries
-        struct tm start = {
-            .tm_hour = 0,
-            .tm_min = 0,
-            .tm_mday = 1,
-            .tm_mon = 1,
-            .tm_year = 1,
-        };
-        struct tm end = {
-            .tm_hour = 23,
-            .tm_min = 59,
-            .tm_mday = 31,
-            .tm_mon = 12,
-            .tm_year = 9999,
-        };
-
-        uint8_t (*_isdate_range_func[])(struct tm *start, struct tm *end, struct tm *info) = {
-            isdate_range_check_tm,
-            isdate_range_check_day,
-            isdate_range_check_month,
-            isdate_range_check_year,
-        };
-
-        // now to fill out required date
-        l_fields_v2_t *curr_field = when_block->fields;
-        while (curr_field)
-        {
-            if (0 == strncmp(curr_field->name, "startTime", 10))
-            {
-                if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
-                {
-                    char startTime[10];
-                    snprintf(startTime, 10, "%s", curr_field->value.value_string);
-                    startTime[10] = '\0';
-                    char *ptr = NULL;
-                    if (0 != strlen(startTime))
-                    {
-                        start.tm_hour = strtoul(startTime, &ptr, 10);
-                        start.tm_min = strtoul(ptr + 1, NULL, 10);
-                    }
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "startDay", 9))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    start.tm_mday = ((curr_field->value.value_double)) ? ((int)(curr_field->value.value_double)) : 1;
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "startMonth", 11))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    start.tm_mon = ((curr_field->value.value_double)) ? ((int)(curr_field->value.value_double)) : 1;
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "startYear", 10))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    start.tm_year = ((int)(curr_field->value.value_double));
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "endTime", 8))
-            {
-                if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->value.value_string))
-                {
-                    char endTime[10];
-                    snprintf(endTime, 10, "%s", curr_field->value.value_string);
-                    endTime[10] = '\0';
-                    char *ptr = NULL;
-                    if (0 != strlen(endTime))
-                    {
-                        end.tm_hour = strtoul(endTime, &ptr, 10);
-                        end.tm_min = strtoul(ptr + 1, NULL, 10);
-                    }
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "endDay", 7))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    end.tm_mday = ((int)(curr_field->value.value_double));
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "endMonth", 9))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    end.tm_mon = ((int)(curr_field->value.value_double));
-                }
-                goto next;
-            }
-            else if (0 == strncmp(curr_field->name, "endYear", 8))
-            {
-                if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
-                {
-                    end.tm_year = ((int)(curr_field->value.value_double));
-                }
-                goto next;
-            }
-        next:
-            curr_field = curr_field->next;
-        }
-
         time_t rawtime = 0;
         time(&rawtime);
         struct tm *info;
         info = localtime(&rawtime);
 
-        // 1. Check the time,day,month and year validity
+        // Default values : start and end times.
+        struct tm start = {
+            .tm_hour = 0,
+            .tm_min = 0,
+        };
+        struct tm end = {
+            .tm_hour = 23,
+            .tm_min = 59,
+        };
+
+        // field function pointers
+        const s_isdate_range_method_t _isdate_range_fields[] = {
+            {.field_name = "startTime", .field_func = isdate_range_get_tm},
+            {.field_name = "startDay", .field_func = isdate_range_get_startday},
+            {.field_name = "startMonth", .field_func = isdate_range_get_startmonth},
+            {.field_name = "startYear", .field_func = isdate_range_get_startyear},
+            {.field_name = "endTime", .field_func = isdate_range_get_tm},
+            {.field_name = "endDay", .field_func = isdate_range_get_endday},
+            {.field_name = "endMonth", .field_func = isdate_range_get_endmonth},
+            {.field_name = "endYear", .field_func = isdate_range_get_endyear},
+            {.field_name = NULL, .field_func = NULL},
+        };
+
+        l_fields_v2_t *curr_field = when_block->fields;
+        while (curr_field)
+        {
+            for (int i = 0; i < ((sizeof(_isdate_range_fields) / sizeof(_isdate_range_fields[i]))); i++)
+            {
+                if (0 == strncmp(_isdate_range_fields[i].field_name, curr_field->name, strlen(_isdate_range_fields[i].field_name) + 1))
+                {
+                    (_isdate_range_fields[i].field_func)(curr_field, ((i < 4) ? &start : &end));
+                    break;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        // Check the time,day,month and year validity
+        uint8_t (*_isdate_range_method[])(struct tm *start, struct tm *end, struct tm *info) = {
+            isdate_range_check_tm,
+            isdate_range_check_day,
+            isdate_range_check_month,
+            isdate_range_check_year,
+        };
+        uint8_t flag_check = 0;
         for (uint8_t i = 0; i < ISDATE_RANGE_MAX; i++)
         {
-            flag_check |= _isdate_range_func[i](&start, &end, info);
+            flag_check |= _isdate_range_method[i](&start, &end, info);
         }
 
         TRACE_D("isdate_range flag_check [0x0%x]", flag_check);
-        if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
-        {
-            if (57 == (uint32_t)(scene_node->when_block->fields->user_arg)++)
-            {
-                // TRACE_W("here! isDate_range");
-                ret = 1;
-            }
-            TRACE_B("user_arg = [%d]", (uint32_t)(scene_node->when_block->fields->user_arg));
-        }
-        else
-        {
-            (scene_node->when_block->fields->user_arg) = 0;
-        }
+        TRACE_B("user_arg = [%d]", (uint32_t)(scene_node->when_block->fields->user_arg));
+        ret = isdate_range_check_flag_result(scene_node, flag_check);
     }
     return ret;
 }
@@ -776,8 +538,7 @@ int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t *scene_node, void *arg)
                     s_ezlopi_cloud_controller_t *controller_info = ezlopi_device_get_controller_information();
                     if (controller_info)
                     {
-                        /* we need to check device_id specific*/
-                        // This is controller specific
+#warning "we need to change from 'controller' to 'device_id' specific"
                         ret = ((value_armed == controller_info->armed) ? 1 : 0);
                         ret = ((value_reachable == controller_info->service_notification) ? 1 : 0);
                     }

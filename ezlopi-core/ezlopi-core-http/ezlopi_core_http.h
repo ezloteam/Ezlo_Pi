@@ -82,11 +82,11 @@ extern "C"
     int ezlopi_core_http_dyna_relloc(char **Buf, int reqSize);
 
     /**
-     * @brief Function to invoke mbedtls_https task
+     * @brief This Task , generates a http request, by combining information contained in '*config'.
      *
-     * @param tmp_http_data [ custom structure 's_ezlopi_core_http_mbedtls_t' with necessary info for invoking a http request. ]
+     * @param config : config_struct [ complete_url + webserver-name + web_port + headers + content + username + password + response ]
      */
-    void function_to_call_mbedtlshttp(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
+    void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *tmp_http_data);
 
     s_ezlopi_http_data_t *ezlopi_http_get_request(char *cloud_url, char *private_key, char *shared_key, char *ca_certificate);
     s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char *location, cJSON *headers, const char *private_key, const char *shared_key, const char *ca_certificate);
