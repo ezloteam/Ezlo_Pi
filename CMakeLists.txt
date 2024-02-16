@@ -53,8 +53,8 @@ foreach(component ${external_components_list})
     LIST(APPEND ALL_COMPONENTS ${SUBDIRS})
 endforeach()
 
-set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS} $ENV{IDF_PATH}/examples/common_components/protocol_examples_common) # add the list of directories 'SUBDIRS' to 'EXTRA_COMPONENT_DIRS'(ESP32 VARIABLES), links the external components
-message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENTS_DIRS}\r\n")
+set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS} ) # add the list of directories 'SUBDIRS' to 'EXTRA_COMPONENT_DIRS'(ESP32 VARIABLES), links the external components
+message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENT_DIRS}\r\n")
 
 ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ##
 project(Ezlo_Pi_v3x)

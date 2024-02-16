@@ -25,6 +25,16 @@
 static void blinky(void *pv);
 // extern void wss_server_init(void);
 
+void vApplicationIdleHook(void)
+{
+    TRACE_D("vApplicationIdleHook");
+}
+
+void vApplicationTickHook(void)
+{
+    TRACE_D("vApplicationTickHook");
+}
+
 void app_main(void)
 {
     gpio_install_isr_service(0);
