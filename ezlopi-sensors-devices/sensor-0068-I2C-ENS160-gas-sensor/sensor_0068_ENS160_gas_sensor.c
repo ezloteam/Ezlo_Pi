@@ -45,7 +45,6 @@ static int __notify(l_ezlopi_item_t* item);
 int sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
   int ret = 0;
-  TRACE_I("%s", ezlopi_actions_to_string(action));
   switch (action)
   {
   case EZLOPI_ACTION_PREPARE:

@@ -84,4 +84,5 @@ CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 
 CLOUD_METHOD("hub.reboot", __hub_reboot, NULL)
+CLOUD_METHOD("hub.status.get", hub_status_get, NULL)
 CLOUD_METHOD("registered", registered, NULL)
