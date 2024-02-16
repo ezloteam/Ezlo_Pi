@@ -4,7 +4,8 @@ file(GLOB_RECURSE config_src "*.c")
 # Define SDK components
 set(EZLOPI_SDK_COMPONENTS
         driver
-        esp_https_server
+        nghttp
+        esp_http_server
 )
 
 # Define ezlopi-components
@@ -58,7 +59,7 @@ set(EZLOPI_SERVICES
 )
 
 # Register the components
-idf_component_register(SRCS "wss_server.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_main.c" "wss_server.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}

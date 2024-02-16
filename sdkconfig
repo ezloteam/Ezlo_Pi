@@ -1653,7 +1653,7 @@ CONFIG_LUA_ROOT="/lua"
 #
 # Compatibility options
 #
-CONFIG_LEGACY_INCLUDE_COMMON_HEADERS=y
+# CONFIG_LEGACY_INCLUDE_COMMON_HEADERS is not set
 # end of Compatibility options
 
 # Deprecated options for backward compatibility

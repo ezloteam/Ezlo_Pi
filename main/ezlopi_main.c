@@ -23,6 +23,7 @@
 #define ENABLE_HEARTBIT_LED 0
 
 static void blinky(void *pv);
+// extern void wss_server_init(void);
 
 void app_main(void)
 {
@@ -36,6 +37,7 @@ void app_main(void)
     web_provisioning_init();
     ota_service_init();
     ezlopi_service_modes_init();
+    // wss_server_init();
 
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
