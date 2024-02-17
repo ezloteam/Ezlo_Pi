@@ -10,6 +10,7 @@ set(EZLOPI_SDK_COMPONENTS
 
 # Define ezlopi-components
 set(EZLOPI_COMPONENTS
+        ezlopi-util-uuid
         ezlopi-util-trace
 )
 
