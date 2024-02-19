@@ -85,3 +85,6 @@ CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 
 CLOUD_METHOD("hub.reboot", __hub_reboot, NULL)
 CLOUD_METHOD("registered", registered, NULL)
+
+CLOUD_METHOD("hub.coordinates.set", hub_coordinates_set, NULL)
+CLOUD_METHOD("hub.coordinates.get", hub_coordinates_get, NULL)

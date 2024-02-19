@@ -87,6 +87,9 @@ extern "C"
 
     char* ezlopi_nvs_read_modes(void);
     int ezlopi_nvs_write_modes(char* data);
+    
+    char *ezlopi_nvs_read_latidtude_longitude();
+    int ezlopi_nvs_write_latitude_longitude(char *data);
 
 #ifdef __cplusplus
 }

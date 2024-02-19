@@ -26,6 +26,7 @@ static const char* ezlopi_scenes_expression_ids = "ezlopi_exp";
 static const char* ezlopi_room_ids_nvs_name = "ezlopi_room";
 static const char* ezlopi_time_location_nvs_name = "timne.local";
 static const char* ezlopi_modes_nvs_name = "ezlopi_modes";
+static const char* ezlopi_coordinates_nvs_name = "coord_vals";
 
 int ezlopi_nvs_init(void)
 {
@@ -601,3 +602,32 @@ char* EZPI_CORE_nvs_read_time_location(void)
 {
     return ezlopi_nvs_read_str(ezlopi_time_location_nvs_name);
 }
+
+char* ezlopi_nvs_read_latidtude_longitude()
+{
+    return ezlopi_nvs_read_str(ezlopi_coordinates_nvs_name);
+}
+
+int ezlopi_nvs_write_latitude_longitude(char* data)
+{
+    int ret = 0;
+    if (data)
+    {
+        ret = ezlopi_nvs_write_str(data, strlen(data), ezlopi_coordinates_nvs_name);
+        if (0 == ret)
+        {
+            TRACE_E("Error writing latitude an longitude in nvs.");
+            ret = 1;
+        }
+        else
+        {
+            ret = 0;
+        }
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
+}
+
