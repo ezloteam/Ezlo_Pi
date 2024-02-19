@@ -222,7 +222,7 @@ static void __event_handler(void* arg, esp_event_base_t event_base, int32_t even
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE)
     {
         wifi_event_sta_scan_done_t* scan_event_param = (wifi_event_sta_scan_done_t*)event_data;
-        TRACE_B("status: %d, event data: %d", scan_event_param->status, scan_event_param->number);
+        TRACE_I("status: %d, event data: %d", scan_event_param->status, scan_event_param->number);
         if (scan_event_param->status == 0)
         {
             total_wifi_APs_available = scan_event_param->number;
@@ -443,7 +443,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         current_time = (xTaskGetTickCount() - start_time);
         if (current_time <= (5 * 60 * configTICK_RATE_HZ))
         {
-            TRACE_B("Scanning time: %d", current_time);
+            TRACE_I("Scanning time: %d", current_time);
             // Scanning for available AP for about 30s. This is because, the scanning tends to prevent data TX/RX over wifi.
             if (current_time - previous_scan_time >= 30000)
             {
@@ -455,7 +455,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         else
         {
-            TRACE_B("5 minutes passed, stopping scanner.");
+            TRACE_I("5 minutes passed, stopping scanner.");
             break;
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
