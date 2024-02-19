@@ -186,15 +186,6 @@ static int __0049_init(l_ezlopi_item_t* item)
 
             ret = 1;
         }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
-        }
     }
     return ret;
 }
