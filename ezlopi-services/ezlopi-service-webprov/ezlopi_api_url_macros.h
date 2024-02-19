@@ -37,6 +37,8 @@ CLOUD_METHOD("hub.gateways.list", gateways_list, NULL)
 CLOUD_METHOD("hub.info.get", info_get, NULL)
 
 CLOUD_METHOD("hub.network.get", network_get, NULL)
+CLOUD_METHOD("hub.network.wifi.scan.start", network_wifi_scan_start, NULL)
+CLOUD_METHOD("hub.network.wifi.scan.stop", network_wifi_scan_stop, NULL)
 
 CLOUD_METHOD("cloud.firmware.info.get", firmware_info_get, NULL)
 CLOUD_METHOD("hub.firmware.update.start", firmware_update_start, NULL)

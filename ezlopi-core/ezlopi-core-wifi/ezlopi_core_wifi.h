@@ -42,6 +42,9 @@ extern "C"
 
 
 
+    void ezlopi_wifi_scan_start();
+    void ezlopi_wifi_scan_stop();
+
 #ifdef __cplusplus
 }
 #endif

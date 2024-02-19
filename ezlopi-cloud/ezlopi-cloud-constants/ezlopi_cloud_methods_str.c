@@ -86,6 +86,7 @@ const char *method_hub_modes_get = "hub.modes.get";
 // const  char *method_hub_network_reset = "hub.network.reset";
 // const  char *method_hub_network_wifi_scan_start = "hub.network.wifi.scan.start";
 // const  char *method_hub_network_wifi_scan_stop = "hub.network.wifi.scan.stop";
+const char *method_hub_network_wifi_scan_progress = "hub.network.wifi.scan.progress";
 const char *method_hub_reset = "hub.reset";
 // const  char *method_hub_log_remote_set = "hub.log.set";
 // const  char *method_hub_log_local_set = "hub.log.local.set";
