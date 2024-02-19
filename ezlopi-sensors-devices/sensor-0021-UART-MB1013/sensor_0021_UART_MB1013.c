@@ -97,7 +97,7 @@ static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_ua
                     if ('R' == buffer[idx] && '\r' == buffer[idx + 5])
                     {
                         s_mb1013_args->current_value = atoi((const char *)&buffer[idx + 1]) / 10.0;
-                        TRACE_B("range: %f", s_mb1013_args->current_value);
+                        TRACE_I("range: %f", s_mb1013_args->current_value);
                         break;
                     }
                     idx++;

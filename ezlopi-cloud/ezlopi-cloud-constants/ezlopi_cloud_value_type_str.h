@@ -6,7 +6,7 @@ extern const char *value_type_int;
 // extern const  char *value_type_int64;
 extern const char *value_type_bool;
 extern const char *value_type_float;
-// extern const  char *value_type_scaleble;
+extern const  char *value_type_scaleble;
 extern const char *value_type_rgb;
 // extern const  char *value_type_usercode;
 // extern const  char *value_type_dailyintervalarraydaily_interval";

@@ -325,7 +325,7 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
                     max_freq_index = i;
                 }
             }
-            // TRACE_I("......................Dominant count ......{%d} ", P_count[max_freq_index]);
+            // TRACE_S("......................Dominant count ......{%d} ", P_count[max_freq_index]);
 
             // reset Queue_flag
             (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;

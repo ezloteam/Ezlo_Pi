@@ -127,4 +127,6 @@ extern const char *ezlopi_hub_room_edited_str;
 extern const char *ezlopi_hub_room_deleted_str;
 extern const char *ezlopi_hub_room_reordered_str;
 
+extern const char *ezlopi_hub_modes_changed_str;
+
 #endif // __EZLOPI_METHODS_STR_H__

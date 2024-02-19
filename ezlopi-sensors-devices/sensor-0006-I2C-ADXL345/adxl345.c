@@ -103,7 +103,7 @@ void __adxl345_get_axis_value(l_ezlopi_item_t *item)
         esp_err_t err = ESP_OK;
         if ((err = adxl345_check_data_ready_INTR(item, &Check_Register)) == ESP_OK)
         {
-            // TRACE_I("chk: Reg @ 0x30H:{%#x}:", Check_Register);
+            // TRACE_S("chk: Reg @ 0x30H:{%#x}:", Check_Register);
             if ((Check_Register & ADXL345_DATA_READY_FLAG))
             {
                 address_val = ADXL345_DATA_X_0_REGISTER;

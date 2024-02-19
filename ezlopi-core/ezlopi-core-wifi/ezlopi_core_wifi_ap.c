@@ -49,16 +49,16 @@ void ezlopi_configure_wifi_ap()
     strncpy((char *)wifi_cred_configurations.ap.ssid, ezlopi_wifi_ap_ssid, sizeof(wifi_cred_configurations.ap.ssid));
     strncpy((char *)wifi_cred_configurations.ap.password, ezlopi_wifi_ap_pass, sizeof(wifi_cred_configurations.ap.password));
 
-    TRACE_B("Setting wifi mode to AP.");
+    TRACE_I("Setting wifi mode to AP.");
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
 
-    TRACE_B("Setting wifi AP credential configurations.");
+    TRACE_I("Setting wifi AP credential configurations.");
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_cred_configurations));
-    TRACE_I("Wifi credentials set complete with channel: %d SSID: %s and PASS: %s", wifi_cred_configurations.ap.channel, wifi_cred_configurations.ap.ssid, wifi_cred_configurations.ap.password);
+    TRACE_S("Wifi credentials set complete with channel: %d SSID: %s and PASS: %s", wifi_cred_configurations.ap.channel, wifi_cred_configurations.ap.ssid, wifi_cred_configurations.ap.password);
 
-    TRACE_B("Starting wifi AP");
+    TRACE_I("Starting wifi AP");
     ESP_ERROR_CHECK(esp_wifi_start());
-    TRACE_B("Wifi AP started!!");
+    TRACE_I("Wifi AP started!!");
 }
 
 void ezlopi_deconfigure_wifi_ap()
@@ -77,7 +77,7 @@ void ezlopi_start_dns_server()
 
     if (dns_hijack_srv_start(resolve_ip) == ESP_OK)
     {
-        TRACE_B("DNS hijack server started");
+        TRACE_I("DNS hijack server started");
     }
     else
     {

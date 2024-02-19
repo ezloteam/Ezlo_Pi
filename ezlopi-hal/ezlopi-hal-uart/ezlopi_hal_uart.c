@@ -51,7 +51,7 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
 #endif
         ESP_ERROR_CHECK(uart_param_config(channel, &uart_config));
         ESP_ERROR_CHECK(uart_set_pin(channel, tx, rx, -1, -1));
-        TRACE_I("UART configured successfully.");
+        TRACE_S("UART configured successfully.");
         uart_object_handle->ezlopi_uart.channel = channel;
         uart_object_handle->ezlopi_uart.baudrate = baudrate;
         uart_object_handle->ezlopi_uart.tx = tx;

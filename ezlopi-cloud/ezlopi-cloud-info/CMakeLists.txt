@@ -7,4 +7,6 @@ idf_component_register(SRCS "ezlopi_cloud_info.c" "${src_files}"
             ezlopi-util-trace
             ezlopi-util-version
             ezlopi-core-sntp      
-            ezlopi-cloud-constants)
+            ezlopi-cloud-constants
+            ezlopi-cloud-coordinates
+            )

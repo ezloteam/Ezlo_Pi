@@ -13,12 +13,12 @@
 
 #include "sensor_0034_digitalIn_proximity.h"
 
-static int proximity_sensor_prepare(void *args);
-static int proximity_sensor_init(l_ezlopi_item_t *item);
-static void proximity_sensor_value_updated_from_device(void *arg);
-static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args);
+static int proximity_sensor_prepare(void* args);
+static int proximity_sensor_init(l_ezlopi_item_t* item);
+static void proximity_sensor_value_updated_from_device(void* arg);
+static int proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args);
 
-int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
+int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* args, void* user_arg)
 {
     int ret = 0;
 
@@ -50,7 +50,7 @@ int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *
     return ret;
 }
 
-static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     if (device && cj_device)
     {
@@ -67,7 +67,7 @@ static void proximity_sensor_setup_device_cloud_properties(l_ezlopi_device_t *de
     }
 }
 
-static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void proximity_sensor_setup_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     if (item && cj_device)
     {
@@ -91,18 +91,18 @@ static void proximity_sensor_setup_item_properties(l_ezlopi_item_t *item, cJSON 
     }
 }
 
-static int proximity_sensor_prepare(void *args)
+static int proximity_sensor_prepare(void* args)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)args;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)args;
 
     if ((NULL != device_prep_arg) && (NULL != device_prep_arg->cjson_device))
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+        l_ezlopi_device_t* device = ezlopi_device_add_device(device_prep_arg->cjson_device);
         if (device)
         {
             proximity_sensor_setup_device_cloud_properties(device, device_prep_arg->cjson_device);
-            l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
+            l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0034_digitalIn_proximity);
             if (item)
             {
                 item->cloud_properties.device_id = device->cloud_properties.device_id;
@@ -120,7 +120,7 @@ static int proximity_sensor_prepare(void *args)
     return ret;
 }
 
-static int proximity_sensor_init(l_ezlopi_item_t *item)
+static int proximity_sensor_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -162,19 +162,19 @@ static int proximity_sensor_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void proximity_sensor_value_updated_from_device(void *arg)
+static void proximity_sensor_value_updated_from_device(void* arg)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
         ezlopi_device_value_updated_from_device_v3(item);
     }
 }
 
-static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
+static int proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)args;
+    cJSON* cj_result = (cJSON*)args;
     if (cj_result)
     {
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
@@ -183,7 +183,7 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t *item, void *args)
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
         cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        const char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? false : true);
+        const char* valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? false : true);
         cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
         ret = 1;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);

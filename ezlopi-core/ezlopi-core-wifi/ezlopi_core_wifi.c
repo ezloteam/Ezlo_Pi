@@ -209,7 +209,7 @@ static void __event_handler(void* arg, esp_event_base_t event_base, int32_t even
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
         {
             s_retry_num++;
-            TRACE_I("retry to connect to the AP");
+            TRACE_S("retry to connect to the AP");
         }
         else
         {

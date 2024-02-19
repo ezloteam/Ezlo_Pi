@@ -1,6 +1,8 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_scenes_value.h"
+#include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -29,12 +31,13 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         TRACE_D("\t\t\t|---------- field_count: %d ----------", ++field_count);
         TRACE_D("\t\t\t|-- name: %s", fields->name);
 
-        const char *value_type_name = ezlopi_scene_get_scene_value_type_name_v2(fields->value_type);
+        const char *value_type_name = ezlopi_scene_get_scene_value_type_name(fields->value_type);
         TRACE_D("\t\t\t|-- type: %s", value_type_name ? value_type_name : ezlopi__str);
 
         switch (fields->value_type)
         {
         case EZLOPI_VALUE_TYPE_INT:
+        case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
         {
             TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
             break;
@@ -67,6 +70,11 @@ void ezlopi_print_fields(l_fields_v2_t *fields)
         case EZLOPI_VALUE_TYPE_BLOCKS:
         {
             ezlopi_print_when_blocks((l_when_block_v2_t *)fields->value.when_block);
+            break;
+        }
+        case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
+        {
+            CJSON_TRACE("\t\t\t|-- value", fields->value.cj_value);
             break;
         }
         case EZLOPI_VALUE_TYPE_DICTIONARY:
@@ -180,9 +188,9 @@ void ezlopi_print_when_blocks(l_when_block_v2_t *when_blocks)
 
 void ezlopi_print_action_blocks(l_action_block_v2_t *action_block)
 {
-    TRACE_D("\t|-- then: ");
     while (action_block)
     {
+        TRACE_D("\t|-- %s: ", (SCENE_BLOCK_TYPE_THEN == action_block->block_type) ? "then" : "else");
         ezlopi_print_block_options(&action_block->block_options, action_block->fields);
         TRACE_D("\t\t|-- blockType: then");
         TRACE_D("\t\t|-- _tempId: %.*s", sizeof(action_block->_tempId), action_block->_tempId);
@@ -213,8 +221,8 @@ void ezlopi_scenes_print(l_scenes_list_v2_t *scene_link_list)
         TRACE_D("\t|-- parent_id: %s", scene_link_list->parent_id);
         ezlopi_print_user_notifications(scene_link_list->user_notifications);
         ezlopi_print_house_modes(scene_link_list->house_modes);
-        ezlopi_print_action_blocks(scene_link_list->then_block);
         ezlopi_print_when_blocks(scene_link_list->when_block);
+        ezlopi_print_action_blocks(scene_link_list->then_block);
         ezlopi_print_action_blocks(scene_link_list->else_block);
         TRACE_D("\t---------------------------------------------------------------");
 

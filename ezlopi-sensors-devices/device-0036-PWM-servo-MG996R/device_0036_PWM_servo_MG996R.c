@@ -152,14 +152,14 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
         int value = 0;
         CJSON_GET_VALUE_INT(cj_result, "value", value);
 
-        TRACE_I("gpio_num: %d", item->interface.pwm.gpio_num);
-        TRACE_I("item_id: %d", item->cloud_properties.item_id);
-        TRACE_I("cur value: %d", value);
+        TRACE_S("gpio_num: %d", item->interface.pwm.gpio_num);
+        TRACE_S("item_id: %d", item->cloud_properties.item_id);
+        TRACE_S("cur value: %d", value);
 
         if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.pwm.gpio_num))
         {
             int target_value = (int)(((value * 17) / 100) + 13);
-            TRACE_I("target value: %d", target_value);
+            TRACE_S("target value: %d", target_value);
             ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
         }
     }
@@ -174,7 +174,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     if (cj_result)
     {
         uint32_t duty = ezlopi_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
-        TRACE_I("raw duty value: %d", duty);
+        TRACE_S("raw duty value: %d", duty);
 
         if (duty < 13)
         {
@@ -182,7 +182,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             TRACE_W("new _ raw duty value: %d", duty);
         }
         int target_duty = (int)(((duty - 13) * 100) / 17);
-        TRACE_I("target duty value: %d", target_duty);
+        TRACE_S("target duty value: %d", target_duty);
 
         if (target_duty > 100)
         {
@@ -349,10 +349,10 @@ static int ezlopi_servo_motor_MG_996R_set_value(s_ezlopi_device_properties_t *pr
         int value = 0;
         CJSON_GET_VALUE_INT(cjson_params, ezlopi_value_str, value);
 
-        TRACE_I("item_name: %s", properties->ezlopi_cloud.item_name);
-        TRACE_I("gpio_num: %d", properties->interface.pwm.gpio_num);
-        TRACE_I("item_id: %d", properties->ezlopi_cloud.item_id);
-        TRACE_I("cur value: %d", value);
+        TRACE_S("item_name: %s", properties->ezlopi_cloud.item_name);
+        TRACE_S("gpio_num: %d", properties->interface.pwm.gpio_num);
+        TRACE_S("item_id: %d", properties->ezlopi_cloud.item_id);
+        TRACE_S("cur value: %d", value);
 
         if (GPIO_IS_VALID_OUTPUT_GPIO(properties->interface.pwm.gpio_num))
         {

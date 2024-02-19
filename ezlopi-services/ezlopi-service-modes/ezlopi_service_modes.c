@@ -1,0 +1,102 @@
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_modes.h"
+#include "ezlopi_core_devices.h"
+#include "ezlopi_cloud_modes.h"
+#include "ezlopi_core_modes_cjson.h"
+#include "ezlopi_service_webprov.h"
+
+#include "ezlopi_service_modes.h"
+
+static TaskHandle_t sg_process_handle = NULL;
+
+static void __modes_service(void* pv);
+
+int ezlopi_service_modes_stop(void)
+{
+    if (sg_process_handle)
+    {
+        vTaskDelete(sg_process_handle);
+        sg_process_handle = NULL;
+        TRACE_W("Modes-service: Stopped!");
+    }
+
+    return 1;
+}
+
+int ezlopi_service_modes_start(void)
+{
+    int ret = 0;
+
+    if ((NULL == sg_process_handle) && ezlopi_core_modes_get_custom_modes())
+    {
+        ret = 1;
+        xTaskCreate(__modes_service, "modes-service", 1024 * 4, NULL, 3, &sg_process_handle);
+        TRACE_I("Starting modes-service");
+    }
+
+    return ret;
+}
+
+void ezlopi_service_modes_init(void)
+{
+    ezlopi_service_modes_start();
+}
+
+static void __modes_service(void* pv)
+{
+    while (1)
+    {
+        s_ezlopi_modes_t* ez_mode = ezlopi_core_modes_get_custom_modes();
+        if (ez_mode)
+        {
+            if (ez_mode->switch_to_mode_id)
+            {
+                if (ez_mode->time_is_left_to_switch_sec)
+                {
+                    ez_mode->time_is_left_to_switch_sec--;
+                    TRACE_D("time_is_left_to_switch_sec: %u", ez_mode->time_is_left_to_switch_sec);
+                }
+                else
+                {
+                    s_house_modes_t* new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
+
+                    if (new_house_mode)
+                    {
+                        TRACE_I("switching-to-mode: %s (id: %u)", new_house_mode->name, new_house_mode->_id);
+
+                        ez_mode->current_mode_id = ez_mode->switch_to_mode_id;
+                        ez_mode->switch_to_mode_id = 0;
+
+                        ezlopi_core_modes_set_current_house_mode(new_house_mode);
+
+                        if (new_house_mode->cj_bypass_devices)
+                        {
+                            cJSON_Delete(new_house_mode->cj_bypass_devices);
+                            new_house_mode->cj_bypass_devices = NULL;
+                        }
+
+                        ezlopi_core_modes_store_to_nvs();
+
+                        cJSON* cj_response = ezlopi_core_modes_cjson_changed();
+                        if (cj_response)
+                        {
+                            web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // TRACE_D("MODE-SERVICE: Idle");
+            }
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
+    vTaskDelete(NULL);
+}

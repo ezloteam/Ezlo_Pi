@@ -407,10 +407,6 @@ static void __scripts_nvs_parse(void)
 
         free(script_ids);
     }
-    else
-    {
-        TRACE_W("Scenes-scripts not available!");
-    }
 }
 
 static l_ezlopi_scenes_script_t *__scripts_create_node(uint32_t script_id, cJSON *cj_script)

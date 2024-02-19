@@ -13,3 +13,4 @@ idf_component_register(SRCS "ezlopi_service_ble_provisioning.c" "ezlopi_ble_serv
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_CORE_COMPONENTS} 
     ) 
+ 

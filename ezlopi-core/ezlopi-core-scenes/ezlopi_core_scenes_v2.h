@@ -61,6 +61,7 @@ typedef enum e_value_type
     VALUE_TYPE_BOOL,
     VALUE_TYPE_CJSON,
     VALUE_TYPE_BLOCK,
+    VALUE_TYPE_HOUSE_MODE_ID_ARRAY,
     VALUE_TYPE_MAX
 } e_value_type_t;
 
@@ -72,6 +73,7 @@ typedef union u_field_value_v2
     bool value_bool;
     cJSON *cj_value;
     struct l_when_block_v2 *when_block;
+    struct l_house_modes_v2_t *house_modes;
 } u_field_value_v2_t;
 
 typedef struct l_fields_v2
@@ -157,13 +159,12 @@ int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON *cj_scene);
 
 l_scenes_list_v2_t *ezlopi_scenes_get_scenes_head_v2(void);
 f_scene_method_v2_t ezlopi_scene_get_method_v2(e_scene_method_type_t scene_method_type);
-const char *ezlopi_scene_get_scene_value_type_name_v2(e_scene_value_type_v2_t value_type);
 
 l_scenes_list_v2_t *ezlopi_scenes_get_by_id_v2(uint32_t _id);
 l_scenes_list_v2_t *ezlopi_scenes_new_scene_populate(cJSON *cj_new_scene, uint32_t scene_id);
 
-e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field);
-e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type);
+// e_scene_value_type_v2_t ezlopi_scenes_get_value_type(cJSON *cj_field);
+// e_scene_value_type_v2_t ezlopi_scenes_get_expressions_value_type(cJSON *cj_value_type);
 
 void ezlopi_scene_add_users_in_notifications(l_scenes_list_v2_t *scene_node, cJSON *cj_user);
 
