@@ -110,7 +110,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web
 
     char web_port[10] = {0};
     snprintf(web_port, 10, "%d", web_port_num);
-    web_port[10] = '\0';
+    web_port[9] = '\0';
 
     mbedtls_entropy_context *entropy = malloc(sizeof(mbedtls_entropy_context));
     mbedtls_ctr_drbg_context *ctr_drbg = malloc(sizeof(mbedtls_ctr_drbg_context));
@@ -143,7 +143,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web
         // TRACE_I("Setting hostname for TLS session...");
 
         /* Hostname set here should match CN in server certificate */
-        if (0 != (ret = mbedtls_ssl_set_hostname(&ssl, web_server)))
+        if (0 != (ret = mbedtls_ssl_set_hostname(ssl, web_server)))
         {
             TRACE_E("mbedtls_ssl_set_hostname returned -0x%x", -ret);
             goto exit;
@@ -241,7 +241,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web
             }
         } while (written_bytes < strlen(url_req));
 
-        // TRACE_I("Reading HTTP response...");
+        TRACE_I("Reading HTTP response...");
         uint32_t resp_buf_size = tmp_buf_size + 1;
         char *resp_buf_dummy = (char *)malloc(resp_buf_size); // points to a memory-block
         if (resp_buf_dummy)
@@ -275,6 +275,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web
                     break;
                 }
                 len = ret;
+                // TRACE_D("ret[%d]: %s", len, tmp_buf);
                 if (ret > 0)
                 {
                     reply_count++;
@@ -387,7 +388,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config)
             }
             default:
             {
-                TRACE_E("METHOD NOT FOUND.. {%d} Freeing the event bit {%d}", config->method);
+                TRACE_E("METHOD NOT FOUND.. {%d}", config->method);
                 break;
             }
             }
@@ -424,11 +425,32 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config)
             TRACE_I("request[capacity: %d]:\n\n%s[%d]", request_len, request, strlen(request));
 
             // char *result = NULL;
-            TRACE_E("&result=[%p]", &(config->response));
+            TRACE_E("&result==[%p]", &(config->response));
+
+            // char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+            char *ca_certificate = NULL;  // ezlopi_factory_info_v3_get_ca_certificate();
+            char *ssl_shared_key = NULL;  // ezlopi_factory_info_v3_get_ssl_shared_key();
+            char *ssl_private_key = NULL; // ezlopi_factory_info_v3_get_ssl_private_key();
+
+            // char http_request[256];
+            // snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
+            // snprintf(http_request, sizeof(http_request), "%s", request);
+            // TRACE_D("http_request: %s", request);
+            // s_ezlopi_http_data_t *ws_endpoint = ezlopi_http_get_request(request, NULL, NULL, NULL);
+            // if (ws_endpoint)
+            // {
+            //     if (ws_endpoint->response)
+            //     {
+            //         TRACE_D("=>\n%s[%d]", ws_endpoint->response, strlen(ws_endpoint->response))
+            //         free(ws_endpoint->response);
+            //     }
+            //     free(ws_endpoint);
+            // }
+
             ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response));
             if (config->response)
             {
-                TRACE_I("TASK:- *resp_buf=>[%p] =>\n%s[%d]", config->response, config->response, strlen(config->response));
+                // TRACE_D("TASK:- result[%p] =>\n%s[%d]", config->response, config->response, strlen(config->response));
                 free(config->response); // return to destination buffer
                 config->response = NULL;
             }

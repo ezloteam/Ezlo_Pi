@@ -6,7 +6,7 @@
 typedef struct s_sendhttp_method
 {
     const char *field_name;
-    uint8_t (*field_func)(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
+    void (*field_func)(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
 } s_sendhttp_method_t;
 
 void parse_http_request_type(s_ezlopi_core_http_mbedtls_t *tmp_http_data, l_fields_v2_t *curr_field);
