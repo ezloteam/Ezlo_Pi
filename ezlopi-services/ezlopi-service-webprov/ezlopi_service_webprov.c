@@ -29,6 +29,7 @@
 #include "ezlopi_cloud_scenes_scripts.h"
 #include "ezlopi_cloud_scenes_expressions.h"
 #include "ezlopi_cloud_location.h"
+#include "ezlopi_cloud_coordinates.h"
 
 #include "ezlopi_service_webprov.h"
 

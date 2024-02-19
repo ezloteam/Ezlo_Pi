@@ -23,6 +23,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-network 
         ezlopi-cloud-ota
         ezlopi-cloud-location
+        ezlopi-cloud-coordinates
 )
 
 
