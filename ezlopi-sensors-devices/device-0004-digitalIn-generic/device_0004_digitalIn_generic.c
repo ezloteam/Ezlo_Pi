@@ -94,9 +94,9 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 static int __prepare(void *arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (arg)
     {
+        s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
@@ -161,6 +161,7 @@ static int __init(l_ezlopi_item_t *item)
         else
         {
             ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -170,12 +171,15 @@ static int __init(l_ezlopi_item_t *item)
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cjson_propertise = (cJSON *)arg;
-    if (cjson_propertise)
+    if (item && arg)
     {
-        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false));
-        ret = 1;
+        cJSON *cjson_propertise = (cJSON *)arg;
+        if (cjson_propertise)
+        {
+            cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_in.value);
+            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false));
+            ret = 1;
+        }
     }
 
     return ret;

@@ -177,7 +177,7 @@ static int __prepare(void *arg)
     {
         cJSON *cj_device = prep_arg->cjson_device;
         s_gy271_data_t *user_data = (s_gy271_data_t *)malloc(sizeof(s_gy271_data_t));
-        if (NULL != user_data)
+        if (user_data)
         {
             memset(user_data, 0, sizeof(s_gy271_data_t));
             l_ezlopi_device_t *gy271_device_parent_x_device = ezlopi_device_add_device(cj_device);
@@ -275,25 +275,34 @@ static int __prepare(void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (item && item->interface.i2c_master.enable)
+    if (item)
     {
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
         if (user_data)
         {
-            ezlopi_i2c_master_init(&item->interface.i2c_master);
-            TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
-            if (0 == __gy271_configure(item)) // ESP_OK
+            if (item->interface.i2c_master.enable)
             {
-                // TRACE_B(" CONFIGURATION  Compplete _____ Calibration Started _____");
-                xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
-                ret = 1;
+                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                TRACE_I("I2C initialized to channel %d", item->interface.i2c_master.channel);
+                if (0 == __gy271_configure(item)) // ESP_OK
+                {
+                    // TRACE_B(" CONFIGURATION  Compplete _____ Calibration Started _____");
+                    xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -302,64 +311,69 @@ static int __init(l_ezlopi_item_t *item)
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)arg;
-    if (cj_result && item)
+    if (item && arg)
     {
-        s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
+        {
+            s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
+            if (user_data)
+            {
+                if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->X);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->X);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Y);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->Y);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Z);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->Z);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
+                {
 
-        if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
-        {
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->X);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->X);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
-                free(valueFormatted);
-            }
-        }
-        if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
-        {
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Y);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->Y);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
-                free(valueFormatted);
-            }
-        }
-        if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
-        {
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Z);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->Z);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
-                free(valueFormatted);
-            }
-        }
-        if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
-        {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->azimuth));
+                    char *valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
 
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->azimuth));
-            char *valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
-                free(valueFormatted);
+                if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->T);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->T);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
+            ret = 1;
         }
-
-        if (ezlopi_item_name_temp == item->cloud_properties.item_name)
-        {
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->T);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->T);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
-                free(valueFormatted);
-            }
-        }
-        ret = 1;
     }
     return ret;
 }
@@ -433,53 +447,55 @@ static void __gy271_calibration_task(void *params) // calibrate task
                                      {0, 0},  // ymin,ymax
                                      {0, 0}}; // zmin,zmax// Initialization added!
         s_gy271_data_t *user_data = (s_gy271_data_t *)item->user_arg;
-
-        for (uint16_t i = 0; i <= 50; i++)
+        if (user_data)
         {
-            __gy271_get_raw_max_min_values(item, calibrationData);
-            vTaskDelay(200 / portTICK_PERIOD_MS);
+            for (uint16_t i = 0; i <= 50; i++)
+            {
+                __gy271_get_raw_max_min_values(item, calibrationData);
+                vTaskDelay(200 / portTICK_PERIOD_MS);
+            }
+
+            TRACE_W(".....................Calculating Paramter.......................");
+            // Calculate the : 1.bias_axis , 2.delta_axis , 3.delta_avg , 4.scale_axis
+            // 1. bias_axis{x,y,z}
+            user_data->calib_factor.bias_axis[0] = ((long)(calibrationData[0][1] + calibrationData[0][0]) / 2); // x-axis
+            user_data->calib_factor.bias_axis[1] = ((long)(calibrationData[1][1] + calibrationData[1][0]) / 2); // y-axis
+            user_data->calib_factor.bias_axis[2] = ((long)(calibrationData[2][1] + calibrationData[2][0]) / 2); // z-axis
+
+            // 2. delta_axis{x,y,z}
+            user_data->calib_factor.delta_axis[0] = (long)(calibrationData[0][1] - calibrationData[0][0]); // x-axis
+            user_data->calib_factor.delta_axis[1] = (long)(calibrationData[1][1] - calibrationData[1][0]); // y-axis
+            user_data->calib_factor.delta_axis[2] = (long)(calibrationData[2][1] - calibrationData[2][0]); // z-axis
+
+            // 3. delta_avg
+            user_data->calib_factor.delta_avg = ((float)((user_data->calib_factor.delta_axis[0]) +
+                                                         (user_data->calib_factor.delta_axis[1]) +
+                                                         (user_data->calib_factor.delta_axis[2])) /
+                                                 3.0f);
+
+            // 4. Scale_axis{x,y,z}
+            user_data->calib_factor.scale_axis[0] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[0]; // x-axis
+            user_data->calib_factor.scale_axis[1] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[1]; // y-axis
+            user_data->calib_factor.scale_axis[2] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[2]; // z-axis
+
+            TRACE_B("Bias :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
+                    user_data->calib_factor.bias_axis[0],
+                    user_data->calib_factor.bias_axis[1],
+                    user_data->calib_factor.bias_axis[2]);
+
+            TRACE_B("Delta :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
+                    user_data->calib_factor.delta_axis[0],
+                    user_data->calib_factor.delta_axis[1],
+                    user_data->calib_factor.delta_axis[2]);
+            TRACE_B("Delta_AVG :--- %6f", user_data->calib_factor.delta_avg);
+
+            TRACE_B("Scale :--- _Xaxis=%6f | _Yaxis=%6f | _Zaxis=%6f ",
+                    user_data->calib_factor.scale_axis[0],
+                    user_data->calib_factor.scale_axis[1],
+                    user_data->calib_factor.scale_axis[0]);
+            TRACE_W("......................CALIBRATION COMPLETE.....................");
+            user_data->calibration_complete = true;
         }
-
-        TRACE_W(".....................Calculating Paramter.......................");
-        // Calculate the : 1.bias_axis , 2.delta_axis , 3.delta_avg , 4.scale_axis
-        // 1. bias_axis{x,y,z}
-        user_data->calib_factor.bias_axis[0] = ((long)(calibrationData[0][1] + calibrationData[0][0]) / 2); // x-axis
-        user_data->calib_factor.bias_axis[1] = ((long)(calibrationData[1][1] + calibrationData[1][0]) / 2); // y-axis
-        user_data->calib_factor.bias_axis[2] = ((long)(calibrationData[2][1] + calibrationData[2][0]) / 2); // z-axis
-
-        // 2. delta_axis{x,y,z}
-        user_data->calib_factor.delta_axis[0] = (long)(calibrationData[0][1] - calibrationData[0][0]); // x-axis
-        user_data->calib_factor.delta_axis[1] = (long)(calibrationData[1][1] - calibrationData[1][0]); // y-axis
-        user_data->calib_factor.delta_axis[2] = (long)(calibrationData[2][1] - calibrationData[2][0]); // z-axis
-
-        // 3. delta_avg
-        user_data->calib_factor.delta_avg = ((float)((user_data->calib_factor.delta_axis[0]) +
-                                                     (user_data->calib_factor.delta_axis[1]) +
-                                                     (user_data->calib_factor.delta_axis[2])) /
-                                             3.0f);
-
-        // 4. Scale_axis{x,y,z}
-        user_data->calib_factor.scale_axis[0] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[0]; // x-axis
-        user_data->calib_factor.scale_axis[1] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[1]; // y-axis
-        user_data->calib_factor.scale_axis[2] = user_data->calib_factor.delta_avg / user_data->calib_factor.delta_axis[2]; // z-axis
-
-        TRACE_B("Bias :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
-                user_data->calib_factor.bias_axis[0],
-                user_data->calib_factor.bias_axis[1],
-                user_data->calib_factor.bias_axis[2]);
-
-        TRACE_B("Delta :--- _Xaxis=%6ld | _Yaxis=%6ld | _Zaxis=%6ld ",
-                user_data->calib_factor.delta_axis[0],
-                user_data->calib_factor.delta_axis[1],
-                user_data->calib_factor.delta_axis[2]);
-        TRACE_B("Delta_AVG :--- %6f", user_data->calib_factor.delta_avg);
-
-        TRACE_B("Scale :--- _Xaxis=%6f | _Yaxis=%6f | _Zaxis=%6f ",
-                user_data->calib_factor.scale_axis[0],
-                user_data->calib_factor.scale_axis[1],
-                user_data->calib_factor.scale_axis[0]);
-        TRACE_W("......................CALIBRATION COMPLETE.....................");
-        user_data->calibration_complete = true;
     }
     vTaskDelete(NULL);
 }

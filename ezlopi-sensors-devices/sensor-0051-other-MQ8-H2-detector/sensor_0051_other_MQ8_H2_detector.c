@@ -164,25 +164,29 @@ static int __0051_init(l_ezlopi_item_t *item)
             input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
             ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
         }
-        if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        else if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
             // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            // calibrate if not done
-            s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
-            if (false == MQ8_value->Calibration_complete_H2)
-            {
-                xTaskCreate(__calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            { // calibrate if not done
+                s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
+                if (MQ8_value)
+                {
+                    if (false == MQ8_value->Calibration_complete_H2)
+                    {
+                        xTaskCreate(__calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                    }
+                }
+                ret = 1;
             }
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
-                free(item->user_arg);// this will free ; memory address linked to all items
-                item->user_arg = NULL;
+                ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                }
             }
         }
     }

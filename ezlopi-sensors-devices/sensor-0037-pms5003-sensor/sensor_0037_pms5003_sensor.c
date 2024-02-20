@@ -164,11 +164,6 @@ static int __init(l_ezlopi_item_t *item)
         {
             pms_init(pms_object);
             ret = 1;
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            // }
         }
     }
     return ret;

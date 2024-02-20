@@ -143,6 +143,7 @@ static int __init(l_ezlopi_item_t *item)
         else
         {
             ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -167,8 +168,8 @@ static int _get_item_list(l_ezlopi_item_t *item, void *arg)
             }
             cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
         ret = 1;
     }
 
@@ -181,8 +182,8 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     cJSON *cj_result = (cJSON *)arg;
     if (cj_result && item)
     {
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
         ret = 1;
     }
     return ret;
@@ -199,11 +200,11 @@ static int __notify(l_ezlopi_item_t *item)
         char *curr_ldr_state = NULL;
         if (((float)(4096 - ezlopi_analog_data.value) / 4096.0f) > 0.5f) // pot_val : [100% - 30%]
         {
-            curr_ldr_state = (char *)light_alarm_states[0]; // no light
+            curr_ldr_state = "no_light"; // no light
         }
         else
         {
-            curr_ldr_state = (char *)light_alarm_states[1]; // light detected
+            curr_ldr_state = "light_detected"; // light detected
         }
         if (curr_ldr_state != (char *)item->user_arg)
         {

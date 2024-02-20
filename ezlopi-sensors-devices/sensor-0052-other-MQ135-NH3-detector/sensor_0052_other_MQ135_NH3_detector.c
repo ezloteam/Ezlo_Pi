@@ -106,9 +106,11 @@ static int __0052_prepare(void *arg)
             {
                 MQ135_item_digi->cloud_properties.device_id = MQ135_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ135_item_digi, device_prep_arg->cjson_device);
+                ret = 1;
             }
             else
             {
+                ret = -1;
                 ezlopi_device_free_device(MQ135_device_digi);
             }
         }
@@ -127,18 +129,20 @@ static int __0052_prepare(void *arg)
                 {
                     MQ135_item_adc->cloud_properties.device_id = MQ135_item_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ135_item_adc, device_prep_arg->cjson_device, MQ135_value);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(MQ135_device_adc);
                     free(MQ135_value);
                 }
             }
             else
             {
+                ret = -1;
                 free(MQ135_value);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -160,25 +164,29 @@ static int __0052_init(l_ezlopi_item_t *item)
             input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
             ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
         }
-        if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        else if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
             // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            // calibrate if not done
-            s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
-            if (false == MQ135_value->Calibration_complete_NH3)
-            {
-                xTaskCreate(__calibrate_MQ135_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            { // calibrate if not done
+                s_mq135_value_t *MQ135_value = (s_mq135_value_t *)item->user_arg;
+                if (MQ135_value)
+                {
+                    if (false == MQ135_value->Calibration_complete_NH3)
+                    {
+                        xTaskCreate(__calibrate_MQ135_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                    }
+                }
+                ret = 1;
             }
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
-                free(item->user_arg);// this will free ; memory address linked to all items
-                item->user_arg = NULL;
+                ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                }
             }
         }
     }

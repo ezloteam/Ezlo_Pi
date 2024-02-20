@@ -77,17 +77,21 @@ int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-
-    s_ultrasonic_sensor_t *ultrasonic_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
-    cJSON *cj_param = (cJSON *)arg;
-    char valueFormatted[20];
-    if (cj_param && ultrasonic_sensor)
+    if (item)
     {
-        snprintf(valueFormatted, 20, "%d cm", ultrasonic_sensor->distance);
-        cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
-        cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
+        cJSON *cj_param = (cJSON *)arg;
+        s_ultrasonic_sensor_t *ultrasonic_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
+        if (cj_param && ultrasonic_sensor)
+        {
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
+            char *valueFormatted = ezlopi_valueformatter_float(ultrasonic_sensor->distance);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
+        }
     }
-
     return ret;
 }
 
@@ -154,7 +158,13 @@ static int __init(l_ezlopi_item_t *item)
             {
                 free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
             }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 

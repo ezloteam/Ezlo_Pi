@@ -163,15 +163,18 @@ static int __0063_init(l_ezlopi_item_t *item)
             input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
             ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
         }
-        if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        else if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
             // initialize analog_pin
             ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
             // calibrate if not done
             s_mq9_value_t *MQ9_value = (s_mq9_value_t *)item->user_arg;
-            if (false == MQ9_value->Calibration_complete_LPG_flameable)
+            if (MQ9_value)
             {
-                xTaskCreate(__calibrate_MQ9_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                if (false == MQ9_value->Calibration_complete_LPG_flameable)
+                {
+                    xTaskCreate(__calibrate_MQ9_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                }
             }
             ret = 1;
         }

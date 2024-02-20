@@ -152,7 +152,7 @@ static int __0050_prepare(void *arg)
 static int __0050_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (NULL != item)
+    if (item)
     {
         if ((ezlopi_item_name_gas_alarm == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
         {
@@ -166,26 +166,30 @@ static int __0050_init(l_ezlopi_item_t *item)
             gpio_config(&input_conf);
             ret = 1;
         }
-        if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        else if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
             // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            // calibrate if not done
-            s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
-            if (false == MQ3_value->Calibration_complete_alcohol)
-            {
-                xTaskCreate(__calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            { // calibrate if not done
+                s_mq3_value_t *MQ3_value = (s_mq3_value_t *)item->user_arg;
+                if (MQ3_value)
+                {
+                    if (false == MQ3_value->Calibration_complete_alcohol)
+                    {
+                        xTaskCreate(__calibrate_MQ3_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                    }
+                }
+                ret = 1;
             }
-        }
-        ret = 1;
-    }
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
-        {
-            free(item->user_arg);// this will free ; memory address linked to all items
-            item->user_arg = NULL;
+            else
+            {
+                ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                }
+            }
         }
     }
 
@@ -285,10 +289,13 @@ static int __0050_get_item(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq3_value_t *MQ3_value = ((s_mq3_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ3_value->_alcohol_ppm);
-                free(valueFormatted);
+                char *valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
             }
             ret = 1;
         }
@@ -312,10 +319,13 @@ static int __0050_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq3_value_t *MQ3_value = ((s_mq3_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ3_value->_alcohol_ppm);
-                free(valueFormatted);
+                char *valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
             }
             ret = 1;
         }

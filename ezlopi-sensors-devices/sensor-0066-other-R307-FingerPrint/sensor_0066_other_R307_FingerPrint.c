@@ -309,16 +309,12 @@ static int __0066_init(l_ezlopi_item_t *item)
                         {
                             ret = -1;
                             gpio_isr_handler_remove(intr_pin);
-                            free(item->user_arg); // this will free ; memory address linked to all items
-                            item->user_arg = NULL;
                             TRACE_E("Error!! : Failed to add GPIO ISR handler.");
                         }
                     }
                     else
                     {
                         ret = -1;
-                        free(item->user_arg); // this will free ; memory address linked to all items
-                        item->user_arg = NULL;
                         TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
                     }
                 }
