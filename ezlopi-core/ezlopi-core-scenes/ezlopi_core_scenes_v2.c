@@ -745,32 +745,33 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
 {
     if (field && cj_value)
     {
+        CJSON_TRACE("cj_value", cj_value);
         TRACE_I("type: %s", ezlopi_scene_get_scene_value_type_name(field->value_type));
         switch (cj_value->type)
         {
         case cJSON_Number:
         {
-            field->value.type = VALUE_TYPE_NUMBER;
-            field->value.value_double = cj_value->valuedouble;
-            TRACE_I("value: %f", field->value.value_double);
+            field->field_value.e_type = VALUE_TYPE_NUMBER;
+            field->field_value.u_value.value_double = cj_value->valuedouble;
+            TRACE_I("value: %f", field->field_value.u_value.value_double);
             break;
         }
         case cJSON_String:
         {
             if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID == field->value_type)
             {
-                field->value.type = VALUE_TYPE_NUMBER;
-                field->value.value_double = strtoul(cj_value->valuestring, NULL, 16);
+                field->field_value.e_type = VALUE_TYPE_NUMBER;
+                field->field_value.u_value.value_double = strtoul(cj_value->valuestring, NULL, 16);
             }
             else
             {
-                field->value.type = VALUE_TYPE_STRING;
+                field->field_value.e_type = VALUE_TYPE_STRING;
                 uint32_t value_len = strlen(cj_value->valuestring) + 1;
-                field->value.value_string = malloc(value_len);
-                if (field->value.value_string)
+                field->field_value.u_value.value_string = malloc(value_len);
+                if (field->field_value.u_value.value_string)
                 {
-                    snprintf(field->value.value_string, value_len, "%s", cj_value->valuestring);
-                    TRACE_I("value: %s", field->value.value_string);
+                    snprintf(field->field_value.u_value.value_string, value_len, "%s", cj_value->valuestring);
+                    TRACE_I("value: %s", field->field_value.u_value.value_string);
                 }
                 else
                 {
@@ -781,23 +782,23 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
         }
         case cJSON_True:
         {
-            field->value.type = VALUE_TYPE_BOOL;
-            field->value.value_bool = true;
+            field->field_value.e_type = VALUE_TYPE_BOOL;
+            field->field_value.u_value.value_bool = true;
             TRACE_I("value: true");
             break;
         }
         case cJSON_False:
         {
-            field->value.type = VALUE_TYPE_BOOL;
-            field->value.value_bool = false;
+            field->field_value.e_type = VALUE_TYPE_BOOL;
+            field->field_value.u_value.value_bool = false;
             TRACE_I("value: false");
             break;
         }
         case cJSON_Object:
         {
-            field->value.type = VALUE_TYPE_CJSON;
-            field->value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
-            CJSON_TRACE("value", field->value.cj_value);
+            field->field_value.e_type = VALUE_TYPE_CJSON;
+            field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
+            CJSON_TRACE("value", field->field_value.u_value.cj_value);
             break;
         }
         case cJSON_Array:
@@ -810,20 +811,20 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
             {
             case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
             {
-                field->value.type = VALUE_TYPE_CJSON;
-                field->value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
+                field->field_value.e_type = VALUE_TYPE_CJSON;
+                field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BLOCKS:
             {
-                field->value.type = VALUE_TYPE_BLOCK;
+                field->field_value.e_type = VALUE_TYPE_BLOCK;
                 while (NULL != (cj_block = cJSON_GetArrayItem(cj_value, block_idx++)))
                 {
                     CJSON_TRACE("cj_block", cj_block);
 
-                    if (field->value.when_block)
+                    if (field->field_value.u_value.when_block)
                     {
-                        l_when_block_v2_t* curr_when_block = field->value.when_block;
+                        l_when_block_v2_t* curr_when_block = field->field_value.u_value.when_block;
                         while (curr_when_block->next)
                         {
                             curr_when_block = curr_when_block->next;
@@ -832,7 +833,7 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
                     }
                     else
                     {
-                        field->value.when_block = ____new_when_block_populate(cj_block);
+                        field->field_value.u_value.when_block = ____new_when_block_populate(cj_block);
                     }
                 }
                 break;
@@ -846,7 +847,7 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
         }
         default:
         {
-            field->value.type = VALUE_TYPE_UNDEFINED;
+            field->field_value.e_type = VALUE_TYPE_UNDEFINED;
             TRACE_E("cj_value type: %d", cj_value->type);
             break;
         }
@@ -863,8 +864,10 @@ static l_fields_v2_t* ______new_field_populate(cJSON* cj_field)
         if (field)
         {
             memset(field, 0, sizeof(l_fields_v2_t));
-            CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, field->name);
 
+            // field->field_value.u_value.when_block
+
+            CJSON_GET_VALUE_STRING_BY_COPY(cj_field, ezlopi_name_str, field->name);
             field->value_type = ezlopi_core_scenes_value_get_type(cj_field, ezlopi_type_str);
             _______fields_get_value(field, cJSON_GetObjectItem(cj_field, ezlopi_value_str));
         }
