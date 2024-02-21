@@ -1,47 +1,73 @@
 #include <string.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include "ezlopi_util_uuid.h"
 #include "ezlopi_core_ws_server_conn.h"
 
-static s_ws_server_new_connections_t *conn_head = NULL;
+static s_ws_server_connections_t *ws_conn_head = NULL;
 
-static s_ws_server_new_connections_t *__create_new_conn(TaskHandle_t handle, struct netconn *conn);
+static s_ws_server_connections_t *__create_ws_conn(struct netconn *conn);
 
-int ezlopi_core_ws_server_conn_add_new_conn(TaskHandle_t handle, struct netconn *conn)
+s_ws_server_connections_t *ezlopi_core_ws_server_conn_get_head(void)
 {
-    int ret = 0;
-    if (conn_head)
+    return ws_conn_head;
+}
+
+s_ws_server_connections_t *ezlopi_core_ws_server_conn_add_ws_conn(struct netconn *new_net_conn)
+{
+    s_ws_server_connections_t *ws_conn = NULL;
+    if (ws_conn_head)
     {
-        s_ws_server_new_connections_t *curr_conn = conn_head;
+        s_ws_server_connections_t *curr_conn = ws_conn_head;
         while (curr_conn->next)
         {
             curr_conn = curr_conn->next;
         }
 
-        curr_conn->next = __create_new_conn(handle, conn);
+        curr_conn->next = __create_ws_conn(new_net_conn);
+        ws_conn = curr_conn->next;
     }
     else
     {
-        conn_head = __create_new_conn(handle, conn);
+        ws_conn_head = __create_ws_conn(new_net_conn);
+        ws_conn = ws_conn_head;
+    }
+
+    return ws_conn;
+}
+
+int ezlopi_core_ws_server_conn_remove(s_ws_server_connections_t *remove_con)
+{
+    int ret = 0;
+
+    if (remove_con)
+    {
     }
 
     return ret;
 }
 
-int ezlopi_core_ws_server_conn_remove_conn(struct netconn *conn)
+s_ws_server_connections_t *ezlopi_core_ws_server_conn_pop(struct netconn *conn)
 {
-    int ret = 0;
+    s_ws_server_connections_t *pop_con = NULL;
 
-    if (conn == conn_head->conn)
+    if (conn == ws_conn_head->conn)
     {
-        netconn_delete(conn);
-        
+        pop_con = ws_conn_head;
+        ws_conn_head = ws_conn_head->next;
+        pop_con->next = NULL;
     }
     else
     {
-        s_ws_server_new_connections_t *curr_conn = conn_head;
+        s_ws_server_connections_t *curr_conn = ws_conn_head;
         while (curr_conn->next)
         {
-            if (curr_conn->next == conn)
+            if (curr_conn->next->conn == conn)
             {
+                pop_con = curr_conn->next;
+                curr_conn->next = curr_conn->next->next;
+                pop_con->next = NULL;
                 break;
             }
 
@@ -49,18 +75,19 @@ int ezlopi_core_ws_server_conn_remove_conn(struct netconn *conn)
         }
     }
 
-    return ret;
+    return pop_con;
 }
 
-static s_ws_server_new_connections_t *__create_new_conn(TaskHandle_t handle, struct netconn *conn)
+static s_ws_server_connections_t *__create_ws_conn(struct netconn *new_net_conn)
 {
-    s_ws_server_new_connections_t *new_ws_conn = malloc(sizeof(s_ws_server_new_connections_t));
+    s_ws_server_connections_t *new_ws_conn = malloc(sizeof(s_ws_server_connections_t));
     if (new_ws_conn)
     {
-        memset(new_ws_conn, 0, sizeof(s_ws_server_new_connections_t));
+        memset(new_ws_conn, 0, sizeof(s_ws_server_connections_t));
 
-        new_ws_conn->conn = conn;
-        new_ws_conn->handle = handle;
+        new_ws_conn->handle = NULL;
+        new_ws_conn->conn = new_net_conn;
+        ezlopi_util_uuid_generate_random(new_ws_conn->uuid);
         new_ws_conn->next = NULL;
     }
 

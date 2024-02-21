@@ -357,7 +357,7 @@ static void web_provisioning_config_check(void *pv)
 
             if (NULL != response)
             {
-                TRACE_S("Statuc Code : %d", response->status_code);
+                TRACE_S("Status Code : %d", response->status_code);
 
                 switch (response->status_code)
                 {

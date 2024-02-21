@@ -25,28 +25,18 @@
 static void blinky(void *pv);
 // extern void wss_server_init(void);
 
-void vApplicationIdleHook(void)
-{
-    TRACE_D("vApplicationIdleHook");
-}
-
-void vApplicationTickHook(void)
-{
-    TRACE_D("vApplicationTickHook");
-}
-
 void app_main(void)
 {
     gpio_install_isr_service(0);
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();
-    ezlopi_ble_service_init();
-    timer_service_init();
-    ezlopi_scenes_meshbot_init();
-    web_provisioning_init();
-    ota_service_init();
-    ezlopi_service_modes_init();
+    // ezlopi_ble_service_init();
+    // timer_service_init();
+    // ezlopi_scenes_meshbot_init();
+    // web_provisioning_init();
+    // ota_service_init();
+    // ezlopi_service_modes_init();
     // wss_server_init();
 
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);

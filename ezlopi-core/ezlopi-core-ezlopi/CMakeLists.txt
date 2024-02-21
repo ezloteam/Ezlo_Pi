@@ -6,8 +6,9 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-wifi
         ezlopi-core-modes
         ezlopi-core-sntp
+        ezlopi-core-ws-server
 )
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_ezlopi.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES ${EZLOPI_CORE_COMPONENTS})

@@ -6,4 +6,6 @@ typedef struct s_ezlopi_ws_server
 
 } s_ezlopi_ws_server_t;
 
+void ezlopi_core_ws_server_init(void);
+
 #endif // __EZLOPI_CORE_WS_H__

@@ -47,7 +47,7 @@ set(EZLOPI_SERVICES
 )
 
 # Register the components
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_main.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}

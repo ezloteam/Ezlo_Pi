@@ -8,7 +8,7 @@ const unsigned char hex[16] = "0123456789abcdef";
 
 static int __hex2dec(char c);
 
-void ezlopi_util_uuid_generate_random(uuid_t out)
+void ezlopi_util_uuid_generate_random(ezlopi_uuid_t out)
 {
     int i, j, rnd;
     static int seeded = 0;
@@ -36,7 +36,7 @@ void ezlopi_util_uuid_generate_random(uuid_t out)
     out[8] = (out[8] & 0x0f) | 0xa0;
 }
 
-void ezlopi_util_uuid_parse(const char *in, uuid_t uuid)
+void ezlopi_util_uuid_parse(const char *in, ezlopi_uuid_t uuid)
 {
     int i, j;
 
@@ -47,16 +47,21 @@ void ezlopi_util_uuid_parse(const char *in, uuid_t uuid)
         switch (in[i])
         {
         case '-':
+        {
             break;
+        }
         default:
-            uuid[j++] = (__hex2dec(in[i++]) << 4) | __hex2dec(in[i]);
+        {
+            uuid[j++] = (__hex2dec(in[i]) << 4) | __hex2dec(in[i + 1]);
+        }
         }
 
-        i++;
+        i+=2;
+        
     } while (j < 16 && i < 36);
 }
 
-void ezlopi_util_uuid_unparse(const uuid_t uuid, char *out)
+void ezlopi_util_uuid_unparse(const ezlopi_uuid_t uuid, char *out)
 {
     int i, j;
 
@@ -82,10 +87,10 @@ void ezlopi_util_uuid_unparse(const uuid_t uuid, char *out)
     out[36] = 0;
 }
 
-void ezlopi_util_uuid_copy(uuid_t dst, const uuid_t src)
+void ezlopi_util_uuid_copy(ezlopi_uuid_t dst, const ezlopi_uuid_t src)
 {
     int i;
-    for (i = 0; i < sizeof(uuid_t); i++)
+    for (i = 0; i < sizeof(ezlopi_uuid_t); i++)
     {
         dst[i] = src[i];
     }

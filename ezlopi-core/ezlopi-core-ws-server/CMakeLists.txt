@@ -6,6 +6,8 @@ set(EZLOPI_SDK_COMPONENTS
         nghttp
         esp_http_server
         protocol_examples_common
+        wpa_supplicant
+        esp_https_server
 )
 
 # Define ezlopi-components
@@ -53,11 +55,12 @@ set(EZLOPI_SERVICES
 )
 
 # Register the components
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_ws_server.c" "ezlopi_core_ws_server_conn.c" "${config_src}"
                         INCLUDE_DIRS "."
-                        REQUIRES        ${EZLOPI_CORE_COMPONENTS}
+                        REQUIRES        ${EZLOPI_SERVICES} 
+                                        ${EZLOPI_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}
+                                        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_CLOUD_COMPONENTS}
                                         ${EZLOPI_SENSOR_DEVICE_COMPONENTS}               
-                                        ${EZLOPI_SERVICES} 
 )
