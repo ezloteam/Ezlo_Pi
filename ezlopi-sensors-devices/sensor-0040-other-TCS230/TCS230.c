@@ -34,7 +34,7 @@ static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32
     if (tcs230_queue)
     {
         // add -> gpio_isr_handle(pin_num)
-        // TRACE_B("Queue_Available..... Adding Gpio_interrupt");
+        // TRACE_I("Queue_Available..... Adding Gpio_interrupt");
         gpio_isr_handler_add(gpio_pulse_output, gpio_isr_handler, NULL);
 
         // check queue_full => 1
@@ -42,7 +42,7 @@ static void Extract_TCS230_Pulse_Period_func(gpio_num_t gpio_pulse_output, int32
         {
         }
         // disable -> gpio_isr_handle_remove(pin_num)
-        // TRACE_B("Queue_full.....Removing Gpio_interrupt");
+        // TRACE_I("Queue_full.....Removing Gpio_interrupt");
         gpio_isr_handler_remove(gpio_pulse_output);
 
         if (QueueFlag == TCS230_QUEUE_FULL)
@@ -275,7 +275,7 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
                                &Green_period,
                                _TCS230_user_data->calib_data.most_green_timeP,
                                _TCS230_user_data->calib_data.least_green_timeP);
-        // TRACE_I("GREEN => %d....", _TCS230_user_data->green_mapped);
+        // TRACE_S("GREEN => %d....", _TCS230_user_data->green_mapped);
         //--------------------------------------------------
 
         int32_t Blue_period = 0;
@@ -287,11 +287,11 @@ bool get_tcs230_sensor_value(l_ezlopi_item_t *item)
                                &Blue_period,
                                _TCS230_user_data->calib_data.most_blue_timeP,
                                _TCS230_user_data->calib_data.least_blue_timeP);
-        // TRACE_B("\t\t BLUE => %d....", _TCS230_user_data->blue_mapped);
+        // TRACE_I("\t\t BLUE => %d....", _TCS230_user_data->blue_mapped);
         //--------------------------------------------------
 
         ESP_ERROR_CHECK(gpio_set_level(_TCS230_user_data->TCS230_pin.gpio_output_en, 0));
-        // TRACE_B("------------------------------------------------------");
+        // TRACE_I("------------------------------------------------------");
     }
     return true;
 }

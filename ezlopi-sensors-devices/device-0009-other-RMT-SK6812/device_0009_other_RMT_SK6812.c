@@ -178,7 +178,7 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
             }
             else
             {
-                TRACE_B("item->cloud_properties.item_name => %s", item->cloud_properties.item_name);
+                TRACE_D("item->cloud_properties.item_name => %s", item->cloud_properties.item_name);
             }
         }
     }

@@ -103,17 +103,17 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
             CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.adc.gpio_num);
-            TRACE_I("Accel X-axis gpio1: %d ", item->interface.adc.gpio_num);
+            TRACE_S("Accel X-axis gpio1: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
             CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.adc.gpio_num);
-            TRACE_I("Accel Y-axis gpio2: %d ", item->interface.adc.gpio_num);
+            TRACE_S("Accel Y-axis gpio2: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
             CJSON_GET_VALUE_INT(cj_device, "gpio3", item->interface.adc.gpio_num);
-            TRACE_I("Accel Z-axis gpio3: %d ", item->interface.adc.gpio_num);
+            TRACE_S("Accel Z-axis gpio3: %d ", item->interface.adc.gpio_num);
         }
     }
 }

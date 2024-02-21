@@ -484,7 +484,7 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
             user_data->gyro_y_offset = calibrationData[1] / (CALIBRATION_SAMPLES);
             user_data->gyro_z_offset = calibrationData[2] / (CALIBRATION_SAMPLES);
 
-            TRACE_I("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
+            TRACE_S("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
                     user_data->gyro_x_offset,
                     user_data->gyro_y_offset,
                     user_data->gyro_z_offset);

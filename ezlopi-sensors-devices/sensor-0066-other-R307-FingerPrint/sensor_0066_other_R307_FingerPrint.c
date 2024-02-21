@@ -68,7 +68,7 @@ static void __timer_callback(void *param)
             }
             else
             {
-                TRACE_I("...timer OFF...");
+                TRACE_S("...timer OFF...");
                 user_data->opmode = FINGERPRINT_MATCH_MODE;
                 ezlopi_device_value_updated_from_device_item_id_v3(user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL]);
                 esp_timer_stop(user_data->timerHandler);
@@ -454,7 +454,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                         for (uint16_t i = 0; i < value_array_size; i++) // eg. first protect => [2,4,5]
                         {
                             cJSON *fp_id = cJSON_GetArrayItem(cj_value_ids, i);
-                            TRACE_I("Protected ID:[#%d]", (fp_id->valueint));
+                            TRACE_S("Protected ID:[#%d]", (fp_id->valueint));
                             user_data->protect[fp_id->valueint] = true; // eg. protect this ID -> 2/4/5
                         }
 
@@ -619,7 +619,7 @@ static void __fingerprint_operation_task(void *params)
                                     {
                                         user_data->matched_id = user_data->user_id;
                                         user_data->matched_confidence_level = (((user_data->confidence_level) > (uint16_t)100) ? 100 : (user_data->confidence_level));
-                                        TRACE_B(" ---->  Matched ID: [%d] ; Confidence : [%d]", (user_data->matched_id), (user_data->matched_confidence_level));
+                                        TRACE_I(" ---->  Matched ID: [%d] ; Confidence : [%d]", (user_data->matched_id), (user_data->matched_confidence_level));
                                         break;
                                     }
                                     else
@@ -652,7 +652,7 @@ static void __fingerprint_operation_task(void *params)
                         {
                             if ((user_data->user_id) == current_id)
                             {
-                                TRACE_B("RESULT:...Enrollment of user_id[%d].... process => Success", current_id);
+                                TRACE_I("RESULT:...Enrollment of user_id[%d].... process => Success", current_id);
 
                                 user_data->opmode = FINGERPRINT_MATCH_MODE;
                                 TRACE_W("____ ENROLL_IDS: SENDING _____");
@@ -663,7 +663,7 @@ static void __fingerprint_operation_task(void *params)
                             }
                             else
                             {
-                                TRACE_B("RESULT:...Duplicate in user_id[%d]....  process => Blocked", current_id);
+                                TRACE_I("RESULT:...Duplicate in user_id[%d]....  process => Blocked", current_id);
                             }
                         }
                     }
@@ -688,12 +688,12 @@ static void __fingerprint_operation_task(void *params)
                                 user_data->user_id = i;
                                 if (r307_as606_erase_specified_id(item)) // then delete and update 'validity[]' status
                                 {
-                                    TRACE_I(" Success... DELETED ID[#%d]", i);
+                                    TRACE_S(" Success... DELETED ID[#%d]", i);
                                     user_data->validity[i] = false;
                                 }
                                 else
                                 {
-                                    TRACE_I(" Fail... NOT DELETED ID[#%d]", i);
+                                    TRACE_S(" Fail... NOT DELETED ID[#%d]", i);
                                 }
                             }
                         }
@@ -733,7 +733,7 @@ static void __fingerprint_operation_task(void *params)
                     break;
                 }
                 }
-                TRACE_I("     --->> Remove Finger; To activate next Task_notify <<----");
+                TRACE_S("     --->> Remove Finger; To activate next Task_notify <<----");
                 gpio_isr_handler_add(user_data->intr_pin, gpio_notify_isr, item);
                 user_data->__busy_guard = false;
             }

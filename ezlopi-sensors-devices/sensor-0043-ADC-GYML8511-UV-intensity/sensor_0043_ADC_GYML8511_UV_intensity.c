@@ -211,7 +211,7 @@ static int __0043_notify(l_ezlopi_item_t *item)
             s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
             ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
             float new_uvIntensity = mapfloat(((float)(adc_data.voltage) / 1000), 0.97, 2.7, 0.0, 15.0);
-            TRACE_I("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
+            TRACE_S("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
             if (fabs((user_data->uv_data) - new_uvIntensity) > 0.01)
             {
                 user_data->uv_data = new_uvIntensity;
