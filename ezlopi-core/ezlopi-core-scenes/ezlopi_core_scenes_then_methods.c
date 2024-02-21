@@ -5,18 +5,20 @@
 
 #include "ezlopi_cloud_constants.h"
 
-int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
+#include "ezlopi_service_meshbot.h"
+
+int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     int ret = 0;
     uint32_t item_id = 0;
-    cJSON *cj_params = cJSON_CreateObject();
+    cJSON* cj_params = cJSON_CreateObject();
 
     if (cj_params)
     {
-        l_action_block_v2_t *curr_then = (l_action_block_v2_t *)arg;
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
         if (curr_then)
         {
-            l_fields_v2_t *curr_field = curr_then->fields;
+            l_fields_v2_t* curr_field = curr_then->fields;
             while (curr_field)
             {
                 if (0 == strncmp(curr_field->name, "item", 4))
@@ -47,11 +49,11 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
                 curr_field = curr_field->next;
             }
 
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
             uint32_t found_item = 0;
             while (curr_device)
             {
-                l_ezlopi_item_t *curr_item = curr_device->items;
+                l_ezlopi_item_t* curr_item = curr_device->items;
                 while (curr_item)
                 {
                     if (item_id == curr_item->cloud_properties.item_id)
@@ -76,82 +78,128 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t *curr_scene, void *arg)
 
     return ret;
 }
-int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_run_scene(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
+{
+    int ret = 0;
+    uint32_t sceneID = 0;
+    bool execute_else_condition = false;
+    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    if (curr_then)
+    {
+        l_fields_v2_t* curr_field = curr_then->fields;
+        while (curr_field)
+        {
+            if ((0 == strncmp(curr_field->name, "sceneID", 7)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_SCENEID))
+            {
+                sceneID = strtoul(curr_field->value.value_string, NULL, 16);
+            }
+            else if ((0 == strncmp(curr_field->name, "block", 5)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
+            {
+                if (0 == strncmp(curr_field->value.value_string, "else", 4))
+                {
+                    execute_else_condition = true;
+                }
+                else if (0 == strncmp(curr_field->value.value_string, "thenGroups", 10))
+                {
+                    TRACE_D("Running scene group, yet to be implemented.");
+                }
+                else
+                {
+                    ret = 1;
+                }
+            }
+            else if ((0 == strncmp(curr_field->name, "group", 5)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
+            {
+                TRACE_D("Running scene group, yet to be implemented.");
+            }
+            curr_field = curr_field->next;
+        }
+        if (execute_else_condition)
+        {
+            ezlopi_meshbot_execute_scene_else_action_group(sceneID);
+        }
+        else
+        {
+            ezlopi_scenes_service_run_by_id(sceneID);
+        }
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
+}
+int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_set_expression(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_set_expression(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
 }
-int ezlopi_scene_then_set_variable(l_scenes_list_v2_t *curr_scene, void *arg)
-{
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
-}
-int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t *curr_scene, void *arg)
+int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
     return 0;
