@@ -232,20 +232,20 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (true == item->interface.i2c_master.enable)
+        bme680_data_t *user_data = (bme680_data_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_i2c_master_init(&item->interface.i2c_master);
-            bme680_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+            if (item->interface.i2c_master.enable)
+            {
+                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                bme680_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
+                ret = 1;
+            }
         }
-        ret = 1;
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -254,54 +254,77 @@ static int __init(l_ezlopi_item_t *item)
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cj_device = (cJSON *)arg;
-    if (cj_device && item)
+    if (item && arg)
     {
-        bme680_data_t *user_data = (bme680_data_t *)item->user_arg;
-        if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+        cJSON *cj_device = (cJSON *)arg;
+        if (cj_device)
         {
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->temperature);
-            cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", user_data->temperature);
-        }
-        if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
-        {
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->humidity);
-            cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", user_data->humidity);
-        }
-        if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
-        {
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->pressure / 1000.0);
-            cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", (user_data->pressure / 1000.0));
-        }
-        if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
-        {
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->iaq);
-            cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", (user_data->iaq));
-        }
-        if (ezlopi_item_name_distance == item->cloud_properties.item_name)
-        {
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->altitude);
-            cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", (user_data->altitude));
-        }
-        if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
-        {
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->co2_equivalent);
-            cJSON_AddStringToObject(cj_device, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-            cJSON_AddNumberToObject(cj_device, "value", (user_data->co2_equivalent));
+            bme680_data_t *user_data = (bme680_data_t *)item->user_arg;
+            if (user_data)
+            {
+                if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, user_data->temperature);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->temperature);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_device, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, user_data->humidity);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->humidity);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_device, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                else if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->pressure / 1000.0));
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->pressure / 1000.0);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_device, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                else if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->iaq));
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->iaq);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_device, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                else if (ezlopi_item_name_distance == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->altitude));
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->altitude);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_device, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                else if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
+                {
+                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->co2_equivalent));
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->co2_equivalent);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_device, ezlopi_valueformatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+            }
         }
     }
-
     return ret;
 }
 
@@ -311,61 +334,64 @@ static int __notify(l_ezlopi_item_t *item)
     if (item)
     {
         bme680_data_t *user_data = (bme680_data_t *)item->user_arg;
-        float temperature = user_data->temperature;
-        float humidity = user_data->humidity;
-        float pressure = user_data->pressure;
-        float iaq = user_data->iaq;
-        float altitude = user_data->altitude;
-        float co2_eqv = user_data->co2_equivalent;
+        if (user_data)
+        {
+            float temperature = user_data->temperature;
+            float humidity = user_data->humidity;
+            float pressure = user_data->pressure;
+            float iaq = user_data->iaq;
+            float altitude = user_data->altitude;
+            float co2_eqv = user_data->co2_equivalent;
 
-        bme680_get_data(user_data);
+            bme680_get_data(user_data);
 
-        if (ezlopi_item_name_temp == item->cloud_properties.item_name)
-        {
-            if (fabs(user_data->temperature - temperature) > 0.05)
+            if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-                user_data->temperature = temperature;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(user_data->temperature - temperature) > 0.05)
+                {
+                    user_data->temperature = temperature;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
-        {
-            if (fabs(user_data->humidity - humidity) > 0.05)
+            if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
-                user_data->humidity = humidity;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(user_data->humidity - humidity) > 0.05)
+                {
+                    user_data->humidity = humidity;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
-        {
-            if (fabs((user_data->pressure / 1000.0f) - (pressure / 1000.0f)) > 0.05)
+            if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
             {
-                user_data->pressure = pressure;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs((user_data->pressure / 1000.0f) - (pressure / 1000.0f)) > 0.05)
+                {
+                    user_data->pressure = pressure;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
-        {
-            if (fabs(user_data->iaq - iaq) > 0.05)
+            if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
             {
-                user_data->iaq = iaq;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(user_data->iaq - iaq) > 0.05)
+                {
+                    user_data->iaq = iaq;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_distance == item->cloud_properties.item_name)
-        {
-            if (fabs(user_data->altitude - altitude) > 0.05)
+            if (ezlopi_item_name_distance == item->cloud_properties.item_name)
             {
-                user_data->altitude = altitude;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(user_data->altitude - altitude) > 0.05)
+                {
+                    user_data->altitude = altitude;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
-        {
-            if (fabs(user_data->co2_equivalent - co2_eqv) > 0.05)
+            if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
             {
-                user_data->co2_equivalent = co2_eqv;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(user_data->co2_equivalent - co2_eqv) > 0.05)
+                {
+                    user_data->co2_equivalent = co2_eqv;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
     }

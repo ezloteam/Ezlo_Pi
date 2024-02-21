@@ -134,20 +134,36 @@ static int __0042_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
+        if (user_data)
         {
-            // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+            {
+                // initialize analog_pin
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -162,16 +178,22 @@ static int __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
+            if (user_data)
+            {
 #if VOLTAGE_DIVIDER_EN
-            char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 9.52f);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->volt) * 9.52f);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->volt) * 9.52f);
+                char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 9.52f);
 #else
-            char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 4.2f);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->volt) * 4.2f);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->volt) * 4.2f);
+                char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 4.2f);
 #endif
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-            ret = 1;
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+                ret = 1;
+            }
         }
     }
     return ret;
@@ -183,16 +205,19 @@ static int __0042_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
-
-        if (fabs(Vout - (user_data->volt)) > 0.5)
+        if (user_data)
         {
-            user_data->volt = Vout;
-            ezlopi_device_value_updated_from_device_v3(item);
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+            float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
+
+            if (fabs(Vout - (user_data->volt)) > 0.5)
+            {
+                user_data->volt = Vout;
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }

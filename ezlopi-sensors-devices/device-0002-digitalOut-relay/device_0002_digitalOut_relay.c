@@ -144,34 +144,37 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (255 != item->interface.gpio.gpio_out.gpio_num)
+        if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num) &&
+            (255 != item->interface.gpio.gpio_out.gpio_num))
         {
-            if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
-            {
-                const gpio_config_t io_conf = {
-                    .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
-                    .mode = GPIO_MODE_OUTPUT,
-                    .pull_up_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
-                                   (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                                      ? GPIO_PULLUP_ENABLE
-                                      : GPIO_PULLUP_DISABLE,
-                    .pull_down_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
-                                     (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                                        ? GPIO_PULLDOWN_ENABLE
-                                        : GPIO_PULLDOWN_DISABLE,
-                    .intr_type = GPIO_INTR_DISABLE,
-                };
+            const gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
+                .mode = GPIO_MODE_OUTPUT,
+                .pull_up_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
+                               (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                  ? GPIO_PULLUP_ENABLE
+                                  : GPIO_PULLUP_DISABLE,
+                .pull_down_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
+                                 (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                    ? GPIO_PULLDOWN_ENABLE
+                                    : GPIO_PULLDOWN_DISABLE,
+                .intr_type = GPIO_INTR_DISABLE,
+            };
 
-                gpio_config(&io_conf);
+            if (0 == gpio_config(&io_conf))
+            {
                 // digital_io_write_gpio_value(item);
                 __write_gpio_value(item);
                 ret = 1;
             }
+            else
+            {
+                ret = -1;
+            }
         }
-
-        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
-            (-1 != item->interface.gpio.gpio_in.gpio_num) &&
-            (255 != item->interface.gpio.gpio_in.gpio_num))
+        else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+                 (-1 != item->interface.gpio.gpio_in.gpio_num) &&
+                 (255 != item->interface.gpio.gpio_in.gpio_num))
         {
             const gpio_config_t io_conf = {
                 .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
@@ -188,19 +191,20 @@ static int __init(l_ezlopi_item_t *item)
                                  ? GPIO_INTR_POSEDGE
                                  : GPIO_INTR_NEGEDGE,
             };
-
-            gpio_config(&io_conf);
-            gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
-            ret = 1;
+            if (0 == gpio_config(&io_conf))
+            {
+                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -210,14 +214,16 @@ static int __init(l_ezlopi_item_t *item)
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cjson_propertise = (cJSON *)arg;
-    if (cjson_propertise)
+    if (item && arg)
     {
-        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
-        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
-        ret = 1;
+        cJSON *cjson_propertise = (cJSON *)arg;
+        if (cjson_propertise)
+        {
+            cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
+            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
+            ret = 1;
+        }
     }
-
     return ret;
 }
 
@@ -230,79 +236,75 @@ static void __set_gpio_value(l_ezlopi_item_t *item, int value)
 static int __set_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cjson_params = (cJSON *)arg;
-
-    if (NULL != cjson_params)
+    if (item && arg)
     {
-        CJSON_TRACE("cjson_params", cjson_params);
+        cJSON *cjson_params = (cJSON *)arg;
 
-        int value = 0;
-        cJSON *cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
-        if (cj_value)
+        if (NULL != cjson_params)
         {
-            switch (cj_value->type)
+            CJSON_TRACE("cjson_params", cjson_params);
+
+            int value = 0;
+            cJSON *cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+            if (cj_value)
             {
-            case cJSON_False:
-            {
-                value = 0;
-                break;
-            }
-            case cJSON_True:
-            {
-                value = 1;
-                break;
-            }
-            case cJSON_Number:
-            {
-                value = cj_value->valueint;
-                break;
+                switch (cj_value->type)
+                {
+                case cJSON_False:
+                    value = 0;
+                    break;
+                case cJSON_True:
+                    value = 1;
+                    break;
+                case cJSON_Number:
+                    value = cj_value->valueint;
+                    break;
+
+                default:
+                    break;
+                }
             }
 
-            default:
-                break;
-            }
-        }
+            TRACE_S("item_name: %s", item->cloud_properties.item_name);
+            TRACE_S("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
+            TRACE_S("item_id: 0x%08x", item->cloud_properties.item_id);
+            TRACE_S("prev value: %d", item->interface.gpio.gpio_out.value);
+            TRACE_S("cur value: %d", value);
 
-        TRACE_S("item_name: %s", item->cloud_properties.item_name);
-        TRACE_S("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
-        TRACE_S("item_id: %08x", item->cloud_properties.item_id);
-        TRACE_S("prev value: %d", item->interface.gpio.gpio_out.value);
-        TRACE_S("cur value: %d", value);
-
-        if (255 != item->interface.gpio.gpio_out.gpio_num)
-        {
-            if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+            if (255 != item->interface.gpio.gpio_out.gpio_num)
             {
-                __set_gpio_value(item, value);
+                if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+                {
+                    __set_gpio_value(item, value);
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            else
+            {
+                // in case of master switch
+                l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+                while (curr_device)
+                {
+                    l_ezlopi_item_t *curr_item = curr_device->items;
+                    while (curr_item)
+                    {
+                        if ((EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type) && (255 != curr_item->interface.gpio.gpio_out.gpio_num))
+                        {
+                            TRACE_D("GPIO-pin: %d", curr_item->interface.gpio.gpio_out.gpio_num);
+                            TRACE_D("value: %d", value);
+                            __set_gpio_value(curr_item, value);
+                            ezlopi_device_value_updated_from_device_v3(curr_item);
+                        }
+                        curr_item = curr_item->next;
+                    }
+                    curr_device = curr_device->next;
+                }
+
+                item->interface.gpio.gpio_out.value = value;
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
-        else
-        {
-            // in case of master switch
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
-            while (curr_device)
-            {
-                l_ezlopi_item_t *curr_item = curr_device->items;
-                while (curr_item)
-                {
-                    if ((EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type) && (255 != curr_item->interface.gpio.gpio_out.gpio_num))
-                    {
-                        TRACE_D("GPIO-pin: %d", curr_item->interface.gpio.gpio_out.gpio_num);
-                        TRACE_D("value: %d", value);
-                        __set_gpio_value(curr_item, value);
-                        ezlopi_device_value_updated_from_device_v3(curr_item);
-                    }
-                    curr_item = curr_item->next;
-                }
-                curr_device = curr_device->next;
-            }
-
-            item->interface.gpio.gpio_out.value = value;
-            ezlopi_device_value_updated_from_device_v3(item);
-        }
     }
-
     return ret;
 }
 

@@ -128,19 +128,35 @@ static int __0017_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        s_potentiometer_t *user_data = (s_potentiometer_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+            {
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -155,11 +171,17 @@ static int __0017_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_potentiometer_t *user_data = (s_potentiometer_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->pot_val);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->pot_val));
-            free(valueFormatted);
-            ret = 1;
+            if (user_data)
+            {
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->pot_val));
+                char *valueFormatted = ezlopi_valueformatter_float(user_data->pot_val);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+                ret = 1;
+            }
         }
     }
     return ret;
@@ -171,16 +193,19 @@ static int __0017_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_potentiometer_t *user_data = (s_potentiometer_t *)item->user_arg;
-        s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
-        float new_pot = (((float)(4095.0f - (adc_data.value)) / 4095.0f) * 100);
-
-        if (fabs((user_data->pot_val) - new_pot) > 0.05)
+        if (user_data)
         {
-            user_data->pot_val = new_pot;
-            ezlopi_device_value_updated_from_device_v3(item);
+            s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
+            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
+            float new_pot = (((float)(4095.0f - (adc_data.value)) / 4095.0f) * 100);
+
+            if (fabs((user_data->pot_val) - new_pot) > 0.05)
+            {
+                user_data->pot_val = new_pot;
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }

@@ -210,24 +210,31 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (true == item->interface.i2c_master.enable)
+        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_i2c_master_init(&item->interface.i2c_master);
-            if (MPU6050_ERR_OK == __mpu6050_config_device(item))
+            if (item->interface.i2c_master.enable)
             {
-                TRACE_S("Configuration Complete.... ");
-                xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2048, item, 1, NULL);
+                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                if (MPU6050_ERR_OK == __mpu6050_config_device(item))
+                {
+                    TRACE_I("Configuration Complete.... ");
+                    xTaskCreate(__mpu6050_calibration_task, "MPU6050_Calibration_Task", 2048, item, 1, NULL);
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
             }
-            ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -236,67 +243,94 @@ static int __init(l_ezlopi_item_t *item)
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)arg;
-    if (cj_result && item)
+    if (item && arg)
     {
-        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
         {
-            TRACE_S("Accel-x : %.2fm/s^2", user_data->ax);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->ax);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->ax);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
+            s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
+            if (user_data)
+            {
+                if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+                {
+                    TRACE_I("Accel-x : %.2fm/s^2", user_data->ax);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->ax);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->ax);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+                {
+                    TRACE_I("Accel-y : %.2fm/s^2", user_data->ay);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->ay);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->ay);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+                {
+                    TRACE_I("Accel-z : %.2fm/s^2", user_data->az);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->az);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->az);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+                {
+                    TRACE_I("Temp : %.2f*C", user_data->tmp);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->tmp);
+                    char *valueFormatted = ezlopi_valueformatter_float(user_data->tmp);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
+                {
+                    TRACE_I("Gyro-x : %d rpm", (int)user_data->gx);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gx));
+                    char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gx);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
+                {
+                    TRACE_I("Gyro-y : %d rpm", (int)user_data->gy);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gy));
+                    char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gy);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
+                {
+                    TRACE_I("Gyro-z : %d rpm", (int)user_data->gz);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gz));
+                    char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gz);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                ret = 1;
+            }
         }
-        if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
-        {
-            TRACE_S("Accel-y : %.2fm/s^2", user_data->ay);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->ay);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->ay);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
-        {
-            TRACE_S("Accel-z : %.2fm/s^2", user_data->az);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->az);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->az);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        if (ezlopi_item_name_temp == item->cloud_properties.item_name)
-        {
-            TRACE_S("Temp : %.2f*C", user_data->tmp);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->tmp);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->tmp);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
-        {
-            TRACE_S("Gyro-x : %d rpm", (int)user_data->gx);
-            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gx));
-            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gx);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
-        {
-            TRACE_S("Gyro-y : %d rpm", (int)user_data->gy);
-            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gy));
-            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gy);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
-        {
-            TRACE_S("Gyro-z : %d rpm", (int)user_data->gz);
-            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gz));
-            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gz);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        ret = 1;
     }
     return ret;
 }
@@ -308,7 +342,7 @@ static int __notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        if (user_data->calibration_complete)
+        if ((user_data) && user_data->calibration_complete)
         {
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
@@ -335,43 +369,42 @@ static int __notify(l_ezlopi_item_t *item)
                 }
                 // }
             }
-            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[1] - user_data->ay) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[2] - user_data->az) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[3] - user_data->tmp) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-
-            if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[4] - user_data->gx) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[5] - user_data->gy) > 0.5)
                 {
                     ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
-            if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
             {
                 if (fabs(__prev[6] - user_data->gz) > 0.5)
                 {
@@ -391,71 +424,73 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
     if (item)
     {
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-
-        uint8_t buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
-        uint8_t dummy[MPU6050_REG_COUNT_LEN] = {0};
-
-        float calibrationData[3] = {0};
-        uint8_t Check_Register = 0;
-        esp_err_t err = ESP_OK;
-        TRACE_W(".....................Calculating Paramter");
-
-        uint8_t write_buffer[] = {REG_INTR_STATUS}; // REG_INTR_STATUS;
-        uint8_t address_val = (ACCEL_X_H);
-
-        for (uint8_t i = CALIBRATION_SAMPLES + 50; i > 0; i--)
+        if (user_data)
         {
-            err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
-            err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, &Check_Register, 1);
+            uint8_t buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
+            uint8_t dummy[MPU6050_REG_COUNT_LEN] = {0};
 
-            if (ESP_OK == err)
+            float calibrationData[3] = {0};
+            uint8_t Check_Register = 0;
+            esp_err_t err = ESP_OK;
+            TRACE_W(".....................Calculating Paramter");
+
+            uint8_t write_buffer[] = {REG_INTR_STATUS}; // REG_INTR_STATUS;
+            uint8_t address_val = (ACCEL_X_H);
+
+            for (uint8_t i = CALIBRATION_SAMPLES + 50; i > 0; i--)
             {
-                if (Check_Register & DATA_RDY_INT_FLAG)
+                err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, write_buffer, 1);
+                err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, &Check_Register, 1);
+
+                if (ESP_OK == err)
                 {
-                    err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                    err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (buf), MPU6050_REG_COUNT_LEN);
+                    if (Check_Register & DATA_RDY_INT_FLAG)
+                    {
+                        err = ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                        err = ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (buf), MPU6050_REG_COUNT_LEN);
+                    }
+                    if (i <= CALIBRATION_SAMPLES)
+                    {
+                        if (ESP_OK != err)
+                        {
+                            buf[8] = dummy[8];
+                            buf[9] = dummy[9];
+                            buf[10] = dummy[10];
+                            buf[11] = dummy[11];
+                            buf[12] = dummy[12];
+                            buf[13] = dummy[13];
+                        }
+                        else
+                        {
+                            dummy[8] = buf[8];
+                            dummy[9] = buf[9];
+                            dummy[10] = buf[10];
+                            dummy[11] = buf[11];
+                            dummy[12] = buf[12];
+                            dummy[13] = buf[13];
+                        }
+                        calibrationData[0] += (float)((int16_t)(buf[8] << 8 | buf[9]));   // mean_raw_gx = 67 & 68;
+                        calibrationData[1] += (float)((int16_t)(buf[10] << 8 | buf[11])); // mean_raw_gy = 69 & 70;
+                        calibrationData[2] += (float)((int16_t)(buf[12] << 8 | buf[13])); // mean_raw_gz = 71 & 72;
+                    }
                 }
-                if (i <= CALIBRATION_SAMPLES)
+                else
                 {
-                    if (ESP_OK != err)
-                    {
-                        buf[8] = dummy[8];
-                        buf[9] = dummy[9];
-                        buf[10] = dummy[10];
-                        buf[11] = dummy[11];
-                        buf[12] = dummy[12];
-                        buf[13] = dummy[13];
-                    }
-                    else
-                    {
-                        dummy[8] = buf[8];
-                        dummy[9] = buf[9];
-                        dummy[10] = buf[10];
-                        dummy[11] = buf[11];
-                        dummy[12] = buf[12];
-                        dummy[13] = buf[13];
-                    }
-                    calibrationData[0] += (float)((int16_t)(buf[8] << 8 | buf[9]));   // mean_raw_gx = 67 & 68;
-                    calibrationData[1] += (float)((int16_t)(buf[10] << 8 | buf[11])); // mean_raw_gy = 69 & 70;
-                    calibrationData[2] += (float)((int16_t)(buf[12] << 8 | buf[13])); // mean_raw_gz = 71 & 72;
+                    TRACE_E("Data not ready ... [%d]", i);
                 }
             }
-            else
-            {
-                TRACE_E("Data not ready ... [%d]", i);
-            }
+
+            user_data->gyro_x_offset = calibrationData[0] / (CALIBRATION_SAMPLES);
+            user_data->gyro_y_offset = calibrationData[1] / (CALIBRATION_SAMPLES);
+            user_data->gyro_z_offset = calibrationData[2] / (CALIBRATION_SAMPLES);
+
+            TRACE_S("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
+                    user_data->gyro_x_offset,
+                    user_data->gyro_y_offset,
+                    user_data->gyro_z_offset);
+            TRACE_W("......................CALIBRATION COMPLETE");
+            user_data->calibration_complete = true;
         }
-
-        user_data->gyro_x_offset = calibrationData[0] / (CALIBRATION_SAMPLES);
-        user_data->gyro_y_offset = calibrationData[1] / (CALIBRATION_SAMPLES);
-        user_data->gyro_z_offset = calibrationData[2] / (CALIBRATION_SAMPLES);
-
-        TRACE_S("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
-                user_data->gyro_x_offset,
-                user_data->gyro_y_offset,
-                user_data->gyro_z_offset);
-        TRACE_W("......................CALIBRATION COMPLETE");
-        user_data->calibration_complete = true;
     }
     vTaskDelete(NULL);
 }

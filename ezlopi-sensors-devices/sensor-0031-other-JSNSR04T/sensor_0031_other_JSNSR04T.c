@@ -59,7 +59,6 @@ static int __notify(l_ezlopi_item_t *item)
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-
     if (item && arg)
     {
         cJSON *cj_result = (cJSON *)arg;
@@ -76,8 +75,11 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, distance);
 
                 char *valueFormatted = ezlopi_valueformatter_float(distance);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
                 cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_meter);
                 ret = 1;
             }
@@ -94,7 +96,6 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
     if (item)
     {
         jsn_sr04t_config_t *jsn_sr04t_config = malloc(sizeof(jsn_sr04t_config_t));
@@ -118,8 +119,14 @@ static int __init(l_ezlopi_item_t *item)
                 ret = -1;
                 item->user_arg = NULL;
                 free(jsn_sr04t_config);
+                ezlopi_device_free_device_by_item(item);
                 TRACE_E("JSN_SR04T not initializeed");
             }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
