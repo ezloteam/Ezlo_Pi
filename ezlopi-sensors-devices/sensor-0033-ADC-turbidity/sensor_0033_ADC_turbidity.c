@@ -164,12 +164,15 @@ static int __init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            {
+                ret = 1;
+            }
         }
         else
         {
             ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;

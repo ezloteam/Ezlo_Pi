@@ -97,10 +97,9 @@ static int __0055_prepare(void *arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         flex_t *flex_res_value = (flex_t *)malloc(sizeof(flex_t));
-        if (NULL != flex_res_value)
+        if (flex_res_value)
         {
             memset(flex_res_value, 0, sizeof(flex_t));
-
             l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (device_adc)
             {
@@ -134,19 +133,35 @@ static int __0055_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        flex_t *flex_res_value = (flex_t *)malloc(sizeof(flex_t));
+        if (flex_res_value)
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+            {
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
         else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -160,11 +175,17 @@ static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             flex_t *flex_res_value = (flex_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_int(flex_res_value->rs_0055);
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flex_res_value->rs_0055);
-            free(valueFormatted);
-            ret = 1;
+            if (flex_res_value)
+            {
+                char *valueFormatted = ezlopi_valueformatter_int(flex_res_value->rs_0055);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flex_res_value->rs_0055);
+                    free(valueFormatted);
+                }
+                ret = 1;
+            }
         }
     }
     return ret;

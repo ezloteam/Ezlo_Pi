@@ -133,19 +133,35 @@ static int __0056_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        fsr_t *fsr_struct = (fsr_t *)item->user_arg;
+        if (fsr_struct)
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+            {
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
         else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -160,10 +176,16 @@ static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             fsr_t *fsr_struct = (fsr_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_float(fsr_struct->fsr_value);
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, fsr_struct->fsr_value);
-            free(valueFormatted);
+            if (fsr_struct)
+            {
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, fsr_struct->fsr_value);
+                char *valueFormatted = ezlopi_valueformatter_float(fsr_struct->fsr_value);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+            }
             ret = 1;
         }
     }
@@ -176,19 +198,22 @@ static int __0056_notify(l_ezlopi_item_t *item)
     if (item)
     {
         fsr_t *fsr_struct = (fsr_t *)item->user_arg;
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
-
-        // New Force[N] is :
-        float new_force = 0.0098f * Calculate_GramForce(Vout);
-        // TRACE_E(" Force[N]: %.4f", fsr_struct->fsr_value);
-        if (new_force != fsr_struct->fsr_value)
+        if (fsr_struct)
         {
-            fsr_struct->fsr_value = new_force;
-            ezlopi_device_value_updated_from_device_v3(item);
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+            float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
+
+            // New Force[N] is :
+            float new_force = 0.0098f * Calculate_GramForce(Vout);
+            // TRACE_E(" Force[N]: %.4f", fsr_struct->fsr_value);
+            if (new_force != fsr_struct->fsr_value)
+            {
+                fsr_struct->fsr_value = new_force;
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }

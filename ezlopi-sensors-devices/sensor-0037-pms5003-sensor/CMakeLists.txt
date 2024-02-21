@@ -7,6 +7,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-actions
         ezlopi-core-devices
         ezlopi-core-timer
+        ezlopi-core-valueformatter 
 )
 set(EZLOPI_CLOUD_COMPONENTS
     ezlopi-cloud-constants

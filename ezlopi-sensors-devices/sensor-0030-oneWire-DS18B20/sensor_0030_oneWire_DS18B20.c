@@ -101,7 +101,8 @@ static int __init(l_ezlopi_item_t *item)
     int ret = -1;
     if ((item) && (item->interface.onewire_master.enable))
     {
-        if (ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
+        if (GPIO_IS_VALID_GPIO(item->interface.onewire_master.onewire_pin) &&
+            ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
         {
             if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
             {
@@ -124,6 +125,7 @@ static int __init(l_ezlopi_item_t *item)
         else
         {
             ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;

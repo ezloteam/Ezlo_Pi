@@ -155,8 +155,19 @@ static int __0041_init(l_ezlopi_item_t *item)
                     ret = -1;
                     free(item->user_arg); // this will free ; memory address linked to all items
                     item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
                 }
             }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -173,11 +184,11 @@ static int __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
             if (user_data)
             {
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->hum_val));
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->hum_val));
                 char *valueFormatted = ezlopi_valueformatter_uint32(user_data->hum_val);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     // TRACE_I("soil moisture  : %d", user_data->hum_val);
                     free(valueFormatted);
                 }

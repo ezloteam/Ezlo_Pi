@@ -386,8 +386,8 @@ static int __0048_notify(l_ezlopi_item_t *item)
                 double new_value = (double)__extract_MQ4_sensor_ppm(item);
                 if (fabs((double)(MQ4_value->_CH4_ppm) - new_value) > 0.0001)
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
                     MQ4_value->_CH4_ppm = (float)new_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
                 }
             }
         }

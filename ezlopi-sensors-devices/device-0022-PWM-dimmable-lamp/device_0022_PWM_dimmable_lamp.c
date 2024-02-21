@@ -232,7 +232,7 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_GPIO())
+        if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
             s_dimmable_bulb_properties_t *dimmable_bulb_arg = (s_dimmable_bulb_properties_t *)item->user_arg;
             if (dimmable_bulb_arg)

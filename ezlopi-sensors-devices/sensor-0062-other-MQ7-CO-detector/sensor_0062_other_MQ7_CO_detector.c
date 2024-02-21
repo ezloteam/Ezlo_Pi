@@ -75,14 +75,7 @@ int sensor_0062_other_MQ7_CO_detector(e_ezlopi_actions_t action, l_ezlopi_item_t
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (item)
-        {
-            s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
-            if (true == MQ7_value->Calibration_complete_CO)
-            {
-                __0062_notify(item);
-            }
-        }
+        __0062_notify(item);
         break;
     }
     default:
@@ -156,39 +149,63 @@ static int __0062_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        if ((ezlopi_item_name_gas_alarm == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
         {
-            // intialize digital_pin
-            gpio_config_t input_conf = {};
-            input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
-            input_conf.intr_type = GPIO_INTR_DISABLE;
-            input_conf.mode = GPIO_MODE_INPUT;
-            input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-            input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-            ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+            { // intialize digital_pin
+                gpio_config_t input_conf = {};
+                input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
+                input_conf.intr_type = GPIO_INTR_DISABLE;
+                input_conf.mode = GPIO_MODE_INPUT;
+                input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+                input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
+            }
+            else
+            {
+                ret = -1;
+                TRACE_E("Deleting Item!!");
+                ezlopi_device_free_device_by_item(item); // remove the item itself
+            }
         }
-        else if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
-            // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            // calibrate if not done
             s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
             if (MQ7_value)
             {
-                if (false == MQ7_value->Calibration_complete_CO)
+                if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+                { // initialize analog_pin
+                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    { // calibrate if not done
+                        if (false == MQ7_value->Calibration_complete_CO)
+                        {
+                            xTaskCreate(__calibrate_MQ7_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                        }
+                        ret = 1;
+                    }
+                    else
+                    {
+                        ret = -1;
+                        TRACE_E("Deleting Item!!");
+                        free(item->user_arg);
+                        item->user_arg = NULL;
+                        ezlopi_device_free_device_by_item(item); // remove the item itself
+                    }
+                }
+                else
                 {
-                    xTaskCreate(__calibrate_MQ7_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                    ret = -1;
+                    TRACE_E("Deleting Item!!");
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item); // remove the item itself
                 }
             }
-            ret = 1;
-        }
-        else
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
+                ret = -1;
+                TRACE_E("Deleting Item!!");
+                ezlopi_device_free_device_by_item(item); // remove the item itself;
             }
         }
     }
@@ -288,10 +305,16 @@ static int __0062_get_item(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq7_value_t *MQ7_value = ((s_mq7_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ7_value->_CO_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ7_value->_CO_ppm);
-                free(valueFormatted);
+                if (MQ7_value)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ7_value->_CO_ppm);
+                    char *valueFormatted = ezlopi_valueformatter_float(MQ7_value->_CO_ppm);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
             ret = 1;
         }
@@ -315,10 +338,16 @@ static int __0062_get_cjson_value(l_ezlopi_item_t *item, void *arg)
             if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq7_value_t *MQ7_value = ((s_mq7_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ7_value->_CO_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ7_value->_CO_ppm);
-                free(valueFormatted);
+                if (MQ7_value)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ7_value->_CO_ppm);
+                    char *valueFormatted = ezlopi_valueformatter_float(MQ7_value->_CO_ppm);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
             ret = 1;
         }
@@ -351,12 +380,15 @@ static int __0062_notify(l_ezlopi_item_t *item)
         if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
             // extract the sensor_output_values
-            double new_value = (double)__extract_MQ7_sensor_ppm(item);
             s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
-            if (fabs((double)(MQ7_value->_CO_ppm) - new_value) > 0.0001)
+            if ((MQ7_value) && (true == MQ7_value->Calibration_complete_CO))
             {
-                MQ7_value->_CO_ppm = (float)new_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                double new_value = (double)__extract_MQ7_sensor_ppm(item);
+                if (fabs((double)(MQ7_value->_CO_ppm) - new_value) > 0.0001)
+                {
+                    MQ7_value->_CO_ppm = (float)new_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
         ret = 1;
@@ -368,47 +400,50 @@ static float __extract_MQ7_sensor_ppm(l_ezlopi_item_t *item)
 {
     uint32_t mq7_adc_pin = item->interface.adc.gpio_num;
     s_mq7_value_t *MQ7_value = (s_mq7_value_t *)item->user_arg;
-    // calculation process
-    //-------------------------------------------------
-    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-    // extract the mean_sensor_analog_output_voltage
-    float analog_sensor_volt = 0;
-    for (uint8_t x = 10; x > 0; x--)
-    {
-        ezlopi_adc_get_adc_data(mq7_adc_pin, &ezlopi_analog_data);
+    if (MQ7_value)
+    { // calculation process
+        //-------------------------------------------------
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+        // extract the mean_sensor_analog_output_voltage
+        float analog_sensor_volt = 0;
+        for (uint8_t x = 10; x > 0; x--)
+        {
+            ezlopi_adc_get_adc_data(mq7_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-        analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
+            analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-        analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
+            analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-        vTaskDelay(1);
+            vTaskDelay(1);
+        }
+        analog_sensor_volt = analog_sensor_volt / 10.0f;
+
+        //-----------------------------------------------------------------------------------
+        // Stage_2 : [from 'sensor_0062_ADC_MQ7_methane_gas_detector.h']
+
+        // 1. Calculate 'Rs_gas' for the gas detected
+        float Rs_gas = (((MQ7_VOLT_RESOLUTION_Vc * mq7_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq7_eqv_RL);
+
+        // 1.1 Calculate @ 'ratio' during CO presence
+        double _ratio = (Rs_gas / ((MQ7_value->MQ7_R0_constant <= 0) ? (1.0f) : (MQ7_value->MQ7_R0_constant))); // avoid dividing by zero??
+        if (_ratio <= 0)
+        {
+            _ratio = 0;
+        }
+        //-------------------------------------------------
+
+        // 1.2 Calculate _CO_ppm
+        float _CO_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq7) / m_slope_mq7); // ---> _CO_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+        if (_CO_ppm < 0)
+        {
+            _CO_ppm = 0; // No negative values accepted or upper datasheet recomendation.
+        }
+        TRACE_E("_CO_ppm [CO] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _CO_ppm, (float)_ratio, analog_sensor_volt);
+
+        //-------------------------------------------------
+        return _CO_ppm;
     }
-    analog_sensor_volt = analog_sensor_volt / 10.0f;
-
-    //-----------------------------------------------------------------------------------
-    // Stage_2 : [from 'sensor_0062_ADC_MQ7_methane_gas_detector.h']
-
-    // 1. Calculate 'Rs_gas' for the gas detected
-    float Rs_gas = (((MQ7_VOLT_RESOLUTION_Vc * mq7_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq7_eqv_RL);
-
-    // 1.1 Calculate @ 'ratio' during CO presence
-    double _ratio = (Rs_gas / ((MQ7_value->MQ7_R0_constant <= 0) ? (1.0f) : (MQ7_value->MQ7_R0_constant))); // avoid dividing by zero??
-    if (_ratio <= 0)
-    {
-        _ratio = 0;
-    }
-    //-------------------------------------------------
-
-    // 1.2 Calculate _CO_ppm
-    float _CO_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq7) / m_slope_mq7); // ---> _CO_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
-    if (_CO_ppm < 0)
-    {
-        _CO_ppm = 0; // No negative values accepted or upper datasheet recomendation.
-    }
-    TRACE_E("_CO_ppm [CO] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _CO_ppm, (float)_ratio, analog_sensor_volt);
-
-    //-------------------------------------------------
-    return _CO_ppm;
+    return 0;
 }
 
 static void __calibrate_MQ7_R0_resistance(void *params)
@@ -467,5 +502,6 @@ static void __calibrate_MQ7_R0_resistance(void *params)
         // Set calibration_complete_CO flag
         MQ7_value->Calibration_complete_CO = true;
     }
+
     vTaskDelete(NULL);
 }

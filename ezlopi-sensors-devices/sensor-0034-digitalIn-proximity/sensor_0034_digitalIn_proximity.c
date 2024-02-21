@@ -145,8 +145,15 @@ static int proximity_sensor_init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
+                ezlopi_device_free_device_by_item(item);
                 TRACE_E("Error initializing Proximity sensor");
             }
+        }
+        else
+        {
+
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 

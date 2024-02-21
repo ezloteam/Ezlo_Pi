@@ -1,7 +1,7 @@
 #include "ld2410.h"
 #include "ezlopi_util_trace.h"
 
-static const char *TAG = "ld2410";
+// static const char *TAG = "ld2410";
 
 esp_err_t ld2410_setup(s_ezlopi_uart_t uart_settings)
 {

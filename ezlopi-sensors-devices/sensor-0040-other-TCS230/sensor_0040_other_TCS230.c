@@ -200,7 +200,13 @@ static int __0040_init(l_ezlopi_item_t *item)
                 ret = -1;
                 free(item->user_arg); // this will free ; memory address linked to all items
                 item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
             }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -213,17 +219,23 @@ static int __0040_get_cjson_value(l_ezlopi_item_t *item, void *args)
     if (cj_result && item)
     {
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
-        if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
+        if (user_data)
         {
-            cJSON *color_values = cJSON_AddObjectToObject(cj_result, "value");
-            cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
-            cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
-            cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
-            char *formatted_val = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", formatted_val);
-            free(formatted_val);
+            if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
+            {
+                cJSON *color_values = cJSON_AddObjectToObject(cj_result, ezlopi_value_str);
+                cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
+                cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
+                cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
+                char *valueFormatted = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }
@@ -234,22 +246,25 @@ static int __0040_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
-        uint32_t red = user_data->red_mapped;
-        uint32_t green = user_data->green_mapped;
-        uint32_t blue = user_data->blue_mapped;
-        bool valid_status = get_tcs230_sensor_value(item); // Informs and updates if valid data
-        if (valid_status)
+        if (user_data)
         {
-            if (fabs(red - user_data->red_mapped) > 10 ||
-                fabs(green - user_data->green_mapped) > 10 ||
-                fabs(blue - user_data->blue_mapped) > 10)
+            uint32_t red = user_data->red_mapped;
+            uint32_t green = user_data->green_mapped;
+            uint32_t blue = user_data->blue_mapped;
+            bool valid_status = get_tcs230_sensor_value(item); // Informs and updates if valid data
+            if (valid_status)
             {
-                TRACE_I("---------------------------------------");
-                TRACE_I("Red : %d", user_data->red_mapped);
-                TRACE_I("Green :%d", user_data->green_mapped);
-                TRACE_I("Blue : %d", user_data->blue_mapped);
-                TRACE_I("---------------------------------------");
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(red - user_data->red_mapped) > 10 ||
+                    fabs(green - user_data->green_mapped) > 10 ||
+                    fabs(blue - user_data->blue_mapped) > 10)
+                {
+                    TRACE_I("---------------------------------------");
+                    TRACE_I("Red : %d", user_data->red_mapped);
+                    TRACE_I("Green :%d", user_data->green_mapped);
+                    TRACE_I("Blue : %d", user_data->blue_mapped);
+                    TRACE_I("---------------------------------------");
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
     }
@@ -264,6 +279,8 @@ static void __tcs230_calibration_task(void *params) // calibration task
     if (item)
     { // extracting the 'user_args' from "item"
         s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        if (user_data)
+        {
 #if 0
 			    //--------------------------------------------------
 			    // calculate red min-max periods for each colour
@@ -314,19 +331,20 @@ static void __tcs230_calibration_task(void *params) // calibration task
 			    // show (LOW,HIGH) -> (max,min)
 #endif
 
-        user_data->calib_data.least_red_timeP = 120; /*Defaults*/
-        user_data->calib_data.most_red_timeP = 48;
-        user_data->calib_data.least_green_timeP = 109;
-        user_data->calib_data.most_green_timeP = 86;
-        user_data->calib_data.least_blue_timeP = 120;
-        user_data->calib_data.most_blue_timeP = 78;
+            user_data->calib_data.least_red_timeP = 120; /*Defaults*/
+            user_data->calib_data.most_red_timeP = 48;
+            user_data->calib_data.least_green_timeP = 109;
+            user_data->calib_data.most_green_timeP = 86;
+            user_data->calib_data.least_blue_timeP = 120;
+            user_data->calib_data.most_blue_timeP = 78;
 
-        TRACE_B("red(Least,Most) => red(%d,%d)", user_data->calib_data.least_red_timeP, user_data->calib_data.most_red_timeP);
-        TRACE_B("green(Least,Most) => green(%d,%d)", user_data->calib_data.least_green_timeP, user_data->calib_data.most_green_timeP);
-        TRACE_B("blue(Least,Most) => blue(%d,%d)", user_data->calib_data.least_blue_timeP, user_data->calib_data.most_blue_timeP);
-        //--------------------------------------------------
-        // set the calib flag
-        user_data->calibration_complete = true;
+            TRACE_B("red(Least,Most) => red(%d,%d)", user_data->calib_data.least_red_timeP, user_data->calib_data.most_red_timeP);
+            TRACE_B("green(Least,Most) => green(%d,%d)", user_data->calib_data.least_green_timeP, user_data->calib_data.most_green_timeP);
+            TRACE_B("blue(Least,Most) => blue(%d,%d)", user_data->calib_data.least_blue_timeP, user_data->calib_data.most_blue_timeP);
+            //--------------------------------------------------
+            // set the calib flag
+            user_data->calibration_complete = true;
+        }
     }
     vTaskDelete(NULL);
 }
