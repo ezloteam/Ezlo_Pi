@@ -1,5 +1,6 @@
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_then_methods.h"
 
@@ -132,8 +133,21 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
 }
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    cJSON* cj_params = cJSON_CreateObject();
+
+    if (cj_params)
+    {
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            TRACE_E("Rebooting ESP......................... ");
+            EZPI_CORE_reboot();
+        }
+
+        cJSON_Delete(cj_params);
+    }
+    return ret;
 }
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
