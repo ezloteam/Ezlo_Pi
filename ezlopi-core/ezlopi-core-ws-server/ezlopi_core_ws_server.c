@@ -120,9 +120,9 @@ static void __connection_process(void *pv)
 
             if (ret)
             {
-
                 do
                 {
+                    __ws_data_handle(ws_conn);
 
                     vTaskDelay(1);
                 } while (1);
@@ -210,7 +210,6 @@ static int __new_connection_handsake(s_ws_server_connections_t *ws_conn)
             uint16_t data_size = 0;
 
             netbuf_data(net_buffer, &buf_data, &data_size);
-            netbuf_delete(net_buffer);
 
             if (buf_data)
             {
@@ -223,8 +222,6 @@ static int __new_connection_handsake(s_ws_server_connections_t *ws_conn)
 
                     ezlopi_util_uuid_generate_random(ws_conn->uuid);
                     uint32_t tmp_len = snprintf(concated_strings, sizeof(concated_strings), "%.*s%s", client_sec_key_len, client_sec_key_start, gsc_wss_guid);
-
-                    free(buf_data); // work of buf_data finishes here
 
                     uint8_t hash_of_cat[20];
                     memset(hash_of_cat, 0, sizeof(hash_of_cat));
@@ -252,15 +249,9 @@ static int __new_connection_handsake(s_ws_server_connections_t *ws_conn)
                         ret = 1;
                     }
                 }
-                else
-                {
-                    TRACE_E("Here");
-                }
             }
-            else
-            {
-                TRACE_E("Here");
-            }
+
+            netbuf_delete(net_buffer);
         }
         else
         {
@@ -277,81 +268,91 @@ static int __new_connection_handsake(s_ws_server_connections_t *ws_conn)
 
 static int __ws_data_handle(s_ws_server_connections_t *ws_conn)
 {
+    int ret = 0;
     if (ws_conn)
     {
+        TRACE_D("Here");
         struct netbuf *net_buffer = NULL;
         err_t err = netconn_recv(ws_conn->net_conn, &net_buffer);
         TRACE_W("err: %s", lwip_strerr(err));
 
         if (net_buffer)
         {
-
             uint8_t *rx_data = NULL;
             uint32_t data_len = 0;
 
+            netbuf_first(net_buffer);
             netbuf_data(net_buffer, &rx_data, &data_len);
-            netbuf_delete(net_buffer);
             net_buffer = NULL;
 
-            uint8_t *payload_start = NULL;
-            s_ws_header_frame_t *header_frame = (s_ws_header_frame_t *)rx_data;
+            if (rx_data)
+            {
+                dump("rx_data", rx_data, 0, data_len);
 
-            if (header_frame->payload_len <= 125)
-            {
-                __process_payload(header_frame, rx_data);
-            }
-            else if (header_frame == 126)
-            {
-                __process_extended_payload_2(header_frame, rx_data);
-            }
-            else if (header_frame == 127)
-            {
-                __process_extended_payload_8(header_frame, rx_data);
+                uint8_t *payload_start = NULL;
+                s_ws_header_frame_t *header_frame = (s_ws_header_frame_t *)rx_data;
+
+                if (header_frame->payload_len <= 125)
+                {
+                    __process_payload(header_frame, rx_data);
+                }
+                else if (header_frame == 126)
+                {
+                    __process_extended_payload_2(header_frame, rx_data);
+                }
+                else if (header_frame == 127)
+                {
+                    __process_extended_payload_8(header_frame, rx_data);
+                }
+
+                switch (header_frame->opcode)
+                {
+                case WS_OPCODE_TEXT_FRAME:
+                {
+                    TRACE_I("text frame");
+                    break;
+                }
+                case WS_OPCODE_CONNECTION_CLOSE:
+                {
+                    TRACE_I("connection close");
+                    break;
+                }
+                case WS_OPCODE_CONTINUOUS_FRAME:
+                {
+                    TRACE_I("continuous frame");
+                    break;
+                }
+                case WS_OPCODE_BINARY_FRAME:
+                {
+                    TRACE_I("binary frame");
+                    break;
+                }
+                case WS_OPCODE_PING_FRAME:
+                {
+                    TRACE_I("ping");
+                }
+                case WS_OPCODE_PONG_FRAME:
+                {
+                    TRACE_I("pong");
+                    break;
+                }
+                default:
+                {
+                    TRACE_E("unknown upcode");
+                    break;
+                }
+                }
             }
 
-            TRACE_D("payload-len: %u", data_len);
-
-            switch (header_frame->opcode)
-            {
-            case WS_OPCODE_TEXT_FRAME:
-            {
-                TRACE_I("text frame");
-                break;
-            }
-            case WS_OPCODE_CONNECTION_CLOSE:
-            {
-                TRACE_I("connection close");
-                break;
-            }
-            case WS_OPCODE_CONTINUOUS_FRAME:
-            {
-                TRACE_I("continuous frame");
-                break;
-            }
-            case WS_OPCODE_BINARY_FRAME:
-            {
-                TRACE_I("binary frame");
-                break;
-            }
-            case WS_OPCODE_PING_FRAME:
-            {
-                TRACE_I("ping");
-            }
-            case WS_OPCODE_PONG_FRAME:
-            {
-                TRACE_I("pong");
-                break;
-            }
-            default:
-            {
-                TRACE_E("unknown upcode");
-                break;
-            }
-            }
-
-            dump("rx-data", rx_data, 0, data_len);
+            netbuf_delete(net_buffer);
+        }
+        else
+        {
+            TRACE_E("netbuf is null");
         }
     }
+
+    return ret;
 }
 
 static int __process_payload(s_ws_header_frame_t *header_frame, uint8_t *rx_data)
@@ -362,6 +363,7 @@ static int __process_payload(s_ws_header_frame_t *header_frame, uint8_t *rx_data
     {
         uint32_t data_len = (uint32_t)header_frame->payload_len;
         uint8_t *payload_start = rx_data + 2;
+        TRACE_D("payload-len: %u", data_len);
     }
 
     return ret;
@@ -374,6 +376,7 @@ static int __process_extended_payload_2(s_ws_header_frame_t *header_frame, uint8
     {
         uint16_t data_len = (uint16_t)(rx_data + 2);
         uint8_t *payload_start = rx_data + 4;
+        TRACE_D("payload-len: %u", data_len);
     }
     return ret;
 }
@@ -385,6 +388,7 @@ static int __process_extended_payload_8(s_ws_header_frame_t *header_frame, uint8
     {
         uint64_t data_len = ((uint64_t)(rx_data + 2));
         uint8_t *payload_start = rx_data + 10;
+        TRACE_D("payload-len: %llu", data_len);
     }
     return ret;
 }
