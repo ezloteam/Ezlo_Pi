@@ -64,8 +64,9 @@ static void __connection_process(void *pv)
                 TRACE_D("here");
                 struct netbuf *net_buffer = NULL;
                 err_t err = netconn_recv(ws_conn->conn, &net_buffer);
+                TRACE_D("here");
 
-                if ((ESP_OK == err) && net_buffer)
+                if ((ERR_OK == err) && net_buffer)
                 {
                     char *data_str = NULL;
                     uint32_t data_len = 0;
@@ -93,7 +94,6 @@ static void __connection_process(void *pv)
 
 static void __server_process(void *pv)
 {
-    TRACE_D("Here");
     struct netconn *listen_con = netconn_new(NETCONN_TCP);
 
     if (listen_con)
@@ -102,7 +102,6 @@ static void __server_process(void *pv)
         err_t err = netconn_listen(listen_con);
         if (ERR_OK == err)
         {
-            TRACE_D("listening...");
             while (1)
             {
                 struct netconn *new_con = NULL;
@@ -114,6 +113,24 @@ static void __server_process(void *pv)
                     s_ws_server_connections_t *ws_conn = ezlopi_core_ws_server_conn_add_ws_conn(new_con);
                     if (ws_conn)
                     {
+                        struct netbuf *tmp_net_buf = NULL;
+                        err_t err = netconn_recv(new_con, &tmp_net_buf);
+
+                        TRACE_W("error: %s", lwip_strerr(err));
+
+                        if ( tmp_net_buf)
+                        {
+                            char *data = NULL;
+                            uint32_t data_len = 0;
+
+                            netbuf_data(tmp_net_buf, &data, &data_len);
+
+                            if (data)
+                            {
+                                TRACE_W("data: %s", data);
+                            }
+                        }
+
                         xTaskCreate(__connection_process, "ws-connection", 4 * 1024, ws_conn, 5, &ws_conn->handle);
                     }
                     else
