@@ -1,7 +1,14 @@
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_http.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_event_group.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_then_methods.h"
+// #include "ezlopi_core_scenes_then_methods_helper_func.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -137,8 +144,57 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    cJSON* cj_params = cJSON_CreateObject();
+
+    if (cj_params)
+    {
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, "type", 5))
+                {
+                    if ((EZLOPI_VALUE_TYPE_ENUM == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                    {
+                        TRACE_S("value: %s", curr_field->field_value.u_value.value_string);
+                        if (0 == strncmp(curr_field->field_value.u_value.value_string, "factory", 8))
+                        {
+                            TRACE_E("Factory Reseting ESP......................... ");
+                            // clear the settings realated to scenes, devices, items, rooms,etc
+                            ezlopi_scenes_scripts_factory_info_reset();
+                            ezlopi_device_factory_info_reset();
+                            ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
+
+                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            TRACE_E("Rebooting ESP......................... ");
+                            EZPI_CORE_reboot();
+                        }
+                        else if (0 == strncmp(curr_field->field_value.u_value.value_string, "soft", 5))
+                        {
+                            ezlopi_nvs_scenes_soft_reset();
+
+                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            TRACE_E("Rebooting ESP......................... ");
+                            EZPI_CORE_reboot();
+                        }
+                        #warning "hard reset not in documention."
+                            // else if (0 == strncmp(curr_field->field_value.u_value.value_string, "hard", 5))
+                            // {
+                            //      ezlopi_factory_info_v3_scenes_factory_hard_reset();
+                            // }
+                    }
+                }
+
+                curr_field = curr_field->next;
+            }
+        }
+
+        cJSON_Delete(cj_params);
+    }
+    return ret;
 }
 int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t* curr_scene, void* arg)
 {
