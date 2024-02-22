@@ -4,7 +4,6 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
-#include "ezlopi_core_reset.h"
 #include "ezlopi_core_factory_info.h"
 
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
@@ -693,12 +692,5 @@ int ezlopi_factory_info_v3_scenes_factory_soft_reset(void)
     {
         TRACE_E("Could not activate factory/soft reset");
     }
-    return ret;
-}
-
-int ezlopi_factory_info_v3_scenes_factory_hard_reset(void)
-{
-    int ret = 0;
-    EZPI_CORE_factory_restore();
     return ret;
 }

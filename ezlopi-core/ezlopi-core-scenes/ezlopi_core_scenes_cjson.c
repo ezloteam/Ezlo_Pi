@@ -38,13 +38,13 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_FLOAT:
             {
                 cJSON_AddNumberToObject(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_double);
-                // cJSON_AddNumberToObject(cj_field, ezlopi_value_str, field_node->value.value_double);
+                // cJSON_AddNumberToObject(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_double);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BOOL:
             {
                 if (0 == field_node->field_value.u_value.value_double)
-                    // if (0 == field_node->value.value_double)
+                    // if (0 == field_node->field_value.u_value.value_double)
                 {
                     cJSON_AddFalseToObject(cj_field, ezlopi_value_str);
                 }
@@ -60,7 +60,7 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_INTERVAL:
             {
                 __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
-                // __cjson_add_string(cj_field, ezlopi_value_str, field_node->value.value_string);
+                // __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BLOCKS:
@@ -87,7 +87,14 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
                 }
                 break;
             }
+            case EZLOPI_VALUE_TYPE_CREDENTIAL:
             case EZLOPI_VALUE_TYPE_DICTIONARY:
+            {
+                // #warning "need to duplicate?"
+                    // cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, field_node->field_value.u_value.cj_value);
+                cJSON_AddItemToObject(cj_field, ezlopi_value_str, cJSON_Duplicate(field_node->field_value.u_value.cj_value, 1));
+                break;
+            }
             case EZLOPI_VALUE_TYPE_ARRAY:
             case EZLOPI_VALUE_TYPE_RGB:
             case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
@@ -417,8 +424,13 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         }
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_CREDENTIAL:
                     case EZLOPI_VALUE_TYPE_DICTIONARY:
                     case EZLOPI_VALUE_TYPE_ARRAY:
+                    {
+                        cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);
+                        break;
+                    }
                     case EZLOPI_VALUE_TYPE_RGB:
                     case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
                     case EZLOPI_VALUE_TYPE_USER_CODE:

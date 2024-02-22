@@ -8,7 +8,7 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_then_methods.h"
-// #include "ezlopi_core_scenes_then_methods_helper_func.h"
+#include "ezlopi_core_scenes_then_methods_helper_func.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -104,8 +104,50 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    if (curr_then)
+    {
+        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)malloc(sizeof(s_ezlopi_core_http_mbedtls_t));
+        if (tmp_http_data)
+        {
+            memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
+            l_fields_v2_t* curr_field = curr_then->fields;
+
+            const s_sendhttp_method_t __sendhttp_method[] = {
+                {.field_name = "request", .field_func = parse_http_request_type},
+                {.field_name = "url", .field_func = parse_http_url},
+                {.field_name = "credential", .field_func = parse_http_creds},
+                {.field_name = "contentType", .field_func = parse_http_content_type},
+                {.field_name = "content", .field_func = parse_http_content},
+                {.field_name = "headers", .field_func = parse_http_headers},
+                {.field_name = "skipSecurity", .field_func = parse_http_skipsecurity},
+                {.field_name = NULL, .field_func = NULL},
+            };
+
+            while (NULL != curr_field) // fields
+            {
+                for (uint8_t i = 0; i < ((sizeof(__sendhttp_method) / sizeof(__sendhttp_method[i]))); i++)
+                {
+                    if (0 == strncmp(__sendhttp_method[i].field_name, curr_field->name, strlen(__sendhttp_method[i].field_name) + 1))
+                    {
+                        (__sendhttp_method[i].field_func)(tmp_http_data, curr_field);
+                        break;
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+            // now to trigger http_request and extract the response.
+            tmp_http_data->response = NULL;
+            tmp_http_data->response_maxlen = 0;
+            ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
+            free_http_mbedtls_struct(tmp_http_data);
+
+            free(tmp_http_data);
+        }
+    }
+
+    return ret;
 }
 int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t* curr_scene, void* arg)
 {
@@ -181,10 +223,10 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
                             EZPI_CORE_reboot();
                         }
                         #warning "hard reset not in documention."
-                            // else if (0 == strncmp(curr_field->field_value.u_value.value_string, "hard", 5))
-                            // {
-                            //      ezlopi_factory_info_v3_scenes_factory_hard_reset();
-                            // }
+                        else if (0 == strncmp(curr_field->field_value.u_value.value_string, "hard", 5))
+                        {
+                            EZPI_CORE_factory_restore();
+                        }
                     }
                 }
 

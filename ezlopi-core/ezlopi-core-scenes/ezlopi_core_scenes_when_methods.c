@@ -414,7 +414,7 @@ int ezlopi_scene_when_not(l_scenes_list_v2_t* scene_node, void* arg)
             if (scene_method)
             {
                 // iterate through all '_when_blocks_'
-                ret &= !(scene_method(scene_node, (void*)value_when_block)); // if all the block-calls are false, then return 1;
+                ret = !(scene_method(scene_node, (void*)value_when_block)); // if all the block-calls are false, then return 1;
             }
 
             value_when_block = value_when_block->next;
