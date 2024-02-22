@@ -2,10 +2,9 @@
 
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_then_methods.h"
+#include "ezlopi_service_meshbot.h"
 
 #include "ezlopi_cloud_constants.h"
-
-#include "ezlopi_service_meshbot.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
@@ -23,26 +22,30 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
             {
                 if (0 == strncmp(curr_field->name, "item", 4))
                 {
-                    cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->value.value_string);
-                    item_id = strtoul(curr_field->value.value_string, NULL, 16);
-                    TRACE_D("item_id: %s", curr_field->value.value_string);
+                    cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
+
+                    // cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
+                    // item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
                 }
                 else if (0 == strncmp(curr_field->name, ezlopi_value_str, 5))
                 {
                     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
                     {
-                        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, curr_field->value.value_double);
-                        TRACE_D("value: %f", curr_field->value.value_double);
+                        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_double);
+                        TRACE_D("value: %f", curr_field->field_value.u_value.value_double);
                     }
                     else if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                     {
-                        cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->value.value_bool);
-                        TRACE_D("value: %s", curr_field->value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+                        cJSON_AddBoolToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_bool);
+                        TRACE_D("value: %s", curr_field->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
                     }
                     else if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                     {
-                        cJSON_AddStringToObject(cj_params, ezlopi_value_str, curr_field->value.value_string);
-                        TRACE_D("value: %s", curr_field->value.value_string);
+                        cJSON_AddStringToObject(cj_params, ezlopi_value_str, curr_field->field_value.u_value.value_string);
+                        TRACE_D("value: %s", curr_field->field_value.u_value.value_string);
                     }
                 }
 
@@ -119,19 +122,33 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
         l_fields_v2_t* curr_field = curr_then->fields;
         while (curr_field)
         {
-            if ((0 == strncmp(curr_field->name, "sceneID", 7)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_SCENEID))
+            if (0 == strncmp(curr_field->name, "sceneId", 7))
             {
-                sceneID = strtoul(curr_field->value.value_string, NULL, 16);
-            }
-            else if ((0 == strncmp(curr_field->name, "block", 5)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
-            {
-                if (0 == strncmp(curr_field->value.value_string, "else", 4))
+                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
                 {
-                    execute_else_condition = true;
+                    sceneID = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
-                else if (0 == strncmp(curr_field->value.value_string, "thenGroups", 10))
+                else
                 {
-                    TRACE_D("Running scene group, yet to be implemented.");
+                    ret = 1;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "block", 5))
+            {
+                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                {
+                    if (0 == strncmp(curr_field->field_value.u_value.value_string, "else", 4))
+                    {
+                        execute_else_condition = true;
+                    }
+                    else if (0 == strncmp(curr_field->field_value.u_value.value_string, "thenGroups", 10))
+                    {
+                        TRACE_D("Running scene group, yet to be implemented.");
+                    }
+                    else
+                    {
+                        ret = 1;
+                    }
                 }
                 else
                 {
@@ -146,10 +163,12 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
         }
         if (execute_else_condition)
         {
+            TRACE_D("Executing else condition");
             ezlopi_meshbot_execute_scene_else_action_group(sceneID);
         }
         else
         {
+            TRACE_D("Executing scene, id: %d", sceneID);
             ezlopi_scenes_service_run_by_id(sceneID);
         }
     }

@@ -22,7 +22,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
         {
             if (0 == strncmp(curr_field->name, "item", 4))
             {
-                item_id = strtoul(curr_field->value.value_string, NULL, 16);
+                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
             else if (0 == strncmp(curr_field->name, ezlopi_value_str, 4))
             {
@@ -52,7 +52,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
                                 {
                                 case cJSON_True:
                                 {
-                                    if (true == value_field->value.value_bool)
+                                    if (true == value_field->field_value.u_value.value_bool)
                                     {
                                         ret = 1;
                                     }
@@ -60,7 +60,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
                                 }
                                 case cJSON_False:
                                 {
-                                    if (false == value_field->value.value_bool)
+                                    if (false == value_field->field_value.u_value.value_bool)
                                     {
                                         ret = 1;
                                     }
@@ -68,7 +68,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
                                 }
                                 case cJSON_Number:
                                 {
-                                    if (cj_value->valuedouble == value_field->value.value_double)
+                                    if (cj_value->valuedouble == value_field->field_value.u_value.value_double)
                                     {
                                         ret = 1;
                                     }
@@ -76,8 +76,8 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
                                 }
                                 case cJSON_String:
                                 {
-                                    uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->value.value_string);
-                                    if (0 == strncmp(cj_value->valuestring, value_field->value.value_string, cmp_size))
+                                    uint32_t cmp_size = (strlen(cj_value->valuestring) > strlen(value_field->field_value.u_value.value_string)) ? strlen(cj_value->valuestring) : strlen(value_field->field_value.u_value.value_string);
+                                    if (0 == strncmp(cj_value->valuestring, value_field->field_value.u_value.value_string, cmp_size))
                                     {
                                         ret = 1;
                                     }
@@ -112,7 +112,7 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t* scene_node, void* arg)
     if (scene_node)
     {
         char* end_prt = NULL;
-        uint32_t interval = strtoul(scene_node->when_block->fields->value.value_string, &end_prt, 10);
+        uint32_t interval = strtoul(scene_node->when_block->fields->field_value.u_value.value_string, &end_prt, 10);
         if (end_prt)
         {
             if (0 == strncmp(end_prt, "m", 1))
@@ -215,7 +215,7 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
         uint32_t idx = 0;
         cJSON* cj_house_mdoe_id = NULL;
 
-        while (NULL == (cj_house_mdoe_id = cJSON_GetArrayItem(house_mode_id_array->value.cj_value, idx++)))
+        while (NULL == (cj_house_mdoe_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
         {
             if (cj_house_mdoe_id->valuestring)
             {
@@ -298,7 +298,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
         {
             if (0 == strncmp(curr_field->name, "item", 4))
             {
-                item_id = strtoul(curr_field->value.value_string, NULL, 16);
+                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
             else if (0 == strncmp(curr_field->name, ezlopi_value_str, 4))
             {
@@ -380,7 +380,7 @@ int ezlopi_scene_when_and(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
     {
-        l_when_block_v2_t* value_when_block = when_block->fields->value.when_block;
+        l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
         while (value_when_block)
         {
             f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
@@ -407,7 +407,7 @@ int ezlopi_scene_when_not(l_scenes_list_v2_t* scene_node, void* arg)
     if (when_block)
     {
         ret = 1; // required for the first case
-        l_when_block_v2_t* value_when_block = when_block->fields->value.when_block;
+        l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
         while (value_when_block)
         {
             f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
@@ -429,7 +429,7 @@ int ezlopi_scene_when_or(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
     {
-        l_when_block_v2_t* value_when_block = when_block->fields->value.when_block;
+        l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
         while (value_when_block)
         {
             f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
@@ -455,7 +455,7 @@ int ezlopi_scene_when_xor(l_scenes_list_v2_t* scene_node, void* arg)
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
     {
-        l_when_block_v2_t* value_when_block = when_block->fields->value.when_block;
+        l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
         while (value_when_block)
         {
             f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
