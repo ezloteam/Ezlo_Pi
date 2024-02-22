@@ -127,6 +127,8 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
+        ezlopi_event_group_clear_event(EZLOPI_EVENT_WIFI_CONNECTED);
+
         // event_data; //
         wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
         TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
@@ -165,6 +167,10 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
         ezlopi_flag_wifi_status = true;
 
         // alert_qt_wifi_got_ip();
+    }
+    else
+    {
+        TRACE_E("unknown event:: event_base: %u, event_id: %d", (uint32_t)event_base, event_id);
     }
 
     ll_ezlopi_wifi_event_upcall_t *curr_upcall = __event_upcall_head;
@@ -291,12 +297,12 @@ esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
 {
     uint32_t ret = 0;
-    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, 0))
+    while (-1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false))
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
-    ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, 0);
+    ret = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, wait_time_ms, false);
     return ret;
 }
 

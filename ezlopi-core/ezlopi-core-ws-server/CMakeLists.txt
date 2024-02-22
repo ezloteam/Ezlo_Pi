@@ -25,6 +25,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-scenes
         ezlopi-core-actions
         ezlopi-core-devices 
+        ezlopi-core-event-group
 )
 
 # Define HAL components

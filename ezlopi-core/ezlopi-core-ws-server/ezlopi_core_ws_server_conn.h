@@ -12,8 +12,8 @@
 typedef struct s_ws_server_connections
 {
     ezlopi_uuid_t uuid;
-    TaskHandle_t handle;
-    struct netconn *conn;
+    TaskHandle_t task_handle;
+    struct netconn *net_conn;
 
     struct s_ws_server_connections *next;
 } s_ws_server_connections_t;
