@@ -15,6 +15,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_mdns.h"
 
 #ifdef EZPI_CORE_ENABLE_ETH
 #include "ezlopi_core_ethernet.h"
@@ -77,6 +78,8 @@ void ezlopi_init(void)
 #endif // EZPI_CORE_ENABLE_ETH
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
+
+    ezlopi_core_initialize_mdns();
 
     ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);

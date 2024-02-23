@@ -10,7 +10,8 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-wifi
         ezlopi-core-sntp
         ezlopi-core-ble
-        ezlopi-core-scenes       
+        ezlopi-core-scenes    
+        ezlopi-core-mdns   
 
 )
 
