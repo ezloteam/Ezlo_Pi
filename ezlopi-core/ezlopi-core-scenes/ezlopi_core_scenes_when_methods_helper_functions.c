@@ -677,7 +677,7 @@ uint8_t issunstate_eval_days(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr
 uint8_t issunstate_eval_range(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
-    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+    if ((EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
         s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
         if ((user_data) && (0 != user_data->sunstate_mode))
@@ -821,27 +821,45 @@ void isdate_range_get_tm(l_fields_v2_t* curr_field, struct tm* tmp_tm)
 }
 void isdate_range_get_startday(l_fields_v2_t* curr_field, struct tm* tmp_tm)
 {
-    tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
+    }
 }
 void isdate_range_get_endday(l_fields_v2_t* curr_field, struct tm* tmp_tm)
 {
-    tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 31;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 31;
+    }
 }
 void isdate_range_get_startmonth(l_fields_v2_t* curr_field, struct tm* tmp_tm)
 {
-    tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
+    }
 }
 void isdate_range_get_endmonth(l_fields_v2_t* curr_field, struct tm* tmp_tm)
 {
-    tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 12;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 12;
+    }
 }
 void isdate_range_get_startyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
 {
-    tmp_tm->tm_year = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        tmp_tm->tm_year = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
+    }
 }
 void isdate_range_get_endyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
 {
-    tmp_tm->tm_year = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 2147483647;
+    if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+    {
+        tmp_tm->tm_year = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 2147483647;
+    }
 }
 
 uint8_t isdate_range_check_tm(struct tm* start, struct tm* end, struct tm* info)
