@@ -36,7 +36,7 @@ extern void ezlopi_ble_service_dynamic_config_init(void);
 
 static void ezlopi_ble_basic_init(void);
 
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void);
 #endif
 
@@ -62,8 +62,8 @@ void ezlopi_ble_service_init(void)
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
 
-#if (1 == EZLOPI_BLE_ENALBE_PAIRING)
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
@@ -96,7 +96,7 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
         "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
 
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
     const uint32_t default_passkey = 123456;

@@ -16,9 +16,9 @@
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 
-#ifdef EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 #include "ezlopi_core_ethernet.h"
-#endif // EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_ota.h"
@@ -65,16 +65,16 @@ void ezlopi_init(void)
 
     ezlopi_ble_service_init();
 
-#ifdef EZPI_SERV_ENABLE_MESHBOTS
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-#ifdef EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
     ezlopi_ethernet_init();
-#endif // EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
