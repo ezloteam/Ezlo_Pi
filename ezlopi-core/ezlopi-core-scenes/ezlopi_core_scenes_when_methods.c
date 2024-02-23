@@ -356,8 +356,34 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'has_atleast_one_dictionary_value' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (scene_node && when_block)
+    {
+        uint32_t item_id = 0;
+        l_fields_v2_t* value_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                value_field = curr_field; // this contains "options [array]" & 'value': to be checked
+            }
+            curr_field = curr_field->next;
+        }
+
+        // now to extract the
+        if (item_id && value_field)
+        {
+            ret = ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(item_id, value_field);
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)

@@ -1416,12 +1416,14 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
                         const char* str_tmp = NULL;
                         if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_tmp = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
-                            /*Below lines are commented because ; docmentation has incorrect type*/
+                            // " ezlopi_cloud_value_type_str.c "
+                            
                             // const char *tmp_value_type = "";
                             // if ((value_field->value_type > EZLOPI_VALUE_TYPE_NONE) && (value_field->value_type < EZLOPI_VALUE_TYPE_MAX))
                             // {
                             //     tmp_value_type = ezlopi_scenes_value_numeric_range_value_types[value_field->value_type]; // must return "dictionary"
                             // }
+
                             if (STR_OP_COMP("dictionary", == , str_tmp)) // 'dictionary' == 'dictionary'?
                             {
                                 cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
