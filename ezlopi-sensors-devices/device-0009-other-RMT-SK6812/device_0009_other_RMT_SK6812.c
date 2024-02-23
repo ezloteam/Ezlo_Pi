@@ -76,48 +76,50 @@ int device_0009_other_RMT_SK6812(e_ezlopi_actions_t action, l_ezlopi_item_t* ite
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-
-    led_strip_t* sk6812_strip = (led_strip_t*)item->user_arg;
-    cJSON* cjson_properties = (cJSON*)arg;
-    if ((NULL != cjson_properties) && (NULL != sk6812_strip))
+    if (item && arg)
     {
-        if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
+        led_strip_t *sk6812_strip = (led_strip_t *)item->user_arg;
+        cJSON *cjson_properties = (cJSON *)arg;
+        if ((NULL != cjson_properties) && (NULL != sk6812_strip))
         {
-            cJSON* color_json = cJSON_AddObjectToObject(cjson_properties, ezlopi_value_str);
-            if (color_json)
+            if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                int green = sk6812_strip->buf[0];
-                int red = sk6812_strip->buf[1];
-                int blue = sk6812_strip->buf[2];
-                cJSON_AddNumberToObject(color_json, "red", red);
-                cJSON_AddNumberToObject(color_json, "green", green);
-                cJSON_AddNumberToObject(color_json, "blue", blue);
-                cJSON_AddNumberToObject(color_json, "cwhite", ((red << 16) | (green << 8) | (blue)));
-                char* formatted_val = ezlopi_valueformatter_rgb(red, green, blue);
+                cJSON *color_json = cJSON_AddObjectToObject(cjson_properties, ezlopi_value_str);
+                if (color_json)
+                {
+                    int green = sk6812_strip->buf[0];
+                    int red = sk6812_strip->buf[1];
+                    int blue = sk6812_strip->buf[2];
+                    cJSON_AddNumberToObject(color_json, "red", red);
+                    cJSON_AddNumberToObject(color_json, "green", green);
+                    cJSON_AddNumberToObject(color_json, "blue", blue);
+                    cJSON_AddNumberToObject(color_json, "cwhite", ((red << 16) | (green << 8) | (blue)));
+                    char *formatted_val = ezlopi_valueformatter_rgb(red, green, blue);
+                    if (formatted_val)
+                    {
+                        cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
+                        free(formatted_val);
+                    }
+                }
+            }
+            else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
+            {
+                item->interface.pwm.duty_cycle = (int)ceil(((sk6812_strip->brightness * 100.0) / 255.0));
+                cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, item->interface.pwm.duty_cycle);
+                char *formatted_val = ezlopi_valueformatter_int32(item->interface.pwm.duty_cycle);
                 if (formatted_val)
                 {
                     cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
                     free(formatted_val);
                 }
             }
-        }
-        else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
-        {
-            item->interface.pwm.duty_cycle = (int)ceil(((sk6812_strip->brightness * 100.0) / 255.0));
-            cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, item->interface.pwm.duty_cycle);
-            char* formatted_val = ezlopi_valueformatter_int32(item->interface.pwm.duty_cycle);
-            if (formatted_val)
+            else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
+                item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
+                cJSON_AddBoolToObject(cjson_properties, ezlopi_value_str, item->interface.gpio.gpio_in.value);
+                const char *formatted_val = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
                 cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
-                free(formatted_val);
             }
-        }
-        else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
-        {
-            item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
-            cJSON_AddBoolToObject(cjson_properties, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-            const char* formatted_val = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-            cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
         }
     }
     return ret;
@@ -127,7 +129,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
-    if (arg && item)
+    if (item && arg)
     {
         cJSON* cjson_params = (cJSON*)arg;
         s_dimmer_args_t* dimmer_args = (s_dimmer_args_t*)item->user_arg;
@@ -176,7 +178,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
             }
             else
             {
-                TRACE_I("item->cloud_properties.item_name => %s", item->cloud_properties.item_name);
+                TRACE_D("item->cloud_properties.item_name => %s", item->cloud_properties.item_name);
             }
         }
     }
@@ -189,52 +191,65 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_dimmer_args_t* dimmer_args = (s_dimmer_args_t*)item->user_arg;
-
-        if (0 == dimmer_args->sk6812_led_strip_initialized)
+        if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
-            dimmer_args->sk6812_strip.type = LED_STRIP_SK6812;
-            dimmer_args->sk6812_strip.length = 1;
-            dimmer_args->sk6812_strip.gpio = item->interface.pwm.gpio_num;
-            dimmer_args->sk6812_strip.buf = NULL;
-            dimmer_args->sk6812_strip.brightness = 255;
-            dimmer_args->sk6812_strip.channel = RMT_CHANNEL_0;
-
-            led_strip_install();
-            esp_err_t err = led_strip_init(&dimmer_args->sk6812_strip);
-            if (ESP_OK == err)
+            s_dimmer_args_t *dimmer_args = (s_dimmer_args_t *)item->user_arg;
+            if (dimmer_args)
             {
-                rgb_t color = {
-                    .red = 255,
-                    .green = 255,
-                    .blue = 255,
-                };
-
-                err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, dimmer_args->sk6812_strip.length, color);
-                if (ESP_OK == (err = led_strip_set_brightness(&dimmer_args->sk6812_strip, 255)))
+                if (0 == dimmer_args->sk6812_led_strip_initialized)
                 {
-                    if (ESP_OK == (err = led_strip_flush(&dimmer_args->sk6812_strip)))
+                    dimmer_args->sk6812_strip.type = LED_STRIP_SK6812;
+                    dimmer_args->sk6812_strip.length = 1;
+                    dimmer_args->sk6812_strip.gpio = item->interface.pwm.gpio_num;
+                    dimmer_args->sk6812_strip.buf = NULL;
+                    dimmer_args->sk6812_strip.brightness = 255;
+                    dimmer_args->sk6812_strip.channel = RMT_CHANNEL_0;
+
+                    led_strip_install();
+                    esp_err_t err = led_strip_init(&dimmer_args->sk6812_strip);
+                    if (ESP_OK == err)
                     {
-                        ret = 1;
-                        dimmer_args->sk6812_led_strip_initialized = true;
+                        rgb_t color = {
+                            .red = 255,
+                            .green = 255,
+                            .blue = 255,
+                        };
+
+                        err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, dimmer_args->sk6812_strip.length, color);
+                        if (ESP_OK == (err = led_strip_set_brightness(&dimmer_args->sk6812_strip, 255)))
+                        {
+                            if (ESP_OK == (err = led_strip_flush(&dimmer_args->sk6812_strip)))
+                            {
+                                ret = 1;
+                                dimmer_args->sk6812_led_strip_initialized = true;
+                            }
+                        }
+                    }
+
+                    if (ESP_OK != err)
+                    {
+                        TRACE_E("Couldn't initiate device!, error: %d", err);
+                        ret = -1;
+                        free(item->user_arg); // this will free ; memory address linked to all items
+                        item->user_arg = NULL;
                     }
                 }
+                else
+                {
+                    TRACE_E("Here");
+                    ret = -1;
+                }
             }
-
-            if (ESP_OK != err)
+            else
             {
-                TRACE_E("Couldn't initiate device!, error: %d", err);
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
             }
         }
-        if (0 == ret)
+        else
         {
-            TRACE_E("Here");
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
 

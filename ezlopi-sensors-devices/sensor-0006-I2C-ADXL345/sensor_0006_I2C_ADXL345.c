@@ -166,23 +166,30 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        if (item->interface.i2c_master.enable)
+        s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_i2c_master_init(&item->interface.i2c_master);
-            if (0 == __adxl345_configure_device(item))
+            if (item->interface.i2c_master.enable)
             {
-                TRACE_S("Configuration Complete...");
+                ezlopi_i2c_master_init(&item->interface.i2c_master);
+                if (0 == __adxl345_configure_device(item)) // ESP_OK
+                {
+                    TRACE_S("Configuration Complete...");
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
             }
-            ret = 1;
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -192,36 +199,51 @@ static int __init(l_ezlopi_item_t* item)
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON* cj_result = (cJSON*)arg;
-    if (cj_result && item)
+    if (item && arg)
     {
-        float acceleration_value;
-        s_adxl345_data_t* user_data = (s_adxl345_data_t*)item->user_arg;
-        if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
         {
-            acceleration_value = (user_data->acc_x * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-            cJSON_AddNumberToObject(cj_result, "value", acceleration_value);
-            char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
+            float acceleration_value = 0;
+            s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
+            if (user_data)
+            {
+                if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+                {
+                    acceleration_value = (user_data->acc_x * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
+                    char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+                {
+                    acceleration_value = (user_data->acc_y * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
+                    char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+                {
+                    acceleration_value = (user_data->acc_z * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
+                    char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                ret = 1;
+            }
         }
-        if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
-        {
-            acceleration_value = (user_data->acc_y * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-            cJSON_AddNumberToObject(cj_result, "value", acceleration_value);
-            char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
-        {
-            acceleration_value = (user_data->acc_z * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-            cJSON_AddNumberToObject(cj_result, "value", acceleration_value);
-            char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            free(valueFormatted);
-        }
-        ret = 1;
     }
     return ret;
 }
@@ -232,30 +254,33 @@ static int __notify(l_ezlopi_item_t* item)
     static float __prev[3] = { 0 };
     if (item)
     {
-        s_adxl345_data_t* user_data = (s_adxl345_data_t*)item->user_arg;
-        if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+        s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
+        if (user_data)
         {
-            __prev[0] = user_data->acc_x;
-            __adxl345_get_axis_value(item);
-            if (fabs((__prev[0] - user_data->acc_x) > 0.5))
+            if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                __prev[0] = user_data->acc_x;
+                __adxl345_get_axis_value(item);
+                if (fabs((__prev[0] - user_data->acc_x) > 0.5))
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
-        {
-            __prev[1] = user_data->acc_y;
-            if (fabs((__prev[1] - user_data->acc_x) > 0.5))
+            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                __prev[1] = user_data->acc_y;
+                if (fabs((__prev[1] - user_data->acc_x) > 0.5))
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
-        }
-        if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
-        {
-            __prev[2] = user_data->acc_z;
-            if (fabs((__prev[2] - user_data->acc_x) > 0.5))
+            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
+                __prev[2] = user_data->acc_z;
+                if (fabs((__prev[2] - user_data->acc_x) > 0.5))
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
         ret = 1;

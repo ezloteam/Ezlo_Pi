@@ -209,19 +209,26 @@ static int __0015_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
+        s_ezlopi_dht11_data_t *dht11_data = (s_ezlopi_dht11_data_t *)item->user_arg;
+        if (dht11_data)
         {
-            setDHT11gpio(item->interface.onewire_master.onewire_pin);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
+            {
+                setDHT11gpio(item->interface.onewire_master.onewire_pin);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -237,17 +244,23 @@ static int __0015_get_value(l_ezlopi_item_t* item, void* args)
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
             cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, dht11_data->temperature);
-            char* valueFormatted = ezlopi_valueformatter_float(dht11_data->temperature);
-            cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, valueFormatted);
-            free(valueFormatted);
+            char *valueFormatted = ezlopi_valueformatter_float(dht11_data->temperature);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
             cJSON_AddStringToObject(cj_properties, ezlopi_scale_str, item->cloud_properties.scale);
         }
         if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
             cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, dht11_data->humidity);
-            char* valueFormatted = ezlopi_valueformatter_float(dht11_data->humidity);
-            cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, valueFormatted);
-            free(valueFormatted);
+            char *valueFormatted = ezlopi_valueformatter_float(dht11_data->humidity);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
             cJSON_AddStringToObject(cj_properties, ezlopi_scale_str, item->cloud_properties.scale);
         }
     }

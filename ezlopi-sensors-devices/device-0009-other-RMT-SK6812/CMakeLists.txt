@@ -2,9 +2,11 @@
 
 idf_component_register(SRCS "device_0009_other_RMT_SK6812.c"
             INCLUDE_DIRS "."
-            REQUIRES    ezlopi-util-trace 
+            REQUIRES    
                         driver
                         led_strip
+
+                        ezlopi-util-trace 
 
                         ezlopi-core-timer 
                         ezlopi-core-cloud 

@@ -161,17 +161,14 @@ static int __0065_init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
+                ezlopi_device_free_device_by_item(item);
                 TRACE_E("Error initializing float switch");
             }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;

@@ -170,37 +170,43 @@ static int __0040_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
-        if (GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s0) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s1) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s2) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s3) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_output_en) &&
-            GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
+        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        if (user_data)
         {
-            __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
-                user_data->TCS230_pin.gpio_s1,
-                user_data->TCS230_pin.gpio_s2,
-                user_data->TCS230_pin.gpio_s3,
-                user_data->TCS230_pin.gpio_output_en,
-                user_data->TCS230_pin.gpio_pulse_output);
-            TRACE_W("Entering Calibration Phase for 30 seconds.....");
+            if (GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s0) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s1) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s2) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s3) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_output_en) &&
+                GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
+            {
+                __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
+                                    user_data->TCS230_pin.gpio_s1,
+                                    user_data->TCS230_pin.gpio_s2,
+                                    user_data->TCS230_pin.gpio_s3,
+                                    user_data->TCS230_pin.gpio_output_en,
+                                    user_data->TCS230_pin.gpio_pulse_output);
+                TRACE_W("Entering Calibration Phase for 30 seconds.....");
 
-            // configure Freq_scale at 20%
-            tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
+                // configure Freq_scale at 20%
+                tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
 
-            // activate a task to calibrate data
-            xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
-            ret = 1;
+                // activate a task to calibrate data
+                xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -212,18 +218,24 @@ static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* args)
     cJSON* cj_result = (cJSON*)args;
     if (cj_result && item)
     {
-        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
-        if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
+        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        if (user_data)
         {
-            cJSON* color_values = cJSON_AddObjectToObject(cj_result, "value");
-            cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
-            cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
-            cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
-            char* formatted_val = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", formatted_val);
-            free(formatted_val);
+            if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
+            {
+                cJSON *color_values = cJSON_AddObjectToObject(cj_result, ezlopi_value_str);
+                cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
+                cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
+                cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
+                char *valueFormatted = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }
@@ -233,23 +245,26 @@ static int __0040_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
-        uint32_t red = user_data->red_mapped;
-        uint32_t green = user_data->green_mapped;
-        uint32_t blue = user_data->blue_mapped;
-        bool valid_status = get_tcs230_sensor_value(item); // Informs and updates if valid data
-        if (valid_status)
+        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        if (user_data)
         {
-            if (fabs(red - user_data->red_mapped) > 10 ||
-                fabs(green - user_data->green_mapped) > 10 ||
-                fabs(blue - user_data->blue_mapped) > 10)
+            uint32_t red = user_data->red_mapped;
+            uint32_t green = user_data->green_mapped;
+            uint32_t blue = user_data->blue_mapped;
+            bool valid_status = get_tcs230_sensor_value(item); // Informs and updates if valid data
+            if (valid_status)
             {
-                TRACE_S("---------------------------------------");
-                TRACE_S("Red : %d", user_data->red_mapped);
-                TRACE_S("Green :%d", user_data->green_mapped);
-                TRACE_S("Blue : %d", user_data->blue_mapped);
-                TRACE_S("---------------------------------------");
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(red - user_data->red_mapped) > 10 ||
+                    fabs(green - user_data->green_mapped) > 10 ||
+                    fabs(blue - user_data->blue_mapped) > 10)
+                {
+                    TRACE_S("---------------------------------------");
+                    TRACE_S("Red : %d", user_data->red_mapped);
+                    TRACE_S("Green :%d", user_data->green_mapped);
+                    TRACE_S("Blue : %d", user_data->blue_mapped);
+                    TRACE_S("---------------------------------------");
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
     }
@@ -263,7 +278,9 @@ static void __tcs230_calibration_task(void* params) // calibration task
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (item)
     { // extracting the 'user_args' from "item"
-        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
+        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        if (user_data)
+        {
 #if 0
         //--------------------------------------------------
         // calculate red min-max periods for each colour
@@ -314,19 +331,20 @@ static void __tcs230_calibration_task(void* params) // calibration task
         // show (LOW,HIGH) -> (max,min)
 #endif
 
-        user_data->calib_data.least_red_timeP = 120; /*Defaults*/
-        user_data->calib_data.most_red_timeP = 48;
-        user_data->calib_data.least_green_timeP = 109;
-        user_data->calib_data.most_green_timeP = 86;
-        user_data->calib_data.least_blue_timeP = 120;
-        user_data->calib_data.most_blue_timeP = 78;
+            user_data->calib_data.least_red_timeP = 120; /*Defaults*/
+            user_data->calib_data.most_red_timeP = 48;
+            user_data->calib_data.least_green_timeP = 109;
+            user_data->calib_data.most_green_timeP = 86;
+            user_data->calib_data.least_blue_timeP = 120;
+            user_data->calib_data.most_blue_timeP = 78;
 
-        TRACE_I("red(Least,Most) => red(%d,%d)", user_data->calib_data.least_red_timeP, user_data->calib_data.most_red_timeP);
-        TRACE_I("green(Least,Most) => green(%d,%d)", user_data->calib_data.least_green_timeP, user_data->calib_data.most_green_timeP);
-        TRACE_I("blue(Least,Most) => blue(%d,%d)", user_data->calib_data.least_blue_timeP, user_data->calib_data.most_blue_timeP);
-        //--------------------------------------------------
-        // set the calib flag
-        user_data->calibration_complete = true;
+            TRACE_I("red(Least,Most) => red(%d,%d)", user_data->calib_data.least_red_timeP, user_data->calib_data.most_red_timeP);
+            TRACE_I("green(Least,Most) => green(%d,%d)", user_data->calib_data.least_green_timeP, user_data->calib_data.most_green_timeP);
+            TRACE_I("blue(Least,Most) => blue(%d,%d)", user_data->calib_data.least_blue_timeP, user_data->calib_data.most_blue_timeP);
+            //--------------------------------------------------
+            // set the calib flag
+            user_data->calibration_complete = true;
+        }
     }
     vTaskDelete(NULL);
 }

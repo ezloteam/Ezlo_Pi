@@ -99,8 +99,8 @@ static int __0046_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)malloc(sizeof(s_currentmeter_t));
-        if (NULL != user_data)
+        s_currentmeter_t *user_data = (s_currentmeter_t *)malloc(sizeof(s_currentmeter_t));
+        if (user_data)
         {
             memset(user_data, 0, sizeof(s_currentmeter_t));
             l_ezlopi_device_t* currentmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
@@ -135,19 +135,35 @@ static int __0046_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
                 free(item->user_arg);
                 item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
             }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -156,15 +172,24 @@ static int __0046_init(l_ezlopi_item_t* item)
 static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON* cjson_properties = (cJSON*)arg;
-    if (cjson_properties && item)
+    if (item)
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
-        char* valueFormatted = ezlopi_valueformatter_float(user_data->amp_value);
-        cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
-        cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, user_data->amp_value); // Irms [A]
-        free(valueFormatted);
-        ret = 1;
+        cJSON *cjson_properties = (cJSON *)arg;
+        if (cjson_properties && item)
+        {
+            s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+            if (user_data)
+            {
+                cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, user_data->amp_value); // Irms [A]
+                char *valueFormatted = ezlopi_valueformatter_float(user_data->amp_value);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+                ret = 1;
+            }
+        }
     }
     return ret;
 }
@@ -175,12 +200,15 @@ static int __0046_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
-        float prev_amp = user_data->amp_value;
-        __calculate_current_value(item); // update amp
-        if (fabs(user_data->amp_value - prev_amp) > 0.5)
+        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_device_value_updated_from_device_v3(item);
+            float prev_amp = user_data->amp_value;
+            __calculate_current_value(item); // update amp
+            if (fabs(user_data->amp_value - prev_amp) > 0.5)
+            {
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
         }
     }
     return ret;
@@ -190,48 +218,51 @@ static void __calculate_current_value(l_ezlopi_item_t* item)
 {
     if (NULL != item)
     {
-        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
-
-        uint32_t period_dur = (1000000 / DEFAULT_AC_FREQUENCY); // 20000uS
-        int Vnow = 0;
-        uint32_t Vsum = 0;
-        uint32_t measurements_count = 0;
-
-        // starting 't' instant
-        uint32_t t_start = (uint32_t)esp_timer_get_time();
-        uint32_t Volt = 0;
-        int diff = 0;
-        PORT_ENTER_CRITICAL();
-        while (((uint32_t)esp_timer_get_time() - t_start) < period_dur) // loops within 1-complete cycle
+        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-            Volt = 2 * (ezlopi_analog_data.voltage); // since the input is half the original value after voltage division
-            diff = ((ASC712TELC_05B_zero_point_mV - Volt) > 0 ? (ASC712TELC_05B_zero_point_mV - Volt) : (Volt - ASC712TELC_05B_zero_point_mV));
-            // getting the voltage value at this instant
-            if (diff > 150 && diff < 1500) // the reading voltage less than 00mV is noise
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+
+            uint32_t period_dur = (1000000 / DEFAULT_AC_FREQUENCY); // 20000uS
+            int Vnow = 0;
+            uint32_t Vsum = 0;
+            uint32_t measurements_count = 0;
+
+            // starting 't' instant
+            uint32_t t_start = (uint32_t)esp_timer_get_time();
+            uint32_t Volt = 0;
+            int diff = 0;
+            PORT_ENTER_CRITICAL();
+            while (((uint32_t)esp_timer_get_time() - t_start) < period_dur) // loops within 1-complete cycle
             {
-                Vnow = Volt - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
+                ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
+                Volt = 2 * (ezlopi_analog_data.voltage); // since the input is half the original value after voltage division
+                diff = ((ASC712TELC_05B_zero_point_mV - Volt) > 0 ? (ASC712TELC_05B_zero_point_mV - Volt) : (Volt - ASC712TELC_05B_zero_point_mV));
+                // getting the voltage value at this instant
+                if (diff > 150 && diff < 1500) // the reading voltage less than 00mV is noise
+                {
+                    Vnow = Volt - ASC712TELC_05B_zero_point_mV; // ()at zero offset => full-scale/2
+                }
+                else
+                {
+                    Vnow = 0;
+                }
+                Vsum += (Vnow * Vnow); // sumof(I^2 + I^2 + .....)
+                measurements_count++;
             }
-            else
+            PORT_EXIT_CRITICAL();
+
+            // If applied for DC;  'AC_Irms' calculation give same value as 'DC-value'
+            if (0 == measurements_count)
             {
-                Vnow = 0;
+                measurements_count = 1; // <-- avoid dividing by zero
             }
-            Vsum += (Vnow * Vnow); // sumof(I^2 + I^2 + .....)
-            measurements_count++;
-        }
-        PORT_EXIT_CRITICAL();
 
-        // If applied for DC;  'AC_Irms' calculation give same value as 'DC-value'
-        if (0 == measurements_count)
-        {
-            measurements_count = 1; // <-- avoid dividing by zero
-        }
-
-        user_data->amp_value = ((float)sqrt(Vsum / measurements_count)) / 185.0f; //  -> I[rms] Ampere
-        if ((user_data->amp_value) < 0.4)
-        {
-            user_data->amp_value = 0;
+            user_data->amp_value = ((float)sqrt(Vsum / measurements_count)) / 185.0f; //  -> I[rms] Ampere
+            if ((user_data->amp_value) < 0.4)
+            {
+                user_data->amp_value = 0;
+            }
         }
     }
 }
