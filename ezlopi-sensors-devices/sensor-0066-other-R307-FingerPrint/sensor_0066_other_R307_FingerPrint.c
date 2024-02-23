@@ -187,9 +187,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         server_packet_t *user_data = (server_packet_t *)item->user_arg;
         if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id) // while initialization; setup only once (during Match item setup)
         {
-            CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.uart.tx);
-            CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.uart.rx);
-            CJSON_GET_VALUE_INT(cj_device, "gpio3", user_data->intr_pin);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.uart.tx);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.uart.rx);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, user_data->intr_pin);
             item->interface.uart.baudrate = FINGERPRINT_UART_BAUDRATE;
             item->interface.uart.enable = true;
         }

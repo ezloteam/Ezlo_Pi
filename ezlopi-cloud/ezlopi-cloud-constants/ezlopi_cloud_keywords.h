@@ -220,7 +220,6 @@ extern const char* ezlopi_armed_str;
 extern const char* ezlopi_subtype_str;
 extern const char* ezlopi_scale_str;
 extern const char* ezlopi_enum_str;
-extern const char* ezlopi_valueformatted_str;
 extern const char* ezlopi_value_default_str;
 extern const char* ezlopi_text_str;
 extern const char* ezlopi_label_str;
