@@ -17,16 +17,16 @@
 
 #include "sensor_0040_other_TCS230.h"
 
-static int __0040_prepare(void *arg);
-static int __0040_init(l_ezlopi_item_t *item);
-static int __0040_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0040_notify(l_ezlopi_item_t *item);
+static int __0040_prepare(void* arg);
+static int __0040_init(l_ezlopi_item_t* item);
+static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0040_notify(l_ezlopi_item_t* item);
 static void __tcs230_setup_gpio(gpio_num_t s0_pin, gpio_num_t s1_pin, gpio_num_t s2_pin, gpio_num_t s3_pin, gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output);
 
-static void __tcs230_calibration_task(void *params);
+static void __tcs230_calibration_task(void* params);
 
 //------------------------------------------------------------------------------------------------------
-int sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -53,11 +53,11 @@ int sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t *item, v
 
 //------------------------------------------------------------------------------------------------------
 static void __tcs230_setup_gpio(gpio_num_t s0_pin,
-                                gpio_num_t s1_pin,
-                                gpio_num_t s2_pin,
-                                gpio_num_t s3_pin,
-                                gpio_num_t gpio_output_en,
-                                gpio_num_t gpio_pulse_output)
+    gpio_num_t s1_pin,
+    gpio_num_t s2_pin,
+    gpio_num_t s3_pin,
+    gpio_num_t gpio_output_en,
+    gpio_num_t gpio_pulse_output)
 {
     esp_err_t ret = ESP_FAIL;
     // Configure GPIO ouput pins (S0, S1, S2, S3 & Freq_scale) for TCS230.
@@ -88,9 +88,9 @@ static void __tcs230_setup_gpio(gpio_num_t s0_pin,
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *device_name = NULL;
+    char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -100,7 +100,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -112,36 +112,36 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
     item->user_arg = user_data;
 }
 
-static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     if (item && cj_device)
     {
-        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX;
-        CJSON_GET_VALUE_INT(cj_device, "gpio1", user_data->TCS230_pin.gpio_s0);           // gpio_s0
-        CJSON_GET_VALUE_INT(cj_device, "gpio2", user_data->TCS230_pin.gpio_s1);           // gpio_s1
-        CJSON_GET_VALUE_INT(cj_device, "gpio3", user_data->TCS230_pin.gpio_s2);           // gpio_s2
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
         CJSON_GET_VALUE_INT(cj_device, "gpio4", user_data->TCS230_pin.gpio_s3);           // gpio_s3
         CJSON_GET_VALUE_INT(cj_device, "gpio5", user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
         CJSON_GET_VALUE_INT(cj_device, "gpio6", user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
     }
 }
 //------------------------------------------------------------------------------------------------------
-static int __0040_prepare(void *arg)
+static int __0040_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        cJSON *cj_device = device_prep_arg->cjson_device;
-        s_TCS230_data_t *user_data = (s_TCS230_data_t *)malloc(sizeof(s_TCS230_data_t));
+        cJSON* cj_device = device_prep_arg->cjson_device;
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)malloc(sizeof(s_TCS230_data_t));
         if (user_data)
         {
-            l_ezlopi_device_t *tcs230_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* tcs230_device = ezlopi_device_add_device(cj_device);
             if (tcs230_device)
             {
                 __prepare_device_cloud_properties(tcs230_device, cj_device);
-                l_ezlopi_item_t *tcs230_item = ezlopi_device_add_item_to_device(tcs230_device, sensor_0040_other_TCS230);
+                l_ezlopi_item_t* tcs230_item = ezlopi_device_add_item_to_device(tcs230_device, sensor_0040_other_TCS230);
                 if (tcs230_item)
                 {
                     __prepare_item_cloud_properties(tcs230_item, user_data);
@@ -165,12 +165,12 @@ static int __0040_prepare(void *arg)
     return ret;
 }
 
-static int __0040_init(l_ezlopi_item_t *item)
+static int __0040_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
         if (GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s0) &&
             GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s1) &&
             GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_s2) &&
@@ -179,11 +179,11 @@ static int __0040_init(l_ezlopi_item_t *item)
             GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
         {
             __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
-                                user_data->TCS230_pin.gpio_s1,
-                                user_data->TCS230_pin.gpio_s2,
-                                user_data->TCS230_pin.gpio_s3,
-                                user_data->TCS230_pin.gpio_output_en,
-                                user_data->TCS230_pin.gpio_pulse_output);
+                user_data->TCS230_pin.gpio_s1,
+                user_data->TCS230_pin.gpio_s2,
+                user_data->TCS230_pin.gpio_s3,
+                user_data->TCS230_pin.gpio_output_en,
+                user_data->TCS230_pin.gpio_pulse_output);
             TRACE_W("Entering Calibration Phase for 30 seconds.....");
 
             // configure Freq_scale at 20%
@@ -206,20 +206,20 @@ static int __0040_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __0040_get_cjson_value(l_ezlopi_item_t *item, void *args)
+static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* args)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)args;
+    cJSON* cj_result = (cJSON*)args;
     if (cj_result && item)
     {
-        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
         if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
         {
-            cJSON *color_values = cJSON_AddObjectToObject(cj_result, "value");
+            cJSON* color_values = cJSON_AddObjectToObject(cj_result, "value");
             cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
             cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
             cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
-            char *formatted_val = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
+            char* formatted_val = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
             cJSON_AddStringToObject(cj_result, "valueFormatted", formatted_val);
             free(formatted_val);
         }
@@ -228,12 +228,12 @@ static int __0040_get_cjson_value(l_ezlopi_item_t *item, void *args)
     return ret;
 }
 
-static int __0040_notify(l_ezlopi_item_t *item)
+static int __0040_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
         uint32_t red = user_data->red_mapped;
         uint32_t green = user_data->green_mapped;
         uint32_t blue = user_data->blue_mapped;
@@ -257,61 +257,61 @@ static int __0040_notify(l_ezlopi_item_t *item)
 }
 
 //------------------------------------------------------------------------------
-static void __tcs230_calibration_task(void *params) // calibration task
+static void __tcs230_calibration_task(void* params) // calibration task
 {
     vTaskDelay(4000 / portTICK_PERIOD_MS); // 4sec
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (item)
     { // extracting the 'user_args' from "item"
-        s_TCS230_data_t *user_data = (s_TCS230_data_t *)item->user_arg;
+        s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
 #if 0
-			    //--------------------------------------------------
-			    // calculate red min-max periods for each colour
-			    TRACE_E("Please, place the red paper in front of colour sensor..... Starting Calibration for RED in ....");
-			    for (uint8_t j = 5; j > 0; j--)
-			    {
-				TRACE_E("....................................................... {%d} ", j);
-				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
-			    }
-			    // choose  RED filter
-			    tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
-			    calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
-						           user_data->TCS230_pin.gpio_pulse_output,
-						           &user_data->calib_data.least_red_timeP,
-						           &user_data->calib_data.most_red_timeP);
+        //--------------------------------------------------
+        // calculate red min-max periods for each colour
+        TRACE_E("Please, place the red paper in front of colour sensor..... Starting Calibration for RED in ....");
+        for (uint8_t j = 5; j > 0; j--)
+        {
+            TRACE_E("....................................................... {%d} ", j);
+            vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
+        }
+        // choose  RED filter
+        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_RED);
+        calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
+            user_data->TCS230_pin.gpio_pulse_output,
+            &user_data->calib_data.least_red_timeP,
+            &user_data->calib_data.most_red_timeP);
 
-			    //--------------------------------------------------
-			    // calculate green min-max periods for each colour
-			    TRACE_S("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
-			    for (uint8_t j = 5; j > 0; j--)
-			    {
-				TRACE_S("....................................................... {%d} ", j);
-				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
-			    }
-			    // choose GREEN filter
-			    tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
-			    calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
-						           user_data->TCS230_pin.gpio_pulse_output,
-						           &user_data->calib_data.least_green_timeP,
-						           &user_data->calib_data.most_green_timeP);
+        //--------------------------------------------------
+        // calculate green min-max periods for each colour
+        TRACE_S("Please, place the green paper in front of colour sensor..... Starting Calibration for GREEN in ....");
+        for (uint8_t j = 5; j > 0; j--)
+        {
+            TRACE_S("....................................................... {%d} ", j);
+            vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
+        }
+        // choose GREEN filter
+        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_GREEN);
+        calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
+            user_data->TCS230_pin.gpio_pulse_output,
+            &user_data->calib_data.least_green_timeP,
+            &user_data->calib_data.most_green_timeP);
 
-			    //--------------------------------------------------
-			    // calculate blue min-max periods for each colour
-			    TRACE_I("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
-			    for (uint8_t j = 5; j > 0; j--)
-			    {
-				TRACE_I("....................................................... {%d} ", j);
-				vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
-			    }
-			    // choose BLUE filter
-			    tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
-			    calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
-						           user_data->TCS230_pin.gpio_pulse_output,
-						           &user_data->calib_data.least_blue_timeP,
-						           &user_data->calib_data.most_blue_timeP);
+        //--------------------------------------------------
+        // calculate blue min-max periods for each colour
+        TRACE_I("Please, place the blue paper in front of colour sensor..... Starting Calibration for BLUE in ....");
+        for (uint8_t j = 5; j > 0; j--)
+        {
+            TRACE_I("....................................................... {%d} ", j);
+            vTaskDelay(1000 / portTICK_PERIOD_MS); // 4sec
+        }
+        // choose BLUE filter
+        tcs230_set_filter_color(item, COLOR_SENSOR_COLOR_BLUE);
+        calculate_max_min_color_values(user_data->TCS230_pin.gpio_output_en,
+            user_data->TCS230_pin.gpio_pulse_output,
+            &user_data->calib_data.least_blue_timeP,
+            &user_data->calib_data.most_blue_timeP);
 
-			    //--------------------------------------------------
-			    // show (LOW,HIGH) -> (max,min)
+        //--------------------------------------------------
+        // show (LOW,HIGH) -> (max,min)
 #endif
 
         user_data->calib_data.least_red_timeP = 120; /*Defaults*/
