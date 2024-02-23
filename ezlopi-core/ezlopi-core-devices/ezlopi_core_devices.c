@@ -585,7 +585,7 @@ static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t* settings)
 {
     if (settings->next)
     {
-        ezlopi_device_free_item(settings->next);
+        ezlopi_device_free_setting(settings->next);
     }
 
     free(settings);
