@@ -69,7 +69,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.item_name = ezlopi_item_name_dimmer;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
@@ -78,7 +78,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
 #if CONFIG_IDF_TARGET_ESP32C3
@@ -319,7 +319,7 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        // CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_name_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num);
+        // CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "duty_cycle", ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle);
         // CJSON_GET_VALUE_INT(cjson_device, "freq_hz", ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz);
         // CJSON_GET_VALUE_INT(cjson_device, "pwm_resln", ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln);

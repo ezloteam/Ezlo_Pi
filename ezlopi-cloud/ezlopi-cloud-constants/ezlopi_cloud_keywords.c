@@ -216,7 +216,6 @@ const char *scene_status_finished_str = "finished";
 const char *scene_status_partially_finished_str = "partially_finished";
 const char *scene_status_failed_str = "failed";
 const char *scene_status_stopped_str = "stopped";
-const char *ezlopi_valueformatted_str = "valueFormatted";
 const char *ezlopi_value_default_str = "valueDefault";
 const char *ezlopi_text_str = "text";
 const char *ezlopi_lang_tag_str = "lang_tag";

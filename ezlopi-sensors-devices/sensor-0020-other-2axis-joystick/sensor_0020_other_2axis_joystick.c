@@ -119,19 +119,19 @@ static void __setup_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_d
         if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
         {
             item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-            CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.adc.gpio_num);
             item->interface.adc.resln_bit = 3;
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
         {
             item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-            CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
             item->interface.adc.resln_bit = 3;
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] == item->cloud_properties.item_id)
         {
             item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_INPUT;
-            CJSON_GET_VALUE_INT(cj_device, "gpio3", item->interface.gpio.gpio_in.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, item->interface.gpio.gpio_in.gpio_num);
             item->interface.gpio.gpio_in.enable = true;
             item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
             item->interface.gpio.gpio_in.pull = GPIO_PULLUP_ONLY;
