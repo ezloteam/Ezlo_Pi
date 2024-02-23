@@ -14,20 +14,25 @@
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_webprov.h"
 
-static void ota_service_process(void *pv);
+static void ota_service_process(void* pv);
+static volatile bool __ota_busy = false;
+bool __get_ota_service_busy_state(void)
+{
+    return __ota_busy;
+}
 
 void ota_service_init(void)
 {
     xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
 }
-static void ota_service_process(void *pv)
+static void ota_service_process(void* pv)
 {
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
     vTaskDelay(5000 / portTICK_RATE_MS);
     while (1)
     {
-
+        __ota_busy = true;
         int ret_nma_reg = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 60000, false);
         int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
         TRACE_D("Configuration Selection NMA Reg: %d", ret_nma_reg);
@@ -36,10 +41,10 @@ static void ota_service_process(void *pv)
         {
             TRACE_D("Sending firmware check request...");
             uint32_t message_counter = web_provisioning_get_message_count();
-            cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+            cJSON* firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
             if (NULL != firmware_info_request)
             {
-                char *data_to_send = cJSON_Print(firmware_info_request);
+                char* data_to_send = cJSON_Print(firmware_info_request);
                 cJSON_Delete(firmware_info_request);
                 firmware_info_request = NULL;
 
@@ -50,9 +55,11 @@ static void ota_service_process(void *pv)
                     free(data_to_send);
                 }
             }
+            __ota_busy = false; // must clear immediately ; if OTA-event is serviced
         }
         else
         {
+            __ota_busy = false; // must clear before the delay
             vTaskDelay(1000 / portTICK_RATE_MS);
         }
     }

@@ -1,11 +1,15 @@
-
+#include <time.h>
 #include "ezlopi_util_trace.h"
-#include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_modes.h"
+#include "ezlopi_core_ota.h"
+#include "ezlopi_core_http.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_when_methods.h"
+#include "ezlopi_core_scenes_when_methods_helper_functions.h"
+
+#include "ezlopi_cloud_constants.h"
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
@@ -358,21 +362,57 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
 
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_firmware_update_state' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (scene_node && when_block)
+    {
+        uint32_t item_id = 0;
+        char* state_value = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "state", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type)
+                {
+                    state_value = curr_field->field_value.u_value.value_string; // started / updating / done
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        // now to extract the
+        if (item_id && (NULL != state_value))
+        {
+            if (0 == strncmp("done", state_value, 5) && (0 == __get_ota_state()))
+            {
+                ret = 1;
+            }
+            else if (0 == strncmp("started", state_value, 8) && (1 == __get_ota_state()))
+            {
+                ret = 1;
+            }
+            else if (0 == strncmp("updating", state_value, 9) && (2 == __get_ota_state()))
+            {
+                ret = 1;
+            }
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
-   int ret = 0;
-    l_when_block_v2_t *when_block = (l_when_block_v2_t *)arg;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
     {
         uint32_t item_id = 0;
-        l_fields_v2_t *key_field = NULL;
-        l_fields_v2_t *operation_field = NULL;
+        l_fields_v2_t* key_field = NULL;
+        l_fields_v2_t* operation_field = NULL;
 
-        l_fields_v2_t *curr_field = when_block->fields;
+        l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
             if (0 == strncmp(curr_field->name, "item", 5))
