@@ -110,10 +110,10 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.scale = scales_kilo_gram;
     item->user_arg = user_data;
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, "gpio1", user_data->HX711_SCK_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->HX711_SCK_pin);
     TRACE_S("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
-    CJSON_GET_VALUE_INT(cj_device, "gpio2", user_data->HX711_DT_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->HX711_DT_pin);
     TRACE_S("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
 }
 

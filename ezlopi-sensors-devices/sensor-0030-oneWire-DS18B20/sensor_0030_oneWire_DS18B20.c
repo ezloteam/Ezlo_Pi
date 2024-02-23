@@ -163,7 +163,7 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.onewire_master.onewire_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
 }
 
 static int __prepare(void* arg)

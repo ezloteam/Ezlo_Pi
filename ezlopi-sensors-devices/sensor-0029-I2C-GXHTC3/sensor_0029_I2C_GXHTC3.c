@@ -90,7 +90,7 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
 //         char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
 //         if (valueFormatted)
 //         {
-//             cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+//             cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
 //             free(valueFormatted);
 //         }
 //         cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
@@ -151,7 +151,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
                 cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
@@ -162,7 +162,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(value_ptr->humidity);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
                 cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_percent);
