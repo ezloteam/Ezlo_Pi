@@ -350,8 +350,63 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'compare_values' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+        l_fields_v2_t* value_type_field = NULL;
+        l_fields_v2_t* value_field = NULL;
+        l_fields_v2_t* comparator_field = NULL;
+        // l_fields_v2_t *expression_field = NULL;
+
+        // e_scene_value_type_v2_t value_type = EZLOPI_VALUE_TYPE_NONE;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // ID extraction [item or expression]
+                }
+            }
+
+            else if (0 == strncmp(curr_field->name, ezlopi_value_type_str, 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    value_type_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    value_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "comparator", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    comparator_field = curr_field;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && value_field && value_type_field) // only for item_value 'string comparisions'
+        {
+            ret = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_id, value_field, value_type_field, comparator_field);
+        }
+        // else if (item_id && expression_field ) // only for expression 'string comparisions'
+        // {
+        // ret = ezlopi_scenes_operators_expn_comparevalues_with_less_operations(item_id, value_field, comparator_field);
+        // }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
@@ -368,11 +423,17 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
         {
             if (0 == strncmp(curr_field->name, "item", 5))
             {
-                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
             }
             else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
             {
-                value_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    value_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                }
             }
             curr_field = curr_field->next;
         }
@@ -400,7 +461,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
         {
             if (0 == strncmp(curr_field->name, "state", 6))
             {
-                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type)
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
                     state_value = curr_field->field_value.u_value.value_string; // started / updating / done
                 }
@@ -443,15 +504,24 @@ int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void
         {
             if (0 == strncmp(curr_field->name, "item", 5))
             {
-                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
             }
             else if (0 == strncmp(curr_field->name, "key", 4))
             {
-                key_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    key_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                }
             }
             else if (0 == strncmp(curr_field->name, "operation", 10))
             {
-                operation_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    operation_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                }
             }
             curr_field = curr_field->next;
         }
