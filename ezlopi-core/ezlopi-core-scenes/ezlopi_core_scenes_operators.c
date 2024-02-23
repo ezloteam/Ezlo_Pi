@@ -1469,6 +1469,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
     {
         cJSON* item_value = NULL;
         cJSON* cj_item_value = cJSON_CreateObject();
+
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1489,19 +1490,6 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                                 cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                                 if (cj_value)
                                 {
-                                    /**
-                                     * item_value->     "value": {
-                                     *                              "key_1": {
-                                     *                                  "value": 36,
-                                     *                                  "scale": "celsius"
-                                     *                              },
-                                     *                              "key_2": {
-                                     *                                  "value": 6,
-                                     *                                  "scale": "fahrenheit"
-                                     *                              },
-                                     *                          },
-                                     *
-                                     */
                                     item_value = cj_value;
                                 }
                             }
@@ -1557,6 +1545,5 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
             cJSON_Delete(cj_item_value);
         }
     }
-
     return ret;
 }

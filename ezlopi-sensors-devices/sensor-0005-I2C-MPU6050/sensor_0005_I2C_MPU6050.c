@@ -14,16 +14,16 @@
 
 #include "sensor_0005_I2C_MPU6050.h"
 
-static int __prepare(void *arg);
-static int __init(l_ezlopi_item_t *item);
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __notify(l_ezlopi_item_t *item);
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data);
-static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static void __mpu6050_calibration_task(void *params);
+static int __prepare(void* arg);
+static int __init(l_ezlopi_item_t* item);
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __notify(l_ezlopi_item_t* item);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data);
+static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device);
+static void __mpu6050_calibration_task(void* params);
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
-int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -58,10 +58,10 @@ int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t *item, vo
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -70,7 +70,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data)
 {
     if (item)
     {
@@ -81,16 +81,16 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
         item->user_arg = user_data;
     }
 }
-static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     if (item && cj_device)
     {
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
             item->interface.i2c_master.enable = true;
-            CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
-            CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
             CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
@@ -106,22 +106,22 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
     }
 }
 
-static int __prepare(void *arg)
+static int __prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        cJSON *cj_device = prep_arg->cjson_device;
-        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)malloc(sizeof(s_mpu6050_data_t));
+        cJSON* cj_device = prep_arg->cjson_device;
+        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)malloc(sizeof(s_mpu6050_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_mpu6050_data_t));
-            l_ezlopi_device_t *mpu6050_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* mpu6050_device = ezlopi_device_add_device(cj_device);
             if (mpu6050_device)
             {
                 __prepare_device_cloud_properties(mpu6050_device, cj_device);
-                l_ezlopi_item_t *mpu6050_acc_x_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
+                l_ezlopi_item_t* mpu6050_acc_x_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_acc_x_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_acc_x_item, user_data);
@@ -130,7 +130,7 @@ static int __prepare(void *arg)
                     mpu6050_acc_x_item->cloud_properties.scale = scales_meter_per_square_second;
                     __prepare_item_interface_properties(mpu6050_acc_x_item, cj_device);
                 }
-                l_ezlopi_item_t *mpu6050_acc_y_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
+                l_ezlopi_item_t* mpu6050_acc_y_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_acc_y_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_acc_y_item, user_data);
@@ -139,7 +139,7 @@ static int __prepare(void *arg)
                     mpu6050_acc_y_item->cloud_properties.scale = scales_meter_per_square_second;
                     __prepare_item_interface_properties(mpu6050_acc_y_item, cj_device);
                 }
-                l_ezlopi_item_t *mpu6050_acc_z_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
+                l_ezlopi_item_t* mpu6050_acc_z_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_acc_z_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_acc_z_item, user_data);
@@ -149,7 +149,7 @@ static int __prepare(void *arg)
                     __prepare_item_interface_properties(mpu6050_acc_z_item, cj_device);
                 }
 
-                l_ezlopi_item_t *mpu6050_temp_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
+                l_ezlopi_item_t* mpu6050_temp_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_temp_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_temp_item, user_data);
@@ -159,7 +159,7 @@ static int __prepare(void *arg)
                     __prepare_item_interface_properties(mpu6050_temp_item, cj_device);
                 }
 
-                l_ezlopi_item_t *mpu6050_gyro_x_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
+                l_ezlopi_item_t* mpu6050_gyro_x_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_gyro_x_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_gyro_x_item, user_data);
@@ -168,7 +168,7 @@ static int __prepare(void *arg)
                     mpu6050_gyro_x_item->cloud_properties.scale = scales_revolutions_per_minute;
                     __prepare_item_interface_properties(mpu6050_gyro_x_item, cj_device);
                 }
-                l_ezlopi_item_t *mpu6050_gyro_y_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
+                l_ezlopi_item_t* mpu6050_gyro_y_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_gyro_y_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_gyro_y_item, user_data);
@@ -177,7 +177,7 @@ static int __prepare(void *arg)
                     mpu6050_gyro_y_item->cloud_properties.scale = scales_revolutions_per_minute;
                     __prepare_item_interface_properties(mpu6050_gyro_y_item, cj_device);
                 }
-                l_ezlopi_item_t *mpu6050_gyro_z_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
+                l_ezlopi_item_t* mpu6050_gyro_z_item = ezlopi_device_add_item_to_device(mpu6050_device, sensor_0005_I2C_MPU6050);
                 if (mpu6050_gyro_z_item)
                 {
                     __prepare_item_cloud_properties(mpu6050_gyro_z_item, user_data);
@@ -205,7 +205,7 @@ static int __prepare(void *arg)
 
     return ret;
 }
-static int __init(l_ezlopi_item_t *item)
+static int __init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -233,67 +233,67 @@ static int __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)arg;
+    cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
+        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)item->user_arg;
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
             TRACE_S("Accel-x : %.2fm/s^2", user_data->ax);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->ax);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->ax);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->ax);
+            char* valueFormatted = ezlopi_valueformatter_float(user_data->ax);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
             TRACE_S("Accel-y : %.2fm/s^2", user_data->ay);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->ay);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->ay);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->ay);
+            char* valueFormatted = ezlopi_valueformatter_float(user_data->ay);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
             TRACE_S("Accel-z : %.2fm/s^2", user_data->az);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->az);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->az);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->az);
+            char* valueFormatted = ezlopi_valueformatter_float(user_data->az);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_temp == item->cloud_properties.item_name)
         {
             TRACE_S("Temp : %.2f*C", user_data->tmp);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->tmp);
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->tmp);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->tmp);
+            char* valueFormatted = ezlopi_valueformatter_float(user_data->tmp);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
         {
             TRACE_S("Gyro-x : %d rpm", (int)user_data->gx);
-            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gx));
-            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gx);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gx));
+            char* valueFormatted = ezlopi_valueformatter_int((int)user_data->gx);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
         {
             TRACE_S("Gyro-y : %d rpm", (int)user_data->gy);
-            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gy));
-            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gy);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gy));
+            char* valueFormatted = ezlopi_valueformatter_int((int)user_data->gy);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
         {
             TRACE_S("Gyro-z : %d rpm", (int)user_data->gz);
-            cJSON_AddNumberToObject(cj_result, "value", ((int)user_data->gz));
-            char *valueFormatted = ezlopi_valueformatter_int((int)user_data->gz);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gz));
+            char* valueFormatted = ezlopi_valueformatter_int((int)user_data->gz);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
         }
         ret = 1;
@@ -301,13 +301,13 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static int __notify(l_ezlopi_item_t* item)
 {
     static float __prev[7];
     int ret = 0;
     if (item)
     {
-        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
+        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)item->user_arg;
         if (user_data->calibration_complete)
         {
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
@@ -384,23 +384,23 @@ static int __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void __mpu6050_calibration_task(void *params) // calibrate task
+static void __mpu6050_calibration_task(void* params) // calibrate task
 {
     vTaskDelay(4000 / portTICK_PERIOD_MS);
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (item)
     {
-        s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
+        s_mpu6050_data_t* user_data = (s_mpu6050_data_t*)item->user_arg;
 
-        uint8_t buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
-        uint8_t dummy[MPU6050_REG_COUNT_LEN] = {0};
+        uint8_t buf[MPU6050_REG_COUNT_LEN] = { 0 }; // 0 - 13
+        uint8_t dummy[MPU6050_REG_COUNT_LEN] = { 0 };
 
-        float calibrationData[3] = {0};
+        float calibrationData[3] = { 0 };
         uint8_t Check_Register = 0;
         esp_err_t err = ESP_OK;
         TRACE_W(".....................Calculating Paramter");
 
-        uint8_t write_buffer[] = {REG_INTR_STATUS}; // REG_INTR_STATUS;
+        uint8_t write_buffer[] = { REG_INTR_STATUS }; // REG_INTR_STATUS;
         uint8_t address_val = (ACCEL_X_H);
 
         for (uint8_t i = CALIBRATION_SAMPLES + 50; i > 0; i--)
@@ -451,9 +451,9 @@ static void __mpu6050_calibration_task(void *params) // calibrate task
         user_data->gyro_z_offset = calibrationData[2] / (CALIBRATION_SAMPLES);
 
         TRACE_S("Scale :--- new_gy_offset_X=%.2f | new_gy_offset_Y=%.2f | new_gy_offset_Z=%.2f ",
-                user_data->gyro_x_offset,
-                user_data->gyro_y_offset,
-                user_data->gyro_z_offset);
+            user_data->gyro_x_offset,
+            user_data->gyro_y_offset,
+            user_data->gyro_z_offset);
         TRACE_W("......................CALIBRATION COMPLETE");
         user_data->calibration_complete = true;
     }

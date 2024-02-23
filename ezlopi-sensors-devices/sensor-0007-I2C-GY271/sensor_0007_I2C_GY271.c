@@ -61,7 +61,7 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void
 static void __prepare_device_cloud_properties_parent_x(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Mag_strength_x");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -76,7 +76,7 @@ static void __prepare_device_cloud_properties_parent_x(l_ezlopi_device_t* device
 static void __prepare_device_cloud_properties_child_y(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Mag_strength_y");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -91,7 +91,7 @@ static void __prepare_device_cloud_properties_child_y(l_ezlopi_device_t* device,
 static void __prepare_device_cloud_properties_child_z(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Mag_strength_z");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -106,7 +106,7 @@ static void __prepare_device_cloud_properties_child_z(l_ezlopi_device_t* device,
 static void __prepare_device_cloud_properties_child_azi(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Azimuth Angle");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -121,7 +121,7 @@ static void __prepare_device_cloud_properties_child_azi(l_ezlopi_device_t* devic
 static void __prepare_device_cloud_properties_child_temp(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Temperature");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -151,9 +151,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
         {
             item->interface.i2c_master.enable = true;
-            CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
-            CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
             CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
@@ -316,7 +316,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             char* valueFormatted = ezlopi_valueformatter_float(user_data->X);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
         }
@@ -326,7 +326,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             char* valueFormatted = ezlopi_valueformatter_float(user_data->Y);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
         }
@@ -336,7 +336,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             char* valueFormatted = ezlopi_valueformatter_float(user_data->Z);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
         }
@@ -347,7 +347,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             char* valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
         }
@@ -358,7 +358,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             char* valueFormatted = ezlopi_valueformatter_float(user_data->T);
             if (valueFormatted)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                 free(valueFormatted);
             }
         }

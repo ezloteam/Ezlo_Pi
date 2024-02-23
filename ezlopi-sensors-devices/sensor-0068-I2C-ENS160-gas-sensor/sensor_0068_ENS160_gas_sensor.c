@@ -11,6 +11,7 @@
 
 #include "ezlopi_hal_i2c_master.h"
 
+#include "ezlopi_cloud_keywords.h"
 #include "ezlopi_cloud_category_str.h"
 #include "ezlopi_cloud_subcategory_str.h"
 #include "ezlopi_cloud_device_types_str.h"
@@ -89,22 +90,22 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
       if (item->cloud_properties.item_id == aqi_item_id)
       {
         valueFormatted = ezlopi_valueformatter_uint32(ens160_sensor->data.aqi);
-        cJSON_AddStringToObject(cj_params, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_params, "value", ens160_sensor->data.aqi);
+        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ens160_sensor->data.aqi);
         free(valueFormatted);
       }
       if (item->cloud_properties.item_id == voc_item_id)
       {
         valueFormatted = ezlopi_valueformatter_uint32(ens160_sensor->data.tvoc);
-        cJSON_AddStringToObject(cj_params, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_params, "value", ens160_sensor->data.tvoc);
+        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ens160_sensor->data.tvoc);
         free(valueFormatted);
       }
       if (item->cloud_properties.item_id == co2_item_id)
       {
         valueFormatted = ezlopi_valueformatter_uint32(ens160_sensor->data.eco2);
-        cJSON_AddStringToObject(cj_params, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_params, "value", ens160_sensor->data.eco2);
+        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ens160_sensor->data.eco2);
         free(valueFormatted);
       }
     }
@@ -208,7 +209,7 @@ static void __prepare_ens160_gas_sensor_device_cloud_properties(l_ezlopi_device_
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
-  CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+  CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
   item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
   item->cloud_properties.has_getter = true;
   item->cloud_properties.has_setter = false;
@@ -216,8 +217,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
   item->user_arg = user_arg;
 
   item->interface.i2c_master.clock_speed = ENS160_I2C_SPEED;
-  CJSON_GET_VALUE_INT(cj_device, "gpio_scl", item->interface.i2c_master.scl);
-  CJSON_GET_VALUE_INT(cj_device, "gpio_sda", item->interface.i2c_master.sda);
+  CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+  CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
   item->interface.i2c_master.channel = I2C_NUM_0;
   item->interface.i2c_master.address = ENS160_I2C_ADDRESS;
   item->interface.i2c_master.enable = false;

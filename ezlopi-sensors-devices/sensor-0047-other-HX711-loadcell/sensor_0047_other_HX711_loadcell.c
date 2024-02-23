@@ -34,18 +34,18 @@ typedef struct s_hx711_data
     float weight;
 } s_hx711_data_t;
 
-static int __0047_prepare(void *arg);
-static int __0047_init(l_ezlopi_item_t *item);
-static int __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0047_notify(l_ezlopi_item_t *item);
+static int __0047_prepare(void* arg);
+static int __0047_init(l_ezlopi_item_t* item);
+static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0047_notify(l_ezlopi_item_t* item);
 
-static void __hx711_power_reset(l_ezlopi_item_t *item);
-static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain);
-static float __hx711_avg_reading(l_ezlopi_item_t *item, uint8_t sample_iteration);
+static void __hx711_power_reset(l_ezlopi_item_t* item);
+static float __hx711_rawdata(l_ezlopi_item_t* item, hx711_gain_t _gain);
+static float __hx711_avg_reading(l_ezlopi_item_t* item, uint8_t sample_iteration);
 
-static void __Calculate_hx711_tare_wt(void *params);
+static void __Calculate_hx711_tare_wt(void* params);
 //-------------------------------------------------------------------------------------------------------------------
-int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
 
@@ -71,7 +71,7 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t 
     {
         if (item)
         {
-            s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+            s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
             if (true == user_data->HX711_initialized)
             {
                 __0047_notify(item);
@@ -87,10 +87,10 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t 
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -99,7 +99,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, s_hx711_data_t *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, s_hx711_data_t* user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -110,29 +110,29 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.scale = scales_kilo_gram;
     item->user_arg = user_data;
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, "gpio1", user_data->HX711_SCK_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->HX711_SCK_pin);
     TRACE_S("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
-    CJSON_GET_VALUE_INT(cj_device, "gpio2", user_data->HX711_DT_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->HX711_DT_pin);
     TRACE_S("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
 }
 
-static int __0047_prepare(void *arg)
+static int __0047_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_hx711_data_t *hx711_data = (s_hx711_data_t *)malloc(sizeof(s_hx711_data_t));
+        s_hx711_data_t* hx711_data = (s_hx711_data_t*)malloc(sizeof(s_hx711_data_t));
         if (hx711_data)
         {
             memset(hx711_data, 0, sizeof(s_hx711_data_t));
             //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-            l_ezlopi_device_t *hx711_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* hx711_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (hx711_device)
             {
                 __prepare_device_cloud_properties(hx711_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *hx711_item = ezlopi_device_add_item_to_device(hx711_device, sensor_0047_other_HX711_loadcell);
+                l_ezlopi_item_t* hx711_item = ezlopi_device_add_item_to_device(hx711_device, sensor_0047_other_HX711_loadcell);
                 if (hx711_item)
                 {
                     ret = 1;
@@ -155,12 +155,12 @@ static int __0047_prepare(void *arg)
     return ret;
 }
 
-static int __0047_init(l_ezlopi_item_t *item)
+static int __0047_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data && GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
         {
             // Configure 'CLOCK_PIN' -> GPIO output pins for HX711.
@@ -202,19 +202,19 @@ static int __0047_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->weight);
+            s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
+            char* valueFormatted = ezlopi_valueformatter_float(user_data->weight);
             cJSON_AddStringToObject(cj_result, "ValueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->weight);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->weight);
             free(valueFormatted);
         }
         ret = 1;
@@ -222,12 +222,12 @@ static int __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __0047_notify(l_ezlopi_item_t *item)
+static int __0047_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         float Mass = __hx711_avg_reading(item, 10); /// 1000.0f; // to avoid spikes
         float weight_in_kg = ((Mass - (user_data->HX711_tare_wt)) / 100.0f) / 1000.0f;
 
@@ -246,13 +246,13 @@ static int __0047_notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void __Calculate_hx711_tare_wt(void *params)
+static void __Calculate_hx711_tare_wt(void* params)
 {
     float RAW_tare = 0;
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         // For Output settling time ; [10SPS] is 400ms
         // So, wait for 400ms after reset [as per datasheet]
         vTaskDelay(400 / portTICK_PERIOD_MS);
@@ -280,13 +280,13 @@ static void __Calculate_hx711_tare_wt(void *params)
     vTaskDelete(NULL);
 }
 
-static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain)
+static float __hx711_rawdata(l_ezlopi_item_t* item, hx711_gain_t _gain)
 {
     float raw_data = 0;
     unsigned long data = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         vTaskDelay(8); // 80ms
         // first check if the data is ready [i.e. 'data_pin' = 1 ; when 'clk_pin' = 0]
 
@@ -343,7 +343,7 @@ static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain)
     return raw_data;
 }
 
-static float __hx711_avg_reading(l_ezlopi_item_t *item, uint8_t sample_iteration)
+static float __hx711_avg_reading(l_ezlopi_item_t* item, uint8_t sample_iteration)
 {
     float sum = 0;
     if (sample_iteration < 1)
@@ -363,11 +363,11 @@ static float __hx711_avg_reading(l_ezlopi_item_t *item, uint8_t sample_iteration
     return sum;
 }
 
-static void __hx711_power_reset(l_ezlopi_item_t *item)
+static void __hx711_power_reset(l_ezlopi_item_t* item)
 {
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         PORT_ENTER_CRITICAL();
         // Pull the clock pin low to make sure this reset condition occurs
         gpio_set_level(user_data->HX711_SCK_pin, 0);

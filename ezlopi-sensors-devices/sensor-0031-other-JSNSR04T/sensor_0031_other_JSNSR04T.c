@@ -155,9 +155,6 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
 static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
-
-    #warning "JSNSR04T has device-type => 'OTHER'  ; so gpio1 & gpio2 are dedicated here";
-
     CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_out.gpio_num);
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
@@ -165,8 +162,6 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     item->interface.gpio.gpio_out.mode = GPIO_MODE_OUTPUT;
     item->interface.gpio.gpio_out.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_out.value = 0;
-    #warning "JSNSR04T has device-type => 'OTHER'  ; so gpio1 & gpio2 are dedicated here";
-
     CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;

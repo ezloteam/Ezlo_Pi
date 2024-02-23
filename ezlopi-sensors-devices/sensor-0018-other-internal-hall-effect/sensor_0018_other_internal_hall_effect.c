@@ -84,7 +84,7 @@ int sensor_0018_other_internal_hall_effect(e_ezlopi_actions_t action, l_ezlopi_i
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_security_sensor;
@@ -210,8 +210,8 @@ static int __get_item_cjson(l_ezlopi_item_t* item, void* arg)
                 cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
             }
             //--------------------------------------------------------------------------------------
-            cJSON_AddStringToObject(cj_result, "valueFormatted", user_data->hall_state);
-            cJSON_AddStringToObject(cj_result, "value", user_data->hall_state);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, user_data->hall_state);
         }
         ret = 1;
     }
@@ -227,8 +227,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, "valueFormatted", user_data->hall_state);
-            cJSON_AddStringToObject(cj_result, "value", user_data->hall_state);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, user_data->hall_state);
         }
         ret = 1;
     }

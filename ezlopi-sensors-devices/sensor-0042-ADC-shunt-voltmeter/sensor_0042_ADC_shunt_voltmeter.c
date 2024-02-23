@@ -20,12 +20,12 @@ typedef struct s_voltmeter
 } s_voltmeter_t;
 
 //------------------------------------------------------------------------------------------------------------------------------
-static int __0042_prepare(void *arg);
-static int __0042_init(l_ezlopi_item_t *item);
-static int __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0042_notify(l_ezlopi_item_t *item);
+static int __0042_prepare(void* arg);
+static int __0042_init(l_ezlopi_item_t* item);
+static int __0042_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0042_notify(l_ezlopi_item_t* item);
 //------------------------------------------------------------------------------------------------------------------------------
-int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -60,10 +60,10 @@ int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -72,7 +72,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -82,8 +82,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.value_type = value_type_electric_potential;
     item->cloud_properties.scale = scales_volt;
 
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
@@ -91,22 +91,22 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 }
 
 //----------------------------------------------------
-static int __0042_prepare(void *arg)
+static int __0042_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_voltmeter_t *user_data = (s_voltmeter_t *)malloc(sizeof(s_voltmeter_t));
+        s_voltmeter_t* user_data = (s_voltmeter_t*)malloc(sizeof(s_voltmeter_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_voltmeter_t));
 
-            l_ezlopi_device_t *voltmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* voltmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (voltmeter_device)
             {
                 __prepare_device_cloud_properties(voltmeter_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *voltmeter_item = ezlopi_device_add_item_to_device(voltmeter_device, sensor_0042_ADC_shunt_voltmeter);
+                l_ezlopi_item_t* voltmeter_item = ezlopi_device_add_item_to_device(voltmeter_device, sensor_0042_ADC_shunt_voltmeter);
                 if (voltmeter_item)
                 {
                     __prepare_item_cloud_properties(voltmeter_item, device_prep_arg->cjson_device, user_data);
@@ -129,7 +129,7 @@ static int __0042_prepare(void *arg)
     return ret;
 }
 
-static int __0042_init(l_ezlopi_item_t *item)
+static int __0042_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -153,23 +153,23 @@ static int __0042_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0042_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
+            s_voltmeter_t* user_data = (s_voltmeter_t*)item->user_arg;
 #if VOLTAGE_DIVIDER_EN
-            char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 9.52f);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->volt) * 9.52f);
+            char* valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 9.52f);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->volt) * 9.52f);
 #else
-            char *valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 4.2f);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->volt) * 4.2f);
+            char* valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 4.2f);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->volt) * 4.2f);
 #endif
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
             free(valueFormatted);
             ret = 1;
         }
@@ -177,13 +177,13 @@ static int __0042_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __0042_notify(l_ezlopi_item_t *item)
+static int __0042_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_voltmeter_t *user_data = (s_voltmeter_t *)item->user_arg;
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+        s_voltmeter_t* user_data = (s_voltmeter_t*)item->user_arg;
+        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 
