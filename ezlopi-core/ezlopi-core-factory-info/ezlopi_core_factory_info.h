@@ -162,15 +162,23 @@ extern "C"
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\":8,\
-                \"dev_name\":\"ENS160\",\
+                \"dev_type\":3,\
+                \"dev_name\":\"Proximity\",\
                 \"id_room\":\"\",\
-                \"id_item\":68,\
-                \"gpio_scl\":17,\
-                \"gpio_sda\":18\
+                \"id_item\":34,\
+                \"gpio\":25,\
+                \"logic_inv\": false\
+            },\
+            {\
+                \"dev_type\":10,\
+                \"dev_name\":\"Hall Effect Sensor\",\
+                \"id_room\":\"\",\
+                \"id_item\":18,\
+                \"en_gpio1\": true,\
+                \"gpio1\":3\
             }\
-        ],\
-    \"dev_total\": 1}";
+        ], \
+    \"dev_total\": 2}";
 #endif
 
 

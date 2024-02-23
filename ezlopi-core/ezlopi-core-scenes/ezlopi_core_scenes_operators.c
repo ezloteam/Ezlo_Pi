@@ -613,10 +613,10 @@ const char* ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
     return ret;
 }
 
-int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
+int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* operation_field)
 {
     int ret = 0;
-    if (item_id && value_field)
+    if (item_id && value_field && operation_field)
     {
         char* item_value = NULL;
         // int item_value_size = 0;
@@ -652,7 +652,7 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
         if (NULL != item_value)
         {
             cJSON* iterator = NULL;
-            char* op_str = (NULL == comparator_field) ? "in" : comparator_field->field_value.u_value.value_string;
+            char* op_str = (NULL == operation_field) ? "in" : operation_field->field_value.u_value.value_string;
             e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(op_str);
             switch (string_operator)
             {
@@ -721,10 +721,10 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
     return ret;
 }
 #if 0
-int ezlopi_scenes_operators_value_expn_inarr_operations(uint32_t expression_id, l_fields_v2_t* expression_field, l_fields_v2_t* comparator_field)
+int ezlopi_scenes_operators_value_expn_inarr_operations(uint32_t expression_id, l_fields_v2_t* expression_field, l_fields_v2_t* operation_field)
 {
     int ret = 0;
-    if (expression_id && expression_field && comparator_field)
+    if (expression_id && expression_field && operation_field)
     {
         size_t expression_name_len = strlen(expression_field->field_value.u_value.value_string);
         char* expression_name = (expression_field->field_value.u_value.value_string); // get the expression_name
@@ -744,7 +744,7 @@ int ezlopi_scenes_operators_value_expn_inarr_operations(uint32_t expression_id, 
 
             //
 
-            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(operation_field->field_value.u_value.value_string);
 
             switch (string_operator)
             {
@@ -1417,7 +1417,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
                         if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_tmp = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
                             // " ezlopi_cloud_value_type_str.c "
-                            
+
                             // const char *tmp_value_type = "";
                             // if ((value_field->value_type > EZLOPI_VALUE_TYPE_NONE) && (value_field->value_type < EZLOPI_VALUE_TYPE_MAX))
                             // {
