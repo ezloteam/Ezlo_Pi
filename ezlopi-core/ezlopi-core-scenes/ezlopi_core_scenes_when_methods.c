@@ -326,8 +326,57 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'number_range' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+
+        l_fields_v2_t* start_value_field = NULL;
+        l_fields_v2_t* end_value_field = NULL;
+
+        l_fields_v2_t* comparator_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "comparator", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    comparator_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "startValue", 11))
+            {
+                start_value_field = curr_field;//contains the 'type' , 'value' & 'scale'
+            }
+            else if (0 == strncmp(curr_field->name, "endValue", 9))
+            {
+                end_value_field = curr_field;//contains the 'type' , 'value' & 'scale'
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && start_value_field && end_value_field && comparator_field)
+        {
+            // check if both 'value_type' and 'scales' match.
+            if ((start_value_field->value_type == end_value_field->value_type) &&
+                (0 == strcmp(start_value_field->scale, end_value_field->scale)))
+            {
+                ret = ezlopi_scenes_operators_value_number_range_operations(item_id, start_value_field, end_value_field, comparator_field);
+            }
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
@@ -467,7 +516,7 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
                     value_field = curr_field;
                 }
             }
-            else if (0 == strncmp(curr_field->name, "operation", 11))
+            else if (0 == strncmp(curr_field->name, "operation", 10))
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {

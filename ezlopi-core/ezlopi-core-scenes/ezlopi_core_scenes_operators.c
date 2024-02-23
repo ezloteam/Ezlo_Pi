@@ -1298,26 +1298,38 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str);
-                        const char* str_tmp = NULL;
-                        if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_tmp = cJSON_GetStringValue(cj_valuetype))))
+                        cJSON* item_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str);
+                        const char* str_item_type = NULL;
+                        if (item_valuetype && cJSON_IsString(item_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(item_valuetype))))
                         {
-                            const char* tmp_value_type = "";
+                            const char* tmp_valuetype = "";
                             if ((start_value_field->value_type > EZLOPI_VALUE_TYPE_NONE) && (start_value_field->value_type < EZLOPI_VALUE_TYPE_MAX))
                             {
-                                tmp_value_type = ezlopi_scenes_value_numeric_range_value_types[start_value_field->value_type]; // bool ? token ? int  ?
+                                tmp_valuetype = ezlopi_scenes_value_numeric_range_value_types[start_value_field->value_type]; // bool ? token ? int  ?
                             }
-                            if (STR_OP_COMP(tmp_value_type, == , str_tmp)) // 'int' == 'int'?
+                            if (STR_OP_COMP(tmp_valuetype, == , str_item_type)) // 'int' == 'int'?
                             {
-                                cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // extract the value from " item " within the device
-                                if (cj_value)
-                                {                          // extract the item_value ;
-                                    item_value = cj_value; // here the value maybe (int , float , string , bool)
+                                //now check if scale matches
+                                cJSON* item_scale = cJSON_GetObjectItem(cj_item_value, ezlopi_scale_str);
+                                const char* str_scale_tmp = NULL;
+                                if (item_scale && cJSON_IsString(item_scale) && (NULL != (str_scale_tmp = cJSON_GetStringValue(item_scale))))
+                                {
+                                    if (STR_OP_COMP(start_value_field->scale, == , str_scale_tmp))  // 'NULL' == 'NULL'
+                                    {
+                                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // extract the value from " item " within the device
+                                        if (cj_value)
+                                        {                          // extract the item_value ;
+                                            item_value = cj_value; // here the value maybe (int , float , string , bool)
+                                        }
+                                    }
+                                    else
+                                    {
+                                        TRACE_E("Scale didnot match..");
+                                    }
                                 }
                             }
                         }
                     }
-
                     break;
                 }
                 item = item->next;
@@ -1352,7 +1364,6 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                 {
                     TRACE_E("Value type mis-matched!");
                 }
-
                 break;
             }
             case SCENES_NUM_COMP_OPERATORS_NOT_BETWEEN:
@@ -1413,18 +1424,18 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
                         cJSON* cj_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
-                        const char* str_tmp = NULL;
-                        if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_tmp = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
+                        const char* str_item_type = NULL;
+                        if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
                             // " ezlopi_cloud_value_type_str.c "
 
-                            // const char *tmp_value_type = "";
+                            // const char *str_item_type = "";
                             // if ((value_field->value_type > EZLOPI_VALUE_TYPE_NONE) && (value_field->value_type < EZLOPI_VALUE_TYPE_MAX))
                             // {
-                            //     tmp_value_type = ezlopi_scenes_value_numeric_range_value_types[value_field->value_type]; // must return "dictionary"
+                            //     str_item_type = ezlopi_scenes_value_numeric_range_value_types[value_field->value_type]; // must return "dictionary"
                             // }
 
-                            if (STR_OP_COMP("dictionary", == , str_tmp)) // 'dictionary' == 'dictionary'?
+                            if (STR_OP_COMP("dictionary", == , str_item_type)) // 'dictionary' == 'dictionary'?
                             {
                                 cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                                 if (cj_value)
@@ -1484,10 +1495,10 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
                         cJSON* cj_valuetype = cJSON_GetObjectItem(cj_item_value, ezlopi_valueType_str); // first check the item_type -> 'valueType'
-                        const char* str_tmp = NULL;
-                        if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_tmp = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
+                        const char* str_item_type = NULL;
+                        if (cj_valuetype && cJSON_IsString(cj_valuetype) && (NULL != (str_item_type = cJSON_GetStringValue(cj_valuetype)))) // type => dictionary
                         {
-                            if (STR_OP_COMP("dictionary", == , str_tmp)) // 'dictionary' == 'dictionary'?
+                            if (STR_OP_COMP("dictionary", == , str_item_type)) // 'dictionary' == 'dictionary'?
                             {
                                 cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // item_value -> dictionary ; [array or object]
                                 if (cj_value)
