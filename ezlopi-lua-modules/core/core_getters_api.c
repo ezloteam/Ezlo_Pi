@@ -257,10 +257,8 @@ static int __create_lua_table_for_device(lua_State *lua_state, l_ezlopi_device_t
     lua_create_table_string_key_value(ezlopi_security_str, controller_info->security);
     lua_create_table_bool_key_value(ezlopi_ready_str, controller_info->ready);
     lua_create_table_string_key_value(ezlopi_status_str, controller_info->status ? controller_info->status : ezlopi__str);
-
-#warning "Krishna needs to verify below 2 lines"
-    lua_create_table_bool_key_value(ezlopi_house_modes_options_str, ezlopi__str);
-    lua_create_table_bool_key_value(ezlopi_parent_room_str, ezlopi__str);
+    lua_create_table_string_key_value(ezlopi_house_modes_options_str, ezlopi__str);
+    lua_create_table_string_key_value(ezlopi_parent_room_str, ezlopi__str);
 
     return 1;
 }
@@ -347,11 +345,9 @@ static int __create_lua_table_for_gateway(lua_State *lua_state, s_ezlopi_gateway
 
     lua_create_table_string_key_value(ezlopi_name_str, gateway_prop->name);
 
-#warning "Krishna needs to check below 3 lines"
-    lua_create_table_bool_key_value(ezlopi_plugin_id_str, gateway_prop->pluginid);
-    lua_create_table_bool_key_value(ezlopi_label_str, gateway_prop->label);
-    lua_create_table_bool_key_value(ezlopi_reason_str, ezlopi__str);
-
+    lua_create_table_string_key_value(ezlopi_plugin_id_str, gateway_prop->pluginid);
+    lua_create_table_string_key_value(ezlopi_label_str, gateway_prop->label);
+    lua_create_table_string_key_value(ezlopi_reason_str, ezlopi__str);
     lua_create_table_string_key_value(ezlopi_unreachable_reasons_str, ezlopi__str);
     lua_create_table_string_key_value(ezlopi_unreachable_actions_str, ezlopi__str);
     lua_create_table_bool_key_value(ezlopi_manual_device_adding_str, gateway_prop->manual_device_adding);

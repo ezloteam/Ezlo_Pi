@@ -6,9 +6,28 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-wifi
         ezlopi-core-modes
         ezlopi-core-sntp
-        ezlopi-core-ws-server
+        ezlopi-core-reboot
+        ezlopi-util-trace
 )
 
-idf_component_register(SRCS "ezlopi_core_ezlopi.c" "${config_src}"
+set(EZLOPI_CLOUD_COMPONENTS
+        ezlopi-cloud-data 
+        ezlopi-cloud-devices 
+        ezlopi-cloud-scenes 
+        ezlopi-cloud-registration 
+        ezlopi-cloud-favorite 
+        ezlopi-cloud-gateways 
+        ezlopi-cloud-info 
+        ezlopi-cloud-modes 
+        ezlopi-cloud-items 
+        ezlopi-cloud-room 
+        ezlopi-cloud-settings 
+        ezlopi-cloud-network 
+        ezlopi-cloud-ota
+)
+
+idf_component_register(SRCS "ezlopi_core_ezlopi_methods.c" "ezlopi_core_ezlopi.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES ${EZLOPI_CORE_COMPONENTS})
+    REQUIRES    ${EZLOPI_CORE_COMPONENTS}
+                ${EZLOPI_CLOUD_COMPONENTS}
+)

@@ -446,7 +446,16 @@ char *ezlopi_factory_info_v3_get_ssl_shared_key(void)
 
 char *ezlopi_factory_info_v3_get_ezlopi_config(void)
 {
-    return ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
+    char *ret = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_EZLOPI_CONFIG_JSON, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_EZLOPI_CONFIG_JSON);
+    if (false == isprint(ret[0]))
+    {
+        if (ret)
+        {
+            free(ret);
+            ret = NULL;
+        }
+    }
+    return ret;
 }
 
 #if 0 // IF version 2

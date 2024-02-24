@@ -41,7 +41,6 @@ void ezlopi_core_sntp_init(void)
 static void sntp_sync_time_call_back(struct timeval *tv)
 {
     sntp_set_sync_interval(60 * 60 * 1000);
-    TRACE_S("Notification of a time synchronization event");
 
     time_t now;
     time(&now);

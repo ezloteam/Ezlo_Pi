@@ -19,11 +19,11 @@
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_service_gpioisr.h"
 #include "ezlopi_service_webprov.h"
+#include "ezlopi_service_ws_server.h"
 
 #define ENABLE_HEARTBIT_LED 0
 
 static void blinky(void *pv);
-// extern void wss_server_init(void);
 
 void app_main(void)
 {
@@ -31,13 +31,13 @@ void app_main(void)
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();
-    // ezlopi_ble_service_init();
-    // timer_service_init();
-    // ezlopi_scenes_meshbot_init();
-    // web_provisioning_init();
-    // ota_service_init();
-    // ezlopi_service_modes_init();
-    // wss_server_init();
+    ezlopi_ble_service_init();
+    timer_service_init();
+    ezlopi_scenes_meshbot_init();
+    web_provisioning_init();
+    ota_service_init();
+    ezlopi_service_modes_init();
+    ezlopi_service_ws_server_start();
 
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
@@ -67,11 +67,12 @@ static void blinky(void *pv)
 
         if (count++ > 10)
         {
+            count = 0;
+
             trace_wb("-----------------------------------------");
             trace_wb("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
             trace_wb("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
             trace_wb("-----------------------------------------");
-            count = 0;
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);

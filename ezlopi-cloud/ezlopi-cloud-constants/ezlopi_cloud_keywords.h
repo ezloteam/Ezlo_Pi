@@ -256,11 +256,14 @@ extern const char *ezlopi_service_str;
 extern const char *ezlopi_alarmed_str;
 extern const char *ezlopi_timeIsLeft_str;
 extern const char *ezlopi_sources_str;
+extern const char *ezlopi_source_str;
 extern const char *ezlopi_timestamp_str;
 extern const char *ezlopi_Home_str;
 extern const char *ezlopi_Away_str;
 extern const char *ezlopi_Night_str;
 extern const char *ezlopi_Vacation_str;
 extern const char *ezlopi_houseMode_str;
+
+extern const char *ezlopi_client_id_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

@@ -9,7 +9,6 @@
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_modes.h"
-#include "ezlopi_core_ws_server.h"
 #include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
@@ -38,7 +37,6 @@ void ezlopi_init(void)
     ezlopi_wifi_initialize();
     vTaskDelay(10);
 
-#if 1
     // Init devices
     ezlopi_device_prepare();
     vTaskDelay(10);
@@ -61,8 +59,6 @@ void ezlopi_init(void)
     ezlopi_ping_init();
     ezlopi_core_sntp_init();
     ezlopi_timer_start_1000ms();
-    ezlopi_core_ws_server_init();
-#endif
 }
 
 static void ezlopi_initialize_devices_v3(void)

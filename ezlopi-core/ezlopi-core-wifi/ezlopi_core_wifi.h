@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-    typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, void *arg);
+    typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, int32_t event_id, void *arg);
 
     typedef struct ll_ezlopi_wifi_event_upcall
     {

@@ -1,33 +1,19 @@
 
-#include "esp_mac.h"
-#include "esp_wifi_types.h"
-#include "esp_idf_version.h"
+#include <esp_mac.h>
+#include <esp_wifi_types.h>
+#include <esp_idf_version.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_http.h"
-#include "ezlopi_core_factory_info.h"
-#include "ezlopi_core_event_group.h"
-#include "ezlopi_core_websocket_client.h"
-
-#include "ezlopi_cloud_data.h"
-#include "ezlopi_cloud_devices.h"
-#include "ezlopi_cloud_scenes.h"
-#include "ezlopi_cloud_registration.h"
-#include "ezlopi_cloud_favorite.h"
-#include "ezlopi_cloud_gateways.h"
-#include "ezlopi_cloud_info.h"
-#include "ezlopi_cloud_modes.h"
-#include "ezlopi_cloud_modes_updaters.h"
-#include "ezlopi_cloud_items.h"
-#include "ezlopi_cloud_room.h"
-#include "ezlopi_cloud_network.h"
-#include "ezlopi_cloud_ota.h"
-#include "ezlopi_cloud_settings.h"
 #include "ezlopi_cloud_constants.h"
-#include "ezlopi_cloud_scenes_scripts.h"
-#include "ezlopi_cloud_scenes_expressions.h"
+#include "ezlopi_core_event_group.h"
+#include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_ezlopi_methods.h"
+#include "ezlopi_core_websocket_client.h"
 
 #include "ezlopi_service_webprov.h"
 
@@ -38,26 +24,9 @@ static TaskHandle_t ezlopi_update_config_notifier = NULL;
 
 static void __connection_upcall(bool connected);
 static void __message_upcall(const char *payload, uint32_t len);
-static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response);
-static void __hub_reboot(cJSON *cj_request, cJSON *cj_response);
 static void __fetch_wss_endpoint(void *pv);
 static void web_provisioning_config_check(void *pv);
 static void __print_sending_data(char *data_str, e_trace_type_t print_type);
-
-typedef void (*f_method_func_t)(cJSON *cj_request, cJSON *cj_response);
-typedef struct s_method_list_v2
-{
-    char *method_name;
-    f_method_func_t method;
-    f_method_func_t updater;
-} s_method_list_v2_t;
-
-static const s_method_list_v2_t method_list_v2[] = {
-#define CLOUD_METHOD(name, func, updater_func) {.method_name = name, .method = func, .updater = updater_func},
-#include "ezlopi_api_url_macros.h"
-#undef CLOUD_METHOD
-    {.method_name = NULL, .method = NULL, .updater = NULL},
-};
 
 uint32_t web_provisioning_get_message_count(void)
 {
@@ -500,7 +469,7 @@ static void __connection_upcall(bool connected)
         {
             TRACE_S("Web-socket re-connected.");
             TRACE_I("Starting registration process....");
-            registration_init();
+            ezlopi_core_ezlopi_methods_registration_init();
         }
     }
     else
@@ -511,32 +480,11 @@ static void __connection_upcall(bool connected)
     prev_status = connected;
 }
 
-static uint32_t __search_method_in_list(cJSON *method)
-{
-    uint32_t found_method = 0;
-    uint32_t idx = 0;
-
-    while (method_list_v2[idx].method_name)
-    {
-        uint32_t request_method_name_len = strlen(method->valuestring);
-        uint32_t list_method_name_len = strlen(method_list_v2[idx].method_name);
-        uint32_t comp_len = list_method_name_len > request_method_name_len ? list_method_name_len : request_method_name_len;
-        if (0 == strncmp(method->valuestring, method_list_v2[idx].method_name, comp_len))
-        {
-            found_method = 1;
-            break;
-        }
-        idx++;
-    }
-
-    return (found_method ? idx : UINT32_MAX);
-}
-
 static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
 {
     if (method_func)
     {
-        if (registered == method_func)
+        if (ezlopi_core_elzlopi_methods_check_method_register(method_func))
         {
             method_func(cj_request, NULL);
         }
@@ -586,17 +534,28 @@ static void __message_upcall(const char *payload, uint32_t len)
             {
                 TRACE_S("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (cj_method->valuestring ? cj_method->valuestring : ezlopi__str), len, payload);
 
-                uint32_t method_idx = __search_method_in_list(cj_method);
+                uint32_t method_id = ezlopi_core_ezlopi_methods_search_in_list(cj_method);
 
-                if (UINT32_MAX != method_idx)
+                if (UINT32_MAX != method_id)
                 {
-                    TRACE_D("Method[%d]: %s", method_idx, method_list_v2[method_idx].method_name);
-                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].method, TRACE_TYPE_D);
-                    __call_method_and_send_response(cj_request, cj_method, method_list_v2[method_idx].updater, TRACE_TYPE_D);
+                    char *method_name = ezlopi_core_ezlopi_methods_get_name_by_id(method_id);
+                    TRACE_D("Method[%d]: %s", method_id, method_name ? method_name : "null");
+
+                    f_method_func_t method = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
+                    if (method)
+                    {
+                        __call_method_and_send_response(cj_request, cj_method, method, TRACE_TYPE_D);
+                    }
+
+                    f_method_func_t updater = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
+                    if (updater)
+                    {
+                        __call_method_and_send_response(cj_request, cj_method, updater, TRACE_TYPE_D);
+                    }
                 }
                 else
                 {
-                    __call_method_and_send_response(cj_request, cj_method, __rpc_method_notfound, TRACE_TYPE_E);
+                    __call_method_and_send_response(cj_request, cj_method, ezlopi_core_ezlopi_methods_rpc_method_notfound, TRACE_TYPE_E);
                 }
             }
         }
@@ -608,27 +567,6 @@ static void __message_upcall(const char *payload, uint32_t len)
 
         cJSON_Delete(cj_request);
     }
-}
-
-static void __rpc_method_notfound(cJSON *cj_request, cJSON *cj_response)
-{
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-    cJSON *cjson_error = cJSON_AddObjectToObject(cj_response, ezlopi_error_str);
-    if (cjson_error)
-    {
-        cJSON_AddNumberToObject(cjson_error, ezlopi_code_str, -32602);
-        cJSON_AddStringToObject(cjson_error, ezlopi_data_str, ezlopi_rpc_method_notfound_str);
-        cJSON_AddStringToObject(cjson_error, ezlopi_message_str, ezlopi_Unknown_method_str);
-    }
-
-    cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
-}
-
-static void __hub_reboot(cJSON *cj_request, cJSON *cj_response)
-{
-    web_provisioning_deinit();
-    esp_restart();
 }
 
 static void __print_sending_data(char *data_str, e_trace_type_t print_type)

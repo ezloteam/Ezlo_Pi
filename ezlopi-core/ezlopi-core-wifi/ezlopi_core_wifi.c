@@ -73,12 +73,6 @@ esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void)
     return &my_ip;
 }
 
-// static void alert_qt_wifi_fail(void)
-// {
-//     char *qt_resp = "{\"cmd\":2,\"status_write\":0,\"status_connect\":0}";
-//     qt_serial_tx_data(strlen(qt_resp), (uint8_t *)qt_resp);
-// }
-
 int ezlopi_wifi_got_ip(void)
 {
     return station_got_ip;
@@ -178,7 +172,7 @@ static void __event_handler(void *arg, esp_event_base_t event_base, int32_t even
     {
         if (curr_upcall->upcall)
         {
-            curr_upcall->upcall(event_base, curr_upcall->arg);
+            curr_upcall->upcall(event_base, event_id, curr_upcall->arg);
         }
         curr_upcall = curr_upcall->next;
     }
@@ -216,8 +210,8 @@ void ezlopi_wifi_connect_from_id_bin(void)
     }
     else
     {
-        strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
-        strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
+        strcpy(&wifi_ssid_pass_global_buffer[00], "krishna home_2.4");
+        strcpy(&wifi_ssid_pass_global_buffer[32], "coldWinter");
     }
 
     ezlopi_factory_info_v3_free(wifi_ssid);
@@ -234,8 +228,8 @@ void ezlopi_wifi_connect_from_nvs(void)
 
     if (wifi_ssid_pass_global_buffer[0] == 0)
     {
-        strcpy(&wifi_ssid_pass_global_buffer[00], "ezlopitest");
-        strcpy(&wifi_ssid_pass_global_buffer[32], "ezlopitest");
+        strcpy(&wifi_ssid_pass_global_buffer[00], "nepaldigisys");
+        strcpy(&wifi_ssid_pass_global_buffer[32], "NDS_0ffice");
         ezlopi_wifi_set_new_wifi_flag();
     }
 
@@ -312,7 +306,6 @@ static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_w
     if (_upcall)
     {
         _upcall->arg = arg;
-#warning "Krishna needs to test and fix it"
         _upcall->upcall = upcall;
         _upcall->next = NULL;
     }

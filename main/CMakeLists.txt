@@ -3,9 +3,9 @@ file(GLOB_RECURSE config_src "*.c")
 
 # Define SDK components
 set(EZLOPI_SDK_COMPONENTS
-        driver
-        nghttp
-        esp_http_server
+        # driver
+        # nghttp
+        # esp_http_server
         # protocol_examples_common
 )
 
@@ -36,20 +36,22 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
 
 # Define service components
 set(EZLOPI_SERVICES
-        ezlopi-service-webprov
-        ezlopi-service-timer
-        ezlopi-service-gpioisr
         ezlopi-service-ble
         ezlopi-service-ota
-        ezlopi-service-meshbot 
         ezlopi-service-uart
         ezlopi-service-modes
+        ezlopi-service-timer
+        ezlopi-service-webprov
+        ezlopi-service-gpioisr
+        ezlopi-service-meshbot 
+        ezlopi-service-ws-server
 )
 
 # Register the components
-idf_component_register(SRCS "ezlopi_main.c" "${config_src}"
+idf_component_register(SRCS "${config_src}"
                         INCLUDE_DIRS "."
-                        REQUIRES        ${EZLOPI_CORE_COMPONENTS}
+                        REQUIRES        ${EZLOPI_COMPONENTS}
+                                        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}
                                         ${EZLOPI_CLOUD_COMPONENTS}
                                         ${EZLOPI_SENSOR_DEVICE_COMPONENTS}               
