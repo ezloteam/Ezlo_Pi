@@ -30,22 +30,16 @@ static const s_method_list_v2_t method_list_v2[] = {
 
 f_method_func_t ezlopi_core_ezlopi_methods_get_by_id(uint32_t method_id)
 {
-    TRACE_D("method_id: %u", method_id);
-    TRACE_D("function ptr: %p", method_list_v2[method_id].method);
     return method_list_v2[method_id].method;
 }
 
 f_method_func_t ezlopi_core_ezlopi_methods_get_updater_by_id(uint32_t method_id)
 {
-    TRACE_D("method_id: %u", method_id);
-    TRACE_D("function ptr: %p", method_list_v2[method_id].updater);
     return method_list_v2[method_id].updater;
 }
 
 char *ezlopi_core_ezlopi_methods_get_name_by_id(uint32_t method_id)
 {
-    TRACE_D("method_id: %u", method_id);
-    TRACE_D("method_name: %s", method_list_v2[method_id].method_name);
     return method_list_v2[method_id].method_name;
 }
 
@@ -58,11 +52,6 @@ uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON *cj_method)
     {
         while (method_list_v2[idx].method_name)
         {
-            TRACE_D("idx: %d", idx);
-            TRACE_D("name: %s", method_list_v2[idx].method_name);
-            TRACE_D("method: %p", method_list_v2[idx].method);
-            TRACE_D("updater: %p\n", method_list_v2[idx].updater);
-
             uint32_t request_method_name_len = strlen(cj_method->valuestring);
             uint32_t list_method_name_len = strlen(method_list_v2[idx].method_name);
             uint32_t comp_len = list_method_name_len > request_method_name_len ? list_method_name_len : request_method_name_len;

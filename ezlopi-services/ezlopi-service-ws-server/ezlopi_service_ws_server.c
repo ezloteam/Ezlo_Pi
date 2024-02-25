@@ -55,6 +55,7 @@ static esp_err_t __trigger_async_send(httpd_req_t *req);
 static void __ws_api_handler(httpd_req_t *req, const char *payload, uint32_t payload_len);
 static void __wifi_connection_event(esp_event_base_t event, int32_t event_id, void *arg);
 static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type);
+static void __print_sending_data(char *data_str, e_trace_type_t print_type);
 
 e_ws_status_t ezlopi_service_ws_server_status(void)
 {
@@ -79,10 +80,16 @@ int ezlopi_service_ws_server_send_cjson(cJSON *cj_data)
                 char *data = cJSON_Print(cj_data);
                 if (data)
                 {
+                    TRACE_D("sending: %s", data);
                     cJSON_Minify(data);
-                    ret = ezlopi_service_ws_server_send(curr_client, data, strlen(data));
+                    ret = ezlopi_service_ws_server_broadcast(data, strlen(data));
+
                     free(data);
                 }
+            }
+            else
+            {
+                TRACE_E("NULL");
             }
         }
         else
@@ -123,31 +130,39 @@ int ezlopi_service_ws_server_send(l_ws_server_client_conn_t *client, char *data,
     int ret = 0;
     if (data && len && client && client->http_handle)
     {
-        httpd_ws_frame_t frm_pkt = {
-            .final = false,
-            .fragmented = false,
-            .len = len,
-            .payload = (uint8_t *)data,
-            .type = HTTPD_WS_TYPE_TEXT,
-        };
+        httpd_ws_frame_t frm_pkt;
 
-        TRACE_D("sending to client: %p", client->http_handle);
+        memset(&frm_pkt, 0, sizeof(httpd_ws_frame_t));
 
-        if (ESP_OK == httpd_ws_send_data((httpd_req_t *)client->http_handle, client->http_descriptor, &frm_pkt))
+        frm_pkt.len = len;
+        frm_pkt.payload = (uint8_t *)data;
+        frm_pkt.type = HTTPD_WS_TYPE_TEXT;
+
+        TRACE_D("client-handle: %p", client->http_handle);
+        TRACE_D("client-desc: %d", client->http_descriptor);
+        TRACE_D("data: %.*s", frm_pkt.len, frm_pkt.payload);
+
+        if (ESP_OK == httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt))
         {
-            client->fail_count = 0;
             ret = 1;
+            client->fail_count = 0;
+
+            TRACE_S("Done");
+            __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_D);
         }
         else
         {
             client->fail_count += 1;
+
+            TRACE_E("Failed!");
+            __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_E);
+
             if (client->fail_count > 5)
             {
-                frm_pkt.len = 0;
-                frm_pkt.payload = NULL;
-                frm_pkt.fragmented = false;
-                frm_pkt.type = HTTPD_WS_TYPE_CLOSE;
-                httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt);
+                // frm_pkt.len = 0;
+                // frm_pkt.payload = "";
+                // frm_pkt.type = HTTPD_WS_TYPE_CLOSE;
+                // httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt);
                 ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
             }
         }
@@ -224,9 +239,9 @@ static void __ws_api_handler(httpd_req_t *req, const char *payload, uint32_t pay
                     if (UINT32_MAX != method_id)
                     {
                         char *method_name = ezlopi_core_ezlopi_methods_get_name_by_id(method_id);
-                        TRACE_D("Method[%d]: %s", method_id, method_name ? method_name : "null");
+                        TRACE_D("Method:: id:[%d], name: %s", method_id, method_name ? method_name : "null");
 
-                        f_method_func_t method = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
+                        f_method_func_t method = ezlopi_core_ezlopi_methods_get_by_id(method_id);
                         TRACE_D("method: %p", method);
 
                         if (method)
@@ -235,7 +250,7 @@ static void __ws_api_handler(httpd_req_t *req, const char *payload, uint32_t pay
                         }
 
                         f_method_func_t updater = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
-                        TRACE_D("method: %p", method);
+                        TRACE_D("updater: %p", updater);
 
                         if (updater)
                         {
@@ -428,15 +443,21 @@ static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method,
             cJSON *cj_response = cJSON_CreateObject();
             if (NULL != cj_response)
             {
-                cJSON *cj_sender = cJSON_GetObjectItem(cj_request, ezlopi_sender_str);
-
                 cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
-                cJSON_AddItemReferenceToObject(cj_response, ezlopi_sender_str, cj_sender);
+                cJSON_AddItemReferenceToObject(cj_response, ezlopi_sender_str, cJSON_GetObjectItem(cj_request, ezlopi_sender_str));
                 cJSON_AddNullToObject(cj_response, ezlopi_error_str);
 
                 method_func(cj_request, cj_response);
+                CJSON_TRACE("cj_response", cj_response);
 
                 ezlopi_service_ws_server_send_cjson(cj_response);
+                // char *data = cJSON_Print(cj_request);
+                // if (data)
+                // {
+                //     cJSON_Minify(data);
+                //     ezlopi_service_ws_server_send();
+                //     free(data);
+                // }
                 cJSON_Delete(cj_response);
             }
             else
@@ -444,5 +465,42 @@ static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method,
                 TRACE_E("Error - cj_response: %d", (uint32_t)cj_response);
             }
         }
+    }
+}
+
+static void __print_sending_data(char *data_str, e_trace_type_t print_type)
+{
+    switch (print_type)
+    {
+    case TRACE_TYPE_W:
+    {
+        TRACE_W("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_B:
+    {
+        TRACE_I("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_D:
+    {
+        TRACE_D("## WSS-SENDING >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_E:
+    {
+        TRACE_E("## WSS-SENDING  >>>>>>>>>>>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    case TRACE_TYPE_I:
+    {
+        TRACE_S("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
+    default:
+    {
+        TRACE_E("## WSS-SENDING >>>>>>>>>>\r\n%s", data_str);
+        break;
+    }
     }
 }

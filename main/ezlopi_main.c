@@ -72,7 +72,11 @@ static void blinky(void *pv)
             trace_wb("-----------------------------------------");
             trace_wb("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
             trace_wb("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+
             trace_wb("-----------------------------------------");
+
+            char *sdfgh = "asdfghjkl";
+            ezlopi_service_ws_server_broadcast(sdfgh, strlen(sdfgh));
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
