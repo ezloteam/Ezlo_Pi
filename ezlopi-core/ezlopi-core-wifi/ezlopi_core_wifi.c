@@ -210,8 +210,8 @@ void ezlopi_wifi_connect_from_id_bin(void)
     }
     else
     {
-        strcpy(&wifi_ssid_pass_global_buffer[00], "krishna home_2.4");
-        strcpy(&wifi_ssid_pass_global_buffer[32], "coldWinter");
+        strcpy(&wifi_ssid_pass_global_buffer[00], "nepaldigisys");
+        strcpy(&wifi_ssid_pass_global_buffer[32], "NDS_0ffice");
     }
 
     ezlopi_factory_info_v3_free(wifi_ssid);

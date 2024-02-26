@@ -15,6 +15,9 @@
 #include <sys/param.h>
 #include <esp_netif.h>
 #include <esp_system.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/semphr.h>
 
 #include "../../build/config/sdkconfig.h"
 #include <esp_http_server.h>
@@ -46,6 +49,7 @@ typedef struct s_async_resp_arg
 static uint32_t message_counter = 0;
 static httpd_handle_t gs_ws_handle = NULL;
 static e_ws_status_t gs_ws_status = WS_STATUS_STOPPED;
+static SemaphoreHandle_t send_lock = NULL;
 
 static void __stop_server(void);
 static void __start_server(void);
@@ -128,43 +132,84 @@ int ezlopi_service_ws_server_broadcast(char *data, uint32_t len)
 int ezlopi_service_ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len)
 {
     int ret = 0;
-    if (data && len && client && client->http_handle)
+    if (data && len && client && client->http_handle && send_lock)
     {
-        httpd_ws_frame_t frm_pkt;
-
-        memset(&frm_pkt, 0, sizeof(httpd_ws_frame_t));
-
-        frm_pkt.len = len;
-        frm_pkt.payload = (uint8_t *)data;
-        frm_pkt.type = HTTPD_WS_TYPE_TEXT;
-
-        TRACE_D("client-handle: %p", client->http_handle);
-        TRACE_D("client-desc: %d", client->http_descriptor);
-        TRACE_D("data: %.*s", frm_pkt.len, frm_pkt.payload);
-
-        if (ESP_OK == httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt))
+        if (pdTRUE == xSemaphoreTake(send_lock, 2000 / portTICK_PERIOD_MS))
         {
-            ret = 1;
-            client->fail_count = 0;
+            TRACE_S("ws-server send-lock acquired.");
 
-            TRACE_S("Done");
-            __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_D);
+            static const uint32_t data_buffer_len = 20;
+            static uint8_t data_buffer[20];
+
+            uint32_t loop_count = len / data_buffer_len;
+            loop_count = (len % data_buffer_len) ? (loop_count + 1) : loop_count;
+
+            TRACE_D("loop-count: %d", loop_count);
+
+            for (uint32_t count = 0; count < loop_count; count++)
+            {
+                memset(data_buffer, 0, data_buffer_len);
+
+                httpd_ws_frame_t frm_pkt;
+                memset(&frm_pkt, 0, sizeof(httpd_ws_frame_t));
+
+                static const char *test_data = "hello world!";
+                frm_pkt.len = strlen(test_data);
+                frm_pkt.payload = test_data;
+                frm_pkt.type = HTTPD_WS_TYPE_TEXT;
+
+                // frm_pkt.len = snprintf((char *)frm_pkt.payload, data_buffer_len, "%.*s", data_buffer_len, (char *)(data + (data_buffer_len * count)));
+
+                if (loop_count > 1)
+                {
+                    frm_pkt.fragmented = true;
+                }
+
+                if (count == loop_count - 1)
+                {
+                    frm_pkt.final = true;
+                }
+
+                TRACE_D("count: %d", count);
+                TRACE_D("client-handle: %p", client->http_handle);
+                TRACE_D("client-desc: %d", client->http_descriptor);
+                TRACE_D("data[%d]: %.*s", frm_pkt.len, frm_pkt.len, frm_pkt.payload);
+
+                if (ESP_OK == httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt))
+                {
+                    ret = 1;
+                    client->fail_count = 0;
+
+                    TRACE_S("Done");
+                    __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_D);
+                }
+                else
+                {
+                    TRACE_E("Failed!");
+
+                    ret = 0;
+                    client->fail_count += 1;
+                    __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_E);
+
+                    if (client->fail_count > 5)
+                    {
+                        ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
+                        break;
+                    }
+                }
+
+                if (count == loop_count)
+                {
+                    frm_pkt.final = true;
+                }
+            }
+
+            TRACE_S("ws-server send-lock released.");
+            xSemaphoreGive(send_lock);
         }
         else
         {
-            client->fail_count += 1;
-
-            TRACE_E("Failed!");
-            __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_E);
-
-            if (client->fail_count > 5)
-            {
-                // frm_pkt.len = 0;
-                // frm_pkt.payload = "";
-                // frm_pkt.type = HTTPD_WS_TYPE_CLOSE;
-                // httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt);
-                ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
-            }
+            TRACE_E("ws-server send-lock failed!");
         }
     }
 
@@ -388,34 +433,38 @@ static esp_err_t __msg_handler(httpd_req_t *req)
 
 static void __start_server(void)
 {
-    static const httpd_uri_t ws = {
-        .uri = "/ws",
-        .method = HTTP_GET,
-        .handler = __msg_handler,
-        .user_ctx = NULL,
-        .is_websocket = true,
-        .handle_ws_control_frames = true,
-    };
-
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.task_priority = 8;
-    config.stack_size = 1024 * 8;
-
-    TRACE_I("Starting ws-server on port: '%d'", config.server_port);
-
-    esp_err_t err = httpd_start(&gs_ws_handle, &config);
-
-    if (ESP_OK == err)
+    send_lock = xSemaphoreCreateMutex();
+    if (send_lock)
     {
-        TRACE_I("Registering URI handlers");
-        if (ESP_OK == httpd_register_uri_handler(gs_ws_handle, &ws))
+        static const httpd_uri_t ws = {
+            .uri = "/ws",
+            .method = HTTP_GET,
+            .handler = __msg_handler,
+            .user_ctx = NULL,
+            .is_websocket = true,
+            .handle_ws_control_frames = true,
+        };
+
+        httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+        config.task_priority = 8;
+        config.stack_size = 1024 * 18;
+
+        TRACE_I("Starting ws-server on port: '%d'", config.server_port);
+
+        esp_err_t err = httpd_start(&gs_ws_handle, &config);
+
+        if (ESP_OK == err)
         {
-            gs_ws_status = WS_STATUS_RUNNING;
+            TRACE_I("Registering URI handlers");
+            if (ESP_OK == httpd_register_uri_handler(gs_ws_handle, &ws))
+            {
+                gs_ws_status = WS_STATUS_RUNNING;
+            }
         }
-    }
-    else
-    {
-        TRACE_E("Error starting server!, err: %d", err);
+        else
+        {
+            TRACE_E("Error starting server!, err: %d", err);
+        }
     }
 }
 
@@ -427,6 +476,12 @@ static void __stop_server(void)
         httpd_stop(gs_ws_handle);
         gs_ws_handle = NULL;
         gs_ws_status = WS_STATUS_STOPPED;
+    }
+
+    if (send_lock)
+    {
+        vSemaphoreDelete(send_lock);
+        send_lock = NULL;
     }
 }
 
@@ -448,17 +503,20 @@ static void __call_method_and_send_response(cJSON *cj_request, cJSON *cj_method,
                 cJSON_AddNullToObject(cj_response, ezlopi_error_str);
 
                 method_func(cj_request, cj_response);
-                CJSON_TRACE("cj_response", cj_response);
+                // CJSON_TRACE("cj_response", cj_response);
 
-                ezlopi_service_ws_server_send_cjson(cj_response);
-                // char *data = cJSON_Print(cj_request);
-                // if (data)
-                // {
-                //     cJSON_Minify(data);
-                //     ezlopi_service_ws_server_send();
-                //     free(data);
-                // }
+                // ezlopi_service_ws_server_send_cjson(cj_response);
+                char *data = cJSON_Print(cj_request);
                 cJSON_Delete(cj_response);
+
+                if (data)
+                {
+                    cJSON_Minify(data);
+                    // ezlopi_service_ws_server_send();
+                    ezlopi_service_ws_server_broadcast(data, strlen(data));
+                    vTaskDelay(5000 / portTICK_PERIOD_MS);
+                    free(data);
+                }
             }
             else
             {
