@@ -151,6 +151,8 @@ extern "C"
     void ezlopi_factory_info_v3_free(void* arg);
     int ezlopi_factory_info_v3_factory_reset(void);
 
+    int ezlopi_factory_info_v3_scenes_factory_soft_reset(void);
+
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
@@ -160,22 +162,23 @@ extern "C"
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"Dining Room Main Lamp\",\
+                \"dev_type\":3,\
+                \"dev_name\":\"Proximity\",\
                 \"id_room\":\"\",\
-                \"id_item\": 2,\
-                \"val_ip\": false,\
-                \"val_op\": false,\
-                \"gpio_in\": 21,\
-                \"gpio_out\": 13,\
-                \"is_ip\": false,\
-                \"ip_inv\": true,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"op_inv\": false\
+                \"id_item\":34,\
+                \"gpio\":25,\
+                \"logic_inv\": false\
+            },\
+            {\
+                \"dev_type\":10,\
+                \"dev_name\":\"Hall Effect Sensor\",\
+                \"id_room\":\"\",\
+                \"id_item\":18,\
+                \"en_gpio1\": true,\
+                \"gpio1\":3\
             }\
-        ],\
-    \"dev_total\": 1}";
+        ], \
+    \"dev_total\": 2}";
 #endif
 
 

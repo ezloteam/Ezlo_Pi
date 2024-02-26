@@ -20,13 +20,13 @@ typedef struct s_fc28_data
     uint32_t hum_val;
 } s_fc28_data_t;
 
-static int __0041_prepare(void *arg);
-static int __0041_init(l_ezlopi_item_t *item);
-static int __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0041_notify(l_ezlopi_item_t *item);
+static int __0041_prepare(void* arg);
+static int __0041_init(l_ezlopi_item_t* item);
+static int __0041_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0041_notify(l_ezlopi_item_t* item);
 
 //--------------------------------------------------------------------------------------------------------
-int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -60,10 +60,10 @@ int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t
     return ret;
 }
 //-------------------------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
+    char* dev_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_humidity;
@@ -72,7 +72,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -84,35 +84,35 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
-static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     if (item && cj_device)
     {
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-        CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
         item->interface.adc.resln_bit = 3;
     }
 }
 //-------------------------------------------------------------------------------------------------------------------------
 
-static int __0041_prepare(void *arg)
+static int __0041_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        cJSON *cj_device = device_prep_arg->cjson_device;
+        cJSON* cj_device = device_prep_arg->cjson_device;
 
-        s_fc28_data_t *user_data = (s_fc28_data_t *)malloc(sizeof(s_fc28_data_t));
+        s_fc28_data_t* user_data = (s_fc28_data_t*)malloc(sizeof(s_fc28_data_t));
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_fc28_data_t));
-            l_ezlopi_device_t *fc28_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* fc28_device = ezlopi_device_add_device(cj_device);
             if (fc28_device)
             {
                 __prepare_device_cloud_properties(fc28_device, cj_device);
 
-                l_ezlopi_item_t *fc28_item = ezlopi_device_add_item_to_device(fc28_device, sensor_0041_ADC_FC28_soilMoisture);
+                l_ezlopi_item_t* fc28_item = ezlopi_device_add_item_to_device(fc28_device, sensor_0041_ADC_FC28_soilMoisture);
                 if (fc28_item)
                 {
                     __prepare_item_cloud_properties(fc28_item, user_data);
@@ -136,7 +136,7 @@ static int __0041_prepare(void *arg)
     return ret;
 }
 
-static int __0041_init(l_ezlopi_item_t *item)
+static int __0041_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (NULL != item)
@@ -173,12 +173,12 @@ static int __0041_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0041_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
             s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
@@ -199,7 +199,7 @@ static int __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __0041_notify(l_ezlopi_item_t *item)
+static int __0041_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)

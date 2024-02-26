@@ -44,6 +44,9 @@ extern "C"
     uint32_t ezlopi_nvs_get_provisioning_status(void);
     void ezlopi_nvs_set_provisioning_status(void);
 
+    void ezlopi_nvs_scenes_soft_reset(void);
+    void ezlopi_nvs_scenes_factory_info_reset(void);
+
 #if 0
     int ezlopi_settings_save_settings(const s_ezlopi_hub_settings_t* settings_list, uint16_t num_settings);
     int ezlopi_settings_retrive_settings(s_ezlopi_hub_settings_t* ezlopi_settings_list, uint16_t num_settings);
@@ -87,9 +90,9 @@ extern "C"
 
     char* ezlopi_nvs_read_modes(void);
     int ezlopi_nvs_write_modes(char* data);
-    
-    char *ezlopi_nvs_read_latidtude_longitude();
-    int ezlopi_nvs_write_latitude_longitude(char *data);
+
+    char* ezlopi_nvs_read_latidtude_longitude();
+    int ezlopi_nvs_write_latitude_longitude(char* data);
 
 #ifdef __cplusplus
 }

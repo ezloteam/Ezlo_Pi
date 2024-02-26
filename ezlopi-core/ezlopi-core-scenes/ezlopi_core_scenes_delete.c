@@ -85,38 +85,38 @@ void ezlopi_scenes_delete_field_value(l_fields_v2_t* field)
     case VALUE_TYPE_NUMBER:
     {
         field->field_value.u_value.value_double = 0;
-        // field->value.value_double = 0;
+        // field->field_value.u_value.value_double = 0;
         break;
     }
     case VALUE_TYPE_STRING:
     {
         if (field->field_value.u_value.value_string)
-            // if (field->value.value_string)
+            // if (field->field_value.u_value.value_string)
         {
             free(field->field_value.u_value.value_string);
             field->field_value.u_value.value_string = NULL;
 
-            // free(field->value.value_string);
-            // field->value.value_string = NULL;
+            // free(field->field_value.u_value.value_string);
+            // field->field_value.u_value.value_string = NULL;
         }
         break;
     }
     case VALUE_TYPE_BOOL:
     {
         field->field_value.u_value.value_bool = false;
-        // field->value.value_bool = false;
+        // field->field_value.u_value.value_bool = false;
         break;
     }
     case VALUE_TYPE_CJSON:
     {
         if (field->field_value.u_value.cj_value)
-            // if (field->value.cj_value)
+            // if (field->field_value.u_value.cj_value)
         {
             cJSON_Delete(field->field_value.u_value.cj_value);
             field->field_value.u_value.cj_value = NULL;
 
-            // cJSON_Delete(field->value.cj_value);
-            // field->value.cj_value = NULL;
+            // cJSON_Delete(field->field_value.u_value.cj_value);
+            // field->field_value.u_value.cj_value = NULL;
         }
         break;
     }

@@ -148,8 +148,8 @@ static bool __found_item_in_field(l_fields_v2_t* field_node, uint32_t item_id)
             uint32_t item_id_check = strtoul(field_node->field_value.u_value.value_string, NULL, 16);
             TRACE_D("item-id: %s | %08x", field_node->field_value.u_value.value_string, item_id);
 
-            // uint32_t item_id_check = strtoul(field_node->value.value_string, NULL, 16);
-            // TRACE_D("item-id: %s | %08x", field_node->value.value_string, item_id);
+            // uint32_t item_id_check = strtoul(field_node->field_value.u_value.value_string, NULL, 16);
+            // TRACE_D("item-id: %s | %08x", field_node->field_value.u_value.value_string, item_id);
 
             if (item_id_check == item_id)
             {

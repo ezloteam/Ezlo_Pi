@@ -13,22 +13,22 @@
 
 #include "sensor_0026_ADC_LDR.h"
 
-const char *light_alarm_states[] =
-    {
-        "no_light",
-        "light_detected",
-        "unknown",
+const char* light_alarm_states[] =
+{
+    "no_light",
+    "light_detected",
+    "unknown",
 };
 
-static int __prepare(void *arg);
-static int __init(l_ezlopi_item_t *item);
-static int __notify(l_ezlopi_item_t *item);
-static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
-static void __setup_device_cloud_params(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static int _get_item_list(l_ezlopi_item_t *item, void *arg);
+static int __prepare(void* arg);
+static int __init(l_ezlopi_item_t* item);
+static int __notify(l_ezlopi_item_t* item);
+static int __get_value_cjson(l_ezlopi_item_t* item, void* arg);
+static void __setup_device_cloud_params(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
+static int _get_item_list(l_ezlopi_item_t* item, void* arg);
 
-int sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
 
@@ -68,10 +68,10 @@ int sensor_0026_ADC_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *
     return ret;
 }
 
-static void __setup_device_cloud_params(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __setup_device_cloud_params(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_light_sensor;
@@ -82,7 +82,7 @@ static void __setup_device_cloud_params(l_ezlopi_device_t *device, cJSON *cj_dev
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
-static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     if (item)
     {
@@ -96,24 +96,24 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
 
         item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
         item->interface.adc.resln_bit = 3;
-        CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     }
 }
 
-static int __prepare(void *arg)
+static int __prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        cJSON *cj_device = prep_arg->cjson_device;
+        cJSON* cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device);
             if (device)
             {
                 __setup_device_cloud_params(device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0026_ADC_LDR);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0026_ADC_LDR);
                 if (item)
                 {
                     __setup_item_cloud_properties(item, cj_device);
@@ -130,7 +130,7 @@ static int __prepare(void *arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t *item)
+static int __init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -151,18 +151,18 @@ static int __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int _get_item_list(l_ezlopi_item_t *item, void *arg)
+static int _get_item_list(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)arg;
+    cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        cJSON *json_array_enum = cJSON_CreateArray();
+        cJSON* json_array_enum = cJSON_CreateArray();
         if (NULL != json_array_enum)
         {
             for (uint8_t i = 0; i < LIGHT_ALARM_MAX; i++)
             {
-                cJSON *json_value = cJSON_CreateString(light_alarm_states[i]);
+                cJSON* json_value = cJSON_CreateString(light_alarm_states[i]);
                 if (NULL != json_value)
                 {
                     cJSON_AddItemToArray(json_array_enum, json_value);
@@ -178,10 +178,10 @@ static int _get_item_list(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
+static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)arg;
+    cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
         cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
@@ -191,15 +191,15 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-        char *curr_ldr_state = NULL;
+        char* curr_ldr_state = NULL;
         if (((float)(4096 - ezlopi_analog_data.value) / 4096.0f) > 0.5f) // pot_val : [100% - 30%]
         {
             curr_ldr_state = "no_light"; // no light
@@ -208,9 +208,9 @@ static int __notify(l_ezlopi_item_t *item)
         {
             curr_ldr_state = "light_detected"; // light detected
         }
-        if (curr_ldr_state != (char *)item->user_arg)
+        if (curr_ldr_state != (char*)item->user_arg)
         {
-            item->user_arg = (void *)curr_ldr_state;
+            item->user_arg = (void*)curr_ldr_state;
             ezlopi_device_value_updated_from_device_v3(item);
         }
     }

@@ -39,14 +39,14 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_INT:
         case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID:
         {
-            TRACE_D("\t\t\t|-- value: %f", fields->field_value.u_value.value_double);
-            // TRACE_D("\t\t\t|-- value: %f", fields->value.value_double);
+            TRACE_D("\t\t\t|-- value: %d", (int)fields->field_value.u_value.value_double);
+            // TRACE_D("\t\t\t|-- value: %f", fields->field_value.u_value.value_double);
             break;
         }
         case EZLOPI_VALUE_TYPE_BOOL:
         {
             TRACE_D("\t\t\t|-- value: [%d]%s", fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
-            // TRACE_D("\t\t\t|-- value: [%d]%s", fields->value.value_bool, fields->value.value_bool ? ezlopi_true_str : ezlopi_false_str);
+            // TRACE_D("\t\t\t|-- value: [%d]%s", fields->field_value.u_value.value_bool, fields->field_value.u_value.value_bool ? ezlopi_true_str : ezlopi_false_str);
             break;
         }
         case EZLOPI_VALUE_TYPE_FLOAT:
@@ -55,16 +55,10 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
             break;
         }
         case EZLOPI_VALUE_TYPE_STRING:
-        {
-            TRACE_D("\t\t\t|-- value: %s", fields->field_value.u_value.value_string);
-            break;
-        }
         case EZLOPI_VALUE_TYPE_ITEM:
-        {
-            TRACE_D("\t\t\t|-- value: %s", fields->field_value.u_value.value_string);
-            break;
-        }
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
         case EZLOPI_VALUE_TYPE_INTERVAL:
+        case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         {
             TRACE_D("\t\t\t|-- value: %s", fields->field_value.u_value.value_string);
             break;
@@ -74,19 +68,38 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
             ezlopi_print_when_blocks((l_when_block_v2_t*)fields->field_value.u_value.when_block);
             break;
         }
+        case EZLOPI_VALUE_TYPE_CREDENTIAL:
+        case EZLOPI_VALUE_TYPE_DICTIONARY:
+        case EZLOPI_VALUE_TYPE_ARRAY:
+        case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+        case EZLOPI_VALUE_TYPE_INT_ARRAY:
         case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
         {
             CJSON_TRACE("\t\t\t|-- value", fields->field_value.u_value.cj_value);
             break;
         }
-        case EZLOPI_VALUE_TYPE_DICTIONARY:
-        case EZLOPI_VALUE_TYPE_ARRAY:
+        case EZLOPI_VALUE_TYPE_ENUM:
+        case EZLOPI_VALUE_TYPE_TOKEN:
+        {
+            if (VALUE_TYPE_STRING == fields->field_value.e_type)
+            {
+                TRACE_D("\t\t\t|-- value: %s", fields->field_value.u_value.value_string);
+            }
+            else if (VALUE_TYPE_CJSON == fields->field_value.e_type)
+            {
+                CJSON_TRACE("\t\t\t|-- value", fields->field_value.u_value.cj_value);
+            }
+            else
+            {
+                TRACE_W("Value type not Implemented!, value_type: %d", fields->value_type);
+            }
+            break;
+        }
         case EZLOPI_VALUE_TYPE_RGB:
         case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
         case EZLOPI_VALUE_TYPE_USER_CODE:
         case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
         case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-        case EZLOPI_VALUE_TYPE_TOKEN:
         case EZLOPI_VALUE_TYPE_BUTTON_STATE:
         case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
         case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
@@ -134,10 +147,6 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
         case EZLOPI_VALUE_TYPE_DEVICE:
         case EZLOPI_VALUE_TYPE_EXPRESSION:
-        case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-        case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-        case EZLOPI_VALUE_TYPE_INT_ARRAY:
-        case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
         case EZLOPI_VALUE_TYPE_NONE:
         case EZLOPI_VALUE_TYPE_MAX:
         {

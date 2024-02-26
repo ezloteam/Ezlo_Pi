@@ -1,11 +1,16 @@
-
+#include <time.h>
 #include "ezlopi_util_trace.h"
-#include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_modes.h"
+#include "ezlopi_core_ota.h"
+#include "ezlopi_core_http.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_operators.h"
+#include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_scenes_when_methods.h"
+#include "ezlopi_core_scenes_when_methods_helper_functions.h"
+
+#include "ezlopi_cloud_constants.h"
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
@@ -164,26 +169,205 @@ int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_sun_state' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        time_t rawtime = 0;
+        time(&rawtime);
+        struct tm* info;
+        info = localtime(&rawtime);
+
+        // list of function for extracting field parameter
+        const s_issunstate_method_t __issunstate_field[] = {
+            {.field_name = "sunrise", .field_func = issunstate_get_suntime},
+            {.field_name = "sunset", .field_func = issunstate_get_suntime},
+            {.field_name = "time", .field_func = issunstate_get_offs_tmval},
+            {.field_name = "weekdays", .field_func = issunstate_eval_weekdays},
+            {.field_name = "days", .field_func = issunstate_eval_days},
+            {.field_name = "range", .field_func = issunstate_eval_range},
+            {.field_name = NULL, .field_func = NULL},
+        };
+
+        // Condition checker
+        uint8_t flag_check = 0;
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (NULL != curr_field)
+        {
+            for (uint8_t i = 0; i < ((sizeof(__issunstate_field) / sizeof(__issunstate_field[i]))); i++)
+            {
+                if (0 == strncmp(__issunstate_field[i].field_name, curr_field->name, strlen(__issunstate_field[i].field_name) + 1))
+                {
+                    flag_check |= (__issunstate_field[i].field_func)(scene_node, curr_field, info, ((0 == i) ? 1 : (1 == i) ? 2
+                        : 0));
+                    break;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+        // Now check the flag results
+        ret = issunstate_check_flag_result(scene_node, info, flag_check);
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_date' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        time_t rawtime = 0;
+        time(&rawtime);
+        struct tm* info;
+        info = localtime(&rawtime);
+
+        if (55 == info->tm_sec) // 55 sec mark
+        {
+            // list of field function to extract the respective parameters
+            const s_isdate_method_t __isdate_func[] = {
+                {.field_name = "type", .field_func = isdate_type_check},
+                {.field_name = "time", .field_func = isdate_tm_check},
+                {.field_name = "weekdays", .field_func = isdate_weekdays_check},
+                {.field_name = "days", .field_func = isdate_mdays_check},
+                {.field_name = "weeks", .field_func = isdate_year_weeks_check},
+                {.field_name = NULL, .field_func = NULL},
+            };
+            uint8_t flag_check = 0;
+            e_isdate_modes_t mode_type = ISDATE_UNDEFINED_MODE;
+            l_fields_v2_t* curr_field = when_block->fields;
+            while (NULL != curr_field)
+            {
+                for (uint8_t i = 0; i < ((sizeof(__isdate_func) / sizeof(__isdate_func[i]))); i++)
+                {
+                    if (0 == strncmp(__isdate_func[i].field_name, curr_field->name, strlen(__isdate_func[i].field_name) + 1))
+                    {
+                        flag_check |= (__isdate_func[i].field_func)(&mode_type, info, curr_field); // bit0 - bit3
+                        break;
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+            ret = isdate_check_flag_result(mode_type, flag_check);
+
+            // Output Filter based on date+time of activation
+            TRACE_D("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_once(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_once' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        time_t rawtime = 0;
+        time(&rawtime);
+        struct tm* info;
+        info = localtime(&rawtime);
+
+        if (57 == info->tm_sec) // 57 sec mark
+        {
+            // list of funciton to check validity of each field values
+            const s_isonce_method_t __isonce_method[] = {
+                {.field_name = "time", .field_func = isonce_tm_check},
+                {.field_name = "day", .field_func = isonce_day_check},
+                {.field_name = "month", .field_func = isonce_month_check},
+                {.field_name = "year", .field_func = isonce_year_check},
+                {.field_name = NULL, .field_func = NULL},
+            };
+            uint8_t flag_check = 0;
+            l_fields_v2_t* curr_field = when_block->fields;
+            while (curr_field)
+            {
+                for (uint8_t i = 0; i < ((sizeof(__isonce_method) / sizeof(__isonce_method[i]))); i++)
+                {
+                    if (0 == strncmp(__isonce_method[i].field_name, curr_field->name, strlen(__isonce_method[i].field_name) + 1))
+                    {
+                        flag_check |= (__isonce_method[i].field_func)(curr_field, info);
+                        break;
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+
+            // Output Filter based on date & time
+            ret = isonce_check_flag_result(scene_node, flag_check);
+            TRACE_D("isOnce :- FLAG_STATUS: 0x0%x", flag_check);
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_date_range' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        time_t rawtime = 0;
+        time(&rawtime);
+        struct tm* info;
+        info = localtime(&rawtime);
+
+        if (59 == info->tm_sec) // 59 sec mark
+        {
+            // Default values : start and end times.
+            struct tm start = {
+                .tm_hour = 0,
+                .tm_min = 0,
+            };
+            struct tm end = {
+                .tm_hour = 23,
+                .tm_min = 59,
+            };
+
+            // field function pointers
+            const s_isdate_range_method_t _isdate_range_fields[] = {
+                {.field_name = "startTime", .field_func = isdate_range_get_tm},
+                {.field_name = "startDay", .field_func = isdate_range_get_startday},
+                {.field_name = "startMonth", .field_func = isdate_range_get_startmonth},
+                {.field_name = "startYear", .field_func = isdate_range_get_startyear},
+                {.field_name = "endTime", .field_func = isdate_range_get_tm},
+                {.field_name = "endDay", .field_func = isdate_range_get_endday},
+                {.field_name = "endMonth", .field_func = isdate_range_get_endmonth},
+                {.field_name = "endYear", .field_func = isdate_range_get_endyear},
+                {.field_name = NULL, .field_func = NULL},
+            };
+            l_fields_v2_t* curr_field = when_block->fields;
+            while (curr_field)
+            {
+                for (int i = 0; i < ((sizeof(_isdate_range_fields) / sizeof(_isdate_range_fields[i]))); i++)
+                {
+                    if (0 == strncmp(_isdate_range_fields[i].field_name, curr_field->name, strlen(_isdate_range_fields[i].field_name) + 1))
+                    {
+                        (_isdate_range_fields[i].field_func)(curr_field, ((i < 4) ? &start : &end));
+                        break;
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+
+            // Check for time,day,month and year validity
+            uint8_t(*isdate_range_check_flags[])(struct tm* start, struct tm* end, struct tm* info) = {
+                isdate_range_check_tm,
+                isdate_range_check_day,
+                isdate_range_check_month,
+                isdate_range_check_year,
+            };
+            uint8_t flag_check = 0;
+            for (uint8_t i = 0; i < ISDATE_RANGE_MAX; i++)
+            {
+                flag_check |= isdate_range_check_flags[i](&start, &end, info);
+            }
+
+            TRACE_D("isdate_range flag_check [0x0%x]", flag_check);
+            ret = isdate_range_check_flag_result(flag_check);
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t* scene_node, void* arg)
@@ -242,8 +426,64 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_device_state' not implemented!");
-    return 0;
+    TRACE_I("isDevice_state.");
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t device_id = 0;
+        bool value_armed = false;
+        bool value_reachable = false;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "device", 7))
+            {
+                if (EZLOPI_VALUE_TYPE_DEVICE == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    device_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "armed", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                {
+                    value_armed = curr_field->field_value.u_value.value_bool;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "reachable", 10))
+            {
+                if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                {
+                    value_reachable = curr_field->field_value.u_value.value_bool;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+        if (device_id)
+        {
+            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+            while (curr_device)
+            {
+                if (device_id == curr_device->cloud_properties.device_id)
+                {
+                    s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                    if (controller_info)
+                    {
+                        #warning "we need to change from 'controller' to 'device_id' specific";
+                        ret = ((value_armed == controller_info->armed) ? 1 : 0);
+                        ret = ((value_reachable == controller_info->service_notification) ? 1 : 0);
+                    }
+                }
+
+                curr_device = curr_device->next;
+            }
+        }
+        #warning "need to check device_group condition";
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg)
@@ -254,8 +494,77 @@ int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_scene_state' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t scene_id = 0;
+        l_fields_v2_t* value_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "scene", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    scene_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "state", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    value_field = curr_field;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (scene_id && value_field)
+        {
+            l_scenes_list_v2_t* curr_scene = ezlopi_scenes_get_scenes_head_v2();
+            while (curr_scene)
+            {
+                if (curr_scene->_id == scene_id)
+                {
+                    if (0 == strncmp("any_result", value_field->field_value.u_value.value_string, 11))
+                    {
+                        ret = 1;
+                    }
+                    else if (0 == strncmp("scene_enabled", value_field->field_value.u_value.value_string, 14))
+                    {
+                        ret = (true == curr_scene->enabled);
+                    }
+                    else if (0 == strncmp("scene_disabled", value_field->field_value.u_value.value_string, 14))
+                    {
+                        ret = (false == curr_scene->enabled);
+                    }
+                    else if (0 == strncmp("finished", value_field->field_value.u_value.value_string, 9))
+                    {
+                        ret = (EZLOPI_SCENE_STATUS_STOP == curr_scene->status);
+                    }
+                    else if (0 == strncmp("partially_finished", value_field->field_value.u_value.value_string, 19))
+                    {
+                        ret = (EZLOPI_SCENE_STATUS_RUNNING == curr_scene->status);
+                    }
+                    else if (0 == strncmp("stopped", value_field->field_value.u_value.value_string, 8))
+                    {
+                        ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status);
+                    }
+                    #warning "need to add 'FAILED' status for scene";
+                    // else if (0 == strncmp("failed", value_field->field_value.u_value.value_string, 7))
+                    // {
+                    //     ret = (false == curr_scene->enabled);
+                    // }
+                    break;
+                }
+                curr_scene = curr_scene->next;
+            }
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t* scene_node, void* arg)
@@ -266,8 +575,39 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_cloud_state' not implemented!");
-    return 0;
+    TRACE_I("isCloud_state.");
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        l_fields_v2_t* value_field = NULL;
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "state", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    value_field = curr_field;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (value_field)
+        {
+            if (ezlopi_websocket_client_is_connected())
+            {
+                ret = (0 == strncmp(value_field->field_value.u_value.value_string, "connected", 10));
+            }
+            else
+            {
+                ret = (0 == strncmp(value_field->field_value.u_value.value_string, "disconnected", 14));
+            }
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_is_battery_state(l_scenes_list_v2_t* scene_node, void* arg)
@@ -322,50 +662,400 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'number_range' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+
+        l_fields_v2_t* start_value_field = NULL;
+        l_fields_v2_t* end_value_field = NULL;
+
+        l_fields_v2_t* comparator_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "comparator", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    comparator_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "startValue", 11))
+            {
+                start_value_field = curr_field;//contains the 'type' , 'value' & 'scale'
+            }
+            else if (0 == strncmp(curr_field->name, "endValue", 9))
+            {
+                end_value_field = curr_field;//contains the 'type' , 'value' & 'scale'
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && start_value_field && end_value_field && comparator_field)
+        {
+            // check if both 'value_type' and 'scales' match.
+            if ((start_value_field->value_type == end_value_field->value_type) &&
+                (0 == strcmp(start_value_field->scale, end_value_field->scale)))
+            {
+                ret = ezlopi_scenes_operators_value_number_range_operations(item_id, start_value_field, end_value_field, comparator_field);
+            }
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'compare_strings' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+        // l_fields_v2_t *expression_field = NULL;
+        l_fields_v2_t* value_field = NULL;
+        l_fields_v2_t* comparator_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // item or expression_id
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "comparator", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    comparator_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && NULL != curr_field->field_value.u_value.value_string)
+                {
+                    value_field = curr_field; // this field has string
+                }
+                // else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && NULL != curr_field->value.value_string)
+                // {
+                //     expression_field = curr_field; // this field has expression_name
+                // }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && value_field && comparator_field) // only for item_value 'string comparisions'
+        {
+            ret = ezlopi_scenes_operators_value_strings_operations(item_id, value_field, comparator_field);
+        }
+        // else if (item_id && expression_field && comparator_field) // only for expression 'string comparisions'
+        // {
+        //     // ret = ezlopi_scenes_operators_value_expn_strings_operations(item_id, value_field, comparator_field);
+        // }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'string_operation' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+        // l_fields_v2_t *expression_field = NULL;
+        l_fields_v2_t* value_field = NULL;
+        l_fields_v2_t* operation_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // ID extraction [item or expression]
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "operation", 10))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    operation_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && NULL != curr_field->field_value.u_value.value_string)
+                {
+                    value_field = curr_field; // this field has string
+                }
+                else if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
+                {
+                    value_field = curr_field; // this field has double/int value
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && value_field && operation_field) // only for item_value 'string comparisions'
+        {
+            ret = ezlopi_scenes_operators_value_strings_operations(item_id, value_field, operation_field);
+        }
+        // else if (item_id && expression_field && operation_field) // only for expression 'string comparisions'
+        // {
+        //     // ret = ezlopi_scenes_operators_value_expn_strings_operations(item_id, value_field, operation_field);
+        // }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'in_array' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+        // l_fields_v2_t *expression_field = NULL;
+        l_fields_v2_t* value_field = NULL;
+        l_fields_v2_t* operation_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // ID extraction [item or expression]
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                if (EZLOPI_VALUE_TYPE_ARRAY == curr_field->value_type && (cJSON_IsArray(curr_field->field_value.u_value.cj_value)))
+                {
+                    value_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "operation", 10))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    operation_field = curr_field;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && value_field) // only for item_value 'string comparisions'
+        {
+            ret = ezlopi_scenes_operators_value_inarr_operations(item_id, value_field, operation_field);
+        }
+        // else if (item_id && expression_field && operation_field) // only for expression 'string comparisions'
+        // {
+        // ret = ezlopi_scenes_operators_value_expn_inarr_operations(item_id, value_field, operation_field);
+        // }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'compare_values' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+        l_fields_v2_t* value_type_field = NULL;
+        l_fields_v2_t* value_field = NULL;
+        l_fields_v2_t* comparator_field = NULL;
+        // l_fields_v2_t *expression_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // ID extraction [item or expression]
+                }
+            }
+
+            else if (0 == strncmp(curr_field->name, ezlopi_value_type_str, 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    value_type_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    value_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "comparator", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    comparator_field = curr_field;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && value_field && value_type_field) // only for item_value 'string comparisions'
+        {
+            ret = ezlopi_scenes_operators_value_comparevalues_with_less_operations(item_id, value_field, value_type_field, comparator_field);
+        }
+        // else if (item_id && expression_field ) // only for expression 'string comparisions'
+        // {
+        // ret = ezlopi_scenes_operators_expn_comparevalues_with_less_operations(item_id, value_field, comparator_field);
+        // }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'has_atleast_one_dictionary_value' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (scene_node && when_block)
+    {
+        uint32_t item_id = 0;
+        l_fields_v2_t* value_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    value_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        // now to extract the
+        if (item_id && value_field)
+        {
+            ret = ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(item_id, value_field);
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_firmware_update_state' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (scene_node && when_block)
+    {
+        uint32_t item_id = 0;
+        char* state_value = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "state", 6))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    state_value = curr_field->field_value.u_value.value_string; // started / updating / done
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        // now to extract the
+        if (item_id && (NULL != state_value))
+        {
+            if (0 == strncmp("done", state_value, 5) && (0 == __get_ota_state()))
+            {
+                ret = 1;
+            }
+            else if (0 == strncmp("started", state_value, 8) && (1 == __get_ota_state()))
+            {
+                ret = 1;
+            }
+            else if (0 == strncmp("updating", state_value, 9) && (2 == __get_ota_state()))
+            {
+                ret = 1;
+            }
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_dictionary_changed' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (scene_node && when_block)
+    {
+        uint32_t item_id = 0;
+        l_fields_v2_t* key_field = NULL;
+        l_fields_v2_t* operation_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "item", 5))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "key", 4))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    key_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "operation", 10))
+            {
+                if (EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    operation_field = curr_field; // this contains "options [array]" & 'value': to be checked
+                }
+            }
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && key_field && operation_field)
+        {
+            ret = ezlopi_scenes_operators_is_dictionary_changed_operations(scene_node, item_id, key_field, operation_field);
+        }
+    }
+    return ret;
 }
 
 int ezlopi_scene_when_is_detected_in_hot_zone(l_scenes_list_v2_t* scene_node, void* arg)
@@ -414,7 +1104,7 @@ int ezlopi_scene_when_not(l_scenes_list_v2_t* scene_node, void* arg)
             if (scene_method)
             {
                 // iterate through all '_when_blocks_'
-                ret &= !(scene_method(scene_node, (void*)value_when_block)); // if all the block-calls are false, then return 1;
+                ret = !(scene_method(scene_node, (void*)value_when_block)); // if all the block-calls are false, then return 1;
             }
 
             value_when_block = value_when_block->next;

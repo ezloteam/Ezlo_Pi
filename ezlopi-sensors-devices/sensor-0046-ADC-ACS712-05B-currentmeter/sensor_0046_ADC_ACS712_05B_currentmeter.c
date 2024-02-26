@@ -65,7 +65,7 @@ int sensor_0046_ADC_ACS712_05B_currentmeter(e_ezlopi_actions_t action, l_ezlopi_
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -172,10 +172,10 @@ static int __0046_init(l_ezlopi_item_t* item)
 static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    if (item)
+    if (item && arg)
     {
         cJSON *cjson_properties = (cJSON *)arg;
-        if (cjson_properties && item)
+        if (cjson_properties)
         {
             s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
             if (user_data)
