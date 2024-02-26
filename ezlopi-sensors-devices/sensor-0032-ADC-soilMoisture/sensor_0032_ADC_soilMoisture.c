@@ -80,12 +80,18 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     {
         cJSON *cj_result = (cJSON *)arg;
         s_ezlopi_analog_data_t *soil_moisture_data = (s_ezlopi_analog_data_t *)item->user_arg;
-        double percent_data = ((4095 - soil_moisture_data->value) / 4095.0) * 100;
-        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, percent_data);
-        char *valueFormatted = ezlopi_valueformatter_double(percent_data);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-        free(valueFormatted);
-        ret = 1;
+        if (soil_moisture_data)
+        {
+            double percent_data = ((4095 - soil_moisture_data->value) / 4095.0) * 100;
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, percent_data);
+            char *valueFormatted = ezlopi_valueformatter_double(percent_data);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
+            ret = 1;
+        }
     }
     return ret;
 }
@@ -97,17 +103,15 @@ static int __init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            {
+                ret = 1;
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -146,7 +150,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->user_arg = user_arg;
 }
 

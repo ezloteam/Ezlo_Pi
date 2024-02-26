@@ -112,7 +112,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
 
     // passing the custom data_structure
     item->user_arg = user_data;
@@ -162,27 +162,34 @@ static int __0054_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
     if (NULL != item)
-    { // intialize digital_pin
-        if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.pwm.gpio_num))
+    {
+        yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
+        if (yfs201_data)
         {
-            gpio_config_t input_conf = {
-                .pin_bit_mask = (1ULL << item->interface.pwm.gpio_num),
-                .intr_type = GPIO_INTR_POSEDGE,
-                .mode = GPIO_MODE_INPUT,
-                .pull_down_en = GPIO_PULLDOWN_DISABLE,
-                .pull_up_en = GPIO_PULLUP_DISABLE,
-            };
-            gpio_config(&input_conf);
-            ret = 1;
+            // intialize digital_pin
+            if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.pwm.gpio_num))
+            {
+                gpio_config_t input_conf = {
+                    .pin_bit_mask = (1ULL << item->interface.pwm.gpio_num),
+                    .intr_type = GPIO_INTR_POSEDGE,
+                    .mode = GPIO_MODE_INPUT,
+                    .pull_down_en = GPIO_PULLDOWN_DISABLE,
+                    .pull_up_en = GPIO_PULLUP_DISABLE,
+                };
+                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -197,24 +204,27 @@ static int __0054_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
-            float freq = 0, Lt_per_hr = 0;
-            // converting pulse_counta into frequency (uSec -> Hz)
-            freq = yfs201_data->yfs201_dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
-
-            // liter per hr
-            Lt_per_hr = freq * 7.3f;
-            Lt_per_hr = (Lt_per_hr < 1) ? 0 : Lt_per_hr;
-            Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
-            // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
-
-            char *valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
-            if (valueFormatted)
+            if (yfs201_data)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
+                float freq = 0, Lt_per_hr = 0;
+                // converting pulse_counta into frequency (uSec -> Hz)
+                freq = yfs201_data->yfs201_dominant_pulse_count * YFS201_QUEUE_SIZE; // [counts_200ms -> counts_1sec]
+
+                // liter per hr
+                Lt_per_hr = freq * 7.3f;
+                Lt_per_hr = (Lt_per_hr < 1) ? 0 : Lt_per_hr;
+                Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
+                // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
+
+                char *valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, Lt_per_hr);
+                ret = 1;
             }
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, Lt_per_hr);
-            ret = 1;
         }
     }
     return ret;
@@ -248,94 +258,97 @@ static void __extract_YFS201_Pulse_Count_func(l_ezlopi_item_t *item)
     if (NULL != item)
     {
         yfs201_t *yfs201_data = (yfs201_t *)item->user_arg;
-        gpio_num_t pulse_pin = item->interface.pwm.gpio_num;
-        // creating queue here
-        yfs201_queue = xQueueCreate(YFS201_QUEUE_SIZE, sizeof(int32_t)); // takes max -> 1mSec
-        if (yfs201_queue)
+        if (yfs201_data)
         {
-            int32_t start_time = 0;
-            // extract data for untill all queue is filled
-            // TRACE_E("--------- Queue Empty --------");
-
-            while ((yfs201_data->yfs201_QueueFlag) < YFS201_QUEUE_FULL)
+            gpio_num_t pulse_pin = item->interface.pwm.gpio_num;
+            // creating queue here
+            yfs201_queue = xQueueCreate(YFS201_QUEUE_SIZE, sizeof(int32_t)); // takes max -> 1mSec
+            if (yfs201_queue)
             {
-                (yfs201_data->_pulses_yfs201) = 0;                                                 // reset variable to store fresh counts within [200ms]
-                gpio_isr_handler_add(pulse_pin, gpio_isr_handler, &(yfs201_data->_pulses_yfs201)); // add -> gpio_isr_handle(pin_num)
-                start_time = (int32_t)esp_timer_get_time();
-                while (((int32_t)esp_timer_get_time() - start_time) < (1000000 / YFS201_QUEUE_SIZE)) // 200ms -> 200000uS
-                {
-                    // polls for '(1000000 / YFS201_QUEUE_SIZE)' -> eg. 200ms
-                }
-                // check queue_full => 1
+                int32_t start_time = 0;
+                // extract data for untill all queue is filled
+                // TRACE_E("--------- Queue Empty --------");
 
-                if (xQueueSend(yfs201_queue, &(yfs201_data->_pulses_yfs201), 0))
+                while ((yfs201_data->yfs201_QueueFlag) < YFS201_QUEUE_FULL)
                 {
-                    (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;
-                    // TRACE_E("Pulse_count : %d", (yfs201_data->_pulses_yfs201));
-                }
-                else
-                {
-                    // TRACE_E("--------- Queue Full --------");
-                    (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_FULL;
-                }
-                // disable -> gpio_isr_handle_remove(pin_num)
-                gpio_isr_handler_remove(pulse_pin);
-            }
-        }
-
-        if ((yfs201_data->yfs201_QueueFlag) == YFS201_QUEUE_FULL)
-        {
-            // loop through all the queue[0-5] values -> pulse counts
-            int32_t P_count[YFS201_QUEUE_SIZE] = {0};
-            int val = 0;
-            for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
-            {
-                if (xQueueReceive(yfs201_queue, &val, portMAX_DELAY))
-                {
-                    if (val)
+                    (yfs201_data->_pulses_yfs201) = 0;                                                 // reset variable to store fresh counts within [200ms]
+                    gpio_isr_handler_add(pulse_pin, gpio_isr_handler, &(yfs201_data->_pulses_yfs201)); // add -> gpio_isr_handle(pin_num)
+                    start_time = (int32_t)esp_timer_get_time();
+                    while (((int32_t)esp_timer_get_time() - start_time) < (1000000 / YFS201_QUEUE_SIZE)) // 200ms -> 200000uS
                     {
-                        P_count[i] = val; // [0 - YFS201_QUEUE_SIZE]
+                        // polls for '(1000000 / YFS201_QUEUE_SIZE)' -> eg. 200ms
                     }
+                    // check queue_full => 1
+
+                    if (xQueueSend(yfs201_queue, &(yfs201_data->_pulses_yfs201), 0))
+                    {
+                        (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;
+                        // TRACE_E("Pulse_count : %d", (yfs201_data->_pulses_yfs201));
+                    }
+                    else
+                    {
+                        // TRACE_E("--------- Queue Full --------");
+                        (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_FULL;
+                    }
+                    // disable -> gpio_isr_handle_remove(pin_num)
+                    gpio_isr_handler_remove(pulse_pin);
                 }
             }
 
-            // generate frequency of occurance table from "P_count[]" array values
-            uint8_t freq[YFS201_QUEUE_SIZE] = {0};
-            float error = 0;
-            for (uint8_t x = 0; x < YFS201_QUEUE_SIZE; x++)
+            if ((yfs201_data->yfs201_QueueFlag) == YFS201_QUEUE_FULL)
             {
+                // loop through all the queue[0-5] values -> pulse counts
+                int32_t P_count[YFS201_QUEUE_SIZE] = {0};
+                int val = 0;
                 for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
                 {
-                    error = P_count[x] - P_count[i];
-                    error = ((error >= 0) ? error : error * -1); // finding difference between two readings
-                    if (error < P_count[x] * 0.1)                // [error less than +-10%]
+                    if (xQueueReceive(yfs201_queue, &val, portMAX_DELAY))
                     {
-                        freq[x] += 1; // increment dominace count
+                        if (val)
+                        {
+                            P_count[i] = val; // [0 - YFS201_QUEUE_SIZE]
+                        }
                     }
                 }
-            }
-            // find the dominant period
-            uint8_t max_freq_index = 0;
-            int32_t dominant_val = 0;
-            for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
-            {
-                if (freq[i] > dominant_val)
+
+                // generate frequency of occurance table from "P_count[]" array values
+                uint8_t freq[YFS201_QUEUE_SIZE] = {0};
+                float error = 0;
+                for (uint8_t x = 0; x < YFS201_QUEUE_SIZE; x++)
                 {
-                    dominant_val = freq[i];
-                    max_freq_index = i;
+                    for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
+                    {
+                        error = P_count[x] - P_count[i];
+                        error = ((error >= 0) ? error : error * -1); // finding difference between two readings
+                        if (error < P_count[x] * 0.1)                // [error less than +-10%]
+                        {
+                            freq[x] += 1; // increment dominace count
+                        }
+                    }
                 }
+                // find the dominant period
+                uint8_t max_freq_index = 0;
+                int32_t dominant_val = 0;
+                for (uint8_t i = 0; i < YFS201_QUEUE_SIZE; i++)
+                {
+                    if (freq[i] > dominant_val)
+                    {
+                        dominant_val = freq[i];
+                        max_freq_index = i;
+                    }
+                }
+                // TRACE_S("......................Dominant count ......{%d} ", P_count[max_freq_index]);
+
+                // reset Queue_flag
+                (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;
+
+                // write the dominant pulse count
+                yfs201_data->yfs201_dominant_pulse_count = P_count[max_freq_index];
             }
-            // TRACE_S("......................Dominant count ......{%d} ", P_count[max_freq_index]);
 
-            // reset Queue_flag
-            (yfs201_data->yfs201_QueueFlag) = YFS201_QUEUE_AVAILABLE;
-
-            // write the dominant pulse count
-            yfs201_data->yfs201_dominant_pulse_count = P_count[max_freq_index];
+            // Deleting queue after no use to avoid conflicts
+            vQueueDelete(yfs201_queue);
         }
-
-        // Deleting queue after no use to avoid conflicts
-        vQueueDelete(yfs201_queue);
     }
 }
 

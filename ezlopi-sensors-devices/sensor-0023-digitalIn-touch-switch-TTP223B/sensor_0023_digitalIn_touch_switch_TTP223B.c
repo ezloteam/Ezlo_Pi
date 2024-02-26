@@ -59,13 +59,15 @@ int sensor_0023_digitalIn_touch_switch_TTP223B(e_ezlopi_actions_t action, l_ezlo
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-
-    cJSON *param = (cJSON *)arg;
-    if (param)
+    if (item)
     {
-        cJSON_AddBoolToObject(param, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        const char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON *param = (cJSON *)arg;
+        if (param)
+        {
+            cJSON_AddBoolToObject(param, ezlopi_value_str, item->interface.gpio.gpio_in.value);
+            const char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
+            cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, valueFormatted);
+        }
     }
 
     return ret;
@@ -76,6 +78,7 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
+
         if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
         {
             const gpio_config_t touch_switch_config = {
@@ -86,18 +89,21 @@ static int __init(l_ezlopi_item_t *item)
                 .intr_type = GPIO_INTR_POSEDGE,
             };
 
-            ESP_ERROR_CHECK(gpio_config(&touch_switch_config));
-            gpio_isr_service_register_v3(item, touch_switch_callback, 200);
-            ret = 1;
+            if (0 == gpio_config(&touch_switch_config)) // ESP_OK
+            {
+                gpio_isr_service_register_v3(item, touch_switch_callback, 200);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -163,7 +169,7 @@ static void __prepare_touch_switch_properties(l_ezlopi_item_t *item, cJSON *cj_d
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
     int val_ip = 0;
     CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, val_ip);

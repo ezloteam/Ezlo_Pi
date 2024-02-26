@@ -81,21 +81,23 @@ static int __init(l_ezlopi_item_t *item)
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
 
-            ESP_ERROR_CHECK(gpio_config(&touch_switch_config));
-
-            int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-            item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-            gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
-            ret = 1;
+            if (0 == gpio_config(&touch_switch_config))
+            {
+                int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
+                gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -164,7 +166,7 @@ static void __prepare_touch_sensor_properties(l_ezlopi_item_t *item, cJSON *cj_d
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
 

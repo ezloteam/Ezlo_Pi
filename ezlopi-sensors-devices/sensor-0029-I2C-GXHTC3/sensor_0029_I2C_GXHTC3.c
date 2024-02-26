@@ -39,40 +39,28 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
                     gxhtce_val->gxhtc3 = GXHTC3_init(item->interface.i2c_master.channel, item->interface.i2c_master.address);
                     if (gxhtce_val->gxhtc3)
                     {
+                        ret = 1;
                         if (gxhtce_val->gxhtc3->id.status)
                         {
                             TRACE_E("GXHTC3 Chip ID: 0x%x", gxhtce_val->gxhtc3->id.id);
                         }
                         else
                         {
-                            ret = -1;
                             TRACE_E("GXHTC3 Chip ID not ready!");
+                            ret = -1;
+                            free(item->user_arg);
+                            item->user_arg = NULL;
+                            ezlopi_device_free_device_by_item(item);
                         }
                     }
                 }
             }
-            else
-            {
-                ret = 1;
-            }
         }
         else
         {
-            ret = 1;
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
-        // if (-1 == ret)
-        // {
-        //     ret = -1;
-        //     if (item->user_arg)
-        //     {
-        //         free(item->user_arg);
-        //         item->user_arg = NULL;
-        //     }
-        // }
-    }
-    else
-    {
-        ret = 1;
     }
 
     return ret;
@@ -90,7 +78,7 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
 //         char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
 //         if (valueFormatted)
 //         {
-//             cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+//             cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
 //             free(valueFormatted);
 //         }
 //         cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
@@ -151,7 +139,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
                 cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
@@ -162,7 +150,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 char *valueFormatted = ezlopi_valueformatter_float(value_ptr->humidity);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
                 cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_percent);
@@ -293,7 +281,7 @@ static int __prepare(void *arg)
         if (value_ptr)
         {
             memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
-           
+
             l_ezlopi_device_t *device_temp = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device_temp)
             {
@@ -309,7 +297,7 @@ static int __prepare(void *arg)
                 else
                 {
                     ezlopi_device_free_device(device_temp);
-                    free(value_ptr);
+                    free(value_ptr); // set to NULL?
                     ret = -1;
                 }
             }
@@ -323,7 +311,7 @@ static int __prepare(void *arg)
                     item_humdity->cloud_properties.device_id = device_hum->cloud_properties.device_id;
                     __prepare_humidity_item_properties(item_humdity, prep_arg->cjson_device);
                     value_ptr->humidity = 65536.0f;
-                    item_humdity->user_arg = (void *)value_ptr;
+                    item_humdity->user_arg = (void *)value_ptr; // affected if 'value_pts' is already freed?
                 }
                 else
                 {

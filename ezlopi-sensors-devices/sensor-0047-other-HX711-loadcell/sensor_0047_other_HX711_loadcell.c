@@ -69,14 +69,9 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t 
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (item)
-        {
-            s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-            if (true == user_data->HX711_initialized)
-            {
-                __0047_notify(item);
-            }
-        }
+
+        __0047_notify(item);
+
         break;
     }
     default:
@@ -112,9 +107,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 
     CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type); // _max = 10
     CJSON_GET_VALUE_INT(cj_device, "gpio1", user_data->HX711_SCK_pin);
-    TRACE_S("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
+    TRACE_I("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
     CJSON_GET_VALUE_INT(cj_device, "gpio2", user_data->HX711_DT_pin);
-    TRACE_S("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
+    TRACE_I("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
 }
 
 static int __0047_prepare(void *arg)
@@ -161,42 +156,56 @@ static int __0047_init(l_ezlopi_item_t *item)
     if (item)
     {
         s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-        if (user_data && GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
+        if (user_data)
         {
-            // Configure 'CLOCK_PIN' -> GPIO output pins for HX711.
-            gpio_config_t output_conf;
-            output_conf.pin_bit_mask = (1ULL << (user_data->HX711_SCK_pin));
-            output_conf.intr_type = GPIO_INTR_DISABLE;
-            output_conf.mode = GPIO_MODE_OUTPUT;
-            output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
-            output_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-            ret |= gpio_config(&output_conf);
-
-            // Configure 'DATA_PIN' ->  GPIO input pins for HX711.
-            gpio_config_t input_conf;
-            input_conf.pin_bit_mask = (1ULL << (user_data->HX711_DT_pin));
-            input_conf.intr_type = GPIO_INTR_DISABLE;
-            input_conf.mode = GPIO_MODE_INPUT;
-            input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
-            input_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-            ret |= gpio_config(&input_conf);
-
-            // then initiate calibration task
-            if (false == (user_data->HX711_initialized))
+            if (GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
             {
-                __hx711_power_reset(item);
-                xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", 2 * 2048, item, 1, NULL);
+                // Configure 'CLOCK_PIN' -> GPIO output pins for HX711.
+                gpio_config_t output_conf;
+                output_conf.pin_bit_mask = (1ULL << (user_data->HX711_SCK_pin));
+                output_conf.intr_type = GPIO_INTR_DISABLE;
+                output_conf.mode = GPIO_MODE_OUTPUT;
+                output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+                output_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+
+                ret = (0 == gpio_config(&output_conf)) ? 1 : -1;
+
+                // Configure 'DATA_PIN' ->  GPIO input pins for HX711.
+                gpio_config_t input_conf;
+                input_conf.pin_bit_mask = (1ULL << (user_data->HX711_DT_pin));
+                input_conf.intr_type = GPIO_INTR_DISABLE;
+                input_conf.mode = GPIO_MODE_INPUT;
+                input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+                input_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
+
+                // then initiate calibration task
+                if ((1 == ret) && (false == (user_data->HX711_initialized)))
+                {
+                    __hx711_power_reset(item);
+                    xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", 2 * 2048, item, 1, NULL);
+                    ret = 1;
+                }
+
+                if (-1 == ret)
+                {
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
             }
-            ret = 1;
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -212,10 +221,13 @@ static int __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_float(user_data->weight);
-            cJSON_AddStringToObject(cj_result, "ValueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", user_data->weight);
-            free(valueFormatted);
+            if (user_data)
+            {
+                char *valueFormatted = ezlopi_valueformatter_float(user_data->weight);
+                cJSON_AddStringToObject(cj_result, "ValueFormatted", valueFormatted);
+                cJSON_AddNumberToObject(cj_result, "value", user_data->weight);
+                free(valueFormatted);
+            }
         }
         ret = 1;
     }
@@ -228,20 +240,23 @@ static int __0047_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-        float Mass = __hx711_avg_reading(item, 10); /// 1000.0f; // to avoid spikes
-        float weight_in_kg = ((Mass - (user_data->HX711_tare_wt)) / 100.0f) / 1000.0f;
-
-        if (fabs(weight_in_kg - (user_data->weight)) > 0.05)
+        if ((user_data) && (true == user_data->HX711_initialized))
         {
-            if (weight_in_kg < 0)
+            float Mass = __hx711_avg_reading(item, 10); /// 1000.0f; // to avoid spikes
+            float weight_in_kg = ((Mass - (user_data->HX711_tare_wt)) / 100.0f) / 1000.0f;
+
+            if (fabs(weight_in_kg - (user_data->weight)) > 0.05)
             {
-                weight_in_kg = 0;
+                if (weight_in_kg < 0)
+                {
+                    weight_in_kg = 0;
+                }
+                user_data->weight = weight_in_kg;
+                // TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f kg ,", Mass, (user_data->HX711_tare_wt), weight_in_kg);
+                ezlopi_device_value_updated_from_device_v3(item);
             }
-            user_data->weight = weight_in_kg;
-            // TRACE_S("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f kg ,", Mass, (user_data->HX711_tare_wt), weight_in_kg);
-            ezlopi_device_value_updated_from_device_v3(item);
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }
@@ -253,28 +268,30 @@ static void __Calculate_hx711_tare_wt(void *params)
     if (item)
     {
         s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-        // For Output settling time ; [10SPS] is 400ms
-        // So, wait for 400ms after reset [as per datasheet]
-        vTaskDelay(400 / portTICK_PERIOD_MS);
+        if (user_data)
+        { // For Output settling time ; [10SPS] is 400ms
+            // So, wait for 400ms after reset [as per datasheet]
+            vTaskDelay(400 / portTICK_PERIOD_MS);
 
-        // ignore first few weight readings [150th ~ 180th]
-        for (uint8_t i = 180; i > 0; i--)
-        {
-            RAW_tare = __hx711_rawdata(item, HX711_GAIN_64); // 100ms each read
-            if (i > 150)
+            // ignore first few weight readings [150th ~ 180th]
+            for (uint8_t i = 180; i > 0; i--)
             {
-                (user_data->HX711_tare_wt) = (RAW_tare);
+                RAW_tare = __hx711_rawdata(item, HX711_GAIN_64); // 100ms each read
+                if (i > 150)
+                {
+                    (user_data->HX711_tare_wt) = (RAW_tare);
+                }
+                else
+                {
+                    (user_data->HX711_tare_wt) = 0.2f * (user_data->HX711_tare_wt) + 0.8f * (RAW_tare);
+                }
+                TRACE_I("Calibration_No : %d , Raw_data : %.2f", i, RAW_tare);
             }
-            else
+            TRACE_I("Calibration Stage ----------> Tare_Offset : %0.2f ", (user_data->HX711_tare_wt));
+            if ((user_data->HX711_tare_wt) > 3000)
             {
-                (user_data->HX711_tare_wt) = 0.2f * (user_data->HX711_tare_wt) + 0.8f * (RAW_tare);
+                user_data->HX711_initialized = true;
             }
-            TRACE_S("Calibration_No : %d , Raw_data : %.2f", i, RAW_tare);
-        }
-        TRACE_S("Calibration Stage ----------> Tare_Offset : %0.2f ", (user_data->HX711_tare_wt));
-        if ((user_data->HX711_tare_wt) > 3000)
-        {
-            user_data->HX711_initialized = true;
         }
     }
     vTaskDelete(NULL);
@@ -287,57 +304,61 @@ static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain)
     if (item)
     {
         s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-        vTaskDelay(8); // 80ms
-        // first check if the data is ready [i.e. 'data_pin' = 1 ; when 'clk_pin' = 0]
 
-        if (gpio_get_level(user_data->HX711_DT_pin))
+        if (user_data)
         {
-            // TRACE_E("Data_pin not ready..................");
-            do
-            {
-                vTaskDelay(2); // 20ms
-            } while (gpio_get_level(user_data->HX711_DT_pin));
-        }
+            vTaskDelay(8); // 80ms
+            // first check if the data is ready [i.e. 'data_pin' = 1 ; when 'clk_pin' = 0]
 
-        PORT_ENTER_CRITICAL();
-        /* STEP 1*/
-        // perform 24bits read
-        for (uint8_t i = 0; i < 24; i++)
-        {
-            gpio_set_level(user_data->HX711_SCK_pin, 1);
-            esp_rom_delay_us(1); //  >= 0.2 us
-            gpio_set_level(user_data->HX711_SCK_pin, 0);
-            data = (data << 1);                          // shift the 'result' by 1 bit
-            if (gpio_get_level(user_data->HX711_DT_pin)) // if data_pin is high
+            if (gpio_get_level(user_data->HX711_DT_pin))
             {
-                data |= (1 << 0); //[ 23~0 ]step
+                // TRACE_E("Data_pin not ready..................");
+                do
+                {
+                    vTaskDelay(2); // 20ms
+                } while (gpio_get_level(user_data->HX711_DT_pin));
             }
-            esp_rom_delay_us(1); //   keep duty cycle ~50%
+
+            PORT_ENTER_CRITICAL();
+            /* STEP 1*/
+            // perform 24bits read
+            for (uint8_t i = 0; i < 24; i++)
+            {
+                gpio_set_level(user_data->HX711_SCK_pin, 1);
+                esp_rom_delay_us(1); //  >= 0.2 us
+                gpio_set_level(user_data->HX711_SCK_pin, 0);
+                data = (data << 1);                          // shift the 'result' by 1 bit
+                if (gpio_get_level(user_data->HX711_DT_pin)) // if data_pin is high
+                {
+                    data |= (1 << 0); //[ 23~0 ]step
+                }
+                esp_rom_delay_us(1); //   keep duty cycle ~50%
+            }
+
+            /* STEP 2*/
+            // Apply the gain pulses to complete serial communication
+            for (uint8_t n = ((uint8_t)_gain); n > 0; n--)
+            {
+                gpio_set_level(user_data->HX711_SCK_pin, 1); // 'n' steps
+                esp_rom_delay_us(1);
+                gpio_set_level(user_data->HX711_SCK_pin, 0);
+                esp_rom_delay_us(1);
+            }
+            PORT_EXIT_CRITICAL();
+
+            //----ending the conversion---
+            // Note : 'Data_pin' is pulled high starting during  step: [24~27]
+            if (!gpio_get_level(user_data->HX711_DT_pin))
+            {
+                TRACE_E("DATA_PIN is low........................... SYSTEM BUSY");
+            }
+
+            // SIGN extend
+            // 24th bit is the sign bit //
+            data ^= 0x800000;
+
+            raw_data = (float)data;
         }
-
-        /* STEP 2*/
-        // Apply the gain pulses to complete serial communication
-        for (uint8_t n = ((uint8_t)_gain); n > 0; n--)
-        {
-            gpio_set_level(user_data->HX711_SCK_pin, 1); // 'n' steps
-            esp_rom_delay_us(1);
-            gpio_set_level(user_data->HX711_SCK_pin, 0);
-            esp_rom_delay_us(1);
-        }
-        PORT_EXIT_CRITICAL();
-
-        //----ending the conversion---
-        // Note : 'Data_pin' is pulled high starting during  step: [24~27]
-        if (!gpio_get_level(user_data->HX711_DT_pin))
-        {
-            TRACE_E("DATA_PIN is low........................... SYSTEM BUSY");
-        }
-
-        // SIGN extend
-        // 24th bit is the sign bit //
-        data ^= 0x800000;
-
-        raw_data = (float)data;
     }
     // TRACE_E("Raw_data -> %.2f ", raw_data);
     return raw_data;
@@ -368,17 +389,20 @@ static void __hx711_power_reset(l_ezlopi_item_t *item)
     if (item)
     {
         s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
-        PORT_ENTER_CRITICAL();
-        // Pull the clock pin low to make sure this reset condition occurs
-        gpio_set_level(user_data->HX711_SCK_pin, 0);
+        if (user_data)
+        {
+            PORT_ENTER_CRITICAL();
+            // Pull the clock pin low to make sure this reset condition occurs
+            gpio_set_level(user_data->HX711_SCK_pin, 0);
 
-        // Pull the clock pin high
-        gpio_set_level(user_data->HX711_SCK_pin, 1);
-        esp_rom_delay_us(70);
+            // Pull the clock pin high
+            gpio_set_level(user_data->HX711_SCK_pin, 1);
+            esp_rom_delay_us(70);
 
-        // Pull the clock pin low for NORMAL operation
-        gpio_set_level(user_data->HX711_SCK_pin, 0);
-        esp_rom_delay_us(10);
-        PORT_EXIT_CRITICAL();
+            // Pull the clock pin low for NORMAL operation
+            gpio_set_level(user_data->HX711_SCK_pin, 0);
+            esp_rom_delay_us(10);
+            PORT_EXIT_CRITICAL();
+        }
     }
 }
