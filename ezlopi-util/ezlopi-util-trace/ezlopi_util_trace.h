@@ -4,15 +4,18 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+#ifdef EZPI_UTIL_ENABLE_TRACE
 #define ENABLE_TRACE 1
+#endif // EZPI_UTIL_ENABLE_TRACE
 
-    void __dump(const char *file_name, uint32_t line, char *buffer_name, void *_buff, uint32_t ofs, uint32_t cnt);
+    void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 
 #ifndef __FILENAME__
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -61,14 +64,14 @@ extern "C"
     //         printf("\x1B[34m %s[%d]:" X "\x1B[0m\r\n", __FILE__, __LINE__, ##__VA_ARGS__);
     //     }
 
-#define trace_bg(bg, txt, X, reg...)                                                       \
+#define TRACE_Dg(bg, txt, X, reg...)                                                       \
     {                                                                                      \
         printf("\x1B[%s;%sm %s[%d]:" X "\x1B[0m\r\n", txt, bg, __FILE__, __LINE__, ##reg); \
     }
 
-#define trace_bw(X, reg...) trace_bg(COLOR_BG_BLACK, COLOR_FONT_WHITE, X, ##reg)
-#define trace_yw(X, reg...) trace_bg(COLOR_BG_YELLOW, COLOR_FONT_WHITE, X, ##reg)
-#define trace_wb(X, reg...) trace_bg(COLOR_BG_WHITE, COLOR_FONT_BLACK, X, ##reg)
+#define TRACE_Dw(X, reg...) TRACE_Dg(COLOR_BG_BLACK, COLOR_FONT_WHITE, X, ##reg)
+#define trace_yw(X, reg...) TRACE_Dg(COLOR_BG_YELLOW, COLOR_FONT_WHITE, X, ##reg)
+#define trace_wb(X, reg...) TRACE_Dg(COLOR_BG_WHITE, COLOR_FONT_BLACK, X, ##reg)
 
 #define F(X) (flash_attr) X
 

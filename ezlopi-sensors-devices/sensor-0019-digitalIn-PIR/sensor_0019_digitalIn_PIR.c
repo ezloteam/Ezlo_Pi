@@ -92,17 +92,23 @@ static int sensor_pir_init_v3(l_ezlopi_item_t *item)
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
 
-            ret = gpio_config(&io_conf);
-            if (ESP_OK == ret)
+            if (ESP_OK == gpio_config(&io_conf))
             {
-                TRACE_S("PIR sensor initialize successfully.");
+                TRACE_I("PIR sensor initialize successfully.");
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, sensor_pir_value_updated_from_device_v3, 200);
+                ret = 1;
             }
             else
             {
                 TRACE_E("Error initializing PIR sensor, error: %s", esp_err_to_name(ret));
+                ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -124,14 +130,14 @@ static int sensor_pir_prepare_v3(void *arg)
                 l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, NULL);
                 if (item)
                 {
-
                     item->func = sensor_0019_digitalIn_PIR;
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // item->cloud_properties.device_id = device->cloud_properties.device_id;
                     sensor_pir_setup_item_properties_v3(item, cj_device);
                     ret = 1;
                 }
                 else
                 {
+                    ezlopi_device_free_device(device);
                     ret = -1;
                 }
             }

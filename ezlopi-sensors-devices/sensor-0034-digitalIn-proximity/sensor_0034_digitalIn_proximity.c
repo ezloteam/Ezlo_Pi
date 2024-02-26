@@ -111,6 +111,7 @@ static int proximity_sensor_prepare(void *args)
             }
             else
             {
+                ezlopi_device_free_device(device);
                 ret = -1;
             }
         }
@@ -122,26 +123,37 @@ static int proximity_sensor_prepare(void *args)
 static int proximity_sensor_init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+    if (item)
     {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
-            .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = (item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
-            .intr_type = item->interface.gpio.gpio_in.interrupt,
-        };
-
-        ret = gpio_config(&io_conf);
-        if (ESP_OK == ret)
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
         {
-            gpio_isr_service_register_v3(item, proximity_sensor_value_updated_from_device, 200);
-            item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-            TRACE_S("Proximity sensor initialize successfully.");
+            const gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                .mode = GPIO_MODE_INPUT,
+                .pull_up_en = GPIO_PULLUP_DISABLE,
+                .pull_down_en = (item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+                .intr_type = item->interface.gpio.gpio_in.interrupt,
+            };
+
+            if (ESP_OK == gpio_config(&io_conf))
+            {
+                gpio_isr_service_register_v3(item, proximity_sensor_value_updated_from_device, 200);
+                item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                TRACE_I("Proximity sensor initialize successfully.");
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+                TRACE_E("Error initializing Proximity sensor");
+            }
         }
         else
         {
-            TRACE_E("Error initializing Proximity sensor");
+
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 

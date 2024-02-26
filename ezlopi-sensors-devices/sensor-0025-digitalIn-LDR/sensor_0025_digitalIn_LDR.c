@@ -85,19 +85,19 @@ static int __init(l_ezlopi_item_t *item)
             if (ESP_OK == gpio_config(&io_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
+                ret = 1;
             }
-
-            gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
-            ret = 1;
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
         else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -129,6 +129,12 @@ static int __prepare(void *arg)
                 {
                     item->func = sensor_0025_digitalIn_LDR;
                     __setup_item_properties(item, cj_device);
+                    ret = 1;
+                }
+                else
+                {
+                    ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }

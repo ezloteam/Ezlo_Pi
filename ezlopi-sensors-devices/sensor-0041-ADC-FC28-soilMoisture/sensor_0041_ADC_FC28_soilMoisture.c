@@ -117,19 +117,20 @@ static int __0041_prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(fc28_item, user_data);
                     __prepare_item_interface_properties(fc28_item, cj_device);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(fc28_device);
                     free(user_data);
                 }
             }
             else
             {
-                ezlopi_device_free_device(fc28_device);
+                ret = -1;
                 free(user_data);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -140,10 +141,33 @@ static int __0041_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+            {
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -158,12 +182,18 @@ static int __0041_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
-            char *valueFormatted = ezlopi_valueformatter_uint32(user_data->hum_val);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->hum_val));
-            // TRACE_S("soil moisture  : %d", user_data->hum_val);
-            free(valueFormatted);
-            ret = 1;
+            if (user_data)
+            {
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->hum_val));
+                char *valueFormatted = ezlopi_valueformatter_uint32(user_data->hum_val);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    // TRACE_S("soil moisture  : %d", user_data->hum_val);
+                    free(valueFormatted);
+                }
+                ret = 1;
+            }
         }
     }
     return ret;
@@ -175,17 +205,20 @@ static int __0041_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_fc28_data_t *user_data = (s_fc28_data_t *)item->user_arg;
-        s_ezlopi_analog_data_t ezlopi_adc_data = {.value = 0, .voltage = 0};
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_adc_data);
-        uint32_t new_hum = ((4095.0f - (ezlopi_adc_data.value)) / 4095.0f) * 100;
-        TRACE_S("[%dmv] soil moisture  : %d", ezlopi_adc_data.voltage, new_hum);
-
-        if (fabs((user_data->hum_val) - new_hum) > 0.5) // percent
+        if (user_data)
         {
-            user_data->hum_val = new_hum;
-            ezlopi_device_value_updated_from_device_v3(item);
+            s_ezlopi_analog_data_t ezlopi_adc_data = {.value = 0, .voltage = 0};
+            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_adc_data);
+            uint32_t new_hum = ((4095.0f - (ezlopi_adc_data.value)) / 4095.0f) * 100;
+            TRACE_S("[%dmv] soil moisture  : %d", ezlopi_adc_data.voltage, new_hum);
+
+            if (fabs((user_data->hum_val) - new_hum) > 0.5) // percent
+            {
+                user_data->hum_val = new_hum;
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }

@@ -57,75 +57,30 @@ static SemaphoreHandle_t send_lock = NULL;
 
 static void __stop_server(void);
 static void __start_server(void);
-static void __wifi_connection_event(esp_event_base_t event, int32_t event_id, void *arg);
+static void __wifi_connection_event(esp_event_base_t event, int32_t event_id, void* arg);
 
-static void __ws_async_send(void *arg);
-static esp_err_t __trigger_async_send(httpd_req_t *req);
-static int __respond_cjson(httpd_req_t *req, cJSON *cj_response);
-static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len);
+static void __ws_async_send(void* arg);
+static esp_err_t __trigger_async_send(httpd_req_t* req);
+static int __respond_cjson(httpd_req_t* req, cJSON* cj_response);
+static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint32_t len);
 
-static esp_err_t __msg_handler(httpd_req_t *req);
-static void __ws_api_handler(httpd_req_t *req, const char *payload, uint32_t payload_len);
+static esp_err_t __msg_handler(httpd_req_t* req);
+static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t payload_len);
 
-static void __print_sending_data(char *data_str, e_trace_type_t print_type);
-static void __call_method_and_send_response(httpd_req_t *req, cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type);
+static void __print_sending_data(char* data_str, e_trace_type_t print_type);
+static void __call_method_and_send_response(httpd_req_t* req, cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func, e_trace_type_t print_type);
 
 e_ws_status_t ezlopi_service_ws_server_status(void)
 {
     return gs_ws_status;
 }
 
-int __ws_server_send_cjson(cJSON *cj_data)
-{
-    int ret = 0;
-
-    if (cj_data)
-    {
-        cJSON *cj_srouce = cJSON_GetObjectItem(cj_data, ezlopi_source_str);
-        if (cj_srouce)
-        {
-            uint32_t client_id = 0;
-
-            CJSON_GET_VALUE_DOUBLE(cj_srouce, ezlopi_client_id_str, client_id)
-            l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_by_handle((void *)client_id);
-            if (curr_client)
-            {
-                char *data = cJSON_Print(cj_data);
-                if (data)
-                {
-                    TRACE_D("sending: %s", data);
-                    cJSON_Minify(data);
-                    ret = __ws_server_send(curr_client, data, strlen(data));
-
-                    free(data);
-                }
-            }
-            else
-            {
-                TRACE_E("NULL");
-            }
-        }
-        else
-        {
-            char *data = cJSON_Print(cj_data);
-            if (data)
-            {
-                cJSON_Minify(data);
-                ret = ezlopi_service_ws_server_broadcast(data);
-                free(data);
-            }
-        }
-    }
-
-    return ret;
-}
-
-int ezlopi_service_ws_server_broadcast_cjson(cJSON *cj_data)
+int ezlopi_service_ws_server_broadcast_cjson(cJSON* cj_data)
 {
     int ret = 0;
     if (cj_data)
     {
-        char *data = cJSON_Print(cj_data);
+        char* data = cJSON_Print(cj_data);
         if (data)
         {
             cJSON_Minify(data);
@@ -137,13 +92,13 @@ int ezlopi_service_ws_server_broadcast_cjson(cJSON *cj_data)
     return ret;
 }
 
-int ezlopi_service_ws_server_broadcast(char *data)
+int ezlopi_service_ws_server_broadcast(char* data)
 {
     int ret = 0;
 
     if (data)
     {
-        l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_head();
+        l_ws_server_client_conn_t* curr_client = ezlopi_service_ws_server_clients_get_head();
 
         while (curr_client)
         {
@@ -166,7 +121,7 @@ void ezlopi_service_ws_server_stop(void)
     __stop_server();
 }
 
-static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_id, void *arg)
+static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_id, void* arg)
 {
     TRACE_D("event-base: %d, event-id: %d", (uint32_t)event_base, event_id);
 
@@ -190,22 +145,22 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     }
 }
 
-static void __ws_api_handler(httpd_req_t *req, const char *payload, uint32_t payload_len)
+static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t payload_len)
 {
     if (payload && payload_len)
     {
-        cJSON *cj_request = cJSON_ParseWithLength(payload, payload_len);
+        cJSON* cj_request = cJSON_ParseWithLength(payload, payload_len);
         if (cj_request)
         {
-            cJSON *cj_src = cJSON_AddObjectToObject(cj_request, ezlopi_source_str);
+            cJSON* cj_src = cJSON_AddObjectToObject(cj_request, ezlopi_source_str);
             if (cj_src)
             {
                 cJSON_AddNumberToObject(cj_src, ezlopi_type_str, 1);
                 cJSON_AddNumberToObject(cj_src, ezlopi_client_id_str, (uint32_t)req->handle);
             }
 
-            cJSON *cj_error = cJSON_GetObjectItem(cj_request, ezlopi_error_str);
-            cJSON *cj_method = cJSON_GetObjectItem(cj_request, ezlopi_method_str);
+            cJSON* cj_error = cJSON_GetObjectItem(cj_request, ezlopi_error_str);
+            cJSON* cj_method = cJSON_GetObjectItem(cj_request, ezlopi_method_str);
 
             if ((NULL == cj_error) || (cJSON_NULL == cj_error->type) || (NULL != cj_error->valuestring) ||
                 ((NULL != cj_error->valuestring) && (0 == strncmp(cj_error->valuestring, ezlopi_null_str, 4))))
@@ -253,10 +208,10 @@ static void __ws_api_handler(httpd_req_t *req, const char *payload, uint32_t pay
     }
 }
 
-static void __ws_async_send(void *arg)
+static void __ws_async_send(void* arg)
 {
-    static const char *data = "Async data";
-    s_async_resp_arg_t *resp_arg = (s_async_resp_arg_t *)arg;
+    static const char* data = "Async data";
+    s_async_resp_arg_t* resp_arg = (s_async_resp_arg_t*)arg;
 
     if (resp_arg)
     {
@@ -264,7 +219,7 @@ static void __ws_async_send(void *arg)
         memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
 
         ws_pkt.len = strlen(data);
-        ws_pkt.payload = (uint8_t *)data;
+        ws_pkt.payload = (uint8_t*)data;
         ws_pkt.type = HTTPD_WS_TYPE_TEXT;
 
         httpd_ws_send_frame_async(resp_arg->hd, resp_arg->fd, &ws_pkt);
@@ -272,10 +227,10 @@ static void __ws_async_send(void *arg)
     }
 }
 
-static esp_err_t __trigger_async_send(httpd_req_t *req)
+static esp_err_t __trigger_async_send(httpd_req_t* req)
 {
     esp_err_t ret = ESP_OK;
-    s_async_resp_arg_t *resp_arg = malloc(sizeof(s_async_resp_arg_t));
+    s_async_resp_arg_t* resp_arg = malloc(sizeof(s_async_resp_arg_t));
 
     if (resp_arg)
     {
@@ -287,18 +242,18 @@ static esp_err_t __trigger_async_send(httpd_req_t *req)
     return ret;
 }
 
-static esp_err_t __msg_handler(httpd_req_t *req)
+static esp_err_t __msg_handler(httpd_req_t* req)
 {
     esp_err_t ret = ESP_OK;
 
     if (req->method == HTTP_GET)
     {
         TRACE_I("Handshake done, the new connection was opened, id: %p", req);
-        ezlopi_service_ws_server_clients_add((void *)req->handle, httpd_req_to_sockfd(req));
+        ezlopi_service_ws_server_clients_add((void*)req->handle, httpd_req_to_sockfd(req));
     }
     else
     {
-        uint8_t *buf = NULL;
+        uint8_t* buf = NULL;
         httpd_ws_frame_t ws_pkt;
 
         memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
@@ -320,14 +275,14 @@ static esp_err_t __msg_handler(httpd_req_t *req)
                 {
                     TRACE_D("Packet type: %d", ws_pkt.type);
 
-                    if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strcmp((char *)ws_pkt.payload, "Trigger async")))
+                    if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strcmp((char*)ws_pkt.payload, "Trigger async")))
                     {
                         ret = __trigger_async_send(req);
                     }
                     else if (HTTPD_WS_TYPE_TEXT == ws_pkt.type)
                     {
                         httpd_ws_send_frame(req, &ws_pkt);
-                        __ws_api_handler(req, (char *)ws_pkt.payload, (uint32_t)ws_pkt.len);
+                        __ws_api_handler(req, (char*)ws_pkt.payload, (uint32_t)ws_pkt.len);
                     }
                     else if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
                     {
@@ -419,7 +374,7 @@ static void __stop_server(void)
     ezlopi_core_ezlopi_broadcast_remove_method(ezlopi_service_ws_server_broadcast);
 }
 
-static void __call_method_and_send_response(httpd_req_t *req, cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)
+static void __call_method_and_send_response(httpd_req_t* req, cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func, e_trace_type_t print_type)
 {
     if (method_func)
     {
@@ -429,7 +384,7 @@ static void __call_method_and_send_response(httpd_req_t *req, cJSON *cj_request,
         }
         else
         {
-            cJSON *cj_response = cJSON_CreateObject();
+            cJSON* cj_response = cJSON_CreateObject();
             if (NULL != cj_response)
             {
                 cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
@@ -448,7 +403,7 @@ static void __call_method_and_send_response(httpd_req_t *req, cJSON *cj_request,
     }
 }
 
-static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
+static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
 {
     int ret = 0;
     if (req && cj_response && send_lock)
@@ -457,7 +412,7 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
         {
             TRACE_S("ws-server send-lock acquired.");
 
-            char *data = cJSON_Print(cj_response);
+            char* data = cJSON_Print(cj_response);
             if (data)
             {
                 cJSON_Minify(data);
@@ -466,7 +421,7 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
                     .final = false,
                     .fragmented = false,
                     .len = strlen(data),
-                    .payload = (uint8_t *)data,
+                    .payload = (uint8_t*)data,
                     .type = HTTPD_WS_TYPE_TEXT,
                 };
 
@@ -496,7 +451,7 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
     return ret;
 }
 
-static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len)
+static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint32_t len)
 {
     int ret = 0;
     if (data && len && client && client->http_handle && send_lock)
@@ -509,7 +464,7 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
             memset(&frm_pkt, 0, sizeof(httpd_ws_frame_t));
 
             frm_pkt.len = strlen(data);
-            frm_pkt.payload = (uint8_t *)data;
+            frm_pkt.payload = (uint8_t*)data;
             frm_pkt.type = HTTPD_WS_TYPE_TEXT;
 
             TRACE_D("client-handle: %p", client->http_handle);
@@ -522,7 +477,7 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
                 client->fail_count = 0;
 
                 TRACE_S("Done");
-                __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_D);
+                __print_sending_data((char*)frm_pkt.payload, TRACE_TYPE_D);
             }
             else
             {
@@ -530,7 +485,7 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
 
                 ret = 0;
                 client->fail_count += 1;
-                __print_sending_data((char *)frm_pkt.payload, TRACE_TYPE_E);
+                __print_sending_data((char*)frm_pkt.payload, TRACE_TYPE_E);
 
                 if (client->fail_count > 5)
                 {
@@ -550,7 +505,7 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
     return ret;
 }
 
-static void __print_sending_data(char *data_str, e_trace_type_t print_type)
+static void __print_sending_data(char* data_str, e_trace_type_t print_type)
 {
     switch (print_type)
     {

@@ -1,7 +1,5 @@
 
 #include "ezlopi_util_trace.h"
-// #include <stdlib.h>
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -67,45 +65,48 @@ int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, l_ezlopi_item_t *item, vo
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    char valueFormatted[20];
-    if (item && arg && item->user_arg)
+    if (item && arg)
     {
         s_mb1013_args_t *mb1013_args = item->user_arg;
-
-        cJSON *cj_result = (cJSON *)arg;
-        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, mb1013_args->current_value);
-        snprintf(valueFormatted, 20, "%.2f", mb1013_args->current_value);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-        ret = 1;
+        if (mb1013_args)
+        {
+            cJSON *cj_result = (cJSON *)arg;
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, mb1013_args->current_value);
+            char *valueFormatted = ezlopi_valueformatter_float(mb1013_args->current_value);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
+            ret = 1;
+        }
     }
     return ret;
 }
 
 static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
-    if (buffer && output_len)
+    if (buffer && output_len && uart_object_handle)
     {
-        if (uart_object_handle)
+        l_ezlopi_item_t *item = (l_ezlopi_item_t *)uart_object_handle->arg;
+        if (item)
         {
-            l_ezlopi_item_t *item = (l_ezlopi_item_t *)uart_object_handle->arg;
-            if (item && item->user_arg)
+            s_mb1013_args_t *s_mb1013_args = (s_mb1013_args_t *)item->user_arg;
+            if (s_mb1013_args)
             {
-                s_mb1013_args_t *s_mb1013_args = (s_mb1013_args_t *)item->user_arg;
                 int idx = 0;
                 TRACE_D("BUFFER-DATA-LEN: %d", output_len);
                 while (idx < output_len)
                 {
-                    dump("rx-buffer", buffer, idx, 6);
+                    // dump("rx-buffer", buffer, idx, 6);
                     if ('R' == buffer[idx] && '\r' == buffer[idx + 5])
                     {
                         s_mb1013_args->current_value = atoi((const char *)&buffer[idx + 1]) / 10.0;
-                        TRACE_I("range: %f", s_mb1013_args->current_value);
+                        TRACE_D("range: %f", s_mb1013_args->current_value);
                         break;
                     }
                     idx++;
                 }
-
-#warning "use ring buffer"
             }
         }
     }
@@ -116,21 +117,27 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
+        s_mb1013_args_t *mb1013_args = (s_mb1013_args_t *)item->user_arg;
+        if (mb1013_args)
         {
-            s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_data_upcall, item);
-            item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO(item->interface.uart.tx) && GPIO_IS_VALID_GPIO(item->interface.uart.rx))
+            {
+                s_ezlopi_uart_object_handle_t ezlopi_uart_object_handle = ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __uart_data_upcall, item);
+                item->interface.uart.channel = ezlopi_uart_get_channel(ezlopi_uart_object_handle);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        else
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -189,7 +196,6 @@ static int __prepare(void *arg)
                     item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
-                    ret = 1;
 
                     s_mb1013_args_t *mb1030_args = malloc(sizeof(s_mb1013_args_t));
                     if (mb1030_args)
@@ -197,10 +203,12 @@ static int __prepare(void *arg)
                         mb1030_args->current_value = 0.0;
                         mb1030_args->previous_value = 0.0;
                         item->user_arg = mb1030_args;
+                        ret = 1;
                     }
                 }
                 else
                 {
+                    ezlopi_device_free_device(device);
                     ret = -1;
                 }
             }
@@ -216,10 +224,13 @@ static int __notify(l_ezlopi_item_t *item)
     if (item && item->user_arg)
     {
         s_mb1013_args_t *mb1013_args = (s_mb1013_args_t *)item->user_arg;
-        if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
+        if (mb1013_args)
         {
-            ezlopi_device_value_updated_from_device_v3(item);
-            mb1013_args->previous_value = mb1013_args->current_value;
+            if (abs(mb1013_args->current_value - mb1013_args->previous_value) > 0.2) // accuracy of 0.5cm (i.e. 5mm)
+            {
+                ezlopi_device_value_updated_from_device_v3(item);
+                mb1013_args->previous_value = mb1013_args->current_value;
+            }
         }
     }
 

@@ -9,6 +9,8 @@
 #include "ezlopi_util_trace.h"
 #include "sdkconfig.h"
 
+#include "EZLOPI_USER_CONFIG.h"
+
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
@@ -42,6 +44,7 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
 
 void ezlopi_ble_service_init(void)
 {
+
     ezlopi_ble_service_wifi_profile_init();
     ezlopi_ble_service_security_init();
     ezlopi_ble_service_provisioning_init();
@@ -79,18 +82,18 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
     const uint8_t init_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
     const uint8_t rsp_key = (ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void *)&auth_req, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void *)&iocap, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_IOCAP_MODE");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void *)&auth_option, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void *)&oob_support, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_OOB_SUPPORT");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void *)&init_key, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_SET_INIT_KEY");
-    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void *)&rsp_key, sizeof(uint8_t)),
-                      "failed -set - ESP_BLE_SM_SET_RSP_KEY");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, (void*)&auth_req, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_AUTHEN_REQ_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, (void*)&iocap, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_IOCAP_MODE");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, (void*)&auth_option, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, (void*)&oob_support, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_OOB_SUPPORT");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, (void*)&init_key, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_SET_INIT_KEY");
+    CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void*)&rsp_key, sizeof(uint8_t)),
+        "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
 
 #if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
@@ -131,7 +134,7 @@ static void ezlopi_ble_basic_init(void)
     // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
     // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v3_get_id());
 
-    char *device_type = ezlopi_factory_info_v3_get_device_type();
+    char* device_type = ezlopi_factory_info_v3_get_device_type();
     if ((NULL != device_type))
     {
         snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v3_get_id());
@@ -142,10 +145,10 @@ static void ezlopi_ble_basic_init(void)
         memset(mac, 0, sizeof(mac));
         esp_read_mac(mac, ESP_MAC_BT);
         snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%02x%02x%02x%02x%02x%02x",
-                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
-    dump("ble_device_name", ble_device_name, 0, 32);
+    // dump("ble_device_name", ble_device_name, 0, 32);
 
     static esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));

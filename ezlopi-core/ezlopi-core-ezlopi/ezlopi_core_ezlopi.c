@@ -1,20 +1,32 @@
 #include "esp_event.h"
 
+#include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_util_trace.h"
-
-#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_modes.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+
+#ifdef EZPI_CORE_ENABLE_ETH
+#include "ezlopi_core_ethernet.h"
+#endif // EZPI_CORE_ENABLE_ETH
+
+// #include "ezlopi_service_uart.h"
+// #include "ezlopi_service_timer.h"
+// #include "ezlopi_service_webprov.h"
+// #include "ezlopi_service_gpioisr.h"
+// #include "ezlopi_service_ble.h"
+// #include "ezlopi_service_meshbot.h"
+// #include "ezlopi_service_modes.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -23,9 +35,13 @@ static void ezlopi_initialize_devices_v3(void);
 void ezlopi_init(void)
 {
 
+    gpio_install_isr_service(0);
+
+    // EZPI_SERVICE_uart_init();
+    // gpio_isr_service_init();
+
     // Init memories
     ezlopi_nvs_init();
-    TRACE_I("Boot count: %d", ezlopi_system_info_get_boot_count());
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -45,10 +61,18 @@ void ezlopi_init(void)
 
     ezlopi_core_modes_init();
     ezlopi_room_init();
+
+    // ezlopi_ble_service_init();
+
+#ifdef EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-    // ezlopi_ethernet_init();
+#endif // EZPI_SERV_ENABLE_MESHBOTS
+
+#ifdef EZPI_CORE_ENABLE_ETH
+    ezlopi_ethernet_init();
+#endif // EZPI_CORE_ENABLE_ETH
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
@@ -57,17 +81,16 @@ void ezlopi_init(void)
 
     ezlopi_event_queue_init();
     ezlopi_ping_init();
-    ezlopi_core_sntp_init();
     ezlopi_timer_start_1000ms();
 }
 
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
-    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
     while (curr_device)
     {
-        l_ezlopi_item_t *curr_item = curr_device->items;
+        l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)
         {
             if (curr_item->func)
@@ -87,7 +110,7 @@ static void ezlopi_initialize_devices_v3(void)
 
         if (device_init_ret < 0)
         {
-            l_ezlopi_device_t *device_to_free = curr_device;
+            l_ezlopi_device_t* device_to_free = curr_device;
             curr_device = curr_device->next;
             device_to_free->next = NULL;
             ezlopi_device_free_device(device_to_free);

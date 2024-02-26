@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -119,19 +118,20 @@ static int __0043_prepare(void *arg)
                 {
                     __prepare_item_cloud_properties(gyml8511_item, gyml8511_value);
                     __prepare_item_interface_properties(gyml8511_item, cj_device);
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(gyml8511_device);
                     free(gyml8511_value);
                 }
             }
             else
             {
-                ezlopi_device_free_device(gyml8511_device);
+                ret = -1;
                 free(gyml8511_value);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -142,10 +142,35 @@ static int __0043_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
+        if (user_data)
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+            {
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -160,14 +185,16 @@ static int __0043_get_cjson_value(l_ezlopi_item_t *item, void *arg)
         if (cj_result)
         {
             s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
+            if (user_data)
+            {
+                char *valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
+                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
+                // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
+                free(valueFormatted);
 
-            char *valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-            // TRACE_S("UV_intensity : %.2f", user_data->uv_data);
-            free(valueFormatted);
-
-            ret = 1;
+                ret = 1;
+            }
         }
     }
     return ret;
@@ -179,16 +206,19 @@ static int __0043_notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_gyml8511_data_t *user_data = (s_gyml8511_data_t *)item->user_arg;
-        s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
-        ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
-        float new_uvIntensity = mapfloat(((float)(adc_data.voltage) / 1000), 0.97, 2.7, 0.0, 15.0);
-        TRACE_S("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
-        if (fabs((user_data->uv_data) - new_uvIntensity) > 0.01)
+        if (user_data)
         {
-            user_data->uv_data = new_uvIntensity;
-            ezlopi_device_value_updated_from_device_v3(item);
+            s_ezlopi_analog_data_t adc_data = {.value = 0, .voltage = 0};
+            ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &adc_data);
+            float new_uvIntensity = mapfloat(((float)(adc_data.voltage) / 1000), 0.97, 2.7, 0.0, 15.0);
+            TRACE_S("%dmv -> intensity: %.2f", adc_data.voltage, new_uvIntensity);
+            if (fabs((user_data->uv_data) - new_uvIntensity) > 0.01)
+            {
+                user_data->uv_data = new_uvIntensity;
+                ezlopi_device_value_updated_from_device_v3(item);
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }

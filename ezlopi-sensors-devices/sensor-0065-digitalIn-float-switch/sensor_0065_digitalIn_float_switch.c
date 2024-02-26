@@ -1,5 +1,4 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -117,10 +116,11 @@ static int __0065_prepare(void *arg)
                 {
                     float_item->cloud_properties.device_id = float_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(float_item, device_prep_arg->cjson_device);
-                    // if you want to add a custom data_structure , add here
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(float_device);
                 }
             }
@@ -151,16 +151,24 @@ static int __0065_init(l_ezlopi_item_t *item)
                                   : GPIO_PULLUP_DISABLE,
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
-            ret = gpio_config(&input_conf);
-            if (ret)
+
+            if (0 == gpio_config(&input_conf))
             {
-                TRACE_E("Error initializing float switch");
-            }
-            else
-            {
+                ret = 1;
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, __0065_update_from_device, 200);
             }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+                TRACE_E("Error initializing float switch");
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -224,11 +232,11 @@ static void __0065_update_from_device(void *arg)
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = water_level_alarm_token[0]; //"water_level_ok";
+            curret_value = "water_level_ok";
         }
         else
         {
-            curret_value = water_level_alarm_token[2]; //"water_level_above_high_threshold";
+            curret_value = "water_level_above_high_threshold";
         }
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
         {

@@ -166,54 +166,57 @@ void __mpu6050_get_data(l_ezlopi_item_t *item)
     {
         e_mpu6050_err_t err = MPU6050_ERR_OK;
         s_raw_mpu6050_data_t RAW_DATA = {0};
-        uint8_t tmp_buf[REG_COUNT_LEN] = {0}; // 0 - 13
+        uint8_t tmp_buf[MPU6050_REG_COUNT_LEN] = {0}; // 0 - 13
         uint8_t Check_Register = 0;
         uint8_t address_val = 0;
 
         s_mpu6050_data_t *user_data = (s_mpu6050_data_t *)item->user_arg;
-        if ((err = mpu6050_check_data_ready_INTR(item, &Check_Register)) == MPU6050_ERR_OK)
+        if (user_data)
         {
-            if (Check_Register & DATA_RDY_INT_FLAG)
+            if ((err = mpu6050_check_data_ready_INTR(item, &Check_Register)) == MPU6050_ERR_OK)
             {
-                address_val = (ACCEL_X_H);
-                ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
-                ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), REG_COUNT_LEN); //(tmp_buf+i), 1);
-            }
-            // user_data->extract_counts++;
-            // TRACE_S("Total Extracted : [%d]", user_data->extract_counts);
-        }
-        else
-        {
-            TRACE_E("Data not ready ... Error type:- %d ", err);
-            for (uint8_t try = 10; ((try > 0) && !(Check_Register & DATA_RDY_INT_FLAG)); try--)
-            {
-                if (MPU6050_ERR_OK == mpu6050_check_data_ready_INTR(item, &Check_Register))
+                if (Check_Register & DATA_RDY_INT_FLAG)
                 {
-                    TRACE_E(" Check Register ... 0x3AH : {%#x}", Check_Register);
-                    if (Check_Register & DATA_RDY_INT_FLAG)
+                    address_val = (ACCEL_X_H);
+                    ezlopi_i2c_master_write_to_device(&item->interface.i2c_master, &address_val, 1);
+                    ezlopi_i2c_master_read_from_device(&item->interface.i2c_master, (tmp_buf), MPU6050_REG_COUNT_LEN); //(tmp_buf+i), 1);
+                }
+                // user_data->extract_counts++;
+                // TRACE_I("Total Extracted : [%d]", user_data->extract_counts);
+            }
+            else
+            {
+                TRACE_E("Data not ready ... Error type:- %d ", err);
+                for (uint8_t try = 10; ((try > 0) && !(Check_Register & DATA_RDY_INT_FLAG)); try--)
+                {
+                    if (MPU6050_ERR_OK == mpu6050_check_data_ready_INTR(item, &Check_Register))
                     {
-                        break;
+                        TRACE_E(" Check Register ... 0x3AH : {%#x}", Check_Register);
+                        if (Check_Register & DATA_RDY_INT_FLAG)
+                        {
+                            break;
+                        }
                     }
                 }
             }
+
+            // Configure data structure // total 14 bytes
+            RAW_DATA.raw_ax = (int16_t)(tmp_buf[0] << 8 | tmp_buf[1]);   // acc_x = 59(0x3B) [msb] & 60(0x3C) [lsb]
+            RAW_DATA.raw_ay = (int16_t)(tmp_buf[2] << 8 | tmp_buf[3]);   // acc_y = 61 & 62
+            RAW_DATA.raw_az = (int16_t)(tmp_buf[4] << 8 | tmp_buf[5]);   // acc_z = 63 & 64
+            RAW_DATA.raw_t = (int16_t)(tmp_buf[6] << 8 | tmp_buf[7]);    // tp = 65 & 66
+            RAW_DATA.raw_gx = (int16_t)(tmp_buf[8] << 8 | tmp_buf[9]);   // gx = 67 & 68
+            RAW_DATA.raw_gy = (int16_t)(tmp_buf[10] << 8 | tmp_buf[11]); // gy = 69 & 70
+            RAW_DATA.raw_gz = (int16_t)(tmp_buf[12] << 8 | tmp_buf[13]); // gz = 71 & 72
+
+            user_data->ax = (RAW_DATA.raw_ax / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+            user_data->ay = (RAW_DATA.raw_ay / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+            user_data->az = (RAW_DATA.raw_az / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
+            user_data->gx = ((RAW_DATA.raw_gx - user_data->gyro_x_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
+            user_data->gy = ((RAW_DATA.raw_gy - user_data->gyro_y_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
+            user_data->gz = ((RAW_DATA.raw_gz - user_data->gyro_z_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
+            user_data->tmp = ((RAW_DATA.raw_t / 340) + 36.530f);
         }
-
-        // Configure data structure // total 14 bytes
-        RAW_DATA.raw_ax = (int16_t)(tmp_buf[0] << 8 | tmp_buf[1]);   // acc_x = 59(0x3B) [msb] & 60(0x3C) [lsb]
-        RAW_DATA.raw_ay = (int16_t)(tmp_buf[2] << 8 | tmp_buf[3]);   // acc_y = 61 & 62
-        RAW_DATA.raw_az = (int16_t)(tmp_buf[4] << 8 | tmp_buf[5]);   // acc_z = 63 & 64
-        RAW_DATA.raw_t = (int16_t)(tmp_buf[6] << 8 | tmp_buf[7]);    // tp = 65 & 66
-        RAW_DATA.raw_gx = (int16_t)(tmp_buf[8] << 8 | tmp_buf[9]);   // gx = 67 & 68
-        RAW_DATA.raw_gy = (int16_t)(tmp_buf[10] << 8 | tmp_buf[11]); // gy = 69 & 70
-        RAW_DATA.raw_gz = (int16_t)(tmp_buf[12] << 8 | tmp_buf[13]); // gz = 71 & 72
-
-        user_data->ax = (RAW_DATA.raw_ax / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
-        user_data->ay = (RAW_DATA.raw_ay / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
-        user_data->az = (RAW_DATA.raw_az / acc_mpu6050_calib_val) * MPU6050_STANDARD_G_TO_ACCEL_CONVERSION_VALUE; // in m/s^2
-        user_data->gx = ((RAW_DATA.raw_gx - user_data->gyro_x_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
-        user_data->gy = ((RAW_DATA.raw_gy - user_data->gyro_y_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
-        user_data->gz = ((RAW_DATA.raw_gz - user_data->gyro_z_offset) / gyro_mpu6050_calib_val) / 6.0f;           // -> revolutions per minute = degrees per second ÷ 6
-        user_data->tmp = ((RAW_DATA.raw_t / 340) + 36.530f);
     }
 }
 

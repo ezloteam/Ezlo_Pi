@@ -4,14 +4,14 @@
 #include "cJSON.h"
 
 #include "ezlopi_util_trace.h"
-#include "ezlopi_core_timer.h"
 
+#include "ezlopi_core_timer.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_device_value_updated.h"
-#include "ezlopi_cloud_constants.h"
-
 #include "ezlopi_core_cloud.h"
+#include "ezlopi_core_valueformatter.h"
 
+#include "ezlopi_cloud_constants.h"
 #include "pms5003.h"
 #include "sensor_0037_pms5003_sensor.h"
 
@@ -91,63 +91,98 @@ static int __cjson_get_value(l_ezlopi_item_t *item, void *arg)
 
     cJSON *cj_param = (cJSON *)arg;
     s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
-    char valueFormatted[20];
     if (cj_param && pms_object)
     {
         if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.pm10_standard);
-            TRACE_S("Dust particle 1 : %s", valueFormatted);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.pm10_standard);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.pm10_standard);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.pm10_standard);
+            if (valueFormatted)
+            {
+                TRACE_I("Dust particle 1 : %s", valueFormatted);
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particulate_matter_2_dot_5 == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.pm25_standard);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.pm25_standard);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.pm25_standard);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.pm25_standard);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particulate_matter_10 == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.pm100_standard);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.pm100_standard);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.pm100_standard);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.pm100_standard);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particles_0_dot_3_um == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.particles_03um);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.particles_03um);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.particles_03um);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.particles_03um);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particles_0_dot_5_um == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.particles_05um);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.particles_05um);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.particles_05um);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.particles_05um);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particles_1_um == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.particles_10um);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.particles_10um);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.particles_10um);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.particles_10um);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particles_2_dot_5_um == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.particles_25um);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.particles_25um);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.particles_25um);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.particles_25um);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particles_5_um == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.particles_50um);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.particles_50um);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.particles_50um);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.particles_50um);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
         if (ezlopi_item_name_particles_10_um == item->cloud_properties.item_name)
         {
-            snprintf(valueFormatted, 20, "%d", pms_object->pms_data.particles_100um);
-            cJSON_AddStringToObject(cj_param, "valueFormatted", valueFormatted);
-            cJSON_AddNumberToObject(cj_param, "value", pms_object->pms_data.particles_100um);
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, pms_object->pms_data.particles_100um);
+            char *valueFormatted = ezlopi_valueformatter_uint32(pms_object->pms_data.particles_100um);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
         }
     }
 
@@ -157,14 +192,23 @@ static int __cjson_get_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
-
-    if (item->interface.uart.enable && pms_object)
+    if (item)
     {
-        pms_init(pms_object);
+        s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
+        if (pms_object)
+        {
+            if (item->interface.uart.enable)
+            {
+                pms_init(pms_object);
+            }
+            ret = 1;
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
+        }
     }
-
     return ret;
 }
 

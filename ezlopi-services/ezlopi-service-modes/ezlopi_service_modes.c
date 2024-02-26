@@ -15,7 +15,7 @@
 
 static TaskHandle_t sg_process_handle = NULL;
 
-static void __modes_service(void *pv);
+static void __modes_service(void* pv);
 
 int ezlopi_service_modes_stop(void)
 {
@@ -48,11 +48,11 @@ void ezlopi_service_modes_init(void)
     ezlopi_service_modes_start();
 }
 
-static void __modes_service(void *pv)
+static void __modes_service(void* pv)
 {
     while (1)
     {
-        s_ezlopi_modes_t *ez_mode = ezlopi_core_modes_get_custom_modes();
+        s_ezlopi_modes_t* ez_mode = ezlopi_core_modes_get_custom_modes();
         if (ez_mode)
         {
             if (ez_mode->switch_to_mode_id)
@@ -64,7 +64,7 @@ static void __modes_service(void *pv)
                 }
                 else
                 {
-                    s_house_modes_t *new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
+                    s_house_modes_t* new_house_mode = ezlopi_core_modes_get_house_mode_by_id(ez_mode->switch_to_mode_id);
 
                     if (new_house_mode)
                     {
@@ -101,7 +101,7 @@ static void __modes_service(void *pv)
             }
             else
             {
-                TRACE_D("MODE-SERVICE: Idle");
+                // TRACE_D("MODE-SERVICE: Idle");
             }
         }
 

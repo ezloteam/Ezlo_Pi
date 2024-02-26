@@ -23,14 +23,14 @@
 
 #define ENABLE_HEARTBIT_LED 0
 
-static void blinky(void *pv);
+static void blinky(void* pv);
 
 void app_main(void)
 {
     gpio_install_isr_service(0);
-    
-    qt_serial_init();
+
     gpio_isr_service_init();
+    EZPI_SERVICE_uart_init();
     ezlopi_init();
 
     ezlopi_ble_service_init();
@@ -44,7 +44,7 @@ void app_main(void)
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
-static void blinky(void *pv)
+static void blinky(void* pv)
 {
 #if (1 == ENABLE_HEARTBIT_LED)
     gpio_config_t io_conf = {
@@ -71,13 +71,12 @@ static void blinky(void *pv)
         {
             count = 0;
 
-            trace_wb("-----------------------------------------");
-            trace_wb("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
-            trace_wb("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
-
-            trace_wb("-----------------------------------------");
+            TRACE_D("----------------------------------------------");
+            TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+            TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+            TRACE_D("----------------------------------------------");
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-}
+    }

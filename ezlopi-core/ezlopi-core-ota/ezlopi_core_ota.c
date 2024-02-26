@@ -14,7 +14,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ota.h"
-#include "ezlopi_core_reboot.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_factory_info.h"
 
 // #include "nvs.h"
@@ -115,7 +115,7 @@ static void ezlopi_ota_process(void *pv)
     if (ret == ESP_OK)
     {
         TRACE_W("Firmware Upgrade Successful, restarting !");
-        esp_restart();
+        EZPI_CORE_reboot();
     }
     else
     {

@@ -113,12 +113,12 @@ static char *device_info_jsonify(void)
         cJSON_AddStringToObject(root, ezlopi_chip_str, CONFIG_IDF_TARGET);
         // cJSON_AddStringToObject(root, "flash_size", CONFIG_ESPTOOLPY_FLASHSIZE);
         // cJSON_AddStringToObject(root, "version_idf", esp_get_idf_version());
-        cJSON_AddNumberToObject(root, ezlopi_uptime_str, uptime_sec);
+        // cJSON_AddNumberToObject(root, ezlopi_uptime_str, uptime_sec);
         cJSON_AddNumberToObject(root, ezlopi_build_date_str, BUILD_DATE);
         // cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
         // cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
         cJSON_AddBoolToObject(root, ezlopi_provisioned_status_str, ezlopi_factory_info_v3_get_provisioning_status());
-        cJSON_AddStringToObject(root, ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
+        __add_factory_info_to_root(root, ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
 
         cJSON_AddStringToObject(root, ezlopi_ezlopi_device_type_str, ezlopi_factory_info_v3_get_device_type());
         __add_factory_info_to_root(root, (char *)ezlopi_model_str, ezlopi_factory_info_v3_get_model());
@@ -166,6 +166,6 @@ void __add_factory_info_to_root(cJSON *root, char *key, char *value)
         {
             cJSON_AddStringToObject(root, key, ezlopi_unknown_str);
         }
-        // free(value);
+        free(value);
     }
 }

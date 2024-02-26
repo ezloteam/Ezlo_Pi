@@ -2,7 +2,6 @@
 #include "sdkconfig.h"
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -61,34 +60,40 @@ int sensor_0008_I2C_LTR303ALS(e_ezlopi_actions_t action, l_ezlopi_item_t *item, 
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-
-    cJSON *cj_param = (cJSON *)arg;
-    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
-    if (cj_param && als_ltr303_data)
+    if (item)
     {
-        cJSON_AddNumberToObject(cj_param, ezlopi_value_str, als_ltr303_data->lux);
-        char *valueFormatted = ezlopi_valueformatter_double(als_ltr303_data->lux);
-        cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
-        free(valueFormatted);
+        cJSON *cj_param = (cJSON *)arg;
+        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
+        if (cj_param && als_ltr303_data)
+        {
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, als_ltr303_data->lux);
+            char *valueFormatted = ezlopi_valueformatter_double(als_ltr303_data->lux);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
+        }
     }
-
     return ret;
 }
 
 static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
-    if (als_ltr303_data)
+    if (item)
     {
-        ltr303_data_t temp_data;
-        if (ESP_OK == ltr303_get_val(&temp_data))
+        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
+        if (als_ltr303_data)
         {
-            if (fabs(als_ltr303_data->lux - temp_data.lux) > 0.2)
+            ltr303_data_t temp_data;
+            if (ESP_OK == ltr303_get_val(&temp_data))
             {
-                als_ltr303_data->lux = temp_data.lux;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (fabs(als_ltr303_data->lux - temp_data.lux) > 0.2)
+                {
+                    als_ltr303_data->lux = temp_data.lux;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
     }
@@ -99,22 +104,31 @@ static int __notify(l_ezlopi_item_t *item)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
-
-    if ((item->interface.i2c_master.enable) && (NULL != als_ltr303_data))
+    if (item)
     {
-        ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true);
-        ltr303_get_val(als_ltr303_data);
-        ret = 1;
-    }
-    else
-    {
-        ret = -1;
-        if (item->user_arg)
+        ltr303_data_t *als_ltr303_data = (ltr303_data_t *)item->user_arg;
+        if (als_ltr303_data)
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            if (item->interface.i2c_master.enable)
+            {
+                if (ESP_OK == ltr303_setup(item->interface.i2c_master.sda, item->interface.i2c_master.scl, true))
+                {
+                    ltr303_get_val(als_ltr303_data);
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -180,6 +194,7 @@ static int __prepare(void *arg)
             else
             {
                 ezlopi_device_free_device(als_ltr303_device);
+                ret = -1;
             }
         }
     }

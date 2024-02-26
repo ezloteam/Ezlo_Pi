@@ -7,7 +7,6 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
 // #include "esp_err.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -134,7 +133,14 @@ static int __prepare(void *arg)
                 else
                 {
                     ezlopi_device_free_device(hall_device);
+                    free(user_data);
+                    ret = -1;
                 }
+            }
+            else
+            {
+                free(user_data);
+                ret = -1;
             }
         }
 
@@ -153,18 +159,30 @@ static int __init(l_ezlopi_item_t *item)
 #else
         esp_err_t error = ESP_ERR_NOT_FOUND;
 #endif
-        if (error)
+        s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
+        if (user_data)
         {
-            TRACE_E("Error 'sensor_door_init'. error: %s)", esp_err_to_name(error));
+            if (ESP_OK == error)
+            {
+                TRACE_I("Width configuration was successfully done!");
+                TRACE_W("Calibrating.....");
+                user_data->hall_state = "dw_is_closed";
+                xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", 2048, item, 1, NULL);
+                ret = 1;
+            }
+            else
+            {
+                TRACE_E("Error 'sensor_door_init'. error: %s)", esp_err_to_name(error));
+                ret = -1;
+                free(user_data);
+                user_data = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
         else
         {
-            ret = 1;
-            TRACE_S("Width configuration was successfully done!");
-            TRACE_W("Calibrating.....");
-            s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
-            user_data->hall_state = "dw_is_closed";
-            xTaskCreate(__hall_calibration_task, "Hall_Calibration_Task", 2048, item, 1, NULL);
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -176,29 +194,31 @@ static int __get_item_cjson(l_ezlopi_item_t *item, void *arg)
     if (item && arg)
     {
         s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
-
-        cJSON *cj_result = (cJSON *)arg;
-        if (cj_result)
+        if (user_data)
         {
-            //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
-            cJSON *json_array_enum = cJSON_CreateArray();
-            if (NULL != json_array_enum)
+            cJSON *cj_result = (cJSON *)arg;
+            if (cj_result)
             {
-                for (uint8_t i = 0; i < HALL_DOOR_WINDOW_MAX; i++)
+                //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
+                cJSON *json_array_enum = cJSON_CreateArray();
+                if (NULL != json_array_enum)
                 {
-                    cJSON *json_value = cJSON_CreateString(hall_door_window_states[i]);
-                    if (NULL != json_value)
+                    for (uint8_t i = 0; i < HALL_DOOR_WINDOW_MAX; i++)
                     {
-                        cJSON_AddItemToArray(json_array_enum, json_value);
+                        cJSON *json_value = cJSON_CreateString(hall_door_window_states[i]);
+                        if (NULL != json_value)
+                        {
+                            cJSON_AddItemToArray(json_array_enum, json_value);
+                        }
                     }
+                    cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
                 }
-                cJSON_AddItemToObject(cj_result, "enum", json_array_enum);
+                //--------------------------------------------------------------------------------------
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, user_data->hall_state);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
             }
-            //--------------------------------------------------------------------------------------
-            cJSON_AddStringToObject(cj_result, "valueFormatted", user_data->hall_state);
-            cJSON_AddStringToObject(cj_result, "value", user_data->hall_state);
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }
@@ -209,13 +229,16 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     if (item && arg)
     {
         s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
-        cJSON *cj_result = (cJSON *)arg;
-        if (cj_result)
+        if (user_data)
         {
-            cJSON_AddStringToObject(cj_result, "valueFormatted", user_data->hall_state);
-            cJSON_AddStringToObject(cj_result, "value", user_data->hall_state);
+            cJSON *cj_result = (cJSON *)arg;
+            if (cj_result)
+            {
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, user_data->hall_state);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, user_data->hall_state);
+            }
+            ret = 1;
         }
-        ret = 1;
     }
     return ret;
 }
@@ -226,27 +249,30 @@ static int __notify(l_ezlopi_item_t *item)
     if (item)
     {
         s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
-        if (user_data->calibration_complete)
+        if (user_data)
         {
-            char *curret_value = NULL;
-#ifdef CONFIG_IDF_TARGET_ESP32
-            int sensor_data = hall_sensor_read();
-#else
-            int sensor_data = 0;
-#endif
-            TRACE_D(" Hall door value ; %d", sensor_data);
-
-            curret_value = ((fabs(user_data->Custom_stable_val - sensor_data) > 35) ? "dw_is_closed" : "dw_is_opened");
-
-            if (curret_value != user_data->hall_state) // calls update only if there is change in state
+            if (user_data->calibration_complete)
             {
-                user_data->hall_state = curret_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                char *curret_value = NULL;
+#ifdef CONFIG_IDF_TARGET_ESP32
+                int sensor_data = hall_sensor_read();
+#else
+                int sensor_data = 0;
+#endif
+                TRACE_D(" Hall door value ; %d", sensor_data);
+
+                curret_value = ((fabs(user_data->Custom_stable_val - sensor_data) > 35) ? "dw_is_closed" : "dw_is_opened");
+
+                if (curret_value != user_data->hall_state) // calls update only if there is change in state
+                {
+                    user_data->hall_state = curret_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+                ret = 1;
             }
-            ret = 1;
         }
     }
-    return;
+    return ret;
 }
 
 static void __hall_calibration_task(void *params) // calibrate task
@@ -255,16 +281,19 @@ static void __hall_calibration_task(void *params) // calibrate task
     if (item)
     {
         s_hall_data_t *user_data = (s_hall_data_t *)item->user_arg;
-
-        float sensor_data = (float)hall_sensor_read();
-        for (uint8_t i = 0; i < 10; i++)
+        if (user_data)
         {
-            sensor_data = (sensor_data * .8f) + (.2f * (float)hall_sensor_read());
-            vTaskDelay(500);
+
+            float sensor_data = (float)hall_sensor_read();
+            for (uint8_t i = 0; i < 10; i++)
+            {
+                sensor_data = (sensor_data * .8f) + (.2f * (float)hall_sensor_read());
+                vTaskDelay(500);
+            }
+            user_data->Custom_stable_val = (int)sensor_data;
+            TRACE_W("Calibration Complete...... Stable_hall is : [%d]", user_data->Custom_stable_val);
+            user_data->calibration_complete = true;
         }
-        user_data->Custom_stable_val = (int)sensor_data;
-        TRACE_W("Calibration Complete...... Stable_hall is : [%d]", user_data->Custom_stable_val);
-        user_data->calibration_complete = true;
     }
     vTaskDelete(NULL);
 }

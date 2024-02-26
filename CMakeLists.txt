@@ -35,12 +35,16 @@ ENDMACRO()
 set(external_components_list 
                                 ezlopi-components 
                                 ezlopi-sensors-devices 
-                                ezlopi-lua-modules 
+                                ezlopi-lua-modules
                                 ezlopi-services 
                                 ezlopi-cloud 
                                 ezlopi-core 
                                 ezlopi-hal
-                                ezlopi-util) 
+                                ezlopi-util
+                                )  
+
+                                # 
+# set_target_properties(your_subdir2 PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 set(EXTRA_COMPONENT_DIRS "") # clearing variable 'EXTRA_COMPONENT_DIRS'
 set(ALL_COMPONENTS "") # clearing 'ALL_COMPONENTS' variable
@@ -53,7 +57,8 @@ foreach(component ${external_components_list})
     LIST(APPEND ALL_COMPONENTS ${SUBDIRS})
 endforeach()
 
-LIST(APPEND ALL_COMPONENTS $ENV{IDF_PATH}/components/esp_http_server)
+LIST(APPEND ALL_COMPONENTS ezlopi-user-config main)
+
 set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS} ) # add the list of directories 'SUBDIRS' to 'EXTRA_COMPONENT_DIRS'(ESP32 VARIABLES), links the external components
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENT_DIRS}\r\n")
 

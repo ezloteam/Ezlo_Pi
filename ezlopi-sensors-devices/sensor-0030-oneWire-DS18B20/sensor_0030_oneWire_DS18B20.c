@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -13,8 +12,6 @@
 
 #include "ds18b20_onewire.h"
 #include "sensor_0030_oneWire_DS18B20.h"
-
-static const double ideal_value = 65536.0f;
 
 static int __prepare(void *arg);
 static int __init(l_ezlopi_item_t *item);
@@ -102,15 +99,15 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = -1;
-
-    if (item->interface.onewire_master.enable)
+    if ((item) && (item->interface.onewire_master.enable))
     {
-        if (ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
+        if (GPIO_IS_VALID_GPIO(item->interface.onewire_master.onewire_pin) &&
+            ds18b20_reset_line(item->interface.onewire_master.onewire_pin))
         {
             if (ds18b20_recognize_device(item->interface.onewire_master.onewire_pin))
             {
                 double *temperature_prev_value = (double *)item->user_arg;
-                TRACE_I("Providing initial settings to DS18B20");
+                TRACE_D("Providing initial settings to DS18B20");
                 ds18b20_write_to_scratchpad(DS18B20_TH_HIGHER_THRESHOLD, DS18B20_TL_LOWER_THRESHOLD, 12, item->interface.onewire_master.onewire_pin);
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = 1;
@@ -118,20 +115,17 @@ static int __init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
+                if (item->user_arg)
+                {
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                }
             }
         }
         else
         {
             ret = -1;
-        }
-
-        if (-1 == ret)
-        {
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -164,7 +158,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.onewire_master.onewire_pin);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
 }
 
 static int __prepare(void *arg)
@@ -183,24 +177,20 @@ static int __prepare(void *arg)
             {
                 item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
-            }
-            if (NULL == item_temperature)
-            {
-                ret = -1;
-            }
-            else
-            {
+
                 double *temperature_value = (double *)malloc(sizeof(double));
                 if (temperature_value)
                 {
                     memset(temperature_value, 0, sizeof(double));
-                    *temperature_value = ideal_value;
+                    *temperature_value = 65536.0f;
                     item_temperature->user_arg = (void *)temperature_value;
                 }
-                else
-                {
-                    free(temperature_value);
-                }
+                ret = 1;
+            }
+            else
+            {
+                ezlopi_device_free_device(device);
+                ret = -1;
             }
         }
     }

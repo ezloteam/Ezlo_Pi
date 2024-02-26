@@ -77,17 +77,21 @@ int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-
-    s_ultrasonic_sensor_t *ultrasonic_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
-    cJSON *cj_param = (cJSON *)arg;
-    char valueFormatted[20];
-    if (cj_param && ultrasonic_sensor)
+    if (item)
     {
-        snprintf(valueFormatted, 20, "%d cm", ultrasonic_sensor->distance);
-        cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
-        cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
+        cJSON *cj_param = (cJSON *)arg;
+        s_ultrasonic_sensor_t *ultrasonic_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
+        if (cj_param && ultrasonic_sensor)
+        {
+            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
+            char *valueFormatted = ezlopi_valueformatter_float(ultrasonic_sensor->distance);
+            if (valueFormatted)
+            {
+                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
+            }
+        }
     }
-
     return ret;
 }
 
@@ -107,55 +111,60 @@ static int __notify(l_ezlopi_item_t *item)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+    if (item)
     {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
-            .mode = GPIO_MODE_OUTPUT,
-            .pull_up_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
-                           (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                              ? GPIO_PULLUP_ENABLE
-                              : GPIO_PULLUP_DISABLE,
-            .pull_down_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
-                             (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
-                                ? GPIO_PULLDOWN_ENABLE
-                                : GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_DISABLE,
-        };
-
-        gpio_config(&io_conf);
-        ret = 1;
-    }
-
-    if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
-    {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
-            .mode = GPIO_MODE_INPUT,
-            .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
-                           (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                              ? GPIO_PULLUP_ENABLE
-                              : GPIO_PULLUP_DISABLE,
-            .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
-                             (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                                ? GPIO_PULLDOWN_ENABLE
-                                : GPIO_PULLDOWN_DISABLE,
-            .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
-                             ? GPIO_INTR_POSEDGE
-                             : GPIO_INTR_NEGEDGE,
-        };
-
-        gpio_config(&io_conf);
-        ret = 1;
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        s_ultrasonic_sensor_t *ultrasonic_HCSR04_sensor = (s_ultrasonic_sensor_t *)item->user_arg;
+        if (ultrasonic_HCSR04_sensor)
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.gpio.gpio_out.gpio_num))
+            {
+                const gpio_config_t io_conf = {
+                    .pin_bit_mask = (1ULL << item->interface.gpio.gpio_out.gpio_num),
+                    .mode = GPIO_MODE_OUTPUT,
+                    .pull_up_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLUP_ONLY) ||
+                                   (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                      ? GPIO_PULLUP_ENABLE
+                                      : GPIO_PULLUP_DISABLE,
+                    .pull_down_en = ((item->interface.gpio.gpio_out.pull == GPIO_PULLDOWN_ONLY) ||
+                                     (item->interface.gpio.gpio_out.pull == GPIO_PULLUP_PULLDOWN))
+                                        ? GPIO_PULLDOWN_ENABLE
+                                        : GPIO_PULLDOWN_DISABLE,
+                    .intr_type = GPIO_INTR_DISABLE,
+                };
+
+                ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
+            }
+            else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+            {
+                const gpio_config_t io_conf = {
+                    .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                    .mode = GPIO_MODE_INPUT,
+                    .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
+                                   (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                      ? GPIO_PULLUP_ENABLE
+                                      : GPIO_PULLUP_DISABLE,
+                    .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
+                                     (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                        ? GPIO_PULLDOWN_ENABLE
+                                        : GPIO_PULLDOWN_DISABLE,
+                    .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
+                                     ? GPIO_INTR_POSEDGE
+                                     : GPIO_INTR_NEGEDGE,
+                };
+
+                ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
+            }
+            if (1 != ret)
+            {
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -230,6 +239,7 @@ static int __prepare(void *arg)
                         ultrasonic_sensor->trigger_pin = item->interface.gpio.gpio_out.gpio_num;
                         ultrasonic_sensor->echo_pin = item->interface.gpio.gpio_in.gpio_num;
                         item->user_arg = (void *)ultrasonic_sensor;
+                        ret = 1;
                     }
                 }
                 else

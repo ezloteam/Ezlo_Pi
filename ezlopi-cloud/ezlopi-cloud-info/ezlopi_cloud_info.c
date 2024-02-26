@@ -14,9 +14,11 @@
 #include "cJSON.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
+#include "ezlopi_cloud_coordinates.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_sntp.h"
 
-char *ezlopi_tick_to_time(uint32_t ms)
+char* ezlopi_tick_to_time(uint32_t ms)
 {
     uint32_t seconds = ms / 1000;
     uint32_t minutes = seconds / 60;
@@ -27,7 +29,7 @@ char *ezlopi_tick_to_time(uint32_t ms)
     minutes %= 60;
     hours %= 24;
 
-    char *time_str = malloc(50);
+    char* time_str = malloc(50);
     if (time_str)
     {
         memset(time_str, 0, 50);
@@ -41,14 +43,14 @@ char *ezlopi_tick_to_time(uint32_t ms)
     return time_str;
 }
 
-void info_get(cJSON *cj_request, cJSON *cj_response)
+void info_get(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
-        char *device_uuid = ezlopi_factory_info_v3_get_device_uuid();
+        char* device_uuid = ezlopi_factory_info_v3_get_device_uuid();
         // #include "esp_app_format.h"
         cJSON_AddStringToObject(cjson_result, ezlopi_model_str, ezlopi_factory_info_v3_get_device_type());
         cJSON_AddStringToObject(cjson_result, "architecture", CONFIG_SDK_TOOLPREFIX);
@@ -61,25 +63,46 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         cJSON_AddBoolToObject(cjson_result, "offlineAnonymousAccess", true);
         cJSON_AddBoolToObject(cjson_result, "offlineInsecureAccess", true);
 
-        cJSON *cjson_location = cJSON_AddObjectToObject(cjson_result, "location");
+        cJSON* cjson_location = cJSON_AddObjectToObject(cjson_result, "location");
         if (cjson_location)
         {
-            cJSON_AddNumberToObject(cjson_location, "latitude", 0);
-            cJSON_AddNumberToObject(cjson_location, "longitude", 0);
-            cJSON_AddStringToObject(cjson_location, "timezone", ezlopi__str);
-            cJSON_AddStringToObject(cjson_location, "state", ezlopi__str);
+            cJSON_AddNumberToObject(cjson_location, "latitude", ezlopi_cloud_get_latitude());
+            cJSON_AddNumberToObject(cjson_location, "longitude", ezlopi_cloud_get_longitude());
+            char* location = EZPI_CORE_sntp_get_location();
+            if (location)
+            {
+                cJSON_AddStringToObject(cjson_location, "timezone", location);
+                cJSON_AddStringToObject(cjson_location, "state", ezlopi_custom_timezone_str);
+                free(location);
+            }
+            else
+            {
+                cJSON_AddStringToObject(cjson_location, "timezone", ezlopi_gmt0_str);
+                cJSON_AddStringToObject(cjson_location, "state", ezlopi_default_str);
+            }
         }
 
-        cJSON *cjson_build = cJSON_AddObjectToObject(cjson_result, "build");
+        cJSON* cjson_build = cJSON_AddObjectToObject(cjson_result, "build");
         if (cjson_build)
         {
-            cJSON_AddStringToObject(cjson_build, "time", COMPILE_TIME);
+
+            char* build_time = EZPI_CORE_sntp_epoch_to_iso8601((time_t)BUILD_DATE);
+            if (build_time)
+            {
+                cJSON_AddStringToObject(cjson_build, "time", build_time);
+                free(build_time);
+            }
+            else
+            {
+                cJSON_AddStringToObject(cjson_build, "time", COMPILE_TIME);
+            }
+
             cJSON_AddStringToObject(cjson_build, "builder", DEVELOPER);
             cJSON_AddStringToObject(cjson_build, "branch", CURRENT_BRANCH);
             cJSON_AddStringToObject(cjson_build, "commit", COMMIT_HASH);
         }
 
-        cJSON *cjson_battery = cJSON_AddObjectToObject(cjson_result, "battery");
+        cJSON* cjson_battery = cJSON_AddObjectToObject(cjson_result, "battery");
         if (cjson_battery)
         {
             cJSON_AddNumberToObject(cjson_battery, "stateOfCharge", 0);
@@ -87,19 +110,18 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
             cJSON_AddNumberToObject(cjson_battery, "health", 0);
             cJSON_AddStringToObject(cjson_battery, ezlopi_status_str, ezlopi__str);
         }
-
-        // time_t now;
-        // char strftime_buf[64];
-        // struct tm timeinfo;
-
-        // time(&now);
-        // setenv("TZ", "UTC-5:45", 1);
-        // tzset();
-        // localtime_r(&now, &timeinfo);
-        // strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-
-        cJSON_AddStringToObject(cjson_result, "localtime", ezlopi__str);
-        char *time_string = ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
+        char* local_time = EZPI_CORE_sntp_get_local_time();
+        if (local_time)
+        {
+            cJSON_AddStringToObject(cjson_result, "localtime", local_time);
+            free(local_time);
+        }
+        else
+        {
+            cJSON_AddStringToObject(cjson_result, "localtime", ezlopi__str);
+        }
+#if 0
+        char* time_string = EZPI_CORE_sntp_get_up_time();
         if (time_string)
         {
             cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
@@ -109,6 +131,18 @@ void info_get(cJSON *cj_request, cJSON *cj_response)
         {
             cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, ezlopi__str);
         }
+#else
+        char* time_string = ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS));
+        if (time_string)
+        {
+            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
+            free(time_string);
+        }
+        else
+        {
+            cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, ezlopi__str);
+        }
+#endif
         ezlopi_factory_info_v3_free(device_uuid);
     }
 }

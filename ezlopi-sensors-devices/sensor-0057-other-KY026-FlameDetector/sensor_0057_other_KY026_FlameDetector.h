@@ -48,7 +48,7 @@ typedef enum
 
 typedef struct flame_t
 {
-    float _absorbed_percent;
+    float absorbed_percent;
 } flame_t;
 //----------------------------------------------------
 int sensor_0057_other_KY026_FlameDetector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);

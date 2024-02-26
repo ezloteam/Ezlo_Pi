@@ -7,4 +7,4 @@ Commit should be made with issue number or EzloPi ticket number (for internal de
   - [ ] Only relevant files were touched
   - [ ] Only one feature/fix was added per PR and the code change compiles without warnings
   - [ ] The code change is tested and works with EzloPi core
-  - [ ] I accept the [CLA](LICENCE.txt).
+  - [ ] I accept the [CLA](https://github.com/ezloteam/Ezlo_Pi/blob/master/CONTRIBUTING.md#contributor-license-agreement-cla).

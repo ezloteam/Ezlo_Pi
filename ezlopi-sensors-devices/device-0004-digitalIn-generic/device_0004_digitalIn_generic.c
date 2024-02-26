@@ -94,9 +94,9 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
 static int __prepare(void *arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (arg)
     {
+        s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
         cJSON *cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
@@ -114,6 +114,7 @@ static int __prepare(void *arg)
                 else
                 {
                     ezlopi_device_free_device(device);
+                    ret = -1;
                 }
             }
         }
@@ -125,40 +126,42 @@ static int __prepare(void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
-        (-1 != item->interface.gpio.gpio_in.gpio_num) &&
-        (255 != item->interface.gpio.gpio_in.gpio_num))
+    if (item)
     {
-        const gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
-            .mode = GPIO_MODE_INPUT,
-            .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
-                           (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                              ? GPIO_PULLUP_ENABLE
-                              : GPIO_PULLUP_DISABLE,
-            .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
-                             (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
-                                ? GPIO_PULLDOWN_ENABLE
-                                : GPIO_PULLDOWN_DISABLE,
-            .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
-                             ? GPIO_INTR_POSEDGE
-                             : GPIO_INTR_NEGEDGE,
-        };
-
-        gpio_config(&io_conf);
-        gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
-
-        ret = 1;
-    }
-
-    if (0 == ret)
-    {
-        ret = -1;
-        if (item->user_arg)
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
+            (-1 != item->interface.gpio.gpio_in.gpio_num) &&
+            (255 != item->interface.gpio.gpio_in.gpio_num))
         {
-            free(item->user_arg);
-            item->user_arg = NULL;
+            const gpio_config_t io_conf = {
+                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                .mode = GPIO_MODE_INPUT,
+                .pull_up_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLUP_ONLY) ||
+                               (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                  ? GPIO_PULLUP_ENABLE
+                                  : GPIO_PULLUP_DISABLE,
+                .pull_down_en = ((item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ||
+                                 (item->interface.gpio.gpio_in.pull == GPIO_PULLUP_PULLDOWN))
+                                    ? GPIO_PULLDOWN_ENABLE
+                                    : GPIO_PULLDOWN_DISABLE,
+                .intr_type = (GPIO_PULLUP_ONLY == item->interface.gpio.gpio_in.pull)
+                                 ? GPIO_INTR_POSEDGE
+                                 : GPIO_INTR_NEGEDGE,
+            };
+
+            if (0 == gpio_config(&io_conf))
+            {
+                gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -168,12 +171,15 @@ static int __init(l_ezlopi_item_t *item)
 static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cjson_propertise = (cJSON *)arg;
-    if (cjson_propertise)
+    if (item && arg)
     {
-        cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false));
-        ret = 1;
+        cJSON *cjson_propertise = (cJSON *)arg;
+        if (cjson_propertise)
+        {
+            cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_in.value);
+            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false));
+            ret = 1;
+        }
     }
 
     return ret;

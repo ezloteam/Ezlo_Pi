@@ -8,7 +8,7 @@
 
 // Calculation parameters
 #define PI (3.1416f)
-#define REG_COUNT_LEN 6 // magnetometer data is to be read in one go .
+#define GY271_REG_COUNT_LEN 6 // magnetometer data is to be read in one go .
 #define GY271_ADDR 0x0D // this chipset uses [QMC5883L chip]
 /*******************************************************************/
 // REGISTER ADDRESS

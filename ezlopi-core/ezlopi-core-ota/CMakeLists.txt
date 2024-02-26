@@ -7,7 +7,7 @@ set(ESP_IDF_COMPONENTS
         app_update
 )
 set(EZLOPI_CORE_COMPONENTS
-        ezlopi-core-reboot
+        ezlopi-core-reset
 )
 
 idf_component_register(SRCS "ezlopi_core_ota.c" "${config_src}"

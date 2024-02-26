@@ -1,5 +1,5 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
+
 #include "esp_err.h"
 #include "driver/gpio.h"
 
@@ -69,21 +69,37 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
+    if (item)
+    {
+        if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        {
+            const gpio_config_t touch_switch_config = {
+                .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
+                .mode = GPIO_MODE_INPUT,
+                .pull_up_en = GPIO_PULLUP_DISABLE,
+                .pull_down_en = (item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
+                .intr_type = item->interface.gpio.gpio_in.interrupt,
+            };
 
-    const gpio_config_t touch_switch_config = {
-        .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
-        .mode = GPIO_MODE_INPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = (item->interface.gpio.gpio_in.pull == GPIO_PULLDOWN_ONLY) ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE,
-        .intr_type = item->interface.gpio.gpio_in.interrupt,
-    };
-
-    ESP_ERROR_CHECK(gpio_config(&touch_switch_config));
-
-    int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-    item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-    gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
-    ret = 1;
+            if (0 == gpio_config(&touch_switch_config))
+            {
+                int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
+                gpio_isr_service_register_v3(item, __touch_switch_callback, 200);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
+        }
+    }
 
     return ret;
 }
@@ -112,10 +128,12 @@ static int __prepare(void *arg)
             {
                 touch_switch_item->cloud_properties.device_id = touch_device->cloud_properties.device_id;
                 __prepare_touch_sensor_properties(touch_switch_item, prep_arg->cjson_device);
+                ret = 1;
             }
             else
             {
                 ezlopi_device_free_device(touch_device);
+                ret = -1;
             }
         }
     }

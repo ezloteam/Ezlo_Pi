@@ -17,9 +17,13 @@
 //*************************************************************************
 //                          Declaration
 //*************************************************************************
+typedef struct s_mq9_value
+{
+    float _LPG_flameable_ppm;
+    float MQ9_R0_constant;
+    bool Calibration_complete_LPG_flameable;
+} s_mq9_value_t;
 
-#warning "use of static variable"
-static bool Calibration_complete_LPG_flameable = false; // flag to activate calibration phase
 const char *mq9_sensor_gas_alarm_token[] = {
     "no_gas",
     "combustible_gas_detected",
@@ -69,10 +73,7 @@ int sensor_0063_other_MQ9_LPG_flameable_detector(e_ezlopi_actions_t action, l_ez
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (Calibration_complete_LPG_flameable)
-        {
-            __0063_notify(item);
-        }
+        __0063_notify(item);
         break;
     }
     default:
@@ -98,20 +99,22 @@ static int __0063_prepare(void *arg)
             l_ezlopi_item_t *MQ9_item_digi = ezlopi_device_add_item_to_device(MQ9_device_digi, sensor_0063_other_MQ9_LPG_flameable_detector);
             if (MQ9_item_digi)
             {
+                ret = 1;
                 MQ9_item_digi->cloud_properties.device_id = MQ9_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ9_item_digi, device_prep_arg->cjson_device);
             }
             else
             {
+                ret = -1;
                 ezlopi_device_free_device(MQ9_device_digi);
             }
         }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        mq9_value_t *MQ9_value = (mq9_value_t *)malloc(sizeof(mq9_value_t));
+        s_mq9_value_t *MQ9_value = (s_mq9_value_t *)malloc(sizeof(s_mq9_value_t));
         if (NULL != MQ9_value)
         {
-            memset(MQ9_value, 0, sizeof(mq9_value_t));
+            memset(MQ9_value, 0, sizeof(s_mq9_value_t));
             l_ezlopi_device_t *MQ9_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (MQ9_device_adc)
             {
@@ -119,20 +122,22 @@ static int __0063_prepare(void *arg)
                 l_ezlopi_item_t *MQ9_item_adc = ezlopi_device_add_item_to_device(MQ9_device_adc, sensor_0063_other_MQ9_LPG_flameable_detector);
                 if (MQ9_item_adc)
                 {
+                    ret = 1;
                     MQ9_item_adc->cloud_properties.device_id = MQ9_device_adc->cloud_properties.device_id;
                     __prepare_item_adc_cloud_properties(MQ9_item_adc, device_prep_arg->cjson_device, MQ9_value);
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(MQ9_device_adc);
                     free(MQ9_value);
                 }
             }
             else
             {
+                ret = -1;
                 free(MQ9_value);
             }
-            ret = 1;
         }
     }
     return ret;
@@ -143,28 +148,66 @@ static int __0063_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        if ((ezlopi_item_name_gas_alarm == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
         {
-            // intialize digital_pin
-            gpio_config_t input_conf = {};
-            input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
-            input_conf.intr_type = GPIO_INTR_DISABLE;
-            input_conf.mode = GPIO_MODE_INPUT;
-            input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-            input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-            gpio_config(&input_conf);
-            ret = 1;
-        }
-        if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
-        {
-            // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            // calibrate if not done
-            if (!Calibration_complete_LPG_flameable)
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
-                xTaskCreate(__calibrate_MQ9_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                // intialize digital_pin
+                gpio_config_t input_conf = {};
+                input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
+                input_conf.intr_type = GPIO_INTR_DISABLE;
+                input_conf.mode = GPIO_MODE_INPUT;
+                input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+                input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            ret = 2;
+            else
+            {
+                ret = -1;
+                TRACE_E("Deleting Item!!");
+                ezlopi_device_free_device_by_item(item); // remove the item itself
+            }
+        }
+        else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+        {
+            s_mq9_value_t *MQ9_value = (s_mq9_value_t *)item->user_arg;
+            if (MQ9_value)
+            {
+                if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+                { // initialize analog_pin
+                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    {
+                        // calibrate if not done
+                        if (false == MQ9_value->Calibration_complete_LPG_flameable)
+                        {
+                            xTaskCreate(__calibrate_MQ9_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                        }
+                        ret = 1;
+                    }
+                    else
+                    {
+                        ret = -1;
+                        TRACE_E("Deleting Item!!");
+                        free(item->user_arg);
+                        item->user_arg = NULL;
+                        ezlopi_device_free_device_by_item(item); // remove the item itself
+                    }
+                }
+                else
+                {
+                    ret = -1;
+                    TRACE_E("Deleting Item!!");
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item); // remove the item itself
+                }
+            }
+            else
+            {
+                ret = -1;
+                TRACE_E("Deleting Item!!");
+                ezlopi_device_free_device_by_item(item); // remove the item itself;
+            }
         }
     }
     return ret;
@@ -266,13 +309,19 @@ static int __0063_get_item(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
                 cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
-            if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq9_value_t *MQ9_value = ((mq9_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ9_value->_LPG_flameable_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ9_value->_LPG_flameable_ppm);
-                free(valueFormatted);
+                s_mq9_value_t *MQ9_value = ((s_mq9_value_t *)item->user_arg);
+                if (MQ9_value)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ9_value->_LPG_flameable_ppm);
+                    char *valueFormatted = ezlopi_valueformatter_float(MQ9_value->_LPG_flameable_ppm);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
             ret = 1;
         }
@@ -293,13 +342,19 @@ static int __0063_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
                 cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
-            if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
-                mq9_value_t *MQ9_value = ((mq9_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ9_value->_LPG_flameable_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ9_value->_LPG_flameable_ppm);
-                free(valueFormatted);
+                s_mq9_value_t *MQ9_value = ((s_mq9_value_t *)item->user_arg);
+                if (MQ9_value)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ9_value->_LPG_flameable_ppm);
+                    char *valueFormatted = ezlopi_valueformatter_float(MQ9_value->_LPG_flameable_ppm);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
             ret = 1;
         }
@@ -317,13 +372,11 @@ static int __0063_notify(l_ezlopi_item_t *item)
             const char *curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                // curret_value = "combustible_gas_detected";
-                curret_value = mq9_sensor_gas_alarm_token[1];
+                curret_value = "combustible_gas_detected";
             }
             else
             {
-                // curret_value = "no_gas";
-                curret_value = mq9_sensor_gas_alarm_token[0];
+                curret_value = "no_gas";
             }
             if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
             {
@@ -332,15 +385,18 @@ static int __0063_notify(l_ezlopi_item_t *item)
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
-        if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+        else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
             // extract the sensor_output_values
-            double new_value = (double)__extract_MQ9_sensor_ppm(item);
-            mq9_value_t *MQ9_value = (mq9_value_t *)item->user_arg;
-            if (fabs((double)(MQ9_value->_LPG_flameable_ppm) - new_value) > 0.0001)
+            s_mq9_value_t *MQ9_value = (s_mq9_value_t *)item->user_arg;
+            if ((MQ9_value) && (true == MQ9_value->Calibration_complete_LPG_flameable))
             {
-                MQ9_value->_LPG_flameable_ppm = (float)new_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                double new_value = (double)__extract_MQ9_sensor_ppm(item);
+                if (fabs((double)(MQ9_value->_LPG_flameable_ppm) - new_value) > 0.0001)
+                {
+                    MQ9_value->_LPG_flameable_ppm = (float)new_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
         ret = 1;
@@ -350,49 +406,52 @@ static int __0063_notify(l_ezlopi_item_t *item)
 //------------------------------------------------------------------------------------------------------
 static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t *item)
 {
-    uint32_t mq9_adc_pin = item->interface.adc.gpio_num;
-    mq9_value_t *MQ9_value = (mq9_value_t *)item->user_arg;
-    // calculation process
-    //-------------------------------------------------
-    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-    // extract the mean_sensor_analog_output_voltage
-    float analog_sensor_volt = 0;
-    for (uint8_t x = 10; x > 0; x--)
-    {
-        ezlopi_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
+    s_mq9_value_t *MQ9_value = (s_mq9_value_t *)item->user_arg;
+    if (MQ9_value)
+    { // calculation process
+      //-------------------------------------------------
+        uint32_t mq9_adc_pin = item->interface.adc.gpio_num;
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+        // extract the mean_sensor_analog_output_voltage
+        float analog_sensor_volt = 0;
+        for (uint8_t x = 10; x > 0; x--)
+        {
+            ezlopi_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-        analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
+            analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-        analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
+            analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-        vTaskDelay(1);
+            vTaskDelay(1);
+        }
+        analog_sensor_volt = analog_sensor_volt / 10.0f;
+
+        //-----------------------------------------------------------------------------------
+        // Stage_2 : [from 'sensor_0063_ADC_MQ9_methane_gas_detector.h']
+
+        // 1. Calculate 'Rs_gas' for the gas detected
+        float Rs_gas = (((MQ9_VOLT_RESOLUTION_Vc * mq9_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq9_eqv_RL);
+
+        // 1.1 Calculate @ 'ratio' during LPG_flameable presence
+        double _ratio = (Rs_gas / ((MQ9_value->MQ9_R0_constant <= 0) ? (1.0f) : (MQ9_value->MQ9_R0_constant))); // avoid dividing by zero??
+        if (_ratio <= 0)
+        {
+            _ratio = 0;
+        }
+        //-------------------------------------------------
+
+        // 1.2 Calculate _LPG_flameable_ppm
+        float _LPG_flameable_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq9) / m_slope_mq9); // ---> _LPG_flameable_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+        if (_LPG_flameable_ppm < 0)
+        {
+            _LPG_flameable_ppm = 0; // No negative values accepted or upper datasheet recomendation.
+        }
+        TRACE_E("_LPG_flameable_ppm [LPG_flameable] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _LPG_flameable_ppm, (float)_ratio, analog_sensor_volt);
+
+        //-------------------------------------------------
+        return _LPG_flameable_ppm;
     }
-    analog_sensor_volt = analog_sensor_volt / 10.0f;
-
-    //-----------------------------------------------------------------------------------
-    // Stage_2 : [from 'sensor_0063_ADC_MQ9_methane_gas_detector.h']
-
-    // 1. Calculate 'Rs_gas' for the gas detected
-    float Rs_gas = (((MQ9_VOLT_RESOLUTION_Vc * mq9_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq9_eqv_RL);
-
-    // 1.1 Calculate @ 'ratio' during LPG_flameable presence
-    double _ratio = (Rs_gas / ((MQ9_value->MQ9_R0_constant <= 0) ? (1.0f) : (MQ9_value->MQ9_R0_constant))); // avoid dividing by zero??
-    if (_ratio <= 0)
-    {
-        _ratio = 0;
-    }
-    //-------------------------------------------------
-
-    // 1.2 Calculate _LPG_flameable_ppm
-    float _LPG_flameable_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq9) / m_slope_mq9); // ---> _LPG_flameable_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
-    if (_LPG_flameable_ppm < 0)
-    {
-        _LPG_flameable_ppm = 0; // No negative values accepted or upper datasheet recomendation.
-    }
-    TRACE_E("_LPG_flameable_ppm [LPG_flameable] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _LPG_flameable_ppm, (float)_ratio, analog_sensor_volt);
-
-    //-------------------------------------------------
-    return _LPG_flameable_ppm;
+    return 0;
 }
 
 static void __calibrate_MQ9_R0_resistance(void *params)
@@ -400,56 +459,58 @@ static void __calibrate_MQ9_R0_resistance(void *params)
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
     if (NULL != item)
     {
-        mq9_value_t *MQ9_value = (mq9_value_t *)item->user_arg;
-
-        uint32_t mq9_adc_pin = item->interface.adc.gpio_num;
-        //-------------------------------------------------
-        // let the sensor to heat for 20seconds
-        for (uint8_t j = 20; j > 0; j--)
+        s_mq9_value_t *MQ9_value = (s_mq9_value_t *)item->user_arg;
+        if (MQ9_value)
         {
-            TRACE_E("Heating sensor.........time left: %d sec", j);
-            vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
-        }
-        //-------------------------------------------------
-        // extract the mean_sensor_analog_output_voltage
-        float _sensor_volt = 0;
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-        for (uint8_t i = 100; i > 0; i--)
-        {
-            if (i % 20 == 0)
+            uint32_t mq9_adc_pin = item->interface.adc.gpio_num;
+            //-------------------------------------------------
+            // let the sensor to heat for 20seconds
+            for (uint8_t j = 20; j > 0; j--)
             {
-                TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
+                TRACE_E("Heating sensor.........time left: %d sec", j);
+                vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
             }
-            // extract ADC values
-            ezlopi_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
+            //-------------------------------------------------
+            // extract the mean_sensor_analog_output_voltage
+            float _sensor_volt = 0;
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+            for (uint8_t i = 100; i > 0; i--)
+            {
+                if (i % 20 == 0)
+                {
+                    TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
+                }
+                // extract ADC values
+                ezlopi_adc_get_adc_data(mq9_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-            _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
+                _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
 #else
-            _sensor_volt += (float)(ezlopi_analog_data->voltage);
+                _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
-            vTaskDelay(1); // 10ms
-        }
-        _sensor_volt = _sensor_volt / 100.0f;
+                vTaskDelay(1); // 10ms
+            }
+            _sensor_volt = _sensor_volt / 100.0f;
 
-        //-------------------------------------------------
-        // Calculate the 'Rs' of heater during clean air [calibration phase]
-        // Range -> [2Kohm - 20Kohm]
-        float RS_calib = 0;                                                                         // Define variable for sensor resistance
-        RS_calib = ((MQ9_VOLT_RESOLUTION_Vc * mq9_eqv_RL) / (_sensor_volt / 1000.0f)) - mq9_eqv_RL; // Calculate RS in fresh air
-        TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
-        if (RS_calib < 0)
-        {
-            RS_calib = 0; // No negative values accepted.
+            //-------------------------------------------------
+            // Calculate the 'Rs' of heater during clean air [calibration phase]
+            // Range -> [2Kohm - 20Kohm]
+            float RS_calib = 0;                                                                         // Define variable for sensor resistance
+            RS_calib = ((MQ9_VOLT_RESOLUTION_Vc * mq9_eqv_RL) / (_sensor_volt / 1000.0f)) - mq9_eqv_RL; // Calculate RS in fresh air
+            TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
+            if (RS_calib < 0)
+            {
+                RS_calib = 0; // No negative values accepted.
+            }
+            // Calculate the R0_air which is constant through-out
+            MQ9_value->MQ9_R0_constant = (RS_calib / RatioMQ9CleanAir); // Calculate MQ9_R0_constant
+            TRACE_E("CALIB_TASK -> 'MQ9_R0_constant' = %.2f", MQ9_value->MQ9_R0_constant);
+            if (MQ9_value->MQ9_R0_constant < 0)
+            {
+                MQ9_value->MQ9_R0_constant = 0; // No negative values accepted.
+            }
+            // Set calibration_complete_LPG_flameable flag
+            MQ9_value->Calibration_complete_LPG_flameable = true;
         }
-        // Calculate the R0_air which is constant through-out
-        MQ9_value->MQ9_R0_constant = (RS_calib / RatioMQ9CleanAir); // Calculate MQ9_R0_constant
-        TRACE_E("CALIB_TASK -> 'MQ9_R0_constant' = %.2f", MQ9_value->MQ9_R0_constant);
-        if (MQ9_value->MQ9_R0_constant < 0)
-        {
-            MQ9_value->MQ9_R0_constant = 0; // No negative values accepted.
-        }
-        // Set calibration_complete_LPG_flameable flag
-        Calibration_complete_LPG_flameable = true;
     }
     vTaskDelete(NULL);
 }

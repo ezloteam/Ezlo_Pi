@@ -1,4 +1,4 @@
-// #include "cJSON.h"
+
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_timer.h"
@@ -115,15 +115,15 @@ static int __0061_prepare(void *arg)
                 {
                     reed_item->cloud_properties.device_id = reed_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
-                    // if you want to add a custom data_structure , add here
+                    ret = 1;
                 }
                 else
                 {
+                    ret = -1;
                     ezlopi_device_free_device(reed_device);
                 }
             }
         }
-        ret = 1;
     }
     return ret;
 }
@@ -149,16 +149,23 @@ static int __0061_init(l_ezlopi_item_t *item)
                                   : GPIO_PULLUP_DISABLE,
                 .intr_type = item->interface.gpio.gpio_in.interrupt,
             };
-            ret = gpio_config(&input_conf);
-            if (ret)
-            {
-                TRACE_E("Error initializing Reed switch");
-            }
-            else
+            if (ESP_OK == gpio_config(&input_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, _0061_update_from_device, 200);
+                ret = 1;
             }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+                TRACE_E("Error initializing Reed switch");
+            }
+        }
+        else
+        {
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -226,11 +233,11 @@ static void _0061_update_from_device(void *arg)
 
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = reed_door_window_states[0]; //"dw_is_opened";
+            curret_value = "dw_is_opened";
         }
         else
         {
-            curret_value = reed_door_window_states[1]; //"dw_is_closed";
+            curret_value = "dw_is_closed";
         }
 
         if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
