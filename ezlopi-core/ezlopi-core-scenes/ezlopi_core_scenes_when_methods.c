@@ -14,6 +14,7 @@
 
 int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" is_item_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
@@ -112,6 +113,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_interval(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" is_interval ");
     int ret = 0;
 
     if (scene_node)
@@ -169,6 +171,7 @@ int ezlopi_scene_when_is_button_state(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" is_SunState ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -213,6 +216,7 @@ int ezlopi_scene_when_is_sun_state(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" isDate ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -259,6 +263,7 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_once(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" isOnce ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -303,6 +308,7 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" isDate_range ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -378,6 +384,7 @@ int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t* scene_node, voi
 
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" isHouse_mode ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -426,7 +433,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_I("isDevice_state.");
+    TRACE_W("isDevice_state.");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -494,6 +501,7 @@ int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" isScene_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -575,7 +583,7 @@ int ezlopi_scene_when_is_group_state(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_I("isCloud_state.");
+    TRACE_W(" isCloud_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -624,6 +632,7 @@ int ezlopi_scene_when_is_battery_level(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" Compare_num ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -662,6 +671,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" Compare_num_range ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
@@ -717,6 +727,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
 
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" Compare_strings ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -772,6 +783,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" Compare_string_op ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -826,6 +838,7 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" Compare_inArray ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -876,6 +889,7 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" Compare_values ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -935,6 +949,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" atleast_one_diction_val ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
@@ -973,6 +988,7 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
 
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" firmware_update ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)
@@ -1015,6 +1031,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
 
 int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    TRACE_W(" isDictionary_changed ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (scene_node && when_block)

@@ -878,6 +878,11 @@ static void _______fields_get_value(l_fields_v2_t* field, cJSON* cj_value)
 
             switch (field->value_type)
             {
+            case EZLOPI_VALUE_TYPE_ARRAY:
+            case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
+            case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+            case EZLOPI_VALUE_TYPE_INT_ARRAY:
+            case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
             case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
             {
                 field->field_value.e_type = VALUE_TYPE_CJSON;

@@ -152,7 +152,7 @@ static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtl
 void parse_http_request_type(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field)
 {
     const char* field_value_string = curr_field->field_value.u_value.value_string;
-    if ((NULL != field_value_string) && (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type))
+    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         if (0 == strncmp(curr_field->field_value.u_value.value_string, "GET", 4))
         {
@@ -179,7 +179,7 @@ void parse_http_request_type(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fiel
 void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field)
 {
     const char* field_value_string = curr_field->field_value.u_value.value_string;
-    if ((NULL != field_value_string) && (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type))
+    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         // TRACE_W("Here! fresh url");
         tmp_http_data->url_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->url), field_value_string);
@@ -207,7 +207,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
 void parse_http_content_type(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field)
 {
     const char* field_value_string = curr_field->field_value.u_value.value_string;
-    if ((NULL != field_value_string) && (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type))
+    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         // TRACE_W("Here! content-type");
         if (STR_SIZE(field_value_string) > 0)
@@ -224,16 +224,16 @@ void parse_http_content_type(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fiel
                 TRACE_E("Failed Creating header for 'Content-Type:'");
             }
         }
-        else
-        {
-            TRACE_E("ERR : Content-Type ==> STRLEN[%d]", STR_SIZE(field_value_string));
-        }
+        // else
+        // {
+        //     TRACE_E("ERR : Content-Type ==> STRLEN[%d]", STR_SIZE(field_value_string));
+        // }
     }
 }
 void parse_http_content(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field)
 {
     const char* field_value_string = curr_field->field_value.u_value.value_string;
-    if ((NULL != field_value_string) && (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type))
+    if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != field_value_string))
     {
         // TRACE_W("Here! fresh content");
         tmp_http_data->content_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->content), field_value_string);
@@ -263,7 +263,7 @@ void parse_http_content(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2
 void parse_http_headers(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field)
 {
     const cJSON* cj_value = curr_field->field_value.u_value.cj_value;
-    if (cJSON_IsObject(cj_value) && (EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type))
+    if ((EZLOPI_VALUE_TYPE_DICTIONARY == curr_field->value_type) && cJSON_IsObject(cj_value))
     {
         // TRACE_W("Here! headers");
         int content_size = __ezlopi_core_scenes_then_create_fresh_header(tmp_http_data);
@@ -309,7 +309,7 @@ void parse_http_skipsecurity(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fiel
 void parse_http_creds(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* curr_field)
 {
     const cJSON* cj_value = curr_field->field_value.u_value.cj_value;
-    if (cJSON_IsObject(cj_value))
+    if ((EZLOPI_VALUE_TYPE_CREDENTIAL == curr_field->value_type) && cJSON_IsObject(cj_value))
     {
         cJSON* userItem = cJSON_GetObjectItem(cj_value, "user");
         cJSON* passwordItem = cJSON_GetObjectItem(cj_value, "password");

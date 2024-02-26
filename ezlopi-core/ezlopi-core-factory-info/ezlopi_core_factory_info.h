@@ -157,18 +157,11 @@ extern "C"
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
     static const char* ezlopi_config_test =
+#if 0 
         "{\
         \"cmd\": 3,\
         \"dev_detail\":\
         [\
-            {\
-                \"dev_type\":3,\
-                \"dev_name\":\"Proximity\",\
-                \"id_room\":\"\",\
-                \"id_item\":34,\
-                \"gpio\":25,\
-                \"logic_inv\": false\
-            },\
             {\
                 \"dev_type\":10,\
                 \"dev_name\":\"Hall Effect Sensor\",\
@@ -176,9 +169,32 @@ extern "C"
                 \"id_item\":18,\
                 \"en_gpio1\": true,\
                 \"gpio1\":3\
+            },\
+            {\
+                \"dev_type\":3,\
+                \"dev_name\":\"POT\",\
+                \"id_room\":\"\",\
+                \"id_item\":17,\
+                \"gpio\": 34,\
+                \"resln_bit\": 3\
             }\
         ], \
     \"dev_total\": 2}";
+#endif
+      "{\
+        \"cmd\": 3,\
+        \"dev_detail\":\
+        [\
+            {\
+                \"dev_type\":3,\
+                \"dev_name\":\"POT\",\
+                \"id_room\":\"\",\
+                \"id_item\":17,\
+                \"gpio\": 34,\
+                \"resln_bit\": 3\
+            }\
+        ], \
+    \"dev_total\": 1}";
 #endif
 
 

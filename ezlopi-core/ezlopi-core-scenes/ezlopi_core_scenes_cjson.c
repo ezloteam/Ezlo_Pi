@@ -55,7 +55,7 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
                 break;
             }
             case EZLOPI_VALUE_TYPE_ITEM:
-            case EZLOPI_VALUE_TYPE_ENUM:
+
             case EZLOPI_VALUE_TYPE_STRING:
             case EZLOPI_VALUE_TYPE_INTERVAL:
             {
@@ -96,12 +96,17 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
                 break;
             }
             case EZLOPI_VALUE_TYPE_ARRAY:
+            case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
+            case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
+            case EZLOPI_VALUE_TYPE_ENUM:
+            case EZLOPI_VALUE_TYPE_TOKEN:
+            {
+                cJSON_AddItemToObject(cj_field, ezlopi_value_str, cJSON_Duplicate(field_node->field_value.u_value.cj_value, 1));
+                break;
+            }
             case EZLOPI_VALUE_TYPE_RGB:
             case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
             case EZLOPI_VALUE_TYPE_USER_CODE:
-            case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
-            case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-            case EZLOPI_VALUE_TYPE_TOKEN:
             case EZLOPI_VALUE_TYPE_BUTTON_STATE:
             case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
             case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
@@ -402,11 +407,19 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->field_value.u_value.value_double);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_ARRAY:
+                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
+                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+                    case EZLOPI_VALUE_TYPE_INT_ARRAY:
+                    case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
                     {
+                        #warning "adding reference vs duplicating the object?";
                         cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_CREDENTIAL:
+                    case EZLOPI_VALUE_TYPE_DICTIONARY:
                     case EZLOPI_VALUE_TYPE_ENUM:
                     case EZLOPI_VALUE_TYPE_TOKEN:
                     {
@@ -424,11 +437,9 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         }
                         break;
                     }
-                    case EZLOPI_VALUE_TYPE_CREDENTIAL:
-                    case EZLOPI_VALUE_TYPE_DICTIONARY:
-                    case EZLOPI_VALUE_TYPE_ARRAY:
+                    case EZLOPI_VALUE_TYPE_SCENEID:
                     {
-                        cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);
+                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
                         break;
                     }
                     case EZLOPI_VALUE_TYPE_RGB:
@@ -483,10 +494,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
                     case EZLOPI_VALUE_TYPE_DEVICE:
                     case EZLOPI_VALUE_TYPE_EXPRESSION:
-                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-                    case EZLOPI_VALUE_TYPE_INT_ARRAY:
-                    case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
+
                     case EZLOPI_VALUE_TYPE_MAX:
                     {
                         TRACE_W("Value type not implemented!, curr-type: %d", curr_field->value_type);

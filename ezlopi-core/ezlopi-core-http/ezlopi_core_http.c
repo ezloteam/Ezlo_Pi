@@ -360,30 +360,30 @@ static void ezlopi_core_http_generate_request(s_ezlopi_core_http_mbedtls_t* conf
             if (((NULL != config->username) && (GET_STRING_SIZE(config->username) > 0)) &&
                 ((NULL != config->password) && (GET_STRING_SIZE(config->password) > 0)))
             {
-                snprintf(*request, request_len, "GET %s?username=%s&password=%s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
+                snprintf(*request, request_len, "GET %s?username=%s&password=%s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url, config->username, config->password);
             }
             else
             {
-                snprintf(*request, request_len, "GET %s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+                snprintf(*request, request_len, "GET %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
             }
             break;
         }
         case HTTP_METHOD_POST:
         {
             // TRACE_S("HTTP POST-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "POST %s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            snprintf(*request, request_len, "POST %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
             break;
         }
         case HTTP_METHOD_PUT:
         {
             // TRACE_S("HTTP PUT-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "PUT %s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            snprintf(*request, request_len, "PUT %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
             break;
         }
         case HTTP_METHOD_DELETE:
         {
             // TRACE_S("HTTP DELETE-METHOD [%d]", config->method);
-            snprintf(*request, request_len, "DELETE %s HTTP/1.1\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
+            snprintf(*request, request_len, "DELETE %s HTTP/1.0\r\nUser-Agent: esp-idf/1.0 esp32\r\n", config->url);
             break;
         }
         default:
@@ -437,7 +437,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
         if (request)
         {
             bzero(request, request_len);
-            // request[request_len - 1] = '\0';
+            request[request_len - 1] = '\0';
 
             ezlopi_core_http_generate_request(config, &request, request_len);
 
@@ -589,7 +589,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             cJSON* header = headers->child;
             while (header)
             {
-                // TRACE_I("%s: %s", header->string, header->valuestring);
+                TRACE_I("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }
@@ -616,7 +616,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
                         while (cur_d)
                         {
                             strcat(ret, cur_d->ptr);
-                            // TRACE_D("%.*s", cur_d->len, cur_d->ptr);
+                            TRACE_D("%.*s", cur_d->len, cur_d->ptr);
                             cur_d = cur_d->next;
                         }
                     }

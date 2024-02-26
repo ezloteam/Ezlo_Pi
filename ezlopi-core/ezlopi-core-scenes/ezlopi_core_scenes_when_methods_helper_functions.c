@@ -175,7 +175,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v
             cJSON* array_item = cJSON_GetArrayItem(cj_time_arr, i);
             if (array_item && cJSON_IsString(array_item))
             {
-                // TRACE_S("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
+                TRACE_S("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
                 if (0 == strncmp(array_item->valuestring, field_hr_mm, 10))
                 {
                     ret |= (1 << 0); // One of the TIME-condition has been met.
@@ -210,7 +210,7 @@ uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fi
             cJSON* array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
-                // TRACE_S("Weekdays activate_%d: %d, [field_weekdays: %d]", i, (int)(array_item->valuedouble), field_weekdays);
+                TRACE_S("Weekdays activate_%d: %d, [field_weekdays: %d]", i, (int)(array_item->valuedouble), field_weekdays);
                 if ((int)(array_item->valuedouble) == field_weekdays)
                 {
                     ret |= (1 << 1); // One of the WEEKDAYS-condition has been met.
@@ -236,7 +236,7 @@ uint8_t isdate_mdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_field
             cJSON* array_item = cJSON_GetArrayItem(cj_days_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
-                // TRACE_S("Days activate_%d: %d, [field_days: %d]", i, (int)(array_item->valuedouble), field_days);
+                TRACE_S("Days activate_%d: %d, [field_days: %d]", i, (int)(array_item->valuedouble), field_days);
                 if ((int)(array_item->valuedouble) == field_days)
                 {
                     ret |= (1 << 2); // One of the DAYS-condition has been met.
@@ -294,7 +294,7 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t* mode_type, struct tm* info, l_
                     if (0 == strncmp(week_val, field_weeks, 10)) // comparsion in string formats only
                     {
                         ret |= (1 << 3); // One of the TIME-condition has been met.
-                        // TRACE_I("Weeks_condition '%sth week' [reqd : %s]  has been satisfied ; ret = (1<<3)", field_weeks, week_val);
+                        TRACE_I("Weeks_condition '%sth week' [reqd : %s]  has been satisfied ; ret = (1<<3)", field_weeks, week_val);
                         break;
                     }
                 }
@@ -320,7 +320,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     {
         if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)))
         {
-            // TRACE_W("here! daily-time");
+            TRACE_W("here! daily-time");
             ret = 1;
         }
         break;
@@ -330,7 +330,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
         {
-            // TRACE_W("here! week_days and time");
+            TRACE_W("here! week_days and time");
             ret = 1;
         }
         break;
@@ -340,7 +340,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
         {
-            // TRACE_W("here! month_days and time");
+            TRACE_W("here! month_days and time");
             ret = 1;
         }
         break;
@@ -351,7 +351,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
         if (((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
             ((flag_check & MASK_FOR_WEEKS_ARG) && (flag_check & WEEKS_FLAG)))
         {
-            // TRACE_W("here! week and time");
+            TRACE_W("here! week and time");
             ret = 1;
         }
         break;
@@ -427,7 +427,7 @@ int isonce_check_flag_result(l_scenes_list_v2_t* scene_node, uint8_t flag_check)
 
     if ((flag_check & TIME_FLAG) && (flag_check & DAY_FLAG) && (flag_check & MONTH_FLAG) && (flag_check & YEAR_FLAG))
     {
-        // TRACE_W("here! once and time");
+        TRACE_W("here! once and time");
         // now to disable the scene and also store in ezlopi_nvs
         scene_node->enabled = false;
         ezlopi_scenes_enable_disable_id_from_list_v2(scene_node->_id, false);

@@ -141,6 +141,11 @@ static int __init(l_ezlopi_item_t* item)
             {
                 ret = 1;
             }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
         else
         {
@@ -170,8 +175,8 @@ static int _get_item_list(l_ezlopi_item_t* item, void* arg)
             }
             cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
         ret = 1;
     }
 
@@ -184,8 +189,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char *)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
         ret = 1;
     }
     return ret;
