@@ -415,6 +415,8 @@ static void __stop_server(void)
         vSemaphoreDelete(send_lock);
         send_lock = NULL;
     }
+
+    ezlopi_core_ezlopi_broadcast_remove_method(ezlopi_service_ws_server_broadcast);
 }
 
 static void __call_method_and_send_response(httpd_req_t *req, cJSON *cj_request, cJSON *cj_method, f_method_func_t method_func, e_trace_type_t print_type)

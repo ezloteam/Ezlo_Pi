@@ -195,7 +195,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("MQ9-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
     char *user_arg = (char *)malloc(40);
     if (user_arg)

@@ -541,7 +541,7 @@ static void __message_upcall(const char *payload, uint32_t len)
                     char *method_name = ezlopi_core_ezlopi_methods_get_name_by_id(method_id);
                     TRACE_D("Method[%d]: %s", method_id, method_name ? method_name : "null");
 
-                    f_method_func_t method = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
+                    f_method_func_t method = ezlopi_core_ezlopi_methods_get_by_id(method_id);
                     if (method)
                     {
                         __call_method_and_send_response(cj_request, cj_method, method, TRACE_TYPE_D);

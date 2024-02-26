@@ -186,8 +186,8 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.scale = scales_centi_meter;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_out.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio2_str, item->interface.gpio.gpio_in.gpio_num);
 
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;

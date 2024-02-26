@@ -274,7 +274,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_ip_str, tmp_var);
@@ -282,7 +282,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 
     item->interface.gpio.gpio_out.enable = true;
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
     CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_op_str, tmp_var);
@@ -395,7 +395,8 @@ static int __init(l_ezlopi_item_t *item)
 
     if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num) &&
         (-1 != item->interface.gpio.gpio_in.gpio_num) &&
-        (255 != item->interface.gpio.gpio_in.gpio_num))
+        (255 != item->interface.gpio.gpio_in.gpio_num)) // &&
+    // (0 != item->interface.gpio.gpio_in.gpio_num))
     {
         const gpio_config_t io_conf = {
             .pin_bit_mask = (1ULL << item->interface.gpio.gpio_in.gpio_num),
@@ -412,6 +413,8 @@ static int __init(l_ezlopi_item_t *item)
                              ? GPIO_INTR_POSEDGE
                              : GPIO_INTR_NEGEDGE,
         };
+
+        TRACE_D("enabling interrup for pin: %d", item->interface.gpio.gpio_in.gpio_num);
 
         gpio_config(&io_conf);
         gpio_isr_service_register_v3(item, __interrupt_upcall, 1000);

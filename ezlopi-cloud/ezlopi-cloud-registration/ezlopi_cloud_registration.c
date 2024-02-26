@@ -64,7 +64,7 @@ static void registration_process(void *pv)
             vTaskDelay(200 / portTICK_RATE_MS);
         }
 
-        while (0 >= ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000, false))
+        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000, false) <= 0)
         {
             web_provisioning_send_to_nma_websocket(cj_register, TRACE_TYPE_B);
         }

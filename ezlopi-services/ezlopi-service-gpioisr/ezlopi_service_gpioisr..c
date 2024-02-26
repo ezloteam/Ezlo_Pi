@@ -55,7 +55,7 @@ void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __
         }
         else
         {
-            TRACE_S("Successfully added GPIO ISR handler.");
+            TRACE_S("Successfully added GPIO ISR handler for pin: %d.", item->interface.gpio.gpio_in.gpio_num);
         }
     }
 }

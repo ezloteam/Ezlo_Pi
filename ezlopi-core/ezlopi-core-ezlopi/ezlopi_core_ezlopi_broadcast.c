@@ -10,12 +10,13 @@ void ezlopi_core_ezlopi_broadcast_execute(char *data)
     if (data)
     {
         l_broadcast_method_t *curr_node = method_head;
+
         while (curr_node)
         {
             if (curr_node->func)
             {
                 uint32_t retries = curr_node->fail_retry;
-                TRACE_D("broadcast-method-name: %s", curr_node->method_name ? curr_node->method_name : "");
+
                 do
                 {
                     if (curr_node->func(data) > 0)
@@ -37,6 +38,8 @@ l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
 
     if (ret)
     {
+        TRACE_D("registering broadcast method ...");
+
         if (method_head)
         {
             l_broadcast_method_t *curr_node = method_head;
@@ -46,15 +49,51 @@ l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
                 curr_node = curr_node->next;
             }
 
+            TRACE_D("registered ...");
             curr_node->next = ret;
         }
         else
         {
+            TRACE_D("registered ...");
             method_head = ret;
         }
     }
+    else
+    {
+        TRACE_E("registering broadcast method failed ...");
+    }
 
     return ret;
+}
+
+void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_method)
+{
+    if (method_head)
+    {
+        if (broadcast_method == method_head->func)
+        {
+            l_broadcast_method_t *remove_node = method_head;
+            method_head = method_head->next;
+            free(remove_node);
+        }
+        else
+        {
+            l_broadcast_method_t *curr_node = method_head;
+            while (curr_node->next)
+            {
+                if (curr_node->next->func == broadcast_method)
+                {
+                    l_broadcast_method_t *remove_node = curr_node->next;
+                    curr_node->next = curr_node->next->next;
+                    free(remove_node);
+
+                    break;
+                }
+
+                curr_node = curr_node->next;
+            }
+        }
+    }
 }
 
 static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32_t retries)
@@ -63,7 +102,7 @@ static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32
 
     if (method)
     {
-        l_broadcast_method_t *method_node = malloc(sizeof(l_broadcast_method_t));
+        method_node = malloc(sizeof(l_broadcast_method_t));
 
         if (method_node)
         {
@@ -72,7 +111,16 @@ static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32
             method_node->next = NULL;
             method_node->func = method;
             method_node->fail_retry = retries;
+            method_node->method_name = "";
         }
+        else
+        {
+            TRACE_E("malloc failed");
+        }
+    }
+    else
+    {
+        TRACE_E("method is NULL");
     }
 
     return method_node;
