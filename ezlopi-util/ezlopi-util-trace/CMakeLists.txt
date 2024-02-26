@@ -6,5 +6,5 @@ idf_component_register(SRCS "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES 
                 log
-                # ezlopi-user-config
+                ezlopi-user-config
                 )
