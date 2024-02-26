@@ -24,7 +24,7 @@ EzloPi features a [web-based configurator](https://config.ezlopi.com/) that allo
 
 # 2. Customizing and building EzloPi firmware in your local setup
 It is required to have [ESP-IDF](https://github.com/espressif/esp-idf) installed in your machine.
-Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/). ESP-IDF version [v4.4.4-292-g7894f032f6-dirty](https://github.com/espressif/esp-idf/releases/tag/v4.4.4).
+Install ESP-IDF with taking help from the docs [here](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/). ESP-IDF version [v4.4.6](https://github.com/espressif/esp-idf/releases/tag/v4.4.6).
 
 ### 1. Clone the Ezlo-Pi Repository from GitHub
 
@@ -34,9 +34,9 @@ Navigate to your terminal or bash shell and execute the following commands:
 git clone --recursive git@github.com:ezloteam/Ezlo_Pi.git ezlopi
 cd ezlopi/firmware/ezlopi
 ```
-### 3. Configure the Projec
+### 2. Configure the Projec
 You need to configure the project as per the chip type you are using. It needs to be modified the file ```sdkconfig``` , equivalent to making changes with ```idf.py menuconfig```.
-EzloPi needs to have constant set of configurations which are defined for different variants of chips and saved in the file such that ```sdkconfig.<chip type>.<flash size>```. Copy the content of the chip you are using and paste it into ```sdkconfig```. For example if I want to build and run this firmware on ESP32C3 with 4MB of memory, I need to copy content of ```[sdkconfig.esp32c3.4mb](sdkconfig.esp32c3.4mb)``` into ```sdkconfig``` or rename the file ```sdkconfig.esp32c3.4mb``` to ```sdkconfig```, clean the existing build with ```idf.py fullclean``` and then build as mentioned at #2. The list of pre-defined ```sdkconfig``` for different varients of ESP32 are listed as : 
+EzloPi needs to have constant set of configurations which are defined for different variants of chips and saved in the file such that ```sdkconfig.<chip type>.<flash size>```. Copy the content of the chip you are using and paste it into ```sdkconfig```. For example if I want to build and run this firmware on ESP32C3 with 4MB of memory, I need to copy content of [sdkconfig.esp32c3.4mb](sdkconfig.esp32c3.4mb) into ```sdkconfig``` or rename the file ```sdkconfig.esp32c3.4mb``` to ```sdkconfig```, and then build as mentioned at #2. The list of pre-defined ```sdkconfig``` for different variants of ESP32 are listed as : 
 
 * __[ESP32 4MB Standard](sdkconfig.esp32.4mb)__
 * __[ESP32-S3 4MB ](sdkconfig.esp32s3.4mb)__
@@ -44,7 +44,7 @@ EzloPi needs to have constant set of configurations which are defined for differ
 * __[ESP32-C3 4MB](sdkconfig.esp32c3.4mb)__
 
 
-### 2. Build the Project
+### 3. Build the Project
 
 Execute the following command to build the project:
 
@@ -52,7 +52,7 @@ Execute the following command to build the project:
 idf.py build
 ```
 
-### 3. Flash the Firmware
+### 4. Flash the Firmware
 
 To flash the firmware, use the following command:
 
@@ -60,7 +60,7 @@ To flash the firmware, use the following command:
 idf.py -p <COM Port Name> -b <baud> flash
 ```
 
-### 4. Open Serial Monitor
+### 5. Open Serial Monitor
 
 To open the serial monitor, use the following command:
 
