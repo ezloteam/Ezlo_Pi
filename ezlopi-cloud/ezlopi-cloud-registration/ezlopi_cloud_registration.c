@@ -46,7 +46,9 @@ static void registration_process(void *pv)
 
         cJSON_AddStringToObject(cj_register, "id", "__ID__");
         cJSON_AddStringToObject(cj_register, ezlopi_method_str, "register");
+
         cJSON *cj_params = cJSON_AddObjectToObject(cj_register, ezlopi_params_str);
+
         if (cj_params)
         {
             cJSON_AddStringToObject(cj_params, ezlopi_firmware_str, VERSION_STR);

@@ -28,9 +28,11 @@ static void blinky(void *pv);
 void app_main(void)
 {
     gpio_install_isr_service(0);
+    
     qt_serial_init();
     gpio_isr_service_init();
     ezlopi_init();
+
     ezlopi_ble_service_init();
     timer_service_init();
     ezlopi_scenes_meshbot_init();
@@ -74,9 +76,6 @@ static void blinky(void *pv)
             trace_wb("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
 
             trace_wb("-----------------------------------------");
-
-            char *sdfgh = "asdfghjkl";
-            ezlopi_service_ws_server_broadcast(sdfgh, strlen(sdfgh));
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);

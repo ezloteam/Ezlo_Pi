@@ -4,6 +4,7 @@
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -437,6 +438,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
         {
             cJSON_Minify(data_str);
             web_provisioning_send_str_data_to_nma_websocket(data_str, TRACE_TYPE_B);
+            ezlopi_core_ezlopi_broadcast_execute(data_str);
             free(data_str);
         }
     }

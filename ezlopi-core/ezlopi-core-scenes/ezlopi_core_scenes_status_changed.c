@@ -1,6 +1,9 @@
-#include "ezlopi_service_webprov.h"
 #include "ezlopi_cloud_constants.h"
+
+#include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_scenes_status_changed.h"
+
+#include "ezlopi_service_webprov.h"
 
 int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const char *status_str)
 {
@@ -48,16 +51,14 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t *scene_node, const 
 
             char *data_to_send = cJSON_Print(cj_response);
             cJSON_Delete(cj_response);
-            
+
             if (data_to_send)
             {
                 cJSON_Minify(data_to_send);
                 ret = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                ezlopi_core_ezlopi_broadcast_execute(data_to_send);
                 free(data_to_send);
             }
-
-            // ret = web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
-            // cJSON_Delete(cj_response);
         }
     }
 

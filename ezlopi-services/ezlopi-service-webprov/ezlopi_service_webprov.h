@@ -17,7 +17,8 @@ extern "C"
         TRACE_TYPE_B,
         TRACE_TYPE_D, // debug (White)
         TRACE_TYPE_I, // Info (Blue)
-        TRACE_TYPE_E  // Error (Red)
+        TRACE_TYPE_E, // Error (Red)
+
     } e_trace_type_t;
 
     void web_provisioning_init(void);

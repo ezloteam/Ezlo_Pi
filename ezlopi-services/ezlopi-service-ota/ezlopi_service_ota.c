@@ -13,6 +13,7 @@
 
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_webprov.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
 
 static void ota_service_process(void *pv);
 
@@ -47,6 +48,7 @@ static void ota_service_process(void *pv)
                 {
                     cJSON_Minify(data_to_send);
                     ret_ota = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                    ezlopi_core_ezlopi_broadcast_execute(data_to_send);
                     free(data_to_send);
                 }
             }

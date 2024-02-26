@@ -3,13 +3,15 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_cloud_modes.h"
+
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_devices.h"
-#include "ezlopi_cloud_modes.h"
 #include "ezlopi_core_modes_cjson.h"
-#include "ezlopi_service_webprov.h"
+#include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_service_modes.h"
+#include "ezlopi_service_webprov.h"
 
 static TaskHandle_t sg_process_handle = NULL;
 
@@ -81,10 +83,18 @@ static void __modes_service(void *pv)
 
                         ezlopi_core_modes_store_to_nvs();
 
-                        cJSON *cj_response = ezlopi_core_modes_cjson_changed();
-                        if (cj_response)
+                        cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                        if (cj_update)
                         {
-                            web_provisioning_send_to_nma_websocket(cj_response, TRACE_TYPE_I);
+                            char *update_str = cJSON_Print(cj_update);
+                            cJSON_Delete(cj_update);
+
+                            if (update_str)
+                            {
+                                web_provisioning_send_str_data_to_nma_websocket(update_str, TRACE_TYPE_I);
+                                ezlopi_core_ezlopi_broadcast_execute(update_str);
+                                free(update_str);
+                            }
                         }
                     }
                 }
