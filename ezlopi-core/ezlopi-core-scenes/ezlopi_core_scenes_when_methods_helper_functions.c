@@ -682,7 +682,7 @@ uint8_t issunstate_eval_range(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cur
         s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
         if ((user_data) && (0 != user_data->sunstate_mode))
         {
-            TRACE_D("checking midnight range offset");
+            TRACE_S("checking midnight range offset");
             flag_check |= (1 << 7); // indicates : midnight-range
             flag_check |= issunstate_check_mdrn(user_data->sunstate_mode, curr_field->field_value.u_value.value_string, info, &(user_data->defined_moment));
         }
@@ -798,7 +798,7 @@ int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info
                 }
             }
         }
-        TRACE_D("offset[%d](intime=0,before=1,after=2,undefined=3) , SunState[%d](sunrise=1,sunset=2) , FLAG_STATUS: %#x", (int)user_data->tmoffs_type, user_data->sunstate_mode, flag_check);
+        TRACE_S("offset[%d](intime=0,before=1,after=2,undefined=3) , SunState[%d](sunrise=1,sunset=2) , FLAG_STATUS: %#x", (int)user_data->tmoffs_type, user_data->sunstate_mode, flag_check);
     }
 
     return ret;

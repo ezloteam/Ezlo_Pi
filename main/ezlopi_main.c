@@ -33,7 +33,7 @@ void app_main(void)
     EZPI_SERVICE_uart_init();
     ezlopi_init();
 
-    ezlopi_ble_service_init();
+    // ezlopi_ble_service_init();
     timer_service_init();
     ezlopi_scenes_meshbot_init();
     web_provisioning_init();
