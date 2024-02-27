@@ -31,6 +31,18 @@ menu "EzloPi User Config"
     default y
     help
         Enable BLE pairing
+    
+    config EZPI_MDNS_HOSTNAME
+    string "mDNS hostname"
+    default "ezlopi_device"
+    help
+        Set mDNS hostname
+    
+    config EZPI_MDNS_INSTANCE_NAME
+    string "mDNS instance name"
+    default "ezlopi_serial"
+    help 
+        Set mDNS instance name
 
 endmenu
 
