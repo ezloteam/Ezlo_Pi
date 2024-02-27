@@ -208,14 +208,14 @@ static int __settings_get_ens160_gas_sensor_ambient_temperature_get(void* arg, l
         cJSON_AddStringToObject(cj_properties, "status", "synced");
         cJSON_AddStringToObject(cj_properties, "valueType", value_type_temperature);
 
-        cJSON* value = cJSON_AddObjectToObject(cj_properties, "value");
+        cJSON* value = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
         cJSON* valueDefault = cJSON_AddObjectToObject(cj_properties, "valueDefault");
         if (value && valueDefault)
         {
-            cJSON_AddNumberToObject(value, "value", ambient_temperature->ambient_temperature);
+            cJSON_AddNumberToObject(value, ezlopi_value_str, ambient_temperature->ambient_temperature);
             cJSON_AddStringToObject(value, "scale", scales_celsius);
 
-            cJSON_AddNumberToObject(valueDefault, "value", 25);
+            cJSON_AddNumberToObject(valueDefault, ezlopi_value_str, 25);
             cJSON_AddStringToObject(valueDefault, "scale", scales_celsius);
         }
     }
@@ -240,14 +240,14 @@ static int __settings_get_ens160_gas_sensor_relative_humidity_get(void* arg, l_e
         cJSON_AddStringToObject(cj_properties, "status", "synced");
         cJSON_AddStringToObject(cj_properties, "valueType", value_type_humidity);
 
-        cJSON* value = cJSON_AddObjectToObject(cj_properties, "value");
+        cJSON* value = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
         cJSON* valueDefault = cJSON_AddObjectToObject(cj_properties, "valueDefault");
         if (value && valueDefault)
         {
-            cJSON_AddNumberToObject(value, "value", relative_humidity->relative_humidity);
+            cJSON_AddNumberToObject(value, ezlopi_value_str, relative_humidity->relative_humidity);
             cJSON_AddStringToObject(value, "scale", scales_percent);
 
-            cJSON_AddNumberToObject(valueDefault, "value", 50);
+            cJSON_AddNumberToObject(valueDefault, ezlopi_value_str, 50);
             cJSON_AddStringToObject(valueDefault, "scale", scales_percent);
         }
     }
@@ -284,7 +284,7 @@ static int __settings_set_ens160_gas_sensor_ambient_temperature_get(void* arg, l
     s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_properties, "value", ambient_temperature->ambient_temperature);
+        CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
         if (!ezlopi_nvs_write_float32(ambient_temperature->ambient_temperature, nvs_key_ens160_gas_sensor_ambient_temperature_setting))
         {
             TRACE_E("Failed to write to NVS");
@@ -306,7 +306,7 @@ static int __settings_set_ens160_gas_sensor_relative_humidity_get(void* arg, l_e
     s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
-        CJSON_GET_VALUE_DOUBLE(cj_properties, "value", relative_humidity->relative_humidity);
+        CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
         if (!ezlopi_nvs_write_float32(relative_humidity->relative_humidity, nvs_key_ens160_gas_sensor_relative_humidity_setting))
         {
             TRACE_E("Failed to write to NVS");
@@ -354,7 +354,7 @@ static int __settings_update_ens160_gas_sensor_ambient_temperature_get(void* arg
     s_sensor_ens160_gas_sensor_setting_ambient_temperature_t* ambient_temperature = (s_sensor_ens160_gas_sensor_setting_ambient_temperature_t*)setting->user_arg;
     if (cj_properties && ambient_temperature)
     {
-        cJSON_AddNumberToObject(cj_properties, "value", ambient_temperature->ambient_temperature);
+        cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, ambient_temperature->ambient_temperature);
         cJSON_AddStringToObject(cj_properties, "scale", scales_celsius);
     }
     else
@@ -372,7 +372,7 @@ static int __settings_update_ens160_gas_sensor_relative_humidity_get(void* arg, 
     s_sensor_ens160_gas_sensor_setting_relative_humidity_t* relative_humidity = (s_sensor_ens160_gas_sensor_setting_relative_humidity_t*)setting->user_arg;
     if (cj_properties && relative_humidity)
     {
-        cJSON_AddNumberToObject(cj_properties, "value", relative_humidity->relative_humidity);
+        cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, relative_humidity->relative_humidity);
         cJSON_AddStringToObject(cj_properties, "scale", scales_percent);
     }
     else

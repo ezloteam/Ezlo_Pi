@@ -20,12 +20,12 @@ typedef struct s_mb1013_args
     float previous_value;
 } s_mb1013_args_t;
 
-static int __prepare(void *arg);
-static int __init(l_ezlopi_item_t *item);
-static int __notify(l_ezlopi_item_t *item);
-static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static int __prepare(void* arg);
+static int __init(l_ezlopi_item_t* item);
+static int __notify(l_ezlopi_item_t* item);
+static int __get_value_cjson(l_ezlopi_item_t* item, void* arg);
 
-int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
 
@@ -62,7 +62,7 @@ int sensor_0021_UART_MB1013(e_ezlopi_actions_t action, l_ezlopi_item_t *item, vo
     return ret;
 }
 
-static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
+static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
@@ -84,7 +84,7 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void __uart_data_upcall(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
     if (buffer && output_len && uart_object_handle)
     {
@@ -112,7 +112,7 @@ static void __uart_data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_ua
     }
 }
 
-static int __init(l_ezlopi_item_t *item)
+static int __init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -144,7 +144,7 @@ static int __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -158,7 +158,7 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
@@ -169,7 +169,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 }
 
-static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __setup_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     CJSON_GET_VALUE_INT(cj_device, ezlopi_baud_rate_str, item->interface.uart.baudrate);
@@ -177,27 +177,27 @@ static void __setup_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_d
     CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
 }
 
-static int __prepare(void *arg)
+static int __prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (arg)
     {
-        cJSON *cjson_device = prep_arg->cjson_device;
+        cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
                 if (item)
                 {
                     item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
 
-                    s_mb1013_args_t *mb1030_args = malloc(sizeof(s_mb1013_args_t));
+                    s_mb1013_args_t* mb1030_args = malloc(sizeof(s_mb1013_args_t));
                     if (mb1030_args)
                     {
                         mb1030_args->current_value = 0.0;
@@ -218,7 +218,7 @@ static int __prepare(void *arg)
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item && item->user_arg)
