@@ -83,17 +83,18 @@ static void __modes_service(void* pv)
 
                         ezlopi_core_modes_store_to_nvs();
 
-                        cJSON *cj_update = ezlopi_core_modes_cjson_changed();
+                        cJSON* cj_update = ezlopi_core_modes_cjson_changed();
                         if (cj_update)
                         {
-                            char *update_str = cJSON_Print(cj_update);
+                            char* update_str = cJSON_Print(cj_update);
                             cJSON_Delete(cj_update);
 
                             if (update_str)
                             {
-                                web_provisioning_send_str_data_to_nma_websocket(update_str, TRACE_TYPE_I);
-                                ezlopi_core_ezlopi_broadcast_execute(update_str);
-                                free(update_str);
+                                ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(update_str, TRACE_TYPE_I);
+                                if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(update_str)) {
+                                    free(update_str);
+                                }
                             }
                         }
                     }

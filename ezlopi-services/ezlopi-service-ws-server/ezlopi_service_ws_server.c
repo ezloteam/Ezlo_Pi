@@ -68,7 +68,7 @@ static esp_err_t __msg_handler(httpd_req_t* req);
 static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t payload_len);
 
 static void __print_sending_data(char* data_str, e_trace_type_t print_type);
-static void __call_method_and_send_response(httpd_req_t* req, cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func, e_trace_type_t print_type);
+static cJSON* __method_execute(httpd_req_t* req, cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func);
 
 e_ws_status_t ezlopi_service_ws_server_status(void)
 {
@@ -177,19 +177,40 @@ static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t pay
 
                         if (method)
                         {
-                            __call_method_and_send_response(req, cj_request, cj_method, method, TRACE_TYPE_D);
+                            cJSON* cj_response = __method_execute(req, cj_request, cj_method, method);
+                            if (cj_response)
+                            {
+                                __respond_cjson(req, cj_response);
+                                cJSON_Delete(cj_response);
+                            }
                         }
 
                         f_method_func_t updater = ezlopi_core_ezlopi_methods_get_updater_by_id(method_id);
 
                         if (updater)
                         {
-                            __call_method_and_send_response(req, cj_request, cj_method, updater, TRACE_TYPE_D);
+                            cJSON* cj_response = __method_execute(req, cj_request, cj_method, updater);
+                            if (cj_response)
+                            {
+                                char* data = cJSON_Print(cj_response);
+                                cJSON_Delete(cj_response);
+
+                                if (data) {
+                                    if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data)) {
+                                        free(data);
+                                    }
+                                }
+                            }
                         }
                     }
                     else
                     {
-                        __call_method_and_send_response(req, cj_request, cj_method, ezlopi_core_ezlopi_methods_rpc_method_notfound, TRACE_TYPE_E);
+                        cJSON* cj_response = __method_execute(req, cj_request, cj_method, ezlopi_core_ezlopi_methods_rpc_method_notfound);
+                        if (cj_response)
+                        {
+                            __respond_cjson(req, cj_response);
+                            cJSON_Delete(cj_response);
+                        }
                     }
                 }
             }
@@ -281,7 +302,6 @@ static esp_err_t __msg_handler(httpd_req_t* req)
                     }
                     else if (HTTPD_WS_TYPE_TEXT == ws_pkt.type)
                     {
-                        httpd_ws_send_frame(req, &ws_pkt);
                         __ws_api_handler(req, (char*)ws_pkt.payload, (uint32_t)ws_pkt.len);
                     }
                     else if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
@@ -374,8 +394,9 @@ static void __stop_server(void)
     ezlopi_core_ezlopi_broadcast_remove_method(ezlopi_service_ws_server_broadcast);
 }
 
-static void __call_method_and_send_response(httpd_req_t* req, cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func, e_trace_type_t print_type)
+static cJSON* __method_execute(httpd_req_t* req, cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func)
 {
+    cJSON* cj_response = NULL;
     if (method_func)
     {
         if (ezlopi_core_elzlopi_methods_check_method_register(method_func))
@@ -384,7 +405,7 @@ static void __call_method_and_send_response(httpd_req_t* req, cJSON* cj_request,
         }
         else
         {
-            cJSON* cj_response = cJSON_CreateObject();
+            cj_response = cJSON_CreateObject();
             if (NULL != cj_response)
             {
                 cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
@@ -392,8 +413,6 @@ static void __call_method_and_send_response(httpd_req_t* req, cJSON* cj_request,
                 cJSON_AddNullToObject(cj_response, ezlopi_error_str);
 
                 method_func(cj_request, cj_response);
-
-                __respond_cjson(req, cj_response);
             }
             else
             {
@@ -401,6 +420,8 @@ static void __call_method_and_send_response(httpd_req_t* req, cJSON* cj_request,
             }
         }
     }
+
+    return cj_response;
 }
 
 static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)

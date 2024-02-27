@@ -10,7 +10,7 @@
 
 void EZPI_CORE_reboot(void)
 {
-    web_provisioning_deinit();
+    ezlopi_service_web_provisioning_deinit();
     esp_restart();
 }
 

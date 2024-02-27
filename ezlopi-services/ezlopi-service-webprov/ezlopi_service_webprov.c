@@ -30,12 +30,12 @@ static void __message_upcall(const char* payload, uint32_t len);
 static void __rpc_method_notfound(cJSON* cj_request, cJSON* cj_response);
 static void __print_sending_data(char* data_str, e_trace_type_t print_type);
 
-uint32_t web_provisioning_get_message_count(void)
+uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 {
     return message_counter;
 }
 
-int web_provisioning_send_str_data_to_nma_websocket(char* str_data, e_trace_type_t print_type)
+int ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(char* str_data, e_trace_type_t print_type)
 {
     int ret = 0;
     if (str_data)
@@ -64,7 +64,7 @@ int web_provisioning_send_str_data_to_nma_websocket(char* str_data, e_trace_type
     return ret;
 }
 
-int web_provisioning_send_to_nma_websocket(cJSON* cjson_data, e_trace_type_t print_type)
+int ezlopi_service_web_provisioning_send_to_nma_websocket(cJSON* cjson_data, e_trace_type_t print_type)
 {
     int ret = 0;
     if (ezlopi_websocket_client_is_connected())
@@ -105,7 +105,7 @@ int web_provisioning_send_to_nma_websocket(cJSON* cjson_data, e_trace_type_t pri
     return ret;
 }
 
-void web_provisioning_init(void)
+void ezlopi_service_web_provisioning_init(void)
 {
     xTaskCreate(__config_check, "web-provisioning config check", 4 * 2048, NULL, 5, NULL);
     xTaskCreate(__fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, &ezlopi_update_config_notifier);
@@ -394,7 +394,7 @@ static void __config_check(void* pv)
     vTaskDelete(NULL);
 }
 
-void web_provisioning_deinit(void)
+void ezlopi_service_web_provisioning_deinit(void)
 {
     if (_task_handle)
     {
@@ -513,7 +513,7 @@ static void __call_method_and_send_response(cJSON* cj_request, cJSON* cj_method,
                 if (data_to_send)
                 {
                     cJSON_Minify(data_to_send);
-                    web_provisioning_send_str_data_to_nma_websocket(data_to_send, print_type);
+                    ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, print_type);
                     free(data_to_send);
                 }
             }

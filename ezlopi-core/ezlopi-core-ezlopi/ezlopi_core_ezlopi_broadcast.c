@@ -1,15 +1,36 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
-static l_broadcast_method_t *method_head = NULL;
+static l_broadcast_method_t* __method_head = NULL;
+static int (*__broadcast_queue_func)(char*) = NULL;
 
-static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32_t retries);
+static l_broadcast_method_t* __method_create(f_broadcast_method_t method, uint32_t retries);
 
-void ezlopi_core_ezlopi_broadcast_execute(char *data)
+void ezlopi_core_ezlopi_broadcast_methods_set_queue(int(*func)(char*))
+{
+    __broadcast_queue_func = func;
+}
+
+int ezlopi_core_ezlopi_broadcast_methods_send_to_queue(char* data)
+{
+    int ret = 0;
+    if (__broadcast_queue_func)
+    {
+        ret = __broadcast_queue_func(data);
+    }
+    return ret;
+}
+
+l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_methods_get_head(void)
+{
+    return __method_head;
+}
+
+void ezlopi_core_ezlopi_broadcast_execute(char* data)
 {
     if (data)
     {
-        l_broadcast_method_t *curr_node = method_head;
+        l_broadcast_method_t* curr_node = __method_head;
 
         while (curr_node)
         {
@@ -32,17 +53,17 @@ void ezlopi_core_ezlopi_broadcast_execute(char *data)
     }
 }
 
-l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, uint32_t retries)
+l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, uint32_t retries)
 {
-    l_broadcast_method_t *ret = __method_create(broadcast_method, retries);
+    l_broadcast_method_t* ret = __method_create(broadcast_method, retries);
 
     if (ret)
     {
         TRACE_D("registering broadcast method ...");
 
-        if (method_head)
+        if (__method_head)
         {
-            l_broadcast_method_t *curr_node = method_head;
+            l_broadcast_method_t* curr_node = __method_head;
 
             while (curr_node->next)
             {
@@ -55,7 +76,7 @@ l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
         else
         {
             TRACE_D("registered ...");
-            method_head = ret;
+            __method_head = ret;
         }
     }
     else
@@ -68,22 +89,22 @@ l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
 
 void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_method)
 {
-    if (method_head)
+    if (__method_head)
     {
-        if (broadcast_method == method_head->func)
+        if (broadcast_method == __method_head->func)
         {
-            l_broadcast_method_t *remove_node = method_head;
-            method_head = method_head->next;
+            l_broadcast_method_t* remove_node = __method_head;
+            __method_head = __method_head->next;
             free(remove_node);
         }
         else
         {
-            l_broadcast_method_t *curr_node = method_head;
+            l_broadcast_method_t* curr_node = __method_head;
             while (curr_node->next)
             {
                 if (curr_node->next->func == broadcast_method)
                 {
-                    l_broadcast_method_t *remove_node = curr_node->next;
+                    l_broadcast_method_t* remove_node = curr_node->next;
                     curr_node->next = curr_node->next->next;
                     free(remove_node);
 
@@ -96,9 +117,9 @@ void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_m
     }
 }
 
-static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32_t retries)
+static l_broadcast_method_t* __method_create(f_broadcast_method_t method, uint32_t retries)
 {
-    l_broadcast_method_t *method_node = NULL;
+    l_broadcast_method_t* method_node = NULL;
 
     if (method)
     {

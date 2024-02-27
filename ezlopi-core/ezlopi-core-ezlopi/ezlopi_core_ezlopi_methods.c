@@ -94,9 +94,6 @@ bool ezlopi_core_elzlopi_methods_check_method_register(f_method_func_t method)
 {
     bool ret = false;
 
-    TRACE_D("method: %p", method);
-    TRACE_D("registered: %p", registered);
-
     if (registered == method)
     {
         ret = true;

@@ -20,6 +20,7 @@
 #include "ezlopi_service_gpioisr.h"
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_service_ws_server.h"
+#include "ezlopi_service_broadcast.h"
 
 #define ENABLE_HEARTBIT_LED 0
 
@@ -31,15 +32,20 @@ void app_main(void)
 
     gpio_isr_service_init();
     EZPI_SERVICE_uart_init();
+
     ezlopi_init();
 
-    ezlopi_ble_service_init();
     timer_service_init();
+    ezlopi_ble_service_init();
+
     ezlopi_scenes_meshbot_init();
-    web_provisioning_init();
-    ota_service_init();
     ezlopi_service_modes_init();
+
     ezlopi_service_ws_server_start();
+    ezlopi_service_web_provisioning_init();
+
+    ota_service_init();
+    ezlopi_service_broadcast_init();
 
     xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
@@ -79,4 +85,4 @@ static void blinky(void* pv)
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    }
+}

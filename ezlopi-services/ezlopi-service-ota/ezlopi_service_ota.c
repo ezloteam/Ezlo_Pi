@@ -15,13 +15,13 @@
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
-static void ota_service_process(void *pv);
+static void ota_service_process(void* pv);
 
 void ota_service_init(void)
 {
     xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
 }
-static void ota_service_process(void *pv)
+static void ota_service_process(void* pv)
 {
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
@@ -36,20 +36,22 @@ static void ota_service_process(void *pv)
         if ((-1 != ret_nma_reg) || (-1 != ret_ota))
         {
             TRACE_D("Sending firmware check request...");
-            uint32_t message_counter = web_provisioning_get_message_count();
-            cJSON *firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+            uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
+            cJSON* firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
             if (NULL != firmware_info_request)
             {
-                char *data_to_send = cJSON_Print(firmware_info_request);
+                char* data_to_send = cJSON_Print(firmware_info_request);
                 cJSON_Delete(firmware_info_request);
                 firmware_info_request = NULL;
 
                 if (data_to_send)
                 {
                     cJSON_Minify(data_to_send);
-                    ret_ota = web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
-                    ezlopi_core_ezlopi_broadcast_execute(data_to_send);
-                    free(data_to_send);
+                    ret_ota = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                    if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
+                    {
+                        free(data_to_send);
+                    }
                 }
             }
         }
