@@ -12,6 +12,7 @@ set(SDK_COMPONENTS
 set(EZLOPI_CORE_COMPONENTS  
         ezlopi-core-wifi
         ezlopi-core-ezlopi
+        ezlopi-core-factory-info
 )
 
 set(EZLOPI_CLOUD_COMPONENTS 

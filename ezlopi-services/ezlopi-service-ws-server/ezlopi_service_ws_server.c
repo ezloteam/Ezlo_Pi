@@ -30,6 +30,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_ezlopi_methods.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
+#include "ezlopi_core_factory_info.h"
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
@@ -341,8 +342,9 @@ static void __start_server(void)
     send_lock = xSemaphoreCreateMutex();
     if (send_lock)
     {
+
         static const httpd_uri_t ws = {
-            .uri = "/ws",
+            .uri = "/",
             .method = HTTP_GET,
             .handler = __msg_handler,
             .user_ctx = NULL,
@@ -351,6 +353,14 @@ static void __start_server(void)
         };
 
         httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+        // uint64_t id_val = ezlopi_factory_info_v3_get_id();
+        // if (id_val)
+        // {
+        //     uint32_t serial_last4 = id_val % 10000;
+        //     config.server_port = serial_last4;
+        // }
+
         config.task_priority = 8;
         config.stack_size = 1024 * 4;
 
