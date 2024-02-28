@@ -27,7 +27,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-coordinates
 )
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_ezlopi.c" "${config_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_CLOUD_COMPONENTS}

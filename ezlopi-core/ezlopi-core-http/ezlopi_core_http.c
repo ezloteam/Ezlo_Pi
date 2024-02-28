@@ -229,10 +229,10 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
     }
     else
     {
-        TRACE_I("Certificate verified.");
+        // TRACE_I("Certificate verified.");
     }
     // TRACE_I("Cipher suite is %s", mbedtls_ssl_get_ciphersuite(ssl));
-    TRACE_I("Writing HTTP request...");
+    // TRACE_I("Writing HTTP request...");
     size_t written_bytes = 0;
     do
     {
@@ -250,7 +250,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
         }
     } while (written_bytes < strlen(url_req));
 
-    TRACE_I("Reading HTTP response...");
+    // TRACE_I("Reading HTTP response...");
     uint32_t resp_buf_size = tmp_buf_size + 1;
     char* resp_buf_dummy = (char*)malloc(resp_buf_size); // points to a memory-block
     if (resp_buf_dummy)
@@ -280,7 +280,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
             }
             if (ret == 0)
             {
-                TRACE_I("connection closed");
+                // TRACE_I("connection closed");
                 break;
             }
             len = ret;
@@ -311,6 +311,11 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
         {
             *resp_buf = resp_buf_dummy;
             TRACE_S("&result==[%p] --> *resp_buf=>[%p]  ", resp_buf, *resp_buf);
+        }
+        else
+        {
+            *resp_buf = NULL;
+            free(resp_buf_dummy);
         }
     }
 

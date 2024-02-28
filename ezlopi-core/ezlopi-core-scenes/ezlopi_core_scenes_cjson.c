@@ -57,6 +57,7 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_ITEM:
             case EZLOPI_VALUE_TYPE_STRING:
             case EZLOPI_VALUE_TYPE_INTERVAL:
+            case EZLOPI_VALUE_TYPE_SCENEID:
             {
                 __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
                 // __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
@@ -419,7 +420,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
                     {
-                        #warning "adding reference vs duplicating the object?";
+                        // #warning "adding reference vs duplicating the object?";
                         cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);
                         break;
                     }
@@ -499,7 +500,6 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
                     case EZLOPI_VALUE_TYPE_DEVICE:
                     case EZLOPI_VALUE_TYPE_EXPRESSION:
-
                     case EZLOPI_VALUE_TYPE_MAX:
                     {
                         TRACE_W("Value type not implemented!, curr-type: %d", curr_field->value_type);

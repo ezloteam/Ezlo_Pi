@@ -167,7 +167,8 @@ uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v
         ret |= (1 << 4);
         char field_hr_mm[10] = { 0 };
         strftime(field_hr_mm, 10, "%H:%M", info);
-        field_hr_mm[10] = '\0';
+        field_hr_mm[9] = '\0';
+        // TRACE_S("[field_hr_mm: %s]", field_hr_mm);
 
         int array_size = cJSON_GetArraySize(cj_time_arr);
         for (int i = 0; i < array_size; i++)
@@ -175,7 +176,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v
             cJSON* array_item = cJSON_GetArrayItem(cj_time_arr, i);
             if (array_item && cJSON_IsString(array_item))
             {
-                TRACE_S("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
+                // TRACE_S("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
                 if (0 == strncmp(array_item->valuestring, field_hr_mm, 10))
                 {
                     ret |= (1 << 0); // One of the TIME-condition has been met.
@@ -210,7 +211,7 @@ uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fi
             cJSON* array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
-                TRACE_S("Weekdays activate_%d: %d, [field_weekdays: %d]", i, (int)(array_item->valuedouble), field_weekdays);
+                // TRACE_S("Weekdays activate_[%d]: %d, [field_weekdays: %d]", i, (int)(array_item->valuedouble), field_weekdays);
                 if ((int)(array_item->valuedouble) == field_weekdays)
                 {
                     ret |= (1 << 1); // One of the WEEKDAYS-condition has been met.
@@ -459,13 +460,13 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
     if (tm_mday && user_data)
     {
         // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
-        // char tmp_url[] = "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140";
-        // char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: close\r\n";
-        // char tmp_web_server[] = "api.sunrisesunset.io";
+        char tmp_url[] = "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140";
+        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: close\r\n";
+        char tmp_web_server[] = "api.sunrisesunset.io";
 
-        char tmp_url[] = "https://official-joke-api.appspot.com/random_joke";
-        char tmp_headers[] = "Host: official-joke-api.appspot.com\r\nAccept: */*\r\nConnection: close\r\n";
-        char tmp_web_server[] = "official-joke-api.appspot.com";
+        // char tmp_url[] = "https://official-joke-api.appspot.com/random_joke";
+        // char tmp_headers[] = "Host: official-joke-api.appspot.com\r\nAccept: */*\r\nConnection: close\r\n";
+        // char tmp_web_server[] = "official-joke-api.appspot.com";
 
         s_ezlopi_core_http_mbedtls_t tmp_config = {
             .method = HTTP_METHOD_GET,
@@ -503,9 +504,9 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* ch
     {
         // Default values to store start and end boundries
         struct tm tmp_time = { 0 };
-        char time_diff[10];
 
         // Nox, extract & add :'tm_offs_val'
+        char time_diff[10];
         snprintf(time_diff, 10, "%s", tm_offs_val);
         time_diff[9] = '\0';
         char* ptr1 = NULL;
@@ -605,7 +606,7 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
         s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
         if (user_data && (info->tm_mday != user_data->curr_tm_day))
         {
-            TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
+            // TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
             user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7)) ? ISSUNSTATE_INTIME_MODE
@@ -682,7 +683,7 @@ uint8_t issunstate_eval_range(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cur
         s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
         if ((user_data) && (0 != user_data->sunstate_mode))
         {
-            TRACE_S("checking midnight range offset");
+            // TRACE_S("checking midnight range offset");
             flag_check |= (1 << 7); // indicates : midnight-range
             flag_check |= issunstate_check_mdrn(user_data->sunstate_mode, curr_field->field_value.u_value.value_string, info, &(user_data->defined_moment));
         }
@@ -798,7 +799,7 @@ int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info
                 }
             }
         }
-        TRACE_S("offset[%d](intime=0,before=1,after=2,undefined=3) , SunState[%d](sunrise=1,sunset=2) , FLAG_STATUS: %#x", (int)user_data->tmoffs_type, user_data->sunstate_mode, flag_check);
+        // TRACE_S("offset[%d](intime=0,before=1,after=2,undefined=3) , SunState[%d](sunrise=1,sunset=2) , FLAG_STATUS: %#x", (int)user_data->tmoffs_type, user_data->sunstate_mode, flag_check);
     }
 
     return ret;
