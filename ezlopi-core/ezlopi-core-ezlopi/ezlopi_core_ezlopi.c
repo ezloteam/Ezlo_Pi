@@ -15,18 +15,11 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_mdns.h"
 
-#ifdef EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 #include "ezlopi_core_ethernet.h"
-#endif // EZPI_CORE_ENABLE_ETH
-
-// #include "ezlopi_service_uart.h"
-// #include "ezlopi_service_timer.h"
-// #include "ezlopi_service_webprov.h"
-// #include "ezlopi_service_gpioisr.h"
-// #include "ezlopi_service_ble.h"
-// #include "ezlopi_service_meshbot.h"
-// #include "ezlopi_service_modes.h"
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
 #include "ezlopi_hal_system_info.h"
 
@@ -35,10 +28,6 @@ static void ezlopi_initialize_devices_v3(void);
 void ezlopi_init(void)
 {
 
-    gpio_install_isr_service(0);
-
-    // EZPI_SERVICE_uart_init();
-    // gpio_isr_service_init();
 
     // Init memories
     ezlopi_nvs_init();
@@ -62,19 +51,20 @@ void ezlopi_init(void)
     ezlopi_core_modes_init();
     ezlopi_room_init();
 
-    // ezlopi_ble_service_init();
 
-#ifdef EZPI_SERV_ENABLE_MESHBOTS
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-#ifdef EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
     ezlopi_ethernet_init();
-#endif // EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
+
+    ezlopi_core_initialize_mdns();
 
     ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);

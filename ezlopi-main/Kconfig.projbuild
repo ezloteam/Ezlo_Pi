@@ -1,0 +1,49 @@
+
+menu "EzloPi User Config"
+    
+    config EZPI_UTIL_ENABLE_TRACE
+    bool "Enable trace component for logging"
+    default y
+    help
+        ezlopi-util-trace component is enabled to log the outputs to the serial monitor
+    
+    config EZPI_CORE_ENABLE_ETH
+    bool "Enable ethernet component"
+    depends on ETH_USE_SPI_ETHERNET
+    default n
+    help 
+        ezlopi-core-ethernet component is enabled
+    
+    config EZPI_SERV_ENABLE_MESHBOTS
+    bool "Enable meshbot service"
+    default y
+    help
+        Enable meshbot services for scenes
+    
+    config EZLOPI_BLE_ENALBE_PASSKEY
+    bool "Enable BLE pass key"
+    default n
+    help
+        Enable BLE pass key
+    
+    config EZLOPI_BLE_ENALBE_PAIRING
+    bool "Enable BLE pairing"
+    default y
+    help
+        Enable BLE pairing
+    
+    config EZPI_MDNS_HOSTNAME
+    string "mDNS hostname"
+    default "ezlopi_device"
+    help
+        Set mDNS hostname
+    
+    config EZPI_MDNS_INSTANCE_NAME
+    string "mDNS instance name"
+    default "ezlopi_serial"
+    help 
+        Set mDNS instance name
+
+endmenu
+
+

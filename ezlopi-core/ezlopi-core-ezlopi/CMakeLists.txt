@@ -6,7 +6,11 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-wifi
         ezlopi-core-modes
         ezlopi-core-sntp
+        ezlopi-core-ble
+        ezlopi-core-scenes    
         ezlopi-util-trace
+        ezlopi-core-mdns   
+
 )
 
 set(EZLOPI_CLOUD_COMPONENTS

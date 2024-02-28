@@ -57,7 +57,7 @@ foreach(component ${external_components_list})
     LIST(APPEND ALL_COMPONENTS ${SUBDIRS})
 endforeach()
 
-LIST(APPEND ALL_COMPONENTS ezlopi-user-config main)
+LIST(APPEND ALL_COMPONENTS ezlopi-user-config ezlopi-main)
 
 set(EXTRA_COMPONENT_DIRS ${ALL_COMPONENTS} ) # add the list of directories 'SUBDIRS' to 'EXTRA_COMPONENT_DIRS'(ESP32 VARIABLES), links the external components
 message(STATUS "EXTRA_COMPONENTS_DIRS: ${EXTRA_COMPONENT_DIRS}\r\n")
