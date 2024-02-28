@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-    typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, void* arg);
+    typedef void (*f_ezlopi_wifi_event_upcall)(esp_event_base_t event, int32_t event_id, void *arg);
 
     typedef struct ll_ezlopi_wifi_event_upcall
     {
@@ -30,7 +30,6 @@ extern "C"
     void ezlopi_wifi_set_new_wifi_flag(void);
     void ezlopi_wifi_initialize(void);
     esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass);
-    void ezlopi_wifi_connect_from_nvs(void);
     void ezlopi_wifi_connect_from_id_bin(void);
     int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms);
     esp_netif_ip_info_t* ezlopi_wifi_get_ip_infos(void);

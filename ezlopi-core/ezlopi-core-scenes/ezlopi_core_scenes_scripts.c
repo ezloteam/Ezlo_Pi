@@ -10,6 +10,7 @@
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
 
+#include "corelib.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_scenes_scripts.h"

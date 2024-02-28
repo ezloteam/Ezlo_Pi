@@ -85,19 +85,19 @@ static int __init(l_ezlopi_item_t *item)
             if (ESP_OK == gpio_config(&io_conf))
             {
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
+                gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
+                ret = 1;
             }
-
-            gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
-            ret = 1;
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -154,7 +154,7 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
     CJSON_GET_VALUE_INT(cj_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
     item->interface.gpio.gpio_in.enable = true;

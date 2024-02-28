@@ -168,7 +168,6 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
             cJSON* root = cJSON_ParseWithLength((const char*)param->write.value, param->write.len);
             if (root)
             {
-
                 uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
                 uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
                 uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);

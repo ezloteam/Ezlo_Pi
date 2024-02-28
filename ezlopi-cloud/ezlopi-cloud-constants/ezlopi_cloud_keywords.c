@@ -216,6 +216,7 @@ const char *scene_status_finished_str = "finished";
 const char *scene_status_partially_finished_str = "partially_finished";
 const char *scene_status_failed_str = "failed";
 const char *scene_status_stopped_str = "stopped";
+
 const char *ezlopi_valueformatted_str = "valueFormatted";
 const char *ezlopi_value_default_str = "valueDefault";
 const char *ezlopi_text_str = "text";
@@ -258,11 +259,14 @@ const char *ezlopi_service_str = "service";
 const char *ezlopi_alarmed_str = "alarmed";
 const char *ezlopi_timeIsLeft_str = "timeIsLeft";
 const char *ezlopi_sources_str = "sources";
+const char *ezlopi_source_str = "source";
 const char *ezlopi_timestamp_str = "timestamp";
 const char *ezlopi_Home_str = "Home";
 const char *ezlopi_Away_str = "Away";
 const char *ezlopi_Night_str = "Night";
 const char *ezlopi_Vacation_str = "Vacation";
 const char *ezlopi_houseMode_str = "houseMode";
+
+const char *ezlopi_client_id_str = "client_id";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

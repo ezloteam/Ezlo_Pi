@@ -1,6 +1,5 @@
 #include <math.h>
 #include "ezlopi_util_trace.h"
- 
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -30,14 +29,14 @@ typedef struct s_gy61_data
 #define esp32S3_convert_mV_to_G(temp_vol) (((6.0f / 3000.0f) * (temp_vol - 100)) - 3.0f)
 #endif
 
-static int __0028_prepare(void *arg);
-static int __0028_init(l_ezlopi_item_t *item);
-static int __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0028_notify(l_ezlopi_item_t *item);
+static int __0028_prepare(void* arg);
+static int __0028_init(l_ezlopi_item_t* item);
+static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0028_notify(l_ezlopi_item_t* item);
 
-static float __update_gy61_axis_value(l_ezlopi_item_t *item);
+static float __update_gy61_axis_value(l_ezlopi_item_t* item);
 //--------------------------------------------------------------------------------------------------------
-int sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -71,9 +70,9 @@ int sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t *item, voi
     return ret;
 }
 //-------------------------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *dev_name = NULL;
+    char* dev_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -83,7 +82,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -95,7 +94,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, void *user_da
     item->user_arg = user_data;
 }
 
-static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     if (item && cj_device)
     {
@@ -103,54 +102,54 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
         item->interface.adc.resln_bit = 3;
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_INT(cj_device, "gpio1", item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.adc.gpio_num);
             TRACE_S("Accel X-axis gpio1: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_INT(cj_device, "gpio2", item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
             TRACE_S("Accel Y-axis gpio2: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_INT(cj_device, "gpio3", item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, item->interface.adc.gpio_num);
             TRACE_S("Accel Z-axis gpio3: %d ", item->interface.adc.gpio_num);
         }
     }
 }
 //-------------------------------------------------------------------------------------------------------------------------
 
-static int __0028_prepare(void *arg)
+static int __0028_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        cJSON *cj_device = device_prep_arg->cjson_device;
+        cJSON* cj_device = device_prep_arg->cjson_device;
 
-        s_gy61_data_t *gy61_value = (s_gy61_data_t *)malloc(sizeof(s_gy61_data_t));
+        s_gy61_data_t* gy61_value = (s_gy61_data_t*)malloc(sizeof(s_gy61_data_t));
         if (NULL != gy61_value)
         {
             memset(gy61_value, 0, sizeof(s_gy61_data_t));
-            l_ezlopi_device_t *gy61_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* gy61_device = ezlopi_device_add_device(cj_device);
             if (gy61_device)
             {
                 __prepare_device_cloud_properties(gy61_device, cj_device);
-                l_ezlopi_item_t *gy61_item_x = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
+                l_ezlopi_item_t* gy61_item_x = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
                 if (gy61_item_x)
                 {
                     gy61_item_x->cloud_properties.item_name = ezlopi_item_name_acceleration_x_axis;
                     __prepare_item_cloud_properties(gy61_item_x, gy61_value);
                     __prepare_item_interface_properties(gy61_item_x, cj_device);
                 }
-                l_ezlopi_item_t *gy61_item_y = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
+                l_ezlopi_item_t* gy61_item_y = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
                 if (gy61_item_y)
                 {
                     gy61_item_y->cloud_properties.item_name = ezlopi_item_name_acceleration_y_axis;
                     __prepare_item_cloud_properties(gy61_item_y, gy61_value);
                     __prepare_item_interface_properties(gy61_item_y, cj_device);
                 }
-                l_ezlopi_item_t *gy61_item_z = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
+                l_ezlopi_item_t* gy61_item_z = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
                 if (gy61_item_z)
                 {
                     gy61_item_z->cloud_properties.item_name = ezlopi_item_name_acceleration_z_axis;
@@ -176,114 +175,142 @@ static int __0028_prepare(void *arg)
     return ret;
 }
 
-static int __0028_init(l_ezlopi_item_t *item)
-{
-    int ret = 0;
-    if (NULL != item)
-    {
-        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
-        {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
-        }
-    }
-    return ret;
-}
-
-static int __0028_get_cjson_value(l_ezlopi_item_t *item, void *arg)
-{
-    int ret = 0;
-    if (item && arg)
-    {
-        cJSON *cj_result = (cJSON *)arg;
-        if (cj_result)
-        {
-            s_gy61_data_t *user_data = ((s_gy61_data_t *)item->user_arg);
-            if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
-            {
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->x_data));
-                // TRACE_S("x-axis-G : %.2f", user_data->x_data);
-                free(valueFormatted);
-            }
-            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
-            {
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->y_data));
-                // TRACE_S("y-axis-G : %.2f", user_data->y_data);
-                free(valueFormatted);
-            }
-            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
-            {
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->z_data));
-                // TRACE_S("z-axis-G : %.2f", user_data->z_data);
-                free(valueFormatted);
-            }
-            ret = 1;
-        }
-    }
-    return ret;
-}
-
-static int __0028_notify(l_ezlopi_item_t *item)
+static int __0028_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
         s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
-        float new_value = 0;
-        if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+        if (user_data)
         {
-            new_value = __update_gy61_axis_value(item);
-
-            if (fabs((user_data->x_data) - new_value) > 0.5)
+            if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
             {
-                user_data->x_data = new_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                free(item->user_arg); // this will free ; memory address linked to all items
+                item->user_arg = NULL;
+                ezlopi_device_free_device_by_item(item);
             }
         }
-        if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+        else
         {
-            new_value = __update_gy61_axis_value(item);
-            if (fabs((user_data->y_data) - new_value) > 0.5)
-            {
-                user_data->y_data = new_value;
-                ezlopi_device_value_updated_from_device_v3(item);
-            }
+            ret = -1;
+            ezlopi_device_free_device_by_item(item);
         }
-        if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
-        {
-            new_value = __update_gy61_axis_value(item);
-            if (fabs((user_data->z_data) - new_value) > 0.5)
-            {
-                user_data->z_data = new_value;
-                ezlopi_device_value_updated_from_device_v3(item);
-            }
-        }
-        ret = 1;
     }
     return ret;
 }
 
-static float __update_gy61_axis_value(l_ezlopi_item_t *item)
+static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
+{
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON* cj_result = (cJSON*)arg;
+        if (cj_result)
+        {
+            s_gy61_data_t* user_data = ((s_gy61_data_t*)item->user_arg);
+            if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+            {
+                cJSON_AddNumberToObject(cj_result, "value", (user_data->x_data));
+                // TRACE_I("x-axis-G : %.2f", user_data->x_data);
+                char *valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+            }
+            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+            {
+                cJSON_AddNumberToObject(cj_result, "value", (user_data->y_data));
+                // TRACE_I("y-axis-G : %.2f", user_data->y_data);
+                char *valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+            }
+            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+            {
+                cJSON_AddNumberToObject(cj_result, "value", (user_data->z_data));
+                // TRACE_I("z-axis-G : %.2f", user_data->z_data);
+                char *valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
+                if (valueFormatted)
+                {
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                    free(valueFormatted);
+                }
+            }
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+static int __0028_notify(l_ezlopi_item_t* item)
+{
+    int ret = 0;
+    if (item)
+    {
+        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
+        if (user_data)
+        {
+            float new_value = 0;
+            if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
+            {
+                new_value = __update_gy61_axis_value(item);
+
+                if (fabs((user_data->x_data) - new_value) > 0.5)
+                {
+                    user_data->x_data = new_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+            {
+                new_value = __update_gy61_axis_value(item);
+                if (fabs((user_data->y_data) - new_value) > 0.5)
+                {
+                    user_data->y_data = new_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+            {
+                new_value = __update_gy61_axis_value(item);
+                if (fabs((user_data->z_data) - new_value) > 0.5)
+                {
+                    user_data->z_data = new_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
+            }
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+static float __update_gy61_axis_value(l_ezlopi_item_t* item)
 {
     float G_data = 0;
     if (item)
     {
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         int temp_vol = ezlopi_analog_data.voltage;
 #if (CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32C3)

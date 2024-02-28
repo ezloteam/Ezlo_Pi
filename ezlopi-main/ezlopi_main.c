@@ -1,27 +1,58 @@
 #include <stdio.h>
 
-#include "EZLOPI_USER_CONFIG.h"
-
 #include <esp_system.h>
+#include <driver/adc.h>
+#include <driver/i2c.h>
 #include <driver/gpio.h>
+#include <mbedtls/config.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+
 #include "ezlopi_util_trace.h"
+
 #include "ezlopi_core_ezlopi.h"
+#include "ezlopi_service_ota.h"
+#include "ezlopi_service_ble.h"
+#include "ezlopi_service_uart.h"
+#include "ezlopi_service_timer.h"
+#include "ezlopi_service_modes.h"
+#include "ezlopi_service_meshbot.h"
+#include "ezlopi_service_gpioisr.h"
+#include "ezlopi_service_webprov.h"
+#include "ezlopi_service_ws_server.h"
+#include "ezlopi_service_broadcast.h"
+
+#define ENABLE_HEARTBIT_LED 0
 
 static void blinky(void* pv);
 
 void app_main(void)
 {
+    gpio_install_isr_service(0);
 
-    xTaskCreate(blinky, "blinky", 2048, NULL, tskIDLE_PRIORITY, NULL);
+    gpio_isr_service_init();
+    EZPI_SERVICE_uart_init();
+
     ezlopi_init();
+
+    timer_service_init();
+    ezlopi_ble_service_init();
+
+    ezlopi_scenes_meshbot_init();
+    ezlopi_service_modes_init();
+
+    ezlopi_service_ws_server_start();
+    ezlopi_service_web_provisioning_init();
+
+    ota_service_init();
+    ezlopi_service_broadcast_init();
+
+    xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
 }
 
 static void blinky(void* pv)
 {
-
-#ifdef EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
+#if (1 == ENABLE_HEARTBIT_LED)
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << GPIO_NUM_2),
         .mode = GPIO_MODE_OUTPUT,
@@ -37,20 +68,21 @@ static void blinky(void* pv)
     uint32_t count = 0;
     while (1)
     {
-
-#ifdef EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
+#if (1 == ENABLE_HEARTBIT_LED)
         state ^= 1;
         gpio_set_level(GPIO_NUM_2, state);
 #endif
+
         if (count++ > 10)
         {
-            TRACE_D("-----------------------------------------");
-            TRACE_D("esp_get_free_heap_size: %.2fKB", (float)(esp_get_free_heap_size() / 1024.0));
-            TRACE_D("esp_get_minimum_free_heap_size: %.2fKB", (float)(esp_get_minimum_free_heap_size() / 1024.0));
-            TRACE_D("-----------------------------------------");
             count = 0;
+
+            TRACE_D("----------------------------------------------");
+            TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+            TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+            TRACE_D("----------------------------------------------");
         }
 
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

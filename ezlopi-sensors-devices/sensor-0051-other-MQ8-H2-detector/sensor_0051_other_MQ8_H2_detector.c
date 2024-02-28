@@ -71,14 +71,8 @@ int sensor_0051_other_MQ8_H2_detector(e_ezlopi_actions_t action, l_ezlopi_item_t
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        if (item)
-        {
-            s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
-            if (true == MQ8_value->Calibration_complete_H2)
-            {
-                __0051_notify(item);
-            }
-        }
+        __0051_notify(item);
+
         break;
     }
     default:
@@ -153,37 +147,64 @@ static int __0051_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        if ((ezlopi_item_name_gas_alarm == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
         {
-            // intialize digital_pin
-            gpio_config_t input_conf = {};
-            input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
-            input_conf.intr_type = GPIO_INTR_DISABLE;
-            input_conf.mode = GPIO_MODE_INPUT;
-            input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-            input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-            gpio_config(&input_conf);
-            ret = 1;
-        }
-        if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
-        {
-            // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            // calibrate if not done
-            s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
-            if (false == MQ8_value->Calibration_complete_H2)
-            {
-                xTaskCreate(__calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+            { // intialize digital_pin
+                gpio_config_t input_conf = {};
+                input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
+                input_conf.intr_type = GPIO_INTR_DISABLE;
+                input_conf.mode = GPIO_MODE_INPUT;
+                input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+                input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            else
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                ret = -1;
+                TRACE_E("Deleting Item!!");
+                ezlopi_device_free_device_by_item(item); // remove the item itself
+            }
+        }
+        else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+        {
+
+            s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
+            if (MQ8_value)
+            {
+                if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+                { // initialize analog_pin
+                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    { // calibrate if not done
+                        if (false == MQ8_value->Calibration_complete_H2)
+                        {
+                            xTaskCreate(__calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                        }
+                        ret = 1;
+                    }
+                    else
+                    {
+                        ret = -1;
+                        TRACE_E("Deleting Item!!");
+                        free(item->user_arg);
+                        item->user_arg = NULL;
+                        ezlopi_device_free_device_by_item(item); // remove the item itself
+                    }
+                }
+                else
+                {
+                    ret = -1;
+                    TRACE_E("Deleting Item!!");
+                    free(item->user_arg);
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item); // remove the item itself
+                }
+            }
+            else
+            {
+                ret = -1;
+                TRACE_E("Deleting Item!!");
+                ezlopi_device_free_device_by_item(item); // remove the item itself
             }
         }
     }
@@ -215,7 +236,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("MQ8-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
 //------------------------------------------------------------------------------------------------------
@@ -280,13 +301,19 @@ static int __0051_get_item(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
                 cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
-            if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq8_value_t *MQ8_value = ((s_mq8_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ8_value->_H2_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ8_value->_H2_ppm);
-                free(valueFormatted);
+                if (MQ8_value)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ8_value->_H2_ppm);
+                    char *valueFormatted = ezlopi_valueformatter_float(MQ8_value->_H2_ppm);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
             ret = 1;
         }
@@ -307,13 +334,19 @@ static int __0051_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_gas");
                 cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_gas");
             }
-            if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq8_value_t *MQ8_value = ((s_mq8_value_t *)item->user_arg);
-                char *valueFormatted = ezlopi_valueformatter_float(MQ8_value->_H2_ppm);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ8_value->_H2_ppm);
-                free(valueFormatted);
+                if (MQ8_value)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ8_value->_H2_ppm);
+                    char *valueFormatted = ezlopi_valueformatter_float(MQ8_value->_H2_ppm);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
             ret = 1;
         }
@@ -343,15 +376,19 @@ static int __0051_notify(l_ezlopi_item_t *item)
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
-        if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
+        else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
             // extract the sensor_output_values
-            double new_value = (double)__extract_MQ8_sensor_ppm(item);
             s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
-            if (fabs((double)(MQ8_value->_H2_ppm) - new_value) > 0.0001)
+            if ((MQ8_value) && (true == MQ8_value->Calibration_complete_H2))
             {
-                MQ8_value->_H2_ppm = (float)new_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                double new_value = (double)__extract_MQ8_sensor_ppm(item);
+
+                if (fabs((double)(MQ8_value->_H2_ppm) - new_value) > 0.0001)
+                {
+                    MQ8_value->_H2_ppm = (float)new_value;
+                    ezlopi_device_value_updated_from_device_v3(item);
+                }
             }
         }
         ret = 1;
@@ -361,49 +398,53 @@ static int __0051_notify(l_ezlopi_item_t *item)
 //------------------------------------------------------------------------------------------------------
 static float __extract_MQ8_sensor_ppm(l_ezlopi_item_t *item)
 {
-    uint32_t mq8_adc_pin = item->interface.adc.gpio_num;
     s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
-    // calculation process
-    //-------------------------------------------------
-    s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-    // extract the mean_sensor_analog_output_voltage
-    float analog_sensor_volt = 0;
-    for (uint8_t x = 10; x > 0; x--)
+    if (MQ8_value)
     {
-        ezlopi_adc_get_adc_data(mq8_adc_pin, &ezlopi_analog_data);
+        // calculation process
+        //-------------------------------------------------
+        uint32_t mq8_adc_pin = item->interface.adc.gpio_num;
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+        // extract the mean_sensor_analog_output_voltage
+        float analog_sensor_volt = 0;
+        for (uint8_t x = 10; x > 0; x--)
+        {
+            ezlopi_adc_get_adc_data(mq8_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-        analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
+            analog_sensor_volt += ((float)(ezlopi_analog_data.voltage) * 2.0f);
 #else
-        analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
+            analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-        vTaskDelay(1);
+            vTaskDelay(1);
+        }
+        analog_sensor_volt = analog_sensor_volt / 10.0f;
+
+        //-----------------------------------------------------------------------------------
+        // Stage_2 : [from 'sensor_0051_ADC_MQ8_methane_gas_detector.h']
+
+        // 1. Calculate 'Rs_gas' for the gas detected
+        float Rs_gas = (((MQ8_VOLT_RESOLUTION_Vc * mq8_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq8_eqv_RL);
+
+        // 1.1 Calculate @ 'ratio' during H2 presence
+        double _ratio = (Rs_gas / ((MQ8_value->MQ8_R0_constant <= 0) ? (1.0f) : (MQ8_value->MQ8_R0_constant))); // avoid dividing by zero??
+        if (_ratio <= 0)
+        {
+            _ratio = 0;
+        }
+        //-------------------------------------------------
+
+        // 1.2 Calculate _H2_ppm
+        float _H2_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq8) / m_slope_mq8); // ---> _H2_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
+        if (_H2_ppm < 0)
+        {
+            _H2_ppm = 0; // No negative values accepted or upper datasheet recomendation.
+        }
+        TRACE_E("_H2_ppm [H2] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _H2_ppm, (float)_ratio, analog_sensor_volt);
+
+        //-------------------------------------------------
+        return _H2_ppm;
     }
-    analog_sensor_volt = analog_sensor_volt / 10.0f;
-
-    //-----------------------------------------------------------------------------------
-    // Stage_2 : [from 'sensor_0051_ADC_MQ8_methane_gas_detector.h']
-
-    // 1. Calculate 'Rs_gas' for the gas detected
-    float Rs_gas = (((MQ8_VOLT_RESOLUTION_Vc * mq8_eqv_RL) / (analog_sensor_volt / 1000.0f)) - mq8_eqv_RL);
-
-    // 1.1 Calculate @ 'ratio' during H2 presence
-    double _ratio = (Rs_gas / ((MQ8_value->MQ8_R0_constant <= 0) ? (1.0f) : (MQ8_value->MQ8_R0_constant))); // avoid dividing by zero??
-    if (_ratio <= 0)
-    {
-        _ratio = 0;
-    }
-    //-------------------------------------------------
-
-    // 1.2 Calculate _H2_ppm
-    float _H2_ppm = (float)pow(10, (((float)log10(_ratio)) - b_coeff_mq8) / m_slope_mq8); // ---> _H2_ppm = 10 ^ [ ( log(ratio) - b ) / m ]
-    if (_H2_ppm < 0)
-    {
-        _H2_ppm = 0; // No negative values accepted or upper datasheet recomendation.
-    }
-    TRACE_E("_H2_ppm [H2] : %.2f -> ratio[RS/R0] : %.2f -> Volts : %0.2fmv", _H2_ppm, (float)_ratio, analog_sensor_volt);
-
-    //-------------------------------------------------
-    return _H2_ppm;
+    return 0;
 }
 
 static void __calibrate_MQ8_R0_resistance(void *params)
@@ -412,55 +453,57 @@ static void __calibrate_MQ8_R0_resistance(void *params)
     if (NULL != item)
     {
         s_mq8_value_t *MQ8_value = (s_mq8_value_t *)item->user_arg;
-
-        uint32_t mq8_adc_pin = item->interface.adc.gpio_num;
-        //-------------------------------------------------
-        // let the sensor to heat for 20seconds
-        for (uint8_t j = 20; j > 0; j--)
+        if (MQ8_value)
         {
-            TRACE_E("Heating sensor.........time left: %d sec", j);
-            vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
-        }
-        //-------------------------------------------------
-        // extract the mean_sensor_analog_output_voltage
-        float _sensor_volt = 0;
-        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
-        for (uint8_t i = 100; i > 0; i--)
-        {
-            if (i % 20 == 0)
+            uint32_t mq8_adc_pin = item->interface.adc.gpio_num;
+            //-------------------------------------------------
+            // let the sensor to heat for 20seconds
+            for (uint8_t j = 20; j > 0; j--)
             {
-                TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
+                TRACE_E("Heating sensor.........time left: %d sec", j);
+                vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
             }
-            // extract ADC values
-            ezlopi_adc_get_adc_data(mq8_adc_pin, &ezlopi_analog_data);
+            //-------------------------------------------------
+            // extract the mean_sensor_analog_output_voltage
+            float _sensor_volt = 0;
+            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+            for (uint8_t i = 100; i > 0; i--)
+            {
+                if (i % 20 == 0)
+                {
+                    TRACE_W("Please Wait..Collecting Ambient Air data ........... [Avoid Smokes/gases]");
+                }
+                // extract ADC values
+                ezlopi_adc_get_adc_data(mq8_adc_pin, &ezlopi_analog_data);
 #ifdef VOLTAGE_DIVIDER_ADDED
-            _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
+                _sensor_volt += (float)((ezlopi_analog_data.voltage) * 2.0f); // [0-2.4V] X2
 #else
-            _sensor_volt += (float)(ezlopi_analog_data->voltage);
+                _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
-            vTaskDelay(1); // 10ms
-        }
-        _sensor_volt = _sensor_volt / 100.0f;
+                vTaskDelay(1); // 10ms
+            }
+            _sensor_volt = _sensor_volt / 100.0f;
 
-        //-------------------------------------------------
-        // Calculate the 'Rs' of heater during clean air [calibration phase]
-        // Range -> [2Kohm - 20Kohm]
-        float RS_calib = 0;                                                                         // Define variable for sensor resistance
-        RS_calib = ((MQ8_VOLT_RESOLUTION_Vc * mq8_eqv_RL) / (_sensor_volt / 1000.0f)) - mq8_eqv_RL; // Calculate RS in fresh air
-        TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
-        if (RS_calib < 0)
-        {
-            RS_calib = 0; // No negative values accepted.
+            //-------------------------------------------------
+            // Calculate the 'Rs' of heater during clean air [calibration phase]
+            // Range -> [2Kohm - 20Kohm]
+            float RS_calib = 0;                                                                         // Define variable for sensor resistance
+            RS_calib = ((MQ8_VOLT_RESOLUTION_Vc * mq8_eqv_RL) / (_sensor_volt / 1000.0f)) - mq8_eqv_RL; // Calculate RS in fresh air
+            TRACE_E("CALIB_TASK -> 'RS_calib' = %.2f", RS_calib);
+            if (RS_calib < 0)
+            {
+                RS_calib = 0; // No negative values accepted.
+            }
+            // Calculate the R0_air which is constant through-out
+            MQ8_value->MQ8_R0_constant = (RS_calib / RatioMQ8CleanAir); // Calculate MQ8_R0_constant
+            TRACE_E("CALIB_TASK -> 'MQ8_R0_constant' = %.2f", MQ8_value->MQ8_R0_constant);
+            if (MQ8_value->MQ8_R0_constant < 0)
+            {
+                MQ8_value->MQ8_R0_constant = 0; // No negative values accepted.
+            }
+            // Set calibration_complete_H2 flag
+            MQ8_value->Calibration_complete_H2 = true;
         }
-        // Calculate the R0_air which is constant through-out
-        MQ8_value->MQ8_R0_constant = (RS_calib / RatioMQ8CleanAir); // Calculate MQ8_R0_constant
-        TRACE_E("CALIB_TASK -> 'MQ8_R0_constant' = %.2f", MQ8_value->MQ8_R0_constant);
-        if (MQ8_value->MQ8_R0_constant < 0)
-        {
-            MQ8_value->MQ8_R0_constant = 0; // No negative values accepted.
-        }
-        // Set calibration_complete_H2 flag
-        MQ8_value->Calibration_complete_H2 = true;
     }
     vTaskDelete(NULL);
 }

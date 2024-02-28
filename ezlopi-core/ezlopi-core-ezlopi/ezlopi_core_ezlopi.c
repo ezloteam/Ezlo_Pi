@@ -21,15 +21,6 @@
 #include "ezlopi_core_ethernet.h"
 #endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
-#include "ezlopi_service_uart.h"
-#include "ezlopi_service_ota.h"
-#include "ezlopi_service_timer.h"
-#include "ezlopi_service_webprov.h"
-#include "ezlopi_service_gpioisr.h"
-#include "ezlopi_service_ble.h"
-#include "ezlopi_service_meshbot.h"
-#include "ezlopi_service_modes.h"
-
 #include "ezlopi_hal_system_info.h"
 
 static void ezlopi_initialize_devices_v3(void);
@@ -37,10 +28,6 @@ static void ezlopi_initialize_devices_v3(void);
 void ezlopi_init(void)
 {
 
-    gpio_install_isr_service(0);
-
-    EZPI_SERVICE_uart_init();
-    gpio_isr_service_init();
 
     // Init memories
     ezlopi_nvs_init();
@@ -64,10 +51,8 @@ void ezlopi_init(void)
     ezlopi_core_modes_init();
     ezlopi_room_init();
 
-    ezlopi_ble_service_init();
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-    ezlopi_scenes_meshbot_init();
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
@@ -87,17 +72,6 @@ void ezlopi_init(void)
     ezlopi_event_queue_init();
     ezlopi_ping_init();
     ezlopi_timer_start_1000ms();
-    ezlopi_ping_init();
-
-    EZPI_CORE_sntp_init();
-
-    timer_service_init();
-
-    web_provisioning_init();
-
-    ota_service_init();
-
-    ezlopi_service_modes_init();
 }
 
 static void ezlopi_initialize_devices_v3(void)

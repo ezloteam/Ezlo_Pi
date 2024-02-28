@@ -13,19 +13,19 @@
 
 #include "sensor_0033_ADC_turbidity.h"
 
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __notify(l_ezlopi_item_t* item);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __get_item_list(l_ezlopi_item_t* item, void* arg);
+static int __prepare(void *arg);
+static int __init(l_ezlopi_item_t *item);
+static int __notify(l_ezlopi_item_t *item);
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __get_item_list(l_ezlopi_item_t *item, void *arg);
 
-static const char* water_filter_replacement_alarm_states[] = {
+static const char *water_filter_replacement_alarm_states[] = {
     "water_filter_ok",
     "replace_water_filter",
     "unknown",
 };
 
-int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -63,18 +63,18 @@ int sensor_0033_ADC_turbidity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, 
     return ret;
 }
 
-static int __get_item_list(l_ezlopi_item_t* item, void* arg)
+static int __get_item_list(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON* cjson_propertise = (cJSON*)arg;
+    cJSON *cjson_propertise = (cJSON *)arg;
     if (cjson_propertise)
     {
-        cJSON* json_array_enum = cJSON_CreateArray();
+        cJSON *json_array_enum = cJSON_CreateArray();
         if (NULL != json_array_enum)
         {
             for (uint8_t i = 0; i < TURBIDITY__MAX; i++)
             {
-                cJSON* json_value = cJSON_CreateString(water_filter_replacement_alarm_states[i]);
+                cJSON *json_value = cJSON_CreateString(water_filter_replacement_alarm_states[i]);
                 if (NULL != json_value)
                 {
                     cJSON_AddItemToArray(json_array_enum, json_value);
@@ -83,11 +83,11 @@ static int __get_item_list(l_ezlopi_item_t* item, void* arg)
             cJSON_AddItemToObject(cjson_propertise, ezlopi_enum_str, json_array_enum);
         }
 
-        s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
+        s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-        const char* ezlopi_water_present_turbidity_state = NULL;
+        const char *ezlopi_water_present_turbidity_state = NULL;
         if (1000 > ezlopi_analog_data.voltage)
         {
             ezlopi_water_present_turbidity_state = "replace_water_filter";
@@ -112,15 +112,15 @@ static int __get_item_list(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    const char* tmp_sensor_state = NULL;
-    char* turbidity_sensor_state = (char*)item->user_arg;
+    const char *tmp_sensor_state = NULL;
+    char *turbidity_sensor_state = (char *)item->user_arg;
 
     if (turbidity_sensor_state)
     {
-        s_ezlopi_analog_data_t tmp_analog_data = { .value = 0, .voltage = 0 };
+        s_ezlopi_analog_data_t tmp_analog_data = {.value = 0, .voltage = 0};
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_analog_data);
         if (1000 > tmp_analog_data.voltage)
         {
@@ -140,13 +140,13 @@ static int __notify(l_ezlopi_item_t* item)
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
-        char* turbidity_sensor_state = (char*)item->user_arg;
+        cJSON *cj_result = (cJSON *)arg;
+        char *turbidity_sensor_state = (char *)item->user_arg;
         if (turbidity_sensor_state)
         {
             cJSON_AddStringToObject(cj_result, ezlopi_value_str, turbidity_sensor_state);
@@ -157,30 +157,28 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
     if (item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            {
+                ret = 1;
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -194,7 +192,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -206,31 +204,31 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, v
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->user_arg = user_arg;
 }
 
-static int __prepare(void* arg)
+static int __prepare(void *arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
         if (device)
         {
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t* item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
+            l_ezlopi_item_t *item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
             if (item_turbidity)
             {
                 item_turbidity->cloud_properties.device_id = device->cloud_properties.device_id;
-                char* turbidity_sensor_states = (char*)malloc(40 * sizeof(char));
+                char *turbidity_sensor_states = (char *)malloc(40 * sizeof(char));
                 if (turbidity_sensor_states)
                 {
 
                     memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));
-                    __prepare_item_properties(item_turbidity, prep_arg->cjson_device, (void*)turbidity_sensor_states);
+                    __prepare_item_properties(item_turbidity, prep_arg->cjson_device, (void *)turbidity_sensor_states);
                     ret = 1;
                 }
             }

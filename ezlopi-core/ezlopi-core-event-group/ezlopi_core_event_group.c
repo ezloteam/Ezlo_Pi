@@ -4,6 +4,8 @@
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
 
+#include "ezlopi_util_trace.h"
+
 #include "ezlopi_core_event_group.h"
 
 static EventGroupHandle_t ezlopi_event_group_handle = NULL;
@@ -42,6 +44,8 @@ int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time
         {
             ret = 1;
         }
+
+        // TRACE_D("event-bits: %08x, event: %08x", event_bits, event);
     }
     else
     {

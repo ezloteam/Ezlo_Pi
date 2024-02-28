@@ -1,6 +1,6 @@
 //          ("name",           func,          updater_func)
 CLOUD_METHOD("hub.items.list", items_list_v3, NULL)
-CLOUD_METHOD("hub.item.value.set", items_set_value_v3, items_update_v3)
+CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
@@ -85,7 +85,7 @@ CLOUD_METHOD("hub.scenes.expressions.delete", scenes_expressions_delete, NULL)
 
 CLOUD_METHOD("hub.nma.register.repeat", register_repeat, NULL)
 
-CLOUD_METHOD("hub.reboot", __hub_reboot, NULL)
+CLOUD_METHOD("hub.reboot", ezlopi_core_ezlopi_methods_reboot, NULL)
 CLOUD_METHOD("registered", registered, NULL)
 
 CLOUD_METHOD("hub.coordinates.set", hub_coordinates_set, NULL)

@@ -44,6 +44,21 @@
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
+
+#define CJSON_GET_VALUE_GPIO(root, item_name, item_val)       \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item && o_item->type == cJSON_Number)           \
+        {                                                     \
+            item_val = o_item->valueint;                      \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = -1;                                    \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
+    }
+
 // TRACE_I("%s: %d", item_name, item_val);
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \

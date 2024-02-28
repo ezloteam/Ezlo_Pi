@@ -1,3 +1,4 @@
+firmware/**
 firmware/v*/**
 firmware/releaseNote.txt
 firmware/ezlopi/firmware/**

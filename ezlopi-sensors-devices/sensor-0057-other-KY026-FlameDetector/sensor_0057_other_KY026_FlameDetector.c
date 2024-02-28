@@ -99,10 +99,10 @@ static int __0057_prepare(void *arg)
         }
 
         //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        flame_t *FLAME_struct = (flame_t *)malloc(sizeof(flame_t));
-        if (NULL != FLAME_struct)
+        flame_t *flame_struct = (flame_t *)malloc(sizeof(flame_t));
+        if (NULL != flame_struct)
         {
-            memset(FLAME_struct, 0, sizeof(flame_t));
+            memset(flame_struct, 0, sizeof(flame_t));
             l_ezlopi_device_t *flame_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (flame_device_adc)
             {
@@ -111,20 +111,20 @@ static int __0057_prepare(void *arg)
                 if (flame_item_adc)
                 {
                     flame_item_adc->cloud_properties.device_id = flame_device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, FLAME_struct);
+                    __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, flame_struct);
                     ret = 1;
                 }
                 else
                 {
                     ret = -1;
                     ezlopi_device_free_device(flame_device_adc);
-                    free(FLAME_struct);
+                    free(flame_struct);
                 }
             }
             else
             {
                 ret = -1;
-                free(FLAME_struct);
+                free(flame_struct);
             }
         }
     }
@@ -136,31 +136,55 @@ static int __0057_init(l_ezlopi_item_t *item)
     int ret = 0;
     if (NULL != item)
     {
-        if ((ezlopi_item_name_heat_alarm == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+        if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
         {
-            // intialize digital_pin
-            gpio_config_t input_conf = {};
-            input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
-            input_conf.intr_type = GPIO_INTR_DISABLE;
-            input_conf.mode = GPIO_MODE_INPUT;
-            input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-            input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-            gpio_config(&input_conf);
-            ret = 1;
-        }
-        if ((ezlopi_item_name_temperature_changes == item->cloud_properties.item_name) && GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
-        {
-            // initialize analog_pin
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
-        }
-        if (0 == ret)
-        {
-            ret = -1;
-            if (item->user_arg)
+            if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
+            { // intialize digital_pin
+                gpio_config_t input_conf = {};
+                input_conf.pin_bit_mask = (1ULL << (item->interface.gpio.gpio_in.gpio_num));
+                input_conf.intr_type = GPIO_INTR_DISABLE;
+                input_conf.mode = GPIO_MODE_INPUT;
+                input_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+                input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
+            }
+            else
             {
-                free(item->user_arg);
-                item->user_arg = NULL;
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
+            }
+        }
+        else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
+        {
+            flame_t *flame_struct = (flame_t *)item->user_arg;
+            if (flame_struct)
+            {
+                if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+                { // initialize analog_pin
+                    if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+                    {
+                        ret = 1;
+                    }
+                    else
+                    {
+                        ret = -1;
+                        free(item->user_arg); // this will free ; memory address linked to all items
+                        item->user_arg = NULL;
+                        ezlopi_device_free_device_by_item(item);
+                    }
+                }
+                else
+                {
+                    ret = -1;
+                    free(item->user_arg); // this will free ; memory address linked to all items
+                    item->user_arg = NULL;
+                    ezlopi_device_free_device_by_item(item);
+                }
+            }
+            else
+            {
+                ret = -1;
+                ezlopi_device_free_device_by_item(item);
             }
         }
     }
@@ -190,7 +214,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t *item, cJSON *c
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("flame_> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
 //------------------------------------------------------------------------------------------------------
@@ -255,16 +279,21 @@ static int __0057_get_item(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
                 cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
-            if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
-                flame_t *FLAME_struct = (flame_t *)item->user_arg;
-
-                char *valueFormatted = ezlopi_valueformatter_float(FLAME_struct->_absorbed_percent);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLAME_struct->_absorbed_percent);
-                free(valueFormatted);
+                flame_t *flame_struct = (flame_t *)item->user_arg;
+                if (flame_struct)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
+                    char *valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
+                ret = 1;
             }
-            ret = 1;
         }
     }
     return ret;
@@ -283,13 +312,19 @@ static int __0057_get_cjson_value(l_ezlopi_item_t *item, void *arg)
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
                 cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "heat_ok");
             }
-            if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
-                flame_t *FLAME_struct = (flame_t *)item->user_arg;
-                char *valueFormatted = ezlopi_valueformatter_float(FLAME_struct->_absorbed_percent);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, FLAME_struct->_absorbed_percent);
-                free(valueFormatted);
+                flame_t *flame_struct = (flame_t *)item->user_arg;
+                if (flame_struct)
+                {
+                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
+                    char *valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
+                    if (valueFormatted)
+                    {
+                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                        free(valueFormatted);
+                    }
+                }
             }
             ret = 1;
         }
@@ -319,18 +354,21 @@ static int __0057_notify(l_ezlopi_item_t *item)
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
-        if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
+        else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
         {
-            flame_t *FLAME_struct = (flame_t *)item->user_arg;
-            float analog_sensor_volt = 0, max_volt_reading = 0;
-            // extract the sensor_output_values
-            __extract_KY026_sensor_value(item->interface.adc.gpio_num, &analog_sensor_volt, &max_volt_reading);
-            float new_percent = ((1 - (analog_sensor_volt / max_volt_reading)) * 100.0f);
-            // TRACE_E("Heat-detected: %.2f percent", _absorbed_percent);
-            if (new_percent != FLAME_struct->_absorbed_percent)
+            flame_t *flame_struct = (flame_t *)item->user_arg;
+            if (flame_struct)
             {
-                ezlopi_device_value_updated_from_device_v3(item);
-                FLAME_struct->_absorbed_percent = new_percent;
+                float analog_sensor_volt = 0, max_volt_reading = 0;
+                // extract the sensor_output_values
+                __extract_KY026_sensor_value(item->interface.adc.gpio_num, &analog_sensor_volt, &max_volt_reading);
+                float new_percent = ((1 - (analog_sensor_volt / max_volt_reading)) * 100.0f);
+                // TRACE_E("Heat-detected: %.2f percent", absorbed_percent);
+                if (new_percent != flame_struct->absorbed_percent)
+                {
+                    ezlopi_device_value_updated_from_device_v3(item);
+                    flame_struct->absorbed_percent = new_percent;
+                }
             }
         }
         ret = 1;

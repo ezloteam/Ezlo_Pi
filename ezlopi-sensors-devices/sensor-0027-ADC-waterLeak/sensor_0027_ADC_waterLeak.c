@@ -13,7 +13,6 @@
 
 #include "sensor_0027_ADC_waterLeak.h"
 
-
 const char *water_leak_alarm_states[] = {
     "no_water_leak",
     "water_leak_detected",
@@ -94,7 +93,7 @@ static void prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
 static void prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
 
@@ -214,17 +213,15 @@ static int __init(l_ezlopi_item_t *item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
         {
-            ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-            ret = 1;
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            {
+                ret = 1;
+            }
         }
-        if (0 == ret)
+        else
         {
             ret = -1;
-            if (item->user_arg)
-            {
-                free(item->user_arg);
-                item->user_arg = NULL;
-            }
+            ezlopi_device_free_device_by_item(item);
         }
     }
 

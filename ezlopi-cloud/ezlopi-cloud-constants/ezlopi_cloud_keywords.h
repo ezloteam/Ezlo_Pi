@@ -107,6 +107,7 @@ extern const char* ezlopi_unreachable_reasons_str;
 extern const char* ezlopi_unreachable_actions_str;
 extern const char* ezlopi_manual_device_adding_str;
 extern const char* ezlopi_enum_str;
+
 extern const char* ezlopi_has_getter_str;
 extern const char* ezlopi_has_setter_str;
 extern const char* ezlopi_scale_str;
@@ -211,6 +212,7 @@ extern const char* ezlopi_baud_str;
 extern const char* ezlopi_baud_rate_str;
 extern const char* ezlopi_sceneId_str;
 extern const char* ezlopi_changed_by_str;
+
 extern const char* scene_status_started_str;
 extern const char* scene_status_finished_str;
 extern const char* scene_status_partially_finished_str;
@@ -218,9 +220,7 @@ extern const char* scene_status_failed_str;
 extern const char* scene_status_stopped_str;
 extern const char* ezlopi_armed_str;
 extern const char* ezlopi_subtype_str;
-extern const char* ezlopi_scale_str;
-extern const char* ezlopi_enum_str;
-extern const char* ezlopi_valueformatted_str;
+
 extern const char* ezlopi_value_default_str;
 extern const char* ezlopi_text_str;
 extern const char* ezlopi_label_str;
@@ -267,5 +267,8 @@ extern const char* ezlopi_Away_str;
 extern const char* ezlopi_Night_str;
 extern const char* ezlopi_Vacation_str;
 extern const char* ezlopi_houseMode_str;
+
+extern const char* ezlopi_client_id_str;
+extern const char* ezlopi_source_str;
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
