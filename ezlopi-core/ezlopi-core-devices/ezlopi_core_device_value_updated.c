@@ -32,7 +32,7 @@ int ezlopi_device_value_updated_from_device_v3(l_ezlopi_item_t* item)
                         if (data_to_send)
                         {
                             cJSON_Minify(data_to_send);
-                            ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                            // ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                             if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send)) {
                                 free(data_to_send);
                             }
@@ -75,7 +75,7 @@ int ezlopi_device_value_updated_from_device_item_id_v3(uint32_t item_id)
                     if (data_to_send)
                     {
                         cJSON_Minify(data_to_send);
-                        ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                        // ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                         if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
                         {
                             free(data_to_send);
@@ -118,7 +118,7 @@ int ezlopi_setting_value_updated_from_device_v3(l_ezlopi_device_settings_v3_t* s
                         if (data_to_send)
                         {
                             cJSON_Minify(data_to_send);
-                            ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                            // ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                             if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
                             {
                                 free(data_to_send);
@@ -159,7 +159,7 @@ int ezlopi_setting_value_updated_from_device_settings_id_v3(uint32_t setting_id)
                         if (data_to_send)
                         {
                             cJSON_Minify(data_to_send);
-                            ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                            // ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                             if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send)) {
                                 free(data_to_send);
                             }
@@ -197,13 +197,16 @@ int ezlopi_network_update_wifi_scan_process(cJSON* network_array)
                 if (data_to_send)
                 {
                     cJSON_Minify(data_to_send);
-                    ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                    // ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                    if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
+                    {
+                        free(data_to_send);
+                    }
                 }
                 else
                 {
                     ret = 1;
                 }
-                free(data_to_send);
             }
             else
             {

@@ -47,7 +47,7 @@ static void ota_service_process(void* pv)
                 if (data_to_send)
                 {
                     cJSON_Minify(data_to_send);
-                    ret_ota = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                    // ret_ota = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                     if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
                     {
                         free(data_to_send);

@@ -44,7 +44,7 @@ int ezlopi_websocket_client_send(char* data, uint32_t len)
 {
     int ret = 0;
 
-    if ((NULL != data) && (len > 0))
+    if ((NULL != data) && (len > 0) && (NULL != client))
     {
         if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
         {
