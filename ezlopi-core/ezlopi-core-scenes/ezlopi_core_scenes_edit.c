@@ -23,7 +23,10 @@ int ezlopi_core_scene_edit_store_updated_to_nvs(cJSON *cj_updated_scene)
             {
                 ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
                 cJSON_Minify(update_scene_str);
-                ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
+                if(1 == ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring))
+                {
+                    ret = 1;
+                }
             }
 
             free(update_scene_str);

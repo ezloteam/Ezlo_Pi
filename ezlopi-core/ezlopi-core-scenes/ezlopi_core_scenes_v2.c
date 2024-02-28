@@ -50,7 +50,7 @@ static l_scenes_list_v2_t* _scenes_populate(cJSON* cj_scene, uint32_t scene_id);
 int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON* cj_scene)
 {
     int ret = 0;
-
+    // TRACE_E("%s", cJSON_Print(cj_scene));
     if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene))
     {
         if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
@@ -264,6 +264,65 @@ void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id)
     {
         ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
     }
+}
+
+int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag)
+{
+    int ret = 0;
+    char* scenes_id_list_str = ezlopi_nvs_scene_get_v2();
+    if (scenes_id_list_str)
+    {
+        cJSON* cj_scene_id_list = cJSON_Parse(scenes_id_list_str);
+        if (cj_scene_id_list)
+        {
+            uint32_t list_len = cJSON_GetArraySize(cj_scene_id_list);
+
+            for (int idx = 0; idx < list_len; idx++)
+            {
+                cJSON* cj_scene_id = cJSON_GetArrayItem(cj_scene_id_list, idx);
+                if (cj_scene_id && (cj_scene_id->type == cJSON_Number))
+                {
+                    if (cj_scene_id->valuedouble == _id)
+                    {
+                        char tmp_buffer[32]; // store the scene name here
+                        uint32_t scene_id = (uint32_t)(cj_scene_id->valuedouble);
+                        snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
+
+                        char* scene_str = ezlopi_nvs_read_str(tmp_buffer);
+                        if (scene_str)
+                        {
+                            // converting string to cJSON format
+                            cJSON* cj_scene = cJSON_Parse(scene_str);
+                            if (cj_scene)
+                            {
+                                cJSON* enable_item = (cJSON_GetObjectItem(cj_scene, "enabled"));
+                                if (enable_item && cJSON_IsBool(enable_item))
+                                {
+                                    cJSON_ReplaceItemInObject(cj_scene, "enabled", cJSON_CreateBool(enabled_flag));
+                                    if (1 == ezlopi_scene_edit_by_id(_id, cj_scene))
+                                    {
+                                        ret = 1;
+                                    }
+                                    else 
+                                    {
+                                        TRACE_E("HERE");
+                                    }
+                                }
+                                cJSON_Delete(cj_scene);
+                            }
+                            // free the scene_name
+                            free(scene_str);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            cJSON_Delete(cj_scene_id_list);
+        }
+        free(scenes_id_list_str);
+    }
+    return ret;
 }
 
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
