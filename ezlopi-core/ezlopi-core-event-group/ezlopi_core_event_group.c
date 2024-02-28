@@ -45,7 +45,7 @@ int ezlopi_event_group_wait_for_event(e_ezlopi_event_t event, uint32_t wait_time
             ret = 1;
         }
 
-        TRACE_D("event-bits: %08x, event: %08x", event_bits, event);
+        // TRACE_D("event-bits: %08x, event: %08x", event_bits, event);
     }
     else
     {

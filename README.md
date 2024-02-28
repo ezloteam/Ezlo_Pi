@@ -2,7 +2,11 @@
 
 [![GitHub issues](https://img.shields.io/github/issues/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/issues) [![GitHub forks](https://img.shields.io/github/forks/ezloteam/Ezlo_Pi)](https://github.com/ezloteam/Ezlo_Pi/network)
 
-# ezlopi
+<picture>
+  <img src="ezlopi-doc/ezlopi_cover.png"  align="center" >
+</picture>
+
+# EzloPi
 EzloPi is a collaborative open-source project developed by Ezlo Innovation to enhance the functionalities of devices and platforms powered by the ESP32 chipset. It offers exceptional features that allow seamless configuration and control of ESP-based devices, empowering you to transform your automation concepts into reality.
 Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 
@@ -20,7 +24,7 @@ Checkout our [website](https://www.ezlopi.com/) for further guide and examples
 # 1. Getting started
 EzloPi features a [web-based configurator](https://config.ezlopi.com/) that allows you to easily configure your ESP32 device for various supported features. The web interface provides a user-friendly platform to set up relays, analog inputs, digital inputs, and I2C-based sensors on your ESP32 device with ease. Once configured, you can leverage our cloud and mobile app services to remotely control your device in real-time.
 
-![EzloPi web configurator](ezlop-doc/ezlopi_web_flasher.png)
+![EzloPi web configurator](ezlopi-doc/ezlopi_web_flasher.png)
 
 # 2. Customizing and building EzloPi firmware in your local setup
 It is required to have [ESP-IDF](https://github.com/espressif/esp-idf) installed in your machine.
