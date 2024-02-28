@@ -160,15 +160,34 @@ static char* generate_hostname(void)
 
 static void ezlopi_mdns_add_service_context(l_ezlopi_mdns_context_t* new_context)
 {
+#if 0
     if (new_context)
     {
         l_ezlopi_mdns_context_t* head_context = ezlopi_mdns_service_cntx;
         if (head_context == NULL)
         {
-            head_context = new_context;
+            ezlopi_mdns_service_cntx = new_context;
         }
         else
         {
+            while (head_context->next)
+            {
+                head_context = head_context->next;
+            }
+            head_context->next = new_context;
+        }
+    }
+#endif
+
+    if (new_context)
+    {
+        if (ezlopi_mdns_service_cntx == NULL)
+        {
+            ezlopi_mdns_service_cntx = new_context;
+        }
+        else
+        {
+            l_ezlopi_mdns_context_t* head_context = ezlopi_mdns_service_cntx;
             while (head_context->next)
             {
                 head_context = head_context->next;
@@ -222,7 +241,7 @@ static void ezlopi_mdns_init_service_context()
             uint64_t id_val = ezlopi_factory_info_v3_get_id();
             if (id_val)
             {
-                char* id_val_str = malloc(EZPI_MDNS_SERIAL_SIZE);
+                char* id_val_str = (char*)malloc(EZPI_MDNS_SERIAL_SIZE);
                 if (id_val_str)
                 {
 
@@ -234,11 +253,9 @@ static void ezlopi_mdns_init_service_context()
 
                     ezlopi_mdns_service_cntx_device_id->mdns_context = service_cntx_device_id;
                     ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_device_id);
-                    free(id_val_str);
                 }
             }
         }
-
     }
 }
 
@@ -259,13 +276,20 @@ static void __mdns_init(void* pv)
 
             char hostname[EZPI_MDNS_HOSTNAME_SIZE];
 
-
             l_ezlopi_mdns_context_t* mdns_contex_head = ezlopi_mdns_get_service_context();
-            while (mdns_contex_head) {
-                err = mdns_service_add(ezlopi_mdns_instance_name, "_http", "_tcp", 80, mdns_contex_head->mdns_context, 1);
-                mdns_contex_head = mdns_contex_head->next;
+            if (mdns_contex_head)
+            {
+                TRACE_I("-------- Adding mDNS Service ------------ ");
+                TRACE_I("\tKEY\t\t\t\tValue");
+                while (mdns_contex_head) {
+                    err = mdns_service_add(ezlopi_mdns_instance_name, "_http", "_tcp", 80, mdns_contex_head->mdns_context, 1);
+                    TRACE_I("\t%s\t%s", mdns_contex_head->mdns_context->key, mdns_contex_head->mdns_context->value);
+                    mdns_contex_head = mdns_contex_head->next;
+                    TRACE_E("Here !!");
+                }
+                break;
             }
-            break;
+
 
             // if (err == ESP_OK)
             // {
