@@ -333,10 +333,6 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
         strncpy((char*)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
         wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
 
-
-        ezlopi_factory_info_v3_free(ssid);
-        ezlopi_factory_info_v3_free(pass);
-
         esp_wifi_stop();
         esp_err_t _err = esp_wifi_set_mode(WIFI_MODE_STA);
         // TRACE_W("WiFi Err : %s", esp_err_to_name(_err));

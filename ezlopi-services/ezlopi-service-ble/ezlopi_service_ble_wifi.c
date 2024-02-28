@@ -19,14 +19,14 @@
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
 
-static s_linked_buffer_t *wifi_creds_linked_buffer = NULL;
+static s_linked_buffer_t* wifi_creds_linked_buffer = NULL;
 
-static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
-static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len);
+static void wifi_creds_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+static void wifi_creds_write_exec_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+static void wifi_creds_parse_and_connect(uint8_t* value, uint32_t len);
 // static void wifi_event_notify_upcall(esp_event_base_t event, void *arg);
 
-static s_gatt_service_t *wifi_ble_service;
+static s_gatt_service_t* wifi_ble_service;
 
 void ezlopi_ble_service_wifi_profile_init(void)
 {
@@ -46,7 +46,7 @@ void ezlopi_ble_service_wifi_profile_init(void)
     ezlopi_ble_gatt_add_characteristic(wifi_ble_service, &uuid, permission, properties, NULL, wifi_creds_write_func, wifi_creds_write_exec_func);
 }
 
-static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void wifi_creds_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     if (0 == param->write.is_prep) // Data received in single packet
     {
@@ -68,7 +68,7 @@ static void wifi_creds_write_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
     }
 }
 
-static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void wifi_creds_write_exec_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     if (wifi_creds_linked_buffer)
     {
@@ -79,22 +79,23 @@ static void wifi_creds_write_exec_func(esp_gatt_value_t *value, esp_ble_gatts_cb
     }
 }
 
-static void wifi_creds_parse_and_connect(uint8_t *value, uint32_t len)
+static void wifi_creds_parse_and_connect(uint8_t* value, uint32_t len)
 {
     if ((NULL != value) && (len > 0))
     {
-        cJSON *root = cJSON_Parse((const char *)value);
+        cJSON* root = cJSON_Parse((const char*)value);
+
         if (root)
         {
-            cJSON *cj_ssid = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_ssid_str);
-            cJSON *cj_user_id = cJSON_GetObjectItemCaseSensitive(root, ezlopi_user_id_str);
-            cJSON *cj_password = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_password_str);
+            cJSON* cj_ssid = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_ssid_str);
+            cJSON* cj_user_id = cJSON_GetObjectItemCaseSensitive(root, ezlopi_user_id_str);
+            cJSON* cj_password = cJSON_GetObjectItemCaseSensitive(root, ezlopi_wifi_password_str);
 
             if (cj_user_id && cj_user_id->valuestring && cj_password && cj_password->valuestring && cj_ssid && cj_ssid->valuestring)
             {
-                char *ssid = cj_ssid->valuestring;
-                char *password = cj_password->valuestring;
-                char *user_id_str = cj_user_id->valuestring;
+                char* ssid = cj_ssid->valuestring;
+                char* password = cj_password->valuestring;
+                char* user_id_str = cj_user_id->valuestring;
 
                 if (user_id_str && ssid && password)
                 {
