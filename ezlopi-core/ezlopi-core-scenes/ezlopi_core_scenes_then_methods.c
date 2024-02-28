@@ -1,14 +1,21 @@
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_http.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_event_group.h"
+#include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_service_meshbot.h"
+#include "ezlopi_core_scenes_then_methods_helper_func.h"
 
 #include "ezlopi_cloud_constants.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
+    TRACE_W(" Set_item_value ");
     int ret = 0;
     uint32_t item_id = 0;
     cJSON* cj_params = cJSON_CreateObject();
@@ -99,13 +106,56 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+     TRACE_W(" send_http ");
+    int ret = 0;
+    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    if (curr_then)
+    {
+        s_ezlopi_core_http_mbedtls_t* tmp_http_data = (s_ezlopi_core_http_mbedtls_t*)malloc(sizeof(s_ezlopi_core_http_mbedtls_t));
+        if (tmp_http_data)
+        {
+            memset(tmp_http_data, 0, sizeof(s_ezlopi_core_http_mbedtls_t));
+            l_fields_v2_t* curr_field = curr_then->fields;
+
+            const s_sendhttp_method_t __sendhttp_method[] = {
+                {.field_name = "request", .field_func = parse_http_request_type},
+                {.field_name = "url", .field_func = parse_http_url},
+                {.field_name = "credential", .field_func = parse_http_creds},
+                {.field_name = "contentType", .field_func = parse_http_content_type},
+                {.field_name = "content", .field_func = parse_http_content},
+                {.field_name = "headers", .field_func = parse_http_headers},
+                {.field_name = "skipSecurity", .field_func = parse_http_skipsecurity},
+                {.field_name = NULL, .field_func = NULL},
+            };
+
+            while (NULL != curr_field) // fields
+            {
+                for (uint8_t i = 0; i < ((sizeof(__sendhttp_method) / sizeof(__sendhttp_method[i]))); i++)
+                {
+                    if (0 == strncmp(__sendhttp_method[i].field_name, curr_field->name, strlen(__sendhttp_method[i].field_name) + 1))
+                    {
+                        (__sendhttp_method[i].field_func)(tmp_http_data, curr_field);
+                        break;
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+            // now to trigger http_request and extract the response.
+            tmp_http_data->response = NULL;
+            tmp_http_data->response_maxlen = 0;
+            ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
+            free_http_mbedtls_struct(tmp_http_data);
+
+            free(tmp_http_data);
+        }
+    }
+
+    return ret;
 }
 int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t* curr_scene, void* arg)
 {
+     TRACE_W(" run_custom_script ");
     int ret = 0;
-
     uint32_t script_id = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
@@ -137,6 +187,7 @@ int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
 {
+     TRACE_W(" run_scene ");
     int ret = 0;
     uint32_t sceneID = 0;
     bool execute_else_condition = false;
@@ -219,13 +270,70 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
 }
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+     TRACE_W(" reboot_hub ");
+    int ret = 0;
+    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    if (curr_then && curr_scene)
+    {
+        TRACE_E("Rebooting ESP......................... ");
+        EZPI_CORE_reboot();
+    }
+    return ret;
 }
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+     TRACE_W(" reset_hub ");
+    int ret = 0;
+    cJSON* cj_params = cJSON_CreateObject();
+
+    if (cj_params)
+    {
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, "type", 5))
+                {
+                    if ((EZLOPI_VALUE_TYPE_ENUM == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
+                    {
+                        TRACE_S("value: %s", curr_field->field_value.u_value.value_string);
+                        if (0 == strncmp(curr_field->field_value.u_value.value_string, "factory", 8))
+                        {
+                            TRACE_E("Factory Reseting ESP......................... ");
+                            // clear the settings realated to scenes, devices, items, rooms,etc
+                            ezlopi_scenes_scripts_factory_info_reset();
+                            ezlopi_device_factory_info_reset();
+                            ezlopi_nvs_scenes_factory_info_reset(); // 'nvs' partitions
+
+                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            TRACE_E("Rebooting ESP......................... ");
+                            EZPI_CORE_reboot();
+                        }
+                        else if (0 == strncmp(curr_field->field_value.u_value.value_string, "soft", 5))
+                        {
+                            ezlopi_nvs_scenes_soft_reset();
+
+                            ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
+                            TRACE_E("Rebooting ESP......................... ");
+                            EZPI_CORE_reboot();
+                        }
+                        else if (0 == strncmp(curr_field->field_value.u_value.value_string, "hard", 5))
+                        {
+                            #warning "hard reset not in documention.";
+                            EZPI_CORE_factory_restore();
+                        }
+                    }
+                }
+
+                curr_field = curr_field->next;
+            }
+        }
+
+        cJSON_Delete(cj_params);
+    }
+    return ret;
 }
 int ezlopi_scene_then_cloud_api(l_scenes_list_v2_t* curr_scene, void* arg)
 {

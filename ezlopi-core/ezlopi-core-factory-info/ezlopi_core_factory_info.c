@@ -2,6 +2,8 @@
 #include <ctype.h>
 
 #include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
 
 #if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
@@ -688,5 +690,19 @@ int ezlopi_factory_info_v3_factory_reset(void)
         }
     }
 
+    return ret;
+}
+
+int ezlopi_factory_info_v3_scenes_factory_soft_reset(void)
+{
+    int ret = 0;
+    if (ezlopi_factory_info_v3_set_wifi("ezlopitest", "ezlopitest"))
+    {
+        ret = 1;
+    }
+    else
+    {
+        TRACE_E("Could not activate factory/soft reset");
+    }
     return ret;
 }

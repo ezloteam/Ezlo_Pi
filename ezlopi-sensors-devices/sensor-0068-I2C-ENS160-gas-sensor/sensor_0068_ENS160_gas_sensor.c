@@ -90,22 +90,22 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
       if (item->cloud_properties.item_id == aqi_item_id)
       {
         valueFormatted = ezlopi_valueformatter_uint32(ens160_sensor->data.aqi);
-        cJSON_AddStringToObject(cj_params, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_params, "value", ens160_sensor->data.aqi);
+        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ens160_sensor->data.aqi);
         free(valueFormatted);
       }
       if (item->cloud_properties.item_id == voc_item_id)
       {
         valueFormatted = ezlopi_valueformatter_uint32(ens160_sensor->data.tvoc);
-        cJSON_AddStringToObject(cj_params, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_params, "value", ens160_sensor->data.tvoc);
+        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ens160_sensor->data.tvoc);
         free(valueFormatted);
       }
       if (item->cloud_properties.item_id == co2_item_id)
       {
         valueFormatted = ezlopi_valueformatter_uint32(ens160_sensor->data.eco2);
-        cJSON_AddStringToObject(cj_params, "valueFormatted", valueFormatted);
-        cJSON_AddNumberToObject(cj_params, "value", ens160_sensor->data.eco2);
+        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ens160_sensor->data.eco2);
         free(valueFormatted);
       }
     }

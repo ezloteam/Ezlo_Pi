@@ -36,7 +36,7 @@ void app_main(void)
     ezlopi_init();
 
     timer_service_init();
-    ezlopi_ble_service_init();
+    // ezlopi_ble_service_init();
 
     ezlopi_scenes_meshbot_init();
     ezlopi_service_modes_init();

@@ -127,7 +127,7 @@ static int __dht11_setup_device_cloud_properties_temperature(l_ezlopi_device_t* 
     if (device && cj_device)
     {
         char* device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
         ASSIGN_DEVICE_NAME_V2(device, device_name);
         device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -146,7 +146,7 @@ static int __dht11_setup_device_cloud_properties_humidity(l_ezlopi_device_t* dev
     if (device && cj_device)
     {
         char* device_name = NULL;
-        CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+        CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
         ASSIGN_DEVICE_NAME_V2(device, device_name);
         device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -252,7 +252,7 @@ static int __0015_get_value(l_ezlopi_item_t* item, void* args)
             }
             cJSON_AddStringToObject(cj_properties, ezlopi_scale_str, item->cloud_properties.scale);
         }
-        if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
+        else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
             cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, dht11_data->humidity);
             char *valueFormatted = ezlopi_valueformatter_float(dht11_data->humidity);
