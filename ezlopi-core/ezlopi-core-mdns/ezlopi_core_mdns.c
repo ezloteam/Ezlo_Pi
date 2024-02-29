@@ -245,12 +245,20 @@ static void __mdns_init(void* pv)
         esp_err_t err = mdns_init();
         if (err == ESP_OK)
         {
-            err = mdns_hostname_set("ezlopi");
 
+            uint32_t serial_last4 = 0;
+            uint64_t id_val = ezlopi_factory_info_v3_get_id();
+            if (id_val)
+            {
+                serial_last4 = id_val % 10000;
+            }
+
+            char hostname[EZPI_MDNS_HOSTNAME_SIZE];
+            snprintf(hostname, EZPI_MDNS_HOSTNAME_SIZE, "%s_%d", serial_last4, ezlopi_ezlopi_str);
+
+            err = mdns_hostname_set(hostname);
             mdns_instance_name_set("EzloPi mdns string");
             TRACE_I("Successful mDNS Initialization, %s", esp_err_to_name(err));
-
-            // char hostname[EZPI_MDNS_HOSTNAME_SIZE];
 
             mdns_txt_item_t* mdns_context = prepare_mdns_item_service_context(&service_size);
             if (mdns_context)
@@ -261,13 +269,7 @@ static void __mdns_init(void* pv)
                 {
                     TRACE_I("\t%s\t%s", mdns_context[i].key, mdns_context[i].value);
                 }
-                uint32_t serial_last4 = 8080;
-                uint64_t id_val = ezlopi_factory_info_v3_get_id();
-                if (id_val)
-                {
-                    serial_last4 = id_val % 10000;
-                }
-                mdns_service_add(ezlopi_mdns_instance_name, "_ezlopi", "_tcp", serial_last4, mdns_context, service_size);
+                mdns_service_add(ezlopi_mdns_instance_name, "_ezlopi", "_tcp", 8073, mdns_context, service_size);
                 break;
             }
             else
