@@ -37,6 +37,10 @@
     - [hub.network.wifi.scan.start](https://log.ezlo.com/new/hub/network/#hubnetworkwifiscanstart)
     - [hub.network.wifi.scan.stop](https://log.ezlo.com/new/hub/network/#hubnetworkwifiscanstop)
 
+7. [Time configuration](https://api.ezlo.com/hub/time/index.html)
+    - [hub.time.location.set](https://api.ezlo.com/hub/time/index.html#hubtimelocationset)
+    - [hub.time.location.get](https://api.ezlo.com/hub/time/index.html#hubtimelocationget)
+    - [hub.time.location.list](https://api.ezlo.com/hub/time/index.html#hubtimelocationlist)
 
 7. [House Modes commands](https://api.ezlo.com/hub/house_modes_manager/index.html#house-modes-commands)
     - [hub.modes.get](https://api.ezlo.com/hub/house_modes_manager/index.html#hubmodesget)
@@ -174,6 +178,154 @@
 5. Addressable LEDs
 
 ## Firmware Features
+### Serial Command
+EzloPi can be configured with serial interface as well. Following are common serial interface commands : 
+#### Action: Device management
+This command is for device administrative purpose such as device restart, device factory restart etc
+```
+Request 
+
+Factory Restore
+{
+    "cmd": 0,
+    "sub_cmd": 0 // Factory Restore only
+}
+
+Just Reboot
+{
+    "cmd": 0,
+    "sub_cmd": 1 // Reboot only
+}
+
+Response : 
+{
+  "cmd": 0,
+  "status": 1 // Status of the command execution, 0 = failed, 1 = success 
+}
+```
+#### Action: Get Info
+```
+Request 
+
+{
+"cmd": 1
+}
+Just Reboot
+{
+    "cmd": 0,
+    "sub_cmd": 1 // Reboot only
+}
+
+Response : 
+
+{
+    "cmd": 1,
+    "firmware_version": "3.3.6",
+    "build": 185,
+    "chip_info": {
+        "chip_type": "ESP32-S3",
+        "chip_version": "0.01",
+        "firmware_SDK_name": "ESP-IDF",
+        "firmware_SDK_version": "v4.4.6-dirty"
+    },
+    "uptime": "0d 0h 30m 7s",
+    "build_date": 1701862983,
+    "boot_count": 354,
+    "boot_reason": "Power ON",
+    "mac": "2A:4B:6F:8E:1D:3C",
+    "uuid": "fb3c84b0-534c-11ec-b2d6-8f260f5287fa",
+    "uuid_prov": "065320-838d-11ee-8889-0f56091e7639",
+    "serial": 102000529,
+    "ssid": "ESP",
+    "device_name": "__NAME",
+    "ezlopi_device_type": "ezlopi_generic",
+    "device_total_flash": "8MB",
+    "brand": "__BRAND",
+    "manufacture": "__MANU",
+    "model": "__MODEL",
+    "net_info": {
+        "wifi_mode": "STA",
+        "wifi_connection_status": true,
+        "ip_sta": "192.168.100.19",
+        "ip_nmask": "255.255.255.0",
+        "ip_gw": "192.168.100.2",
+        "internet_status": "unknown",
+        "cloud_connection_status": false
+    }
+}
+```
+#### Action: Set Wi-Fi
+```
+Request 
+
+{
+  "cmd": 2,
+  "pass": "myWiFiPass",
+  "ssid": "my wifi ssid"
+}
+
+Response : 
+{
+  "cmd": 2,
+  "status_write": 1,
+  "status_connect": 1
+}
+```
+#### Action Device Config
+```
+Request 
+
+{
+  "cmd": 4
+}
+
+Response : 
+	
+{
+    "config_id": "_ID_",
+    "config_time": 1696508363,
+    "dev_total": 3,
+    "config_name": "My moisture sensor",
+    "dev_detail": [
+        {
+            "dev_type": 1,
+            "dev_name": "Dining Room Main Lamp",
+            "id_room": "",
+            "id_item": 2,
+            "val_ip": true,
+            "val_op": false,
+            "gpio_in": 21,
+            "gpio_out": 13,
+            "is_ip": false,
+            "ip_inv": true,
+            "pullup_ip": true,
+            "pullup_op ": true,
+            "op_inv": false
+        },
+        {
+            "dev_type": 2,
+            "dev_name": "Switch",
+            "id_room": "",
+            "id_item": 4,
+            "gpio": 21,
+            "pull_up": true,
+            "logic_inv": true
+        },
+        {
+            "dev_type": 8,
+            "dev_name": "Sensor for my Dog",
+            "id_room": "",
+            "id_item": 5,
+            "gpio_sda": 21,
+            "gpio_scl": 22,
+            "pullup_scl": true,
+            "pullup_sda": true,
+            "slave_addr": 105
+        }
+    ]
+}
+```
+
 ### BLE WiFi Onboarding 
 BLE (Bluetooth Low Energy) WiFi on-boarding for EzloPi Devices simplifies the process of connecting EzloPi devices to a WiFi network. Using BLE technology, the device can initiate a secure and user-friendly on-boarding process without the need for direct user input on the device. 
 ### BLE Provisioning 
@@ -182,6 +334,9 @@ BLE provisioning for EzloPi devices enhances user convenience by providing a wir
 BLE Configuration simplifies the process of configuring the GPIOs of a hardware microcontroller employed by EzloPi, enhancing user convenience.
 ### OTA 
 This feature allows for convenient and remote firmware upgrades, ensuring that EzloPi devices can receive the latest software improvements and enhancements without the need for manual intervention or physical access.
+
+### mDNS Discovery
+The EzloPi can be discovered locally with following services. The hostname would be ```ezlopi_<last 4 digits of Serial id>```
 
 ## Local Meshbot (Scene)
 Scenes provide the possibility to make the relations between devices and make some actions with them. A scene consists of "conditions" and "actions" represented by (when blocks and action blocks respectively. All of them, except action groups, have Json Array representation.
