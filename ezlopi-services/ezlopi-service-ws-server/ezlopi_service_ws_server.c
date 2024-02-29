@@ -354,12 +354,12 @@ static void __start_server(void)
 
         httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
-        // uint64_t id_val = ezlopi_factory_info_v3_get_id();
-        // if (id_val)
-        // {
-        //     uint32_t serial_last4 = id_val % 10000;
-        //     config.server_port = serial_last4;
-        // }
+        uint64_t id_val = ezlopi_factory_info_v3_get_id();
+        if (id_val)
+        {
+            uint32_t serial_last4 = id_val % 10000;
+            config.server_port = serial_last4;
+        }
 
         config.task_priority = 8;
         config.stack_size = 1024 * 4;
