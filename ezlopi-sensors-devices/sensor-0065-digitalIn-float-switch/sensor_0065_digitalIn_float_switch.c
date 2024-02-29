@@ -158,12 +158,12 @@ static int __0065_init(l_ezlopi_item_t* item)
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, __0065_update_from_device, 200);
             }
-            else
-            {
-                ret = -1;
-                // ezlopi_device_free_device_by_item(item);
-                TRACE_E("Error initializing float switch");
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // ezlopi_device_free_device_by_item(item);
+            //     TRACE_E("Error initializing float switch");
+            // }
         }
         // else
         // {

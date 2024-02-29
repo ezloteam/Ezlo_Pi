@@ -19,12 +19,12 @@
 
 #include "sensor_0066_other_R307_FingerPrint.h"
 //---------------------------------------------------------------------------------------------------------------
-static void IRAM_ATTR gpio_notify_isr(void *param)
+static void IRAM_ATTR gpio_notify_isr(void* param)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)param;
     if (item)
     {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if (false == (user_data->__busy_guard))
         {
             vTaskNotifyGiveFromISR(user_data->notifyHandler, NULL);
@@ -32,26 +32,26 @@ static void IRAM_ATTR gpio_notify_isr(void *param)
     }
 }
 
-static int __0066_prepare(void *arg);
-static int __0066_init(l_ezlopi_item_t *item);
-static int __0066_set_value(l_ezlopi_item_t *item, void *arg);
-static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static int __0066_prepare(void* arg);
+static int __0066_init(l_ezlopi_item_t* item);
+static int __0066_set_value(l_ezlopi_item_t* item, void* arg);
+static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg);
 
-static void __fingerprint_operation_task(void *params);
-static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
+static void __fingerprint_operation_task(void* params);
+static void __uart_0066_fingerprint_upcall(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
-static void __prepare_item_action_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
-static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data);
-static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t* item, uint32_t item_id, cJSON* cj_device, server_packet_t* user_data);
+static void __prepare_item_action_cloud_properties(l_ezlopi_item_t* item, uint32_t item_id, cJSON* cj_device, server_packet_t* user_data);
+static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t* item, uint32_t item_id, cJSON* cj_device, server_packet_t* user_data);
+static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device);
 
-static void __timer_callback(void *param)
+static void __timer_callback(void* param)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)param;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)param;
     if (item)
     {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if (user_data)
         {
             time_t now = 0;
@@ -78,7 +78,7 @@ static void __timer_callback(void *param)
 }
 
 //---------------------------------------------------------------------------------------------------------------
-int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     // TRACE_E("%s", ezlopi_actions_to_string(action));
@@ -103,7 +103,7 @@ int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_
     {
         if (item)
         {
-            server_packet_t *user_data = (server_packet_t *)item->user_arg;
+            server_packet_t* user_data = (server_packet_t*)item->user_arg;
             if ((user_data) && (false == user_data->notify_flag))
             {
                 user_data->notify_flag = true;
@@ -116,7 +116,7 @@ int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_
     {
         if (item)
         {
-            server_packet_t *user_data = (server_packet_t *)item->user_arg;
+            server_packet_t* user_data = (server_packet_t*)item->user_arg;
             if ((user_data) &&
                 (false == user_data->notify_flag) &&
                 (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id)) // enroll
@@ -136,9 +136,9 @@ int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_
 }
 
 //-------------------------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *dev_name = NULL;
+    char* dev_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -148,7 +148,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor; /*needs to be changed to custom*/
 }
-static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data)
+static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t* item, uint32_t item_id, cJSON* cj_device, server_packet_t* user_data)
 {
     item->cloud_properties.item_id = item_id;
     item->cloud_properties.has_getter = false;
@@ -160,7 +160,7 @@ static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t *item, uint32
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
-static void __prepare_item_action_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data)
+static void __prepare_item_action_cloud_properties(l_ezlopi_item_t* item, uint32_t item_id, cJSON* cj_device, server_packet_t* user_data)
 {
     item->cloud_properties.item_id = item_id;
     item->cloud_properties.has_getter = true;
@@ -172,7 +172,7 @@ static void __prepare_item_action_cloud_properties(l_ezlopi_item_t *item, uint32
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
-static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t *item, uint32_t item_id, cJSON *cj_device, server_packet_t *user_data)
+static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t* item, uint32_t item_id, cJSON* cj_device, server_packet_t* user_data)
 {
     item->cloud_properties.item_id = item_id;
     item->cloud_properties.has_getter = true;
@@ -184,12 +184,12 @@ static void __prepare_item_ids_cloud_properties(l_ezlopi_item_t *item, uint32_t 
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
     item->user_arg = user_data;
 }
-static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     if (item && cj_device)
     {
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id) // while initialization; setup only once (during Match item setup)
         {
             CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.uart.tx);
@@ -206,19 +206,19 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj
 }
 //-------------------------------------------------------------------------------------------------------------------------
 
-static int __0066_prepare(void *arg)
+static int __0066_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *dev_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* dev_prep_arg = (s_ezlopi_prep_arg_t*)arg;
 
     if (dev_prep_arg && (dev_prep_arg->cjson_device))
     {
-        cJSON *cj_device = (dev_prep_arg->cjson_device);
+        cJSON* cj_device = (dev_prep_arg->cjson_device);
         /* device-1 */
-        l_ezlopi_device_t *fingerprint_device = ezlopi_device_add_device(cj_device);
+        l_ezlopi_device_t* fingerprint_device = ezlopi_device_add_device(cj_device);
         if (fingerprint_device)
         {
-            server_packet_t *user_data = (server_packet_t *)malloc(sizeof(server_packet_t));
+            server_packet_t* user_data = (server_packet_t*)malloc(sizeof(server_packet_t));
             if (user_data)
             {
                 memset(user_data, 0, sizeof(server_packet_t));
@@ -229,19 +229,19 @@ static int __0066_prepare(void *arg)
                 __prepare_device_cloud_properties(fingerprint_device, cj_device);
 
                 /* Preparation for uart items */
-                l_ezlopi_item_t *fingerprint_item_enroll = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
+                l_ezlopi_item_t* fingerprint_item_enroll = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
                 if (fingerprint_item_enroll)
                 {
                     __prepare_item_enroll_cloud_properties(fingerprint_item_enroll, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL], cj_device, user_data);
                     __prepare_item_interface_properties(fingerprint_item_enroll, cj_device);
                 }
-                l_ezlopi_item_t *fingerprint_item_action = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
+                l_ezlopi_item_t* fingerprint_item_action = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
                 if (fingerprint_item_action)
                 {
                     __prepare_item_action_cloud_properties(fingerprint_item_action, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION], cj_device, user_data);
                     __prepare_item_interface_properties(fingerprint_item_action, cj_device);
                 }
-                l_ezlopi_item_t *fingerprint_item_ids = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
+                l_ezlopi_item_t* fingerprint_item_ids = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
                 if (fingerprint_item_ids)
                 {
                     __prepare_item_ids_cloud_properties(fingerprint_item_ids, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS], cj_device, user_data);
@@ -265,12 +265,12 @@ static int __0066_prepare(void *arg)
     return ret;
 }
 
-static int __0066_init(l_ezlopi_item_t *item)
+static int __0066_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if ((NULL != item))
     {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO((gpio_num_t)user_data->intr_pin) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.tx) && GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.uart.rx))
@@ -304,42 +304,42 @@ static int __0066_init(l_ezlopi_item_t *item)
 
                                 const esp_timer_create_args_t esp_timer_create_args = {
                                     .callback = __timer_callback,
-                                    .arg = (void *)item,
-                                    .name = "Enrollment timer"};
+                                    .arg = (void*)item,
+                                    .name = "Enrollment timer" };
                                 if (0 == esp_timer_create(&esp_timer_create_args, &(user_data->timerHandler)))
                                 {
                                     TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
                                 }
                             }
-                            else
-                            {
-                                ret = -1;
-                                gpio_isr_handler_remove(intr_pin);
-                                TRACE_E("Error!! : Failed to add GPIO ISR handler.");
-                            }
+                            // else
+                            // {
+                            //     ret = -1;
+                            //     gpio_isr_handler_remove(intr_pin);
+                            //     TRACE_E("Error!! : Failed to add GPIO ISR handler.");
+                            // }
                         }
-                        else
-                        {
-                            ret = -1;
-                            TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
-                        }
+                        // else
+                        // {
+                        //     ret = -1;
+                        //     TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
+                        // }
                     }
-                    else
-                    {
-                        ret = -1;
-                        free(item->user_arg); // this will free ; memory address linked to all items
-                        item->user_arg = NULL;
-                        TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
-                    }
+                    // else
+                    // {
+                    //     ret = -1;
+                    //     free(item->user_arg); // this will free ; memory address linked to all items
+                    //     item->user_arg = NULL;
+                    //     TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
+                    // }
                 }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                // ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg); // this will free ; memory address linked to all items
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
         // else
         // {
@@ -350,18 +350,18 @@ static int __0066_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg)
+static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)arg;
+    cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if ((user_data) && (user_data->notify_flag))
         {
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION] == item->cloud_properties.item_id) // match
             {
-                cJSON *cj_value = cJSON_CreateObject();
+                cJSON* cj_value = cJSON_CreateObject();
                 cJSON_AddNumberToObject(cj_value, "id", user_data->matched_id);
                 cJSON_AddNumberToObject(cj_value, "confidence_level", user_data->matched_confidence_level);
                 cJSON_AddItemToObject(cj_result, ezlopi_value_str, cj_value);
@@ -384,7 +384,7 @@ static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg)
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS] == item->cloud_properties.item_id) // erase or list
             {
                 cJSON_AddStringToObject(cj_result, "elementType", "int");
-                cJSON *cj_value_array = cJSON_AddArrayToObject(cj_result, ezlopi_value_str);
+                cJSON* cj_value_array = cJSON_AddArrayToObject(cj_result, ezlopi_value_str);
 
                 for (int idx = 1; idx <= FINGERPRINT_MAX_CAPACITY_LIMIT; idx++)
                 {
@@ -402,18 +402,18 @@ static int __0066_get_value_cjson(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
+static int __0066_set_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON *cjson_params = (cJSON *)arg;
+    cJSON* cjson_params = (cJSON*)arg;
     if ((NULL != cjson_params) && (NULL != item))
     {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if (user_data)
         {
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id) // Set conditon trigger enroll mode
             {
-                cJSON *cj_value_cmd = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+                cJSON* cj_value_cmd = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
                 if (cj_value_cmd)
                 {
                     TRACE_E("HERE!! enroll");
@@ -443,7 +443,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
             }
             else if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS] == item->cloud_properties.item_id) // Set condition erase IDs
             {
-                cJSON *cj_value_ids = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
+                cJSON* cj_value_ids = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
                 if ((cj_value_ids != NULL) && cJSON_IsArray(cj_value_ids))
                 {
                     time(&user_data->timeout_start_time); // !< reset the internal timer_start_time
@@ -453,7 +453,7 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
                         TRACE_W("HERE!! erase specific");
                         for (uint16_t i = 0; i < value_array_size; i++) // eg. first protect => [2,4,5]
                         {
-                            cJSON *fp_id = cJSON_GetArrayItem(cj_value_ids, i);
+                            cJSON* fp_id = cJSON_GetArrayItem(cj_value_ids, i);
                             TRACE_S("Protected ID:[#%d]", (fp_id->valueint));
                             user_data->protect[fp_id->valueint] = true; // eg. protect this ID -> 2/4/5
                         }
@@ -483,9 +483,9 @@ static int __0066_set_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
+static void __uart_0066_fingerprint_upcall(uint8_t* buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
 {
-    char *temp_buf = (char *)malloc(256);
+    char* temp_buf = (char*)malloc(256);
     if (NULL != temp_buf)
     {
         memset(temp_buf, 0, 256);
@@ -494,12 +494,12 @@ static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len,
             memcpy(temp_buf, buffer, 256);
             TRACE_D("BUFFER-DATA-LEN: %d", output_len);
 
-            l_ezlopi_item_t *item = (l_ezlopi_item_t *)uart_object_handle->arg;
-            server_packet_t *user_data = (server_packet_t *)item->user_arg;
+            l_ezlopi_item_t* item = (l_ezlopi_item_t*)uart_object_handle->arg;
+            server_packet_t* user_data = (server_packet_t*)item->user_arg;
             if (user_data)
             {
                 uint16_t package_len = 0;
-                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = {0};
+                uint8_t another_buffer[MAX_PACKET_LENGTH_VAL] = { 0 };
                 memcpy(another_buffer, temp_buf, MAX_PACKET_LENGTH_VAL);
                 // Programmed only for ACK_operation [0x07h] with 256byte results.
                 if (another_buffer[6] == FINGERPRINT_PID_ACKPACKET)
@@ -584,12 +584,12 @@ static void __uart_0066_fingerprint_upcall(uint8_t *buffer, uint32_t output_len,
     }
 }
 
-static void __fingerprint_operation_task(void *params)
+static void __fingerprint_operation_task(void* params)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (NULL != item)
     {
-        server_packet_t *user_data = (server_packet_t *)item->user_arg;
+        server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if (user_data)
         {
             time(&user_data->timeout_start_time);   // !< reset the internal timer_start_time

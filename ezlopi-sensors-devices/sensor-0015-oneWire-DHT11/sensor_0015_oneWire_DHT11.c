@@ -214,21 +214,21 @@ static int __0015_init(l_ezlopi_item_t* item)
         if (item->interface.onewire_master.enable)
         {
             // s_ezlopi_dht11_data_t *dht11_data = (s_ezlopi_dht11_data_t *)item->user_arg;
-        // if (dht11_data)
-        // {
+            // if (dht11_data)
+            // {
             if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
             {
                 TRACE_S("HERE");
                 setDHT11gpio(item->interface.onewire_master.onewire_pin);
                 ret = 1;
             }
-            else
-            {
+            // else
+            // {
                 // ret = -1;
                 // free(item->user_arg); // this will free ; memory address linked to all items
                 // item->user_arg = NULL;
                 // ezlopi_device_free_device_by_item(item);
-            }
+            // }
             // }
             // else
             // {

@@ -13,15 +13,15 @@
 #include "sensor_0055_ADC_FlexResistor.h"
 
 //--------------------------------------------------------------------------------------------------------
-static int __0055_prepare(void *arg);
-static int __0055_init(l_ezlopi_item_t *item);
-static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0055_notify(l_ezlopi_item_t *item);
-static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
+static int __0055_prepare(void* arg);
+static int __0055_init(l_ezlopi_item_t* item);
+static int __0055_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0055_notify(l_ezlopi_item_t* item);
+static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data);
 //--------------------------------------------------------------------------------------------------------
 
-int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -56,7 +56,7 @@ int sensor_0055_ADC_FlexResistor(e_ezlopi_actions_t action, l_ezlopi_item_t *ite
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -69,7 +69,7 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t *device, cJS
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
+static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
 {
 
     item->cloud_properties.has_getter = true;
@@ -90,21 +90,21 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t *item, cJSON *cj
 
 //------------------------------------------------------------------------------------------------------
 
-static int __0055_prepare(void *arg)
+static int __0055_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        flex_t *flex_res_value = (flex_t *)malloc(sizeof(flex_t));
+        flex_t* flex_res_value = (flex_t*)malloc(sizeof(flex_t));
         if (flex_res_value)
         {
             memset(flex_res_value, 0, sizeof(flex_t));
-            l_ezlopi_device_t *device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (device_adc)
             {
                 __prepare_device_adc_cloud_properties(device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
+                l_ezlopi_item_t* item_adc = ezlopi_device_add_item_to_device(device_adc, sensor_0055_ADC_FlexResistor);
                 if (item_adc)
                 {
                     item_adc->cloud_properties.device_id = device_adc->cloud_properties.device_id;
@@ -128,12 +128,12 @@ static int __0055_prepare(void *arg)
     return ret;
 }
 
-static int __0055_init(l_ezlopi_item_t *item)
+static int __0055_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (NULL != item)
     {
-        flex_t *flex_res_value = (flex_t *)malloc(sizeof(flex_t));
+        flex_t* flex_res_value = (flex_t*)malloc(sizeof(flex_t));
         if (flex_res_value)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
@@ -142,21 +142,21 @@ static int __0055_init(l_ezlopi_item_t *item)
                 {
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    // ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                // ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg); // this will free ; memory address linked to all items
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
         // else
         // {
@@ -166,18 +166,18 @@ static int __0055_init(l_ezlopi_item_t *item)
     }
     return ret;
 }
-static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0055_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            flex_t *flex_res_value = (flex_t *)item->user_arg;
+            flex_t* flex_res_value = (flex_t*)item->user_arg;
             if (flex_res_value)
             {
-                char *valueFormatted = ezlopi_valueformatter_int(flex_res_value->rs_0055);
+                char* valueFormatted = ezlopi_valueformatter_int(flex_res_value->rs_0055);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -190,16 +190,16 @@ static int __0055_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     }
     return ret;
 }
-static int __0055_notify(l_ezlopi_item_t *item)
+static int __0055_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        flex_t *flex_res_value = (flex_t *)item->user_arg;
+        flex_t* flex_res_value = (flex_t*)item->user_arg;
         if (flex_res_value)
         {
-            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0,
-                                                         .voltage = 0};
+            s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0,
+                                                         .voltage = 0 };
             // extract the sensor_output_values
             ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
             float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage

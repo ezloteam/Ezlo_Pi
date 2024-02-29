@@ -225,10 +225,10 @@ static int __init(l_ezlopi_item_t* item)
                     rgb_args->RGB_LED_initialized = true;
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                }
+                // else
+                // {
+                //     ret = -1;
+                // }
             }
             // else
             // {

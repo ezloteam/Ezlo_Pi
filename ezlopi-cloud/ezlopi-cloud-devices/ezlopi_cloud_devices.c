@@ -28,7 +28,7 @@ void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
                 cJSON* cj_properties = ezlopi_device_create_device_table_from_prop(curr_device);
                 if (cj_properties)
                 {
-                    TRACE_W("Device_ID : %s [%d]", cJSON_Print(cj_properties), ++count);
+                    // TRACE_W("Device_ID : %s [%d]", cJSON_Print(cj_properties), ++count);
                     if (!cJSON_AddItemToArray(cjson_devices_array, cj_properties))
                     {
                         cJSON_Delete(cj_properties);

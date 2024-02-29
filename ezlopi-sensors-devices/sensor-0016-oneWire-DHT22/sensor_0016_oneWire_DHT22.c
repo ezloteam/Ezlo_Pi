@@ -78,14 +78,14 @@ static int dht22_sensor_init_v3(l_ezlopi_item_t* item)
             setDHT22gpio(item->interface.onewire_master.onewire_pin);
             ret = 1;
         }
-        else
-        {
-            ret = -1;
+        // else
+        // {
+            // ret = -1;
             // free(item->user_arg); // this will free ; memory address linked to all items
             // item->user_arg = NULL;
 
             // ezlopi_device_free_device_by_item(item);
-        }
+        // }
         // }
         // else
         // {

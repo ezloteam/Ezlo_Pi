@@ -16,22 +16,22 @@
 
 #include "sensor_0061_digitalIn_reed_switch.h"
 //-----------------------------------------------------------------------
-const char *reed_door_window_states[] = {
+const char* reed_door_window_states[] = {
     "dw_is_opened",
     "dw_is_closed",
     "unknown",
 };
 
-static int __0061_prepare(void *arg);
-static int __0061_init(l_ezlopi_item_t *item);
-static int __0061_get_item(l_ezlopi_item_t *item, void *arg);
-static int __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
-static void _0061_update_from_device(void *arg);
+static int __0061_prepare(void* arg);
+static int __0061_init(l_ezlopi_item_t* item);
+static int __0061_get_item(l_ezlopi_item_t* item, void* arg);
+static int __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
+static void _0061_update_from_device(void* arg);
 //-----------------------------------------------------------------------
 
-int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -65,7 +65,7 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t
 }
 
 //----------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -78,7 +78,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
@@ -98,19 +98,19 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
-static int __0061_prepare(void *arg)
+static int __0061_prepare(void* arg)
 {
     int ret = 0;
     if (arg)
     {
-        s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+        s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
         if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* reed_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (reed_device)
             {
                 __prepare_device_cloud_properties(reed_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
+                l_ezlopi_item_t* reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
                     reed_item->cloud_properties.device_id = reed_device->cloud_properties.device_id;
@@ -128,7 +128,7 @@ static int __0061_prepare(void *arg)
     return ret;
 }
 
-static int __0061_init(l_ezlopi_item_t *item)
+static int __0061_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (NULL != item)
@@ -155,12 +155,12 @@ static int __0061_init(l_ezlopi_item_t *item)
                 gpio_isr_service_register_v3(item, _0061_update_from_device, 200);
                 ret = 1;
             }
-            else
-            {
-                ret = -1;
-                // ezlopi_device_free_device_by_item(item);
-                TRACE_E("Error initializing Reed switch");
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // ezlopi_device_free_device_by_item(item);
+            //     TRACE_E("Error initializing Reed switch");
+            // }
         }
         // else
         // {
@@ -171,21 +171,21 @@ static int __0061_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __0061_get_item(l_ezlopi_item_t *item, void *arg)
+static int __0061_get_item(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
             //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
-            cJSON *json_array_enum = cJSON_CreateArray();
+            cJSON* json_array_enum = cJSON_CreateArray();
             if (NULL != json_array_enum)
             {
                 for (uint8_t i = 0; i < REED_DOOR_WINDOW_MAX; i++)
                 {
-                    cJSON *json_value = cJSON_CreateString(reed_door_window_states[i]);
+                    cJSON* json_value = cJSON_CreateString(reed_door_window_states[i]);
                     if (NULL != json_value)
                     {
                         cJSON_AddItemToArray(json_array_enum, json_value);
@@ -195,23 +195,23 @@ static int __0061_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
             ret = 1;
         }
     }
     return ret;
 }
-static int __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0061_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "dw_is_closed");
             ret = 1;
         }
     }
@@ -219,17 +219,17 @@ static int __0061_get_cjson_value(l_ezlopi_item_t *item, void *arg)
 }
 
 //------------------------------------------------------------------------------------------------------------
-static void _0061_update_from_device(void *arg)
+static void _0061_update_from_device(void* arg)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
-        const char *curret_value = NULL;
+        const char* curret_value = NULL;
         item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
 
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert)
-                                                 ? (item->interface.gpio.gpio_in.value)
-                                                 : (!item->interface.gpio.gpio_in.value);
+            ? (item->interface.gpio.gpio_in.value)
+            : (!item->interface.gpio.gpio_in.value);
 
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
@@ -240,9 +240,9 @@ static void _0061_update_from_device(void *arg)
             curret_value = "dw_is_closed";
         }
 
-        if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
+        if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
         {
-            item->user_arg = (void *)curret_value;
+            item->user_arg = (void*)curret_value;
             ezlopi_device_value_updated_from_device_v3(item);
         }
     }
