@@ -107,7 +107,7 @@ int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
  */
 static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web_port_num, const char* url_req, char** resp_buf)
 {
-    TRACE_S("&result==[%p] --> *resp_buf=>[%p]", resp_buf, *resp_buf);
+    TRACE_I("&result==[%p] --> *resp_buf=>[%p]", resp_buf, *resp_buf);
     int ret, flags, len;
     uint32_t tmp_buf_size = 256;
     char tmp_buf[tmp_buf_size];
@@ -269,7 +269,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
             }
             if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
             {
-                TRACE_D("MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY");
+                TRACE_S("MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY");
                 ret = 0;
                 break;
             }
@@ -310,7 +310,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
         if (strlen(resp_buf_dummy) > 0)
         {
             *resp_buf = resp_buf_dummy;
-            TRACE_S("&result==[%p] --> *resp_buf=>[%p]  ", resp_buf, *resp_buf);
+            TRACE_I("&result==[%p] --> *resp_buf=>[%p]  ", resp_buf, *resp_buf);
         }
         else
         {
@@ -470,7 +470,7 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
             ezlopi_core_http_request_via_mbedTLS(config->web_server, (config->web_port), request, &(config->response));
             if (config->response)
             {
-                TRACE_D("TASK:- result[%p] =>\n[%d]\n%s", config->response, strlen(config->response), config->response);
+                TRACE_D("*result[%p] =>\n[%d]\n%s", config->response, strlen(config->response), config->response);
                 free(config->response); // return to destination buffer
                 config->response = NULL;
             }

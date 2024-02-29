@@ -6,6 +6,7 @@
 #include "ezlopi_core_ota.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_scenes_when_methods.h"
@@ -227,8 +228,6 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
         time(&rawtime);
         struct tm* info;
         info = localtime(&rawtime);
-        TRACE_E("scene_id : %#x", scene_node->_id);
-
         if (2 == info->tm_sec) // nth sec mark
         {
             // list of field function to extract the respective parameters
@@ -436,6 +435,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // TRACE_W(" isDevice_state. ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -506,7 +506,9 @@ int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg
 int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // TRACE_W(" isScene_state ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
+#if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
@@ -542,7 +544,6 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
             {
                 if (curr_scene->_id == scene_id)
                 {
-                    TRACE_S(" SceneId : %#x , state: %s", scene_id, value_field->field_value.u_value.value_string);
                     if (0 == strncmp("any_result", value_field->field_value.u_value.value_string, 11))
                     {
                         ret = 1;
@@ -579,6 +580,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
             }
         }
     }
+#endif
     return ret;
 }
 
@@ -592,7 +594,6 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" isCloud_state ");
     int ret = 0;
-#if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
@@ -612,17 +613,18 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
 
         if (value_field)
         {
-            if (ezlopi_websocket_client_is_connected())
+            if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
             {
                 ret = (0 == strncmp(value_field->field_value.u_value.value_string, "connected", 10));
+                // TRACE_S("NMA_CONNECTED, ret = %d", ret);
             }
             else
             {
                 ret = (0 == strncmp(value_field->field_value.u_value.value_string, "disconnected", 14));
+                // TRACE_S("NMA_DISCONNECTED, ret = %d", ret);
             }
         }
     }
-#endif
     return ret;
 }
 
@@ -680,6 +682,7 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_num_range ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -738,6 +741,7 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_strings ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -795,6 +799,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_string_op ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -852,6 +857,7 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
 int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // //TRACE_W(" Compare_inArray ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -905,6 +911,7 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_values ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -967,6 +974,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" atleast_one_diction_val ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1008,6 +1016,7 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" firmware_update ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1053,6 +1062,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
 int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" isDictionary_changed ");
+    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
