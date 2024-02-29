@@ -179,13 +179,13 @@ extern "C"
                 \"dev_name\": \"LED\",\
                 \"id_room\": \"\",\
                 \"id_item\": 1,\
-                \"gpio_in\": ,\
+                \"gpio_in\": 0,\
                 \"gpio_out\": 1,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": true,\
                 \"is_ip\": false,\
                 \"ip_inv\": false,\
-                \"op_inv\": false\
+                \"op_inv\": false,\
                 \"val_ip\": false,\
                 \"val_op\": false\
             },\
