@@ -254,7 +254,7 @@ static void __mdns_init(void* pv)
             }
 
             char hostname[EZPI_MDNS_HOSTNAME_SIZE];
-            snprintf(hostname, EZPI_MDNS_HOSTNAME_SIZE, "%s_%d", serial_last4, ezlopi_ezlopi_str);
+            snprintf(hostname, EZPI_MDNS_HOSTNAME_SIZE, "%s_%d", ezlopi_ezlopi_str, serial_last4);
 
             err = mdns_hostname_set(hostname);
             mdns_instance_name_set("EzloPi mdns string");
