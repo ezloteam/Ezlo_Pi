@@ -21,6 +21,7 @@
 static char* generate_hostname(void);
 const char* ezlopi_mdns_instance_name = "EzloPi, an Open Source IoT Platform";
 static l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx = NULL;
+static int service_count = 0;
 
 static void __mdns_init(void* pv);
 
@@ -218,11 +219,12 @@ static void ezlopi_mdns_init_service_context()
         {
             memset(service_cntx_device_type, 0, sizeof(mdns_txt_item_t));
             service_cntx_device_type->key = ezlopi_ezlopi_device_type_str;
-            service_cntx_device_type->value = ezlopi_factory_info_v3_get_device_type();;
+            service_cntx_device_type->value = ezlopi_factory_info_v3_get_device_type();
 
             ezlopi_mdns_service_cntx_device_type->mdns_context = service_cntx_device_type;
 
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_device_type);
+            service_count++;
         }
     }
 
@@ -253,6 +255,7 @@ static void ezlopi_mdns_init_service_context()
 
                     ezlopi_mdns_service_cntx_device_id->mdns_context = service_cntx_device_id;
                     ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_device_id);
+                    service_count++;
                 }
             }
         }
@@ -271,36 +274,40 @@ static void __mdns_init(void* pv)
         if (err == ESP_OK)
         {
             err = mdns_hostname_set("ezlopi");
+
             mdns_instance_name_set("EzloPi mdns string");
-            TRACE_I("Successful mDNS Initialization");
+            TRACE_I("Successful mDNS Initialization, %s", esp_err_to_name(err));
 
             char hostname[EZPI_MDNS_HOSTNAME_SIZE];
 
             l_ezlopi_mdns_context_t* mdns_contex_head = ezlopi_mdns_get_service_context();
+
+            mdns_txt_item_t mdns_context[service_count];
             if (mdns_contex_head)
             {
                 TRACE_I("-------- Adding mDNS Service ------------ ");
                 TRACE_I("\tKEY\t\t\t\tValue");
-                while (mdns_contex_head) {
-                    err = mdns_service_add(ezlopi_mdns_instance_name, "_http", "_tcp", 80, mdns_contex_head->mdns_context, 1);
+                int i = 0;
+                while (mdns_contex_head)
+                {
+                    mdns_context[i].key = mdns_contex_head->mdns_context->key;
+                    mdns_context[i].value = mdns_contex_head->mdns_context->value;
                     TRACE_I("\t%s\t%s", mdns_contex_head->mdns_context->key, mdns_contex_head->mdns_context->value);
                     mdns_contex_head = mdns_contex_head->next;
-                    TRACE_E("Here !!");
+                    i++;
                 }
+
+                mdns_service_add(ezlopi_mdns_instance_name, "_ezlopi", "_tcp", 8080, mdns_context, service_count);
+
+                /*
+                    1. Two services requires different instance names for same service_type, protocol and prot
+                    2. Only the first added service is valid for multiple services if service text is only different. It holds true for port number as well.
+                    3. Same instance name and different service_type works properly.
+                    4. So, while creating mDNS service, it is either the instance name or the service type that has to be different and the other being the same.
+                */
+
                 break;
             }
-
-
-            // if (err == ESP_OK)
-            // {
-
-            //     TRACE_I("Successful mDNS hostname setting");
-            //     break;
-            // }
-            // else
-            // {
-            //     TRACE_E("Error mDNS hostname setting");
-            // }
         }
         else
         {
