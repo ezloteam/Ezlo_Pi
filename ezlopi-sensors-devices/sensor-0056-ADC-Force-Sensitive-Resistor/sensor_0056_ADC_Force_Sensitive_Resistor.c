@@ -14,15 +14,15 @@
 #include "sensor_0056_ADC_Force_Sensitive_Resistor.h"
 
 //------------------------------------------------------------------------------------------------------------------------------
-static int __0056_prepare(void *arg);
-static int __0056_init(l_ezlopi_item_t *item);
-static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0056_notify(l_ezlopi_item_t *item);
+static int __0056_prepare(void* arg);
+static int __0056_init(l_ezlopi_item_t* item);
+static int __0056_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0056_notify(l_ezlopi_item_t* item);
 static float Calculate_GramForce(float Vout);
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data);
 //------------------------------------------------------------------------------------------------------------------------------
-int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -57,7 +57,7 @@ int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -70,7 +70,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
 {
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -89,22 +89,22 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
 }
 
 //----------------------------------------------------
-static int __0056_prepare(void *arg)
+static int __0056_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        fsr_t *fsr_struct = (fsr_t *)malloc(sizeof(fsr_t));
+        fsr_t* fsr_struct = (fsr_t*)malloc(sizeof(fsr_t));
         if (NULL != fsr_struct)
         {
             memset(fsr_struct, 0, sizeof(fsr_t));
 
-            l_ezlopi_device_t *FSR_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* FSR_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
             if (FSR_device)
             {
                 __prepare_device_cloud_properties(FSR_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_ADC_Force_Sensitive_Resistor);
+                l_ezlopi_item_t* FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_ADC_Force_Sensitive_Resistor);
                 if (FSR_item)
                 {
                     FSR_item->cloud_properties.device_id = FSR_device->cloud_properties.device_id;
@@ -128,12 +128,12 @@ static int __0056_prepare(void *arg)
     return ret;
 }
 
-static int __0056_init(l_ezlopi_item_t *item)
+static int __0056_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        fsr_t *fsr_struct = (fsr_t *)item->user_arg;
+        fsr_t* fsr_struct = (fsr_t*)item->user_arg;
         if (fsr_struct)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
@@ -142,44 +142,44 @@ static int __0056_init(l_ezlopi_item_t *item)
                 {
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg); // this will free ; memory address linked to all items
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     // ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
 
-static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0056_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            fsr_t *fsr_struct = (fsr_t *)item->user_arg;
+            fsr_t* fsr_struct = (fsr_t*)item->user_arg;
             if (fsr_struct)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, fsr_struct->fsr_value);
-                char *valueFormatted = ezlopi_valueformatter_float(fsr_struct->fsr_value);
+                char* valueFormatted = ezlopi_valueformatter_float(fsr_struct->fsr_value);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -192,15 +192,15 @@ static int __0056_get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __0056_notify(l_ezlopi_item_t *item)
+static int __0056_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        fsr_t *fsr_struct = (fsr_t *)item->user_arg;
+        fsr_t* fsr_struct = (fsr_t*)item->user_arg;
         if (fsr_struct)
         {
-            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+            s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
             ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
             float Vout = (ezlopi_analog_data.voltage) / 1000.0f; // millivolt -> voltage
 

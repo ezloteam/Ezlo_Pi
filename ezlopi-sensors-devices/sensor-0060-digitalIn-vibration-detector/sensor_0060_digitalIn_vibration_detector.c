@@ -14,23 +14,23 @@
 #include "sensor_0060_digitalIn_vibration_detector.h"
 
 //---------------------------------------------------------------------------------------------------------
-const char *Sw420_vibration_activity_state_token[] = {
+const char* Sw420_vibration_activity_state_token[] = {
     "no_activity",
     "shake",
     "tilt",
     "drop",
 };
 
-static int __0060_prepare(void *arg);
-static int __0060_init(l_ezlopi_item_t *item);
-static int __0060_get_item(l_ezlopi_item_t *item, void *arg);
-static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0060_notify(l_ezlopi_item_t *item);
+static int __0060_prepare(void* arg);
+static int __0060_init(l_ezlopi_item_t* item);
+static int __0060_get_item(l_ezlopi_item_t* item, void* arg);
+static int __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0060_notify(l_ezlopi_item_t* item);
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device);
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
 //---------------------------------------------------------------------------------------------------------
-int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -69,7 +69,7 @@ int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi
 }
 //---------------------------------------------------------------------------------------------------------
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *dev_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
@@ -82,7 +82,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
@@ -102,19 +102,19 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->interface.gpio.gpio_in.pull = GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }
-static int __0060_prepare(void *arg)
+static int __0060_prepare(void* arg)
 {
     int ret = 0;
     if (arg)
     {
-        s_ezlopi_prep_arg_t *dev_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+        s_ezlopi_prep_arg_t* dev_prep_arg = (s_ezlopi_prep_arg_t*)arg;
         if (dev_prep_arg && (NULL != dev_prep_arg->cjson_device))
         {
-            l_ezlopi_device_t *vibration_device = ezlopi_device_add_device(dev_prep_arg->cjson_device);
+            l_ezlopi_device_t* vibration_device = ezlopi_device_add_device(dev_prep_arg->cjson_device);
             if (vibration_device)
             {
                 __prepare_device_cloud_properties(vibration_device, dev_prep_arg->cjson_device);
-                l_ezlopi_item_t *vibration_item = ezlopi_device_add_item_to_device(vibration_device, sensor_0060_digitalIn_vibration_detector);
+                l_ezlopi_item_t* vibration_item = ezlopi_device_add_item_to_device(vibration_device, sensor_0060_digitalIn_vibration_detector);
                 if (vibration_item)
                 {
                     vibration_item->cloud_properties.device_id = vibration_device->cloud_properties.device_id;
@@ -132,7 +132,7 @@ static int __0060_prepare(void *arg)
     return ret;
 }
 
-static int __0060_init(l_ezlopi_item_t *item)
+static int __0060_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (NULL != item)
@@ -157,35 +157,35 @@ static int __0060_init(l_ezlopi_item_t *item)
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 ret = 1;
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     // ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
-static int __0060_get_item(l_ezlopi_item_t *item, void *arg)
+static int __0060_get_item(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
             //-------------------  POSSIBLE JSON ENUM LPGNTENTS ----------------------------------
-            cJSON *json_array_enum = cJSON_CreateArray();
+            cJSON* json_array_enum = cJSON_CreateArray();
             if (NULL != json_array_enum)
             {
                 for (uint8_t i = 0; i < SW420_VIBRATION_ACTIVITY_MAX; i++)
                 {
-                    cJSON *json_value = cJSON_CreateString(Sw420_vibration_activity_state_token[i]);
+                    cJSON* json_value = cJSON_CreateString(Sw420_vibration_activity_state_token[i]);
                     if (NULL != json_value)
                     {
                         cJSON_AddItemToArray(json_array_enum, json_value);
@@ -195,33 +195,33 @@ static int __0060_get_item(l_ezlopi_item_t *item, void *arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_activity");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_activity");
             ret = 1;
         }
     }
     return ret;
 }
-static int __0060_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0060_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char *)item->user_arg ? item->user_arg : "no_activity");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char *)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_activity");
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_activity");
             ret = 1;
         }
     }
     return ret;
 }
 //------------------------------------------------------------------------------------------------------------
-static int __0060_notify(l_ezlopi_item_t *item)
+static int __0060_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
-    const char *curret_value = NULL;
+    const char* curret_value = NULL;
     item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
     item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
 
@@ -234,9 +234,9 @@ static int __0060_notify(l_ezlopi_item_t *item)
         curret_value = "shake";
     }
 
-    if (curret_value != (char *)item->user_arg) // calls update only if there is change in state
+    if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
     {
-        item->user_arg = (void *)curret_value;
+        item->user_arg = (void*)curret_value;
         ezlopi_device_value_updated_from_device_v3(item);
         ret = 1;
     }

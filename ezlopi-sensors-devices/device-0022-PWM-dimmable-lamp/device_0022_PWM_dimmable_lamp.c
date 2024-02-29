@@ -257,10 +257,6 @@ static int __init(l_ezlopi_item_t* item)
                         ret = -1;
                     }
                 }
-                else
-                {
-                    ret = -1;
-                }
             }
             else
             {
@@ -372,6 +368,7 @@ static void __prepare_dimmer_switch_item_properties(l_ezlopi_item_t* item, cJSON
 
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_out.gpio_num);
     item->interface.gpio.gpio_in.enable = false;
+
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = false;
     item->interface.gpio.gpio_out.invert = false;

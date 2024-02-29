@@ -678,6 +678,7 @@ cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t* device_pro
             {
                 cJSON_AddItemReferenceToObject(cj_device, ezlopi_info_str, device_prop->cloud_properties.info);
             }
+            // TRACE_E(" Cj_device [%s]", cJSON_Print(cj_device));
         }
     }
 

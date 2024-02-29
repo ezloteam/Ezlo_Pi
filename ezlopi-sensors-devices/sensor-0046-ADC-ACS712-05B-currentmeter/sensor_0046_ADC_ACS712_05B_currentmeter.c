@@ -99,7 +99,7 @@ static int __0046_prepare(void* arg)
     s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_currentmeter_t *user_data = (s_currentmeter_t *)malloc(sizeof(s_currentmeter_t));
+        s_currentmeter_t* user_data = (s_currentmeter_t*)malloc(sizeof(s_currentmeter_t));
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_currentmeter_t));
@@ -135,7 +135,7 @@ static int __0046_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
@@ -144,27 +144,27 @@ static int __0046_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg);
-                item->user_arg = NULL;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg);
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -174,14 +174,14 @@ static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item)
     {
-        cJSON *cjson_properties = (cJSON *)arg;
+        cJSON* cjson_properties = (cJSON*)arg;
         if (cjson_properties && item)
         {
-            s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+            s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
             if (user_data)
             {
                 cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, user_data->amp_value); // Irms [A]
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->amp_value);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->amp_value);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
@@ -200,7 +200,7 @@ static int __0046_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
         if (user_data)
         {
             float prev_amp = user_data->amp_value;
@@ -218,10 +218,10 @@ static void __calculate_current_value(l_ezlopi_item_t* item)
 {
     if (NULL != item)
     {
-        s_currentmeter_t *user_data = (s_currentmeter_t *)item->user_arg;
+        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
         if (user_data)
         {
-            s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
+            s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
 
             uint32_t period_dur = (1000000 / DEFAULT_AC_FREQUENCY); // 20000uS
             int Vnow = 0;

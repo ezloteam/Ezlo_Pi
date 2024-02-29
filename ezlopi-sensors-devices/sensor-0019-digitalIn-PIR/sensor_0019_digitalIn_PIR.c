@@ -102,14 +102,14 @@ static int sensor_pir_init_v3(l_ezlopi_item_t* item)
             else
             {
                 TRACE_E("Error initializing PIR sensor, error: %s", esp_err_to_name(ret));
-                ret = -1;
+                // ret = -1;
             }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
