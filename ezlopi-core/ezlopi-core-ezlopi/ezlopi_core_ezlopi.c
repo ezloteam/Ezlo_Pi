@@ -64,8 +64,6 @@ void ezlopi_init(void)
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
-    ezlopi_core_initialize_mdns();
-
     ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);
 
@@ -73,6 +71,8 @@ void ezlopi_init(void)
     ezlopi_ping_init();
     // EZPI_CORE_sntp_init();
     ezlopi_timer_start_1000ms();
+
+    EZPI_core_init_mdns();
 }
 
 static void ezlopi_initialize_devices_v3(void)

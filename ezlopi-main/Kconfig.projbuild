@@ -31,18 +31,55 @@ menu "EzloPi User Config"
     default y
     help
         Enable BLE pairing
-    
-    config EZPI_MDNS_HOSTNAME
-    string "mDNS hostname"
-    default "ezlopi_device"
-    help
-        Set mDNS hostname
-    
-    config EZPI_MDNS_INSTANCE_NAME
-    string "mDNS instance name"
-    default "ezlopi_serial"
-    help 
-        Set mDNS instance name
+
+    menu "EzloPi mDNS config"
+        config EZPI_MDNS_HOSTNAME
+        string "mDNS hostname"
+        default "ezlopi_device"
+        help
+            Set mDNS hostname
+        
+        config EZPI_MDNS_INSTANCE_NAME
+        string "mDNS instance name"
+        default "ezlopi_serial"
+        help 
+            Set mDNS instance name
+
+        config EZPI_MDNS_ENABLE_EXTRA_SERVICES
+        bool "mDNS enable extra services"
+        default n
+        help
+            Enable extra services such as manufacturer, brand, etc. 
+        
+        config EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE
+        bool "mDNS enable manufacturer service"
+        depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+        default n
+        help 
+            Enable manufacturer extra service in ezlopi mDNS
+        
+        config EZPI_MDNS_ENABLE_BRAND_SERVICE
+        bool "mDNS enable brand service"
+        depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+        default n
+        help 
+            Enable brand extra service in ezlopi mDNS
+        
+        config EZPI_MDNS_ENABLE_MODEL_SERVICE
+        bool "mDNS enable model service"
+        depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+        default n
+        help 
+            Enable model extra service in ezlopi mDNS
+        
+        config EZPI_MDNS_ENABLE_NAME_SERVICE
+        bool "mDNS enable name service"
+        depends on EZPI_MDNS_ENABLE_EXTRA_SERVICES
+        default n
+        help 
+            Enable name extra service in ezlopi mDNS
+
+    endmenu
 
 endmenu
 
