@@ -255,7 +255,7 @@ static int __init(l_ezlopi_item_t* item)
                     ret = -1;
                     free(item->user_arg); // this will free ; memory address linked to all items
                     item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
+                    // ezlopi_device_free_device_by_item(item);
                 }
             }
             else if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] &&
@@ -290,7 +290,7 @@ static int __init(l_ezlopi_item_t* item)
                         TRACE_E("Error initializing joystick switch");
                         free(item->user_arg); // this will free ; memory address linked to all items
                         item->user_arg = NULL;
-                        ezlopi_device_free_device_by_item(item);
+                        // ezlopi_device_free_device_by_item(item);
                     }
                 }
                 else
@@ -298,14 +298,15 @@ static int __init(l_ezlopi_item_t* item)
                     ret = -1;
                     free(item->user_arg); // this will free ; memory address linked to all items
                     item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
+                    // ezlopi_device_free_device_by_item(item);
                 }
             }
         }
-        else
-        {
-            ret = -1;
-        }
+        // else
+        // {
+        //     ret = -1;
+        //       ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }

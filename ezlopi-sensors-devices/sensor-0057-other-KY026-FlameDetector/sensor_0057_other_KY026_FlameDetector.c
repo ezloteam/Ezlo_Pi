@@ -151,7 +151,7 @@ static int __0057_init(l_ezlopi_item_t *item)
             else
             {
                 ret = -1;
-                ezlopi_device_free_device_by_item(item);
+                // ezlopi_device_free_device_by_item(item);
             }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
@@ -170,7 +170,7 @@ static int __0057_init(l_ezlopi_item_t *item)
                         ret = -1;
                         free(item->user_arg); // this will free ; memory address linked to all items
                         item->user_arg = NULL;
-                        ezlopi_device_free_device_by_item(item);
+                        // ezlopi_device_free_device_by_item(item);
                     }
                 }
                 else
@@ -178,14 +178,14 @@ static int __0057_init(l_ezlopi_item_t *item)
                     ret = -1;
                     free(item->user_arg); // this will free ; memory address linked to all items
                     item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
+                    // ezlopi_device_free_device_by_item(item);
                 }
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
     }
     return ret;

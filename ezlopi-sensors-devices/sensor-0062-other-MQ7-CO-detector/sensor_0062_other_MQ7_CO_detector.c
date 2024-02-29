@@ -164,8 +164,8 @@ static int __0062_init(l_ezlopi_item_t* item)
             else
             {
                 ret = -1;
-                TRACE_E("Deleting Item!!");
-                ezlopi_device_free_device_by_item(item); // remove the item itself
+                // // TRACE_E("Deleting Item!!");
+                // ezlopi_device_free_device_by_item(item); // remove the item itself
             }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -186,27 +186,27 @@ static int __0062_init(l_ezlopi_item_t* item)
                     else
                     {
                         ret = -1;
-                        TRACE_E("Deleting Item!!");
+                        // TRACE_E("Deleting Item!!");
                         free(item->user_arg);
                         item->user_arg = NULL;
-                        ezlopi_device_free_device_by_item(item); // remove the item itself
+                        // ezlopi_device_free_device_by_item(item); // remove the item itself
                     }
                 }
                 else
                 {
                     ret = -1;
-                    TRACE_E("Deleting Item!!");
+                    // TRACE_E("Deleting Item!!");
                     free(item->user_arg);
                     item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item); // remove the item itself
+                    // ezlopi_device_free_device_by_item(item); // remove the item itself
                 }
             }
-            else
-            {
-                ret = -1;
-                TRACE_E("Deleting Item!!");
-                ezlopi_device_free_device_by_item(item); // remove the item itself;
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // TRACE_E("Deleting Item!!");
+            //     // ezlopi_device_free_device_by_item(item); // remove the item itself;
+            // }
         }
     }
     return ret;
