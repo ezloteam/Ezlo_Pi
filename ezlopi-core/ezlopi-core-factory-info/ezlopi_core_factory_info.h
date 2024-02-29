@@ -173,9 +173,44 @@ extern "C"
                 \"pullup_ip\": true,\
                 \"pullup_op\": true,\
                 \"op_inv\": false\
+            },\
+            {\
+                \"dev_type\": 1,\
+                \"dev_name\": \"LED\",\
+                \"id_room\": \"\",\
+                \"id_item\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 1,\
+                \"pullup_ip\": false,\
+                \"pullup_op\": true,\
+                \"is_ip\": false,\
+                \"ip_inv\": false,\
+                \"op_inv\": false,\
+                \"val_ip\": false,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_type\":5,\
+                \"dev_name\":\"RED LED\",\
+                \"id_room\":\"\",\
+                \"id_item\":22,\
+                \"gpio\":5,\
+                \"pwm_resln\":8,\
+                \"freq_hz\":10000,\
+                \"duty_cycle\":0\
+            },\
+            {\
+                \"dev_type\":5,\
+                \"dev_name\":\"GREEN LED\",\
+                \"id_room\":\"\",\
+                \"id_item\":22,\
+                \"gpio\":13,\
+                \"pwm_resln\":8,\
+                \"freq_hz\":10000,\
+                \"duty_cycle\":0\
             }\
-        ],\
-    \"dev_total\": 1}";
+        ], \
+    \"dev_total\": 4}";
 #endif
 
 
