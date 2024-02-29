@@ -1,5 +1,4 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -70,7 +69,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, "dev_type", item->interface_type);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.item_name = ezlopi_item_name_dimmer;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
@@ -79,7 +78,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     item->cloud_properties.value_type = value_type_int;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
     CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
     CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
 #if CONFIG_IDF_TARGET_ESP32C3
@@ -110,11 +109,8 @@ static int __prepare(void *arg)
             else
             {
                 ezlopi_device_free_device(servo_device);
+                ret = -1;
             }
-        }
-        else
-        {
-            ezlopi_device_free_device(servo_device);
         }
     }
     return ret;
@@ -125,15 +121,27 @@ static int __init(l_ezlopi_item_t *item)
     int ret = 0;
     if (item)
     {
-        static s_ezlopi_channel_speed_t *servo_item = NULL;
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
+            static s_ezlopi_channel_speed_t *servo_item = NULL;
             servo_item = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
                                          item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
-            item->interface.pwm.channel = servo_item->channel;
-            item->interface.pwm.speed_mode = servo_item->speed_mode;
+            if (servo_item)
+            {
+                item->interface.pwm.channel = servo_item->channel;
+                item->interface.pwm.speed_mode = servo_item->speed_mode;
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
         }
-        ret = 1;
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -141,21 +149,24 @@ static int __init(l_ezlopi_item_t *item)
 static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)arg;
-    if (cj_result && item)
+    if (item && arg)
     {
-        int value = 0;
-        CJSON_GET_VALUE_INT(cj_result, "value", value);
-
-        TRACE_I("gpio_num: %d", item->interface.pwm.gpio_num);
-        TRACE_I("item_id: %d", item->cloud_properties.item_id);
-        TRACE_I("cur value: %d", value);
-
-        if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.pwm.gpio_num))
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result && item)
         {
-            int target_value = (int)(((value * 17) / 100) + 13);
-            TRACE_I("target value: %d", target_value);
-            ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
+            int value = 0;
+            CJSON_GET_VALUE_INT(cj_result, "value", value);
+
+            TRACE_I("gpio_num: %d", item->interface.pwm.gpio_num);
+            TRACE_I("item_id: %d", item->cloud_properties.item_id);
+            TRACE_I("cur value: %d", value);
+
+            if (GPIO_IS_VALID_OUTPUT_GPIO(item->interface.pwm.gpio_num))
+            {
+                int target_value = (int)(((value * 17) / 100) + 13);
+                TRACE_I("target value: %d", target_value);
+                ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
+            }
         }
     }
     return ret;
@@ -164,31 +175,37 @@ static int __set_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
-
-    cJSON *cj_result = (cJSON *)arg;
-    if (cj_result)
+    if (item && arg)
     {
-        uint32_t duty = ezlopi_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
-        TRACE_I("raw duty value: %d", duty);
-
-        if (duty < 13)
+        cJSON *cj_result = (cJSON *)arg;
+        if (cj_result)
         {
-            duty = 13;
-            TRACE_W("new _ raw duty value: %d", duty);
-        }
-        int target_duty = (int)(((duty - 13) * 100) / 17);
-        TRACE_I("target duty value: %d", target_duty);
+            uint32_t duty = ezlopi_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
+            TRACE_I("raw duty value: %d", duty);
 
-        if (target_duty > 100)
-        {
-            target_duty = 100;
-            TRACE_W("new _ target duty value: %d", duty);
-        }
+            if (duty < 13)
+            {
+                duty = 13;
+                TRACE_W("new _ raw duty value: %d", duty);
+            }
+            int target_duty = (int)(((duty - 13) * 100) / 17);
+            TRACE_I("target duty value: %d", target_duty);
 
-        char *formatted_val = ezlopi_valueformatter_int(target_duty);
-        cJSON_AddStringToObject(cj_result, "valueFormatted", formatted_val);
-        cJSON_AddNumberToObject(cj_result, "value", target_duty);
-        ret = 1;
+            if (target_duty > 100)
+            {
+                target_duty = 100;
+                TRACE_W("new _ target duty value: %d", duty);
+            }
+
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, target_duty);
+            char *formatted_val = ezlopi_valueformatter_int(target_duty);
+            if (formatted_val)
+            {
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, formatted_val);
+                free(formatted_val);
+            }
+            ret = 1;
+        }
     }
 
     return ret;
@@ -302,7 +319,7 @@ static s_ezlopi_device_properties_t *ezlopi_servo_motor_MG_996R_prepare(cJSON *c
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.room_id = ezlopi_cloud_generate_room_id();
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
-        // CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_name_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num);
+        // CJSON_GET_VALUE_INT(cjson_device, ezlopi_gpio_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num);
         // CJSON_GET_VALUE_INT(cjson_device, "duty_cycle", ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle);
         // CJSON_GET_VALUE_INT(cjson_device, "freq_hz", ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz);
         // CJSON_GET_VALUE_INT(cjson_device, "pwm_resln", ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln);

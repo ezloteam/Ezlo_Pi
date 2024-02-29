@@ -11,24 +11,24 @@
 
 #include "ezlopi_service_webprov.h"
 
-void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
+void ezlopi_device_settings_list_v3(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
-    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON *cj_settings_array = cJSON_AddArrayToObject(cj_result, ezlopi_settings_str);
+        cJSON* cj_settings_array = cJSON_AddArrayToObject(cj_result, ezlopi_settings_str);
         if (cj_settings_array)
         {
-            l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+            l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
             while (curr_device)
             {
-                l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
+                l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
                 while (curr_setting)
                 {
-                    cJSON *cj_properties = cJSON_CreateObject();
+                    cJSON* cj_properties = cJSON_CreateObject();
                     if (cj_properties)
                     {
                         char tmp_string[64];
@@ -50,24 +50,24 @@ void ezlopi_device_settings_list_v3(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
-void ezlopi_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
+void ezlopi_device_settings_value_set_v3(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        char *setting_id_str = 0;
+        char* setting_id_str = 0;
         CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, setting_id_str);
         uint32_t setting_id = strtoul(setting_id_str, NULL, 16);
 
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
         uint32_t found_setting = 0;
         while (curr_device)
         {
-            l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
+            l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
             while (curr_setting)
             {
                 if (setting_id == curr_setting->cloud_properties.setting_id)
@@ -86,28 +86,28 @@ void ezlopi_device_settings_value_set_v3(cJSON *cj_request, cJSON *cj_response)
         }
     }
 }
-void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
+void ezlopi_device_settings_reset_v3(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
 
         while (curr_device)
         {
             if (cJSON_HasObjectItem(cj_params, ezlopi_deviceId_str))
             {
-                char *device_id_str = 0;
+                char* device_id_str = 0;
                 CJSON_GET_VALUE_STRING(cj_params, ezlopi_deviceId_str, device_id_str);
                 int device_id = strtol(device_id_str, NULL, 16);
                 TRACE_E("device_id: %X", device_id);
                 if (device_id == curr_device->cloud_properties.device_id)
                 {
-                    l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
+                    l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
                     while (curr_setting)
                     {
                         curr_setting->func(EZLOPI_SETTINGS_ACTION_RESET_SETTING, curr_setting, cj_params, curr_setting->user_arg);
@@ -118,11 +118,11 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
             else if (cJSON_HasObjectItem(cj_params, ezlopi__id_str))
             {
 
-                char *setting_id_str = 0;
+                char* setting_id_str = 0;
                 CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, setting_id_str);
                 uint32_t setting_id = strtol(setting_id_str, NULL, 16);
                 TRACE_E("setting_id: %X", setting_id);
-                l_ezlopi_device_settings_v3_t *curr_setting = curr_device->settings;
+                l_ezlopi_device_settings_v3_t* curr_setting = curr_device->settings;
                 while (curr_setting)
                 {
                     if (setting_id == curr_setting->cloud_properties.setting_id)
@@ -141,18 +141,18 @@ void ezlopi_device_settings_reset_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-cJSON *ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_device_settings_v3_t *setting)
+cJSON* ezlopi_cloud_settings_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_device_settings_v3_t* setting)
 {
-    cJSON *cjson_response = cJSON_CreateObject();
+    cJSON* cjson_response = cJSON_CreateObject();
     if (cjson_response)
     {
         if (NULL != setting)
         {
             cJSON_AddStringToObject(cjson_response, ezlopi_msg_subclass_str, method_hub_device_setting_updated);
-            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, web_provisioning_get_message_count());
+            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
             cJSON_AddStringToObject(cjson_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
 
-            cJSON *cj_result = cJSON_AddObjectToObject(cjson_response, ezlopi_result_str);
+            cJSON* cj_result = cJSON_AddObjectToObject(cjson_response, ezlopi_result_str);
             if (cj_result)
             {
                 char tmp_string[64];

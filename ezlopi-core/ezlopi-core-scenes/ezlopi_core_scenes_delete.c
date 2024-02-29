@@ -2,18 +2,17 @@
 
 #include "ezlopi_core_scenes_v2.h"
 
-void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t *user_notifications)
+void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t* user_notifications)
 {
     if (user_notifications)
     {
-
         ezlopi_scenes_delete_user_notifications(user_notifications->next);
         user_notifications->next = NULL;
         free(user_notifications);
     }
 }
 
-void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t *house_modes)
+void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t* house_modes)
 {
     if (house_modes)
     {
@@ -23,33 +22,19 @@ void ezlopi_scenes_delete_house_modes(l_house_modes_v2_t *house_modes)
     }
 }
 
-void ezlopi_scenes_delete_fields(l_fields_v2_t *fields)
+void ezlopi_scenes_delete_fields(l_fields_v2_t* fields)
 {
     if (fields)
     {
-        switch (fields->value_type)
-        {
-        case EZLOPI_VALUE_TYPE_TOKEN:
-        {
-            if (fields->value.cj_value)
-            {
-                cJSON_Delete(fields->value.cj_value);
-                fields->value.cj_value = NULL;
-            }
-            break;
-        }
-        default:
-        {
-            break;
-        }
-        }
+
         ezlopi_scenes_delete_fields(fields->next);
         fields->next = NULL;
+        ezlopi_scenes_delete_field_value(fields);
         free(fields);
     }
 }
 
-void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks)
+void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t* action_blocks)
 {
     if (action_blocks)
     {
@@ -60,7 +45,7 @@ void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t *action_blocks)
     }
 }
 
-void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
+void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t* when_blocks)
 {
     if (when_blocks)
     {
@@ -71,7 +56,7 @@ void ezlopi_scenes_delete_when_blocks(l_when_block_v2_t *when_blocks)
     }
 }
 
-void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list)
+void ezlopi_scenes_delete(l_scenes_list_v2_t* scenes_list)
 {
     if (scenes_list)
     {
@@ -91,3 +76,66 @@ void ezlopi_scenes_delete(l_scenes_list_v2_t *scenes_list)
 // {
 //     ezlopi_scenes_delete(ezlopi_scenes_pop_by_id_v2(_id));
 // }
+
+void ezlopi_scenes_delete_field_value(l_fields_v2_t* field)
+{
+    switch (field->field_value.e_type)
+        // switch (field->value.type)
+    {
+    case VALUE_TYPE_NUMBER:
+    {
+        field->field_value.u_value.value_double = 0;
+        // field->value.value_double = 0;
+        break;
+    }
+    case VALUE_TYPE_STRING:
+    {
+        if (field->field_value.u_value.value_string)
+            // if (field->value.value_string)
+        {
+            free(field->field_value.u_value.value_string);
+            field->field_value.u_value.value_string = NULL;
+
+            // free(field->value.value_string);
+            // field->value.value_string = NULL;
+        }
+        break;
+    }
+    case VALUE_TYPE_BOOL:
+    {
+        field->field_value.u_value.value_bool = false;
+        // field->value.value_bool = false;
+        break;
+    }
+    case VALUE_TYPE_CJSON:
+    {
+        if (field->field_value.u_value.cj_value)
+            // if (field->value.cj_value)
+        {
+            cJSON_Delete(field->field_value.u_value.cj_value);
+            field->field_value.u_value.cj_value = NULL;
+
+            // cJSON_Delete(field->value.cj_value);
+            // field->value.cj_value = NULL;
+        }
+        break;
+    }
+    case VALUE_TYPE_BLOCK:
+    {
+        if (field->field_value.u_value.when_block)
+            // if (field->value.when_block)
+        {
+            ezlopi_scenes_delete_when_blocks(field->field_value.u_value.when_block);
+            field->field_value.u_value.when_block = NULL;
+
+            // ezlopi_scenes_delete_when_blocks(field->value.when_block);
+            // field->value.when_block = NULL;
+        }
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+}

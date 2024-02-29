@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
+
 #include "ld2410.h"
 
 #include "ezlopi_core_nvs.h"
@@ -91,7 +91,7 @@ static int __setting_initialize_hilink_presence_sensor_predefined_settings(l_ezl
             char *read_value = ezlopi_nvs_read_str(nvs_key_hilink_presence_sensor_predefined_setting);
             if (NULL != read_value)
             {
-                TRACE_B("Setting already exist");
+                TRACE_I("Setting already exist");
                 snprintf(hilink_presence_sensor_setting_value->setting_value, 50, "%s", read_value);
             }
             else
@@ -132,7 +132,7 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
             char *read_value = ezlopi_nvs_read_str(nvs_key_hilink_presence_sensor_userdefined_setting);
             if (NULL != read_value)
             {
-                TRACE_B("Setting already exist.");
+                TRACE_I("Setting already exist.");
                 ESP_ERROR_CHECK(__setting_extract_user_defined_setting(read_value, hilink_presence_sensor_user_defined_setting_val));
             }
             else
@@ -188,7 +188,7 @@ static int __setting_initialize_hilink_presence_sensor_radar_distance_sensitivit
                 uint8_t error = ezlopi_nvs_read_int32(&read_value, nvs_key_hilink_presence_sensor_radar_distance_sensitivity);
                 if (1 == error)
                 {
-                    TRACE_B("Setting already exist.");
+                    TRACE_I("Setting already exist.");
                     distance_sensitivity_value->distance_sensitivity_value = read_value;
                 }
                 else
@@ -291,25 +291,25 @@ static int __settings_callback(e_ezlopi_settings_action_t action, struct l_ezlop
     {
     case EZLOPI_SETTINGS_ACTION_GET_SETTING:
     {
-        TRACE_B("%s", stringify(EZLOPI_SETTINGS_ACTION_GET_SETTING));
+        TRACE_I("%s", stringify(EZLOPI_SETTINGS_ACTION_GET_SETTING));
         __settings_get(arg, setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_SET_SETTING:
     {
-        TRACE_B("%s", stringify(EZLOPI_SETTINGS_ACTION_SET_SETTING))
+        TRACE_I("%s", stringify(EZLOPI_SETTINGS_ACTION_SET_SETTING))
         __settings_set(arg, setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_RESET_SETTING:
     {
-        TRACE_B("%s", stringify(EZLOPI_SETTINGS_ACTION_RESET_SETTING));
+        TRACE_I("%s", stringify(EZLOPI_SETTINGS_ACTION_RESET_SETTING));
         __settings_reset(arg, setting);
         break;
     }
     case EZLOPI_SETTINGS_ACTION_UPDATE_SETTING:
     {
-        TRACE_B("%s", stringify(EZLOPI_SETTINGS_ACTION_UPDATE_SETTING));
+        TRACE_I("%s", stringify(EZLOPI_SETTINGS_ACTION_UPDATE_SETTING));
         __settings_update(arg, setting);
         break;
     }
@@ -785,7 +785,7 @@ static int __setting_reset_user_defined_setting(void *arg, l_ezlopi_device_setti
             {
                 if (ezlopi_nvs_write_str(setting_val_str, strlen(setting_val_str), nvs_key_hilink_presence_sensor_userdefined_setting))
                 {
-                    TRACE_B("Failed to write to nvs.");
+                    TRACE_I("Failed to write to nvs.");
                     ret = 1;
                 }
                 else

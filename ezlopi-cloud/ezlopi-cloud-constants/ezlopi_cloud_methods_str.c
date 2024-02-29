@@ -86,6 +86,7 @@ const char *method_hub_modes_get = "hub.modes.get";
 // const  char *method_hub_network_reset = "hub.network.reset";
 // const  char *method_hub_network_wifi_scan_start = "hub.network.wifi.scan.start";
 // const  char *method_hub_network_wifi_scan_stop = "hub.network.wifi.scan.stop";
+const char *method_hub_network_wifi_scan_progress = "hub.network.wifi.scan.progress";
 const char *method_hub_reset = "hub.reset";
 // const  char *method_hub_log_remote_set = "hub.log.set";
 // const  char *method_hub_log_local_set = "hub.log.local.set";
@@ -104,7 +105,7 @@ const char *method_hub_room_name_set = "hub.room.name.set";
 // const  char *method_hub_server_request = "hub.server.request";
 // const  char *method_hub_time_location_get = "hub.time.location.get";
 // const  char *method_hub_time_location_set = "hub.time.location.set";
-// const  char *method_hub_time_location_list = "hub.time.location.list";
+const char *method_hub_time_location_list = "hub.time.location.list";
 // const  char *method_hub_software_info_get = "hub.software.info.get";
 const char *method_register = "register";
 const char *method_registered = "registered";
@@ -125,5 +126,7 @@ const char *ezlopi_hub_room_created_str = "hub.room.created";
 const char *ezlopi_hub_room_edited_str = "hub.room.edited";
 const char *ezlopi_hub_room_deleted_str = "hub.room.deleted";
 const char *ezlopi_hub_room_reordered_str = "hub.room.reordered";
+
+const char *ezlopi_hub_modes_changed_str = "hub.modes.changed";
 
 #endif // __EZLOPI_METHODS_STR_H__

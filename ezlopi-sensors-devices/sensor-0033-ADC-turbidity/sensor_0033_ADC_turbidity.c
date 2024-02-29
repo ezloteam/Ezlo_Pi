@@ -1,5 +1,4 @@
 #include "ezlopi_util_trace.h"
-// #include "cJSON.h"
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
@@ -19,9 +18,6 @@ static int __init(l_ezlopi_item_t *item);
 static int __notify(l_ezlopi_item_t *item);
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 static int __get_item_list(l_ezlopi_item_t *item, void *arg);
-
-#warning "Use of static variable, static variable can't be used!"
-static const char *ezlopi_water_present_turbidity_state = NULL;
 
 static const char *water_filter_replacement_alarm_states[] = {
     "water_filter_ok",
@@ -90,15 +86,15 @@ static int __get_item_list(l_ezlopi_item_t *item, void *arg)
         s_ezlopi_analog_data_t ezlopi_analog_data = {.value = 0, .voltage = 0};
 
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
-        TRACE_B("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-
+        TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
+        const char *ezlopi_water_present_turbidity_state = NULL;
         if (1000 > ezlopi_analog_data.voltage)
         {
-            ezlopi_water_present_turbidity_state = water_filter_replacement_alarm_states[TURBIDITY_REPLACE_WATER_FILTER];
+            ezlopi_water_present_turbidity_state = "replace_water_filter";
         }
         else
         {
-            ezlopi_water_present_turbidity_state = water_filter_replacement_alarm_states[TURBIDITY_WATER_FILTER_OK];
+            ezlopi_water_present_turbidity_state = "water_filter_ok";
         }
 
         if (ezlopi_water_present_turbidity_state)
@@ -128,11 +124,11 @@ static int __notify(l_ezlopi_item_t *item)
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_analog_data);
         if (1000 > tmp_analog_data.voltage)
         {
-            tmp_sensor_state = water_filter_replacement_alarm_states[TURBIDITY_REPLACE_WATER_FILTER];
+            tmp_sensor_state = "replace_water_filter";
         }
         else
         {
-            tmp_sensor_state = water_filter_replacement_alarm_states[TURBIDITY_WATER_FILTER_OK];
+            tmp_sensor_state = "water_filter_ok";
         }
         if (strcmp(turbidity_sensor_state, tmp_sensor_state) != 0)
         {
@@ -164,10 +160,20 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+    if (item)
     {
-        ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit);
-        ret = 1;
+        if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
+        {
+            if (0 == ezlopi_adc_init(item->interface.adc.gpio_num, item->interface.adc.resln_bit))
+            {
+                ret = 1;
+            }
+        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -198,7 +204,7 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->user_arg = user_arg;
 }
 
@@ -223,7 +229,13 @@ static int __prepare(void *arg)
 
                     memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));
                     __prepare_item_properties(item_turbidity, prep_arg->cjson_device, (void *)turbidity_sensor_states);
+                    ret = 1;
                 }
+            }
+            else
+            {
+                ezlopi_device_free_device(device);
+                ret = -1;
             }
         }
     }

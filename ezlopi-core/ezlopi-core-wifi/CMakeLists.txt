@@ -10,7 +10,7 @@ set(EZLOPI_SERVICE_COMPONENTS
 )
 
 
-idf_component_register(SRCS "${wifi_src}"
+idf_component_register(SRCS "ezlopi_core_wifi.c" "ezlopi_core_wifi_ap.c" "${wifi_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_COMPONENTS}
                 ${EZLOPI_SERVICE_COMPONENTS}

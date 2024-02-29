@@ -86,6 +86,7 @@ extern const char *method_hub_modes_get;
 // extern const  char *method_hub_network_reset ;
 // extern const  char *method_hub_network_wifi_scan_start ;
 // extern const  char *method_hub_network_wifi_scan_stop ;
+extern const char *method_hub_network_wifi_scan_progress;
 extern const char *method_hub_reset;
 // extern const  char *method_hub_log_remote_set;
 // extern const  char *method_hub_log_local_set;
@@ -104,7 +105,7 @@ extern const char *method_hub_room_name_set;
 // extern const  char *method_hub_server_request;
 // extern const  char *method_hub_time_location_get;
 // extern const  char *method_hub_time_location_set;
-// extern const  char *method_hub_time_location_list;
+extern const char *method_hub_time_location_list;
 // extern const  char *method_hub_software_info_get;
 extern const char *method_register;
 extern const char *method_registered;
@@ -125,5 +126,7 @@ extern const char *ezlopi_hub_room_created_str;
 extern const char *ezlopi_hub_room_edited_str;
 extern const char *ezlopi_hub_room_deleted_str;
 extern const char *ezlopi_hub_room_reordered_str;
+
+extern const char *ezlopi_hub_modes_changed_str;
 
 #endif // __EZLOPI_METHODS_STR_H__

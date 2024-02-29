@@ -16,9 +16,9 @@
 
 #include "ezlopi_service_webprov.h"
 
-static cJSON *ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t *item_properties)
+static cJSON* ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t* item_properties)
 {
-    cJSON *cj_item_properties = cJSON_CreateObject();
+    cJSON* cj_item_properties = cJSON_CreateObject();
     if (cj_item_properties)
     {
         char tmp_string[64];
@@ -49,23 +49,23 @@ static cJSON *ezlopi_device_create_item_table_from_prop(l_ezlopi_item_t *item_pr
     return cj_item_properties;
 }
 
-void items_list_v3(cJSON *cj_request, cJSON *cj_response)
+void items_list_v3(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
-    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON *cj_items_array = cJSON_AddArrayToObject(cj_result, ezlopi_items_str);
+        cJSON* cj_items_array = cJSON_AddArrayToObject(cj_result, ezlopi_items_str);
 
         if (cj_items_array)
         {
 
-            cJSON *params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+            cJSON* params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
             if (params != NULL)
             {
-                cJSON *device_ids_array = cJSON_GetObjectItem(params, ezlopi_device_ids_str);
+                cJSON* device_ids_array = cJSON_GetObjectItem(params, ezlopi_device_ids_str);
 
                 if (device_ids_array != NULL)
                 {
@@ -73,23 +73,23 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                     {
                         if (cJSON_GetArraySize(device_ids_array) > 0)
                         {
-                            cJSON *device_id;
+                            cJSON* device_id;
                             cJSON_ArrayForEach(device_id, device_ids_array)
                             {
                                 if (cJSON_IsString(device_id))
                                 {
-                                    char *device_id_str = device_id->valuestring;
+                                    char* device_id_str = device_id->valuestring;
                                     uint32_t device_id = strtol(device_id_str, NULL, 16);
 
-                                    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+                                    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
                                     while (curr_device)
                                     {
                                         if (curr_device->cloud_properties.device_id == device_id)
                                         {
-                                            l_ezlopi_item_t *curr_item = curr_device->items;
+                                            l_ezlopi_item_t* curr_item = curr_device->items;
                                             while (curr_item)
                                             {
-                                                cJSON *cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
+                                                cJSON* cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
                                                 if (cj_item_properties)
                                                 {
                                                     if (!cJSON_AddItemToArray(cj_items_array, cj_item_properties))
@@ -111,13 +111,13 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
                 }
                 else
                 {
-                    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+                    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
                     while (curr_device)
                     {
-                        l_ezlopi_item_t *curr_item = curr_device->items;
+                        l_ezlopi_item_t* curr_item = curr_device->items;
                         while (curr_item)
                         {
-                            cJSON *cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
+                            cJSON* cj_item_properties = ezlopi_device_create_item_table_from_prop(curr_item);
                             if (cj_item_properties)
                             {
 
@@ -138,25 +138,25 @@ void items_list_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void items_set_value_v3(cJSON *cj_request, cJSON *cj_response)
+void items_set_value_v3(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_key_method_str, cJSON_GetObjectItem(cj_request, ezlopi_key_method_str));
+    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        char *item_id_str = 0;
+        char* item_id_str = 0;
         CJSON_GET_VALUE_STRING(cj_params, ezlopi__id_str, item_id_str);
         int item_id = strtol(item_id_str, NULL, 16);
-        TRACE_I("item_id: %X", item_id);
+        TRACE_S("item_id: %X", item_id);
 
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
         uint32_t found_item = 0;
         while (curr_device)
         {
-            l_ezlopi_item_t *curr_item = curr_device->items;
+            l_ezlopi_item_t* curr_item = curr_device->items;
             while (curr_item)
             {
                 if (item_id == curr_item->cloud_properties.item_id)
@@ -176,26 +176,26 @@ void items_set_value_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void items_update_v3(cJSON *cj_request, cJSON *cj_response)
+void items_update_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON *cjson_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cjson_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cjson_params)
     {
-        char *item_id_str = NULL;
+        char* item_id_str = NULL;
         CJSON_GET_VALUE_STRING(cjson_params, ezlopi__id_str, item_id_str);
         int item_id = strtol(item_id_str, NULL, 16);
 
-        l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
+        l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
         while (curr_device)
         {
-            l_ezlopi_item_t *curr_item = curr_device->items;
+            l_ezlopi_item_t* curr_item = curr_device->items;
             while (curr_item)
             {
                 if (item_id == curr_item->cloud_properties.item_id)
                 {
                     cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
                     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, method_hub_item_updated);
-                    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+                    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
                     if (cj_result)
                     {
                         char tmp_string[64];
@@ -229,18 +229,18 @@ void items_update_v3(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-cJSON *ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t *device, l_ezlopi_item_t *item)
+cJSON* ezlopi_cloud_items_updated_from_devices_v3(l_ezlopi_device_t* device, l_ezlopi_item_t* item)
 {
-    cJSON *cjson_response = cJSON_CreateObject();
+    cJSON* cjson_response = cJSON_CreateObject();
     if (cjson_response)
     {
         if (NULL != item)
         {
             cJSON_AddStringToObject(cjson_response, ezlopi_msg_subclass_str, method_hub_item_updated);
-            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, web_provisioning_get_message_count());
+            cJSON_AddNumberToObject(cjson_response, ezlopi_msg_id_str, ezlopi_service_web_provisioning_get_message_count());
             cJSON_AddStringToObject(cjson_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
 
-            cJSON *cj_result = cJSON_AddObjectToObject(cjson_response, ezlopi_result_str);
+            cJSON* cj_result = cJSON_AddObjectToObject(cjson_response, ezlopi_result_str);
             if (cj_result)
             {
                 char tmp_string[64];

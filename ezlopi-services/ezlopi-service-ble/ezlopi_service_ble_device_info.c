@@ -39,14 +39,14 @@ void ezlopi_ble_service_device_info_init(void)
     uuid.len = ESP_UUID_LEN_16;
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_SERVICE_UUID;
     g_device_info_service = ezlopi_ble_gatt_create_service(BLE_DEVICE_INFO_ID_HANDLE, &uuid);
-    TRACE_W("'provisioning_service' service added to list");
+    TRACE_W("'provisioning_service' service added to ezlopi-ble-stack");
 
     uuid.uuid.uuid16 = BLE_DEVICE_INFO_CHAR_UUID;
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
     ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_info_read_func, NULL, NULL);
-    TRACE_W("'provisioning_service' service added to list");
+    TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
 }
 
 static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
@@ -113,12 +113,12 @@ static char *device_info_jsonify(void)
         cJSON_AddStringToObject(root, ezlopi_chip_str, CONFIG_IDF_TARGET);
         // cJSON_AddStringToObject(root, "flash_size", CONFIG_ESPTOOLPY_FLASHSIZE);
         // cJSON_AddStringToObject(root, "version_idf", esp_get_idf_version());
-        cJSON_AddNumberToObject(root, ezlopi_uptime_str, uptime_sec);
+        // cJSON_AddNumberToObject(root, ezlopi_uptime_str, uptime_sec);
         cJSON_AddNumberToObject(root, ezlopi_build_date_str, BUILD_DATE);
         // cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
         // cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
         cJSON_AddBoolToObject(root, ezlopi_provisioned_status_str, ezlopi_factory_info_v3_get_provisioning_status());
-        cJSON_AddStringToObject(root, ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
+        __add_factory_info_to_root(root, ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
 
         cJSON_AddStringToObject(root, ezlopi_ezlopi_device_type_str, ezlopi_factory_info_v3_get_device_type());
         __add_factory_info_to_root(root, (char *)ezlopi_model_str, ezlopi_factory_info_v3_get_model());
@@ -147,7 +147,7 @@ static char *device_info_jsonify(void)
         if (device_info)
         {
             cJSON_Minify(device_info);
-            TRACE_I("Created device info: %s", device_info);
+            TRACE_S("Created device info: %s", device_info);
         }
     }
 
@@ -166,6 +166,6 @@ void __add_factory_info_to_root(cJSON *root, char *key, char *value)
         {
             cJSON_AddStringToObject(root, key, ezlopi_unknown_str);
         }
-        // free(value);
+        free(value);
     }
 }

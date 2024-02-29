@@ -26,7 +26,7 @@ void ezlopi_ble_gatts_characteristic_notify(s_gatt_service_t *service, s_gatt_ch
 
 void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param)
 {
-    TRACE_B("BLE GATT Event: %s, gatts_if: %d", ezlopi_ble_gatt_event_to_string(event), gatts_if);
+    TRACE_I("BLE GATT Event: %s, gatts_if: %d", ezlopi_ble_gatt_event_to_string(event), gatts_if);
 
     switch (event)
     {
@@ -61,7 +61,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     }
     case ESP_GATTS_START_EVT:
     {
-        TRACE_I("SERVICE_START_EVT, status %d, service_handle %d", param->start.status, param->start.service_handle);
+        TRACE_S("SERVICE_START_EVT, status %d, service_handle %d", param->start.status, param->start.service_handle);
         s_gatt_service_t *service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
         s_gatt_char_t *char_to_add = ezlopi_ble_profile_get_characterstics_to_init(service);
         if (char_to_add)
@@ -78,7 +78,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     }
     case ESP_GATTS_ADD_CHAR_EVT:
     {
-        TRACE_I("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
+        TRACE_S("ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
 
         s_gatt_service_t *service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
@@ -122,7 +122,7 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
     }
     case ESP_GATTS_ADD_CHAR_DESCR_EVT:
     {
-        TRACE_I("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
+        TRACE_S("ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
                 param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
 
         s_gatt_service_t *service = ezlopi_ble_profile_get_service_by_gatts_if(gatts_if);
@@ -187,10 +187,10 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
         ezlopi_ble_gatt_call_write_exec_by_handle(gatts_if, param);
         break;
     }
-#if (1 == EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
     case ESP_GATTS_CONNECT_EVT:
     {
-        TRACE_I("ESP_GATTS_CONNECT_EVT");
+        TRACE_S("ESP_GATTS_CONNECT_EVT");
         /* start security connect with peer device when receive the connect event sent by the master */
         esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM);
         break;
@@ -198,14 +198,14 @@ void ezlopi_ble_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t ga
 #endif
     case ESP_GATTS_DISCONNECT_EVT:
     {
-        TRACE_I("ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
+        TRACE_S("ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
         ezlopi_ble_gap_start_advertising();
         break;
     }
     case ESP_GATTS_MTU_EVT: // 4
     {
         ezlopi_ble_setup_adv_config();
-        TRACE_I("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
+        TRACE_S("ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
         g_mtu_size = param->mtu.mtu;
         break;
     }
@@ -237,22 +237,22 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
                 {
                 case ESP_GATTS_READ_EVT:
                 {
-                    TRACE_I("Is a characteristic 'read'.");
+                    TRACE_S("Is a characteristic 'read'.");
                     return characteristic->read_upcall;
                 }
                 case ESP_GATTS_WRITE_EVT:
                 {
-                    TRACE_I("Is a characteristic 'write'.");
+                    TRACE_S("Is a characteristic 'write'.");
                     return characteristic->write_upcall;
                 }
                 case ESP_GATTS_EXEC_WRITE_EVT:
                 {
-                    TRACE_I("Is a characteristic 'write_exce'.");
+                    TRACE_S("Is a characteristic 'write_exce'.");
                     return characteristic->write_exce_upcall;
                 }
                 default:
                 {
-                    TRACE_I("Characteristic upcall not found!");
+                    TRACE_S("Characteristic upcall not found!");
                     return NULL;
                 }
                 }
@@ -263,28 +263,28 @@ static f_upcall_t ezlopi_ble_gatt_call_by_handle(esp_gatt_if_t gatts_if, uint16_
             {
                 if (handle == descriptor->handle)
                 {
-                    TRACE_I("Is a descriptor %s.", event ? "read" : "write");
+                    TRACE_S("Is a descriptor %s.", event ? "read" : "write");
                     // ezlopi_ble_gatt_print_descriptor(descriptor);
                     switch (event)
                     {
                     case ESP_GATTS_READ_EVT:
                     {
-                        TRACE_I("Is a descriptor 'read'.");
+                        TRACE_S("Is a descriptor 'read'.");
                         return descriptor->read_upcall;
                     }
                     case ESP_GATTS_WRITE_EVT:
                     {
-                        TRACE_I("Is a descriptor 'write'.");
+                        TRACE_S("Is a descriptor 'write'.");
                         return descriptor->write_upcall;
                     }
                     case ESP_GATTS_EXEC_WRITE_EVT:
                     {
-                        TRACE_I("Is a descriptor 'write_exce'.");
+                        TRACE_S("Is a descriptor 'write_exce'.");
                         return descriptor->write_exce_upcall;
                     }
                     default:
                     {
-                        TRACE_I("Descriptor upcall not found!");
+                        TRACE_S("Descriptor upcall not found!");
                         return NULL;
                     }
                     }

@@ -28,8 +28,8 @@ extern "C"
 #define EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL 5000
 #define EZLOPI_WIFI_CONN_RETRY_ATTEMPT 2
 
-    void qt_serial_init(void);
-    int qt_serial_tx_data(int len, uint8_t *data);
+    void EZPI_SERVICE_uart_init(void);
+    int EZPI_SERVICE_uart_tx_data(int len, uint8_t *data);
 
 #ifdef __cplusplus
 }

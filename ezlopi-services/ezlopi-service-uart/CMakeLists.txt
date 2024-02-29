@@ -7,7 +7,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-nvs
         ezlopi-core-factory-info
         ezlopi-core-net
-        ezlopi-core-reboot
+        ezlopi-core-reset
 )
 set(EZLOPI_HAL_COMPONENTS 
         ezlopi-hal-sysinfo
@@ -16,7 +16,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-info
 )
 
-idf_component_register(SRCS "${src_files}"
+idf_component_register(SRCS "ezlopi_service_uart.c" "${src_files}"
     INCLUDE_DIRS "."
     REQUIRES    ${EZLOPI_CORE_COMPONENTS} 
                 ${EZLOPI_HAL_COMPONENTS}

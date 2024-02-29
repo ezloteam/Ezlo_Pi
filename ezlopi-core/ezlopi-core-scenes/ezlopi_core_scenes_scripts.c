@@ -10,6 +10,7 @@
 #include "lua/lualib.h"
 #include "lua/lauxlib.h"
 
+#include "corelib.h"
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_scenes_scripts.h"
@@ -406,10 +407,6 @@ static void __scripts_nvs_parse(void)
         }
 
         free(script_ids);
-    }
-    else
-    {
-        TRACE_W("Scenes-scripts not available!");
     }
 }
 

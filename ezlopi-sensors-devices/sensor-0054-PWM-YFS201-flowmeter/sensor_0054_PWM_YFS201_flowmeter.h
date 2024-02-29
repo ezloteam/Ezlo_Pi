@@ -19,21 +19,7 @@
  *      +-----------------------+
  */
 
-#define YFS201_QUEUE_SIZE 5
 
-typedef enum YFS201_queue_enum
-{
-    YFS201_QUEUE_RESET = 0,
-    YFS201_QUEUE_AVAILABLE,
-    YFS201_QUEUE_FULL,
-} YFS201_queue_enum_t;
-
-typedef struct yfs201_t
-{
-    uint32_t _pulses_yfs201;
-    uint32_t yfs201_dominant_pulse_count;
-    YFS201_queue_enum_t yfs201_QueueFlag;
-} yfs201_t;
 //-----------------------------------------------------------------------------------------------
 int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 

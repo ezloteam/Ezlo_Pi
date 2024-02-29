@@ -14,23 +14,21 @@
 
 #include "sensor_0029_I2C_GXHTC3.h"
 
-static const float ideal_value = 65536.0f;
-
-static int __prepare(void *arg);
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __get_cjson_update_value(l_ezlopi_item_t *item);
+static int __prepare(void* arg);
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __get_cjson_update_value(l_ezlopi_item_t* item);
 
 static uint8_t compare_float_values(float a, float b)
 {
     return (fabs(a - b) > FLOAT_EPSILON);
 }
 
-static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
+static int gxhtc3_sensor_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_gxhtc3_value_t *gxhtce_val = (s_gxhtc3_value_t *)item->user_arg;
+        s_gxhtc3_value_t* gxhtce_val = (s_gxhtc3_value_t*)item->user_arg;
         if (gxhtce_val)
         {
             if (NULL == gxhtce_val->gxhtc3)
@@ -41,6 +39,7 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
                     gxhtce_val->gxhtc3 = GXHTC3_init(item->interface.i2c_master.channel, item->interface.i2c_master.address);
                     if (gxhtce_val->gxhtc3)
                     {
+                        ret = 1;
                         if (gxhtce_val->gxhtc3->id.status)
                         {
                             TRACE_E("GXHTC3 Chip ID: 0x%x", gxhtce_val->gxhtc3->id.id);
@@ -48,23 +47,20 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
                         else
                         {
                             TRACE_E("GXHTC3 Chip ID not ready!");
+                            // ret = -1;
+                            // free(item->user_arg);
+                            // item->user_arg = NULL;
+                            // ezlopi_device_free_device_by_item(item);
                         }
                     }
                 }
             }
-            else
-            {
-                ret = 1;
-            }
         }
-        else
-        {
-            ret = 1;
-        }
-    }
-    else
-    {
-        ret = 1;
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
 
     return ret;
@@ -82,7 +78,7 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
 //         char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
 //         if (valueFormatted)
 //         {
-//             cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+//             cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
 //             free(valueFormatted);
 //         }
 //         cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
@@ -91,7 +87,7 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t *item)
 //     return ret;
 // }
 
-int sensor_0029_I2C_GXHTC3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0029_I2C_GXHTC3(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     switch (action)
@@ -125,14 +121,14 @@ int sensor_0029_I2C_GXHTC3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, voi
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
-        s_gxhtc3_value_t *value_ptr = (s_gxhtc3_value_t *)item->user_arg;
+        cJSON* cj_result = (cJSON*)arg;
+        s_gxhtc3_value_t* value_ptr = (s_gxhtc3_value_t*)item->user_arg;
 
         if (value_ptr)
         {
@@ -140,10 +136,10 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             {
 
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, value_ptr->temperature);
-                char *valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
+                char* valueFormatted = ezlopi_valueformatter_float(value_ptr->temperature);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
                 cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
@@ -151,10 +147,10 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
             else if (value_type_humidity == item->cloud_properties.value_type)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, value_ptr->humidity);
-                char *valueFormatted = ezlopi_valueformatter_float(value_ptr->humidity);
+                char* valueFormatted = ezlopi_valueformatter_float(value_ptr->humidity);
                 if (valueFormatted)
                 {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueformatted_str, valueFormatted);
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
                     free(valueFormatted);
                 }
                 cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_percent);
@@ -165,13 +161,13 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __get_cjson_update_value(l_ezlopi_item_t *item)
+static int __get_cjson_update_value(l_ezlopi_item_t* item)
 {
     int ret = 0;
 
     if (item)
     {
-        s_gxhtc3_value_t *value_ptr = (s_gxhtc3_value_t *)item->user_arg;
+        s_gxhtc3_value_t* value_ptr = (s_gxhtc3_value_t*)item->user_arg;
 
         if (value_ptr && value_ptr->gxhtc3)
         {
@@ -206,9 +202,9 @@ static int __get_cjson_update_value(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void __prepare_device_cloud_properties_temp(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties_temp(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *device_name = NULL;
+    char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
@@ -220,9 +216,9 @@ static void __prepare_device_cloud_properties_temp(l_ezlopi_device_t *device, cJ
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
-static void __prepare_device_cloud_properties_hum(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties_hum(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char *device_name = NULL;
+    char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
@@ -234,7 +230,7 @@ static void __prepare_device_cloud_properties_hum(l_ezlopi_device_t *device, cJS
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
-static void __prepare_temperature_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_temperature_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -254,7 +250,7 @@ static void __prepare_temperature_item_properties(l_ezlopi_item_t *item, cJSON *
     CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 }
 
-static void __prepare_humidity_item_properties(l_ezlopi_item_t *item, cJSON *cj_device)
+static void __prepare_humidity_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -274,54 +270,57 @@ static void __prepare_humidity_item_properties(l_ezlopi_item_t *item, cJSON *cj_
     CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
 }
 
-static int __prepare(void *arg)
+static int __prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
 
     if (prep_arg && prep_arg->cjson_device)
     {
-
-        s_gxhtc3_value_t *value_ptr = malloc(sizeof(s_gxhtc3_value_t));
+        s_gxhtc3_value_t* value_ptr = malloc(sizeof(s_gxhtc3_value_t));
         if (value_ptr)
         {
             memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
-            l_ezlopi_device_t *device_temp = ezlopi_device_add_device(prep_arg->cjson_device);
+
+            l_ezlopi_device_t* device_temp = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device_temp)
             {
                 __prepare_device_cloud_properties_temp(device_temp, prep_arg->cjson_device);
-                l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device_temp, sensor_0029_I2C_GXHTC3);
+                l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device_temp, sensor_0029_I2C_GXHTC3);
                 if (item_temperature)
                 {
                     item_temperature->cloud_properties.device_id = device_temp->cloud_properties.device_id;
                     __prepare_temperature_item_properties(item_temperature, prep_arg->cjson_device);
-                    value_ptr->temperature = ideal_value;
-                    item_temperature->user_arg = (void *)value_ptr;
+                    value_ptr->temperature = 65536.0f;
+                    item_temperature->user_arg = (void*)value_ptr;
                 }
                 else
                 {
                     ezlopi_device_free_device(device_temp);
-                    free(value_ptr);
+                    free(value_ptr); // set to NULL?
+                    ret = -1;
                 }
             }
-            l_ezlopi_device_t *device_hum = ezlopi_device_add_device(prep_arg->cjson_device);
+            l_ezlopi_device_t* device_hum = ezlopi_device_add_device(prep_arg->cjson_device);
             if (device_hum)
             {
                 __prepare_device_cloud_properties_hum(device_hum, prep_arg->cjson_device);
-                l_ezlopi_item_t *item_humdity = ezlopi_device_add_item_to_device(device_hum, sensor_0029_I2C_GXHTC3);
+                l_ezlopi_item_t* item_humdity = ezlopi_device_add_item_to_device(device_hum, sensor_0029_I2C_GXHTC3);
                 if (item_humdity)
                 {
                     item_humdity->cloud_properties.device_id = device_hum->cloud_properties.device_id;
                     __prepare_humidity_item_properties(item_humdity, prep_arg->cjson_device);
-                    value_ptr->humidity = ideal_value;
-                    item_humdity->user_arg = (void *)value_ptr;
+                    value_ptr->humidity = 65536.0f;
+                    item_humdity->user_arg = (void*)value_ptr; // affected if 'value_pts' is already freed?
                 }
                 else
                 {
                     ezlopi_device_free_device(device_hum);
                     free(value_ptr);
+                    ret = -1;
                 }
             }
+            ret = 1;
         }
     }
     return ret;

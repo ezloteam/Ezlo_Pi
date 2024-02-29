@@ -3,16 +3,16 @@
 
 // #include "cJSON.h"
 
-#include "ezlopi_core_settings.h"
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
+#include "ezlopi_core_settings.h"
 
-#include "ezlopi_hal_i2c_master.h"
-#include "ezlopi_hal_uart.h"
-#include "ezlopi_hal_onewire.h"
-#include "ezlopi_hal_gpio.h"
-#include "ezlopi_hal_pwm.h"
 #include "ezlopi_hal_adc.h"
+#include "ezlopi_hal_pwm.h"
+#include "ezlopi_hal_uart.h"
+#include "ezlopi_hal_gpio.h"
+#include "ezlopi_hal_onewire.h"
+#include "ezlopi_hal_i2c_master.h"
 #include "ezlopi_hal_spi_master.h"
 
 // #include "ezlopi_cloud_settings.h"
@@ -44,7 +44,22 @@
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
-// TRACE_B("%s: %d", item_name, item_val);
+
+#define CJSON_GET_VALUE_GPIO(root, item_name, item_val)       \
+    {                                                         \
+        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
+        if (o_item && o_item->type == cJSON_Number)           \
+        {                                                     \
+            item_val = o_item->valueint;                      \
+        }                                                     \
+        else                                                  \
+        {                                                     \
+            item_val = -1;                                    \
+            TRACE_E("%s not found!", item_name);              \
+        }                                                     \
+    }
+
+// TRACE_I("%s: %d", item_name, item_val);
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
     {                                                         \
@@ -59,7 +74,7 @@
             TRACE_E("%s: NULL", item_name);                   \
         }                                                     \
     }
-// TRACE_B("%s: %s", item_name, item_val ? item_val : "");
+// TRACE_I("%s: %s", item_name, item_val ? item_val : "");
 
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \
     {                                                                 \

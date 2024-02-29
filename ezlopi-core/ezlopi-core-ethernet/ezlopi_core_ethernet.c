@@ -100,8 +100,8 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
     case ETHERNET_EVENT_CONNECTED:
     {
         esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_addr);
-        TRACE_B("Ethernet Link Up");
-        TRACE_B("Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x",
+        TRACE_I("Ethernet Link Up");
+        TRACE_I("Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x",
                 mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
         eth_last_status = ETHERNET_STATUS_LINK_UP;
         break;
@@ -110,19 +110,19 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
     {
 
         eth_last_status = ETHERNET_STATUS_LINK_DOWN;
-        TRACE_B("Ethernet Link Down");
+        TRACE_I("Ethernet Link Down");
         break;
     }
     case ETHERNET_EVENT_START:
     {
         eth_last_status = ETHERNET_STATUS_STARTED;
-        TRACE_B("Ethernet Started");
+        TRACE_I("Ethernet Started");
         break;
     }
     case ETHERNET_EVENT_STOP:
     {
         eth_last_status = ETHERNET_STATUS_STOPPED;
-        TRACE_B("Ethernet Stopped");
+        TRACE_I("Ethernet Stopped");
         break;
     }
     default:
@@ -141,12 +141,12 @@ static void __ip_event_handler(void *arg, esp_event_base_t event_base, int32_t e
     case IP_EVENT_ETH_GOT_IP:
     {
         memcpy(&eth_ip_info, &event->ip_info, sizeof(esp_netif_ip_info_t));
-        TRACE_B("Ethernet Got IP Address");
-        TRACE_B("~~~~~~~~~~~");
-        TRACE_B("ETHIP:" IPSTR, IP2STR(&eth_ip_info.ip));
-        TRACE_B("ETHMASK:" IPSTR, IP2STR(&eth_ip_info.netmask));
-        TRACE_B("ETHGW:" IPSTR, IP2STR(&eth_ip_info.gw));
-        TRACE_B("~~~~~~~~~~~");
+        TRACE_I("Ethernet Got IP Address");
+        TRACE_I("~~~~~~~~~~~");
+        TRACE_I("ETHIP:" IPSTR, IP2STR(&eth_ip_info.ip));
+        TRACE_I("ETHMASK:" IPSTR, IP2STR(&eth_ip_info.netmask));
+        TRACE_I("ETHGW:" IPSTR, IP2STR(&eth_ip_info.gw));
+        TRACE_I("~~~~~~~~~~~");
         eth_last_status = ETHERNET_STATUS_GOT_IP;
         break;
     }

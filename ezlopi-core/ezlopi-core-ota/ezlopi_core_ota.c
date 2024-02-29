@@ -14,9 +14,8 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_ota.h"
-#include "ezlopi_core_reboot.h"
+#include "ezlopi_core_reset.h"
 #include "ezlopi_core_factory_info.h"
-
 
 // #include "nvs.h"
 // #include "nvs_flash.h"
@@ -67,7 +66,7 @@ static void ezlopi_ota_process(void *pv)
     __ota_in_process = 1;
     char *url = (char *)pv;
 
-    TRACE_I("Starting OTA ");
+    TRACE_S("Starting OTA ");
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
     esp_netif_t *netif = get_example_netif_from_desc(bind_interface_name);
     if (netif == NULL)
@@ -77,7 +76,7 @@ static void ezlopi_ota_process(void *pv)
     }
     struct ifreq ifr;
     esp_netif_get_netif_impl_name(netif, ifr.ifr_name);
-    TRACE_I("Bind interface name is %s", ifr.ifr_name);
+    TRACE_S("Bind interface name is %s", ifr.ifr_name);
 #endif
 
     esp_http_client_config_t config = {
@@ -116,7 +115,7 @@ static void ezlopi_ota_process(void *pv)
     if (ret == ESP_OK)
     {
         TRACE_W("Firmware Upgrade Successful, restarting !");
-        esp_restart();
+        EZPI_CORE_reboot();
     }
     else
     {

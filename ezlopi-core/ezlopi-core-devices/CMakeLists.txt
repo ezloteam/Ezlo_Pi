@@ -83,10 +83,12 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         sensor-0065-digitalIn-float-switch
         sensor-0066-other-R307-FingerPrint
         sensor-0067-UART-hilink-presence-sensor
+        sensor-0068-I2C-ENS160-gas-sensor
+        sensor-0069-UART-ze08-ch02-gas-sensor
 )
 
 
-idf_component_register(SRCS "${config_src}"
+idf_component_register(SRCS "ezlopi_core_device_value_updated.c" "ezlopi_core_devices.c" "${config_src}"
                         INCLUDE_DIRS "."
                         REQUIRES        ${EZLOPI_CORE_COMPONENTS}
                                         ${EZLOPI_HAL_COMPONENTS}
