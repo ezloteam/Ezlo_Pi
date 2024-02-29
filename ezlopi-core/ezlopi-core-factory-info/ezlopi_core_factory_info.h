@@ -208,10 +208,29 @@ extern "C"
                 \"pwm_resln\":8,\
                 \"freq_hz\":10000,\
                 \"duty_cycle\":0\
+            },\
+            {\
+            \"dev_type\": 8,\
+            \"dev_name\": \"ADXL 345\",\
+            \"id_room\": \"\",\
+            \"id_item\": 6,\
+            \"gpio_sda\": 18,\
+            \"gpio_scl\": 19,\
+            \"pullup_scl\": true,\
+            \"pullup_sda\": true,\
+            \"slave_addr\": 83\
+        },\
+        {\
+                 \"dev_type\": 3,\
+                \"dev_name\": \"Water_leak\",\
+                \"id_room\": \"\",\
+                \"id_item\": 27,\
+                \"gpio\": 33\
             }\
         ], \
-    \"dev_total\": 4}";
+    \"dev_total\": 5}";
 #endif
+
 
 
 #ifdef __cplusplus
