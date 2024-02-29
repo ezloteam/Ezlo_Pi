@@ -106,7 +106,7 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-     TRACE_W(" send_http ");
+    TRACE_W(" send_http ");
     int ret = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
@@ -154,7 +154,7 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_run_custom_script(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-     TRACE_W(" run_custom_script ");
+    TRACE_W(" run_custom_script ");
     int ret = 0;
     uint32_t script_id = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
@@ -187,9 +187,9 @@ int ezlopi_scene_then_run_plugin_script(l_scenes_list_v2_t* curr_scene, void* ar
 }
 int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-     TRACE_W(" run_scene ");
+    TRACE_W(" run_scene ");
     int ret = 0;
-    uint32_t sceneID = 0;
+    uint32_t sceneId = 0;
     bool execute_else_condition = false;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
@@ -201,7 +201,7 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
             {
                 if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
                 {
-                    sceneID = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
                 else
                 {
@@ -239,12 +239,12 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
         if (execute_else_condition)
         {
             TRACE_D("Executing else condition");
-            ezlopi_meshbot_execute_scene_else_action_group(sceneID);
+            ezlopi_meshbot_execute_scene_else_action_group(sceneId);
         }
         else
         {
-            TRACE_D("Executing scene, id: %d", sceneID);
-            ezlopi_scenes_service_run_by_id(sceneID);
+            TRACE_D("Executing scene, id: %d", sceneId);
+            ezlopi_scenes_service_run_by_id(sceneId);
         }
     }
     else
@@ -270,7 +270,7 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
 }
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-     TRACE_W(" reboot_hub ");
+    TRACE_W(" reboot_hub ");
     int ret = 0;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then && curr_scene)
@@ -282,7 +282,7 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-     TRACE_W(" reset_hub ");
+    TRACE_W(" reset_hub ");
     int ret = 0;
     cJSON* cj_params = cJSON_CreateObject();
 

@@ -9,6 +9,7 @@
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_scenes_when_methods.h"
+#include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 #include "ezlopi_cloud_constants.h"
@@ -226,6 +227,7 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
         time(&rawtime);
         struct tm* info;
         info = localtime(&rawtime);
+        TRACE_E("scene_id : %#x", scene_node->_id);
 
         if (2 == info->tm_sec) // nth sec mark
         {
@@ -254,7 +256,6 @@ int ezlopi_scene_when_is_date(l_scenes_list_v2_t* scene_node, void* arg)
                 curr_field = curr_field->next;
             }
             ret = isdate_check_flag_result(mode_type, flag_check);
-
             // Output Filter based on date+time of activation
             // TRACE_S("mode[%d], isDate:- FLAG_STATUS: %#x", mode_type, flag_check);
         }
@@ -504,7 +505,7 @@ int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg
 
 int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W(" isScene_state ");
+    // TRACE_W(" isScene_state ");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
@@ -517,10 +518,10 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
         {
             if (0 == strncmp(curr_field->name, "scene", 6))
             {
-                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
                 {
                     scene_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-
+                    // TRACE_E("scene_id : %d", scene_id);
                 }
             }
             else if (0 == strncmp(curr_field->name, "state", 6))
@@ -541,36 +542,37 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
             {
                 if (curr_scene->_id == scene_id)
                 {
-                    TRACE_S(" SceneID : %d , state: %s", scene_id, value_field->field_value.u_value.value_string);
+                    TRACE_S(" SceneId : %#x , state: %s", scene_id, value_field->field_value.u_value.value_string);
                     if (0 == strncmp("any_result", value_field->field_value.u_value.value_string, 11))
                     {
                         ret = 1;
                     }
                     else if (0 == strncmp("scene_enabled", value_field->field_value.u_value.value_string, 14))
                     {
-                        ret = (true == curr_scene->enabled);
+                        ret = (true == curr_scene->enabled) ? 1 : 0;
                     }
                     else if (0 == strncmp("scene_disabled", value_field->field_value.u_value.value_string, 14))
                     {
-                        ret = (false == curr_scene->enabled);
+                        ret = (false == curr_scene->enabled) ? 1 : 0;
                     }
                     else if (0 == strncmp("finished", value_field->field_value.u_value.value_string, 9))
                     {
-                        ret = (EZLOPI_SCENE_STATUS_STOP == curr_scene->status);
+                        ret = (EZLOPI_SCENE_STATUS_STOP == curr_scene->status) ? 1 : 0;
                     }
                     else if (0 == strncmp("partially_finished", value_field->field_value.u_value.value_string, 19))
                     {
-                        ret = (EZLOPI_SCENE_STATUS_RUNNING == curr_scene->status);
+                        ret = (EZLOPI_SCENE_STATUS_RUNNING == curr_scene->status) ? 1 : 0;
                     }
                     else if (0 == strncmp("stopped", value_field->field_value.u_value.value_string, 8))
                     {
-                        ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status);
+                        ret = (EZLOPI_SCENE_STATUS_STOPPED == curr_scene->status) ? 1 : 0;
                     }
                     #warning "need to add 'FAILED' status for scene";
                     // else if (0 == strncmp("failed", value_field->field_value.u_value.value_string, 7))
                     // {
-                    //     ret = (false == curr_scene->enabled);
+                    //     ret = (false == curr_scene->enabled)? 1:0;
                     // }
+                    TRACE_E("scene_state : %s , ret = %d", ezlopi_scenes_status_to_string(curr_scene->status), ret);
                     break;
                 }
                 curr_scene = curr_scene->next;
