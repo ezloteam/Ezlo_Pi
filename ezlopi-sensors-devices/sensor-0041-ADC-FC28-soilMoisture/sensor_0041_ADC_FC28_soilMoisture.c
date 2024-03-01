@@ -63,7 +63,7 @@ int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_humidity;
@@ -89,7 +89,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     if (item && cj_device)
     {
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-        CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
         item->interface.adc.resln_bit = 3;
     }
 }

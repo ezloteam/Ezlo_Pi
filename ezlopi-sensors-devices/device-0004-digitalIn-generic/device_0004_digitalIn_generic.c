@@ -15,12 +15,12 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "device_0004_digitalIn_generic.h"
-static int __prepare(void *arg);
-static int __init(l_ezlopi_item_t *item);
-static void __interrupt_upcall(void *arg);
-static int __get_value_cjson(l_ezlopi_item_t *item, void *arg);
+static int __prepare(void* arg);
+static int __init(l_ezlopi_item_t* item);
+static void __interrupt_upcall(void* arg);
+static int __get_value_cjson(l_ezlopi_item_t* item, void* arg);
 
-int device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
 
@@ -57,7 +57,7 @@ int device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t *it
     return ret;
 }
 
-static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cjson_device)
+static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cjson_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
@@ -71,7 +71,7 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
+static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
 {
     int tmp_var = 0;
     item->cloud_properties.has_getter = true;
@@ -91,20 +91,20 @@ static void __setup_item_properties(l_ezlopi_item_t *item, cJSON *cjson_device)
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 }
 
-static int __prepare(void *arg)
+static int __prepare(void* arg)
 {
     int ret = 0;
     if (arg)
     {
-        s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
-        cJSON *cjson_device = prep_arg->cjson_device;
+        s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+        cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(cjson_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, device_0004_digitalIn_generic);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, device_0004_digitalIn_generic);
                 if (item)
                 {
                     item->cloud_properties.device_id = device->cloud_properties.device_id;
@@ -123,7 +123,7 @@ static int __prepare(void *arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t *item)
+static int __init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -168,12 +168,12 @@ static int __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
+static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cjson_propertise = (cJSON *)arg;
+        cJSON* cjson_propertise = (cJSON*)arg;
         if (cjson_propertise)
         {
             cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_in.value);
@@ -185,9 +185,9 @@ static int __get_value_cjson(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static void __interrupt_upcall(void *arg)
+static void __interrupt_upcall(void* arg)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
         item->interface.gpio.gpio_in.value = !item->interface.gpio.gpio_in.value;

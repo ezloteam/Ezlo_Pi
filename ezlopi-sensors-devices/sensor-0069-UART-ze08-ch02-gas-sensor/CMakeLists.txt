@@ -1,6 +1,6 @@
 file(GLOB_RECURSE config_src "*.c")
 
-idf_component_register(SRCS "${config_src}" "ze08_ch2o.c"
+idf_component_register(SRCS "sensor_0069_ze08_ch02_gas_sensor.c" "${config_src}" "ze08_ch2o.c"
                     INCLUDE_DIRS "."
                     REQUIRES    ezlopi-util-trace 
                                 ezlopi-core-devices

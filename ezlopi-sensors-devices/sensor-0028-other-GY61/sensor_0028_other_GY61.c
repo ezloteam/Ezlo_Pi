@@ -73,7 +73,7 @@ int sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t* item, voi
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -225,7 +225,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_gy61_data_t* user_data = ((s_gy61_data_t*)item->user_arg);
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->x_data));
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->x_data));
                 // TRACE_I("x-axis-G : %.2f", user_data->x_data);
                 char *valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
                 if (valueFormatted)
@@ -236,7 +236,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             }
             if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->y_data));
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->y_data));
                 // TRACE_I("y-axis-G : %.2f", user_data->y_data);
                 char *valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
                 if (valueFormatted)
@@ -247,7 +247,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             }
             if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->z_data));
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->z_data));
                 // TRACE_I("z-axis-G : %.2f", user_data->z_data);
                 char *valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
                 if (valueFormatted)

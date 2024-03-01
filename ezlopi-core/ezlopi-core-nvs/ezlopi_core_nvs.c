@@ -364,6 +364,53 @@ uint32_t ezlopi_nvs_get_boot_count(void)
     return boot_count;
 }
 
+void ezlopi_nvs_scenes_soft_reset(void)
+{
+    esp_err_t err = ESP_OK;
+    if (1 == ezlopi_nvs_init())
+    {
+        // only 'wifi' key is cleared during 'soft reset'
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, wifi_info_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", wifi_info_nvs_name, esp_err_to_name(err));
+        }
+    }
+}
+
+void ezlopi_nvs_scenes_factory_info_reset(void)
+{
+    esp_err_t err = ESP_OK;
+    if (1 == ezlopi_nvs_init())
+    {
+        // list of nvs keys cleared during 'factory reset'
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, user_id_nvs_name))) // ble
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", user_id_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, passkey_nvs_name))) // ble
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", passkey_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, ezlopi_scenes_v2_nvs_name)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scenes_v2_nvs_name, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, ezlopi_scripts_nvs_ids)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scripts_nvs_ids, esp_err_to_name(err));
+        }
+        if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, ezlopi_scenes_expression_ids)))
+        {
+            TRACE_E("Erasing nvs-key '%s' failed!, error: %s", ezlopi_scenes_expression_ids, esp_err_to_name(err));
+        }
+        // if (ESP_OK != (err = nvs_erase_key(ezlopi_nvs_handle, settings_initialized_status_name)))                // "settings_magic"
+        // {
+        //     TRACE_E("Erasing nvs-key '%s' failed!, error: %s", settings_initialized_status_name, esp_err_to_name(err));
+        // }
+    }
+    ezlopi_nvs_scenes_soft_reset();
+}
+
 uint8_t ezlopi_nvs_write_int32(int32_t i, const char* key_name)
 {
     uint8_t ret = 0;

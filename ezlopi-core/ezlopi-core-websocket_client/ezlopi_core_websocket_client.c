@@ -107,7 +107,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         {
             free(ca_cert);
             free(ssl_shared);
-            free(ssl_shared);
+            free(ssl_priv);
         }
     }
     else
