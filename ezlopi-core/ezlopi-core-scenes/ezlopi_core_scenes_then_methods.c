@@ -92,7 +92,54 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg)
 {
     TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    if (curr_scene)
+    {
+        uint32_t device_id = 0;
+        bool device_armed = false;
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, "device", 7))
+                {
+                    device_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+                else if (0 == strncmp(curr_field->name, "deviceFlag", 11))
+                {
+                    if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
+                    {
+                        device_armed = curr_field->field_value.u_value.value_bool;
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+
+            if (device_id)
+            {
+                l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+                while (curr_device)
+                {
+                    if (device_id == curr_device->cloud_properties.device_id)
+                    {
+                        s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
+                        if (controller_info)
+                        {
+                            #warning "we need to change from 'controller' to 'device_id' specific"
+                                controller_info->armed = (device_armed) ? true : false;
+                        }
+                        break;
+                    }
+                    curr_device = curr_device->next;
+                }
+            }
+        }
+
+    }
+
+    return ret;
 }
 int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* curr_scene, void* arg)
 {
