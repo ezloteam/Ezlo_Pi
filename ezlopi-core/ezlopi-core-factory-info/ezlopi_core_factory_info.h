@@ -157,7 +157,6 @@ extern "C"
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
     static const char* ezlopi_config_test =
-#if 0 
         "{\
         \"cmd\": 3,\
         \"dev_detail\":\
@@ -168,9 +167,9 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 1,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 1,\
+                \"gpio_out\": 2,\
                 \"pullup_ip\": false,\
-                \"pullup_op\": true,\
+                \"pullup_op\": false,\
                 \"is_ip\": false,\
                 \"ip_inv\": false,\
                 \"op_inv\": false,\
@@ -178,67 +177,11 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \"dev_type\": 2,\
-                \"dev_name\": \"Switch\",\
-                \"id_room\": \"\",\
-                \"id_item\": 4,\
-                \"gpio\": 21,\
-                \"logic_inv\": false,\
-                \"pull_up\": true,\
-                \"val_ip\": false,\
-                \"ip_inv\": false\
-            },\
-            {\
                 \"dev_type\": 3,\
                 \"dev_name\": \"Water_leak\",\
                 \"id_room\": \"\",\
                 \"id_item\": 27,\
-                \"gpio\": 7\
-            },\
-            {\
-                \"dev_type\": 5,\
-                \"dev_name\": \"RGB-Backlight\",\
-                \"gpio\": 48,\
-                \"id_item\": 9,\
-                \"id_room\": \"\",\
-                \"pwm_resln\": 3,\
-                \"freq_hz\": 50,\
-                \"duty_cycle\": 10\
-            },\
-            {\
-                \"dev_type\": 6,\
-                \"dev_name\": \"UART_MB1013\",\
-                \"id_item\": 21,\
-                \"id_room\": \"\",\
-                \"gpio_tx\": 17,\
-                \"gpio_rx\": 18,\
-                \"baud_rate\": 9600\
-            },\
-            {\
-                \"dev_type\": 7,\
-                \"dev_name\": \"DHT 11\",\
-                \"id_room\": \"\",\
-                \"id_item\": 15,\
-                \"gpio\": 15\
-            },\
-            {\
-                \"dev_type\": 8,\
-                \"dev_name\": \"GY271\",\
-                \"id_room\": \"\",\
-                \"id_item\": 7,\
-                \"gpio_sda\": 40,\
-                \"gpio_scl\": 41,\
-                \"pullup_scl\": true,\
-                \"pullup_sda\": true,\
-                \"slave_addr\": 13\
-            },\
-             {\
-                \"dev_name\": \"MQ9_LPG\",\
-                \"dev_type\": 10,\
-                \"id_item\": 63,\
-                \"id_room\": \"\",\
-                \"gpio1\": 25,\
-                \"gpio2\": 6\
+                \"gpio\": 33\
             }\
         ],\
     \"dev_total\": 8}";

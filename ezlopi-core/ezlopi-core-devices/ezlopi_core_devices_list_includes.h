@@ -29,7 +29,7 @@
 // #include "sensor_0024_other_HCSR04.h"
 // #include "sensor_0025_digitalIn_LDR.h"
 // #include "sensor_0026_ADC_LDR.h"
-// #include "sensor_0027_ADC_waterLeak.h"
+#include "sensor_0027_ADC_waterLeak.h"
 // #include "sensor_0028_other_GY61.h"
 // #include "sensor_0029_I2C_GXHTC3.h"
 // #include "sensor_0030_oneWire_DS18B20.h"

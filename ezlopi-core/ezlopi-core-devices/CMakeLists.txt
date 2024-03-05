@@ -43,7 +43,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         # sensor-0024-other-HCSR04
         # sensor-0025-digitalIn-LDR
         # sensor-0026-ADC-LDR
-        # sensor-0027-ADC-waterLeak                                
+        sensor-0027-ADC-waterLeak                                
 
         # sensor-0028-other-GY61
         # sensor-0029-I2C-GXHTC3
