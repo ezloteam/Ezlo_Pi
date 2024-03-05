@@ -743,7 +743,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
     //TRACE_W(" Compare_strings ");
     TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
-#if 0
+    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
@@ -792,7 +792,7 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
         //     // ret = ezlopi_scenes_operators_value_expn_strings_operations(item_id, value_field, comparator_field);
         // }
     }
-#endif
+    // #endif
     return ret;
 }
 
