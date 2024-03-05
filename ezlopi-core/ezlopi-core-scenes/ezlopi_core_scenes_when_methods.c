@@ -974,7 +974,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" atleast_one_diction_val ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    TRACE_W("Warning: when-method 'atleast_one_dictionary_value' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1016,7 +1016,7 @@ int ezlopi_scene_when_has_atleast_one_dictionary_value(l_scenes_list_v2_t* scene
 int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" firmware_update ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    TRACE_W("Warning: when-method 'firmware_update_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -1062,7 +1062,7 @@ int ezlopi_scene_when_is_firmware_update_state(l_scenes_list_v2_t* scene_node, v
 int ezlopi_scene_when_is_dictionary_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" isDictionary_changed ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    TRACE_W("Warning: when-method 'is_dictionary_changed' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
