@@ -435,7 +435,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // TRACE_W(" isDevice_state. ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    TRACE_W("Warning: when-method 'is_device_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -506,7 +506,7 @@ int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t* scene_node, void* arg
 int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // TRACE_W(" isScene_state ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    // TRACE_W("Warning: when-method 'is_scene_state' not implemented!");
     int ret = 0;
 #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -682,9 +682,9 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_num_range ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    // TRACE_W("Warning: when-method 'compare_number_range' not implemented!");
     int ret = 0;
-#if 0
+    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
     if (when_block && scene_node)
@@ -734,14 +734,14 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
             }
         }
     }
-#endif
+    // #endif
     return ret;
 }
 
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_strings ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    // TRACE_W("Warning: when-method 'compare_strings' not implemented!");
     int ret = 0;
     // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
@@ -799,9 +799,9 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
 int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_string_op ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    // TRACE_W("Warning: when-method 'string_operation' not implemented!");
     int ret = 0;
-#if 0
+    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
@@ -850,16 +850,16 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
         //     // ret = ezlopi_scenes_operators_value_expn_strings_operations(item_id, value_field, operation_field);
         // }
     }
-#endif
+    // #endif
     return ret;
 }
 
 int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // //TRACE_W(" Compare_inArray ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    // TRACE_W("Warning: when-method 'in_array' not implemented!");
     int ret = 0;
-#if 0
+    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
@@ -904,16 +904,16 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
         // ret = ezlopi_scenes_operators_value_expn_inarr_operations(item_id, value_field, operation_field);
         // }
     }
-#endif
+    // #endif
     return ret;
 }
 
 int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" Compare_values ");
-    TRACE_W("Warning: when-method 'is_group_state' not implemented!");
+    // TRACE_W("Warning: when-method 'is_group_state' not implemented!");
     int ret = 0;
-#if 0
+    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
@@ -967,7 +967,7 @@ int ezlopi_scene_when_compare_values(l_scenes_list_v2_t* scene_node, void* arg)
         // ret = ezlopi_scenes_operators_expn_comparevalues_with_less_operations(item_id, value_field, comparator_field);
         // }
     }
-#endif
+    // #endif
     return ret;
 }
 
