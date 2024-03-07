@@ -25,15 +25,23 @@ menu "EzloPi User Config"
     default y
     help
         Enable meshbot services for scenes
-    
+
+    config EZLOPI_BLE_ENABLE
+    bool "Enable BLE"
+    default n
+    help
+        Enable BLE
+
     config EZLOPI_BLE_ENALBE_PASSKEY
     bool "Enable BLE pass key"
     default n
+    depends on EZLOPI_BLE_ENABLE
     help
         Enable BLE pass key
     
     config EZLOPI_BLE_ENALBE_PAIRING
     bool "Enable BLE pairing"
+    depends on EZLOPI_BLE_ENABLE
     default y
     help
         Enable BLE pairing
