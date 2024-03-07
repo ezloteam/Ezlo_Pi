@@ -79,12 +79,26 @@ static void blinky(void* pv)
         {
             count = 0;
 
-            TRACE_D("----------------------------------------------");
-            TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
-            TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
-            TRACE_D("----------------------------------------------");
-        }
+            UBaseType_t total_task_numbers = uxTaskGetNumberOfTasks();
+            TaskStatus_t task_array[total_task_numbers];
 
+            TRACE_D("----------------------------------------------");
+            TRACE_D("Free Heap Size: %.2f KB", esp_get_free_heap_size() / 1024.0);
+            TRACE_D("Minimum Free Heap Size: %.2f KB", esp_get_minimum_free_heap_size() / 1024.0);
+
+            uxTaskGetSystemState(task_array, total_task_numbers, NULL);
+
+            for (int i = 0; i < total_task_numbers; i++) {
+                TRACE_D("Process Name: %s, \tPID: %d, \tBase: %p, \tWatermark: %.2f KB",
+                    task_array[i].pcTaskName,
+                    task_array[i].xTaskNumber,
+                    task_array[i].pxStackBase,
+                    task_array[i].usStackHighWaterMark / 1024.0);
+            }
+
+            TRACE_D("----------------------------------------------");
+
+        }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    }
+}

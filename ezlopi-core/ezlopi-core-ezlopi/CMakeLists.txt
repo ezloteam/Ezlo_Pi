@@ -29,6 +29,7 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-ota
         ezlopi-cloud-location
         ezlopi-cloud-coordinates
+        ezlopi-cloud-status
 )
 
 idf_component_register(SRCS "ezlopi_core_ezlopi.c" "ezlopi_core_ezlopi_broadcast.c" "${config_src}"

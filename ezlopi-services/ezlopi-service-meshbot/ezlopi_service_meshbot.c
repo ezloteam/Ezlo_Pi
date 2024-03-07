@@ -253,7 +253,7 @@ static void __scenes_process(void* arg)
                     }
                     else
                     {
-                            TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
+                        TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
                     }
                 }
 
