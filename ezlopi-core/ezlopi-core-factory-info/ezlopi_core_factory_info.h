@@ -150,6 +150,8 @@ extern "C"
     void ezlopi_factory_info_v3_free(void* arg);
     int ezlopi_factory_info_v3_factory_reset(void);
 
+    int ezlopi_factory_info_v3_scenes_factory_soft_reset(void);
+
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
@@ -164,24 +166,24 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 1,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 1,\
+                \"gpio_out\": 2,\
                 \"pullup_ip\": false,\
-                \"pullup_op\": true,\
+                \"pullup_op\": false,\
                 \"is_ip\": false,\
                 \"ip_inv\": false,\
                 \"op_inv\": false,\
                 \"val_ip\": false,\
                 \"val_op\": false\
-            }\
+            },\
             {\
                 \"dev_type\": 3,\
-                \"dev_name\": \"Water_leak\",\
+                \"dev_name\": \"soil_moisture\",\
                 \"id_room\": \"\",\
-                \"id_item\": 27,\
-                \"gpio\": 7\
+                \"id_item\": 32,\
+                \"gpio\": 33\
             }\
         ],\
-    \"dev_total\": 8}";
+    \"dev_total\": 2}";
 #endif
 
 

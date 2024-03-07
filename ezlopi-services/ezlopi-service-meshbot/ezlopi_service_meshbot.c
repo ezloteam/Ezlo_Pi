@@ -139,7 +139,7 @@ void ezlopi_scenes_meshbot_init(void)
     {
         if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
-            xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+            xTaskCreate(__scenes_process, scene_node->name, 3 * 2048, scene_node, 2, NULL);
         }
         else
         {

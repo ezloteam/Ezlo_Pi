@@ -133,8 +133,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
     {
         cJSON* cjson_params = (cJSON*)arg;
         s_dimmer_args_t* dimmer_args = (s_dimmer_args_t*)item->user_arg;
-
-        if (NULL != dimmer_args)
+        if ((dimmer_args) && (cjson_params))
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
@@ -232,24 +231,25 @@ static int __init(l_ezlopi_item_t* item)
                         ret = -1;
                         free(item->user_arg); // this will free ; memory address linked to all items
                         item->user_arg = NULL;
+                        ezlopi_device_free_device_by_item(item);
                     }
                 }
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
-
     return ret;
 }
+
 
 static void __prepare_device_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
@@ -270,8 +270,8 @@ static void __prepare_SK6812_RGB_color_item(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
-    item->cloud_properties.item_name = ezlopi_item_name_rgbcolor,
-        item->cloud_properties.show = true;
+    item->cloud_properties.item_name = ezlopi_item_name_rgbcolor;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_rgb;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
@@ -288,8 +288,8 @@ static void __prepare_SK6812_RGB_dimmer_item(l_ezlopi_item_t* item, cJSON* cj_de
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
-    item->cloud_properties.item_name = ezlopi_item_name_dimmer,
-        item->cloud_properties.show = true;
+    item->cloud_properties.item_name = ezlopi_item_name_dimmer;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_int;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_PWM;
@@ -357,8 +357,8 @@ static void __prepare_SK6812_LED_onoff_switch_item(l_ezlopi_item_t* item, cJSON*
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
-    item->cloud_properties.item_name = ezlopi_item_name_switch,
-        item->cloud_properties.show = true;
+    item->cloud_properties.item_name = ezlopi_item_name_switch;
+    item->cloud_properties.show = true;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.value_type = value_type_bool;
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;

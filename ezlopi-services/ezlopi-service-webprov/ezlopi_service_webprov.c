@@ -387,7 +387,6 @@ static void __config_check(void* pv)
 
         vTaskDelay(50000 / portTICK_RATE_MS);
     }
-
     free(ca_certificate);
     free(provision_token);
     free(provisioning_server);
