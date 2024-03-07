@@ -8,6 +8,7 @@
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_then_methods.h"
+#include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_service_meshbot.h"
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
 
@@ -302,8 +303,61 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    int ret = 0;
+    uint32_t sceneID = 0;
+    bool set_scene_enable = false;
+    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+    if (curr_then)
+    {
+        l_fields_v2_t* curr_field = curr_then->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, "sceneId", 7))
+            {
+                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                {
+                    sceneID = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+                else
+                {
+                    ret = 1;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "enabled", 5))
+            {
+                if (curr_field->field_value.e_type == VALUE_TYPE_BOOL)
+                {
+                    set_scene_enable = curr_field->field_value.u_value.value_bool;
+                }
+                else
+                {
+                    ret = 1;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+        l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_by_id_v2(sceneID);
+        if (scene_node)
+        {
+            if (1 == ezlopi_scenes_enable_disable_id_from_list_v2(sceneID, set_scene_enable))
+            {
+                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+            }
+            else
+            {
+                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
+            }
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
 }
 int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
 {

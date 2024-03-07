@@ -50,7 +50,7 @@ static l_scenes_list_v2_t* _scenes_populate(cJSON* cj_scene, uint32_t scene_id);
 int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON* cj_scene)
 {
     int ret = 0;
-
+    // TRACE_E("%s", cJSON_Print(cj_scene));
     if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene))
     {
         if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
@@ -298,11 +298,14 @@ int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag
                                 cJSON* enable_item = (cJSON_GetObjectItem(cj_scene, "enabled"));
                                 if (enable_item && cJSON_IsBool(enable_item))
                                 {
-                                    cJSON_ReplaceItemInObject(cj_scene, "enabled", cJSON_CreateBool(false));
+                                    cJSON_ReplaceItemInObject(cj_scene, "enabled", cJSON_CreateBool(enabled_flag));
                                     if (1 == ezlopi_scene_edit_by_id(_id, cj_scene))
                                     {
                                         ret = 1;
-                                        TRACE_S("Scene_id[%d] : %s", _id, ((true == enabled_flag) ? "true" : "false"));
+                                    }
+                                    else 
+                                    {
+                                        TRACE_E("HERE");
                                     }
                                 }
                                 cJSON_Delete(cj_scene);
