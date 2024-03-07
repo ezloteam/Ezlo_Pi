@@ -22,6 +22,8 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
 
+#include "ezlopi_core_ble_config.h"
+
 #define ENABLE_HEARTBIT_LED 0
 
 static void blinky(void* pv);
@@ -85,4 +87,4 @@ static void blinky(void* pv)
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-}
+    }

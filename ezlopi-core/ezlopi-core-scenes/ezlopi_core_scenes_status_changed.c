@@ -91,6 +91,7 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
         ret = "EZLOPI_SCENE_STATUS_STOPPED";
         break;
     }
+    #warning "need to add status_failed";
     default:
     {
         ret = "EZLOPI_SCENE_STATUS_NONE";

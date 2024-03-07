@@ -1,5 +1,11 @@
 
 menu "EzloPi User Config"
+
+    config EZPI_DEV_TYPE_TEST
+    bool "Run device in test mode"
+    default n
+    help 
+        Run the device in test mode
     
     config EZPI_UTIL_ENABLE_TRACE
     bool "Enable trace component for logging"
