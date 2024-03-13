@@ -81,6 +81,7 @@ static void ezlopi_initialize_devices_v3(void)
     l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
     while (curr_device)
     {
+        TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)
         {
@@ -98,9 +99,9 @@ static void ezlopi_initialize_devices_v3(void)
 
             curr_item = curr_item->next;
         }
-
-        if (device_init_ret < 0)
+        if (-1 == device_init_ret)
         {
+            device_init_ret = 0;
             l_ezlopi_device_t* device_to_free = curr_device;
             curr_device = curr_device->next;
             device_to_free->next = NULL;

@@ -174,7 +174,7 @@ void ezlopi_device_free_device(l_ezlopi_device_t* device)
             l_device_head = l_device_head->next;
             device->next = NULL;
 
-            TRACE_D("Device-ID: %08x", device->cloud_properties.device_id);
+            TRACE_D("Head Device-ID: %08x", device->cloud_properties.device_id);
             ezlopi_device_free_single(device);
         }
         else
@@ -573,48 +573,64 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
 
 static void ezlopi_device_free_item(l_ezlopi_item_t* items)
 {
-    if (items->next)
+    if (items)
     {
-        ezlopi_device_free_item(items->next);
-    }
+        if (items->next)
+        {
+            ezlopi_device_free_item(items->next);
+        }
 
-    free(items);
+        if (items->user_arg)
+        {
+            free(items->user_arg);
+            items->user_arg = NULL;
+        }
+
+        free(items);
+    }
 }
 
 static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t* settings)
 {
-    if (settings->next)
+    if (settings)
     {
-        ezlopi_device_free_setting(settings->next);
-    }
+        if (settings->next)
+        {
+            ezlopi_device_free_setting(settings->next);
+        }
 
-    free(settings);
+        free(settings);
+    }
 }
 
 static void ezlopi_device_free_single(l_ezlopi_device_t* device)
 {
-    if (device->items)
+    if (device)
     {
-        ezlopi_device_free_item(device->items);
-        device->items = NULL;
-    }
+        TRACE_E("free single Device-ID: %08x", device->cloud_properties.device_id);    
+        if (device->items)
+        {
+            ezlopi_device_free_item(device->items);
+            device->items = NULL;
+        }
 
-    //  if (device->settings)
-    // {
-    //     ezlopi_device_free_setting(device->settings);
-    //     device->settings = NULL;
-    // }
-    // if (device->cloud_properties.device_type_id)
-    // {
-    //     free(device->cloud_properties.device_type_id);
-    // }
-    if (NULL != device->cloud_properties.info)
-    {
-        cJSON_Delete(device->cloud_properties.info);
-        device->cloud_properties.info = NULL;
-    }
+        //  if (device->settings)
+        // {
+        //     ezlopi_device_free_setting(device->settings);
+        //     device->settings = NULL;
+        // }
+        // if (device->cloud_properties.device_type_id)
+        // {
+        //     free(device->cloud_properties.device_type_id);
+        // }
+        // if (NULL != device->cloud_properties.info)
+        // {
+        //     cJSON_Delete(device->cloud_properties.info);
+        //     device->cloud_properties.info = NULL;
+        // }
 
-    free(device);
+        free(device);
+    }
 }
 
 static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t* curr_device)
