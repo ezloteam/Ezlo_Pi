@@ -172,7 +172,7 @@ uint32_t ezlopi_scenes_get_list_v2(cJSON* cj_scenes_array)
                 if (cj_scene_id && cj_scene_id->valuedouble)
                 {
                     char tmp_buffer[32];
-                    uint32_t scene_id = (uint32_t)cj_scene_id->valueint;
+                    uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
                     char* scene_str = ezlopi_nvs_read_str(tmp_buffer);
                     if (scene_str)
@@ -336,7 +336,7 @@ void ezlopi_scenes_init_v2(void)
                 if (cj_scene_id && cj_scene_id->valuedouble)
                 {
                     char tmp_buffer[32];
-                    uint32_t scene_id = (uint32_t)cj_scene_id->valueint;
+                    uint32_t scene_id = (uint32_t)cj_scene_id->valuedouble;
 
                     snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", scene_id);
                     ezlopi_cloud_update_scene_id((uint32_t)scene_id);
@@ -411,8 +411,8 @@ static l_scenes_list_v2_t* __new_scene_populate(cJSON* cj_scene, uint32_t scene_
             new_scene->task_handle = NULL;
             new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
-            CJSON_GET_VALUE_INT(cj_scene, ezlopi_enabled_str, new_scene->enabled);
-            CJSON_GET_VALUE_INT(cj_scene, ezlopi_is_group_str, new_scene->is_group);
+            CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, new_scene->enabled);
+            CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
             {
                 CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);

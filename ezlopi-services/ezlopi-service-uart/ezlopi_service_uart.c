@@ -187,7 +187,7 @@ static int qt_serial_parse_rx_data(const char* data)
     {
         if (cJSON_GetObjectItem(root, ezlopi_cmd_str))
         {
-            uint8_t cmd_temp = cJSON_GetObjectItem(root, ezlopi_cmd_str)->valueint;
+            uint8_t cmd_temp = cJSON_GetObjectItem(root, ezlopi_cmd_str)->valuedouble;
 
             switch (cmd_temp)
             {
@@ -213,7 +213,7 @@ static int qt_serial_parse_rx_data(const char* data)
             }
             case 0:
             {
-                ezlopi_service_uart_execute_command_0(cJSON_GetObjectItem(root, ezlopi_sub_cmd_str)->valueint);
+                ezlopi_service_uart_execute_command_0(cJSON_GetObjectItem(root, ezlopi_sub_cmd_str)->valuedouble);
                 break;
             }
 

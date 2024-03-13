@@ -12,8 +12,8 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t* new_scene, cJSON* cj_scene
         new_scene->task_handle = NULL;
         new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
-        CJSON_GET_VALUE_INT(cj_scene, ezlopi_enabled_str, new_scene->enabled);
-        CJSON_GET_VALUE_INT(cj_scene, ezlopi_is_group_str, new_scene->is_group);
+        CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, new_scene->enabled);
+        CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, new_scene->name);

@@ -424,7 +424,7 @@ static uint8_t __config_update(void* arg)
 
         if (NULL != cJSON_id)
         {
-            const uint64_t id = cJSON_id->valueint;
+            const uint64_t id = cJSON_id->valuedouble;
             TRACE_S("id: %lld", id);
             config_check_factoryInfo->id = id;
         }
@@ -463,7 +463,7 @@ static uint8_t __config_update(void* arg)
 
         if (NULL != cJSON_config_version)
         {
-            const uint16_t config_version = cJSON_config_version->valueint;
+            const uint16_t config_version = cJSON_config_version->valuedouble;
             TRACE_S("config_version: %d", config_version);
             config_check_factoryInfo->config_version = config_version;
         }
@@ -519,7 +519,7 @@ static uint8_t __config_update(void* arg)
         // TODO Decide about its usefulness
         // if (NULL != cJSON_provision_order)
         // {
-        //     const uint32_t provision_order = cJSON_provision_order->valueint;
+        //     const uint32_t provision_order = cJSON_provision_order->valuedouble;
         //     TRACE_S("provision_order: %d", provision_order);
         // }
         if (NULL != cJSON_ssl_private_key)

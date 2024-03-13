@@ -25,7 +25,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 {
                     cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
+                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
 
                     // cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     // item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
@@ -68,11 +68,13 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                     }
                     curr_item = curr_item->next;
                 }
+
                 if (found_item)
                 {
-                    TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
+                    // TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
                     break;
                 }
+
                 curr_device = curr_device->next;
             }
         }

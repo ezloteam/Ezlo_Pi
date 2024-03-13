@@ -271,4 +271,10 @@ extern const char* ezlopi_houseMode_str;
 extern const char* ezlopi_client_id_str;
 extern const char* ezlopi_source_str;
 
+extern const char* ezlopi_endValue_str;
+extern const char* ezlopi_startValue_str;
+extern const char* ezlopi_item_str;
+extern const char* ezlopi_comparator_str;
+extern const char* ezlopi_scenes_str;
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

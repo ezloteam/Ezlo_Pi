@@ -70,7 +70,7 @@ static int dht22_sensor_init_v3(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_ezlopi_dht22_data_t *dht22_data = (s_ezlopi_dht22_data_t *)item->user_arg;
+        s_ezlopi_dht22_data_t* dht22_data = (s_ezlopi_dht22_data_t*)item->user_arg;
         if (dht22_data)
         {
             if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
@@ -144,7 +144,7 @@ static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t* item, void* args)
         {
 
             cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, dht22_data->temperature);
-            char *valueFormatted = ezlopi_valueformatter_float(dht22_data->temperature);
+            char* valueFormatted = ezlopi_valueformatter_float(dht22_data->temperature);
             if (valueFormatted)
             {
                 cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, valueFormatted);
@@ -156,7 +156,7 @@ static int dht22_sensor_get_sensor_value_v3(l_ezlopi_item_t* item, void* args)
         if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
         {
             cJSON_AddNumberToObject(cj_properties, ezlopi_value_str, dht22_data->humidity);
-            char *valueFormatted = ezlopi_valueformatter_float(dht22_data->humidity);
+            char* valueFormatted = ezlopi_valueformatter_float(dht22_data->humidity);
             if (valueFormatted)
             {
                 cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, valueFormatted);
@@ -282,10 +282,10 @@ static int dht22_sensor_setup_item_properties_temperature(l_ezlopi_item_t* item,
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
         item->user_arg = user_arg;
 
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.onewire_master.enable = true;
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
     }
 
     return ret;
@@ -306,10 +306,10 @@ static int dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_t* item, cJ
         item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
         item->user_arg = user_arg;
 
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
 
         item->interface.onewire_master.enable = true;
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_name_str, item->interface.onewire_master.onewire_pin);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_name_str, item->interface.onewire_master.onewire_pin);
     }
 
     return ret;

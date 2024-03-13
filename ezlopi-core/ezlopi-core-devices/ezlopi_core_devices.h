@@ -6,6 +6,7 @@
 #include "ezlopi_core_cloud.h"
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_settings.h"
+#include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_hal_adc.h"
 #include "ezlopi_hal_pwm.h"
@@ -16,41 +17,12 @@
 #include "ezlopi_hal_spi_master.h"
 
 // #include "ezlopi_cloud_settings.h"
-
-#define CJSON_GET_VALUE_DOUBLE(root, item_name, item_val)     \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            item_val = o_item->valuedouble;                   \
-        }                                                     \
-        else                                                  \
-        {                                                     \
-            item_val = 0;                                     \
-            TRACE_E("%s not found!", item_name);              \
-        }                                                     \
-    }
-
-#define CJSON_GET_VALUE_INT(root, item_name, item_val)        \
-    {                                                         \
-        cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
-        if (o_item)                                           \
-        {                                                     \
-            item_val = o_item->valueint;                      \
-        }                                                     \
-        else                                                  \
-        {                                                     \
-            item_val = 0;                                     \
-            TRACE_E("%s not found!", item_name);              \
-        }                                                     \
-    }
-
 #define CJSON_GET_VALUE_GPIO(root, item_name, item_val)       \
     {                                                         \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
         if (o_item && o_item->type == cJSON_Number)           \
         {                                                     \
-            item_val = o_item->valueint;                      \
+            item_val = o_item->valuedouble;                      \
         }                                                     \
         else                                                  \
         {                                                     \
@@ -141,49 +113,49 @@ typedef struct l_ezlopi_item
         s_ezlopi_adc_t adc;
     } interface;
 
-    void *user_arg;
-    int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg);
+    void* user_arg;
+    int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item* item, void* arg, void* user_arg);
 
-    struct l_ezlopi_item *next;
+    struct l_ezlopi_item* next;
 } l_ezlopi_item_t;
 
 typedef struct l_ezlopi_device_settings_v3
 {
-    void *user_arg;
+    void* user_arg;
     s_ezlopi_cloud_device_settings_t cloud_properties;
-    int (*func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg);
-    struct l_ezlopi_device_settings_v3 *next;
+    int (*func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg);
+    struct l_ezlopi_device_settings_v3* next;
 
 } l_ezlopi_device_settings_v3_t;
 
 typedef struct l_ezlopi_device
 {
-    l_ezlopi_item_t *items;
-    l_ezlopi_device_settings_v3_t *settings;
+    l_ezlopi_item_t* items;
+    l_ezlopi_device_settings_v3_t* settings;
     s_ezlopi_cloud_device_t cloud_properties;
-    struct l_ezlopi_device *next;
+    struct l_ezlopi_device* next;
 } l_ezlopi_device_t;
 
 void ezlopi_device_prepare(void);
 
-l_ezlopi_device_t *ezlopi_device_get_head(void);
-l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device);
+l_ezlopi_device_t* ezlopi_device_get_head(void);
+l_ezlopi_device_t* ezlopi_device_add_device(cJSON* cj_device);
 
-l_ezlopi_device_t *ezlopi_device_get_by_id(uint32_t device_id);
-l_ezlopi_item_t *ezlopi_device_get_item_by_id(uint32_t item_id);
-l_ezlopi_device_settings_v3_t *ezlopi_device_settings_get_by_id(uint32_t settings_id);
+l_ezlopi_device_t* ezlopi_device_get_by_id(uint32_t device_id);
+l_ezlopi_item_t* ezlopi_device_get_item_by_id(uint32_t item_id);
+l_ezlopi_device_settings_v3_t* ezlopi_device_settings_get_by_id(uint32_t settings_id);
 
 // l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device);
-l_ezlopi_item_t *ezlopi_device_add_item_to_device(l_ezlopi_device_t *device,
-                                                  int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item *item, void *arg, void *user_arg));
+l_ezlopi_item_t* ezlopi_device_add_item_to_device(l_ezlopi_device_t* device,
+    int (*item_func)(e_ezlopi_actions_t action, struct l_ezlopi_item* item, void* arg, void* user_arg));
 
-l_ezlopi_device_settings_v3_t *ezlopi_device_add_settings_to_device_v3(l_ezlopi_device_t *device,
-                                                                       int (*setting_func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3 *setting, void *arg, void *user_arg));
+l_ezlopi_device_settings_v3_t* ezlopi_device_add_settings_to_device_v3(l_ezlopi_device_t* device,
+    int (*setting_func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg));
 
-void ezlopi_device_free_device(l_ezlopi_device_t *device);
-void ezlopi_device_free_device_by_item(l_ezlopi_item_t *item);
-cJSON *ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t *device_prop);
-s_ezlopi_cloud_controller_t *ezlopi_device_get_controller_information(void);
-void ezlopi_device_name_set_by_device_id(uint32_t device_id, cJSON *cj_new_name);
+void ezlopi_device_free_device(l_ezlopi_device_t* device);
+void ezlopi_device_free_device_by_item(l_ezlopi_item_t* item);
+cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t* device_prop);
+s_ezlopi_cloud_controller_t* ezlopi_device_get_controller_information(void);
+void ezlopi_device_name_set_by_device_id(uint32_t device_id, cJSON* cj_new_name);
 
 #endif // EZLOPI_CORE_DEVICES_H

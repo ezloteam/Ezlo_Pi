@@ -225,7 +225,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if ((item))
     {
-        ld2410_outputs_t *hilink_data = (ld2410_outputs_t *)item->user_arg;
+        ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)item->user_arg;
         if (hilink_data)
         {
             if (item->interface.uart.enable)
@@ -282,9 +282,9 @@ static void __prepare_hilink_motion_item_cloud_properties(l_ezlopi_item_t* item,
     item->interface.uart.enable = true;
     item->interface.uart.channel = 0;
 
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
     item->user_arg = user_args;
 }
@@ -303,9 +303,9 @@ static void __prepare_hilink_motion_direction_item_cloud_properties(l_ezlopi_ite
     item->interface.uart.enable = false;
     item->interface.uart.channel = 0;
 
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
     item->user_arg = user_arg;
 }
@@ -324,9 +324,9 @@ static void __prepare_hilink_distance_item_cloud_properties(l_ezlopi_item_t* ite
     item->interface.uart.enable = false;
     item->interface.uart.channel = 0;
 
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_INT(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_DOUBLE(cj_properties, ezlopi_gpio_rx_str, item->interface.uart.rx);
 
     item->user_arg = user_arg;
 }

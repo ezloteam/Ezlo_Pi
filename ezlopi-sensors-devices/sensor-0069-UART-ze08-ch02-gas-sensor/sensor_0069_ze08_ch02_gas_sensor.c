@@ -74,10 +74,10 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
     cJSON* cj_params = (cJSON*)arg;
     ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
-    
+
     if (ze08_ch2o_sensor && cj_params)
     {
-        char *valueFormatted = ezlopi_valueformatter_float(ze08_ch2o_sensor->ppm);
+        char* valueFormatted = ezlopi_valueformatter_float(ze08_ch2o_sensor->ppm);
         cJSON_AddStringToObject(cj_params, "valueFormatted", valueFormatted);
         cJSON_AddNumberToObject(cj_params, "value", ze08_ch2o_sensor->ppm);
         free(valueFormatted);
@@ -149,9 +149,9 @@ static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t
     item->cloud_properties.value_type = value_type_substance_amount;
     item->cloud_properties.scale = scales_parts_per_million;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
-    CJSON_GET_VALUE_INT(cj_device,ezlopi_baud_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
     item->interface.uart.enable = true;
     item->user_arg = user_arg;
 

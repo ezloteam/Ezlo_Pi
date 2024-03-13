@@ -139,7 +139,7 @@ void ezlopi_scenes_meshbot_init(void)
     {
         if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
-            xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+            // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
         }
         else
         {
@@ -181,7 +181,7 @@ static void __scenes_process(void* arg)
 {
     l_scenes_list_v2_t* scene_node = (l_scenes_list_v2_t*)arg;
     scene_node->status = EZLOPI_SCENE_STATUS_RUN;
-    TRACE_I("task - '%s': Running", scene_node->name);
+    // TRACE_I("task - '%s': Running", scene_node->name);
     uint32_t stopped_condition_count = 0;
     uint32_t started_condition_fired_count = 0;
 
@@ -282,9 +282,9 @@ static int __execute_then_condition(l_scenes_list_v2_t* scene_node)
     while (then_node)
     {
         uint32_t delay_ms = (then_node->delay.days * (24 * 60 * 60) + then_node->delay.hours * (60 * 60) + then_node->delay.minutes * 60 + then_node->delay.seconds) * 1000;
-        TRACE_D("scene-delay_ms: %d", delay_ms);
         if (delay_ms)
         {
+            TRACE_D("scene-delay_ms: %d", delay_ms);
             vTaskDelay(delay_ms / portTICK_RATE_MS);
         }
 
@@ -299,7 +299,7 @@ static int __execute_then_condition(l_scenes_list_v2_t* scene_node)
         }
 
         f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_node->block_options.method.type);
-        TRACE_D("then-method: %p", then_method);
+        // TRACE_D("then-method: %p", then_method);
         if (then_method)
         {
             ret = 1;

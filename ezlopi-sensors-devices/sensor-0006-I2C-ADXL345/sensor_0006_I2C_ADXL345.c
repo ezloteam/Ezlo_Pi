@@ -88,10 +88,10 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
             item->interface.i2c_master.enable = true;
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-            CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_DOUBLE(cj_device, "slave_addr", item->interface.i2c_master.address);
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)
             {
@@ -166,7 +166,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
+        s_adxl345_data_t* user_data = (s_adxl345_data_t*)item->user_arg;
         if (user_data)
         {
             if (item->interface.i2c_master.enable)
@@ -201,18 +201,18 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
             float acceleration_value = 0;
-            s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
+            s_adxl345_data_t* user_data = (s_adxl345_data_t*)item->user_arg;
             if (user_data)
             {
                 if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_x * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
                     cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
-                    char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+                    char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -223,7 +223,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 {
                     acceleration_value = (user_data->acc_y * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
                     cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
-                    char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+                    char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -234,7 +234,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 {
                     acceleration_value = (user_data->acc_z * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
                     cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
-                    char *valueFormatted = ezlopi_valueformatter_float(acceleration_value);
+                    char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -254,7 +254,7 @@ static int __notify(l_ezlopi_item_t* item)
     static float __prev[3] = { 0 };
     if (item)
     {
-        s_adxl345_data_t *user_data = (s_adxl345_data_t *)item->user_arg;
+        s_adxl345_data_t* user_data = (s_adxl345_data_t*)item->user_arg;
         if (user_data)
         {
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)

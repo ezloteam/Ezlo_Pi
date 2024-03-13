@@ -62,14 +62,14 @@ typedef struct s_hilink_radar_distance_sensitivity_value
     int distance_sensitivity_value;
 } s_hilink_radar_distance_sensitivity_value_t;
 
-int hilink_presence_sensor_initialize_settings(l_ezlopi_device_t *device);
+int hilink_presence_sensor_initialize_settings(l_ezlopi_device_t* device);
 int hilink_presence_sensor_apply_settings();
 bool hilink_presence_sensor_target_in_detectable_range(const uint16_t moving_target_distance);
 
-static inline cJSON *__setting_add_text_and_lang_tag(const char *const object_text, const char *const object_lang_tag)
+static inline cJSON* __setting_add_text_and_lang_tag(const char* const object_text, const char* const object_lang_tag)
 {
 
-    cJSON *cj_object = cJSON_CreateObject();
+    cJSON* cj_object = cJSON_CreateObject();
     if (cj_object)
     {
         cJSON_AddStringToObject(cj_object, "text", object_text);
@@ -84,10 +84,10 @@ static inline cJSON *__setting_add_text_and_lang_tag(const char *const object_te
     return cj_object;
 }
 
-static inline int __setting_extract_user_defined_setting(const char *setting_str, s_hilink_userdefined_setting_value_t *user_defined_setting_val)
+static inline int __setting_extract_user_defined_setting(const char* setting_str, s_hilink_userdefined_setting_value_t* user_defined_setting_val)
 {
     int ret = 0;
-    cJSON *cj_dest = cJSON_CreateObject();
+    cJSON* cj_dest = cJSON_CreateObject();
     if (setting_str && cj_dest)
     {
         cj_dest = cJSON_Parse(setting_str);
@@ -96,7 +96,7 @@ static inline int __setting_extract_user_defined_setting(const char *setting_str
         CJSON_GET_VALUE_DOUBLE(cj_dest, "min_still_distance", user_defined_setting_val->min_still_distance);
         CJSON_GET_VALUE_DOUBLE(cj_dest, "max_still_distance", user_defined_setting_val->max_still_distance);
         CJSON_GET_VALUE_DOUBLE(cj_dest, "timeout", user_defined_setting_val->timeout);
-        CJSON_GET_VALUE_INT(cj_dest, "is_active", user_defined_setting_val->is_active);
+        CJSON_GET_VALUE_DOUBLE(cj_dest, "is_active", user_defined_setting_val->is_active);
     }
     else
     {
@@ -105,7 +105,7 @@ static inline int __setting_extract_user_defined_setting(const char *setting_str
     return ret;
 }
 
-static inline int __prepare_user_defined_setting_cjson(cJSON *cj_value, s_hilink_userdefined_setting_value_t *setting_val)
+static inline int __prepare_user_defined_setting_cjson(cJSON* cj_value, s_hilink_userdefined_setting_value_t* setting_val)
 {
     int ret = 0;
     if (cj_value && setting_val)
@@ -124,11 +124,11 @@ static inline int __prepare_user_defined_setting_cjson(cJSON *cj_value, s_hilink
     return ret;
 }
 
-static inline char *__prepare_user_defined_setting_str(s_hilink_userdefined_setting_value_t *setting_val)
+static inline char* __prepare_user_defined_setting_str(s_hilink_userdefined_setting_value_t* setting_val)
 {
-    char *ret = NULL;
+    char* ret = NULL;
 
-    cJSON *cj_setting = cJSON_CreateObject();
+    cJSON* cj_setting = cJSON_CreateObject();
     if (cj_setting && setting_val)
     {
         ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_setting, setting_val));

@@ -296,15 +296,15 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "item", 4))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, strlen(ezlopi_item_str)))
             {
                 item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
-            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 4))
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, strlen(ezlopi_value_str)))
             {
                 value_field = curr_field;
             }
-            else if (0 == strncmp(curr_field->name, "comparator", 10))
+            else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, strlen(ezlopi_comparator_str)))
             {
                 comparator_field = curr_field;
             }
@@ -322,8 +322,50 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'number_range' not implemented!");
-    return 0;
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+
+    if (when_block && scene_node)
+    {
+        uint32_t item_id = 0;
+        l_fields_v2_t* end_vlaue_field = NULL;
+        l_fields_v2_t* start_value_field = NULL;
+
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 4))
+            {
+                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_startValue_str, strlen(ezlopi_startValue_str)))
+            {
+                start_value_field = curr_field;
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_endValue_str, strlen(ezlopi_endValue_str)))
+            {
+                end_vlaue_field = curr_field;
+            }
+
+            curr_field = curr_field->next;
+        }
+
+        if (item_id && end_vlaue_field && start_value_field)
+        {
+            double double_item_value = ezlopi_core_scenes_operator_get_item_double_value_current(item_id);
+            if ((start_value_field->field_value.u_value.value_double <= double_item_value) &&
+                (end_vlaue_field->field_value.u_value.value_double >= double_item_value))
+            {
+                ret = 1;
+            }
+        }
+        else
+        {
+            TRACE_E("error args");
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)

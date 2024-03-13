@@ -77,10 +77,10 @@ static void blinky(void* pv)
         {
             count = 0;
 
-            TRACE_D("----------------------------------------------");
-            TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
-            TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
-            TRACE_D("----------------------------------------------");
+            trace_wb("----------------------------------------------");
+            trace_wb("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+            trace_wb("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+            trace_wb("----------------------------------------------");
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);

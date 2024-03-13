@@ -77,37 +77,48 @@ const char* ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cm
     return ret;
 }
 
+double ezlopi_core_scenes_operator_get_item_double_value_current(uint32_t item_id)
+{
+    double item_value = 0.0;
+    l_ezlopi_device_t* device = ezlopi_device_get_head();
+    while (device)
+    {
+        l_ezlopi_item_t* item = device->items;
+        while (item)
+        {
+            if (item->cloud_properties.item_id == item_id)
+            {
+                cJSON* cj_item_value = cJSON_CreateObject();
+                if (cj_item_value)
+                {
+                    item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
+                    cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                    if (cj_value)
+                    {
+                        item_value = cj_value->valuedouble;
+                    }
+
+                    cJSON_Delete(cj_item_value);
+                }
+
+                break;
+            }
+
+            item = item->next;
+        }
+
+        device = device->next;
+    }
+
+    return item_value;
+}
+
 int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
 {
     int ret = 0;
     if (item_id && value_field && comparator_field)
     {
-        double item_value = 0.0;
-        cJSON* cj_item_value = cJSON_CreateObject();
-        l_ezlopi_device_t* device = ezlopi_device_get_head();
-        while (device)
-        {
-            l_ezlopi_item_t* item = device->items;
-            while (item)
-            {
-                if (item->cloud_properties.item_id == item_id)
-                {
-                    if (cj_item_value)
-                    {
-                        item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
-                        if (cj_value)
-                        {
-                            item_value = cj_value->valuedouble;
-                        }
-                    }
-
-                    break;
-                }
-                item = item->next;
-            }
-            device = device->next;
-        }
+        double item_value = ezlopi_core_scenes_operator_get_item_double_value_current(item_id);
 
         switch (ezlopi_scenes_numeric_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string))
         {
@@ -167,11 +178,6 @@ int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v
         {
             break;
         }
-        }
-
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
         }
     }
 
