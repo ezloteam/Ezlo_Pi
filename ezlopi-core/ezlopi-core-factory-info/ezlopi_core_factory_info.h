@@ -161,29 +161,16 @@ extern "C"
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"LED\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"RGB_70\",\
                 \"id_room\": \"\",\
-                \"id_item\": 1,\
-                \"gpio_in\": 0,\
-                \"gpio_out\": 2,\
-                \"pullup_ip\": false,\
-                \"pullup_op\": false,\
-                \"is_ip\": false,\
-                \"ip_inv\": false,\
-                \"op_inv\": false,\
-                \"val_ip\": false,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"soil_moisture\",\
-                \"id_room\": \"\",\
-                \"id_item\": 32,\
-                \"gpio\": 33\
+                \"id_item\": 70,\
+                \"gpio1\": 33,\
+                \"gpio2\": 25,\
+                \"gpio3\": 26\
             }\
-        ],\
-    \"dev_total\": 2}";
+        ], \
+        \"dev_total\": 1}";
 #endif
 
 

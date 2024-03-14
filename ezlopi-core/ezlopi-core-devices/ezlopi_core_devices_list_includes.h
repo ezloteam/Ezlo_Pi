@@ -40,7 +40,7 @@
 // #include "sensor_0035_digitalIn_touch_sensor_TPP223B.h"
 // #include "device_0036_PWM_servo_MG996R.h"
 // #include "sensor_0037_pms5003_sensor.h"
-// #include "device_0038_other_RGB.h"
+#include "device_0038_other_RGB.h"
 
 // #include "sensor_0040_other_TCS230.h"
 // #include "sensor_0041_ADC_FC28_soilMoisture.h"
@@ -70,5 +70,6 @@
 // #include "sensor_0067_hilink_presence_sensor.h"
 // #include "sensor_0068_ENS160_gas_sensor.h"
 // #include "sensor_0069_ze08_ch02_gas_sensor.h"
+#include "device_0070_other_RGB_CW.h"
 
 #endif // _EZLOPI_CORE_DEVICES_LIST_INCLUDES_H_

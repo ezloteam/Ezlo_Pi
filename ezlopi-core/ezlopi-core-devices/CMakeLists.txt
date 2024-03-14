@@ -22,6 +22,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         device-0002-digitalOut-relay
         device-0003-digitalOut-plug
         device-0004-digitalIn-generic
+        device-0070-other-RGB-CW
 
         sensor-0005-I2C-MPU6050
         sensor-0007-I2C-GY271
@@ -55,7 +56,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         # sensor-0035-digitalIn-touch-sensor-TPP223B                                                       
         # device-0036-PWM-servo-MG996R
         # sensor-0037-pms5003-sensor
-        # device-0038-other-RGB
+        device-0038-other-RGB
                 
         # sensor-0040-other-TCS230          
         # sensor-0041-ADC-FC28-soilMoisture  

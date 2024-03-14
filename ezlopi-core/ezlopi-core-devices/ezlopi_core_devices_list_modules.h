@@ -50,7 +50,7 @@ EZLOPI_DEVICE_LIST("sensor-soilMoisture-ADC             ", 32, sensor_0032_ADC_s
 // EZLOPI_DEVICE_LIST("sensor-proximity-digital            ", 34, sensor_0034_digitalIn_proximity)
 // EZLOPI_DEVICE_LIST("sensor-TPP223B-digital-touch        ", 35, sensor_0035_digitalIn_touch_sensor_TPP223B)
 // EZLOPI_DEVICE_LIST("sensor-PMS5003                      ", 37, sensor_pms5003_v3)
-// EZLOPI_DEVICE_LIST("device-other-RGB-LED                ", 38, device_0038_other_RGB)
+EZLOPI_DEVICE_LIST("device-other-RGB-LED                ", 38, device_0038_other_RGB)
 
 // EZLOPI_DEVICE_LIST("device-PWM-servo-MG996R             ", 36, device_0036_PWM_servo_MG996R)
 
@@ -86,6 +86,7 @@ EZLOPI_DEVICE_LIST("sensor-Flex-Resistor-ADC            ", 55, sensor_0055_ADC_F
 // EZLOPI_DEVICE_LIST("sensor-hilink-presence-sensor       ", 67, sensor_0067_hilink_presence_sensor_v3)
 // EZLOPI_DEVICE_LIST("sensor-ENS160-gas-sensor            ", 68, sensor_0068_ENS160_gas_sensor)
 // EZLOPI_DEVICE_LIST("sensor-ze08-ch02-gas-sensor         ", 69, sensor_0069_ze08_ch02_gas_sensor)
+EZLOPI_DEVICE_LIST("device-other-RGB-CW-LED         ", 70, device_0070_other_RGB_CW)
 
 //////// End of sensor/device list
 EZLOPI_DEVICE_LIST(NULL, 0, NULL)

@@ -427,7 +427,7 @@ char* ezlopi_factory_info_v3_get_provisioning_server(void)
 
 const char* ezlopi_factory_info_v3_get_device_type(void)
 {
-    return "ezlopi_generic";
+    return "ezlopi_frankever_rgb_cct";
 }
 
 char* ezlopi_factory_info_v3_get_ca_certificate(void)
