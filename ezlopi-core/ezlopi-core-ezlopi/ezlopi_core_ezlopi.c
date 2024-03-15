@@ -79,6 +79,7 @@ static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
     l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+
     while (curr_device)
     {
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
@@ -104,7 +105,7 @@ static void ezlopi_initialize_devices_v3(void)
             device_init_ret = 0;
             l_ezlopi_device_t* device_to_free = curr_device;
             curr_device = curr_device->next;
-            device_to_free->next = NULL;
+            // device_to_free->next = NULL; /* this effects actual device_ll */
             ezlopi_device_free_device(device_to_free);
         }
         else
@@ -112,4 +113,13 @@ static void ezlopi_initialize_devices_v3(void)
             curr_device = curr_device->next;
         }
     }
+
+
+    l_ezlopi_device_t* final_list_device = ezlopi_device_get_head();
+    while (final_list_device)
+    {
+        TRACE_W("Final_device_list : [0x%x] ", final_list_device->cloud_properties.device_id);
+        final_list_device = final_list_device->next;
+    }
+
 }
