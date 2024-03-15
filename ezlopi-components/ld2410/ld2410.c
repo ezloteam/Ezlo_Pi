@@ -1,7 +1,6 @@
 #include "ld2410.h"
 #include "ezlopi_util_trace.h"
 
-static const char *TAG = "ld2410";
 
 esp_err_t ld2410_setup(s_ezlopi_uart_t uart_settings)
 {
@@ -13,12 +12,12 @@ esp_err_t ld2410_setup(s_ezlopi_uart_t uart_settings)
         TRACE_I("OK");
 
         ld2410_settings_t settings =
-            {
-                .max_still_distance = DISTANCE_525CM,
-                .max_move_distance = DISTANCE_525CM,
-                .min_still_distance = DISTANCE_0CM,
-                .min_move_distance = DISTANCE_0CM,
-                .no_one_duration = 5};
+        {
+            .max_still_distance = DISTANCE_525CM,
+            .max_move_distance = DISTANCE_525CM,
+            .min_still_distance = DISTANCE_0CM,
+            .min_move_distance = DISTANCE_0CM,
+            .no_one_duration = 5 };
         ld2410_set_template(CUSTOM_TEMPLATE, &settings);
         return ESP_OK;
     }
@@ -29,15 +28,15 @@ esp_err_t ld2410_setup(s_ezlopi_uart_t uart_settings)
     return ESP_FAIL;
 }
 
-esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t *p_settings)
+esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t* p_settings)
 {
     ld2410_settings_t settings =
-        {
-            .max_still_distance = DISTANCE_600CM,
-            .max_move_distance = DISTANCE_600CM,
-            .no_one_duration = 5};
-    uint8_t move_sensitivity[9] = {20, 20, 20, 20, 20, 20, 20, 20, 20};  // Gate 0 to 8 sensitivity : sensitivity range 0-100
-    uint8_t still_sensitivity[9] = {20, 20, 20, 20, 20, 20, 20, 20, 20}; // Gate 0 to 8 sensitivity : sensitivity range 0-100
+    {
+        .max_still_distance = DISTANCE_600CM,
+        .max_move_distance = DISTANCE_600CM,
+        .no_one_duration = 5 };
+    uint8_t move_sensitivity[9] = { 20, 20, 20, 20, 20, 20, 20, 20, 20 };  // Gate 0 to 8 sensitivity : sensitivity range 0-100
+    uint8_t still_sensitivity[9] = { 20, 20, 20, 20, 20, 20, 20, 20, 20 }; // Gate 0 to 8 sensitivity : sensitivity range 0-100
 
     switch (template)
     {
@@ -154,7 +153,7 @@ esp_err_t ld2410_set_template(ld2410_template_t template, ld2410_settings_t *p_s
     return ESP_OK;
 }
 
-esp_err_t ld2410_get_data(ld2410_outputs_t *output)
+esp_err_t ld2410_get_data(ld2410_outputs_t* output)
 {
     if (NULL == output)
     {

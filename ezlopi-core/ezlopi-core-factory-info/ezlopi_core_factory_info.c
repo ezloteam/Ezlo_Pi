@@ -4,13 +4,6 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_factory_info.h"
 
-#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
-static char* g_ca_certificate = NULL;
-static char* g_ssl_private_key = NULL;
-static char* g_ssl_shared_key = NULL;
-static char* g_ezlopi_config = NULL;
-#endif
-
 static const esp_partition_t* partition_ctx_v3 = NULL;
 static uint32_t g_provisioning_status = 0;
 
@@ -148,8 +141,8 @@ void print_factory_info_v3(void)
     char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
     char* wifi_password = ezlopi_factory_info_v3_get_password();
     char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-    char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
-    char* device_type = ezlopi_factory_info_v3_get_device_type();
+    // const char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
+    const char* device_type = ezlopi_factory_info_v3_get_device_type();
     char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
     char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();

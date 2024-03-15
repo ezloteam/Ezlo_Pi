@@ -9,10 +9,12 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_meshbot.h"
+#include "pt.h"
 
 static void __scenes_process(void* arg);
-static int __execute_then_condition(l_scenes_list_v2_t* scene_node);
-static int __execute_else_condition(l_scenes_list_v2_t* scene_node);
+static void __scene_proto_thread(s_thread_ctx_t* ctx);
+static int __execute_then_condition(s_thread_ctx_t* ctx);
+static int __execute_else_condition(s_thread_ctx_t* ctx);
 
 uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
 {
@@ -134,12 +136,15 @@ uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
 
 void ezlopi_scenes_meshbot_init(void)
 {
+    uint32_t start_thread = 0;
     l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
     while (scene_node)
     {
         if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
+            start_thread = 1;
             // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+
         }
         else
         {
@@ -147,6 +152,11 @@ void ezlopi_scenes_meshbot_init(void)
         }
 
         scene_node = scene_node->next;
+    }
+
+    if (start_thread)
+    {
+        xTaskCreate(__scenes_thread_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
     }
 }
 
@@ -177,6 +187,117 @@ uint32_t ezlopi_meshbot_execute_scene_else_action_group(uint32_t scene_id)
     return ret;
 }
 
+typedef struct s_thread_ctx {
+    struct pt pt;
+    uint32_t curr_ticks;
+    uint32_t start_cond;
+    uint32_t stopped_cond;
+    l_scenes_list_v2_t* scene_node;
+} s_thread_ctx_t;
+
+static void __scene_proto_thread(s_thread_ctx_t* ctx)
+{
+    if (ctx && ctx->pt.lc)
+    {
+        PT_BEGIN(&ctx->pt);
+
+        while (1)
+        {
+            if ((EZLOPI_SCENE_STATUS_RUN == ctx->scene_node->status) || (EZLOPI_SCENE_STATUS_RUNNING == ctx->scene_node->status))
+            {
+                ctx->scene_node->status = EZLOPI_SCENE_STATUS_RUNNING;
+
+                uint32_t when_condition_returned = 0;
+                l_when_block_v2_t* when_condition_node = ctx->scene_node->when_block;
+
+                if (when_condition_node)
+                {
+                    f_scene_method_v2_t when_method = ezlopi_scene_get_method_v2(when_condition_node->block_options.method.type);
+                    if (when_method)
+                    {
+                        when_condition_returned = when_method(ctx->scene_node, (void*)when_condition_node);
+                        if (when_condition_returned)
+                        {
+                            if (ctx->start_cond < 2)
+                            {
+                                ctx->stopped_cond = 0;
+
+                                int write_status = 1;
+
+                                if (ctx->start_cond)
+                                {
+                                    if (0 == ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_started_str))
+                                    {
+                                        write_status = 0;
+                                    }
+                                }
+
+                                if (1 == __execute_then_condition(ctx))
+                                {
+                                    if (0 == ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_finished_str))
+                                    {
+                                        write_status = 0;
+                                    }
+                                }
+                                else
+                                {
+                                    if (0 == ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_failed_str))
+                                    {
+                                        write_status = 0;
+                                    }
+                                }
+
+                                if (write_status)
+                                {
+                                    ctx->start_cond += 1;
+                                }
+                            }
+                            else
+                            {
+                                TRACE_D("Meshobot '%s' is Idle.", ctx->scene_node->name);
+                            }
+
+                            TRACE_I("here");
+                        }
+                        else if (ctx->stopped_cond < 2)
+                        {
+                            __execute_else_condition(ctx->scene_node);
+                            if (ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_stopped_str))
+                            {
+                                ctx->stopped_cond += 1;
+                            }
+
+                            ctx->start_cond = 0;
+                            TRACE_I("here");
+                        }
+                        else
+                        {
+                            TRACE_D("Meshobot '%s' is Idle.", ctx->scene_node->name);
+                        }
+                    }
+                    else {
+                        TRACE_E("method not found");
+                    }
+
+                    when_condition_node = when_condition_node->next;
+                }
+            }
+
+            if (EZLOPI_SCENE_STATUS_STOP == ctx->scene_node->status)
+            {
+                break;
+            }
+
+
+            ctx->curr_ticks = xTaskGetTickCount();
+            PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > 1000);
+        }
+
+        PT_END(&ctx->pt);
+    }
+}
+
+#if 0
 static void __scenes_process(void* arg)
 {
     l_scenes_list_v2_t* scene_node = (l_scenes_list_v2_t*)arg;
@@ -240,6 +361,8 @@ static void __scenes_process(void* arg)
                         {
                             TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
                         }
+
+                        TRACE_I("here");
                     }
                     else if (stopped_condition_count < 2)
                     {
@@ -250,11 +373,15 @@ static void __scenes_process(void* arg)
                         }
 
                         started_condition_fired_count = 0;
+                        TRACE_I("here");
                     }
                     else
                     {
                         TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
                     }
+                }
+                else {
+                    TRACE_E("method not found");
                 }
 
                 when_condition_node = when_condition_node->next;
@@ -274,18 +401,23 @@ static void __scenes_process(void* arg)
 
     vTaskDelete(NULL);
 }
+#endif
 
-static int __execute_then_condition(l_scenes_list_v2_t* scene_node)
+static int __execute_then_condition(s_thread_ctx_t* ctx)
 {
     int ret = 0;
-    l_action_block_v2_t* then_node = scene_node->then_block;
+    l_action_block_v2_t* then_node = ctx->scene_node->then_block;
     while (then_node)
     {
         uint32_t delay_ms = (then_node->delay.days * (24 * 60 * 60) + then_node->delay.hours * (60 * 60) + then_node->delay.minutes * 60 + then_node->delay.seconds) * 1000;
         if (delay_ms)
         {
             TRACE_D("scene-delay_ms: %d", delay_ms);
-            vTaskDelay(delay_ms / portTICK_RATE_MS);
+
+            ctx->curr_ticks = xTaskGetTickCount();
+            PT_WAIT_UNTIL(ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > delay_ms);
+
+            // vTaskDelay(delay_ms / portTICK_RATE_MS);
         }
 
         const char* method_name = ezlopi_scene_get_scene_method_name(then_node->block_options.method.type);
@@ -303,12 +435,12 @@ static int __execute_then_condition(l_scenes_list_v2_t* scene_node)
         if (then_method)
         {
             ret = 1;
-            then_method(scene_node, (void*)then_node);
+            then_method(ctx->scene_node, (void*)then_node);
         }
 
         if (then_node->next)
         {
-            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
+            ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_partially_finished_str);
         }
 
         then_node = then_node->next;
@@ -317,17 +449,19 @@ static int __execute_then_condition(l_scenes_list_v2_t* scene_node)
     return ret;
 }
 
-static int __execute_else_condition(l_scenes_list_v2_t* scene_node)
+static int __execute_else_condition(s_thread_ctx_t* ctx)
 {
     int ret = 0;
-    l_action_block_v2_t* else_node = scene_node->else_block;
+    l_action_block_v2_t* else_node = ctx->scene_node->else_block;
     while (else_node)
     {
         uint32_t delay_ms = (else_node->delay.days * (24 * 60 * 60) + else_node->delay.hours * (60 * 60) + else_node->delay.minutes * 60 + else_node->delay.seconds) * 1000;
         TRACE_D("scene-delay_ms: %d", delay_ms);
         if (delay_ms)
         {
-            vTaskDelay(delay_ms / portTICK_RATE_MS);
+            // vTaskDelay(delay_ms / portTICK_RATE_MS);
+            ctx->curr_ticks = xTaskGetTickCount();
+            PT_WAIT_UNTIL(ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > delay_ms);
         }
 
         const char* method_name = ezlopi_scene_get_scene_method_name(else_node->block_options.method.type);
@@ -345,7 +479,7 @@ static int __execute_else_condition(l_scenes_list_v2_t* scene_node)
         if (else_method)
         {
             ret = 1;
-            else_method(scene_node, (void*)else_node);
+            else_method(ctx->scene_node, (void*)else_node);
         }
 
         else_node = else_node->next;

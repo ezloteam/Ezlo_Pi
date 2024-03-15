@@ -436,7 +436,7 @@ static uint8_t __config_update(void* arg)
         if (NULL != cJSON_uuid)
         {
             #warning "Lomas need to check this"
-                const char* uuid = cJSON_uuid->valuestring;
+                char* uuid = cJSON_uuid->valuestring;
             TRACE_I("uuid: %s", uuid);
             config_check_factoryInfo->device_uuid = (char*)uuid;
         }
@@ -448,7 +448,7 @@ static uint8_t __config_update(void* arg)
         if (NULL != cJSON_cloud_uuid)
         {
             #warning "Lomas need to check this"
-                const char* cloud_uuid = cJSON_cloud_uuid->valuestring;
+                char* cloud_uuid = cJSON_cloud_uuid->valuestring;
             TRACE_S("cloud_uuid: %s", cloud_uuid);
             config_check_factoryInfo->prov_uuid = cloud_uuid;
         }

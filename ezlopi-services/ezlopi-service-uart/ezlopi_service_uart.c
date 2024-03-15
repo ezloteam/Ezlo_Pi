@@ -275,7 +275,7 @@ static void ezlopi_service_uart_get_info()
         char* device_brand = ezlopi_factory_info_v3_get_brand();
         char* device_manufacturer = ezlopi_factory_info_v3_get_manufacturer();
         char* device_name = ezlopi_factory_info_v3_get_name();
-        char* device_type = ezlopi_factory_info_v3_get_device_type();
+        const char* device_type = ezlopi_factory_info_v3_get_device_type();
         char* device_mac = ezlopi_factory_info_v3_get_ezlopi_mac();
         char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
 

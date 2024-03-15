@@ -182,6 +182,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             free(uri);
         }
     }
+    
     return http_get_data;
 }
 

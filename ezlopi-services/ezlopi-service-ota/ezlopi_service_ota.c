@@ -26,9 +26,9 @@ static void ota_service_process(void* pv)
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
     vTaskDelay(5000 / portTICK_RATE_MS);
+
     while (1)
     {
-
         int ret_nma_reg = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 60000, false);
         int ret_ota = ezlopi_event_group_wait_for_event(EZLOPI_EVENT_OTA, 86400 * 1000, 1); // 86400 seconds in a day (24 hrs)
         TRACE_D("Configuration Selection NMA Reg: %d", ret_nma_reg);

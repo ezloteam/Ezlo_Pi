@@ -85,8 +85,8 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri->valuestring,
-            .task_stack = 8 * 1024,
-            .buffer_size = 12 * 1024,
+            .task_stack = 6 * 1024,
+            .buffer_size = 6 * 1024,
             .cert_pem = ca_cert,
             .client_cert = ssl_shared,
             .client_key = ssl_priv,

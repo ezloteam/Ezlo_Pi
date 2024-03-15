@@ -330,6 +330,7 @@ void ezlopi_device_prepare(void)
 }
 
 ///////// Print functions start here ////////////
+#if 0
 static void ezlopi_device_print_controller_cloud_information_v3(void)
 {
     TRACE_I("Armed: %d", s_controller_information.armed);
@@ -473,6 +474,7 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
     }
     }
 }
+#endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////
 

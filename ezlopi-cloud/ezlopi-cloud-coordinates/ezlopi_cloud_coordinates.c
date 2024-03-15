@@ -21,7 +21,7 @@ void hub_coordinates_set(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            #warning "Nabin: what is 'cJSON_GetObjectItem(cj_params, "latitude")' returns NULL";
+            #warning "Nabin: what if 'cJSON_GetObjectItem(cj_params, "latitude")' returns NULL";
 
             latitude = cJSON_GetObjectItem(cj_params, "latitude")->valuedouble;
             longitude = cJSON_GetObjectItem(cj_params, "longitude")->valuedouble;

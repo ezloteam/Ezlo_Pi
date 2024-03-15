@@ -360,6 +360,7 @@ void ezlopi_scenes_init_v2(void)
                         free(scene_str);
                     }
                 }
+
             }
 
             cJSON_Delete(cj_scenes_ids);

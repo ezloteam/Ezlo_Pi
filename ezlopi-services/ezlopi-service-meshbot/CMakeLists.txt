@@ -6,6 +6,7 @@ set(ESP_IDF_COMPONENTS
         freertos
     )
 set(EZLOPI_COMPONENTS 
+        pt
         ezlopi-util-trace
     )
 set(EZLOPI_CORE_COMPONENTS 

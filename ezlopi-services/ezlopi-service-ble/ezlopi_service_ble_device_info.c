@@ -24,11 +24,11 @@
 
 #include "ezlopi_service_ble.h"
 
-static s_gatt_service_t *g_device_info_service = NULL;
+static s_gatt_service_t* g_device_info_service = NULL;
 
-static char *device_info_jsonify(void);
-static void __add_factory_info_to_root(cJSON *root, char *key, char *value);
-static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param);
+static char* device_info_jsonify(void);
+static void __add_factory_info_to_root(cJSON* root, char* key, char* value);
+static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
 void ezlopi_ble_service_device_info_init(void)
 {
@@ -49,9 +49,9 @@ void ezlopi_ble_service_device_info_init(void)
     TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
 }
 
-static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_param_t *param)
+static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
-    static char *json_str_device_info;
+    static char* json_str_device_info;
 
     if (NULL == json_str_device_info)
     {
@@ -70,7 +70,7 @@ static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
             if ((0 != total_data_len) && (total_data_len > param->read.offset))
             {
                 TRACE_D("Sending: [len = %d]\r\n%.*s", copy_size, copy_size, json_str_device_info + param->read.offset);
-                strncpy((char *)value->value, json_str_device_info + param->read.offset, copy_size);
+                strncpy((char*)value->value, json_str_device_info + param->read.offset, copy_size);
                 value->len = copy_size;
             }
             else
@@ -98,15 +98,15 @@ static void device_info_read_func(esp_gatt_value_t *value, esp_ble_gatts_cb_para
     }
 }
 
-static char *device_info_jsonify(void)
+static char* device_info_jsonify(void)
 {
-    char *device_info = NULL;
-    cJSON *root = cJSON_CreateObject();
+    char* device_info = NULL;
+    cJSON* root = cJSON_CreateObject();
     if (root)
     {
 
-        uint64_t uptime_us = esp_timer_get_time();
-        uint64_t uptime_sec = uptime_us / 1000000;
+        // uint64_t uptime_us = esp_timer_get_time();
+        // uint64_t uptime_sec = uptime_us / 1000000;
 
         cJSON_AddStringToObject(root, ezlopi_firmware_version_str, VERSION_STR);
         cJSON_AddNumberToObject(root, ezlopi_firmware_build_str, BUILD);
@@ -118,16 +118,16 @@ static char *device_info_jsonify(void)
         // cJSON_AddNumberToObject(root, "boot_count", ezlopi_system_info_get_boot_count());
         // cJSON_AddNumberToObject(root, "boot_reason", esp_reset_reason());
         cJSON_AddBoolToObject(root, ezlopi_provisioned_status_str, ezlopi_factory_info_v3_get_provisioning_status());
-        __add_factory_info_to_root(root, ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
+        __add_factory_info_to_root(root, (char*)ezlopi_mac_str, ezlopi_factory_info_v3_get_ezlopi_mac());
 
         cJSON_AddStringToObject(root, ezlopi_ezlopi_device_type_str, ezlopi_factory_info_v3_get_device_type());
-        __add_factory_info_to_root(root, (char *)ezlopi_model_str, ezlopi_factory_info_v3_get_model());
-        __add_factory_info_to_root(root, (char *)ezlopi_device_name_str, ezlopi_factory_info_v3_get_name());
-        __add_factory_info_to_root(root, (char *)ezlopi_brand_str, ezlopi_factory_info_v3_get_brand());
-        __add_factory_info_to_root(root, (char *)ezlopi_manufacturer_str, ezlopi_factory_info_v3_get_manufacturer());
+        __add_factory_info_to_root(root, (char*)ezlopi_model_str, ezlopi_factory_info_v3_get_model());
+        __add_factory_info_to_root(root, (char*)ezlopi_device_name_str, ezlopi_factory_info_v3_get_name());
+        __add_factory_info_to_root(root, (char*)ezlopi_brand_str, ezlopi_factory_info_v3_get_brand());
+        __add_factory_info_to_root(root, (char*)ezlopi_manufacturer_str, ezlopi_factory_info_v3_get_manufacturer());
         cJSON_AddNumberToObject(root, ezlopi_serial_str, ezlopi_factory_info_v3_get_id());
 
-        char *ssid = ezlopi_factory_info_v3_get_ssid();
+        char* ssid = ezlopi_factory_info_v3_get_ssid();
         if (ssid)
         {
             cJSON_AddStringToObject(root, ezlopi_wifi_ssid_str, (isprint(ssid[0])) ? ssid : ezlopi__str);
@@ -154,7 +154,7 @@ static char *device_info_jsonify(void)
     return device_info;
 }
 
-void __add_factory_info_to_root(cJSON *root, char *key, char *value)
+void __add_factory_info_to_root(cJSON* root, char* key, char* value)
 {
     if (value)
     {
