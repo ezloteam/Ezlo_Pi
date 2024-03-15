@@ -162,7 +162,7 @@ extern "C"
         [\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"RGB_70\",\
+                \"dev_name\": \"RGB_CW\",\
                 \"id_room\": \"\",\
                 \"id_item\": 70,\
                 \"gpio1\": 33,\
