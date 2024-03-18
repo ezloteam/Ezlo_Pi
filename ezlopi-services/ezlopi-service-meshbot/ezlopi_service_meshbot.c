@@ -11,10 +11,20 @@
 #include "ezlopi_service_meshbot.h"
 #include "pt.h"
 
-static void __scenes_process(void* arg);
-static void __scene_proto_thread(s_thread_ctx_t* ctx);
-static int __execute_then_condition(s_thread_ctx_t* ctx);
-static int __execute_else_condition(s_thread_ctx_t* ctx);
+typedef struct s_thread_ctx {
+    struct pt pt;
+    uint32_t curr_ticks;
+    uint32_t start_cond;
+    uint32_t stopped_cond;
+    uint32_t delay_ms;
+    l_action_block_v2_t* action_node;
+    // l_scenes_list_v2_t* scene_node;
+} s_thread_ctx_t;
+
+static void __scenes_thread_process(void* pv);
+// static void __scenes_process(void* arg);
+// static int __execute_else_condition(l_scenes_list_v2_t* scene_node);
+static char __scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_delay_ms);
 
 uint32_t ezlopi_meshbot_service_stop_for_scene_id(uint32_t _id)
 {
@@ -70,7 +80,7 @@ uint32_t ezlopi_meshbot_service_start_scene(l_scenes_list_v2_t* scene_node)
         if ((EZLOPI_SCENE_STATUS_NONE == scene_node->status) ||
             (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status))
         {
-            xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
+            // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
             ret = 1;
         }
     }
@@ -105,7 +115,11 @@ uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
         if (scene_node->then_block)
         {
             ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
-            if (1 == __execute_then_condition(scene_node))
+
+
+
+            // if (1 == __execute_then_condition(scene_node))
+            if (1)
             {
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
             }
@@ -116,7 +130,8 @@ uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
         }
         else if (scene_node->else_block)
         {
-            if (1 == __execute_else_condition(scene_node))
+            // if (1 == __execute_else_condition(scene_node))
+            if (1)
             {
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
             }
@@ -134,32 +149,6 @@ uint32_t ezlopi_scenes_service_run_by_id(uint32_t _id)
     return ret;
 }
 
-void ezlopi_scenes_meshbot_init(void)
-{
-    uint32_t start_thread = 0;
-    l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
-    while (scene_node)
-    {
-        if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
-        {
-            start_thread = 1;
-            // xTaskCreate(__scenes_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
-
-        }
-        else
-        {
-            scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
-        }
-
-        scene_node = scene_node->next;
-    }
-
-    if (start_thread)
-    {
-        xTaskCreate(__scenes_thread_process, scene_node->name, 2 * 2048, scene_node, 2, NULL);
-    }
-}
-
 uint32_t ezlopi_meshbot_execute_scene_else_action_group(uint32_t scene_id)
 {
     int ret = 0;
@@ -168,7 +157,8 @@ uint32_t ezlopi_meshbot_execute_scene_else_action_group(uint32_t scene_id)
     {
         if (scene_node->else_block)
         {
-            if (1 == __execute_else_condition(scene_node))
+            // if (1 == __execute_else_condition(scene_node))
+            if (1)
             {
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
             }
@@ -187,113 +177,219 @@ uint32_t ezlopi_meshbot_execute_scene_else_action_group(uint32_t scene_id)
     return ret;
 }
 
-typedef struct s_thread_ctx {
-    struct pt pt;
-    uint32_t curr_ticks;
-    uint32_t start_cond;
-    uint32_t stopped_cond;
-    l_scenes_list_v2_t* scene_node;
-} s_thread_ctx_t;
-
-static void __scene_proto_thread(s_thread_ctx_t* ctx)
+void ezlopi_scenes_meshbot_init(void)
 {
-    if (ctx && ctx->pt.lc)
+    uint32_t start_thread = 0;
+    l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
+    while (scene_node)
     {
-        PT_BEGIN(&ctx->pt);
 
-        while (1)
+        // if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
+        if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
-            if ((EZLOPI_SCENE_STATUS_RUN == ctx->scene_node->status) || (EZLOPI_SCENE_STATUS_RUNNING == ctx->scene_node->status))
+            start_thread = 1;
+
+            s_thread_ctx_t* thread_ctx = malloc(sizeof(s_thread_ctx_t));
+            if (thread_ctx)
             {
-                ctx->scene_node->status = EZLOPI_SCENE_STATUS_RUNNING;
+                memset(thread_ctx, 0, sizeof(s_thread_ctx_t));
+                PT_INIT(&thread_ctx->pt);
+                scene_node->arg = (void*)thread_ctx;
+                scene_node->status = EZLOPI_SCENE_STATUS_RUN;
+            }
+        }
+        else
+        {
+            scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
+        }
 
-                uint32_t when_condition_returned = 0;
-                l_when_block_v2_t* when_condition_node = ctx->scene_node->when_block;
+        scene_node = scene_node->next;
+    }
 
-                if (when_condition_node)
+    if (start_thread)
+    {
+        TRACE_D("starting thread process");
+        xTaskCreate(__scenes_thread_process, "Scene-task", 2 * 2048, NULL, 2, NULL);
+    }
+    else
+    {
+        TRACE_E("scene not available!");
+    }
+}
+
+
+PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_delay_ms))
+{
+    s_thread_ctx_t* ctx = scene_node->arg;
+    PT_BEGIN(&ctx->pt);
+
+    while (1)
+    {
+        if ((EZLOPI_SCENE_STATUS_RUN == scene_node->status) || (EZLOPI_SCENE_STATUS_RUNNING == scene_node->status))
+        {
+            scene_node->status = EZLOPI_SCENE_STATUS_RUNNING;
+
+            uint32_t when_condition_returned = 0;
+            l_when_block_v2_t* when_condition_node = scene_node->when_block;
+
+            if (when_condition_node)
+            {
+                f_scene_method_v2_t when_method = ezlopi_scene_get_method_v2(when_condition_node->block_options.method.type);
+                if (when_method)
                 {
-                    f_scene_method_v2_t when_method = ezlopi_scene_get_method_v2(when_condition_node->block_options.method.type);
-                    if (when_method)
+                    when_condition_returned = when_method(scene_node, (void*)when_condition_node);
+                    if (when_condition_returned)
                     {
-                        when_condition_returned = when_method(ctx->scene_node, (void*)when_condition_node);
-                        if (when_condition_returned)
+                        TRACE_D("here");
+                        if (ctx->start_cond < 2)
                         {
-                            if (ctx->start_cond < 2)
+                            TRACE_D("here");
+                            ctx->stopped_cond = 0;
+
+                            if (ctx->start_cond)
                             {
-                                ctx->stopped_cond = 0;
+                                TRACE_D("here");
+                                ezlopi_scenes_status_change_broadcast(scene_node, scene_status_started_str);
+                            }
 
-                                int write_status = 1;
+                            l_action_block_v2_t* then_block_node = scene_node->then_block;
+                            while (then_block_node)
+                            {
+                                uint32_t delay_ms = (then_block_node->delay.days * (24 * 60 * 60)
+                                    + then_block_node->delay.hours * (60 * 60)
+                                    + then_block_node->delay.minutes * 60
+                                    + then_block_node->delay.seconds) * 1000;
 
-                                if (ctx->start_cond)
+                                if (delay_ms)
                                 {
-                                    if (0 == ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_started_str))
-                                    {
-                                        write_status = 0;
-                                    }
+                                    ctx->delay_ms = delay_ms;
+                                    ctx->action_node = then_block_node;
+
+                                    ctx->curr_ticks = xTaskGetTickCount();
+                                    TRACE_D("entering delay: %d", ctx->curr_ticks);
+                                    PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
+                                    TRACE_D("exiting delay: %d", xTaskGetTickCount());
+
+                                    then_block_node = ctx->action_node;
                                 }
 
-                                if (1 == __execute_then_condition(ctx))
+                                f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_block_node->block_options.method.type);
+                                TRACE_D("then-method: %p", then_method);
+                                if (then_method)
                                 {
-                                    if (0 == ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_finished_str))
+                                    then_method(scene_node, (void*)then_block_node); //then method executed here
+
+                                    if (then_block_node->next)
                                     {
-                                        write_status = 0;
+                                        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_partially_finished_str);
                                     }
+                                    else
+                                    {
+                                        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                                    }
+
+                                    ctx->start_cond += 1;
                                 }
                                 else
                                 {
-                                    if (0 == ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_failed_str))
-                                    {
-                                        write_status = 0;
-                                    }
+                                    ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
                                 }
 
-                                if (write_status)
-                                {
-                                    ctx->start_cond += 1;
-                                }
-                            }
-                            else
-                            {
-                                TRACE_D("Meshobot '%s' is Idle.", ctx->scene_node->name);
-                            }
+                                vTaskDelay(10);
 
-                            TRACE_I("here");
-                        }
-                        else if (ctx->stopped_cond < 2)
-                        {
-                            __execute_else_condition(ctx->scene_node);
-                            if (ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_stopped_str))
-                            {
-                                ctx->stopped_cond += 1;
+                                then_block_node = then_block_node->next;
                             }
-
-                            ctx->start_cond = 0;
-                            TRACE_I("here");
                         }
                         else
                         {
-                            TRACE_D("Meshobot '%s' is Idle.", ctx->scene_node->name);
+                            TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
                         }
                     }
-                    else {
-                        TRACE_E("method not found");
+                    else if (ctx->stopped_cond < 2)
+                    {
+                        l_action_block_v2_t* else_block_node = scene_node->else_block;
+                        while (else_block_node)
+                        {
+                            uint32_t delay_ms = (else_block_node->delay.days * (24 * 60 * 60)
+                                + else_block_node->delay.hours * (60 * 60)
+                                + else_block_node->delay.minutes * 60
+                                + else_block_node->delay.seconds) * 1000;
+
+                            if (delay_ms)
+                            {
+                                ctx->delay_ms = delay_ms;
+                                ctx->action_node = else_block_node;
+
+                                ctx->curr_ticks = xTaskGetTickCount();
+                                TRACE_D("entering delay: %d", ctx->curr_ticks);
+                                PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > ctx->delay_ms);
+                                TRACE_D("exiting delay: %d", xTaskGetTickCount());
+
+                                else_block_node = ctx->action_node;
+                            }
+
+                            f_scene_method_v2_t else_method = ezlopi_scene_get_method_v2(else_block_node->block_options.method.type);
+                            TRACE_D("else-method: %p", else_method);
+                            if (else_method)
+                            {
+                                else_method(scene_node, (void*)else_block_node);
+                            }
+
+                            else_block_node = else_block_node->next;
+                        }
+
+                        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+
+                        ctx->stopped_cond += 1;
+                        ctx->start_cond = 0;
+
                     }
-
-                    when_condition_node = when_condition_node->next;
+                    else
+                    {
+                        TRACE_D("Meshobot '%s' is Idle.", scene_node->name);
+                    }
                 }
+                else
+                {
+                    TRACE_E("method not found");
+                }
+
+                when_condition_node = when_condition_node->next;
             }
-
-            if (EZLOPI_SCENE_STATUS_STOP == ctx->scene_node->status)
-            {
-                break;
-            }
-
-
-            ctx->curr_ticks = xTaskGetTickCount();
-            PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > 1000);
         }
 
-        PT_END(&ctx->pt);
+        if (EZLOPI_SCENE_STATUS_STOP == scene_node->status)
+        {
+            free(scene_node->arg);
+            scene_node->arg = NULL;
+            scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
+            break;
+        }
+
+        ctx->curr_ticks = xTaskGetTickCount();
+        TRACE_D("entering delay: %d", ctx->curr_ticks);
+        PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > routine_delay_ms);
+        TRACE_D("exiting delay: %d", xTaskGetTickCount());
+    }
+
+    PT_END(&ctx->pt);
+}
+
+static void __scenes_thread_process(void* pv)
+{
+    while (1)
+    {
+        l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
+        while (scene_node)
+        {
+            if (scene_node->arg)
+            {
+                __scene_proto_thread(scene_node, 1000); // 
+            }
+
+            vTaskDelay(100);
+            scene_node = scene_node->next;
+        }
     }
 }
 
@@ -403,56 +499,12 @@ static void __scenes_process(void* arg)
 }
 #endif
 
-static int __execute_then_condition(s_thread_ctx_t* ctx)
+
+static int __execute_else_condition(l_scenes_list_v2_t* scene_node)
 {
     int ret = 0;
-    l_action_block_v2_t* then_node = ctx->scene_node->then_block;
-    while (then_node)
-    {
-        uint32_t delay_ms = (then_node->delay.days * (24 * 60 * 60) + then_node->delay.hours * (60 * 60) + then_node->delay.minutes * 60 + then_node->delay.seconds) * 1000;
-        if (delay_ms)
-        {
-            TRACE_D("scene-delay_ms: %d", delay_ms);
-
-            ctx->curr_ticks = xTaskGetTickCount();
-            PT_WAIT_UNTIL(ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > delay_ms);
-
-            // vTaskDelay(delay_ms / portTICK_RATE_MS);
-        }
-
-        const char* method_name = ezlopi_scene_get_scene_method_name(then_node->block_options.method.type);
-        if (method_name)
-        {
-            TRACE_D("Calling: %s", method_name);
-        }
-        else
-        {
-            TRACE_E("Error: Method is NULL!");
-        }
-
-        f_scene_method_v2_t then_method = ezlopi_scene_get_method_v2(then_node->block_options.method.type);
-        // TRACE_D("then-method: %p", then_method);
-        if (then_method)
-        {
-            ret = 1;
-            then_method(ctx->scene_node, (void*)then_node);
-        }
-
-        if (then_node->next)
-        {
-            ezlopi_scenes_status_change_broadcast(ctx->scene_node, scene_status_partially_finished_str);
-        }
-
-        then_node = then_node->next;
-    }
-
-    return ret;
-}
-
-static int __execute_else_condition(s_thread_ctx_t* ctx)
-{
-    int ret = 0;
-    l_action_block_v2_t* else_node = ctx->scene_node->else_block;
+    s_thread_ctx_t* ctx = (s_thread_ctx_t*)scene_node->arg;
+    l_action_block_v2_t* else_node = scene_node->else_block;
     while (else_node)
     {
         uint32_t delay_ms = (else_node->delay.days * (24 * 60 * 60) + else_node->delay.hours * (60 * 60) + else_node->delay.minutes * 60 + else_node->delay.seconds) * 1000;
@@ -461,7 +513,7 @@ static int __execute_else_condition(s_thread_ctx_t* ctx)
         {
             // vTaskDelay(delay_ms / portTICK_RATE_MS);
             ctx->curr_ticks = xTaskGetTickCount();
-            PT_WAIT_UNTIL(ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > delay_ms);
+            // PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > delay_ms);
         }
 
         const char* method_name = ezlopi_scene_get_scene_method_name(else_node->block_options.method.type);
@@ -479,7 +531,7 @@ static int __execute_else_condition(s_thread_ctx_t* ctx)
         if (else_method)
         {
             ret = 1;
-            else_method(ctx->scene_node, (void*)else_node);
+            else_method(scene_node, (void*)else_node);
         }
 
         else_node = else_node->next;

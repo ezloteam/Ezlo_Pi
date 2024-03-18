@@ -56,21 +56,19 @@ void app_main(void)
     ezlopi_init();
 
     timer_service_init();
-    ezlopi_ble_service_init();
+    // ezlopi_ble_service_init();
 
     ezlopi_service_modes_init();
 
-    ezlopi_service_ws_server_start();
-    ezlopi_service_web_provisioning_init();
+    // ezlopi_service_ws_server_start();
+    // ezlopi_service_web_provisioning_init();
 
-    ota_service_init();
-    ezlopi_service_broadcast_init();
+    // ota_service_init();
+    // ezlopi_service_broadcast_init();
 
-
-    __init_heartbeat_led();
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
 
-    vTaskDelay(10000);
+    // vTaskDelay(10000);
     TRACE_D("starting meshbot-service");
     ezlopi_scenes_meshbot_init();
 }
@@ -79,7 +77,7 @@ static void __init_heartbeat_led(void)
 {
 #if (1 == ENABLE_HEARTBIT_LED)
     gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_2),
+        .pin_bit_mask = (1ULL << GPIO_NUM_1),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
@@ -95,12 +93,14 @@ static void __toggle_heartbeat_led(void) {
     static uint32_t state = 0;
 
     state ^= 1;
-    gpio_set_level(GPIO_NUM_2, state);
+    gpio_set_level(GPIO_NUM_1, state);
 #endif
 }
 
 static void __blinky(void* pv)
 {
+    __init_heartbeat_led();
+
     PT_INIT(&pt1);
     uint32_t count = 0;
 

@@ -135,8 +135,6 @@ typedef struct l_house_modes_v2
 
 typedef struct l_scenes_list_v2
 {
-    // char _id[32];
-
     e_scene_status_v2_t status;
     TaskHandle_t task_handle;
 
@@ -152,6 +150,8 @@ typedef struct l_scenes_list_v2
     l_action_block_v2_t* then_block;
     l_when_block_v2_t* when_block;
     l_action_block_v2_t* else_block;
+
+    void* arg;
 
     struct l_scenes_list_v2* next;
 } l_scenes_list_v2_t;
