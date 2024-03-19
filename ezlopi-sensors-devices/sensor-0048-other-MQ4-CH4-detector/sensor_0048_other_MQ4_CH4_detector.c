@@ -41,8 +41,8 @@ static int __0048_notify(l_ezlopi_item_t* item);
 static void __calibrate_MQ4_R0_resistance(void* params);
 static float __extract_MQ4_sensor_ppm(l_ezlopi_item_t* item);
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device);
-static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
-static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_device_adc_cloud_properties_child_adc(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_device_digi_cloud_properties_parent_digi(l_ezlopi_device_t* device, cJSON* cj_device);
 static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data);
 //--------------------------------------------------------------------------------------------------------
 
@@ -92,53 +92,59 @@ static int __0048_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t* MQ4_device_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
-        if (MQ4_device_digi)
+        l_ezlopi_device_t* MQ4_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
+        if (MQ4_device_parent_digi)
         {
-            __prepare_device_digi_cloud_properties(MQ4_device_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t* MQ4_item_digi = ezlopi_device_add_item_to_device(MQ4_device_digi, sensor_0048_other_MQ4_CH4_detector);
+            TRACE_I("Parent_MQ4_device_digi-[0x%x] ", MQ4_device_parent_digi->cloud_properties.device_id);
+            __prepare_device_digi_cloud_properties_parent_digi(MQ4_device_parent_digi, device_prep_arg->cjson_device);
+            l_ezlopi_item_t* MQ4_item_digi = ezlopi_device_add_item_to_device(MQ4_device_parent_digi, sensor_0048_other_MQ4_CH4_detector);
             if (MQ4_item_digi)
             {
                 ret = 1;
-                MQ4_item_digi->cloud_properties.device_id = MQ4_device_digi->cloud_properties.device_id;
+                MQ4_item_digi->cloud_properties.device_id = MQ4_device_parent_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ4_item_digi, device_prep_arg->cjson_device);
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device(MQ4_device_digi);
-            }
-        }
+            //---------------------------- ADC - DEVICE 2 -------------------------------------------
 
-        //---------------------------- ADC - DEVICE 2 -------------------------------------------
-
-        s_mq4_value_t* MQ4_value = (s_mq4_value_t*)malloc(sizeof(s_mq4_value_t));
-        if (NULL != MQ4_value)
-        {
-            memset(MQ4_value, 0, sizeof(s_mq4_value_t));
-            l_ezlopi_device_t* MQ4_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
-            if (MQ4_device_adc)
+            s_mq4_value_t* MQ4_value = (s_mq4_value_t*)malloc(sizeof(s_mq4_value_t));
+            if (NULL != MQ4_value)
             {
-                __prepare_device_adc_cloud_properties(MQ4_device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* MQ4_item_adc = ezlopi_device_add_item_to_device(MQ4_device_adc, sensor_0048_other_MQ4_CH4_detector);
-                if (MQ4_item_adc)
+                memset(MQ4_value, 0, sizeof(s_mq4_value_t));
+                l_ezlopi_device_t* MQ4_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
+                if (MQ4_device_child_adc)
                 {
-                    ret = 1;
-                    MQ4_item_adc->cloud_properties.device_id = MQ4_device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(MQ4_item_adc, device_prep_arg->cjson_device, MQ4_value);
+                    TRACE_I("Child_MQ4_device_adc[0x%x] ", MQ4_device_child_adc->cloud_properties.device_id);
+                    __prepare_device_adc_cloud_properties_child_adc(MQ4_device_child_adc, device_prep_arg->cjson_device);
+
+                    MQ4_device_child_adc->cloud_properties.parent_device_id = MQ4_device_parent_digi->cloud_properties.device_id;// assigning parent_device_id to child_device
+                    l_ezlopi_item_t* MQ4_item_adc = ezlopi_device_add_item_to_device(MQ4_device_child_adc, sensor_0048_other_MQ4_CH4_detector);
+                    if (MQ4_item_adc)
+                    {
+                        ret = 1;
+                        MQ4_item_adc->cloud_properties.device_id = MQ4_device_child_adc->cloud_properties.device_id;
+                        __prepare_item_adc_cloud_properties(MQ4_item_adc, device_prep_arg->cjson_device, MQ4_value);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(MQ4_device_child_adc);
+                        free(MQ4_value);
+                    }
                 }
                 else
                 {
                     ret = -1;
-                    ezlopi_device_free_device(MQ4_device_adc);
                     free(MQ4_value);
                 }
             }
             else
             {
                 ret = -1;
-                free(MQ4_value);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -161,12 +167,12 @@ static int __0048_init(l_ezlopi_item_t* item)
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
                 ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            //   else
-            //   {
-            //       ret = -1;
-            //        TRACE_E("Deleting Item!!");
-            //        ezlopi_device_free_device_by_item(item); // remove the item itself
-            //   }
+            else
+            {
+                ret = -1;
+                //        TRACE_E("Deleting Item!!");
+                //        ezlopi_device_free_device_by_item(item); // remove the item itself
+            }
         }
         else if ((ezlopi_item_name_smoke_density == item->cloud_properties.item_name))
         {
@@ -183,37 +189,37 @@ static int __0048_init(l_ezlopi_item_t* item)
                         }
                         ret = 1;
                     }
-                    // else
-                    // {
-                    //     ret = -1;
-                    //     // TRACE_E("Deleting Item!!");
-                    //     free(item->user_arg);
-                    //     item->user_arg = NULL;
-                    //     // ezlopi_device_free_device_by_item(item); // remove the item itself
-                    // }
+                    else
+                    {
+                        ret = -1;
+                        //     // TRACE_E("Deleting Item!!");
+                        //     free(item->user_arg);
+                        //     item->user_arg = NULL;
+                        //     // ezlopi_device_free_device_by_item(item); // remove the item itself
+                    }
                 }
-                //else
-            //    {
-            //        ret = -1;
-            //         TRACE_E("Deleting Item!!");
-            //        free(item->user_arg);
-            //        item->user_arg = NULL;
-            //         ezlopi_device_free_device_by_item(item); // remove the item itself
-            //    }
+                else
+                {
+                    ret = -1;
+                    //         TRACE_E("Deleting Item!!");
+                    //        free(item->user_arg);
+                    //        item->user_arg = NULL;
+                    //         ezlopi_device_free_device_by_item(item); // remove the item itself
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // TRACE_E("Deleting Item!!");
-            //     ezlopi_device_free_device_by_item(item); // remove the item itself;
-            // }
+            else
+            {
+                ret = -1;
+                //     // TRACE_E("Deleting Item!!");
+                //     ezlopi_device_free_device_by_item(item); // remove the item itself;
+            }
         }
     }
     return ret;
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_digi_cloud_properties_parent_digi(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -241,7 +247,7 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* c
     TRACE_S("MQ4-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
 }
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_adc_cloud_properties_child_adc(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);

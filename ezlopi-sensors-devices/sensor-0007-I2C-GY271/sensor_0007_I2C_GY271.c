@@ -211,6 +211,11 @@ static int __prepare(void* arg)
                         gyro_y_item->cloud_properties.scale = scales_guass;
                         __prepare_item_interface_properties(gyro_y_item, cj_device);
                     }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_y_device);
+                    }
                 }
 
                 l_ezlopi_device_t* gy271_device_child_z_device = ezlopi_device_add_device(cj_device);
@@ -229,6 +234,11 @@ static int __prepare(void* arg)
                         gyro_z_item->cloud_properties.scale = scales_guass;
                         __prepare_item_interface_properties(gyro_z_item, cj_device);
                     }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_z_device);
+                    }
                 }
                 l_ezlopi_device_t* gy271_device_child_azi_device = ezlopi_device_add_device(cj_device);
                 if (gy271_device_child_azi_device)
@@ -245,6 +255,11 @@ static int __prepare(void* arg)
                         gyro_azi_item->cloud_properties.value_type = value_type_angle;
                         gyro_azi_item->cloud_properties.scale = scales_north_pole_degress;
                         __prepare_item_interface_properties(gyro_azi_item, cj_device);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_azi_device);
                     }
                 }
                 l_ezlopi_device_t* gy271_device_child_temp_device = ezlopi_device_add_device(cj_device);
@@ -263,14 +278,37 @@ static int __prepare(void* arg)
                         gyro_temp_item->cloud_properties.scale = scales_celsius;
                         __prepare_item_interface_properties(gyro_temp_item, cj_device);
                     }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_temp_device);
+                    }
                 }
-                ret = 1;
+
+
+                if ((NULL == gyro_x_item) &&
+                    (NULL == gy271_device_child_y_device) &&
+                    (NULL == gy271_device_child_z_device) &&
+                    (NULL == gy271_device_child_azi_device) &&
+                    (NULL == gy271_device_child_temp_device))
+                {
+                    ret = -1;
+                    //ezlopi_device_free_device( gy271_device_parent_x_device)
+                }
+                else
+                {
+                    ret = 1;
+                }
             }
             else // if the parent_device dosenot exsist then dealloc the 'user_data'
             {
                 free(user_data);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
 
@@ -302,6 +340,10 @@ static int __init(l_ezlopi_item_t* item)
                     // item->user_arg = NULL;
                     // ezlopi_device_free_device_by_item(item);
                 }
+            }
+            else
+            {
+                ret = -1;
             }
         }
         else

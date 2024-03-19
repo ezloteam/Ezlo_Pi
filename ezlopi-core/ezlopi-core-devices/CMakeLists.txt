@@ -65,7 +65,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         # sensor-0046-ADC-ACS712-05B-currentmeter
 
         # sensor-0047-other-HX711-loadcell
-        # sensor-0048-other-MQ4-CH4-detector
+        sensor-0048-other-MQ4-CH4-detector
         # sensor-0049-other-MQ2-LPG-detector
         # sensor-0050-other-MQ3-alcohol-detector
         # sensor-0051-other-MQ8-H2-detector

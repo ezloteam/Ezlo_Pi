@@ -78,6 +78,7 @@ void ezlopi_init(void)
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
+    uint32_t active_parent_id = 0;
     l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
 
     while (curr_device)
@@ -88,6 +89,7 @@ static void ezlopi_initialize_devices_v3(void)
         {
             if (curr_item->func)
             {
+                // TRACE_D("item_id: [0x%x]", curr_item->cloud_properties.item_id);
                 if ((device_init_ret = curr_item->func(EZLOPI_ACTION_INITIALIZE, curr_item, NULL, NULL)) < 0)
                 {
                     break;
@@ -97,20 +99,26 @@ static void ezlopi_initialize_devices_v3(void)
             {
                 TRACE_E("Function is not defined!");
             }
-
             curr_item = curr_item->next;
         }
-        if (-1 == device_init_ret)
+
+        if (0 > device_init_ret)
         {
-            device_init_ret = 0;
             l_ezlopi_device_t* device_to_free = curr_device;
             curr_device = curr_device->next;
-            ezlopi_device_free_device(device_to_free);
+            ezlopi_device_free_device(device_to_free);  /*only good for child devices free*/
         }
         else
         {
             curr_device = curr_device->next;
         }
+    }
+
+    l_ezlopi_device_t* final_devices = ezlopi_device_get_head();
+    while (final_devices)
+    {
+        TRACE_W("Device_id_list : [0x%x], parent [0x%x] ", final_devices->cloud_properties.device_id, final_devices->cloud_properties.parent_device_id);
+        final_devices = final_devices->next;
     }
 
 }
