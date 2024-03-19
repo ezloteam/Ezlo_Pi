@@ -151,7 +151,7 @@ typedef struct l_scenes_list_v2
     l_when_block_v2_t* when_block;
     l_action_block_v2_t* else_block;
 
-    void* arg;
+    void* thread_ctx;
 
     struct l_scenes_list_v2* next;
 } l_scenes_list_v2_t;

@@ -56,21 +56,20 @@ void app_main(void)
     ezlopi_init();
 
     timer_service_init();
-    // ezlopi_ble_service_init();
+    ezlopi_ble_service_init();
 
     ezlopi_service_modes_init();
 
-    // ezlopi_service_ws_server_start();
-    // ezlopi_service_web_provisioning_init();
+    ezlopi_service_ws_server_start();
+    ezlopi_service_web_provisioning_init();
 
-    // ota_service_init();
-    // ezlopi_service_broadcast_init();
+    ezlopi_service_ota_init();
+    ezlopi_service_broadcast_init();
 
-    xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
-
-    // vTaskDelay(10000);
     TRACE_D("starting meshbot-service");
     ezlopi_scenes_meshbot_init();
+
+    xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
 }
 
 static void __init_heartbeat_led(void)

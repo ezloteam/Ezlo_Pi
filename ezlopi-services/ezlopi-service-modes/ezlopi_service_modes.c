@@ -45,7 +45,7 @@ int ezlopi_service_modes_start(void)
 
 void ezlopi_service_modes_init(void)
 {
-    // ezlopi_service_modes_start();
+    ezlopi_service_modes_start();
 }
 
 static void __modes_service(void* pv)

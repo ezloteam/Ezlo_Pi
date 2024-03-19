@@ -35,22 +35,22 @@ void ezlopi_init(void)
     ezlopi_factory_info_v3_init();
     print_factory_info_v3();
 
-    // ezlopi_event_group_create();
-    // ezlopi_wifi_initialize();
+    ezlopi_event_group_create();
+    ezlopi_wifi_initialize();
     vTaskDelay(10);
 
     // Init devices
-    // ezlopi_device_prepare();
+    ezlopi_device_prepare();
     vTaskDelay(10);
-    // ezlopi_initialize_devices_v3();
+    ezlopi_initialize_devices_v3();
     vTaskDelay(10);
 
-    // ezlopi_core_modes_init();
-    // ezlopi_room_init();
+    ezlopi_core_modes_init();
+    ezlopi_room_init();
 
 #ifdef EZPI_SERV_ENABLE_MESHBOTS
-    // ezlopi_scenes_scripts_init();
-    // ezlopi_scenes_expressions_init();
+    ezlopi_scenes_scripts_init();
+    ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
 #endif // EZPI_SERV_ENABLE_MESHBOTS
 
@@ -58,14 +58,14 @@ void ezlopi_init(void)
     ezlopi_ethernet_init();
 #endif // EZPI_CORE_ENABLE_ETH
 
-    // uint32_t boot_count = ezlopi_system_info_get_boot_count();
+    uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
-    // ezlopi_wifi_connect_from_id_bin();
-    // ezlopi_nvs_set_boot_count(boot_count + 1);
+    ezlopi_wifi_connect_from_id_bin();
+    ezlopi_nvs_set_boot_count(boot_count + 1);
 
-    // ezlopi_event_queue_init();
-    // ezlopi_ping_init();
-    // ezlopi_timer_start_1000ms();
+    ezlopi_event_queue_init();
+    ezlopi_ping_init();
+    ezlopi_timer_start_1000ms();
 }
 
 static void ezlopi_initialize_devices_v3(void)

@@ -187,6 +187,7 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
             }
             curr_field = curr_field->next;
         }
+        
         if (execute_else_condition)
         {
             TRACE_D("Executing else condition");
