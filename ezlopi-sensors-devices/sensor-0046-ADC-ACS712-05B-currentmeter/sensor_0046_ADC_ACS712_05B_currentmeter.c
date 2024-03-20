@@ -35,23 +35,23 @@ int sensor_0046_ADC_ACS712_05B_currentmeter(e_ezlopi_actions_t action, l_ezlopi_
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0046_prepare(arg);
+        ret = __0046_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0046_init(item);
+        ret = __0046_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0046_get_cjson_value(item, arg);
+        ret = __0046_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0046_notify(item);
+        ret = __0046_notify(item);
         break;
     }
     default:
@@ -144,27 +144,20 @@ static int __0046_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg);
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -174,7 +167,7 @@ static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cjson_properties = (cJSON *)arg;
+        cJSON* cjson_properties = (cJSON*)arg;
         if (cjson_properties)
         {
             s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;

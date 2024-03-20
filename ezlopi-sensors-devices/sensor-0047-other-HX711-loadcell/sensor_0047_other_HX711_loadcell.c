@@ -53,24 +53,24 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t*
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0047_prepare(arg);
+        ret = __0047_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0047_init(item);
+        ret = __0047_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0047_get_cjson_value(item, arg);
+        ret = __0047_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
 
-        __0047_notify(item);
+        ret = __0047_notify(item);
 
         break;
     }
@@ -155,7 +155,7 @@ static int __0047_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
@@ -168,8 +168,6 @@ static int __0047_init(l_ezlopi_item_t* item)
                 output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
                 output_conf.pull_up_en = GPIO_PULLUP_DISABLE;
 
-                ret = (0 == gpio_config(&output_conf)) ? 1 : -1;
-
                 // Configure 'DATA_PIN' ->  GPIO input pins for HX711.
                 gpio_config_t input_conf;
                 input_conf.pin_bit_mask = (1ULL << (user_data->HX711_DT_pin));
@@ -177,36 +175,32 @@ static int __0047_init(l_ezlopi_item_t* item)
                 input_conf.mode = GPIO_MODE_INPUT;
                 input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
                 input_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-                ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
 
-                // then initiate calibration task
-                if ((1 == ret) && (false == (user_data->HX711_initialized)))
+                if ((0 == gpio_config(&output_conf)) &&
+                    (0 == gpio_config(&input_conf)))
                 {
-                    __hx711_power_reset(item);
-                    xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", 2 * 2048, item, 1, NULL);
-                    ret = 1;
+                    // Initiate calibration task
+                    if (false == (user_data->HX711_initialized))
+                    {
+                        __hx711_power_reset(item);
+                        xTaskCreate(__Calculate_hx711_tare_wt, "Calculate the Tare weight", 2 * 2048, item, 1, NULL);
+                        ret = 1;
+                    }
                 }
-
-                // if (-1 == ret)
-                // {
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -220,10 +214,10 @@ static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+            s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
             if (user_data)
             {
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->weight);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->weight);
                 cJSON_AddStringToObject(cj_result, "ValueFormatted", valueFormatted);
                 cJSON_AddNumberToObject(cj_result, "value", user_data->weight);
                 free(valueFormatted);
@@ -239,7 +233,7 @@ static int __0047_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if ((user_data) && (true == user_data->HX711_initialized))
         {
             float Mass = __hx711_avg_reading(item, 10); /// 1000.0f; // to avoid spikes
@@ -267,7 +261,7 @@ static void __Calculate_hx711_tare_wt(void* params)
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         { // For Output settling time ; [10SPS] is 400ms
             // So, wait for 400ms after reset [as per datasheet]
@@ -303,7 +297,7 @@ static float __hx711_rawdata(l_ezlopi_item_t* item, hx711_gain_t _gain)
     unsigned long data = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
 
         if (user_data)
         {
@@ -388,7 +382,7 @@ static void __hx711_power_reset(l_ezlopi_item_t* item)
 {
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         {
             PORT_ENTER_CRITICAL();

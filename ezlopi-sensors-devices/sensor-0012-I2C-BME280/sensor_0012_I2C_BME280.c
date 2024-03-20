@@ -24,16 +24,16 @@ typedef struct s_ezlopi_bmp280
 
 } s_ezlopi_bmp280_t;
 
-static void __prepare_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
-static void __prepare_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
-static void __prepare_temperature_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
-static void __prepare_pressure_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
-static void __prepare_temp_humid_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
+static void __prepare_humidity_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
+static void __prepare_pressure_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
+static void __prepare_temperature_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
+static void __prepare_pressure_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
+static void __prepare_temp_humid_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
 
-static int __init(l_ezlopi_item_t *item);
-static int __notify(l_ezlopi_item_t *item);
-static int __prepare(void *arg);
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __init(l_ezlopi_item_t* item);
+static int __notify(l_ezlopi_item_t* item);
+static int __prepare(void* arg);
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
 /**
  * @brief Public function to interface bme280. This is used to handles all the action on the bme280 sensor and is the entry point to interface the sensor.
@@ -42,29 +42,30 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
  * @param arg Other arguments if needed
  * @return int
  */
-int sensor_0012_I2C_BME280(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0012_I2C_BME280(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
+    int ret = 0;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __prepare(arg);
+        ret = __prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __init(item);
+        ret = __init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __get_cjson_value(item, arg);
+        ret = __get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        ret = __notify(item);
         break;
     }
     default:
@@ -72,7 +73,7 @@ int sensor_0012_I2C_BME280(e_ezlopi_actions_t action, l_ezlopi_item_t *item, voi
         break;
     }
     }
-    return 0;
+    return ret;
 }
 
 static bool check_double_val_equal(double first, double second)
@@ -90,12 +91,12 @@ static bool check_double_val_equal(double first, double second)
     }
     return ret;
 }
-static int __notify(l_ezlopi_item_t *item)
+static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_ezlopi_bmp280_t *sensor_params = (s_ezlopi_bmp280_t *)item->user_arg;
+        s_ezlopi_bmp280_t* sensor_params = (s_ezlopi_bmp280_t*)item->user_arg;
         if (sensor_params)
         {
             float temperature, pressure, humidity;
@@ -129,18 +130,18 @@ static int __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_device = (cJSON *)arg;
-        s_ezlopi_bmp280_t *bmp280_sensor_params = (s_ezlopi_bmp280_t *)item->user_arg;
+        cJSON* cj_device = (cJSON*)arg;
+        s_ezlopi_bmp280_t* bmp280_sensor_params = (s_ezlopi_bmp280_t*)item->user_arg;
         if (cj_device && bmp280_sensor_params)
         {
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-                char *valueFormatted = ezlopi_valueformatter_float(bmp280_sensor_params->temperature);
+                char* valueFormatted = ezlopi_valueformatter_float(bmp280_sensor_params->temperature);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -152,7 +153,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
             if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
-                char *valueFormatted = ezlopi_valueformatter_float(bmp280_sensor_params->humidity);
+                char* valueFormatted = ezlopi_valueformatter_float(bmp280_sensor_params->humidity);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -164,7 +165,7 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 
             if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
             {
-                char *valueFormatted = ezlopi_valueformatter_float((bmp280_sensor_params->pressure / 1000.0));
+                char* valueFormatted = ezlopi_valueformatter_float((bmp280_sensor_params->pressure / 1000.0));
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -178,12 +179,12 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t *item)
+static int __init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_ezlopi_bmp280_t *bmp280_sensor_params = (s_ezlopi_bmp280_t *)item->user_arg;
+        s_ezlopi_bmp280_t* bmp280_sensor_params = (s_ezlopi_bmp280_t*)item->user_arg;
         if (bmp280_sensor_params)
         {
             if (item->interface.i2c_master.enable)
@@ -195,27 +196,26 @@ static int __init(l_ezlopi_item_t *item)
                 ret = 1;
             }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
 }
 
-static int __prepare(void *arg)
+static int __prepare(void* arg)
 {
     int ret = 0;
 
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *temp_humid_device = ezlopi_device_add_device(prep_arg->cjson_device);
-        l_ezlopi_device_t *pressure_deivce = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t* temp_humid_device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t* pressure_deivce = ezlopi_device_add_device(prep_arg->cjson_device);
 
-        s_ezlopi_bmp280_t *bme280_sensor_params = (s_ezlopi_bmp280_t *)malloc(sizeof(s_ezlopi_bmp280_t));
+        s_ezlopi_bmp280_t* bme280_sensor_params = (s_ezlopi_bmp280_t*)malloc(sizeof(s_ezlopi_bmp280_t));
 
         if (temp_humid_device && pressure_deivce && bme280_sensor_params)
         {
@@ -223,22 +223,22 @@ static int __prepare(void *arg)
 
             __prepare_temp_humid_device_cloud_properties(temp_humid_device, prep_arg->cjson_device);
 
-            l_ezlopi_item_t *temperature_item = ezlopi_device_add_item_to_device(temp_humid_device, sensor_0012_I2C_BME280);
+            l_ezlopi_item_t* temperature_item = ezlopi_device_add_item_to_device(temp_humid_device, sensor_0012_I2C_BME280);
             if (temperature_item)
             {
                 temperature_item->cloud_properties.device_id = temp_humid_device->cloud_properties.device_id;
-                __prepare_temperature_properties(temperature_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
+                __prepare_temperature_properties(temperature_item, prep_arg->cjson_device, (void*)bme280_sensor_params);
             }
             else
             {
                 ret = -1;
             }
 
-            l_ezlopi_item_t *humidity_item = ezlopi_device_add_item_to_device(temp_humid_device, sensor_0012_I2C_BME280);
+            l_ezlopi_item_t* humidity_item = ezlopi_device_add_item_to_device(temp_humid_device, sensor_0012_I2C_BME280);
             if (humidity_item)
             {
                 humidity_item->cloud_properties.device_id = temp_humid_device->cloud_properties.device_id;
-                __prepare_humidity_properties(humidity_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
+                __prepare_humidity_properties(humidity_item, prep_arg->cjson_device, (void*)bme280_sensor_params);
             }
             else
             {
@@ -247,11 +247,11 @@ static int __prepare(void *arg)
 
             __prepare_pressure_device_cloud_properties(pressure_deivce, prep_arg->cjson_device);
 
-            l_ezlopi_item_t *pressure_item = ezlopi_device_add_item_to_device(pressure_deivce, sensor_0012_I2C_BME280);
+            l_ezlopi_item_t* pressure_item = ezlopi_device_add_item_to_device(pressure_deivce, sensor_0012_I2C_BME280);
             if (pressure_item)
             {
                 pressure_item->cloud_properties.device_id = pressure_deivce->cloud_properties.device_id;
-                __prepare_pressure_properties(pressure_item, prep_arg->cjson_device, (void *)bme280_sensor_params);
+                __prepare_pressure_properties(pressure_item, prep_arg->cjson_device, (void*)bme280_sensor_params);
             }
             else
             {
@@ -280,7 +280,7 @@ static int __prepare(void *arg)
     return ret;
 }
 
-static void __prepare_temp_humid_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_temp_humid_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -294,7 +294,7 @@ static void __prepare_temp_humid_device_cloud_properties(l_ezlopi_device_t *devi
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_pressure_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_pressure_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
@@ -308,7 +308,7 @@ static void __prepare_pressure_device_cloud_properties(l_ezlopi_device_t *device
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_temperature_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
+static void __prepare_temperature_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -327,7 +327,7 @@ static void __prepare_temperature_properties(l_ezlopi_item_t *item, cJSON *cj_de
     item->user_arg = user_arg;
 }
 
-static void __prepare_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
+static void __prepare_humidity_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -346,7 +346,7 @@ static void __prepare_humidity_properties(l_ezlopi_item_t *item, cJSON *cj_devic
     item->user_arg = user_arg;
 }
 
-static void __prepare_pressure_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
+static void __prepare_pressure_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
     CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;

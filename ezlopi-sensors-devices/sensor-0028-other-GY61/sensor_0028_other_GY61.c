@@ -43,23 +43,23 @@ int sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t* item, voi
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0028_prepare(arg);
+        ret = __0028_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0028_init(item);
+        ret = __0028_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0028_get_cjson_value(item, arg);
+        ret = __0028_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0028_notify(item);
+        ret = __0028_notify(item);
         break;
     }
     default:
@@ -180,7 +180,7 @@ static int __0028_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
+        s_gy61_data_t* user_data = (s_gy61_data_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
@@ -192,24 +192,17 @@ static int __0028_init(l_ezlopi_item_t* item)
                 else
                 {
                     ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    // ezlopi_device_free_device_by_item(item);
                 }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -227,7 +220,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->x_data));
                 // TRACE_I("x-axis-G : %.2f", user_data->x_data);
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -238,7 +231,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->y_data));
                 // TRACE_I("y-axis-G : %.2f", user_data->y_data);
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -249,7 +242,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->z_data));
                 // TRACE_I("z-axis-G : %.2f", user_data->z_data);
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -267,7 +260,7 @@ static int __0028_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
+        s_gy61_data_t* user_data = (s_gy61_data_t*)item->user_arg;
         if (user_data)
         {
             float new_value = 0;

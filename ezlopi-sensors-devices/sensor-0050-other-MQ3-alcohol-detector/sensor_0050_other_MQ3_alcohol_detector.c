@@ -52,27 +52,27 @@ int sensor_0050_other_MQ3_alcohol_detector(e_ezlopi_actions_t action, l_ezlopi_i
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0050_prepare(arg);
+        ret = __0050_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0050_init(item);
+        ret = __0050_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0050_get_item(item, arg);
+        ret = __0050_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0050_get_cjson_value(item, arg);
+        ret = __0050_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0050_notify(item);
+        ret = __0050_notify(item);
         break;
     }
     default:
@@ -160,12 +160,10 @@ static int __0050_init(l_ezlopi_item_t* item)
                 gpio_config(&input_conf);
                 ret = 1;
             }
-            //   else
-            //   {
-            //       ret = -1;
-            //        TRACE_E("Deleting Item!!");
-            //        ezlopi_device_free_device_by_item(item); // remove the item itself
-            //   }
+            else
+            {
+                ret = -1;
+            }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
@@ -182,30 +180,20 @@ static int __0050_init(l_ezlopi_item_t* item)
                         }
                         ret = 1;
                     }
-                    // else
-                    // {
-                    //     ret = -1;
-                    //     // TRACE_E("Deleting Item!!");
-                    //     free(item->user_arg);
-                    //     item->user_arg = NULL;
-                    //     // ezlopi_device_free_device_by_item(item); // remove the item itself
-                    // }
+                    else
+                    {
+                        ret = -1;
+                    }
                 }
-                //else
-            //    {
-            //        ret = -1;
-            //         TRACE_E("Deleting Item!!");
-            //        free(item->user_arg);
-            //        item->user_arg = NULL;
-            //         ezlopi_device_free_device_by_item(item); // remove the item itself
-            //    }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // TRACE_E("Deleting Item!!");
-            //     // ezlopi_device_free_device_by_item(item); // remove the item itself;
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
     }
 

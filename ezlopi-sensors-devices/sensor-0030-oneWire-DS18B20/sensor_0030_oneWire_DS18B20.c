@@ -112,21 +112,15 @@ static int __init(l_ezlopi_item_t* item)
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     if (item->user_arg)
-            //     {
-            //         free(item->user_arg); // this will free ; memory address linked to all items
-            //         item->user_arg = NULL;
-            //     }
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

@@ -31,6 +31,7 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t* item)
         s_gxhtc3_value_t* gxhtce_val = (s_gxhtc3_value_t*)item->user_arg;
         if (gxhtce_val)
         {
+            ret = 1;
             if (NULL == gxhtce_val->gxhtc3)
             {
                 if (item->interface.i2c_master.enable)
@@ -39,7 +40,6 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t* item)
                     gxhtce_val->gxhtc3 = GXHTC3_init(item->interface.i2c_master.channel, item->interface.i2c_master.address);
                     if (gxhtce_val->gxhtc3)
                     {
-                        ret = 1;
                         if (gxhtce_val->gxhtc3->id.status)
                         {
                             TRACE_E("GXHTC3 Chip ID: 0x%x", gxhtce_val->gxhtc3->id.id);
@@ -47,20 +47,16 @@ static int gxhtc3_sensor_init(l_ezlopi_item_t* item)
                         else
                         {
                             TRACE_E("GXHTC3 Chip ID not ready!");
-                            // ret = -1;
-                            // free(item->user_arg);
-                            // item->user_arg = NULL;
-                            // ezlopi_device_free_device_by_item(item);
+                            ret = -1;
                         }
                     }
                 }
             }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;

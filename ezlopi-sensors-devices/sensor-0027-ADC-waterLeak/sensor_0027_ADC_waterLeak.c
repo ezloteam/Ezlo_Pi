@@ -43,17 +43,17 @@ int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t* item, 
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __get_item_list(item, arg);
+        ret = __get_item_list(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __get_ezlopi_value(item, arg);
+        ret = __get_ezlopi_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        ret = __notify(item);
         break;
     }
     default:
@@ -220,13 +220,11 @@ static int __init(l_ezlopi_item_t* item)
             else
             {
                 ret = -1;
-                // ezlopi_device_free_device_by_item(item);
             }
         }
         else
         {
             ret = -1;
-            // ezlopi_device_free_device_by_item(item);
         }
     }
 

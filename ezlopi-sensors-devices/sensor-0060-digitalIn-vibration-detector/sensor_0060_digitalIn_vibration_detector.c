@@ -37,27 +37,27 @@ int sensor_0060_digitalIn_vibration_detector(e_ezlopi_actions_t action, l_ezlopi
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0060_prepare(arg);
+        ret = __0060_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0060_init(item);
+        ret = __0060_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0060_get_item(item, arg);
+        ret = __0060_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0060_get_cjson_value(item, arg);
+        ret = __0060_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0060_notify(item);
+        ret = __0060_notify(item);
         break;
     }
     default:
@@ -157,17 +157,15 @@ static int __0060_init(l_ezlopi_item_t* item)
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     // ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

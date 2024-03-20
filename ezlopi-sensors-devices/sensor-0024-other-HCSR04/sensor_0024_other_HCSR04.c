@@ -131,8 +131,8 @@ static int __init(l_ezlopi_item_t* item)
                                         : GPIO_PULLDOWN_DISABLE,
                     .intr_type = GPIO_INTR_DISABLE,
                 };
-
                 ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
+
             }
             else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
@@ -154,18 +154,15 @@ static int __init(l_ezlopi_item_t* item)
 
                 ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
             }
-            // if (1 != ret)
-            // {
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            if (1 != ret)
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;

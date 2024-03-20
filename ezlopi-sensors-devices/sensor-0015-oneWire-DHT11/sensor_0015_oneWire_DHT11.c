@@ -38,23 +38,23 @@ int sensor_0015_oneWire_DHT11(e_ezlopi_actions_t action, l_ezlopi_item_t* item, 
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0015_prepare(arg);
+        ret = __0015_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0015_init(item);
+        ret = __0015_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0015_get_value(item, arg);
+        ret = __0015_get_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0015_notify(item);
+        ret = __0015_notify(item);
         break;
     }
     default:
@@ -213,28 +213,24 @@ static int __0015_init(l_ezlopi_item_t* item)
         TRACE_E("Item name; %s", item->cloud_properties.item_name);
         if (item->interface.onewire_master.enable)
         {
-            // s_ezlopi_dht11_data_t *dht11_data = (s_ezlopi_dht11_data_t *)item->user_arg;
-            // if (dht11_data)
-            // {
-            if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
+            s_ezlopi_dht11_data_t* dht11_data = (s_ezlopi_dht11_data_t*)item->user_arg;
+            if (dht11_data)
             {
-                TRACE_S("HERE");
-                setDHT11gpio(item->interface.onewire_master.onewire_pin);
-                ret = 1;
+                if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
+                {
+                    TRACE_S("HERE");
+                    setDHT11gpio(item->interface.onewire_master.onewire_pin);
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-                // ret = -1;
-                // free(item->user_arg); // this will free ; memory address linked to all items
-                // item->user_arg = NULL;
-                // ezlopi_device_free_device_by_item(item);
-            // }
-            // }
-            // else
-            // {
-            //     ret = -1;
-            //     ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
     }
     return ret;

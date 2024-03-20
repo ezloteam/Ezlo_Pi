@@ -55,18 +55,18 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t*
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0054_prepare(arg);
+        ret = __0054_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0054_init(item);
+        ret = __0054_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0054_get_cjson_value(item, arg);
+        ret = __0054_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -74,7 +74,7 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t*
         static uint8_t count;
         if (count++ > 1)
         {
-            __0054_notify(item);
+            ret = __0054_notify(item);
             count = 0;
         }
         break;
@@ -178,19 +178,15 @@ static int __0054_init(l_ezlopi_item_t* item)
                 };
                 ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

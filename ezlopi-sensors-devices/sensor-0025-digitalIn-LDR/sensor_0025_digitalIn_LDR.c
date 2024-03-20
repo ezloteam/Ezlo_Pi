@@ -88,17 +88,15 @@ static int __init(l_ezlopi_item_t* item)
                 gpio_isr_service_register_v3(item, __value_updated_from_interrupt, 200);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-            // ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

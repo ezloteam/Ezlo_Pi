@@ -29,7 +29,7 @@ static int dht22_sensor_setup_item_properties_humidity(l_ezlopi_item_t* item, cJ
 static int dht22_sensor_setup_device_cloud_properties_temperature(l_ezlopi_device_t* device, cJSON* cj_device);
 static int dht22_sensor_setup_device_cloud_properties_humidity(l_ezlopi_device_t* device, cJSON* cj_device);
 
-static int __notify(l_ezlopi_item_t* item);
+static int dht22_sensor_notify(l_ezlopi_item_t* item);
 
 int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
@@ -38,23 +38,23 @@ int sensor_0016_oneWire_DHT22(e_ezlopi_actions_t action, l_ezlopi_item_t* item, 
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        dht22_sensor_prepare_v3(arg);
+        ret = dht22_sensor_prepare_v3(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        dht22_sensor_init_v3(item);
+        ret = dht22_sensor_init_v3(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        dht22_sensor_get_sensor_value_v3(item, arg);
+        ret = dht22_sensor_get_sensor_value_v3(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        ret = dht22_sensor_notify(item);
         break;
     }
     default:
@@ -70,33 +70,28 @@ static int dht22_sensor_init_v3(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        // s_ezlopi_dht22_data_t *dht22_data = (s_ezlopi_dht22_data_t *)item->user_arg;
-        // if (dht22_data)
-        // {
-        if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
+        s_ezlopi_dht22_data_t* dht22_data = (s_ezlopi_dht22_data_t*)item->user_arg;
+        if (dht22_data)
         {
-            setDHT22gpio(item->interface.onewire_master.onewire_pin);
-            ret = 1;
+            if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
+            {
+                setDHT22gpio(item->interface.onewire_master.onewire_pin);
+                ret = 1;
+            }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-            // ret = -1;
-            // free(item->user_arg); // this will free ; memory address linked to all items
-            // item->user_arg = NULL;
-
-            // ezlopi_device_free_device_by_item(item);
-        // }
-        // }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static int dht22_sensor_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)

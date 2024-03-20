@@ -39,22 +39,22 @@ int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0065_prepare(arg);
+        ret = __0065_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0065_init(item);
+        ret = __0065_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0065_get_item(item, arg);
+        ret = __0065_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0065_get_cjson_value(item, arg);
+        ret = __0065_get_cjson_value(item, arg);
         break;
     }
     default:
@@ -158,18 +158,15 @@ static int __0065_init(l_ezlopi_item_t* item)
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, __0065_update_from_device, 200);
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            //     TRACE_E("Error initializing float switch");
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     // ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

@@ -161,17 +161,6 @@ extern "C"
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 8,\
-                \"dev_name\": \"GY271\",\
-                \"id_room\": \"\",\
-                \"id_item\": 7,\
-                \"gpio_sda\": 18,\
-                \"gpio_scl\": 19,\
-                \"pullup_scl\": true,\
-                \"pullup_sda\": true,\
-                \"slave_addr\": 13\
-            },\
-            {\
                 \"dev_type\": 1,\
                 \"dev_name\": \"LED\",\
                 \"id_room\": \"\",\
@@ -191,15 +180,26 @@ extern "C"
                 \"dev_name\": \"Water_leak\",\
                 \"id_room\": \"\",\
                 \"id_item\": 27,\
-                \"gpio\": 32\
+                \"gpio\": 25\
             },\
             {\
                 \"dev_type\": 10,\
                 \"dev_name\": \"MQ4_CH4\",\
                 \"id_item\": 48,\
                 \"id_room\": \"\",\
-                \"gpio1\": 25,\
+                \"gpio1\": 10,\
                 \"gpio2\": 33\
+            },\
+            {\
+                \"dev_type\": 8,\
+                \"dev_name\": \"GY271\",\
+                \"id_room\": \"\",\
+                \"id_item\": 7,\
+                \"gpio_sda\": 18,\
+                \"gpio_scl\": 19,\
+                \"pullup_scl\": true,\
+                \"pullup_sda\": true,\
+                \"slave_addr\": 13\
             },\
             {\
                 \"dev_type\": 3,\
@@ -209,7 +209,7 @@ extern "C"
                 \"gpio\": 34\
             }\
         ], \
-        \"dev_total\": 6}";
+        \"dev_total\": 5}";
 #endif
 
 

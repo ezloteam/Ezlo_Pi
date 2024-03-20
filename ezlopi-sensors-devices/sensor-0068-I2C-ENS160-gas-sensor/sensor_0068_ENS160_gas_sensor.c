@@ -50,22 +50,22 @@ int sensor_0068_ENS160_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* it
   {
   case EZLOPI_ACTION_PREPARE:
   {
-    __prepare(arg, user_arg);
+    ret = __prepare(arg, user_arg);
     break;
   }
   case EZLOPI_ACTION_INITIALIZE:
   {
-    __init(item);
+    ret = __init(item);
     break;
   }
   case EZLOPI_ACTION_GET_EZLOPI_VALUE:
   {
-    __get_cjson_value(item, arg);
+    ret = __get_cjson_value(item, arg);
     break;
   }
   case EZLOPI_ACTION_NOTIFY_1000_MS:
   {
-    __notify(item);
+    ret = __notify(item);
     break;
   }
   default:

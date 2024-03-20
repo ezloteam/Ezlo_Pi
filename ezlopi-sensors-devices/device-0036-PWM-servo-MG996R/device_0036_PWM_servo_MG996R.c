@@ -123,9 +123,9 @@ static int __init(l_ezlopi_item_t* item)
     {
         if (GPIO_IS_VALID_GPIO(item->interface.pwm.gpio_num))
         {
-            static s_ezlopi_channel_speed_t *servo_item = NULL;
+            static s_ezlopi_channel_speed_t* servo_item = NULL;
             servo_item = ezlopi_pwm_init(item->interface.pwm.gpio_num, item->interface.pwm.pwm_resln,
-                                         item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
+                item->interface.pwm.freq_hz, item->interface.pwm.duty_cycle);
             if (servo_item)
             {
                 item->interface.pwm.channel = servo_item->channel;
@@ -137,11 +137,10 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -151,7 +150,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result && item)
         {
             int value = 0;
@@ -177,7 +176,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
             uint32_t duty = ezlopi_pwm_get_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode);
@@ -198,7 +197,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             }
 
             cJSON_AddNumberToObject(cj_result, ezlopi_value_str, target_duty);
-            char *formatted_val = ezlopi_valueformatter_int(target_duty);
+            char* formatted_val = ezlopi_valueformatter_int(target_duty);
             if (formatted_val)
             {
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, formatted_val);

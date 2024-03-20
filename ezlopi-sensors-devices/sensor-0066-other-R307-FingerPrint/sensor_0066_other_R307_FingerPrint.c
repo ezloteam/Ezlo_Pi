@@ -311,41 +311,35 @@ static int __0066_init(l_ezlopi_item_t* item)
                                     TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
                                 }
                             }
-                            // else
-                            // {
-                            //     ret = -1;
-                            //     gpio_isr_handler_remove(intr_pin);
-                            //     TRACE_E("Error!! : Failed to add GPIO ISR handler.");
-                            // }
+                            else
+                            {
+                                ret = -1;
+                                gpio_isr_handler_remove(intr_pin);
+                                TRACE_E("Error!! : Failed to add GPIO ISR handler.");
+                            }
                         }
-                        // else
-                        // {
-                        //     ret = -1;
-                        //     TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
-                        // }
+                        else
+                        {
+                            ret = -1;
+                            TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
+                        }
                     }
-                    // else
-                    // {
-                    //     ret = -1;
-                    //     free(item->user_arg); // this will free ; memory address linked to all items
-                    //     item->user_arg = NULL;
-                    //     TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
-                    // }
+                    else
+                    {
+                        ret = -1;
+                        TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
+                    }
                 }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
