@@ -78,7 +78,7 @@ void ezlopi_init(void)
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
-    uint32_t active_parent_id = 0;
+    uint32_t clear_target_parent_id = 0;
     l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
 
     while (curr_device)
@@ -105,8 +105,34 @@ static void ezlopi_initialize_devices_v3(void)
         if (0 > device_init_ret)
         {
             l_ezlopi_device_t* device_to_free = curr_device;
-            curr_device = curr_device->next;
+
+            if ((NULL != curr_device->next) &&
+                curr_device->cloud_properties.device_id == curr_device->next->cloud_properties.parent_device_id &&
+                curr_device->cloud_properties.parent_device_id == 0)/*identify if this curr_dev is 'parent_node' with children*/
+            {
+                /*assign 'curr_device' a node, just after the 'parent_tree' finishes*/
+                clear_target_parent_id = curr_device->cloud_properties.device_id;
+                l_ezlopi_device_t* pre_devices = ezlopi_device_get_head();
+                while (pre_devices)
+                {
+                    TRACE_W("Pre_clear_list : [0x%x], parent [0x%x] ", pre_devices->cloud_properties.device_id, pre_devices->cloud_properties.parent_device_id);
+                    if (pre_devices->next->cloud_properties.parent_device_id == 0 &&
+                        pre_devices->next->cloud_properties.device_id > clear_target_parent_id)
+                    {
+                        curr_device = pre_devices->next;
+                        break;
+                    }
+                    pre_devices = pre_devices->next;
+                }
+            }
+            else
+            {
+                curr_device = curr_device->next;
+            }
+
+
             ezlopi_device_free_device(device_to_free);  /*only good for child devices free*/
+
         }
         else
         {

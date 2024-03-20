@@ -204,7 +204,21 @@ static void ezlopi_device_free_parent_tree(l_ezlopi_device_t* parent_device, uin
         ezlopi_device_clear_bottom_children(parent_device, parent_dev_id);
 
         /*Clearing the parent_node*/
+        l_ezlopi_device_t* pre_final_devices = ezlopi_device_get_head();
+        while (pre_final_devices)
+        {
+            TRACE_W("Pre_final_Device_id_list : [0x%x], parent [0x%x] ", pre_final_devices->cloud_properties.device_id, pre_final_devices->cloud_properties.parent_device_id);
+            pre_final_devices = pre_final_devices->next;
+        }
+
         ezlopi_device_free_device(parent_device);
+
+        l_ezlopi_device_t* final_devices = ezlopi_device_get_head();
+        while (final_devices)
+        {
+            TRACE_W("Final_Device_id_list : [0x%x], parent [0x%x] ", final_devices->cloud_properties.device_id, final_devices->cloud_properties.parent_device_id);
+            final_devices = final_devices->next;
+        }
     }
 }
 
@@ -215,14 +229,14 @@ void ezlopi_device_free_device(l_ezlopi_device_t* device)
         /*First identify if it is parent or child device*/
         if ((NULL != device->next) &&
             device->cloud_properties.device_id == device->next->cloud_properties.parent_device_id &&
-            device->cloud_properties.parent_device_id == 0) /*for whole parent_tree*/
+            device->cloud_properties.parent_device_id == 0) /*for clearing the whole parent_tree_nodes*/
         {
             TRACE_S("STARTING TREE CLEARING PROCESS.....");
             TRACE_D("Parent-Device-ID: %08x", device->cloud_properties.device_id);
             ezlopi_device_free_parent_tree(device, device->cloud_properties.device_id);
         }
         else
-        { /*for only child nodes*/
+        { /*for clearing only single tree nodes*/
             if (l_device_head == device)
             {
                 l_device_head = l_device_head->next;
@@ -630,21 +644,20 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
 
 static void ezlopi_device_free_item(l_ezlopi_item_t* items)
 {
-    static uint32_t prev_item_user_arg_addr = 0;
+    static uint32_t prev_item_user_arg_addr = 0; // all recusive functions utilize the same 'prev_item_user_arg_addr'
     if (items)
     {
         if (NULL != (items->next))
         {
-            // prev_item_user_arg_addr = (int*)items->user_arg;
             ezlopi_device_free_item(items->next);
         }
 
         if (NULL != (items->user_arg))
         {
-            if (items->user_arg != prev_item_user_arg_addr)
+            if ((int)(items->user_arg) != prev_item_user_arg_addr)
             {
-                prev_item_user_arg_addr = (int*)items->user_arg;
-                TRACE_I("....item_user_arg , [prev:%p-> curr:%p]", prev_item_user_arg_addr, (int*)items->user_arg);
+                TRACE_I("....item_user_arg , [prev:%d-> curr:%d]", prev_item_user_arg_addr, (int)items->user_arg);
+                prev_item_user_arg_addr = (int)items->user_arg;
                 free(items->user_arg);
                 items->user_arg = NULL;
             }
@@ -694,7 +707,7 @@ static void ezlopi_device_free_single(l_ezlopi_device_t* device)
         //     device->cloud_properties.info = NULL;
         // }
 
-        TRACE_W("freeing device");
+        TRACE_S("freeing device");
         free(device);
     }
 }
