@@ -15,10 +15,11 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
+#include "ezlopi_core_mdns.h"
 
-#ifdef EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 #include "ezlopi_core_ethernet.h"
-#endif // EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
 #include "ezlopi_hal_system_info.h"
 
@@ -48,15 +49,16 @@ void ezlopi_init(void)
     ezlopi_core_modes_init();
     ezlopi_room_init();
 
-#ifdef EZPI_SERV_ENABLE_MESHBOTS
+
+#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-#ifdef EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
     ezlopi_ethernet_init();
-#endif // EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
@@ -65,15 +67,20 @@ void ezlopi_init(void)
 
     ezlopi_event_queue_init();
     ezlopi_ping_init();
+    // EZPI_CORE_sntp_init();
     ezlopi_timer_start_1000ms();
+
+    EZPI_core_init_mdns();
 }
 
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
     l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+
     while (curr_device)
     {
+        TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
         l_ezlopi_item_t* curr_item = curr_device->items;
         while (curr_item)
         {
@@ -91,12 +98,11 @@ static void ezlopi_initialize_devices_v3(void)
 
             curr_item = curr_item->next;
         }
-
-        if (device_init_ret < 0)
+        if (-1 == device_init_ret)
         {
+            device_init_ret = 0;
             l_ezlopi_device_t* device_to_free = curr_device;
             curr_device = curr_device->next;
-            device_to_free->next = NULL;
             ezlopi_device_free_device(device_to_free);
         }
         else
@@ -104,4 +110,5 @@ static void ezlopi_initialize_devices_v3(void)
             curr_device = curr_device->next;
         }
     }
+
 }

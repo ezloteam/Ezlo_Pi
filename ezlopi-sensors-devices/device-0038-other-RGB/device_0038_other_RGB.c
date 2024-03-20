@@ -98,9 +98,9 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 cJSON* color_values = cJSON_AddObjectToObject(cjson_params, ezlopi_value_str);
                 if (color_values)
                 {
-                    cJSON_AddNumberToObject(color_values, "red", rgb_args->red_struct.value);
-                    cJSON_AddNumberToObject(color_values, "green", rgb_args->green_struct.value);
-                    cJSON_AddNumberToObject(color_values, "blue", rgb_args->blue_struct.value);
+                    cJSON_AddNumberToObject(color_values, ezlopi_red_str, rgb_args->red_struct.value);
+                    cJSON_AddNumberToObject(color_values, ezlopi_green_str, rgb_args->green_struct.value);
+                    cJSON_AddNumberToObject(color_values, ezlopi_blue_str, rgb_args->blue_struct.value);
                     char* formatted_val = ezlopi_valueformatter_rgb(rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
                     if (formatted_val)
                     {
@@ -146,9 +146,9 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
 
                 CJSON_TRACE("cjson_params_rgb_values", cjson_params_rgb_values);
 
-                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, "red", rgb_args->red_struct.value);
-                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, "green", rgb_args->green_struct.value);
-                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, "blue", rgb_args->blue_struct.value);
+                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_red_str, rgb_args->red_struct.value);
+                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_green_str, rgb_args->green_struct.value);
+                CJSON_GET_VALUE_DOUBLE(cjson_params_rgb_values, ezlopi_blue_str, rgb_args->blue_struct.value);
 
                 RGB_LED_change_color_value(rgb_args);
             }
@@ -225,22 +225,22 @@ static int __init(l_ezlopi_item_t* item)
                     rgb_args->RGB_LED_initialized = true;
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                }
+                // else
+                // {
+                //     ret = -1;
+                // }
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
 
     return ret;

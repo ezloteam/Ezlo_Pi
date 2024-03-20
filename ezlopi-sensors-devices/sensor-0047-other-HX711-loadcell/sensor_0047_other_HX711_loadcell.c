@@ -85,7 +85,7 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t*
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -105,10 +105,10 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.scale = scales_kilo_gram;
     item->user_arg = user_data;
 
-    CJSON_GET_VALUE_DOUBLE(cj_device, "dev_type", item->interface_type); // _max = 10
-    CJSON_GET_VALUE_DOUBLE(cj_device, "gpio1", user_data->HX711_SCK_pin);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, user_data->HX711_SCK_pin);
     TRACE_I("hx711_SCL_PIN: %d ", user_data->HX711_SCK_pin);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "gpio2", user_data->HX711_DT_pin);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, user_data->HX711_DT_pin);
     TRACE_I("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
 }
 
@@ -187,26 +187,26 @@ static int __0047_init(l_ezlopi_item_t* item)
                     ret = 1;
                 }
 
-                if (-1 == ret)
-                {
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // if (-1 == ret)
+                // {
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg); // this will free ; memory address linked to all items
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -224,8 +224,8 @@ static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (user_data)
             {
                 char* valueFormatted = ezlopi_valueformatter_float(user_data->weight);
-                cJSON_AddStringToObject(cj_result, "ValueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", user_data->weight);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->weight);
                 free(valueFormatted);
             }
         }

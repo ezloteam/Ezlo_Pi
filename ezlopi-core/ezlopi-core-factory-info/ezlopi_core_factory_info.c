@@ -2,6 +2,8 @@
 #include <ctype.h>
 
 #include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
 
 static const esp_partition_t* partition_ctx_v3 = NULL;
@@ -110,9 +112,6 @@ const esp_partition_t* ezlopi_factory_info_v3_init(void)
     if (NULL == partition_ctx_v3)
     {
         partition_ctx_v3 = esp_partition_find_first(EZLOPI_FACTORY_INFO_V3_PARTITION_TYPE, EZLOPI_FACTORY_INFO_V3_SUBTYPE, EZLOPI_FACTORY_INFO_V3_PARTITION_NAME);
-
-        unsigned long long id = ezlopi_factory_info_v3_get_id();
-        TRACE_D("SERIAL-ID [off: 0x%04X, size: 0x%04X]:             %llu", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_ID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_ID, id);
     }
     return partition_ctx_v3;
 }
@@ -128,6 +127,7 @@ void ezlopi_factory_info_v3_free(void* arg)
 
 void print_factory_info_v3(void)
 {
+#if (1 == ENABLE_TRACE)
     // uint16_t version = ezlopi_factory_info_v3_get_version();
     unsigned long long id = ezlopi_factory_info_v3_get_id();
 
@@ -182,6 +182,7 @@ void print_factory_info_v3(void)
     ezlopi_factory_info_v3_free(ca_certificate);
     ezlopi_factory_info_v3_free(ssl_private_key);
     ezlopi_factory_info_v3_free(ssl_shared_key);
+#endif
 }
 
 /** Getter */
@@ -198,8 +199,7 @@ uint16_t ezlopi_factory_info_v3_get_version(void)
     {
         uint8_t tmp_version_arr[EZLOPI_FINFO_LEN_VERSION];
         memset(tmp_version_arr, 0, EZLOPI_FINFO_LEN_VERSION);
-        int read_couont = esp_partition_read(partition_ctx_v3, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_FMW_VERSION, E_EZLOPI_FACTORY_INFO_HUB_DATA), &tmp_version_arr, EZLOPI_FINFO_LEN_VERSION);
-        TRACE_I("read-count: %d", read_couont);
+        esp_partition_read(partition_ctx_v3, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_FMW_VERSION, E_EZLOPI_FACTORY_INFO_HUB_DATA), &tmp_version_arr, EZLOPI_FINFO_LEN_VERSION);
 
         for (int i = 0; i < 4; i++)
         {
@@ -681,5 +681,19 @@ int ezlopi_factory_info_v3_factory_reset(void)
         }
     }
 
+    return ret;
+}
+
+int ezlopi_factory_info_v3_scenes_factory_soft_reset(void)
+{
+    int ret = 0;
+    if (ezlopi_factory_info_v3_set_wifi("ezlopitest", "ezlopitest"))
+    {
+        ret = 1;
+    }
+    else
+    {
+        TRACE_E("Could not activate factory/soft reset");
+    }
     return ret;
 }

@@ -195,11 +195,11 @@ static int __init(l_ezlopi_item_t* item)
                 ret = 1;
             }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
 
     return ret;
@@ -322,7 +322,7 @@ static void __prepare_temperature_properties(l_ezlopi_item_t* item, cJSON* cj_de
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "slave_addr", item->interface.i2c_master.address);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->user_arg = user_arg;
 }
@@ -341,7 +341,7 @@ static void __prepare_humidity_properties(l_ezlopi_item_t* item, cJSON* cj_devic
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "slave_addr", item->interface.i2c_master.address);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->user_arg = user_arg;
 }
@@ -360,7 +360,7 @@ static void __prepare_pressure_properties(l_ezlopi_item_t* item, cJSON* cj_devic
     item->interface.i2c_master.clock_speed = 100000;
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "slave_addr", item->interface.i2c_master.address);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->user_arg = user_arg;
 }

@@ -139,7 +139,7 @@ int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_generic_sensor;
@@ -311,41 +311,41 @@ static int __0066_init(l_ezlopi_item_t* item)
                                     TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
                                 }
                             }
-                            else
-                            {
-                                ret = -1;
-                                gpio_isr_handler_remove(intr_pin);
-                                TRACE_E("Error!! : Failed to add GPIO ISR handler.");
-                            }
+                            // else
+                            // {
+                            //     ret = -1;
+                            //     gpio_isr_handler_remove(intr_pin);
+                            //     TRACE_E("Error!! : Failed to add GPIO ISR handler.");
+                            // }
                         }
-                        else
-                        {
-                            ret = -1;
-                            TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
-                        }
+                        // else
+                        // {
+                        //     ret = -1;
+                        //     TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
+                        // }
                     }
-                    else
-                    {
-                        ret = -1;
-                        free(item->user_arg); // this will free ; memory address linked to all items
-                        item->user_arg = NULL;
-                        TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
-                    }
+                    // else
+                    // {
+                    //     ret = -1;
+                    //     free(item->user_arg); // this will free ; memory address linked to all items
+                    //     item->user_arg = NULL;
+                    //     TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
+                    // }
                 }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg); // this will free ; memory address linked to all items
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -362,10 +362,10 @@ static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION] == item->cloud_properties.item_id) // match
             {
                 cJSON* cj_value = cJSON_CreateObject();
-                cJSON_AddNumberToObject(cj_value, "id", user_data->matched_id);
-                cJSON_AddNumberToObject(cj_value, "confidence_level", user_data->matched_confidence_level);
+                cJSON_AddNumberToObject(cj_value, ezlopi_id_str, user_data->matched_id);
+                cJSON_AddNumberToObject(cj_value, ezlopi_confidence_level_str, user_data->matched_confidence_level);
                 cJSON_AddItemToObject(cj_result, ezlopi_value_str, cj_value);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi__str);
             }
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id) // enroll
             {
@@ -373,17 +373,17 @@ static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
                 if (user_data->opmode != FINGERPRINT_ENROLLMENT_MODE)
                 {
                     cJSON_AddFalseToObject(cj_result, ezlopi_value_str);
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "false");
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi_false_str);
                 }
                 else
                 {
                     cJSON_AddTrueToObject(cj_result, ezlopi_value_str);
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "true");
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi_true_str);
                 }
             }
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS] == item->cloud_properties.item_id) // erase or list
             {
-                cJSON_AddStringToObject(cj_result, "elementType", "int");
+                cJSON_AddStringToObject(cj_result, ezlopi_elementType_str, value_type_int);
                 cJSON* cj_value_array = cJSON_AddArrayToObject(cj_result, ezlopi_value_str);
 
                 for (int idx = 1; idx <= FINGERPRINT_MAX_CAPACITY_LIMIT; idx++)
@@ -393,7 +393,7 @@ static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
                         cJSON_AddItemToArray(cj_value_array, cJSON_CreateNumber(idx));
                     }
                 }
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi__str);
             }
             user_data->notify_flag = false;
         }
@@ -454,11 +454,9 @@ static int __0066_set_value(l_ezlopi_item_t* item, void* arg)
                         for (uint16_t i = 0; i < value_array_size; i++) // eg. first protect => [2,4,5]
                         {
                             cJSON* fp_id = cJSON_GetArrayItem(cj_value_ids, i);
-                            if (fp_id && (fp_id->valuedouble <= FINGERPRINT_MAX_CAPACITY_LIMIT))
-                            {
-                                TRACE_S("Protected ID:[#%.0f]", (fp_id->valuedouble));
-                                user_data->protect[(uint32_t)fp_id->valuedouble] = true; // eg. protect this ID -> 2/4/5
-                            }
+
+                            TRACE_S("Protected ID:[#%d]", (fp_id->valueint));
+                            user_data->protect[fp_id->valueint] = true; // eg. protect this ID -> 2/4/5
                         }
 
                         user_data->opmode = FINGERPRINT_ERASE_WITH_IDS_MODE;

@@ -348,8 +348,9 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
                 {
                     _err = set_wifi_station_host_name();
                     // TRACE_W("WiFi Err : %s", esp_err_to_name(_err));
-                    if (_err != ESP_OK)
+                    if (_err != ESP_OK) {
                         TRACE_W("'tcpip_adapter_set_hostname' ERROR: %s", esp_err_to_name(err));
+                    }
                 }
             }
         }

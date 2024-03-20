@@ -58,15 +58,15 @@ static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
 
-    s_ezlopi_analog_data_t* soil_moisture_data = (s_ezlopi_analog_data_t*)item->user_arg;
+    double* soil_moisture_data = (double*)item->user_arg;
     if (soil_moisture_data)
     {
         s_ezlopi_analog_data_t tmp_data = { .value = 0, .voltage = 0 };
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &tmp_data);
-        if (fabs(tmp_data.voltage - soil_moisture_data->voltage) > 100)
+        double percentage = ((4095 - tmp_data.value) / 4096.0) * 100;
+        if (fabs(percentage - *soil_moisture_data) > 1.0)
         {
-            soil_moisture_data->value = tmp_data.value;
-            soil_moisture_data->voltage = tmp_data.voltage;
+            *soil_moisture_data = percentage;
             ezlopi_device_value_updated_from_device_v3(item);
         }
     }
@@ -79,12 +79,12 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
-        s_ezlopi_analog_data_t* soil_moisture_data = (s_ezlopi_analog_data_t*)item->user_arg;
+        // s_ezlopi_analog_data_t* soil_moisture_data = (s_ezlopi_analog_data_t*)item->user_arg;
+        double* soil_moisture_data = (double*)item->user_arg;
         if (soil_moisture_data)
         {
-            double percent_data = ((4095 - soil_moisture_data->value) / 4095.0) * 100;
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, percent_data);
-            char* valueFormatted = ezlopi_valueformatter_double(percent_data);
+            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, *soil_moisture_data);
+            char* valueFormatted = ezlopi_valueformatter_double(*soil_moisture_data);
             if (valueFormatted)
             {
                 cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -107,11 +107,16 @@ static int __init(l_ezlopi_item_t* item)
             {
                 ret = 1;
             }
+            else
+            {
+                ret = -1;
+                // ezlopi_device_free_device_by_item(item);
+            }
         }
         else
         {
             ret = -1;
-            ezlopi_device_free_device_by_item(item);
+            // ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -169,10 +174,11 @@ static int __prepare(void* arg)
             if (item_temperature)
             {
                 item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
-                s_ezlopi_analog_data_t* soil_moisture_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+                // s_ezlopi_analog_data_t* soil_moisture_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
+                double* soil_moisture_data = (double*)malloc(sizeof(double));
                 if (soil_moisture_data)
                 {
-                    memset(soil_moisture_data, 0, sizeof(s_ezlopi_analog_data_t));
+                    memset(soil_moisture_data, 0, sizeof(double));
                     __prepare_item_properties(item_temperature, prep_arg->cjson_device, (void*)soil_moisture_data);
                 }
                 ret = 1;

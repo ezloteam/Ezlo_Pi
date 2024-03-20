@@ -548,5 +548,5 @@ static void ezlopi_service_uart_read_config(void)
 void EZPI_SERVICE_uart_init(void)
 {
     serial_init();
-    xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", 1024 * 10, NULL, configMAX_PRIORITIES, NULL);
+    xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", 1024 * 2, NULL, configMAX_PRIORITIES, NULL);
 }

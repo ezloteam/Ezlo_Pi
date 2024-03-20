@@ -12,7 +12,13 @@ static s_ezlopi_cloud_controller_t s_controller_information;
 
 static void ezlopi_device_parse_json_v3(cJSON* cj_config);
 static void ezlopi_device_free_single(l_ezlopi_device_t* device);
+#if (1 == ENABLE_TRACE)
 static void ezlopi_device_print_controller_cloud_information_v3(void);
+#endif
+
+static void ezlopi_device_free_item(l_ezlopi_item_t* items);
+static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t* settings);
+static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t* curr_device);
 
 void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_name)
 {
@@ -170,7 +176,7 @@ void ezlopi_device_free_device(l_ezlopi_device_t* device)
             l_device_head = l_device_head->next;
             device->next = NULL;
 
-            TRACE_D("Device-ID: %08x", device->cloud_properties.device_id);
+            TRACE_D("Head Device-ID: %08x", device->cloud_properties.device_id);
             ezlopi_device_free_single(device);
         }
         else
@@ -571,34 +577,85 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
 
 static void ezlopi_device_free_item(l_ezlopi_item_t* items)
 {
-    if (items->next)
+    if (items)
     {
-        ezlopi_device_free_item(items->next);
-    }
+        if (items->next)
+        {
+            ezlopi_device_free_item(items->next);
+        }
 
-    free(items);
+        if (items->user_arg)
+        {
+            free(items->user_arg);
+            items->user_arg = NULL;
+        }
+
+        free(items);
+    }
 }
 
-// static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3 *settings)
-// {
-//     if (settings->next)
-//     {
-//         ezlopi_device_free_setting(settings->next);//recursive
-//     }
-//
-//     free(settings);
-// }
+static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t* settings)
+{
+    if (settings)
+    {
+        if (settings->next)
+        {
+            ezlopi_device_free_setting(settings->next);
+        }
+
+        free(settings);
+    }
+}
 
 static void ezlopi_device_free_single(l_ezlopi_device_t* device)
 {
-    if (device->items)
+    if (device)
     {
-        ezlopi_device_free_item(device->items);
-        device->items = NULL;
-    }
+        TRACE_E("free single Device-ID: %08x", device->cloud_properties.device_id);
+        if (device->items)
+        {
+            ezlopi_device_free_item(device->items);
+            device->items = NULL;
+        }
 
-    free(device);
+        //  if (device->settings)
+        // {
+        //     ezlopi_device_free_setting(device->settings);
+        //     device->settings = NULL;
+        // }
+        // if (device->cloud_properties.device_type_id)
+        // {
+        //     free(device->cloud_properties.device_type_id);
+        // }
+        // if (NULL != device->cloud_properties.info)
+        // {
+        //     cJSON_Delete(device->cloud_properties.info);
+        //     device->cloud_properties.info = NULL;
+        // }
+
+        free(device);
+    }
 }
+
+static void ezlopi_device_free_all_device_setting(l_ezlopi_device_t* curr_device)
+{
+    if (curr_device)
+    {
+        ezlopi_device_free_all_device_setting(curr_device->next);
+        ezlopi_device_free_setting(curr_device->settings); // unlink settings from devices, items, rooms, etc.
+    }
+}
+
+void ezlopi_device_factory_info_reset(void)
+{
+    // clear all 'devices', along with their 'items & settings'
+    l_ezlopi_device_t* curr_device = l_device_head;
+    if (curr_device)
+    {
+        ezlopi_device_free_all_device_setting(curr_device);
+    }
+}
+
 
 l_ezlopi_device_settings_v3_t* ezlopi_device_add_settings_to_device_v3(l_ezlopi_device_t* device, int (*setting_func)(e_ezlopi_settings_action_t action, struct l_ezlopi_device_settings_v3* setting, void* arg, void* user_arg))
 {
@@ -680,6 +737,7 @@ cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t* device_pro
             {
                 cJSON_AddItemReferenceToObject(cj_device, ezlopi_info_str, device_prop->cloud_properties.info);
             }
+            // TRACE_E(" Cj_device [%s]", cJSON_Print(cj_device));
         }
     }
 

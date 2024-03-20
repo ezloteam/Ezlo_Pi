@@ -63,7 +63,7 @@ int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -144,27 +144,27 @@ static int __0042_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg); // this will free ; memory address linked to all items
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }

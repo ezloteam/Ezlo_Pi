@@ -120,7 +120,7 @@ int ezlopi_room_delete(cJSON* cj_room)
             {
                 TRACE_I("room_id: %8x", room_id);
 
-                int ret = __free_room_from_list_by_id(room_id);
+                ret = __free_room_from_list_by_id(room_id);
                 TRACE_I("ret: %d", ret);
                 ret = __remove_room_from_nvs_by_id(room_id);
                 TRACE_I("ret: %d", ret);

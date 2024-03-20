@@ -64,7 +64,7 @@ int sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_it
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
     ASSIGN_DEVICE_NAME_V2(device, dev_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -90,7 +90,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     if (item && cj_device)
     {
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-        CJSON_GET_VALUE_DOUBLE(cj_device, "gpio", item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
         item->interface.adc.resln_bit = 3;
     }
 }
@@ -151,27 +151,27 @@ static int __0043_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     free(item->user_arg); // this will free ; memory address linked to all items
+            //     item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -188,8 +188,8 @@ static int __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (user_data)
             {
                 char* valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
                 // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
                 free(valueFormatted);
 

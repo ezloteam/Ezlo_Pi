@@ -437,7 +437,7 @@ static int __execute_scene_start(l_scenes_list_v2_t* scene_node)
         if (scene_node->thread_ctx)
         {
             memset(scene_node->thread_ctx, 0, sizeof(s_thread_ctx_t));
-            scene_node = EZLOPI_SCENE_STATUS_RUN;
+            scene_node->status = EZLOPI_SCENE_STATUS_RUN;
             ret = 1;
         }
     }
@@ -448,7 +448,6 @@ static int __execute_scene_start(l_scenes_list_v2_t* scene_node)
 static int __execute_action_block(l_scenes_list_v2_t* scene_node, l_action_block_v2_t* action_block)
 {
     int ret = 0;
-    s_thread_ctx_t* ctx = (s_thread_ctx_t*)scene_node->thread_ctx;
     while (action_block)
     {
         uint32_t delay_ms = (action_block->delay.days * (24 * 60 * 60)
@@ -464,6 +463,7 @@ static int __execute_action_block(l_scenes_list_v2_t* scene_node, l_action_block
 
         f_scene_method_v2_t action_method = ezlopi_scene_get_method_v2(action_block->block_options.method.type);
         TRACE_D("action-method: %p", action_method);
+        
         if (action_method)
         {
             action_method(scene_node, (void*)action_block);

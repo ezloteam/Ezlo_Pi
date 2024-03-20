@@ -148,11 +148,11 @@ static int __0057_init(l_ezlopi_item_t* item)
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
                 ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
         else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
         {
@@ -165,27 +165,27 @@ static int __0057_init(l_ezlopi_item_t* item)
                     {
                         ret = 1;
                     }
-                    else
-                    {
-                        ret = -1;
-                        free(item->user_arg); // this will free ; memory address linked to all items
-                        item->user_arg = NULL;
-                        ezlopi_device_free_device_by_item(item);
-                    }
+                    // else
+                    // {
+                    //     ret = -1;
+                    //     free(item->user_arg); // this will free ; memory address linked to all items
+                    //     item->user_arg = NULL;
+                    //     // ezlopi_device_free_device_by_item(item);
+                    // }
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
     }
     return ret;
@@ -276,8 +276,8 @@ static int __0057_get_item(l_ezlopi_item_t* item, void* arg)
                     cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -309,8 +309,8 @@ static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_heat_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "heat_ok");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : ky206_sensor_heat_alarm_token[0]);
             }
             else if (ezlopi_item_name_temperature_changes == item->cloud_properties.item_name)
             {
@@ -342,7 +342,7 @@ static int __0057_notify(l_ezlopi_item_t* item)
             const char* curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = "heat_ok";
+                curret_value = ky206_sensor_heat_alarm_token[0];
             }
             else
             {

@@ -91,7 +91,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
 
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
@@ -158,18 +158,18 @@ static int __0065_init(l_ezlopi_item_t* item)
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, __0065_update_from_device, 200);
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-                TRACE_E("Error initializing float switch");
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     // ezlopi_device_free_device_by_item(item);
+            //     TRACE_E("Error initializing float switch");
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     // ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -197,8 +197,8 @@ static int __0065_get_item(l_ezlopi_item_t* item, void* arg)
             }
             //--------------------------------------------------------------------------------------
 
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "water_level_ok");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "water_level_ok");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
             ret = 1;
         }
     }
@@ -213,8 +213,8 @@ static int __0065_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "water_level_ok");
-            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "water_level_ok");
+            cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
+            cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : water_level_alarm_token[0]);
             ret = 1;
         }
     }
@@ -232,11 +232,11 @@ static void __0065_update_from_device(void* arg)
         item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
         if (0 == (item->interface.gpio.gpio_in.value)) // when D0 -> 0V,
         {
-            curret_value = "water_level_ok";
+            curret_value = water_level_alarm_token[0];
         }
         else
         {
-            curret_value = "water_level_above_high_threshold";
+            curret_value = water_level_alarm_token[2];
         }
         if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
         {

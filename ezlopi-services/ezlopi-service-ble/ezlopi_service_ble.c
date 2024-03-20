@@ -36,11 +36,13 @@ extern void ezlopi_ble_service_dynamic_config_init(void);
 
 static void ezlopi_ble_basic_init(void);
 
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void);
 #endif
 
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
+#endif
 
 void ezlopi_ble_service_init(void)
 {
@@ -51,7 +53,7 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_service_device_info_init();
     ezlopi_ble_service_dynamic_config_init();
 
-    // ezlopi_ble_profile_print();
+    ezlopi_ble_profile_print();
     ezlopi_ble_basic_init();
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts 'wifi-app' register error");
@@ -62,8 +64,8 @@ void ezlopi_ble_service_init(void)
 
     CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
 
-#if (1 == EZLOPI_BLE_ENALBE_PAIRING)
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
@@ -71,6 +73,8 @@ void ezlopi_ble_service_init(void)
 #endif
 }
 
+
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
 {
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
@@ -95,8 +99,9 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void*)&rsp_key, sizeof(uint8_t)),
         "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
+#endif
 
-#if (1 == EZLOPI_BLE_ENALBE_PASSKEY)
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void)
 {
     const uint32_t default_passkey = 123456;

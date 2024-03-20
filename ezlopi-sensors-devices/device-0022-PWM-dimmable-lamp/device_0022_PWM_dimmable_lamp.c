@@ -126,8 +126,8 @@ static int __list_cjson_value(l_ezlopi_item_t* item, void* arg)
                 cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, formatted_val);
                 free(formatted_val);
             }
-            cJSON_AddNumberToObject(param, "minValue", 0);
-            cJSON_AddNumberToObject(param, "maxValue", 100);
+            cJSON_AddNumberToObject(param, ezlopi_minValue_str, 0);
+            cJSON_AddNumberToObject(param, ezlopi_maxValue_str, 100);
         }
         else if (ezlopi_item_name_dimmer_up == item->cloud_properties.item_name)
         {
@@ -257,22 +257,18 @@ static int __init(l_ezlopi_item_t* item)
                         ret = -1;
                     }
                 }
-                else
-                {
-                    ret = -1;
-                }
             }
-            else
-            {
-                ret = -1;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     ret = -1;
+            //     ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -303,8 +299,8 @@ static void __prepare_dimmer_item_properties(l_ezlopi_item_t* item, cJSON* cj_de
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
@@ -320,8 +316,8 @@ static void __prepare_dimmer_up_item_properties(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
@@ -337,8 +333,8 @@ static void __prepare_dimmer_down_item_properties(l_ezlopi_item_t* item, cJSON* 
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
@@ -354,8 +350,8 @@ static void __prepare_dimmer_stop_item_properties(l_ezlopi_item_t* item, cJSON* 
     item->cloud_properties.scale = NULL;
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
@@ -370,8 +366,9 @@ static void __prepare_dimmer_switch_item_properties(l_ezlopi_item_t* item, cJSON
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_out.gpio_num);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_str, item->interface.gpio.gpio_out.gpio_num);
     item->interface.gpio.gpio_in.enable = false;
+
     item->interface.gpio.gpio_out.enable = true;
     item->interface.gpio.gpio_out.interrupt = false;
     item->interface.gpio.gpio_out.invert = false;

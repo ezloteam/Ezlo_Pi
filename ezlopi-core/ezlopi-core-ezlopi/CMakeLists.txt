@@ -6,7 +6,11 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-wifi
         ezlopi-core-modes
         ezlopi-core-sntp
+        ezlopi-core-ble
+        ezlopi-core-scenes    
         ezlopi-util-trace
+        ezlopi-core-mdns   
+
 )
 
 set(EZLOPI_CLOUD_COMPONENTS
@@ -32,3 +36,4 @@ idf_component_register(SRCS "ezlopi_core_ezlopi.c" "${config_src}"
     REQUIRES    ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_CLOUD_COMPONENTS}
 )
+

@@ -12,7 +12,11 @@
 
 #include "ezlopi_core_ezlopi.h"
 #include "ezlopi_service_ota.h"
+
+#if CONFIG_EZLOPI_BLE_ENABLE == 1
 #include "ezlopi_service_ble.h"
+#endif
+
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_timer.h"
 #include "ezlopi_service_modes.h"
@@ -56,7 +60,9 @@ void app_main(void)
     ezlopi_init();
 
     timer_service_init();
+#if CONFIG_EZLOPI_BLE_ENABLE == 1
     ezlopi_ble_service_init();
+#endif
 
     ezlopi_service_modes_init();
 

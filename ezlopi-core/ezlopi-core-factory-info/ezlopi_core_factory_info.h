@@ -13,12 +13,11 @@ extern "C"
 #define EZLOPI_DEVICE_TYPE_TEST_DEVICE -1
 #define EZLOPI_DEVICE_TYPE_GENERIC 0
 
-
-#ifdef EZPI_DEV_TYPE_GENERIC
-#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
-#else
+#if CONFIG_EZPI_DEV_TYPE_TEST == 1
 #define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_TEST_DEVICE
-#endif 
+#else 
+#define EZLOPI_DEVICE_TYPE EZLOPI_DEVICE_TYPE_GENERIC
+#endif
 
 #define EZLOPI_FACTORY_INFO_V3_PARTITION_NAME "prov_data"
 #define EZLOPI_FACTORY_INFO_V3_PARTITION_SIZE 0x8000 // 32KB
@@ -151,6 +150,8 @@ extern "C"
     void ezlopi_factory_info_v3_free(void* arg);
     int ezlopi_factory_info_v3_factory_reset(void);
 
+    int ezlopi_factory_info_v3_scenes_factory_soft_reset(void);
+
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
@@ -161,22 +162,48 @@ extern "C"
         [\
             {\
                 \"dev_type\": 1,\
-                \"dev_name\": \"Dining Room Main Lamp\",\
-                \"id_room\":\"\",\
-                \"id_item\": 2,\
-                \"val_ip\": false,\
-                \"val_op\": false,\
-                \"gpio_in\": 21,\
-                \"gpio_out\": 13,\
+                \"dev_name\": \"LED\",\
+                \"id_room\": \"\",\
+                \"id_item\": 1,\
+                \"gpio_in\": 0,\
+                \"gpio_out\": 2,\
+                \"pullup_ip\": false,\
+                \"pullup_op\": false,\
                 \"is_ip\": false,\
-                \"ip_inv\": true,\
-                \"pullup_ip\": true,\
-                \"pullup_op\": true,\
-                \"op_inv\": false\
+                \"ip_inv\": false,\
+                \"op_inv\": false,\
+                \"val_ip\": false,\
+                \"val_op\": false\
+            },\
+            {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"Water_leak\",\
+                \"id_room\": \"\",\
+                \"id_item\": 27,\
+                \"gpio\": 25\
+            },\
+            {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"soil_moisture\",\
+                \"id_room\": \"\",\
+                \"id_item\": 32,\
+                \"gpio\": 33\
+            },\
+            {\
+                \"dev_type\": 8,\
+                \"dev_name\": \"GY271\",\
+                \"id_room\": \"\",\
+                \"id_item\": 7,\
+                \"gpio_sda\": 18,\
+                \"gpio_scl\": 19,\
+                \"pullup_scl\": true,\
+                \"pullup_sda\": true,\
+                \"slave_addr\": 13\
             }\
-        ],\
-    \"dev_total\": 1}";
+        ], \
+        \"dev_total\": 4}";
 #endif
+
 
 
 #ifdef __cplusplus

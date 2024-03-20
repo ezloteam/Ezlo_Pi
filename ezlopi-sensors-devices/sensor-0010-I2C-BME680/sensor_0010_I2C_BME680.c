@@ -59,7 +59,7 @@ int sensor_0010_I2C_BME680(e_ezlopi_actions_t action, l_ezlopi_item_t* item, voi
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -84,7 +84,7 @@ static void __prepare_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, 
         item->interface.i2c_master.clock_speed = 100000;
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-        CJSON_GET_VALUE_DOUBLE(cj_device, "slave_addr", item->interface.i2c_master.address);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
     }
     else
     {
@@ -242,11 +242,11 @@ static int __init(l_ezlopi_item_t* item)
                 ret = 1;
             }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }

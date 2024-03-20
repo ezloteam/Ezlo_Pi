@@ -67,7 +67,8 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
 
 const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 {
-    const char* ret = "NULL";
+    const char* ret = "";
+#if (1 == ENABLE_TRACE)
     switch (scene_status)
     {
     case EZLOPI_SCENE_STATUS_RUN:
@@ -90,12 +91,14 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
         ret = "EZLOPI_SCENE_STATUS_STOPPED";
         break;
     }
+    #warning "need to add status_failed";
     default:
     {
         ret = "EZLOPI_SCENE_STATUS_NONE";
         break;
     }
     }
+#endif
 
     return ret;
 }

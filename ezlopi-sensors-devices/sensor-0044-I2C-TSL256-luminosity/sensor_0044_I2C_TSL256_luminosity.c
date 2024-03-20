@@ -117,21 +117,21 @@ static int __init(l_ezlopi_item_t* item)
                     sensor_0044_tsl2561_configure_device(&item->interface.i2c_master);
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                    TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                //     TRACE_E("TSL561 not found!....... Please Restart!! or Check your I2C connection...");
+                // }
             }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -163,7 +163,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "slave_addr", item->interface.i2c_master.address);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;

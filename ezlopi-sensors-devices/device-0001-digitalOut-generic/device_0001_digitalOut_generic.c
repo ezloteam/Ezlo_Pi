@@ -125,28 +125,28 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
             cJSON* value = cJSON_CreateObject();
             cJSON* value_default = cJSON_CreateObject();
 
-            cJSON_AddStringToObject(label, "text", "User defined mode");
-            cJSON_AddStringToObject(label, "lang_tag", "ezlopi_presence_user_defined_mode_label");
+            cJSON_AddStringToObject(label, ezlopi_text_str, "User defined mode");
+            cJSON_AddStringToObject(label, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_label");
 
-            cJSON_AddStringToObject(description, "text", "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
-            cJSON_AddStringToObject(description, "lang_tag", "ezlopi_presence_user_defined_mode_description");
+            cJSON_AddStringToObject(description, ezlopi_text_str, "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
+            cJSON_AddStringToObject(description, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_description");
 
             cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
             cJSON_AddItemToObject(cjson_propertise, "description", description);
             cJSON_AddStringToObject(cjson_propertise, ezlopi_valueType_str, "presence_operation_mode");
 
-            cJSON_AddNumberToObject(value, "min_move_distance", 0.75);
-            cJSON_AddNumberToObject(value, "max_move_distance", 1.5);
-            cJSON_AddNumberToObject(value, "min_still_distance", 0.75);
-            cJSON_AddNumberToObject(value, "max_still_distance", 1.5);
-            cJSON_AddTrueToObject(value, "is_active");
+            cJSON_AddNumberToObject(value, ezlopi_min_move_distance_str, 0.75);
+            cJSON_AddNumberToObject(value, ezlopi_max_move_distance_str, 1.5);
+            cJSON_AddNumberToObject(value, ezlopi_min_still_distance_str, 0.75);
+            cJSON_AddNumberToObject(value, ezlopi_max_still_distance_str, 1.5);
+            cJSON_AddTrueToObject(value, ezlopi_is_active_str);
             cJSON_AddItemToObject(cjson_propertise, ezlopi_value_str, value);
 
-            cJSON_AddNumberToObject(value_default, "min_move_distance", 0.75);
-            cJSON_AddNumberToObject(value_default, "max_move_distance", 6.0);
-            cJSON_AddNumberToObject(value_default, "min_still_distance", 0.75);
-            cJSON_AddNumberToObject(value_default, "max_still_distance", 6.0);
-            cJSON_AddFalseToObject(value_default, "is_active");
+            cJSON_AddNumberToObject(value_default, ezlopi_min_move_distance_str, 0.75);
+            cJSON_AddNumberToObject(value_default, ezlopi_max_move_distance_str, 6.0);
+            cJSON_AddNumberToObject(value_default, ezlopi_min_still_distance_str, 0.75);
+            cJSON_AddNumberToObject(value_default, ezlopi_max_still_distance_str, 6.0);
+            cJSON_AddFalseToObject(value_default, ezlopi_is_active_str);
             cJSON_AddItemToObject(cjson_propertise, "valueDefault", value_default);
         }
         else if (setting->cloud_properties.setting_id == settings_ids[1])
@@ -154,11 +154,11 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
             cJSON* label = cJSON_CreateObject();
             cJSON* description = cJSON_CreateObject();
 
-            cJSON_AddStringToObject(label, "text", "Backlight Brightness");
-            cJSON_AddStringToObject(label, "lang_tag", "ezlopi_digitalio_pwm_setting_label");
+            cJSON_AddStringToObject(label, ezlopi_text_str, "Backlight Brightness");
+            cJSON_AddStringToObject(label, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_label");
 
-            cJSON_AddStringToObject(description, "text", "This is PWM setting value for setting the backlight brightness");
-            cJSON_AddStringToObject(description, "lang_tag", "ezlopi_digitalio_pwm_setting_description");
+            cJSON_AddStringToObject(description, ezlopi_text_str, "This is PWM setting value for setting the backlight brightness");
+            cJSON_AddStringToObject(description, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_description");
 
             cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
             cJSON_AddItemToObject(cjson_propertise, "description", description);
@@ -168,7 +168,7 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
 
             cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
             cJSON_AddNumberToObject(cjson_propertise, "valueMin", 0);
-            cJSON_AddNumberToObject(cjson_propertise, "valueMax", 100);
+            cJSON_AddNumberToObject(cjson_propertise, ezlopi_valueMax_str, 100);
             cJSON_AddNumberToObject(cjson_propertise, "valueDefault", 50);
         }
 

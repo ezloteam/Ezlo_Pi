@@ -1,4 +1,6 @@
 // #include "cJSON.h"
+// #include "nvs.h"
+// #include "nvs_flash.h"
 #include <string.h>
 #include <sys/socket.h>
 
@@ -17,32 +19,44 @@
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_factory_info.h"
 
-// #include "nvs.h"
-// #include "nvs_flash.h"
+#include "ezlopi_service_ota.h"
 
 #define HASH_LEN 32
 
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
 /* The interface name value can refer to if_desc in esp_netif_defaults.h */
 #if CONFIG_FIRMWARE_UPGRADE_BIND_IF_ETH
-static const char *bind_interface_name = "eth";
+static const char* bind_interface_name = "eth";
 #elif CONFIG_FIRMWARE_UPGRADE_BIND_IF_STA
-static const char *bind_interface_name = "sta";
+static const char* bind_interface_name = "sta";
 #endif
 #endif
 
 #define OTA_URL_SIZE 512
 
+typedef enum e_ezlopi_ota_state
+{
+    EZLOPI_OTA_STATE_FINISH = 0,
+    EZLOPI_OTA_STATE_STARTED,
+    EZLOPI_OTA_STATE_UPDATING,
+    EZLOPI_OTA_STATE_MAX,
+} e_ezlopi_ota_state_t;
+
 static volatile uint32_t __ota_in_process = 0;
 
-static void ezlopi_ota_process(void *pv);
-static esp_err_t _http_event_handler(esp_http_client_event_t *evt);
+static void ezlopi_ota_process(void* pv);
+static esp_err_t _http_event_handler(esp_http_client_event_t* evt);
 
-void ezlopi_ota_start(cJSON *url)
+uint32_t __get_ota_state(void)
+{
+    return ((__ota_in_process < EZLOPI_OTA_STATE_MAX) ? __ota_in_process : EZLOPI_OTA_STATE_FINISH);
+}
+
+void ezlopi_ota_start(cJSON* url)
 {
     if (url && url->valuestring)
     {
-        char *ota_url = (char *)malloc(OTA_URL_SIZE);
+        char* ota_url = (char*)malloc(OTA_URL_SIZE);
         memcpy(ota_url, url->valuestring, OTA_URL_SIZE);
         if (0 == __ota_in_process)
         {
@@ -61,14 +75,14 @@ void ezlopi_ota_start(cJSON *url)
     }
 }
 
-static void ezlopi_ota_process(void *pv)
+static void ezlopi_ota_process(void* pv)
 {
-    __ota_in_process = 1;
-    char *url = (char *)pv;
+    __ota_in_process = EZLOPI_OTA_STATE_STARTED;
+    char* url = (char*)pv;
 
     TRACE_S("Starting OTA ");
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
-    esp_netif_t *netif = get_example_netif_from_desc(bind_interface_name);
+    esp_netif_t* netif = get_example_netif_from_desc(bind_interface_name);
     if (netif == NULL)
     {
         TRACE_E("Can't find netif from interface description");
@@ -111,6 +125,11 @@ static void ezlopi_ota_process(void *pv)
     }
 #endif
 
+    if (true == ezlopi_service_ota_get_busy_state())
+    {
+        __ota_in_process = EZLOPI_OTA_STATE_UPDATING;
+    }
+
     esp_err_t ret = esp_https_ota(&config);
     if (ret == ESP_OK)
     {
@@ -122,7 +141,7 @@ static void ezlopi_ota_process(void *pv)
         TRACE_E("Firmware upgrade failed");
     }
 
-    __ota_in_process = 0;
+    __ota_in_process = EZLOPI_OTA_STATE_FINISH;
 
     vTaskDelete(NULL);
 
@@ -130,7 +149,7 @@ static void ezlopi_ota_process(void *pv)
         free(url);
 }
 
-static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
+static esp_err_t _http_event_handler(esp_http_client_event_t* evt)
 {
     switch (evt->event_id)
     {

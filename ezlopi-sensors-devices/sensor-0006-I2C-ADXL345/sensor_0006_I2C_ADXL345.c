@@ -59,7 +59,7 @@ int sensor_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t* item, vo
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
@@ -91,7 +91,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
             CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-            CJSON_GET_VALUE_DOUBLE(cj_device, "slave_addr", item->interface.i2c_master.address);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)
             {
@@ -177,20 +177,20 @@ static int __init(l_ezlopi_item_t* item)
                     TRACE_S("Configuration Complete...");
                     ret = 1;
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     ret = -1;
+                //     free(item->user_arg); // this will free ; memory address linked to all items
+                //     item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
 
     return ret;

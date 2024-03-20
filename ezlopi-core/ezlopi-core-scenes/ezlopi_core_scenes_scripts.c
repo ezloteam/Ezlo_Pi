@@ -104,6 +104,17 @@ void ezlopi_scenes_scripts_delete_by_id(uint32_t script_id)
     }
 }
 
+void ezlopi_scenes_scripts_factory_info_reset(void)
+{
+    l_ezlopi_scenes_script_t* curr_script = ezlopi_scenes_scripts_get_head();
+
+    while (curr_script)
+    {
+        ezlopi_scenes_scripts_delete_by_id(curr_script->id); // auto-script_head shift
+        curr_script = ezlopi_scenes_scripts_get_head();
+    }
+}
+
 uint32_t ezlopi_scenes_scripts_add_to_head(uint32_t script_id, cJSON* cj_script)
 {
     uint32_t new_script_id = 0;

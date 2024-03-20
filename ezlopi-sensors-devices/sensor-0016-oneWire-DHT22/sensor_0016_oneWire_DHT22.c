@@ -70,28 +70,28 @@ static int dht22_sensor_init_v3(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_ezlopi_dht22_data_t* dht22_data = (s_ezlopi_dht22_data_t*)item->user_arg;
-        if (dht22_data)
+        // s_ezlopi_dht22_data_t *dht22_data = (s_ezlopi_dht22_data_t *)item->user_arg;
+        // if (dht22_data)
+        // {
+        if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
         {
-            if (GPIO_IS_VALID_GPIO((gpio_num_t)item->interface.onewire_master.onewire_pin))
-            {
-                setDHT22gpio(item->interface.onewire_master.onewire_pin);
-                ret = 1;
-            }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
+            setDHT22gpio(item->interface.onewire_master.onewire_pin);
+            ret = 1;
+        }
+        // else
+        // {
+            // ret = -1;
+            // free(item->user_arg); // this will free ; memory address linked to all items
+            // item->user_arg = NULL;
 
-                ezlopi_device_free_device_by_item(item);
-            }
-        }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+            // ezlopi_device_free_device_by_item(item);
+        // }
+        // }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }

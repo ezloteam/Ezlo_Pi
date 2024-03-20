@@ -102,14 +102,14 @@ static int sensor_pir_init_v3(l_ezlopi_item_t* item)
             else
             {
                 TRACE_E("Error initializing PIR sensor, error: %s", esp_err_to_name(ret));
-                ret = -1;
+                // ret = -1;
             }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -179,8 +179,8 @@ static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t* item, cJSON* cj
     item->interface.gpio.gpio_in.enable = true;
     item->interface.gpio.gpio_in.mode = GPIO_MODE_INPUT;
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "logic_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "pull_up", tmp_var);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_pull_up_str, tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_ANYEDGE;
 }

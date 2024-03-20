@@ -72,7 +72,7 @@ int sensor_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t*
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
 
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
@@ -255,7 +255,7 @@ static int __init(l_ezlopi_item_t* item)
                     ret = -1;
                     free(item->user_arg); // this will free ; memory address linked to all items
                     item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
+                    // ezlopi_device_free_device_by_item(item);
                 }
             }
             else if (item->cloud_properties.item_id == user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] &&
@@ -290,22 +290,23 @@ static int __init(l_ezlopi_item_t* item)
                         TRACE_E("Error initializing joystick switch");
                         free(item->user_arg); // this will free ; memory address linked to all items
                         item->user_arg = NULL;
-                        ezlopi_device_free_device_by_item(item);
+                        // ezlopi_device_free_device_by_item(item);
                     }
                 }
-                else
-                {
-                    ret = -1;
-                    free(item->user_arg); // this will free ; memory address linked to all items
-                    item->user_arg = NULL;
-                    ezlopi_device_free_device_by_item(item);
-                }
+                // else
+                // {
+                //     // ret = -1;
+                //     // free(item->user_arg); // this will free ; memory address linked to all items
+                //     // item->user_arg = NULL;
+                //     // ezlopi_device_free_device_by_item(item);
+                // }
             }
         }
-        else
-        {
-            ret = -1;
-        }
+        // else
+        // {
+        //     ret = -1;
+        //       ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }

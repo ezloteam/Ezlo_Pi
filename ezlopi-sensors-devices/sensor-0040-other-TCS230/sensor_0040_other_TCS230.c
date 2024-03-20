@@ -91,7 +91,7 @@ static void __tcs230_setup_gpio(gpio_num_t s0_pin,
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_generic_sensor;
@@ -121,9 +121,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
         CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
-        CJSON_GET_VALUE_DOUBLE(cj_device, "gpio4", user_data->TCS230_pin.gpio_s3);           // gpio_s3
-        CJSON_GET_VALUE_DOUBLE(cj_device, "gpio5", user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
-        CJSON_GET_VALUE_DOUBLE(cj_device, "gpio6", user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio4_str, user_data->TCS230_pin.gpio_s3);           // gpio_s3
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio5_str, user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio6_str, user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
     }
 }
 //------------------------------------------------------------------------------------------------------
@@ -195,19 +195,19 @@ static int __0040_init(l_ezlopi_item_t* item)
                 xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
                 ret = 1;
             }
-            else
-            {
-                ret = -1;
-                free(item->user_arg); // this will free ; memory address linked to all items
-                item->user_arg = NULL;
-                ezlopi_device_free_device_by_item(item);
-            }
+            // else
+            // {
+            //     // ret = -1;
+            //     // free(item->user_arg); // this will free ; memory address linked to all items
+            //     // item->user_arg = NULL;
+            //     // ezlopi_device_free_device_by_item(item);
+            // }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -224,9 +224,9 @@ static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* args)
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
                 cJSON* color_values = cJSON_AddObjectToObject(cj_result, ezlopi_value_str);
-                cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
-                cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
-                cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_red_str, user_data->red_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_green_str, user_data->green_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_blue_str, user_data->blue_mapped);
                 char* valueFormatted = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
                 if (valueFormatted)
                 {

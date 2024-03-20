@@ -57,7 +57,7 @@ int device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t* ite
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_dimmable_light;
@@ -79,8 +79,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_DOUBLE(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
 #if CONFIG_IDF_TARGET_ESP32C3
     item->interface.pwm.pwm_resln = 9;
 #else
@@ -137,11 +137,11 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-        else
-        {
-            ret = -1;
-            ezlopi_device_free_device_by_item(item);
-        }
+        // else
+        // {
+        //     ret = -1;
+        //     ezlopi_device_free_device_by_item(item);
+        // }
     }
     return ret;
 }
@@ -155,7 +155,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
         if (cj_result && item)
         {
             int value = 0;
-            CJSON_GET_VALUE_DOUBLE(cj_result, "value", value);
+            CJSON_GET_VALUE_DOUBLE(cj_result, ezlopi_value_str, value);
 
             TRACE_I("gpio_num: %d", item->interface.pwm.gpio_num);
             TRACE_I("item_id: %d", item->cloud_properties.item_id);
@@ -320,8 +320,8 @@ static s_ezlopi_device_properties_t* ezlopi_servo_motor_MG_996R_prepare(cJSON* c
         ezlopi_servo_motor_MG_996R_properties->ezlopi_cloud.item_id = ezlopi_cloud_generate_item_id();
 
         // CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_gpio_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num);
-        // CJSON_GET_VALUE_DOUBLE(cjson_device, "duty_cycle", ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle);
-        // CJSON_GET_VALUE_DOUBLE(cjson_device, "freq_hz", ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz);
+        // CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_duty_cycle_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.duty_cycle);
+        // CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_freq_hz_str, ezlopi_servo_motor_MG_996R_properties->interface.pwm.freq_hz);
         // CJSON_GET_VALUE_DOUBLE(cjson_device, "pwm_resln", ezlopi_servo_motor_MG_996R_properties->interface.pwm.pwm_resln);
 
         ezlopi_servo_motor_MG_996R_properties->interface.pwm.gpio_num = 4;

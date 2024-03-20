@@ -4,6 +4,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_cloud_coordinates.h"
@@ -21,10 +22,9 @@ void hub_coordinates_set(cJSON* cj_request, cJSON* cj_response)
         cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
         if (cj_params)
         {
-            #warning "Nabin: what if 'cJSON_GetObjectItem(cj_params, "latitude")' returns NULL";
-
-            latitude = cJSON_GetObjectItem(cj_params, "latitude")->valuedouble;
-            longitude = cJSON_GetObjectItem(cj_params, "longitude")->valuedouble;
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_latitude_str, latitude);
+            CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_longitude_str, longitude);
+            
             char* lat_long_str = cJSON_Print(cj_params);
             if (lat_long_str)
             {

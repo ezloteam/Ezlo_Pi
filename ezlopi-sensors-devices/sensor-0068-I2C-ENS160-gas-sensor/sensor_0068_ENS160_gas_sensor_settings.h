@@ -44,8 +44,8 @@ static inline cJSON *__setting_add_text_and_lang_tag(const char *const object_te
     cJSON *cj_object = cJSON_CreateObject();
     if (cj_object)
     {
-        cJSON_AddStringToObject(cj_object, "text", object_text);
-        cJSON_AddStringToObject(cj_object, "lang_tag", object_lang_tag);
+        cJSON_AddStringToObject(cj_object, ezlopi_text_str, object_text);
+        cJSON_AddStringToObject(cj_object, ezlopi_lang_tag_str, object_lang_tag);
     }
     else
     {
