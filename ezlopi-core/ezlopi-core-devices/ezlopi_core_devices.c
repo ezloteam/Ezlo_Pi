@@ -671,23 +671,19 @@ static void ezlopi_device_free_single(l_ezlopi_device_t* device)
     {
         if (NULL != (device->items))
         {
+            // if (device->cloud_properties.device_id == device->next->cloud_properties.parent_device_id &&
+            //     device->cloud_properties.parent_device_id == 0)
+            // {
+            //     ezlopi_device_free_item(device->items);
+            // }
+            // else
+            // {
             ezlopi_device_free_item(device->items);
+            // }
+
             device->items = NULL;
         }
 
-        if ((NULL != device->next) &&
-            device->cloud_properties.device_id == device->next->cloud_properties.parent_device_id &&
-            device->cloud_properties.parent_device_id == 0) /*for clearing the whole parent_tree_nodes*/
-        {
-
-            TRACE_E("parent_id [0x%x] , item->user_arg : ", device->cloud_properties.device_id, (int)(device->items->user_arg));
-            if (NULL != (device->items->user_arg))
-            {
-                TRACE_I(" parent_device -> free...item");
-                free(device->items->user_arg);
-                device->items->user_arg = NULL;
-            }
-        }
 
         // if (device->settings)
         // {
