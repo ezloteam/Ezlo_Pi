@@ -170,17 +170,18 @@ static void ezlopi_device_clear_bottom_children(l_ezlopi_device_t* curr_node, ui
 {
     if (curr_node)
     {
-        if (curr_node->next->cloud_properties.parent_device_id == compare_parent_id)
+        if ((NULL != curr_node->next) && (curr_node->next->cloud_properties.parent_device_id == compare_parent_id))
         {
             ezlopi_device_clear_bottom_children(curr_node->next, compare_parent_id);
         }
+
         l_ezlopi_device_t* curr_device = l_device_head;
         while (curr_device->next)
         {
+            // TRACE_D("Child-Device-ID: %08x", curr_device->next->cloud_properties.device_id);
             if (curr_device->next == curr_node)
             {
                 TRACE_E("tree_member_id: %08x", curr_device->next->cloud_properties.device_id);
-
                 l_ezlopi_device_t* free_device = curr_device->next;
                 curr_device->next = curr_device->next->next;
                 free_device->next = NULL;
@@ -200,12 +201,12 @@ static void ezlopi_device_free_parent_tree(l_ezlopi_device_t* parent_device, uin
         ezlopi_device_clear_bottom_children(parent_device, parent_dev_id);
 
         /*Display the latest list*/
-        // l_ezlopi_device_t* prefinal_list = ezlopi_device_get_head();
-        // while (prefinal_list)
-        // {
-        //     TRACE_W("prefinal_list : [0x%x], parent [0x%x] ", prefinal_list->cloud_properties.device_id, prefinal_list->cloud_properties.parent_device_id);
-        //     prefinal_list = prefinal_list->next;
-        // }
+        l_ezlopi_device_t* prefinal_list = ezlopi_device_get_head();
+        while (prefinal_list)
+        {
+            TRACE_W("prefinal_list : [0x%x], parent [0x%x] ", prefinal_list->cloud_properties.device_id, prefinal_list->cloud_properties.parent_device_id);
+            prefinal_list = prefinal_list->next;
+        }
     }
 }
 

@@ -176,6 +176,16 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
+                \"dev_type\": 10,\
+                \"dev_name\": \"2Axis_Joystick\",\
+                \"id_room\": \"\",\
+                \"id_item\": 20,\
+                \"gpio1\": 34,\
+                \"gpio2\": 35,\
+                \"gpio3\": 15,\
+                \"resln_bit\": 3\
+            },\
+            {\
                 \"dev_type\": 3,\
                 \"dev_name\": \"Water_leak\",\
                 \"id_room\": \"\",\
@@ -200,16 +210,6 @@ extern "C"
                 \"pullup_scl\": true,\
                 \"pullup_sda\": true,\
                 \"slave_addr\": 13\
-            },\
-            {\
-                 \"dev_type\": 10,\
-                \"dev_name\": \"2Axis_Joystick\",\
-                \"id_room\": \"\",\
-                \"id_item\": 20,\
-                \"gpio1\": 34,\
-                \"gpio2\": 35,\
-                \"gpio3\": 15,\
-                \"resln_bit\": 3\
             }\
         ], \
         \"dev_total\": 5}";
