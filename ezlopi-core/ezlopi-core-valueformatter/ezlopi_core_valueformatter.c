@@ -1,34 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cJSON.h>
 
 #include "ezlopi_cloud_constants.h"
-
 #include "ezlopi_core_valueformatter.h"
 
-const char *ezlopi_valueformatter_bool(bool val)
-{
-    return val ? ezlopi_true_str : ezlopi_false_str;
-}
 
-char *ezlopi_valueformatter_float(float val)
+void ezlopi_valueformatter_float_to_cjson(l_ezlopi_item_t* item, cJSON* cj_root, float value)
 {
+    cJSON_AddNumberToObject(cj_root, ezlopi_value_str, value);
 
-    char *formatted_val_str = (char *)malloc(15);
-    if (formatted_val_str)
+    char valueFormatted[16];
+    snprintf(valueFormatted, sizeof(valueFormatted), "%.02f", value);
+    cJSON_AddStringToObject(cj_root, ezlopi_valueFormatted_str, valueFormatted);
+
+    if (item->cloud_properties.scale)
     {
-        snprintf(formatted_val_str, 15, "%.2f", val);
-        return formatted_val_str;
-    }
-    else
-    {
-        return NULL;
+        cJSON_AddStringToObject(cj_root, ezlopi_scale_str, item->cloud_properties.scale);
     }
 }
 
-char *ezlopi_valueformatter_double(double val)
+char* ezlopi_valueformatter_double(double val)
 {
-    char *formatted_val_str = (char *)malloc(15);
+    char* formatted_val_str = (char*)malloc(15);
     if (formatted_val_str)
     {
         snprintf(formatted_val_str, 15, "%.2lf", val);
@@ -40,9 +35,9 @@ char *ezlopi_valueformatter_double(double val)
     }
 }
 
-char *ezlopi_valueformatter_int(int val)
+char* ezlopi_valueformatter_int(int val)
 {
-    char *formatted_val_str = (char *)malloc(15);
+    char* formatted_val_str = (char*)malloc(15);
     if (formatted_val_str)
     {
         snprintf(formatted_val_str, 15, "%d", val);
@@ -54,9 +49,9 @@ char *ezlopi_valueformatter_int(int val)
     }
 }
 
-char *ezlopi_valueformatter_int32(int32_t val)
+char* ezlopi_valueformatter_int32(int32_t val)
 {
-    char *formatted_val_str = (char *)malloc(15);
+    char* formatted_val_str = (char*)malloc(15);
     if (formatted_val_str)
     {
         snprintf(formatted_val_str, 15, "%d", val);
@@ -68,9 +63,9 @@ char *ezlopi_valueformatter_int32(int32_t val)
     }
 }
 
-char *ezlopi_valueformatter_uint32(uint32_t val)
+char* ezlopi_valueformatter_uint32(uint32_t val)
 {
-    char *formatted_val_str = (char *)malloc(15);
+    char* formatted_val_str = (char*)malloc(15);
     if (formatted_val_str)
     {
         snprintf(formatted_val_str, 15, "%d", val);
@@ -82,9 +77,9 @@ char *ezlopi_valueformatter_uint32(uint32_t val)
     }
 }
 
-char *ezlopi_valueformatter_rgb(uint8_t r, uint8_t g, uint8_t b)
+char* ezlopi_valueformatter_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
-    char *formatted_val_str = (char *)malloc(10);
+    char* formatted_val_str = (char*)malloc(10);
     if (formatted_val_str)
     {
         snprintf(formatted_val_str, 10, "#%02x%02x%02x", r, g, b);

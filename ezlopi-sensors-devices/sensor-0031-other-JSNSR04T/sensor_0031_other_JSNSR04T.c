@@ -69,18 +69,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             ret = measurement(tmp_config, &jsn_sr04t_data);
             if (ret)
             {
-                // jsn_sr04t_print_data(jsn_sr04t_data);
-
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, distance);
-
-                char* valueFormatted = ezlopi_valueformatter_float(distance);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_meter);
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, distance);
                 ret = 1;
             }
             else

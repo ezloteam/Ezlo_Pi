@@ -140,38 +140,15 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_temp == item->cloud_properties.item_name)
             {
-                char* valueFormatted = ezlopi_valueformatter_float(bmp280_sensor_params->temperature);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                cJSON_AddNumberToObject(cj_device, ezlopi_value_str, bmp280_sensor_params->temperature);
-                cJSON_AddStringToObject(cj_device, ezlopi_scale_str, scales_celsius);
+                ezlopi_valueformatter_float_to_cjson(item, cj_device, bmp280_sensor_params->temperature);
             }
-
-            if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
             {
-                char* valueFormatted = ezlopi_valueformatter_float(bmp280_sensor_params->humidity);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                cJSON_AddNumberToObject(cj_device, ezlopi_value_str, bmp280_sensor_params->humidity);
-                cJSON_AddStringToObject(cj_device, ezlopi_scale_str, scales_percent);
+                ezlopi_valueformatter_float_to_cjson(item, cj_device, bmp280_sensor_params->humidity);
             }
-
-            if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
             {
-                char* valueFormatted = ezlopi_valueformatter_float((bmp280_sensor_params->pressure / 1000.0));
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (bmp280_sensor_params->pressure / 1000.0));
-                cJSON_AddStringToObject(cj_device, ezlopi_scale_str, scales_kilo_pascal);
+                ezlopi_valueformatter_float_to_cjson(item, cj_device, (bmp280_sensor_params->pressure / 1000.0));
             }
         }
     }

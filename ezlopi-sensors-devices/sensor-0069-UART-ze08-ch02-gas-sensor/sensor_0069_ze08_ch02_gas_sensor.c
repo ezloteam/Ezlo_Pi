@@ -77,10 +77,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
     if (ze08_ch2o_sensor && cj_params)
     {
-        char* valueFormatted = ezlopi_valueformatter_float(ze08_ch2o_sensor->ppm);
-        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
-        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ze08_ch2o_sensor->ppm);
-        free(valueFormatted);
+        ezlopi_valueformatter_float_to_cjson(item, cj_params, ze08_ch2o_sensor->ppm);
     }
     else
     {

@@ -215,14 +215,8 @@ static int __0054_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 Lt_per_hr = (Lt_per_hr < 1) ? 0 : Lt_per_hr;
                 Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
                 // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
-
-                char* valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, Lt_per_hr);
+                
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, Lt_per_hr);
                 ret = 1;
             }
         }

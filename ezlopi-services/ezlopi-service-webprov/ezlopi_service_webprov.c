@@ -104,14 +104,12 @@ static void __connection_upcall(bool connected)
         {
             TRACE_S("Web-socket re-connected.");
             TRACE_I("Starting registration process....");
-            ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, 4);
             ezlopi_core_ezlopi_methods_registration_init();
         }
     }
     else
     {
         ezlopi_event_group_clear_event(EZLOPI_EVENT_NMA_REG);
-        ezlopi_core_ezlopi_broadcast_remove_method(__send_str_data_to_nma_websocket);
     }
 
     prev_status = connected;
@@ -150,7 +148,10 @@ static void __fetch_wss_endpoint(void* pv)
                     if (cjson_uri)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
+
+                        ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, 4);
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
+
                         task_complete = 1;
                     }
                 }
@@ -251,20 +252,20 @@ static void __message_upcall(const char* payload, uint32_t len)
                     {
                         __call_method_and_send_response(cj_request, cj_method, updater, TRACE_TYPE_D);
                     }
-                }
+            }
                 else
                 {
                     __call_method_and_send_response(cj_request, cj_method, ezlopi_core_ezlopi_methods_rpc_method_notfound, TRACE_TYPE_E);
                 }
-            }
         }
+    }
         else
         {
 #if (1 == ENABLE_TRACE)
             TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
             TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : ezlopi_null_str) : ezlopi_null_str);
 #endif
-        }
+}
 
         cJSON_Delete(cj_request);
     }

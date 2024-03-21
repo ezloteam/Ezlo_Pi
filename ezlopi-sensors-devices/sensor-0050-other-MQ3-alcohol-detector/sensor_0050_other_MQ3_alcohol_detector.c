@@ -299,21 +299,15 @@ static int __0050_get_item(l_ezlopi_item_t* item, void* arg)
                     cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
                 }
                 //--------------------------------------------------------------------------------------
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : mq3_sensor_gas_alarm_token[0]);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : mq3_sensor_gas_alarm_token[0]);
             }
             else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq3_value_t* MQ3_value = ((s_mq3_value_t*)item->user_arg);
                 if (MQ3_value)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ3_value->_alcohol_ppm);
-                    char* valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ3_value->_alcohol_ppm);
                 }
             }
             ret = 1;
@@ -332,21 +326,15 @@ static int __0050_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         {
             if (ezlopi_item_name_gas_alarm == item->cloud_properties.item_name)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : "no_gas");
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : "no_gas");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (char*)item->user_arg ? item->user_arg : mq3_sensor_gas_alarm_token[0]);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (char*)item->user_arg ? item->user_arg : mq3_sensor_gas_alarm_token[0]);
             }
             else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
             {
                 s_mq3_value_t* MQ3_value = ((s_mq3_value_t*)item->user_arg);
                 if (MQ3_value)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ3_value->_alcohol_ppm);
-                    char* valueFormatted = ezlopi_valueformatter_float(MQ3_value->_alcohol_ppm);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ3_value->_alcohol_ppm);
                 }
             }
             ret = 1;
@@ -365,11 +353,11 @@ static int __0050_notify(l_ezlopi_item_t* item)
             const char* curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = "combustible_gas_detected";
+                curret_value = mq3_sensor_gas_alarm_token[1];
             }
             else
             {
-                curret_value = "no_gas";
+                curret_value = mq3_sensor_gas_alarm_token[0];
             }
             if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
             {

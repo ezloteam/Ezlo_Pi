@@ -286,52 +286,26 @@ static int __0053_get_value_cjson(l_ezlopi_item_t* item, void* arg)
             {
                 if ((sensor_0053_UART_gps6mv2_data->Latitude_item_id) == item->cloud_properties.item_id)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val);
-                    char* valueFormatted = ezlopi_valueformatter_float(sensor_0053_UART_gps6mv2_data->prev_lat_angle_val);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Longitude_item_id) == item->cloud_properties.item_id)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, sensor_0053_UART_gps6mv2_data->prev_long_angle_val);
-                    char* valueFormatted = ezlopi_valueformatter_float(sensor_0053_UART_gps6mv2_data->prev_long_angle_val);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, sensor_0053_UART_gps6mv2_data->prev_lat_angle_val);
                 }
-
                 else if ((sensor_0053_UART_gps6mv2_data->Fix_item_id) == item->cloud_properties.item_id)
                 {
                     cJSON_AddBoolToObject(cj_result, ezlopi_value_str, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX);
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(sensor_0053_UART_gps6mv2_data->prev_GPS_FIX));
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(sensor_0053_UART_gps6mv2_data->prev_GPS_FIX));
                 }
-
                 else if ((sensor_0053_UART_gps6mv2_data->Sea_level_item_id) == item->cloud_properties.item_id)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, sensor_0053_UART_gps6mv2_data->prev_antenna_alti);
-                    char* valueFormatted = ezlopi_valueformatter_float(sensor_0053_UART_gps6mv2_data->prev_antenna_alti);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, sensor_0053_UART_gps6mv2_data->prev_antenna_alti);
                 }
-
                 else if ((sensor_0053_UART_gps6mv2_data->Geoid_item_id) == item->cloud_properties.item_id)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, sensor_0053_UART_gps6mv2_data->prev_geoid);
-                    char* valueFormatted = ezlopi_valueformatter_float(sensor_0053_UART_gps6mv2_data->prev_geoid);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, sensor_0053_UART_gps6mv2_data->prev_geoid);
                 }
+
                 ret = 1;
             }
         }

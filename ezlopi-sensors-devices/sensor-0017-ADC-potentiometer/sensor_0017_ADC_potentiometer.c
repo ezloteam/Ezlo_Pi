@@ -173,13 +173,7 @@ static int __0017_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_potentiometer_t* user_data = (s_potentiometer_t*)item->user_arg;
             if (user_data)
             {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->pot_val));
-                char* valueFormatted = ezlopi_valueformatter_float(user_data->pot_val);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->pot_val);
                 ret = 1;
             }
         }

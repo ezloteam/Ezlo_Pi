@@ -142,53 +142,28 @@ static int __0056_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     // ezlopi_device_free_device_by_item(item);
-        // }
     }
+
     return ret;
 }
 
 static int __0056_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
+
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
-        if (cj_result)
+        fsr_t* fsr_struct = (fsr_t*)item->user_arg;
+        if (fsr_struct)
         {
-            fsr_t* fsr_struct = (fsr_t*)item->user_arg;
-            if (fsr_struct)
-            {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, fsr_struct->fsr_value);
-                char* valueFormatted = ezlopi_valueformatter_float(fsr_struct->fsr_value);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-            }
+            ezlopi_valueformatter_float_to_cjson(item, cj_result, fsr_struct->fsr_value);
             ret = 1;
         }
     }
+
     return ret;
 }
 

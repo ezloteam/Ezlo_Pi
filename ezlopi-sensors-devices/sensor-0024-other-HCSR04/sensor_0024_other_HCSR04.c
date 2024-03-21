@@ -77,19 +77,14 @@ int sensor_0024_other_HCSR04_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item
 static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    if (item)
+    if (item && arg)
     {
         cJSON* cj_param = (cJSON*)arg;
         s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)item->user_arg;
         if (cj_param && ultrasonic_sensor)
         {
-            cJSON_AddNumberToObject(cj_param, ezlopi_value_str, ultrasonic_sensor->distance);
-            char* valueFormatted = ezlopi_valueformatter_float(ultrasonic_sensor->distance);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_param, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_float_to_cjson(item, cj_param, ultrasonic_sensor->distance);
+            ret = 1;
         }
     }
     return ret;

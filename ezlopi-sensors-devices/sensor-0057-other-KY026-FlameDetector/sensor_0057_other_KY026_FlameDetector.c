@@ -284,13 +284,7 @@ static int __0057_get_item(l_ezlopi_item_t* item, void* arg)
                 flame_t* flame_struct = (flame_t*)item->user_arg;
                 if (flame_struct)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
-                    char* valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, flame_struct->absorbed_percent);
                 }
                 ret = 1;
             }
@@ -317,13 +311,7 @@ static int __0057_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 flame_t* flame_struct = (flame_t*)item->user_arg;
                 if (flame_struct)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flame_struct->absorbed_percent);
-                    char* valueFormatted = ezlopi_valueformatter_float(flame_struct->absorbed_percent);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, flame_struct->absorbed_percent);
                 }
             }
             ret = 1;

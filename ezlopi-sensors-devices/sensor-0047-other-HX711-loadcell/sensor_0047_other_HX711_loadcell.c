@@ -223,13 +223,10 @@ static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
             if (user_data)
             {
-                char* valueFormatted = ezlopi_valueformatter_float(user_data->weight);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->weight);
-                free(valueFormatted);
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->weight);
+                ret = 1;
             }
         }
-        ret = 1;
     }
     return ret;
 }

@@ -296,7 +296,13 @@ static void ezlopi_service_uart_get_info()
             cJSON_AddStringToObject(json_chip_info, "firmware_SDK_version", esp_get_idf_version());
             cJSON_AddItemToObject(get_info, "chip_info", json_chip_info);
         }
-        cJSON_AddStringToObject(get_info, ezlopi_uptime_str, ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS)));
+
+
+        char time_string[50];
+        uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
+        ezlopi_tick_to_time(tick_count_ms, time_string, sizeof(time_string));
+
+        cJSON_AddStringToObject(get_info, ezlopi_uptime_str, time_string);
         cJSON_AddNumberToObject(get_info, ezlopi_build_date_str, BUILD_DATE);
         cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddStringToObject(get_info, "boot_reason", ezlopi_esp_reset_reason_str(esp_reset_reason()));

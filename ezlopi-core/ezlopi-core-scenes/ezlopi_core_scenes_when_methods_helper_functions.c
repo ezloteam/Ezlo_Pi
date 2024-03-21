@@ -627,8 +627,10 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
             TRACE_W("update_day = [%d][%dth] , offset[%d] : intime=0,before=1,after=2,undefined=3 , SunState[%d] : sunrise=1,sunset=2", info->tm_mday, user_data->curr_tm_day, user_data->tmoffs_type, user_data->sunstate_mode);
         }
     }
+
     return flag_check;
 }
+
 uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;

@@ -253,49 +253,21 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
                 {
-                    TRACE_I("Accel-x : %.2fm/s^2", user_data->ax);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->ax);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->ax);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->ax);
                 }
-                if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+                else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
                 {
-                    TRACE_I("Accel-y : %.2fm/s^2", user_data->ay);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->ay);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->ay);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->ay);
                 }
-                if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+                else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
                 {
-                    TRACE_I("Accel-z : %.2fm/s^2", user_data->az);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->az);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->az);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->az);
                 }
-                if (ezlopi_item_name_temp == item->cloud_properties.item_name)
+                else if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    TRACE_I("Temp : %.2f*C", user_data->tmp);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->tmp);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->tmp);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->tmp);
                 }
-                if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
+                else if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-x : %d rpm", (int)user_data->gx);
                     cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gx));
@@ -306,7 +278,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                         free(valueFormatted);
                     }
                 }
-                if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
+                else if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-y : %d rpm", (int)user_data->gy);
                     cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gy));
@@ -317,7 +289,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                         free(valueFormatted);
                     }
                 }
-                if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
+                else if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-z : %d rpm", (int)user_data->gz);
                     cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gz));
@@ -328,10 +300,12 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                         free(valueFormatted);
                     }
                 }
+
                 ret = 1;
             }
         }
     }
+
     return ret;
 }
 

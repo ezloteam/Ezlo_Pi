@@ -35,15 +35,20 @@ void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
                 curr_device = curr_device->next;
             }
         }
+#if (1 == ENABLE_TRACE)
         else
         {
             TRACE_E("Failed to create devices-array");
         }
+#endif
     }
+
+#if (1 == ENABLE_TRACE)
     else
     {
         TRACE_E("Failed to create 'result'");
     }
+#endif
 }
 
 void device_name_set(cJSON* cj_request, cJSON* cj_response)

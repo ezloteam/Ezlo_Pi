@@ -177,20 +177,8 @@ static int __init(l_ezlopi_item_t* item)
                     TRACE_S("Configuration Complete...");
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
             }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
     }
 
     return ret;
@@ -211,35 +199,17 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_x * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
-                    char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, acceleration_value);
                 }
                 if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_y * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
-                    char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, acceleration_value);
                 }
                 if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
                 {
                     acceleration_value = (user_data->acc_z * ADXL345_CONVERTER_FACTOR_MG_TO_G * ADXL345_STANDARD_G_TO_ACCEL_CONVERSION_VALUE);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, acceleration_value);
-                    char* valueFormatted = ezlopi_valueformatter_float(acceleration_value);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, acceleration_value);
                 }
                 ret = 1;
             }

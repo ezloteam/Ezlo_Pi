@@ -344,9 +344,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] == item->cloud_properties.item_id)
         {
-
             cJSON_AddBoolToObject(cj_result, "value", ((0 == item->interface.gpio.gpio_in.value) ? true : false));
-            const char* valueFormatted = ezlopi_valueformatter_bool((0 == item->interface.gpio.gpio_in.value) ? true : false);
+            const char* valueFormatted = EZPI_VALUEFORMATTER_BOOL((0 == item->interface.gpio.gpio_in.value) ? true : false);
             cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
         }
         ret = 1;

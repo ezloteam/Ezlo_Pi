@@ -181,17 +181,10 @@ static int __0042_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (user_data)
             {
 #if VOLTAGE_DIVIDER_EN
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->volt) * 9.52f);
-                char* valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 9.52f);
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, (user_data->volt) * 9.52f);
 #else
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->volt) * 4.2f);
-                char* valueFormatted = ezlopi_valueformatter_float((user_data->volt) * 4.2f);
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, (user_data->volt) * 4.2f);
 #endif
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
                 ret = 1;
             }
         }

@@ -54,16 +54,17 @@ int sensor_0025_digitalIn_LDR(e_ezlopi_actions_t action, l_ezlopi_item_t* item, 
 static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    if (item && arg)
+    cJSON* cj_value_obj = (cJSON*)arg;
+
+    if (item && cj_value_obj)
     {
-        cJSON* cj_value_obj = (cJSON*)arg;
         int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
         cJSON_AddBoolToObject(cj_value_obj, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        const char* valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(cj_value_obj, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddStringToObject(cj_value_obj, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_in.value));
         ret = 1;
     }
+
     return ret;
 }
 

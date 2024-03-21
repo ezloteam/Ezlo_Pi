@@ -59,8 +59,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     if (param)
     {
         cJSON_AddBoolToObject(param, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        const char* valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_in.value ? true : false);
-        cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, valueFormatted);
+        cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_in.value));
     }
 
     return ret;

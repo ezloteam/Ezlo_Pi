@@ -187,12 +187,7 @@ static int __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_gyml8511_data_t* user_data = (s_gyml8511_data_t*)item->user_arg;
             if (user_data)
             {
-                char* valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-                // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
-                free(valueFormatted);
-
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, (user_data->uv_data) / 10);
                 ret = 1;
             }
         }

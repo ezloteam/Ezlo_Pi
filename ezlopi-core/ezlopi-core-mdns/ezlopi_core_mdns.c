@@ -99,7 +99,6 @@ static void ezlopi_mdns_init_service_context()
                 char* id_val_str = (char*)malloc(EZPI_MDNS_SERIAL_SIZE);
                 if (id_val_str)
                 {
-
                     service_cntx_device_id->key = ezlopi_serial_str;
 
                     memset(id_val_str, 0, EZPI_MDNS_SERIAL_SIZE);

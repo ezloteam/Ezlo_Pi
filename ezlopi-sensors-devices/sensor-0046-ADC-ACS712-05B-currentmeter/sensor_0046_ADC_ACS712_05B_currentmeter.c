@@ -174,17 +174,11 @@ static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cjson_properties = (cJSON*)arg;
+        cJSON* cj_result = (cJSON*)arg;
         s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
         if (user_data)
         {
-            cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, user_data->amp_value); // Irms [A]
-            char* valueFormatted = ezlopi_valueformatter_float(user_data->amp_value);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->amp_value);
             ret = 1;
         }
     }

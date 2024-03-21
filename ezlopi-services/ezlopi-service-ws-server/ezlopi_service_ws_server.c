@@ -114,6 +114,7 @@ int ezlopi_service_ws_server_broadcast(char* data)
 
 void ezlopi_service_ws_server_start(void)
 {
+    ezlopi_core_ezlopi_broadcast_method_add(ezlopi_service_ws_server_broadcast, 2);
     ezlopi_wifi_event_add(__wifi_connection_event, NULL);
 }
 
@@ -382,8 +383,6 @@ static void __start_server(void)
         {
             TRACE_E("Error starting server!, err: %d", err);
         }
-
-        ezlopi_core_ezlopi_broadcast_method_add(ezlopi_service_ws_server_broadcast, 2);
     }
 }
 
@@ -402,8 +401,6 @@ static void __stop_server(void)
         vSemaphoreDelete(send_lock);
         send_lock = NULL;
     }
-
-    ezlopi_core_ezlopi_broadcast_remove_method(ezlopi_service_ws_server_broadcast);
 }
 
 static cJSON* __method_execute(httpd_req_t* req, cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func)
@@ -540,6 +537,7 @@ static int __ws_server_send(l_ws_server_client_conn_t* client, char* data, uint3
 
 static void __print_sending_data(char* data_str, e_trace_type_t print_type)
 {
+#if (ENABLE_TRACE)
     switch (print_type)
     {
     case TRACE_TYPE_W:
@@ -573,4 +571,5 @@ static void __print_sending_data(char* data_str, e_trace_type_t print_type)
         break;
     }
     }
+#endif
 }

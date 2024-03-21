@@ -71,13 +71,7 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         if (mb1013_args)
         {
             cJSON* cj_result = (cJSON*)arg;
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, mb1013_args->current_value);
-            char* valueFormatted = ezlopi_valueformatter_float(mb1013_args->current_value);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_float_to_cjson(item, cj_result, mb1013_args->current_value);
             ret = 1;
         }
     }

@@ -161,9 +161,8 @@ static int __list_cjson_value(l_ezlopi_item_t* item, void* arg)
         }
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
-            bool switch_state = (0 == dimmable_bulb_arg->current_brightness_value) ? false : true;
-            cJSON_AddBoolToObject(param, ezlopi_value_str, switch_state);
-            cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(switch_state));
+            cJSON_AddBoolToObject(param, ezlopi_value_str, dimmable_bulb_arg->current_brightness_value);
+            cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(dimmable_bulb_arg->current_brightness_value));
         }
     }
 
@@ -218,9 +217,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         }
         else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
         {
-            bool switch_state = (0 == dimmable_bulb_arg->current_brightness_value) ? false : true;
-            cJSON_AddBoolToObject(param, ezlopi_value_str, switch_state);
-            cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(switch_state));
+            cJSON_AddBoolToObject(param, ezlopi_value_str, dimmable_bulb_arg->current_brightness_value);
+            cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(dimmable_bulb_arg->current_brightness_value));
         }
     }
 

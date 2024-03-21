@@ -264,63 +264,27 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, user_data->temperature);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->temperature);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->temperature);
                 }
                 else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, user_data->humidity);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->humidity);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->humidity);
                 }
                 else if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->pressure / 1000.0));
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->pressure / 1000.0);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->pressure / 1000.0);
                 }
                 else if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->iaq));
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->iaq);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->iaq);
                 }
                 else if (ezlopi_item_name_distance == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->altitude));
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->altitude);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->altitude);
                 }
                 else if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->co2_equivalent));
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->co2_equivalent);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_device, user_data->co2_equivalent);
                 }
             }
         }

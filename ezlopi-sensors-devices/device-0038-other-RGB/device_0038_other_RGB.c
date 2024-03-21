@@ -111,9 +111,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             }
             if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
-                int state = ((0 == rgb_args->brightness) ? 0 : 1);
-                cJSON_AddBoolToObject(cjson_params, ezlopi_value_str, state);
-                cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(state ? true : false));
+                cJSON_AddBoolToObject(cjson_params, ezlopi_value_str, rgb_args->brightness);
+                cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(rgb_args->brightness));
             }
             if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {

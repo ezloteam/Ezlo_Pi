@@ -223,39 +223,20 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
         if (cj_result)
         {
             s_gy61_data_t* user_data = ((s_gy61_data_t*)item->user_arg);
+
             if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
             {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->x_data));
-                // TRACE_I("x-axis-G : %.2f", user_data->x_data);
-                char* valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->x_data);
             }
-            if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
             {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->y_data));
-                // TRACE_I("y-axis-G : %.2f", user_data->y_data);
-                char* valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->y_data);
             }
-            if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
             {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->z_data));
-                // TRACE_I("z-axis-G : %.2f", user_data->z_data);
-                char* valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->z_data);
             }
+
             ret = 1;
         }
     }

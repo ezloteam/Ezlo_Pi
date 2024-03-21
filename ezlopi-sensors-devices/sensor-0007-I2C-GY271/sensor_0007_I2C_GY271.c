@@ -326,34 +326,19 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->X);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->X);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->X);
                 }
+
                 if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Y);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->Y);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->Y);
                 }
+
                 if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Z);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->Z);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->Z);
                 }
+
                 if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
                 {
 
@@ -368,18 +353,14 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->T);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->T);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->T);
                 }
             }
+
             ret = 1;
         }
     }
+
     return ret;
 }
 
