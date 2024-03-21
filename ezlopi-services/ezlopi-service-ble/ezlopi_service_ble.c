@@ -40,7 +40,9 @@ static void ezlopi_ble_basic_init(void);
 static void ezlopi_ble_start_secure_gatt_server(void);
 #endif
 
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void);
+#endif
 
 void ezlopi_ble_service_init(void)
 {
@@ -51,7 +53,7 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_service_device_info_init();
     ezlopi_ble_service_dynamic_config_init();
 
-    // ezlopi_ble_profile_print();
+    ezlopi_ble_profile_print();
     ezlopi_ble_basic_init();
 
     CHECK_PRINT_ERROR(esp_ble_gatts_app_register(BLE_WIFI_SERVICE_HANDLE), "gatts 'wifi-app' register error");
@@ -71,6 +73,8 @@ void ezlopi_ble_service_init(void)
 #endif
 }
 
+
+#if (1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING)
 static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
 {
     const esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
@@ -95,6 +99,7 @@ static void ezlopi_ble_start_secure_gatt_server_open_pairing(void)
     CHECK_PRINT_ERROR(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, (void*)&rsp_key, sizeof(uint8_t)),
         "failed -set - ESP_BLE_SM_SET_RSP_KEY");
 }
+#endif
 
 #if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
 static void ezlopi_ble_start_secure_gatt_server(void)
@@ -134,7 +139,7 @@ static void ezlopi_ble_basic_init(void)
     // s_ezlopi_factory_info_t *factory = ezlopi_factory_info_get_info();
     // snprintf(ble_device_name, sizeof(ble_device_name), "ezlopi_%llu", ezlopi_factory_info_v3_get_id());
 
-    char* device_type = ezlopi_factory_info_v3_get_device_type();
+    const char* device_type = ezlopi_factory_info_v3_get_device_type();
     if ((NULL != device_type))
     {
         snprintf(ble_device_name, sizeof(ble_device_name), "%s_%llu", device_type, ezlopi_factory_info_v3_get_id());

@@ -78,7 +78,7 @@ const static int timer_group_index_pair[MAX_TIMER][2] = {
 
 static void send_event_to_queue(e_ezlopi_actions_t action)
 {
-    s_ezlo_event_t *event_data = malloc(sizeof(s_ezlo_event_t));
+    s_ezlo_event_t* event_data = malloc(sizeof(s_ezlo_event_t));
     if (NULL != event_data)
     {
         event_data->arg = NULL;
@@ -93,10 +93,10 @@ static void send_event_to_queue(e_ezlopi_actions_t action)
 /*******************************************************************************
  *                          Static Function Definition
  *******************************************************************************/
-static bool IRAM_ATTR timer_group_isr_callback(void *args)
+static bool IRAM_ATTR timer_group_isr_callback(void* args)
 {
     BaseType_t high_task_awoken = pdFALSE;
-    s_ezlopi_timer_t *_timer_conf = (s_ezlopi_timer_t *)args;
+    s_ezlopi_timer_t* _timer_conf = (s_ezlopi_timer_t*)args;
 
     uint64_t timer_counter_value = timer_group_get_counter_value_in_isr(_timer_conf->group, _timer_conf->index);
 
@@ -161,9 +161,9 @@ static bool IRAM_ATTR timer_group_isr_callback(void *args)
     return high_task_awoken == pdTRUE; // return whether we need to yield at the end of ISR
 }
 
-static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t *timer_conf);
+static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t* timer_conf);
 static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_actions_t event_type);
-static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_actions_t event_type, int group, int index, int alarm_ms);
+static void ezlopi_timer_setup_struct(s_ezlopi_timer_t* timer_config, e_ezlopi_actions_t event_type, int group, int index, int alarm_ms);
 
 #if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32
 // void ezlopi_timer_start_50ms(void)
@@ -197,7 +197,7 @@ static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_a
 {
     if (timer_num < MAX_TIMER)
     {
-        s_ezlopi_timer_t *timer_config = malloc(sizeof(s_ezlopi_timer_t));
+        s_ezlopi_timer_t* timer_config = malloc(sizeof(s_ezlopi_timer_t));
 
         if (timer_config)
         {
@@ -215,20 +215,20 @@ static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_a
     }
 }
 
-static void ezlopi_timer_setup_struct(s_ezlopi_timer_t *timer_config, e_ezlopi_actions_t event_type, int group, int index, int alarm_ms)
+static void ezlopi_timer_setup_struct(s_ezlopi_timer_t* timer_config, e_ezlopi_actions_t event_type, int group, int index, int alarm_ms)
 {
     timer_config->event_type = event_type;
     timer_config->alarm_value = (alarm_ms * (EZLOPI_TIMER_SCALE / 1000));
     timer_config->group = group;
     timer_config->index = index;
     timer_config->internal.alarm_en = TIMER_ALARM_EN,
-    timer_config->internal.auto_reload = true,
-    timer_config->internal.counter_dir = TIMER_COUNT_UP;
+        timer_config->internal.auto_reload = true,
+        timer_config->internal.counter_dir = TIMER_COUNT_UP;
     timer_config->internal.divider = EZLOPI_TIMER_DIVIDER;
     timer_config->internal.intr_type = TIMER_INTR_LEVEL;
 }
 
-static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t *timer_conf)
+static int ezlopi_timer_alarm_enable(s_ezlopi_timer_t* timer_conf)
 {
     int ret = 1;
 

@@ -83,10 +83,10 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
     item->interface.gpio.gpio_in.enable = true;
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
-    CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_str, item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cjson_device, "logic_inv", item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cjson_device, "pull_up", tmp_var);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_dev_name_str, item->interface.gpio.gpio_in.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_logic_inv_str, item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pull_up_str, tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 }

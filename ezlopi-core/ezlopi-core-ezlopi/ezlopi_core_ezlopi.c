@@ -27,8 +27,6 @@ static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
 {
-
-
     // Init memories
     ezlopi_nvs_init();
 

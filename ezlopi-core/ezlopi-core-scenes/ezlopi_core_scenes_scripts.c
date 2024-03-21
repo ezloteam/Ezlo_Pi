@@ -263,8 +263,7 @@ static void __script_process(void* arg)
         int tmp_ret = luaL_loadstring(lua_state, script_node->code);
         if (tmp_ret)
         {
-            #warning "Krishna needs to check this."
-                const char* script_report = __script_report(lua_state, tmp_ret);
+            const char* script_report = __script_report(lua_state, tmp_ret);
             if (script_report)
             {
                 TRACE_E("Error in '%s' -> %s", script_node->name, script_report);

@@ -151,10 +151,10 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
         {
             item->interface.i2c_master.enable = true;
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-            CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)

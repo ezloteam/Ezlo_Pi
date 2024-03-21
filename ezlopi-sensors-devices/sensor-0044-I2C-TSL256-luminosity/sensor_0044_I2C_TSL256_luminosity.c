@@ -152,7 +152,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_data)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_lux;
@@ -161,9 +161,9 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.scale = scales_lux;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
     item->interface.i2c_master.enable = true;
     item->interface.i2c_master.clock_speed = 100000;

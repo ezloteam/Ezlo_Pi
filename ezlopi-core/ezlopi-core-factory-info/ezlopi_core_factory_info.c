@@ -6,13 +6,6 @@
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_factory_info.h"
 
-#if (ID_BIN_VERSION_2 == ID_BIN_VERSION)
-static char* g_ca_certificate = NULL;
-static char* g_ssl_private_key = NULL;
-static char* g_ssl_shared_key = NULL;
-static char* g_ezlopi_config = NULL;
-#endif
-
 static const esp_partition_t* partition_ctx_v3 = NULL;
 static uint32_t g_provisioning_status = 0;
 
@@ -119,9 +112,6 @@ const esp_partition_t* ezlopi_factory_info_v3_init(void)
     if (NULL == partition_ctx_v3)
     {
         partition_ctx_v3 = esp_partition_find_first(EZLOPI_FACTORY_INFO_V3_PARTITION_TYPE, EZLOPI_FACTORY_INFO_V3_SUBTYPE, EZLOPI_FACTORY_INFO_V3_PARTITION_NAME);
-
-        unsigned long long id = ezlopi_factory_info_v3_get_id();
-        // TRACE_D("SERIAL-ID [off: 0x%04X, size: 0x%04X]:             %llu", ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_DEVICE_ID, E_EZLOPI_FACTORY_INFO_HUB_DATA), EZLOPI_FINFO_LEN_DEVICE_ID, id);
     }
     return partition_ctx_v3;
 }
@@ -137,6 +127,7 @@ void ezlopi_factory_info_v3_free(void* arg)
 
 void print_factory_info_v3(void)
 {
+#if (1 == ENABLE_TRACE)
     // uint16_t version = ezlopi_factory_info_v3_get_version();
     unsigned long long id = ezlopi_factory_info_v3_get_id();
 
@@ -150,8 +141,8 @@ void print_factory_info_v3(void)
     char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
     char* wifi_password = ezlopi_factory_info_v3_get_password();
     char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-    char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
-    char* device_type = ezlopi_factory_info_v3_get_device_type();
+    // const char* provision_server = ezlopi_factory_info_v3_get_provisioning_server();
+    const char* device_type = ezlopi_factory_info_v3_get_device_type();
     char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
     char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
     char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
@@ -191,6 +182,7 @@ void print_factory_info_v3(void)
     ezlopi_factory_info_v3_free(ca_certificate);
     ezlopi_factory_info_v3_free(ssl_private_key);
     ezlopi_factory_info_v3_free(ssl_shared_key);
+#endif
 }
 
 /** Getter */
@@ -207,8 +199,7 @@ uint16_t ezlopi_factory_info_v3_get_version(void)
     {
         uint8_t tmp_version_arr[EZLOPI_FINFO_LEN_VERSION];
         memset(tmp_version_arr, 0, EZLOPI_FINFO_LEN_VERSION);
-        int read_couont = esp_partition_read(partition_ctx_v3, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_FMW_VERSION, E_EZLOPI_FACTORY_INFO_HUB_DATA), &tmp_version_arr, EZLOPI_FINFO_LEN_VERSION);
-        TRACE_I("read-count: %d", read_couont);
+        esp_partition_read(partition_ctx_v3, ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_FMW_VERSION, E_EZLOPI_FACTORY_INFO_HUB_DATA), &tmp_version_arr, EZLOPI_FINFO_LEN_VERSION);
 
         for (int i = 0; i < 4; i++)
         {

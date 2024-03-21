@@ -6,10 +6,10 @@
 
 #include "ezlopi_cloud_constants.h"
 
-void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks);
 
 void ezlopi_print_block_options(s_block_options_v2_t* block_options, l_fields_v2_t* fields)
 {
+#if (1 == ENABLE_TRACE)
     TRACE_D("\t\t|-- blockOptions:");
     TRACE_D("\t\t\t|-- method");
     TRACE_D("\t\t\t\t|-- name: %s", block_options->method.name);
@@ -20,10 +20,12 @@ void ezlopi_print_block_options(s_block_options_v2_t* block_options, l_fields_v2
         TRACE_D("\t\t\t\t\t|-- %s: %s", fields->name, fields->name);
         fields = fields->next;
     }
+#endif
 }
 
 void ezlopi_print_fields(l_fields_v2_t* fields)
 {
+#if (1 == ENABLE_TRACE)
     TRACE_D("\t\t|-- fields: ");
     int field_count = 0;
     while (fields)
@@ -164,30 +166,36 @@ void ezlopi_print_fields(l_fields_v2_t* fields)
         fields = fields->next;
     }
     TRACE_D("\t\t\t|------------------------------------");
+#endif
 }
 
 void ezlopi_print_house_modes(l_house_modes_v2_t* house_modes)
 {
+#if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- house_modes: ");
     while (house_modes)
     {
         TRACE_D("\t\t|-- %s", house_modes->house_mode);
         house_modes = house_modes->next;
     }
+#endif
 }
 
 void ezlopi_print_user_notifications(l_user_notification_v2_t* user_notification)
 {
+#if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- user_notifications: ");
     while (user_notification)
     {
         TRACE_D("\t\t|-- %s", user_notification->user_id);
         user_notification = user_notification->next;
     }
+#endif
 }
 
 void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
 {
+#if (1 == ENABLE_TRACE)
     TRACE_D("\t|-- when: ");
     while (when_blocks)
     {
@@ -196,10 +204,12 @@ void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
         ezlopi_print_fields(when_blocks->fields);
         when_blocks = when_blocks->next;
     }
+#endif
 }
 
 void ezlopi_print_action_blocks(l_action_block_v2_t* action_block)
 {
+#if (1 == ENABLE_TRACE)
     while (action_block)
     {
         TRACE_D("\t|-- %s: ", (SCENE_BLOCK_TYPE_THEN == action_block->block_type) ? "then" : "else");
@@ -217,10 +227,12 @@ void ezlopi_print_action_blocks(l_action_block_v2_t* action_block)
             TRACE_D("\t\t|--");
         }
     }
+#endif
 }
 
 void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
 {
+#if (1 == ENABLE_TRACE)
     int scene_count = 0;
     while (scene_link_list)
     {
@@ -238,6 +250,9 @@ void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list)
         ezlopi_print_action_blocks(scene_link_list->else_block);
         TRACE_D("\t---------------------------------------------------------------");
 
+        vTaskDelay(10);
+
         scene_link_list = scene_link_list->next;
     }
+#endif
 }

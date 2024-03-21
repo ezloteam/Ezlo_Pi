@@ -8,7 +8,7 @@
 
 #include "ezlopi_cloud_constants.h"
 
-#include "ezlopi_service_webprov.h"
+// #include "ezlopi_service_webprov.h"
 
 static s_ezlopi_room_t* l_room_head = NULL;
 
@@ -120,7 +120,7 @@ int ezlopi_room_delete(cJSON* cj_room)
             {
                 TRACE_I("room_id: %8x", room_id);
 
-                int ret = __free_room_from_list_by_id(room_id);
+                ret = __free_room_from_list_by_id(room_id);
                 TRACE_I("ret: %d", ret);
                 ret = __remove_room_from_nvs_by_id(room_id);
                 TRACE_I("ret: %d", ret);
@@ -421,7 +421,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
     {
         cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_room_deleted_str);
-        cJSON_AddStringToObject(cj_response, ezlopi_method_str, "hub.room.all.delete");
+        cJSON_AddStringToObject(cj_response, ezlopi_method_str, method_hub_room_all_delete);
 
         cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
         if (cj_result)
@@ -437,7 +437,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
         if (data_str)
         {
             cJSON_Minify(data_str);
-            ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_str, TRACE_TYPE_B);
+            // ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_str, TRACE_TYPE_B);
             if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_str)) {
                 free(data_str);
             }

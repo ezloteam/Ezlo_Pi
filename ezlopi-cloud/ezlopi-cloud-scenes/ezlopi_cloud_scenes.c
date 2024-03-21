@@ -14,25 +14,24 @@
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_notifications.h"
 
-void scenes_list(cJSON *cj_request, cJSON *cj_response)
+void scenes_list(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-    cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
-        cJSON *cj_scene_array = cJSON_AddArrayToObject(cj_result, "scenes");
-        ezlopi_scenes_get_list_v2(cj_scene_array);
+        ezlopi_scenes_get_list_v2(cJSON_AddArrayToObject(cj_result, ezlopi_scenes_str));
     }
 }
 
-void scenes_create(cJSON *cj_request, cJSON *cj_response)
+void scenes_create(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
         uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
@@ -48,18 +47,18 @@ void scenes_create(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_get(cJSON *cj_request, cJSON *cj_response)
+void scenes_get(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_ids = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
+        cJSON* cj_ids = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
         if (cj_ids && cj_ids->valuestring)
         {
-            char *scene_str = ezlopi_nvs_read_str(cj_ids->valuestring);
+            char* scene_str = ezlopi_nvs_read_str(cj_ids->valuestring);
             if (scene_str)
             {
                 cJSON_AddRawToObject(cj_response, ezlopi_result_str, scene_str);
@@ -69,20 +68,20 @@ void scenes_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_edit(cJSON *cj_request, cJSON *cj_response)
+void scenes_edit(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_eo = cJSON_GetObjectItem(cj_params, "eo");
+        cJSON* cj_eo = cJSON_GetObjectItem(cj_params, "eo");
         if (cj_eo)
         {
             CJSON_TRACE("scene-edit eo", cj_eo);
 
-            cJSON *cj_id = cJSON_GetObjectItem(cj_eo, ezlopi__id_str);
+            cJSON* cj_id = cJSON_GetObjectItem(cj_eo, ezlopi__id_str);
             if (cj_id && cj_id->valuestring)
             {
                 if (cj_id && cj_id->valuestring)
@@ -95,16 +94,16 @@ void scenes_edit(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_delete(cJSON *cj_request, cJSON *cj_response)
+void scenes_delete(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
+        cJSON* cj_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
         if (cj_id && cj_id->valuestring)
         {
             uint32_t u_id = strtoul(cj_id->valuestring, NULL, 16);
@@ -115,18 +114,18 @@ void scenes_delete(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
+void scenes_status_get(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_sceneId_str);
+        cJSON* cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_sceneId_str);
         if (cj_scene_id && cj_scene_id->valuestring)
         {
-            char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+            char* scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
             if (scene_str)
             {
                 cJSON_AddRawToObject(cj_response, ezlopi_result_str, scene_str);
@@ -136,16 +135,16 @@ void scenes_status_get(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_run(cJSON *cj_request, cJSON *cj_response)
+void scenes_run(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_sceneId_str);
+        cJSON* cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_sceneId_str);
         if (cj_scene_id && cj_scene_id->valuestring)
         {
             uint32_t u32_scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
@@ -154,15 +153,15 @@ void scenes_run(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
+void scenes_enable_set(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
+        cJSON* cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
         if (cj_scene_id && cj_scene_id->valuestring)
         {
             uint32_t scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
@@ -170,11 +169,11 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
             {
                 bool enabled_flag = false;
                 CJSON_GET_VALUE_BOOL(cj_params, ezlopi_enabled_str, enabled_flag);
-                char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+                char* scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
 
                 if (scene_str)
                 {
-                    cJSON *cj_scene = cJSON_Parse(scene_str);
+                    cJSON* cj_scene = cJSON_Parse(scene_str);
                     free(scene_str);
 
                     if (cj_scene)
@@ -182,7 +181,7 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
                         cJSON_DeleteItemFromObject(cj_scene, ezlopi_enabled_str);
                         cJSON_AddBoolToObject(cj_scene, ezlopi_enabled_str, enabled_flag);
 
-                        char *updated_scene_str = cJSON_Print(cj_scene);
+                        char* updated_scene_str = cJSON_Print(cj_scene);
                         cJSON_Delete(cj_scene);
 
                         if (updated_scene_str)
@@ -196,7 +195,7 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
                     }
                 }
 
-                l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
+                l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_by_id_v2(scene_id);
                 if (scene_node)
                 {
                     scene_node->enabled = enabled_flag;
@@ -216,36 +215,36 @@ void scenes_enable_set(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 }
 
-void scenes_notification_add(cJSON *cj_request, cJSON *cj_response)
+void scenes_notification_add(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_user_id = cJSON_GetObjectItem(cj_params, ezlopi_userId_str);
-        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_notifications_str);
+        cJSON* cj_user_id = cJSON_GetObjectItem(cj_params, ezlopi_userId_str);
+        cJSON* cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_notifications_str);
 
         if (cj_scene_id && cj_scene_id->valuestring && cj_user_id && cj_user_id->valuestring)
         {
-            char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+            char* scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
             if (scene_str)
             {
-                cJSON *cj_scene = cJSON_Parse(scene_str);
+                cJSON* cj_scene = cJSON_Parse(scene_str);
                 free(scene_str);
 
                 if (cj_scene)
                 {
-                    cJSON *cj_user_notifications = cJSON_GetObjectItem(cj_scene, ezlopi_user_notifications_str);
+                    cJSON* cj_user_notifications = cJSON_GetObjectItem(cj_scene, ezlopi_user_notifications_str);
                     if (cj_user_notifications)
                     {
                         cJSON_AddItemReferenceToArray(cj_user_notifications, cj_user_id);
                     }
 
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char *updated_scene_str = cJSON_Print(cj_scene);
+                    char* updated_scene_str = cJSON_Print(cj_scene);
                     cJSON_Delete(cj_scene);
 
                     if (updated_scene_str)
@@ -260,7 +259,7 @@ void scenes_notification_add(cJSON *cj_request, cJSON *cj_response)
 
             if (scene_id)
             {
-                l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+                l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
                 while (scene_node)
                 {
                     if (scene_id == scene_node->_id)
@@ -275,33 +274,33 @@ void scenes_notification_add(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
+void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_user_id_del = cJSON_GetObjectItem(cj_params, ezlopi_userId_str);
-        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_notifications_str);
+        cJSON* cj_user_id_del = cJSON_GetObjectItem(cj_params, ezlopi_userId_str);
+        cJSON* cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi_notifications_str);
 
         if (cj_scene_id && cj_scene_id->valuestring && cj_user_id_del && cj_user_id_del->valuestring)
         {
-            char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+            char* scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
             if (scene_str)
             {
-                cJSON *cj_scene = cJSON_Parse(scene_str);
+                cJSON* cj_scene = cJSON_Parse(scene_str);
                 free(scene_str);
 
                 if (cj_scene)
                 {
-                    cJSON *cj_user_notifications = cJSON_GetObjectItem(cj_scene, ezlopi_user_notifications_str);
+                    cJSON* cj_user_notifications = cJSON_GetObjectItem(cj_scene, ezlopi_user_notifications_str);
                     if (cj_user_notifications && cj_user_id_del)
                     {
                         uint32_t idx = 0;
-                        cJSON *cj_user_id = NULL;
+                        cJSON* cj_user_id = NULL;
                         while (NULL != (cj_user_id = cJSON_GetArrayItem(cj_user_notifications, idx)))
                         {
                             if (0 == strcmp(cj_user_id->valuestring, cj_user_id_del->valuestring))
@@ -313,7 +312,7 @@ void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
                     }
 
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char *updated_scene_str = cJSON_Print(cj_scene);
+                    char* updated_scene_str = cJSON_Print(cj_scene);
                     cJSON_Delete(cj_scene);
 
                     if (updated_scene_str)
@@ -327,26 +326,26 @@ void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
             uint32_t scene_id = strtoul(cj_scene_id->valuestring, NULL, 16);
             if (scene_id)
             {
-                l_scenes_list_v2_t *scene_node = ezlopi_scenes_get_scenes_head_v2();
+                l_scenes_list_v2_t* scene_node = ezlopi_scenes_get_scenes_head_v2();
                 while (scene_node)
                 {
                     if (scene_node->_id == scene_id)
                     {
                         if (0 == strcmp(scene_node->user_notifications->user_id, cj_user_id_del->valuestring))
                         {
-                            l_user_notification_v2_t *user_id_del = scene_node->user_notifications;
+                            l_user_notification_v2_t* user_id_del = scene_node->user_notifications;
                             scene_node->user_notifications = scene_node->user_notifications->next;
                             user_id_del->next = NULL;
                             ezlopi_scenes_delete_user_notifications(user_id_del);
                         }
                         else
                         {
-                            l_user_notification_v2_t *user_node = scene_node->user_notifications;
+                            l_user_notification_v2_t* user_node = scene_node->user_notifications;
                             while (user_node->next)
                             {
                                 if (0 == strcmp(user_node->user_id, cj_user_id_del->valuestring))
                                 {
-                                    l_user_notification_v2_t *user_id_del = user_node;
+                                    l_user_notification_v2_t* user_id_del = user_node;
                                     user_node = user_node->next;
                                     user_id_del->next = NULL;
                                     ezlopi_scenes_delete_user_notifications(user_id_del);
@@ -368,7 +367,7 @@ void scenes_notification_remove(cJSON *cj_request, cJSON *cj_response)
 
 /////////// updater for scene
 ////// useful for 'hub.scenes.enabled.set'
-void scene_changed(cJSON *cj_request, cJSON *cj_response)
+void scene_changed(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
@@ -377,13 +376,13 @@ void scene_changed(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_changed_str);
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_changed_by_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
 
-    cJSON *cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
+    cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        cJSON *cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
+        cJSON* cj_scene_id = cJSON_GetObjectItem(cj_params, ezlopi__id_str);
         if (cj_scene_id && cj_scene_id->valuestring)
         {
-            char *scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
+            char* scene_str = ezlopi_nvs_read_str(cj_scene_id->valuestring);
             if (scene_str)
             {
                 cJSON_AddRawToObject(cj_response, ezlopi_result_str, scene_str);
@@ -392,7 +391,7 @@ void scene_changed(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scene_added(cJSON *cj_request, cJSON *cj_response)
+void scene_added(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
@@ -400,10 +399,10 @@ void scene_added(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_added_str);
 
-    cJSON *new_scene_id = cJSON_GetObjectItem(cj_request, ezlopi__id_str);
+    cJSON* new_scene_id = cJSON_GetObjectItem(cj_request, ezlopi__id_str);
     if (new_scene_id && new_scene_id->valuestring)
     {
-        char *new_scene = ezlopi_nvs_read_str(new_scene_id->valuestring);
+        char* new_scene = ezlopi_nvs_read_str(new_scene_id->valuestring);
         if (new_scene)
         {
             cJSON_AddRawToObject(cj_response, ezlopi_result_str, new_scene);
@@ -412,7 +411,7 @@ void scene_added(cJSON *cj_request, cJSON *cj_response)
     }
 }
 
-void scene_deleted(cJSON *cj_request, cJSON *cj_response)
+void scene_deleted(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
     cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
@@ -421,7 +420,7 @@ void scene_deleted(cJSON *cj_request, cJSON *cj_response)
     cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, ezlopi_hub_scene_deleted_str);
 
     cJSON_AddItemReferenceToObject(cj_response, ezlopi_result_str, cJSON_GetObjectItem(cj_request, ezlopi_params_str));
-    cJSON *cj_result = cJSON_GetObjectItem(cj_response, ezlopi_result_str);
+    cJSON* cj_result = cJSON_GetObjectItem(cj_response, ezlopi_result_str);
     if (cj_result)
     {
         cJSON_AddBoolToObject(cj_result, ezlopi_syncNotification_str, true);

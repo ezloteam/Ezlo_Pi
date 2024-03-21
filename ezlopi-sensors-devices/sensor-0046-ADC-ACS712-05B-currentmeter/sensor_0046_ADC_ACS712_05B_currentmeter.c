@@ -84,8 +84,8 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.value_type = value_type_electric_current;
     item->cloud_properties.scale = scales_ampere;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
@@ -174,23 +174,21 @@ static int __0046_get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cjson_properties = (cJSON *)arg;
-        if (cjson_properties)
+        cJSON* cjson_properties = (cJSON*)arg;
+        s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
+        if (user_data)
         {
-            s_currentmeter_t* user_data = (s_currentmeter_t*)item->user_arg;
-            if (user_data)
+            cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, user_data->amp_value); // Irms [A]
+            char* valueFormatted = ezlopi_valueformatter_float(user_data->amp_value);
+            if (valueFormatted)
             {
-                cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, user_data->amp_value); // Irms [A]
-                char* valueFormatted = ezlopi_valueformatter_float(user_data->amp_value);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                ret = 1;
+                cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
+                free(valueFormatted);
             }
+            ret = 1;
         }
     }
+
     return ret;
 }
 

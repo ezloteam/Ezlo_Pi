@@ -63,7 +63,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
                 l_ezlopi_item_t *curr_item = curr_device->items;
                 while (curr_item)
                 {
-#warning "Needs works here"
+#warning "Needs works here [Krishna]"
                     cJSON *cj_device = cJSON_CreateObject();
                     if (cj_device)
                     {

@@ -118,12 +118,12 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     {
         s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX;
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
-        CJSON_GET_VALUE_INT(cj_device, "gpio4", user_data->TCS230_pin.gpio_s3);           // gpio_s3
-        CJSON_GET_VALUE_INT(cj_device, "gpio5", user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
-        CJSON_GET_VALUE_INT(cj_device, "gpio6", user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio4_str, user_data->TCS230_pin.gpio_s3);           // gpio_s3
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio5_str, user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio6_str, user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
     }
 }
 //------------------------------------------------------------------------------------------------------
@@ -224,9 +224,9 @@ static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* args)
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
                 cJSON* color_values = cJSON_AddObjectToObject(cj_result, ezlopi_value_str);
-                cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
-                cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
-                cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_red_str, user_data->red_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_green_str, user_data->green_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_blue_str, user_data->blue_mapped);
                 char* valueFormatted = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
                 if (valueFormatted)
                 {

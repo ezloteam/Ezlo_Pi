@@ -15,22 +15,26 @@
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
-static void ota_service_process(void* pv);
 static volatile bool __ota_busy = false;
-bool __get_ota_service_busy_state(void)
+
+static void ota_service_process(void* pv);
+
+bool ezlopi_service_ota_get_busy_state(void)
 {
     return __ota_busy;
 }
 
-void ota_service_init(void)
+void ezlopi_service_ota_init(void)
 {
     xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
 }
+
 static void ota_service_process(void* pv)
 {
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
     vTaskDelay(5000 / portTICK_RATE_MS);
+
     while (1)
     {
         __ota_busy = true;
@@ -52,7 +56,6 @@ static void ota_service_process(void* pv)
                 if (data_to_send)
                 {
                     cJSON_Minify(data_to_send);
-                    ret_ota = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                     if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
                     {
                         free(data_to_send);

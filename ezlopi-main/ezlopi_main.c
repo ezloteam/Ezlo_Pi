@@ -26,13 +26,29 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
 
-#if CONFIG_EZLOPI_BLE_ENABLE == 1
-#include "ezlopi_core_ble_config.h"
-#endif
+#include "pt.h"
 
-#define ENABLE_HEARTBIT_LED 0
+#define ENABLE_HEARTBIT_LED 1
 
-static void blinky(void* pv);
+static void __blinky(void* pv);
+static void __init_heartbeat_led(void);
+static void __toggle_heartbeat_led(void);
+
+static struct pt pt1;
+
+PT_THREAD(example(struct pt* pt))
+{
+    static uint32_t curr_ticks;
+    PT_BEGIN(pt);
+
+    while (1) {
+        curr_ticks = xTaskGetTickCount();
+        PT_WAIT_UNTIL(pt, (xTaskGetTickCount() - curr_ticks) > 1000);
+        __toggle_heartbeat_led();
+    }
+
+    PT_END(pt);
+}
 
 void app_main(void)
 {
@@ -48,51 +64,64 @@ void app_main(void)
     ezlopi_ble_service_init();
 #endif
 
-    ezlopi_scenes_meshbot_init();
     ezlopi_service_modes_init();
 
     ezlopi_service_ws_server_start();
     ezlopi_service_web_provisioning_init();
 
-    ota_service_init();
+    ezlopi_service_ota_init();
     ezlopi_service_broadcast_init();
 
-    xTaskCreate(blinky, "blinky", 2 * 2048, NULL, 1, NULL);
+    TRACE_D("starting meshbot-service");
+    ezlopi_scenes_meshbot_init();
+
+    xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
 }
 
-static void blinky(void* pv)
+static void __init_heartbeat_led(void)
 {
 #if (1 == ENABLE_HEARTBIT_LED)
     gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_2),
+        .pin_bit_mask = (1ULL << GPIO_NUM_1),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
 
-    uint32_t state = 0;
     gpio_config(&io_conf);
 #endif
+}
 
+static void __toggle_heartbeat_led(void) {
+#if (1 == ENABLE_HEARTBIT_LED)
+    static uint32_t state = 0;
+
+    state ^= 1;
+    gpio_set_level(GPIO_NUM_1, state);
+#endif
+}
+
+static void __blinky(void* pv)
+{
+    __init_heartbeat_led();
+
+    PT_INIT(&pt1);
     uint32_t count = 0;
+
     while (1)
     {
-#if (1 == ENABLE_HEARTBIT_LED)
-        state ^= 1;
-        gpio_set_level(GPIO_NUM_2, state);
-#endif
-
-        if (count++ > 10)
+        if (count++ > 1000)
         {
             count = 0;
 
-            TRACE_D("----------------------------------------------");
-            TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
-            TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
-            TRACE_D("----------------------------------------------");
+            trace_wb("----------------------------------------------");
+            trace_wb("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+            trace_wb("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+            trace_wb("----------------------------------------------");
         }
 
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(5 / portTICK_PERIOD_MS);
+        example(&pt1);
     }
-    }
+}

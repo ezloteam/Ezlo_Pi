@@ -3,7 +3,6 @@
 #include "ezlopi_core_ezlopi_broadcast.h"
 #include "ezlopi_core_scenes_status_changed.h"
 
-#include "ezlopi_service_webprov.h"
 
 int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const char* status_str)
 {
@@ -55,7 +54,7 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
             if (data_to_send)
             {
                 cJSON_Minify(data_to_send);
-                ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
+                // ret = ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(data_to_send, TRACE_TYPE_D);
                 if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send)) {
                     free(data_to_send);
                 }
@@ -68,7 +67,8 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
 
 const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
 {
-    const char* ret = "NULL";
+    const char* ret = "";
+#if (1 == ENABLE_TRACE)
     switch (scene_status)
     {
     case EZLOPI_SCENE_STATUS_RUN:
@@ -98,6 +98,7 @@ const char* ezlopi_scenes_status_to_string(e_scene_status_v2_t scene_status)
         break;
     }
     }
+#endif
 
     return ret;
 }

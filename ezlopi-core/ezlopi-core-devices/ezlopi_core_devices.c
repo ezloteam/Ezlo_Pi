@@ -12,7 +12,9 @@ static s_ezlopi_cloud_controller_t s_controller_information;
 
 static void ezlopi_device_parse_json_v3(cJSON* cj_config);
 static void ezlopi_device_free_single(l_ezlopi_device_t* device);
+#if (1 == ENABLE_TRACE)
 static void ezlopi_device_print_controller_cloud_information_v3(void);
+#endif
 
 static void ezlopi_device_free_item(l_ezlopi_item_t* items);
 static void ezlopi_device_free_setting(l_ezlopi_device_settings_v3_t* settings);
@@ -334,6 +336,7 @@ void ezlopi_device_prepare(void)
 }
 
 ///////// Print functions start here ////////////
+#if 0
 static void ezlopi_device_print_controller_cloud_information_v3(void)
 {
     TRACE_I("Armed: %d", s_controller_information.armed);
@@ -477,6 +480,7 @@ static void ezlopi_device_print_interface_type(l_ezlopi_item_t* item)
     }
     }
 }
+#endif
 //////////////////// Print functions end here /////////////////////////
 ///////////////////////////////////////////////////////////////////////
 
@@ -495,7 +499,7 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
             TRACE_I("Device-%d:", config_dev_idx);
 
             int id_item = 0;
-            CJSON_GET_VALUE_INT(cjson_device, ezlopi_id_item_str, id_item);
+            CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_id_item_str, id_item);
 
             if (0 != id_item)
             {
@@ -607,7 +611,7 @@ static void ezlopi_device_free_single(l_ezlopi_device_t* device)
 {
     if (device)
     {
-        TRACE_E("free single Device-ID: %08x", device->cloud_properties.device_id);    
+        TRACE_E("free single Device-ID: %08x", device->cloud_properties.device_id);
         if (device->items)
         {
             ezlopi_device_free_item(device->items);

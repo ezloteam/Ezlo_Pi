@@ -24,7 +24,7 @@ int ezlopi_scene_when_is_item_state(l_scenes_list_v2_t* scene_node, void* arg)
     {
         uint32_t item_id = 0;
         l_fields_v2_t* value_field = NULL;
-        #warning "Warning: armed check remains"
+        #warning "Warning: armed check remains [Krishna]"
 
             l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
@@ -655,15 +655,15 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "item", 4))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, strlen(ezlopi_item_str)))
             {
                 item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
-            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 4))
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, strlen(ezlopi_value_str)))
             {
                 value_field = curr_field;
             }
-            else if (0 == strncmp(curr_field->name, "comparator", 10))
+            else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, strlen(ezlopi_comparator_str)))
             {
                 comparator_field = curr_field;
             }
@@ -681,60 +681,49 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    //TRACE_W(" Compare_num_range ");
-    // TRACE_W("Warning: when-method 'compare_number_range' not implemented!");
     int ret = 0;
-    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
 
     if (when_block && scene_node)
     {
         uint32_t item_id = 0;
-
+        l_fields_v2_t* end_vlaue_field = NULL;
         l_fields_v2_t* start_value_field = NULL;
-        l_fields_v2_t* end_value_field = NULL;
-
-        l_fields_v2_t* comparator_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "item", 5))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 4))
             {
-                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
-                {
-                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                }
+                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
-            else if (0 == strncmp(curr_field->name, "comparator", 11))
+            else if (0 == strncmp(curr_field->name, ezlopi_startValue_str, strlen(ezlopi_startValue_str)))
             {
-                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
-                {
-                    comparator_field = curr_field;
-                }
+                start_value_field = curr_field;
             }
-            else if (0 == strncmp(curr_field->name, "startValue", 11))
+            else if (0 == strncmp(curr_field->name, ezlopi_endValue_str, strlen(ezlopi_endValue_str)))
             {
-                start_value_field = curr_field;//contains the 'type' , 'value' & 'scale'
+                end_vlaue_field = curr_field;
             }
-            else if (0 == strncmp(curr_field->name, "endValue", 9))
-            {
-                end_value_field = curr_field;//contains the 'type' , 'value' & 'scale'
-            }
+
             curr_field = curr_field->next;
         }
 
-        if (item_id && start_value_field && end_value_field && comparator_field)
+        if (item_id && end_vlaue_field && start_value_field)
         {
-            // check if both 'value_type' and 'scales' match.
-            if ((start_value_field->value_type == end_value_field->value_type) &&
-                (0 == strcmp(start_value_field->scale, end_value_field->scale)))
+            double double_item_value = ezlopi_core_scenes_operator_get_item_double_value_current(item_id);
+            if ((start_value_field->field_value.u_value.value_double <= double_item_value) &&
+                (end_vlaue_field->field_value.u_value.value_double >= double_item_value))
             {
-                ret = ezlopi_scenes_operators_value_number_range_operations(item_id, start_value_field, end_value_field, comparator_field);
+                ret = 1;
             }
         }
+        else
+        {
+            TRACE_E("error args");
+        }
     }
-    // #endif
+
     return ret;
 }
 

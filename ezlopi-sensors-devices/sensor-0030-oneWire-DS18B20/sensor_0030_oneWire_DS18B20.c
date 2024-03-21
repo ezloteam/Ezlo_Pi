@@ -147,7 +147,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 
 static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -158,7 +158,7 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ONEWIRE_MASTER;
 
     item->interface.onewire_master.enable = true;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.onewire_master.onewire_pin);
 }
 
 static int __prepare(void* arg)

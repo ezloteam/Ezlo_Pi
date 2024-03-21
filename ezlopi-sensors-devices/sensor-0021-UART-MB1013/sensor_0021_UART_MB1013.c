@@ -172,9 +172,9 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_devic
 static void __setup_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_baud_rate_str, item->interface.uart.baudrate);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_rate_str, item->interface.uart.baudrate);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
 }
 
 static int __prepare(void* arg)

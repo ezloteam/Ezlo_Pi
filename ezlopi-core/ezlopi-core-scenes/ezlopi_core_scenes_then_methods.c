@@ -33,7 +33,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 {
                     cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
+                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
 
                     // cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     // item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
@@ -76,11 +76,13 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                     }
                     curr_item = curr_item->next;
                 }
+
                 if (found_item)
                 {
-                    TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
+                    // TRACE_D("\r\n\r\n FOUND DEVICE \r\n\r\n");
                     break;
                 }
+
                 curr_device = curr_device->next;
             }
         }
@@ -128,7 +130,7 @@ int ezlopi_scene_then_set_device_armed(l_scenes_list_v2_t* curr_scene, void* arg
                         s_ezlopi_cloud_controller_t* controller_info = ezlopi_device_get_controller_information();
                         if (controller_info)
                         {
-                            #warning "we need to change from 'controller' to 'device_id' specific"
+                            #warning "we need to change from 'controller' to device-specific [krishna]"
                                 controller_info->armed = (device_armed) ? true : false;
                         }
                         break;
@@ -284,6 +286,7 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
             }
             curr_field = curr_field->next;
         }
+
         if (execute_else_condition)
         {
             TRACE_D("Executing else condition");

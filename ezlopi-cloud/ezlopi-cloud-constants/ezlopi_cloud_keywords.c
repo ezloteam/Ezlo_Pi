@@ -83,6 +83,8 @@ const char* ezlopi_firmware_version_str = "firmware_version";
 const char* ezlopi_uptime_str = "uptime";
 const char* ezlopi_mac_str = "mac";
 const char* ezlopi_uuid_str = "uuid";
+const char* ezlopi_cloud_uuid_str = "cloud_uuid";
+const char* ezlopi_config_version_str = "config_version";
 const char* ezlopi_firmware_type_str = "firmware_type";
 const char* ezlopi_deviceTypeId_str = "deviceTypeId";
 const char* ezlopi_parentDeviceId_str = "parentDeviceId";
@@ -172,6 +174,7 @@ const char* ezlopi_cloud_server_str = "cloud_server";
 const char* ezlopi_provision_token_str = "provision_token";
 const char* ezlopi_device_type_ezlopi_str = "device_type_ezlopi";
 const char* ezlopi_ssl_private_key_str = "ssl_private_key";
+const char* ezlopi_ssl_public_key_str = "ssl_public_key";
 const char* ezlopi_ssl_shared_key_str = "ssl_shared_key";
 const char* ezlopi_signing_ca_certificate_str = "signing_ca_certificate";
 const char* ezlopi_len_str = "len";
@@ -201,9 +204,16 @@ const char* ezlopi_uuid_prov_str = "uuid_prov";
 const char* ezlopi_status_write_str = "status_write";
 const char* ezlopi_status_connect_str = "status_connect";
 const char* ezlopi_first_start_str = "first_start";
+
 const char* ezlopi_gpio1_str = "gpio1";
 const char* ezlopi_gpio2_str = "gpio2";
 const char* ezlopi_gpio3_str = "gpio3";
+const char* ezlopi_gpio4_str = "gpio4";
+const char* ezlopi_gpio5_str = "gpio5";
+const char* ezlopi_gpio6_str = "gpio6";
+const char* ezlopi_gpio7_str = "gpio7";
+const char* ezlopi_gpio8_str = "gpio8";
+
 const char* ezlopi_gpio_tx_str = "gpio_tx";
 const char* ezlopi_gpio_rx_str = "gpio_rx";
 const char* ezlopi_baud_str = "baud";
@@ -217,14 +227,15 @@ const char* scene_status_partially_finished_str = "partially_finished";
 const char* scene_status_failed_str = "failed";
 const char* scene_status_stopped_str = "stopped";
 
-const char* ezlopi_valueformatted_str = "valueFormatted";
-const char* ezlopi_value_default_str = "valueDefault";
+// const char* ezlopi_valueformatted_str = "valueFormatted";
+const char* ezlopi_valueDefault_str = "valueDefault";
 const char* ezlopi_text_str = "text";
 const char* ezlopi_lang_tag_str = "lang_tag";
 const char* ezlopi_description_str = "description";
-const char* ezlopi_value_min_str = "valueMin";
-const char* ezlopi_value_max_str = "valueMax";
+const char* ezlopi_valueMin_str = "valueMin";
+const char* ezlopi_valueMax_str = "valueMax";
 const char* ezlopi_idle_str = "idle";
+const char* ezlopi_is_active_str = "is_active";
 
 const char* ezlopi_armed_str = "armed";
 const char* ezlopi_subtype_str = "subtype";
@@ -268,5 +279,37 @@ const char* ezlopi_Vacation_str = "Vacation";
 const char* ezlopi_houseMode_str = "houseMode";
 
 const char* ezlopi_client_id_str = "client_id";
+
+const char* ezlopi_endValue_str = "endValue";
+const char* ezlopi_startValue_str = "startValue";
+const char* ezlopi_item_str = "item";
+const char* ezlopi_comparator_str = "comparator";
+const char* ezlopi_scenes_str = "scenes";
+
+const char* ezlopi_logic_inv_str = "logic_inv";
+const char* ezlopi_duty_cycle_str = "duty_cycle";
+const char* ezlopi_freq_hz_str = "freq_hz";
+const char* ezlopi_slave_addr_str = "slave_addr";
+const char* ezlopi_pull_up_str = "pull_up";
+
+const char* ezlopi_red_str = "red";
+const char* ezlopi_green_str = "green";
+const char* ezlopi_blue_str = "blue";
+const char* ezlopi_cwhite_str = "cwhite";
+
+const char* ezlopi_minValue_str = "minValue";
+const char* ezlopi_maxValue_str = "maxValue";
+
+const char* ezlopi_confidence_level_str = "confidence_level";
+const char* ezlopi_elementType_str = "elementType";
+
+const char* ezlopi_min_move_distance_str = "min_move_distance";
+const char* ezlopi_max_move_distance_str = "max_move_distance";
+const char* ezlopi_min_still_distance_str = "min_still_distance";
+const char* ezlopi_max_still_distance_str = "max_still_distance";
+const char* ezlopi_timeout_str = "timeout";
+
+const char* ezlopi_latitude_str = "latitude";
+const char* ezlopi_longitude_str = "longitude";
 
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

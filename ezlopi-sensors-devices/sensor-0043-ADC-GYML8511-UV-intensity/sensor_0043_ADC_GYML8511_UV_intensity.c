@@ -90,7 +90,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     if (item && cj_device)
     {
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
         item->interface.adc.resln_bit = 3;
     }
 }
@@ -188,8 +188,8 @@ static int __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (user_data)
             {
                 char* valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
                 // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
                 free(valueFormatted);
 

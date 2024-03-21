@@ -71,7 +71,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 
 static void __prepare_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
@@ -82,9 +82,9 @@ static void __prepare_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, 
     {
         item->interface.i2c_master.enable = true;
         item->interface.i2c_master.clock_speed = 100000;
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-        CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
     }
     else
     {
@@ -232,7 +232,7 @@ static int __init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        bme680_data_t *user_data = (bme680_data_t *)item->user_arg;
+        bme680_data_t* user_data = (bme680_data_t*)item->user_arg;
         if (user_data)
         {
             if (item->interface.i2c_master.enable)
@@ -256,16 +256,16 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON *cj_device = (cJSON *)arg;
+        cJSON* cj_device = (cJSON*)arg;
         if (cj_device)
         {
-            bme680_data_t *user_data = (bme680_data_t *)item->user_arg;
+            bme680_data_t* user_data = (bme680_data_t*)item->user_arg;
             if (user_data)
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
                     cJSON_AddNumberToObject(cj_device, ezlopi_value_str, user_data->temperature);
-                    char *valueFormatted = ezlopi_valueformatter_float(user_data->temperature);
+                    char* valueFormatted = ezlopi_valueformatter_float(user_data->temperature);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -275,7 +275,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
                 {
                     cJSON_AddNumberToObject(cj_device, ezlopi_value_str, user_data->humidity);
-                    char *valueFormatted = ezlopi_valueformatter_float(user_data->humidity);
+                    char* valueFormatted = ezlopi_valueformatter_float(user_data->humidity);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -285,7 +285,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 else if (ezlopi_item_name_atmospheric_pressure == item->cloud_properties.item_name)
                 {
                     cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->pressure / 1000.0));
-                    char *valueFormatted = ezlopi_valueformatter_float(user_data->pressure / 1000.0);
+                    char* valueFormatted = ezlopi_valueformatter_float(user_data->pressure / 1000.0);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -295,7 +295,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 else if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
                 {
                     cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->iaq));
-                    char *valueFormatted = ezlopi_valueformatter_float(user_data->iaq);
+                    char* valueFormatted = ezlopi_valueformatter_float(user_data->iaq);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -305,7 +305,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 else if (ezlopi_item_name_distance == item->cloud_properties.item_name)
                 {
                     cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->altitude));
-                    char *valueFormatted = ezlopi_valueformatter_float(user_data->altitude);
+                    char* valueFormatted = ezlopi_valueformatter_float(user_data->altitude);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -315,7 +315,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 else if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
                 {
                     cJSON_AddNumberToObject(cj_device, ezlopi_value_str, (user_data->co2_equivalent));
-                    char *valueFormatted = ezlopi_valueformatter_float(user_data->co2_equivalent);
+                    char* valueFormatted = ezlopi_valueformatter_float(user_data->co2_equivalent);
                     if (valueFormatted)
                     {
                         cJSON_AddStringToObject(cj_device, ezlopi_valueFormatted_str, valueFormatted);
@@ -333,7 +333,7 @@ static int __notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        bme680_data_t *user_data = (bme680_data_t *)item->user_arg;
+        bme680_data_t* user_data = (bme680_data_t*)item->user_arg;
         if (user_data)
         {
             float temperature = user_data->temperature;

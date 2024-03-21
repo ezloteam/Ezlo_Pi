@@ -125,7 +125,7 @@ static void ezlopi_ota_process(void* pv)
     }
 #endif
 
-    if (true == __get_ota_service_busy_state())
+    if (true == ezlopi_service_ota_get_busy_state())
     {
         __ota_in_process = EZLOPI_OTA_STATE_UPDATING;
     }

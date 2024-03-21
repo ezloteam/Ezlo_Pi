@@ -96,7 +96,7 @@ static void __setup_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_devic
 
         item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
         item->interface.adc.resln_bit = 3;
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     }
 }
 
@@ -175,8 +175,8 @@ static int _get_item_list(l_ezlopi_item_t* item, void* arg)
             }
             cJSON_AddItemToObject(cj_result, ezlopi_enum_str, json_array_enum);
         }
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
 
@@ -189,8 +189,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     cJSON* cj_result = (cJSON*)arg;
     if (cj_result && item)
     {
-        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : "no_light");
+        cJSON_AddStringToObject(cj_result, ezlopi_value_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
+        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ((char*)item->user_arg) ? item->user_arg : light_alarm_states[0]);
         ret = 1;
     }
     return ret;
@@ -204,14 +204,14 @@ static int __notify(l_ezlopi_item_t* item)
         s_ezlopi_analog_data_t ezlopi_analog_data = { .value = 0, .voltage = 0 };
         ezlopi_adc_get_adc_data(item->interface.adc.gpio_num, &ezlopi_analog_data);
         TRACE_I("Value is: %d, voltage is: %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-        char* curr_ldr_state = NULL;
+        const char* curr_ldr_state = NULL;
         if (((float)(4096 - ezlopi_analog_data.value) / 4096.0f) > 0.5f) // pot_val : [100% - 30%]
         {
-            curr_ldr_state = "no_light"; // no light
+            curr_ldr_state = light_alarm_states[0]; // no light
         }
         else
         {
-            curr_ldr_state = "light_detected"; // light detected
+            curr_ldr_state = light_alarm_states[1]; // light detected
         }
         if (curr_ldr_state != (char*)item->user_arg)
         {

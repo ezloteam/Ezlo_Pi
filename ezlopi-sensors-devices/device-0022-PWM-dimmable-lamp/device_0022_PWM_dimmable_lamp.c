@@ -84,7 +84,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int value = 0;
-                CJSON_GET_VALUE_INT(device_details, ezlopi_value_str, value);
+                CJSON_GET_VALUE_DOUBLE(device_details, ezlopi_value_str, value);
                 int target_value = (int)ceil(((value * 4095.0) / 100.0));
                 ezlopi_pwm_change_duty(item->interface.pwm.channel, item->interface.pwm.speed_mode, target_value);
                 dimmable_bulb_arg->previous_brightness_value = dimmable_bulb_arg->current_brightness_value;
@@ -95,7 +95,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 bool switch_state = false;
-                CJSON_GET_VALUE_INT(device_details, ezlopi_value_str, switch_state);
+                CJSON_GET_VALUE_DOUBLE(device_details, ezlopi_value_str, switch_state);
                 dimmable_bulb_arg->previous_brightness_value = (false == switch_state) ? dimmable_bulb_arg->current_brightness_value : dimmable_bulb_arg->previous_brightness_value;
                 dimmable_bulb_arg->current_brightness_value = (false == switch_state) ? 0 : (0 == dimmable_bulb_arg->previous_brightness_value ? 4095 : dimmable_bulb_arg->previous_brightness_value);
                 ezlopi_pwm_change_duty(dimmable_bulb_arg->item_dimmer->interface.pwm.channel, dimmable_bulb_arg->item_dimmer->interface.pwm.speed_mode, dimmable_bulb_arg->current_brightness_value);
@@ -126,8 +126,8 @@ static int __list_cjson_value(l_ezlopi_item_t* item, void* arg)
                 cJSON_AddStringToObject(param, ezlopi_valueFormatted_str, formatted_val);
                 free(formatted_val);
             }
-            cJSON_AddNumberToObject(param, "minValue", 0);
-            cJSON_AddNumberToObject(param, "maxValue", 100);
+            cJSON_AddNumberToObject(param, ezlopi_minValue_str, 0);
+            cJSON_AddNumberToObject(param, ezlopi_maxValue_str, 100);
         }
         else if (ezlopi_item_name_dimmer_up == item->cloud_properties.item_name)
         {
@@ -289,7 +289,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 
 static void __prepare_dimmer_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -298,15 +298,15 @@ static void __prepare_dimmer_item_properties(l_ezlopi_item_t* item, cJSON* cj_de
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
 static void __prepare_dimmer_up_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -315,15 +315,15 @@ static void __prepare_dimmer_up_item_properties(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
 static void __prepare_dimmer_down_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -332,15 +332,15 @@ static void __prepare_dimmer_down_item_properties(l_ezlopi_item_t* item, cJSON* 
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 
 static void __prepare_dimmer_stop_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = true;
     item->cloud_properties.show = true;
@@ -349,9 +349,9 @@ static void __prepare_dimmer_stop_item_properties(l_ezlopi_item_t* item, cJSON* 
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.scale = NULL;
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
-    CJSON_GET_VALUE_INT(cj_device, "duty_cycle", item->interface.pwm.duty_cycle);
-    CJSON_GET_VALUE_INT(cj_device, "freq_hz", item->interface.pwm.freq_hz);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_duty_cycle_str, item->interface.pwm.duty_cycle);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_freq_hz_str, item->interface.pwm.freq_hz);
     item->interface.pwm.pwm_resln = 12;
 }
 

@@ -102,17 +102,17 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         item->interface.adc.resln_bit = 3;
         if (ezlopi_item_name_acceleration_x_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.adc.gpio_num);
             TRACE_S("Accel X-axis gpio1: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
             TRACE_S("Accel Y-axis gpio2: %d ", item->interface.adc.gpio_num);
         }
         else if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
         {
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, item->interface.adc.gpio_num);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, item->interface.adc.gpio_num);
             TRACE_S("Accel Z-axis gpio3: %d ", item->interface.adc.gpio_num);
         }
     }
@@ -180,7 +180,7 @@ static int __0028_init(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
+        s_gy61_data_t* user_data = (s_gy61_data_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(item->interface.adc.gpio_num))
@@ -227,7 +227,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->x_data));
                 // TRACE_I("x-axis-G : %.2f", user_data->x_data);
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->x_data);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -238,7 +238,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->y_data));
                 // TRACE_I("y-axis-G : %.2f", user_data->y_data);
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->y_data);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -249,7 +249,7 @@ static int __0028_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->z_data));
                 // TRACE_I("z-axis-G : %.2f", user_data->z_data);
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
+                char* valueFormatted = ezlopi_valueformatter_float(user_data->z_data);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -267,7 +267,7 @@ static int __0028_notify(l_ezlopi_item_t* item)
     int ret = 0;
     if (item)
     {
-        s_gy61_data_t *user_data = (s_gy61_data_t *)item->user_arg;
+        s_gy61_data_t* user_data = (s_gy61_data_t*)item->user_arg;
         if (user_data)
         {
             float new_value = 0;

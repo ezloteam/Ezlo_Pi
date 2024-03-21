@@ -11,7 +11,7 @@
 #include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_service_modes.h"
-#include "ezlopi_service_webprov.h"
+// #include "ezlopi_service_webprov.h"
 
 static TaskHandle_t sg_process_handle = NULL;
 
@@ -91,7 +91,7 @@ static void __modes_service(void* pv)
 
                             if (update_str)
                             {
-                                ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(update_str, TRACE_TYPE_I);
+                                // ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(update_str, TRACE_TYPE_I);
                                 if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(update_str)) {
                                     free(update_str);
                                 }

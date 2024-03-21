@@ -192,9 +192,9 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
         server_packet_t* user_data = (server_packet_t*)item->user_arg;
         if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id) // while initialization; setup only once (during Match item setup)
         {
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, item->interface.uart.tx);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.uart.rx);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, user_data->intr_pin);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, item->interface.uart.tx);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, item->interface.uart.rx);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, user_data->intr_pin);
             item->interface.uart.baudrate = FINGERPRINT_UART_BAUDRATE;
             item->interface.uart.enable = true;
         }
@@ -362,10 +362,10 @@ static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION] == item->cloud_properties.item_id) // match
             {
                 cJSON* cj_value = cJSON_CreateObject();
-                cJSON_AddNumberToObject(cj_value, "id", user_data->matched_id);
-                cJSON_AddNumberToObject(cj_value, "confidence_level", user_data->matched_confidence_level);
+                cJSON_AddNumberToObject(cj_value, ezlopi_id_str, user_data->matched_id);
+                cJSON_AddNumberToObject(cj_value, ezlopi_confidence_level_str, user_data->matched_confidence_level);
                 cJSON_AddItemToObject(cj_result, ezlopi_value_str, cj_value);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi__str);
             }
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL] == item->cloud_properties.item_id) // enroll
             {
@@ -373,17 +373,17 @@ static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
                 if (user_data->opmode != FINGERPRINT_ENROLLMENT_MODE)
                 {
                     cJSON_AddFalseToObject(cj_result, ezlopi_value_str);
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "false");
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi_false_str);
                 }
                 else
                 {
                     cJSON_AddTrueToObject(cj_result, ezlopi_value_str);
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "true");
+                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi_true_str);
                 }
             }
             if (user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS] == item->cloud_properties.item_id) // erase or list
             {
-                cJSON_AddStringToObject(cj_result, "elementType", "int");
+                cJSON_AddStringToObject(cj_result, ezlopi_elementType_str, value_type_int);
                 cJSON* cj_value_array = cJSON_AddArrayToObject(cj_result, ezlopi_value_str);
 
                 for (int idx = 1; idx <= FINGERPRINT_MAX_CAPACITY_LIMIT; idx++)
@@ -393,7 +393,7 @@ static int __0066_get_value_cjson(l_ezlopi_item_t* item, void* arg)
                         cJSON_AddItemToArray(cj_value_array, cJSON_CreateNumber(idx));
                     }
                 }
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, "");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, ezlopi__str);
             }
             user_data->notify_flag = false;
         }
@@ -454,6 +454,7 @@ static int __0066_set_value(l_ezlopi_item_t* item, void* arg)
                         for (uint16_t i = 0; i < value_array_size; i++) // eg. first protect => [2,4,5]
                         {
                             cJSON* fp_id = cJSON_GetArrayItem(cj_value_ids, i);
+
                             TRACE_S("Protected ID:[#%d]", (fp_id->valueint));
                             user_data->protect[fp_id->valueint] = true; // eg. protect this ID -> 2/4/5
                         }
