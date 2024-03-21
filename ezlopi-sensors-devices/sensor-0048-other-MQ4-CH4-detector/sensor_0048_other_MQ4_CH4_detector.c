@@ -101,8 +101,12 @@ static int __0048_prepare(void* arg)
             if (MQ4_item_digi)
             {
                 ret = 1;
-                MQ4_item_digi->cloud_properties.device_id = MQ4_device_parent_digi->cloud_properties.device_id;
+                // MQ4_item_digi->cloud_properties.device_id = MQ4_device_parent_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ4_item_digi, device_prep_arg->cjson_device);
+            }
+            else
+            {
+                ret = -1;
             }
             //---------------------------- ADC - DEVICE 2 -------------------------------------------
 
@@ -113,7 +117,7 @@ static int __0048_prepare(void* arg)
                 l_ezlopi_device_t* MQ4_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
                 if (MQ4_device_child_adc)
                 {
-                    TRACE_I("Child_MQ4_device_adc[0x%x] ", MQ4_device_child_adc->cloud_properties.device_id);
+                    TRACE_I("Child_MQ4_device_adc-[0x%x] ", MQ4_device_child_adc->cloud_properties.device_id);
                     __prepare_device_adc_cloud_properties_child_adc(MQ4_device_child_adc, device_prep_arg->cjson_device);
 
                     MQ4_device_child_adc->cloud_properties.parent_device_id = MQ4_device_parent_digi->cloud_properties.device_id;// assigning parent_device_id to child_device
@@ -121,7 +125,7 @@ static int __0048_prepare(void* arg)
                     if (MQ4_item_adc)
                     {
                         ret = 1;
-                        MQ4_item_adc->cloud_properties.device_id = MQ4_device_child_adc->cloud_properties.device_id;
+                        // MQ4_item_adc->cloud_properties.device_id = MQ4_device_child_adc->cloud_properties.device_id;
                         __prepare_item_adc_cloud_properties(MQ4_item_adc, device_prep_arg->cjson_device, MQ4_value);
                     }
                     else
@@ -265,6 +269,7 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
 
     // passing the custom data_structure
     item->user_arg = user_data;
+    item->is_user_arg_unique = true; // since 'item->user_arg' exist in only one-child [item_adc]
 }
 
 //------------------------------------------------------------------------------------------------------

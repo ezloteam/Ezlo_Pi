@@ -75,7 +75,7 @@ void ezlopi_init(void)
     EZPI_core_init_mdns();
 }
 
-l_ezlopi_device_t* get_next_parent_id(uint32_t target_to_clear_parent_id)
+l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)
 {
     l_ezlopi_device_t* pre_devs = ezlopi_device_get_head();
     while (pre_devs)
@@ -115,7 +115,7 @@ static void ezlopi_initialize_devices_v3(void)
             }
             curr_item = curr_item->next;
         }
-        TRACE_D("ret = %d", device_init_ret);
+        // TRACE_D("ret = %d", device_init_ret);
         if (0 > device_init_ret)
         {
             device_init_ret = 0;
@@ -126,7 +126,7 @@ static void ezlopi_initialize_devices_v3(void)
                 curr_device->cloud_properties.device_id == curr_device->next->cloud_properties.parent_device_id)
             {
                 /* if 'device_to_free' is parent_with_child_nodes */
-                curr_device = get_next_parent_id(curr_device->cloud_properties.device_id);
+                curr_device = link_next_parent_id(curr_device->cloud_properties.device_id);
             }
             else
             {

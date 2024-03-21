@@ -180,14 +180,14 @@ extern "C"
                 \"dev_name\": \"Water_leak\",\
                 \"id_room\": \"\",\
                 \"id_item\": 27,\
-                \"gpio\": 25\
+                \"gpio\": 32\
             },\
             {\
                 \"dev_type\": 10,\
                 \"dev_name\": \"MQ4_CH4\",\
                 \"id_item\": 48,\
                 \"id_room\": \"\",\
-                \"gpio1\": 10,\
+                \"gpio1\": 25,\
                 \"gpio2\": 33\
             },\
             {\
@@ -202,11 +202,14 @@ extern "C"
                 \"slave_addr\": 13\
             },\
             {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"soil_moisture\",\
+                 \"dev_type\": 10,\
+                \"dev_name\": \"2Axis_Joystick\",\
                 \"id_room\": \"\",\
-                \"id_item\": 32,\
-                \"gpio\": 34\
+                \"id_item\": 20,\
+                \"gpio1\": 34,\
+                \"gpio2\": 35,\
+                \"gpio3\": 15,\
+                \"resln_bit\": 3\
             }\
         ], \
         \"dev_total\": 5}";

@@ -36,7 +36,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         sensor-0017-ADC-potentiometer
         sensor-0018-other-internal-hall-effect
         # sensor-0019-digitalIn-PIR
-        # sensor-0020-other-2axis-joystick
+        sensor-0020-other-2axis-joystick
         # sensor-0021-UART-MB1013
         # device-0022-PWM-dimmable-lamp
         # sensor-0023-digitalIn-touch-switch-TTP223B

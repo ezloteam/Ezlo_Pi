@@ -142,6 +142,7 @@ typedef struct l_ezlopi_item
     } interface;
 
     void* user_arg;
+    bool is_user_arg_unique;
     int (*func)(e_ezlopi_actions_t action, struct l_ezlopi_item* item, void* arg, void* user_arg);
 
     struct l_ezlopi_item* next;

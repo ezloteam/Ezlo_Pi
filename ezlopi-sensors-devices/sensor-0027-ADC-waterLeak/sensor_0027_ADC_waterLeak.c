@@ -107,23 +107,27 @@ static int __prepare(void* arg)
         cJSON* cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
-            if (device)
+            l_ezlopi_device_t* parent_device = ezlopi_device_add_device(prep_arg->cjson_device);
+            if (parent_device)
             {
-                prepare_device_cloud_properties(device, cj_device);
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0027_ADC_waterLeak);
+                prepare_device_cloud_properties(parent_device, cj_device);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(parent_device, sensor_0027_ADC_waterLeak);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // item->cloud_properties.device_id = parent_device->cloud_properties.device_id;
                     prepare_item_cloud_properties(item, cj_device);
                     prepare_item_interface_properties(item, cj_device);
                     ret = 1;
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    ezlopi_device_free_device(parent_device);
                     ret = -1;
                 }
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }

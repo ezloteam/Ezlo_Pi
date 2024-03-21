@@ -22,7 +22,7 @@
 #endif // CONFIG_IDF_TARGET_ESP32
 
 // #include "sensor_0019_digitalIn_PIR.h"
-// #include "sensor_0020_other_2axis_joystick.h"
+#include "sensor_0020_other_2axis_joystick.h"
 // #include "sensor_0021_UART_MB1013.h"
 // #include "device_0022_PWM_dimmable_lamp.h"
 // #include "sensor_0023_digitalIn_touch_switch_TTP223B.h"

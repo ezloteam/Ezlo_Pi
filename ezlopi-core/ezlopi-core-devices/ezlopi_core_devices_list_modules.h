@@ -30,7 +30,7 @@ EZLOPI_DEVICE_LIST("sensor-Hall-effect                  ", 18, sensor_0018_other
 #endif // CONFIG_IDF_TARGET_ESP32
 
 // EZLOPI_DEVICE_LIST("sensor-PIR-digital-proximity        ", 19, sensor_0019_digitalIn_PIR)
-// EZLOPI_DEVICE_LIST("sensor-2AXIS-JOYSTICK               ", 20, sensor_0020_other_2axis_joystick)
+EZLOPI_DEVICE_LIST("sensor-2AXIS-JOYSTICK               ", 20, sensor_0020_other_2axis_joystick)
 // EZLOPI_DEVICE_LIST("sensor-UART-MB1013                  ", 21, sensor_0021_UART_MB1013)
 
 // EZLOPI_DEVICE_LIST("device-PWM-dimmable-lamp            ", 22, device_0022_PWM_dimmable_lamp)

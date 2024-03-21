@@ -174,13 +174,12 @@ static void ezlopi_device_clear_bottom_children(l_ezlopi_device_t* curr_node, ui
         {
             ezlopi_device_clear_bottom_children(curr_node->next, compare_parent_id);
         }
-
         l_ezlopi_device_t* curr_device = l_device_head;
         while (curr_device->next)
         {
             if (curr_device->next == curr_node)
             {
-                TRACE_D("Removed: Tree-Device-ID: %08x", curr_device->next->cloud_properties.device_id);
+                TRACE_E("tree_member_id: %08x", curr_device->next->cloud_properties.device_id);
 
                 l_ezlopi_device_t* free_device = curr_device->next;
                 curr_device->next = curr_device->next->next;
@@ -200,12 +199,13 @@ static void ezlopi_device_free_parent_tree(l_ezlopi_device_t* parent_device, uin
         /*Clearing only the child nodes first*/
         ezlopi_device_clear_bottom_children(parent_device, parent_dev_id);
 
-        l_ezlopi_device_t* prefinal_list = ezlopi_device_get_head();
-        while (prefinal_list)
-        {
-            TRACE_W("prefinal_list : [0x%x], parent [0x%x] ", prefinal_list->cloud_properties.device_id, prefinal_list->cloud_properties.parent_device_id);
-            prefinal_list = prefinal_list->next;
-        }
+        /*Display the latest list*/
+        // l_ezlopi_device_t* prefinal_list = ezlopi_device_get_head();
+        // while (prefinal_list)
+        // {
+        //     TRACE_W("prefinal_list : [0x%x], parent [0x%x] ", prefinal_list->cloud_properties.device_id, prefinal_list->cloud_properties.parent_device_id);
+        //     prefinal_list = prefinal_list->next;
+        // }
     }
 }
 
@@ -213,25 +213,22 @@ void ezlopi_device_free_device(l_ezlopi_device_t* device)
 {
     if (device && l_device_head)
     {
-        /*First identify if it is parent or child device*/
         if ((NULL != device->next) &&
             device->cloud_properties.device_id == device->next->cloud_properties.parent_device_id &&
-            device->cloud_properties.parent_device_id == 0) /*for clearing the whole parent_tree_nodes*/
+            device->cloud_properties.parent_device_id == 0)
         {
-            // TRACE_D("PARENT_TREE_ID: [%#x]", device->cloud_properties.device_id);
+            TRACE_W("PARENT_TREE_ID: [%#x]", device->cloud_properties.device_id);
+
             ezlopi_device_free_parent_tree(device, device->cloud_properties.device_id);
         }
         else
         {
-            /*for clearing only single tree nodes*/
             if (l_device_head == device)
             {
                 l_device_head = l_device_head->next;
                 device->next = NULL;
-
                 TRACE_D("Head Device-ID: %08x", device->cloud_properties.device_id);
                 ezlopi_device_free_single(device);
-
             }
             else
             {
@@ -248,11 +245,9 @@ void ezlopi_device_free_device(l_ezlopi_device_t* device)
                         ezlopi_device_free_single(free_device);
                         break;
                     }
-
                     curr_device = curr_device->next;
                 }
             }
-
         }
     }
 }
@@ -630,25 +625,20 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
 
 static void ezlopi_device_free_item(l_ezlopi_item_t* items)
 {
-    // static uint32_t prev_item_user_arg_addr = 0; // all recusive functions utilize the same 'prev_item_user_arg_addr'
     if (items)
     {
         if (NULL != (items->next))
         {
             ezlopi_device_free_item(items->next);
         }
-
-        // if (NULL != (items->user_arg))
-        // {
-        //     if ((int)(items->user_arg) != prev_item_user_arg_addr)
-        //     {
-        //         TRACE_D("...item->user_arg: [prev:%d-> curr:%d]", prev_item_user_arg_addr, (int)items->user_arg);
-        //         prev_item_user_arg_addr = (int)items->user_arg;
-        //         TRACE_I("free item");
-        //         free(items->user_arg);
-        //         items->user_arg = NULL;
-        //     }
-        // }
+        // now start to clear each node from 'bottom-up'
+        if (NULL != (items->user_arg) && (true == items->is_user_arg_unique))
+        {
+            TRACE_D("free :- 'item->user_arg' ");
+            free(items->user_arg);
+            items->user_arg = NULL;
+        }
+        TRACE_I("free item");
         free(items);
     }
 }
@@ -671,19 +661,9 @@ static void ezlopi_device_free_single(l_ezlopi_device_t* device)
     {
         if (NULL != (device->items))
         {
-            // if (device->cloud_properties.device_id == device->next->cloud_properties.parent_device_id &&
-            //     device->cloud_properties.parent_device_id == 0)
-            // {
-            //     ezlopi_device_free_item(device->items);
-            // }
-            // else
-            // {
             ezlopi_device_free_item(device->items);
-            // }
-
             device->items = NULL;
         }
-
 
         // if (device->settings)
         // {
@@ -700,7 +680,7 @@ static void ezlopi_device_free_single(l_ezlopi_device_t* device)
         //     device->cloud_properties.info = NULL;
         // }
 
-        // TRACE_S("free...device");
+        TRACE_S("free...device");
         free(device);
     }
 }
