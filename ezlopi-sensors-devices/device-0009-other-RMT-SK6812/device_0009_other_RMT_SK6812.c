@@ -79,45 +79,37 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     if (item && arg)
     {
         led_strip_t* sk6812_strip = (led_strip_t*)item->user_arg;
-        cJSON* cjson_properties = (cJSON*)arg;
-        if ((NULL != cjson_properties) && (NULL != sk6812_strip))
+        cJSON* cj_properties = (cJSON*)arg;
+        if ((NULL != cj_properties) && (NULL != sk6812_strip))
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* color_json = cJSON_AddObjectToObject(cjson_properties, ezlopi_value_str);
+                cJSON* color_json = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
                 if (color_json)
                 {
                     int green = sk6812_strip->buf[0];
                     int red = sk6812_strip->buf[1];
                     int blue = sk6812_strip->buf[2];
+
                     cJSON_AddNumberToObject(color_json, ezlopi_red_str, red);
                     cJSON_AddNumberToObject(color_json, ezlopi_green_str, green);
                     cJSON_AddNumberToObject(color_json, ezlopi_blue_str, blue);
                     cJSON_AddNumberToObject(color_json, ezlopi_cwhite_str, ((red << 16) | (green << 8) | (blue)));
-                    char* formatted_val = ezlopi_valueformatter_rgb(red, green, blue);
-                    if (formatted_val)
-                    {
-                        cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
-                        free(formatted_val);
-                    }
+
+                    char formatted_rgb_value[32];
+                    snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", red, green, blue);
+                    cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
                 }
             }
             else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 item->interface.pwm.duty_cycle = (int)ceil(((sk6812_strip->brightness * 100.0) / 255.0));
-                cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, item->interface.pwm.duty_cycle);
-                char* formatted_val = ezlopi_valueformatter_int32(item->interface.pwm.duty_cycle);
-                if (formatted_val)
-                {
-                    cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, formatted_val);
-                    free(formatted_val);
-                }
+                ezlopi_valueformatter_uint32_to_cjson(item, cj_properties, item->interface.pwm.duty_cycle);
             }
             else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
                 item->interface.gpio.gpio_in.value = (0 == sk6812_strip->brightness) ? 0 : 1;
-                cJSON_AddBoolToObject(cjson_properties, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-                cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_in.value));
+                ezlopi_valueformatter_bool_to_cjson(item, cj_properties, item->interface.gpio.gpio_out.value);
             }
         }
     }

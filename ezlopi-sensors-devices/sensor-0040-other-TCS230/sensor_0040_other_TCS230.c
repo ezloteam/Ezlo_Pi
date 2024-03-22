@@ -227,12 +227,10 @@ static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* args)
                 cJSON_AddNumberToObject(color_values, ezlopi_red_str, user_data->red_mapped);
                 cJSON_AddNumberToObject(color_values, ezlopi_green_str, user_data->green_mapped);
                 cJSON_AddNumberToObject(color_values, ezlopi_blue_str, user_data->blue_mapped);
-                char* valueFormatted = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
+
+                char formatted_rgb_value[32];
+                snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, formatted_rgb_value);
             }
             ret = 1;
         }
@@ -344,8 +342,8 @@ static void __tcs230_calibration_task(void* params) // calibration task
             //--------------------------------------------------
             // set the calib flag
             user_data->calibration_complete = true;
-        }
     }
+}
     vTaskDelete(NULL);
 }
 //------------------------------------------------------------------------------

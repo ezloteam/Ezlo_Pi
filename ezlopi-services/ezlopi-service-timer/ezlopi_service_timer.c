@@ -43,7 +43,7 @@ static void event_process_v3(void* pv)
                     }
                     else // in case of default we receive event == NULL, and we pass the action EZLOPI_ACTION_NOTIFY_1000_MS
                     {
-                        curr_item->func(EZLOPI_ACTION_NOTIFY_1000_MS, curr_item, event->arg, curr_item->user_arg);
+                        curr_item->func(EZLOPI_ACTION_NOTIFY_1000_MS, curr_item, NULL, curr_item->user_arg);
                     }
 
                     curr_item = curr_item->next;
@@ -55,6 +55,7 @@ static void event_process_v3(void* pv)
         }
         else
         {
+            TRACE_E("failed to get timer-event");
             vTaskDelay(5);
         }
     }

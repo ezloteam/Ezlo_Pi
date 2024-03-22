@@ -177,13 +177,7 @@ static int __0055_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             flex_t* flex_res_value = (flex_t*)item->user_arg;
             if (flex_res_value)
             {
-                char* valueFormatted = ezlopi_valueformatter_int(flex_res_value->rs_0055);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, flex_res_value->rs_0055);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_int32_to_cjson(item, cj_result, flex_res_value->rs_0055);
                 ret = 1;
             }
         }

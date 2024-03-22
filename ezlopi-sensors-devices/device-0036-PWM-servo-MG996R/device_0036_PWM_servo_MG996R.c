@@ -197,13 +197,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 TRACE_W("new _ target duty value: %d", duty);
             }
 
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, target_duty);
-            char* formatted_val = ezlopi_valueformatter_int(target_duty);
-            if (formatted_val)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, formatted_val);
-                free(formatted_val);
-            }
+            ezlopi_valueformatter_int32_to_cjson(item, cj_result, target_duty);
             ret = 1;
         }
     }

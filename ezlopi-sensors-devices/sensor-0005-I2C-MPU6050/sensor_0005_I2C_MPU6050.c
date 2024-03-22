@@ -270,35 +270,17 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 else if (ezlopi_item_name_gyroscope_x_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-x : %d rpm", (int)user_data->gx);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gx));
-                    char* valueFormatted = ezlopi_valueformatter_int((int)user_data->gx);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_int32_to_cjson(item, cj_result, ((int)user_data->gx));
                 }
                 else if (ezlopi_item_name_gyroscope_y_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-y : %d rpm", (int)user_data->gy);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gy));
-                    char* valueFormatted = ezlopi_valueformatter_int((int)user_data->gy);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_int32_to_cjson(item, cj_result, ((int)user_data->gy));
                 }
                 else if (ezlopi_item_name_gyroscope_z_axis == item->cloud_properties.item_name)
                 {
                     TRACE_I("Gyro-z : %d rpm", (int)user_data->gz);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, ((int)user_data->gz));
-                    char* valueFormatted = ezlopi_valueformatter_int((int)user_data->gz);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_int32_to_cjson(item, cj_result, (int)user_data->gz);
                 }
 
                 ret = 1;

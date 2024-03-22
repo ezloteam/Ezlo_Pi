@@ -300,7 +300,7 @@ static void ezlopi_service_uart_get_info()
 
         char time_string[50];
         uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
-        ezlopi_tick_to_time(tick_count_ms, time_string, sizeof(time_string));
+        ezlopi_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
 
         cJSON_AddStringToObject(get_info, ezlopi_uptime_str, time_string);
         cJSON_AddNumberToObject(get_info, ezlopi_build_date_str, BUILD_DATE);

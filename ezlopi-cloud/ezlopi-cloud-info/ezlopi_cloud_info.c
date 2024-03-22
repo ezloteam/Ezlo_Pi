@@ -114,7 +114,7 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
         {
             char time_string[50];
             uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
-            ezlopi_tick_to_time(tick_count_ms, time_string, sizeof(time_string));
+            ezlopi_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
             cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
         }
 

@@ -294,8 +294,7 @@ static int __0053_get_value_cjson(l_ezlopi_item_t* item, void* arg)
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Fix_item_id) == item->cloud_properties.item_id)
                 {
-                    cJSON_AddBoolToObject(cj_result, ezlopi_value_str, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX);
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(sensor_0053_UART_gps6mv2_data->prev_GPS_FIX));
+                    ezlopi_valueformatter_bool_to_cjson(item, cj_result, sensor_0053_UART_gps6mv2_data->prev_GPS_FIX);
                 }
                 else if ((sensor_0053_UART_gps6mv2_data->Sea_level_item_id) == item->cloud_properties.item_id)
                 {

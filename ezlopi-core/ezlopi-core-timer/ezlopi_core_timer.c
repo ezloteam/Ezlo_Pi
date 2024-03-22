@@ -228,9 +228,9 @@ static void ezlopi_timer_setup_struct(s_ezlopi_timer_t* timer_config, e_ezlopi_a
     timer_config->alarm_value = (alarm_ms * (EZLOPI_TIMER_SCALE / 1000));
     timer_config->group = group;
     timer_config->index = index;
-    timer_config->internal.alarm_en = TIMER_ALARM_EN,
-        timer_config->internal.auto_reload = true,
-        timer_config->internal.counter_dir = TIMER_COUNT_UP;
+    timer_config->internal.alarm_en = TIMER_ALARM_EN;
+    timer_config->internal.auto_reload = true;
+    timer_config->internal.counter_dir = TIMER_COUNT_UP;
     timer_config->internal.divider = EZLOPI_TIMER_DIVIDER;
     timer_config->internal.intr_type = TIMER_INTR_LEVEL;
 }

@@ -59,8 +59,7 @@ static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t* item, void* args)
     if (cj_result)
     {
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_out.value);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_out.value));
+        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_out.value);
         ret = 1;
     }
 

@@ -341,14 +341,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
                 if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
                 {
-
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->azimuth));
-                    char* valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_int32_to_cjson(item, cj_result, user_data->azimuth);
                 }
 
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)

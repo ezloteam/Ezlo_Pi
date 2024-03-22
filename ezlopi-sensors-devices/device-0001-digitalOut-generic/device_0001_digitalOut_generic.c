@@ -474,11 +474,10 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cjson_propertise = (cJSON*)arg;
-        if (cjson_propertise)
+        cJSON* cj_propertise = (cJSON*)arg;
+        if (cj_propertise)
         {
-            cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_out.value));
+            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
             ret = 1;
         }
     }
@@ -508,26 +507,23 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             {
                 switch (cj_value->type)
                 {
-                case cJSON_False:
+                case cJSON_False: {
                     value = 0;
                     break;
-                case cJSON_True:
+                }
+                case cJSON_True: {
                     value = 1;
                     break;
-                case cJSON_Number:
+                }
+                case cJSON_Number: {
                     value = cj_value->valuedouble;
                     break;
-
-                default:
+                }
+                default: {
                     break;
                 }
+                }
             }
-
-            // TRACE_I("item_name: %s", item->cloud_properties.item_name);
-            // TRACE_I("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
-            // TRACE_I("item_id: 0x%08x", item->cloud_properties.item_id);
-            // TRACE_I("prev value: %d", item->interface.gpio.gpio_out.value);
-            // TRACE_I("cur value: %d", value);
 
             if (255 != item->interface.gpio.gpio_out.gpio_num)
             {

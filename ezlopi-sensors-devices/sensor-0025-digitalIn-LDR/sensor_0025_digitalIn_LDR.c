@@ -60,8 +60,8 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     {
         int gpio_level = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
         item->interface.gpio.gpio_in.value = (0 == item->interface.gpio.gpio_in.invert) ? gpio_level : !gpio_level;
-        cJSON_AddBoolToObject(cj_value_obj, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        cJSON_AddStringToObject(cj_value_obj, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_in.value));
+
+        ezlopi_valueformatter_bool_to_cjson(item, cj_value_obj, item->interface.gpio.gpio_in.value);
         ret = 1;
     }
 

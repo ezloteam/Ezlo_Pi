@@ -78,20 +78,13 @@ static int __notify(l_ezlopi_item_t* item)
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
-    cJSON* cjson_properties = (cJSON*)arg;
-    if (cjson_properties)
+    cJSON* cj_result = (cJSON*)arg;
+    if (cj_result)
     {
         TSL256_lum_t* illuminance_value = ((TSL256_lum_t*)item->user_arg);
         if (illuminance_value)
         {
-            char* valueFormatted = ezlopi_valueformatter_int((int)(illuminance_value->lux_val));
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cjson_properties, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
-            cJSON_AddNumberToObject(cjson_properties, ezlopi_value_str, (int)illuminance_value->lux_val);
-            cJSON_AddStringToObject(cjson_properties, ezlopi_scale_str, item->cloud_properties.scale);
+            ezlopi_valueformatter_uint32_to_cjson(item, cj_result, illuminance_value->lux_val);
             ret = 1;
         }
     }

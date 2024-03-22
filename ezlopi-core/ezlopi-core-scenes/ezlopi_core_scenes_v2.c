@@ -10,6 +10,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_value.h"
+#include "ezlopi_core_scenes_print.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
@@ -303,7 +304,7 @@ int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag
                                     {
                                         ret = 1;
                                     }
-                                    else 
+                                    else
                                     {
                                         TRACE_E("HERE");
                                     }

@@ -83,15 +83,11 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
-    if (item && arg)
+    if (item && arg && item->user_arg)
     {
         cJSON* cj_result = (cJSON*)arg;
         double* temperatue_value = (double*)item->user_arg;
-        cJSON_AddNumberToObject(cj_result, ezlopi_value_str, *temperatue_value);
-        char* valueFormatted = ezlopi_valueformatter_double(*temperatue_value);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-        free(valueFormatted);
-        cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_celsius);
+        ezlopi_valueformatter_double_to_cjson(item, cj_result, *temperatue_value);
     }
     return ret;
 }

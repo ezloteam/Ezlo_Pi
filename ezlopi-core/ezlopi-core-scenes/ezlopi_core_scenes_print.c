@@ -6,6 +6,8 @@
 
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_core_scenes_print.h"
+
 
 void ezlopi_print_block_options(s_block_options_v2_t* block_options, l_fields_v2_t* fields)
 {

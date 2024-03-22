@@ -321,32 +321,15 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
         s_joystick_data_t* user_data = (s_joystick_data_t*)item->user_arg;
         if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X] == item->cloud_properties.item_id)
         {
-            cJSON_AddNumberToObject(cj_result, "value", user_data->adc_x);
-            cJSON_AddStringToObject(cj_result, "scale", "milli_volt");
-            char* valueFormatted = ezlopi_valueformatter_uint32(user_data->adc_x);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_uint32_to_cjson(item, cj_result, user_data->adc_x);
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
         {
-
-            cJSON_AddNumberToObject(cj_result, "value", user_data->adc_y);
-            cJSON_AddStringToObject(cj_result, "scale", "milli_volt");
-            char* valueFormatted = ezlopi_valueformatter_uint32(user_data->adc_y);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_uint32_to_cjson(item, cj_result, user_data->adc_y);
         }
         else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH] == item->cloud_properties.item_id)
         {
-            cJSON_AddBoolToObject(cj_result, "value", ((0 == item->interface.gpio.gpio_in.value) ? true : false));
-            const char* valueFormatted = EZPI_VALUEFORMATTER_BOOL((0 == item->interface.gpio.gpio_in.value) ? true : false);
-            cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+            ezlopi_valueformatter_bool_to_cjson(item, cj_result, (0 == item->interface.gpio.gpio_in.value) ? true : false);
         }
         ret = 1;
     }

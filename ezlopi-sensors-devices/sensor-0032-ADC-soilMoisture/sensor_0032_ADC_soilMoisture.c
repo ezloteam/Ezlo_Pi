@@ -83,13 +83,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
         double* soil_moisture_data = (double*)item->user_arg;
         if (soil_moisture_data)
         {
-            cJSON_AddNumberToObject(cj_result, ezlopi_value_str, *soil_moisture_data);
-            char* valueFormatted = ezlopi_valueformatter_double(*soil_moisture_data);
-            if (valueFormatted)
-            {
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                free(valueFormatted);
-            }
+            ezlopi_valueformatter_double_to_cjson(item, cj_result, *soil_moisture_data);
             ret = 1;
         }
     }

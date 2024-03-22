@@ -180,9 +180,8 @@ static int proximity_sensor_get_value_cjson(l_ezlopi_item_t* item, void* args)
         {
             item->interface.gpio.gpio_in.value = item->interface.gpio.gpio_in.value ? false : true;
         }
-        cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-        const char* valueFormatted = EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_in.value ? false : true);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+
+        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_in.value);
         ret = 1;
         // TRACE_D("value: %d", item->interface.gpio.gpio_in.value);
     }

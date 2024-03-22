@@ -88,42 +88,33 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cjson_params = (cJSON*)arg;
+        cJSON* cj_properties = (cJSON*)arg;
         s_rgb_args_t* rgb_args = (s_rgb_args_t*)item->user_arg;
 
-        if ((NULL != cjson_params) && (NULL != rgb_args))
+        if ((NULL != cj_properties) && (NULL != rgb_args))
         {
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
-                cJSON* color_values = cJSON_AddObjectToObject(cjson_params, ezlopi_value_str);
+                cJSON* color_values = cJSON_AddObjectToObject(cj_properties, ezlopi_value_str);
                 if (color_values)
                 {
                     cJSON_AddNumberToObject(color_values, ezlopi_red_str, rgb_args->red_struct.value);
                     cJSON_AddNumberToObject(color_values, ezlopi_green_str, rgb_args->green_struct.value);
                     cJSON_AddNumberToObject(color_values, ezlopi_blue_str, rgb_args->blue_struct.value);
-                    char* formatted_val = ezlopi_valueformatter_rgb(rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
-                    if (formatted_val)
-                    {
-                        cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, formatted_val);
-                        free(formatted_val);
-                    }
+
+                    char formatted_rgb_value[32];
+                    snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", rgb_args->red_struct.value, rgb_args->green_struct.value, rgb_args->blue_struct.value);
+                    cJSON_AddStringToObject(cj_properties, ezlopi_valueFormatted_str, formatted_rgb_value);
                 }
             }
-            if (ezlopi_item_name_switch == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_switch == item->cloud_properties.item_name)
             {
-                cJSON_AddBoolToObject(cjson_params, ezlopi_value_str, rgb_args->brightness);
-                cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(rgb_args->brightness));
+                ezlopi_valueformatter_bool_to_cjson(item, cj_properties, rgb_args->brightness);
             }
-            if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
+            else if (ezlopi_item_name_dimmer == item->cloud_properties.item_name)
             {
                 int dim_percentage = (int)(rgb_args->brightness * 100);
-                cJSON_AddNumberToObject(cjson_params, ezlopi_value_str, dim_percentage);
-                char* formatted_val = ezlopi_valueformatter_int(dim_percentage);
-                if (formatted_val)
-                {
-                    cJSON_AddStringToObject(cjson_params, ezlopi_valueFormatted_str, formatted_val);
-                    free(formatted_val);
-                }
+                ezlopi_valueformatter_int32_to_cjson(item, cj_properties, dim_percentage);
             }
         }
     }

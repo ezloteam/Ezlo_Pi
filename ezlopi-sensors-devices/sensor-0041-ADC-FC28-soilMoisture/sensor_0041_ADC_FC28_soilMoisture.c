@@ -184,18 +184,12 @@ static int __0041_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_fc28_data_t* user_data = (s_fc28_data_t*)item->user_arg;
             if (user_data)
             {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->hum_val));
-                char* valueFormatted = ezlopi_valueformatter_uint32(user_data->hum_val);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    // TRACE_S("soil moisture  : %d", user_data->hum_val);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_uint32_to_cjson(item, cj_result, user_data->hum_val);
                 ret = 1;
             }
         }
     }
+    
     return ret;
 }
 

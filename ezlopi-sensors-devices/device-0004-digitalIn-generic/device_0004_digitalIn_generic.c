@@ -173,11 +173,10 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cjson_propertise = (cJSON*)arg;
-        if (cjson_propertise)
+        cJSON* cj_propertise = (cJSON*)arg;
+        if (cj_propertise)
         {
-            cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_in.value);
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, EZPI_VALUEFORMATTER_BOOL(item->interface.gpio.gpio_in.value));
+            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
             ret = 1;
         }
     }
