@@ -477,8 +477,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
             .header_maxlen = sizeof(tmp_headers),
             .web_server = tmp_web_server,
             .web_server_maxlen = sizeof(tmp_web_server),
-            .response = NULL,
-            .response_maxlen = 0,
+            .response = NULL
         };
         /*Make API call here and extract the suntime[according to 'user_data->sunstate_mode']*/
         
