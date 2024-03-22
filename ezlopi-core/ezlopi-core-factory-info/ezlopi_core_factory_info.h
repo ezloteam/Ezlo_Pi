@@ -159,48 +159,15 @@ extern "C"
         "{\
         \"cmd\": 3,\
         \"dev_detail\":\
-        [\
-            {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"LED\",\
-                \"id_room\": \"\",\
-                \"id_item\": 1,\
-                \"gpio_in\": 0,\
-                \"gpio_out\": 2,\
-                \"pullup_ip\": false,\
-                \"pullup_op\": false,\
-                \"is_ip\": false,\
-                \"ip_inv\": false,\
-                \"op_inv\": false,\
-                \"val_ip\": false,\
-                \"val_op\": false\
-            },\
-            {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"Water_leak\",\
-                \"id_room\": \"\",\
-                \"id_item\": 27,\
-                \"gpio\": 25\
-            },\
-            {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"soil_moisture\",\
-                \"id_room\": \"\",\
-                \"id_item\": 32,\
-                \"gpio\": 33\
-            },\
-            {\
-                \"dev_type\": 8,\
-                \"dev_name\": \"GY271\",\
-                \"id_room\": \"\",\
-                \"id_item\": 7,\
-                \"gpio_sda\": 18,\
-                \"gpio_scl\": 19,\
-                \"pullup_scl\": true,\
-                \"pullup_sda\": true,\
-                \"slave_addr\": 13\
-            }\
-        ], \
+        [{\
+            \"dev_type\": 2,\
+            \"dev_name\": \"PIR\",\
+            \"id_room\": \"\",\
+            \"id_item\": 19,\
+            \"gpio\": 36,\
+            \"pull_up\": false,\
+            \"logic_inv\": false\
+        }],\
         \"dev_total\": 4}";
 #endif
 

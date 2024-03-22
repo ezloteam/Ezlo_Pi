@@ -55,6 +55,7 @@ extern const char *method_hub_favorite_list;
 extern const char *method_hub_favorite_set;
 extern const char *method_hub_firmware_update;
 extern const char *method_hub_info_get;
+const char *method_hub_info_changed;
 extern const char *method_hub_data_value_list_request;
 extern const char *method_hub_settings_list_request;
 extern const char *method_hub_features_list;

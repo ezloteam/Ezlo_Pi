@@ -11,11 +11,11 @@ extern "C"
 {
 #endif
 
-#ifdef CONFIG_EZPI_UTIL_ENABLE_TRACE
+#ifdef CONFIG_EZPI_DEV_TYPE_TEST
 #define ENABLE_TRACE 1
 #else
 #define ENABLE_TRACE 0
-#endif // CONFIG_EZPI_UTIL_ENABLE_TRACE
+#endif // CONFIG_EZPI_DEV_TYPE_TEST
 
     void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 

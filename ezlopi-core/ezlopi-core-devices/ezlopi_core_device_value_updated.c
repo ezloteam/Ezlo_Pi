@@ -226,3 +226,48 @@ int ezlopi_network_update_wifi_scan_process(cJSON* network_array)
     return ret;
 }
 
+int ezlopi_device_information_updated_from_device_v3(l_ezlopi_item_t* item)
+{
+    int ret = 0;
+    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+    while (curr_device)
+    {
+        l_ezlopi_item_t* curr_item = curr_device->items;
+        while (curr_item)
+        {
+            if (curr_item == item)
+            {
+                cJSON* cjson_broadcast_info = cJSON_CreateObject();
+                if (cjson_broadcast_info)
+                {
+                    cJSON_AddStringToObject(cjson_broadcast_info, ezlopi__id_str, ezlopi_ui_broadcast_str);
+                    cJSON_AddStringToObject(cjson_broadcast_info, ezlopi_msg_subclass_str, method_hub_info_changed);
+
+                    cJSON* cjson_result = cJSON_AddObjectToObject(cjson_broadcast_info, "result");
+                    if (cjson_result)
+                    {
+                        cJSON* cjson_battery = cJSON_AddObjectToObject(cjson_result, "battery");
+                        if (cjson_battery)
+                        {
+                            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, cjson_battery, NULL);
+                            char* data_to_send = cJSON_Print(cjson_broadcast_info);
+                            cJSON_Delete(cjson_broadcast_info);
+                            if (data_to_send)
+                            {
+                                cJSON_Minify(data_to_send);
+                                if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
+                                {
+                                    free(data_to_send);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            curr_item = curr_item->next;
+        }
+        curr_device = curr_device->next;
+    }
+    return ret;
+}
+

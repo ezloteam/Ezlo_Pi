@@ -55,6 +55,7 @@ const char *method_hub_favorite_list = "hub.favorite.list";
 const char *method_hub_favorite_set = "hub.favorite.set";
 const char *method_hub_firmware_update = "hub.firmware.update";
 const char *method_hub_info_get = "hub.info.get";
+const char *method_hub_info_changed = "hub.info.changed";
 const char *method_hub_data_value_list_request = "hub.data.list";
 const char *method_hub_settings_list_request = "hub.settings.list";
 const char *method_hub_features_list = "hub.features.list";

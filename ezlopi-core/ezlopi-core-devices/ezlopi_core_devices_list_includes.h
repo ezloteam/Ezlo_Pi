@@ -21,7 +21,7 @@
 #include "sensor_0018_other_internal_hall_effect.h"
 #endif // CONFIG_IDF_TARGET_ESP32
 
-// #include "sensor_0019_digitalIn_PIR.h"
+#include "sensor_0019_digitalIn_PIR.h"
 // #include "sensor_0020_other_2axis_joystick.h"
 // #include "sensor_0021_UART_MB1013.h"
 // #include "device_0022_PWM_dimmable_lamp.h"
@@ -70,5 +70,6 @@
 // #include "sensor_0067_hilink_presence_sensor.h"
 // #include "sensor_0068_ENS160_gas_sensor.h"
 // #include "sensor_0069_ze08_ch02_gas_sensor.h"
+#include "device_0070_battery_sensor.h"
 #warning "need to uncomment necessary modules";
 #endif // _EZLOPI_CORE_DEVICES_LIST_INCLUDES_H_

@@ -85,7 +85,7 @@ extern const char *ezlopi_item_name_atmospheric_pressure;
 // extern const  char *ezlopi_item_name_clock_state;
 // extern const  char *ezlopi_item_name_remaining_time;
 extern const char *ezlopi_item_name_basic;
-// extern const  char *ezlopi_item_name_battery;
+extern const  char *ezlopi_item_name_battery;
 extern const char *ezlopi_item_name_co2_level;
 // extern const  char *ezlopi_item_name_co_level;
 // extern const  char *ezlopi_item_name_dew_point;

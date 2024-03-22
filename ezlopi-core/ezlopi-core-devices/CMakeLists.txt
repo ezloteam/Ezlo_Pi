@@ -35,7 +35,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
 
         sensor-0017-ADC-potentiometer
         sensor-0018-other-internal-hall-effect
-        # sensor-0019-digitalIn-PIR
+        sensor-0019-digitalIn-PIR
         # sensor-0020-other-2axis-joystick
         # sensor-0021-UART-MB1013
         # device-0022-PWM-dimmable-lamp
@@ -85,6 +85,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         # sensor-0067-UART-hilink-presence-sensor
         # sensor-0068-I2C-ENS160-gas-sensor
         # sensor-0069-UART-ze08-ch02-gas-sensor
+        device-0070-battery-sensor
 )
 
 

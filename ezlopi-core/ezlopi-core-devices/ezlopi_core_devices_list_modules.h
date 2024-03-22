@@ -29,7 +29,7 @@ EZLOPI_DEVICE_LIST("sensor-potentiometer-ADC            ", 17, sensor_0017_ADC_p
 EZLOPI_DEVICE_LIST("sensor-Hall-effect                  ", 18, sensor_0018_other_internal_hall_effect)
 #endif // CONFIG_IDF_TARGET_ESP32
 
-// EZLOPI_DEVICE_LIST("sensor-PIR-digital-proximity        ", 19, sensor_0019_digitalIn_PIR)
+EZLOPI_DEVICE_LIST("sensor-PIR-digital-proximity        ", 19, sensor_0019_digitalIn_PIR)
 // EZLOPI_DEVICE_LIST("sensor-2AXIS-JOYSTICK               ", 20, sensor_0020_other_2axis_joystick)
 // EZLOPI_DEVICE_LIST("sensor-UART-MB1013                  ", 21, sensor_0021_UART_MB1013)
 
@@ -86,7 +86,7 @@ EZLOPI_DEVICE_LIST("sensor-Flex-Resistor-ADC            ", 55, sensor_0055_ADC_F
 // EZLOPI_DEVICE_LIST("sensor-hilink-presence-sensor       ", 67, sensor_0067_hilink_presence_sensor_v3)
 // EZLOPI_DEVICE_LIST("sensor-ENS160-gas-sensor            ", 68, sensor_0068_ENS160_gas_sensor)
 // EZLOPI_DEVICE_LIST("sensor-ze08-ch02-gas-sensor         ", 69, sensor_0069_ze08_ch02_gas_sensor)
-
+EZLOPI_DEVICE_LIST("device_0070_battery_sensor", 70, device_0070_battery_sensor)
 #warning "need to uncomment necessary modules";
 //////// End of sensor/device list
 EZLOPI_DEVICE_LIST(NULL, 0, NULL)
