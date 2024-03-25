@@ -62,10 +62,6 @@ int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* 
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_electricity;
     device->cloud_properties.device_type_id = NULL;

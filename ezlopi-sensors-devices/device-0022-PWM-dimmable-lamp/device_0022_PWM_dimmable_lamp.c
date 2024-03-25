@@ -398,7 +398,7 @@ static int __prepare(void* arg)
                 if (dimmable_bulb_arg->item_dimmer)
                 {
                     dimmable_bulb_arg->item_dimmer->user_arg = dimmable_bulb_arg;
-                    dimmable_bulb_arg->item_dimmer->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmable_bulb_arg->item_dimmer->cloud_properties.device_id = device->cloud_properties.device_id;
                     __prepare_dimmer_item_properties(dimmable_bulb_arg->item_dimmer, prep_arg->cjson_device);
                 }
 
@@ -406,7 +406,7 @@ static int __prepare(void* arg)
                 if (dimmable_bulb_arg->item_dimmer_up)
                 {
                     dimmable_bulb_arg->item_dimmer_up->user_arg = dimmable_bulb_arg;
-                    dimmable_bulb_arg->item_dimmer_up->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmable_bulb_arg->item_dimmer_up->cloud_properties.device_id = device->cloud_properties.device_id;
                     __prepare_dimmer_up_item_properties(dimmable_bulb_arg->item_dimmer_up, prep_arg->cjson_device);
                 }
 
@@ -414,7 +414,7 @@ static int __prepare(void* arg)
                 if (dimmable_bulb_arg->item_dimmer_down)
                 {
                     dimmable_bulb_arg->item_dimmer_down->user_arg = dimmable_bulb_arg;
-                    dimmable_bulb_arg->item_dimmer_down->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmable_bulb_arg->item_dimmer_down->cloud_properties.device_id = device->cloud_properties.device_id;
                     __prepare_dimmer_down_item_properties(dimmable_bulb_arg->item_dimmer_down, prep_arg->cjson_device);
                 }
 
@@ -422,7 +422,7 @@ static int __prepare(void* arg)
                 if (dimmable_bulb_arg->item_dimmer_stop)
                 {
                     dimmable_bulb_arg->item_dimmer_stop->user_arg = dimmable_bulb_arg;
-                    dimmable_bulb_arg->item_dimmer_stop->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmable_bulb_arg->item_dimmer_stop->cloud_properties.device_id = device->cloud_properties.device_id;
                     __prepare_dimmer_stop_item_properties(dimmable_bulb_arg->item_dimmer_stop, prep_arg->cjson_device);
                 }
 
@@ -430,7 +430,7 @@ static int __prepare(void* arg)
                 if (dimmable_bulb_arg->item_dimmer_switch)
                 {
                     dimmable_bulb_arg->item_dimmer_switch->user_arg = dimmable_bulb_arg;
-                    dimmable_bulb_arg->item_dimmer_switch->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmable_bulb_arg->item_dimmer_switch->cloud_properties.device_id = device->cloud_properties.device_id;
                     __prepare_dimmer_switch_item_properties(dimmable_bulb_arg->item_dimmer_switch, prep_arg->cjson_device);
                 }
 

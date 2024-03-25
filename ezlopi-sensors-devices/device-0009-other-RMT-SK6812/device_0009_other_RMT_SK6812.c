@@ -393,12 +393,12 @@ static int __prepare(void* arg)
 
                 if (dimmer_args->switch_item && dimmer_args->dimmer_item && dimmer_args->dimmer_up_item && dimmer_args->dimmer_down_item && dimmer_args->dimmer_stop_item && dimmer_args->rgb_color_item)
                 {
-                    dimmer_args->rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
 
                     dimmer_args->rgb_color_item->user_arg = dimmer_args;
                     dimmer_args->dimmer_item->user_arg = dimmer_args;

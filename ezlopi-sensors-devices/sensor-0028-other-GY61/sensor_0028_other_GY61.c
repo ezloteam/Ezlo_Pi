@@ -72,16 +72,40 @@ int sensor_0028_other_GY61(e_ezlopi_actions_t action, l_ezlopi_item_t* item, voi
 //-------------------------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
-    ASSIGN_DEVICE_NAME_V2(device, dev_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
+static void __prepare_device_cloud_properties_parent_x(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_x");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_y(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_y");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_z(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_z");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
@@ -131,42 +155,81 @@ static int __0028_prepare(void* arg)
         if (NULL != gy61_value)
         {
             memset(gy61_value, 0, sizeof(s_gy61_data_t));
-            l_ezlopi_device_t* gy61_device = ezlopi_device_add_device(cj_device);
-            if (gy61_device)
+            l_ezlopi_device_t* gy61_device_x_parent = ezlopi_device_add_device(cj_device);
+            if (gy61_device_x_parent)
             {
-                __prepare_device_cloud_properties(gy61_device, cj_device);
-                l_ezlopi_item_t* gy61_item_x = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
+                TRACE_I("Parent_gy61_device_x-[0x%x] ", gy61_device_x_parent->cloud_properties.device_id);
+                __prepare_device_cloud_properties(gy61_device_x_parent, cj_device);
+                __prepare_device_cloud_properties_parent_x(gy61_device_x_parent, cj_device);
+                l_ezlopi_item_t* gy61_item_x = ezlopi_device_add_item_to_device(gy61_device_x_parent, sensor_0028_other_GY61);
                 if (gy61_item_x)
                 {
                     gy61_item_x->cloud_properties.item_name = ezlopi_item_name_acceleration_x_axis;
                     __prepare_item_cloud_properties(gy61_item_x, gy61_value);
                     __prepare_item_interface_properties(gy61_item_x, cj_device);
                 }
-                l_ezlopi_item_t* gy61_item_y = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
-                if (gy61_item_y)
+                else
                 {
-                    gy61_item_y->cloud_properties.item_name = ezlopi_item_name_acceleration_y_axis;
-                    __prepare_item_cloud_properties(gy61_item_y, gy61_value);
-                    __prepare_item_interface_properties(gy61_item_y, cj_device);
+                    ret = -1;
                 }
-                l_ezlopi_item_t* gy61_item_z = ezlopi_device_add_item_to_device(gy61_device, sensor_0028_other_GY61);
-                if (gy61_item_z)
+
+                l_ezlopi_device_t* gy61_device_y_child = ezlopi_device_add_device(device_prep_arg->cjson_device);
+                if (gy61_device_y_child)
                 {
-                    gy61_item_z->cloud_properties.item_name = ezlopi_item_name_acceleration_z_axis;
-                    __prepare_item_cloud_properties(gy61_item_z, gy61_value);
-                    __prepare_item_interface_properties(gy61_item_z, cj_device);
+                    TRACE_I("Child_gy61_device_y-[0x%x] ", gy61_device_y_child->cloud_properties.device_id);
+                    __prepare_device_cloud_properties(gy61_device_y_child, cj_device);
+                    __prepare_device_cloud_properties_child_y(gy61_device_y_child, cj_device);
+                    gy61_device_y_child->cloud_properties.parent_device_id = gy61_device_x_parent->cloud_properties.device_id;
+
+                    l_ezlopi_item_t* gy61_item_y = ezlopi_device_add_item_to_device(gy61_device_y_child, sensor_0028_other_GY61);
+                    if (gy61_item_y)
+                    {
+                        gy61_item_y->cloud_properties.item_name = ezlopi_item_name_acceleration_y_axis;
+                        __prepare_item_cloud_properties(gy61_item_y, gy61_value);
+                        __prepare_item_interface_properties(gy61_item_y, cj_device);
+                    }
+                    else
+                    {
+                        ezlopi_device_free_device(gy61_device_y_child);
+                        ret = -1;
+                    }
+                }
+
+
+                l_ezlopi_device_t* gy61_device_z_child = ezlopi_device_add_device(device_prep_arg->cjson_device);
+                if (gy61_device_z_child)
+                {
+                    TRACE_I("Child_gy61_device_z-[0x%x] ", gy61_device_z_child->cloud_properties.device_id);
+                    __prepare_device_cloud_properties(gy61_device_z_child, cj_device);
+                    __prepare_device_cloud_properties_child_z(gy61_device_z_child, cj_device);
+                    gy61_device_z_child->cloud_properties.parent_device_id = gy61_device_x_parent->cloud_properties.device_id;
+
+                    l_ezlopi_item_t* gy61_item_z = ezlopi_device_add_item_to_device(gy61_device_z_child, sensor_0028_other_GY61);
+                    if (gy61_item_z)
+                    {
+                        gy61_item_z->cloud_properties.item_name = ezlopi_item_name_acceleration_z_axis;
+                        __prepare_item_cloud_properties(gy61_item_z, gy61_value);
+                        __prepare_item_interface_properties(gy61_item_z, cj_device);
+                    }
+                    else
+                    {
+                        ezlopi_device_free_device(gy61_device_z_child);
+                        ret = -1;
+                    }
                 }
                 ret = 1;
-                if ((NULL == gy61_item_x) && (NULL == gy61_item_y) && (NULL == gy61_item_z))
+
+                if ((NULL == gy61_item_x) &&
+                    (NULL == gy61_device_y_child) &&
+                    (NULL == gy61_device_z_child))
                 {
-                    ezlopi_device_free_device(gy61_device);
+                    ezlopi_device_free_device(gy61_device_x_parent);
                     free(gy61_value);
                     ret = -1;
                 }
             }
             else
             {
-                ezlopi_device_free_device(gy61_device);
                 free(gy61_value);
                 ret = -1;
             }

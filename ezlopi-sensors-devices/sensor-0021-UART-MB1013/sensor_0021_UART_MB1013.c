@@ -145,7 +145,6 @@ static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -189,7 +188,6 @@ static int __prepare(void* arg)
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0021_UART_MB1013);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_cloud_properties(item, cjson_device);
                     __setup_item_interface_properties(item, cjson_device);
 
@@ -207,6 +205,10 @@ static int __prepare(void* arg)
                     ezlopi_device_free_device(device);
                     ret = -1;
                 }
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }

@@ -91,52 +91,61 @@ static int __0051_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t* MQ8_device_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
-        if (MQ8_device_digi)
+        l_ezlopi_device_t* MQ8_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
+        if (MQ8_device_parent_digi)
         {
-            __prepare_device_digi_cloud_properties(MQ8_device_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t* MQ8_item_digi = ezlopi_device_add_item_to_device(MQ8_device_digi, sensor_0051_other_MQ8_H2_detector);
+            TRACE_I("Parent_MQ8_device_digi-[0x%x] ", MQ8_device_parent_digi->cloud_properties.device_id);
+            __prepare_device_digi_cloud_properties(MQ8_device_parent_digi, device_prep_arg->cjson_device);
+            l_ezlopi_item_t* MQ8_item_digi = ezlopi_device_add_item_to_device(MQ8_device_parent_digi, sensor_0051_other_MQ8_H2_detector);
             if (MQ8_item_digi)
             {
-                MQ8_item_digi->cloud_properties.device_id = MQ8_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ8_item_digi, device_prep_arg->cjson_device);
                 ret = 1;
             }
             else
             {
                 ret = -1;
-                ezlopi_device_free_device(MQ8_device_digi);
             }
-        }
 
-        //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        s_mq8_value_t* MQ8_value = (s_mq8_value_t*)malloc(sizeof(s_mq8_value_t));
-        if (NULL != MQ8_value)
-        {
-            memset(MQ8_value, 0, sizeof(s_mq8_value_t));
-            l_ezlopi_device_t* MQ8_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
-            if (MQ8_device_adc)
+            //---------------------------- ADC - DEVICE 2 -------------------------------------------
+            s_mq8_value_t* MQ8_value = (s_mq8_value_t*)malloc(sizeof(s_mq8_value_t));
+            if (NULL != MQ8_value)
             {
-                __prepare_device_adc_cloud_properties(MQ8_device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* MQ8_item_adc = ezlopi_device_add_item_to_device(MQ8_device_adc, sensor_0051_other_MQ8_H2_detector);
-                if (MQ8_item_adc)
+                memset(MQ8_value, 0, sizeof(s_mq8_value_t));
+                l_ezlopi_device_t* MQ8_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
+                if (MQ8_device_child_adc)
                 {
-                    MQ8_item_adc->cloud_properties.device_id = MQ8_device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(MQ8_item_adc, device_prep_arg->cjson_device, MQ8_value);
-                    ret = 1;
+                    TRACE_I("Child_MQ8_device_adc-[0x%x] ", MQ8_device_child_adc->cloud_properties.device_id);
+                    __prepare_device_adc_cloud_properties(MQ8_device_child_adc, device_prep_arg->cjson_device);
+
+                    MQ8_device_child_adc->cloud_properties.parent_device_id = MQ8_device_parent_digi->cloud_properties.device_id;
+                    l_ezlopi_item_t* MQ8_item_adc = ezlopi_device_add_item_to_device(MQ8_device_child_adc, sensor_0051_other_MQ8_H2_detector);
+                    if (MQ8_item_adc)
+                    {
+                        __prepare_item_adc_cloud_properties(MQ8_item_adc, device_prep_arg->cjson_device, MQ8_value);
+                        ret = 1;
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(MQ8_device_child_adc);
+                        free(MQ8_value);
+                    }
                 }
                 else
                 {
                     ret = -1;
-                    ezlopi_device_free_device(MQ8_device_adc);
                     free(MQ8_value);
                 }
             }
             else
             {
                 ret = -1;
-                free(MQ8_value);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -202,11 +211,12 @@ static int __0051_init(l_ezlopi_item_t* item)
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "digi");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -230,11 +240,12 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* c
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "adc");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -403,7 +414,7 @@ static float __extract_MQ8_sensor_ppm(l_ezlopi_item_t* item)
 #else
             analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-            vTaskDelay(1);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
         }
         analog_sensor_volt = analog_sensor_volt / 10.0f;
 
@@ -449,7 +460,7 @@ static void __calibrate_MQ8_R0_resistance(void* params)
             for (uint8_t j = 20; j > 0; j--)
             {
                 TRACE_E("Heating sensor.........time left: %d sec", j);
-                vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
+                vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
             }
             //-------------------------------------------------
             // extract the mean_sensor_analog_output_voltage
@@ -468,7 +479,7 @@ static void __calibrate_MQ8_R0_resistance(void* params)
 #else
                 _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
-                vTaskDelay(1); // 10ms
+                vTaskDelay(10 / portTICK_PERIOD_MS);
             }
             _sensor_volt = _sensor_volt / 100.0f;
 

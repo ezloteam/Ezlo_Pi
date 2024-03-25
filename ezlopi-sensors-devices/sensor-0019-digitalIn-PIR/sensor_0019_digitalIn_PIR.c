@@ -126,11 +126,9 @@ static int sensor_pir_prepare_v3(void* arg)
             if (device)
             {
                 sensor_pir_setup_device_cloud_properties_v3(device, cj_device);
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, NULL);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0019_digitalIn_PIR);
                 if (item)
                 {
-                    item->func = sensor_0019_digitalIn_PIR;
-                    // item->cloud_properties.device_id = device->cloud_properties.device_id;
                     sensor_pir_setup_item_properties_v3(item, cj_device);
                     ret = 1;
                 }
@@ -140,6 +138,10 @@ static int sensor_pir_prepare_v3(void* arg)
                     ret = -1;
                 }
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
 
@@ -153,7 +155,6 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t* devic
         // char *device_name = NULL;
         // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
         // ASSIGN_DEVICE_NAME_V2(device, device_name);
-        // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
         device->cloud_properties.category = category_generic_sensor;
         device->cloud_properties.subcategory = subcategory_motion;

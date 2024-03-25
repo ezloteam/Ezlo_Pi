@@ -133,11 +133,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_params)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_params, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_light_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -184,7 +179,6 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* als_ltr303_item = ezlopi_device_add_item_to_device(als_ltr303_device, sensor_0008_I2C_LTR303ALS);
             if (als_ltr303_item)
             {
-                als_ltr303_item->cloud_properties.device_id = als_ltr303_device->cloud_properties.device_id;
                 __prepare_item_properties(als_ltr303_item, prep_arg->cjson_device);
             }
             else

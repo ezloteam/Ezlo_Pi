@@ -186,7 +186,6 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_water;
@@ -225,7 +224,6 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
             if (item_turbidity)
             {
-                item_turbidity->cloud_properties.device_id = device->cloud_properties.device_id;
                 char* turbidity_sensor_states = (char*)malloc(40 * sizeof(char));
                 if (turbidity_sensor_states)
                 {
@@ -240,6 +238,10 @@ static int __prepare(void* arg)
                 ezlopi_device_free_device(device);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;

@@ -71,11 +71,10 @@ int sensor_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t*
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // char* device_name = NULL;
+    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_type = dev_type_device;
@@ -169,13 +168,16 @@ static int __prepare(void* arg)
                     l_ezlopi_item_t* joystick_x_item = ezlopi_device_add_item_to_device(joystick_parent_x_device, sensor_0020_other_2axis_joystick);
                     if (joystick_x_item)
                     {
-                        // joystick_x_item->cloud_properties.device_id = joystick_parent_x_device->cloud_properties.device_id;
                         joystick_x_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X];
                         joystick_x_item->is_user_arg_unique = true;// allow to clear in 'parent_device->item_x'
 
                         __setup_item_cloud_properties(joystick_x_item, user_data);
                         __setup_item_interface_properties(joystick_x_item, cj_device);
                         ret = 1;
+                    }
+                    else
+                    {
+                        ret = -1;
                     }
 
                     l_ezlopi_device_t* joystick_child_y_device = ezlopi_device_add_device(cj_device);
@@ -192,7 +194,6 @@ static int __prepare(void* arg)
                         l_ezlopi_item_t* joystick_y_item = ezlopi_device_add_item_to_device(joystick_child_y_device, sensor_0020_other_2axis_joystick);
                         if (joystick_y_item)
                         {
-                            // joystick_y_item->cloud_properties.device_id = joystick_child_y_device->cloud_properties.device_id;
                             joystick_y_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y];
 
                             __setup_item_cloud_properties(joystick_y_item, user_data);
@@ -204,10 +205,6 @@ static int __prepare(void* arg)
                             ezlopi_device_free_device(joystick_child_y_device);
                             ret = -1;
                         }
-                    }
-                    else
-                    {
-                        ret = -1;
                     }
 
                     l_ezlopi_device_t* joystick_child_sw_device = ezlopi_device_add_device(cj_device);
@@ -224,7 +221,6 @@ static int __prepare(void* arg)
                         l_ezlopi_item_t* joystick_sw_item = ezlopi_device_add_item_to_device(joystick_child_sw_device, sensor_0020_other_2axis_joystick);
                         if (joystick_sw_item)
                         {
-                            // joystick_sw_item->cloud_properties.device_id = joystick_child_sw_device->cloud_properties.device_id;
                             joystick_sw_item->cloud_properties.item_id = user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH];
 
                             __setup_item_cloud_properties(joystick_sw_item, user_data);
@@ -237,9 +233,13 @@ static int __prepare(void* arg)
                             ret = -1;
                         }
                     }
-                    else
+
+                    if ((NULL == joystick_x_item) &&
+                        (NULL == joystick_child_y_device) &&
+                        (NULL == joystick_child_sw_device))
                     {
-                        ret = -1;
+
+                        ezlopi_device_free_device(joystick_parent_x_device);
                     }
                 }
                 else

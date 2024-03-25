@@ -169,7 +169,6 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
             if (item_temperature)
             {
-                item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
 
                 double* temperature_value = (double*)malloc(sizeof(double));
@@ -186,6 +185,10 @@ static int __prepare(void* arg)
                 ezlopi_device_free_device(device);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
 

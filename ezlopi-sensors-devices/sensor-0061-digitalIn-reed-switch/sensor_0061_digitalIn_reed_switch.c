@@ -67,11 +67,6 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t
 //----------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_door;
     device->cloud_properties.device_type = dev_type_doorlock;
@@ -113,7 +108,6 @@ static int __0061_prepare(void* arg)
                 l_ezlopi_item_t* reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
-                    reed_item->cloud_properties.device_id = reed_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
                     ret = 1;
                 }

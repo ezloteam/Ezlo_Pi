@@ -63,10 +63,6 @@ int sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_it
 //-------------------------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
-    ASSIGN_DEVICE_NAME_V2(device, dev_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
@@ -181,10 +177,12 @@ static int __0043_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             if (user_data)
             {
                 char* valueFormatted = ezlopi_valueformatter_float((user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-                cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
-                cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
-                // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
-                free(valueFormatted);
+                if (valueFormatted) {
+                    cJSON_AddStringToObject(cj_result, "valueFormatted", valueFormatted);
+                    cJSON_AddNumberToObject(cj_result, "value", (user_data->uv_data) / 10); // [mW/cm^2] -> [W/m^2]
+                    // TRACE_I("UV_intensity : %.2f", user_data->uv_data);
+                    free(valueFormatted);
+                }
 
                 ret = 1;
             }

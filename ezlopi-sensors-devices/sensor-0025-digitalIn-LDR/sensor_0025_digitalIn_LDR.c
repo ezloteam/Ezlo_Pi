@@ -122,10 +122,9 @@ static int __prepare(void* arg)
             if (device)
             {
                 __setup_device_properties(device, cj_device);
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, NULL);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0025_digitalIn_LDR);
                 if (item)
                 {
-                    item->func = sensor_0025_digitalIn_LDR;
                     __setup_item_properties(item, cj_device);
                     ret = 1;
                 }
@@ -135,6 +134,11 @@ static int __prepare(void* arg)
                     ret = -1;
                 }
             }
+            else
+            {
+                ret = -1;
+            }
+
         }
     }
 
@@ -165,7 +169,6 @@ static void __setup_device_properties(l_ezlopi_device_t* device, cJSON* cj_devic
     // char *device_name = NULL;
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;

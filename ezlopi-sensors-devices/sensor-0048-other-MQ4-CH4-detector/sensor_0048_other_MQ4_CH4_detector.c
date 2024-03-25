@@ -101,7 +101,6 @@ static int __0048_prepare(void* arg)
             if (MQ4_item_digi)
             {
                 ret = 1;
-                // MQ4_item_digi->cloud_properties.device_id = MQ4_device_parent_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ4_item_digi, device_prep_arg->cjson_device);
             }
             else
@@ -120,12 +119,11 @@ static int __0048_prepare(void* arg)
                     TRACE_I("Child_MQ4_device_adc-[0x%x] ", MQ4_device_child_adc->cloud_properties.device_id);
                     __prepare_device_adc_cloud_properties_child_adc(MQ4_device_child_adc, device_prep_arg->cjson_device);
 
-                    MQ4_device_child_adc->cloud_properties.parent_device_id = MQ4_device_parent_digi->cloud_properties.device_id;// assigning parent_device_id to child_device
+                    MQ4_device_child_adc->cloud_properties.parent_device_id = MQ4_device_parent_digi->cloud_properties.device_id;
                     l_ezlopi_item_t* MQ4_item_adc = ezlopi_device_add_item_to_device(MQ4_device_child_adc, sensor_0048_other_MQ4_CH4_detector);
                     if (MQ4_item_adc)
                     {
                         ret = 1;
-                        // MQ4_item_adc->cloud_properties.device_id = MQ4_device_child_adc->cloud_properties.device_id;
                         __prepare_item_adc_cloud_properties(MQ4_item_adc, device_prep_arg->cjson_device, MQ4_value);
                     }
                     else
@@ -213,11 +211,12 @@ static int __0048_init(l_ezlopi_item_t* item)
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_digi_cloud_properties_parent_digi(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "digi");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -245,7 +244,12 @@ static void __prepare_device_adc_cloud_properties_child_adc(l_ezlopi_device_t* d
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
     // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "adc");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -413,7 +417,7 @@ static float __extract_MQ4_sensor_ppm(l_ezlopi_item_t* item)
 #else
             analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-            vTaskDelay(1);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
         }
         analog_sensor_volt = analog_sensor_volt / 10.0f;
 
@@ -459,7 +463,7 @@ static void __calibrate_MQ4_R0_resistance(void* params)
             for (uint8_t j = 20; j > 0; j--)
             {
                 TRACE_E("Heating sensor.........time left: %d sec", j);
-                vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
+                vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
             }
             //-------------------------------------------------
             // extract the mean_sensor_analog_output_voltage
@@ -478,7 +482,7 @@ static void __calibrate_MQ4_R0_resistance(void* params)
 #else
                 _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
-                vTaskDelay(1); // 10ms
+                vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms
             }
             _sensor_volt = _sensor_volt / 100.0f;
 

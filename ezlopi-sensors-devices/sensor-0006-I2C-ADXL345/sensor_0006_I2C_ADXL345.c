@@ -58,15 +58,38 @@ int sensor_0006_I2C_ADXL345(e_ezlopi_actions_t action, l_ezlopi_item_t* item, vo
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
+}
+static void __prepare_device_cloud_properties_parent_x(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_x");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_y(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_y");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_z(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_z");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
 }
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data)
 {
@@ -116,36 +139,70 @@ static int __prepare(void* arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_adxl345_data_t));
-            l_ezlopi_device_t* adxl345_device = ezlopi_device_add_device(cj_device);
-            if (adxl345_device)
+            l_ezlopi_device_t* adxl345_parent_x_device = ezlopi_device_add_device(cj_device);
+            if (adxl345_parent_x_device)
             {
-                __prepare_device_cloud_properties(adxl345_device, cj_device);
-                l_ezlopi_item_t* x_item = ezlopi_device_add_item_to_device(adxl345_device, sensor_0006_I2C_ADXL345);
+                TRACE_I("Parent_adxl345_acc-x-[0x%x] ", adxl345_parent_x_device->cloud_properties.device_id);
+                __prepare_device_cloud_properties_parent_x(adxl345_parent_x_device, cj_device);
+                __prepare_device_cloud_properties(adxl345_parent_x_device, cj_device);
+                l_ezlopi_item_t* x_item = ezlopi_device_add_item_to_device(adxl345_parent_x_device, sensor_0006_I2C_ADXL345);
                 if (x_item)
                 {
                     x_item->cloud_properties.item_name = ezlopi_item_name_acceleration_x_axis;
                     __prepare_item_cloud_properties(x_item, user_data);
                     __prepare_item_interface_properties(x_item, cj_device);
                 }
-                l_ezlopi_item_t* y_item = ezlopi_device_add_item_to_device(adxl345_device, sensor_0006_I2C_ADXL345);
-                if (y_item)
+
+                l_ezlopi_device_t* adxl345_child_y_device = ezlopi_device_add_device(cj_device);
+                if (adxl345_child_y_device)
                 {
-                    y_item->cloud_properties.item_name = ezlopi_item_name_acceleration_y_axis;
-                    __prepare_item_cloud_properties(y_item, user_data);
-                    __prepare_item_interface_properties(y_item, cj_device);
+
+                    TRACE_I("child_mpu6050_acc-y-[0x%x] ", adxl345_child_y_device->cloud_properties.device_id);
+                    __prepare_device_cloud_properties_child_y(adxl345_child_y_device, cj_device);
+                    __prepare_device_cloud_properties(adxl345_child_y_device, cj_device);
+                    adxl345_child_y_device->cloud_properties.parent_device_id = adxl345_parent_x_device->cloud_properties.device_id;
+                    l_ezlopi_item_t* y_item = ezlopi_device_add_item_to_device(adxl345_child_y_device, sensor_0006_I2C_ADXL345);
+                    if (y_item)
+                    {
+                        y_item->cloud_properties.item_name = ezlopi_item_name_acceleration_y_axis;
+                        __prepare_item_cloud_properties(y_item, user_data);
+                        __prepare_item_interface_properties(y_item, cj_device);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(adxl345_child_y_device);
+                    }
                 }
-                l_ezlopi_item_t* z_item = ezlopi_device_add_item_to_device(adxl345_device, sensor_0006_I2C_ADXL345);
-                if (z_item)
+
+                l_ezlopi_device_t* adxl345_child_z_device = ezlopi_device_add_device(cj_device);
+                if (adxl345_child_z_device)
                 {
-                    z_item->cloud_properties.item_name = ezlopi_item_name_acceleration_z_axis;
-                    __prepare_item_cloud_properties(z_item, user_data);
-                    __prepare_item_interface_properties(z_item, cj_device);
+
+                    TRACE_I("child_mpu6050_acc-z-[0x%x] ", adxl345_child_z_device->cloud_properties.device_id);
+                    __prepare_device_cloud_properties_child_z(adxl345_child_z_device, cj_device);
+                    __prepare_device_cloud_properties(adxl345_child_z_device, cj_device);
+                    adxl345_child_z_device->cloud_properties.parent_device_id = adxl345_parent_x_device->cloud_properties.device_id;
+                    l_ezlopi_item_t* z_item = ezlopi_device_add_item_to_device(adxl345_child_z_device, sensor_0006_I2C_ADXL345);
+                    if (z_item)
+                    {
+                        z_item->cloud_properties.item_name = ezlopi_item_name_acceleration_z_axis;
+                        __prepare_item_cloud_properties(z_item, user_data);
+                        __prepare_item_interface_properties(z_item, cj_device);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(adxl345_child_z_device);
+                    }
                 }
 
                 ret = 1;
-                if ((NULL == x_item) && (NULL == y_item) && (NULL == z_item))
+                if ((NULL == x_item) &&
+                    (NULL == adxl345_child_y_device) &&
+                    (NULL == adxl345_child_z_device))
                 {
-                    ezlopi_device_free_device(adxl345_device);
+                    ezlopi_device_free_device(adxl345_parent_x_device);
                     free(user_data);
                     ret = -1;
                 }

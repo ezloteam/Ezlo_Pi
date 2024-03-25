@@ -73,13 +73,13 @@ EZLOPI_DEVICE_LIST("sensor-MQ4-CH4-methane              ", 48, sensor_0048_other
 // EZLOPI_DEVICE_LIST("sensor-YFS201-PWM-flowmeter         ", 54, sensor_0054_PWM_YFS201_flowmeter)
 EZLOPI_DEVICE_LIST("sensor-Flex-Resistor-ADC            ", 55, sensor_0055_ADC_FlexResistor)
 // EZLOPI_DEVICE_LIST("sensor-Force-sensetive-resistor-ADC ", 56, sensor_0056_ADC_Force_Sensitive_Resistor)
-// EZLOPI_DEVICE_LIST("sensor-KY026-Flame-detector         ", 57, sensor_0057_other_KY026_FlameDetector)
+EZLOPI_DEVICE_LIST("sensor-KY026-Flame-detector         ", 57, sensor_0057_other_KY026_FlameDetector)
 
 // EZLOPI_DEVICE_LIST("sensor-MQ6-LPG-detector             ", 59, sensor_0059_other_MQ6_LPG_detector)
 // EZLOPI_DEVICE_LIST("sensor-vibration-detector-Digital   ", 60, sensor_0060_digitalIn_vibration_detector)
 // EZLOPI_DEVICE_LIST("sensor-reed-switch-digital          ", 61, sensor_0061_digitalIn_reed_switch)
 // EZLOPI_DEVICE_LIST("sensor-MQ7-CO-detector              ", 62, sensor_0062_other_MQ7_CO_detector)
-// EZLOPI_DEVICE_LIST("sensor-MQ9-LPG-flameable-detector   ", 63, sensor_0063_other_MQ9_LPG_flameable_detector)
+EZLOPI_DEVICE_LIST("sensor-MQ9-LPG-flameable-detector   ", 63, sensor_0063_other_MQ9_LPG_flameable_detector)
 
 // EZLOPI_DEVICE_LIST("sensor-float-switch-digital         ", 65, sensor_0065_digitalIn_float_switch)
 // EZLOPI_DEVICE_LIST("sensor-fingerprint-sensor           ", 66, sensor_0066_other_R307_FingerPrint)

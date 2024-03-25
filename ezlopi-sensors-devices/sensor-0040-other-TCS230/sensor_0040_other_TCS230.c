@@ -93,10 +93,6 @@ static int __tcs230_setup_gpio(gpio_num_t s0_pin,
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
@@ -120,13 +116,16 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     if (item && cj_device)
     {
         s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
-        item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX;
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
-        CJSON_GET_VALUE_INT(cj_device, "gpio4", user_data->TCS230_pin.gpio_s3);           // gpio_s3
-        CJSON_GET_VALUE_INT(cj_device, "gpio5", user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
-        CJSON_GET_VALUE_INT(cj_device, "gpio6", user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
+        if (user_data)
+        {
+            item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX;
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
+            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
+            CJSON_GET_VALUE_INT(cj_device, "gpio4", user_data->TCS230_pin.gpio_s3);           // gpio_s3
+            CJSON_GET_VALUE_INT(cj_device, "gpio5", user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
+            CJSON_GET_VALUE_INT(cj_device, "gpio6", user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
+        }
     }
 }
 //------------------------------------------------------------------------------------------------------
@@ -163,6 +162,10 @@ static int __0040_prepare(void* arg)
                 ret = -1;
                 free(user_data);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;

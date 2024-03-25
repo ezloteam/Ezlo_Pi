@@ -74,12 +74,12 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         # sensor-0054-PWM-YFS201-flowmeter
         sensor-0055-ADC-FlexResistor
         # sensor-0056-ADC-Force-Sensitive-Resistor                             
-        # sensor-0057-other-KY026-FlameDetector
+        sensor-0057-other-KY026-FlameDetector
         # sensor-0059-other-MQ6-LPG-detector
         # sensor-0060-digitalIn-vibration-detector
         # sensor-0061-digitalIn-reed-switch
         # sensor-0062-other-MQ7-CO-detector
-        # sensor-0063-other-MQ9-LPG-flameable-detector
+        sensor-0063-other-MQ9-LPG-flameable-detector
         # sensor-0065-digitalIn-float-switch
         # sensor-0066-other-R307-FingerPrint
         # sensor-0067-UART-hilink-presence-sensor

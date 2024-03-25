@@ -202,28 +202,32 @@ static void __prepare_device_cloud_properties_temp(l_ezlopi_device_t* device, cJ
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "temp");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_temperature;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_device_cloud_properties_hum(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "humi");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
 
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
     device->cloud_properties.category = category_humidity;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
 }
 
 static void __prepare_temperature_item_properties(l_ezlopi_item_t* item, cJSON* cj_device)
@@ -278,45 +282,58 @@ static int __prepare(void* arg)
         {
             memset(value_ptr, 0, sizeof(s_gxhtc3_value_t));
 
-            l_ezlopi_device_t* device_temp = ezlopi_device_add_device(prep_arg->cjson_device);
-            if (device_temp)
+            l_ezlopi_device_t* parent_device_temp = ezlopi_device_add_device(prep_arg->cjson_device);
+            if (parent_device_temp)
             {
-                __prepare_device_cloud_properties_temp(device_temp, prep_arg->cjson_device);
-                l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device_temp, sensor_0029_I2C_GXHTC3);
+                ret = 1;
+                TRACE_I("Parent_temp_device-[0x%x] ", parent_device_temp->cloud_properties.device_id);
+                __prepare_device_cloud_properties_temp(parent_device_temp, prep_arg->cjson_device);
+                l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(parent_device_temp, sensor_0029_I2C_GXHTC3);
                 if (item_temperature)
                 {
-                    item_temperature->cloud_properties.device_id = device_temp->cloud_properties.device_id;
                     __prepare_temperature_item_properties(item_temperature, prep_arg->cjson_device);
                     value_ptr->temperature = 65536.0f;
                     item_temperature->user_arg = (void*)value_ptr;
                 }
-                else
+
+                l_ezlopi_device_t* child_device_hum = ezlopi_device_add_device(prep_arg->cjson_device);
+                if (child_device_hum)
                 {
-                    ezlopi_device_free_device(device_temp);
-                    free(value_ptr); // set to NULL?
-                    ret = -1;
+                    TRACE_I("Child_humidity_device-[0x%x] ", child_device_hum->cloud_properties.device_id);
+                    __prepare_device_cloud_properties_hum(child_device_hum, prep_arg->cjson_device);
+
+                    child_device_hum->cloud_properties.parent_device_id = parent_device_temp->cloud_properties.device_id;
+                    l_ezlopi_item_t* item_humdity = ezlopi_device_add_item_to_device(child_device_hum, sensor_0029_I2C_GXHTC3);
+                    if (item_humdity)
+                    {
+                        __prepare_humidity_item_properties(item_humdity, prep_arg->cjson_device);
+                        value_ptr->humidity = 65536.0f;
+                        item_humdity->user_arg = (void*)value_ptr; // affected if 'value_pts' is already freed?
+                    }
+                    else
+                    {
+                        ezlopi_device_free_device(child_device_hum);
+                        ret = -1;
+                    }
                 }
-            }
-            l_ezlopi_device_t* device_hum = ezlopi_device_add_device(prep_arg->cjson_device);
-            if (device_hum)
-            {
-                __prepare_device_cloud_properties_hum(device_hum, prep_arg->cjson_device);
-                l_ezlopi_item_t* item_humdity = ezlopi_device_add_item_to_device(device_hum, sensor_0029_I2C_GXHTC3);
-                if (item_humdity)
+
+                if ((NULL == item_temperature) &&
+                    (NULL == child_device_hum))
                 {
-                    item_humdity->cloud_properties.device_id = device_hum->cloud_properties.device_id;
-                    __prepare_humidity_item_properties(item_humdity, prep_arg->cjson_device);
-                    value_ptr->humidity = 65536.0f;
-                    item_humdity->user_arg = (void*)value_ptr; // affected if 'value_pts' is already freed?
-                }
-                else
-                {
-                    ezlopi_device_free_device(device_hum);
                     free(value_ptr);
+                    ezlopi_device_free_device(parent_device_temp);
                     ret = -1;
                 }
             }
-            ret = 1;
+            else
+            {
+                free(value_ptr);
+                ret = -1;
+            }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;

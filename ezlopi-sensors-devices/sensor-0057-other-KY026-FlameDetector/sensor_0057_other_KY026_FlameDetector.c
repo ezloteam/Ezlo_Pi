@@ -80,52 +80,63 @@ static int __0057_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t* flame_device_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
-        if (flame_device_digi)
+        l_ezlopi_device_t* flame_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
+        if (flame_device_parent_digi)
         {
-            __prepare_device_digi_cloud_properties(flame_device_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t* flame_item_digi = ezlopi_device_add_item_to_device(flame_device_digi, sensor_0057_other_KY026_FlameDetector);
+            TRACE_I("Parent_flame_device_digi-[0x%x] ", flame_device_parent_digi->cloud_properties.device_id);
+            __prepare_device_digi_cloud_properties(flame_device_parent_digi, device_prep_arg->cjson_device);
+            l_ezlopi_item_t* flame_item_digi = ezlopi_device_add_item_to_device(flame_device_parent_digi, sensor_0057_other_KY026_FlameDetector);
             if (flame_item_digi)
             {
-                flame_item_digi->cloud_properties.device_id = flame_device_digi->cloud_properties.device_id;
+                flame_item_digi->cloud_properties.device_id = flame_device_parent_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(flame_item_digi, device_prep_arg->cjson_device);
                 ret = 1;
             }
             else
             {
                 ret = -1;
-                ezlopi_device_free_device(flame_device_digi);
             }
-        }
 
-        //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        flame_t* flame_struct = (flame_t*)malloc(sizeof(flame_t));
-        if (NULL != flame_struct)
-        {
-            memset(flame_struct, 0, sizeof(flame_t));
-            l_ezlopi_device_t* flame_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
-            if (flame_device_adc)
+            //---------------------------- ADC - DEVICE 2 -------------------------------------------
+            flame_t* flame_struct = (flame_t*)malloc(sizeof(flame_t));
+            if (NULL != flame_struct)
             {
-                __prepare_device_adc_cloud_properties(flame_device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* flame_item_adc = ezlopi_device_add_item_to_device(flame_device_adc, sensor_0057_other_KY026_FlameDetector);
-                if (flame_item_adc)
+                memset(flame_struct, 0, sizeof(flame_t));
+                l_ezlopi_device_t* flame_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
+                if (flame_device_child_adc)
                 {
-                    flame_item_adc->cloud_properties.device_id = flame_device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, flame_struct);
-                    ret = 1;
+                    TRACE_I("Child_flame_device_adc-[0x%x] ", flame_device_child_adc->cloud_properties.device_id);
+                    __prepare_device_adc_cloud_properties(flame_device_child_adc, device_prep_arg->cjson_device);
+
+                    flame_device_child_adc->cloud_properties.parent_device_id = flame_device_parent_digi->cloud_properties.device_id;
+                    l_ezlopi_item_t* flame_item_adc = ezlopi_device_add_item_to_device(flame_device_child_adc, sensor_0057_other_KY026_FlameDetector);
+                    if (flame_item_adc)
+                    {
+                        flame_item_adc->cloud_properties.device_id = flame_device_child_adc->cloud_properties.device_id;
+                        __prepare_item_adc_cloud_properties(flame_item_adc, device_prep_arg->cjson_device, flame_struct);
+                        ret = 1;
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(flame_device_child_adc);
+                        free(flame_struct);
+                    }
                 }
                 else
                 {
                     ret = -1;
-                    ezlopi_device_free_device(flame_device_adc);
                     free(flame_struct);
                 }
             }
             else
             {
                 ret = -1;
-                free(flame_struct);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -190,11 +201,18 @@ static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJ
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
     // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "digi");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
 
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_heat;
     device->cloud_properties.device_type = dev_type_sensor;
 }
+
 static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->cloud_properties.has_getter = true;
@@ -216,6 +234,12 @@ static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJS
     // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
     // ASSIGN_DEVICE_NAME_V2(device, device_name);
     // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    // ASSIGN_DEVICE_NAME_V2(device, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "adc");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
 
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;

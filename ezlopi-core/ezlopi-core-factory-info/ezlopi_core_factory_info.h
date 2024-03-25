@@ -177,39 +177,27 @@ extern "C"
             },\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"2Axis_Joystick\",\
-                \"id_room\": \"\",\
-                \"id_item\": 20,\
-                \"gpio1\": 34,\
-                \"gpio2\": 35,\
-                \"gpio3\": 15,\
-                \"resln_bit\": 3\
-            },\
-            {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"Water_leak\",\
-                \"id_room\": \"\",\
-                \"id_item\": 27,\
-                \"gpio\": 32\
-            },\
-            {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"MQ4_CH4\",\
-                \"id_item\": 48,\
+                \"dev_name\": \"MQ6\",\
+                \"id_item\": 59,\
                 \"id_room\": \"\",\
                 \"gpio1\": 25,\
                 \"gpio2\": 33\
             },\
             {\
-                \"dev_type\": 8,\
-                \"dev_name\": \"GY271\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"MQ9\",\
+                \"id_item\": 63,\
                 \"id_room\": \"\",\
-                \"id_item\": 7,\
-                \"gpio_sda\": 18,\
-                \"gpio_scl\": 19,\
-                \"pullup_scl\": true,\
-                \"pullup_sda\": true,\
-                \"slave_addr\": 13\
+                \"gpio1\": 25,\
+                \"gpio2\": 33\
+            },\
+            {\
+                \"dev_type\": 10,\
+                \"dev_name\": \"flame\",\
+                \"id_item\": 57,\
+                \"id_room\": \"\",\
+                \"gpio1\": 22,\
+                \"gpio2\": 34\
             }\
         ], \
         \"dev_total\": 5}";

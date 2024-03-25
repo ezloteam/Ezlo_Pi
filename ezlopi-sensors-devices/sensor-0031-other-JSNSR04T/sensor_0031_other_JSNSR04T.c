@@ -199,6 +199,10 @@ static int __prepare(void* arg)
                 ret = -1;
             }
         }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
