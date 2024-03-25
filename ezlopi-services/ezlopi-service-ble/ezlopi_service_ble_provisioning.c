@@ -87,13 +87,18 @@ static char* __provisioning_status_jsonify(void)
         cJSON_AddStringToObject(root, ezlopi_config_id_str, tmp_buffer);
         cJSON_AddNumberToObject(root, ezlopi_config_time_str, ezlopi_nvs_config_info_update_time_get());
 
-        prov_status_jstr = cJSON_Print(root);
-        cJSON_Delete(root);
-
+        uint32_t buff_len = 256;
+        prov_status_jstr = malloc(buff_len);
         if (prov_status_jstr)
         {
-            cJSON_Minify(prov_status_jstr);
+            if (!cJSON_PrintPreallocated(root, prov_status_jstr, buff_len, false))
+            {
+                free(prov_status_jstr);
+                prov_status_jstr = NULL;
+            }
         }
+
+        cJSON_Delete(root);
     }
 
     return prov_status_jstr;
@@ -269,6 +274,7 @@ static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts
 {
     // TRACE_D("Read function called!");
 
+    static const uint32_t _data_size = 400;
     static char* g_provisioning_info_base64;
     static uint32_t g_provisioning_sequence_no;
     static time_t g_provisioning_last_read_time;
@@ -296,49 +302,50 @@ static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts
 
             g_provisioning_sequence_no = 0;
             g_provisioning_number_of_sequence = strlen(g_provisioning_info_base64) / ezlopi_ble_gatt_get_max_data_size();
-            g_provisioning_number_of_sequence = (strlen(g_provisioning_info_base64) % ezlopi_ble_gatt_get_max_data_size()) ? (g_provisioning_number_of_sequence + 1) : g_provisioning_number_of_sequence;
+            g_provisioning_number_of_sequence = (strlen(g_provisioning_info_base64) % ezlopi_ble_gatt_get_max_data_size()) ?
+                (g_provisioning_number_of_sequence + 1) : g_provisioning_number_of_sequence;
         }
 
         if (NULL != g_provisioning_info_base64)
         {
             if (ezlopi_ble_gatt_get_max_data_size() >= g_required_ble_prov_buffer_size)
             {
-
                 uint32_t total_data_len = strlen(g_provisioning_info_base64);
-                uint32_t copy_size = total_data_len - (g_provisioning_sequence_no * 400);
-                copy_size = (copy_size > 400) ? 400 : copy_size;
-
-                TRACE_I("copy_size: %d", copy_size);
-                TRACE_I("total_data_len: %d", total_data_len);
+                uint32_t copy_size = total_data_len - (g_provisioning_sequence_no * _data_size);
+                copy_size = (copy_size > _data_size) ? _data_size : copy_size;
 
                 cJSON* cj_response = cJSON_CreateObject();
                 if (cj_response)
                 {
-                    char* data_buffer = (char*)malloc(400 + 1);
-                    snprintf(data_buffer, 400, "%.*s", copy_size, g_provisioning_info_base64 + (g_provisioning_sequence_no * 400));
+                    char data_buffer[_data_size + 4];
+                    snprintf(data_buffer, sizeof(data_buffer), "%.*s", copy_size, g_provisioning_info_base64 + (g_provisioning_sequence_no * _data_size));
 
                     cJSON_AddNumberToObject(cj_response, ezlopi_len_str, copy_size);
                     cJSON_AddNumberToObject(cj_response, ezlopi_total_len_str, total_data_len);
                     cJSON_AddNumberToObject(cj_response, ezlopi_sequence_str, g_provisioning_sequence_no);
                     cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
-                    char* send_data = cJSON_Print(cj_response);
-                    if (send_data)
-                    {
-                        TRACE_D("data: %s", send_data);
-                        cJSON_Minify(send_data);
+                    const uint32_t buffer_len = 512;
+                    char json_to_str_buffer[buffer_len];
+                    memset(json_to_str_buffer, 0, buffer_len);
+                    status = cJSON_PrintPreallocated(cj_response, json_to_str_buffer, buffer_len, false);
+                    cJSON_Delete(cj_response);
 
-                        if ((0 != total_data_len) && (total_data_len >= ((g_provisioning_sequence_no * 400) + copy_size)))
+                    if (status)
+                    {
+                        TRACE_D("data: %s", json_to_str_buffer);
+
+                        if ((0 != total_data_len) && (total_data_len >= ((g_provisioning_sequence_no * _data_size) + copy_size)))
                         {
-                            value->len = strlen(send_data);
-                            strncpy((char*)value->value, send_data, value->len + 1);
+                            value->len = strlen(json_to_str_buffer);
+                            strncpy((char*)value->value, json_to_str_buffer, value->len + 1);
 
                             TRACE_I("data: %s", (char*)value->value);
 
                             g_provisioning_sequence_no += 1;
                             status = 0;
 
-                            if (copy_size < 400) // Done reading
+                            if (copy_size < _data_size) // Done reading
                             {
                                 status = 1; // non negative for done reading
                                 free(g_provisioning_info_base64);
@@ -347,20 +354,15 @@ static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts
                         }
                         else
                         {
-                            TRACE_W("Check value: %d", ((g_provisioning_sequence_no * 400) + copy_size));
+                            TRACE_W("Check value: %d", ((g_provisioning_sequence_no * _data_size) + copy_size));
                             TRACE_W("total_data_len: %d", total_data_len);
                             status = -4;
                         }
-
-                        free(send_data);
                     }
                     else
                     {
                         status = -3;
                     }
-
-                    cJSON_Delete(cj_response);
-                    free(data_buffer);
                 }
                 else
                 {
@@ -372,7 +374,7 @@ static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts
                 TRACE_E("MTU size must be greater than %d!", g_required_ble_prov_buffer_size);
                 TRACE_W("call SET-MTU API from client stack!");
 
-                CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
+                CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(g_required_ble_prov_buffer_size), "set local  MTU failed");
                 status = -2;
             }
         }
@@ -418,13 +420,10 @@ static char* __base64_decode_provisioning_info(uint32_t total_size)
 
         while (tmp_prov_buffer)
         {
-            // TRACE_W("tmp_prov_buffer->buffer[%d]: %.*s", tmp_prov_buffer->len, tmp_prov_buffer->len, (char *)tmp_prov_buffer->buffer);
             cJSON* root = cJSON_ParseWithLength((const char*)tmp_prov_buffer->buffer, tmp_prov_buffer->len);
             if (root)
             {
                 uint32_t len = CJ_GET_NUMBER(ezlopi_len_str);
-                // uint32_t tot_len = CJ_GET_NUMBER(ezlopi_total_len_str);
-                // uint32_t sequence = CJ_GET_NUMBER(ezlopi_sequence_str);
                 char* data = CJ_GET_STRING(ezlopi_data_str);
                 if (data)
                 {
@@ -512,13 +511,19 @@ static char* __provisioning_info_jsonify(void)
         ezlopi_factory_info_v3_free(ssl_shared_key);
         ezlopi_factory_info_v3_free(ca_cert);
 
-        str_json_prov_info = cJSON_Print(cj_prov_info);
-        cJSON_Delete(cj_prov_info);
+        uint32_t buf_len = 6 * 1024;
+        str_json_prov_info = malloc(buf_len);
 
         if (str_json_prov_info)
         {
-            cJSON_Minify(str_json_prov_info);
+            if (!cJSON_PrintPreallocated(cj_prov_info, str_json_prov_info, buf_len, false))
+            {
+                free(str_json_prov_info);
+                str_json_prov_info = NULL;
+            }
         }
+
+        cJSON_Delete(cj_prov_info);
     }
 
     return str_json_prov_info;
@@ -526,30 +531,30 @@ static char* __provisioning_info_jsonify(void)
 
 static char* __provisioning_info_base64(void)
 {
-    const uint32_t base64_data_len = 5120;
-    char* base64_data = malloc(base64_data_len);
-    if (base64_data)
+    char* base64_data = NULL;
+    char* str_provisioning_data = __provisioning_info_jsonify();
+
+    if (str_provisioning_data)
     {
-        uint32_t out_put_len = 0;
-        char* str_provisioning_data = __provisioning_info_jsonify();
-        if (str_provisioning_data)
+        const uint32_t base64_data_len = 6 * 1024;
+        base64_data = malloc(base64_data_len);
+
+        if (base64_data)
         {
+            uint32_t out_put_len = 0;
             TRACE_D("str_provisioning_data[len: %d]: %s", strlen(str_provisioning_data), str_provisioning_data);
 
-            int ret = mbedtls_base64_encode((unsigned char*)base64_data, base64_data_len, &out_put_len, (const unsigned char*)str_provisioning_data, strlen(str_provisioning_data));
+            int ret = mbedtls_base64_encode((unsigned char*)base64_data, base64_data_len, &out_put_len,
+                (const unsigned char*)str_provisioning_data, strlen(str_provisioning_data));
 
-            TRACE_D("'mbedtls_base64_encode' returned: %04x", ret);
-            free(str_provisioning_data);
+            if (0 == out_put_len)
+            {
+                free(base64_data);
+                base64_data = NULL;
+            }
         }
 
-        if (0 == out_put_len)
-        {
-            free(base64_data);
-            base64_data = NULL;
-        }
-
-        TRACE_D("out-put-len: %d", out_put_len);
-        TRACE_D("base64_data[len: %d]: %s", strlen(base64_data), base64_data);
+        free(str_provisioning_data);
     }
 
     return base64_data;
