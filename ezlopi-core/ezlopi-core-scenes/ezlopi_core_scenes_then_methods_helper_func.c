@@ -254,10 +254,10 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
 
             if (succ_parsing)
             {
-                TRACE_D("*source = \"%s\"\n", field_value_string);
-                TRACE_S("host = \"%s\"\n", host);
-                TRACE_S("port = \"%d\"\n", port);
-                TRACE_S("page = \"%s\"\n", page);
+                TRACE_D("*source = '%s'", field_value_string);
+                TRACE_S("host = '%s'", host);
+                TRACE_S("port = '%d'", port);
+                TRACE_S("page = '%s'", page);
 
                 tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), host);
                 tmp_http_data->web_port = port;

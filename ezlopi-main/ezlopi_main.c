@@ -28,7 +28,7 @@
 
 #include "pt.h"
 
-#define ENABLE_HEARTBIT_LED 1
+#define ENABLE_HEARTBIT_LED 0
 
 static void __blinky(void* pv);
 static void __init_heartbeat_led(void);
@@ -104,7 +104,7 @@ static void __toggle_heartbeat_led(void) {
 
 static void __blinky(void* pv)
 {
-    __init_heartbeat_led();
+    // __init_heartbeat_led();
 
     PT_INIT(&pt1);
     uint32_t count = 0;
