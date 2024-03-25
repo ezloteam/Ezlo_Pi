@@ -5,6 +5,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdint.h>
+#include <cJSON.h>
+
 
 typedef int (*f_broadcast_method_t)(char* data);
 
@@ -19,6 +21,8 @@ typedef struct l_broadcast_method
 
 void ezlopi_core_ezlopi_broadcast_execute(char* data);
 int ezlopi_core_ezlopi_broadcast_methods_send_to_queue(char* data);
+int ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cJSON* cj_data);
+
 void ezlopi_core_ezlopi_broadcast_methods_set_queue(int(*func)(char*));
 l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_methods_get_head(void);
 void ezlopi_core_ezlopi_broadcast_remove_method(f_broadcast_method_t broadcast_method);

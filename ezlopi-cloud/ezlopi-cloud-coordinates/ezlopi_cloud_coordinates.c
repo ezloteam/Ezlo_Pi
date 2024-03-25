@@ -24,13 +24,11 @@ void hub_coordinates_set(cJSON* cj_request, cJSON* cj_response)
         {
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_latitude_str, latitude);
             CJSON_GET_VALUE_DOUBLE(cj_params, ezlopi_longitude_str, longitude);
-            
-            char* lat_long_str = cJSON_Print(cj_params);
-            if (lat_long_str)
+
+            char lat_long_str[256];
+            if (cJSON_PrintPreallocated(cj_params, lat_long_str, sizeof(lat_long_str), false))
             {
-                cJSON_Minify(lat_long_str);
                 ezlopi_nvs_write_latitude_longitude(lat_long_str);
-                free(lat_long_str);
             }
         }
     }

@@ -67,13 +67,16 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
                     }
                 }
 
-                char* update_device_config = cJSON_Print(cj_device_config);
+                char* updated_device_config = cJSON_PrintBuffered(cj_device_config, 4 * 1024, false);
+                TRACE_D("length of 'updated_device_config': %d", strlen(updated_device_config));
+
                 cJSON_Delete(cj_device_config);
-                if (update_device_config)
+
+                if (updated_device_config)
                 {
-                    cJSON_Minify(update_device_config);
-                    ezlopi_factory_info_v3_set_ezlopi_config(update_device_config);
-                    free(update_device_config);
+                    cJSON_Minify(updated_device_config);
+                    ezlopi_factory_info_v3_set_ezlopi_config(updated_device_config);
+                    free(updated_device_config);
                 }
             }
         }
@@ -302,10 +305,13 @@ void ezlopi_device_prepare(void)
     s_controller_information.status = "idle";
 
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
+    int free_config = 1;
     char* config_string = ezlopi_factory_info_v3_get_ezlopi_config();
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
+    int free_config = 0;
     char* config_string = ezlopi_config_test;
 #else
+    int free_config = 1;
     char* config_string = ezlopi_factory_info_v3_get_ezlopi_config();
 #endif
 
@@ -313,14 +319,14 @@ void ezlopi_device_prepare(void)
     {
         TRACE_D("Initial config:\r\n%s", config_string);
         cJSON* cj_config = cJSON_Parse(config_string);
-        // ezlopi_factory_info_v3_free(config_string);
         if (cj_config)
         {
             ezlopi_device_parse_json_v3(cj_config);
 
             if (g_store_dev_config_with_id)
             {
-                char* updated_config = cJSON_Print(cj_config);
+                char* updated_config = cJSON_PrintBuffered(cj_config, 1024, false);
+
                 if (updated_config)
                 {
                     TRACE_D("Updated config:\r\n%s", config_string);
@@ -332,6 +338,11 @@ void ezlopi_device_prepare(void)
 
             cJSON_Delete(cj_config);
         }
+    }
+
+    if ((1 == free_config) && config_string)
+    {
+        free(config_string);
     }
 }
 
@@ -737,7 +748,6 @@ cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t* device_pro
             {
                 cJSON_AddItemReferenceToObject(cj_device, ezlopi_info_str, device_prop->cloud_properties.info);
             }
-            // TRACE_E(" Cj_device [%s]", cJSON_Print(cj_device));
         }
     }
 

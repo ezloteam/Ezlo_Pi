@@ -181,13 +181,12 @@ void scenes_enable_set(cJSON* cj_request, cJSON* cj_response)
                         cJSON_DeleteItemFromObject(cj_scene, ezlopi_enabled_str);
                         cJSON_AddBoolToObject(cj_scene, ezlopi_enabled_str, enabled_flag);
 
-                        char* updated_scene_str = cJSON_Print(cj_scene);
+                        char* updated_scene_str = cJSON_PrintBuffered(cj_scene, 2048, false);
                         cJSON_Delete(cj_scene);
 
                         if (updated_scene_str)
                         {
                             TRACE_D("updated-scene: %s", updated_scene_str);
-                            cJSON_Minify(updated_scene_str);
                             ezlopi_nvs_write_str(updated_scene_str, strlen(updated_scene_str), cj_scene_id->valuestring);
 
                             free(updated_scene_str);
@@ -244,7 +243,7 @@ void scenes_notification_add(cJSON* cj_request, cJSON* cj_response)
                     }
 
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char* updated_scene_str = cJSON_Print(cj_scene);
+                    char* updated_scene_str = cJSON_PrintBuffered(cj_scene, 2048, false);
                     cJSON_Delete(cj_scene);
 
                     if (updated_scene_str)
@@ -312,7 +311,7 @@ void scenes_notification_remove(cJSON* cj_request, cJSON* cj_response)
                     }
 
                     CJSON_TRACE("updated-scene", cj_scene);
-                    char* updated_scene_str = cJSON_Print(cj_scene);
+                    char* updated_scene_str = cJSON_PrintBuffered(cj_scene, 2048, false);
                     cJSON_Delete(cj_scene);
 
                     if (updated_scene_str)

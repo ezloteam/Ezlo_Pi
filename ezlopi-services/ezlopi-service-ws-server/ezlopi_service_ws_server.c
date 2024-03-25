@@ -82,6 +82,8 @@ int ezlopi_service_ws_server_broadcast_cjson(cJSON* cj_data)
     if (cj_data)
     {
         char* data = cJSON_Print(cj_data);
+        TRACE_D("length of 'data': %d", strlen(data));
+
         if (data)
         {
             cJSON_Minify(data);
@@ -180,6 +182,7 @@ static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t pay
                         if (method)
                         {
                             cJSON* cj_response = __method_execute(req, cj_request, cj_method, method);
+                            
                             if (cj_response)
                             {
                                 __respond_cjson(req, cj_response);
@@ -192,9 +195,15 @@ static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t pay
                         if (updater)
                         {
                             cJSON* cj_response = __method_execute(req, cj_request, cj_method, updater);
+                            ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cj_response);
+                            cJSON_Delete(cj_response);
+
+#if 0
                             if (cj_response)
                             {
                                 char* data = cJSON_Print(cj_response);
+                                TRACE_D("length of 'data': %d", strlen(data));
+
                                 cJSON_Delete(cj_response);
 
                                 if (data) {
@@ -203,6 +212,7 @@ static void __ws_api_handler(httpd_req_t* req, const char* payload, uint32_t pay
                                     }
                                 }
                             }
+#endif
                         }
                     }
                     else
@@ -438,15 +448,14 @@ static int __respond_cjson(httpd_req_t* req, cJSON* cj_response)
     int ret = 0;
     if (req && cj_response && send_lock)
     {
-        if (xSemaphoreTake(send_lock, 2000 / portTICK_PERIOD_MS))
+        if (pdTRUE == xSemaphoreTake(send_lock, 2000 / portTICK_PERIOD_MS))
         {
             TRACE_S("ws-server send-lock acquired.");
+            char* data = cJSON_PrintBuffered(cj_response, 10*1024, false);
+            TRACE_D("length of 'data': %d", strlen(data));
 
-            char* data = cJSON_Print(cj_response);
             if (data)
             {
-                cJSON_Minify(data);
-
                 httpd_ws_frame_t data_frame = {
                     .final = false,
                     .fragmented = false,

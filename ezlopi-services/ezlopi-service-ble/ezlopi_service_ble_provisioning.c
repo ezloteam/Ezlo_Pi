@@ -63,7 +63,6 @@ void ezlopi_ble_service_provisioning_init(void)
 
 }
 
-#if 1
 static char* __provisioning_status_jsonify(void)
 {
     char* prov_status_jstr = NULL;
@@ -87,16 +86,7 @@ static char* __provisioning_status_jsonify(void)
         cJSON_AddStringToObject(root, ezlopi_config_id_str, tmp_buffer);
         cJSON_AddNumberToObject(root, ezlopi_config_time_str, ezlopi_nvs_config_info_update_time_get());
 
-        uint32_t buff_len = 256;
-        prov_status_jstr = malloc(buff_len);
-        if (prov_status_jstr)
-        {
-            if (!cJSON_PrintPreallocated(root, prov_status_jstr, buff_len, false))
-            {
-                free(prov_status_jstr);
-                prov_status_jstr = NULL;
-            }
-        }
+        prov_status_jstr = cJSON_PrintBuffered(root, 256, false);
 
         cJSON_Delete(root);
     }
@@ -511,18 +501,7 @@ static char* __provisioning_info_jsonify(void)
         ezlopi_factory_info_v3_free(ssl_shared_key);
         ezlopi_factory_info_v3_free(ca_cert);
 
-        uint32_t buf_len = 6 * 1024;
-        str_json_prov_info = malloc(buf_len);
-
-        if (str_json_prov_info)
-        {
-            if (!cJSON_PrintPreallocated(cj_prov_info, str_json_prov_info, buf_len, false))
-            {
-                free(str_json_prov_info);
-                str_json_prov_info = NULL;
-            }
-        }
-
+        str_json_prov_info = cJSON_PrintBuffered(cj_prov_info, 6 * 1024, false);
         cJSON_Delete(cj_prov_info);
     }
 
@@ -560,4 +539,3 @@ static char* __provisioning_info_base64(void)
     return base64_data;
 }
 
-#endif 

@@ -343,15 +343,16 @@ int ezlopi_scenes_expressions_delete_node(s_ezlopi_expressions_t* exp_node)
                     idx++;
                 }
 
-                char* updated_ids = cJSON_Print(cj_exp_ids);
-                TRACE_D("updated-expression-ids: %s", updated_ids);
+                char* updated_ids_str = cJSON_PrintBuffered(cj_exp_ids, 1024, false);
+                TRACE_D("length of 'updated_ids_str': %d", strlen(updated_ids_str));
+
                 cJSON_Delete(cj_exp_ids);
 
-                if (updated_ids)
+                if (updated_ids_str)
                 {
-                    cJSON_Minify(updated_ids);
-                    ezlopi_nvs_write_scenes_expressions(updated_ids);
-                    free(updated_ids);
+                    TRACE_D("updated-expression-ids: %s", updated_ids_str);
+                    ezlopi_nvs_write_scenes_expressions(updated_ids_str);
+                    free(updated_ids_str);
                     ret = 1;
                 }
             }
@@ -645,10 +646,11 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON* cj_expression)
 {
     if (0 == exp_id)
     {
-        char* exp_string = cJSON_Print(cj_expression);
+        char* exp_string = cJSON_PrintBuffered(cj_expression, 1024, false);
+        TRACE_D("length of 'exp_string': %d", strlen(exp_string));
+
         if (exp_string)
         {
-            cJSON_Minify(exp_string);
             exp_id = ezlopi_cloud_generate_expression_id();
             if (exp_id)
             {
@@ -686,10 +688,11 @@ static uint32_t __expression_store_to_nvs(uint32_t exp_id, cJSON* cj_expression)
                             TRACE_D("Here");
                             if (cJSON_AddItemToArray(cj_exp_id_list, cj_exp_id))
                             {
-                                exp_id_list_str = cJSON_Print(cj_exp_id_list);
+                                exp_id_list_str = cJSON_PrintBuffered(cj_exp_id_list, 1024, false);
+                                TRACE_D("length of 'exp_id_list_str': %d", strlen(exp_id_list_str));
+
                                 if (exp_id_list_str)
                                 {
-                                    cJSON_Minify(exp_id_list_str);
                                     ezlopi_nvs_write_scenes_expressions(exp_id_list_str);
                                     free(exp_id_list_str);
                                 }

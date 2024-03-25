@@ -664,24 +664,6 @@ cJSON* ezlopi_scenes_create_cjson_scene_list(l_scenes_list_v2_t* scenes_list)
     return cj_scenes_array;
 }
 
-char* ezlopi_scenes_create_json_string(l_scenes_list_v2_t* scenes_list)
-{
-    char* scenes_list_str = NULL;
-
-    cJSON* cj_scenes_array = ezlopi_scenes_create_cjson_scene_list(scenes_list);
-    if (cj_scenes_array)
-    {
-        scenes_list_str = cJSON_Print(cj_scenes_array);
-        cJSON_Delete(cj_scenes_array);
-
-        if (scenes_list_str)
-        {
-            cJSON_Minify(scenes_list_str);
-        }
-    }
-    return scenes_list_str;
-}
-
 static void __cjson_add_string(cJSON* root, const char* key, const char* value)
 {
     if (root && key && value)

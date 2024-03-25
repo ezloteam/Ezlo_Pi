@@ -46,22 +46,29 @@ static void ota_service_process(void* pv)
         {
             TRACE_D("Sending firmware check request...");
             uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
-            cJSON* firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
-            if (NULL != firmware_info_request)
+            cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+
+            ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cj_firmware_info_request);
+            cJSON_Delete(cj_firmware_info_request);
+
+#if 0
+            if (NULL != cj_firmware_info_request)
             {
-                char* data_to_send = cJSON_Print(firmware_info_request);
-                cJSON_Delete(firmware_info_request);
-                firmware_info_request = NULL;
+                char* data_to_send = cJSON_PrintBuffered(cj_firmware_info_request, 256, false);
+                TRACE_D("length of 'data_to_send': %d", strlen(data_to_send));
+
+                cJSON_Delete(cj_firmware_info_request);
+                cj_firmware_info_request = NULL;
 
                 if (data_to_send)
                 {
-                    cJSON_Minify(data_to_send);
                     if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(data_to_send))
                     {
                         free(data_to_send);
                     }
                 }
             }
+#endif
             __ota_busy = false; // must clear immediately ; if OTA-event is serviced
         }
         else

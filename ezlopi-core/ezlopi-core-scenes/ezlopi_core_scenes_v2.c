@@ -51,7 +51,7 @@ static l_scenes_list_v2_t* _scenes_populate(cJSON* cj_scene, uint32_t scene_id);
 int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON* cj_scene)
 {
     int ret = 0;
-    // TRACE_E("%s", cJSON_Print(cj_scene));
+
     if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene))
     {
         if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
@@ -92,7 +92,10 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
         char tmp_buffer[32];
         snprintf(tmp_buffer, sizeof(tmp_buffer), "%08x", new_scene_id);
         cJSON_AddStringToObject(cj_new_scene, ezlopi__id_str, tmp_buffer);
-        char* new_scnee_str = cJSON_Print(cj_new_scene);
+
+        char* new_scnee_str = cJSON_PrintBuffered(cj_new_scene, 4096, false);
+        TRACE_D("length of 'new_scnee_str': %d", strlen(new_scnee_str));
+
         if (new_scnee_str)
         {
             if (ezlopi_nvs_write_str(new_scnee_str, strlen(new_scnee_str) + 1, tmp_buffer))
@@ -117,7 +120,9 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
                     }
                     else
                     {
-                        char* updated_scenes_list = cJSON_Print(cj_scenes_list);
+                        char* updated_scenes_list = cJSON_PrintBuffered(cj_scenes_list, 1024, false);
+                        TRACE_D("length of 'updated_scenes_list': %d", strlen(updated_scenes_list));
+
                         if (updated_scenes_list)
                         {
                             TRACE_D("updated_scenes_list: %s", updated_scenes_list);
@@ -129,6 +134,7 @@ uint32_t ezlopi_store_new_scene_v2(cJSON* cj_new_scene)
                             {
                                 TRACE_E("Scenes list update failed!");
                             }
+
                             free(updated_scenes_list);
                         }
                     }
@@ -344,7 +350,9 @@ void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id)
                     {
                         cJSON_DeleteItemFromArray(cj_scene_id_list, idx);
 
-                        char* updated_id_list_str = cJSON_Print(cj_scene_id_list);
+                        char* updated_id_list_str = cJSON_PrintBuffered(cj_scene_id_list, 1024, false);
+                        TRACE_D("length of 'updated_id_list_str': %d", strlen(updated_id_list_str));
+
                         if (updated_id_list_str)
                         {
                             ezlopi_nvs_scene_set_v2(updated_id_list_str);

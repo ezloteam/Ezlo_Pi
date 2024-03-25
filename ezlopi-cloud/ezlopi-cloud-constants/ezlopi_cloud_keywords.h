@@ -315,4 +315,6 @@ extern const char* ezlopi_timeout_str;
 extern const char* ezlopi_latitude_str;
 extern const char* ezlopi_longitude_str;
 
+extern const char* ezlopi_urls_str;
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

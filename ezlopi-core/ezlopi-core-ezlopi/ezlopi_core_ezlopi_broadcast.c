@@ -1,6 +1,12 @@
+#include <cJSON.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/semphr.h>
+
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
+static SemaphoreHandle_t __broadcast_lock = NULL;
 static l_broadcast_method_t* __method_head = NULL;
 static int (*__broadcast_queue_func)(char*) = NULL;
 
@@ -18,6 +24,49 @@ int ezlopi_core_ezlopi_broadcast_methods_send_to_queue(char* data)
     {
         ret = __broadcast_queue_func(data);
     }
+    return ret;
+}
+
+int ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cJSON* cj_data)
+{
+    int ret = 0;
+
+    if (cj_data && __broadcast_queue_func)
+    {
+        if (__broadcast_lock)
+        {
+            if (pdTRUE == xSemaphoreTake(__broadcast_lock, 2000 / portTICK_RATE_MS))
+            {
+                char* data_to_broadcast = cJSON_PrintBuffered(cj_data, 10 * 1024, cJSON_False);
+
+                if (data_to_broadcast)
+                {
+                    TRACE_D("length of 'data_to_broadcast': %d", sizeof(data_to_broadcast));
+
+                    ret = __broadcast_queue_func(data_to_broadcast);
+                    if (ret <= 0)
+                    {
+                        free(data_to_broadcast);
+                    }
+                }
+
+                xSemaphoreGive(__broadcast_lock);
+            }
+        }
+        else
+        {
+            char* data_to_broadcast = cJSON_PrintBuffered(cj_data, 10 * 1024, cJSON_False);
+            if (data_to_broadcast)
+            {
+                ret = __broadcast_queue_func(data_to_broadcast);
+                if (ret <= 0)
+                {
+                    free(data_to_broadcast);
+                }
+            }
+        }
+    }
+
     return ret;
 }
 
@@ -82,6 +131,15 @@ l_broadcast_method_t* ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
     else
     {
         TRACE_E("registering broadcast method failed ...");
+    }
+
+    if ((NULL != __method_head) && (NULL == __broadcast_lock))
+    {
+        __broadcast_lock = xSemaphoreCreateMutex();
+        if (__broadcast_lock)
+        {
+            xSemaphoreGive(__broadcast_lock);
+        }
     }
 
     return ret;

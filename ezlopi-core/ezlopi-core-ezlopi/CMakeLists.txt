@@ -10,7 +10,6 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-scenes    
         ezlopi-util-trace
         ezlopi-core-mdns   
-
 )
 
 set(EZLOPI_CLOUD_COMPONENTS
@@ -31,9 +30,10 @@ set(EZLOPI_CLOUD_COMPONENTS
         ezlopi-cloud-coordinates
 )
 
-idf_component_register(SRCS "ezlopi_core_ezlopi.c" "${config_src}"
+idf_component_register(SRCS "ezlopi_core_ezlopi_broadcast.c" "ezlopi_core_ezlopi.c" "${config_src}"
     INCLUDE_DIRS "."
-    REQUIRES    ${EZLOPI_CORE_COMPONENTS}
+    REQUIRES    freertos
+                ${EZLOPI_CORE_COMPONENTS}
                 ${EZLOPI_CLOUD_COMPONENTS}
 )
 

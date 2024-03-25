@@ -84,9 +84,14 @@ static void __modes_service(void* pv)
                         ezlopi_core_modes_store_to_nvs();
 
                         cJSON* cj_update = ezlopi_core_modes_cjson_changed();
+                        ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cj_update);
+                        cJSON_Delete(cj_update);
+#if 0
                         if (cj_update)
                         {
                             char* update_str = cJSON_Print(cj_update);
+                            TRACE_D("length of 'update_str': %d", strlen(update_str));
+
                             cJSON_Delete(cj_update);
 
                             if (update_str)
@@ -97,6 +102,7 @@ static void __modes_service(void* pv)
                                 }
                             }
                         }
+#endif
                     }
                 }
             }

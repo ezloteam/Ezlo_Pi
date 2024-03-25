@@ -4,6 +4,7 @@
 #include <esp_idf_version.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/semphr.h>
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
@@ -20,6 +21,7 @@
 #include "ezlopi_service_webprov.h"
 
 static uint32_t message_counter = 0;
+static xSemaphoreHandle sg_web_prov_lock = NULL;
 static xTaskHandle _task_handle = NULL;
 
 static TaskHandle_t ezlopi_update_config_notifier = NULL;
@@ -44,11 +46,10 @@ int ezlopi_service_web_provisioning_send_to_nma_websocket(cJSON* cjson_data, e_t
     {
         if (cjson_data)
         {
-            char* cjson_str_data = cJSON_Print(cjson_data);
+            char* cjson_str_data = cJSON_PrintBuffered(cjson_data, 256, false);
+
             if (cjson_str_data)
             {
-                cJSON_Minify(cjson_str_data);
-
                 int retries = 3;
                 while (--retries)
                 {
@@ -149,6 +150,12 @@ static void __fetch_wss_endpoint(void* pv)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
 
+                        sg_web_prov_lock = xSemaphoreCreateMutex();
+                        if (sg_web_prov_lock)
+                        {
+                            xSemaphoreGive(sg_web_prov_lock);
+                        }
+
                         ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, 4);
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
 
@@ -178,8 +185,9 @@ static void __fetch_wss_endpoint(void* pv)
     vTaskDelete(NULL);
 }
 
-static void __call_method_and_send_response(cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func, e_trace_type_t print_type)
+static int __call_method_and_send_response(cJSON* cj_request, cJSON* cj_method, f_method_func_t method_func, e_trace_type_t print_type)
 {
+    int ret = 0;
     if (method_func)
     {
         if (ezlopi_core_elzlopi_methods_check_method_register(method_func))
@@ -199,14 +207,36 @@ static void __call_method_and_send_response(cJSON* cj_request, cJSON* cj_method,
 
                 method_func(cj_request, cj_response);
 
-                char* data_to_send = cJSON_Print(cj_response);
-                cJSON_Delete(cj_response);
-
-                if (data_to_send)
+                if (sg_web_prov_lock)
                 {
-                    cJSON_Minify(data_to_send);
-                    __send_str_data_to_nma_websocket(data_to_send);
-                    free(data_to_send);
+                    if (pdTRUE == xSemaphoreTake(sg_web_prov_lock, 2000 / portTICK_RATE_MS))
+                    {
+                        char* data_to_send = cJSON_PrintBuffered(cj_response, 10 * 1024, false);
+                        cJSON_Delete(cj_response);
+
+                        if (data_to_send)
+                        {
+                            ret = __send_str_data_to_nma_websocket(data_to_send);
+                            free(data_to_send);
+                        }
+
+                        xSemaphoreGive(sg_web_prov_lock);
+                    }
+                    else
+                    {
+                        cJSON_Delete(cj_response);
+                    }
+                }
+                else
+                {
+                    char* data_to_send = cJSON_PrintBuffered(cj_response, 10 * 1024, false);
+                    cJSON_Delete(cj_response);
+
+                    if (data_to_send)
+                    {
+                        ret = __send_str_data_to_nma_websocket(data_to_send);
+                        free(data_to_send);
+                    }
                 }
             }
             else
@@ -215,6 +245,8 @@ static void __call_method_and_send_response(cJSON* cj_request, cJSON* cj_method,
             }
         }
     }
+
+    return ret;
 }
 
 static void __message_upcall(const char* payload, uint32_t len)
@@ -252,20 +284,20 @@ static void __message_upcall(const char* payload, uint32_t len)
                     {
                         __call_method_and_send_response(cj_request, cj_method, updater, TRACE_TYPE_D);
                     }
-            }
+                }
                 else
                 {
                     __call_method_and_send_response(cj_request, cj_method, ezlopi_core_ezlopi_methods_rpc_method_notfound, TRACE_TYPE_E);
                 }
+            }
         }
-    }
         else
         {
 #if (1 == ENABLE_TRACE)
             TRACE_E("## WS Rx <<<<<<<<<< '%s'\r\n%.*s", (NULL != cj_method) ? (cj_method->valuestring ? cj_method->valuestring : ezlopi__str) : ezlopi__str, len, payload);
             TRACE_E("cj_error: %p, cj_error->type: %u, cj_error->value_string: %s", cj_error, cj_error->type, cj_error ? (cj_error->valuestring ? cj_error->valuestring : ezlopi_null_str) : ezlopi_null_str);
 #endif
-}
+        }
 
         cJSON_Delete(cj_request);
     }

@@ -84,10 +84,11 @@ int ezlopi_room_name_set(cJSON* cj_room)
 
                         if (ret)
                         {
-                            char* updated_rooms = cJSON_Print(cj_rooms);
+                            char* updated_rooms = cJSON_PrintBuffered(cj_rooms, 4096, false);
+                            TRACE_D("length of 'updated_rooms': %d", strlen(updated_rooms));
+
                             if (updated_rooms)
                             {
-                                cJSON_Minify(updated_rooms);
                                 ezlopi_nvs_write_rooms(updated_rooms);
                                 free(updated_rooms);
                             }
@@ -173,11 +174,11 @@ int ezlopi_room_add_to_nvs(cJSON* cj_room)
             {
 
                 CJSON_TRACE("cj_rooms", cj_rooms);
-                char* updated_rooms_str = cJSON_Print(cj_rooms);
+                char* updated_rooms_str = cJSON_PrintBuffered(cj_rooms, 4096, false);
+                TRACE_D("length of 'updated_rooms_str': %d", strlen(updated_rooms_str));
+
                 if (updated_rooms_str)
                 {
-                    cJSON_Minify(updated_rooms_str);
-
                     if (ezlopi_nvs_write_rooms(updated_rooms_str))
                     {
                         TRACE_I("room saved");
@@ -249,10 +250,11 @@ int ezlopi_room_reorder(cJSON* cj_rooms_ids)
 
                 if (cJSON_GetArraySize(cj_reordered_rooms))
                 {
-                    char* reordered_rooms_str = cJSON_Print(cj_reordered_rooms);
+                    char* reordered_rooms_str = cJSON_PrintBuffered(cj_reordered_rooms, 4096, false);
+                    TRACE_D("length of 'reordered_rooms_str': %d", strlen(reordered_rooms_str));
+
                     if (reordered_rooms_str)
                     {
-                        cJSON_Minify(reordered_rooms_str);
                         ezlopi_nvs_write_rooms(reordered_rooms_str);
                         free(reordered_rooms_str);
                     }
@@ -260,71 +262,6 @@ int ezlopi_room_reorder(cJSON* cj_rooms_ids)
 
                 cJSON_Delete(cj_reordered_rooms);
             }
-
-#if 0 
-            int idx = 0;
-            cJSON* cj_room_id = NULL;
-            uint32_t rooms_id_arr[rooms_id_arr_size];
-
-            while (NULL != (cj_room_id = cJSON_GetArrayItem(cj_rooms_ids, idx)))
-            {
-                rooms_id_arr[idx] = strtoul(cj_room_id->valuestring, NULL, 16);
-                idx++;
-            }
-            char* room_list_str = ezlopi_nvs_read_rooms();
-
-            if (room_list_str)
-            {
-                TRACE_D("old-order list: %s", room_list_str);
-                cJSON* cj_stored_room_list = cJSON_Parse(room_list_str);
-                free(room_list_str);
-
-                if (cj_stored_room_list)
-                {
-                    cJSON* cj_reordered_rooms = cJSON_CreateArray();
-
-                    if (cj_reordered_rooms)
-                    {
-                        int idx1 = 0;
-                        while (idx1 < rooms_id_arr_size)
-                        {
-                            int idx2 = 0;
-                            cJSON* cj_stored_room = NULL;
-                            while (NULL != (cj_stored_room = cJSON_GetArrayItem(cj_stored_room_list, idx2)))
-                            {
-                                cJSON* cj_stored_room_id = cJSON_GetObjectItem(cj_stored_room, ezlopi__id_str);
-                                if (cj_stored_room_id && cj_stored_room_id->valuestring)
-                                {
-                                    uint32_t stored_room_id = strtoul(cj_stored_room_id->valuestring, NULL, 16);
-                                    if (stored_room_id == rooms_id_arr[idx1])
-                                    {
-                                        cJSON_AddItemReferenceToArray(cj_reordered_rooms, cj_stored_room);
-                                    }
-                                }
-
-                                idx2++;
-                            }
-
-                            __rooms_move_to_pos(rooms_id_arr[idx1], idx1);
-                            idx1++;
-                        }
-
-                        char* reordered_rooms_str = cJSON_Print(cj_reordered_rooms);
-                        cJSON_Delete(cj_reordered_rooms);
-
-                        if (reordered_rooms_str)
-                        {
-                            TRACE_D("reordered room list: %s", reordered_rooms_str);
-                            cJSON_Minify(reordered_rooms_str);
-                            // ezlopi_nvs_write_rooms(reordered_rooms_str);
-                            free(reordered_rooms_str);
-                        }
-                    }
-
-                    cJSON_Delete(cj_stored_room_list);
-                }
-            }
-#endif
         }
     }
 
@@ -431,7 +368,14 @@ static void __update_cloud_room_deleted(uint32_t room_id)
             cJSON_AddStringToObject(cj_result, ezlopi__id_str, tmp_str);
         }
 
+        ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cj_response);
+        cJSON_Delete(cj_response);
+
+#if 0
+
         char* data_str = cJSON_Print(cj_response);
+        TRACE_D("length of 'data_str': %d", strlen(data_str));
+
         cJSON_Delete(cj_response);
 
         if (data_str)
@@ -442,6 +386,7 @@ static void __update_cloud_room_deleted(uint32_t room_id)
                 free(data_str);
             }
         }
+#endif
     }
 }
 
@@ -598,12 +543,12 @@ static int __remove_room_from_nvs_by_id(uint32_t a_room_id)
             if (ret)
             {
                 CJSON_TRACE("cj_rooms", cj_rooms);
-                char* updated_rooms = cJSON_Print(cj_rooms);
+                char* updated_rooms = cJSON_PrintBuffered(cj_rooms, 4096, false);
+                TRACE_D("length of 'updated_rooms': %d", strlen(updated_rooms));
 
                 if (updated_rooms)
                 {
                     ret = 1;
-                    cJSON_Minify(updated_rooms);
                     ezlopi_nvs_write_rooms(updated_rooms);
                     free(updated_rooms);
                 }

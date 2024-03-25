@@ -133,7 +133,14 @@ static int __setting_initialize_hilink_presence_sensor_userdefined_settings(l_ez
             if (NULL != read_value)
             {
                 TRACE_I("Setting already exist.");
-                ESP_ERROR_CHECK(__setting_extract_user_defined_setting(read_value, hilink_presence_sensor_user_defined_setting_val));
+                cJSON* cj_value = cJSON_Parse(read_value);
+                free(read_value);
+
+                if (cj_value)
+                {
+                    __setting_extract_user_defined_setting(cj_value, hilink_presence_sensor_user_defined_setting_val);
+                    cJSON_Delete(cj_value);
+                }
             }
             else
             {
@@ -656,7 +663,8 @@ static int __setting_set_user_defined_setting(void* arg, l_ezlopi_device_setting
         cJSON* cj_value = cJSON_GetObjectItem(cj_properties, ezlopi_value_str);
         if (cj_value)
         {
-            ESP_ERROR_CHECK(__setting_extract_user_defined_setting(cJSON_Print(cj_value), setting_val));
+            __setting_extract_user_defined_setting(cj_value, setting_val);
+
             char* value_str = __prepare_user_defined_setting_str(setting_val);
             if (value_str)
             {

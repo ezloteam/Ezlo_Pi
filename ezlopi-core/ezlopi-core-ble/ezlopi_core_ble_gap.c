@@ -358,7 +358,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     }
 }
 
-#if 0
+#if (1 == ENABLE_TRACE)
 static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
 {
     char* ret = "BLE GAP Event Not defined!";
