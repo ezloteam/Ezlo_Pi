@@ -56,10 +56,6 @@ int device_0036_PWM_servo_MG996R(e_ezlopi_actions_t action, l_ezlopi_item_t* ite
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_bulb;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
@@ -137,11 +133,10 @@ static int __init(l_ezlopi_item_t* item)
                 ret = -1;
             }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

@@ -59,11 +59,6 @@ int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -107,7 +102,6 @@ static int __0056_prepare(void* arg)
                 l_ezlopi_item_t* FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_ADC_Force_Sensitive_Resistor);
                 if (FSR_item)
                 {
-                    FSR_item->cloud_properties.device_id = FSR_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(FSR_item, device_prep_arg->cjson_device, fsr_struct);
                     ret = 1;
                 }

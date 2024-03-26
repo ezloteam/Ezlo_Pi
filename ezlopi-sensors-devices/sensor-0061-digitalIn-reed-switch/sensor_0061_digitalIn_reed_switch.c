@@ -38,22 +38,22 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0061_prepare(arg);
+        ret = __0061_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0061_init(item);
+        ret = __0061_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0061_get_item(item, arg);
+        ret = __0061_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0061_get_cjson_value(item, arg);
+        ret = __0061_get_cjson_value(item, arg);
         break;
     }
     default:
@@ -67,11 +67,6 @@ int sensor_0061_digitalIn_reed_switch(e_ezlopi_actions_t action, l_ezlopi_item_t
 //----------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_door;
     device->cloud_properties.device_type = dev_type_doorlock;
@@ -113,7 +108,6 @@ static int __0061_prepare(void* arg)
                 l_ezlopi_item_t* reed_item = ezlopi_device_add_item_to_device(reed_device, sensor_0061_digitalIn_reed_switch);
                 if (reed_item)
                 {
-                    reed_item->cloud_properties.device_id = reed_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(reed_item, device_prep_arg->cjson_device);
                     ret = 1;
                 }
@@ -155,18 +149,15 @@ static int __0061_init(l_ezlopi_item_t* item)
                 gpio_isr_service_register_v3(item, _0061_update_from_device, 200);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            //     TRACE_E("Error initializing Reed switch");
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

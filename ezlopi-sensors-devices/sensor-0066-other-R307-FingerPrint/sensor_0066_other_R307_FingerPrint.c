@@ -138,16 +138,38 @@ int sensor_0066_other_R307_FingerPrint(e_ezlopi_actions_t action, l_ezlopi_item_
 //-------------------------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
-    ASSIGN_DEVICE_NAME_V2(device, dev_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor; /*needs to be changed to custom*/
 }
+
+static void __prepare_device_cloud_properties_parent_enroll(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "enroll");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_action(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "action");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_ids(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "ids");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+
 static void __prepare_item_enroll_cloud_properties(l_ezlopi_item_t* item, uint32_t item_id, cJSON* cj_device, server_packet_t* user_data)
 {
     item->cloud_properties.item_id = item_id;
@@ -215,51 +237,95 @@ static int __0066_prepare(void* arg)
     {
         cJSON* cj_device = (dev_prep_arg->cjson_device);
         /* device-1 */
-        l_ezlopi_device_t* fingerprint_device = ezlopi_device_add_device(cj_device);
-        if (fingerprint_device)
+        server_packet_t* user_data = (server_packet_t*)malloc(sizeof(server_packet_t));
+        if (user_data)
         {
-            server_packet_t* user_data = (server_packet_t*)malloc(sizeof(server_packet_t));
-            if (user_data)
+            l_ezlopi_device_t* parent_fingerprint_enroll_device = ezlopi_device_add_device(cj_device);
+            if (parent_fingerprint_enroll_device)
             {
                 memset(user_data, 0, sizeof(server_packet_t));
                 for (uint8_t i = 0; i < SENSOR_FP_ITEM_ID_MAX; i++)
                 {
                     user_data->sensor_fp_item_ids[i] = ezlopi_cloud_generate_item_id();
                 }
-                __prepare_device_cloud_properties(fingerprint_device, cj_device);
+                TRACE_I("Parent_fingerprint_action_device-[0x%x] ", parent_fingerprint_enroll_device->cloud_properties.device_id);
+                __prepare_device_cloud_properties(parent_fingerprint_enroll_device, cj_device);
+                __prepare_device_cloud_properties_parent_enroll(parent_fingerprint_enroll_device, cj_device);
 
                 /* Preparation for uart items */
-                l_ezlopi_item_t* fingerprint_item_enroll = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
+                l_ezlopi_item_t* fingerprint_item_enroll = ezlopi_device_add_item_to_device(parent_fingerprint_enroll_device, sensor_0066_other_R307_FingerPrint);
                 if (fingerprint_item_enroll)
                 {
                     __prepare_item_enroll_cloud_properties(fingerprint_item_enroll, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ENROLL], cj_device, user_data);
                     __prepare_item_interface_properties(fingerprint_item_enroll, cj_device);
                 }
-                l_ezlopi_item_t* fingerprint_item_action = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
-                if (fingerprint_item_action)
-                {
-                    __prepare_item_action_cloud_properties(fingerprint_item_action, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION], cj_device, user_data);
-                    __prepare_item_interface_properties(fingerprint_item_action, cj_device);
-                }
-                l_ezlopi_item_t* fingerprint_item_ids = ezlopi_device_add_item_to_device(fingerprint_device, sensor_0066_other_R307_FingerPrint);
-                if (fingerprint_item_ids)
-                {
-                    __prepare_item_ids_cloud_properties(fingerprint_item_ids, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS], cj_device, user_data);
-                    __prepare_item_interface_properties(fingerprint_item_ids, cj_device);
-                }
-
-                if ((NULL == fingerprint_item_enroll) && (NULL == fingerprint_item_action) && (NULL == fingerprint_item_ids))
+                else
                 {
                     ret = -1;
-                    ezlopi_device_free_device(fingerprint_device);
+                }
+
+                l_ezlopi_device_t* child_fingerprint_action_device = ezlopi_device_add_device(cj_device);
+                if (child_fingerprint_action_device)
+                {
+                    TRACE_I("Child_fingerprint_action_device-[0x%x] ", child_fingerprint_action_device->cloud_properties.device_id);
+                    __prepare_device_cloud_properties(child_fingerprint_action_device, cj_device);
+                    __prepare_device_cloud_properties_child_action(child_fingerprint_action_device, cj_device);
+
+                    child_fingerprint_action_device->cloud_properties.parent_device_id = parent_fingerprint_enroll_device->cloud_properties.device_id;
+                    l_ezlopi_item_t* fingerprint_item_action = ezlopi_device_add_item_to_device(child_fingerprint_action_device, sensor_0066_other_R307_FingerPrint);
+                    if (fingerprint_item_action)
+                    {
+                        __prepare_item_action_cloud_properties(fingerprint_item_action, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_ACTION], cj_device, user_data);
+                        __prepare_item_interface_properties(fingerprint_item_action, cj_device);
+                    }
+                    else
+                    {
+                        ezlopi_device_free_device(child_fingerprint_action_device);
+                        ret = -1;
+                    }
+                }
+
+                l_ezlopi_device_t* child_fingerprint_ids_device = ezlopi_device_add_device(cj_device);
+                if (child_fingerprint_ids_device)
+                {
+                    TRACE_I("Child_fingerprint_ids_device-[0x%x] ", child_fingerprint_ids_device->cloud_properties.device_id);
+                    __prepare_device_cloud_properties(child_fingerprint_ids_device, cj_device);
+                    __prepare_device_cloud_properties_child_ids(child_fingerprint_ids_device, cj_device);
+
+                    child_fingerprint_ids_device->cloud_properties.parent_device_id = parent_fingerprint_enroll_device->cloud_properties.device_id;
+
+                    l_ezlopi_item_t* fingerprint_item_ids = ezlopi_device_add_item_to_device(child_fingerprint_ids_device, sensor_0066_other_R307_FingerPrint);
+                    if (fingerprint_item_ids)
+                    {
+                        __prepare_item_ids_cloud_properties(fingerprint_item_ids, user_data->sensor_fp_item_ids[SENSOR_FP_ITEM_ID_FP_IDS], cj_device, user_data);
+                        __prepare_item_interface_properties(fingerprint_item_ids, cj_device);
+                    }
+                    else
+                    {
+                        ezlopi_device_free_device(child_fingerprint_ids_device);
+                        ret = -1;
+                    }
+                }
+
+                ret = 1;
+                if ((NULL == fingerprint_item_enroll) &&
+                    (NULL == child_fingerprint_action_device) &&
+                    (NULL == child_fingerprint_ids_device))
+                {
+                    ret = -1;
+                    ezlopi_device_free_device(parent_fingerprint_enroll_device);
                     free(user_data);
                 }
             }
             else
             {
                 ret = -1;
-                ezlopi_device_free_device(fingerprint_device);
+                free(user_data);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -311,41 +377,35 @@ static int __0066_init(l_ezlopi_item_t* item)
                                     TRACE_I(" ---->>> Creating Enrollment Timer <<<----");
                                 }
                             }
-                            // else
-                            // {
-                            //     ret = -1;
-                            //     gpio_isr_handler_remove(intr_pin);
-                            //     TRACE_E("Error!! : Failed to add GPIO ISR handler.");
-                            // }
+                            else
+                            {
+                                ret = -1;
+                                gpio_isr_handler_remove(intr_pin);
+                                TRACE_E("Error!! : Failed to add GPIO ISR handler.");
+                            }
                         }
-                        // else
-                        // {
-                        //     ret = -1;
-                        //     TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
-                        // }
+                        else
+                        {
+                            ret = -1;
+                            TRACE_E("Need to Reconfigure : Fingerprint sensor ..... Please, Reset ESP32.");
+                        }
                     }
-                    // else
-                    // {
-                    //     ret = -1;
-                    //     free(item->user_arg); // this will free ; memory address linked to all items
-                    //     item->user_arg = NULL;
-                    //     TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
-                    // }
+                    else
+                    {
+                        ret = -1;
+                        TRACE_E("Error!! : Problem is 'GPIO_intr_pin' Config......");
+                    }
                 }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

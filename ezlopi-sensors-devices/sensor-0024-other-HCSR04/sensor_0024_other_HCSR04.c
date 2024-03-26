@@ -131,8 +131,8 @@ static int __init(l_ezlopi_item_t* item)
                                         : GPIO_PULLDOWN_DISABLE,
                     .intr_type = GPIO_INTR_DISABLE,
                 };
-
                 ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
+
             }
             else if (GPIO_IS_VALID_GPIO(item->interface.gpio.gpio_in.gpio_num))
             {
@@ -154,18 +154,15 @@ static int __init(l_ezlopi_item_t* item)
 
                 ret = (0 == gpio_config(&io_conf)) ? 1 : -1;
             }
-            // if (1 != ret)
-            // {
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            if (1 != ret)
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -173,11 +170,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -229,7 +221,6 @@ static int __prepare(void* arg)
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0024_other_HCSR04_v3);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cj_device);
                     s_ultrasonic_sensor_t* ultrasonic_sensor = (s_ultrasonic_sensor_t*)malloc(sizeof(s_ultrasonic_sensor_t));
                     if (ultrasonic_sensor)
@@ -246,6 +237,10 @@ static int __prepare(void* arg)
                 {
                     ret = -1;
                 }
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }

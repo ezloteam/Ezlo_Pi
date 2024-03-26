@@ -83,10 +83,6 @@ int sensor_0018_other_internal_hall_effect(e_ezlopi_actions_t action, l_ezlopi_i
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_door;
     device->cloud_properties.device_type = dev_type_doorlock;
@@ -128,6 +124,7 @@ static int __prepare(void* arg)
                 l_ezlopi_item_t* hall_item = ezlopi_device_add_item_to_device(hall_device, sensor_0018_other_internal_hall_effect);
                 if (hall_item)
                 {
+                    ret = 1;
                     __setup_item_properties(hall_item, cj_device, user_data);
                 }
                 else
@@ -143,8 +140,10 @@ static int __prepare(void* arg)
                 ret = -1;
             }
         }
-
-        ret = 1;
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -173,17 +172,13 @@ static int __init(l_ezlopi_item_t* item)
             else
             {
                 TRACE_E("Error 'sensor_door_init'. error: %s)", esp_err_to_name(error));
-                // ret = -1;
-                // free(user_data);
-                // user_data = NULL;
-                // ezlopi_device_free_device_by_item(item);
+                ret = -1;
             }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
