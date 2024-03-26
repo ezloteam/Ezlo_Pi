@@ -9,10 +9,8 @@
 #include "ezlopi_cloud_methods_str.h"
 
 void data_list(cJSON *cj_request, cJSON *cj_response)
-{
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-    cJSON *cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
+{    
+    cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
         cJSON *cj_settings = cJSON_AddObjectToObject(cjson_result, ezlopi_settings_str);

@@ -12,8 +12,6 @@
 
 void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
@@ -53,9 +51,6 @@ void devices_list_v3(cJSON* cj_request, cJSON* cj_response)
 
 void device_name_set(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
@@ -79,9 +74,6 @@ void device_updated(cJSON* cj_request, cJSON* cj_response)
 {
     if (cj_request)
     {
-        cJSON_DeleteItemFromObject(cj_response, ezlopi_sender_str);
-        cJSON_DeleteItemFromObject(cj_response, ezlopi_error_str);
-
         cJSON_AddStringToObject(cj_response, ezlopi_id_str, ezlopi_ui_broadcast_str);
         cJSON_AddStringToObject(cj_response, ezlopi_msg_subclass_str, "hub.device.updated");
 

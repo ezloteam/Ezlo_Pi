@@ -17,7 +17,7 @@
 
 static volatile bool __ota_busy = false;
 
-static void ota_service_process(void* pv);
+static void ota_service_process(void *pv);
 
 bool ezlopi_service_ota_get_busy_state(void)
 {
@@ -29,7 +29,7 @@ void ezlopi_service_ota_init(void)
     xTaskCreate(ota_service_process, "ota-service-process", 2 * 2048, NULL, 2, NULL);
 }
 
-static void ota_service_process(void* pv)
+static void ota_service_process(void *pv)
 {
     ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
     ezlopi_event_group_set_event(EZLOPI_EVENT_OTA);
@@ -46,9 +46,9 @@ static void ota_service_process(void* pv)
         {
             TRACE_D("Sending firmware check request...");
             uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
-            cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+            cJSON *cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
 
-            ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cj_firmware_info_request);
+            ezlopi_core_ezlopi_broadcast_cjson(cj_firmware_info_request);
             cJSON_Delete(cj_firmware_info_request);
 
 #if 0

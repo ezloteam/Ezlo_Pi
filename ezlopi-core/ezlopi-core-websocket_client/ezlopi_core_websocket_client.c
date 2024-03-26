@@ -34,10 +34,6 @@ typedef struct s_ws_data_buffer
     struct s_ws_data_buffer* next;
 } s_ws_data_buffer_t;
 
-// static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer);
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len);
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer);
-
 static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data);
 
 int ezlopi_websocket_client_send(char* data, uint32_t len)

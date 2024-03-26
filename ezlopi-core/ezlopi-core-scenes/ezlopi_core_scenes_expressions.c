@@ -92,10 +92,12 @@ void ezlopi_scenes_expressions_list_cjson(cJSON* cj_expresson_array, cJSON* cj_p
                     snprintf(exp_id, sizeof(exp_id), "%08x", curr_exp->exp_id);
                     cJSON_AddStringToObject(cj_expr, ezlopi__id_str, exp_id);
                     cJSON_AddStringToObject(cj_expr, ezlopi_name_str, curr_exp->name);
+                    
                     if (show_code && curr_exp->code)
                     {
                         cJSON_AddStringToObject(cj_expr, ezlopi_code_str, curr_exp->code);
                     }
+
                     if (curr_exp->meta_data)
                     {
                         cJSON_AddItemReferenceToObject(cj_expr, ezlopi_metadata_str, curr_exp->meta_data);

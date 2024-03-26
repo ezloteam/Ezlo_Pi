@@ -50,7 +50,7 @@ int ezlopi_scenes_status_change_broadcast(l_scenes_list_v2_t* scene_node, const 
                 cJSON_AddStringToObject(cj_result, ezlopi_room_name_str, ezlopi__str);
             }
 
-            ret = ezlopi_core_ezlopi_broadcast_methods_send_cjson_to_queue(cj_response);
+            ret = ezlopi_core_ezlopi_broadcast_cjson(cj_response);
             cJSON_Delete(cj_response);
 #if 0
             char* data_to_send = cJSON_Print(cj_response);

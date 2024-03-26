@@ -110,8 +110,6 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_INT_ARRAY:
             case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
             {
-                // #warning "need to duplicate?"
-                // cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, field_node->field_value.u_value.cj_value);
                 cJSON_AddItemToObject(cj_field, ezlopi_value_str, cJSON_Duplicate(field_node->field_value.u_value.cj_value, 1));
                 break;
             }

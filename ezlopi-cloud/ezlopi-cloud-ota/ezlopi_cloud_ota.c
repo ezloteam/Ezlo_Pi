@@ -16,8 +16,6 @@
 
 void firmware_update_start(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddNullToObject(cj_response, ezlopi_error_str);
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 
@@ -54,8 +52,6 @@ void firmware_update_start(cJSON* cj_request, cJSON* cj_response)
 
 void firmware_info_get(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddNullToObject(cj_response, ezlopi_error_str);
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 

@@ -25,24 +25,24 @@
 #include "ezlopi_service_gpioisr.h"
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_service_ws_server.h"
-#include "ezlopi_service_broadcast.h"
 
 #include "pt.h"
 
 #define ENABLE_HEARTBIT_LED 1
 
-static void __blinky(void* pv);
+static void __blinky(void *pv);
 static void __init_heartbeat_led(void);
 static void __toggle_heartbeat_led(void);
 
 static struct pt pt1;
 
-PT_THREAD(example(struct pt* pt))
+PT_THREAD(example(struct pt *pt))
 {
     static uint32_t curr_ticks;
     PT_BEGIN(pt);
 
-    while (1) {
+    while (1)
+    {
         curr_ticks = xTaskGetTickCount();
         PT_WAIT_UNTIL(pt, (xTaskGetTickCount() - curr_ticks) > 1000);
         __toggle_heartbeat_led();
@@ -66,15 +66,12 @@ void app_main(void)
 #if CONFIG_EZLOPI_BLE_ENABLE == 1
 #endif
 
-    ezlopi_service_modes_init();
-
     ezlopi_service_ws_server_start();
     ezlopi_service_web_provisioning_init();
 
     ezlopi_service_ota_init();
-    ezlopi_service_broadcast_init();
 
-    TRACE_D("starting meshbot-service");
+    ezlopi_service_modes_init();
     ezlopi_scenes_meshbot_init();
 
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
@@ -95,7 +92,8 @@ static void __init_heartbeat_led(void)
 #endif
 }
 
-static void __toggle_heartbeat_led(void) {
+static void __toggle_heartbeat_led(void)
+{
 #if (1 == ENABLE_HEARTBIT_LED)
     static uint32_t state = 0;
 
@@ -104,7 +102,7 @@ static void __toggle_heartbeat_led(void) {
 #endif
 }
 
-static void __blinky(void* pv)
+static void __blinky(void *pv)
 {
     __init_heartbeat_led();
 
