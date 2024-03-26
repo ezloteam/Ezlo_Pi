@@ -32,23 +32,23 @@ int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* 
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0042_prepare(arg);
+        ret = __0042_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0042_init(item);
+        ret = __0042_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0042_get_cjson_value(item, arg);
+        ret = __0042_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0042_notify(item);
+        ret = __0042_notify(item);
         break;
     }
     default:
@@ -62,10 +62,6 @@ int sensor_0042_ADC_shunt_voltmeter(e_ezlopi_actions_t action, l_ezlopi_item_t* 
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_electricity;
     device->cloud_properties.device_type_id = NULL;
@@ -144,27 +140,20 @@ static int __0042_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

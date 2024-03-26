@@ -229,23 +229,18 @@ static int __init(l_ezlopi_item_t* item)
                     {
                         TRACE_E("Couldn't initiate device!, error: %d", err);
                         ret = -1;
-                        free(item->user_arg); // this will free ; memory address linked to all items
-                        item->user_arg = NULL;
-                        ezlopi_device_free_device_by_item(item);
                     }
                 }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -253,11 +248,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
@@ -398,12 +388,12 @@ static int __prepare(void* arg)
 
                 if (dimmer_args->switch_item && dimmer_args->dimmer_item && dimmer_args->dimmer_up_item && dimmer_args->dimmer_down_item && dimmer_args->dimmer_stop_item && dimmer_args->rgb_color_item)
                 {
-                    dimmer_args->rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
-                    dimmer_args->switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->rgb_color_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_up_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_down_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->dimmer_stop_item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // dimmer_args->switch_item->cloud_properties.device_id = device->cloud_properties.device_id;
 
                     dimmer_args->rgb_color_item->user_arg = dimmer_args;
                     dimmer_args->dimmer_item->user_arg = dimmer_args;

@@ -112,32 +112,21 @@ static int __init(l_ezlopi_item_t* item)
                 ds18b20_get_temperature_data(temperature_prev_value, item->interface.onewire_master.onewire_pin);
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     if (item->user_arg)
-            //     {
-            //         free(item->user_arg); // this will free ; memory address linked to all items
-            //         item->user_arg = NULL;
-            //     }
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_temperature;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -175,7 +164,6 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0030_oneWire_DS18B20);
             if (item_temperature)
             {
-                item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
                 __prepare_item_properties(item_temperature, prep_arg->cjson_device);
 
                 double* temperature_value = (double*)malloc(sizeof(double));
@@ -192,6 +180,10 @@ static int __prepare(void* arg)
                 ezlopi_device_free_device(device);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
 

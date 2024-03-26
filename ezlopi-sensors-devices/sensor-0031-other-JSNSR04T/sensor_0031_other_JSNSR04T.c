@@ -114,20 +114,15 @@ static int __init(l_ezlopi_item_t* item)
                 TRACE_S("JSN_SR04T initialized");
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     item->user_arg = NULL;
-            //     free(jsn_sr04t_config);
-            //     // ezlopi_device_free_device_by_item(item);
-            //     TRACE_E("JSN_SR04T not initializeed");
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -135,11 +130,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -203,6 +193,10 @@ static int __prepare(void* arg)
                 ezlopi_device_free_device(device);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
 

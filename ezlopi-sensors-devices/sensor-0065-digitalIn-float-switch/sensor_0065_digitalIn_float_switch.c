@@ -39,22 +39,22 @@ int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0065_prepare(arg);
+        ret = __0065_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0065_init(item);
+        ret = __0065_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0065_get_item(item, arg);
+        ret = __0065_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0065_get_cjson_value(item, arg);
+        ret = __0065_get_cjson_value(item, arg);
         break;
     }
     default:
@@ -68,11 +68,6 @@ int sensor_0065_digitalIn_float_switch(e_ezlopi_actions_t action, l_ezlopi_item_
 //----------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_water;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -114,7 +109,6 @@ static int __0065_prepare(void* arg)
                 l_ezlopi_item_t* float_item = ezlopi_device_add_item_to_device(float_device, sensor_0065_digitalIn_float_switch);
                 if (float_item)
                 {
-                    float_item->cloud_properties.device_id = float_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(float_item, device_prep_arg->cjson_device);
                     ret = 1;
                 }
@@ -158,18 +152,15 @@ static int __0065_init(l_ezlopi_item_t* item)
                 item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
                 gpio_isr_service_register_v3(item, __0065_update_from_device, 200);
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            //     TRACE_E("Error initializing float switch");
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     // ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }

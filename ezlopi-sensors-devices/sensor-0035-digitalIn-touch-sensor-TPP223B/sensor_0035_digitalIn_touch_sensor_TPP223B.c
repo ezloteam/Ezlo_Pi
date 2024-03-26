@@ -25,22 +25,23 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
 int sensor_0035_digitalIn_touch_sensor_TPP223B(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
+    int ret = 0;
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __prepare(arg);
+        ret = __prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __init(item);
+        ret = __init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __get_cjson_value(item, arg);
+        ret = __get_cjson_value(item, arg);
         break;
     }
     default:
@@ -48,7 +49,7 @@ int sensor_0035_digitalIn_touch_sensor_TPP223B(e_ezlopi_actions_t action, l_ezlo
         break;
     }
     }
-    return 0;
+    return ret;
 }
 
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
@@ -90,15 +91,13 @@ static int __init(l_ezlopi_item_t* item)
             }
             else
             {
-                // ret = -1;
-                // ezlopi_device_free_device_by_item(item);
+                ret = -1;
             }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -126,7 +125,6 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* touch_switch_item = ezlopi_device_add_item_to_device(touch_device, sensor_0035_digitalIn_touch_sensor_TPP223B);
             if (touch_switch_item)
             {
-                touch_switch_item->cloud_properties.device_id = touch_device->cloud_properties.device_id;
                 __prepare_touch_sensor_properties(touch_switch_item, prep_arg->cjson_device);
                 ret = 1;
             }
@@ -136,6 +134,10 @@ static int __prepare(void* arg)
                 ret = -1;
             }
         }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -143,11 +145,6 @@ static int __prepare(void* arg)
 
 static void __prepare_touch_sensor_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_sensor;

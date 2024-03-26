@@ -176,32 +176,16 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"Water_leak\",\
+                \"dev_type\": 10,\
+                \"dev_name\": \"GY61\",\
                 \"id_room\": \"\",\
-                \"id_item\": 27,\
-                \"gpio\": 25\
-            },\
-            {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"soil_moisture\",\
-                \"id_room\": \"\",\
-                \"id_item\": 32,\
-                \"gpio\": 33\
-            },\
-            {\
-                \"dev_type\": 8,\
-                \"dev_name\": \"GY271\",\
-                \"id_room\": \"\",\
-                \"id_item\": 7,\
-                \"gpio_sda\": 18,\
-                \"gpio_scl\": 19,\
-                \"pullup_scl\": true,\
-                \"pullup_sda\": true,\
-                \"slave_addr\": 13\
+                \"id_item\": 28,\
+                \"gpio1\": 33,\
+                \"gpio2\": 34,\
+                \"gpio3\": 35\
             }\
         ], \
-        \"dev_total\": 4}";
+        \"dev_total\": 5}";
 #endif
 
 

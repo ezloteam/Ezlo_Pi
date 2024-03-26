@@ -79,7 +79,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
-        // s_ezlopi_analog_data_t* soil_moisture_data = (s_ezlopi_analog_data_t*)item->user_arg;
+        
         double* soil_moisture_data = (double*)item->user_arg;
         if (soil_moisture_data)
         {
@@ -110,13 +110,11 @@ static int __init(l_ezlopi_item_t* item)
             else
             {
                 ret = -1;
-                // ezlopi_device_free_device_by_item(item);
             }
         }
         else
         {
             ret = -1;
-            // ezlopi_device_free_device_by_item(item);
         }
     }
     return ret;
@@ -124,20 +122,15 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
-    device->cloud_properties.category = category_generic_sensor;
-    device->cloud_properties.subcategory = subcategory_moisture;
-    device->cloud_properties.device_type = dev_type_sensor;
     // cJSON *cj_info = cJSON_CreateObject();
     // cJSON_AddStringToObject(cj_info, ezlopi_manufacturer_str, "EzloPi");
     // cJSON_AddStringToObject(cj_info, ezlopi_model_str, "EzloPi Generic");
     // cJSON_AddStringToObject(cj_info, "protocol", "WiFi");
     // cJSON_AddStringToObject(cj_info, "firmware.stack", "3.0.4");
     // cJSON_AddStringToObject(cj_info, "hardware", "ESP32");
+    device->cloud_properties.category = category_generic_sensor;
+    device->cloud_properties.subcategory = subcategory_moisture;
+    device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
 }
@@ -173,8 +166,6 @@ static int __prepare(void* arg)
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0032_ADC_soilMoisture);
             if (item_temperature)
             {
-                item_temperature->cloud_properties.device_id = device->cloud_properties.device_id;
-                // s_ezlopi_analog_data_t* soil_moisture_data = (s_ezlopi_analog_data_t*)malloc(sizeof(s_ezlopi_analog_data_t));
                 double* soil_moisture_data = (double*)malloc(sizeof(double));
                 if (soil_moisture_data)
                 {
