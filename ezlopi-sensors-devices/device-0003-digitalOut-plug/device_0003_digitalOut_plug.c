@@ -66,11 +66,6 @@ int device_0003_digitalOut_plug(e_ezlopi_actions_t action, l_ezlopi_item_t* item
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cjson_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_relay;
     device->cloud_properties.device_type = dev_type_switch_inwall;
@@ -124,7 +119,6 @@ static int __prepare(void* arg)
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, device_0003_digitalOut_plug);
                 if (item)
                 {
-                    // item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cjson_device);
                     ret = 1;
                 }

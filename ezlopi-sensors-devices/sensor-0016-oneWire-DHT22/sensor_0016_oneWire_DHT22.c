@@ -243,7 +243,6 @@ static int dht22_sensor_setup_device_cloud_properties_temperature(l_ezlopi_devic
     {
         char* device_name = NULL;
         CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-        // ASSIGN_DEVICE_NAME_V2(device, device_name);
         char device_full_name[50];
         snprintf(device_full_name, 50, "%s_%s", device_name, "temp");
         ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -264,7 +263,6 @@ static int dht22_sensor_setup_device_cloud_properties_humidity(l_ezlopi_device_t
     {
         char* device_name = NULL;
         CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-        // ASSIGN_DEVICE_NAME_V2(device, device_name);
         char device_full_name[50];
         snprintf(device_full_name, 50, "%s_%s", device_name, "humi");
         ASSIGN_DEVICE_NAME_V2(device, device_full_name);

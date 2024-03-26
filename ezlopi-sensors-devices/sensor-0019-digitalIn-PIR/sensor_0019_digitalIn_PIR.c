@@ -152,10 +152,6 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t* devic
 {
     if (device && cj_device)
     {
-        // char *device_name = NULL;
-        // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-        // ASSIGN_DEVICE_NAME_V2(device, device_name);
-
         device->cloud_properties.category = category_generic_sensor;
         device->cloud_properties.subcategory = subcategory_motion;
         device->cloud_properties.device_type = dev_type_sensor_motion;

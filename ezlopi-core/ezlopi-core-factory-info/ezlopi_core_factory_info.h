@@ -177,27 +177,12 @@ extern "C"
             },\
             {\
                 \"dev_type\": 10,\
-                \"dev_name\": \"MQ6\",\
-                \"id_item\": 59,\
+                \"dev_name\": \"GY61\",\
                 \"id_room\": \"\",\
-                \"gpio1\": 25,\
-                \"gpio2\": 33\
-            },\
-            {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"MQ9\",\
-                \"id_item\": 63,\
-                \"id_room\": \"\",\
-                \"gpio1\": 25,\
-                \"gpio2\": 33\
-            },\
-            {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"flame\",\
-                \"id_item\": 57,\
-                \"id_room\": \"\",\
-                \"gpio1\": 22,\
-                \"gpio2\": 34\
+                \"id_item\": 28,\
+                \"gpio1\": 33,\
+                \"gpio2\": 34,\
+                \"gpio3\": 35\
             }\
         ], \
         \"dev_total\": 5}";

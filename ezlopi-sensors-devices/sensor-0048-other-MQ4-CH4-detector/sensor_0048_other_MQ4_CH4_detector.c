@@ -213,10 +213,10 @@ static void __prepare_device_digi_cloud_properties_parent_digi(l_ezlopi_device_t
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "digi");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -240,16 +240,12 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* c
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties_child_adc(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "adc");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+    
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;

@@ -60,7 +60,6 @@ int sensor_0005_I2C_MPU6050(e_ezlopi_actions_t action, l_ezlopi_item_t* item, vo
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -71,7 +70,6 @@ static void __prepare_device_cloud_properties_parent_acc_x(l_ezlopi_device_t* de
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_x");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -81,7 +79,6 @@ static void __prepare_device_cloud_properties_child_acc_y(l_ezlopi_device_t* dev
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_y");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -91,7 +88,6 @@ static void __prepare_device_cloud_properties_child_acc_z(l_ezlopi_device_t* dev
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Acc_z");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -100,7 +96,6 @@ static void __prepare_device_cloud_properties_child_temp(l_ezlopi_device_t* devi
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Temp");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -109,7 +104,6 @@ static void __prepare_device_cloud_properties_child_gyro_x(l_ezlopi_device_t* de
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Gyro_x");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -118,7 +112,6 @@ static void __prepare_device_cloud_properties_child_gyro_y(l_ezlopi_device_t* de
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Gyro_y");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -127,7 +120,6 @@ static void __prepare_device_cloud_properties_child_gyro_z(l_ezlopi_device_t* de
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "Gyro_z");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -182,7 +174,6 @@ static int __prepare(void* arg)
             l_ezlopi_device_t* mpu6050_parent_acc_x_device = ezlopi_device_add_device(cj_device);
             if (mpu6050_parent_acc_x_device)
             {
-
                 TRACE_I("Parent_mpu6050_acc-x-[0x%x] ", mpu6050_parent_acc_x_device->cloud_properties.device_id);
                 __prepare_device_cloud_properties_parent_acc_x(mpu6050_parent_acc_x_device, cj_device);
                 __prepare_device_cloud_properties(mpu6050_parent_acc_x_device, cj_device);

@@ -293,7 +293,6 @@ static void __prepare_device_cloud_properties_parent_temp_humid(l_ezlopi_device_
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "temp_hum");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);
@@ -309,7 +308,6 @@ static void __prepare_device_cloud_properties_child_pressure(l_ezlopi_device_t* 
 {
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "pressure");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);

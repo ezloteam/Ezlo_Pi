@@ -71,10 +71,6 @@ int sensor_0020_other_2axis_joystick(e_ezlopi_actions_t action, l_ezlopi_item_t*
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char* device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.device_type = dev_type_device;

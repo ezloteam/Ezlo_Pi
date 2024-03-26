@@ -246,11 +246,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
@@ -363,21 +358,18 @@ static int __prepare(void* arg)
                 rgb_args->RGB_LED_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_item)
                 {
-                    // rgb_args->RGB_LED_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_item(rgb_args->RGB_LED_item, prep_arg->cjson_device, rgb_args);
                 }
 
                 rgb_args->RGB_LED_onoff_switch_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_onoff_switch_item)
                 {
-                    // rgb_args->RGB_LED_onoff_switch_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_onoff_switch_item(rgb_args->RGB_LED_onoff_switch_item, prep_arg->cjson_device, rgb_args);
                 }
 
                 rgb_args->RGB_LED_dimmer_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_dimmer_item)
                 {
-                    // rgb_args->RGB_LED_dimmer_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_dimmer_item(rgb_args->RGB_LED_dimmer_item, prep_arg->cjson_device, rgb_args);
                 }
 

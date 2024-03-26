@@ -238,13 +238,8 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* c
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     char* device_name = NULL;
     CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
     char device_full_name[50];
     snprintf(device_full_name, 50, "%s_%s", device_name, "adc");
     ASSIGN_DEVICE_NAME_V2(device, device_full_name);

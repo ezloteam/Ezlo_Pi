@@ -122,11 +122,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     // cJSON *cj_info = cJSON_CreateObject();
     // cJSON_AddStringToObject(cj_info, ezlopi_manufacturer_str, "EzloPi");
     // cJSON_AddStringToObject(cj_info, ezlopi_model_str, "EzloPi Generic");

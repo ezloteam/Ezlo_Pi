@@ -6,6 +6,8 @@
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_cloud.h"
+#include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
 
 #include "ezlopi_cloud_items.h"
@@ -77,12 +79,12 @@ static void __notify_if_needed(ld2410_outputs_t* hilink_data, ld2410_outputs_t* 
         hilink_data->direction = present_hilink_data->direction;
         ezlopi_device_value_updated_from_device_v3(motion_direction_item);
     }
-    if (hilink_data->presence != present_hilink_data->presence)
+    else if (hilink_data->presence != present_hilink_data->presence)
     {
         hilink_data->presence = present_hilink_data->presence;
         ezlopi_device_value_updated_from_device_v3(motion_item);
     }
-    if (hilink_data->moving_target_distance != present_hilink_data->moving_target_distance)
+    else if (hilink_data->moving_target_distance != present_hilink_data->moving_target_distance)
     {
         hilink_data->moving_target_distance = present_hilink_data->moving_target_distance;
         ezlopi_device_value_updated_from_device_v3(distance_item);
@@ -166,7 +168,7 @@ static int __add_value_to_cjson(l_ezlopi_item_t* item, cJSON* cj_params, bool is
             cJSON_AddBoolToObject(cj_params, ezlopi_valueFormatted_str, motion);
             cJSON_AddBoolToObject(cj_params, ezlopi_value_str, motion);
         }
-        if (ezlopi_item_name_motion_direction == item->cloud_properties.item_name)
+        else if (ezlopi_item_name_motion_direction == item->cloud_properties.item_name)
         {
             if (is_hub_request)
             {
@@ -175,7 +177,7 @@ static int __add_value_to_cjson(l_ezlopi_item_t* item, cJSON* cj_params, bool is
             cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, hilink_presence_sensor_motion_direction_enum[hilink_data->direction + 1]);
             cJSON_AddStringToObject(cj_params, ezlopi_value_str, hilink_presence_sensor_motion_direction_enum[hilink_data->direction + 1]);
         }
-        if (ezlopi_item_name_distance == item->cloud_properties.item_name)
+        else if (ezlopi_item_name_distance == item->cloud_properties.item_name)
         {
             cJSON_AddNumberToObject(cj_params, ezlopi_valueFormatted_str, hilink_data->moving_target_distance);
             cJSON_AddNumberToObject(cj_params, ezlopi_value_str, hilink_data->moving_target_distance);
@@ -228,6 +230,7 @@ static int __init(l_ezlopi_item_t* item)
         ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)item->user_arg;
         if (hilink_data)
         {
+            ret = 1;
             if (item->interface.uart.enable)
             {
                 s_ezlopi_uart_t uart_settings = {
@@ -239,7 +242,6 @@ static int __init(l_ezlopi_item_t* item)
                 {
                     ESP_ERROR_CHECK(hilink_presence_sensor_apply_settings());
                     ESP_ERROR_CHECK(ld2410_get_data(hilink_data));
-                    ret = 1;
                 }
                 else
                 {
@@ -255,13 +257,37 @@ static int __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void __perare_hilink_device_cloud_properties(l_ezlopi_device_t* device)
+static void __perare_device_cloud_properties(l_ezlopi_device_t* device)
 {
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_motion;
     device->cloud_properties.device_type = dev_type_sensor_motion;
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-    device->cloud_properties.parent_device_id = device->cloud_properties.device_id;
+    device->cloud_properties.info = NULL;
+    device->cloud_properties.device_type_id = NULL;
+}
+static void __prepare_device_cloud_properties_parent_motion(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "motion");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_direction(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "direction");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
+}
+static void __prepare_device_cloud_properties_child_distance(l_ezlopi_device_t* device, cJSON* cj_device)
+{
+    char* device_name = NULL;
+    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
+    char device_full_name[50];
+    snprintf(device_full_name, 50, "%s_%s", device_name, "distance");
+    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
 }
 
 static void __prepare_hilink_motion_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_properties, void* user_args)
@@ -336,45 +362,91 @@ static int __prepare(void* arg, void* user_arg)
         ld2410_outputs_t* hilink_data = (ld2410_outputs_t*)malloc(sizeof(ld2410_outputs_t));
         if (hilink_data)
         {
-            l_ezlopi_device_t* hilink_device = ezlopi_device_add_device(prep_arg->cjson_device);
-            if (hilink_device)
+            memset(hilink_data, 0, sizeof(ld2410_outputs_t));
+            l_ezlopi_device_t* parent_hilink_device_motion = ezlopi_device_add_device(prep_arg->cjson_device);
+            if (parent_hilink_device_motion)
             {
-                memset(hilink_data, 0, sizeof(ld2410_outputs_t));
-                __perare_hilink_device_cloud_properties(hilink_device);
+                TRACE_I("Parent_hilink_motion-[0x%x] ", parent_hilink_device_motion->cloud_properties.device_id);
+                __perare_device_cloud_properties(parent_hilink_device_motion);
+                __prepare_device_cloud_properties_parent_motion(parent_hilink_device_motion, prep_arg->cjson_device);
 
-                motion_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
+                motion_item = ezlopi_device_add_item_to_device(parent_hilink_device_motion, sensor_0067_hilink_presence_sensor_v3);
                 if (motion_item)
                 {
                     __prepare_hilink_motion_item_cloud_properties(motion_item, prep_arg->cjson_device, (void*)hilink_data);
                 }
+                else
+                {
+                    ret = -1;
+                }
 
-                motion_direction_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
-                if (motion_direction_item)
+                l_ezlopi_device_t* child_hilink_device_direction = ezlopi_device_add_device(prep_arg->cjson_device);
+                if (child_hilink_device_direction)
                 {
-                    __prepare_hilink_motion_direction_item_cloud_properties(motion_direction_item, prep_arg->cjson_device, (void*)hilink_data);
+                    TRACE_I("child_hilink_device_direction-[0x%x] ", child_hilink_device_direction->cloud_properties.device_id);
+                    __perare_device_cloud_properties(child_hilink_device_direction);
+                    __prepare_device_cloud_properties_child_direction(child_hilink_device_direction, prep_arg->cjson_device);
+
+                    child_hilink_device_direction->cloud_properties.parent_device_id = parent_hilink_device_motion->cloud_properties.device_id;
+
+                    motion_direction_item = ezlopi_device_add_item_to_device(child_hilink_device_direction, sensor_0067_hilink_presence_sensor_v3);
+                    if (motion_direction_item)
+                    {
+                        __prepare_hilink_motion_direction_item_cloud_properties(motion_direction_item, prep_arg->cjson_device, (void*)hilink_data);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(child_hilink_device_direction);
+                    }
                 }
-                distance_item = ezlopi_device_add_item_to_device(hilink_device, sensor_0067_hilink_presence_sensor_v3);
-                if (distance_item)
+
+                l_ezlopi_device_t* child_hilink_device_distance = ezlopi_device_add_device(prep_arg->cjson_device);
+                if (child_hilink_device_distance)
                 {
-                    __prepare_hilink_distance_item_cloud_properties(distance_item, prep_arg->cjson_device, (void*)hilink_data);
+                    TRACE_I("child_hilink_device_distance-[0x%x] ", child_hilink_device_distance->cloud_properties.device_id);
+                    __perare_device_cloud_properties(child_hilink_device_distance);
+                    __prepare_device_cloud_properties_child_distance(child_hilink_device_distance, prep_arg->cjson_device);
+
+                    child_hilink_device_distance->cloud_properties.parent_device_id = parent_hilink_device_motion->cloud_properties.device_id;
+
+                    distance_item = ezlopi_device_add_item_to_device(child_hilink_device_distance, sensor_0067_hilink_presence_sensor_v3);
+                    if (distance_item)
+                    {
+                        __prepare_hilink_distance_item_cloud_properties(distance_item, prep_arg->cjson_device, (void*)hilink_data);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(child_hilink_device_distance);
+                    }
                 }
-                if (!motion_item && !motion_direction_item && !distance_item)
+
+
+                ret = 1;
+                if ((NULL == motion_item) &&
+                    (NULL == child_hilink_device_direction) &&
+                    (NULL == child_hilink_device_distance))
                 {
-                    ezlopi_device_free_device(hilink_device);
+                    ezlopi_device_free_device(parent_hilink_device_motion);
                     free(hilink_data);
                     ret = -1;
                 }
                 else
                 {
-                    ret = hilink_presence_sensor_initialize_settings(hilink_device);
+                    ret = hilink_presence_sensor_initialize_settings(parent_hilink_device_motion);
                 }
             }
             else
             {
-                ezlopi_device_free_device(hilink_device);
+                ezlopi_device_free_device(parent_hilink_device_motion);
                 free(hilink_data);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
