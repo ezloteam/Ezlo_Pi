@@ -210,7 +210,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
             }
             else if (sscanf(field_value_string, "https://%99[^:]:%i/%199[^\n]", host, &port, page) == 3)
             {
-                port = 443;
+                // port = 443;
                 succ_parsing = 1;
             }
             else if (sscanf(field_value_string, "http://%99[^:]:%i[^\n]", host, &port) == 2)
@@ -219,7 +219,7 @@ void parse_http_url(s_ezlopi_core_http_mbedtls_t* tmp_http_data, l_fields_v2_t* 
             }
             else if (sscanf(field_value_string, "https://%99[^:]:%i[^\n]", host, &port) == 2)
             {
-                port = 443;
+                // port = 443;
                 succ_parsing = 1;
             }
             else if (sscanf(field_value_string, "http://%99[^/]/%199[^\n]", host, page) == 2)

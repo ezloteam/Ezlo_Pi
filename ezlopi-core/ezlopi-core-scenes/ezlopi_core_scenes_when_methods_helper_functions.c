@@ -5,7 +5,7 @@
 
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
 
-static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm* info)
+static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct tm *info)
 {
     uint8_t ret = 0;
     static uint8_t _last_day_of_curr_month = 0;
@@ -112,10 +112,10 @@ static uint8_t isdate_check_endweek_conditon(e_isdate_modes_t mode_type, struct 
     }
     return ret;
 }
-static uint8_t isdate_find_nth_week_curr_month(struct tm* info)
+static uint8_t isdate_find_nth_week_curr_month(struct tm *info)
 {
     // 2. find the fisrt day in this month
-    uint8_t tmp_week_num = 1;                        // starts with 1 ; since are already in one of the week-count
+    uint8_t tmp_week_num = 1; // starts with 1 ; since are already in one of the week-count
     // for this calculation dont change default 'info->tm_wday' -> '0-6'
     int tmp_weekday_of_curr_month = (info->tm_wday); // 0-6 ; sun = 0
     for (uint8_t i = (info->tm_mday); i > 1; i--)    // total_days_in_curr_month - 1
@@ -135,9 +135,9 @@ static uint8_t isdate_find_nth_week_curr_month(struct tm* info)
     return tmp_week_num;
 }
 
-uint8_t isdate_type_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_type_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
-    const char* field_type_name[] = {
+    const char *field_type_name[] = {
         "daily",
         "weekly",
         "monthly",
@@ -146,7 +146,7 @@ uint8_t isdate_type_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields
     };
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        const char* check_type_name = curr_field->field_value.u_value.value_string;
+        const char *check_type_name = curr_field->field_value.u_value.value_string;
         for (uint8_t t = 0; t < 5; t++)
         {
             if (0 == strncmp(field_type_name[t], check_type_name, strlen(check_type_name) + 1))
@@ -158,14 +158,14 @@ uint8_t isdate_type_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields
     }
     return 0;
 }
-uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_tm_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_time_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_time_arr = curr_field->field_value.u_value.cj_value;
     if (cj_time_arr && (cJSON_Array == cj_time_arr->type))
     {
         ret |= (1 << 4);
-        char field_hr_mm[10] = { 0 };
+        char field_hr_mm[10] = {0};
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
         // TRACE_S("[field_hr_mm: %s]", field_hr_mm);
@@ -173,7 +173,7 @@ uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v
         int array_size = cJSON_GetArraySize(cj_time_arr);
         for (int i = 0; i < array_size; i++)
         {
-            cJSON* array_item = cJSON_GetArrayItem(cj_time_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_time_arr, i);
             if (array_item && cJSON_IsString(array_item))
             {
                 // TRACE_S("Time activate_%d: %s,  [field_hr_mm: %s]", i, array_item->valuestring, field_hr_mm);
@@ -195,10 +195,10 @@ uint8_t isdate_tm_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v
     }
     return ret;
 }
-uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_weekdays_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_weekdays_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_weekdays_arr = curr_field->field_value.u_value.cj_value;
     if (cj_weekdays_arr && (cJSON_Array == cj_weekdays_arr->type))
     {
         ret |= (1 << 5);
@@ -208,7 +208,7 @@ uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fi
         int array_size = cJSON_GetArraySize(cj_weekdays_arr);
         for (int i = 0; i < array_size; i++)
         {
-            cJSON* array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_weekdays_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
                 // TRACE_S("Weekdays activate_[%d]: %d, [field_weekdays: %d]", i, (int)(array_item->valuedouble), field_weekdays);
@@ -222,10 +222,10 @@ uint8_t isdate_weekdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fi
     }
     return ret;
 }
-uint8_t isdate_mdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_mdays_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_days_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_days_arr = curr_field->field_value.u_value.cj_value;
     if (cj_days_arr && (cJSON_Array == cj_days_arr->type))
     {
         ret |= (1 << 6);
@@ -234,7 +234,7 @@ uint8_t isdate_mdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_field
 
         for (int i = 0; i < array_size; i++)
         {
-            cJSON* array_item = cJSON_GetArrayItem(cj_days_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_days_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
                 TRACE_S("Days activate_%d: %d, [field_days: %d]", i, (int)(array_item->valuedouble), field_days);
@@ -249,10 +249,10 @@ uint8_t isdate_mdays_check(e_isdate_modes_t* mode_type, struct tm* info, l_field
     return ret;
 }
 
-uint8_t isdate_year_weeks_check(e_isdate_modes_t* mode_type, struct tm* info, l_fields_v2_t* curr_field)
+uint8_t isdate_year_weeks_check(e_isdate_modes_t *mode_type, struct tm *info, l_fields_v2_t *curr_field)
 {
     uint8_t ret = 0;
-    cJSON* cj_weeks_arr = curr_field->field_value.u_value.cj_value;
+    cJSON *cj_weeks_arr = curr_field->field_value.u_value.cj_value;
     if (cj_weeks_arr && (cJSON_Array == cj_weeks_arr->type))
     {
         ret |= (1 << 7);
@@ -260,7 +260,7 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t* mode_type, struct tm* info, l_
         for (int i = 0; i < array_size; i++)
         {
             // extract ;- [1,4,5,23,6,9,...,-1]
-            cJSON* array_item = cJSON_GetArrayItem(cj_weeks_arr, i);
+            cJSON *array_item = cJSON_GetArrayItem(cj_weeks_arr, i);
             if (array_item && cJSON_IsNumber(array_item))
             {
                 if (-1 == (int)(array_item->valuedouble)) // for case :- '-1'
@@ -273,8 +273,8 @@ uint8_t isdate_year_weeks_check(e_isdate_modes_t* mode_type, struct tm* info, l_
                 }
                 else // for case :- 'n'
                 {
-                    char field_weeks[10] = { 0 }; // week_value extracted from ESP32.
-                    char week_val[10] = { 0 };    // week_value given to us from cloud.
+                    char field_weeks[10] = {0}; // week_value extracted from ESP32.
+                    char week_val[10] = {0};    // week_value given to us from cloud.
 
                     // reducing array values by -1, for easier comparison ::==>  [1_54]--->[0_53]      or      [1_6]-->[0_5]
                     snprintf(week_val, 10, "%d", (int)(array_item->valuedouble - 1));
@@ -329,7 +329,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_WEEKLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-            ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
+             ((flag_check & MASK_FOR_WEEKDAYS_ARG) && (flag_check & WEEKDAYS_FLAG))))
         {
             TRACE_W("here! week_days and time");
             ret = 1;
@@ -339,7 +339,7 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
     case ISDATE_MONTHLY_MODE:
     {
         if ((((flag_check & MASK_FOR_TIME_ARG) && (flag_check & TIME_FLAG)) &&
-            ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
+             ((flag_check & MASK_FOR_DAYS_ARG) && (flag_check & DAYS_FLAG))))
         {
             TRACE_W("here! month_days and time");
             ret = 1;
@@ -366,12 +366,12 @@ int isdate_check_flag_result(e_isdate_modes_t mode_type, uint8_t flag_check)
 }
 
 //------------------------------- ezlopi_scene_when_is_once ------------------------------------------
-uint8_t isonce_tm_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_tm_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        char field_hr_mm[10] = { 0 };
+        char field_hr_mm[10] = {0};
         strftime(field_hr_mm, 10, "%H:%M", info);
         field_hr_mm[9] = '\0';
 
@@ -382,7 +382,7 @@ uint8_t isonce_tm_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-uint8_t isonce_day_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_day_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -394,7 +394,7 @@ uint8_t isonce_day_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-uint8_t isonce_month_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_month_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -406,7 +406,7 @@ uint8_t isonce_month_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-uint8_t isonce_year_check(l_fields_v2_t* curr_field, struct tm* info)
+uint8_t isonce_year_check(l_fields_v2_t *curr_field, struct tm *info)
 {
     uint8_t flag_check = 0;
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
@@ -418,7 +418,7 @@ uint8_t isonce_year_check(l_fields_v2_t* curr_field, struct tm* info)
     }
     return flag_check;
 }
-int isonce_check_flag_result(l_scenes_list_v2_t* scene_node, uint8_t flag_check)
+int isonce_check_flag_result(l_scenes_list_v2_t *scene_node, uint8_t flag_check)
 {
     int ret = 0;
     const uint8_t TIME_FLAG = (1 << 0);
@@ -455,7 +455,7 @@ typedef struct s_sunstate_data
     struct tm defined_moment;          // offset+suntime
 } s_sunstate_data_t;
 
-static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_data)
+static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t *user_data)
 {
     if (tm_mday && user_data)
     {
@@ -477,10 +477,8 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
             .header_maxlen = sizeof(tmp_headers),
             .web_server = tmp_web_server,
             .web_server_maxlen = sizeof(tmp_web_server),
-            .response = NULL
-        };
+            .response = NULL};
         /*Make API call here and extract the suntime[according to 'user_data->sunstate_mode']*/
-        
 
         ezlopi_core_http_mbedtls_req(&tmp_config);
         // e.g. after valid extraction
@@ -499,19 +497,19 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
         }
     }
 }
-static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* choosen_suntime, struct tm* defined_moment, const char* tm_offs_val)
+static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm *choosen_suntime, struct tm *defined_moment, const char *tm_offs_val)
 {
     if (choosen_suntime && defined_moment && tm_offs_val) // choosen_suntime => sunrise or sunset
     {
         // Default values to store start and end boundries
-        struct tm tmp_time = { 0 };
+        struct tm tmp_time = {0};
 
         // Nox, extract & add :'tm_offs_val'
         char time_diff[10];
         snprintf(time_diff, 10, "%s", tm_offs_val);
         time_diff[9] = '\0';
-        char* ptr1 = NULL;
-        char* ptr2 = NULL;
+        char *ptr1 = NULL;
+        char *ptr2 = NULL;
         if (0 != strlen(time_diff))
         {
             tmp_time.tm_hour = strtoul(time_diff, &ptr1, 10);
@@ -537,6 +535,9 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* ch
             }
         }
         // Combined  'tm_offs_val' & 'curr_suntime'
+        int hr_overflow = 0;
+        int min_overflow = 0;
+
         switch (tmoffs_type)
         {
         case ISSUNSTATE_INTIME_MODE:
@@ -550,23 +551,44 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* ch
         case ISSUNSTATE_BEFORE_MODE:
         {
             TRACE_S("offset : Before");
-            defined_moment->tm_hour = (choosen_suntime->tm_hour - tmp_time.tm_hour);
-            defined_moment->tm_hour = (defined_moment->tm_hour < 0) ? (24 + defined_moment->tm_hour) : defined_moment->tm_hour; // check the hour-range
-            defined_moment->tm_min = (choosen_suntime->tm_min - tmp_time.tm_min);
-            defined_moment->tm_min = (defined_moment->tm_min < 0) ? (60 + defined_moment->tm_min) : defined_moment->tm_min; // check the min-range
             defined_moment->tm_sec = (choosen_suntime->tm_sec - tmp_time.tm_sec);
-            defined_moment->tm_sec = (defined_moment->tm_sec < 0) ? (60 + defined_moment->tm_sec) : defined_moment->tm_sec; // check the sec-range
+            if (defined_moment->tm_sec < 0)
+            {
+                defined_moment->tm_sec = (60 + defined_moment->tm_sec);
+                min_overflow = -1;
+            }
+            defined_moment->tm_min = (choosen_suntime->tm_min - tmp_time.tm_min + min_overflow);
+            if (defined_moment->tm_min < 0)
+            {
+                defined_moment->tm_min = (60 + defined_moment->tm_min);
+                hr_overflow = -1;
+            }
+            defined_moment->tm_hour = (choosen_suntime->tm_hour - tmp_time.tm_hour + hr_overflow);
+            if (defined_moment->tm_hour < 0)
+            {
+                defined_moment->tm_hour = (24 + defined_moment->tm_hour);
+            }
             break;
         }
         case ISSUNSTATE_AFTER_MODE:
         {
             TRACE_S("offset : After");
-            defined_moment->tm_hour = (choosen_suntime->tm_hour + tmp_time.tm_hour);
-            defined_moment->tm_hour = (defined_moment->tm_hour > 23) ? (defined_moment->tm_hour - 24) : defined_moment->tm_hour; // check the hour-range
-            defined_moment->tm_min = (choosen_suntime->tm_min + tmp_time.tm_min);
-            defined_moment->tm_min = (defined_moment->tm_min > 59) ? (defined_moment->tm_min - 60) : defined_moment->tm_min; // check the min-range
             defined_moment->tm_sec = (choosen_suntime->tm_sec + tmp_time.tm_sec);
-            defined_moment->tm_sec = (defined_moment->tm_sec > 59) ? (defined_moment->tm_sec - 60) : defined_moment->tm_sec; // check the sec-range
+            if (defined_moment->tm_sec > 59)
+            {
+                defined_moment->tm_sec = (defined_moment->tm_sec - 60);
+                min_overflow = +1;
+            }
+            defined_moment->tm_min = (choosen_suntime->tm_min + tmp_time.tm_min + min_overflow);
+            if (defined_moment->tm_min > 59)
+            {
+                defined_moment->tm_min = (defined_moment->tm_min - 60);
+            }
+            defined_moment->tm_hour = (choosen_suntime->tm_hour + tmp_time.tm_hour + hr_overflow);
+            if (defined_moment->tm_hour > 23)
+            {
+                defined_moment->tm_hour = (defined_moment->tm_hour - 24);
+            }
             break;
         }
         case ISSUNSTATE_UNDEFINED:
@@ -578,7 +600,7 @@ static void issunstate_add_offs(e_issunstate_offset_t tmoffs_type, struct tm* ch
     }
 }
 
-uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_get_suntime(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     /*Extract today's suntime via API call*/
@@ -590,11 +612,11 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
 
         if (NULL == (scene_node->when_block->fields->user_arg))
         {
-            s_sunstate_data_t* data = (s_sunstate_data_t*)malloc(sizeof(s_sunstate_data_t));
+            s_sunstate_data_t *data = (s_sunstate_data_t *)malloc(sizeof(s_sunstate_data_t));
             if (data)
             {
                 memset(data, 0, sizeof(s_sunstate_data_t));
-                scene_node->when_block->fields->user_arg = (void*)data;
+                scene_node->when_block->fields->user_arg = (void *)data;
                 // TRACE_D("created user_data...");
             }
             else
@@ -604,16 +626,16 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
             }
         }
         // 2. Recalculate suntime for new-day or null
-        s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+        s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
         if (user_data && (info->tm_mday != user_data->curr_tm_day))
         {
             // TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
-            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7)) ? ISSUNSTATE_INTIME_MODE
-                : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
-                : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6)) ? ISSUNSTATE_AFTER_MODE
-                : ISSUNSTATE_UNDEFINED;
+            user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7))   ? ISSUNSTATE_INTIME_MODE
+                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
+                                     : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6))  ? ISSUNSTATE_AFTER_MODE
+                                                                                                                 : ISSUNSTATE_UNDEFINED;
             // 3. check if, curr_tm_day has been updated successfully
             if ((0 == user_data->curr_tm_day) ||
                 (0 == user_data->sunstate_mode) ||
@@ -630,12 +652,12 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
     return flag_check;
 }
 
-uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_HMS_INTERVAL == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+        s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
         if ((user_data) && (0 != user_data->sunstate_mode))
         {
             if ((0 == user_data->defined_moment.tm_hour) &&
@@ -645,20 +667,20 @@ uint8_t issunstate_get_offs_tmval(l_scenes_list_v2_t* scene_node, l_fields_v2_t*
                 TRACE_D(".... Adding offset:  +/- (hh:mm:ss) ....");
                 issunstate_add_offs(user_data->tmoffs_type, &(user_data->choosen_suntime), &(user_data->defined_moment), curr_field->field_value.u_value.value_string);
                 TRACE_S("\nSunMode[%d]{sunrise=1,sunset=2,0=NULL},\nChoosen_suntime(hh:mm:ss = %d:%d:%d),\ndefined_moment(hh:mm:ss = %d:%d:%d),\nOffset(%s)\n",
-                    user_data->sunstate_mode,
-                    user_data->choosen_suntime.tm_hour,
-                    user_data->choosen_suntime.tm_min,
-                    user_data->choosen_suntime.tm_sec,
-                    user_data->defined_moment.tm_hour,
-                    user_data->defined_moment.tm_min,
-                    user_data->defined_moment.tm_sec,
-                    curr_field->field_value.u_value.value_string);
+                        user_data->sunstate_mode,
+                        user_data->choosen_suntime.tm_hour,
+                        user_data->choosen_suntime.tm_min,
+                        user_data->choosen_suntime.tm_sec,
+                        user_data->defined_moment.tm_hour,
+                        user_data->defined_moment.tm_min,
+                        user_data->defined_moment.tm_sec,
+                        curr_field->field_value.u_value.value_string);
             }
         }
     }
     return flag_check;
 }
-uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_INT_ARRAY == curr_field->value_type) && (curr_field))
@@ -668,7 +690,7 @@ uint8_t issunstate_eval_weekdays(l_scenes_list_v2_t* scene_node, l_fields_v2_t* 
     }
     return flag_check;
 }
-uint8_t issunstate_eval_days(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_eval_days(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_INT_ARRAY == curr_field->value_type) && (curr_field))
@@ -678,12 +700,12 @@ uint8_t issunstate_eval_days(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr
     }
     return flag_check;
 }
-uint8_t issunstate_eval_range(l_scenes_list_v2_t* scene_node, l_fields_v2_t* curr_field, struct tm* info, uint8_t curr_sunstate_mode)
+uint8_t issunstate_eval_range(l_scenes_list_v2_t *scene_node, l_fields_v2_t *curr_field, struct tm *info, uint8_t curr_sunstate_mode)
 {
     uint8_t flag_check = 0;
     if ((EZLOPI_VALUE_TYPE_TOKEN == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
-        s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+        s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
         if ((user_data) && (0 != user_data->sunstate_mode))
         {
             // TRACE_S("checking midnight range offset");
@@ -693,7 +715,7 @@ uint8_t issunstate_eval_range(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cur
     }
     return flag_check;
 }
-uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char* range_type, struct tm* info, struct tm* defined_moment)
+uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char *range_type, struct tm *info, struct tm *defined_moment)
 {
     uint8_t ret = 0;
     if (sunstate_mode && range_type && info && defined_moment)
@@ -715,8 +737,8 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char* range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour < 24) && (info->tm_hour == defined_moment->tm_hour)) &&
-                ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
-                ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
+                     ((info->tm_min < 60) && (info->tm_min >= defined_moment->tm_min)) &&
+                     ((info->tm_sec < 60) && (info->tm_sec > defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -728,8 +750,8 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char* range_type, str
                 ret = (1 << 3);
             }
             else if (((info->tm_hour >= 0) && (info->tm_hour == defined_moment->tm_hour)) &&
-                ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
-                ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
+                     ((info->tm_min >= 0) && (info->tm_min <= defined_moment->tm_min)) &&
+                     ((info->tm_sec >= 0) && (info->tm_sec <= defined_moment->tm_sec)))
             {
                 ret = (1 << 3);
             }
@@ -738,7 +760,7 @@ uint8_t issunstate_check_mdrn(uint8_t sunstate_mode, const char* range_type, str
     return ret;
 }
 
-int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info, uint8_t flag_check)
+int issunstate_check_flag_result(l_scenes_list_v2_t *scene_node, struct tm *info, uint8_t flag_check)
 {
     int ret = 0;
     const uint8_t TIME_FLAG = (1 << 0);
@@ -749,7 +771,7 @@ int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info
     const uint8_t MASK_WEEKDAYS_FLAG = (1 << 5);
     const uint8_t MASK_DAYS_FLAG = (1 << 6);
     const uint8_t MASK_MIDNIGHT_FLAG = (1 << 7);
-    s_sunstate_data_t* user_data = (s_sunstate_data_t*)(scene_node->when_block->fields->user_arg);
+    s_sunstate_data_t *user_data = (s_sunstate_data_t *)(scene_node->when_block->fields->user_arg);
     if (user_data)
     {
         if ((0 != user_data->curr_tm_day) && (0 != user_data->sunstate_mode) && (flag_check & MASK_TIME_FLAG)) // defined_moment should have the current day
@@ -808,14 +830,14 @@ int issunstate_check_flag_result(l_scenes_list_v2_t* scene_node, struct tm* info
     return ret;
 }
 //--------------------------- ezlopi_scene_when_is_date_range ----------------------------------------
-void isdate_range_get_tm(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_tm(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if ((EZLOPI_VALUE_TYPE_24_HOURS_TIME == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
         char time[10];
         snprintf(time, 10, "%s", curr_field->field_value.u_value.value_string);
         time[9] = '\0';
-        char* ptr = NULL;
+        char *ptr = NULL;
         if (0 != strlen(time))
         {
             tmp_tm->tm_hour = strtoul(time, &ptr, 10);
@@ -823,42 +845,42 @@ void isdate_range_get_tm(l_fields_v2_t* curr_field, struct tm* tmp_tm)
         }
     }
 }
-void isdate_range_get_startday(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_startday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
-void isdate_range_get_endday(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_endday(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mday = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 31;
     }
 }
-void isdate_range_get_startmonth(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_startmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
-void isdate_range_get_endmonth(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_endmonth(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_mon = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 12;
     }
 }
-void isdate_range_get_startyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_startyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
         tmp_tm->tm_year = (curr_field->field_value.u_value.value_double) ? (int)(curr_field->field_value.u_value.value_double) : 1;
     }
 }
-void isdate_range_get_endyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
+void isdate_range_get_endyear(l_fields_v2_t *curr_field, struct tm *tmp_tm)
 {
     if (EZLOPI_VALUE_TYPE_INT == curr_field->value_type)
     {
@@ -866,7 +888,7 @@ void isdate_range_get_endyear(l_fields_v2_t* curr_field, struct tm* tmp_tm)
     }
 }
 
-uint8_t isdate_range_check_tm(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_tm(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     // first confirm if the time range has positive or negative difference (end - start)
@@ -905,7 +927,7 @@ uint8_t isdate_range_check_tm(struct tm* start, struct tm* end, struct tm* info)
 end:
     return ret;
 }
-uint8_t isdate_range_check_day(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_day(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     if ((info->tm_mday >= start->tm_mday) && (info->tm_mday <= end->tm_mday))
@@ -918,7 +940,7 @@ uint8_t isdate_range_check_day(struct tm* start, struct tm* end, struct tm* info
     }
     return ret;
 }
-uint8_t isdate_range_check_month(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_month(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     if (((info->tm_mon + 1) >= start->tm_mon) && ((info->tm_mon + 1) <= end->tm_mon))
@@ -931,7 +953,7 @@ uint8_t isdate_range_check_month(struct tm* start, struct tm* end, struct tm* in
     }
     return ret;
 }
-uint8_t isdate_range_check_year(struct tm* start, struct tm* end, struct tm* info)
+uint8_t isdate_range_check_year(struct tm *start, struct tm *end, struct tm *info)
 {
     uint8_t ret = 0;
     if (((info->tm_year + 1900) >= start->tm_year) && ((info->tm_year + 1900) <= end->tm_year))
