@@ -358,7 +358,6 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     }
 }
 
-#if 0
 static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
 {
     char* ret = "BLE GAP Event Not defined!";
@@ -817,7 +816,6 @@ static void show_bonded_devices(void)
         free(dev_list);
     }
 }
-#endif
 
 static void ezlopi_ble_setup_service_uuid(void)
 {

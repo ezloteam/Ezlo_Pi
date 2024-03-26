@@ -90,3 +90,4 @@ CLOUD_METHOD("registered", registered, NULL)
 
 CLOUD_METHOD("hub.coordinates.set", hub_coordinates_set, NULL)
 CLOUD_METHOD("hub.coordinates.get", hub_coordinates_get, NULL)
+CLOUD_METHOD("hub.offline.login.ui", EZPI_CLOUD_offline_login, NULL)

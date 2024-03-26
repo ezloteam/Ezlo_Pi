@@ -115,6 +115,13 @@ int ezlopi_service_ws_server_broadcast(char* data)
 void ezlopi_service_ws_server_start(void)
 {
     ezlopi_wifi_event_add(__wifi_connection_event, NULL);
+    if (ezlopi_wifi_got_ip())
+    {
+        if (WS_STATUS_STOPPED == gs_ws_status)
+        {
+            __start_server();
+        }
+    }
 }
 
 void ezlopi_service_ws_server_stop(void)
@@ -130,7 +137,10 @@ static void __wifi_connection_event(esp_event_base_t event_base, int32_t event_i
     {
         if (IP_EVENT_STA_GOT_IP == event_id)
         {
-            __start_server();
+            if (WS_STATUS_STOPPED == gs_ws_status)
+            {
+                __start_server();
+            }
         }
         else
         {
@@ -354,14 +364,7 @@ static void __start_server(void)
 
         httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
-        // uint64_t id_val = ezlopi_factory_info_v3_get_id();
-        // if (id_val)
-        // {
-        //     uint32_t serial_last4 = id_val % 10000;
-        //     config.server_port = serial_last4;
-        // }
-
-        config.server_port = 8073;
+        config.server_port = 17001;
 
         config.task_priority = 8;
         config.stack_size = 1024 * 4;

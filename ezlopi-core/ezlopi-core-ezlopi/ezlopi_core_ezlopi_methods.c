@@ -18,6 +18,7 @@
 #include "ezlopi_cloud_modes_updaters.h"
 #include "ezlopi_cloud_scenes_scripts.h"
 #include "ezlopi_cloud_scenes_expressions.h"
+#include "ezlopi_cloud_offline_login.h"
 
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_ezlopi_methods.h"
