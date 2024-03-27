@@ -12,12 +12,12 @@
 #include "jsn_sr04t.h"
 #include "sensor_0031_other_JSNSR04T.h"
 
-static int __prepare(void* arg);
-static int __init(l_ezlopi_item_t* item);
-static int __notify(l_ezlopi_item_t* item);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __prepare(void *arg);
+static int __init(l_ezlopi_item_t *item);
+static int __notify(l_ezlopi_item_t *item);
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
 
-int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
     switch (action)
@@ -51,18 +51,18 @@ int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t* item,
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static int __notify(l_ezlopi_item_t *item)
 {
     return ezlopi_device_value_updated_from_device_v3(item);
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
-        jsn_sr04t_config_t* tmp_config = (jsn_sr04t_config_t*)item->user_arg;
+        cJSON *cj_result = (cJSON *)arg;
+        jsn_sr04t_config_t *tmp_config = (jsn_sr04t_config_t *)item->user_arg;
         if (tmp_config)
         {
             jsn_sr04t_data_t jsn_sr04t_data;
@@ -74,7 +74,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
                 cJSON_AddNumberToObject(cj_result, ezlopi_value_str, distance);
 
-                char* valueFormatted = ezlopi_valueformatter_float(distance);
+                char *valueFormatted = ezlopi_valueformatter_float(distance);
                 if (valueFormatted)
                 {
                     cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
@@ -93,12 +93,12 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
     if (item)
     {
-        jsn_sr04t_config_t* jsn_sr04t_config = malloc(sizeof(jsn_sr04t_config_t));
+        jsn_sr04t_config_t *jsn_sr04t_config = malloc(sizeof(jsn_sr04t_config_t));
         if (jsn_sr04t_config)
         {
             jsn_sr04t_config_t tmp_config = (jsn_sr04t_config_t)JSN_SR04T_CONFIG_DEFAULT();
@@ -107,7 +107,7 @@ static int __init(l_ezlopi_item_t* item)
             tmp_config.rmt_channel = 4;
 
             memcpy(jsn_sr04t_config, &tmp_config, sizeof(jsn_sr04t_config_t));
-            item->user_arg = (void*)jsn_sr04t_config;
+            item->user_arg = (void *)jsn_sr04t_config;
 
             if (ESP_OK == init_JSN_SR04T(jsn_sr04t_config))
             {
@@ -128,7 +128,7 @@ static int __init(l_ezlopi_item_t* item)
     return ret;
 }
 
-static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -137,7 +137,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.device_type_id = NULL;
 }
 
-static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
@@ -149,7 +149,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 }
 
-static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void __prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT;
 
@@ -170,23 +170,23 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     item->interface.gpio.gpio_in.value = 0;
 }
 
-static int __prepare(void* arg)
+static int __prepare(void *arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
+            ret = 1;
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
-            l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
+            l_ezlopi_item_t *item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
             if (item_temperature)
             {
                 __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
                 __prepare_item_interface_properties(item_temperature, prep_arg->cjson_device);
-                ret = 1;
             }
             else
             {
