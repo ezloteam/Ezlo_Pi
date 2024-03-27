@@ -55,23 +55,7 @@ extern "C"
         TaskHandle_t mbedtls_task_handle;
     } s_ezlopi_core_http_mbedtls_t;
 
-    /*this return initial 'updated' gmt_time */
-
-    typedef struct http_gmt_time
-    {
-        char str_wday[4];
-        char str_month[4];
-        int wday;
-        int month;
-
-        int mday;
-        int year;
-        int hour;
-        int min;
-        int sec;
-    } http_gmt_time_t;
-    http_gmt_time_t *get_initial_gmttime(void);
-
+ 
     /**
      * @brief Function to return remaining space in *dest_buffer.
      */

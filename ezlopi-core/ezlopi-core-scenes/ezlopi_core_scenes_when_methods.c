@@ -276,46 +276,8 @@ int ezlopi_scene_when_is_once(l_scenes_list_v2_t *scene_node, void *arg)
         struct tm *info;
         info = localtime(&rawtime);
 
-#if 1
-        http_gmt_time_t *raw_info = get_initial_gmttime();
-        int max_mday = 31;
-        if (2 == raw_info->month)
-        {
-            if ((0 == (raw_info->year % 4)) && ((0 == (raw_info->year % 400)) || (0 != (raw_info->year % 100))))
-            {
-                max_mday = 29;
-            }
-            else
-            {
-                max_mday = 28;
-            }
-        }
-        else if ((4 == raw_info->month) ||
-                 (6 == raw_info->month) ||
-                 (9 == raw_info->month) ||
-                 (11 == raw_info->month))
-        {
-            max_mday = 30;
-        }
-
-        info->tm_year = (raw_info->year);
-        info->tm_wday = (info->tm_wday + (raw_info->wday)) % 7;
-        info->tm_mday = (info->tm_mday + (raw_info->mday)) % max_mday;
-        info->tm_mon = (info->tm_mon + (raw_info->month)) % 12;
-        info->tm_hour = (info->tm_hour + (raw_info->hour)) % 24;
-        info->tm_min = (info->tm_min + (raw_info->min)) % 60;
-        info->tm_sec = (info->tm_sec + (raw_info->sec)) % 60;
-
-#endif
         if (4 == info->tm_sec) // nth sec mark
         {
-            TRACE_S("Nepal_gmt: %d-%d-%d %d:%d:%d",
-                    (info->tm_year),
-                    (info->tm_mon),
-                    (info->tm_wday),
-                    (info->tm_hour) % 24,
-                    (info->tm_min) % 60,
-                    (info->tm_sec) % 60);
             // list of funciton to check validity of each field values
             const s_isonce_method_t __isonce_method[] = {
                 {.field_name = "time", .field_func = isonce_tm_check},

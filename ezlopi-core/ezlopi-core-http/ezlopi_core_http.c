@@ -17,16 +17,6 @@
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_event_group.h"
 
-static http_gmt_time_t initial_gmt_time = {0};
-
-static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
-static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
-
-http_gmt_time_t *get_initial_gmttime(void)
-{
-    return (&initial_gmt_time);
-}
-
 #define TAG __FILE__
 
 #define FREE_IF_NOT_NULL(ptr) \
@@ -47,6 +37,9 @@ http_gmt_time_t *get_initial_gmttime(void)
 //     struct ll_resp_buf *next;
 // } ll_resp_buf_t; // implementation for response
 #endif
+
+static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
+static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 //--------------- Memory Malloc functions --------------------------
 int ezlopi_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size)
 {
@@ -655,46 +648,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt)
     case HTTP_EVENT_ON_HEADER:
     {
         TRACE_D("HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
-        if (0 == strncmp(evt->header_key, "Date", 5))
-        {
-            TRACE_S("Storing this GMT-Time")
-            sscanf(evt->header_value, "%3s, %d %3s %d %d:%d:%d",
-                   (initial_gmt_time.str_wday),
-                   (&initial_gmt_time.mday),
-                   (initial_gmt_time.str_month),
-                   (&initial_gmt_time.year),
-                   (&initial_gmt_time.hour),
-                   (&initial_gmt_time.min),
-                   (&initial_gmt_time.sec));
-
-            initial_gmt_time.wday = (0 == strncmp("Mon", initial_gmt_time.str_wday, 4))   ? 1
-                                    : (0 == strncmp("Tue", initial_gmt_time.str_wday, 4)) ? 2
-                                    : (0 == strncmp("Wed", initial_gmt_time.str_wday, 4)) ? 3
-                                    : (0 == strncmp("Thu", initial_gmt_time.str_wday, 4)) ? 4
-                                    : (0 == strncmp("Fri", initial_gmt_time.str_wday, 4)) ? 5
-                                    : (0 == strncmp("Sat", initial_gmt_time.str_wday, 4)) ? 6
-                                                                                          : 7;
-            initial_gmt_time.month = (0 == strncmp("Jan", initial_gmt_time.str_month, 4))   ? 1
-                                     : (0 == strncmp("Feb", initial_gmt_time.str_month, 4)) ? 2
-                                     : (0 == strncmp("Mar", initial_gmt_time.str_month, 4)) ? 3
-                                     : (0 == strncmp("Apr", initial_gmt_time.str_month, 4)) ? 4
-                                     : (0 == strncmp("May", initial_gmt_time.str_month, 4)) ? 5
-                                     : (0 == strncmp("Jun", initial_gmt_time.str_month, 4)) ? 6
-                                     : (0 == strncmp("Jul", initial_gmt_time.str_month, 4)) ? 7
-                                     : (0 == strncmp("Aug", initial_gmt_time.str_month, 4)) ? 8
-                                     : (0 == strncmp("Sep", initial_gmt_time.str_month, 4)) ? 9
-                                     : (0 == strncmp("Oct", initial_gmt_time.str_month, 4)) ? 10
-                                     : (0 == strncmp("Nov", initial_gmt_time.str_month, 4)) ? 11
-                                                                                            : 12;
-
-            // TRACE_W("New_week_Day: %d", initial_gmt_time.wday);
-            // TRACE_W("New_month_Day: %d", initial_gmt_time.mday);
-            // TRACE_W("New_Month: %d", initial_gmt_time.month);
-            // TRACE_W("New_Year: %d", initial_gmt_time.year);
-            // TRACE_W("New_Hour: %d", initial_gmt_time.hour);
-            // TRACE_W("New_Minute: %d", initial_gmt_time.min);
-            // TRACE_W("New_Second: %d", initial_gmt_time.sec);
-        }
+      
         break;
     }
     case HTTP_EVENT_ON_DATA:
