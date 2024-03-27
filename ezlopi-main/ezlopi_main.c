@@ -28,7 +28,7 @@
 
 #include "pt.h"
 
-#define ENABLE_HEARTBIT_LED 1
+#define ENABLE_HEARTBIT_LED 0
 
 static void __blinky(void *pv);
 static void __init_heartbeat_led(void);
@@ -81,7 +81,7 @@ static void __init_heartbeat_led(void)
 {
 #if (1 == ENABLE_HEARTBIT_LED)
     gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_1),
+        .pin_bit_mask = (1ULL << GPIO_NUM_2),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
@@ -98,13 +98,13 @@ static void __toggle_heartbeat_led(void)
     static uint32_t state = 0;
 
     state ^= 1;
-    gpio_set_level(GPIO_NUM_1, state);
+    gpio_set_level(GPIO_NUM_2, state);
 #endif
 }
 
 static void __blinky(void *pv)
 {
-    __init_heartbeat_led();
+    // __init_heartbeat_led();
 
     PT_INIT(&pt1);
     uint32_t count = 0;

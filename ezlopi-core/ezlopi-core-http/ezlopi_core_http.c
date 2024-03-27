@@ -17,10 +17,6 @@
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_event_group.h"
 
-
-static void ezlopi_http_free_rx_data(s_rx_data_t* rx_data);
-static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt);
-
 #define TAG __FILE__
 
 #define FREE_IF_NOT_NULL(ptr) \
@@ -32,7 +28,6 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt);
         }                     \
     }
 
-
 #define GET_STRING_SIZE(str) ((NULL != str) ? (strlen(str)) : 0)
 #if 0
 // typedef struct ll_resp_buf
@@ -42,8 +37,11 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt);
 //     struct ll_resp_buf *next;
 // } ll_resp_buf_t; // implementation for response
 #endif
+
+static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data);
+static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt);
 //--------------- Memory Malloc functions --------------------------
-int ezlopi_core_http_calc_empty_bufsize(char* dest_buff, int dest_size, int reqd_size)
+int ezlopi_core_http_calc_empty_bufsize(char *dest_buff, int dest_size, int reqd_size)
 {
     int limit = dest_size - GET_STRING_SIZE(dest_buff);
     limit = (limit > 0) ? limit : 0;
@@ -54,7 +52,7 @@ int ezlopi_core_http_calc_empty_bufsize(char* dest_buff, int dest_size, int reqd
     return 0;
 }
 
-int ezlopi_core_http_mem_malloc(char** __dest_ptr, const char* src_ptr)
+int ezlopi_core_http_mem_malloc(char **__dest_ptr, const char *src_ptr)
 {
     int ret = GET_STRING_SIZE(src_ptr); // calculate the size of content to be stored
     if (NULL != src_ptr)
@@ -62,7 +60,7 @@ int ezlopi_core_http_mem_malloc(char** __dest_ptr, const char* src_ptr)
         FREE_IF_NOT_NULL(*__dest_ptr);
         // Now, do a fresh allocation
         ret += 5; // (must be: n>2)
-        char* tmp_ptr = malloc(ret);
+        char *tmp_ptr = malloc(ret);
         if (tmp_ptr)
         {
             bzero(tmp_ptr, (ret));
@@ -79,12 +77,12 @@ int ezlopi_core_http_mem_malloc(char** __dest_ptr, const char* src_ptr)
     return ret;
 }
 
-int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
+int ezlopi_core_http_dyna_relloc(char **Buf, int reqSize)
 {
     int ret = 0;
     if ((NULL != *Buf) && (reqSize > 0)) // strictly:  (new-size != 0)
     {
-        void* NewBuf = realloc(*Buf, reqSize); // reqSize ≤ 1.6 * n
+        void *NewBuf = realloc(*Buf, reqSize); // reqSize ≤ 1.6 * n
         if (NULL == NewBuf)
         {
             TRACE_E("Reallocation - failed");
@@ -105,14 +103,14 @@ int ezlopi_core_http_dyna_relloc(char** Buf, int reqSize)
  *
  * @return Address of a memory_block ; (char*)malloc(...)
  */
-static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web_port_num, const char* url_req, char** resp_buf)
+static void ezlopi_core_http_request_via_mbedTLS(const char *web_server, int web_port_num, const char *url_req, char **resp_buf)
 {
     TRACE_I("&result==[%p] --> *resp_buf=>[%p]", resp_buf, *resp_buf);
     int ret, flags, len;
     uint32_t tmp_buf_size = 256;
     char tmp_buf[tmp_buf_size];
 
-    char web_port[10] = { 0 };
+    char web_port[10] = {0};
     snprintf(web_port, 10, "%d", web_port_num);
     web_port[9] = '\0';
 
@@ -136,7 +134,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
     mbedtls_ssl_config_init(&conf);
     mbedtls_entropy_init(&entropy);
     if (0 != (ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-        NULL, 0)))
+                                          NULL, 0)))
     {
         TRACE_E("mbedtls_ctr_drbg_seed returned %d", ret);
         goto exit;
@@ -160,9 +158,9 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
 
     // TRACE_I("Setting up the SSL/TLS structure...");
     if (0 != (ret = mbedtls_ssl_config_defaults(&conf,
-        MBEDTLS_SSL_IS_CLIENT,
-        MBEDTLS_SSL_TRANSPORT_STREAM,
-        MBEDTLS_SSL_PRESET_DEFAULT)))
+                                                MBEDTLS_SSL_IS_CLIENT,
+                                                MBEDTLS_SSL_TRANSPORT_STREAM,
+                                                MBEDTLS_SSL_PRESET_DEFAULT)))
     {
         TRACE_E("mbedtls_ssl_config_defaults returned %d", ret);
         goto exit;
@@ -190,7 +188,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
     // TRACE_I("Connecting to %s:%s...", web_server, web_port);
 
     if (0 != (ret = mbedtls_net_connect(&server_fd, web_server,
-        web_port, MBEDTLS_NET_PROTO_TCP)))
+                                        web_port, MBEDTLS_NET_PROTO_TCP)))
     {
         TRACE_E("mbedtls_net_connect returned -%x", -ret);
         goto exit;
@@ -236,8 +234,8 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
     size_t written_bytes = 0;
     do
     {
-        ret = mbedtls_ssl_write(&ssl, (const unsigned char*)url_req + written_bytes,
-            strlen(url_req) - written_bytes);
+        ret = mbedtls_ssl_write(&ssl, (const unsigned char *)url_req + written_bytes,
+                                strlen(url_req) - written_bytes);
         if (ret >= 0)
         {
             // TRACE_I("%d bytes written", ret);
@@ -252,7 +250,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
 
     // TRACE_I("Reading HTTP response...");
     uint32_t resp_buf_size = tmp_buf_size + 1;
-    char* resp_buf_dummy = (char*)malloc(resp_buf_size); // points to a memory-block
+    char *resp_buf_dummy = (char *)malloc(resp_buf_size); // points to a memory-block
     if (resp_buf_dummy)
     {
         bzero(resp_buf_dummy, resp_buf_size); // clear the buffer
@@ -261,7 +259,7 @@ static void ezlopi_core_http_request_via_mbedTLS(const char* web_server, int web
         {
             len = tmp_buf_size - 1;
             bzero(tmp_buf, tmp_buf_size);
-            ret = mbedtls_ssl_read(&ssl, (unsigned char*)tmp_buf, len);
+            ret = mbedtls_ssl_read(&ssl, (unsigned char *)tmp_buf, len);
             if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE)
             {
                 TRACE_I("MBEDTLS_ERR_SSL_WANT_READ/WRITE");
@@ -341,7 +339,7 @@ exit:
     // free(ctr_drbg);
     // free(entropy);
     // free(cacert);
-// }
+    // }
     TRACE_I("Completed a request");
 }
 
@@ -352,7 +350,7 @@ exit:
  * @param request : *ptr that holds the complete request_url
  * @param request_len : total char-capacity the '*request' can contain.
  */
-static void ezlopi_core_http_generate_request(s_ezlopi_core_http_mbedtls_t* config, char** request, int request_len)
+static void ezlopi_core_http_generate_request(s_ezlopi_core_http_mbedtls_t *config, char **request, int request_len)
 {
     if ((NULL != config) && (NULL != *request) && (request_len > 0))
     {
@@ -433,12 +431,12 @@ static void ezlopi_core_http_generate_request(s_ezlopi_core_http_mbedtls_t* conf
     }
 }
 
-void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
+void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t *config)
 {
     if (config)
     {
         int request_len = (config->url_maxlen) + (config->header_maxlen) + (config->content_maxlen) + 100; // [>25] ; for "skipSecurity: true"
-        char* request = malloc(sizeof(char) * request_len);
+        char *request = malloc(sizeof(char) * request_len);
         if (request)
         {
             bzero(request, request_len);
@@ -463,13 +461,12 @@ void ezlopi_core_http_mbedtls_req(s_ezlopi_core_http_mbedtls_t* config)
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char* private_key, const char* shared_key, const char* ca_certificate)
+s_ezlopi_http_data_t *ezlopi_http_get_request(const char *cloud_url, const char *private_key, const char *shared_key, const char *ca_certificate)
 {
-    char* ret = NULL;
+    char *ret = NULL;
     int status_code = 0;
-    s_rx_data_t* my_data = (s_rx_data_t*)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t* http_get_data = NULL;
+    s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
+    s_ezlopi_http_data_t *http_get_data = NULL;
     if ((NULL != my_data))
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
@@ -481,7 +478,7 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
             .client_key_pem = private_key,
             .event_handler = ezlopi_http_event_handler,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
-            .user_data = (void*)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
 
         esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -498,11 +495,11 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
 
                 if (my_data->total_len)
                 {
-                    ret = (char*)malloc(my_data->total_len + 1);
+                    ret = (char *)malloc(my_data->total_len + 1);
                     // TRACE_E("Response lent: %d", my_data->total_len);
                     if (ret)
                     {
-                        s_rx_data_t* cur_d = my_data;
+                        s_rx_data_t *cur_d = my_data;
                         memset(ret, 0, my_data->total_len + 1);
 
                         while (cur_d)
@@ -512,7 +509,7 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
                             cur_d = cur_d->next;
                         }
 
-                        http_get_data = (s_ezlopi_http_data_t*)malloc(sizeof(s_ezlopi_http_data_t));
+                        http_get_data = (s_ezlopi_http_data_t *)malloc(sizeof(s_ezlopi_http_data_t));
                         if (http_get_data)
                         {
                             memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
@@ -534,18 +531,18 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
     return http_get_data;
 }
 
-s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char* location, cJSON* headers, const char* private_key, const char* shared_key, const char* ca_certificate)
+s_ezlopi_http_data_t *ezlopi_http_post_request(const char *cloud_url, const char *location, cJSON *headers, const char *private_key, const char *shared_key, const char *ca_certificate)
 {
-    char* ret = NULL;
-    s_rx_data_t* my_data = (s_rx_data_t*)malloc(sizeof(s_rx_data_t));
-    s_ezlopi_http_data_t* http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
+    char *ret = NULL;
+    s_rx_data_t *my_data = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
+    s_ezlopi_http_data_t *http_get_data = malloc(sizeof(s_ezlopi_http_data_t));
     memset(http_get_data, 0, sizeof(s_ezlopi_http_data_t));
 
     if (my_data)
     {
         memset(my_data, 0, sizeof(s_rx_data_t));
 
-        char* uri = malloc(256);
+        char *uri = malloc(256);
         if (uri)
         {
             snprintf(uri, 256, "%s/%s", cloud_url, location);
@@ -553,7 +550,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
         }
         else
         {
-            uri = (char*)cloud_url;
+            uri = (char *)cloud_url;
         }
 
         esp_http_client_config_t config = {
@@ -563,7 +560,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             .client_key_pem = private_key,
             .event_handler = ezlopi_http_event_handler,
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
-            .user_data = (void*)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
+            .user_data = (void *)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
 
         esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -571,7 +568,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
         if (NULL != client)
         {
             esp_http_client_set_method(client, HTTP_METHOD_POST);
-            cJSON* header = headers->child;
+            cJSON *header = headers->child;
             while (header)
             {
                 // TRACE_I("%s: %s", header->string, header->valuestring);
@@ -583,7 +580,8 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
 
             if (err == ESP_OK)
             {
-                http_get_data->status_code = esp_http_client_get_status_code(client);;
+                http_get_data->status_code = esp_http_client_get_status_code(client);
+                ;
                 while (!esp_http_client_is_complete_data_received(client))
                 {
                     vTaskDelay(10 / portTICK_RATE_MS);
@@ -591,11 +589,11 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
 
                 if (my_data->total_len)
                 {
-                    ret = (char*)malloc(my_data->total_len + 1);
+                    ret = (char *)malloc(my_data->total_len + 1);
 
                     if (ret)
                     {
-                        s_rx_data_t* cur_d = my_data;
+                        s_rx_data_t *cur_d = my_data;
                         memset(ret, 0, my_data->total_len + 1);
 
                         while (cur_d)
@@ -628,7 +626,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
     return http_get_data;
 }
 
-static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
+static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t *evt)
 {
     switch (evt->event_id)
     {
@@ -650,35 +648,36 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
     case HTTP_EVENT_ON_HEADER:
     {
         TRACE_D("HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
+      
         break;
     }
     case HTTP_EVENT_ON_DATA:
     {
-        TRACE_D("HTTP_EVENT_ON_DATA, len=%d, data: %.*s", evt->data_len, evt->data_len, (char*)evt->data);
+        TRACE_D("HTTP_EVENT_ON_DATA, len=%d, data: %.*s", evt->data_len, evt->data_len, (char *)evt->data);
         // if (!esp_http_client_is_chunked_response(evt->client))
         {
             if (evt->user_data)
             {
-                char* tmp_data = (char*)malloc(evt->data_len + 1);
+                char *tmp_data = (char *)malloc(evt->data_len + 1);
                 if (NULL != tmp_data)
                 {
                     memcpy(tmp_data, evt->data, evt->data_len);
                     tmp_data[evt->data_len] = '\0';
 
-                    s_rx_data_t* my_data = (s_rx_data_t*)evt->user_data;
+                    s_rx_data_t *my_data = (s_rx_data_t *)evt->user_data;
                     if (my_data->len || my_data->total_len || my_data->ptr)
                     {
-                        s_rx_data_t* cur_dh = my_data;
+                        s_rx_data_t *cur_dh = my_data;
                         while (cur_dh->next)
                         {
                             cur_dh = cur_dh->next;
                         }
 
-                        cur_dh->next = (s_rx_data_t*)malloc(sizeof(s_rx_data_t));
+                        cur_dh->next = (s_rx_data_t *)malloc(sizeof(s_rx_data_t));
                         if (cur_dh->next)
                         {
                             cur_dh->next->len = evt->data_len;
-                            cur_dh->next->ptr = (char*)tmp_data;
+                            cur_dh->next->ptr = (char *)tmp_data;
                             cur_dh->next->total_len = 0;
                             my_data->total_len += evt->data_len;
                             cur_dh->next->next = NULL;
@@ -688,7 +687,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
                     {
                         my_data->len = evt->data_len;
                         my_data->total_len = evt->data_len;
-                        my_data->ptr = (char*)tmp_data;
+                        my_data->ptr = (char *)tmp_data;
                         my_data->next = NULL;
                     }
                 }
@@ -718,7 +717,7 @@ static esp_err_t ezlopi_http_event_handler(esp_http_client_event_t* evt)
     return ESP_OK;
 }
 
-static void ezlopi_http_free_rx_data(s_rx_data_t* rx_data)
+static void ezlopi_http_free_rx_data(s_rx_data_t *rx_data)
 {
     if (rx_data)
     {
