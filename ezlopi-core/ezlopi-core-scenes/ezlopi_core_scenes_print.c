@@ -6,6 +6,7 @@
 
 #include "ezlopi_cloud_constants.h"
 
+static void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks);
 
 void ezlopi_print_block_options(s_block_options_v2_t* block_options, l_fields_v2_t* fields)
 {
