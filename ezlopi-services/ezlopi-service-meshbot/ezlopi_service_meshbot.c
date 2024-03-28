@@ -203,7 +203,7 @@ void ezlopi_scenes_meshbot_init(void)
     if (start_thread)
     {
         TRACE_D("starting thread process");
-        xTaskCreate(__scenes_thread_process, "Scene-task", 2 * 2048, NULL, 2, NULL);
+        xTaskCreate(__scenes_thread_process, "Scene-task", 2 * 3048, NULL, 2, NULL);
     }
     else
     {

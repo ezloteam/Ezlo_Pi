@@ -49,7 +49,6 @@ void ezlopi_init(void)
     ezlopi_core_modes_init();
     ezlopi_room_init();
 
-
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
@@ -67,21 +66,21 @@ void ezlopi_init(void)
 
     ezlopi_event_queue_init();
     ezlopi_ping_init();
-    // EZPI_CORE_sntp_init();
     ezlopi_timer_start_1000ms();
 
+    EZPI_CORE_sntp_init();
     EZPI_core_init_mdns();
 }
 
 static void ezlopi_initialize_devices_v3(void)
 {
     int device_init_ret = 0;
-    l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+    l_ezlopi_device_t *curr_device = ezlopi_device_get_head();
 
     while (curr_device)
     {
         TRACE_S("Device_id_curr_device : [0x%x] ", curr_device->cloud_properties.device_id);
-        l_ezlopi_item_t* curr_item = curr_device->items;
+        l_ezlopi_item_t *curr_item = curr_device->items;
         while (curr_item)
         {
             if (curr_item->func)
@@ -101,7 +100,7 @@ static void ezlopi_initialize_devices_v3(void)
         if (-1 == device_init_ret)
         {
             device_init_ret = 0;
-            l_ezlopi_device_t* device_to_free = curr_device;
+            l_ezlopi_device_t *device_to_free = curr_device;
             curr_device = curr_device->next;
             ezlopi_device_free_device(device_to_free);
         }
@@ -110,5 +109,4 @@ static void ezlopi_initialize_devices_v3(void)
             curr_device = curr_device->next;
         }
     }
-
 }

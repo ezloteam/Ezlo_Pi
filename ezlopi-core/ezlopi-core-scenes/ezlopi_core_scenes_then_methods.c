@@ -192,7 +192,6 @@ int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* ar
             }
             // now to trigger http_request and extract the response.
             tmp_http_data->response = NULL;
-            tmp_http_data->response_maxlen = 0;
             ezlopi_core_http_mbedtls_req(tmp_http_data); // Returns:- [response_buffer = &Memory_block]
             free_http_mbedtls_struct(tmp_http_data);
 
