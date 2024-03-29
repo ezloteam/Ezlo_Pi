@@ -54,6 +54,8 @@ extern "C"
 
     uint8_t ezlopi_nvs_write_int32(int32_t i, const char* key_name);
     uint8_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name);
+    uint8_t ezlopi_nvs_write_uint32(int32_t i, const char* key_name);
+    uint8_t ezlopi_nvs_read_uint32(int32_t* i, const char* key_name);
     uint8_t ezlopi_nvs_write_bool(bool b, const char* key_name);
     uint8_t ezlopi_nvs_read_bool(bool* b, const char* key_name);
     uint8_t ezlopi_nvs_write_float32(float f, const char* key_name);
@@ -93,6 +95,9 @@ extern "C"
 
     char* ezlopi_nvs_read_latidtude_longitude();
     int ezlopi_nvs_write_latitude_longitude(char* data);
+
+    bool EZPI_CORE_nvs_write_baud(uint32_t baud);
+    uint32_t EZPI_CORE_nvs_read_baud();
 
 #ifdef __cplusplus
 }

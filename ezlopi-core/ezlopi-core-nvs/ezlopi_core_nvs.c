@@ -27,6 +27,7 @@ static const char* ezlopi_room_ids_nvs_name = "ezlopi_room";
 static const char* ezlopi_time_location_nvs_name = "timne.local";
 static const char* ezlopi_modes_nvs_name = "ezlopi_modes";
 static const char* ezlopi_coordinates_nvs_name = "coord_vals";
+static const char* ezlopi_serial_baud_name = "ezpi_baud";
 
 int ezlopi_nvs_init(void)
 {
@@ -447,6 +448,42 @@ uint8_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name)
     return ret;
 }
 
+uint8_t ezlopi_nvs_write_uint32(int32_t i, const char* key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, i);
+        if (ESP_OK != err)
+        {
+            TRACE_W("nvs_set_i32 - error: %s", esp_err_to_name(err));
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+uint8_t ezlopi_nvs_read_uint32(int32_t* i, const char* key_name)
+{
+    uint8_t ret = 0;
+    if (ezlopi_nvs_handle)
+    {
+        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, i);
+        if (ESP_OK == err)
+        {
+            ret = 1;
+        }
+        else
+        {
+            TRACE_W("nvs_get_i32 - error: %s", esp_err_to_name(err));
+        }
+    }
+    return ret;
+}
+
 uint8_t ezlopi_nvs_write_float32(float f, const char* key_name)
 {
     uint8_t ret = 0;
@@ -678,3 +715,13 @@ int ezlopi_nvs_write_latitude_longitude(char* data)
     return ret;
 }
 
+    bool EZPI_CORE_nvs_write_baud(uint32_t baud)
+    {
+        // Key ezlopi_serial_baud_name
+        // ezlopi_nvs_write_int32()
+    }
+
+    uint32_t EZPI_CORE_nvs_read_baud()
+    {
+
+    }
