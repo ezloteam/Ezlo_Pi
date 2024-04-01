@@ -4,10 +4,12 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_cloud_modes.h"
+#include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_core_modes.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_modes_cjson.h"
+#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_service_modes.h"
@@ -84,31 +86,14 @@ static void __modes_service(void *pv)
                         ezlopi_core_modes_store_to_nvs();
 
                         cJSON *cj_update = ezlopi_core_modes_cjson_changed();
-                        ezlopi_core_ezlopi_broadcast_cjson(cj_update);
-                        cJSON_Delete(cj_update);
-#if 0
-                        if (cj_update)
+                        CJSON_TRACE("----------------- broadcasting - cj_update", cj_update);
+
+                        if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_update))
                         {
-                            char* update_str = cJSON_Print(cj_update);
-                            TRACE_D("length of 'update_str': %d", strlen(update_str));
-
                             cJSON_Delete(cj_update);
-
-                            if (update_str)
-                            {
-                                // ezlopi_service_web_provisioning_send_str_data_to_nma_websocket(update_str, TRACE_TYPE_I);
-                                if (0 == ezlopi_core_ezlopi_broadcast_methods_send_to_queue(update_str)) {
-                                    free(update_str);
-                                }
-                            }
                         }
-#endif
                     }
                 }
-            }
-            else
-            {
-                // TRACE_D("MODE-SERVICE: Idle");
             }
         }
 

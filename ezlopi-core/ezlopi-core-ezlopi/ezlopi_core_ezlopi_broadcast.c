@@ -9,50 +9,68 @@
 #include <freertos/semphr.h>
 
 #include "ezlopi_util_trace.h"
+#include "ezlopi_core_buffer.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
-static char __data_to_broadcast[10 * 1024];
-
-static SemaphoreHandle_t __broadcast_lock = NULL;
 static l_broadcast_method_t *__method_head = NULL;
-static int (*__broadcast_queue_func)(char *) = NULL;
+static int (*__broadcast_queue_func)(cJSON *cj_data) = NULL;
 
 static int __call_broadcast_methods(char *data);
-static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32_t retries);
+static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *name, uint32_t retries);
+
+void ezlopi_core_ezlopi_broadcast_methods_set_queue(int (*func)(cJSON *))
+{
+    __broadcast_queue_func = func;
+}
+
+int ezlopi_core_ezlopi_broadcast_add_to_queue(cJSON *cj_data)
+{
+    int ret = 0;
+    if (cj_data && __broadcast_queue_func)
+    {
+        ret = __broadcast_queue_func(cj_data);
+    }
+    return ret;
+}
 
 int ezlopi_core_ezlopi_broadcast_cjson(cJSON *cj_data)
 {
     int ret = 0;
 
-    if (cj_data && __broadcast_queue_func)
+    if (cj_data)
     {
-        if (__broadcast_lock)
+        uint32_t buffer_len = 0;
+        char *data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+
+        if (data_buffer && buffer_len)
         {
-            if (pdTRUE == xSemaphoreTake(__broadcast_lock, 2000 / portTICK_RATE_MS))
+            TRACE_I("-----------------------------> buffer acquired!");
+            memset(data_buffer, 0, buffer_len);
+
+            if (true == cJSON_PrintPreallocated(cj_data, data_buffer, buffer_len, false))
             {
-                memset(__data_to_broadcast, 0, sizeof(__data_to_broadcast));
-
-                if (true == cJSON_PrintPreallocated(cj_data, __data_to_broadcast, sizeof(__data_to_broadcast), false))
-                {
-                    ret = __call_broadcast_methods(__data_to_broadcast);
-                }
-
-                xSemaphoreGive(__broadcast_lock);
+                TRACE_D("----------------- broadcasting:\r\n%s", data_buffer);
+                ret = __call_broadcast_methods(data_buffer);
             }
+
+            ezlopi_core_buffer_release();
+            TRACE_I("-----------------------------> buffer released!");
+        }
+        else
+        {
+            TRACE_E("-----------------------------> buffer acquired failed!");
         }
     }
 
     return ret;
 }
 
-l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, uint32_t retries)
+l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method_t broadcast_method, char *method_name, uint32_t retries)
 {
-    l_broadcast_method_t *ret = __method_create(broadcast_method, retries);
+    l_broadcast_method_t *ret = __method_create(broadcast_method, method_name, retries);
 
     if (ret)
     {
-        TRACE_D("registering broadcast method ...");
-
         if (__method_head)
         {
             l_broadcast_method_t *curr_node = __method_head;
@@ -62,26 +80,11 @@ l_broadcast_method_t *ezlopi_core_ezlopi_broadcast_method_add(f_broadcast_method
                 curr_node = curr_node->next;
             }
 
-            TRACE_D("registered ...");
             curr_node->next = ret;
         }
         else
         {
-            TRACE_D("registered ...");
             __method_head = ret;
-        }
-    }
-    else
-    {
-        TRACE_E("registering broadcast method failed ...");
-    }
-
-    if ((NULL != __method_head) && (NULL == __broadcast_lock))
-    {
-        __broadcast_lock = xSemaphoreCreateMutex();
-        if (__broadcast_lock)
-        {
-            xSemaphoreGive(__broadcast_lock);
         }
     }
 
@@ -134,12 +137,8 @@ static int __call_broadcast_methods(char *data)
             {
                 if (curr_method->func(data))
                 {
+                    // TRACE_S("broadcasted - method:'%s'\r\ndata: %s", curr_method->method_name ? curr_method->method_name : "", data);
                     break;
-                }
-                else
-                {
-                    TRACE_E("failed to broadcast to '%s'!", curr_method->method_name ? curr_method->method_name : "");
-                    TRACE_W("retries-rem: %d", retries);
                 }
 
                 vTaskDelay(10 / portTICK_RATE_MS);
@@ -153,7 +152,7 @@ static int __call_broadcast_methods(char *data)
     return ret;
 }
 
-static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32_t retries)
+static l_broadcast_method_t *__method_create(f_broadcast_method_t method, char *method_name, uint32_t retries)
 {
     l_broadcast_method_t *method_node = NULL;
 
@@ -168,7 +167,10 @@ static l_broadcast_method_t *__method_create(f_broadcast_method_t method, uint32
             method_node->next = NULL;
             method_node->func = method;
             method_node->fail_retry = retries;
-            method_node->method_name = "";
+            if (method_name)
+            {
+                snprintf(method_node->method_name, sizeof(method_node->method_name), "%s", method_name);
+            }
         }
         else
         {

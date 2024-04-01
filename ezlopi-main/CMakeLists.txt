@@ -46,6 +46,7 @@ ezlopi-service-ble
         ezlopi-service-gpioisr
         ezlopi-service-meshbot 
         ezlopi-service-ws-server
+        ezlopi-service-broadcast
 )
 
 # Register the components

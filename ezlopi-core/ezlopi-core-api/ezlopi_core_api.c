@@ -49,14 +49,14 @@ cJSON *ezlopi_core_api_consume(const char *payload, uint32_t len)
                         TRACE_W("updater function: %p", updater);
 
                         cJSON *cj_update_response = __execute_method(cj_request, updater);
-                        cJSON_AddNullToObject(cj_update_response, ezlopi_error_str);
 
                         if (cj_update_response)
                         {
-                            if (!ezlopi_core_ezlopi_broadcast_cjson(cj_update_response))
+                            cJSON_AddNullToObject(cj_update_response, ezlopi_error_str);
+
+                            if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_update_response))
                             {
                                 cJSON_Delete(cj_update_response);
-                                cj_update_response = NULL;
                             }
                         }
                     }
@@ -69,7 +69,7 @@ cJSON *ezlopi_core_api_consume(const char *payload, uint32_t len)
                     cJSON_AddItemToObject(cj_response, ezlopi_sender_str, cJSON_Duplicate(cj_sender, cJSON_True));
                     cJSON_AddItemToObject(cj_response, ezlopi_method_str, cJSON_Duplicate(cj_method, cJSON_True));
 
-                    CJSON_TRACE("x-cj_response", cj_response);
+                    // CJSON_TRACE("x-cj_response", cj_response);
                 }
             }
 #if (1 == ENABLE_TRACE)

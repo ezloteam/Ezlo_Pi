@@ -28,6 +28,7 @@
 
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_buffer.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
@@ -55,8 +56,8 @@ typedef struct s_async_resp_arg
 static char data_buffer[10 * 1024];
 static uint32_t message_counter = 0;
 static httpd_handle_t gs_ws_handle = NULL;
-static SemaphoreHandle_t send_lock = NULL;
 static volatile e_ws_status_t gs_ws_status = WS_STATUS_STOPPED;
+static SemaphoreHandle_t gs_send_lock = NULL;
 
 static void __stop_server(void);
 static void __start_server(void);
@@ -79,7 +80,7 @@ e_ws_status_t ezlopi_service_ws_server_status(void)
 
 void ezlopi_service_ws_server_start(void)
 {
-    ezlopi_core_ezlopi_broadcast_method_add(__ws_server_broadcast, 2);
+    ezlopi_core_ezlopi_broadcast_method_add(__ws_server_broadcast, "wss-method", 2);
 
     if (ezlopi_wifi_got_ip())
     {
@@ -89,28 +90,63 @@ void ezlopi_service_ws_server_start(void)
         }
     }
 
+    if (NULL == gs_send_lock)
+    {
+        gs_send_lock = xSemaphoreCreateMutex();
+        if (gs_send_lock)
+        {
+            xSemaphoreGive(gs_send_lock);
+        }
+    }
+
     ezlopi_wifi_event_add(__wifi_connection_event, NULL);
 }
 
 void ezlopi_service_ws_server_stop(void)
 {
-    __stop_server();
+    if (gs_send_lock)
+    {
+        if (pdTRUE == xSemaphoreTake(gs_send_lock, portMAX_DELAY))
+        {
+            vSemaphoreDelete(gs_send_lock);
+            gs_send_lock = NULL;
+
+            __stop_server();
+        }
+    }
 }
 
 static int __ws_server_broadcast(char *data)
 {
     int ret = 0;
 
-    if (data)
+    if (gs_send_lock && pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS))
     {
-        l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_head();
-
-        while (curr_client)
+        TRACE_S("-----------------------------> acquired send-lock");
+        if (data)
         {
             ret = 1;
-            __ws_server_send(curr_client, data, strlen(data));
-            curr_client = curr_client->next;
+            l_ws_server_client_conn_t *curr_client = ezlopi_service_ws_server_clients_get_head();
+
+            while (curr_client)
+            {
+                ret = __ws_server_send(curr_client, data, strlen(data));
+                curr_client = curr_client->next;
+            }
         }
+
+        if (pdTRUE == xSemaphoreGive(gs_send_lock))
+        {
+            TRACE_S("-----------------------------> released send-lock");
+        }
+        else
+        {
+            TRACE_E("-----------------------------> release send-lock failed!");
+        }
+    }
+    else
+    {
+        TRACE_E("-----------------------------> acquire send-lock failed!");
     }
 
     return ret;
@@ -163,72 +199,91 @@ static esp_err_t __trigger_async_send(httpd_req_t *req)
 
 static esp_err_t __msg_handler(httpd_req_t *req)
 {
-    esp_err_t ret = ESP_OK;
+    esp_err_t ret = ESP_FAIL;
 
-    if (req->method == HTTP_GET)
+    if (gs_send_lock && (pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS)))
     {
-        TRACE_I("Handshake done, the new connection was opened, id: %p", req);
-        ezlopi_service_ws_server_clients_add((void *)req->handle, httpd_req_to_sockfd(req));
-    }
-    else
-    {
-        uint8_t *buf = NULL;
-        httpd_ws_frame_t ws_pkt;
+        TRACE_S("-----------------------------> acquired send-lock");
 
-        memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-        ws_pkt.type = HTTPD_WS_TYPE_TEXT;
-
-        ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
-
-        if ((ESP_OK == ret) && (0 < ws_pkt.len))
+        if (req->method == HTTP_GET)
         {
-            TRACE_I("frame len is %d", ws_pkt.len);
-            buf = malloc(ws_pkt.len + 1);
-
-            if (NULL != buf)
-            {
-                ws_pkt.payload = buf;
-                ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
-
-                if (ESP_OK == ret)
-                {
-                    TRACE_D("Packet type: %d", ws_pkt.type);
-
-                    if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strcmp((char *)ws_pkt.payload, "Trigger async")))
-                    {
-                        ret = __trigger_async_send(req);
-                    }
-                    else if (HTTPD_WS_TYPE_TEXT == ws_pkt.type)
-                    {
-                        __message_upcall(req, (char *)ws_pkt.payload, (uint32_t)ws_pkt.len);
-                    }
-                    else if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
-                    {
-                        TRACE_D("closing connection!");
-                        ezlopi_service_ws_server_clients_remove_by_handle(req);
-                    }
-                    else
-                    {
-                        TRACE_W("packet type un-handled!");
-                    }
-                }
-                else
-                {
-                    TRACE_E("httpd_ws_recv_frame failed with %d", ret);
-                }
-
-                free(buf);
-            }
-            else
-            {
-                TRACE_E("malloc failed!");
-                ret = ESP_ERR_NO_MEM;
-            }
+            TRACE_I("Handshake done, the new connection was opened, id: %p", req);
+            ezlopi_service_ws_server_clients_add((void *)req->handle, httpd_req_to_sockfd(req));
+            ret = ESP_OK;
         }
         else
         {
-            TRACE_E("httpd_ws_recv_frame failed to get frame len with %d", ret);
+            uint8_t *buf = NULL;
+            httpd_ws_frame_t ws_pkt;
+
+            memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+            ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+
+            ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
+
+            if ((ESP_OK == ret) && (0 < ws_pkt.len))
+            {
+                TRACE_I("frame len is %d", ws_pkt.len);
+                buf = malloc(ws_pkt.len + 1);
+
+                if (NULL != buf)
+                {
+                    ws_pkt.payload = buf;
+                    ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
+
+                    if (ESP_OK == ret)
+                    {
+                        TRACE_D("Packet type: %d", ws_pkt.type);
+
+                        if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strcmp((char *)ws_pkt.payload, "Trigger async")))
+                        {
+                            ret = __trigger_async_send(req);
+                        }
+                        else if (HTTPD_WS_TYPE_TEXT == ws_pkt.type)
+                        {
+                            __message_upcall(req, (char *)ws_pkt.payload, (uint32_t)ws_pkt.len);
+                        }
+                        else if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
+                        {
+                            TRACE_D("closing connection!");
+                            ezlopi_service_ws_server_clients_remove_by_handle(req);
+                        }
+                        else
+                        {
+                            TRACE_W("packet type un-handled!");
+                        }
+                    }
+                    else
+                    {
+                        TRACE_E("httpd_ws_recv_frame failed with %d", ret);
+                    }
+
+                    free(buf);
+                }
+                else
+                {
+                    TRACE_E("malloc failed!");
+                    ret = ESP_ERR_NO_MEM;
+                }
+            }
+            else
+            {
+                TRACE_E("httpd_ws_recv_frame failed to get frame len with %d", ret);
+            }
         }
+
+        if (pdTRUE == xSemaphoreGive(gs_send_lock))
+        {
+            TRACE_S("-----------------------------> released send-lock");
+        }
+        else
+        {
+            TRACE_E("-----------------------------> release send-lock failed!");
+        }
+    }
+    else
+    {
+        TRACE_E("-----------------------------> acquire send-lock failed!");
     }
 
     return ret;
@@ -237,49 +292,37 @@ static esp_err_t __msg_handler(httpd_req_t *req)
 static void __start_server(void)
 {
     gs_ws_status = WS_STATUS_STARTED;
-    send_lock = xSemaphoreCreateMutex();
-    if (send_lock)
+
+    static const httpd_uri_t ws = {
+        .uri = "/",
+        .method = HTTP_GET,
+        .handler = __msg_handler,
+        .user_ctx = NULL,
+        .is_websocket = true,
+        .handle_ws_control_frames = true,
+    };
+
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+    config.server_port = 8073;
+    config.task_priority = 8;
+    config.stack_size = 1024 * 4;
+
+    TRACE_I("Starting ws-server on port: '%d'", config.server_port);
+
+    esp_err_t err = httpd_start(&gs_ws_handle, &config);
+
+    if (ESP_OK == err)
     {
-
-        static const httpd_uri_t ws = {
-            .uri = "/",
-            .method = HTTP_GET,
-            .handler = __msg_handler,
-            .user_ctx = NULL,
-            .is_websocket = true,
-            .handle_ws_control_frames = true,
-        };
-
-        httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-
-        // uint64_t id_val = ezlopi_factory_info_v3_get_id();
-        // if (id_val)
-        // {
-        //     uint32_t serial_last4 = id_val % 10000;
-        //     config.server_port = serial_last4;
-        // }
-
-        config.server_port = 8073;
-
-        config.task_priority = 8;
-        config.stack_size = 1024 * 4;
-
-        TRACE_I("Starting ws-server on port: '%d'", config.server_port);
-
-        esp_err_t err = httpd_start(&gs_ws_handle, &config);
-
-        if (ESP_OK == err)
+        TRACE_I("Registering URI handlers");
+        if (ESP_OK == httpd_register_uri_handler(gs_ws_handle, &ws))
         {
-            TRACE_I("Registering URI handlers");
-            if (ESP_OK == httpd_register_uri_handler(gs_ws_handle, &ws))
-            {
-                gs_ws_status = WS_STATUS_RUNNING;
-            }
+            gs_ws_status = WS_STATUS_RUNNING;
         }
-        else
-        {
-            TRACE_E("Error starting server!, err: %d", err);
-        }
+    }
+    else
+    {
+        TRACE_E("Error starting server!, err: %d", err);
     }
 }
 
@@ -292,24 +335,22 @@ static void __stop_server(void)
         gs_ws_handle = NULL;
         gs_ws_status = WS_STATUS_STOPPED;
     }
-
-    if (send_lock)
-    {
-        vSemaphoreDelete(send_lock);
-        send_lock = NULL;
-    }
 }
 
 static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
 {
     int ret = 0;
-    if (req && cj_response && send_lock)
+    if (req && cj_response)
     {
-        if (pdTRUE == xSemaphoreTake(send_lock, 2000 / portTICK_PERIOD_MS))
-        {
-            memset(data_buffer, 0, sizeof(data_buffer));
+        uint32_t buffer_len = 0;
+        char *data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
 
-            if (cJSON_PrintPreallocated(cj_response, data_buffer, sizeof(data_buffer), false))
+        if (data_buffer && buffer_len)
+        {
+            TRACE_I("-----------------------------> buffer acquired!");
+            memset(data_buffer, 0, buffer_len);
+
+            if (cJSON_PrintPreallocated(cj_response, data_buffer, buffer_len, false))
             {
                 httpd_ws_frame_t data_frame = {
                     .final = false,
@@ -332,7 +373,12 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
                 }
             }
 
-            xSemaphoreGive(send_lock);
+            ezlopi_core_buffer_release();
+            TRACE_I("-----------------------------> buffer released!");
+        }
+        else
+        {
+            TRACE_E("-----------------------------> buffer acquired failed!");
         }
     }
 
@@ -342,48 +388,39 @@ static int __respond_cjson(httpd_req_t *req, cJSON *cj_response)
 static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint32_t len)
 {
     int ret = 0;
-    if (data && len && client && client->http_handle && send_lock)
+    if (data && len && client && client->http_handle)
     {
-        if (pdTRUE == xSemaphoreTake(send_lock, 2000 / portTICK_PERIOD_MS))
+        httpd_ws_frame_t frm_pkt;
+        memset(&frm_pkt, 0, sizeof(httpd_ws_frame_t));
+
+        frm_pkt.len = strlen(data);
+        frm_pkt.payload = (uint8_t *)data;
+        frm_pkt.type = HTTPD_WS_TYPE_TEXT;
+
+        // TRACE_D("client-handle: %p", client->http_handle);
+        // TRACE_D("client-desc: %d", client->http_descriptor);
+        // TRACE_D("data[%d]: %.*s", frm_pkt.len, frm_pkt.len, frm_pkt.payload);
+
+        if (ESP_OK == httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt))
         {
-            httpd_ws_frame_t frm_pkt;
-            memset(&frm_pkt, 0, sizeof(httpd_ws_frame_t));
+            ret = 1;
+            client->fail_count = 0;
+            message_counter++;
 
-            frm_pkt.len = strlen(data);
-            frm_pkt.payload = (uint8_t *)data;
-            frm_pkt.type = HTTPD_WS_TYPE_TEXT;
-
-            TRACE_D("client-handle: %p", client->http_handle);
-            TRACE_D("client-desc: %d", client->http_descriptor);
-            TRACE_D("data[%d]: %.*s", frm_pkt.len, frm_pkt.len, frm_pkt.payload);
-
-            if (ESP_OK == httpd_ws_send_data(client->http_handle, client->http_descriptor, &frm_pkt))
-            {
-                ret = 1;
-                client->fail_count = 0;
-                message_counter++;
-
-                TRACE_D("## WSS-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", data);
-            }
-            else
-            {
-                TRACE_E("Failed!");
-                TRACE_E("## WSS-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", data);
-
-                ret = 0;
-                client->fail_count += 1;
-
-                if (client->fail_count > 5)
-                {
-                    ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
-                }
-            }
-
-            xSemaphoreGive(send_lock);
+            TRACE_S("## WSS-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", data);
         }
         else
         {
-            TRACE_E("ws-server send-lock failed!");
+            TRACE_E("Failed!");
+            TRACE_E("## WSS-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", data);
+
+            ret = 0;
+            client->fail_count += 1;
+
+            if (client->fail_count > 5)
+            {
+                ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
+            }
         }
     }
 

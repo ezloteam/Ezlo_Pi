@@ -12,10 +12,11 @@
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_wifi.h"
+#include "ezlopi_core_buffer.h"
+#include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_api_methods.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
@@ -25,7 +26,6 @@ static char s_data_buffer[10 * 1024];
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
-static xSemaphoreHandle sg_web_prov_lock = NULL;
 static TaskHandle_t ezlopi_update_config_notifier = NULL;
 
 static void __config_check(void *pv);
@@ -115,13 +115,7 @@ static void __fetch_wss_endpoint(void *pv)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
 
-                        sg_web_prov_lock = xSemaphoreCreateMutex();
-                        if (sg_web_prov_lock)
-                        {
-                            xSemaphoreGive(sg_web_prov_lock);
-                        }
-
-                        ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, 4);
+                        ezlopi_core_ezlopi_broadcast_method_add(__send_str_data_to_nma_websocket, "nma-websocket", 4);
                         ezlopi_websocket_client_init(cjson_uri, __message_upcall, __connection_upcall);
 
                         task_complete = 1;
@@ -177,57 +171,25 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
 
     if (cj_data)
     {
-        if (sg_web_prov_lock)
+        uint32_t buffer_len = 0;
+        char *data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+
+        if (data_buffer && buffer_len)
         {
-            uint32_t start_time = xTaskGetTickCount();
-            if (pdTRUE == xSemaphoreTake(sg_web_prov_lock, 3000 / portTICK_RATE_MS))
+            TRACE_I("-----------------------------> buffer acquired!");
+            memset(s_data_buffer, 0, buffer_len);
+
+            if (true == cJSON_PrintPreallocated(cj_data, s_data_buffer, buffer_len, false))
             {
-                TRACE_I("'sg_web_prov_lock' acquired!, time: %d", xTaskGetTickCount() - start_time);
-
-                memset(s_data_buffer, 0, sizeof(s_data_buffer));
-
-                if (true == cJSON_PrintPreallocated(cj_data, s_data_buffer, sizeof(s_data_buffer), false))
-                {
-                    ret = __send_str_data_to_nma_websocket(s_data_buffer);
-                    if (ret)
-                    {
-                        TRACE_S("send success\r\n%s", s_data_buffer);
-                    }
-                    else
-                    {
-                        TRACE_E("send failed!\r\n%s", s_data_buffer);
-                    }
-                }
-                else
-                {
-                    TRACE_E("failed to parse!");
-                }
-
-#if 0
-                char* data_to_send = cJSON_PrintBuffered(cj_data, 10 * 1024, false);
-
-                if (data_to_send)
-                {
-                    ret = __send_str_data_to_nma_websocket(data_to_send);
-                    free(data_to_send);
-                }
-#endif
-                TRACE_I("'sg_web_prov_lock' released!");
-                xSemaphoreGive(sg_web_prov_lock);
+                ret = __send_str_data_to_nma_websocket(s_data_buffer);
             }
+
+            ezlopi_core_buffer_release();
+            TRACE_I("-----------------------------> buffer released!");
         }
         else
         {
-            char *data_to_send = cJSON_PrintBuffered(cj_data, 10 * 1024, false);
-            if (data_to_send)
-            {
-                ret = __send_str_data_to_nma_websocket(data_to_send);
-                free(data_to_send);
-            }
-            else
-            {
-                TRACE_E("malloc-failed");
-            }
+            TRACE_E("-----------------------------> buffer acquired failed!");
         }
     }
 
@@ -242,17 +204,19 @@ static int __send_str_data_to_nma_websocket(char *str_data)
         int retries = 3;
         while (--retries)
         {
-            if (ezlopi_websocket_client_send(str_data, strlen(str_data)) > 0)
+            if (ezlopi_websocket_client_send(str_data, strlen(str_data)))
             {
                 ret = 1;
                 message_counter++;
                 break;
             }
+
+            vTaskDelay(50 / portTICK_PERIOD_MS);
         }
 
         if (ret)
         {
-            TRACE_D("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
+            TRACE_S("## WSC-SENDING done >>>>>>>>>>>>>>>>>>>\r\n%s", str_data);
         }
         else
         {

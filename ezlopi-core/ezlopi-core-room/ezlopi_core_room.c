@@ -368,8 +368,12 @@ static void __update_cloud_room_deleted(uint32_t room_id)
             cJSON_AddStringToObject(cj_result, ezlopi__id_str, tmp_str);
         }
 
-        ezlopi_core_ezlopi_broadcast_cjson(cj_response);
-        cJSON_Delete(cj_response);
+        CJSON_TRACE("----------------- broadcasting - cj_response", cj_response);
+
+        if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_response))
+        {
+            cJSON_Delete(cj_response);
+        }
     }
 }
 

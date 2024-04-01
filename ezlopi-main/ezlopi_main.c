@@ -25,6 +25,7 @@
 #include "ezlopi_service_gpioisr.h"
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_service_ws_server.h"
+#include "ezlopi_service_broadcast.h"
 
 #include "pt.h"
 
@@ -66,6 +67,7 @@ void app_main(void)
 #if CONFIG_EZLOPI_BLE_ENABLE == 1
 #endif
 
+    ezlopi_service_broadcast_init();
     ezlopi_service_ws_server_start();
     ezlopi_service_web_provisioning_init();
 

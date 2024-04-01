@@ -3,13 +3,14 @@
 file(GLOB_RECURSE config_src "*.c")
 
 set(EZLOPI_CORE_COMPONENTS 
-        ezlopi-core-wifi
-        ezlopi-core-modes
-        ezlopi-core-sntp
-        ezlopi-core-ble
-        ezlopi-core-scenes    
         ezlopi-util-trace
+        ezlopi-core-ble
+        ezlopi-core-wifi
+        ezlopi-core-sntp
         ezlopi-core-mdns   
+        ezlopi-core-modes
+        ezlopi-core-scenes    
+        ezlopi-core-buffer
 )
 
 set(EZLOPI_CLOUD_COMPONENTS

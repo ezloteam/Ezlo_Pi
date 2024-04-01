@@ -11,6 +11,7 @@
 #include "ezlopi_cloud_registration.h"
 
 #include "ezlopi_core_event_group.h"
+#include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
@@ -54,7 +55,7 @@ static void registration_process(void *pv)
         if (cj_params)
         {
             cJSON_AddStringToObject(cj_params, ezlopi_firmware_str, VERSION_STR);
-            cJSON_AddNumberToObject(cj_params, "timeOffset", 18000);
+            cJSON_AddNumberToObject(cj_params, "timeOffset", 20700);
             cJSON_AddStringToObject(cj_params, "media", "radio");
             cJSON_AddStringToObject(cj_params, "hubType", "32.1");
             cJSON_AddStringToObject(cj_params, "mac_address", mac_str);
@@ -66,9 +67,17 @@ static void registration_process(void *pv)
             vTaskDelay(200 / portTICK_RATE_MS);
         }
 
-        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 2000, false) <= 0)
+        while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
         {
-            ezlopi_core_ezlopi_broadcast_cjson(cj_register);
+            //     CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
+            cJSON *cj_register_dup = cJSON_CreateObjectReference(cj_register->child);
+            if (cj_register_dup)
+            {
+                if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_register_dup))
+                {
+                    cJSON_Delete(cj_register_dup);
+                }
+            }
         }
 
         cJSON_Delete(cj_register);
