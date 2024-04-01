@@ -131,6 +131,7 @@ static int __ws_server_broadcast(char *data)
             while (curr_client)
             {
                 ret = __ws_server_send(curr_client, data, strlen(data));
+                TRACE_D("ret: %d", ret);
                 curr_client = curr_client->next;
             }
         }
@@ -170,14 +171,18 @@ static void __ws_async_send(void *arg)
 
     if (resp_arg)
     {
-        httpd_ws_frame_t ws_pkt;
-        memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+        if (gs_send_lock && pdTRUE == xSemaphoreTake(gs_send_lock, 5000 / portTICK_RATE_MS))
+        {
+            httpd_ws_frame_t ws_pkt;
+            memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
 
-        ws_pkt.len = strlen(data);
-        ws_pkt.payload = (uint8_t *)data;
-        ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+            ws_pkt.len = strlen(data);
+            ws_pkt.payload = (uint8_t *)data;
+            ws_pkt.type = HTTPD_WS_TYPE_TEXT;
 
-        httpd_ws_send_frame_async(resp_arg->hd, resp_arg->fd, &ws_pkt);
+            httpd_ws_send_frame_async(resp_arg->hd, resp_arg->fd, &ws_pkt);
+        }
+
         free(resp_arg);
     }
 }
@@ -219,56 +224,67 @@ static esp_err_t __msg_handler(httpd_req_t *req)
             memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
             ws_pkt.type = HTTPD_WS_TYPE_TEXT;
 
-            ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
+            ret = httpd_ws_recv_frame(req, &ws_pkt, 0); // to get only rx-data length
 
-            if ((ESP_OK == ret) && (0 < ws_pkt.len))
+            TRACE_D("Packet type: %d", ws_pkt.type);
+            TRACE_I("frame len is %d", ws_pkt.len);
+
+            if (ESP_OK == ret)
             {
-                TRACE_I("frame len is %d", ws_pkt.len);
-                buf = malloc(ws_pkt.len + 1);
-
-                if (NULL != buf)
+                if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
                 {
-                    ws_pkt.payload = buf;
-                    ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
+                    TRACE_D("closing connection!");
+                    ezlopi_service_ws_server_clients_remove_by_handle(req->handle);
+                }
+                else if (0 < ws_pkt.len)
+                {
+                    buf = malloc(ws_pkt.len + 1);
 
-                    if (ESP_OK == ret)
+                    if (NULL != buf)
                     {
-                        TRACE_D("Packet type: %d", ws_pkt.type);
+                        ws_pkt.payload = buf;
+                        ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
 
-                        if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strcmp((char *)ws_pkt.payload, "Trigger async")))
+                        if (ESP_OK == ret)
                         {
-                            ret = __trigger_async_send(req);
-                        }
-                        else if (HTTPD_WS_TYPE_TEXT == ws_pkt.type)
-                        {
-                            __message_upcall(req, (char *)ws_pkt.payload, (uint32_t)ws_pkt.len);
-                        }
-                        else if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
-                        {
-                            TRACE_D("closing connection!");
-                            ezlopi_service_ws_server_clients_remove_by_handle(req);
+                            TRACE_D("Packet type: %d", ws_pkt.type);
+
+                            if ((HTTPD_WS_TYPE_TEXT == ws_pkt.type) && (0 == strcmp((char *)ws_pkt.payload, "Trigger async")))
+                            {
+                                TRACE_E("ASYNC");
+                                ret = __trigger_async_send(req);
+                            }
+                            else if (HTTPD_WS_TYPE_TEXT == ws_pkt.type)
+                            {
+                                __message_upcall(req, (char *)ws_pkt.payload, (uint32_t)ws_pkt.len);
+                            }
+                            else if (HTTPD_WS_TYPE_CLOSE == ws_pkt.type)
+                            {
+                                TRACE_D("closing connection!");
+                                ezlopi_service_ws_server_clients_remove_by_handle(req->handle);
+                            }
+                            else
+                            {
+                                TRACE_W("packet type un-handled!");
+                            }
                         }
                         else
                         {
-                            TRACE_W("packet type un-handled!");
+                            TRACE_E("httpd_ws_recv_frame failed with %d", ret);
                         }
+
+                        free(buf);
                     }
                     else
                     {
-                        TRACE_E("httpd_ws_recv_frame failed with %d", ret);
+                        TRACE_E("malloc failed!");
+                        ret = ESP_ERR_NO_MEM;
                     }
-
-                    free(buf);
                 }
                 else
                 {
-                    TRACE_E("malloc failed!");
-                    ret = ESP_ERR_NO_MEM;
+                    TRACE_E("httpd_ws_recv_frame failed to get frame len with %d", ret);
                 }
-            }
-            else
-            {
-                TRACE_E("httpd_ws_recv_frame failed to get frame len with %d", ret);
             }
         }
 
@@ -411,7 +427,6 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
         }
         else
         {
-            TRACE_E("Failed!");
             TRACE_E("## WSS-SENDING failed >>>>>>>>>>>>>>>>>>>\r\n%s", data);
 
             ret = 0;
@@ -419,6 +434,7 @@ static int __ws_server_send(l_ws_server_client_conn_t *client, char *data, uint3
 
             if (client->fail_count > 5)
             {
+                TRACE_E("fail count reached maximum!");
                 ezlopi_service_ws_server_clients_remove_by_handle(client->http_handle);
             }
         }

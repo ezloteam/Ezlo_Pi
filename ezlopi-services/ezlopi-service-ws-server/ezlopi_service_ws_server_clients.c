@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ezlopi_util_trace.h"
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
 
+static uint32_t __number_of_clients = 0;
 static l_ws_server_client_conn_t *l_client_conn_head = NULL;
 
-static l_ws_server_client_conn_t *__create_client_conn(void);
+l_ws_server_client_conn_t *__create_new_client(void *http_handle, int http_descriptor);
 
 l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_get_head(void)
 {
@@ -49,26 +51,25 @@ l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_add(void *http_handl
 
             if (0 == dup_flag)
             {
-                ws_client_conn = __create_client_conn();
-                if (ws_client_conn)
+                curr_conn->next = __create_new_client(http_handle, http_descriptor);
+                if (curr_conn->next)
                 {
-                    curr_conn->next = ws_client_conn;
-                    ws_client_conn->http_handle = http_handle;
-                    ws_client_conn->http_descriptor = http_descriptor;
+                    __number_of_clients++;
                 }
             }
         }
     }
     else
     {
-        ws_client_conn = __create_client_conn();
+        ws_client_conn = __create_new_client(http_handle, http_descriptor);
         if (ws_client_conn)
         {
+            __number_of_clients++;
             l_client_conn_head = ws_client_conn;
-            ws_client_conn->http_handle = http_handle;
-            ws_client_conn->http_descriptor = http_descriptor;
         }
     }
+
+    TRACE_I("numbers of clients: %u", __number_of_clients);
 
     return ws_client_conn;
 }
@@ -82,9 +83,12 @@ int ezlopi_service_ws_server_clients_remove_by_handle(void *http_handle)
         l_ws_server_client_conn_t *ws_popped_con = ezlopi_service_ws_server_clients_pop(http_handle);
         if (ws_popped_con)
         {
+            __number_of_clients--;
             free(ws_popped_con);
         }
     }
+
+    TRACE_I("numbers of clients: %u", __number_of_clients);
 
     return ret;
 }
@@ -93,42 +97,45 @@ l_ws_server_client_conn_t *ezlopi_service_ws_server_clients_pop(void *http_handl
 {
     l_ws_server_client_conn_t *pop_con = NULL;
 
-    if (http_handle == l_client_conn_head->http_handle)
+    if (l_client_conn_head)
     {
-        pop_con = l_client_conn_head;
-        l_client_conn_head = l_client_conn_head->next;
-        pop_con->next = NULL;
-    }
-    else
-    {
-        l_ws_server_client_conn_t *curr_conn = l_client_conn_head;
-        while (curr_conn->next)
+        if (http_handle == l_client_conn_head->http_handle)
         {
-            if (curr_conn->next->http_handle == http_handle)
+            pop_con = l_client_conn_head;
+            l_client_conn_head = l_client_conn_head->next;
+            pop_con->next = NULL;
+        }
+        else
+        {
+            l_ws_server_client_conn_t *curr_conn = l_client_conn_head;
+            while (curr_conn->next)
             {
-                pop_con = curr_conn->next;
-                curr_conn->next = curr_conn->next->next;
-                pop_con->next = NULL;
-                break;
-            }
+                if (curr_conn->next->http_handle == http_handle)
+                {
+                    pop_con = curr_conn->next;
+                    curr_conn->next = curr_conn->next->next;
+                    pop_con->next = NULL;
+                    break;
+                }
 
-            curr_conn = curr_conn->next;
+                curr_conn = curr_conn->next;
+            }
         }
     }
 
     return pop_con;
 }
 
-static l_ws_server_client_conn_t *__create_client_conn(void)
+l_ws_server_client_conn_t *__create_new_client(void *http_handle, int http_descriptor)
 {
-    l_ws_server_client_conn_t *new_ws_conn = malloc(sizeof(l_ws_server_client_conn_t));
-    if (new_ws_conn)
+    l_ws_server_client_conn_t *ws_client_conn = malloc(sizeof(l_ws_server_client_conn_t));
+    if (ws_client_conn)
     {
-        new_ws_conn->fail_count = 0;
-        new_ws_conn->http_handle = NULL;
-        new_ws_conn->http_descriptor = 0;
-        new_ws_conn->next = NULL;
+        memset(ws_client_conn, 0, sizeof(l_ws_server_client_conn_t));
+
+        ws_client_conn->http_handle = http_handle;
+        ws_client_conn->http_descriptor = http_descriptor;
     }
 
-    return new_ws_conn;
+    return ws_client_conn;
 }

@@ -29,7 +29,7 @@ static void __broadcast_process(void *pv)
         {
             if (cj_data)
             {
-                vTaskDelay(100 / portTICK_PERIOD_MS);
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
                 ezlopi_core_ezlopi_broadcast_cjson(cj_data);
                 cJSON_Delete(cj_data);
             }
