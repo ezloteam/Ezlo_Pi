@@ -312,4 +312,10 @@ const char* ezlopi_timeout_str = "timeout";
 const char* ezlopi_latitude_str = "latitude";
 const char* ezlopi_longitude_str = "longitude";
 
+const char *ezlopi_parity_str = "parity";
+const char *ezlopi_start_bits_str = "start_bits";
+const char *ezlopi_stop_bits_str = "stop_bits";
+const char *ezlopi_frame_size_str = "frame_size";
+const char *ezlopi_flow_control_str = "flow_control";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

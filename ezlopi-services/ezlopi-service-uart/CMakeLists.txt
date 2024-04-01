@@ -8,6 +8,7 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-factory-info
         ezlopi-core-net
         ezlopi-core-reset
+        ezlopi-core-ezlopi
 )
 set(EZLOPI_HAL_COMPONENTS 
         ezlopi-hal-sysinfo

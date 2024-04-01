@@ -97,7 +97,22 @@ extern "C"
     int ezlopi_nvs_write_latitude_longitude(char* data);
 
     bool EZPI_CORE_nvs_write_baud(uint32_t baud);
-    uint32_t EZPI_CORE_nvs_read_baud();
+    uint8_t EZPI_CORE_nvs_read_baud(uint32_t *baud);
+
+    bool EZPI_CORE_nvs_write_parity(uint8_t parity);
+    uint8_t EZPI_CORE_nvs_read_parity(uint8_t *parity);
+
+    bool EZPI_CORE_nvs_write_start_bits(uint8_t start_bits);
+    uint8_t EZPI_CORE_nvs_read_start_bits(uint8_t *start_bits);
+
+    bool EZPI_CORE_nvs_write_stop_bits(uint8_t stop_bits);
+    uint8_t EZPI_CORE_nvs_read_stop_bits(uint8_t *stop_bits);
+
+    bool EZPI_CORE_nvs_write_frame_size(uint8_t frame_size);
+    uint8_t EZPI_CORE_nvs_read_frame_size(uint8_t *frame_size);
+
+    bool EZPI_CORE_nvs_write_flow_control(bool flow_control);
+    uint8_t EZPI_CORE_nvs_read_flow_control(bool *flow_control);
 
 #ifdef __cplusplus
 }

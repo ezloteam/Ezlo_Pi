@@ -55,10 +55,11 @@ void app_main(void)
     gpio_install_isr_service(0);
 
     gpio_isr_service_init();
-    EZPI_SERVICE_uart_init();
 
     ezlopi_init();
 
+    EZPI_SERVICE_uart_init();
+    
     timer_service_init();
 #if CONFIG_EZLOPI_BLE_ENABLE == 1
     ezlopi_ble_service_init();
@@ -71,9 +72,10 @@ void app_main(void)
 
     ezlopi_service_ota_init();
     ezlopi_service_broadcast_init();
-
+#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     TRACE_D("starting meshbot-service");
     ezlopi_scenes_meshbot_init();
+#endif
 
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
 }

@@ -25,6 +25,12 @@ menu "EzloPi User Config"
     default y
     help
         Enable meshbot services for scenes
+    
+    config EZLPI_SERV_ENABLE_MODES
+    bool "Enable mode services"
+    default y
+    help
+        Enable mode services
 
     config EZLOPI_BLE_ENABLE
     bool "Enable BLE"
