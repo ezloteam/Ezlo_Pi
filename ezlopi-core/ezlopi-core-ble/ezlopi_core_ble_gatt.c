@@ -360,6 +360,7 @@ static void ezlopi_ble_gatt_call_read_by_handle(esp_gatt_if_t gatts_if, esp_ble_
     }
 }
 
+#if (1 == ENABLE_TRACE)
 static char* ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
 {
     char* ret = "GATT event not defined!";
@@ -498,3 +499,4 @@ static char* ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
     }
     return ret;
 }
+#endif // 1 == ENABLE_TRACE

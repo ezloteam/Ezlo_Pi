@@ -34,30 +34,32 @@
 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 
-static esp_netif_t* wifi_sta_netif = NULL;
-static esp_netif_ip_info_t my_ip;
-// static uint32_t new_wifi = 0;
-static int s_retry_num = 0;
-// static char wifi_ssid_pass_global_buffer[EZLOPI_FINFO_LEN_WIFI_SSID + EZLOPI_FINFO_LEN_WIFI_PASS];
-static int station_got_ip = 0;
-static const char* const wifi_no_error_str = "NO_ERROR";
-static const char* last_disconnect_reason = wifi_no_error_str;
-static ll_ezlopi_wifi_event_upcall_t* __event_upcall_head = NULL;
-static volatile bool ezlopi_flag_wifi_status = false;
+static esp_netif_ip_info_t sg_my_ip;
+static esp_netif_t *sg_wifi_sta_netif = NULL;
+
+static int sg_retry_num = 0;
+static volatile int sg_station_got_ip = 0;
+static const char *const scg_wifi_no_error_str = "NO_ERROR";
+static const char *sg_last_disconnect_reason = scg_wifi_no_error_str;
+
+static ll_ezlopi_wifi_event_upcall_t *__event_upcall_head = NULL;
 
 // This task name is used to get the task handle while deleting the scanner task. Also, the task name should be < 16 to get handle using the freeRTOS API.
-static const char* wifi_scanner_task_name = "scanner_task";
+static TaskHandle_t sg_scan_handle = NULL;
+static wifi_ap_record_t *ap_record = NULL;
 static uint16_t total_wifi_APs_available = 0;
-static wifi_ap_record_t* ap_record = NULL;
 
-static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void* arg);
-static void ezlopi_wifi_scanner_task(void* params);
+static void __event_ip_got_ip(void *event_data);
+static void __event_wifi_scan_done(void *event_data);
+static void __event_wifi_disconnected(void *event_data);
+static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void *arg);
+static void ezlopi_wifi_scanner_task(void *params);
 
-void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void* arg)
+void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void *arg)
 {
     if (__event_upcall_head)
     {
-        ll_ezlopi_wifi_event_upcall_t* curr_upcall_head = __event_upcall_head;
+        ll_ezlopi_wifi_event_upcall_t *curr_upcall_head = __event_upcall_head;
         while (curr_upcall_head->next)
         {
             curr_upcall_head = curr_upcall_head->next;
@@ -71,43 +73,37 @@ void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void* arg)
     }
 }
 
-const char* ezlopi_wifi_get_last_disconnect_reason(void)
+const char *ezlopi_wifi_get_last_disconnect_reason(void)
 {
-    return last_disconnect_reason;
+    return sg_last_disconnect_reason;
 }
 
-esp_netif_ip_info_t* ezlopi_wifi_get_ip_infos(void)
+esp_netif_ip_info_t *ezlopi_wifi_get_ip_infos(void)
 {
-    return &my_ip;
+    return &sg_my_ip;
 }
 
 int ezlopi_wifi_got_ip(void)
 {
-    return station_got_ip;
+    return sg_station_got_ip;
 }
 
-// void ezlopi_wifi_set_new_wifi_flag(void)
-// {
-//     new_wifi = 1;
-// }
-
-ezlopi_wifi_status_t* ezlopi_wifi_status(void)
+ezlopi_wifi_status_t *ezlopi_wifi_status(void)
 {
 
-    ezlopi_wifi_status_t* wifi_stat = (ezlopi_wifi_status_t*)malloc(sizeof(ezlopi_wifi_status_t));
+    ezlopi_wifi_status_t *wifi_stat = (ezlopi_wifi_status_t *)malloc(sizeof(ezlopi_wifi_status_t));
 
-    if (ezlopi_flag_wifi_status)
+    if (sg_station_got_ip)
     {
-
         wifi_stat->wifi_connection = true;
         wifi_stat->wifi_mode = WIFI_MODE_STA;
         wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
     }
     else
     {
+        wifi_stat->wifi_connection = false;
         wifi_stat->wifi_mode = WIFI_MODE_STA;
         wifi_stat->ip_info = ezlopi_wifi_get_ip_infos();
-        wifi_stat->wifi_connection = false;
     }
 
     return wifi_stat;
@@ -125,7 +121,7 @@ static int get_auth_mode_str(char auth_str[50], wifi_auth_mode_t mode)
 {
     int ret = 0;
     memset(auth_str, 0, 50);
-    char* auth_mode_str = "";
+    char *auth_mode_str = "";
     switch (mode)
     {
     case WIFI_AUTH_OPEN:
@@ -183,96 +179,61 @@ static int get_auth_mode_str(char auth_str[50], wifi_auth_mode_t mode)
     return ret;
 }
 
-static void __event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
+static void __event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
+    if (WIFI_EVENT == event_base)
     {
-        esp_wifi_connect();
-    }
-    else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
-    {
-        ezlopi_event_group_clear_event(EZLOPI_EVENT_WIFI_CONNECTED);
-
-        // event_data; //
-        wifi_event_sta_disconnected_t* disconnected = (wifi_event_sta_disconnected_t*)event_data;
-        TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
-        last_disconnect_reason = ezlopi_wifi_err_reason_str(disconnected->reason);
-        ezlopi_flag_wifi_status = false;
-
-        station_got_ip = 0;
-        esp_wifi_connect();
-
-        if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
+        switch (event_id)
         {
-            s_retry_num++;
-            TRACE_S("retry to connect to the AP");
+        case WIFI_EVENT_STA_START:
+        {
+            esp_wifi_connect();
+            break;
         }
-        else
+        case WIFI_EVENT_STA_DISCONNECTED:
         {
-            ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_FAIL);
-            s_retry_num = 0;
+            __event_wifi_disconnected(event_data);
+            break;
         }
-        TRACE_W("connect to the AP fail");
-        memset(&my_ip, 0, sizeof(esp_netif_ip_info_t));
-    }
-    else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_SCAN_DONE)
-    {
-        wifi_event_sta_scan_done_t* scan_event_param = (wifi_event_sta_scan_done_t*)event_data;
-        TRACE_I("status: %d, event data: %d", scan_event_param->status, scan_event_param->number);
-        if (scan_event_param->status == 0)
+        case WIFI_EVENT_SCAN_DONE:
         {
-            total_wifi_APs_available = scan_event_param->number;
-            ap_record = (wifi_ap_record_t*)malloc(total_wifi_APs_available * sizeof(wifi_ap_record_t));
-            ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&total_wifi_APs_available, ap_record));
-            cJSON* network_array = cJSON_CreateArray();
-            if (network_array)
-            {
-                char temporary[50];
-                for (int i = 0; i < total_wifi_APs_available; i++)
-                {
-                    cJSON* network_data = cJSON_CreateObject();
-                    if (network_data)
-                    {
-                        memset(temporary, 0, 50);
-                        memcpy(temporary, ap_record[i].ssid, 33);
-                        cJSON_AddStringToObject(network_data, "ssid", temporary);
-                        memset(temporary, 0, 50);
-                        snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_record[i].bssid[0], ap_record[i].bssid[1], ap_record[i].bssid[2],
-                            ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
-                        cJSON_AddStringToObject(network_data, "bssid", temporary);
-                        cJSON_AddNumberToObject(network_data, "rssi", ap_record[i].rssi);
-                        get_auth_mode_str(temporary, ap_record[i].authmode);
-                        cJSON_AddStringToObject(network_data, "security", temporary);
-                        cJSON_AddItemToArray(network_array, network_data);
-                    }
-                }
-                ezlopi_network_update_wifi_scan_process(network_array);
-            }
-            free(ap_record);
-            ap_record = NULL;
+            __event_wifi_scan_done(event_data);
+            break;
+        }
+        case WIFI_EVENT_STA_STOP:
+        {
+            TRACE_D("wifi-stopped!");
+            break;
+        }
+        default:
+        {
+            TRACE_W("un-known wifi-event received: %d", event_id);
+            break;
+        }
         }
     }
-    else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
+    else if (IP_EVENT == event_base)
     {
-        last_disconnect_reason = wifi_no_error_str;
-        ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
-        TRACE_I("got - ip:      " IPSTR, IP2STR(&event->ip_info.ip));
-        TRACE_I("      netmask: " IPSTR, IP2STR(&event->ip_info.netmask));
-        TRACE_I("      gw:      " IPSTR, IP2STR(&event->ip_info.gw));
-
-        station_got_ip = 1;
-        s_retry_num = 0;
-
-        memcpy(&my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
-        ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
-        ezlopi_flag_wifi_status = true;
+        switch (event_id)
+        {
+        case IP_EVENT_STA_GOT_IP:
+        {
+            __event_ip_got_ip(event_data);
+            break;
+        }
+        default:
+        {
+            TRACE_W("un-known ip-event received: %d", event_id);
+            break;
+        }
+        }
     }
     else
     {
-        TRACE_E("unknown event:: event_base: %u, event_id: %d", (uint32_t)event_base, event_id);
+        TRACE_W("unkown event received, event-base: %d, event-id: %d", (uint32_t)event_base, event_id);
     }
 
-    ll_ezlopi_wifi_event_upcall_t* curr_upcall = __event_upcall_head;
+    ll_ezlopi_wifi_event_upcall_t *curr_upcall = __event_upcall_head;
     while (curr_upcall)
     {
         if (curr_upcall->upcall)
@@ -285,8 +246,8 @@ static void __event_handler(void* arg, esp_event_base_t event_base, int32_t even
 
 void ezlopi_wifi_initialize(void)
 {
-    memset(&my_ip, 0, sizeof(my_ip));
-    wifi_sta_netif = esp_netif_create_default_wifi_sta();
+    memset(&sg_my_ip, 0, sizeof(sg_my_ip));
+    sg_wifi_sta_netif = esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -298,14 +259,12 @@ void ezlopi_wifi_initialize(void)
         WIFI_EVENT, ESP_EVENT_ANY_ID, &__event_handler, NULL, &instance_any_id));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
         IP_EVENT, IP_EVENT_STA_GOT_IP, &__event_handler, NULL, &instance_got_ip));
-
-
 }
 
 void ezlopi_wifi_connect_from_id_bin(void)
 {
-    char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
-    char* wifi_password = ezlopi_factory_info_v3_get_password();
+    char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
+    char *wifi_password = ezlopi_factory_info_v3_get_password();
 
     if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
         (NULL != wifi_password) && ('\0' != wifi_password[0]))
@@ -315,7 +274,7 @@ void ezlopi_wifi_connect_from_id_bin(void)
     }
 }
 
-esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
+esp_err_t ezlopi_wifi_connect(const char *ssid, const char *pass)
 {
     esp_err_t err = ESP_OK;
 
@@ -329,8 +288,8 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
             },
         };
 
-        strncpy((char*)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
-        strncpy((char*)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
+        strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
+        strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password));
         wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
 
         esp_wifi_stop();
@@ -348,7 +307,8 @@ esp_err_t ezlopi_wifi_connect(const char* ssid, const char* pass)
                 {
                     _err = set_wifi_station_host_name();
                     // TRACE_W("WiFi Err : %s", esp_err_to_name(_err));
-                    if (_err != ESP_OK) {
+                    if (_err != ESP_OK)
+                    {
                         TRACE_W("'tcpip_adapter_set_hostname' ERROR: %s", esp_err_to_name(err));
                     }
                 }
@@ -372,20 +332,24 @@ int ezlopi_wait_for_wifi_to_connect(uint32_t wait_time_ms)
     return ret;
 }
 
-static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void* arg)
+static ll_ezlopi_wifi_event_upcall_t *ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void *arg)
 {
-    ll_ezlopi_wifi_event_upcall_t* _upcall = malloc(sizeof(ll_ezlopi_wifi_event_upcall_t));
+    ll_ezlopi_wifi_event_upcall_t *_upcall = malloc(sizeof(ll_ezlopi_wifi_event_upcall_t));
     if (_upcall)
     {
         _upcall->arg = arg;
         _upcall->upcall = upcall;
         _upcall->next = NULL;
     }
+    else
+    {
+        TRACE_E("malloc failed!");
+    }
 
     return _upcall;
 }
 
-static void ezlopi_wifi_scanner_task(void* params)
+static void ezlopi_wifi_scanner_task(void *params)
 {
     TickType_t start_time = xTaskGetTickCount();
     TickType_t current_time, previous_scan_time = 0;
@@ -429,13 +393,16 @@ void ezlopi_wifi_scan_stop()
 {
     TRACE_E("Stopping the scanning process.");
     esp_wifi_scan_stop();
-    TaskHandle_t scan_handle = xTaskGetHandle(wifi_scanner_task_name);
-    if (scan_handle)
+
+    if (sg_scan_handle)
     {
-        TRACE_E("Resetting WiFi scanner task.(handle: %p)", scan_handle);
-        vTaskDelete(scan_handle);
+        TRACE_E("Resetting WiFi scanner task.(handle: %p)", sg_scan_handle);
+        vTaskDelete(sg_scan_handle);
+        sg_scan_handle = NULL;
     }
+
     TRACE_E("Deleting previous record.");
+
     if (ap_record)
     {
         free(ap_record);
@@ -446,5 +413,100 @@ void ezlopi_wifi_scan_stop()
 void ezlopi_wifi_scan_start()
 {
     ezlopi_wifi_scan_stop();
-    xTaskCreate(ezlopi_wifi_scanner_task, wifi_scanner_task_name, 2 * 2048, NULL, 3, NULL);
+    if (NULL == sg_scan_handle)
+    {
+        xTaskCreate(ezlopi_wifi_scanner_task, "wifi-scanner", 2 * 2048, NULL, 3, &sg_scan_handle);
+    }
+}
+
+static void __event_wifi_disconnected(void *event_data)
+{
+    ezlopi_event_group_clear_event(EZLOPI_EVENT_WIFI_CONNECTED);
+
+    if (event_data)
+    {
+        // event_data; //
+        wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
+        TRACE_E("Disconnect reason[%d]: %s", disconnected->reason, ezlopi_wifi_err_reason_str(disconnected->reason));
+        sg_last_disconnect_reason = ezlopi_wifi_err_reason_str(disconnected->reason);
+
+        sg_station_got_ip = 0;
+        esp_wifi_connect();
+
+        if (sg_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
+        {
+            sg_retry_num++;
+            TRACE_S("retry to connect to the AP");
+        }
+        else
+        {
+            ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_FAIL);
+            sg_retry_num = 0;
+        }
+
+        TRACE_W("connect to the AP fail");
+        memset(&sg_my_ip, 0, sizeof(esp_netif_ip_info_t));
+    }
+}
+
+static void __event_wifi_scan_done(void *event_data)
+{
+    if (event_data)
+    {
+        wifi_event_sta_scan_done_t *scan_event_param = (wifi_event_sta_scan_done_t *)event_data;
+        TRACE_I("status: %d, event data: %d", scan_event_param->status, scan_event_param->number);
+        if (scan_event_param->status == 0)
+        {
+            total_wifi_APs_available = scan_event_param->number;
+            ap_record = (wifi_ap_record_t *)malloc(total_wifi_APs_available * sizeof(wifi_ap_record_t));
+            ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&total_wifi_APs_available, ap_record));
+            cJSON *network_array = cJSON_CreateArray();
+            if (network_array)
+            {
+                char temporary[50];
+                for (int i = 0; i < total_wifi_APs_available; i++)
+                {
+                    cJSON *network_data = cJSON_CreateObject();
+                    if (network_data)
+                    {
+                        memset(temporary, 0, 50);
+                        memcpy(temporary, ap_record[i].ssid, 33);
+                        cJSON_AddStringToObject(network_data, "ssid", temporary);
+                        memset(temporary, 0, 50);
+                        snprintf(temporary, 50, "%02x:%02x:%02x:%02x:%02x:%02x", ap_record[i].bssid[0], ap_record[i].bssid[1], ap_record[i].bssid[2],
+                                 ap_record[i].bssid[3], ap_record[i].bssid[0], ap_record[i].bssid[5]);
+                        cJSON_AddStringToObject(network_data, "bssid", temporary);
+                        cJSON_AddNumberToObject(network_data, "rssi", ap_record[i].rssi);
+                        get_auth_mode_str(temporary, ap_record[i].authmode);
+                        cJSON_AddStringToObject(network_data, "security", temporary);
+                        cJSON_AddItemToArray(network_array, network_data);
+                    }
+                }
+
+                ezlopi_network_update_wifi_scan_process(network_array);
+            }
+
+            free(ap_record);
+            ap_record = NULL;
+        }
+    }
+}
+
+static void __event_ip_got_ip(void *event_data)
+{
+    ezlopi_event_group_set_event(EZLOPI_EVENT_WIFI_CONNECTED);
+
+    if (event_data)
+    {
+        sg_last_disconnect_reason = scg_wifi_no_error_str;
+        ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+        TRACE_I("got - ip:      " IPSTR, IP2STR(&event->ip_info.ip));
+        TRACE_I("      netmask: " IPSTR, IP2STR(&event->ip_info.netmask));
+        TRACE_I("      gw:      " IPSTR, IP2STR(&event->ip_info.gw));
+
+        sg_station_got_ip = 1;
+        sg_retry_num = 0;
+
+        memcpy(&sg_my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
+    }
 }

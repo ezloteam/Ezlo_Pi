@@ -34,18 +34,18 @@ typedef struct s_hx711_data
     float weight;
 } s_hx711_data_t;
 
-static int __0047_prepare(void *arg);
-static int __0047_init(l_ezlopi_item_t *item);
-static int __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __0047_notify(l_ezlopi_item_t *item);
+static int __0047_prepare(void* arg);
+static int __0047_init(l_ezlopi_item_t* item);
+static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __0047_notify(l_ezlopi_item_t* item);
 
-static void __hx711_power_reset(l_ezlopi_item_t *item);
-static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain);
-static float __hx711_avg_reading(l_ezlopi_item_t *item, uint8_t sample_iteration);
+static void __hx711_power_reset(l_ezlopi_item_t* item);
+static float __hx711_rawdata(l_ezlopi_item_t* item, hx711_gain_t _gain);
+static float __hx711_avg_reading(l_ezlopi_item_t* item, uint8_t sample_iteration);
 
-static void __Calculate_hx711_tare_wt(void *params);
+static void __Calculate_hx711_tare_wt(void* params);
 //-------------------------------------------------------------------------------------------------------------------
-int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
 
@@ -82,7 +82,7 @@ int sensor_0047_other_HX711_loadcell(e_ezlopi_actions_t action, l_ezlopi_item_t 
     return ret;
 }
 //------------------------------------------------------------------------------------------------------
-static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
+static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
@@ -90,7 +90,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type = dev_type_sensor;
 }
-static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, s_hx711_data_t *user_data)
+static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, s_hx711_data_t* user_data)
 {
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
@@ -110,23 +110,23 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_dev
     TRACE_I("hx711_DT_PIN: %d ", user_data->HX711_DT_pin);
 }
 
-static int __0047_prepare(void *arg)
+static int __0047_prepare(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *device_prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* device_prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
-        s_hx711_data_t *hx711_data = (s_hx711_data_t *)malloc(sizeof(s_hx711_data_t));
+        s_hx711_data_t* hx711_data = (s_hx711_data_t*)malloc(sizeof(s_hx711_data_t));
         if (hx711_data)
         {
             memset(hx711_data, 0, sizeof(s_hx711_data_t));
             //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-            l_ezlopi_device_t *hx711_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t* hx711_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (hx711_device)
             {
                 ret = 1;
                 __prepare_device_cloud_properties(hx711_device, device_prep_arg->cjson_device);
-                l_ezlopi_item_t *hx711_item = ezlopi_device_add_item_to_device(hx711_device, sensor_0047_other_HX711_loadcell);
+                l_ezlopi_item_t* hx711_item = ezlopi_device_add_item_to_device(hx711_device, sensor_0047_other_HX711_loadcell);
                 if (hx711_item)
                 {
                     __prepare_item_cloud_properties(hx711_item, device_prep_arg->cjson_device, hx711_data);
@@ -148,12 +148,12 @@ static int __0047_prepare(void *arg)
     return ret;
 }
 
-static int __0047_init(l_ezlopi_item_t *item)
+static int __0047_init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         {
             if (GPIO_IS_VALID_GPIO(user_data->HX711_SCK_pin) && (GPIO_IS_VALID_GPIO(user_data->HX711_DT_pin)))
@@ -203,38 +203,32 @@ static int __0047_init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __0047_get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __0047_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
     if (item && arg)
     {
-        cJSON *cj_result = (cJSON *)arg;
+        cJSON* cj_result = (cJSON*)arg;
         if (cj_result)
         {
-            s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+            s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
             if (user_data)
             {
-                char *valueFormatted = ezlopi_valueformatter_float(user_data->weight);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->weight);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->weight);
+                ret = 1;
             }
         }
-        ret = 1;
     }
     return ret;
 }
 
-static int __0047_notify(l_ezlopi_item_t *item)
+static int __0047_notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if ((user_data) && (true == user_data->HX711_initialized))
         {
             float Mass = __hx711_avg_reading(item, 10); /// 1000.0f; // to avoid spikes
@@ -256,13 +250,13 @@ static int __0047_notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void __Calculate_hx711_tare_wt(void *params)
+static void __Calculate_hx711_tare_wt(void* params)
 {
     float RAW_tare = 0;
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)params;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)params;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         { // For Output settling time ; [10SPS] is 400ms
             // So, wait for 400ms after reset [as per datasheet]
@@ -292,13 +286,13 @@ static void __Calculate_hx711_tare_wt(void *params)
     vTaskDelete(NULL);
 }
 
-static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain)
+static float __hx711_rawdata(l_ezlopi_item_t* item, hx711_gain_t _gain)
 {
     float raw_data = 0;
     unsigned long data = 0;
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
 
         if (user_data)
         {
@@ -359,7 +353,7 @@ static float __hx711_rawdata(l_ezlopi_item_t *item, hx711_gain_t _gain)
     return raw_data;
 }
 
-static float __hx711_avg_reading(l_ezlopi_item_t *item, uint8_t sample_iteration)
+static float __hx711_avg_reading(l_ezlopi_item_t* item, uint8_t sample_iteration)
 {
     float sum = 0;
     if (sample_iteration < 1)
@@ -379,11 +373,11 @@ static float __hx711_avg_reading(l_ezlopi_item_t *item, uint8_t sample_iteration
     return sum;
 }
 
-static void __hx711_power_reset(l_ezlopi_item_t *item)
+static void __hx711_power_reset(l_ezlopi_item_t* item)
 {
     if (item)
     {
-        s_hx711_data_t *user_data = (s_hx711_data_t *)item->user_arg;
+        s_hx711_data_t* user_data = (s_hx711_data_t*)item->user_arg;
         if (user_data)
         {
             PORT_ENTER_CRITICAL();

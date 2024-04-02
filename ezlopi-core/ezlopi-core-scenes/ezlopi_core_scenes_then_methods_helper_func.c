@@ -69,10 +69,10 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = malloc(sizeof(char) * length); // tmp_string != NULL
+                    char* tmp_string = malloc(length); // tmp_string != NULL
                     if (tmp_string)
                     {
-                        bzero(tmp_string, sizeof(char) * length);
+                        bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", start);
                         // TRACE_I("web_host_name : %s", tmp_string);
                         tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
@@ -87,10 +87,10 @@ static void __ezlopi_core_scenes_then_sendhttp_parse_host_name(s_ezlopi_core_htt
                 if (length > 0)
                 {
                     length++;                                         // include null character
-                    char* tmp_string = malloc(sizeof(char) * length); // tmp_string != NULL
+                    char* tmp_string = malloc(length); // tmp_string != NULL
                     if (tmp_string)
                     {
-                        bzero(tmp_string, sizeof(char) * length);
+                        bzero(tmp_string, length);
                         snprintf(tmp_string, length, "%s", (ptr + ((int)(start - ptr))));
                         // TRACE_I("web_host_name : %s", tmp_string);
                         tmp_http_data->web_server_maxlen = (uint16_t)ezlopi_core_http_mem_malloc(&(tmp_http_data->web_server), tmp_string);
@@ -131,10 +131,10 @@ static void __ezlopi_core_scenes_then_append_to_header(s_ezlopi_core_http_mbedtl
     }
     else // We reallocate:- 'tmp_http_data->header'
     {
-        char* append_str = malloc(sizeof(char) * append_size); // append_str != NULL
+        char* append_str = malloc(append_size); // append_str != NULL
         if (append_str)
         {
-            bzero(append_str, sizeof(char) * append_size);
+            bzero(append_str, append_size);
             snprintf(append_str, append_size, "%s: %s\r\n", str1, str2);
 
             //-----------------------------------------------------------------------------------

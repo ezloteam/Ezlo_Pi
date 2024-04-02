@@ -2,20 +2,22 @@
 
 #include "EZLOPI_USER_CONFIG.h"
 #include "ezlopi_util_trace.h"
+
+#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_mdns.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_ping.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_room.h"
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_modes.h"
-#include "ezlopi_core_nvs.h"
+#include "ezlopi_core_buffer.h"
 #include "ezlopi_core_event_queue.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
-#include "ezlopi_core_mdns.h"
 
 #ifdef CONFIG_EZPI_CORE_ENABLE_ETH
 #include "ezlopi_core_ethernet.h"
@@ -29,6 +31,7 @@ void ezlopi_init(void)
 {
     // Init memories
     ezlopi_nvs_init();
+    ezlopi_core_buffer_init(10 * 1024); // allocate 10kB
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -48,7 +51,6 @@ void ezlopi_init(void)
 
     ezlopi_core_modes_init();
     ezlopi_room_init();
-
 
 #ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_scripts_init();
@@ -138,12 +140,4 @@ static void ezlopi_initialize_devices_v3(void)
             curr_device = curr_device->next;
         }
     }
-
-    l_ezlopi_device_t* final_devices = ezlopi_device_get_head();
-    while (final_devices)
-    {
-        TRACE_W("Final_Device_id_list : [0x%x], parent [0x%x] ", final_devices->cloud_properties.device_id, final_devices->cloud_properties.parent_device_id);
-        final_devices = final_devices->next;
-    }
-
 }

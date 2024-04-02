@@ -312,4 +312,6 @@ const char* ezlopi_timeout_str = "timeout";
 const char* ezlopi_latitude_str = "latitude";
 const char* ezlopi_longitude_str = "longitude";
 
+const char* ezlopi_urls_str = "urls";
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__

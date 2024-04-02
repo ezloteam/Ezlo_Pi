@@ -17,6 +17,7 @@ extern "C"
 #define ENABLE_TRACE 0
 #endif // CONFIG_EZPI_UTIL_ENABLE_TRACE
 
+
     void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 
 #ifndef __FILENAME__

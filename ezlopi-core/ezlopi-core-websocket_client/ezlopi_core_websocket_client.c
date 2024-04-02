@@ -17,30 +17,26 @@
 #include "ezlopi_core_websocket_client.h"
 
 static esp_websocket_client_handle_t client = NULL;
-static void (*__msg_upcall)(const char*, uint32_t) = NULL;
+static void (*__msg_upcall)(const char *, uint32_t) = NULL;
 
 typedef struct s_ws_event_arg
 {
     esp_websocket_client_handle_t client;
-    void (*msg_upcall)(const char*, uint32_t);
+    void (*msg_upcall)(const char *, uint32_t);
     void (*connection_upcall)(bool connected);
 } s_ws_event_arg_t;
 
 typedef struct s_ws_data_buffer
 {
-    char* buffer;
+    char *buffer;
     uint32_t len;
     uint32_t tot_len;
-    struct s_ws_data_buffer* next;
+    struct s_ws_data_buffer *next;
 } s_ws_data_buffer_t;
 
-// static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer);
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len);
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer);
+static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
-static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data);
-
-int ezlopi_websocket_client_send(char* data, uint32_t len)
+int ezlopi_websocket_client_send(char *data, uint32_t len)
 {
     int ret = 0;
 
@@ -48,7 +44,8 @@ int ezlopi_websocket_client_send(char* data, uint32_t len)
     {
         if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
         {
-            ret = esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
+            ret = esp_websocket_client_send_text(client, data, len, 1000 / portTICK_RATE_MS);
+            ret = (ret >= 0) ? 1 : 0;
         }
     }
 
@@ -68,14 +65,14 @@ void ezlopi_websocket_client_kill(void)
     client = NULL;
 }
 
-esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*msg_upcall)(const char*, uint32_t), void (*connection_upcall)(bool connected))
+esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON *uri, void (*msg_upcall)(const char *, uint32_t), void (*connection_upcall)(bool connected))
 {
 
     if ((NULL == client) && (NULL != uri) && (NULL != uri->valuestring) && (NULL != msg_upcall))
     {
-        char* ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
-        char* ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
-        char* ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
+        char *ca_cert = ezlopi_factory_info_v3_get_ca_certificate();
+        char *ssl_shared = ezlopi_factory_info_v3_get_ssl_shared_key();
+        char *ssl_priv = ezlopi_factory_info_v3_get_ssl_private_key();
         __msg_upcall = msg_upcall;
 
         static s_ws_event_arg_t event_arg;
@@ -100,7 +97,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         client = esp_websocket_client_init(&websocket_cfg);
         if (client)
         {
-            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void*)&event_arg);
+            esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)&event_arg);
             esp_websocket_client_start(client);
         }
         else
@@ -118,10 +115,10 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
     return client;
 }
 
-static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data)
+static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
-    s_ws_event_arg_t* event_arg = (s_ws_event_arg_t*)handler_args;
-    esp_websocket_event_data_t* data = (esp_websocket_event_data_t*)event_data;
+    s_ws_event_arg_t *event_arg = (s_ws_event_arg_t *)handler_args;
+    esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
     switch (event_id)
     {
     case WEBSOCKET_EVENT_CONNECTED:

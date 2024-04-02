@@ -296,7 +296,13 @@ static void ezlopi_service_uart_get_info()
             cJSON_AddStringToObject(json_chip_info, "firmware_SDK_version", esp_get_idf_version());
             cJSON_AddItemToObject(get_info, "chip_info", json_chip_info);
         }
-        cJSON_AddStringToObject(get_info, ezlopi_uptime_str, ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS)));
+
+
+        char time_string[50];
+        uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
+        ezlopi_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
+
+        cJSON_AddStringToObject(get_info, ezlopi_uptime_str, time_string);
         cJSON_AddNumberToObject(get_info, ezlopi_build_date_str, BUILD_DATE);
         cJSON_AddNumberToObject(get_info, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddStringToObject(get_info, "boot_reason", ezlopi_esp_reset_reason_str(esp_reset_reason()));
@@ -379,6 +385,8 @@ static void ezlopi_service_uart_get_info()
         ezlopi_factory_info_v3_free((void*)wifi_ssid);
 
         char* serial_data_json_string = cJSON_Print(get_info);
+        TRACE_D("length of 'serial_data_json_string': %d", strlen(serial_data_json_string));
+
         if (serial_data_json_string)
         {
             cJSON_Minify(serial_data_json_string);
@@ -465,6 +473,8 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         cJSON_AddNumberToObject(response, "status_connect", status_connect);
 
         char* my_json_string = cJSON_Print(response);
+        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
+
         cJSON_Delete(response); // free Json string
 
         if (my_json_string)
@@ -532,6 +542,7 @@ static void ezlopi_service_uart_read_config(void)
     if (root)
     {
         char* my_json_string = cJSON_Print(root);
+        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
 
         if (my_json_string)
         {

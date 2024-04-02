@@ -358,6 +358,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     }
 }
 
+#if (1 == ENABLE_TRACE)
 static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
 {
     char* ret = "BLE GAP Event Not defined!";
@@ -797,6 +798,7 @@ static char* esp_key_type_to_str(esp_ble_key_type_t key_type)
     return key_str;
 }
 
+#endif // 1 == ENABLE_TRACE
 static void show_bonded_devices(void)
 {
     int dev_num = esp_ble_get_bond_device_num();
