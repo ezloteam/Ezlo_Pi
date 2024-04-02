@@ -17,6 +17,7 @@
 #include "ezlopi_core_ble_buffer.h"
 #include "ezlopi_core_ble_profile.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_event_group.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -24,11 +25,16 @@
 
 #include "ezlopi_service_ble.h"
 
+#define AND &&
+#define OR ||
+
 static s_gatt_service_t* g_device_info_service = NULL;
+static s_gatt_char_t* g_device_status_notify_characteristics = NULL;
 
 static char* device_info_jsonify(void);
 static void __add_factory_info_to_root(cJSON* root, char* key, char* value);
 static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
 void ezlopi_ble_service_device_info_init(void)
 {
@@ -47,7 +53,74 @@ void ezlopi_ble_service_device_info_init(void)
     properties = ESP_GATT_CHAR_PROP_BIT_READ;
     ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_info_read_func, NULL, NULL);
     TRACE_W("'provisioning_service' character added to ezlopi-ble-stack");
+
+    uuid.uuid.uuid16 = BLE_DEVICE_STATUS_CHAR_NET_INFO_UUDI;
+    uuid.len = ESP_UUID_LEN_16;
+    permission = ESP_GATT_PERM_READ;
+    properties = ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_READ;
+    g_device_status_notify_characteristics = ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_status_read_func, NULL, NULL);
 }
+
+static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
+{
+    if (value)
+    {
+        cJSON* cj_device_status = cJSON_CreateObject();
+        if (cj_device_status)
+        {
+            e_ezlopi_event_t event = ezlopi_get_event_bit_status();
+
+            bool wifi_conn_status = (event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED;
+            cJSON_AddStringToObject(cj_device_status, "wifi_status", (true == wifi_conn_status) ? "Connected" : "Disconnected");
+            cJSON_AddStringToObject(cj_device_status, "internet_status", (true == wifi_conn_status) ? "Connected" : "Disconnected");
+
+            bool cloud_status = (event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG;
+            cJSON_AddStringToObject(cj_device_status, "cloud_status", (true == cloud_status) ? "Connected" : "Disconnected");
+            cJSON_AddStringToObject(cj_device_status, "provision_status", (true == cloud_status) ? "Provisioned" : "Not Provisioned");
+
+            cJSON_AddTrueToObject(cj_device_status, "powered_on");
+
+            char* send_data = cJSON_Print(cj_device_status);
+            if (send_data)
+            {
+                cJSON_Minify(send_data);
+
+                uint32_t total_data_len = strlen(send_data);
+                uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
+                uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
+
+                if ((0 != total_data_len) && (total_data_len > param->read.offset))
+                {
+                    strncpy((char*)value->value, send_data + param->read.offset, copy_size);
+                    value->len = copy_size;
+                }
+                if ((param->read.offset + copy_size) >= total_data_len)
+                {
+                    free(send_data);
+                    send_data = NULL;
+                }
+
+                free(send_data);
+            }
+            else
+            {
+                TRACE_E("No data to send");
+                value->len = 1;
+                value->value[0] = 0; // Read 0 if the device not provisioned yet.
+            }
+            cJSON_Delete(cj_device_status);
+        }
+        else
+        {
+            TRACE_E("Couldn't allocate memory for device status");
+        }
+    }
+    else
+    {
+        TRACE_E("Value is NULL");
+    }
+}
+
 
 static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {

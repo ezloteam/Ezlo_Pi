@@ -17,6 +17,7 @@
 #include "ezlopi_core_ble_profile.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
+#include "ezlopi_core_event_group.h"
 
 #include "ezlopi_cloud_constants.h"
 
@@ -37,7 +38,6 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
 static void __provisioning_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
 static void __provisioning_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
-
 
 void ezlopi_ble_service_provisioning_init(void)
 {
@@ -62,6 +62,7 @@ void ezlopi_ble_service_provisioning_init(void)
     ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, __provisioning_status_read_func, NULL, NULL);
 
 }
+
 
 #if 1
 static char* __provisioning_status_jsonify(void)
