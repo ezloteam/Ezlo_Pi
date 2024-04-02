@@ -59,11 +59,6 @@ int device_0004_digitalIn_generic(e_ezlopi_actions_t action, l_ezlopi_item_t* it
 
 static void __setup_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cjson_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cjson_device, ezlopi_dev_name_str, device_name);
-    // // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_switch;
     device->cloud_properties.subcategory = subcategory_in_wall;
     device->cloud_properties.device_type = dev_type_switch_inwall;
@@ -100,16 +95,15 @@ static int __prepare(void* arg)
         cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device, NULL);
             if (device)
             {
+                ret = 1;
                 __setup_device_cloud_properties(device, cjson_device);
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, device_0004_digitalIn_generic);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cjson_device);
-                    ret = 1;
                 }
                 else
                 {
@@ -161,7 +155,6 @@ static int __init(l_ezlopi_item_t* item)
         else
         {
             ret = -1;
-            ezlopi_device_free_device_by_item(item);
         }
     }
 

@@ -798,6 +798,7 @@ static char* esp_key_type_to_str(esp_ble_key_type_t key_type)
     return key_str;
 }
 
+#endif // 1 == ENABLE_TRACE
 static void show_bonded_devices(void)
 {
     int dev_num = esp_ble_get_bond_device_num();
@@ -817,7 +818,6 @@ static void show_bonded_devices(void)
         free(dev_list);
     }
 }
-#endif
 
 static void ezlopi_ble_setup_service_uuid(void)
 {

@@ -268,7 +268,7 @@ static void __mdns_init(void* pv)
                 {
                     TRACE_I("\t%s\t%s", mdns_context[i].key, mdns_context[i].value);
                 }
-                mdns_service_add(ezlopi_mdns_instance_name, "_ezlopi", "_tcp", 8073, mdns_context, service_size);
+                mdns_service_add(ezlopi_mdns_instance_name, "_ezlopi", "_tcp", 17001, mdns_context, service_size);
                 break;
             }
             else

@@ -215,22 +215,20 @@ static int __init(l_ezlopi_item_t* item)
                     rgb_args->RGB_LED_initialized = true;
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -238,11 +236,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_dimmable_light;
     device->cloud_properties.subcategory = subcategory_dimmable_colored;
     device->cloud_properties.device_type = dev_type_dimmer_outlet;
@@ -290,6 +283,8 @@ static void __prepare_RGB_LED_item(l_ezlopi_item_t* item, cJSON* cj_device, void
     item->interface.pwm.duty_cycle = 0;
     item->interface.pwm.freq_hz = 5000;
     item->interface.pwm.pwm_resln = 8;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_arg;
 }
 
@@ -311,6 +306,8 @@ static void __prepare_RGB_LED_onoff_switch_item(l_ezlopi_item_t* item, cJSON* cj
     item->interface.gpio.gpio_out.pull = false;
     item->interface.gpio.gpio_out.value = false;
     item->interface.gpio.gpio_in.enable = false;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_arg;
 }
 
@@ -330,6 +327,8 @@ static void __prepare_RGB_LED_dimmer_item(l_ezlopi_item_t* item, cJSON* cj_devic
     item->interface.pwm.duty_cycle = 0;
     item->interface.pwm.freq_hz = 5000;
     item->interface.pwm.pwm_resln = 8;
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_arg;
 }
 
@@ -340,9 +339,10 @@ static int __prepare(void* arg)
     s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* RGB_device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t* RGB_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (RGB_device)
         {
+            ret = 1;
             s_rgb_args_t* rgb_args = malloc(sizeof(s_rgb_args_t));
             if (rgb_args)
             {
@@ -355,25 +355,20 @@ static int __prepare(void* arg)
                 rgb_args->RGB_LED_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_item)
                 {
-                    rgb_args->RGB_LED_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_item(rgb_args->RGB_LED_item, prep_arg->cjson_device, rgb_args);
                 }
 
                 rgb_args->RGB_LED_onoff_switch_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_onoff_switch_item)
                 {
-                    rgb_args->RGB_LED_onoff_switch_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_onoff_switch_item(rgb_args->RGB_LED_onoff_switch_item, prep_arg->cjson_device, rgb_args);
                 }
 
                 rgb_args->RGB_LED_dimmer_item = ezlopi_device_add_item_to_device(RGB_device, device_0038_other_RGB);
                 if (rgb_args->RGB_LED_dimmer_item)
                 {
-                    rgb_args->RGB_LED_dimmer_item->cloud_properties.device_id = RGB_device->cloud_properties.device_id;
                     __prepare_RGB_LED_dimmer_item(rgb_args->RGB_LED_dimmer_item, prep_arg->cjson_device, rgb_args);
                 }
-
-                ret = 1;
 
                 if (!rgb_args->RGB_LED_item && !rgb_args->RGB_LED_onoff_switch_item && !rgb_args->RGB_LED_dimmer_item)
                 {

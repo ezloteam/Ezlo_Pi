@@ -499,4 +499,4 @@ static char* ezlopi_ble_gatt_event_to_string(esp_gatts_cb_event_t event)
     }
     return ret;
 }
-#endif
+#endif // 1 == ENABLE_TRACE

@@ -305,14 +305,14 @@ static int __prepare(void* arg)
         cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device, NULL);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, device_0001_digitalOut_generic);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cjson_device);
                     ret = 1;
                 }
@@ -462,7 +462,6 @@ static int __init(l_ezlopi_item_t* item)
         else
         {
             ret = -1;
-            ezlopi_device_free_device_by_item(item);
         }
     }
 

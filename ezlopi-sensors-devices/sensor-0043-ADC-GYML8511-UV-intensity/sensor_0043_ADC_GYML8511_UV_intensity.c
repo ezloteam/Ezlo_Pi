@@ -34,23 +34,23 @@ int sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_it
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0043_prepare(arg);
+        ret = __0043_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0043_init(item);
+        ret = __0043_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0043_get_cjson_value(item, arg);
+        ret = __0043_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0043_notify(item);
+        ret = __0043_notify(item);
         break;
     }
     default:
@@ -63,10 +63,6 @@ int sensor_0043_ADC_GYML8511_UV_intensity(e_ezlopi_actions_t action, l_ezlopi_it
 //-------------------------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, dev_name);
-    ASSIGN_DEVICE_NAME_V2(device, dev_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
@@ -83,6 +79,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_da
     item->cloud_properties.value_type = value_type_ultraviolet;
     item->cloud_properties.scale = scales_watt_per_square_meter;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
 static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
@@ -108,9 +105,10 @@ static int __0043_prepare(void* arg)
         if (NULL != gyml8511_value)
         {
             memset(gyml8511_value, 0, sizeof(s_gyml8511_data_t));
-            l_ezlopi_device_t* gyml8511_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* gyml8511_device = ezlopi_device_add_device(cj_device, NULL);
             if (gyml8511_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(gyml8511_device, cj_device);
 
                 l_ezlopi_item_t* gyml8511_item = ezlopi_device_add_item_to_device(gyml8511_device, sensor_0043_ADC_GYML8511_UV_intensity);
@@ -118,7 +116,6 @@ static int __0043_prepare(void* arg)
                 {
                     __prepare_item_cloud_properties(gyml8511_item, gyml8511_value);
                     __prepare_item_interface_properties(gyml8511_item, cj_device);
-                    ret = 1;
                 }
                 else
                 {
@@ -151,27 +148,20 @@ static int __0043_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
