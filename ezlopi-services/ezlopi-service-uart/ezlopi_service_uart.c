@@ -239,30 +239,36 @@ static char* ezlopi_chip_type_str(int chip_type)
 static int ezlopi_service_uart_execute_command_0(cJSON* root)
 {
     int ret = 0;
-    uint8_t sub_cmd = cJSON_GetObjectItem(root, ezlopi_sub_cmd_str)->valuedouble;
-    switch (sub_cmd)
+    cJSON* cj_sub_cmd = cJSON_GetObjectItem(root, ezlopi_sub_cmd_str);
+    if (cj_sub_cmd)
     {
-    case 0:
-    {
-        TRACE_E("Factory restore command");
-        const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
-        EZPI_CORE_factory_restore();
-        break;
+        uint8_t sub_cmd = cj_sub_cmd->valuedouble;
+        switch (sub_cmd)
+        {
+        case 0:
+        {
+            TRACE_E("Factory restore command");
+            const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
+            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_CORE_factory_restore();
+            break;
+        }
+        case 1:
+        {
+            TRACE_E("Reboot only command");
+            const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
+            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_CORE_reboot();
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+        cJSON_Delete(cj_sub_cmd);
     }
-    case 1:
-    {
-        TRACE_E("Reboot only command");
-        const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
-        EZPI_CORE_reboot();
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
+
     return ret;
 }
 
@@ -306,9 +312,10 @@ static int qt_serial_parse_rx_data(const char* data)
 
     if (root)
     {
-        if (cJSON_GetObjectItem(root, ezlopi_cmd_str))
+        cJSON* cj_cmd = cJSON_GetObjectItem(root, ezlopi_cmd_str);
+        if (cj_cmd)
         {
-            uint8_t cmd_temp = cJSON_GetObjectItem(root, ezlopi_cmd_str)->valuedouble;
+            uint8_t cmd_temp = cj_cmd->valuedouble;
 
             switch (cmd_temp)
             {
@@ -348,6 +355,7 @@ static int qt_serial_parse_rx_data(const char* data)
                 break;
             }
             }
+            cJSON_Delete(cj_cmd);
         }
         else
         {
@@ -438,7 +446,12 @@ static int get_device_status(cJSON* parent)
     cJSON* cj_device_status = cJSON_AddObjectToObject(parent, "device_info");
     if (cj_device_status)
     {
-        cJSON_AddStringToObject(cj_device_status, ezlopi_uptime_str, ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS)));
+
+        char time_string[50];
+        uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
+        ezlopi_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
+
+        cJSON_AddStringToObject(cj_device_status, ezlopi_uptime_str, time_string);
         cJSON_AddNumberToObject(cj_device_status, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddStringToObject(cj_device_status, "boot_reason", ezlopi_esp_reset_reason_str(esp_reset_reason()));
 
