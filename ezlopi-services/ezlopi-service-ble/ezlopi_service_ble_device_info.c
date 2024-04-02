@@ -70,13 +70,11 @@ static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_pa
         {
             e_ezlopi_event_t event = ezlopi_get_event_bit_status();
 
-            bool wifi_conn_status = (event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED;
-            cJSON_AddStringToObject(cj_device_status, "wifi_status", (true == wifi_conn_status) ? "Connected" : "Disconnected");
-            cJSON_AddStringToObject(cj_device_status, "internet_status", (true == wifi_conn_status) ? "Connected" : "Disconnected");
+            cJSON_AddBoolToObject(cj_device_status, "wifi_connection_status", (event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED);
+            cJSON_AddBoolToObject(cj_device_status, "internet_connection_status", (event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED);
 
-            bool cloud_status = (event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG;
-            cJSON_AddStringToObject(cj_device_status, "cloud_status", (true == cloud_status) ? "Connected" : "Disconnected");
-            cJSON_AddStringToObject(cj_device_status, "provision_status", (true == cloud_status) ? "Provisioned" : "Not Provisioned");
+            cJSON_AddBoolToObject(cj_device_status, "cloud_connection_status", (event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG);
+            cJSON_AddBoolToObject(cj_device_status, "provision_completion_status", (event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG);
 
             cJSON_AddTrueToObject(cj_device_status, "powered_on");
 
@@ -99,8 +97,6 @@ static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_pa
                     free(send_data);
                     send_data = NULL;
                 }
-
-                free(send_data);
             }
             else
             {
