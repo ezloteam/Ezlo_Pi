@@ -448,3 +448,13 @@ void ezlopi_wifi_scan_start()
     ezlopi_wifi_scan_stop();
     xTaskCreate(ezlopi_wifi_scanner_task, wifi_scanner_task_name, 2 * 2048, NULL, 3, NULL);
 }
+
+uint8_t ezlopi_wifi_get_wifi_mac(uint8_t mac[6])
+{
+    int ret = 0;
+    if (ESP_OK == esp_wifi_get_mac(WIFI_IF_STA, mac))
+    {
+        ret = 1;
+    }
+    return ret;
+}

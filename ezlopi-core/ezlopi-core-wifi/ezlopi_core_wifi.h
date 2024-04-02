@@ -38,7 +38,7 @@ extern "C"
     ezlopi_wifi_status_t* ezlopi_wifi_status(void);
 
     void ezlopi_wifi_event_add(f_ezlopi_wifi_event_upcall upcall, void* arg);
-
+    uint8_t ezlopi_wifi_get_wifi_mac(uint8_t mac[6]);
 
 
     void ezlopi_wifi_scan_start();

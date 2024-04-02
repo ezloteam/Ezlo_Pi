@@ -35,6 +35,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_uart.h"
+#include "ezlopi_service_ble.h"
 
 static const int RX_BUF_SIZE = 3096;
 
@@ -440,6 +441,19 @@ static int get_device_status(cJSON* parent)
         cJSON_AddStringToObject(cj_device_status, ezlopi_uptime_str, ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS)));
         cJSON_AddNumberToObject(cj_device_status, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddStringToObject(cj_device_status, "boot_reason", ezlopi_esp_reset_reason_str(esp_reset_reason()));
+
+        uint8_t mac[6];
+        ezlopi_wifi_get_wifi_mac(mac);
+        char mac_str[20];
+        memset(mac_str, 0, sizeof(mac_str));
+        snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        cJSON_AddStringToObject(cj_device_status, "wifi_mac", mac_str);
+        
+        memset(mac, 0, sizeof(mac));
+        ezlopi_ble_service_get_ble_mac(mac);
+        memset(mac_str, 0, sizeof(mac_str));
+        snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        cJSON_AddStringToObject(cj_device_status, "ble_mac", mac_str);
         ret = 1;
     }
     return ret;
