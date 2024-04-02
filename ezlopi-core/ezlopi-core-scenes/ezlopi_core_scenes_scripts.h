@@ -15,7 +15,7 @@ typedef enum e_script_state
 typedef struct l_ezlopi_scenes_script
 {
     uint32_t id;
-    char* name;
+    char name[32];
     char* code;
     e_script_state_t state;
     void* script_handle;

@@ -700,7 +700,7 @@ char* ezlopi_nvs_read_str(const char* nvs_name)
             }
             else
             {
-                TRACE_E("%s: buf_len_needed: %d, err: %s", nvs_name, buf_len_needed, esp_err_to_name(err));
+                TRACE_W("%s: buf_len_needed: %d, err: %s", nvs_name, buf_len_needed, esp_err_to_name(err));
             }
         }
     }
@@ -813,7 +813,7 @@ uint8_t EZPI_CORE_nvs_read_start_bits(uint8_t* start_bits)
         ret = -1;
         *start_bits = 0;
     }
-    
+
     return ret;
 }
 

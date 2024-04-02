@@ -1,97 +1,74 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cJSON.h>
 
 #include "ezlopi_cloud_constants.h"
-
 #include "ezlopi_core_valueformatter.h"
 
-const char *ezlopi_valueformatter_bool(bool val)
+void ezlopi_valueformatter_bool_to_cjson(l_ezlopi_item_t* item, cJSON* cj_root, bool value)
 {
-    return val ? ezlopi_true_str : ezlopi_false_str;
-}
+    cJSON_AddBoolToObject(cj_root, ezlopi_value_str, value);
+    cJSON_AddStringToObject(cj_root, ezlopi_valueFormatted_str, value ? ezlopi_true_str : ezlopi_false_str);
 
-char *ezlopi_valueformatter_float(float val)
-{
-
-    char *formatted_val_str = (char *)malloc(15);
-    if (formatted_val_str)
+    if (item->cloud_properties.scale)
     {
-        snprintf(formatted_val_str, 15, "%.2f", val);
-        return formatted_val_str;
-    }
-    else
-    {
-        return NULL;
+        cJSON_AddStringToObject(cj_root, ezlopi_scale_str, item->cloud_properties.scale);
     }
 }
 
-char *ezlopi_valueformatter_double(double val)
+void ezlopi_valueformatter_float_to_cjson(l_ezlopi_item_t* item, cJSON* cj_root, float value)
 {
-    char *formatted_val_str = (char *)malloc(15);
-    if (formatted_val_str)
+    cJSON_AddNumberToObject(cj_root, ezlopi_value_str, value);
+
+    char valueFormatted[16];
+    snprintf(valueFormatted, sizeof(valueFormatted), "%.02f", value);
+    cJSON_AddStringToObject(cj_root, ezlopi_valueFormatted_str, valueFormatted);
+
+    if (item->cloud_properties.scale)
     {
-        snprintf(formatted_val_str, 15, "%.2lf", val);
-        return formatted_val_str;
-    }
-    else
-    {
-        return NULL;
+        cJSON_AddStringToObject(cj_root, ezlopi_scale_str, item->cloud_properties.scale);
     }
 }
 
-char *ezlopi_valueformatter_int(int val)
+void ezlopi_valueformatter_double_to_cjson(l_ezlopi_item_t* item, cJSON* cj_root, double value)
 {
-    char *formatted_val_str = (char *)malloc(15);
-    if (formatted_val_str)
+    cJSON_AddNumberToObject(cj_root, ezlopi_value_str, value);
+
+    char valueFormatted[16];
+    snprintf(valueFormatted, sizeof(valueFormatted), "%.2lf", value);
+    cJSON_AddStringToObject(cj_root, ezlopi_valueFormatted_str, valueFormatted);
+
+    if (item->cloud_properties.scale)
     {
-        snprintf(formatted_val_str, 15, "%d", val);
-        return formatted_val_str;
-    }
-    else
-    {
-        return NULL;
+        cJSON_AddStringToObject(cj_root, ezlopi_scale_str, item->cloud_properties.scale);
     }
 }
 
-char *ezlopi_valueformatter_int32(int32_t val)
+void ezlopi_valueformatter_int32_to_cjson(l_ezlopi_item_t* item, cJSON* cj_root, int value)
 {
-    char *formatted_val_str = (char *)malloc(15);
-    if (formatted_val_str)
+    cJSON_AddNumberToObject(cj_root, ezlopi_value_str, value);
+
+    char valueFormatted[16];
+    snprintf(valueFormatted, sizeof(valueFormatted), "%d", value);
+    cJSON_AddStringToObject(cj_root, ezlopi_valueFormatted_str, valueFormatted);
+
+    if (item->cloud_properties.scale)
     {
-        snprintf(formatted_val_str, 15, "%d", val);
-        return formatted_val_str;
-    }
-    else
-    {
-        return NULL;
+        cJSON_AddStringToObject(cj_root, ezlopi_scale_str, item->cloud_properties.scale);
     }
 }
 
-char *ezlopi_valueformatter_uint32(uint32_t val)
+void ezlopi_valueformatter_uint32_to_cjson(l_ezlopi_item_t* item, cJSON* cj_root, uint32_t value)
 {
-    char *formatted_val_str = (char *)malloc(15);
-    if (formatted_val_str)
-    {
-        snprintf(formatted_val_str, 15, "%d", val);
-        return formatted_val_str;
-    }
-    else
-    {
-        return NULL;
-    }
-}
+    cJSON_AddNumberToObject(cj_root, ezlopi_value_str, value);
 
-char *ezlopi_valueformatter_rgb(uint8_t r, uint8_t g, uint8_t b)
-{
-    char *formatted_val_str = (char *)malloc(10);
-    if (formatted_val_str)
+    char valueFormatted[16];
+    snprintf(valueFormatted, sizeof(valueFormatted), "%u", value);
+    cJSON_AddStringToObject(cj_root, ezlopi_valueFormatted_str, valueFormatted);
+
+    if (item->cloud_properties.scale)
     {
-        snprintf(formatted_val_str, 10, "#%02x%02x%02x", r, g, b);
-        return formatted_val_str;
-    }
-    else
-    {
-        return NULL;
+        cJSON_AddStringToObject(cj_root, ezlopi_scale_str, item->cloud_properties.scale);
     }
 }

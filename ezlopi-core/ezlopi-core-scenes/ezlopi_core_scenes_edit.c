@@ -15,18 +15,16 @@ int ezlopi_core_scene_edit_store_updated_to_nvs(cJSON* cj_updated_scene)
     int ret = 0;
     if (cj_updated_scene)
     {
-        char* update_scene_str = cJSON_Print(cj_updated_scene);
+        char* update_scene_str = cJSON_PrintBuffered(cj_updated_scene, 4096, false);
+        TRACE_D("length of 'update_scene_str': %d", strlen(update_scene_str));
+
         if (update_scene_str)
         {
             cJSON* cj_scene_id = cJSON_GetObjectItem(cj_updated_scene, ezlopi__id_str);
             if (cj_scene_id && cj_scene_id->valuestring)
             {
                 ezlopi_nvs_delete_stored_data_by_name(cj_scene_id->valuestring);
-                cJSON_Minify(update_scene_str);
-                if (1 == ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring))
-                {
-                    ret = 1;
-                }
+                ret = ezlopi_nvs_write_str(update_scene_str, strlen(update_scene_str), cj_scene_id->valuestring);
             }
 
             free(update_scene_str);

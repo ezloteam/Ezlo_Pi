@@ -483,7 +483,7 @@ s_ezlopi_http_data_t* ezlopi_http_get_request(const char* cloud_url, const char*
             .transport_type = HTTP_TRANSPORT_OVER_SSL,
             .user_data = (void*)(my_data), // my_data will be filled in 'ezlopi_http_event_handler'
         };
-        
+
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (NULL != client)
         {
@@ -574,7 +574,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             cJSON* header = headers->child;
             while (header)
             {
-                TRACE_I("%s: %s", header->string, header->valuestring);
+                // TRACE_I("%s: %s", header->string, header->valuestring);
                 esp_http_client_set_header(client, header->string, header->valuestring);
                 header = header->next;
             }
@@ -624,7 +624,7 @@ s_ezlopi_http_data_t* ezlopi_http_post_request(const char* cloud_url, const char
             free(uri);
         }
     }
-    
+
     return http_get_data;
 }
 

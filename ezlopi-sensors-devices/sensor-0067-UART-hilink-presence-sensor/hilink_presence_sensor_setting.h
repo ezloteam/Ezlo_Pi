@@ -84,25 +84,14 @@ static inline cJSON* __setting_add_text_and_lang_tag(const char* const object_te
     return cj_object;
 }
 
-static inline int __setting_extract_user_defined_setting(const char* setting_str, s_hilink_userdefined_setting_value_t* user_defined_setting_val)
+static inline void __setting_extract_user_defined_setting(cJSON* cj_value, s_hilink_userdefined_setting_value_t* user_defined_setting_val)
 {
-    int ret = 0;
-    cJSON* cj_dest = cJSON_CreateObject();
-    if (setting_str && cj_dest)
-    {
-        cj_dest = cJSON_Parse(setting_str);
-        CJSON_GET_VALUE_DOUBLE(cj_dest, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
-        CJSON_GET_VALUE_DOUBLE(cj_dest, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
-        CJSON_GET_VALUE_DOUBLE(cj_dest, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
-        CJSON_GET_VALUE_DOUBLE(cj_dest, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
-        CJSON_GET_VALUE_DOUBLE(cj_dest, ezlopi_timeout_str, user_defined_setting_val->timeout);
-        CJSON_GET_VALUE_DOUBLE(cj_dest, ezlopi_is_active_str, user_defined_setting_val->is_active);
-    }
-    else
-    {
-        ret = 1;
-    }
-    return ret;
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_move_distance_str, user_defined_setting_val->min_move_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_move_distance_str, user_defined_setting_val->max_move_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_min_still_distance_str, user_defined_setting_val->min_still_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_max_still_distance_str, user_defined_setting_val->max_still_distance);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_timeout_str, user_defined_setting_val->timeout);
+    CJSON_GET_VALUE_DOUBLE(cj_value, ezlopi_is_active_str, user_defined_setting_val->is_active);
 }
 
 static inline int __prepare_user_defined_setting_cjson(cJSON* cj_value, s_hilink_userdefined_setting_value_t* setting_val)
@@ -132,12 +121,8 @@ static inline char* __prepare_user_defined_setting_str(s_hilink_userdefined_sett
     if (cj_setting && setting_val)
     {
         ESP_ERROR_CHECK(__prepare_user_defined_setting_cjson(cj_setting, setting_val));
-        ret = cJSON_Print(cj_setting);
-    }
-    else
-    {
-        free(cj_setting);
-        cj_setting = NULL;
+        ret = cJSON_PrintBuffered(cj_setting, 1024, false);
+        TRACE_D("length of 'ret': %d", strlen(ret));
     }
 
     return ret;

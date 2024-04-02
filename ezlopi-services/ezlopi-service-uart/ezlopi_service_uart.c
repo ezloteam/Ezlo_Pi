@@ -448,7 +448,7 @@ static int get_device_status(cJSON* parent)
         memset(mac_str, 0, sizeof(mac_str));
         snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
         cJSON_AddStringToObject(cj_device_status, "wifi_mac", mac_str);
-        
+
         memset(mac, 0, sizeof(mac));
         ezlopi_ble_service_get_ble_mac(mac);
         memset(mac_str, 0, sizeof(mac_str));
@@ -717,6 +717,8 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         cJSON_AddNumberToObject(response, "status_connect", status_connect);
 
         char* my_json_string = cJSON_Print(response);
+        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
+
         cJSON_Delete(response); // free Json string
 
         if (my_json_string)
@@ -784,6 +786,7 @@ static void ezlopi_service_uart_read_config(void)
     if (root)
     {
         char* my_json_string = cJSON_Print(root);
+        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
 
         if (my_json_string)
         {

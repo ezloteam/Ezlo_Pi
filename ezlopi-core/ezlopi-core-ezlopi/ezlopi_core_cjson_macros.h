@@ -17,7 +17,6 @@
         }                                                     \
     }
 
-
 #define CJSON_GET_VALUE_BOOL(root, item_name, item_val)       \
     {                                                         \
         cJSON *o_item = cJSON_GetObjectItem(root, item_name); \
@@ -31,7 +30,7 @@
             {                                                 \
                 item_val = true;                              \
             }                                                 \
-            item_val = o_item->valuedouble;                      \
+            item_val = o_item->valuedouble;                   \
         }                                                     \
         else                                                  \
         {                                                     \
@@ -39,7 +38,6 @@
             TRACE_E("%s not found!", item_name);              \
         }                                                     \
     }
-
 
 #define CJSON_GET_VALUE_STRING(root, item_name, item_val)     \
     {                                                         \
@@ -55,24 +53,22 @@
         }                                                     \
     }
 
-
-#define CJSON_TRACE(name, object)                                         \
-    {                                                                     \
-        if (object)                                                       \
-        {                                                                 \
-            char *obj_str = cJSON_Print(object);                          \
-            if (obj_str)                                                  \
-            {                                                             \
-                TRACE_D("%s: %s", name ? name : ezlopi__str, obj_str); \
-                free(obj_str);                                            \
-            }                                                             \
-        }                                                                 \
-        else                                                              \
-        {                                                                 \
-            TRACE_E("%s: Null", name ? name : "");                        \
-        }                                                                 \
+#define CJSON_TRACE(name, object)                                                           \
+    {                                                                                       \
+        if (object)                                                                         \
+        {                                                                                   \
+            char *obj_str = cJSON_Print(object);                                            \
+            if (obj_str)                                                                    \
+            {                                                                               \
+                TRACE_D("%s[%d]: %s", name ? name : ezlopi__str, strlen(obj_str), obj_str); \
+                free(obj_str);                                                              \
+            }                                                                               \
+        }                                                                                   \
+        else                                                                                \
+        {                                                                                   \
+            TRACE_E("%s: Null", name ? name : "");                                          \
+        }                                                                                   \
     }
-
 
 #define CJSON_GET_VALUE_STRING_BY_COPY(root, item_name, item_val)     \
     {                                                                 \
@@ -83,7 +79,6 @@
             snprintf(item_val, sizeof(item_val), "%s", tmp_item_val); \
         }                                                             \
     }
-
 
 #define ASSIGN_DEVICE_NAME(digital_io_device_properties, dev_name)                                \
     {                                                                                             \
@@ -101,7 +96,6 @@
         }                                                                                         \
     }
 
-
 #define ASSIGN_DEVICE_NAME_V2(device, dev_name)                        \
     {                                                                  \
         if ((NULL != dev_name) && ('\0' != dev_name[0]))               \
@@ -118,7 +112,6 @@
         }                                                              \
     }
 
-
 #define CJSON_GET_ID(id, cj_id)                         \
     {                                                   \
         if (cj_id && cj_id->valuestring)                \
@@ -131,7 +124,6 @@
         }                                               \
     }
 
-
 #define CJSON_ASSIGN_ID(cj_object, id, id_str)                   \
     {                                                            \
         if (id && cj_object && id_str)                           \
@@ -141,7 +133,6 @@
             cJSON_AddStringToObject(cj_object, id_str, tmp_str); \
         }                                                        \
     }
-
 
 #define CJSON_ASSIGN_NUMBER_AS_STRING(cj_obj, num, name_str)         \
     {                                                                \

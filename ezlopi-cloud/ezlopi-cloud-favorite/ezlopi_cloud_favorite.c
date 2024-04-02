@@ -14,9 +14,6 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_items_req = NULL;
     // cJSON *cj_rules_req = NULL;
 
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     cJSON *cj_param = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
 

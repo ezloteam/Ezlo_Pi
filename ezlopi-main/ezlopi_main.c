@@ -9,12 +9,13 @@
 #include <freertos/task.h>
 
 #include "ezlopi_util_trace.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #include "ezlopi_core_ezlopi.h"
 #include "ezlopi_service_ota.h"
 
-#if CONFIG_EZLOPI_BLE_ENABLE == 1
 #include "ezlopi_service_ble.h"
+#if CONFIG_EZLOPI_BLE_ENABLE == 1
 #endif
 
 #include "ezlopi_service_uart.h"
@@ -41,7 +42,8 @@ PT_THREAD(example(struct pt* pt))
     static uint32_t curr_ticks;
     PT_BEGIN(pt);
 
-    while (1) {
+    while (1)
+    {
         curr_ticks = xTaskGetTickCount();
         PT_WAIT_UNTIL(pt, (xTaskGetTickCount() - curr_ticks) > 1000);
         __toggle_heartbeat_led();
@@ -59,21 +61,20 @@ void app_main(void)
     ezlopi_init();
 
     EZPI_SERVICE_uart_init();
-    
+
     timer_service_init();
-#if CONFIG_EZLOPI_BLE_ENABLE == 1
     ezlopi_ble_service_init();
+
+#if CONFIG_EZLOPI_BLE_ENABLE == 1
 #endif
 
-    ezlopi_service_modes_init();
-
+    ezlopi_service_broadcast_init();
     ezlopi_service_ws_server_start();
     ezlopi_service_web_provisioning_init();
 
     ezlopi_service_ota_init();
-    ezlopi_service_broadcast_init();
 #if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
-    TRACE_D("starting meshbot-service");
+    ezlopi_service_modes_init();
     ezlopi_scenes_meshbot_init();
 #endif
 
@@ -95,7 +96,8 @@ static void __init_heartbeat_led(void)
 #endif
 }
 
-static void __toggle_heartbeat_led(void) {
+static void __toggle_heartbeat_led(void)
+{
 #if (1 == ENABLE_HEARTBIT_LED)
     static uint32_t state = 0;
 
