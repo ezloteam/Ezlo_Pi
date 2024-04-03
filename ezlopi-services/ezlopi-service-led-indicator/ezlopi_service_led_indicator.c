@@ -25,7 +25,7 @@
 #define INDICATOR_LED_FADE_TIME_MS 20
 
 #define INDICATOR_LED_PIN 8
-#define RMT_TX_CHANNEL RMT_CHANNEL_1
+#define INDICATOR_RGB_RMT_TX_CHANNEL RMT_CHANNEL_1
 
 static led_strip_t indicator_led;
 #endif // #ifdef CONFIG_EZPI_RGB_LED
@@ -227,7 +227,7 @@ int ezlopi_service_led_indicator_init()
     indicator_led.gpio = INDICATOR_LED_PIN;
     indicator_led.buf = NULL;
     indicator_led.brightness = 255;
-    indicator_led.channel = RMT_TX_CHANNEL;
+    indicator_led.channel = INDICATOR_RGB_RMT_TX_CHANNEL;
 
     led_strip_install();
     if (ESP_OK == led_strip_init(&indicator_led))
