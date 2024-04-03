@@ -1131,23 +1131,30 @@ int ezlopi_scene_when_and(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_not(l_scenes_list_v2_t* scene_node, void* arg)
 {
+    // TRACE_E("Here");
     int ret = 0;
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block)
     {
         ret = 1; // required for the first case
-        l_when_block_v2_t* value_when_block = when_block->fields->field_value.u_value.when_block;
+        cJSON* cj_when_block = when_block->fields->field_value.u_value.cj_value;
+        CJSON_TRACE("cj_when_block", cj_when_block);
+
+#if 0
         while (value_when_block)
         {
             f_scene_method_v2_t scene_method = ezlopi_scene_get_method_v2(value_when_block->block_options.method.type);
             if (scene_method)
             {
+                TRACE_E("%p", scene_method);
+                TRACE_E("Method Name : %s", ezlopi_scene_get_scene_method_name(value_when_block->block_options.method.type));
                 // iterate through all '_when_blocks_'
                 ret = !(scene_method(scene_node, (void*)value_when_block)); // if all the block-calls are false, then return 1;
             }
 
             value_when_block = value_when_block->next;
         }
+#endif
     }
     return ret;
 }

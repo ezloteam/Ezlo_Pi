@@ -31,13 +31,13 @@
 
 #define ENABLE_HEARTBIT_LED 1
 
-static void __blinky(void *pv);
+static void __blinky(void* pv);
 static void __init_heartbeat_led(void);
 static void __toggle_heartbeat_led(void);
 
 static struct pt pt1;
 
-PT_THREAD(example(struct pt *pt))
+PT_THREAD(example(struct pt* pt))
 {
     static uint32_t curr_ticks;
     PT_BEGIN(pt);
@@ -57,14 +57,15 @@ void app_main(void)
     gpio_install_isr_service(0);
 
     gpio_isr_service_init();
-    EZPI_SERVICE_uart_init();
 
     ezlopi_init();
 
+    EZPI_SERVICE_uart_init();
+
     timer_service_init();
-    ezlopi_ble_service_init();
 
 #if CONFIG_EZLOPI_BLE_ENABLE == 1
+    ezlopi_ble_service_init();
 #endif
 
     ezlopi_service_broadcast_init();
@@ -72,9 +73,12 @@ void app_main(void)
     ezlopi_service_web_provisioning_init();
 
     ezlopi_service_ota_init();
-
+#if CONFIG_EZLPI_SERV_ENABLE_MODES
     ezlopi_service_modes_init();
+#endif
+#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
+#endif
 
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
 }
@@ -83,7 +87,7 @@ static void __init_heartbeat_led(void)
 {
 #if (1 == ENABLE_HEARTBIT_LED)
     gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_1),
+        .pin_bit_mask = (1ULL << GPIO_NUM_2),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
@@ -100,11 +104,11 @@ static void __toggle_heartbeat_led(void)
     static uint32_t state = 0;
 
     state ^= 1;
-    gpio_set_level(GPIO_NUM_1, state);
+    gpio_set_level(GPIO_NUM_2, state);
 #endif
 }
 
-static void __blinky(void *pv)
+static void __blinky(void* pv)
 {
     __init_heartbeat_led();
 

@@ -165,3 +165,13 @@ static void ezlopi_ble_basic_init(void)
     CHECK_PRINT_ERROR(esp_ble_gap_register_callback(ezlopi_ble_gap_event_handler), "gap register error");
     CHECK_PRINT_ERROR(esp_ble_gap_set_device_name(ble_device_name), "Set device name failed!");
 }
+
+int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
+{
+    int ret = 0;
+    if(ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
+    {
+        ret = 1;
+    }
+    return ret;
+}

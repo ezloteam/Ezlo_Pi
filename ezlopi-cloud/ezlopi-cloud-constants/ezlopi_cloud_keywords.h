@@ -317,4 +317,10 @@ extern const char* ezlopi_longitude_str;
 
 extern const char* ezlopi_urls_str;
 
+const char* ezlopi_parity_str;
+const char* ezlopi_start_bits_str;
+const char* ezlopi_stop_bits_str;
+const char* ezlopi_frame_size_str;
+const char* ezlopi_flow_control_str;
+
 #endif // __EZLOPI_CLOUD_KEYWORDS_H__
