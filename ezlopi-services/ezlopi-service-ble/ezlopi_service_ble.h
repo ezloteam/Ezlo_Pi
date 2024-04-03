@@ -35,7 +35,5 @@
 #define BLE_DYNAMIC_CONFIG_CHAR_UUID 0xE501
 
 void ezlopi_ble_service_init(void);
-uint8_t ezlopi_ble_service_get_ble_mac(uint8_t mac[6]);
-
 
 #endif //  _EZLOPI_SERVICE_BLE_H_

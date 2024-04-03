@@ -510,13 +510,3 @@ static void __event_ip_got_ip(void *event_data)
         memcpy(&sg_my_ip, &event->ip_info, sizeof(esp_netif_ip_info_t));
     }
 }
-
-uint8_t ezlopi_wifi_get_wifi_mac(uint8_t mac[6])
-{
-    int ret = 0;
-    if (ESP_OK == esp_wifi_get_mac(WIFI_IF_STA, mac))
-    {
-        ret = 1;
-    }
-    return ret;
-}

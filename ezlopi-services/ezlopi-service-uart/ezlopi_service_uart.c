@@ -35,7 +35,6 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_uart.h"
-#include "ezlopi_service_ble.h"
 
 static const int RX_BUF_SIZE = 3096;
 
