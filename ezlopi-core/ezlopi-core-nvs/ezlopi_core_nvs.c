@@ -847,7 +847,7 @@ uint8_t EZPI_CORE_nvs_read_frame_size(uint8_t* frame_size)
     if (0 == err)
     {
         ret = -1;
-        *frame_size = 3;
+        *frame_size = 8;
     }
     return ret;
 }
