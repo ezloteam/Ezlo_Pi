@@ -34,7 +34,7 @@ menu "EzloPi User Config"
 
     config EZLOPI_BLE_ENABLE
     bool "Enable BLE"
-    default n
+    default y
     help
         Enable BLE
 
@@ -100,6 +100,15 @@ menu "EzloPi User Config"
             Enable name extra service in ezlopi mDNS
 
     endmenu
+
+    choice 
+        prompt "Select the indicator LED available in the device"
+        default EZPI_ON_OFF_LED
+        config EZPI_ON_OFF_LED
+            bool "Buildin LED for ESP32 dev board"
+        config EZPI_RGB_LED
+            bool "Builtin addressable RGB LED for ESP32S3 and ESP32C3"
+    endchoice
 
 endmenu
 
