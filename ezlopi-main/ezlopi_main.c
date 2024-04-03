@@ -63,9 +63,9 @@ void app_main(void)
     EZPI_SERVICE_uart_init();
 
     timer_service_init();
-    ezlopi_ble_service_init();
 
 #if CONFIG_EZLOPI_BLE_ENABLE == 1
+    ezlopi_ble_service_init();
 #endif
 
     ezlopi_service_broadcast_init();
@@ -73,8 +73,10 @@ void app_main(void)
     ezlopi_service_web_provisioning_init();
 
     ezlopi_service_ota_init();
-#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#if CONFIG_EZLPI_SERV_ENABLE_MODES
     ezlopi_service_modes_init();
+#endif
+#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
 #endif
 

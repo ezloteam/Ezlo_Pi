@@ -34,6 +34,8 @@
 #include "ezlopi_cloud_info.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_service_ble.h"
+
 #include "ezlopi_service_uart.h"
 
 static const int RX_BUF_SIZE = 3096;
@@ -354,7 +356,6 @@ static int qt_serial_parse_rx_data(const char* data)
                 break;
             }
             }
-            cJSON_Delete(cj_cmd);
         }
         else
         {
@@ -527,6 +528,7 @@ static int get_ezlopi_device_ezlopi_info(cJSON* parent)
         cJSON_AddNumberToObject(cj_cj_device_ezlopi_info, ezlopi_serial_str, serial_id);
         cJSON_AddStringToObject(cj_cj_device_ezlopi_info, ezlopi_mac_str, device_mac ? device_mac : "");
 
+        
         ezlopi_factory_info_v3_free(device_mac);
         ezlopi_factory_info_v3_free(controller_uuid);
         ezlopi_factory_info_v3_free(provisioning_uuid);
@@ -647,7 +649,7 @@ static void ezlopi_service_uart_get_info()
             TRACE_E("%s", serial_data_json_string);
             cJSON_Minify(serial_data_json_string);
             EZPI_SERVICE_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
-            cJSON_free(serial_data_json_string);
+            free(serial_data_json_string);
         }
 
         cJSON_Delete(cj_get_info);
