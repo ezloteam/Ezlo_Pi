@@ -47,6 +47,7 @@ ezlopi-service-ble
         ezlopi-service-meshbot 
         ezlopi-service-ws-server
         ezlopi-service-broadcast
+        ezlopi-service-led-indicator
 )
 
 # Register the components

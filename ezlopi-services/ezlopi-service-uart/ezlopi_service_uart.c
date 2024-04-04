@@ -646,7 +646,6 @@ static void ezlopi_service_uart_get_info()
         char* serial_data_json_string = cJSON_Print(cj_get_info);
         if (serial_data_json_string)
         {
-            TRACE_E("%s", serial_data_json_string);
             cJSON_Minify(serial_data_json_string);
             EZPI_SERVICE_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
             free(serial_data_json_string);

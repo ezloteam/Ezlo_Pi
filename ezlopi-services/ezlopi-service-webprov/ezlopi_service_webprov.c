@@ -161,7 +161,7 @@ static void __message_upcall(const char *payload, uint32_t len)
     }
     else
     {
-        TRACE_W("no response!");
+            TRACE_W("no response!");
     }
 }
 

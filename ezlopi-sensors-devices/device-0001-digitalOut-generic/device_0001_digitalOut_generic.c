@@ -43,7 +43,6 @@ uint32_t settings_ids[2];
 int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
-
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:

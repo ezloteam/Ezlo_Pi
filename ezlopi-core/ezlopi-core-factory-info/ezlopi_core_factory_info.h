@@ -174,15 +174,6 @@ extern "C"
                 \"op_inv\": false,\
                 \"val_ip\": false,\
                 \"val_op\": false\
-            },\
-            {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"GY61\",\
-                \"id_room\": \"\",\
-                \"id_item\": 28,\
-                \"gpio1\": 33,\
-                \"gpio2\": 34,\
-                \"gpio3\": 35\
             }\
         ], \
         \"dev_total\": 5}";

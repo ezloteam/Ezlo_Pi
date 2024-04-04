@@ -196,6 +196,7 @@ void ezlopi_timer_start_1000ms(void)
 #else
 void ezlopi_timer_start_1000ms(void)
 {
+    TRACE_D("initializing timer for 1000 ms interrupt...");
     ezlopi_timer_init_timer_event(0, 1000, EZLOPI_ACTION_NOTIFY_1000_MS);
 }
 #endif
