@@ -176,13 +176,11 @@ extern "C"
                 \"val_op\": false\
             },\
             {\
-                \"dev_type\": 10,\
-                \"dev_name\": \"GY61\",\
+                \"dev_type\": 3,\
+                \"dev_name\": \"Water_leak\",\
                 \"id_room\": \"\",\
-                \"id_item\": 28,\
-                \"gpio1\": 33,\
-                \"gpio2\": 34,\
-                \"gpio3\": 35\
+                \"id_item\": 27,\
+                \"gpio\": 25\
             }\
         ], \
         \"dev_total\": 5}";

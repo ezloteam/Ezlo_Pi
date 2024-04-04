@@ -53,13 +53,18 @@ int ezlopi_core_scene_edit_update_id(uint32_t scene_id, cJSON* cj_updated_scene)
                     ezlopi_meshbot_service_start_scene(scene_node);
                 }
                 ret = 1;
+
+                TRACE_D("----------------------------------------------");
+                TRACE_D("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
+                TRACE_D("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
+                TRACE_D("----------------------------------------------");
+
                 break;
             }
 
             scene_node = scene_node->next;
         }
     }
-
     return ret;
 }
 

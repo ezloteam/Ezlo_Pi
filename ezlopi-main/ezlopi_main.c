@@ -29,7 +29,7 @@
 
 #include "pt.h"
 
-#define ENABLE_HEARTBIT_LED 1
+#define ENABLE_HEARTBIT_LED 0
 
 static void __blinky(void* pv);
 static void __init_heartbeat_led(void);

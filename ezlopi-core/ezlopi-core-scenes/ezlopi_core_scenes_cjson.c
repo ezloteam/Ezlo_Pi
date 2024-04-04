@@ -383,6 +383,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_BLOCK:
                     case EZLOPI_VALUE_TYPE_BLOCKS:
                     {
                         cJSON* vlaue_block_array = cJSON_AddArrayToObject(cj_field, ezlopi_value_str);
