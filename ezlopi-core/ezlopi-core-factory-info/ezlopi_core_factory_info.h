@@ -166,7 +166,7 @@ extern "C"
                 \"id_room\": \"\",\
                 \"id_item\": 1,\
                 \"gpio_in\": 0,\
-                \"gpio_out\": 2,\
+                \"gpio_out\": 5,\
                 \"pullup_ip\": false,\
                 \"pullup_op\": false,\
                 \"is_ip\": false,\
