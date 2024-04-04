@@ -14,8 +14,6 @@
 
 void network_get(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON* cjson_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cjson_result)
     {
@@ -129,16 +127,12 @@ static int get_wifi_properties(cJSON* interface_array)
 void network_wifi_scan_start(cJSON* cj_request, cJSON* cj_response)
 {
     ezlopi_wifi_scan_start();
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 }
 
 void network_wifi_scan_stop(cJSON* cj_request, cJSON* cj_response)
 {
     ezlopi_wifi_scan_stop();
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
 }
 

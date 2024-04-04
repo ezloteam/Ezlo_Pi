@@ -72,3 +72,4 @@ _deps
 
 dependencies.lock
 sdkconfig.old
+sdkconfig

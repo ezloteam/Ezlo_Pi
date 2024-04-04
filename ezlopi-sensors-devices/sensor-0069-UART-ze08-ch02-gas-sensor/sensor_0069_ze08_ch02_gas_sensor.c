@@ -17,10 +17,10 @@
 
 #include "ze08_ch2o.h"
 
-static int __prepare(void *arg, void *user_arg);
-static int __init(l_ezlopi_item_t *item);
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __notify(l_ezlopi_item_t *item);
+static int __prepare(void* arg, void* user_arg);
+static int __init(l_ezlopi_item_t* item);
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
+static int __notify(l_ezlopi_item_t* item);
 
 /*
 {\
@@ -34,7 +34,7 @@ static int __notify(l_ezlopi_item_t *item);
 }\
 */
 
-int sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
     // TRACE_D("%s", ezlopi_actions_to_string(action));
@@ -68,19 +68,16 @@ int sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t 
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
-    cJSON *cj_params = (cJSON *)arg;
-    ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)item->user_arg;
+    cJSON* cj_params = (cJSON*)arg;
+    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
 
     if (ze08_ch2o_sensor && cj_params)
     {
-        char *valueFormatted = ezlopi_valueformatter_float(ze08_ch2o_sensor->ppm);
-        cJSON_AddStringToObject(cj_params, ezlopi_valueFormatted_str, valueFormatted);
-        cJSON_AddNumberToObject(cj_params, ezlopi_value_str, ze08_ch2o_sensor->ppm);
-        free(valueFormatted);
+        ezlopi_valueformatter_float_to_cjson(item, cj_params, ze08_ch2o_sensor->ppm);
     }
     else
     {
@@ -89,11 +86,11 @@ static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
 
-    ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)item->user_arg;
+    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
     if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
     {
         ezlopi_device_value_updated_from_device_v3(item);
@@ -107,10 +104,10 @@ static int __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t *item)
+static int __init(l_ezlopi_item_t* item)
 {
     int ret = 0;
-    ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)item->user_arg;
+    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
     if (ze08_ch2o_sensor)
     {
         ret = 1;
@@ -129,7 +126,7 @@ static int __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t *device)
+static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t* device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_particulate_matter;
@@ -138,7 +135,7 @@ static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t
     device->cloud_properties.info = NULL;
 }
 
-static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
+static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
@@ -155,24 +152,24 @@ static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t
     item->user_arg = user_arg;
 }
 
-static int __prepare(void *arg, void *user_arg)
+static int __prepare(void* arg, void* user_arg)
 {
     int ret = 0;
 
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)
     {
-        ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)malloc(sizeof(ze08_ch2o_sensor_data_t));
+        ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)malloc(sizeof(ze08_ch2o_sensor_data_t));
         if (ze08_ch2o_sensor)
         {
             memset(ze08_ch2o_sensor, 0, sizeof(ze08_ch2o_sensor_data_t));
-            l_ezlopi_device_t *ze08_ch2o_sensor_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t* ze08_ch2o_sensor_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (ze08_ch2o_sensor_device)
             {
                 ret = 1;
                 memset(ze08_ch2o_sensor_device, 0, sizeof(l_ezlopi_device_t));
                 __prepare_ze08_ch2o_sensor_device_cloud_properties(ze08_ch2o_sensor_device);
-                l_ezlopi_item_t *ze08_ch02_ppm_item = ezlopi_device_add_item_to_device(ze08_ch2o_sensor_device, sensor_0069_ze08_ch02_gas_sensor);
+                l_ezlopi_item_t* ze08_ch02_ppm_item = ezlopi_device_add_item_to_device(ze08_ch2o_sensor_device, sensor_0069_ze08_ch02_gas_sensor);
                 if (ze08_ch02_ppm_item)
                 {
                     __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(ze08_ch02_ppm_item, prep_arg->cjson_device, ze08_ch2o_sensor);

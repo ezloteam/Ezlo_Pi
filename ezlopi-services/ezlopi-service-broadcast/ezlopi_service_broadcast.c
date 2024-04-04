@@ -7,13 +7,12 @@
 
 static QueueHandle_t __broadcast_queue = NULL;
 
-static void __broadcast_process(void* pv);
-static int ezlopi_service_broadcast_send_to_queue(char* data);
-
+static void __broadcast_process(void *pv);
+static int ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data);
 
 void ezlopi_service_broadcast_init(void)
 {
-    __broadcast_queue = xQueueCreate(sizeof(char*), 30);
+    __broadcast_queue = xQueueCreate(sizeof(char *), 10);
     if (__broadcast_queue)
     {
         xTaskCreate(__broadcast_process, "broadcast-service", 4 * 1024, NULL, 2, NULL);
@@ -21,44 +20,47 @@ void ezlopi_service_broadcast_init(void)
     }
 }
 
-static void __broadcast_process(void* pv) {
+static void __broadcast_process(void *pv)
+{
     while (1)
     {
-        char* data = NULL;
-        if (pdTRUE == xQueueReceive(__broadcast_queue, &data, portMAX_DELAY))
+        cJSON *cj_data = NULL;
+        if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_data, portMAX_DELAY))
         {
-            if (data)
+            if (cj_data)
             {
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
-                ezlopi_core_ezlopi_broadcast_execute(data);
-                free(data);
+                ezlopi_core_ezlopi_broadcast_cjson(cj_data);
+                cJSON_Delete(cj_data);
             }
         }
     }
 }
 
-static int ezlopi_service_broadcast_send_to_queue(char* data)
+static int ezlopi_service_broadcast_send_to_queue(cJSON *cj_broadcast_data)
 {
     int ret = 0;
-    if (__broadcast_queue && data)
+
+    if (__broadcast_queue && cj_broadcast_data)
     {
         if (xQueueIsQueueFullFromISR(__broadcast_queue))
         {
-            char* tmp_data = NULL;
-            if (pdTRUE == xQueueReceive(__broadcast_queue, &tmp_data, 0))
+            cJSON *cj_tmp_data = NULL;
+            if (pdTRUE == xQueueReceive(__broadcast_queue, &cj_tmp_data, 0))
             {
-                if (tmp_data)
+                if (cj_tmp_data)
                 {
-                    free(tmp_data);
+                    cJSON_Delete(cj_tmp_data);
                 }
             }
         }
 
-        char* tmp_data = data;
-        if (pdTRUE == xQueueSend(__broadcast_queue, &tmp_data, 1000 / portTICK_PERIOD_MS))
+        cJSON *cj_data = cj_broadcast_data;
+        if (pdTRUE == xQueueSend(__broadcast_queue, &cj_data, 1000 / portTICK_PERIOD_MS))
         {
             ret = 1;
         }
     }
+
     return ret;
 }

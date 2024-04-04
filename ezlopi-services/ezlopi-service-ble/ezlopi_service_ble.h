@@ -38,5 +38,6 @@
   
 
 void ezlopi_ble_service_init(void);
+int ezlopi_ble_service_get_ble_mac(uint8_t mac[6]);
 
 #endif //  _EZLOPI_SERVICE_BLE_H_

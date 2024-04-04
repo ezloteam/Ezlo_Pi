@@ -99,8 +99,7 @@ static void ezlopi_mdns_init_service_context()
                 char* id_val_str = (char*)malloc(EZPI_MDNS_SERIAL_SIZE);
                 if (id_val_str)
                 {
-
-                    service_cntx_device_id->key = ezlopi_serial_str;
+                    service_cntx_device_id->key = "Serial";
 
                     memset(id_val_str, 0, EZPI_MDNS_SERIAL_SIZE);
                     snprintf(id_val_str, EZPI_MDNS_SERIAL_SIZE, "%lld", id_val);
@@ -269,7 +268,7 @@ static void __mdns_init(void* pv)
                 {
                     TRACE_I("\t%s\t%s", mdns_context[i].key, mdns_context[i].value);
                 }
-                mdns_service_add(ezlopi_mdns_instance_name, "_ezlopi", "_tcp", 17001, mdns_context, service_size);
+                mdns_service_add(ezlopi_mdns_instance_name, "_ezlo", "_tcp", 17001, mdns_context, service_size);
                 break;
             }
             else

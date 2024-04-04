@@ -13,14 +13,14 @@
 
 #include "sensor_0019_digitalIn_PIR.h"
 
-static int sensor_pir_prepare_v3(void *arg);
-static int sensor_pir_init_v3(l_ezlopi_item_t *item);
-static void sensor_pir_value_updated_from_device_v3(void *arg);
-static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *arg);
-static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj_device);
-static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *device, cJSON *cj_device);
+static int sensor_pir_prepare_v3(void* arg);
+static int sensor_pir_init_v3(l_ezlopi_item_t* item);
+static void sensor_pir_value_updated_from_device_v3(void* arg);
+static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t* item, void* arg);
+static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t* item, cJSON* cj_device);
+static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t* device, cJSON* cj_device);
 
-int sensor_0019_digitalIn_PIR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg)
+int sensor_0019_digitalIn_PIR(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* args, void* user_arg)
 {
     int ret = 0;
 
@@ -52,32 +52,30 @@ int sensor_0019_digitalIn_PIR(e_ezlopi_actions_t action, l_ezlopi_item_t *item, 
     return ret;
 }
 
-static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t *item, void *args)
+static int sensor_pir_get_value_cjson_v3(l_ezlopi_item_t* item, void* args)
 {
     int ret = 0;
-    cJSON *cj_result = (cJSON *)args;
+    cJSON* cj_result = (cJSON*)args;
     if (cj_result)
     {
         item->interface.gpio.gpio_out.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
-        cJSON_AddBoolToObject(cj_result, ezlopi_value_str, item->interface.gpio.gpio_out.value);
-        const char *valueFormatted = ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false);
-        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
+        ezlopi_valueformatter_bool_to_cjson(item, cj_result, item->interface.gpio.gpio_out.value);
         ret = 1;
     }
 
     return ret;
 }
 
-static void sensor_pir_value_updated_from_device_v3(void *arg)
+static void sensor_pir_value_updated_from_device_v3(void* arg)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)arg;
+    l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
         ezlopi_device_value_updated_from_device_v3(item);
     }
 }
 
-static int sensor_pir_init_v3(l_ezlopi_item_t *item)
+static int sensor_pir_init_v3(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -113,21 +111,21 @@ static int sensor_pir_init_v3(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int sensor_pir_prepare_v3(void *arg)
+static int sensor_pir_prepare_v3(void* arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)
     {
-        cJSON *cj_device = prep_arg->cjson_device;
+        cJSON* cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
             if (device)
             {
                 ret = 1;
                 sensor_pir_setup_device_cloud_properties_v3(device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0019_digitalIn_PIR);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0019_digitalIn_PIR);
                 if (item)
                 {
                     sensor_pir_setup_item_properties_v3(item, cj_device);
@@ -152,7 +150,7 @@ static int sensor_pir_prepare_v3(void *arg)
     return ret;
 }
 
-static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *device, cJSON *cj_device)
+static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t* device, cJSON* cj_device)
 {
     if (device && cj_device)
     {
@@ -164,7 +162,7 @@ static void sensor_pir_setup_device_cloud_properties_v3(l_ezlopi_device_t *devic
     }
 }
 
-static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t *item, cJSON *cj_device)
+static void sensor_pir_setup_item_properties_v3(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     int tmp_var = 0;
     item->cloud_properties.has_getter = true;

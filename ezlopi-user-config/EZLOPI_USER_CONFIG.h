@@ -11,7 +11,7 @@
 #define EZPI_DEV_TYPE_GENERIC 1
 
 // Util
-#define EZPI_UTIL_ENABLE_TRACE
+#define EZPI_UTIL_ENABLE_TRACE 1
 
 // Core
 #define EZPI_CORE_ENABLE_ETH

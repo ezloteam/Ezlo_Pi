@@ -21,12 +21,12 @@
 #include "ezlopi_cloud_offline_login.h"
 
 #include "ezlopi_core_reset.h"
-#include "ezlopi_core_ezlopi_methods.h"
+#include "ezlopi_core_api_methods.h"
 #include "ezlopi_util_trace.h"
 
 static const s_method_list_v2_t method_list_v2[] = {
 #define CLOUD_METHOD(name, _method, _updater) {.method_name = name, .method = _method, .updater = _updater},
-#include "ezlopi_core_ezlopi_cloud_api_macros.h"
+#include "ezlopi_core_api_macros.h"
 #undef CLOUD_METHOD
     {.method_name = NULL, .method = NULL, .updater = NULL},
 };
@@ -73,8 +73,6 @@ uint32_t ezlopi_core_ezlopi_methods_search_in_list(cJSON* cj_method)
 
 void ezlopi_core_ezlopi_methods_rpc_method_notfound(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
     cJSON* cjson_error = cJSON_AddObjectToObject(cj_response, ezlopi_error_str);
     if (cjson_error)
     {

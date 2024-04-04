@@ -78,14 +78,21 @@ const static int timer_group_index_pair[MAX_TIMER][2] = {
 
 static void send_event_to_queue(e_ezlopi_actions_t action)
 {
-    s_ezlo_event_t* event_data = malloc(sizeof(s_ezlo_event_t));
-    if (NULL != event_data)
+    if (EZLOPI_ACTION_NOTIFY_DEFAULT == action)
     {
-        event_data->arg = NULL;
-        event_data->action = action;
-        if (0 == ezlopi_event_queue_send(event_data, true))
+        ezlopi_event_queue_send(NULL, true);
+    }
+    else
+    {
+        s_ezlo_event_t* event_data = malloc(sizeof(s_ezlo_event_t));
+        if (NULL != event_data)
         {
-            free(event_data);
+            event_data->arg = NULL;
+            event_data->action = action;
+            if (0 == ezlopi_event_queue_send(event_data, true))
+            {
+                free(event_data);
+            }
         }
     }
 }
@@ -155,7 +162,7 @@ static bool IRAM_ATTR timer_group_isr_callback(void* args)
 
     if (EZLOPI_ACTION_NOTIFY_1000_MS == _timer_conf->event_type)
     {
-        send_event_to_queue(EZLOPI_ACTION_NOTIFY_1000_MS);
+        send_event_to_queue(EZLOPI_ACTION_NOTIFY_DEFAULT); // 1000 ms for default
     }
 
     return high_task_awoken == pdTRUE; // return whether we need to yield at the end of ISR
@@ -221,9 +228,9 @@ static void ezlopi_timer_setup_struct(s_ezlopi_timer_t* timer_config, e_ezlopi_a
     timer_config->alarm_value = (alarm_ms * (EZLOPI_TIMER_SCALE / 1000));
     timer_config->group = group;
     timer_config->index = index;
-    timer_config->internal.alarm_en = TIMER_ALARM_EN,
-        timer_config->internal.auto_reload = true,
-        timer_config->internal.counter_dir = TIMER_COUNT_UP;
+    timer_config->internal.alarm_en = TIMER_ALARM_EN;
+    timer_config->internal.auto_reload = true;
+    timer_config->internal.counter_dir = TIMER_COUNT_UP;
     timer_config->internal.divider = EZLOPI_TIMER_DIVIDER;
     timer_config->internal.intr_type = TIMER_INTR_LEVEL;
 }

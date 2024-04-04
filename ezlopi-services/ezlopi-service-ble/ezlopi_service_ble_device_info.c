@@ -234,12 +234,13 @@ static char* device_info_jsonify(void)
         uint8_t flag_internet_status = (EZLOPI_PING_STATUS_LIVE == ezlopi_ping_get_internet_status()) ? 1 : 0;
         cJSON_AddNumberToObject(root, ezlopi_internet_status_str, flag_internet_status);
 
-        device_info = cJSON_Print(root);
+        device_info = cJSON_PrintBuffered(root, 4096, false);
+        TRACE_D("length of 'device_info': %d", strlen(device_info));
+
         cJSON_Delete(root);
 
         if (device_info)
         {
-            cJSON_Minify(device_info);
             TRACE_S("Created device info: %s", device_info);
         }
     }

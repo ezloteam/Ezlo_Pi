@@ -34,6 +34,8 @@
 #include "ezlopi_cloud_info.h"
 #include "ezlopi_cloud_constants.h"
 
+#include "ezlopi_service_ble.h"
+
 #include "ezlopi_service_uart.h"
 
 static const int RX_BUF_SIZE = 3096;
@@ -238,30 +240,36 @@ static char* ezlopi_chip_type_str(int chip_type)
 static int ezlopi_service_uart_execute_command_0(cJSON* root)
 {
     int ret = 0;
-    uint8_t sub_cmd = cJSON_GetObjectItem(root, ezlopi_sub_cmd_str)->valuedouble;
-    switch (sub_cmd)
+    cJSON* cj_sub_cmd = cJSON_GetObjectItem(root, ezlopi_sub_cmd_str);
+    if (cj_sub_cmd)
     {
-    case 0:
-    {
-        TRACE_E("Factory restore command");
-        const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
-        EZPI_CORE_factory_restore();
-        break;
+        uint8_t sub_cmd = cj_sub_cmd->valuedouble;
+        switch (sub_cmd)
+        {
+        case 0:
+        {
+            TRACE_E("Factory restore command");
+            const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
+            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_CORE_factory_restore();
+            break;
+        }
+        case 1:
+        {
+            TRACE_E("Reboot only command");
+            const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
+            EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+            EZPI_CORE_reboot();
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+        cJSON_Delete(cj_sub_cmd);
     }
-    case 1:
-    {
-        TRACE_E("Reboot only command");
-        const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
-        EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
-        EZPI_CORE_reboot();
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
+
     return ret;
 }
 
@@ -305,9 +313,10 @@ static int qt_serial_parse_rx_data(const char* data)
 
     if (root)
     {
-        if (cJSON_GetObjectItem(root, ezlopi_cmd_str))
+        cJSON* cj_cmd = cJSON_GetObjectItem(root, ezlopi_cmd_str);
+        if (cj_cmd)
         {
-            uint8_t cmd_temp = cJSON_GetObjectItem(root, ezlopi_cmd_str)->valuedouble;
+            uint8_t cmd_temp = cj_cmd->valuedouble;
 
             switch (cmd_temp)
             {
@@ -437,9 +446,27 @@ static int get_device_status(cJSON* parent)
     cJSON* cj_device_status = cJSON_AddObjectToObject(parent, "device_info");
     if (cj_device_status)
     {
-        cJSON_AddStringToObject(cj_device_status, ezlopi_uptime_str, ezlopi_tick_to_time((uint32_t)(xTaskGetTickCount() / portTICK_PERIOD_MS)));
+
+        char time_string[50];
+        uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
+        ezlopi_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
+
+        cJSON_AddStringToObject(cj_device_status, ezlopi_uptime_str, time_string);
         cJSON_AddNumberToObject(cj_device_status, "boot_count", ezlopi_system_info_get_boot_count());
         cJSON_AddStringToObject(cj_device_status, "boot_reason", ezlopi_esp_reset_reason_str(esp_reset_reason()));
+
+        uint8_t mac[6];
+        ezlopi_wifi_get_wifi_mac(mac);
+        char mac_str[20];
+        memset(mac_str, 0, sizeof(mac_str));
+        snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        cJSON_AddStringToObject(cj_device_status, "wifi_mac", mac_str);
+
+        memset(mac, 0, sizeof(mac));
+        ezlopi_ble_service_get_ble_mac(mac);
+        memset(mac_str, 0, sizeof(mac_str));
+        snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        cJSON_AddStringToObject(cj_device_status, "ble_mac", mac_str);
         ret = 1;
     }
     return ret;
@@ -501,6 +528,7 @@ static int get_ezlopi_device_ezlopi_info(cJSON* parent)
         cJSON_AddNumberToObject(cj_cj_device_ezlopi_info, ezlopi_serial_str, serial_id);
         cJSON_AddStringToObject(cj_cj_device_ezlopi_info, ezlopi_mac_str, device_mac ? device_mac : "");
 
+        
         ezlopi_factory_info_v3_free(device_mac);
         ezlopi_factory_info_v3_free(controller_uuid);
         ezlopi_factory_info_v3_free(provisioning_uuid);
@@ -621,7 +649,7 @@ static void ezlopi_service_uart_get_info()
             TRACE_E("%s", serial_data_json_string);
             cJSON_Minify(serial_data_json_string);
             EZPI_SERVICE_uart_tx_data(strlen(serial_data_json_string), (uint8_t*)serial_data_json_string);
-            cJSON_free(serial_data_json_string);
+            free(serial_data_json_string);
         }
 
         cJSON_Delete(cj_get_info);
@@ -703,6 +731,8 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
         cJSON_AddNumberToObject(response, "status_connect", status_connect);
 
         char* my_json_string = cJSON_Print(response);
+        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
+
         cJSON_Delete(response); // free Json string
 
         if (my_json_string)
@@ -770,6 +800,7 @@ static void ezlopi_service_uart_read_config(void)
     if (root)
     {
         char* my_json_string = cJSON_Print(root);
+        TRACE_D("length of 'my_json_string': %d", strlen(my_json_string));
 
         if (my_json_string)
         {
