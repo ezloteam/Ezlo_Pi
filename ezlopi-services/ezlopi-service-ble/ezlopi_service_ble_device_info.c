@@ -25,16 +25,13 @@
 
 #include "ezlopi_service_ble.h"
 
-#define AND &&
-#define OR ||
-
 static s_gatt_service_t* g_device_info_service = NULL;
-static s_gatt_char_t* g_device_status_notify_characteristics = NULL;
 
 static char* device_info_jsonify(void);
 static void __add_factory_info_to_root(cJSON* root, char* key, char* value);
 static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
+static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param);
 
 void ezlopi_ble_service_device_info_init(void)
 {
@@ -58,7 +55,33 @@ void ezlopi_ble_service_device_info_init(void)
     uuid.len = ESP_UUID_LEN_16;
     permission = ESP_GATT_PERM_READ;
     properties = ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_READ;
-    g_device_status_notify_characteristics = ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_status_read_func, NULL, NULL);
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_status_read_func, NULL, NULL);
+
+    uuid.uuid.uuid16 = BLE_DEVICE_INFO_MAC_CHAR_UUID;
+    uuid.len = ESP_UUID_LEN_16;
+    permission = ESP_GATT_PERM_READ;
+    properties = ESP_GATT_CHAR_PROP_BIT_READ;
+    ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_mac_read_func, NULL, NULL);
+}
+
+static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
+{
+    if(value)
+    {
+        cJSON * cj_device_mac = cJSON_CreateObject();
+        if(cj_device_mac)
+        {
+            char* device_mac = ezlopi_factory_info_v3_get_ezlopi_mac();
+        }
+        else 
+        {
+            TRACE_E("Couldn't allocate memory for device mac json");
+        }
+    }
+    else 
+    {
+        TRACE_E("Value is empty");
+    }
 }
 
 static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
@@ -69,12 +92,13 @@ static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_pa
         if (cj_device_status)
         {
             e_ezlopi_event_t event = ezlopi_get_event_bit_status();
+            e_ping_status_t ping_status = ezlopi_ping_get_internet_status();
 
             cJSON_AddBoolToObject(cj_device_status, "wifi_connection_status", (event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED);
-            cJSON_AddBoolToObject(cj_device_status, "internet_connection_status", (event & EZLOPI_EVENT_WIFI_CONNECTED) == EZLOPI_EVENT_WIFI_CONNECTED);
+            cJSON_AddBoolToObject(cj_device_status, "internet_connection_status", ping_status == EZLOPI_PING_STATUS_LIVE);
 
             cJSON_AddBoolToObject(cj_device_status, "cloud_connection_status", (event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG);
-            cJSON_AddBoolToObject(cj_device_status, "provision_completion_status", (event & EZLOPI_EVENT_NMA_REG) == EZLOPI_EVENT_NMA_REG);
+            cJSON_AddBoolToObject(cj_device_status, "provision_completion_status", ezlopi_factory_info_v3_get_provisioning_status());
 
             cJSON_AddTrueToObject(cj_device_status, "powered_on");
 
