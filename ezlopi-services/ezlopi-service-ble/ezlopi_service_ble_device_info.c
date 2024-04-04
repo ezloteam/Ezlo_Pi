@@ -227,7 +227,7 @@ static char* device_info_jsonify(void)
         // uint64_t uptime_sec = uptime_us / 1000000;
 
         cJSON_AddStringToObject(root, ezlopi_firmware_version_str, VERSION_STR);
-        cJSON_AddNumberToObject(root, ezlopi_firmware_build_str, BUILD);
+        cJSON_AddNumberToObject(root, ezlopi_build_str, BUILD);
         cJSON_AddStringToObject(root, ezlopi_chip_str, CONFIG_IDF_TARGET);
         // cJSON_AddStringToObject(root, "flash_size", CONFIG_ESPTOOLPY_FLASHSIZE);
         // cJSON_AddStringToObject(root, "version_idf", esp_get_idf_version());
