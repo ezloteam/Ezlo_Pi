@@ -11,7 +11,9 @@ struct s_ezlopi_pwm_object
     ledc_channel_config_t *ledc_channel_configuration;
 };
 
-#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+#if CONFIG_IDF_TARGET_ESP32 
+static bool available_channels[LEDC_CHANNEL_MAX] = {false, true, true, true, true, true, true};
+#elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
 static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true, true, true};
 #elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3
 static bool available_channels[LEDC_CHANNEL_MAX] = {true, true, true, true, true};

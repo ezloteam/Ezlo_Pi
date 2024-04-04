@@ -7,6 +7,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 
 #include "ezlopi_util_trace.h"
 
@@ -41,7 +42,6 @@ static led_strip_t indicator_led;
 #define INDICATTOR_LED_WIFI_STATUS_BLINK_MS 50
 #define INDICATTOR_LED_INTERNET_STATUS_BLINK_MS 100
 #define INDICATTOR_LED_CLOUD_STATUS_BLINK_MS 200
-static bool indicator_led_status = false;
 #endif
 
 static e_indicator_led_priority_t indicator_priority = PRIORITY_CLOUD;
@@ -102,66 +102,85 @@ static void indicator_LED_fade_blue(uint16_t fade_time_ms)
     indicator_RGB_led_fade_out(fade_time_ms);
     indicator_RGB_led_fade_up(fade_time_ms);
 }
-#endif // #ifdef CONFIG_EZPI_RGB_LED
 
 static void indicator_LED_power_on_effect()
 {
-#ifdef CONFIG_EZPI_ON_OFF_LED
-    indicator_led_status = !indicator_led_status;
-    gpio_set_level(INDICATOR_LED_PIN, indicator_led_status);
-    vTaskDelay(INDICATTOR_LED_POWER_STATUS_BLINK_MS / portTICK_PERIOD_MS);
-#endif
-#ifdef CONFIG_EZPI_RGB_LED
     indicator_LED_fade_red(INDICATOR_LED_FADE_TIME_MS);
     indicator_LED_fade_green(INDICATOR_LED_FADE_TIME_MS);
     indicator_LED_fade_blue(INDICATOR_LED_FADE_TIME_MS);
-#endif // #ifdef CONFIG_EZPI_RGB_LED
 }
 
 static void indicator_LED_wifi_connected_effect()
 {
-#ifdef CONFIG_EZPI_ON_OFF_LED
-    indicator_led_status = !indicator_led_status;
-    gpio_set_level(INDICATOR_LED_PIN, indicator_led_status);
-    vTaskDelay(INDICATTOR_LED_WIFI_STATUS_BLINK_MS / portTICK_PERIOD_MS);
-#endif
-#ifdef CONFIG_EZPI_RGB_LED
     indicator_LED_fade_red(INDICATOR_LED_FADE_TIME_MS);
-#endif // #ifdef CONFIG_EZPI_RGB_LED
 }
 
 static void indicator_LED_internet_connected_effect()
 {
-#ifdef CONFIG_EZPI_ON_OFF_LED
-    indicator_led_status = !indicator_led_status;
-    gpio_set_level(INDICATOR_LED_PIN, indicator_led_status);
-    vTaskDelay(INDICATTOR_LED_INTERNET_STATUS_BLINK_MS / portTICK_PERIOD_MS);
-#endif
-#ifdef CONFIG_EZPI_RGB_LED
     indicator_LED_fade_blue(INDICATOR_LED_FADE_TIME_MS);
-#endif // #ifdef CONFIG_EZPI_RGB_LED
 }
 
 static void indicator_LED_cloud_connected_effect()
 {
-#ifdef CONFIG_EZPI_ON_OFF_LED
-    indicator_led_status = !indicator_led_status;
-    gpio_set_level(INDICATOR_LED_PIN, indicator_led_status);
-    vTaskDelay(INDICATTOR_LED_CLOUD_STATUS_BLINK_MS / portTICK_PERIOD_MS);
-#endif // #ifdef CONFIG_EZPI_ON_OFF_LED 
-#ifdef CONFIG_EZPI_RGB_LED
     indicator_LED_fade_green(INDICATOR_LED_FADE_TIME_MS);
-#endif // #ifdef CONFIG_EZPI_RGB_LED
 }
+#endif // #ifdef CONFIG_EZPI_RGB_LED
 
 #ifdef CONFIG_EZPI_ON_OFF_LED
-static const gpio_config_t indicator_led_configuration = {
-    .pin_bit_mask = (1ULL << INDICATOR_LED_PIN),
-    .mode = GPIO_MODE_OUTPUT,
-    .pull_up_en = GPIO_PULLUP_DISABLE,
-    .pull_down_en = GPIO_PULLDOWN_ENABLE,
-    .intr_type = GPIO_INTR_DISABLE,
+static ledc_timer_config_t indicator_pwm_timer_cfg = {
+    .speed_mode = LEDC_LOW_SPEED_MODE,
+    .duty_resolution = LEDC_TIMER_12_BIT,
+    .timer_num = LEDC_TIMER_3,
+    .freq_hz = 5000,
+    .clk_cfg = LEDC_AUTO_CLK,
 };
+
+static ledc_channel_config_t indicator_pwm_channel_cfg = {
+    .gpio_num = INDICATOR_LED_PIN,
+    .speed_mode = LEDC_LOW_SPEED_MODE,
+    .channel = LEDC_CHANNEL_0,
+    .intr_type = LEDC_INTR_DISABLE,
+    .timer_sel = LEDC_TIMER_3,
+    .duty = 0,
+};
+
+static void indicator_LED_fade_effect(uint32_t fade_ms)
+{
+    static int i = 0;
+    for (; i < 4095; i += 117)
+    {
+        ESP_ERROR_CHECK_WITHOUT_ABORT(ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i));
+        ESP_ERROR_CHECK_WITHOUT_ABORT(ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0));
+        vTaskDelay(fade_ms / portTICK_PERIOD_MS);
+    }
+    for (; i > 0; i -= 117)
+    {
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, i);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        vTaskDelay(fade_ms / portTICK_PERIOD_MS);
+    }
+}
+
+static void indicator_LED_power_on_effect()
+{
+    indicator_LED_fade_effect(10);
+}
+
+static void indicator_LED_wifi_connected_effect()
+{
+    indicator_LED_fade_effect(20);
+}
+
+static void indicator_LED_internet_connected_effect()
+{
+    indicator_LED_fade_effect(30);
+}
+
+static void indicator_LED_cloud_connected_effect()
+{
+    indicator_LED_fade_effect(40);
+}
+
 #endif // #ifdef CONFIG_EZPI_ON_OFF_LED
 
 
@@ -255,9 +274,14 @@ int ezlopi_service_led_indicator_init()
 
 #ifdef CONFIG_EZPI_ON_OFF_LED
 
-    ESP_ERROR_CHECK(gpio_config(&indicator_led_configuration));
-    gpio_set_level(INDICATOR_LED_PIN, indicator_led_status);
-    xTaskCreate(indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, tskIDLE_PRIORITY, NULL);
+    if (ESP_OK == ledc_timer_config(&indicator_pwm_timer_cfg))
+    {
+        if (ESP_OK == ledc_channel_config(&indicator_pwm_channel_cfg))
+        {
+            xTaskCreate(indicator_LED_blinker, "indicator_task", 2048 * 2, NULL, 1, NULL);
+            ret = 1;
+        }
+    }
 
 #endif // #ifdef CONFIG_EZPI_ON_OFF_LED
 
