@@ -42,7 +42,6 @@ void ezlopi_init(void)
     ezlopi_event_group_create();
     ezlopi_wifi_initialize();
     vTaskDelay(10);
-
     // Init devices
     ezlopi_device_prepare();
     vTaskDelay(10);
@@ -67,12 +66,10 @@ void ezlopi_init(void)
 
     ezlopi_wifi_connect_from_id_bin();
     ezlopi_nvs_set_boot_count(boot_count + 1);
-
     ezlopi_event_queue_init();
     ezlopi_ping_init();
     // EZPI_CORE_sntp_init();
     ezlopi_timer_start_1000ms();
-
     EZPI_core_init_mdns();
 }
 
