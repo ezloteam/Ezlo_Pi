@@ -64,21 +64,70 @@ void ezlopi_ble_service_device_info_init(void)
     ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, device_mac_read_func, NULL, NULL);
 }
 
+static void ble_device_info_send_data(const cJSON* cj_response_data, esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
+{
+    char* send_data = cJSON_Print(cj_response_data);
+    if (send_data)
+    {
+        cJSON_Minify(send_data);
+
+        uint32_t total_data_len = strlen(send_data);
+        uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
+        uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
+
+        if ((0 != total_data_len) && (total_data_len > param->read.offset))
+        {
+            strncpy((char*)value->value, send_data + param->read.offset, copy_size);
+            value->len = copy_size;
+        }
+        if ((param->read.offset + copy_size) >= total_data_len)
+        {
+            free(send_data);
+            send_data = NULL;
+        }
+    }
+    else
+    {
+        TRACE_E("No data to send");
+        value->len = 1;
+        value->value[0] = 0; // Read 0 if the device not provisioned yet.
+    }
+}
+
 static void device_mac_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
-    if(value)
+    if (value)
     {
-        cJSON * cj_device_mac = cJSON_CreateObject();
-        if(cj_device_mac)
+        cJSON* cj_device_mac = cJSON_CreateObject();
+        if (cj_device_mac)
         {
             char* device_mac = ezlopi_factory_info_v3_get_ezlopi_mac();
+            cJSON_AddStringToObject(cj_device_mac, "ezlopi_mac", device_mac ? device_mac : "unknown");
+
+            uint8_t mac[6];
+            ezlopi_wifi_get_wifi_mac(mac);
+            char mac_str[20];
+            memset(mac_str, 0, sizeof(mac_str));
+            snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            cJSON_AddStringToObject(cj_device_mac, "wifi_mac", mac_str);
+
+            memset(mac, 0, sizeof(mac));
+            ezlopi_ble_service_get_ble_mac(mac);
+            memset(mac_str, 0, sizeof(mac_str));
+            snprintf(mac_str, 20, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            cJSON_AddStringToObject(cj_device_mac, "ble_mac", mac_str);
+
+            ble_device_info_send_data(cj_device_mac, value, param);
+
+            cJSON_Delete(cj_device_mac);
+            free(device_mac);
         }
-        else 
+        else
         {
             TRACE_E("Couldn't allocate memory for device mac json");
         }
     }
-    else 
+    else
     {
         TRACE_E("Value is empty");
     }
@@ -102,32 +151,8 @@ static void device_status_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_pa
 
             cJSON_AddTrueToObject(cj_device_status, "powered_on");
 
-            char* send_data = cJSON_Print(cj_device_status);
-            if (send_data)
-            {
-                cJSON_Minify(send_data);
+            ble_device_info_send_data(cj_device_status, value, param);
 
-                uint32_t total_data_len = strlen(send_data);
-                uint32_t max_data_buffer_size = ezlopi_ble_gatt_get_max_data_size();
-                uint32_t copy_size = ((total_data_len - param->read.offset) < max_data_buffer_size) ? (total_data_len - param->read.offset) : max_data_buffer_size;
-
-                if ((0 != total_data_len) && (total_data_len > param->read.offset))
-                {
-                    strncpy((char*)value->value, send_data + param->read.offset, copy_size);
-                    value->len = copy_size;
-                }
-                if ((param->read.offset + copy_size) >= total_data_len)
-                {
-                    free(send_data);
-                    send_data = NULL;
-                }
-            }
-            else
-            {
-                TRACE_E("No data to send");
-                value->len = 1;
-                value->value[0] = 0; // Read 0 if the device not provisioned yet.
-            }
             cJSON_Delete(cj_device_status);
         }
         else

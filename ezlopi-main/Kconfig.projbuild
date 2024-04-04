@@ -102,12 +102,14 @@ menu "EzloPi User Config"
     endmenu
 
     choice 
-        prompt "Select the indicator LED available in the device"
-        default EZPI_ON_OFF_LED
+        prompt "Select the indicator LED available in the device (current target $(IDF_TARGET))"
+        depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32
         config EZPI_ON_OFF_LED
-            bool "Buildin LED for ESP32 dev board"
+            bool "Onboard LED"
+            depends on IDF_TARGET_ESP32
         config EZPI_RGB_LED
-            bool "Builtin addressable RGB LED for ESP32S3 and ESP32C3"
+            bool "Onboard addressable LED"
+            depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3
     endchoice
 
 endmenu

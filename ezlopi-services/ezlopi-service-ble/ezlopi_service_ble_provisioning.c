@@ -62,7 +62,6 @@ void ezlopi_ble_service_provisioning_init(void)
     ezlopi_ble_gatt_add_characteristic(g_provisioning_service, &uuid, permission, properties, __provisioning_status_read_func, NULL, NULL);
 }
 
-#if 1
 static char* __provisioning_status_jsonify(void)
 {
     char *prov_status_jstr = NULL;
