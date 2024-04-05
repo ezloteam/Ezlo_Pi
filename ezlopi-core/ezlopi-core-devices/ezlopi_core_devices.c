@@ -217,7 +217,7 @@ static void ezlopi_device_free_parent_tree(l_ezlopi_device_t* parent_device, uin
 }
 
 void ezlopi_device_free_device(l_ezlopi_device_t* device)
-{
+    {
     if (device && l_device_head)
     {
         if ((NULL != device->next) &&
