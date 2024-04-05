@@ -504,7 +504,7 @@ uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
         }
         else
         {
-            TRACE_E("nvs_get_i32 - error: %s", esp_err_to_name(err));
+            TRACE_E("nvs_get_i32 - error:: %s: %s", key_name, esp_err_to_name(err));
         }
     }
     return ret;

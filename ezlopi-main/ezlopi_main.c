@@ -47,7 +47,7 @@ void app_main(void)
     timer_service_init();
 
 #if CONFIG_EZLOPI_BLE_ENABLE == 1
-    ezlopi_ble_service_init();
+    // ezlopi_ble_service_init();
 #endif
 
     ezlopi_service_broadcast_init();
@@ -86,3 +86,5 @@ static void __blinky(void* pv)
         vTaskDelay(5 / portTICK_PERIOD_MS);
     }
 }
+
+
