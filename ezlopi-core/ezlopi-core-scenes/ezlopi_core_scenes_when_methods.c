@@ -582,7 +582,7 @@ int ezlopi_scene_when_is_scene_state(l_scenes_list_v2_t* scene_node, void* arg)
                     // {
                     //     ret = (false == curr_scene->enabled)? 1:0;
                     // }
-                    TRACE_E("scene_state : %s , ret = %d", ezlopi_scenes_status_to_string(curr_scene->status), ret);
+                    // TRACE_E("scene_state : %s , ret = %d", ezlopi_scenes_status_to_string(curr_scene->status), ret);
                     break;
                 }
                 curr_scene = curr_scene->next;
