@@ -34,7 +34,7 @@ menu "EzloPi User Config"
 
     config EZLOPI_BLE_ENABLE
     bool "Enable BLE"
-    default n
+    default y
     help
         Enable BLE
 
@@ -100,6 +100,17 @@ menu "EzloPi User Config"
             Enable name extra service in ezlopi mDNS
 
     endmenu
+
+    choice 
+        prompt "Select the indicator LED available in the device (current target $(IDF_TARGET))"
+        depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32
+        config EZPI_ON_OFF_LED
+            bool "Onboard LED"
+            depends on IDF_TARGET_ESP32
+        config EZPI_RGB_LED
+            bool "Onboard addressable LED"
+            depends on IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3
+    endchoice
 
 endmenu
 

@@ -26,34 +26,16 @@
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
+#include "ezlopi_service_led_indicator.h"
 
 #include "pt.h"
 
-#define ENABLE_HEARTBIT_LED 0
-
 static void __blinky(void* pv);
-static void __init_heartbeat_led(void);
-static void __toggle_heartbeat_led(void);
 
-static struct pt pt1;
-
-PT_THREAD(example(struct pt* pt))
-{
-    static uint32_t curr_ticks;
-    PT_BEGIN(pt);
-
-    while (1)
-    {
-        curr_ticks = xTaskGetTickCount();
-        PT_WAIT_UNTIL(pt, (xTaskGetTickCount() - curr_ticks) > 1000);
-        __toggle_heartbeat_led();
-    }
-
-    PT_END(pt);
-}
 
 void app_main(void)
 {
+    ezlopi_service_led_indicator_init();
     gpio_install_isr_service(0);
 
     gpio_isr_service_init();
@@ -80,39 +62,13 @@ void app_main(void)
     ezlopi_scenes_meshbot_init();
 #endif
 
-    xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 1, NULL);
+    xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 0, NULL);
 }
 
-static void __init_heartbeat_led(void)
-{
-#if (1 == ENABLE_HEARTBIT_LED)
-    gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << GPIO_NUM_2),
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
-
-    gpio_config(&io_conf);
-#endif
-}
-
-static void __toggle_heartbeat_led(void)
-{
-#if (1 == ENABLE_HEARTBIT_LED)
-    static uint32_t state = 0;
-
-    state ^= 1;
-    gpio_set_level(GPIO_NUM_2, state);
-#endif
-}
 
 static void __blinky(void* pv)
 {
-    __init_heartbeat_led();
 
-    PT_INIT(&pt1);
     uint32_t count = 0;
 
     while (1)
@@ -128,6 +84,5 @@ static void __blinky(void* pv)
         }
 
         vTaskDelay(5 / portTICK_PERIOD_MS);
-        example(&pt1);
     }
 }

@@ -463,12 +463,12 @@ uint8_t ezlopi_nvs_read_int32(int32_t* i, const char* key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_write_uint32(int32_t i, const char* key_name)
+uint8_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
-        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, (uint32_t*)i);
+        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, (uint32_t)i);
         if (ESP_OK != err)
         {
             TRACE_W("nvs_set_i32 - error: %s", esp_err_to_name(err));
@@ -491,7 +491,7 @@ uint8_t ezlopi_nvs_write_uint32(int32_t i, const char* key_name)
     return ret;
 }
 
-uint8_t ezlopi_nvs_read_uint32(int32_t* i, const char* key_name)
+uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
 {
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
@@ -774,7 +774,7 @@ bool EZPI_CORE_nvs_write_baud(uint32_t baud)
 uint8_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
 {
     uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32((int32_t*)baud, ezlopi_serial_baud_name);
+    uint8_t err = ezlopi_nvs_read_uint32(baud, ezlopi_serial_baud_name);
     if (0 == err)
     {
         ret = -1;
@@ -783,12 +783,12 @@ uint8_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
     return ret;
 }
 
-bool EZPI_CORE_nvs_write_parity(uint8_t parity)
+bool EZPI_CORE_nvs_write_parity(uint32_t parity)
 {
     return ezlopi_nvs_write_uint32(parity, ezlopi_serial_parity) == 1 ? true : false;
 }
 
-uint8_t EZPI_CORE_nvs_read_parity(uint8_t* parity)
+uint8_t EZPI_CORE_nvs_read_parity(uint32_t* parity)
 {
     uint8_t ret = 0;
     uint8_t err = ezlopi_nvs_read_uint32(parity, ezlopi_serial_parity);
@@ -852,19 +852,18 @@ uint8_t EZPI_CORE_nvs_read_frame_size(uint8_t* frame_size)
     return ret;
 }
 
-bool EZPI_CORE_nvs_write_flow_control(bool flow_control)
+bool EZPI_CORE_nvs_write_flow_control(uint32_t flow_control)
 {
-    return ezlopi_nvs_write_bool(flow_control, ezlopi_serial_flow_control) == 1 ? true : false;
+    return ezlopi_nvs_write_uint32(flow_control, ezlopi_serial_flow_control) == 1 ? true : false;
 }
 
-uint8_t EZPI_CORE_nvs_read_flow_control(bool* flow_control)
+bool EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
 {
     bool ret = false;
-    uint8_t err = ezlopi_nvs_read_bool(&ret, ezlopi_serial_flow_control);
-    if (0 == err)
+    uint8_t err = ezlopi_nvs_read_uint32(flow_control, ezlopi_serial_flow_control);
+    if (1 == err)
     {
-        ret = -1;
-        *flow_control = false;
+        ret = true;
     }
     return ret;
 }
