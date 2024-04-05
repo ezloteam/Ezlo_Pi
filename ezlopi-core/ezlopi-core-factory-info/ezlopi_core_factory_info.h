@@ -174,6 +174,13 @@ extern "C"
                 \"op_inv\": false,\
                 \"val_ip\": false,\
                 \"val_op\": false\
+            },\
+            {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"Water_leak\",\
+                \"id_room\": \"\",\
+                \"id_item\": 27,\
+                \"gpio\": 25\
             }\
         ], \
         \"dev_total\": 5}";

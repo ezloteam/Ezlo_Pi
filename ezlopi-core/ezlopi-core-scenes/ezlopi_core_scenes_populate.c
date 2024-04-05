@@ -390,10 +390,28 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t* field, cJSON* cj_val
         }
         case cJSON_Object:
         {
-            field->field_value.e_type = VALUE_TYPE_CJSON;
-            field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
-            CJSON_TRACE("value", field->field_value.u_value.cj_value);
+
+            if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)
+            {
+                field->field_value.e_type = VALUE_TYPE_BLOCK;
+                CJSON_TRACE("single_obj_value", cj_value);
+
+                field->field_value.u_value.when_block = (l_when_block_v2_t*)malloc(sizeof(l_when_block_v2_t));
+                if (field->field_value.u_value.when_block)
+                {
+                    memset(field->field_value.u_value.when_block, 0, sizeof(l_when_block_v2_t));
+                    ezlopi_scenes_populate_assign_when_block(field->field_value.u_value.when_block, cj_value);
+                }
+            }
+            else
+            {
+                field->field_value.e_type = VALUE_TYPE_CJSON;
+                field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
+                CJSON_TRACE("value", field->field_value.u_value.cj_value);
+            }
+
             break;
+
         }
         case cJSON_Array:
         {

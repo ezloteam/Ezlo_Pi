@@ -68,7 +68,7 @@ void ezlopi_init(void)
     ezlopi_nvs_set_boot_count(boot_count + 1);
     ezlopi_event_queue_init();
     ezlopi_ping_init();
-    // EZPI_CORE_sntp_init();
+    EZPI_CORE_sntp_init();
     ezlopi_timer_start_1000ms();
     EZPI_core_init_mdns();
 }

@@ -1,6 +1,8 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_nvs.h"
 #include "ezlopi_core_scenes_v2.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
 
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
@@ -459,14 +461,21 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
 {
     if (tm_mday && user_data)
     {
-        // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
-        char tmp_url[] = "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140";
-        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: close\r\n";
+        char tmp_url[100] = { 0 };
+        char tmp_headers[] = "Host: api.sunrisesunset.io\r\nAccept: */*\r\nConnection: keep-alive\r\n";
         char tmp_web_server[] = "api.sunrisesunset.io";
-
-        // char tmp_url[] = "https://official-joke-api.appspot.com/random_joke";
-        // char tmp_headers[] = "Host: official-joke-api.appspot.com\r\nAccept: */*\r\nConnection: close\r\n";
-        // char tmp_web_server[] = "official-joke-api.appspot.com";
+        char* lat_long_vals = ezlopi_nvs_read_latidtude_longitude();
+        if (lat_long_vals)
+        {
+            TRACE_S("co-ordinate : %s", lat_long_vals);
+            snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
+            free(lat_long_vals);
+        }
+        else
+        {
+            // send httprequest to 'sunrisesunset.io' // use the latitude and longitude from NVS
+            snprintf(tmp_url, 95, "%s", "https://api.sunrisesunset.io/json?lat=27.700769&lng=85.300140");
+        }
 
         s_ezlopi_core_http_mbedtls_t tmp_config = {
             .method = HTTP_METHOD_GET,
@@ -481,7 +490,7 @@ static void issunsate_update_sunstate_tm(int tm_mday, s_sunstate_data_t* user_da
             .response_maxlen = 0,
         };
         /*Make API call here and extract the suntime[according to 'user_data->sunstate_mode']*/
-        
+
 
         ezlopi_core_http_mbedtls_req(&tmp_config);
         // e.g. after valid extraction
@@ -586,9 +595,17 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
     if ((EZLOPI_VALUE_TYPE_STRING == curr_field->value_type) && (NULL != curr_field->field_value.u_value.value_string))
     {
         flag_check |= (1 << 4); // indicates 'MASK_TIME_FLAG'
+        // if (0 < ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 100, false))
+        // {
+        //     TRACE_S("NMA_CONNECTED");
+        // }
+        // else
+        // {
+        //     TRACE_S("NMA_NOTCONNECTED");
+        //     return flag_check;
+        // }
 
         // 1. check for valid data within 'user_arg'
-
         if (NULL == (scene_node->when_block->fields->user_arg))
         {
             s_sunstate_data_t* data = (s_sunstate_data_t*)malloc(sizeof(s_sunstate_data_t));
@@ -611,6 +628,7 @@ uint8_t issunstate_get_suntime(l_scenes_list_v2_t* scene_node, l_fields_v2_t* cu
             // TRACE_S("curr_day = [%d] ; [%dth]", info->tm_mday, user_data->curr_tm_day);
             user_data->sunstate_mode = curr_sunstate_mode;          // this sets target sunstate for curr meshbot
             issunsate_update_sunstate_tm(info->tm_mday, user_data); // assign 'curr_day' & 'suntime' only
+
             user_data->tmoffs_type = (0 == strncmp(curr_field->field_value.u_value.value_string, "intime", 7)) ? ISSUNSTATE_INTIME_MODE
                 : (0 == strncmp(curr_field->field_value.u_value.value_string, "before", 7)) ? ISSUNSTATE_BEFORE_MODE
                 : (0 == strncmp(curr_field->field_value.u_value.value_string, "after", 6)) ? ISSUNSTATE_AFTER_MODE
