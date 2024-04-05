@@ -4,6 +4,7 @@
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
+#include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
@@ -29,7 +30,7 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
             l_fields_v2_t* curr_field = curr_then->fields;
             while (curr_field)
             {
-                if (0 == strncmp(curr_field->name, "item", 4))
+                if (0 == strncmp(curr_field->name, "item", 5))
                 {
                     cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
@@ -315,26 +316,21 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
         l_fields_v2_t* curr_field = curr_then->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "sceneId", 7))
+            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type)
                 {
                     sceneID = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
-                else
-                {
-                    ret = 1;
-                }
             }
-            else if (0 == strncmp(curr_field->name, "enabled", 5))
+            else if (0 == strncmp(curr_field->name, ezlopi_enabled_str, 8))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_BOOL)
+
+                TRACE_W("%s", (curr_field->field_value.u_value.value_bool ? "true" : "false"));
+
+                if (EZLOPI_VALUE_TYPE_BOOL == curr_field->value_type)
                 {
                     set_scene_enable = curr_field->field_value.u_value.value_bool;
-                }
-                else
-                {
-                    ret = 1;
                 }
             }
             curr_field = curr_field->next;
@@ -345,20 +341,15 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
             if (1 == ezlopi_scenes_enable_disable_id_from_list_v2(sceneID, set_scene_enable))
             {
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_finished_str);
+                ret = 1;
             }
             else
             {
+                TRACE_W("Failed set_scene_state");
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
             }
         }
-        else
-        {
-            ret = 1;
-        }
-    }
-    else
-    {
-        ret = 1;
+        TRACE_W("ret = %d", ret);
     }
     return ret;
 }
