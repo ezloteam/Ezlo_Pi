@@ -6,6 +6,8 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-ble
         ezlopi-core-reset
         ezlopi-core-ping
+        ezlopi-core-sntp
+        ezlopi-core-info
         # ezlopi-user-config
 )
 

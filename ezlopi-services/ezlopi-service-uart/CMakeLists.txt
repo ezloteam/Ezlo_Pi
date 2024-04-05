@@ -9,6 +9,8 @@ set(EZLOPI_CORE_COMPONENTS
         ezlopi-core-net
         ezlopi-core-reset
         ezlopi-core-ezlopi
+        ezlopi-core-sntp
+        ezlopi-core-info
 )
 set(EZLOPI_HAL_COMPONENTS 
         ezlopi-hal-sysinfo
