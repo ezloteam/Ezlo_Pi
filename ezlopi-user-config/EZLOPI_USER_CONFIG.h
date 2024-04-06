@@ -5,6 +5,8 @@
 /////////////// Do not change here //////////////////
 ////////////////////////////////////////////////////////////
 
+#include "driver/uart.h"
+
 // User Configs
 #define EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
 #define EZPI_USR_CONFIG_ENABLE_LOG
@@ -36,6 +38,11 @@
 
 
 // EzloPi Default Serial Configuartion 
+
+#define EZPI_SERV_UART_NUM_DEFAULT UART_NUM_0
+
+#define EZPI_SERV_UART_NUM EZPI_SERV_UART_NUM_DEFAULT
+
 #define EZPI_SERV_UART_BAUD_DEFAULT      (uint32_t)115200
 #define EZPI_SERV_UART_PARITY_DEFAULT      (uint32_t)UART_PARITY_DISABLE
 #define EZPI_SERV_UART_START_BIT_DEFAULT      (uint32_t)0
@@ -44,6 +51,8 @@
 #define EZPI_SERV_UART_FLOW_CTRL_DEFAULT      (uint32_t)UART_HW_FLOWCTRL_DISABLE
 
 #define EZPI_SERV_UART_RX_BUFFER_SIZE (uint32_t)3096
+
+#define EZPI_UART_SERV_FLW_CTRL_STR_SIZE 10
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
 #define EZPI_SERV_UART_TXD_PIN (GPIO_NUM_1)

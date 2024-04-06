@@ -24,6 +24,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_sntp.h"
 #include "ezlopi_core_info.h"
+#include "ezlopi_core_reset.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -34,7 +35,6 @@
 
 #include "ezlopi_service_ble.h"
 
-static const uint8_t EZPI_UART_FLW_CTRL_STR_MAX = 10;
 static s_gatt_service_t* g_device_info_service = NULL;
 
 static char* device_info_jsonify(void);
@@ -105,7 +105,7 @@ void ezlopi_ble_service_device_info_init(void)
 
     uuid.uuid.uuid16 = EZPI_BLE_CHAR_SER_CONFIG_INFO_UUID;
     uuid.len = ESP_UUID_LEN_16;
-    permission = ESP_GATT_PERM_READ;
+    permission = ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE;
     properties = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE;
     ezlopi_ble_gatt_add_characteristic(g_device_info_service, &uuid, permission, properties, EZPI_SERVICE_BLE_serial_config_info, EZPI_SERVICE_BLE_serial_config_write, NULL);
 
@@ -351,34 +351,37 @@ static void EZPI_SERVICE_BLE_serial_config_info(esp_gatt_value_t* value, esp_ble
         cJSON* cj_serial_config = cJSON_CreateObject();
         if (cj_serial_config)
         {
-            uint32_t baud = 0;
-            uint8_t start_bits = 0;
-            uint8_t stop_bits = 0;
-            uint8_t frame_size = 0;
-            uint32_t flow_control = 0;
-            uart_parity_t parity_val = UART_PARITY_DISABLE;
-            char flw_ctrl_bffr[EZPI_UART_FLW_CTRL_STR_MAX + 1];
-            flw_ctrl_bffr[EZPI_UART_FLW_CTRL_STR_MAX] = 0;
+            uint32_t baud = EZPI_SERV_UART_BAUD_DEFAULT;
+            uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
+            uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
+            uint32_t stop_bits = EZPI_SERV_UART_STOP_BIT_DEFAULT;
+            uint32_t frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
+            uint32_t flow_control = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
+            char parity[2];
+
+            char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
+            flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE] = 0;
 
             EZPI_CORE_nvs_read_baud(&baud);
             cJSON_AddNumberToObject(cj_serial_config, ezlopi_baud_str, baud);
 
-            EZPI_CORE_nvs_read_parity((uint8_t*)&parity_val);
-            char parity = EZPI_CORE_info_get_parity(parity_val);
-            cJSON_AddStringToObject(cj_serial_config, "parity", &parity);
+            EZPI_CORE_nvs_read_parity(&parity_val);
+            parity[0] = EZPI_CORE_info_get_parity(parity_val);
+            parity[1] = 0;
+            cJSON_AddStringToObject(cj_serial_config, ezlopi_parity_str, parity);
 
             EZPI_CORE_nvs_read_start_bits(&start_bits);
-            cJSON_AddNumberToObject(cj_serial_config, "start_bits", start_bits);
+            cJSON_AddNumberToObject(cj_serial_config, ezlopi_start_bits_str, start_bits);
 
             EZPI_CORE_nvs_read_stop_bits(&stop_bits);
-            cJSON_AddNumberToObject(cj_serial_config, "stop_bits", stop_bits);
+            cJSON_AddNumberToObject(cj_serial_config, ezlopi_stop_bits_str, stop_bits);
 
             EZPI_CORE_nvs_read_frame_size(&frame_size);
-            cJSON_AddNumberToObject(cj_serial_config, "data_bits", frame_size);
+            cJSON_AddNumberToObject(cj_serial_config, ezlopi_frame_size_str, frame_size);
 
             EZPI_CORE_nvs_read_flow_control(&flow_control);
             EZPI_CORE_info_get_flow_ctrl_to_str(flow_control, flw_ctrl_bffr);
-            cJSON_AddStringToObject(cj_serial_config, "flow_control", flw_ctrl_bffr);
+            cJSON_AddStringToObject(cj_serial_config, ezlopi_flow_control_str, flw_ctrl_bffr);
 
             ble_device_info_send_data(cj_serial_config, value, param);
 
@@ -404,12 +407,15 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
             cJSON* root = cJSON_ParseWithLength((const char*)param->write.value, param->write.len);
             if (root)
             {
-                uint32_t baud = 0;
                 char* parity = NULL;
-                uint8_t start_bits = 0;
-                uint8_t stop_bits = 0;
-                uint16_t frame_size = 0;
                 char* flow_control = NULL;
+                uint32_t baud = 0;
+                uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
+                uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
+                uint32_t stop_bits = EZPI_SERV_UART_STOP_BIT_DEFAULT;
+                uint32_t frame_size = 0;
+                uint32_t flow_control_val = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
+
 
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_baud_str, baud);
                 CJSON_GET_VALUE_STRING(root, ezlopi_parity_str, parity);
@@ -418,16 +424,44 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_frame_size_str, frame_size);
                 CJSON_GET_VALUE_STRING(root, ezlopi_flow_control_str, flow_control);
 
-                uart_parity_t parity_val = EZPI_CORE_info_set_parity(parity);
+                if (parity)
+                {
+                    parity_val = (uint32_t)EZPI_CORE_info_set_parity(parity);
+                }
+                EZPI_CORE_nvs_write_parity(parity_val);
 
-                EZPI_CORE_nvs_write_baud(baud);
-                EZPI_CORE_nvs_write_parity((uint8_t)parity_val);
+                if (baud)
+                {
+                    EZPI_CORE_nvs_write_baud(baud);
+                }
+                else
+                {
+                    baud = EZPI_SERV_UART_BAUD_DEFAULT;
+                    EZPI_CORE_nvs_write_baud(baud);
+                }
+
                 EZPI_CORE_nvs_write_start_bits(start_bits);
                 EZPI_CORE_nvs_write_stop_bits(stop_bits);
-                EZPI_CORE_nvs_write_frame_size((uint8_t)frame_size);
-                EZPI_CORE_nvs_write_flow_control(EZPI_CORE_info_get_flow_ctrl_frm_str(flow_control));
-            }
 
+                if (!frame_size)
+                {
+                    frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
+                }
+                EZPI_CORE_nvs_write_frame_size(frame_size);
+
+
+                if (flow_control)
+                {
+                    flow_control_val = (uint32_t)EZPI_CORE_info_get_flow_ctrl_frm_str(flow_control);
+                    TRACE_W("New Flow control: %d", flow_control_val);
+                }
+
+                EZPI_CORE_nvs_write_flow_control(flow_control_val);
+
+                TRACE_W("New config has been applied, device rebooting");
+                vTaskDelay(10);
+                EZPI_CORE_reset_reboot();
+            }
         }
     }
     else

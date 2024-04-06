@@ -40,60 +40,6 @@ static void ezlopi_service_uart_response(uint8_t cmd, uint8_t status_write, uint
 static void ezlopi_service_uart_save_config(const char* data);
 static void ezlopi_service_uart_read_config(void);
 
-
-static void ezlopi_service_uart_init(void)
-{
-    uint32_t baud = EZPI_SERV_UART_BAUD_DEFAULT;
-    uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
-    uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
-    uint32_t stop_bits = EZPI_SERV_UART_STOP_BIT_DEFAULT;
-    uint32_t frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
-    uint32_t flow_control = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
-
-    if (EZPI_CORE_nvs_read_baud(&baud))
-    {
-        EZPI_CORE_nvs_write_baud(EZPI_SERV_UART_BAUD_DEFAULT);
-    }
-    if (EZPI_CORE_nvs_read_parity((uint32_t*)&parity_val))
-    {
-        EZPI_CORE_nvs_write_parity(EZPI_SERV_UART_PARITY_DEFAULT);
-    }
-    if (EZPI_CORE_nvs_read_start_bits(&start_bits))
-    {
-        EZPI_CORE_nvs_write_start_bits(EZPI_SERV_UART_START_BIT_DEFAULT);
-    }
-    if (EZPI_CORE_nvs_read_stop_bits(&stop_bits))
-    {
-        EZPI_CORE_nvs_write_stop_bits(EZPI_SERV_UART_STOP_BIT_DEFAULT);
-    }
-    if (EZPI_CORE_nvs_read_frame_size(&frame_size))
-    {
-        EZPI_CORE_nvs_write_frame_size(EZPI_SERV_UART_FRAME_SIZE_DEFAULT);
-    }
-    if (EZPI_CORE_nvs_read_flow_control(&flow_control))
-    {
-        EZPI_CORE_nvs_write_flow_control(EZPI_SERV_UART_FLOW_CTRL_DEFAULT);
-    }
-
-    uart_word_length_t frame_size_val = EZPI_CORE_info_get_frame_size(frame_size);
-
-    const uart_config_t uart_config = {
-        .baud_rate = baud,
-        .data_bits = frame_size_val,
-        .parity = (uart_parity_t)parity_val,
-        .stop_bits = stop_bits,
-        .flow_ctrl = (uart_hw_flowcontrol_t)flow_control,
-        .source_clk = UART_SCLK_APB,
-    };
-
-    // We won't use a buffer for sending data.
-    uart_driver_install(UART_NUM_0, EZPI_SERV_UART_RX_BUFFER_SIZE * 2, 0, 0, NULL, 0);
-    uart_param_config(UART_NUM_0, &uart_config);
-    uart_set_pin(UART_NUM_0, EZPI_SERV_UART_TXD_PIN, EZPI_SERV_UART_RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-}
-
-
-
 static int ezlopi_service_uart_execute_command_0(cJSON* root)
 {
     int ret = 0;
@@ -108,7 +54,7 @@ static int ezlopi_service_uart_execute_command_0(cJSON* root)
             TRACE_E("Factory restore command");
             const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":0,\"status\":1}";
             EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
-            EZPI_CORE_factory_restore();
+            EZPI_CORE_reset_factory_restore();
             break;
         }
         case 1:
@@ -116,7 +62,7 @@ static int ezlopi_service_uart_execute_command_0(cJSON* root)
             TRACE_E("Reboot only command");
             const static char* reboot_response = "{\"cmd\":0, \"sub_cmd\":1, \"status\":1}";
             EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
-            EZPI_CORE_reboot();
+            EZPI_CORE_reset_reboot();
             break;
         }
         default:
@@ -134,12 +80,15 @@ static int ezlopi_service_uart_read_uart_params(const cJSON* root)
 {
     int ret = 0;
 
-    uint32_t baud = 0;
     char* parity = NULL;
-    uint8_t start_bits = 0;
-    uint8_t stop_bits = 0;
-    uint16_t frame_size = 0;
     char* flow_control = NULL;
+    uint32_t baud = 0;
+    uint32_t parity_val = EZPI_SERV_UART_PARITY_DEFAULT;
+    uint32_t start_bits = EZPI_SERV_UART_START_BIT_DEFAULT;
+    uint32_t stop_bits = EZPI_SERV_UART_STOP_BIT_DEFAULT;
+    uint32_t frame_size = 0;
+    uint32_t flow_control_val = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
+
 
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_baud_str, baud);
     CJSON_GET_VALUE_STRING(root, ezlopi_parity_str, parity);
@@ -148,17 +97,47 @@ static int ezlopi_service_uart_read_uart_params(const cJSON* root)
     CJSON_GET_VALUE_DOUBLE(root, ezlopi_frame_size_str, frame_size);
     CJSON_GET_VALUE_STRING(root, ezlopi_flow_control_str, flow_control);
 
-    uart_parity_t parity_val = EZPI_CORE_info_set_parity(parity);
+    if (parity)
+    {
+        parity_val = (uint32_t)EZPI_CORE_info_set_parity(parity);
+    }
+    EZPI_CORE_nvs_write_parity(parity_val);
 
-    EZPI_CORE_nvs_write_baud(baud);
-    EZPI_CORE_nvs_write_parity((uint8_t)parity_val);
+    if (baud)
+    {
+        EZPI_CORE_nvs_write_baud(baud);
+    }
+    else
+    {
+        baud = EZPI_SERV_UART_BAUD_DEFAULT;
+        EZPI_CORE_nvs_write_baud(baud);
+    }
+
     EZPI_CORE_nvs_write_start_bits(start_bits);
     EZPI_CORE_nvs_write_stop_bits(stop_bits);
-    EZPI_CORE_nvs_write_frame_size((uint8_t)frame_size);
-    EZPI_CORE_nvs_write_flow_control(EZPI_CORE_info_get_flow_ctrl_frm_str(flow_control));
+
+    if (!frame_size)
+    {
+        frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
+    }
+    EZPI_CORE_nvs_write_frame_size(frame_size);
+
+
+    if (flow_control)
+    {
+        flow_control_val = (uint32_t)EZPI_CORE_info_get_flow_ctrl_frm_str(flow_control);
+        TRACE_W("New Flow control: %d", flow_control_val);
+    }
+
+    EZPI_CORE_nvs_write_flow_control(flow_control_val);
+
 
     const static char* reboot_response = "{\"cmd\":5, \"status\":1}";
     EZPI_SERVICE_uart_tx_data(strlen(reboot_response), (uint8_t*)reboot_response);
+
+    TRACE_W("New config has been applied, device rebooting");
+    vTaskDelay(10);
+    EZPI_CORE_reset_reboot();
 
     return ret;
 }
@@ -237,7 +216,7 @@ static void ezlopi_service_uart_task(void* arg)
 
     while (1)
     {
-        int rxBytes = uart_read_bytes(UART_NUM_0, data, EZPI_SERV_UART_RX_BUFFER_SIZE, 1000 / portTICK_RATE_MS);
+        int rxBytes = uart_read_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, EZPI_SERV_UART_RX_BUFFER_SIZE, 1000 / portTICK_RATE_MS);
 
         if (rxBytes > 0)
         {
@@ -344,30 +323,31 @@ static int ezlopi_service_uart_config_info(cJSON* parent)
         uint32_t stop_bits = EZPI_SERV_UART_STOP_BIT_DEFAULT;
         uint32_t frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
         uint32_t flow_control = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
+        char parity[2];
 
-
-        char flw_ctrl_bffr[EZPI_UART_FLW_CTRL_STR_MAX + 1];
-        flw_ctrl_bffr[EZPI_UART_FLW_CTRL_STR_MAX] = 0;
+        char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
+        flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE] = 0;
 
         EZPI_CORE_nvs_read_baud(&baud);
         cJSON_AddNumberToObject(cj_serial_config, ezlopi_baud_str, baud);
 
         EZPI_CORE_nvs_read_parity(&parity_val);
-        char parity = EZPI_CORE_info_get_parity(parity_val);
-        cJSON_AddStringToObject(cj_serial_config, "parity", &parity);
+        parity[0] = EZPI_CORE_info_get_parity(parity_val);
+        parity[1] = 0;
+        cJSON_AddStringToObject(cj_serial_config, ezlopi_parity_str, parity);
 
         EZPI_CORE_nvs_read_start_bits(&start_bits);
-        cJSON_AddNumberToObject(cj_serial_config, "start_bits", start_bits);
+        cJSON_AddNumberToObject(cj_serial_config, ezlopi_start_bits_str, start_bits);
 
         EZPI_CORE_nvs_read_stop_bits(&stop_bits);
-        cJSON_AddNumberToObject(cj_serial_config, "stop_bits", stop_bits);
+        cJSON_AddNumberToObject(cj_serial_config, ezlopi_stop_bits_str, stop_bits);
 
         EZPI_CORE_nvs_read_frame_size(&frame_size);
-        cJSON_AddNumberToObject(cj_serial_config, "data_bits", frame_size);
+        cJSON_AddNumberToObject(cj_serial_config, ezlopi_frame_size_str, frame_size);
 
         EZPI_CORE_nvs_read_flow_control(&flow_control);
         EZPI_CORE_info_get_flow_ctrl_to_str(flow_control, flw_ctrl_bffr);
-        cJSON_AddStringToObject(cj_serial_config, "flow_control", flw_ctrl_bffr);
+        cJSON_AddStringToObject(cj_serial_config, ezlopi_flow_control_str, flw_ctrl_bffr);
 
         ret = 1;
     }
@@ -422,8 +402,6 @@ static int ezlopi_service_uart_oem_info(cJSON* parent)
     }
     return ret;
 }
-
-
 
 static int ezlopi_service_uart_newtwork_info(cJSON* parent)
 {
@@ -665,13 +643,12 @@ static void ezlopi_service_uart_read_config(void)
 int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data)
 {
     int ret = 0;
-    ret = uart_write_bytes(UART_NUM_0, data, len);
-    ret += uart_write_bytes(UART_NUM_0, "\r\n", 2);
+    ret = uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, data, len);
+    ret += uart_write_bytes(EZPI_SERV_UART_NUM_DEFAULT, "\r\n", 2);
     return ret;
 }
 
-void EZPI_SERVICE_uart_init(void)
+void EZPI_SERV_uart_init(void)
 {
-    ezlopi_service_uart_init();
     xTaskCreate(ezlopi_service_uart_task, "ezlopi_service_uart_task", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
 }

@@ -778,7 +778,6 @@ uint8_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
     if (0 == err)
     {
         ret = 1;
-        *baud = 115200;
     }
     return ret;
 }
@@ -795,7 +794,6 @@ uint8_t EZPI_CORE_nvs_read_parity(uint32_t* parity)
     if (0 == err)
     {
         ret = 1;
-        *parity = 0;
     }
     return ret;
 }
@@ -811,7 +809,6 @@ uint8_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits)
     if (0 == err)
     {
         ret = 1;
-        *start_bits = 0;
     }
 
     return ret;
@@ -829,7 +826,6 @@ uint8_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits)
     if (0 == err)
     {
         ret = 1;
-        *stop_bits = 1;
     }
     return ret;
 }
@@ -847,7 +843,6 @@ uint8_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size)
     if (0 == err)
     {
         ret = 1;
-        *frame_size = 8;
     }
     return ret;
 }

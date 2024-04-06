@@ -4,7 +4,7 @@
 #include "esp_netif_ip_addr.h"
 #include "ezlopi_core_info.h"
 
-static const uint8_t EZPI_UART_FLW_CTRL_STR_MAX = 10;
+static const uint8_t EZPI_UART_SERV_FLW_CTRL_STR_SIZE = 10;
 
 uart_parity_t EZPI_CORE_info_set_parity(const char* parity)
 {
@@ -55,19 +55,19 @@ void EZPI_CORE_info_get_flow_ctrl_to_str(uart_hw_flowcontrol_t flw_ctrl, char* f
     switch (flw_ctrl)
     {
     case UART_HW_FLOWCTRL_DISABLE:
-        strncpy(flw_ctrl_str, "DISABLED", EZPI_UART_FLW_CTRL_STR_MAX);
+        strncpy(flw_ctrl_str, "DISABLED", EZPI_UART_SERV_FLW_CTRL_STR_SIZE);
         break;
     case UART_HW_FLOWCTRL_RTS:
-        strncpy(flw_ctrl_str, "RTS", EZPI_UART_FLW_CTRL_STR_MAX);
+        strncpy(flw_ctrl_str, "RTS", EZPI_UART_SERV_FLW_CTRL_STR_SIZE);
         break;
     case UART_HW_FLOWCTRL_CTS:
-        strncpy(flw_ctrl_str, "CTS", EZPI_UART_FLW_CTRL_STR_MAX);
+        strncpy(flw_ctrl_str, "CTS", EZPI_UART_SERV_FLW_CTRL_STR_SIZE);
         break;
     case UART_HW_FLOWCTRL_CTS_RTS:
-        strncpy(flw_ctrl_str, "CTS_RTS", EZPI_UART_FLW_CTRL_STR_MAX);
+        strncpy(flw_ctrl_str, "CTS_RTS", EZPI_UART_SERV_FLW_CTRL_STR_SIZE);
         break;
     default:
-        strncpy(flw_ctrl_str, "DISABLED", EZPI_UART_FLW_CTRL_STR_MAX);
+        strncpy(flw_ctrl_str, "DISABLED", EZPI_UART_SERV_FLW_CTRL_STR_SIZE);
         break;
     }
 }
@@ -75,19 +75,19 @@ void EZPI_CORE_info_get_flow_ctrl_to_str(uart_hw_flowcontrol_t flw_ctrl, char* f
 uart_hw_flowcontrol_t EZPI_CORE_info_get_flow_ctrl_frm_str(char* flw_ctrl_str)
 {
     uart_hw_flowcontrol_t flw_ctrl = UART_HW_FLOWCTRL_DISABLE;
-    if (strncmp(flw_ctrl_str, "DISABLED", EZPI_UART_FLW_CTRL_STR_MAX) == 0)
+    if (strncmp(flw_ctrl_str, "DISABLED", EZPI_UART_SERV_FLW_CTRL_STR_SIZE) == 0)
     {
         flw_ctrl = UART_HW_FLOWCTRL_DISABLE;
     }
-    else if (strncmp(flw_ctrl_str, "RTS", EZPI_UART_FLW_CTRL_STR_MAX) == 0)
+    else if (strncmp(flw_ctrl_str, "RTS", EZPI_UART_SERV_FLW_CTRL_STR_SIZE) == 0)
     {
         flw_ctrl = UART_HW_FLOWCTRL_RTS;
     }
-    else if (strncmp(flw_ctrl_str, "CTS", EZPI_UART_FLW_CTRL_STR_MAX) == 0)
+    else if (strncmp(flw_ctrl_str, "CTS", EZPI_UART_SERV_FLW_CTRL_STR_SIZE) == 0)
     {
         flw_ctrl = UART_HW_FLOWCTRL_CTS;
     }
-    else if (strncmp(flw_ctrl_str, "CTS_RTS", EZPI_UART_FLW_CTRL_STR_MAX) == 0)
+    else if (strncmp(flw_ctrl_str, "CTS_RTS", EZPI_UART_SERV_FLW_CTRL_STR_SIZE) == 0)
     {
         flw_ctrl = UART_HW_FLOWCTRL_CTS_RTS;
     }

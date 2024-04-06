@@ -11,9 +11,9 @@ extern "C"
 {
 #endif
 
-#define EZPI_UART_FLW_CTRL_STR_MAX 10
+#define EZPI_UART_SERV_FLW_CTRL_STR_SIZE 10
 
-    void EZPI_SERVICE_uart_init(void);
+    void EZPI_SERV_uart_init(void);
     int EZPI_SERVICE_uart_tx_data(int len, uint8_t* data);
 
 #ifdef __cplusplus
