@@ -248,20 +248,16 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
         l_fields_v2_t* curr_field = curr_then->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "sceneId", 7))
+            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type)
                 {
                     sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                 }
-                else
-                {
-                    ret = 1;
-                }
             }
-            else if (0 == strncmp(curr_field->name, "block", 5))
+            else if (0 == strncmp(curr_field->name, "block", 6))
             {
-                if (curr_field->field_value.e_type == VALUE_TYPE_STRING)
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                 {
                     if (0 == strncmp(curr_field->field_value.u_value.value_string, "else", 4))
                     {
@@ -271,18 +267,15 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
                     {
                         TRACE_D("Running scene group, yet to be implemented.");
                     }
-                    else
-                    {
-                        ret = 1;
-                    }
                 }
                 else
                 {
-                    ret = 1;
+                    ret = -1;
                 }
             }
-            else if ((0 == strncmp(curr_field->name, "group", 5)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
+            else if ((0 == strncmp(curr_field->name, "group", 6)) && (curr_field->value_type == EZLOPI_VALUE_TYPE_STRING))
             {
+                ret = -1;
                 TRACE_D("Running scene group, yet to be implemented.");
             }
             curr_field = curr_field->next;
@@ -292,16 +285,18 @@ int ezlopi_scene_then_run_scene(l_scenes_list_v2_t* curr_scene, void* arg)
         {
             TRACE_D("Executing else condition");
             ezlopi_meshbot_execute_scene_else_action_group(sceneId);
+            ret = 1;
         }
         else
         {
             TRACE_D("Executing scene, id: %d", sceneId);
             ezlopi_scenes_service_run_by_id(sceneId);
+            ret = 1;
         }
     }
     else
     {
-        ret = 1;
+        ret = -1;
     }
     return ret;
 }
@@ -310,6 +305,7 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
     int ret = 0;
     uint32_t sceneID = 0;
     bool set_scene_enable = false;
+    bool execute_else_condition = false;
     l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
     if (curr_then)
     {
@@ -345,7 +341,7 @@ int ezlopi_scene_then_set_scene_state(l_scenes_list_v2_t* curr_scene, void* arg)
             }
             else
             {
-                TRACE_W("Failed set_scene_state");
+                // TRACE_E("Failed : 'set_scene_state'");
                 ezlopi_scenes_status_change_broadcast(scene_node, scene_status_failed_str);
             }
         }

@@ -630,7 +630,7 @@ int ezlopi_scene_when_is_cloud_state(l_scenes_list_v2_t* scene_node, void* arg)
             else
             {
                 ret = (0 == strncmp(value_field->field_value.u_value.value_string, "disconnected", 14));
-                TRACE_S("NMA_DISCONNECTED, ret = %d", ret);
+                // TRACE_S("NMA_DISCONNECTED, ret = %d", ret);
             }
         }
     }
