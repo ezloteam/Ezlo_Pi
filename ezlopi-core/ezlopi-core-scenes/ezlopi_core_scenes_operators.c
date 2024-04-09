@@ -1315,12 +1315,12 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                             }
                             if (STR_OP_COMP(tmp_valuetype, == , str_item_type)) // 'int' == 'int'?
                             {
-                                //now check if scale matches
+                                // now check if scale matches
                                 cJSON* item_scale = cJSON_GetObjectItem(cj_item_value, ezlopi_scale_str);
                                 const char* str_scale_tmp = NULL;
                                 if (item_scale && cJSON_IsString(item_scale) && (NULL != (str_scale_tmp = cJSON_GetStringValue(item_scale))))
                                 {
-                                    if (STR_OP_COMP(start_value_field->scale, == , str_scale_tmp))  // 'NULL' == 'NULL'
+                                    if (STR_OP_COMP(start_value_field->scale, == , str_scale_tmp)) // 'NULL' == 'NULL'
                                     {
                                         cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // extract the value from " item " within the device
                                         if (cj_value)

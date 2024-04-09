@@ -41,6 +41,13 @@ typedef enum e_scene_value_without_less_cmp_operators
 #undef SCENES_VALUES_WITHOUT_LESS_OPERATORS
 } e_scene_value_without_less_cmp_operators_t;
 
+// typedef enum e_scene_when_function_operators
+// {
+// #define SCENES_WHEN_FUNCTION_OPERATORS(OPERATOR, op, name, method) SCENES_WHEN_FUNCTION_OPERATORS_##OPERATOR,
+// #include "__operators_macros/__scene_function_operators_macros.h"
+// #undef SCENES_WHEN_FUNCTION_OPERATORS
+// } e_scene_when_function_operators_t;
+
 // Numeric Operators
 e_scene_num_cmp_operators_t ezlopi_scenes_numeric_comparator_operators_get_enum(char* operator_str);
 const char* ezlopi_scenes_numeric_comparator_operators_get_op(e_scene_num_cmp_operators_t operator);

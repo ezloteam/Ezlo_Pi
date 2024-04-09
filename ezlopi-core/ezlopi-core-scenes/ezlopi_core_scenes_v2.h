@@ -45,6 +45,7 @@ typedef struct s_method_v2
 typedef struct s_block_options_v2
 {
     s_method_v2_t method;
+    cJSON* cj_function;
 } s_block_options_v2_t;
 
 typedef struct s_action_delay_v2
