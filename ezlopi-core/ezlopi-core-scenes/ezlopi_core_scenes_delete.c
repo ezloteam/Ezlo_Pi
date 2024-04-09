@@ -26,8 +26,11 @@ void ezlopi_scenes_delete_fields(l_fields_v2_t* fields)
 {
     if (fields)
     {
-
         ezlopi_scenes_delete_fields(fields->next);
+        if (fields->user_arg)
+        {
+            free(fields->user_arg);
+        }
         fields->next = NULL;
         ezlopi_scenes_delete_field_value(fields);
         free(fields);
