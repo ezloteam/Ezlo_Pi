@@ -366,7 +366,7 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                 {
                     sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    TRACE_S("reset_latch _---> sceneId[%d]", sceneId);
+                    TRACE_E("reset_latch _---> sceneId[%d]", sceneId);
                     l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
                     if (scene_to_reset_latch)
                     {
