@@ -302,18 +302,39 @@ int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag
                             cJSON* cj_scene = cJSON_Parse(scene_str);
                             if (cj_scene)
                             {
-                                cJSON* enable_item = (cJSON_GetObjectItem(cj_scene, "enabled"));
-                                if (enable_item && cJSON_IsBool(enable_item))
+                                cJSON* enable_item = cJSON_GetObjectItem(cj_scene, ezlopi_enabled_str);
+                                TRACE_S("prev_enable => [%s]", (enable_item->type == cJSON_True) ? "True" : "False");
+                                if ((enable_item && cJSON_IsBool(enable_item)) && (enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
                                 {
-                                    cJSON_ReplaceItemInObject(cj_scene, "enabled", cJSON_CreateBool(enabled_flag));
-                                    if (1 == ezlopi_scene_edit_by_id(_id, cj_scene))
+                                    enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
+
+                                    l_scenes_list_v2_t* curr_scene_head = scenes_list_head_v2;
+                                    while (curr_scene_head)
+                                    {
+                                        if (curr_scene_head->_id == _id)
+                                        {
+                                            curr_scene_head->enabled = enabled_flag;
+                                            break;
+                                        }
+
+                                        curr_scene_head = curr_scene_head->next;
+                                    }
+
+                                    CJSON_TRACE("cj_scene----> 2. updated", cj_scene);
+
+                                    if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
                                     {
                                         ret = 1;
+                                        TRACE_W("nvs enabled successfull");
                                     }
                                     else
                                     {
-                                        TRACE_E("HERE");
+                                        TRACE_E("Error!! failed");
                                     }
+                                }
+                                else
+                                {
+                                    TRACE_W("Scene-Already [%s] or, invalid option ", (true == enabled_flag) ? "enabled" : "disabled");
                                 }
                                 cJSON_Delete(cj_scene);
                             }
