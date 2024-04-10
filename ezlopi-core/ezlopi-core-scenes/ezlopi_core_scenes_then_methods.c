@@ -361,11 +361,12 @@ int ezlopi_scene_then_reset_latch(l_scenes_list_v2_t* curr_scene, void* arg)
         l_fields_v2_t* curr_field = curr_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 7))
+            if (0 == strncmp(curr_field->name, ezlopi_sceneId_str, 8))
             {
-                if (EZLOPI_VALUE_TYPE_SCENEID == curr_field->value_type)
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
                 {
                     sceneId = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                    TRACE_S("reset_latch _---> sceneId[%d]", sceneId);
                     l_scenes_list_v2_t* scene_to_reset_latch = ezlopi_scenes_get_by_id_v2(sceneId);
                     if (scene_to_reset_latch)
                     {
