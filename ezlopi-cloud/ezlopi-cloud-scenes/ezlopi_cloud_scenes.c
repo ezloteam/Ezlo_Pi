@@ -32,10 +32,10 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        float curr_free_kb_heap = (float)heap_caps_get_largest_free_block(MALLOC_CAP_DEFAULT) / 1024.0;
-        TRACE_D("esp_get_largest_free_heapBlock_size - %f kB", curr_free_kb_heap);
-        if ((int)curr_free_kb_heap > 24)/* (245760 bytes) = 30kb*/
+        float curr_free_kb_heap = (float)esp_get_free_heap_size() / 1024.0;
+        if ((int)curr_free_kb_heap > 30)/* (>245760 bytes) = 30kb*/
         {
+            TRACE_E("create_scene : esp_get_free_heap_size = %f kB", curr_free_kb_heap);
             uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
             TRACE_D("new-scene-id: %08x", new_scene_id);
             if (new_scene_id)
@@ -48,11 +48,10 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
         }
         else
         {
-            TRACE_D(" Error!! not enough memory for scene creation. [Current size - %f kB (<30kb)]", curr_free_kb_heap);
+            TRACE_E(" Error!! Not enough memory for scene creation. [Current size - %f kB (<30kb)]", curr_free_kb_heap);
         }
     }
 }
-
 void scenes_get(cJSON* cj_request, cJSON* cj_response)
 {
 
