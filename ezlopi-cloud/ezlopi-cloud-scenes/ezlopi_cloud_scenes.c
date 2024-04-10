@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <cJSON.h>
+#include "esp_heap_caps.h"
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_service_meshbot.h"
@@ -31,15 +32,23 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
     cJSON* cj_params = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
     if (cj_params)
     {
-        uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
-        TRACE_D("new-scene-id: %08x", new_scene_id);
-
-        if (new_scene_id)
+        float curr_free_kb_heap = (float)heap_caps_get_largest_free_block(MALLOC_CAP_DEFAULT) / 1024.0;
+        TRACE_D("esp_get_largest_free_heapBlock_size - %f kB", curr_free_kb_heap);
+        if ((int)curr_free_kb_heap > 24)/* (245760 bytes) = 30kb*/
         {
-            char tmp_buff[32];
-            snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
-            cJSON_AddStringToObject(cj_request, ezlopi__id_str, tmp_buff);
-            ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
+            uint32_t new_scene_id = ezlopi_store_new_scene_v2(cj_params);
+            TRACE_D("new-scene-id: %08x", new_scene_id);
+            if (new_scene_id)
+            {
+                char tmp_buff[32];
+                snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
+                cJSON_AddStringToObject(cj_request, ezlopi__id_str, tmp_buff);
+                ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
+            }
+        }
+        else
+        {
+            TRACE_D(" Error!! not enough memory for scene creation. [Current size - %f kB (<30kb)]", curr_free_kb_heap);
         }
     }
 }
