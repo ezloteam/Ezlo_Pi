@@ -134,7 +134,7 @@ static void ezlopi_ota_process(void* pv)
     if (ret == ESP_OK)
     {
         TRACE_W("Firmware Upgrade Successful, restarting !");
-        EZPI_CORE_reboot();
+        EZPI_CORE_reset_reboot();
     }
     else
     {

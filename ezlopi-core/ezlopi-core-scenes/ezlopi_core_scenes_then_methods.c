@@ -367,7 +367,7 @@ int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
     if (curr_then && curr_scene)
     {
         TRACE_E("Rebooting ESP......................... ");
-        EZPI_CORE_reboot();
+        EZPI_CORE_reset_reboot();
     }
     return ret;
 }
@@ -400,7 +400,7 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            EZPI_CORE_reboot();
+                            EZPI_CORE_reset_reboot();
                         }
                         else if (0 == strncmp(curr_field->field_value.u_value.value_string, "soft", 5))
                         {
@@ -408,12 +408,12 @@ int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 
                             ezlopi_factory_info_v3_scenes_factory_soft_reset(); // 'ID' partition :- 'wifi' sector
                             TRACE_E("Rebooting ESP......................... ");
-                            EZPI_CORE_reboot();
+                            EZPI_CORE_reset_reboot();
                         }
                         else if (0 == strncmp(curr_field->field_value.u_value.value_string, "hard", 5))
                         {
                             #warning "hard reset not in documention.";
-                            EZPI_CORE_factory_restore();
+                            EZPI_CORE_reset_factory_restore();
                         }
                     }
                 }

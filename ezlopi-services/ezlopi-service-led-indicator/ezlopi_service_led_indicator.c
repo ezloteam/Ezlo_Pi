@@ -163,12 +163,12 @@ static void indicator_LED_fade_effect(uint32_t fade_ms)
 
 static void indicator_LED_power_on_effect()
 {
-    indicator_LED_fade_effect(10);
+    indicator_LED_fade_effect(50);
 }
 
 static void indicator_LED_wifi_connected_effect()
 {
-    indicator_LED_fade_effect(20);
+    indicator_LED_fade_effect(10);
 }
 
 static void indicator_LED_internet_connected_effect()
@@ -178,7 +178,7 @@ static void indicator_LED_internet_connected_effect()
 
 static void indicator_LED_cloud_connected_effect()
 {
-    indicator_LED_fade_effect(40);
+    indicator_LED_fade_effect(80);
 }
 
 #endif // #ifdef CONFIG_EZPI_ON_OFF_LED

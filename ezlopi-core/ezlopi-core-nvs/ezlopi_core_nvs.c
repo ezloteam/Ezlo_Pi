@@ -471,7 +471,7 @@ uint8_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name)
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, (uint32_t)i);
         if (ESP_OK != err)
         {
-            TRACE_W("nvs_set_i32 - error: %s", esp_err_to_name(err));
+            TRACE_W("nvs_set_ui32 - error: %s", esp_err_to_name(err));
         }
         else
         {
@@ -496,7 +496,7 @@ uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
     uint8_t ret = 0;
     if (ezlopi_nvs_handle)
     {
-        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, (uint32_t*)i);
+        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, i);
         if (ESP_OK == err)
         {
             TRACE_D("NVS read success");
@@ -504,7 +504,7 @@ uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
         }
         else
         {
-            TRACE_E("nvs_get_i32 - error:: %s: %s", key_name, esp_err_to_name(err));
+            TRACE_E("nvs_get_ui32 - error:: %s: %s", key_name, esp_err_to_name(err));
         }
     }
     return ret;
@@ -777,8 +777,7 @@ uint8_t EZPI_CORE_nvs_read_baud(uint32_t* baud)
     uint8_t err = ezlopi_nvs_read_uint32(baud, ezlopi_serial_baud_name);
     if (0 == err)
     {
-        ret = -1;
-        *baud = 115200;
+        ret = 1;
     }
     return ret;
 }
@@ -794,60 +793,56 @@ uint8_t EZPI_CORE_nvs_read_parity(uint32_t* parity)
     uint8_t err = ezlopi_nvs_read_uint32(parity, ezlopi_serial_parity);
     if (0 == err)
     {
-        ret = -1;
-        *parity = 0;
+        ret = 1;
     }
     return ret;
 }
 
-bool EZPI_CORE_nvs_write_start_bits(uint8_t start_bits)
+bool EZPI_CORE_nvs_write_start_bits(uint32_t start_bits)
 {
     return ezlopi_nvs_write_uint32(start_bits, ezlopi_serial_start_bits) == 1 ? true : false;
 }
-uint8_t EZPI_CORE_nvs_read_start_bits(uint8_t* start_bits)
+uint8_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits)
 {
     uint8_t ret = 0;
-    uint8_t err = ezlopi_nvs_read_uint32(&ret, ezlopi_serial_start_bits);
+    uint8_t err = ezlopi_nvs_read_uint32(start_bits, ezlopi_serial_start_bits);
     if (0 == err)
     {
-        ret = -1;
-        *start_bits = 0;
+        ret = 1;
     }
 
     return ret;
 }
 
-bool EZPI_CORE_nvs_write_stop_bits(uint8_t stop_bits)
+bool EZPI_CORE_nvs_write_stop_bits(uint32_t stop_bits)
 {
     return ezlopi_nvs_write_uint32(stop_bits, ezlopi_serial_stop_bits) == 1 ? true : false;
 }
 
-uint8_t EZPI_CORE_nvs_read_stop_bits(uint8_t* stop_bits)
+uint8_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits)
 {
     uint8_t ret = 0;
     uint8_t err = ezlopi_nvs_read_uint32(stop_bits, ezlopi_serial_stop_bits);
     if (0 == err)
     {
-        ret = -1;
-        *stop_bits = 1;
+        ret = 1;
     }
     return ret;
 }
 
 
-bool EZPI_CORE_nvs_write_frame_size(uint8_t frame_size)
+bool EZPI_CORE_nvs_write_frame_size(uint32_t frame_size)
 {
     return ezlopi_nvs_write_uint32(frame_size, ezlopi_serial_frame_size) == 1 ? true : false;
 }
 
-uint8_t EZPI_CORE_nvs_read_frame_size(uint8_t* frame_size)
+uint8_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size)
 {
     uint32_t ret = 0;
     uint8_t err = ezlopi_nvs_read_uint32(frame_size, ezlopi_serial_frame_size);
     if (0 == err)
     {
-        ret = -1;
-        *frame_size = 8;
+        ret = 1;
     }
     return ret;
 }
@@ -857,13 +852,13 @@ bool EZPI_CORE_nvs_write_flow_control(uint32_t flow_control)
     return ezlopi_nvs_write_uint32(flow_control, ezlopi_serial_flow_control) == 1 ? true : false;
 }
 
-bool EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
+uint8_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control)
 {
-    bool ret = false;
+    uint8_t ret = 0;
     uint8_t err = ezlopi_nvs_read_uint32(flow_control, ezlopi_serial_flow_control);
-    if (1 == err)
+    if (0 == err)
     {
-        ret = true;
+        ret = 1;
     }
     return ret;
 }
