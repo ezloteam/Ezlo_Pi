@@ -16,7 +16,7 @@ set(EZLOPI_UTIL_COMPONENTS
         ezlopi-util-version
 )
 
-idf_component_register(SRCS "${info_src}"
+idf_component_register(SRCS "ezlopi_core_info.c" "${info_src}"
     INCLUDE_DIRS "."
     REQUIRES    ${ESP_IDF_COMPONENTS}
                 ${EZLOPI_COMPONENTS}

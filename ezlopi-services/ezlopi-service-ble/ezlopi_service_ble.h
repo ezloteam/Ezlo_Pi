@@ -30,15 +30,15 @@
 #define BLE_DEVICE_INFO_SERVICE_UUID 0x00E4
 #define BLE_DEVICE_INFO_CHAR_UUID 0xE401
 
-#define EZPI_BLE_CHAR_API_VERSION_INFO_UUID 0xE402     // EzloPi Firmware Info
-#define EZPI_BLE_CHAR_FIRMWARE_INFO_UUID 0xE403     // EzloPi Firmware Info
-#define EZPI_BLE_CHAR_CHIP_INFO_UUID 0xE404     // EzloPi Chip Info
+#define EZPI_BLE_CHAR_API_VERSION_INFO_UUID 0xE402      // EzloPi Firmware Info
+#define EZPI_BLE_CHAR_FIRMWARE_INFO_UUID 0xE403         // EzloPi Firmware Info
+#define EZPI_BLE_CHAR_CHIP_INFO_UUID 0xE404             // EzloPi Chip Info
 #define EZPI_BLE_CHAR_FIRMWARE_SDK_INFO_UUID 0xE405     // EzloPi firmware sdk Info
-#define EZPI_BLE_CHAR_DEV_STATE_INFO_UUID 0xE406     // EzloPi device state Info
-#define EZPI_BLE_CHAR_SER_CONFIG_INFO_UUID 0xE407     // EzloPi serial config Info
-#define EZPI_BLE_CHAR_EZPI_CLOUD_INFO_UUID 0xE408     // EzloPi ezlopi cloud Info
-#define EZPI_BLE_CHAR_OEM_INFO_UUID 0xE409     // EzloPi oem Info
-#define EZPI_BLE_CHAR_NETWORK_INFO_UUID 0xE40A     // EzloPi Network Info
+#define EZPI_BLE_CHAR_DEV_STATE_INFO_UUID 0xE406        // EzloPi device state Info
+#define EZPI_BLE_CHAR_SER_CONFIG_INFO_UUID 0xE407       // EzloPi serial config Info
+#define EZPI_BLE_CHAR_EZPI_CLOUD_INFO_UUID 0xE408       // EzloPi ezlopi cloud Info
+#define EZPI_BLE_CHAR_OEM_INFO_UUID 0xE409              // EzloPi oem Info
+#define EZPI_BLE_CHAR_NETWORK_INFO_UUID 0xE40A          // EzloPi Network Info
 
 #define BLE_DYNAMIC_CONFIG_HANDLE 4
 #define BLE_DYNAMIC_CONFIG_SERVICE_UUID 0x00E5
