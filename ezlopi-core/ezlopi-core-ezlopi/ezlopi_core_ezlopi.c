@@ -29,8 +29,11 @@ static void ezlopi_initialize_devices_v3(void);
 
 void ezlopi_init(void)
 {
-    // Init memories
+    // Init memories  
     ezlopi_nvs_init();
+
+    EZPI_HAL_uart_init();
+
     ezlopi_core_buffer_init(10 * 1024); // allocate 10kB
 
     ESP_ERROR_CHECK(esp_netif_init());

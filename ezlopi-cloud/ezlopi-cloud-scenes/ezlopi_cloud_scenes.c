@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <cJSON.h>
+#include "esp_heap_caps.h"
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_service_meshbot.h"
@@ -52,7 +53,6 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
         }
     }
 }
-
 void scenes_get(cJSON* cj_request, cJSON* cj_response)
 {
 

@@ -42,7 +42,7 @@ void app_main(void)
 
     ezlopi_init();
 
-    EZPI_SERVICE_uart_init();
+    EZPI_SERV_uart_init();
 
     timer_service_init();
 
@@ -61,6 +61,8 @@ void app_main(void)
 #if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
 #endif
+
+
 
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 0, NULL);
 }

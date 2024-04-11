@@ -108,7 +108,7 @@ static void factory_reset_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_p
             {
             case BLE_CMD_REBOOT:
             {
-                EZPI_CORE_reboot();
+                EZPI_CORE_reset_reboot();
                 break;
             }
             case BLE_CMD_FACTORY_RESET: // factory reset command
@@ -146,7 +146,7 @@ static void __process_hard_reset_command(void)
     if ((1 == authenticated_flag) && (current_tick - start_tick) < (30 * 1000 / portTICK_RATE_MS)) // once authenticated, valid for 30 seconds only
     {
 #endif
-        EZPI_CORE_factory_restore();
+        EZPI_CORE_reset_factory_restore();
 #if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
     }
     else

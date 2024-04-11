@@ -17,24 +17,7 @@
 #include "ezlopi_cloud_coordinates.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_sntp.h"
-
-void ezlopi_tick_to_time(char* time_buff, uint32_t buff_len, uint32_t ms)
-{
-    uint32_t seconds = ms / 1000;
-    uint32_t minutes = seconds / 60;
-    uint32_t hours = minutes / 60;
-    uint32_t days = hours / 24;
-
-    seconds %= 60;
-    minutes %= 60;
-    hours %= 24;
-
-    if (time_buff && buff_len)
-    {
-        memset(time_buff, 0, buff_len);
-        snprintf(time_buff, buff_len, "%dd %dh %dm %ds", days, hours, minutes, seconds);
-    }
-}
+#include "ezlopi_core_info.h"
 
 void info_get(cJSON* cj_request, cJSON* cj_response)
 {
@@ -112,7 +95,7 @@ void info_get(cJSON* cj_request, cJSON* cj_response)
         {
             char time_string[50];
             uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
-            ezlopi_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
+            EZPI_CORE_info_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
             cJSON_AddStringToObject(cjson_result, ezlopi_uptime_str, time_string);
         }
 
