@@ -473,6 +473,124 @@ int ezlopi_scene_then_set_variable(l_scenes_list_v2_t* curr_scene, void* arg)
 }
 int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    TRACE_W(" toggle_value ");
+    int ret = 0;
+
+    if (curr_scene)
+    {
+        int item_id = 0;       /* item or expression*/
+        int expression_id = 0; /* item or expression*/
+        const char* __id_string = NULL;
+
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
+                {
+                    if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type)
+                    {
+                        item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        __id_string = curr_field->field_value.u_value.value_string;
+                        TRACE_D("item_id: %s", __id_string);
+                    }
+                }
+                else if (0 == strncmp(curr_field->name, ezlopi_expressions_str, 12))
+                {
+                    if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type)
+                    {
+                        expression_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        __id_string = curr_field->field_value.u_value.value_string;
+                        TRACE_D("expression_id: %s", __id_string);
+                    }
+                }
+                curr_field = curr_field->next;
+            }
+
+            if (item_id > 0)
+            {
+                uint8_t found_item = 0;
+                l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
+                while (curr_device)
+                {
+                    l_ezlopi_item_t* curr_item = curr_device->items;
+                    while (curr_item)
+                    {
+                        if (item_id == curr_item->cloud_properties.item_id &&
+                            EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type)
+                        {
+                            cJSON* cj_tmp_value = cJSON_CreateObject();
+                            if (cj_tmp_value)
+                            {
+                                curr_item->func(EZLOPI_ACTION_HUB_GET_ITEM, curr_item, (void*)cj_tmp_value, NULL);
+                                cJSON* cj_val = cJSON_GetObjectItem(cj_tmp_value, ezlopi_value_str);
+                                cJSON* cj_valuetype = cJSON_GetObjectItem(cj_tmp_value, ezlopi_valueType_str);
+                                if (cj_val && cj_valuetype)
+                                {
+                                    cJSON* cj_result_value = cJSON_CreateObject();
+                                    if (cj_result_value)
+                                    {
+                                        ret = 1;
+                                        cJSON_AddStringToObject(cj_result_value, ezlopi__id_str, __id_string);
+
+                                        if (0 == strncmp(cj_valuetype->valuestring, value_type_bool, 6))
+                                        {
+                                            TRACE_S("1. getting 'item_id[%d]' ; bool_value = %s ", item_id, cj_val->valuestring); // "false" or "true"
+                                            if (0 == strncmp(cj_val->valuestring, "false", 6))
+                                            {
+                                                cJSON_AddBoolToObject(cj_result_value, ezlopi_value_str, true);
+                                            }
+                                            else
+                                            {
+                                                cJSON_AddBoolToObject(cj_result_value, ezlopi_value_str, false);
+                                            }
+
+                                            curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
+                                        }
+                                        else if (0 == strncmp(cj_valuetype->valuestring, value_type_int, 6))
+                                        {
+                                            TRACE_S("2. getting 'item_id[%d]' ; int_value = %d ", item_id, (int)cj_val->valuedouble);
+                                            if (cj_val->valuedouble == 0) // either  '0' or '1'.
+                                            {
+                                                cJSON_AddNumberToObject(cj_result_value, ezlopi_value_str, 1);
+                                            }
+                                            else if (cj_val->valuedouble == 1)
+                                            {
+                                                cJSON_AddNumberToObject(cj_result_value, ezlopi_value_str, 0);
+                                            }
+                                            curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
+                                        }
+                                        else
+                                        {
+                                            ret = -1;
+                                            TRACE_E(" 'item_id[%d]' neither 'boolean' nor 'int' ;  Value-type mis-matched!  ", item_id);
+                                        }
+                                        cJSON_Delete(cj_result_value);
+                                    }
+                                }
+                            }
+                            found_item = 1;
+                            cJSON_Delete(cj_tmp_value);
+                            break;
+                        }
+                        curr_item = curr_item->next;
+                    }
+
+                    if (found_item)
+                    {
+                        break;
+                    }
+                    curr_device = curr_device->next;
+                }
+            }
+            // else if (expression_id > 0)
+            // {
+            // #warning "need guidance"
+            // }
+        }
+    }
+
+    return ret;
 }
