@@ -16,7 +16,6 @@ static const char* passkey_nvs_name = "passkey";
 static const char* user_id_nvs_name = "user_id";
 static const char* wifi_info_nvs_name = "wifi_info";
 static const char* boot_count_nvs_name = "boot_count";
-static const char* provisioning_status_nvs_name = "prov_stat";
 static const char* ezlopi_scenes_nvs_name = "ezlopi_scenes";
 static const char* ezlopi_scenes_v2_nvs_name = "ez_scenes_v2";
 static const char* ezlopi_scripts_nvs_ids = "ezlopi_scripts";
@@ -315,32 +314,6 @@ void ezlopi_nvs_deinit(void)
 {
     nvs_close(ezlopi_nvs_handle);
     ezlopi_nvs_handle = 0;
-}
-
-void ezlopi_nvs_set_provisioning_status(void)
-{
-    if (ezlopi_nvs_handle)
-    {
-        esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, provisioning_status_nvs_name, 1);
-        TRACE_W("nvs_set_u32 - error: %s", esp_err_to_name(err));
-    }
-}
-
-uint32_t ezlopi_nvs_get_provisioning_status(void)
-{
-    uint32_t provisioning_status = 0;
-    if (ezlopi_nvs_handle)
-    {
-        esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, provisioning_status_nvs_name, &provisioning_status);
-        TRACE_S("Provisioning_Status: %d", provisioning_status);
-        if (ESP_OK != err)
-        {
-            provisioning_status = 0;
-            TRACE_E("Error nvs_get_u32: %s", esp_err_to_name(err));
-        }
-    }
-
-    return provisioning_status;
 }
 
 void ezlopi_nvs_set_boot_count(uint32_t boot_count)

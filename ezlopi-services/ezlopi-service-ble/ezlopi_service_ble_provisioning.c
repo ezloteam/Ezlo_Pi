@@ -82,7 +82,7 @@ static char* __provisioning_status_jsonify(void)
     cJSON* root = cJSON_CreateObject();
     if (root)
     {
-        uint32_t prov_stat = ezlopi_nvs_get_provisioning_status();
+        uint32_t prov_stat = ezlopi_factory_info_v3_get_provisioning_status();
         if (1 == prov_stat)
         {
             cJSON_AddNumberToObject(root, ezlopi_version_str, ezlopi_factory_info_v3_get_version());
@@ -158,9 +158,8 @@ static void __provisioning_status_read_func(esp_gatt_value_t* value, esp_ble_gat
 static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
     // TRACE_D("Write function called!");
-    TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
 
-    ezlopi_nvs_set_provisioning_status();
+    TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
 
     if (NULL == g_provisioning_linked_buffer)
     {
@@ -243,14 +242,16 @@ static void __provisioning_info_write_func(esp_gatt_value_t* value, esp_ble_gatt
                                     CJSON_GET_VALUE_STRING(cj_config, ezlopi_ssl_shared_key_str, ssl_shared_key);
                                     CJSON_GET_VALUE_STRING(cj_config, ezlopi_signing_ca_certificate_str, ca_certs);
 
+                                    // ezlopi_factory_info_v3_set_ssl_public_key(ssl_public_key);
+
                                     ezlopi_factory_info_v3_set_ca_cert(ca_certs);
                                     ezlopi_factory_info_v3_set_ssl_shared_key(ssl_shared_key);
                                     ezlopi_factory_info_v3_set_ssl_private_key(ssl_private_key);
-                                    // ezlopi_factory_info_v3_set_ssl_public_key(ssl_public_key);
+
                                 }
                                 else
                                 {
-                                    TRACE_E("User varification failed!");
+                                    TRACE_E("User verification failed!");
 
                                     char* curr_user_id = ezlopi_nvs_read_user_id_str();
                                     if (curr_user_id)

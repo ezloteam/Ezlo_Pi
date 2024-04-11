@@ -58,8 +58,6 @@ static void __dynamic_config_write_func(esp_gatt_value_t* value, esp_ble_gatts_c
     TRACE_D("Write function called!");
     TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
 
-    ezlopi_nvs_set_provisioning_status();
-
     if (NULL == g_dynamic_config_linked_buffer)
     {
         g_dynamic_config_linked_buffer = ezlopi_ble_buffer_create(param);
