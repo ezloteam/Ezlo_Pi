@@ -12,8 +12,8 @@ void ezlopi_scenes_populate_scene(l_scenes_list_v2_t* new_scene, cJSON* cj_scene
         new_scene->task_handle = NULL;
         new_scene->status = EZLOPI_SCENE_STATUS_STOPPED;
 
-        CJSON_GET_VALUE_INT(cj_scene, ezlopi_enabled_str, new_scene->enabled);
-        CJSON_GET_VALUE_INT(cj_scene, ezlopi_is_group_str, new_scene->is_group);
+        CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_enabled_str, new_scene->enabled);
+        CJSON_GET_VALUE_DOUBLE(cj_scene, ezlopi_is_group_str, new_scene->is_group);
 
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_group_id_str, new_scene->group_id);
         CJSON_GET_VALUE_STRING_BY_COPY(cj_scene, ezlopi_name_str, new_scene->name);
@@ -390,10 +390,28 @@ void ezlopi_scenes_populate_fields_get_value(l_fields_v2_t* field, cJSON* cj_val
         }
         case cJSON_Object:
         {
-            field->field_value.e_type = VALUE_TYPE_CJSON;
-            field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
-            CJSON_TRACE("value", field->field_value.u_value.cj_value);
+
+            if (EZLOPI_VALUE_TYPE_BLOCK == field->value_type)
+            {
+                field->field_value.e_type = VALUE_TYPE_BLOCK;
+                CJSON_TRACE("single_obj_value", cj_value);
+
+                field->field_value.u_value.when_block = (l_when_block_v2_t*)malloc(sizeof(l_when_block_v2_t));
+                if (field->field_value.u_value.when_block)
+                {
+                    memset(field->field_value.u_value.when_block, 0, sizeof(l_when_block_v2_t));
+                    ezlopi_scenes_populate_assign_when_block(field->field_value.u_value.when_block, cj_value);
+                }
+            }
+            else
+            {
+                field->field_value.e_type = VALUE_TYPE_CJSON;
+                field->field_value.u_value.cj_value = cJSON_Duplicate(cj_value, cJSON_True);
+                CJSON_TRACE("value", field->field_value.u_value.cj_value);
+            }
+
             break;
+
         }
         case cJSON_Array:
         {

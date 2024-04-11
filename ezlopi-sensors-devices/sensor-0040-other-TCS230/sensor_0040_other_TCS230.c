@@ -21,7 +21,7 @@ static int __0040_prepare(void* arg);
 static int __0040_init(l_ezlopi_item_t* item);
 static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* arg);
 static int __0040_notify(l_ezlopi_item_t* item);
-static void __tcs230_setup_gpio(gpio_num_t s0_pin, gpio_num_t s1_pin, gpio_num_t s2_pin, gpio_num_t s3_pin, gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output);
+static int __tcs230_setup_gpio(gpio_num_t s0_pin, gpio_num_t s1_pin, gpio_num_t s2_pin, gpio_num_t s3_pin, gpio_num_t gpio_output_en, gpio_num_t gpio_pulse_output);
 
 static void __tcs230_calibration_task(void* params);
 
@@ -32,17 +32,17 @@ int sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t* item, v
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
-        __0040_prepare(arg);
+        ret = __0040_prepare(arg);
         break;
     case EZLOPI_ACTION_INITIALIZE:
-        __0040_init(item);
+        ret = __0040_init(item);
         break;
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
-        __0040_get_cjson_value(item, arg);
+        ret = __0040_get_cjson_value(item, arg);
         break;
     case EZLOPI_ACTION_NOTIFY_1000_MS:
-        __0040_notify(item);
+        ret = __0040_notify(item);
         break;
 
     default:
@@ -52,14 +52,14 @@ int sensor_0040_other_TCS230(e_ezlopi_actions_t action, l_ezlopi_item_t* item, v
 }
 
 //------------------------------------------------------------------------------------------------------
-static void __tcs230_setup_gpio(gpio_num_t s0_pin,
+static int __tcs230_setup_gpio(gpio_num_t s0_pin,
     gpio_num_t s1_pin,
     gpio_num_t s2_pin,
     gpio_num_t s3_pin,
     gpio_num_t gpio_output_en,
     gpio_num_t gpio_pulse_output)
 {
-    esp_err_t ret = ESP_FAIL;
+    int ret = 0;
     // Configure GPIO ouput pins (S0, S1, S2, S3 & Freq_scale) for TCS230.
     gpio_config_t output_conf;
     output_conf.pin_bit_mask = ((1ULL << s0_pin) | (1ULL << s1_pin) | (1ULL << s2_pin) | (1ULL << s3_pin) | (1ULL << gpio_output_en));
@@ -67,7 +67,6 @@ static void __tcs230_setup_gpio(gpio_num_t s0_pin,
     output_conf.mode = GPIO_MODE_OUTPUT;
     output_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
     output_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-    ret |= gpio_config(&output_conf);
 
     // Configures GPIO input pins (Freq_Out_pin) for TCS230.
     gpio_config_t input_conf;
@@ -76,24 +75,24 @@ static void __tcs230_setup_gpio(gpio_num_t s0_pin,
     input_conf.mode = GPIO_MODE_INPUT;
     input_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
     input_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-    ret |= gpio_config(&input_conf);
-    if (ESP_OK == ret)
+
+    if ((0 == gpio_config(&output_conf)) &&
+        (0 == gpio_config(&input_conf)))
     {
         TRACE_I("GPIO setup..... complete");
+        ret = 1;
     }
     else
     {
         TRACE_I("GPIO setup..... failed");
+        ret = -1;
     }
+    return ret;
 }
 
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", device_name);
-    ASSIGN_DEVICE_NAME_V2(device, device_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
@@ -117,13 +116,16 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     if (item && cj_device)
     {
         s_TCS230_data_t* user_data = (s_TCS230_data_t*)item->user_arg;
-        item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX;
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
-        CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
-        CJSON_GET_VALUE_INT(cj_device, "gpio4", user_data->TCS230_pin.gpio_s3);           // gpio_s3
-        CJSON_GET_VALUE_INT(cj_device, "gpio5", user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
-        CJSON_GET_VALUE_INT(cj_device, "gpio6", user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
+        if (user_data)
+        {
+            item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX;
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio1_str, user_data->TCS230_pin.gpio_s0);           // gpio_s0
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, user_data->TCS230_pin.gpio_s1);           // gpio_s1
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio3_str, user_data->TCS230_pin.gpio_s2);           // gpio_s2
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio4_str, user_data->TCS230_pin.gpio_s3);           // gpio_s3
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio5_str, user_data->TCS230_pin.gpio_output_en);    // gpio_output_en
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio6_str, user_data->TCS230_pin.gpio_pulse_output); // gpio_pulse_output
+        }
     }
 }
 //------------------------------------------------------------------------------------------------------
@@ -137,16 +139,16 @@ static int __0040_prepare(void* arg)
         s_TCS230_data_t* user_data = (s_TCS230_data_t*)malloc(sizeof(s_TCS230_data_t));
         if (user_data)
         {
-            l_ezlopi_device_t* tcs230_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* tcs230_device = ezlopi_device_add_device(cj_device, NULL);
             if (tcs230_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(tcs230_device, cj_device);
                 l_ezlopi_item_t* tcs230_item = ezlopi_device_add_item_to_device(tcs230_device, sensor_0040_other_TCS230);
                 if (tcs230_item)
                 {
                     __prepare_item_cloud_properties(tcs230_item, user_data);
                     __prepare_item_interface_properties(tcs230_item, cj_device);
-                    ret = 1;
                 }
                 else
                 {
@@ -160,6 +162,10 @@ static int __0040_prepare(void* arg)
                 ret = -1;
                 free(user_data);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -180,34 +186,36 @@ static int __0040_init(l_ezlopi_item_t* item)
                 GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_output_en) &&
                 GPIO_IS_VALID_GPIO(user_data->TCS230_pin.gpio_pulse_output))
             {
-                __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
+                if (1 == __tcs230_setup_gpio(user_data->TCS230_pin.gpio_s0,
                     user_data->TCS230_pin.gpio_s1,
                     user_data->TCS230_pin.gpio_s2,
                     user_data->TCS230_pin.gpio_s3,
                     user_data->TCS230_pin.gpio_output_en,
-                    user_data->TCS230_pin.gpio_pulse_output);
-                TRACE_W("Entering Calibration Phase for 30 seconds.....");
+                    user_data->TCS230_pin.gpio_pulse_output))
+                {
+                    TRACE_W("Entering Calibration Phase for 30 seconds.....");
 
-                // configure Freq_scale at 20%
-                tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
+                    // configure Freq_scale at 20%
+                    tcs230_set_frequency_scaling(item, COLOR_SENSOR_FREQ_SCALING_20_PERCENT);
 
-                // activate a task to calibrate data
-                xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
-                ret = 1;
+                    // activate a task to calibrate data
+                    xTaskCreate(__tcs230_calibration_task, "TCS230_Calibration_Task", 2 * 2048, item, 1, NULL);
+                    ret = 1;
+                }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     // ret = -1;
-            //     // free(item->user_arg); // this will free ; memory address linked to all items
-            //     // item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -224,15 +232,13 @@ static int __0040_get_cjson_value(l_ezlopi_item_t* item, void* args)
             if (ezlopi_item_name_rgbcolor == item->cloud_properties.item_name)
             {
                 cJSON* color_values = cJSON_AddObjectToObject(cj_result, ezlopi_value_str);
-                cJSON_AddNumberToObject(color_values, "red", user_data->red_mapped);
-                cJSON_AddNumberToObject(color_values, "green", user_data->green_mapped);
-                cJSON_AddNumberToObject(color_values, "blue", user_data->blue_mapped);
-                char* valueFormatted = ezlopi_valueformatter_rgb(user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
+                cJSON_AddNumberToObject(color_values, ezlopi_red_str, user_data->red_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_green_str, user_data->green_mapped);
+                cJSON_AddNumberToObject(color_values, ezlopi_blue_str, user_data->blue_mapped);
+
+                char formatted_rgb_value[32];
+                snprintf(formatted_rgb_value, sizeof(formatted_rgb_value), "#%02x%02x%02x", user_data->red_mapped, user_data->green_mapped, user_data->blue_mapped);
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, formatted_rgb_value);
             }
             ret = 1;
         }

@@ -11,6 +11,7 @@ set(EZLOPI_SDK_COMPONENTS
 
 # Define ezlopi-components
 set(EZLOPI_COMPONENTS
+        pt
         ezlopi-util-trace
 )
 
@@ -36,7 +37,7 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
 
 # Define service components
 set(EZLOPI_SERVICES
-        ezlopi-service-ble
+ezlopi-service-ble
         ezlopi-service-ota
         ezlopi-service-uart
         ezlopi-service-modes
@@ -46,6 +47,7 @@ set(EZLOPI_SERVICES
         ezlopi-service-meshbot 
         ezlopi-service-ws-server
         ezlopi-service-broadcast
+        ezlopi-service-led-indicator
 )
 
 # Register the components

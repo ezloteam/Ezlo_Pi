@@ -7,20 +7,20 @@
 
 #include "ezlopi_cloud_constants.h"
 
-static s_gatt_service_t *gatt_head_service = NULL;
+static s_gatt_service_t* gatt_head_service = NULL;
 
-static void ezlopi_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t *characteristic, s_gatt_descr_t *descriptor);
-static void ezlopi_ble_gatt_append_characterstic_to_service(s_gatt_service_t *service_obj, s_gatt_char_t *character_object);
-static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t *service_obj);
-static s_gatt_service_t *ezlopi_ble_gatt_search_service_by_characteristic(s_gatt_char_t *characteristic);
-s_gatt_service_t *ezlopi_ble_profile_get_head(void)
+static void ezlopi_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t* characteristic, s_gatt_descr_t* descriptor);
+static void ezlopi_ble_gatt_append_characterstic_to_service(s_gatt_service_t* service_obj, s_gatt_char_t* character_object);
+static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t* service_obj);
+static s_gatt_service_t* ezlopi_ble_gatt_search_service_by_characteristic(s_gatt_char_t* characteristic);
+s_gatt_service_t* ezlopi_ble_profile_get_head(void)
 {
     return gatt_head_service;
 }
 
-s_gatt_descr_t *ezlopi_ble_profile_get_initiating_descriptor(s_gatt_char_t *characteristic)
+s_gatt_descr_t* ezlopi_ble_profile_get_initiating_descriptor(s_gatt_char_t* characteristic)
 {
-    s_gatt_descr_t *curr_desc = NULL;
+    s_gatt_descr_t* curr_desc = NULL;
 
     if (characteristic)
     {
@@ -38,9 +38,9 @@ s_gatt_descr_t *ezlopi_ble_profile_get_initiating_descriptor(s_gatt_char_t *char
     return curr_desc;
 }
 
-s_gatt_descr_t *ezlopi_ble_profile_get_descriptor_to_init(s_gatt_char_t *characteristic)
+s_gatt_descr_t* ezlopi_ble_profile_get_descriptor_to_init(s_gatt_char_t* characteristic)
 {
-    s_gatt_descr_t *curr_desc = NULL;
+    s_gatt_descr_t* curr_desc = NULL;
     if (characteristic)
     {
         curr_desc = characteristic->descriptor;
@@ -56,9 +56,9 @@ s_gatt_descr_t *ezlopi_ble_profile_get_descriptor_to_init(s_gatt_char_t *charact
     return curr_desc;
 }
 
-s_gatt_char_t *ezlopi_ble_profile_get_initiating_characterstics(s_gatt_service_t *service)
+s_gatt_char_t* ezlopi_ble_profile_get_initiating_characterstics(s_gatt_service_t* service)
 {
-    s_gatt_char_t *curr_char = NULL;
+    s_gatt_char_t* curr_char = NULL;
 
     if (service)
     {
@@ -76,9 +76,9 @@ s_gatt_char_t *ezlopi_ble_profile_get_initiating_characterstics(s_gatt_service_t
     return curr_char;
 }
 
-s_gatt_char_t *ezlopi_ble_profile_get_characterstics_to_init(s_gatt_service_t *service)
+s_gatt_char_t* ezlopi_ble_profile_get_characterstics_to_init(s_gatt_service_t* service)
 {
-    s_gatt_char_t *curr_char = NULL;
+    s_gatt_char_t* curr_char = NULL;
 
     if (service)
     {
@@ -96,9 +96,9 @@ s_gatt_char_t *ezlopi_ble_profile_get_characterstics_to_init(s_gatt_service_t *s
     return curr_char;
 }
 
-s_gatt_service_t *ezlopi_ble_profile_get_by_app_id(uint16_t app_id)
+s_gatt_service_t* ezlopi_ble_profile_get_by_app_id(uint16_t app_id)
 {
-    s_gatt_service_t *curr_head = gatt_head_service;
+    s_gatt_service_t* curr_head = gatt_head_service;
 
     while (curr_head)
     {
@@ -111,9 +111,9 @@ s_gatt_service_t *ezlopi_ble_profile_get_by_app_id(uint16_t app_id)
     return curr_head;
 }
 
-s_gatt_service_t *ezlopi_ble_profile_get_service_by_gatts_if(uint16_t gatts_if)
+s_gatt_service_t* ezlopi_ble_profile_get_service_by_gatts_if(uint16_t gatts_if)
 {
-    s_gatt_service_t *curr_head = gatt_head_service;
+    s_gatt_service_t* curr_head = gatt_head_service;
 
     while (curr_head)
     {
@@ -129,7 +129,7 @@ s_gatt_service_t *ezlopi_ble_profile_get_service_by_gatts_if(uint16_t gatts_if)
 int ezlopi_ble_gatt_number_of_services(void)
 {
     int count = 0;
-    s_gatt_service_t *curr_head = gatt_head_service;
+    s_gatt_service_t* curr_head = gatt_head_service;
 
     while (curr_head)
     {
@@ -139,9 +139,9 @@ int ezlopi_ble_gatt_number_of_services(void)
     return count;
 }
 
-s_gatt_service_t *ezlopi_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid_t *service_uuid)
+s_gatt_service_t* ezlopi_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid_t* service_uuid)
 {
-    s_gatt_service_t *service_obj = malloc(sizeof(s_gatt_service_t));
+    s_gatt_service_t* service_obj = malloc(sizeof(s_gatt_service_t));
     if (service_obj)
     {
         memset(service_obj, 0, sizeof(s_gatt_service_t));
@@ -152,18 +152,20 @@ s_gatt_service_t *ezlopi_ble_gatt_create_service(uint16_t app_id, esp_bt_uuid_t 
         memcpy(&service_obj->service_id.id.uuid, service_uuid, sizeof(esp_bt_uuid_t));
         ezlopi_ble_gatt_service_append_to_head(service_obj);
     }
+#if (1 == ENABLE_TRACE)
     else
     {
         TRACE_E("Failed to create gatt-service!");
     }
+#endif
 
     return service_obj;
 }
 
-s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission, esp_gatt_char_prop_t properties,
-                                                  f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
+s_gatt_char_t* ezlopi_ble_gatt_add_characteristic(s_gatt_service_t* service_obj, esp_bt_uuid_t* uuid, esp_gatt_perm_t permission, esp_gatt_char_prop_t properties,
+    f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
 {
-    s_gatt_char_t *character_object = NULL;
+    s_gatt_char_t* character_object = NULL;
     if (service_obj)
     {
         character_object = malloc(sizeof(s_gatt_char_t));
@@ -180,19 +182,21 @@ s_gatt_char_t *ezlopi_ble_gatt_add_characteristic(s_gatt_service_t *service_obj,
             ezlopi_ble_gatt_append_characterstic_to_service(service_obj, character_object);
             service_obj->num_handles += 2;
         }
+#if (1 == ENABLE_TRACE)
         else
         {
             TRACE_E("Failed to create gatt-characteristic!");
         }
+#endif
     }
 
     return character_object;
 }
 
-s_gatt_descr_t *ezlopi_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp_bt_uuid_t *uuid, esp_gatt_perm_t permission,
-                                               f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
+s_gatt_descr_t* ezlopi_ble_gatt_add_descriptor(s_gatt_char_t* charcteristic, esp_bt_uuid_t* uuid, esp_gatt_perm_t permission,
+    f_upcall_t read_func, f_upcall_t write_func, f_upcall_t write_exec_func)
 {
-    s_gatt_descr_t *descriptor_obj = NULL;
+    s_gatt_descr_t* descriptor_obj = NULL;
 
     if (charcteristic)
     {
@@ -217,30 +221,33 @@ s_gatt_descr_t *ezlopi_ble_gatt_add_descriptor(s_gatt_char_t *charcteristic, esp
 
             descriptor_obj->permission = permission;
             ezlopi_ble_gatt_append_descriptor_to_characteristic(charcteristic, descriptor_obj);
-            s_gatt_service_t *cur_service = ezlopi_ble_gatt_search_service_by_characteristic(charcteristic);
+            s_gatt_service_t* cur_service = ezlopi_ble_gatt_search_service_by_characteristic(charcteristic);
             if (cur_service)
             {
                 cur_service->num_handles += 1;
             }
         }
+
+#if (1 == ENABLE_TRACE)
         else
         {
             TRACE_E("Failed to create gatt-descriptor!");
         }
+#endif
     }
 
     return descriptor_obj;
 }
 
-static s_gatt_service_t *ezlopi_ble_gatt_search_service_by_characteristic(s_gatt_char_t *characteristic)
+static s_gatt_service_t* ezlopi_ble_gatt_search_service_by_characteristic(s_gatt_char_t* characteristic)
 {
     if (gatt_head_service)
     {
-        s_gatt_service_t *curr_service = gatt_head_service;
+        s_gatt_service_t* curr_service = gatt_head_service;
 
         while (curr_service)
         {
-            s_gatt_char_t *cur_char = curr_service->characteristics;
+            s_gatt_char_t* cur_char = curr_service->characteristics;
 
             while (cur_char)
             {
@@ -259,7 +266,7 @@ static s_gatt_service_t *ezlopi_ble_gatt_search_service_by_characteristic(s_gatt
     return NULL;
 }
 
-static void ezlopi_ble_gatt_append_characterstic_to_service(s_gatt_service_t *service_obj, s_gatt_char_t *character_object)
+static void ezlopi_ble_gatt_append_characterstic_to_service(s_gatt_service_t* service_obj, s_gatt_char_t* character_object)
 {
     if (NULL == service_obj->characteristics)
     {
@@ -267,7 +274,7 @@ static void ezlopi_ble_gatt_append_characterstic_to_service(s_gatt_service_t *se
     }
     else
     {
-        s_gatt_char_t *cur_char = service_obj->characteristics;
+        s_gatt_char_t* cur_char = service_obj->characteristics;
         while (cur_char->next)
         {
             cur_char = cur_char->next;
@@ -277,7 +284,7 @@ static void ezlopi_ble_gatt_append_characterstic_to_service(s_gatt_service_t *se
     }
 }
 
-static void ezlopi_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t *characteristic, s_gatt_descr_t *descriptor)
+static void ezlopi_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t* characteristic, s_gatt_descr_t* descriptor)
 {
     if (characteristic)
     {
@@ -287,7 +294,7 @@ static void ezlopi_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t *c
         }
         else
         {
-            s_gatt_descr_t *cur_descriptor = characteristic->descriptor;
+            s_gatt_descr_t* cur_descriptor = characteristic->descriptor;
 
             while (cur_descriptor->next)
             {
@@ -299,11 +306,11 @@ static void ezlopi_ble_gatt_append_descriptor_to_characteristic(s_gatt_char_t *c
     }
 }
 
-static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t *service_obj)
+static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t* service_obj)
 {
     if (gatt_head_service)
     {
-        s_gatt_service_t *cur_service = gatt_head_service;
+        s_gatt_service_t* cur_service = gatt_head_service;
         while (cur_service->next)
         {
             cur_service = cur_service->next;
@@ -324,20 +331,21 @@ static void ezlopi_ble_gatt_service_append_to_head(s_gatt_service_t *service_obj
 
 void ezlopi_ble_profile_print(void)
 {
+#if (1 == ENABLE_TRACE)
     TRACE_S("BLE PROFILES: ");
 
-    s_gatt_service_t *cur_service = gatt_head_service;
+    s_gatt_service_t* cur_service = gatt_head_service;
 
     while (cur_service)
     {
         ezlopi_ble_gatt_print_service(cur_service);
 
-        s_gatt_char_t *cur_character = cur_service->characteristics;
+        s_gatt_char_t* cur_character = cur_service->characteristics;
         while (cur_character)
         {
             ezlopi_ble_gatt_print_characteristic(cur_character);
 
-            s_gatt_descr_t *cur_descriptor = cur_character->descriptor;
+            s_gatt_descr_t* cur_descriptor = cur_character->descriptor;
             while (cur_descriptor)
             {
                 ezlopi_ble_gatt_print_descriptor(cur_descriptor);
@@ -352,10 +360,12 @@ void ezlopi_ble_profile_print(void)
         TRACE_I("---------------------------------------------------------------");
         cur_service = cur_service->next;
     }
+#endif
 }
 
-void ezlopi_ble_gatt_print_descriptor(s_gatt_descr_t *descriptor)
+void ezlopi_ble_gatt_print_descriptor(s_gatt_descr_t* descriptor)
 {
+#if (1 == ENABLE_TRACE)
     if (descriptor)
     {
         TRACE_I("|    |    |--------------Descriptor----------------------------");
@@ -364,10 +374,12 @@ void ezlopi_ble_gatt_print_descriptor(s_gatt_descr_t *descriptor)
         TRACE_I("|    |    |- permission: 0x%02x", descriptor->permission);
         TRACE_I("|    |    |- status: 0x%02x", descriptor->status);
     }
+#endif
 }
 
-void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t *characteristic)
+void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t* characteristic)
 {
+#if (1 == ENABLE_TRACE)
     if (characteristic)
     {
         TRACE_I("|    |--------------------Characteristic-----------------------");
@@ -380,10 +392,12 @@ void ezlopi_ble_gatt_print_characteristic(s_gatt_char_t *characteristic)
         // TRACE_I("|    |- write_upcall: 0x%02x", (uint32_t)characteristic->write_upcall);
         // TRACE_I("|    |- write_exce_upcall: 0x%02x", (uint32_t)characteristic->write_exce_upcall);
     }
+#endif
 }
 
-void ezlopi_ble_gatt_print_service(s_gatt_service_t *service)
+void ezlopi_ble_gatt_print_service(s_gatt_service_t* service)
 {
+#if (1 == ENABLE_TRACE)
     TRACE_I("--------------------------Service-------------------------------");
     ezlopi_ble_gatt_print_uuid(&service->service_id.id.uuid, "|-");
     TRACE_I("|- app-id: %d", service->app_id);
@@ -392,11 +406,13 @@ void ezlopi_ble_gatt_print_service(s_gatt_service_t *service)
     TRACE_I("|- num handles: %d", service->num_handles);
     TRACE_I("|- service handle: %d", service->service_handle);
     TRACE_I("|- status: %d", service->status);
+#endif
 }
 
-void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
+void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t* uuid, char* msg)
 {
-    msg = msg ? msg : (char *)ezlopi__str;
+#if (1 == ENABLE_TRACE)
+    msg = msg ? msg : (char*)ezlopi__str;
 
     if (uuid)
     {
@@ -411,11 +427,12 @@ void ezlopi_ble_gatt_print_uuid(esp_bt_uuid_t *uuid, char *msg)
         else
         {
             TRACE_I("%s uuid: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", msg,
-                    uuid->uuid.uuid128[15], uuid->uuid.uuid128[14], uuid->uuid.uuid128[13], uuid->uuid.uuid128[12],
-                    uuid->uuid.uuid128[11], uuid->uuid.uuid128[10],
-                    uuid->uuid.uuid128[9], uuid->uuid.uuid128[8],
-                    uuid->uuid.uuid128[7], uuid->uuid.uuid128[6],
-                    uuid->uuid.uuid128[5], uuid->uuid.uuid128[4], uuid->uuid.uuid128[3], uuid->uuid.uuid128[2], uuid->uuid.uuid128[1], uuid->uuid.uuid128[0]);
+                uuid->uuid.uuid128[15], uuid->uuid.uuid128[14], uuid->uuid.uuid128[13], uuid->uuid.uuid128[12],
+                uuid->uuid.uuid128[11], uuid->uuid.uuid128[10],
+                uuid->uuid.uuid128[9], uuid->uuid.uuid128[8],
+                uuid->uuid.uuid128[7], uuid->uuid.uuid128[6],
+                uuid->uuid.uuid128[5], uuid->uuid.uuid128[4], uuid->uuid.uuid128[3], uuid->uuid.uuid128[2], uuid->uuid.uuid128[1], uuid->uuid.uuid128[0]);
         }
     }
+#endif
 }

@@ -53,27 +53,27 @@ int sensor_0063_other_MQ9_LPG_flameable_detector(e_ezlopi_actions_t action, l_ez
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0063_prepare(arg);
+        ret = __0063_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0063_init(item);
+        ret = __0063_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __0063_get_item(item, arg);
+        ret = __0063_get_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0063_get_cjson_value(item, arg);
+        ret = __0063_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0063_notify(item);
+        ret = __0063_notify(item);
         break;
     }
     default:
@@ -92,52 +92,61 @@ static int __0063_prepare(void* arg)
     if (device_prep_arg && (NULL != device_prep_arg->cjson_device))
     {
         //---------------------------  DIGI - DEVICE 1 --------------------------------------------
-        l_ezlopi_device_t* MQ9_device_digi = ezlopi_device_add_device(device_prep_arg->cjson_device);
-        if (MQ9_device_digi)
+        l_ezlopi_device_t* MQ9_device_parent_digi = ezlopi_device_add_device(device_prep_arg->cjson_device, "digi");
+        if (MQ9_device_parent_digi)
         {
-            __prepare_device_digi_cloud_properties(MQ9_device_digi, device_prep_arg->cjson_device);
-            l_ezlopi_item_t* MQ9_item_digi = ezlopi_device_add_item_to_device(MQ9_device_digi, sensor_0063_other_MQ9_LPG_flameable_detector);
+            ret = 1;
+            TRACE_I("Parent_MQ9_device_digi-[0x%x] ", MQ9_device_parent_digi->cloud_properties.device_id);
+            __prepare_device_digi_cloud_properties(MQ9_device_parent_digi, device_prep_arg->cjson_device);
+
+            l_ezlopi_item_t* MQ9_item_digi = ezlopi_device_add_item_to_device(MQ9_device_parent_digi, sensor_0063_other_MQ9_LPG_flameable_detector);
             if (MQ9_item_digi)
             {
-                ret = 1;
-                MQ9_item_digi->cloud_properties.device_id = MQ9_device_digi->cloud_properties.device_id;
                 __prepare_item_digi_cloud_properties(MQ9_item_digi, device_prep_arg->cjson_device);
             }
             else
             {
                 ret = -1;
-                ezlopi_device_free_device(MQ9_device_digi);
             }
-        }
 
-        //---------------------------- ADC - DEVICE 2 -------------------------------------------
-        s_mq9_value_t* MQ9_value = (s_mq9_value_t*)malloc(sizeof(s_mq9_value_t));
-        if (NULL != MQ9_value)
-        {
-            memset(MQ9_value, 0, sizeof(s_mq9_value_t));
-            l_ezlopi_device_t* MQ9_device_adc = ezlopi_device_add_device(device_prep_arg->cjson_device);
-            if (MQ9_device_adc)
+            //---------------------------- ADC - DEVICE 2 -------------------------------------------
+            s_mq9_value_t* MQ9_value = (s_mq9_value_t*)malloc(sizeof(s_mq9_value_t));
+            if (NULL != MQ9_value)
             {
-                __prepare_device_adc_cloud_properties(MQ9_device_adc, device_prep_arg->cjson_device);
-                l_ezlopi_item_t* MQ9_item_adc = ezlopi_device_add_item_to_device(MQ9_device_adc, sensor_0063_other_MQ9_LPG_flameable_detector);
-                if (MQ9_item_adc)
+                memset(MQ9_value, 0, sizeof(s_mq9_value_t));
+                l_ezlopi_device_t* MQ9_device_child_adc = ezlopi_device_add_device(device_prep_arg->cjson_device, "adc");
+                if (MQ9_device_child_adc)
                 {
-                    ret = 1;
-                    MQ9_item_adc->cloud_properties.device_id = MQ9_device_adc->cloud_properties.device_id;
-                    __prepare_item_adc_cloud_properties(MQ9_item_adc, device_prep_arg->cjson_device, MQ9_value);
+                    TRACE_I("Child_MQ9_device_child_adc-[0x%x] ", MQ9_device_child_adc->cloud_properties.device_id);
+                    __prepare_device_adc_cloud_properties(MQ9_device_child_adc, device_prep_arg->cjson_device);
+
+                    MQ9_device_child_adc->cloud_properties.parent_device_id = MQ9_device_parent_digi->cloud_properties.device_id;
+                    l_ezlopi_item_t* MQ9_item_adc = ezlopi_device_add_item_to_device(MQ9_device_child_adc, sensor_0063_other_MQ9_LPG_flameable_detector);
+                    if (MQ9_item_adc)
+                    {
+                        __prepare_item_adc_cloud_properties(MQ9_item_adc, device_prep_arg->cjson_device, MQ9_value);
+                    }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(MQ9_device_child_adc);
+                        free(MQ9_value);
+                    }
                 }
                 else
                 {
                     ret = -1;
-                    ezlopi_device_free_device(MQ9_device_adc);
                     free(MQ9_value);
                 }
             }
             else
             {
                 ret = -1;
-                free(MQ9_value);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -161,12 +170,10 @@ static int __0063_init(l_ezlopi_item_t* item)
                 input_conf.pull_up_en = GPIO_PULLUP_ENABLE;
                 ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // // TRACE_E("Deleting Item!!");
-            //     // ezlopi_device_free_device_by_item(item); // remove the item itself
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
         else if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
         {
@@ -184,29 +191,20 @@ static int __0063_init(l_ezlopi_item_t* item)
                         }
                         ret = 1;
                     }
-                    // else
-                    // {
-                    //     // ret = -1;
-                    //     // free(item->user_arg);
-                    //     // item->user_arg = NULL;
-                    //     // ezlopi_device_free_device_by_item(item); // remove the item itself
-                    // }
+                    else
+                    {
+                        ret = -1;
+                    }
                 }
-                // else
-                // {
-                //     // ret = -1;
-                //     // TRACE_E("Deleting Item!!");
-                //     // free(item->user_arg);
-                //     // item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item); // remove the item itself
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // TRACE_E("Deleting Item!!");
-            //     // ezlopi_device_free_device_by_item(item); // remove the item itself;
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
     }
     return ret;
@@ -215,11 +213,6 @@ static int __0063_init(l_ezlopi_item_t* item)
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_digi_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_gas;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -236,24 +229,13 @@ static void __prepare_item_digi_cloud_properties(l_ezlopi_item_t* item, cJSON* c
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
     CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio1_str, item->interface.gpio.gpio_in.gpio_num);
     TRACE_S("MQ9-> DIGITAL_PIN: %d ", item->interface.gpio.gpio_in.gpio_num);
-    char* user_arg = (char*)malloc(40);
-    if (user_arg)
-    {
-        memset(user_arg, 0, 40);
-    }
-    item->user_arg = (void*)user_arg;
 }
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_adc_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -270,12 +252,13 @@ static void __prepare_item_adc_cloud_properties(l_ezlopi_item_t* item, cJSON* cj
     item->cloud_properties.scale = scales_parts_per_million;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio2_str, item->interface.adc.gpio_num);
     TRACE_S("MQ9-> ADC_PIN: %d ", item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
 
@@ -313,13 +296,7 @@ static int __0063_get_item(l_ezlopi_item_t* item, void* arg)
                 s_mq9_value_t* MQ9_value = ((s_mq9_value_t*)item->user_arg);
                 if (MQ9_value)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ9_value->_LPG_flameable_ppm);
-                    char* valueFormatted = ezlopi_valueformatter_float(MQ9_value->_LPG_flameable_ppm);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ9_value->_LPG_flameable_ppm);
                 }
             }
             ret = 1;
@@ -346,13 +323,7 @@ static int __0063_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 s_mq9_value_t* MQ9_value = ((s_mq9_value_t*)item->user_arg);
                 if (MQ9_value)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, MQ9_value->_LPG_flameable_ppm);
-                    char* valueFormatted = ezlopi_valueformatter_float(MQ9_value->_LPG_flameable_ppm);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, MQ9_value->_LPG_flameable_ppm);
                 }
             }
             ret = 1;
@@ -371,16 +342,15 @@ static int __0063_notify(l_ezlopi_item_t* item)
             const char* curret_value = NULL;
             if (0 == gpio_get_level(item->interface.gpio.gpio_in.gpio_num)) // when D0 -> 0V,
             {
-                curret_value = "combustible_gas_detected";
+                curret_value = mq9_sensor_gas_alarm_token[1];
             }
             else
             {
-                curret_value = "no_gas";
+                curret_value = mq9_sensor_gas_alarm_token[0];
             }
             if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
             {
-                char* gas_alarm_state = (char*)item->user_arg;
-                snprintf(gas_alarm_state, 40, "%s", curret_value);
+                item->user_arg = (void*)curret_value;
                 ezlopi_device_value_updated_from_device_v3(item);
             }
         }
@@ -421,7 +391,7 @@ static float __extract_MQ9_sensor_ppm(l_ezlopi_item_t* item)
 #else
             analog_sensor_volt += (float)(ezlopi_analog_data.voltage);
 #endif
-            vTaskDelay(1);
+            vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms
         }
         analog_sensor_volt = analog_sensor_volt / 10.0f;
 
@@ -467,7 +437,7 @@ static void __calibrate_MQ9_R0_resistance(void* params)
             for (uint8_t j = 20; j > 0; j--)
             {
                 TRACE_E("Heating sensor.........time left: %d sec", j);
-                vTaskDelay(100); // vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
+                vTaskDelay(1000 / portTICK_PERIOD_MS); // 1sec delay before calibration
             }
             //-------------------------------------------------
             // extract the mean_sensor_analog_output_voltage
@@ -486,7 +456,7 @@ static void __calibrate_MQ9_R0_resistance(void* params)
 #else
                 _sensor_volt += (float)(ezlopi_analog_data->voltage);
 #endif
-                vTaskDelay(1); // 10ms
+                vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms
             }
             _sensor_volt = _sensor_volt / 100.0f;
 

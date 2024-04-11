@@ -19,7 +19,6 @@ static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 static int __notify(l_ezlopi_item_t* item);
-// static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device);
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_data);
 static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device);
 static void __gy271_calibration_task(void* params);
@@ -60,12 +59,6 @@ int sensor_0007_I2C_GY271(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties_parent_x(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    char device_full_name[50];
-    snprintf(device_full_name, 50, "%s_%s", device_name, "Mag_strength_x");
-    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -75,12 +68,6 @@ static void __prepare_device_cloud_properties_parent_x(l_ezlopi_device_t* device
 
 static void __prepare_device_cloud_properties_child_y(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    char device_full_name[50];
-    snprintf(device_full_name, 50, "%s_%s", device_name, "Mag_strength_y");
-    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -90,12 +77,6 @@ static void __prepare_device_cloud_properties_child_y(l_ezlopi_device_t* device,
 
 static void __prepare_device_cloud_properties_child_z(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    char device_full_name[50];
-    snprintf(device_full_name, 50, "%s_%s", device_name, "Mag_strength_z");
-    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -105,12 +86,6 @@ static void __prepare_device_cloud_properties_child_z(l_ezlopi_device_t* device,
 
 static void __prepare_device_cloud_properties_child_azi(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    char device_full_name[50];
-    snprintf(device_full_name, 50, "%s_%s", device_name, "Azimuth Angle");
-    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_navigation;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -120,12 +95,6 @@ static void __prepare_device_cloud_properties_child_azi(l_ezlopi_device_t* devic
 
 static void __prepare_device_cloud_properties_child_temp(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* device_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    char device_full_name[50];
-    snprintf(device_full_name, 50, "%s_%s", device_name, "Temperature");
-    ASSIGN_DEVICE_NAME_V2(device, device_full_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_temperature;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -150,11 +119,12 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     {
         if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
         {
+            item->is_user_arg_unique = true;
             item->interface.i2c_master.enable = true;
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-            CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-            CJSON_GET_VALUE_INT(cj_device, "slave_addr", item->interface.i2c_master.address);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+            CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 
             item->interface.i2c_master.clock_speed = 100000;
             if (0 == item->interface.i2c_master.address)
@@ -180,86 +150,117 @@ static int __prepare(void* arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_gy271_data_t));
-            l_ezlopi_device_t* gy271_device_parent_x_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* gy271_device_parent_x_device = ezlopi_device_add_device(cj_device, "Mag_strength_X");
             if (gy271_device_parent_x_device)
             {
+                ret = 1;
+                TRACE_I("Parent_gy271-x-[0x%x] ", gy271_device_parent_x_device->cloud_properties.device_id);
                 __prepare_device_cloud_properties_parent_x(gy271_device_parent_x_device, cj_device);
                 l_ezlopi_item_t* gyro_x_item = ezlopi_device_add_item_to_device(gy271_device_parent_x_device, sensor_0007_I2C_GY271);
                 if (gyro_x_item)
                 {
                     __prepare_item_cloud_properties(gyro_x_item, user_data);
-                    gyro_x_item->cloud_properties.device_id = gy271_device_parent_x_device->cloud_properties.device_id;
                     gyro_x_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_x_axis;
                     gyro_x_item->cloud_properties.value_type = value_type_float;
                     gyro_x_item->cloud_properties.scale = scales_guass;
                     __prepare_item_interface_properties(gyro_x_item, cj_device);
                 }
-                l_ezlopi_device_t* gy271_device_child_y_device = ezlopi_device_add_device(cj_device);
+
+                l_ezlopi_device_t* gy271_device_child_y_device = ezlopi_device_add_device(cj_device, "Mag_strength_Y");
                 if (gy271_device_child_y_device)
                 {
+                    TRACE_I("Child_gy271-y-[0x%x] ", gy271_device_child_y_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_y(gy271_device_child_y_device, cj_device);
-                    gy271_device_child_y_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id; // assigning parent_device_id to child_device
+                    gy271_device_child_y_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id;
                     l_ezlopi_item_t* gyro_y_item = ezlopi_device_add_item_to_device(gy271_device_child_y_device, sensor_0007_I2C_GY271);
                     if (gyro_y_item)
                     {
                         __prepare_item_cloud_properties(gyro_y_item, user_data);
-                        gyro_y_item->cloud_properties.device_id = gy271_device_child_y_device->cloud_properties.device_id;
                         gyro_y_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_y_axis;
                         gyro_y_item->cloud_properties.value_type = value_type_float;
                         gyro_y_item->cloud_properties.scale = scales_guass;
                         __prepare_item_interface_properties(gyro_y_item, cj_device);
                     }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_y_device);
+                    }
                 }
 
-                l_ezlopi_device_t* gy271_device_child_z_device = ezlopi_device_add_device(cj_device);
+                l_ezlopi_device_t* gy271_device_child_z_device = ezlopi_device_add_device(cj_device, "Mag_strength_Z");
                 if (gy271_device_child_z_device)
                 {
+                    TRACE_I("Child_gy271-z-[0x%x] ", gy271_device_child_z_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_z(gy271_device_child_z_device, cj_device);
-                    gy271_device_child_z_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id; // assigning parent_device_id to child_device
+                    gy271_device_child_z_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id;
                     l_ezlopi_item_t* gyro_z_item = ezlopi_device_add_item_to_device(gy271_device_child_z_device, sensor_0007_I2C_GY271);
                     if (gyro_z_item)
                     {
                         __prepare_item_cloud_properties(gyro_z_item, user_data);
-                        gyro_z_item->cloud_properties.device_id = gy271_device_child_z_device->cloud_properties.device_id;
                         gyro_z_item->cloud_properties.item_name = ezlopi_item_name_magnetic_strength_z_axis;
                         gyro_z_item->cloud_properties.value_type = value_type_float;
                         gyro_z_item->cloud_properties.scale = scales_guass;
                         __prepare_item_interface_properties(gyro_z_item, cj_device);
                     }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_z_device);
+                    }
                 }
-                l_ezlopi_device_t* gy271_device_child_azi_device = ezlopi_device_add_device(cj_device);
+                l_ezlopi_device_t* gy271_device_child_azi_device = ezlopi_device_add_device(cj_device, "Azimuth_Angle");
                 if (gy271_device_child_azi_device)
                 {
+                    TRACE_I("Child_gy271-azi-[0x%x] ", gy271_device_child_azi_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_azi(gy271_device_child_azi_device, cj_device);
-                    gy271_device_child_azi_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id; // assigning parent_device_id to child_device
+                    gy271_device_child_azi_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id;
                     l_ezlopi_item_t* gyro_azi_item = ezlopi_device_add_item_to_device(gy271_device_child_azi_device, sensor_0007_I2C_GY271);
                     if (gyro_azi_item)
                     {
                         __prepare_item_cloud_properties(gyro_azi_item, user_data);
-                        gyro_azi_item->cloud_properties.device_id = gy271_device_child_azi_device->cloud_properties.device_id;
                         gyro_azi_item->cloud_properties.item_name = ezlopi_item_name_angle_position;
                         gyro_azi_item->cloud_properties.value_type = value_type_angle;
                         gyro_azi_item->cloud_properties.scale = scales_north_pole_degress;
                         __prepare_item_interface_properties(gyro_azi_item, cj_device);
                     }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_azi_device);
+                    }
                 }
-                l_ezlopi_device_t* gy271_device_child_temp_device = ezlopi_device_add_device(cj_device);
+                l_ezlopi_device_t* gy271_device_child_temp_device = ezlopi_device_add_device(cj_device, "Temp");
                 if (gy271_device_child_temp_device)
                 {
+                    TRACE_I("Child_gy271-temp-[0x%x] ", gy271_device_child_temp_device->cloud_properties.device_id);
                     __prepare_device_cloud_properties_child_temp(gy271_device_child_temp_device, cj_device);
-                    gy271_device_child_temp_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id; // assigning parent_device_id to child_device
+                    gy271_device_child_temp_device->cloud_properties.parent_device_id = gy271_device_parent_x_device->cloud_properties.device_id;
                     l_ezlopi_item_t* gyro_temp_item = ezlopi_device_add_item_to_device(gy271_device_child_temp_device, sensor_0007_I2C_GY271);
                     if (gyro_temp_item)
                     {
                         __prepare_item_cloud_properties(gyro_temp_item, user_data);
-                        gyro_temp_item->cloud_properties.device_id = gy271_device_child_temp_device->cloud_properties.device_id;
                         gyro_temp_item->cloud_properties.item_name = ezlopi_item_name_temp;
                         gyro_temp_item->cloud_properties.value_type = value_type_temperature;
                         gyro_temp_item->cloud_properties.scale = scales_celsius;
                         __prepare_item_interface_properties(gyro_temp_item, cj_device);
                     }
+                    else
+                    {
+                        ret = -1;
+                        ezlopi_device_free_device(gy271_device_child_temp_device);
+                    }
                 }
-                ret = 1;
+
+                if ((NULL == gyro_x_item) &&
+                    (NULL == gy271_device_child_y_device) &&
+                    (NULL == gy271_device_child_z_device) &&
+                    (NULL == gy271_device_child_azi_device) &&
+                    (NULL == gy271_device_child_temp_device))
+                {
+                    ret = -1;
+                    ezlopi_device_free_device(gy271_device_parent_x_device);
+                }
             }
             else // if the parent_device dosenot exsist then dealloc the 'user_data'
             {
@@ -267,8 +268,11 @@ static int __prepare(void* arg)
                 ret = -1;
             }
         }
+        else
+        {
+            ret = -1;
+        }
     }
-
     return ret;
 }
 
@@ -290,20 +294,20 @@ static int __init(l_ezlopi_item_t* item)
                     xTaskCreate(__gy271_calibration_task, "GY271_Calibration_Task", 2 * 2048, item, 1, NULL);
                     ret = 1;
                 }
-                // else
-                // {
-                //     // ret = -1;
-                //     // free(item->user_arg); // this will free ; memory address linked to all items
-                //     // item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
+            }
+            else
+            {
+                ret = -1;
             }
         }
-        // else
-        // {
-        //     // ret = -1;
-        //     // ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -321,60 +325,34 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->X);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->X);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->X);
                 }
+
                 if (ezlopi_item_name_magnetic_strength_y_axis == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Y);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->Y);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->Y);
                 }
+
                 if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->Z);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->Z);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->Z);
                 }
+
                 if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
                 {
-
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->azimuth));
-                    char* valueFormatted = ezlopi_valueformatter_int(user_data->azimuth);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_int32_to_cjson(item, cj_result, user_data->azimuth);
                 }
 
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    cJSON_AddNumberToObject(cj_result, ezlopi_value_str, user_data->T);
-                    char* valueFormatted = ezlopi_valueformatter_float(user_data->T);
-                    if (valueFormatted)
-                    {
-                        cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                        free(valueFormatted);
-                    }
+                    ezlopi_valueformatter_float_to_cjson(item, cj_result, user_data->T);
                 }
             }
+
             ret = 1;
         }
     }
+
     return ret;
 }
 
@@ -387,7 +365,8 @@ static int __notify(l_ezlopi_item_t* item)
         s_gy271_data_t* user_data = (s_gy271_data_t*)item->user_arg;
         if (user_data)
         {
-            if (user_data->calibration_complete) {
+            if (user_data->calibration_complete)
+            {
                 if (ezlopi_item_name_magnetic_strength_x_axis == item->cloud_properties.item_name)
                 {
                     __prev[0] = user_data->X;

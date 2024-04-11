@@ -168,23 +168,21 @@ static int __init(l_ezlopi_item_t *item)
             {
                 ret = 1;
             }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_water;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -204,7 +202,9 @@ static void __prepare_item_properties(l_ezlopi_item_t *item, cJSON *cj_device, v
 
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
     item->interface.adc.resln_bit = 3;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+
+    item->is_user_arg_unique = true;
     item->user_arg = user_arg;
 }
 
@@ -215,21 +215,19 @@ static int __prepare(void *arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
+            ret = 1;
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
             l_ezlopi_item_t *item_turbidity = ezlopi_device_add_item_to_device(device, sensor_0033_ADC_turbidity);
             if (item_turbidity)
             {
-                item_turbidity->cloud_properties.device_id = device->cloud_properties.device_id;
                 char *turbidity_sensor_states = (char *)malloc(40 * sizeof(char));
                 if (turbidity_sensor_states)
                 {
-
                     memset(turbidity_sensor_states, 0, sizeof(s_ezlopi_analog_data_t));
                     __prepare_item_properties(item_turbidity, prep_arg->cjson_device, (void *)turbidity_sensor_states);
-                    ret = 1;
                 }
             }
             else
@@ -237,6 +235,10 @@ static int __prepare(void *arg)
                 ezlopi_device_free_device(device);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;

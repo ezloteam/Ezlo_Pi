@@ -69,18 +69,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             ret = measurement(tmp_config, &jsn_sr04t_data);
             if (ret)
             {
-                // jsn_sr04t_print_data(jsn_sr04t_data);
-
                 float distance = (jsn_sr04t_data.distance_cm / 100.0f);
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, distance);
-
-                char* valueFormatted = ezlopi_valueformatter_float(distance);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                cJSON_AddStringToObject(cj_result, ezlopi_scale_str, scales_meter);
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, distance);
                 ret = 1;
             }
             else
@@ -114,20 +104,15 @@ static int __init(l_ezlopi_item_t* item)
                 TRACE_S("JSN_SR04T initialized");
                 ret = 1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     item->user_arg = NULL;
-            //     free(jsn_sr04t_config);
-            //     // ezlopi_device_free_device_by_item(item);
-            //     TRACE_E("JSN_SR04T not initializeed");
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;
@@ -135,11 +120,6 @@ static int __init(l_ezlopi_item_t* item)
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -149,7 +129,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.item_name = ezlopi_item_name_distance;
@@ -187,22 +167,26 @@ static int __prepare(void* arg)
 
     if (prep_arg && prep_arg->cjson_device)
     {
-        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device);
+        l_ezlopi_device_t* device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
         if (device)
         {
+            ret = 1;
             __prepare_device_cloud_properties(device, prep_arg->cjson_device);
             l_ezlopi_item_t* item_temperature = ezlopi_device_add_item_to_device(device, sensor_0031_other_JSNSR04T);
             if (item_temperature)
             {
                 __prepare_item_cloud_properties(item_temperature, prep_arg->cjson_device);
                 __prepare_item_interface_properties(item_temperature, prep_arg->cjson_device);
-                ret = 1;
             }
             else
             {
                 ezlopi_device_free_device(device);
                 ret = -1;
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
 

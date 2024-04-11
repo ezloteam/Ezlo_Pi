@@ -33,23 +33,23 @@ int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0041_prepare(arg);
+        ret = __0041_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0041_init(item);
+        ret = __0041_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0041_get_cjson_value(item, arg);
+        ret = __0041_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __0041_notify(item);
+        ret = __0041_notify(item);
         break;
     }
     default:
@@ -62,10 +62,6 @@ int sensor_0041_ADC_FC28_soilMoisture(e_ezlopi_actions_t action, l_ezlopi_item_t
 //-------------------------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    char* dev_name = NULL;
-    CJSON_GET_VALUE_STRING(cj_device, "dev_name", dev_name);
-    ASSIGN_DEVICE_NAME_V2(device, dev_name);
-    device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
     device->cloud_properties.category = category_humidity;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type_id = NULL;
@@ -82,6 +78,7 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, void* user_da
     item->cloud_properties.value_type = value_type_moisture;
     item->cloud_properties.scale = scales_percent;
     //----- CUSTOM DATA STRUCTURE -----------------------------------------
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
 static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
@@ -89,7 +86,7 @@ static void __prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj
     if (item && cj_device)
     {
         item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
-        CJSON_GET_VALUE_INT(cj_device, "gpio", item->interface.adc.gpio_num);
+        CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
         item->interface.adc.resln_bit = 3;
     }
 }
@@ -107,9 +104,10 @@ static int __0041_prepare(void* arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_fc28_data_t));
-            l_ezlopi_device_t* fc28_device = ezlopi_device_add_device(cj_device);
+            l_ezlopi_device_t* fc28_device = ezlopi_device_add_device(cj_device, NULL);
             if (fc28_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(fc28_device, cj_device);
 
                 l_ezlopi_item_t* fc28_item = ezlopi_device_add_item_to_device(fc28_device, sensor_0041_ADC_FC28_soilMoisture);
@@ -117,7 +115,6 @@ static int __0041_prepare(void* arg)
                 {
                     __prepare_item_cloud_properties(fc28_item, user_data);
                     __prepare_item_interface_properties(fc28_item, cj_device);
-                    ret = 1;
                 }
                 else
                 {
@@ -131,6 +128,10 @@ static int __0041_prepare(void* arg)
                 ret = -1;
                 free(user_data);
             }
+        }
+        else
+        {
+            ret = -1;
         }
     }
     return ret;
@@ -150,25 +151,20 @@ static int __0041_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
+                else
+                {
+                    ret = -1;
+                }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -184,18 +180,12 @@ static int __0041_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_fc28_data_t* user_data = (s_fc28_data_t*)item->user_arg;
             if (user_data)
             {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, (user_data->hum_val));
-                char* valueFormatted = ezlopi_valueformatter_uint32(user_data->hum_val);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    // TRACE_S("soil moisture  : %d", user_data->hum_val);
-                    free(valueFormatted);
-                }
+                ezlopi_valueformatter_uint32_to_cjson(item, cj_result, user_data->hum_val);
                 ret = 1;
             }
         }
     }
+
     return ret;
 }
 

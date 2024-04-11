@@ -5,5 +5,4 @@
 
 void ezlopi_service_broadcast_init(void);
 
-
 #endif // __EZLOPI_SERVICE_BROADCAST_H__

@@ -22,9 +22,6 @@ static e_scenes_block_type_v2_t __get_block_type_and_create_block_array(cJSON* c
 
 void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response)
 {
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi__id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON* cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     if (cj_result)
     {
@@ -148,8 +145,8 @@ static bool __found_item_in_field(l_fields_v2_t* field_node, uint32_t item_id)
             uint32_t item_id_check = strtoul(field_node->field_value.u_value.value_string, NULL, 16);
             TRACE_D("item-id: %s | %08x", field_node->field_value.u_value.value_string, item_id);
 
-            // uint32_t item_id_check = strtoul(field_node->value.value_string, NULL, 16);
-            // TRACE_D("item-id: %s | %08x", field_node->value.value_string, item_id);
+            // uint32_t item_id_check = strtoul(field_node->field_value.u_value.value_string, NULL, 16);
+            // TRACE_D("item-id: %s | %08x", field_node->field_value.u_value.value_string, item_id);
 
             if (item_id_check == item_id)
             {

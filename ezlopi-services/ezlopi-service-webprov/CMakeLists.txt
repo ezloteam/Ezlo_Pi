@@ -2,6 +2,7 @@
 file(GLOB_RECURSE provisioning_src "*.c*")
 
 set(EZLOPI_CORE_COMPONENTS  
+        ezlopi-core-api
         ezlopi-core-wifi
         ezlopi-core-http
         ezlopi-core-ezlopi

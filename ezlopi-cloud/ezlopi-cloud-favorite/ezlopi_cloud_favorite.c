@@ -14,9 +14,6 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
     cJSON *cj_items_req = NULL;
     // cJSON *cj_rules_req = NULL;
 
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_id_str, cJSON_GetObjectItem(cj_request, ezlopi_id_str));
-    cJSON_AddItemReferenceToObject(cj_response, ezlopi_method_str, cJSON_GetObjectItem(cj_request, ezlopi_method_str));
-
     cJSON *cj_result = cJSON_AddObjectToObject(cj_response, ezlopi_result_str);
     cJSON *cj_param = cJSON_GetObjectItem(cj_request, ezlopi_params_str);
 
@@ -63,7 +60,7 @@ void favorite_list_v3(cJSON *cj_request, cJSON *cj_response)
                 l_ezlopi_item_t *curr_item = curr_device->items;
                 while (curr_item)
                 {
-#warning "Needs works here"
+#warning "Needs works here [Krishna]"
                     cJSON *cj_device = cJSON_CreateObject();
                     if (cj_device)
                     {

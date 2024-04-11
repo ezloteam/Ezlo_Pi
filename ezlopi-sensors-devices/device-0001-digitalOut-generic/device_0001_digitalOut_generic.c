@@ -43,7 +43,6 @@ uint32_t settings_ids[2];
 int device_0001_digitalOut_generic(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
-
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
@@ -125,28 +124,28 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
             cJSON* value = cJSON_CreateObject();
             cJSON* value_default = cJSON_CreateObject();
 
-            cJSON_AddStringToObject(label, "text", "User defined mode");
-            cJSON_AddStringToObject(label, "lang_tag", "ezlopi_presence_user_defined_mode_label");
+            cJSON_AddStringToObject(label, ezlopi_text_str, "User defined mode");
+            cJSON_AddStringToObject(label, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_label");
 
-            cJSON_AddStringToObject(description, "text", "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
-            cJSON_AddStringToObject(description, "lang_tag", "ezlopi_presence_user_defined_mode_description");
+            cJSON_AddStringToObject(description, ezlopi_text_str, "User defined operation mode, where user can set several distance parameters for setting a custom operation mode");
+            cJSON_AddStringToObject(description, ezlopi_lang_tag_str, "ezlopi_presence_user_defined_mode_description");
 
             cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
             cJSON_AddItemToObject(cjson_propertise, "description", description);
             cJSON_AddStringToObject(cjson_propertise, ezlopi_valueType_str, "presence_operation_mode");
 
-            cJSON_AddNumberToObject(value, "min_move_distance", 0.75);
-            cJSON_AddNumberToObject(value, "max_move_distance", 1.5);
-            cJSON_AddNumberToObject(value, "min_still_distance", 0.75);
-            cJSON_AddNumberToObject(value, "max_still_distance", 1.5);
-            cJSON_AddTrueToObject(value, "is_active");
+            cJSON_AddNumberToObject(value, ezlopi_min_move_distance_str, 0.75);
+            cJSON_AddNumberToObject(value, ezlopi_max_move_distance_str, 1.5);
+            cJSON_AddNumberToObject(value, ezlopi_min_still_distance_str, 0.75);
+            cJSON_AddNumberToObject(value, ezlopi_max_still_distance_str, 1.5);
+            cJSON_AddTrueToObject(value, ezlopi_is_active_str);
             cJSON_AddItemToObject(cjson_propertise, ezlopi_value_str, value);
 
-            cJSON_AddNumberToObject(value_default, "min_move_distance", 0.75);
-            cJSON_AddNumberToObject(value_default, "max_move_distance", 6.0);
-            cJSON_AddNumberToObject(value_default, "min_still_distance", 0.75);
-            cJSON_AddNumberToObject(value_default, "max_still_distance", 6.0);
-            cJSON_AddFalseToObject(value_default, "is_active");
+            cJSON_AddNumberToObject(value_default, ezlopi_min_move_distance_str, 0.75);
+            cJSON_AddNumberToObject(value_default, ezlopi_max_move_distance_str, 6.0);
+            cJSON_AddNumberToObject(value_default, ezlopi_min_still_distance_str, 0.75);
+            cJSON_AddNumberToObject(value_default, ezlopi_max_still_distance_str, 6.0);
+            cJSON_AddFalseToObject(value_default, ezlopi_is_active_str);
             cJSON_AddItemToObject(cjson_propertise, "valueDefault", value_default);
         }
         else if (setting->cloud_properties.setting_id == settings_ids[1])
@@ -154,11 +153,11 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
             cJSON* label = cJSON_CreateObject();
             cJSON* description = cJSON_CreateObject();
 
-            cJSON_AddStringToObject(label, "text", "Backlight Brightness");
-            cJSON_AddStringToObject(label, "lang_tag", "ezlopi_digitalio_pwm_setting_label");
+            cJSON_AddStringToObject(label, ezlopi_text_str, "Backlight Brightness");
+            cJSON_AddStringToObject(label, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_label");
 
-            cJSON_AddStringToObject(description, "text", "This is PWM setting value for setting the backlight brightness");
-            cJSON_AddStringToObject(description, "lang_tag", "ezlopi_digitalio_pwm_setting_description");
+            cJSON_AddStringToObject(description, ezlopi_text_str, "This is PWM setting value for setting the backlight brightness");
+            cJSON_AddStringToObject(description, ezlopi_lang_tag_str, "ezlopi_digitalio_pwm_setting_description");
 
             cJSON_AddItemToObject(cjson_propertise, ezlopi_label_str, label);
             cJSON_AddItemToObject(cjson_propertise, "description", description);
@@ -168,7 +167,7 @@ static int __settings_get(void* arg, l_ezlopi_device_settings_v3_t* setting)
 
             cJSON_AddNumberToObject(cjson_propertise, ezlopi_value_str, settings_data->settings_int_data);
             cJSON_AddNumberToObject(cjson_propertise, "valueMin", 0);
-            cJSON_AddNumberToObject(cjson_propertise, "valueMax", 100);
+            cJSON_AddNumberToObject(cjson_propertise, ezlopi_valueMax_str, 100);
             cJSON_AddNumberToObject(cjson_propertise, "valueDefault", 50);
         }
 
@@ -189,7 +188,7 @@ static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
         else if (setting->cloud_properties.setting_id == settings_ids[1])
         {
             int32_t value = 0;
-            CJSON_GET_VALUE_INT(cjson_propertise, ezlopi_value_str, value);
+            CJSON_GET_VALUE_DOUBLE(cjson_propertise, ezlopi_value_str, value);
             TRACE_D("Setting Value : %d", value);
 
             s_digio_settings_t* settings_data = (s_digio_settings_t*)setting->user_arg;
@@ -271,21 +270,21 @@ static void __setup_item_properties(l_ezlopi_item_t* item, cJSON* cjson_device)
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_dev_type_str, item->interface_type);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_dev_type_str, item->interface_type);
 
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_is_ip_str, item->interface.gpio.gpio_in.enable);
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_in_str, item->interface.gpio.gpio_in.gpio_num);
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_ip_str, tmp_var);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_ip_inv_str, item->interface.gpio.gpio_in.invert);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_ip_str, item->interface.gpio.gpio_in.value);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_ip_str, tmp_var);
     item->interface.gpio.gpio_in.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
     item->interface.gpio.gpio_in.interrupt = GPIO_INTR_DISABLE;
 
     item->interface.gpio.gpio_out.enable = true;
     CJSON_GET_VALUE_GPIO(cjson_device, ezlopi_gpio_out_str, item->interface.gpio.gpio_out.gpio_num);
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
-    CJSON_GET_VALUE_INT(cjson_device, ezlopi_pullup_op_str, tmp_var);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_op_inv_str, item->interface.gpio.gpio_out.invert);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_val_op_str, item->interface.gpio.gpio_out.value);
+    CJSON_GET_VALUE_DOUBLE(cjson_device, ezlopi_pullup_op_str, tmp_var);
     item->interface.gpio.gpio_out.interrupt = GPIO_INTR_DISABLE;
     item->interface.gpio.gpio_out.pull = tmp_var ? GPIO_PULLUP_ONLY : GPIO_PULLDOWN_ONLY;
 }
@@ -305,14 +304,14 @@ static int __prepare(void* arg)
         cJSON* cjson_device = prep_arg->cjson_device;
         if (cjson_device)
         {
-            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(cjson_device, NULL);
             if (device)
             {
                 __setup_device_cloud_properties(device, cjson_device);
                 l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, device_0001_digitalOut_generic);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
+                    // item->cloud_properties.device_id = device->cloud_properties.device_id;
                     __setup_item_properties(item, cjson_device);
                     ret = 1;
                 }
@@ -462,7 +461,6 @@ static int __init(l_ezlopi_item_t* item)
         else
         {
             ret = -1;
-            ezlopi_device_free_device_by_item(item);
         }
     }
 
@@ -474,11 +472,10 @@ static int __get_value_cjson(l_ezlopi_item_t* item, void* arg)
     int ret = 0;
     if (item && arg)
     {
-        cJSON* cjson_propertise = (cJSON*)arg;
-        if (cjson_propertise)
+        cJSON* cj_propertise = (cJSON*)arg;
+        if (cj_propertise)
         {
-            cJSON_AddBoolToObject(cjson_propertise, ezlopi_value_str, item->interface.gpio.gpio_out.value);
-            cJSON_AddStringToObject(cjson_propertise, ezlopi_valueFormatted_str, ezlopi_valueformatter_bool(item->interface.gpio.gpio_out.value ? true : false));
+            ezlopi_valueformatter_bool_to_cjson(item, cj_propertise, item->interface.gpio.gpio_out.value);
             ret = 1;
         }
     }
@@ -500,7 +497,7 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
 
         if (NULL != cjson_params)
         {
-            CJSON_TRACE("cjson_params", cjson_params);
+            // CJSON_TRACE("cjson_params", cjson_params);
 
             int value = 0;
             cJSON* cj_value = cJSON_GetObjectItem(cjson_params, ezlopi_value_str);
@@ -508,26 +505,23 @@ static int __set_value(l_ezlopi_item_t* item, void* arg)
             {
                 switch (cj_value->type)
                 {
-                case cJSON_False:
+                case cJSON_False: {
                     value = 0;
                     break;
-                case cJSON_True:
+                }
+                case cJSON_True: {
                     value = 1;
                     break;
-                case cJSON_Number:
-                    value = cj_value->valueint;
-                    break;
-
-                default:
+                }
+                case cJSON_Number: {
+                    value = cj_value->valuedouble;
                     break;
                 }
+                default: {
+                    break;
+                }
+                }
             }
-
-            TRACE_I("item_name: %s", item->cloud_properties.item_name);
-            TRACE_I("gpio_num: %d", item->interface.gpio.gpio_out.gpio_num);
-            TRACE_I("item_id: 0x%08x", item->cloud_properties.item_id);
-            TRACE_I("prev value: %d", item->interface.gpio.gpio_out.value);
-            TRACE_I("cur value: %d", value);
 
             if (255 != item->interface.gpio.gpio_out.gpio_num)
             {

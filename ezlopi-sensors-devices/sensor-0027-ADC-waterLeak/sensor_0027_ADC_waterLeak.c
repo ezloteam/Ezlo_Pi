@@ -43,17 +43,17 @@ int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, 
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __get_item_list(item, arg);
+        ret = __get_item_list(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __get_ezlopi_value(item, arg);
+        ret = __get_ezlopi_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        ret = __notify(item);
         break;
     }
     default:
@@ -67,11 +67,6 @@ int sensor_0027_ADC_waterLeak(e_ezlopi_actions_t action, l_ezlopi_item_t *item, 
 
 static void prepare_device_cloud_properties(l_ezlopi_device_t *device, cJSON *cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_leak;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -93,7 +88,7 @@ static void prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_devic
 static void prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT;
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
 
@@ -107,23 +102,26 @@ static int __prepare(void *arg)
         cJSON *cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t *device = ezlopi_device_add_device(prep_arg->cjson_device);
-            if (device)
+            l_ezlopi_device_t *parent_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
+            if (parent_device)
             {
-                prepare_device_cloud_properties(device, cj_device);
-                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0027_ADC_waterLeak);
+                ret = 1;
+                prepare_device_cloud_properties(parent_device, cj_device);
+                l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(parent_device, sensor_0027_ADC_waterLeak);
                 if (item)
                 {
-                    item->cloud_properties.device_id = device->cloud_properties.device_id;
                     prepare_item_cloud_properties(item, cj_device);
                     prepare_item_interface_properties(item, cj_device);
-                    ret = 1;
                 }
                 else
                 {
-                    ezlopi_device_free_device(device);
+                    ezlopi_device_free_device(parent_device);
                     ret = -1;
                 }
+            }
+            else
+            {
+                ret = -1;
             }
         }
     }
@@ -217,12 +215,15 @@ static int __init(l_ezlopi_item_t *item)
             {
                 ret = 1;
             }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
 
     return ret;

@@ -58,8 +58,6 @@ static void __dynamic_config_write_func(esp_gatt_value_t* value, esp_ble_gatts_c
     TRACE_D("Write function called!");
     TRACE_D("GATT_WRITE_EVT value: %.*s", param->write.len, param->write.value);
 
-    ezlopi_nvs_set_provisioning_status();
-
     if (NULL == g_dynamic_config_linked_buffer)
     {
         g_dynamic_config_linked_buffer = ezlopi_ble_buffer_create(param);
@@ -97,7 +95,7 @@ static void __dynamic_config_write_func(esp_gatt_value_t* value, esp_ble_gatts_c
                             {
                                 // TRACE_W("Restarting .....");
                                 // vTaskDelay(1000 / portTICK_PERIOD_MS);
-                                // EZPI_CORE_reboot();
+                                // EZPI_CORE_reset_reboot();
                             }
                             free(decoded_data);
                         }
@@ -170,19 +168,17 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
                     cJSON_AddNumberToObject(cj_response, ezlopi_sequence_str, g_dynamic_config_sequence_no);
                     cJSON_AddStringToObject(cj_response, ezlopi_data_str, data_buffer);
 
-                    char* send_data = cJSON_Print(cj_response);
-                    if (send_data)
+                    cJSON_bool ret = cJSON_PrintPreallocated(cj_response, (char*)value->value, 512, false);
+                    cJSON_Delete(cj_response);
+
+                    if (true == ret)
                     {
-                        TRACE_D("data: %s", send_data);
-                        cJSON_Minify(send_data);
+                        TRACE_D("data: %s", (char*)value->value);
+                        TRACE_D("length of 'send_data': %d", strlen((char*)value->value));
 
                         if ((0 != total_data_len) && (total_data_len >= ((g_dynamic_config_sequence_no * 400) + copy_size)))
                         {
-                            value->len = strlen(send_data);
-                            strncpy((char*)value->value, send_data, value->len + 1);
-
-                            TRACE_I("data: %s", (char*)value->value);
-
+                            value->len = strlen((char*)value->value);
                             g_dynamic_config_sequence_no += 1;
                             status = 0;
 
@@ -199,15 +195,11 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
                             TRACE_W("total_data_len: %d", total_data_len);
                             status = -4;
                         }
-
-                        free(send_data);
                     }
                     else
                     {
                         status = -3;
                     }
-
-                    cJSON_Delete(cj_response);
                 }
                 else
                 {
@@ -220,13 +212,18 @@ static void __dynamic_config_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb
                 TRACE_W("call SET-MTU API from client stack!");
 
                 CHECK_PRINT_ERROR(esp_ble_gatt_set_local_mtu(517), "set local  MTU failed");
-                status = -2;
+                status = -5;
             }
         }
 
         if (status)
         {
-            if (status < 0)
+            if (status == -5)
+            {
+                const char* mtu_fail_resp = "{\"req_mtu_size\":517}";
+                strcpy((char*)value->value, mtu_fail_resp);
+            }
+            else if (status < 0)
             {
                 TRACE_E("Error found: %d", status);
                 value->len = 1;

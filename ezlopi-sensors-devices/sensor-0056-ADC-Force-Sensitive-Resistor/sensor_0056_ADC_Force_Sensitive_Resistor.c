@@ -59,11 +59,6 @@ int sensor_0056_ADC_Force_Sensitive_Resistor(e_ezlopi_actions_t action, l_ezlopi
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -80,11 +75,12 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.scale = scales_newton;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3; // ADC 12_bit
 
     // passing the custom data_structure
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
 
@@ -100,16 +96,15 @@ static int __0056_prepare(void* arg)
         {
             memset(fsr_struct, 0, sizeof(fsr_t));
 
-            l_ezlopi_device_t* FSR_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* FSR_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (FSR_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(FSR_device, device_prep_arg->cjson_device);
                 l_ezlopi_item_t* FSR_item = ezlopi_device_add_item_to_device(FSR_device, sensor_0056_ADC_Force_Sensitive_Resistor);
                 if (FSR_item)
                 {
-                    FSR_item->cloud_properties.device_id = FSR_device->cloud_properties.device_id;
                     __prepare_item_cloud_properties(FSR_item, device_prep_arg->cjson_device, fsr_struct);
-                    ret = 1;
                 }
                 else
                 {
@@ -142,53 +137,28 @@ static int __0056_init(l_ezlopi_item_t* item)
                 {
                     ret = 1;
                 }
-                // else
-                // {
-                //     ret = -1;
-                //     free(item->user_arg); // this will free ; memory address linked to all items
-                //     item->user_arg = NULL;
-                //     // ezlopi_device_free_device_by_item(item);
-                // }
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     // ezlopi_device_free_device_by_item(item);
-        // }
     }
+
     return ret;
 }
 
 static int __0056_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
+
     if (item && arg)
     {
         cJSON* cj_result = (cJSON*)arg;
-        if (cj_result)
+        fsr_t* fsr_struct = (fsr_t*)item->user_arg;
+        if (fsr_struct)
         {
-            fsr_t* fsr_struct = (fsr_t*)item->user_arg;
-            if (fsr_struct)
-            {
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, fsr_struct->fsr_value);
-                char* valueFormatted = ezlopi_valueformatter_float(fsr_struct->fsr_value);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-            }
+            ezlopi_valueformatter_float_to_cjson(item, cj_result, fsr_struct->fsr_value);
             ret = 1;
         }
     }
+
     return ret;
 }
 

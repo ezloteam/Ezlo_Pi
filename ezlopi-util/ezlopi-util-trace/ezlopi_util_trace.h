@@ -11,9 +11,12 @@ extern "C"
 {
 #endif
 
-#ifdef CONFIG_EZPI_UTIL_ENABLE_TRACE
+#ifdef CONFIG_EZPI_UTIL_TRACE_EN
 #define ENABLE_TRACE 1
-#endif // CONFIG_EZPI_UTIL_ENABLE_TRACE
+#else
+#define ENABLE_TRACE 0
+#endif // CONFIG_EZPI_UTIL_TRACE_EN
+
 
     void __dump(const char* file_name, uint32_t line, char* buffer_name, void* _buff, uint32_t ofs, uint32_t cnt);
 
@@ -90,6 +93,11 @@ extern "C"
 #define TRACE_D(X, ...)
 #define TRACE_I(x, ...)
 #define dump(name, X, Y, Z)
+
+
+#define TRACE_Dw(X, reg...)
+#define trace_yw(X, reg...)
+#define trace_wb(X, reg...)
 
 #endif
 

@@ -135,8 +135,6 @@ typedef struct l_house_modes_v2
 
 typedef struct l_scenes_list_v2
 {
-    // char _id[32];
-
     e_scene_status_v2_t status;
     TaskHandle_t task_handle;
 
@@ -152,6 +150,8 @@ typedef struct l_scenes_list_v2
     l_action_block_v2_t* then_block;
     l_when_block_v2_t* when_block;
     l_action_block_v2_t* else_block;
+
+    void* thread_ctx;
 
     struct l_scenes_list_v2* next;
 } l_scenes_list_v2_t;
@@ -182,10 +182,10 @@ void ezlopi_scenes_delete_action_blocks(l_action_block_v2_t* action_blocks);
 void ezlopi_scenes_delete_user_notifications(l_user_notification_v2_t* user_notifications);
 
 void ezlopi_scenes_depopulate_by_id_v2(uint32_t _id);
+int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag);
 void ezlopi_scenes_remove_id_from_list_v2(uint32_t _id);
 l_scenes_list_v2_t* ezlopi_scenes_pop_by_id_v2(uint32_t _id);
 
-void ezlopi_scenes_print(l_scenes_list_v2_t* scene_link_list);
 void ezlopi_scenes_notifications_add(cJSON* cj_notifications);
 
 #endif // _EZLOPI_CORE_SCENES_V2_H_

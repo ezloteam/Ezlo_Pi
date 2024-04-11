@@ -8,12 +8,11 @@ idf_component_register(SRCS "bme680_bsec.c" "sensor_0010_I2C_BME680.c" "${config
                  
                 ezlopi-core-timer 
                 ezlopi-core-cloud 
-                ezlopi-core-actions 
-                ezlopi-core-devices 
-                ezlopi-core-valueformatter 
+                ezlopi-core-actions
+                ezlopi-core-valueformatter
 
                 ezlopi-hal-i2c
                 
                 ezlopi-cloud-items 
                 ezlopi-cloud-constants    
-                )
+)

@@ -87,5 +87,6 @@ EZLOPI_DEVICE_LIST("sensor-hilink-presence-sensor       ", 67, sensor_0067_hilin
 EZLOPI_DEVICE_LIST("sensor-ENS160-gas-sensor            ", 68, sensor_0068_ENS160_gas_sensor)
 EZLOPI_DEVICE_LIST("sensor-ze08-ch02-gas-sensor         ", 69, sensor_0069_ze08_ch02_gas_sensor)
 
+#warning "need to uncomment necessary modules";
 //////// End of sensor/device list
 EZLOPI_DEVICE_LIST(NULL, 0, NULL)

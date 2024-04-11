@@ -55,18 +55,18 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t*
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __0054_prepare(arg);
+        ret = __0054_prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __0054_init(item);
+        ret = __0054_init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __0054_get_cjson_value(item, arg);
+        ret = __0054_get_cjson_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -74,7 +74,7 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t*
         static uint8_t count;
         if (count++ > 1)
         {
-            __0054_notify(item);
+            ret = __0054_notify(item);
             count = 0;
         }
         break;
@@ -90,11 +90,6 @@ int sensor_0054_PWM_YFS201_flowmeter(e_ezlopi_actions_t action, l_ezlopi_item_t*
 //------------------------------------------------------------------------------------------------------
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
 {
-    // char *device_name = NULL;
-    // CJSON_GET_VALUE_STRING(cj_device, ezlopi_dev_name_str, device_name);
-    // ASSIGN_DEVICE_NAME_V2(device, device_name);
-    // device->cloud_properties.device_id = ezlopi_cloud_generate_device_id();
-
     device->cloud_properties.category = category_flow_meter;
     device->cloud_properties.subcategory = subcategory_not_defined;
     device->cloud_properties.device_type = dev_type_sensor;
@@ -111,10 +106,11 @@ static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_device, v
     item->cloud_properties.scale = scales_liter_per_hour;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
-    CJSON_GET_VALUE_INT(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type); // _max = 10
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.pwm.gpio_num);
 
     // passing the custom data_structure
+    item->is_user_arg_unique = true;
     item->user_arg = user_data;
 }
 //------------------------------------------------------------------------------------------------------
@@ -130,16 +126,15 @@ static int __0054_prepare(void* arg)
         if (NULL != yfs201_data)
         {
             memset(yfs201_data, 0, sizeof(yfs201_t));
-            l_ezlopi_device_t* flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device);
+            l_ezlopi_device_t* flowmeter_device = ezlopi_device_add_device(device_prep_arg->cjson_device, NULL);
             if (flowmeter_device)
             {
+                ret = 1;
                 __prepare_device_cloud_properties(flowmeter_device, device_prep_arg->cjson_device);
                 l_ezlopi_item_t* flowmeter_item = ezlopi_device_add_item_to_device(flowmeter_device, sensor_0054_PWM_YFS201_flowmeter);
                 if (flowmeter_item)
                 {
-                    flowmeter_item->cloud_properties.device_id = flowmeter_device->cloud_properties.device_id;
                     __prepare_item_properties(flowmeter_item, device_prep_arg->cjson_device, yfs201_data);
-                    ret = 1;
                 }
                 else
                 {
@@ -178,19 +173,15 @@ static int __0054_init(l_ezlopi_item_t* item)
                 };
                 ret = (0 == gpio_config(&input_conf)) ? 1 : -1;
             }
-            // else
-            // {
-            //     ret = -1;
-            //     free(item->user_arg); // this will free ; memory address linked to all items
-            //     item->user_arg = NULL;
-            //     // ezlopi_device_free_device_by_item(item);
-            // }
+            else
+            {
+                ret = -1;
+            }
         }
-        // else
-        // {
-        //     ret = -1;
-        //     ezlopi_device_free_device_by_item(item);
-        // }
+        else
+        {
+            ret = -1;
+        }
     }
     return ret;
 }
@@ -216,13 +207,7 @@ static int __0054_get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 Lt_per_hr = (Lt_per_hr > 720) ? 720 : Lt_per_hr;
                 // TRACE_E(" Frequency : %.2f Hz --> FlowRate : %.2f [Lt_per_hr]", freq, Lt_per_hr);
 
-                char* valueFormatted = ezlopi_valueformatter_float(Lt_per_hr);
-                if (valueFormatted)
-                {
-                    cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, valueFormatted);
-                    free(valueFormatted);
-                }
-                cJSON_AddNumberToObject(cj_result, ezlopi_value_str, Lt_per_hr);
+                ezlopi_valueformatter_float_to_cjson(item, cj_result, Lt_per_hr);
                 ret = 1;
             }
         }

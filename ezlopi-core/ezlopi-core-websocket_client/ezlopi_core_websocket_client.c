@@ -34,21 +34,18 @@ typedef struct s_ws_data_buffer
     struct s_ws_data_buffer* next;
 } s_ws_data_buffer_t;
 
-// static void ezlopi_ws_data_buffer_free(s_ws_data_buffer_t *buffer);
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_create(char *data, uint32_t len);
-// static s_ws_data_buffer_t *ezlopi_ws_data_buffer_add(s_ws_data_buffer_t *head_buffer, s_ws_data_buffer_t *data_buffer);
-
 static void websocket_event_handler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data);
 
 int ezlopi_websocket_client_send(char* data, uint32_t len)
 {
     int ret = 0;
 
-    if ((NULL != data) && (len > 0))
+    if ((NULL != data) && (len > 0) && (NULL != client))
     {
         if (esp_websocket_client_is_connected(client) && (len > 0) && (NULL != data))
         {
-            ret = esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
+            ret = esp_websocket_client_send_text(client, data, len, 1000 / portTICK_RATE_MS);
+            ret = (ret >= 0) ? 1 : 0;
         }
     }
 
@@ -85,8 +82,8 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
 
         esp_websocket_client_config_t websocket_cfg = {
             .uri = uri->valuestring,
-            .task_stack = 8 * 1024,
-            .buffer_size = 12 * 1024,
+            .task_stack = 6 * 1024,
+            .buffer_size = 6 * 1024,
             .cert_pem = ca_cert,
             .client_cert = ssl_shared,
             .client_key = ssl_priv,
@@ -107,7 +104,7 @@ esp_websocket_client_handle_t ezlopi_websocket_client_init(cJSON* uri, void (*ms
         {
             free(ca_cert);
             free(ssl_shared);
-            free(ssl_shared);
+            free(ssl_priv);
         }
     }
     else
@@ -135,6 +132,7 @@ static void websocket_event_handler(void* handler_args, esp_event_base_t base, i
     }
     case WEBSOCKET_EVENT_DISCONNECTED:
     {
+        TRACE_E("free-heap: %d", esp_get_free_heap_size());
         TRACE_S("WEBSOCKET_EVENT_DISCONNECTED");
         if (event_arg && event_arg->connection_upcall)
         {

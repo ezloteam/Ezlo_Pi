@@ -20,4 +20,4 @@ idf_component_register(SRCS "device_0001_digitalOut_generic.c" "${config_src}"
                 ezlopi-cloud-constants 
 
                 ezlopi-service-gpioisr
-                )
+)

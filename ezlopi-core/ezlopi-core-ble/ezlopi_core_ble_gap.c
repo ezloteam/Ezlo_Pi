@@ -63,10 +63,12 @@ static esp_ble_adv_params_t adv_params = {
 };
 
 static void ezlopi_ble_setup_service_uuid(void);
+#if (1 == ENABLE_TRACE)
 static void show_bonded_devices(void);
 static char* esp_key_type_to_str(esp_ble_key_type_t key_type);
 static char* esp_auth_req_to_str(esp_ble_auth_req_t auth_req);
 static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event);
+#endif
 // static void ezlopi_ble_setup_adv_config(void);
 
 #if (1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY)
@@ -267,7 +269,9 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
             TRACE_S("pair status = success");
             TRACE_S("auth mode =  %s", esp_auth_req_to_str(param->ble_security.auth_cmpl.auth_mode));
         }
+#if (1 == ENABLE_TRACE)
         show_bonded_devices();
+#endif // 1 == ENABLE_TRACE
         break;
     }
     case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: // 23
@@ -356,6 +360,7 @@ void ezlopi_ble_gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_p
     }
 }
 
+#if (1 == ENABLE_TRACE)
 static char* ezlopi_ble_gap_event_to_str(esp_gap_ble_cb_event_t event)
 {
     char* ret = "BLE GAP Event Not defined!";
@@ -795,6 +800,7 @@ static char* esp_key_type_to_str(esp_ble_key_type_t key_type)
     return key_str;
 }
 
+
 static void show_bonded_devices(void)
 {
     int dev_num = esp_ble_get_bond_device_num();
@@ -814,7 +820,7 @@ static void show_bonded_devices(void)
         free(dev_list);
     }
 }
-
+#endif // 1 == ENABLE_TRACE
 static void ezlopi_ble_setup_service_uuid(void)
 {
     s_gatt_service_t* service_head = ezlopi_ble_profile_get_head();

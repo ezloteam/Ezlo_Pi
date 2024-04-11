@@ -13,7 +13,7 @@
 
 static time_t start_time = 0;
 
-static void sntp_sync_time_call_back(struct timeval* tv)
+static void sntp_sync_time_call_back(struct timeval *tv)
 {
 
     char strftime_buf[64];
@@ -59,7 +59,7 @@ void EZPI_CORE_sntp_init(void)
     }
 }
 
-int EZPI_CORE_sntp_set_location(const char* location)
+int EZPI_CORE_sntp_set_location(const char *location)
 {
     int ret = 1;
     if (location)
@@ -67,7 +67,7 @@ int EZPI_CORE_sntp_set_location(const char* location)
         if (EZPI_CORE_nvs_write_time_location(location, strlen(location)))
         {
 
-            const char* posix_str = micro_tz_db_get_posix_str(location);
+            const char *posix_str = micro_tz_db_get_posix_str(location);
 
             if (NULL == posix_str)
             {
@@ -87,108 +87,76 @@ int EZPI_CORE_sntp_set_location(const char* location)
     return ret;
 }
 
-char* EZPI_CORE_sntp_get_location(void)
+char *EZPI_CORE_sntp_get_location(void)
 {
-    char* location = EZPI_CORE_nvs_read_time_location();
-    if (location)
+    return EZPI_CORE_nvs_read_time_location();
+}
+
+void EZPI_CORE_sntp_get_local_time(char *time_buf, uint32_t buf_len)
+{
+    if (time_buf && buf_len)
     {
-        return location;
-    }
-    else
-    {
-        return NULL;
+        char *location = EZPI_CORE_nvs_read_time_location();
+        const char *posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
+
+        if (!posix_str)
+        {
+            TRACE_E("Unknown time zone location or invalid location, setting GMT0!!");
+            posix_str = "GMT0";
+        }
+
+        if (setenv("TZ", posix_str, 1) != 0)
+        {
+            TRACE_E("Error setting time zone: %s", posix_str);
+            return NULL;
+        }
+        else
+        {
+            tzset();
+
+            TRACE_I("Timezone set: %s", posix_str);
+
+            time_t now;
+            struct tm timeinfo;
+
+            time(&now);
+            localtime_r(&now, &timeinfo);
+
+            if (strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S%z", &timeinfo))
+            {
+                TRACE_I("The current date/time int %s is: %s", location ? location : posix_str, time_buf);
+            }
+            else
+            {
+                TRACE_E("Error - strftime");
+            }
+        }
+
+        if (location)
+        {
+            free(location);
+        }
     }
 }
 
-char* EZPI_CORE_sntp_get_local_time(void)
+void EZPI_CORE_sntp_get_up_time(char *up_time_buf, uint32_t buf_len)
 {
-
-    char* strftime_buf = (char*)malloc(100);
-
-    if (!strftime_buf)
-    {
-        TRACE_E("Error - Memory allocation failed");
-        return NULL;
-    }
-
-    char* location = EZPI_CORE_nvs_read_time_location();
-    const char* posix_str = (location) ? micro_tz_db_get_posix_str(location) : NULL;
-
-    if (!posix_str)
-    {
-        TRACE_E("Unknown time zone location or invalid location, setting GMT!!");
-        posix_str = "GMT0";
-    }
-
-    if (setenv("TZ", posix_str, 1) != 0)
-    {
-        TRACE_E("Error setting time zone: %s", posix_str);
-        free(strftime_buf);
-        return NULL;
-    }
-
-    tzset();
-
-    TRACE_I("Timezone set: %s", posix_str);
-
-    time_t now;
-    struct tm timeinfo;
-
-    time(&now);
-    localtime_r(&now, &timeinfo);
-
-    if (strftime(strftime_buf, 100, "%Y-%m-%dT%H:%M:%S%z", &timeinfo))
-    {
-        TRACE_I("The current date/time int %s is: %s", location ? location : posix_str, strftime_buf);
-    }
-    else
-    {
-        TRACE_E("Error - strftime");
-        free(strftime_buf);
-        strftime_buf = NULL;
-    }
-
-    if (location)
-        free(location);
-
-    return strftime_buf;
-}
-
-char* EZPI_CORE_sntp_get_up_time(void)
-{
-    char* strftime_buf = (char*)malloc(64);
-
-    if (strftime_buf)
+    if (up_time_buf && buf_len)
     {
         struct tm timeinfo;
-
         localtime_r(&start_time, &timeinfo);
-        strftime(strftime_buf, 64, "%c", &timeinfo);
-
-        return strftime_buf;
-    }
-    else
-    {
-        return NULL;
+        strftime(up_time_buf, buf_len, "%c", &timeinfo);
     }
 }
 
-char* EZPI_CORE_sntp_epoch_to_iso8601(time_t t)
+void EZPI_CORE_sntp_epoch_to_iso8601(char *time_buf, uint32_t buf_len, time_t t)
 {
-
-    char* strftime_buf = (char*)malloc(64);
-
-    if (strftime_buf)
+    if (time_buf && buf_len)
     {
-        struct tm* timeinfo;
+        struct tm *timeinfo;
         timeinfo = gmtime(&t);
-        strftime(strftime_buf, 64, "%Y-%m-%dT%H:%M:%S+545", timeinfo);
-        TRACE_E("Build Time: %s", strftime_buf);
-        return strftime_buf;
-    }
-    else
-    {
-        return NULL;
+        strftime(time_buf, buf_len, "%Y-%m-%dT%H:%M:%S+545", timeinfo);
+        TRACE_I("Build Time: %s", time_buf);
     }
 }
 

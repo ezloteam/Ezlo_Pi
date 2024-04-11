@@ -38,13 +38,13 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_FLOAT:
             {
                 cJSON_AddNumberToObject(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_double);
-                // cJSON_AddNumberToObject(cj_field, ezlopi_value_str, field_node->value.value_double);
+                // cJSON_AddNumberToObject(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_double);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BOOL:
             {
                 if (0 == field_node->field_value.u_value.value_double)
-                    // if (0 == field_node->value.value_double)
+                    // if (0 == field_node->field_value.u_value.value_double)
                 {
                     cJSON_AddFalseToObject(cj_field, ezlopi_value_str);
                 }
@@ -57,9 +57,10 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_ITEM:
             case EZLOPI_VALUE_TYPE_STRING:
             case EZLOPI_VALUE_TYPE_INTERVAL:
+            case EZLOPI_VALUE_TYPE_SCENEID:
             {
                 __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
-                // __cjson_add_string(cj_field, ezlopi_value_str, field_node->value.value_string);
+                // __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
                 break;
             }
             case EZLOPI_VALUE_TYPE_BLOCKS:
@@ -86,14 +87,35 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
                 }
                 break;
             }
+            case EZLOPI_VALUE_TYPE_ENUM:
+            case EZLOPI_VALUE_TYPE_TOKEN:
+            {
+                if (field_node->field_value.e_type == VALUE_TYPE_STRING)
+                {
+                    __cjson_add_string(cj_field, ezlopi_value_str, field_node->field_value.u_value.value_string);
+                }
+                else if (field_node->field_value.e_type == VALUE_TYPE_CJSON)
+                {
+                    cJSON_AddItemToObject(cj_field, ezlopi_value_str, cJSON_Duplicate(field_node->field_value.u_value.cj_value, 1));
+                }
+                break;
+            }
+            case EZLOPI_VALUE_TYPE_CREDENTIAL:
             case EZLOPI_VALUE_TYPE_DICTIONARY:
             case EZLOPI_VALUE_TYPE_ARRAY:
+            case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
+            case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
+            case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
+            case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+            case EZLOPI_VALUE_TYPE_INT_ARRAY:
+            case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
+            {
+                cJSON_AddItemToObject(cj_field, ezlopi_value_str, cJSON_Duplicate(field_node->field_value.u_value.cj_value, 1));
+                break;
+            }
             case EZLOPI_VALUE_TYPE_RGB:
             case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
             case EZLOPI_VALUE_TYPE_USER_CODE:
-            case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
-            case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-            case EZLOPI_VALUE_TYPE_TOKEN:
             case EZLOPI_VALUE_TYPE_BUTTON_STATE:
             case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
             case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
@@ -141,11 +163,6 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
             case EZLOPI_VALUE_TYPE_DEVICE:
             case EZLOPI_VALUE_TYPE_EXPRESSION:
-            case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-            case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-            case EZLOPI_VALUE_TYPE_INT_ARRAY:
-            case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
-
             case EZLOPI_VALUE_TYPE_NONE:
             case EZLOPI_VALUE_TYPE_MAX:
             {
@@ -154,8 +171,10 @@ cJSON* ezlopi_scene_cjson_get_field(l_fields_v2_t* field_node)
             }
             default:
             {
+#if (1 == ENABLE_TRACE)
                 const char* value_type_name = ezlopi_scene_get_scene_value_type_name(field_node->value_type);
                 TRACE_E("Value type not matched!, curr-type[%d]: %s ", field_node->value_type, value_type_name ? value_type_name : ezlopi_null_str);
+#endif
                 break;
             }
             }
@@ -364,6 +383,7 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_BLOCK:
                     case EZLOPI_VALUE_TYPE_BLOCKS:
                     {
                         cJSON* vlaue_block_array = cJSON_AddArrayToObject(cj_field, ezlopi_value_str);
@@ -394,19 +414,46 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                         snprintf(id_str, sizeof(id_str), "%u", (uint32_t)curr_field->field_value.u_value.value_double);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_ARRAY:
+                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
+                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
+                    case EZLOPI_VALUE_TYPE_INT_ARRAY:
+                    case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
                     case EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY:
                     {
+                        // #warning "adding reference vs duplicating the object?";
                         cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);
                         break;
                     }
+                    case EZLOPI_VALUE_TYPE_CREDENTIAL:
                     case EZLOPI_VALUE_TYPE_DICTIONARY:
-                    case EZLOPI_VALUE_TYPE_ARRAY:
+                    case EZLOPI_VALUE_TYPE_ENUM:
+                    case EZLOPI_VALUE_TYPE_TOKEN:
+                    {
+                        if (VALUE_TYPE_STRING == curr_field->field_value.e_type)
+                        {
+                            __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
+                        }
+                        else if (VALUE_TYPE_CJSON == curr_field->field_value.e_type)
+                        {
+                            cJSON_AddItemReferenceToObject(cj_field, ezlopi_value_str, curr_field->field_value.u_value.cj_value);
+                        }
+                        else
+                        {
+                            TRACE_W("Value type not Implemented!, value_type: %d", curr_field->value_type);
+                        }
+                        break;
+                    }
+                    case EZLOPI_VALUE_TYPE_SCENEID:
+                    {
+                        __cjson_add_string(cj_field, ezlopi_value_str, curr_field->field_value.u_value.value_string);
+                        break;
+                    }
                     case EZLOPI_VALUE_TYPE_RGB:
                     case EZLOPI_VALUE_TYPE_CAMERA_STREAM:
                     case EZLOPI_VALUE_TYPE_USER_CODE:
                     case EZLOPI_VALUE_TYPE_WEEKLY_INTERVAL:
                     case EZLOPI_VALUE_TYPE_DAILY_INTERVAL:
-                    case EZLOPI_VALUE_TYPE_TOKEN:
                     case EZLOPI_VALUE_TYPE_BUTTON_STATE:
                     case EZLOPI_VALUE_TYPE_USER_LOCK_OPERATION:
                     case EZLOPI_VALUE_TYPE_USER_CODE_ACTION:
@@ -454,10 +501,6 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     case EZLOPI_VALUE_TYPE_REACTIVE_POWER_CONSUMPTION:
                     case EZLOPI_VALUE_TYPE_DEVICE:
                     case EZLOPI_VALUE_TYPE_EXPRESSION:
-                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME:
-                    case EZLOPI_VALUE_TYPE_24_HOURS_TIME_ARRAY:
-                    case EZLOPI_VALUE_TYPE_INT_ARRAY:
-                    case EZLOPI_VALUE_TYPE_HMS_INTERVAL:
                     case EZLOPI_VALUE_TYPE_MAX:
                     {
                         TRACE_W("Value type not implemented!, curr-type: %d", curr_field->value_type);
@@ -465,8 +508,10 @@ static void __cjson_add_fields(cJSON* cj_block, l_fields_v2_t* fields)
                     }
                     default:
                     {
+#if (1 == ENABLE_TRACE)
                         const char* value_type_name = ezlopi_scene_get_scene_value_type_name(curr_field->value_type);
                         TRACE_E("Value type not matched!, curr-type[%d]: %s ", curr_field->value_type, value_type_name ? value_type_name : ezlopi_null_str);
+#endif
                         break;
                     }
                     }
@@ -616,24 +661,6 @@ cJSON* ezlopi_scenes_create_cjson_scene_list(l_scenes_list_v2_t* scenes_list)
     }
 
     return cj_scenes_array;
-}
-
-char* ezlopi_scenes_create_json_string(l_scenes_list_v2_t* scenes_list)
-{
-    char* scenes_list_str = NULL;
-
-    cJSON* cj_scenes_array = ezlopi_scenes_create_cjson_scene_list(scenes_list);
-    if (cj_scenes_array)
-    {
-        scenes_list_str = cJSON_Print(cj_scenes_array);
-        cJSON_Delete(cj_scenes_array);
-
-        if (scenes_list_str)
-        {
-            cJSON_Minify(scenes_list_str);
-        }
-    }
-    return scenes_list_str;
 }
 
 static void __cjson_add_string(cJSON* root, const char* key, const char* value)

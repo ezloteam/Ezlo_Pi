@@ -25,8 +25,8 @@ static uint32_t g_expression_id = 0;
 static uint32_t ezlopi_get_mac_crc(void)
 {
     uint32_t crc = 0;
-    uint8_t mac_base[6] = {0};
-    esp_efuse_mac_get_default((uint8_t *)mac_base);
+    uint8_t mac_base[6] = { 0 };
+    esp_efuse_mac_get_default((uint8_t*)mac_base);
 
     // Perform CRC calculation on each byte of the MAC address
     for (int i = 0; i < 6; i++)
@@ -53,6 +53,7 @@ void ezlopi_cloud_update_device_id(uint32_t device_id)
 {
     g_device_id = (device_id > g_device_id) ? device_id : g_device_id;
 }
+
 uint32_t ezlopi_cloud_generate_device_id(void)
 {
     if (0 == g_device_id)
@@ -110,6 +111,7 @@ void ezlopi_cloud_update_scene_id(uint32_t a_scene_id)
 {
     g_scene_id = (a_scene_id > g_scene_id) ? a_scene_id : g_scene_id;
 }
+
 uint32_t ezlopi_cloud_generate_scene_id(void)
 {
     g_scene_id = (0 == g_scene_id) ? (SCENE_ID_START + ezlopi_get_mac_crc()) : (g_scene_id + 1);
@@ -120,6 +122,7 @@ void ezlopi_cloud_update_script_id(uint32_t a_script_id)
 {
     g_script_id = (a_script_id > g_script_id) ? a_script_id : g_script_id;
 }
+
 uint32_t ezlopi_cloud_generate_script_id(void)
 {
     g_script_id = (0 == g_script_id) ? (SCRIPT_ID_START + ezlopi_get_mac_crc()) : (g_script_id + 1);
@@ -130,6 +133,7 @@ void ezlopi_cloud_update_expression_id(uint32_t a_expression_id)
 {
     g_expression_id = (a_expression_id > g_expression_id) ? a_expression_id : g_expression_id;
 }
+
 uint32_t ezlopi_cloud_generate_expression_id(void)
 {
     g_expression_id = (0 == g_expression_id) ? (EXPRESSION_ID_START + ezlopi_get_mac_crc()) : (g_expression_id + 1);
@@ -140,15 +144,10 @@ void ezlopi_cloud_update_room_id(uint32_t a_room_id)
 {
     g_room_id = (a_room_id > g_room_id) ? a_room_id : g_room_id;
 }
+
 uint32_t ezlopi_cloud_generate_room_id(void)
 {
     g_room_id = (0 == g_room_id) ? (ROOM_ID_START + ezlopi_get_mac_crc()) : (g_room_id + 1);
     return g_room_id;
 }
 
-#if 0
-uint32_t ezlopi_cloud_get_modes_initial_id(void)
-{
-    return (MODES_ID_START | (0x00FFFF00 & ezlopi_get_mac_crc()));
-}
-#endif
