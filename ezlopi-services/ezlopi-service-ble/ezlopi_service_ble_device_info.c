@@ -487,9 +487,9 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
 
                     EZPI_CORE_nvs_write_flow_control(flow_control_val);
 
-                    TRACE_W("New config has been applied, device rebooting");
+                    TRACE_W("New config has been saved, reboot needed to apply changes.");
                     vTaskDelay(10);
-                    EZPI_CORE_reset_reboot();
+                    // EZPI_CORE_reset_reboot();
                 }
                 else
                 {

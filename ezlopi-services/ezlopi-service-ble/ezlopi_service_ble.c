@@ -69,8 +69,8 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
-#endif
-#endif
+#endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY
+#endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING
 }
 
 
@@ -169,7 +169,7 @@ static void ezlopi_ble_basic_init(void)
 int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
 {
     int ret = 0;
-    if(ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
+    if (ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
     {
         ret = 1;
     }

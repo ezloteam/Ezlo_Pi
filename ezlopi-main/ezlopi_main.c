@@ -47,7 +47,7 @@ void app_main(void)
     timer_service_init();
 
 #if CONFIG_EZPI_SERV_BLE_EN == 1
-    // ezlopi_ble_service_init();
+    ezlopi_ble_service_init();
 #endif
 
     ezlopi_service_broadcast_init();
@@ -61,8 +61,6 @@ void app_main(void)
 #if CONFIG_EZPI_SERV_MESHBOT_EN
     ezlopi_scenes_meshbot_init();
 #endif
-
-
 
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 0, NULL);
 }
