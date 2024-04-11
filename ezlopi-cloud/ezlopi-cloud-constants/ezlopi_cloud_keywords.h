@@ -169,6 +169,7 @@ extern const char* ezlopi_build_str;
 const char* ezlopi_firmware_build_str;
 extern const char* ezlopi_chip_str;
 extern const char* ezlopi_provisioned_status_str;
+const char* ezlopi_provisioned_str;
 extern const char* ezlopi_model_number_str;
 extern const char* ezlopi_serial_str;
 extern const char* ezlopi_uuid_provisioning_str;

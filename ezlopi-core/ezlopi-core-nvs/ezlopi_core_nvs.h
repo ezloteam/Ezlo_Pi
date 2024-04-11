@@ -41,9 +41,6 @@ extern "C"
     uint32_t ezlopi_nvs_get_boot_count(void);
     void ezlopi_nvs_set_boot_count(uint32_t boot_count);
 
-    uint32_t ezlopi_nvs_get_provisioning_status(void);
-    void ezlopi_nvs_set_provisioning_status(void);
-
     void ezlopi_nvs_scenes_soft_reset(void);
     void ezlopi_nvs_scenes_factory_info_reset(void);
 

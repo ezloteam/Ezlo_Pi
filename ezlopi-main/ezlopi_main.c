@@ -15,7 +15,7 @@
 #include "ezlopi_service_ota.h"
 
 #include "ezlopi_service_ble.h"
-#if CONFIG_EZLOPI_BLE_ENABLE == 1
+#if CONFIG_EZPI_SERV_BLE_EN == 1
 #endif
 
 #include "ezlopi_service_uart.h"
@@ -46,8 +46,8 @@ void app_main(void)
 
     timer_service_init();
 
-#if CONFIG_EZLOPI_BLE_ENABLE == 1
-    // ezlopi_ble_service_init();
+#if CONFIG_EZPI_SERV_BLE_EN == 1
+    ezlopi_ble_service_init();
 #endif
 
     ezlopi_service_broadcast_init();
@@ -55,14 +55,12 @@ void app_main(void)
     ezlopi_service_web_provisioning_init();
 
     ezlopi_service_ota_init();
-#if CONFIG_EZLPI_SERV_ENABLE_MODES
+#if CONFIG_EZLPI_SERV_MODES_EN
     ezlopi_service_modes_init();
 #endif
-#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#if CONFIG_EZPI_SERV_MESHBOT_EN
     ezlopi_scenes_meshbot_init();
 #endif
-
-
 
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 0, NULL);
 }

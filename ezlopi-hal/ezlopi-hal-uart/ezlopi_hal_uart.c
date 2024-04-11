@@ -191,7 +191,7 @@ void EZPI_HAL_uart_init(void)
     uart_word_length_t frame_size_val = EZPI_CORE_info_get_frame_size(frame_size);
 
     char flw_ctrl_bffr[EZPI_UART_SERV_FLW_CTRL_STR_SIZE + 1];
-    EZPI_CORE_info_get_flow_ctrl_to_str(flow_control, flw_ctrl_bffr);
+    EZPI_CORE_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
 
     TRACE_I("Serial Configuration:");
     TRACE_I("  Baud Rate: %d", baud);

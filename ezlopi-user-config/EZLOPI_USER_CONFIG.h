@@ -5,11 +5,10 @@
 /////////////// Do not change here //////////////////
 ////////////////////////////////////////////////////////////
 
-#include "driver/uart.h"
 
 // EzloPi Versions
-#define EZLOPI_SERIAL_API_VERSION "1.0.0"
-#define EZLOPI_BLE_API_VERSION "1.0.0"
+#define EZPI_VERSION_API_SERIAL "1.0.0"
+#define EZPI_VERSION_API_BLE "1.0.0"
 
 // User Configs
 #define EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
@@ -28,16 +27,16 @@
 #define EZPI_SERV_ENABLE_MESHBOTS
 
 // EzloPi BLE Service Pass key 
-#define EZLOPI_BLE_ENALBE_PASSKEY 0
-#define EZLOPI_BLE_ENALBE_PAIRING 1
+#define EZPI_SERV_BLE_PASSKEY_EN 0
+#define EZPI_SERV_BLE_PAIRING_EN 1
 #define EZPI_SERV_BLE_ENABLE_READ_PROV
 #define EZPI_SERV_BLE_ENABLE_STAT_PROV
 
 // EzloPi WiFi Configuration 
-#define EZLOPI_WIFI_CONNECT_TIMEOUT 5000
-#define EZLOPI_WIFI_MIN_PASS_CHAR 8
-#define EZLOPI_WIFI_CONN_ATTEMPT_INTERVAL 5000
-#define EZLOPI_WIFI_CONN_RETRY_ATTEMPT 2
+#define EZPI_CORE_WIFI_CONNECT_TIMEOUT 5000
+#define EZPI_CORE_WIFI_PASS_CHAR_MIN_LEN 8
+#define EZPI_CORE_WIFI_CONN_ATTEMPT_INTERVAL 5000
+#define EZPI_CORE_WIFI_CONN_RETRY_ATTEMPT 2
 
 
 // EzloPi Default Serial Configuartion 

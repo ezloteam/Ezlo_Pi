@@ -26,7 +26,7 @@ static int ezlopi_factory_info_v3_set_4kb(const char* data, uint32_t offset)
         {
             if (ESP_OK == esp_partition_write(partition_ctx_v3, offset, data, strlen(data) + 1))
             {
-                TRACE_S("Flash write succeessful");
+                TRACE_S("Flash write successful");
                 ret = 1;
             }
             else
@@ -186,6 +186,13 @@ void print_factory_info_v3(void)
 /** Getter */
 uint32_t ezlopi_factory_info_v3_get_provisioning_status(void)
 {
+    char* cloud_server = ezlopi_factory_info_v3_read_string(ezlopi_factory_info_v3_get_abs_address(EZLOPI_FINFO_REL_OFFSET_CLOUD_SERVER_URL, E_EZLOPI_FACTORY_INFO_CONN_DATA), EZLOPI_FINFO_LEN_CLOUD_SERVER_URL);
+    if (cloud_server && strstr(cloud_server, "https://"))
+    {
+        g_provisioning_status = 1;
+        free(cloud_server);
+    }
+
     return g_provisioning_status;
 }
 
@@ -302,6 +309,11 @@ uint16_t ezlopi_factory_info_v3_get_config_version(void)
 unsigned long long ezlopi_factory_info_v3_get_id(void)
 {
     unsigned long long _id = 0ULL;
+
+    if (ezlopi_factory_info_v3_get_provisioning_status() != 1)
+    {
+        return 0;
+    }
 
     if (ezlopi_factory_info_v3_init())
     {
@@ -573,6 +585,14 @@ int ezlopi_factory_info_v3_set_basic(s_basic_factory_info_t* ezlopi_config_basic
                         {
                             ret = (ret == 1) ? 1 : 0;
                         }
+                        else
+                        {
+                            ret = 0;
+                        }
+                    }
+                    else
+                    {
+                        ret = 0;
                     }
                 }
                 else

@@ -152,6 +152,8 @@ extern "C"
 
     int ezlopi_factory_info_v3_scenes_factory_soft_reset(void);
 
+    int EZPI_CORE_factory_info_prov_init(void);
+
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
