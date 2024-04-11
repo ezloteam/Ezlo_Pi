@@ -421,6 +421,7 @@ static int ezlopi_service_uart_ezlopi_info(cJSON* parent)
         unsigned long long serial_id = ezlopi_factory_info_v3_get_id();
         const char* device_type = ezlopi_factory_info_v3_get_device_type();
 
+        cJSON_AddBoolToObject(cj_ezlopi, ezlopi_provisioned_str, ezlopi_factory_info_v3_get_provisioning_status());
         cJSON_AddStringToObject(cj_ezlopi, ezlopi_uuid_str, controller_uuid ? controller_uuid : "");
         cJSON_AddStringToObject(cj_ezlopi, ezlopi_uuid_prov_str, provisioning_uuid ? provisioning_uuid : "");
         cJSON_AddStringToObject(cj_ezlopi, ezlopi_type_str, device_type ? device_type : "");

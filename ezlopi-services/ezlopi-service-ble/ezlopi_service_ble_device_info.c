@@ -517,6 +517,7 @@ static void EZPI_SERVICE_BLE_ezlo_cloud_info(esp_gatt_value_t* value, esp_ble_ga
             unsigned long long serial_id = ezlopi_factory_info_v3_get_id();
             const char* device_type = ezlopi_factory_info_v3_get_device_type();
 
+            cJSON_AddBoolToObject(cj_ezlopi, ezlopi_provisioned_str, ezlopi_factory_info_v3_get_provisioning_status());
             cJSON_AddStringToObject(cj_ezlopi, ezlopi_uuid_str, controller_uuid ? controller_uuid : "");
             cJSON_AddStringToObject(cj_ezlopi, ezlopi_uuid_prov_str, provisioning_uuid ? provisioning_uuid : "");
             cJSON_AddStringToObject(cj_ezlopi, ezlopi_type_str, device_type ? device_type : "");
@@ -636,7 +637,8 @@ static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t* value, esp_ble_gatts_cb_
 
 static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_param_t* param)
 {
-    static char* json_str_device_info;
+    #warning "This Characteristics is depricated, will be removed in future release later than 3.4.7"
+        static char* json_str_device_info;
 
     if (NULL == json_str_device_info)
     {
@@ -686,6 +688,7 @@ static void device_info_read_func(esp_gatt_value_t* value, esp_ble_gatts_cb_para
 static char* device_info_jsonify(void)
 {
     #warning "This info will be only available till Version 3.4.6 !"
+
         char* device_info = NULL;
     cJSON* root = cJSON_CreateObject();
     if (root)

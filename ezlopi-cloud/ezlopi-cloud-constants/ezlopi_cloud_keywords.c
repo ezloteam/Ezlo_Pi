@@ -167,6 +167,7 @@ const char* ezlopi_build_str = "build";
 const char* ezlopi_firmware_build_str = "firmware_build";
 const char* ezlopi_chip_str = "chip";
 const char* ezlopi_provisioned_status_str = "provisioned_status";
+const char* ezlopi_provisioned_str = "provisioned";
 const char* ezlopi_model_number_str = "model_number";
 const char* ezlopi_serial_str = "serial";
 const char* ezlopi_uuid_provisioning_str = "uuid_provisioning";
