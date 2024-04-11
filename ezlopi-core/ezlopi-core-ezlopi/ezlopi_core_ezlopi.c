@@ -19,9 +19,9 @@
 #include "ezlopi_core_scenes_scripts.h"
 #include "ezlopi_core_scenes_expressions.h"
 
-#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ETHERNET_EN
 #include "ezlopi_core_ethernet.h"
-#endif // CONFIG_EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
 #include "ezlopi_hal_system_info.h"
 
@@ -50,20 +50,20 @@ void ezlopi_init(void)
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
-#if CONFIG_EZLPI_SERV_ENABLE_MODES
+#if CONFIG_EZLPI_SERV_MODES_EN
     ezlopi_core_modes_init();
 #endif
     ezlopi_room_init();
 
-#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#ifdef CONFIG_EZPI_SERV_MESHBOT_EN
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
-#endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#endif // CONFIG_EZPI_SERV_MESHBOT_EN
 
-#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
+#ifdef CONFIG_EZPI_CORE_ETHERNET_EN
     ezlopi_ethernet_init();
-#endif // CONFIG_EZPI_CORE_ENABLE_ETH
+#endif // CONFIG_EZPI_CORE_ETHERNET_EN
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 

@@ -205,7 +205,7 @@ static void EZPI_SERVICE_BLE_ezlopi_api_info(esp_gatt_value_t* value, esp_ble_ga
         cJSON* cj_api = cJSON_CreateObject();
         if (cj_api)
         {
-            cJSON_AddStringToObject(cj_api, "api", EZLOPI_BLE_API_VERSION);
+            cJSON_AddStringToObject(cj_api, "api", EZPI_VERSION_API_BLE);
             ble_device_info_send_data(cj_api, value, param);
             cJSON_Delete(cj_api);
         }
@@ -259,7 +259,7 @@ static void EZPI_SERVICE_BLE_chip_info(esp_gatt_value_t* value, esp_ble_gatts_cb
             char chip_revision[10];
             esp_chip_info(&chip_info);
             sprintf(chip_revision, "%.2f", (float)(chip_info.full_revision / 100.0));
-            cJSON_AddStringToObject(cj_chip, "type", EZPI_CORE_info_chip_type_str(chip_info.model));
+            cJSON_AddStringToObject(cj_chip, "type", EZPI_CORE_info_get_chip_type_to_name(chip_info.model));
             cJSON_AddStringToObject(cj_chip, "version", chip_revision);
             ble_device_info_send_data(cj_chip, value, param);
             cJSON_Delete(cj_chip);
@@ -308,11 +308,11 @@ static void EZPI_SERVICE_BLE_device_state_info(esp_gatt_value_t* value, esp_ble_
 
             char time_string[50];
             uint32_t tick_count_ms = xTaskGetTickCount() / portTICK_PERIOD_MS;
-            EZPI_CORE_info_tick_to_time(time_string, sizeof(time_string), tick_count_ms);
+            EZPI_CORE_info_get_tick_to_time_name(time_string, sizeof(time_string), tick_count_ms);
 
             cJSON_AddStringToObject(cj_device_state, ezlopi_uptime_str, time_string);
             cJSON_AddNumberToObject(cj_device_state, "boot_count", ezlopi_system_info_get_boot_count());
-            cJSON_AddStringToObject(cj_device_state, "boot_reason", EZPI_CORE_info_esp_reset_reason_str(esp_reset_reason()));
+            cJSON_AddStringToObject(cj_device_state, "boot_reason", EZPI_CORE_info_get_esp_reset_reason_to_name(esp_reset_reason()));
 
             cJSON_AddStringToObject(cj_device_state, ezlopi_flash_size_str, CONFIG_ESPTOOLPY_FLASHSIZE);
 
@@ -366,7 +366,7 @@ static void EZPI_SERVICE_BLE_serial_config_info(esp_gatt_value_t* value, esp_ble
             cJSON_AddNumberToObject(cj_serial_config, ezlopi_baud_str, baud);
 
             EZPI_CORE_nvs_read_parity(&parity_val);
-            parity[0] = EZPI_CORE_info_get_parity(parity_val);
+            parity[0] = EZPI_CORE_info_parity_to_name(parity_val);
             parity[1] = 0;
             cJSON_AddStringToObject(cj_serial_config, ezlopi_parity_str, parity);
 
@@ -380,7 +380,7 @@ static void EZPI_SERVICE_BLE_serial_config_info(esp_gatt_value_t* value, esp_ble
             cJSON_AddNumberToObject(cj_serial_config, ezlopi_frame_size_str, frame_size);
 
             EZPI_CORE_nvs_read_flow_control(&flow_control);
-            EZPI_CORE_info_get_flow_ctrl_to_str(flow_control, flw_ctrl_bffr);
+            EZPI_CORE_info_get_flow_ctrl_to_name(flow_control, flw_ctrl_bffr);
             cJSON_AddStringToObject(cj_serial_config, ezlopi_flow_control_str, flw_ctrl_bffr);
 
             ble_device_info_send_data(cj_serial_config, value, param);
@@ -416,6 +416,14 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
                 uint32_t frame_size = 0;
                 uint32_t flow_control_val = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
 
+                uint32_t baud_current = EZPI_SERV_UART_BAUD_DEFAULT;
+                uint32_t parity_val_current = EZPI_SERV_UART_PARITY_DEFAULT;
+                uint32_t start_bits_current = EZPI_SERV_UART_START_BIT_DEFAULT;
+                uint32_t stop_bits_current = EZPI_SERV_UART_STOP_BIT_DEFAULT;
+                uint32_t frame_size_current = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
+                uint32_t flow_control_current = EZPI_SERV_UART_FLOW_CTRL_DEFAULT;
+
+                bool flag_new_config = false;
 
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_baud_str, baud);
                 CJSON_GET_VALUE_STRING(root, ezlopi_parity_str, parity);
@@ -424,43 +432,69 @@ static void EZPI_SERVICE_BLE_serial_config_write(esp_gatt_value_t* value, esp_bl
                 CJSON_GET_VALUE_DOUBLE(root, ezlopi_frame_size_str, frame_size);
                 CJSON_GET_VALUE_STRING(root, ezlopi_flow_control_str, flow_control);
 
-                if (parity)
-                {
-                    parity_val = (uint32_t)EZPI_CORE_info_set_parity(parity);
-                }
-                EZPI_CORE_nvs_write_parity(parity_val);
+                EZPI_CORE_nvs_read_baud(&baud_current);
+                EZPI_CORE_nvs_read_parity(&parity_val_current);
+                EZPI_CORE_nvs_read_start_bits(&start_bits_current);
+                EZPI_CORE_nvs_read_stop_bits(&stop_bits_current);
+                EZPI_CORE_nvs_read_frame_size(&frame_size_current);
+                EZPI_CORE_nvs_read_flow_control(&flow_control_current);
 
-                if (baud)
+                if (
+                    (baud_current != baud) ||
+                    (parity_val_current != (uint32_t)EZPI_CORE_info_name_to_parity(parity)) ||
+                    (start_bits_current != start_bits) ||
+                    (stop_bits != stop_bits_current) ||
+                    (frame_size != frame_size_current) ||
+                    (flow_control_current != (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control))
+                    )
                 {
-                    EZPI_CORE_nvs_write_baud(baud);
+                    flag_new_config = true;
+                }
+
+                if (flag_new_config)
+                {
+                    if (parity)
+                    {
+                        parity_val = (uint32_t)EZPI_CORE_info_name_to_parity(parity);
+                    }
+                    EZPI_CORE_nvs_write_parity(parity_val);
+
+                    if (baud)
+                    {
+                        EZPI_CORE_nvs_write_baud(baud);
+                    }
+                    else
+                    {
+                        baud = EZPI_SERV_UART_BAUD_DEFAULT;
+                        EZPI_CORE_nvs_write_baud(baud);
+                    }
+
+                    EZPI_CORE_nvs_write_start_bits(start_bits);
+                    EZPI_CORE_nvs_write_stop_bits(stop_bits);
+
+                    if (!frame_size)
+                    {
+                        frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
+                    }
+                    EZPI_CORE_nvs_write_frame_size(frame_size);
+
+
+                    if (flow_control)
+                    {
+                        flow_control_val = (uint32_t)EZPI_CORE_info_get_flw_ctrl_from_name(flow_control);
+                        TRACE_W("New Flow control: %d", flow_control_val);
+                    }
+
+                    EZPI_CORE_nvs_write_flow_control(flow_control_val);
+
+                    TRACE_W("New config has been applied, device rebooting");
+                    vTaskDelay(10);
+                    EZPI_CORE_reset_reboot();
                 }
                 else
                 {
-                    baud = EZPI_SERV_UART_BAUD_DEFAULT;
-                    EZPI_CORE_nvs_write_baud(baud);
+                    TRACE_W("Configuration unchanged !");
                 }
-
-                EZPI_CORE_nvs_write_start_bits(start_bits);
-                EZPI_CORE_nvs_write_stop_bits(stop_bits);
-
-                if (!frame_size)
-                {
-                    frame_size = EZPI_SERV_UART_FRAME_SIZE_DEFAULT;
-                }
-                EZPI_CORE_nvs_write_frame_size(frame_size);
-
-
-                if (flow_control)
-                {
-                    flow_control_val = (uint32_t)EZPI_CORE_info_get_flow_ctrl_frm_str(flow_control);
-                    TRACE_W("New Flow control: %d", flow_control_val);
-                }
-
-                EZPI_CORE_nvs_write_flow_control(flow_control_val);
-
-                TRACE_W("New config has been applied, device rebooting");
-                vTaskDelay(10);
-                EZPI_CORE_reset_reboot();
             }
         }
     }
@@ -557,7 +591,7 @@ static void EZPI_SERVICE_BLE_net_info(esp_gatt_value_t* value, esp_ble_gatts_cb_
             ezlopi_wifi_status_t* wifi_status = ezlopi_wifi_status();
             // if (wifi_status)
             {
-                char* wifi_mode = EZPI_CORE_info_get_wifi_mode(wifi_status->wifi_mode);
+                char* wifi_mode = EZPI_CORE_info_get_wifi_mode_to_name(wifi_status->wifi_mode);
                 cJSON_AddStringToObject(cj_network, "wifi_mode", wifi_mode ? wifi_mode : "");
 
                 char ip_str[20];

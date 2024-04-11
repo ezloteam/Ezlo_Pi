@@ -51,7 +51,7 @@ CLOUD_METHOD("hub.time.location.list", EZPI_CLOUD_location_list, NULL)
 CLOUD_METHOD("hub.time.location.set", EZPI_CLOUD_location_set, NULL)
 CLOUD_METHOD("hub.time.location.get", EZPI_CLOUD_location_get, NULL)
 
-#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#if CONFIG_EZPI_SERV_MESHBOT_EN
 CLOUD_METHOD("hub.scenes.list", scenes_list, NULL)
 CLOUD_METHOD("hub.scenes.create", scenes_create, scene_added)
 CLOUD_METHOD("hub.scenes.run", scenes_run, NULL)
@@ -74,7 +74,7 @@ CLOUD_METHOD("hub.room.get", room_get, NULL)
 CLOUD_METHOD("hub.room.delete", room_delete, room_deleted)
 CLOUD_METHOD("hub.room.all.delete", room_all_delete, NULL)
 
-#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#if CONFIG_EZPI_SERV_MESHBOT_EN
 CLOUD_METHOD("hub.scenes.scripts.list", scenes_scripts_list, NULL)
 CLOUD_METHOD("hub.scenes.scripts.add", scenes_scripts_add, NULL)
 CLOUD_METHOD("hub.scenes.scripts.get", scenes_scripts_get, NULL)
