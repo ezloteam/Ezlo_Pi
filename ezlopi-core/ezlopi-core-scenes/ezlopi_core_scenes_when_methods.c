@@ -162,7 +162,68 @@ int ezlopi_scene_when_is_interval(l_scenes_list_v2_t* scene_node, void* arg)
 
 int ezlopi_scene_when_is_item_state_changed(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_item_state_changed' not implemented!");
+    int ret = 1;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+    if (when_block)
+    {
+        uint16_t start_value = 0, finish_value = 0;
+        uint32_t item_id = 0;
+        l_fields_v2_t* curr_field = when_block->fields;
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
+            {
+                if ((EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type) && (VALUE_TYPE_STRING == curr_field->field_value.e_type))
+                {
+                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "start", 6))
+            {
+                if ((EZLOPI_VALUE_TYPE_INT == curr_field->value_type) && (VALUE_TYPE_NUMBER == curr_field->field_value.e_type))
+                {
+                    start_value = (uint16_t)curr_field->field_value.u_value.value_double;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "finish", 8))
+            {
+                if ((EZLOPI_VALUE_TYPE_INT == curr_field->value_type) && (VALUE_TYPE_NUMBER == curr_field->field_value.e_type))
+                {
+                    finish_value = (uint16_t)curr_field->field_value.u_value.value_double;
+                }
+            }
+            curr_field = curr_field->next;
+        }
+        if (item_id != 0)
+        {
+            l_ezlopi_item_t* item_to_check = ezlopi_device_get_item_by_id(item_id);
+            cJSON* cj_item_val = cJSON_CreateObject();
+            if (item_to_check && cj_item_val)
+            {
+                item_to_check->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item_to_check, (void*)cj_item_val, NULL);
+                cJSON* cj_value_state = cJSON_GetObjectItem(cj_item_val, ezlopi_value_str);
+                if (cj_value_state)
+                {
+                    switch (cj_value_state->type)
+                    {
+                    case cJSON_Number:
+                    {
+                        if((start_value < cj_value_state->valuedouble) && (finish_value > cj_value_state->valuedouble))
+                        {
+                            ret = 1;
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+
     return 0;
 }
 
