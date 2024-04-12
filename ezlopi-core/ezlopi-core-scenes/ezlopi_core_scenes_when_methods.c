@@ -411,7 +411,6 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
             {
                 house_mode_id_array = curr_field;
             }
-
             curr_field = curr_field->next;
         }
 
