@@ -7,7 +7,7 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include <cJSON.h>
+#include "cjext.h"
 #include <esp_log.h>
 #include <esp_eth.h>
 #include <esp_wifi.h>

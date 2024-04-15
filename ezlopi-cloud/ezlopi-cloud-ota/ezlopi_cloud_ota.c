@@ -1,6 +1,6 @@
 #include <string.h>
 #include <ctype.h>
-#include <cJSON.h>
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"

@@ -6,7 +6,7 @@
 #include "ezlopi_util_trace.h"
 #include "sdkconfig.h"
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_constants.h"

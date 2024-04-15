@@ -1,5 +1,5 @@
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include <math.h>
 
 #include "ezlopi_core_timer.h"

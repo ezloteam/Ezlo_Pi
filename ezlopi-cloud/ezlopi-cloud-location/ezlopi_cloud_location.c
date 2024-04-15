@@ -4,7 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "zones.h"
 
 #include "ezlopi_cloud_constants.h"

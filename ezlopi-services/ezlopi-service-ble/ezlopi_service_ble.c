@@ -4,7 +4,7 @@
 
 #include "esp_system.h"
 #include "esp_log.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "ezlopi_util_trace.h"
 #include "sdkconfig.h"
@@ -169,7 +169,7 @@ static void ezlopi_ble_basic_init(void)
 int ezlopi_ble_service_get_ble_mac(uint8_t mac[6])
 {
     int ret = 0;
-    if(ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
+    if (ESP_OK == esp_read_mac(mac, ESP_MAC_BT))
     {
         ret = 1;
     }

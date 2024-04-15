@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_cloud_scenes.h"
 
 #include "ezlopi_core_nvs.h"

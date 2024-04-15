@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <ctype.h>
-#include <cJSON.h>
+#include "cjext.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

@@ -1,7 +1,7 @@
 #ifndef _EZLOPI_CORE_OTA_H_
 #define _EZLOPI_CORE_OTA_H_
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "nvs_flash.h"
 
 #ifdef __cplusplus

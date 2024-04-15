@@ -1,7 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 #include "esp_chip_info.h"

@@ -3,7 +3,7 @@
 #define _HILINK_PRESENCE_SENSOR_SETTINGS_H_
 
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_core_devices.h"
 
 #define HILINK_PRESENCE_SENSOR_SETTING_PREDEFINED_LABEL_TEXT "Pre-defined operation mode"

@@ -3,7 +3,7 @@ file(GLOB_RECURSE config_src "*.c")
 
 #Define SDK components
 set(ESP_IDF_COMPONENTS
-        json
+
 )
 
 # Define core components

@@ -8,7 +8,7 @@
 */
 
 #include "freertos/FreeRTOSConfig.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_netif.h"
@@ -288,7 +288,7 @@ static int ezlopi_service_uart_execute_command_0(cJSON* root)
     int ret = 0;
     cJSON* cj_sub_cmd = cJSON_GetObjectItem(root, ezlopi_sub_cmd_str);
     if (cj_sub_cmd)
-    { 
+    {
         uint8_t sub_cmd = cj_sub_cmd->valuedouble;
         switch (sub_cmd)
         {

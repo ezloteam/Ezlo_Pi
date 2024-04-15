@@ -2,7 +2,7 @@
 #define _EZLOPI_CORE_SCENES_WHEN_METHODS_HELPER_FUNCTIONS_H_
 #include <time.h>
 #include <stdint.h>
-#include <cJSON.h>
+#include "cjext.h"
 
 typedef enum e_isdate_modes
 {

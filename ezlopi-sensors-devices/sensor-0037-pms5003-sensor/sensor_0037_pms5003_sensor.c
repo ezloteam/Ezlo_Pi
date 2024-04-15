@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 
@@ -15,12 +15,12 @@
 #include "pms5003.h"
 #include "sensor_0037_pms5003_sensor.h"
 
-static int __prepare(void *arg, void *user_arg);
-static int __init(l_ezlopi_item_t *item);
-static int __cjson_get_value(l_ezlopi_item_t *item, void *arg);
-static int __notify(l_ezlopi_item_t *item);
+static int __prepare(void* arg, void* user_arg);
+static int __init(l_ezlopi_item_t* item);
+static int __cjson_get_value(l_ezlopi_item_t* item, void* arg);
+static int __notify(l_ezlopi_item_t* item);
 
-int sensor_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+int sensor_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
     int ret = 0;
 
@@ -56,11 +56,11 @@ int sensor_pms5003_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *ar
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
 
-    s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
+    s_pms5003_sensor_object* pms_object = (s_pms5003_sensor_object*)item->user_arg;
 
     if (pms_object)
     {
@@ -71,7 +71,7 @@ static int __notify(l_ezlopi_item_t *item)
         }
         if ((pms_object->counter != 0) && (pms_object->counter <= 9))
         {
-            s_pms5003_sensor_object *pms_object = (s_pms5003_sensor_object *)item->user_arg;
+            s_pms5003_sensor_object* pms_object = (s_pms5003_sensor_object*)item->user_arg;
             pms_print_data(&pms_object->pms_data);
             ezlopi_device_value_updated_from_device_v3(item);
             pms_object->counter++;
@@ -85,7 +85,7 @@ static int __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __cjson_get_value(l_ezlopi_item_t *item, void *arg)
+static int __cjson_get_value(l_ezlopi_item_t* item, void* arg)
 {
     int ret = 0;
 
@@ -134,7 +134,7 @@ static int __cjson_get_value(l_ezlopi_item_t *item, void *arg)
     return ret;
 }
 
-static int __init(l_ezlopi_item_t *item)
+static int __init(l_ezlopi_item_t* item)
 {
     int ret = 0;
     if (item)
@@ -156,11 +156,11 @@ static int __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __prepare(void *arg, void *user_arg)
+static int __prepare(void* arg, void* user_arg)
 {
     int ret = 0;
 
-    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
     if (prep_arg)
     {
         uint32_t parent_id = 0;

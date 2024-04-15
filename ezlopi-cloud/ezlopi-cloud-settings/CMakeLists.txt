@@ -4,7 +4,7 @@ idf_component_register(SRCS "ezlopi_cloud_settings.c" "${src_files}"
     REQUIRES
     
     ezlopi-util-trace
-    json  
+    cjext  
     ezlopi-core-devices
     ezlopi-core-factory-info
     ezlopi-core-settings  

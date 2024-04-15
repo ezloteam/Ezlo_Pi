@@ -2,7 +2,7 @@
 #define __HUB_INFO_H__
 #include <string.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 
 #ifdef __cplusplus
 extern "C"

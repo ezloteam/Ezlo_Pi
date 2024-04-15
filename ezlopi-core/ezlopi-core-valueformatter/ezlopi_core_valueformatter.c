@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cJSON.h>
+#include "cjext.h"
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_valueformatter.h"
