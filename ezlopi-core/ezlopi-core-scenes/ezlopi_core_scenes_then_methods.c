@@ -164,14 +164,21 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
                 {
                     if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID == curr_field->value_type)
                     {
-                        house_mode_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        if (NULL != curr_field->field_value.u_value.value_string)
+                        {
+                            house_mode_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        }
+                        else
+                        {
+                            house_mode_id = (uint32_t)curr_field->field_value.u_value.value_double;
+                        }
                     }
                 }
 
                 curr_field = curr_field->next;
             }
 
-            if (house_mode_id)
+            if (house_mode_id > 0)
             {
                 // first get the current 
                 s_ezlopi_modes_t* curr_house_mode = ezlopi_core_modes_get_custom_modes();
