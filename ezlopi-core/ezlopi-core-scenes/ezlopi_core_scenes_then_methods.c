@@ -185,13 +185,13 @@ int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* ar
 
                 // find and match the 'house_mode' you want to switch with.
                 s_house_modes_t* req_mode = ezlopi_core_modes_get_house_mode_by_id(house_mode_id);
+                TRACE_E("req-house-mode-id [%d] : curr->switch_to_mode_id[%d]",
+                    req_mode->_id,
+                    curr_house_mode->switch_to_mode_id);
                 if ((req_mode->_id != curr_house_mode->switch_to_mode_id))
                 {
-                    curr_house_mode->switch_to_mode_id = req_mode->_id;
-                    ezlopi_core_modes_api_switch_mode(curr_house_mode);
+                    ezlopi_core_modes_api_switch_mode(req_mode);
                     ret = 1;
-
-                    TRACE_E("house-mode-changed-to: %d", house_mode_id);
                 }
             }
         }
