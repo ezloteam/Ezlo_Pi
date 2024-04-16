@@ -443,6 +443,41 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
     return 0;
 }
 
+int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_node, void* arg)
+{
+    //TRACE_W(" is_House_Mode_Alarm_Phase_Range ");
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+
+    if (when_block)
+    {
+        char* phase_name = NULL;
+        l_fields_v2_t* curr_field = when_block->fields;
+
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, ezlopi_houseMode_str, strlen(ezlopi_houseMode_str)))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type)
+                {
+                    if (NULL != (phase_name = curr_field->field_value.u_value.value_string))
+                    {
+                        s_ezlopi_modes_t* curr_mode = ezlopi_core_default_mode_get();
+
+                        if (0 == strcmp(curr_mode->alarmed.type, phase_name))
+                        {
+                            ret = 1;
+                        }
+                    }
+                }
+            }
+            curr_field = curr_field->next;
+        }
+    }
+
+    return ret;
+}
+
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     TRACE_W(" isDevice_state. ");
