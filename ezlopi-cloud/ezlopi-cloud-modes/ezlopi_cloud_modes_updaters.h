@@ -2,6 +2,9 @@
 #define __EZLOPI_CLOUD_MODES_UPDATERS_H__
 
 #include "cjext.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
 
 void ezlopi_cloud_modes_switched(cJSON* cj_request, cJSON* cj_response);
 void ezlopi_cloud_modes_alarmed(cJSON* cj_request, cJSON* cj_response);
@@ -22,5 +25,8 @@ void ezlopi_cloud_modes_protect_buttons_updated(cJSON* cj_request, cJSON* cj_res
 void ezlopi_cloud_modes_protect_buttons_removed(cJSON* cj_request, cJSON* cj_response);
 void ezlopi_cloud_modes_protect_devices_added(cJSON* cj_request, cJSON* cj_response);
 void ezlopi_cloud_modes_protect_devices_removed(cJSON* cj_request, cJSON* cj_response);
+
+#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
+
 
 #endif // __EZLOPI_CLOUD_MODES_UPDATERS_H__

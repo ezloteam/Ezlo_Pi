@@ -5,6 +5,7 @@ CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
 
+#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
 CLOUD_METHOD("hub.modes.get", ezlopi_cloud_modes_get, NULL)
 CLOUD_METHOD("hub.modes.current.get", ezlopi_cloud_modes_current_get, NULL)
 CLOUD_METHOD("hub.modes.switch", ezlopi_cloud_modes_switch, NULL)
@@ -29,6 +30,7 @@ CLOUD_METHOD("hub.modes.protect.devices.add", ezlopi_cloud_modes_protect_devices
 CLOUD_METHOD("hub.modes.protect.devices.remove", ezlopi_cloud_modes_protect_devices_remove, NULL)
 CLOUD_METHOD("hub.modes.entry_delay.set", ezlopi_cloud_modes_entry_delay_set, NULL)
 CLOUD_METHOD("hub.modes.entry_delay.reset", ezlopi_cloud_modes_entry_delay_reset, NULL)
+#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
 
 CLOUD_METHOD("hub.favorite.list", favorite_list_v3, NULL)
 

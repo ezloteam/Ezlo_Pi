@@ -15,11 +15,10 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
-#include "ezlopi_util_version.h"
-#include "sdkconfig.h"
 #include "esp_netif_ip_addr.h"
 
 #include "ezlopi_util_trace.h"
+#include "ezlopi_util_version.h"
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_wifi.h"
@@ -35,8 +34,10 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "ezlopi_service_ble.h"
-
 #include "ezlopi_service_uart.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+#if defined (CONFIG_EZPI_ENABLE_UART_PROVISIONING)
 
 static const int RX_BUF_SIZE = 3096;
 static const uint8_t EZPI_UART_FLW_CTRL_STR_MAX = 10;
@@ -536,7 +537,7 @@ static int get_device_serial_protocol_info(cJSON* parent)
         EZPI_CORE_nvs_read_baud(&baud);
         cJSON_AddNumberToObject(cj_serial_config, ezlopi_baud_str, baud);
 
-        EZPI_CORE_nvs_read_parity((uint8_t*)&parity_val);
+        EZPI_CORE_nvs_read_parity((uint32_t*)&parity_val);
         char parity = get_parity(parity_val);
         cJSON_AddStringToObject(cj_serial_config, "parity", &parity);
 
@@ -878,3 +879,5 @@ void EZPI_SERVICE_uart_init(void)
     serial_init();
     xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
 }
+
+#endif // CONFIG_EZPI_ENABLE_UART_PROVISIONING

@@ -394,6 +394,7 @@ int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t* scene_node, voi
     return 0;
 }
 
+#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, void* arg)
 {
     //TRACE_W(" isHouse_mode ");
@@ -442,6 +443,7 @@ int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node,
     TRACE_W("Warning: when-method 'is_house_mode_changed_from' not implemented!");
     return 0;
 }
+#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {

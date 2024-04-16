@@ -31,7 +31,10 @@ void ezlopi_init(void)
 {
     // Init memories
     ezlopi_nvs_init();
-    ezlopi_core_buffer_init(10 * 1024); // allocate 10kB
+
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT) || defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
+    ezlopi_core_buffer_init(CONFIG_EZPI_CORE_STATIC_BUFFER_SIZE); // allocate 10kB
+#endif
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -40,37 +43,54 @@ void ezlopi_init(void)
     print_factory_info_v3();
 
     ezlopi_event_group_create();
+
+#if defined(CONFIG_EZPI_ENABLE_WIFI)
     ezlopi_wifi_initialize();
+#endif
+
     vTaskDelay(10);
     // Init devices
     ezlopi_device_prepare();
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
-#if CONFIG_EZLPI_SERV_ENABLE_MODES
+
+#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
     ezlopi_core_modes_init();
 #endif
+
     ezlopi_room_init();
 
-#ifdef CONFIG_EZPI_SERV_ENABLE_MESHBOTS
+#if defined(CONFIG_EZPI_SERV_ENABLE_MESHBOTS)
     ezlopi_scenes_scripts_init();
     ezlopi_scenes_expressions_init();
     ezlopi_scenes_init_v2();
 #endif // CONFIG_EZPI_SERV_ENABLE_MESHBOTS
 
-#ifdef CONFIG_EZPI_CORE_ENABLE_ETH
+#if defined(CONFIG_EZPI_CORE_ENABLE_ETH)
     ezlopi_ethernet_init();
 #endif // CONFIG_EZPI_CORE_ENABLE_ETH
 
     uint32_t boot_count = ezlopi_system_info_get_boot_count();
 
+#if defined(CONFIG_EZPI_ENABLE_WIFI)
     ezlopi_wifi_connect_from_id_bin();
+#endif
+
     ezlopi_nvs_set_boot_count(boot_count + 1);
+
     ezlopi_event_queue_init();
+
+#if (defined(CONFIG_EZPI_ENABLE_WIFI) || defined(CONFIG_EZPI_CORE_ENABLE_ETH))
     ezlopi_ping_init();
     EZPI_CORE_sntp_init();
+#endif
+
     ezlopi_timer_start_1000ms();
+
+#if defined(EZPI_ENABLE_MDNS_SERVICE)
     EZPI_core_init_mdns();
+#endif
 }
 
 l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)
