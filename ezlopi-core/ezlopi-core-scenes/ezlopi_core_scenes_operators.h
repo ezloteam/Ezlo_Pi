@@ -49,6 +49,7 @@ const char* ezlopi_scenes_numeric_comparator_operators_get_method(e_scene_num_cm
 double ezlopi_core_scenes_operator_get_item_double_value_current(uint32_t item_id);
 
 int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
+int ezlopi_scenes_operators_value_expn_number_operations(char* expression_name_left, char* expression_name_right, l_fields_v2_t* comparator_field);
 
 // Strings Operators
 e_scene_str_cmp_operators_t ezlopi_scenes_strings_comparator_operators_get_enum(char* operator_str);
@@ -57,7 +58,7 @@ const char* ezlopi_scenes_strings_comparator_operators_get_name(e_scene_str_cmp_
 const char* ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cmp_operators_t operator);
 
 int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
-// int ezlopi_scenes_operators_value_expn_strings_operations(uint32_t item_id, l_fields_v2_t *value_field, l_fields_v2_t *comparator_field);
+int ezlopi_scenes_operators_value_expn_strings_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field);
 
 // InArray Operators
 e_scene_inarr_cmp_operators_t ezlopi_scenes_inarr_comparator_operators_get_enum(char* operator_inarr);

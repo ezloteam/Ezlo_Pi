@@ -658,23 +658,39 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
     if (when_block && scene_node)
     {
         uint32_t item_id = 0;
+        char* expression_name = 0;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
+        l_fields_v2_t* expression_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, ezlopi_item_str, strlen(ezlopi_item_str)))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
             {
                 item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
             }
-            else if (0 == strncmp(curr_field->name, ezlopi_value_str, strlen(ezlopi_value_str)))
+            else if (0 == strncmp(curr_field->name, "expression", 11))
             {
-                value_field = curr_field;
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    expression_name = curr_field->field_value.u_value.value_string; // expression_name
+                }
             }
-            else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, strlen(ezlopi_comparator_str)))
+            else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, 11))
             {
                 comparator_field = curr_field;
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
+            {
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    value_field = curr_field;
+                }
+                else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    expression_field = curr_field; // this field has expression_name
+                }
             }
             curr_field = curr_field->next;
         }
@@ -682,6 +698,14 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
         if (item_id && value_field && comparator_field)
         {
             ret = ezlopi_scenes_operators_value_number_operations(item_id, value_field, comparator_field);
+        }
+        else if (item_id && expression_field && comparator_field)
+        {
+            ret = ezlopi_scenes_operators_value_number_operations(item_id, expression_field, comparator_field);
+        }
+        else if (expression_name && expression_field && comparator_field) // only for expression 'string comparisions'
+        {
+            ret = ezlopi_scenes_operators_value_expn_strings_operations(expression_name, value_field, comparator_field);
         }
     }
 
@@ -746,21 +770,30 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
     if (when_block && scene_node)
     {
         uint32_t item_id = 0;
-        // l_fields_v2_t *expression_field = NULL;
+        char* expression_name = NULL;
+
+        l_fields_v2_t* expression_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "item", 5))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
             {
                 if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // item or expression_id
                 }
             }
-            else if (0 == strncmp(curr_field->name, "comparator", 11))
+            else if (0 == strncmp(curr_field->name, "expression", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    expression_name = curr_field->field_value.u_value.value_string; // expression_name
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, 11))
             {
                 if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
@@ -769,26 +802,33 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
             }
             else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
             {
-                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && NULL != curr_field->field_value.u_value.value_string)
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
                 {
                     value_field = curr_field; // this field has string
                 }
-                // else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && NULL != curr_field->value.value_string)
-                // {
-                //     expression_field = curr_field; // this field has expression_name
-                // }
+                else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
+                {
+                    expression_field = curr_field; // this field has expression_name
+                }
             }
             curr_field = curr_field->next;
         }
 
-        if (item_id && value_field && comparator_field) // only for item_value 'string comparisions'
+        if (item_id && value_field && comparator_field) // only for item_id vs item_value 'string comparisions'
         {
             ret = ezlopi_scenes_operators_value_strings_operations(item_id, value_field, comparator_field);
         }
-        // else if (item_id && expression_field && comparator_field) // only for expression 'string comparisions'
-        // {
-        //     // ret = ezlopi_scenes_operators_value_expn_strings_operations(item_id, value_field, comparator_field);
-        // }
+        else if (item_id && expression_field && comparator_field) // only for item_id vs expression 'string comparisions'
+        {
+            #warning "need to add different function";
+            ret = ezlopi_scenes_operators_value_strings_operations(item_id, expression_field, comparator_field);
+        }
+        else if (expression_name && expression_field && comparator_field) // only for expression_name vs expression 'string comparisions'
+        {
+            ret = ezlopi_scenes_operators_value_expn_strings_operations(value_field, expression_field, comparator_field);
+        }
+
+
     }
     // #endif
     return ret;
