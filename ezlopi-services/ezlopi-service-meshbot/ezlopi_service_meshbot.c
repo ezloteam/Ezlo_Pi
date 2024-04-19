@@ -179,8 +179,8 @@ void ezlopi_scenes_meshbot_init(void)
     while (scene_node)
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
-        // if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
-        if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
+        if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
+        // if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
             start_thread = 1;
 

@@ -8,6 +8,7 @@
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_operators.h"
+#include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_scenes_when_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
@@ -657,24 +658,25 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
 
     if (when_block && scene_node)
     {
-        uint32_t item_id = 0;
-        char* expression_name = 0;
+        l_fields_v2_t* item_or_expression_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
-        l_fields_v2_t* expression_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
             if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
             {
-                item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_or_expression_field = curr_field;
+                }
             }
             else if (0 == strncmp(curr_field->name, "expression", 11))
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
-                    expression_name = curr_field->field_value.u_value.value_string; // expression_name
+                    item_or_expression_field = curr_field; // expression_name
                 }
             }
             else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, 11))
@@ -689,23 +691,15 @@ int ezlopi_scene_when_compare_numbers(l_scenes_list_v2_t* scene_node, void* arg)
                 }
                 else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
                 {
-                    expression_field = curr_field; // this field has expression_name
+                    value_field = curr_field; // this field has expression_name
                 }
             }
             curr_field = curr_field->next;
         }
 
-        if (item_id && value_field && comparator_field)
+        if (item_or_expression_field && value_field && comparator_field) // item_or_expression_field vs value_field
         {
-            ret = ezlopi_scenes_operators_value_number_operations(item_id, value_field, comparator_field);
-        }
-        else if (item_id && expression_field && comparator_field)
-        {
-            ret = ezlopi_scenes_operators_value_number_operations(item_id, expression_field, comparator_field);
-        }
-        else if (expression_name && expression_field && comparator_field) // only for expression 'string comparisions'
-        {
-            ret = ezlopi_scenes_operators_value_expn_strings_operations(expression_name, value_field, comparator_field);
+            ret = ezlopi_scenes_operators_value_number_operations(item_or_expression_field, value_field, comparator_field);
         }
     }
 
@@ -720,15 +714,34 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
     if (when_block && scene_node)
     {
         uint32_t item_id = 0;
-        l_fields_v2_t* end_vlaue_field = NULL;
+        char* expression_name = NULL;
+        l_fields_v2_t* item_exp_field = NULL;
+        l_fields_v2_t* end_value_field = NULL;
         l_fields_v2_t* start_value_field = NULL;
+        bool comparator_choice = 0;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, ezlopi_item_str, 4))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
             {
+                item_exp_field = curr_field;
                 item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+            }
+            else if (0 == strncmp(curr_field->name, "expression", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_exp_field = curr_field;
+                    expression_name = curr_field->field_value.u_value.value_string; // expression_name
+                }
+            }
+            else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, 11))
+            {
+                if (EZLOPI_VALUE_TYPE_STRING == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    comparator_choice = (0 == strncmp(curr_field->field_value.u_value.value_string, "notbetween", 11)) ? 1 : 0;
+                }
             }
             else if (0 == strncmp(curr_field->name, ezlopi_startValue_str, strlen(ezlopi_startValue_str)))
             {
@@ -736,24 +749,53 @@ int ezlopi_scene_when_compare_number_range(l_scenes_list_v2_t* scene_node, void*
             }
             else if (0 == strncmp(curr_field->name, ezlopi_endValue_str, strlen(ezlopi_endValue_str)))
             {
-                end_vlaue_field = curr_field;
+                end_value_field = curr_field;
             }
-
             curr_field = curr_field->next;
         }
 
-        if (item_id && end_vlaue_field && start_value_field)
+        if (item_id && end_value_field && start_value_field)
         {
             double double_item_value = ezlopi_core_scenes_operator_get_item_double_value_current(item_id);
+
             if ((start_value_field->field_value.u_value.value_double <= double_item_value) &&
-                (end_vlaue_field->field_value.u_value.value_double >= double_item_value))
+                (end_value_field->field_value.u_value.value_double >= double_item_value))
             {
-                ret = 1;
+                if (0 == comparator_choice) //between
+                {
+                    ret = 1;
+                }
+            }
+            else
+            {
+                if (1 == comparator_choice) // not between
+                {
+                    ret = 1;
+                }
             }
         }
-        else
+        else if (expression_name && end_value_field && start_value_field)
         {
-            TRACE_E("error args");
+            s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(expression_name);
+            #warning "extract the double from expression";
+            double double_expn_value = 0;
+
+            if ((start_value_field->field_value.u_value.value_double <= double_expn_value) &&
+                (end_value_field->field_value.u_value.value_double >= double_expn_value))
+            {
+
+                if (0 == comparator_choice) //between
+                {
+                    ret = 1;
+                }
+            }
+            else
+            {
+                if (1 == comparator_choice) // not between
+                {
+                    ret = 1;
+                }
+            }
         }
     }
 
@@ -765,14 +807,11 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
     TRACE_W(" Compare_strings ");
     // TRACE_W("Warning: when-method 'compare_strings' not implemented!");
     int ret = 0;
-    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
-        uint32_t item_id = 0;
-        char* expression_name = NULL;
 
-        l_fields_v2_t* expression_field = NULL;
+        l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* comparator_field = NULL;
 
@@ -783,14 +822,14 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
             {
                 if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
-                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // item or expression_id
+                    item_exp_field = curr_field;
                 }
             }
             else if (0 == strncmp(curr_field->name, "expression", 11))
             {
                 if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
-                    expression_name = curr_field->field_value.u_value.value_string; // expression_name
+                    item_exp_field = curr_field;
                 }
             }
             else if (0 == strncmp(curr_field->name, ezlopi_comparator_str, 11))
@@ -808,29 +847,18 @@ int ezlopi_scene_when_compare_strings(l_scenes_list_v2_t* scene_node, void* arg)
                 }
                 else if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != curr_field->field_value.u_value.value_string))
                 {
-                    expression_field = curr_field; // this field has expression_name
+                    value_field = curr_field; // this field has expression_name
                 }
             }
             curr_field = curr_field->next;
         }
 
-        if (item_id && value_field && comparator_field) // only for item_id vs item_value 'string comparisions'
+        if (item_exp_field && value_field && comparator_field) // only for item_id vs item_value 'string comparisions'
         {
-            ret = ezlopi_scenes_operators_value_strings_operations(item_id, value_field, comparator_field);
+            ret = ezlopi_scenes_operators_value_strings_operations(item_exp_field, value_field, comparator_field);
         }
-        else if (item_id && expression_field && comparator_field) // only for item_id vs expression 'string comparisions'
-        {
-            #warning "need to add different function";
-            ret = ezlopi_scenes_operators_value_strings_operations(item_id, expression_field, comparator_field);
-        }
-        else if (expression_name && expression_field && comparator_field) // only for expression_name vs expression 'string comparisions'
-        {
-            ret = ezlopi_scenes_operators_value_expn_strings_operations(value_field, expression_field, comparator_field);
-        }
-
-
     }
-    // #endif
+
     return ret;
 }
 
@@ -839,23 +867,28 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
     TRACE_W(" Compare_string_op ");
     // TRACE_W("Warning: when-method 'string_operation' not implemented!");
     int ret = 0;
-    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
-        uint32_t item_id = 0;
-        // l_fields_v2_t *expression_field = NULL;
+        l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* operation_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "item", 5))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
             {
                 if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
-                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // ID extraction [item or expression]
+                    item_exp_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "expression", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_exp_field = curr_field;
                 }
             }
             else if (0 == strncmp(curr_field->name, "operation", 10))
@@ -879,16 +912,11 @@ int ezlopi_scene_when_string_operation(l_scenes_list_v2_t* scene_node, void* arg
             curr_field = curr_field->next;
         }
 
-        if (item_id && value_field && operation_field) // only for item_value 'string comparisions'
+        if (item_exp_field && value_field && operation_field) // only for item_value 'string comparisions'
         {
-            ret = ezlopi_scenes_operators_value_strings_operations(item_id, value_field, operation_field);
+            ret = ezlopi_scenes_operators_value_strops_operations(item_exp_field, value_field, operation_field);
         }
-        // else if (item_id && expression_field && operation_field) // only for expression 'string comparisions'
-        // {
-        //     // ret = ezlopi_scenes_operators_value_expn_strings_operations(item_id, value_field, operation_field);
-        // }
     }
-    // #endif
     return ret;
 }
 
@@ -897,23 +925,28 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
     TRACE_W(" Compare_inArray ");
     // TRACE_W("Warning: when-method 'in_array' not implemented!");
     int ret = 0;
-    // #if 0
     l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
     if (when_block && scene_node)
     {
-        uint32_t item_id = 0;
-        // l_fields_v2_t *expression_field = NULL;
+        l_fields_v2_t* item_exp_field = NULL;
         l_fields_v2_t* value_field = NULL;
         l_fields_v2_t* operation_field = NULL;
 
         l_fields_v2_t* curr_field = when_block->fields;
         while (curr_field)
         {
-            if (0 == strncmp(curr_field->name, "item", 5))
+            if (0 == strncmp(curr_field->name, ezlopi_item_str, 5))
             {
                 if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
                 {
-                    item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16); // ID extraction [item or expression]
+                    item_exp_field = curr_field;
+                }
+            }
+            else if (0 == strncmp(curr_field->name, "expression", 11))
+            {
+                if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type && (NULL != (curr_field->field_value.u_value.value_string)))
+                {
+                    item_exp_field = curr_field;
                 }
             }
             else if (0 == strncmp(curr_field->name, ezlopi_value_str, 6))
@@ -933,16 +966,12 @@ int ezlopi_scene_when_in_array(l_scenes_list_v2_t* scene_node, void* arg)
             curr_field = curr_field->next;
         }
 
-        if (item_id && value_field) // only for item_value 'string comparisions'
+        if (item_exp_field && value_field && operation_field) // only for item_value 'string comparisions'
         {
-            ret = ezlopi_scenes_operators_value_inarr_operations(item_id, value_field, operation_field);
+            ret = ezlopi_scenes_operators_value_inarr_operations(item_exp_field, value_field, operation_field);
         }
-        // else if (item_id && expression_field && operation_field) // only for expression 'string comparisions'
-        // {
-        // ret = ezlopi_scenes_operators_value_expn_inarr_operations(item_id, value_field, operation_field);
-        // }
     }
-    // #endif
+
     return ret;
 }
 

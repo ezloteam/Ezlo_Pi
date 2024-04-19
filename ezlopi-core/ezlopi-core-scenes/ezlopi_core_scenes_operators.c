@@ -130,123 +130,73 @@ double ezlopi_core_scenes_operator_get_item_double_value_current(uint32_t item_i
     return item_value;
 }
 
-int ezlopi_scenes_operators_value_number_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
+int ezlopi_scenes_operators_value_number_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
 {
     int ret = 0;
-    if (item_id && value_field && comparator_field)
+    if (item_exp_field && value_field && comparator_field)
     {
-        double item_value = ezlopi_core_scenes_operator_get_item_double_value_current(item_id);
 
-        switch (ezlopi_scenes_numeric_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string))
+        double item_exp_value = 0;
+        double value_to_compare_with = 0;
+        //---------------------- LHS -------------------------
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-        case SCENES_NUM_COMP_OPERATORS_LESS:
+            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            #warning "extract the double from expression";
+            item_exp_value = 0;
+        }
+        else
         {
-            ret = (item_value < value_field->field_value.u_value.value_double);
-            break;
+            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+            item_exp_value = ezlopi_core_scenes_operator_get_item_double_value_current(item_id);
         }
-        case SCENES_NUM_COMP_OPERATORS_LESS_EQUAL:
+        //---------------------- RHS -------------------------
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
         {
-            ret = (item_value <= value_field->field_value.u_value.value_double);
-            break;
+            s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+            #warning "extract the double from expression";
+            value_to_compare_with = 0;
         }
-        case SCENES_NUM_COMP_OPERATORS_GREATER:
+        else
         {
-            ret = (item_value > value_field->field_value.u_value.value_double);
-            break;
+            value_to_compare_with = value_field->field_value.u_value.value_double;
         }
-        case SCENES_NUM_COMP_OPERATORS_GREATER_EQUAL:
-        {
-            ret = (item_value >= value_field->field_value.u_value.value_double);
-            break;
-        }
-        case SCENES_NUM_COMP_OPERATORS_EQUAL:
-        {
-            ret = (item_value == value_field->field_value.u_value.value_double);
-            break;
-        }
-        case SCENES_NUM_COMP_OPERATORS_NOT_EQUAL:
-        {
-            ret = (item_value != value_field->field_value.u_value.value_double);
-            break;
-        }
-        case SCENES_NUM_COMP_OPERATORS_BETWEEN:
-        {
-            TRACE_W("'SCENES_OPERATORS_BETWEEN' not implemented!");
-            break;
-        }
-        case SCENES_NUM_COMP_OPERATORS_NOT_BETWEEN:
-        {
-            TRACE_W("'SCENES_OPERATORS_NOT_BETWEEN' not implemented!");
-            break;
-        }
-#if 0
-        case SCENES_NUM_COMP_OPERATORS_ANY_OF:
-        {
-            TRACE_W("'SCENES_OPERATORS_ANY_OF' not implemented!");
-            break;
-        }
-        case SCENES_NUM_COMP_OPERATORS_NONE_OF:
-        {
-            TRACE_W("'SCENES_OPERATORS_NONE_OF' not implemented!");
-            break;
-        }
-#endif
-        default:
-        {
-            break;
-        }
-        }
-    }
-
-    return ret;
-}
-
-int ezlopi_scenes_operators_value_expn_number_operations(char* expression_name_left, char* expression_name_right, l_fields_v2_t* comparator_field)
-{
-    int ret = 0;
-    if (expression_name_left && expression_name_right && comparator_field)
-    {
-        s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(expression_name_left);
-        s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(expression_name_right);
-
-        #warning "incomplete !! ; need to call lua-script to evaluate and populate -> 'exp_value.type' for both L&R_expression";
-
-        if ((curr_expr_left->value_type == curr_expr_right->value_type) &&
-            ((curr_expr_left->exp_value.type == EXPRESSION_VALUE_TYPE_NUMBER)) &&
-            ((curr_expr_right->exp_value.type == EXPRESSION_VALUE_TYPE_NUMBER)))  /* should have smae expression*/
+        //----------------------------------------------------
+        if (item_exp_value && value_to_compare_with)
         {
             switch (ezlopi_scenes_numeric_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string))
             {
             case SCENES_NUM_COMP_OPERATORS_LESS:
             {
-                ret = (curr_expr_left->exp_value.u_value.number_value < curr_expr_right->exp_value.u_value.number_value);
+                ret = (item_exp_value < value_to_compare_with);
                 break;
             }
             case SCENES_NUM_COMP_OPERATORS_LESS_EQUAL:
             {
-                ret = (curr_expr_left->exp_value.u_value.number_value <= curr_expr_right->exp_value.u_value.number_value);
+                ret = (item_exp_value <= value_to_compare_with);
                 break;
             }
             case SCENES_NUM_COMP_OPERATORS_GREATER:
             {
-                ret = (curr_expr_left->exp_value.u_value.number_value > curr_expr_right->exp_value.u_value.number_value);
+                ret = (item_exp_value > value_to_compare_with);
                 break;
             }
             case SCENES_NUM_COMP_OPERATORS_GREATER_EQUAL:
             {
-                ret = (curr_expr_left->exp_value.u_value.number_value >= curr_expr_right->exp_value.u_value.number_value);
+                ret = (item_exp_value >= value_to_compare_with);
                 break;
             }
             case SCENES_NUM_COMP_OPERATORS_EQUAL:
             {
-                ret = (curr_expr_left->exp_value.u_value.number_value == curr_expr_right->exp_value.u_value.number_value);
+                ret = (item_exp_value == value_to_compare_with);
                 break;
             }
             case SCENES_NUM_COMP_OPERATORS_NOT_EQUAL:
             {
-                ret = (curr_expr_left->exp_value.u_value.number_value != curr_expr_right->exp_value.u_value.number_value);
+                ret = (item_exp_value != value_to_compare_with);
                 break;
             }
+#if 0
             case SCENES_NUM_COMP_OPERATORS_BETWEEN:
             {
                 TRACE_W("'SCENES_OPERATORS_BETWEEN' not implemented!");
@@ -257,7 +207,6 @@ int ezlopi_scenes_operators_value_expn_number_operations(char* expression_name_l
                 TRACE_W("'SCENES_OPERATORS_NOT_BETWEEN' not implemented!");
                 break;
             }
-#if 0
             case SCENES_NUM_COMP_OPERATORS_ANY_OF:
             {
                 TRACE_W("'SCENES_OPERATORS_ANY_OF' not implemented!");
@@ -348,6 +297,189 @@ const char* ezlopi_scenes_strings_comparator_operators_get_method(e_scene_str_cm
     return ret;
 }
 
+char* ezlopi_core_scenes_operator_get_item_string_value_current_by_id(uint32_t item_id)
+{
+    char* item_value = NULL;
+    l_ezlopi_device_t* device = ezlopi_device_get_head();
+    while (device)
+    {
+        l_ezlopi_item_t* item = device->items;
+        while (item)
+        {
+            if (item->cloud_properties.item_id == item_id)
+            {
+                cJSON* cj_item_value = cJSON_CreateObject();
+                if (cj_item_value)
+                {
+                    item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
+                    cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
+                    if (cj_value)
+                    {
+                        if (cJSON_IsString(cj_value))
+                        {
+                            item_value = cJSON_GetStringValue(cj_value);
+                        }
+                    }
+                    cJSON_Delete(cj_item_value);
+                }
+                break;
+            }
+            item = item->next;
+        }
+        device = device->next;
+    }
+    return  item_value;
+}
+
+int ezlopi_scenes_operators_value_strings_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
+{
+    int ret = 0;
+    if (item_exp_field && value_field && comparator_field)
+    {
+        char* item_exp_value_str = NULL;
+        char* value_to_compare_with = NULL;
+
+        //---------------------- LHS -------------------------
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
+        {
+            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            #warning "extract the 'string' from expression";
+            item_exp_value_str = NULL;
+        }
+        else
+        {
+            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+            item_exp_value_str = ezlopi_core_scenes_operator_get_item_string_value_current_by_id(item_id);
+        }
+        //---------------------- RHS -------------------------
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == value_field->value_type)
+        {
+            s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(value_field->field_value.u_value.value_string);
+            #warning "extract the 'string' from expression";
+            value_to_compare_with = NULL;
+        }
+        else
+        {
+            value_to_compare_with = value_field->field_value.u_value.value_string;
+        }
+        //----------------------------------------------------
+
+        if (item_exp_value_str && value_to_compare_with)
+        {
+            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_strings_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+            switch (string_operator)
+            {
+            case SCENES_STRINGS_OPERATORS_LESS:
+            {
+                ret = STR_OP_COMP(item_exp_value_str, < , value_to_compare_with);
+                break;
+            }
+            case SCENES_STRINGS_OPERATORS_GREATER:
+            {
+                ret = STR_OP_COMP(item_exp_value_str, > , value_to_compare_with);
+                break;
+            }
+            case SCENES_STRINGS_OPERATORS_LESS_EQUAL:
+            {
+                ret = STR_OP_COMP(item_exp_value_str, <= , value_to_compare_with);
+                break;
+            }
+            case SCENES_STRINGS_OPERATORS_GREATER_EQUAL:
+            {
+                ret = STR_OP_COMP(item_exp_value_str, >= , value_to_compare_with);
+                break;
+            }
+            case SCENES_STRINGS_OPERATORS_EQUAL:
+            {
+                ret = STR_OP_COMP(item_exp_value_str, == , value_to_compare_with);
+                break;
+            }
+            case SCENES_STRINGS_OPERATORS_NOT_EQUAL:
+            {
+                ret = STR_OP_COMP(item_exp_value_str, != , value_to_compare_with);
+                break;
+            }
+            default:
+            {
+                TRACE_E("'SCENES_STRINGS_OPERATORS_* [%d]' out of range!", string_operator);
+                break;
+            }
+            }
+        }
+
+
+    }
+
+    return ret;
+}
+
+/************* String_operations ************/
+static const char* const ezlopi_scenes_strops_cmp_operators_op[] = {
+#define SCENES_STRING_OP_COMP_OPERATORES(OPERATOR, op, name, method) op,
+#include "__operators_macros/__string_op_comparision_operators_macros.h"
+#undef SCENES_STRING_OP_COMP_OPERATORES
+};
+
+static const char* const ezlopi_scenes_strops_cmp_operators_name[] = {
+#define SCENES_STRING_OP_COMP_OPERATORES(OPERATOR, op, name, method) name,
+#include "__operators_macros/__string_op_comparision_operators_macros.h"
+#undef SCENES_STRING_OP_COMP_OPERATORES
+};
+
+static const char* const ezlopi_scenes_strops_cmp_operators_method[] = {
+#define SCENES_STRING_OP_COMP_OPERATORES(OPERATOR, op, name, method) method,
+#include "__operators_macros/__string_op_comparision_operators_macros.h"
+#undef SCENES_STRING_OP_COMP_OPERATORES
+};
+
+e_scene_strops_cmp_operators_t ezlopi_scenes_strops_comparator_operators_get_enum(char* operator_str)
+{
+    e_scene_strops_cmp_operators_t ret = SCENES_STRING_OP_COMP_OPERATORES_NONE + 1;
+    if (operator_str)
+    {
+        while ((ret <= SCENES_STRING_OP_COMP_OPERATORES_MAX) && ezlopi_scenes_strops_cmp_operators_op[ret])
+        {
+            if (0 == strcmp(ezlopi_scenes_strops_cmp_operators_op[ret], operator_str))
+            {
+                break;
+            }
+
+            ret++;
+        }
+    }
+    return ret;
+}
+
+const char* ezlopi_scenes_strops_comparator_operators_get_op(e_scene_strops_cmp_operators_t operator)
+{
+    const char* ret = NULL;
+    if ((operator>= SCENES_STRING_OP_COMP_OPERATORES_NONE) && (operator<SCENES_STRING_OP_COMP_OPERATORES_MAX))
+    {
+        ret = ezlopi_scenes_strops_cmp_operators_op[operator];
+    }
+    return ret;
+}
+
+const char* ezlopi_scenes_strops_comparator_operators_get_name(e_scene_strops_cmp_operators_t operator)
+{
+    const char* ret = NULL;
+    if ((operator> SCENES_STRING_OP_COMP_OPERATORES_NONE) && (operator<SCENES_STRING_OP_COMP_OPERATORES_MAX))
+    {
+        ret = ezlopi_scenes_strops_cmp_operators_name[operator];
+    }
+    return ret;
+}
+
+const char* ezlopi_scenes_strops_comparator_operators_get_method(e_scene_strops_cmp_operators_t operator)
+{
+    const char* ret = NULL;
+    if ((operator> SCENES_STRING_OP_COMP_OPERATORES_NONE) && (operator<SCENES_STRING_OP_COMP_OPERATORES_MAX))
+    {
+        ret = ezlopi_scenes_strops_cmp_operators_method[operator];
+    }
+    return ret;
+}
+
 static char* ezlopi_scenes_laststr_comp(const char* haystack, const char* needle)
 {
     char* loc = NULL;
@@ -361,288 +493,126 @@ static char* ezlopi_scenes_laststr_comp(const char* haystack, const char* needle
     return loc;
 }
 
-int ezlopi_scenes_operators_value_strings_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
+int ezlopi_scenes_operators_value_strops_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* comparator_field)
 {
     int ret = 0;
-    if (item_id && value_field && comparator_field)
+    if (item_exp_field && value_field && comparator_field)
     {
-        char* item_value = NULL;
-        // int item_value_size = 0;
-        cJSON* cj_item_value = cJSON_CreateObject();
-        l_ezlopi_device_t* device = ezlopi_device_get_head();
-        while (device)
-        {
-            l_ezlopi_item_t* item = device->items;
-            while (item)
-            {
-                if (item->cloud_properties.item_id == item_id)
-                {
-                    if (cj_item_value)
-                    {
-                        item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
-                        if (cj_value)
-                        {
-                            if (cJSON_IsString(cj_value))
-                            {
-                                item_value = cJSON_GetStringValue(cj_value);
-                            }
-                        }
-                    }
+        char* item_exp_value_str = NULL;
+        char* value_to_compare_with = NULL;
+        uint32_t value_to_compare_with_num = NULL;
 
-                    break;
-                }
-                item = item->next;
-            }
-            device = device->next;
+        //---------------------- LHS -------------------------
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
+        {
+            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            #warning "extract the 'string' from expression";
+            item_exp_value_str = NULL;
         }
-
-        if (NULL != item_value)
+        else
         {
-            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_strings_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
+            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+            item_exp_value_str = ezlopi_core_scenes_operator_get_item_string_value_current_by_id(item_id);
+        }
+        //---------------------- RHS -------------------------
+
+        if (EZLOPI_VALUE_TYPE_STRING == value_field->value_type)
+        {
+            value_to_compare_with = value_field->field_value.u_value.value_string;
+        }
+        else if (EZLOPI_VALUE_TYPE_INT == value_field->value_type)
+        {
+            value_to_compare_with_num = value_field->field_value.u_value.value_double;
+        }
+        //----------------------------------------------------
+
+        if (item_exp_value_str && (value_to_compare_with || (value_to_compare_with_num > 0)))
+        {
+            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_string_operations_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
             switch (string_operator)
             {
-            case SCENES_STRINGS_OPERATORS_LESS:
+
+            case SCENES_STRING_OP_COMP_OPERATORES_BEGINS_WITH:
             {
-                ret = STR_OP_COMP(item_value, < , value_field->field_value.u_value.value_string);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_GREATER:
-            {
-                ret = STR_OP_COMP(item_value, > , value_field->field_value.u_value.value_string);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_LESS_EQUAL:
-            {
-                ret = STR_OP_COMP(item_value, <= , value_field->field_value.u_value.value_string);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_GREATER_EQUAL:
-            {
-                ret = STR_OP_COMP(item_value, >= , value_field->field_value.u_value.value_string);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_EQUAL:
-            {
-                ret = STR_OP_COMP(item_value, == , value_field->field_value.u_value.value_string);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_NOT_EQUAL:
-            {
-                ret = STR_OP_COMP(item_value, != , value_field->field_value.u_value.value_string);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_BEGINS_WITH:
-            {
-                char* str_pos = strstr(item_value, value_field->field_value.u_value.value_string); // finds out the position of first occurance
+                char* str_pos = strstr(item_exp_value_str, value_to_compare_with); // finds out the position of first occurance
                 if (str_pos)
                 {
-                    int diff = (str_pos - item_value);
+                    int diff = (str_pos - item_exp_value_str);
                     ret = (0 == diff) ? 1 : 0;
                 }
                 break;
             }
-            case SCENES_STRINGS_OPERATORS_NOT_BEGIN:
+            case SCENES_STRING_OP_COMP_OPERATORES_NOT_BEGIN:
             {
-                char* str_pos = strstr(item_value, value_field->field_value.u_value.value_string); // finds out the position of first occurance
+                char* str_pos = strstr(item_exp_value_str, value_to_compare_with); // finds out the position of first occurance
                 if (str_pos)
                 {
-                    int diff = (str_pos - item_value);
+                    int diff = (str_pos - item_exp_value_str);
                     ret = (0 < diff) ? 1 : 0;
                 }
                 break;
             }
-            case SCENES_STRINGS_OPERATORS_CONTAINS:
+            case SCENES_STRING_OP_COMP_OPERATORES_CONTAINS:
             {
-                char* str_pos = strstr(item_value, value_field->field_value.u_value.value_string); // finds out the position of first occurance
+                char* str_pos = strstr(item_exp_value_str, value_to_compare_with); // finds out the position of first occurance
                 if (str_pos)
                 {
-                    int diff = (str_pos - item_value);
+                    int diff = (str_pos - item_exp_value_str);
                     ret = (diff <= 0) ? 1 : 0;
                 }
                 break;
             }
-            case SCENES_STRINGS_OPERATORS_NOT_CONTAIN:
+            case SCENES_STRING_OP_COMP_OPERATORES_NOT_CONTAIN:
             {
-                char* str_pos = strstr(item_value, value_field->field_value.u_value.value_string); // finds out the position of first occurance
+                char* str_pos = strstr(item_exp_value_str, value_to_compare_with); // finds out the position of first occurance
                 if (NULL == str_pos)
                 {
                     ret = 1;
                 }
                 break;
             }
-            case SCENES_STRINGS_OPERATORS_ENDS_WITH:
+            case SCENES_STRING_OP_COMP_OPERATORES_ENDS_WITH:
             {
-                char* last = ezlopi_scenes_laststr_comp(item_value, value_field->field_value.u_value.value_string); // finds out the position of last occurance
+                char* last = ezlopi_scenes_laststr_comp(item_exp_value_str, value_to_compare_with); // finds out the position of last occurance
                 if (NULL != last)
                 {
-                    ret = (strlen(value_field->field_value.u_value.value_string) == strlen(last)) ? 1 : 0;
+                    ret = (strlen(value_to_compare_with) == strlen(last)) ? 1 : 0;
                 }
                 break;
             }
-            case SCENES_STRINGS_OPERATORS_NOT_END:
+            case SCENES_STRING_OP_COMP_OPERATORES_NOT_END:
             {
-                char* last = ezlopi_scenes_laststr_comp(item_value, value_field->field_value.u_value.value_string); // finds out the position of last occurance
+                char* last = ezlopi_scenes_laststr_comp(item_exp_value_str, value_to_compare_with); // finds out the position of last occurance
                 if (NULL != last)
                 {
-                    ret = (strlen(value_field->field_value.u_value.value_string) != strlen(last)) ? 1 : 0;
+                    ret = (strlen(value_to_compare_with) != strlen(last)) ? 1 : 0;
                 }
                 break;
             }
-            case SCENES_STRINGS_OPERATORS_LENGTH:
+            case SCENES_STRING_OP_COMP_OPERATORES_LENGTH:
             {
-                ret = (value_field->field_value.u_value.value_double == strlen(item_value)); // int value comparision
+                ret = (value_to_compare_with_num == strlen(item_exp_value_str)); // int value comparision
                 break;
             }
-            case SCENES_STRINGS_OPERATORS_NOT_LENGTH:
+            case SCENES_STRING_OP_COMP_OPERATORES_NOT_LENGTH:
             {
-                ret = (value_field->field_value.u_value.value_double != strlen(item_value)); // int value comparision
+                ret = (value_to_compare_with_num != strlen(item_exp_value_str)); // int value comparision
                 break;
             }
             default:
             {
-                TRACE_E("'SCENES_STRINGS_OPERATORS_* [%d]' out of range!", string_operator);
+                TRACE_E("'SCENES_STRING_OP_COMP_OPERATORES_* [%d]' out of range!", string_operator);
                 break;
             }
             }
         }
 
-        if (cj_item_value)
-        {
-            if (item_value)
-            {
-                free(item_value);
-            }
-            cJSON_Delete(cj_item_value);
-        }
+
     }
 
     return ret;
 }
 
-int ezlopi_scenes_operators_value_expn_strings_operations(char* expression_name_left, char* expression_name_right, l_fields_v2_t* comparator_field)
-{
-    int ret = 0;
-    if (expression_name_left && expression_name_right && comparator_field)
-    {
-        {
-            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(expression_name_left);
-            s_ezlopi_expressions_t* curr_expr_right = ezlopi_scenes_get_expression_node_by_name(expression_name_right);
-
-            #warning "incomplete !! ; need to call lua-script to evaluate and populate -> 'exp_value.type' for both L&R_expression";
-
-            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_strings_comparator_operators_get_enum(comparator_field->field_value.u_value.value_string);
-
-            switch (string_operator)
-            {
-            case SCENES_STRINGS_OPERATORS_LESS:
-            {
-                ret = STR_OP_COMP(curr_expr_left->exp_value.u_value.str_value, < , curr_expr_left->exp_value.u_value.str_value);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_GREATER:
-            {
-                ret = STR_OP_COMP(curr_expr_left->exp_value.u_value.str_value, > , curr_expr_left->exp_value.u_value.str_value);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_LESS_EQUAL:
-            {
-                ret = STR_OP_COMP(curr_expr_left->exp_value.u_value.str_value, <= , curr_expr_left->exp_value.u_value.str_value);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_GREATER_EQUAL:
-            {
-                ret = STR_OP_COMP(curr_expr_left->exp_value.u_value.str_value, >= , curr_expr_left->exp_value.u_value.str_value);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_EQUAL:
-            {
-                ret = STR_OP_COMP(curr_expr_left->exp_value.u_value.str_value, == , curr_expr_left->exp_value.u_value.str_value);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_NOT_EQUAL:
-            {
-                ret = STR_OP_COMP(curr_expr_left->exp_value.u_value.str_value, != , curr_expr_left->exp_value.u_value.str_value);
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_BEGINS_WITH:
-            {
-                char* str_pos = strstr(curr_expr_left->exp_value.u_value.str_value, curr_expr_left->exp_value.u_value.str_value); // finds out the position of first occurance
-                if (str_pos)
-                {
-                    int diff = (str_pos - curr_expr_left->exp_value.u_value.str_value);
-                    ret = (0 == diff) ? 1 : 0;
-                }
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_NOT_BEGIN:
-            {
-                char* str_pos = strstr(curr_expr_left->exp_value.u_value.str_value, curr_expr_left->exp_value.u_value.str_value); // finds out the position of first occurance
-                if (str_pos)
-                {
-                    int diff = (str_pos - curr_expr_left->exp_value.u_value.str_value);
-                    ret = (0 < diff) ? 1 : 0;
-                }
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_CONTAINS:
-            {
-                char* str_pos = strstr(curr_expr_left->exp_value.u_value.str_value, curr_expr_left->exp_value.u_value.str_value); // finds out the position of first occurance
-                if (str_pos)
-                {
-                    int diff = (str_pos - curr_expr_left->exp_value.u_value.str_value);
-                    ret = (diff <= 0) ? 1 : 0;
-                }
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_NOT_CONTAIN:
-            {
-                char* str_pos = strstr(curr_expr_left->exp_value.u_value.str_value, curr_expr_left->exp_value.u_value.str_value); // finds out the position of first occurance
-                if (NULL == str_pos)
-                {
-                    ret = 1;
-                }
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_ENDS_WITH:
-            {
-                char* last = ezlopi_scenes_laststr_comp(curr_expr_left->exp_value.u_value.str_value, curr_expr_left->exp_value.u_value.str_value); // finds out the position of last occurance
-                if (NULL != last)
-                {
-                    ret = (strlen(curr_expr_left->exp_value.u_value.str_value) == strlen(last)) ? 1 : 0;
-                }
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_NOT_END:
-            {
-                char* last = ezlopi_scenes_laststr_comp(curr_expr_left->exp_value.u_value.str_value, curr_expr_left->exp_value.u_value.str_value); // finds out the position of last occurance
-                if (NULL != last)
-                {
-                    ret = (strlen(curr_expr_left->exp_value.u_value.str_value) != strlen(last)) ? 1 : 0;
-                }
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_LENGTH:
-            {
-                ret = (value_field->field_value.u_value.value_double == strlen(curr_expr_left->exp_value.u_value.str_value)); // int value comparision
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_NOT_LENGTH:
-            {
-                ret = (value_field->field_value.u_value.value_double != strlen(curr_expr_left->exp_value.u_value.str_value)); // int value comparision
-                break;
-            }
-            default:
-            {
-                TRACE_E("'SCENES_STRINGS_OPERATORS_* [%d]' out of range!", string_operator);
-                break;
-            }
-            }
-        }
-    }
-
-    return ret;
-}
 
 /************* Values in_array ************/
 static const char* const ezlopi_scenes_inarr_cmp_operators_op[] = {
@@ -710,43 +680,26 @@ const char* ezlopi_scenes_inarr_comparator_operators_get_method(e_scene_inarr_cm
     return ret;
 }
 
-int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* operation_field)
+int ezlopi_scenes_operators_value_inarr_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* operation_field)
 {
     int ret = 0;
-    if (item_id && value_field && operation_field)
+    if (item_exp_field && value_field && operation_field)
     {
-        char* item_value = NULL;
-        // int item_value_size = 0;
-        cJSON* cj_item_value = cJSON_CreateObject();
-        l_ezlopi_device_t* device = ezlopi_device_get_head();
-        while (device)
+        char* item_exp_value_str = NULL;
+        //------------------------------------------------
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            l_ezlopi_item_t* item = device->items;
-            while (item)
-            {
-                if (item->cloud_properties.item_id == item_id)
-                {
-                    if (cj_item_value)
-                    {
-                        item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                        cJSON* cj_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str);
-                        if (cj_value)
-                        {
-                            if (cJSON_IsString(cj_value))
-                            {
-                                item_value = cJSON_GetStringValue(cj_value);
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                item = item->next;
-            }
-            device = device->next;
+            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
+            #warning "extract the 'string' from expression";
+            item_exp_value_str = NULL;
         }
-
-        if (NULL != item_value)
+        else
+        {
+            uint32_t item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+            item_exp_value_str = ezlopi_core_scenes_operator_get_item_string_value_current_by_id(item_id);
+        }
+        //------------------------------------------------
+        if (NULL != item_exp_value_str)
         {
             cJSON* iterator = NULL;
             char* op_str = (NULL == operation_field) ? "in" : operation_field->field_value.u_value.value_string;
@@ -762,7 +715,7 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
                         const char* string_item = cJSON_GetStringValue(iterator);
                         if (NULL != string_item)
                         {
-                            if (STR_OP_COMP(item_value, == , string_item)) // check for all array elements ; if exists then break
+                            if (STR_OP_COMP(item_exp_value_str, == , string_item)) // check for all array elements ; if exists then break
                             {
                                 ret = 1;
                                 break;
@@ -782,7 +735,7 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
                         const char* string_item = cJSON_GetStringValue(iterator);
                         if (NULL != string_item)
                         {
-                            if (STR_OP_COMP(item_value, == , string_item)) // check for all array elements ; if exists then break
+                            if (STR_OP_COMP(item_exp_value_str, == , string_item)) // check for all array elements ; if exists then break
                             {
                                 ret = 0;
                                 break;
@@ -805,68 +758,10 @@ int ezlopi_scenes_operators_value_inarr_operations(uint32_t item_id, l_fields_v2
             }
         }
 
-        if (cj_item_value)
-        {
-            if (item_value)
-            {
-                free(item_value);
-            }
-            cJSON_Delete(cj_item_value);
-        }
     }
 
     return ret;
 }
-#if 0
-int ezlopi_scenes_operators_value_expn_inarr_operations(uint32_t expression_id, l_fields_v2_t* expression_field, l_fields_v2_t* operation_field)
-{
-    int ret = 0;
-    if (expression_id && expression_field && operation_field)
-    {
-        size_t expression_name_len = strlen(expression_field->field_value.u_value.value_string);
-        char* expression_name = (expression_field->field_value.u_value.value_string); // get the expression_name
-        if (expression_name)
-        {
-            s_ezlopi_expressions_t* curr_expr = ezlopi_scenes_expressions_get_head();
-            while (curr_expr)
-            {
-                // find value representing 'item_id/expression_id' and then compare with value pointed by 'expression_field->field_value.u_value.value_string' ?
-
-               // if (STR_OP_COMP(curr_expr->name,==, expression_name)) // "string != NULL"
-                // {
-                //     break;
-                // }
-                curr_expr = curr_expr->next;
-            }
-
-            //
-
-            e_scene_str_cmp_operators_t string_operator = ezlopi_scenes_inarr_comparator_operators_get_enum(operation_field->field_value.u_value.value_string);
-
-            switch (string_operator)
-            {
-            case SCENES_STRINGS_OPERATORS_CONTAINS:
-            {
-                TRACE_W("'SCENES_STRINGS_OPERATORS_CONTAINS' not implemented!");
-                break;
-            }
-            case SCENES_STRINGS_OPERATORS_NOT_CONTAIN:
-            {
-                TRACE_W("'SCENES_STRINGS_OPERATORS_NOT_CONTAIN' not implemented!");
-                break;
-            }
-            default:
-            {
-                TRACE_E("'SCENES_STRINGS_OPERATORS_* [%d]' out of range!", string_operator);
-                break;
-            }
-            }
-        }
-    }
-
-    return ret;
-}
-#endif
 
 /************* Values with Less ************/
 
