@@ -64,13 +64,19 @@ uint32_t ezlopi_meshobot_service_stop_scene(l_scenes_list_v2_t* scene_node)
             scene_node->status = EZLOPI_SCENE_STATUS_STOP;
         }
 
-        while (EZLOPI_SCENE_STATUS_STOPPED != scene_node->status)
+        const int poll_ms = 50;
+        const int wait_max_ms = 10000; // wait for 10 Sec
+        int loop_count = wait_max_ms / poll_ms;
+
+        while ((EZLOPI_SCENE_STATUS_STOPPED != scene_node->status) && loop_count--)
         {
-            vTaskDelay(50 / portTICK_RATE_MS);
+            vTaskDelay(poll_ms / portTICK_RATE_MS);
         }
 
-        ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
-
+        if (EZLOPI_SCENE_STATUS_STOPPED == scene_node->status) {
+            ezlopi_scenes_status_change_broadcast(scene_node, scene_status_stopped_str);
+        }
+        
         ret = 1;
     }
     return ret;
@@ -179,8 +185,8 @@ void ezlopi_scenes_meshbot_init(void)
     while (scene_node)
     {
         scene_node->status = EZLOPI_SCENE_STATUS_STOPPED;
-        // if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
-        if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
+        if (scene_node->enabled && scene_node->when_block && (scene_node->else_block || scene_node->then_block))
+            // if (scene_node->when_block && (scene_node->else_block || scene_node->then_block))
         {
             start_thread = 1;
 
@@ -374,11 +380,10 @@ PT_THREAD(__scene_proto_thread(l_scenes_list_v2_t* scene_node, uint32_t routine_
         TRACE_D("entering delay: %d", ctx->curr_ticks);
 
         PT_WAIT_UNTIL(&ctx->pt, (xTaskGetTickCount() - ctx->curr_ticks) > routine_delay_ms);
-        
+
         TRACE_D("waited for: %d", (xTaskGetTickCount() - ctx->curr_ticks));
         TRACE_D("exiting delay: %d", xTaskGetTickCount());
     }
-
     PT_END(&ctx->pt);
 }
 

@@ -15,6 +15,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_scenes_operators.h"
 #include "ezlopi_core_scenes_notifications.h"
+#include "ezlopi_core_scenes_edit.h"
 
 void scenes_list(cJSON* cj_request, cJSON* cj_response)
 {
@@ -23,6 +24,80 @@ void scenes_list(cJSON* cj_request, cJSON* cj_response)
     {
         ezlopi_scenes_get_list_v2(cJSON_AddArrayToObject(cj_result, ezlopi_scenes_str));
     }
+}
+
+
+static int scene_create_scene_group(l_fields_v2_t* curr_field, uint32_t group_id)
+{
+    int ret = 0;
+    while (curr_field)
+    {
+        if (curr_field->field_value.e_type == VALUE_TYPE_BLOCK)
+        {
+            l_when_block_v2_t* field_value_when = curr_field->field_value.u_value.when_block;
+            while (field_value_when)
+            {
+                l_fields_v2_t* field_value_when_field = field_value_when->fields;
+                while (field_value_when_field)
+                {
+                    if (field_value_when_field->field_value.e_type == VALUE_TYPE_STRING)
+                    {
+                        char* scene_str = ezlopi_nvs_read_str(field_value_when_field->field_value.u_value.value_string);
+                        if (scene_str)
+                        {
+                            cJSON* cj_scene = cJSON_Parse(scene_str);
+                            if (cj_scene)
+                            {
+                                cJSON* cj_is_group = cJSON_GetObjectItem(cj_scene, ezlopi_is_group_str);
+                                cJSON* cj_group_id = cJSON_GetObjectItem(cj_scene, ezlopi_group_id_str);
+                                if ((cJSON_False == cj_is_group->type) && (cJSON_NULL == cj_group_id->type))
+                                {
+                                    char group_id_str[32];
+                                    snprintf(group_id_str, sizeof(group_id_str), "%08x", group_id);
+                                    cJSON_ReplaceItemInObject(cj_scene, ezlopi_is_group_str, cJSON_CreateTrue());
+                                    cJSON_ReplaceItemInObject(cj_scene, ezlopi_group_id_str, cJSON_CreateString(group_id_str));
+                                }
+                                uint32_t scene_id_to_edit_and_update = strtoul(field_value_when_field->field_value.u_value.value_string, NULL, 16);
+                                if (ezlopi_core_scene_edit_update_id(scene_id_to_edit_and_update, cj_scene))
+                                {
+                                    if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
+                                    {
+                                        ret = 1;
+                                    }
+                                }
+                                ret = 1;
+                            }
+                        }
+                    }
+                    field_value_when_field = field_value_when_field->next;
+                }
+                field_value_when = field_value_when->next;
+            }
+        }
+        curr_field = curr_field->next;
+    }
+    return ret;
+}
+
+static int scene_create_group_if_required(uint32_t scene_id)
+{
+    int ret = 0;
+    l_scenes_list_v2_t* scene_to_check = ezlopi_scenes_get_by_id_v2(scene_id);
+    if (scene_to_check)
+    {
+        l_when_block_v2_t* when_to_check = scene_to_check->when_block;
+        if (when_to_check)
+        {
+            if (NULL != when_to_check->block_name)
+            {
+                l_fields_v2_t* curr_field = when_to_check->fields;
+                uint32_t group_id = ezlopi_cloud_generate_scene_group_id();
+                scene_create_scene_group(curr_field, group_id);
+                ret = 1;
+            }
+        }
+    }
+    return ret;
 }
 
 void scenes_create(cJSON* cj_request, cJSON* cj_response)
@@ -44,6 +119,7 @@ void scenes_create(cJSON* cj_request, cJSON* cj_response)
                 snprintf(tmp_buff, sizeof(tmp_buff), "%08x", new_scene_id);
                 cJSON_AddStringToObject(cj_request, ezlopi__id_str, tmp_buff);
                 ezlopi_scenes_new_scene_populate(cj_params, new_scene_id);
+                scene_create_group_if_required(new_scene_id);
             }
         }
         else

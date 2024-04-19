@@ -51,7 +51,8 @@ static l_scenes_list_v2_t* _scenes_populate(cJSON* cj_scene, uint32_t scene_id);
 int ezlopi_scene_edit_by_id(uint32_t scene_id, cJSON* cj_scene)
 {
     int ret = 0;
-
+    // assert(1 != ezlopi_core_scene_edit_update_id(scene_id, cj_scene));
+    // assert(1 != ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene));
     if (1 == ezlopi_core_scene_edit_update_id(scene_id, cj_scene))
     {
         if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
@@ -757,6 +758,14 @@ static l_when_block_v2_t* ____new_when_block_populate(cJSON* cj_when_block)
     if (new_when_block)
     {
         memset(new_when_block, 0, sizeof(l_when_block_v2_t));
+
+        cJSON* cj_block_name = cJSON_GetObjectItem(cj_when_block, ezlopi_blockName_str);
+        if(cj_block_name)
+        {
+            size_t length = strlen(cj_block_name->valuestring);
+            snprintf(new_when_block->block_name, 40, "%s", cj_block_name->valuestring);
+        }
+
         cJSON* cj_block_options = cJSON_GetObjectItem(cj_when_block, ezlopi_blockOptions_str);
         if (cj_block_options)
         {

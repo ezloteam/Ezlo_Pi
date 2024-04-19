@@ -202,6 +202,7 @@ void ezlopi_print_when_blocks(l_when_block_v2_t* when_blocks)
     TRACE_D("\t|-- when: ");
     while (when_blocks)
     {
+        TRACE_D("\t\t|--blockName: %s", when_blocks->block_name);
         ezlopi_print_block_options(&when_blocks->block_options, when_blocks->fields);
         TRACE_D("\t\t|-- blockType: when");
         ezlopi_print_fields(when_blocks->fields);
