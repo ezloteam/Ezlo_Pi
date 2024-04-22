@@ -52,20 +52,31 @@ menu "EzloPi User Config"
     help
         Enable BLE pairing
 
+
     menu "EzloPi mDNS config"
+        
+        config EZPI_SERV_MDNS_EN
+        bool "Enable mDNS service"
+        default n
+        help
+            Enable mDNS Broadcast
+
         config EZPI_SERV_MDNS_HOSTNAME
         string "mDNS hostname"
         default "ezlopi_device"
+        depends on EZPI_SERV_MDNS_EN
         help
             Set mDNS hostname
         
         config EZPI_SERV_MDNS_INSTANCE_NAME
         string "mDNS instance name"
+        depends on EZPI_SERV_MDNS_EN
         default "ezlopi_serial"
         help 
             Set mDNS instance name
 
         config EZPI_SERV_MDNS_EXTRA_SERVICE_EN
+        depends on EZPI_SERV_MDNS_EN
         bool "mDNS enable extra services"
         default n
         help
