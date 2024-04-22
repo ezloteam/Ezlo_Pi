@@ -242,7 +242,7 @@ static int __0047_notify(l_ezlopi_item_t* item)
                 }
                 user_data->weight = weight_in_kg;
                 // TRACE_I("Mass : %0.2f unit , _Offset : %0.2f unit , Actual_Mass : %0.2f kg ,", Mass, (user_data->HX711_tare_wt), weight_in_kg);
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

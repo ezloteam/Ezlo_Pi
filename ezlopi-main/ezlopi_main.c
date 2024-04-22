@@ -53,6 +53,8 @@ void app_main(void)
     ezlopi_service_broadcast_init();
 #endif
 
+    ezlpi_service_ws_server_dummy();
+
 #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
     ezlopi_service_ws_server_start();
 #endif

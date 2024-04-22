@@ -106,7 +106,7 @@ static void __value_updated_from_interrupt(void* arg)
 {
     if (arg)
     {
-        ezlopi_device_value_updated_from_device_v3((l_ezlopi_item_t*)arg);
+        ezlopi_device_value_updated_from_device_broadcast((l_ezlopi_item_t*)arg);
     }
 }
 

@@ -378,7 +378,7 @@ static int __notify(l_ezlopi_item_t* item)
                     {
                         if (fabs(__prev[0] - user_data->X) > 0.1)
                         {
-                            ezlopi_device_value_updated_from_device_v3(item);
+                            ezlopi_device_value_updated_from_device_broadcast(item);
                         }
                     }
                 }
@@ -386,28 +386,28 @@ static int __notify(l_ezlopi_item_t* item)
                 {
                     if (fabs(__prev[1] - user_data->Y) > 0.1)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 if (ezlopi_item_name_magnetic_strength_z_axis == item->cloud_properties.item_name)
                 {
                     if (fabs(__prev[2] - user_data->Z) > 0.1)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
                     if (fabs(__prev[3] - user_data->T) > 0.5)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
                 if (ezlopi_item_name_angle_position == item->cloud_properties.item_name)
                 {
                     if (fabs(__prev[4] - user_data->azimuth) > 1)
                     {
-                        ezlopi_device_value_updated_from_device_v3(item);
+                        ezlopi_device_value_updated_from_device_broadcast(item);
                     }
                 }
             }

@@ -26,6 +26,9 @@
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CUSTOM"
 #endif
 
+
+#define EZLOPI_SERIAL_API_VERSION "1.0.0"
+
 #else
 /////////////////////////////////////////////////////////////
 /////////////// Do not change here //////////////////

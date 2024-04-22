@@ -200,7 +200,7 @@ static int __0043_notify(l_ezlopi_item_t* item)
             if (fabs((user_data->uv_data) - new_uvIntensity) > 0.01)
             {
                 user_data->uv_data = new_uvIntensity;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

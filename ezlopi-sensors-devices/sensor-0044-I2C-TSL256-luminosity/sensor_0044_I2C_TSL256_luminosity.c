@@ -67,7 +67,7 @@ static int __notify(l_ezlopi_item_t* item)
     {
         if (fabs((double)(TSL2561_lux_data->lux_val) - new_value) > 0.0001)
         {
-            ezlopi_device_value_updated_from_device_v3(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
             TSL2561_lux_data->lux_val = (uint32_t)new_value;
         }
     }

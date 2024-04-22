@@ -108,7 +108,7 @@ static int dht22_sensor_notify(l_ezlopi_item_t* item)
                 if (fabs(dht22_data->temperature - temperature) > 0.5)
                 {
                     dht22_data->temperature = temperature;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
@@ -118,7 +118,7 @@ static int dht22_sensor_notify(l_ezlopi_item_t* item)
                 if (fabs(dht22_data->humidity - humidity) > 0.5)
                 {
                     dht22_data->humidity = humidity;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

@@ -180,7 +180,7 @@ static int __0056_notify(l_ezlopi_item_t* item)
             if (new_force != fsr_struct->fsr_value)
             {
                 fsr_struct->fsr_value = new_force;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

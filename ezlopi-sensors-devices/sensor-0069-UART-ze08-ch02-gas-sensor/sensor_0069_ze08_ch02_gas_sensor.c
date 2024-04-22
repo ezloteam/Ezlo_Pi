@@ -93,7 +93,7 @@ static int __notify(l_ezlopi_item_t* item)
     ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
     if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
     {
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
         ze08_ch2o_sensor->available = false;
     }
     else

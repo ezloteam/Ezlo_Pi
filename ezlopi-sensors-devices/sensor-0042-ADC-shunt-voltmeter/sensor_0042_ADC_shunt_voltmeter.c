@@ -201,7 +201,7 @@ static int __0042_notify(l_ezlopi_item_t* item)
             if (fabs(Vout - (user_data->volt)) > 0.5)
             {
                 user_data->volt = Vout;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

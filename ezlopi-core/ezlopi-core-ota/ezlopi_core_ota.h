@@ -9,8 +9,10 @@ extern "C"
 {
 #endif
 
+#if defined(CONFIG_EZPI_ENABLE_OTA)
     uint32_t __get_ota_state(void);
     void ezlopi_ota_start(cJSON* cj_url);
+#endif
 
 #ifdef __cplusplus
 }

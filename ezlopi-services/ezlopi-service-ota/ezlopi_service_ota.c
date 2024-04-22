@@ -1,4 +1,5 @@
 #include <string.h>
+#include <bootloader_random.h>
 
 #include "cjext.h"
 #include "freertos/FreeRTOS.h"
@@ -17,6 +18,8 @@
 #include "ezlopi_service_ota.h"
 #include "ezlopi_service_webprov.h"
 
+
+#if defined(CONFIG_EZPI_ENABLE_OTA)
 static volatile bool __ota_busy = false;
 
 static void ota_service_process(void* pv);
@@ -49,8 +52,8 @@ static void ota_service_process(void* pv)
         if ((-1 != ret_nma_reg) || (-1 != ret_ota))
         {
             TRACE_D("Sending firmware check request...");
-            uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
-            cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(message_counter);
+            // uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
+            cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 
             CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);
 
@@ -67,3 +70,4 @@ static void ota_service_process(void* pv)
         }
     }
 }
+#endif // CONFIG_EZPI_ENABLE_OTA

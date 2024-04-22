@@ -73,7 +73,7 @@ static int __notify(l_ezlopi_item_t* item)
         {
             s_pms5003_sensor_object* pms_object = (s_pms5003_sensor_object*)item->user_arg;
             pms_print_data(&pms_object->pms_data);
-            ezlopi_device_value_updated_from_device_v3(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
             pms_object->counter++;
         }
         else if (pms_object->counter > 9)

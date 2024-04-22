@@ -21,6 +21,8 @@
 
 #include "ezlopi_service_ota.h"
 
+#if defined(CONFIG_EZPI_ENABLE_OTA)
+
 #define HASH_LEN 32
 
 #ifdef CONFIG_FIRMWARE_UPGRADE_BIND_IF
@@ -194,3 +196,4 @@ static esp_err_t _http_event_handler(esp_http_client_event_t* evt)
     }
     return ESP_OK;
 }
+#endif // CONFIG_EZPI_ENABLE_OTA

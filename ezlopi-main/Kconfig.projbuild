@@ -68,12 +68,6 @@ menu "EzloPi User Config"
         help
             Enable BLE pass key
 
-    config EZPI_ENABLE_OTA 
-        bool "Enable OTA"
-        default n
-        help
-            Enable OTA
-
     config EZPI_CORE_ENABLE_ETH
         bool "Enable ethernet"
         depends on ETH_USE_SPI_ETHERNET || EZPI_DISTRO_FULL_OPTION 
@@ -86,6 +80,14 @@ menu "EzloPi User Config"
         default y
         help 
             ezlopi-core-wifi component is enabled
+
+    
+    config EZPI_ENABLE_OTA 
+        depends on EZPI_ENABLE_WIFI || EZPI_CORE_ENABLE_ETH
+        bool "Enable OTA"
+        default n
+        help
+            Enable OTA
     
     config EZPI_ENABLE_UART_PROVISIONING
         bool "Enable UART provisioning"
@@ -95,14 +97,14 @@ menu "EzloPi User Config"
             Enable provisioning and monitoring via UART
     
     config EZPI_LOCAL_WEBSOCKET_SERVER
-        depends on EZPI_DISTRO_FULL_OPTION || EZLOPI_DISTRO_LOCAL || EZLOPI_DISTRO_LOCAL_MESHBOT
+        depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZLOPI_DISTRO_LOCAL || EZLOPI_DISTRO_LOCAL_MESHBOT)
         bool "Enable local websocket server"
         default n
         help 
             Enable local websocket server
 
     config EZPI_WEBSOCKET_CLIENT
-        depends on EZPI_DISTRO_FULL_OPTION || EZLOPI_DISTRO_CLOUD || EZLOPI_DISTRO_CLOUD_MESHBOT || EZLOPI_DISTRO_BLE_CLOUD || EZLOPI_DISTRO_WIFI_HUB || EZLOPI_DISTRO_BLE_HUB
+        depends on (EZPI_CORE_ENABLE_ETH || EZPI_ENABLE_WIFI ) && (EZPI_DISTRO_FULL_OPTION || EZLOPI_DISTRO_CLOUD || EZLOPI_DISTRO_CLOUD_MESHBOT || EZLOPI_DISTRO_BLE_CLOUD || EZLOPI_DISTRO_WIFI_HUB || EZLOPI_DISTRO_BLE_HUB)
         bool "Enable Web-Socket client"
         default n
         help 
@@ -116,7 +118,7 @@ menu "EzloPi User Config"
             Static buffer is used to broadcast data. Data is broadcasted by local-websocket-server and websocket-client. Default value is 10KB"
 
     config EZPI_SERV_ENABLE_MESHBOTS 
-        depends on EZPI_DISTRO_FULL_OPTION || EZLOPI_DISTRO_LOCAL_MESHBOT || EZLOPI_DISTRO_CLOUD_MESHBOT 
+        depends on (EZPI_WEBSOCKET_CLIENT || EZPI_LOCAL_WEBSOCKET_SERVER) && (EZPI_DISTRO_FULL_OPTION || EZLOPI_DISTRO_LOCAL_MESHBOT || EZLOPI_DISTRO_CLOUD_MESHBOT )
         bool "Enable meshbot service"
         default n
         help

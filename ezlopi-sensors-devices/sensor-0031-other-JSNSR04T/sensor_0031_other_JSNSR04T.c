@@ -53,7 +53,7 @@ int sensor_0031_other_JSNSR04T(e_ezlopi_actions_t action, l_ezlopi_item_t* item,
 
 static int __notify(l_ezlopi_item_t* item)
 {
-    return ezlopi_device_value_updated_from_device_v3(item);
+    return ezlopi_device_value_updated_from_device_broadcast(item);
 }
 
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)

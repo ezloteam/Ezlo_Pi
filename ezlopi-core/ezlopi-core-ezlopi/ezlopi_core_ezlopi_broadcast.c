@@ -12,6 +12,7 @@
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
 
+// static uint32_t __message_count = 0;
 static l_broadcast_method_t* __method_head = NULL;
 static int (*__broadcast_queue_func)(cJSON* cj_data) = NULL;
 

@@ -8,6 +8,7 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
+#include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_http.h"
@@ -22,22 +23,23 @@
 
 #include "ezlopi_service_webprov.h"
 
-static char s_data_buffer[10 * 1024];
+
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
 static TaskHandle_t ezlopi_update_config_notifier = NULL;
 
-static void __config_check(void *pv);
-static void __fetch_wss_endpoint(void *pv);
+static void __config_check(void* pv);
+static void __fetch_wss_endpoint(void* pv);
 
 static void __connection_upcall(bool connected);
-static void __message_upcall(const char *payload, uint32_t len);
+static void __message_upcall(const char* payload, uint32_t len);
 
-static uint8_t __config_update(void *arg);
+static uint8_t __config_update(void* arg);
 
-static int __send_str_data_to_nma_websocket(char *str_data);
-static int __send_cjson_data_to_nma_websocket(cJSON *cj_data);
+static int __send_str_data_to_nma_websocket(char* str_data);
+static int __send_cjson_data_to_nma_websocket(cJSON* cj_data);
 
 uint32_t ezlopi_service_web_provisioning_get_message_count(void)
 {
@@ -81,10 +83,10 @@ static void __connection_upcall(bool connected)
     prev_status = connected;
 }
 
-static void __fetch_wss_endpoint(void *pv)
+static void __fetch_wss_endpoint(void* pv)
 {
     uint32_t task_complete = 0;
-    s_ezlopi_http_data_t *ws_endpoint = NULL;
+    s_ezlopi_http_data_t* ws_endpoint = NULL;
 
     while (1)
     {
@@ -92,10 +94,10 @@ static void __fetch_wss_endpoint(void *pv)
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
         vTaskDelay(100 / portTICK_RATE_MS);
 
-        char *cloud_server = ezlopi_factory_info_v3_get_cloud_server();
-        char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-        char *ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
-        char *ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
+        char* cloud_server = ezlopi_factory_info_v3_get_cloud_server();
+        char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+        char* ssl_shared_key = ezlopi_factory_info_v3_get_ssl_shared_key();
+        char* ssl_private_key = ezlopi_factory_info_v3_get_ssl_private_key();
 
         char http_request[128];
         snprintf(http_request, sizeof(http_request), "%s/getserver?json=true", cloud_server);
@@ -107,10 +109,10 @@ static void __fetch_wss_endpoint(void *pv)
             if (ws_endpoint->response)
             {
                 TRACE_D("ws_endpoint: %s", ws_endpoint->response); // {"uri": "wss://endpoint:port"}
-                cJSON *root = cJSON_Parse(ws_endpoint->response);
+                cJSON* root = cJSON_Parse(ws_endpoint->response);
                 if (root)
                 {
-                    cJSON *cjson_uri = cJSON_GetObjectItem(root, "uri");
+                    cJSON* cjson_uri = cJSON_GetObjectItem(root, "uri");
                     if (cjson_uri)
                     {
                         TRACE_D("uri: %s", cjson_uri->valuestring ? cjson_uri->valuestring : "NULL");
@@ -150,9 +152,9 @@ static void __fetch_wss_endpoint(void *pv)
     vTaskDelete(NULL);
 }
 
-static void __message_upcall(const char *payload, uint32_t len)
+static void __message_upcall(const char* payload, uint32_t len)
 {
-    cJSON *cj_response = ezlopi_core_api_consume(payload, len);
+    cJSON* cj_response = ezlopi_core_api_consume(payload, len);
     if (cj_response)
     {
         cJSON_AddNumberToObject(cj_response, ezlopi_msg_id_str, message_counter);
@@ -161,27 +163,27 @@ static void __message_upcall(const char *payload, uint32_t len)
     }
     else
     {
-            TRACE_W("no response!");
+        TRACE_W("no response!");
     }
 }
 
-static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
+static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
 {
     int ret = 0;
 
     if (cj_data)
     {
         uint32_t buffer_len = 0;
-        char *data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+        char* data_buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
 
         if (data_buffer && buffer_len)
         {
             TRACE_I("-----------------------------> buffer acquired!");
-            memset(s_data_buffer, 0, buffer_len);
+            memset(data_buffer, 0, buffer_len);
 
-            if (true == cJSON_PrintPreallocated(cj_data, s_data_buffer, buffer_len, false))
+            if (true == cJSON_PrintPreallocated(cj_data, data_buffer, buffer_len, false))
             {
-                ret = __send_str_data_to_nma_websocket(s_data_buffer);
+                ret = __send_str_data_to_nma_websocket(data_buffer);
             }
 
             ezlopi_core_buffer_release();
@@ -196,7 +198,7 @@ static int __send_cjson_data_to_nma_websocket(cJSON *cj_data)
     return ret;
 }
 
-static int __send_str_data_to_nma_websocket(char *str_data)
+static int __send_str_data_to_nma_websocket(char* str_data)
 {
     int ret = 0;
     if (str_data)
@@ -227,14 +229,14 @@ static int __send_str_data_to_nma_websocket(char *str_data)
     return ret;
 }
 
-static void __config_check(void *pv)
+static void __config_check(void* pv)
 {
     uint8_t flag_break_loop = 0;
     static uint8_t retry_count = 0;
-    s_ezlopi_http_data_t *response = NULL;
-    char *ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
-    char *provision_token = ezlopi_factory_info_get_v3_provision_token();
-    char *provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
+    s_ezlopi_http_data_t* response = NULL;
+    char* ca_certificate = ezlopi_factory_info_v3_get_ca_certificate();
+    char* provision_token = ezlopi_factory_info_get_v3_provision_token();
+    char* provisioning_server = ezlopi_factory_info_v3_get_provisioning_server();
     uint16_t config_version = ezlopi_factory_info_v3_get_config_version();
 
     TRACE_D("water_mark: %d", uxTaskGetStackHighWaterMark(NULL));
@@ -242,7 +244,7 @@ static void __config_check(void *pv)
     while (1)
     {
         ezlopi_wait_for_wifi_to_connect(portMAX_DELAY);
-        cJSON *root_header_prov_token = cJSON_CreateObject();
+        cJSON* root_header_prov_token = cJSON_CreateObject();
         cJSON_AddStringToObject(root_header_prov_token, "controller-key", provision_token);
 
         if (NULL != provisioning_server)
@@ -331,13 +333,13 @@ static void __config_check(void *pv)
     vTaskDelete(NULL);
 }
 
-static uint8_t __config_update(void *arg)
+static uint8_t __config_update(void* arg)
 {
-    cJSON *root_prov_data = cJSON_Parse((char *)arg);
+    cJSON* root_prov_data = cJSON_Parse((char*)arg);
     uint8_t ret = 0;
     if (NULL != root_prov_data)
     {
-        s_basic_factory_info_t *config_check_factoryInfo = malloc(sizeof(s_basic_factory_info_t));
+        s_basic_factory_info_t* config_check_factoryInfo = malloc(sizeof(s_basic_factory_info_t));
 
         if (config_check_factoryInfo)
         {
@@ -388,19 +390,19 @@ static uint8_t __config_update(void *arg)
             free(config_check_factoryInfo);
         }
 
-        const char *ssl_private_key = NULL;
+        const char* ssl_private_key = NULL;
         CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_ssl_private_key_str, ssl_private_key);
         ezlopi_factory_info_v3_set_ssl_private_key(ssl_private_key);
 
-        const char *ssl_public_key = NULL;
+        const char* ssl_public_key = NULL;
         CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_ssl_public_key_str, ssl_public_key);
         ezlopi_factory_info_v3_set_ssl_public_key(ssl_public_key);
 
-        const char *ssl_shared_key = NULL;
+        const char* ssl_shared_key = NULL;
         CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_ssl_shared_key_str, ssl_shared_key);
         ezlopi_factory_info_v3_set_ssl_shared_key(ssl_shared_key);
 
-        const char *signing_ca_certificate = NULL;
+        const char* signing_ca_certificate = NULL;
         CJSON_GET_VALUE_STRING(root_prov_data, ezlopi_signing_ca_certificate_str, signing_ca_certificate);
         ezlopi_factory_info_v3_set_ca_cert(signing_ca_certificate);
 
@@ -413,3 +415,5 @@ static uint8_t __config_update(void *arg)
 
     return ret;
 }
+
+#endif // CONFIG_EZPI_WEBSOCKET_CLIENT
