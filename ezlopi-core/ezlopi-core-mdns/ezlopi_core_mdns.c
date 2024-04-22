@@ -1,4 +1,6 @@
 
+#ifdef CONFIG_EZPI_SERV_MDNS_EN
+
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -285,3 +287,5 @@ static void __mdns_init(void* pv)
     vTaskDelete(NULL);
 
 }
+
+#endif // CONFIG_EZPI_SERV_MDNS_EN

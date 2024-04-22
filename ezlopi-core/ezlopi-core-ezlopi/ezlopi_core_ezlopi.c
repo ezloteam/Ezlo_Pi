@@ -74,7 +74,9 @@ void ezlopi_init(void)
     ezlopi_ping_init();
     EZPI_CORE_sntp_init();
     ezlopi_timer_start_1000ms();
+#ifdef CONFIG_EZPI_SERV_MDNS_EN
     EZPI_core_init_mdns();
+#endif // CONFIG_EZPI_SERV_MDNS_EN
 }
 
 l_ezlopi_device_t* link_next_parent_id(uint32_t target_to_clear_parent_id)
