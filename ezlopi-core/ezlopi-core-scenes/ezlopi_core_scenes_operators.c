@@ -838,7 +838,6 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
     if (item_id && value_field && comparator_field)
     {
         double item_value = 0.0;
-        cJSON* cj_item_value = cJSON_CreateObject();
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -847,6 +846,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
+                    cJSON* cj_item_value = cJSON_CreateObject();
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
@@ -856,8 +856,8 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
                             #warning "Krishna needs to complete this"
                                 item_value = cj_value->valuedouble;
                         }
+                        cJSON_Delete(cj_item_value);
                     }
-
                     break;
                 }
                 item = item->next;
@@ -906,10 +906,7 @@ int ezlopi_scenes_operators_value_with_less_operations(uint32_t item_id, l_field
         }
         }
 
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
-        }
+
     }
 
     return ret;
@@ -990,7 +987,6 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
     if (item_id && value_field && comparator_field)
     {
         double item_value = 0.0;
-        cJSON* cj_item_value = cJSON_CreateObject();
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -999,6 +995,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
+                    cJSON* cj_item_value = cJSON_CreateObject();
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
@@ -1008,8 +1005,8 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
                             #warning "Krishna needs to complete this"
                                 item_value = cj_value->valuedouble;
                         }
+                        cJSON_Delete(cj_item_value);
                     }
-
                     break;
                 }
 
@@ -1040,10 +1037,7 @@ int ezlopi_scenes_operators_value_without_less_operations(uint32_t item_id, l_fi
         }
         }
 
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
-        }
+
     }
 
     return ret;
@@ -1058,7 +1052,6 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
     {
         cJSON* item_value = NULL;
 
-        cJSON* cj_item_value = cJSON_CreateObject();
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1069,10 +1062,12 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
                 {
                     if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
                     {
+                        cJSON* cj_item_value = cJSON_CreateObject();
                         if (cj_item_value)
                         {
                             item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
                             item_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // eg. double_type : 5.005  or string_type : "5.005"
+                            cJSON_Delete(cj_item_value);
                         }
                     }
                     else
@@ -1124,51 +1119,84 @@ int ezlopi_scenes_operators_value_comparevalues_without_less_operations(uint32_t
             }
         }
 
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
-        }
+
     }
 
     return ret;
 }
 
-int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t item_id, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field)
+int ezlopi_scenes_operators_value_comparevalues_with_less_operations(l_fields_v2_t* item_exp_field, l_fields_v2_t* value_field, l_fields_v2_t* value_type_field, l_fields_v2_t* comparator_field)
 {
     int ret = 0;
-    if (item_id && value_field && value_type_field && comparator_field)
+    if (item_exp_field && value_field && value_type_field && comparator_field)
     {
-        cJSON* item_value = NULL;
+        cJSON* item_exp_value = NULL;
 
-        cJSON* cj_item_value = cJSON_CreateObject();
-        l_ezlopi_device_t* device = ezlopi_device_get_head();
-        while (device)
+        //---------------------- LHS -------------------------
+        if (EZLOPI_VALUE_TYPE_EXPRESSION == item_exp_field->value_type)
         {
-            l_ezlopi_item_t* item = device->items;
-            while (item)
-            {
-                if (item->cloud_properties.item_id == item_id) // unique
-                {
-                    if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
-                    {
-                        if (cj_item_value)
-                        {
-                            item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
-                            item_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // "5.0"
-                        }
-                    }
-                    else
-                    {
-                        ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
-                    }
-                    break;
-                }
-                item = item->next;
-            }
-            device = device->next;
-        }
+            s_ezlopi_expressions_t* curr_expr_left = ezlopi_scenes_get_expression_node_by_name(item_exp_field->field_value.u_value.value_string);
 
-        if (NULL != item_value)
+            cJSON* cj_item_value = cJSON_CreateObject();
+            if (cj_item_value)
+            {
+                if (0 == strncmp(value_type_field->field_value.u_value.value_string, "bool", 5))
+                {
+                    item_exp_value = cJSON_AddBoolToObject(cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.boolean_value);
+                }
+                else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "number", 7))
+                {
+                    item_exp_value = cJSON_AddNumberToObject(cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.number_value);
+                }
+                else if (0 == strncmp(value_type_field->field_value.u_value.value_string, "string", 7))
+                {
+                    item_exp_value = cJSON_AddStringToObject(cj_item_value, ezlopi_value_str, curr_expr_left->exp_value.u_value.str_value);
+                }
+                else
+                {
+                    ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
+                }
+                cJSON_Delete(cj_item_value);
+            }
+
+        }
+        else
+        {
+            uint32_t item_id = 0;
+            item_id = strtoul(item_exp_field->field_value.u_value.value_string, NULL, 16);
+
+            l_ezlopi_device_t* device = ezlopi_device_get_head();
+            while (device)
+            {
+                l_ezlopi_item_t* item = device->items;
+                while (item)
+                {
+                    if (item->cloud_properties.item_id == item_id) // unique
+                    {
+                        if (STR_OP_COMP(value_type_field->field_value.u_value.value_string, == , item->cloud_properties.value_type)) // bool == bool?
+                        {
+                            cJSON* cj_item_value = cJSON_CreateObject();
+                            if (cj_item_value)
+                            {
+                                item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
+                                item_exp_value = cJSON_GetObjectItem(cj_item_value, ezlopi_value_str); // "5.0"
+                                cJSON_Delete(cj_item_value);
+                            }
+                        }
+                        else
+                        {
+                            ret = 0; // SCENES_WHEN_TYPE_MISMATCH error
+                        }
+                        break;
+                    }
+                    item = item->next;
+                }
+                device = device->next;
+            }
+        }
+        //----------------------------------------------------
+
+        if (NULL != item_exp_value)
         { // operating according to 'with-less or without-less' comparator
 
             char* op_str = (NULL == comparator_field) ? "==" : comparator_field->field_value.u_value.value_string;
@@ -1179,8 +1207,8 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
 
             case SCENES_VALUES_WITH_LESS_OPERATORS_LESS:
             {
-                ret = ((item_value->type == cJSON_Number) ? (item_value->valuedouble < value_field->field_value.u_value.value_double)
-                    : (item_value->type == cJSON_String) ? STR_OP_COMP(item_value->valuestring, < , value_field->field_value.u_value.value_string)
+                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble < value_field->field_value.u_value.value_double)
+                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, < , value_field->field_value.u_value.value_string)
                     : 0);
                 if (0 == ret)
                 {
@@ -1190,8 +1218,8 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
             }
             case SCENES_VALUES_WITH_LESS_OPERATORS_GREATER:
             {
-                ret = ((item_value->type == cJSON_Number) ? (item_value->valuedouble > value_field->field_value.u_value.value_double)
-                    : (item_value->type == cJSON_String) ? STR_OP_COMP(item_value->valuestring, > , value_field->field_value.u_value.value_string)
+                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble > value_field->field_value.u_value.value_double)
+                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, > , value_field->field_value.u_value.value_string)
                     : 0);
                 if (0 == ret)
                 {
@@ -1202,8 +1230,8 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
             }
             case SCENES_VALUES_WITH_LESS_OPERATORS_LESS_EQUAL:
             {
-                ret = ((item_value->type == cJSON_Number) ? (item_value->valuedouble <= value_field->field_value.u_value.value_double)
-                    : (item_value->type == cJSON_String) ? STR_OP_COMP(item_value->valuestring, <= , value_field->field_value.u_value.value_string)
+                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble <= value_field->field_value.u_value.value_double)
+                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, <= , value_field->field_value.u_value.value_string)
                     : 0);
                 if (0 == ret)
                 {
@@ -1214,8 +1242,8 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
             }
             case SCENES_VALUES_WITH_LESS_OPERATORS_GREATER_EQUAL:
             {
-                ret = ((item_value->type == cJSON_Number) ? (item_value->valuedouble >= value_field->field_value.u_value.value_double)
-                    : (item_value->type == cJSON_String) ? STR_OP_COMP(item_value->valuestring, >= , value_field->field_value.u_value.value_string)
+                ret = ((item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble >= value_field->field_value.u_value.value_double)
+                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, >= , value_field->field_value.u_value.value_string)
                     : 0);
                 if (0 == ret)
                 {
@@ -1227,10 +1255,10 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
 
             case SCENES_VALUES_WITH_LESS_OPERATORS_EQUAL:
             {
-                ret = ((item_value->type == cJSON_True) ? (true == value_field->field_value.u_value.value_bool)
-                    : (item_value->type == cJSON_False) ? (false == value_field->field_value.u_value.value_bool)
-                    : (item_value->type == cJSON_Number) ? (item_value->valuedouble == value_field->field_value.u_value.value_double)
-                    : (item_value->type == cJSON_String) ? STR_OP_COMP(item_value->valuestring, == , value_field->field_value.u_value.value_string)
+                ret = ((item_exp_value->type == cJSON_True) ? (true == value_field->field_value.u_value.value_bool)
+                    : (item_exp_value->type == cJSON_False) ? (false == value_field->field_value.u_value.value_bool)
+                    : (item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble == value_field->field_value.u_value.value_double)
+                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, == , value_field->field_value.u_value.value_string)
                     : 0);
                 if (0 == ret)
                 {
@@ -1242,10 +1270,10 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
 
             case SCENES_VALUES_WITH_LESS_OPERATORS_NOT_EQUAL:
             {
-                ret = ((item_value->type == cJSON_True) ? (true != value_field->field_value.u_value.value_bool)
-                    : (item_value->type == cJSON_False) ? (false != value_field->field_value.u_value.value_bool)
-                    : (item_value->type == cJSON_Number) ? (item_value->valuedouble != value_field->field_value.u_value.value_double)
-                    : (item_value->type == cJSON_String) ? STR_OP_COMP(item_value->valuestring, != , value_field->field_value.u_value.value_string)
+                ret = ((item_exp_value->type == cJSON_True) ? (true != value_field->field_value.u_value.value_bool)
+                    : (item_exp_value->type == cJSON_False) ? (false != value_field->field_value.u_value.value_bool)
+                    : (item_exp_value->type == cJSON_Number) ? (item_exp_value->valuedouble != value_field->field_value.u_value.value_double)
+                    : (item_exp_value->type == cJSON_String) ? STR_OP_COMP(item_exp_value->valuestring, != , value_field->field_value.u_value.value_string)
                     : 0);
                 if (0 == ret)
                 {
@@ -1262,10 +1290,6 @@ int ezlopi_scenes_operators_value_comparevalues_with_less_operations(uint32_t it
             }
         }
 
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
-        }
     }
 
     return ret;
@@ -1278,7 +1302,6 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
     if (item_id && start_value_field && end_value_field)
     {
         cJSON* item_value = NULL;
-        cJSON* cj_item_value = cJSON_CreateObject();
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1287,6 +1310,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
             {
                 if (item->cloud_properties.item_id == item_id) // find the correct " item " within the device
                 {
+                    cJSON* cj_item_value = cJSON_CreateObject();
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
@@ -1321,6 +1345,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
                                 }
                             }
                         }
+                        cJSON_Delete(cj_item_value);
                     }
                     break;
                 }
@@ -1387,10 +1412,7 @@ int ezlopi_scenes_operators_value_number_range_operations(uint32_t item_id, l_fi
             }
             }
         }
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
-        }
+
     }
 
     return ret;
@@ -1403,7 +1425,6 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
     if (item_id && value_field)
     {
         cJSON* item_value = NULL;
-        cJSON* cj_item_value = cJSON_CreateObject();
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
         {
@@ -1412,6 +1433,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
+                    cJSON* cj_item_value = cJSON_CreateObject();
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
@@ -1436,8 +1458,8 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
                                 }
                             }
                         }
+                        cJSON_Delete(cj_item_value);
                     }
-
                     break;
                 }
                 item = item->next;
@@ -1457,10 +1479,7 @@ int ezlopi_scenes_operators_has_atleastone_dictionary_value_operations(uint32_t 
                 }
             }
         }
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
-        }
+
     }
 
     return ret;
@@ -1473,7 +1492,6 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
     if (item_id && key_field && operation_field)
     {
         cJSON* item_value = NULL;
-        cJSON* cj_item_value = cJSON_CreateObject();
 
         l_ezlopi_device_t* device = ezlopi_device_get_head();
         while (device)
@@ -1483,6 +1501,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
             {
                 if (item->cloud_properties.item_id == item_id)
                 {
+                    cJSON* cj_item_value = cJSON_CreateObject();
                     if (cj_item_value)
                     {
                         item->func(EZLOPI_ACTION_GET_EZLOPI_VALUE, item, (void*)cj_item_value, NULL);
@@ -1499,6 +1518,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                                 }
                             }
                         }
+                        cJSON_Delete(cj_item_value);
                     }
 
                     break;
@@ -1545,10 +1565,7 @@ int ezlopi_scenes_operators_is_dictionary_changed_operations(l_scenes_list_v2_t*
                 scene_node->when_block->fields->user_arg = (void*)item_value;
             }
         }
-        if (cj_item_value)
-        {
-            cJSON_Delete(cj_item_value);
-        }
+
     }
     return ret;
 }
