@@ -349,6 +349,11 @@ static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_w
     return _upcall;
 }
 
+static void ezlopi_wifi_scanner_send_status(const char* status)
+{
+    ezlopi_network_update_wifi_scan_process(NULL, status);
+}
+
 static void ezlopi_wifi_scanner_task(void* params)
 {
     TickType_t start_time = xTaskGetTickCount();
@@ -363,7 +368,7 @@ static void ezlopi_wifi_scanner_task(void* params)
         .scan_time.active.min = 120,
         .scan_time.active.max = 150,
     };
-
+    ezlopi_wifi_scanner_send_status("started");
     while (1)
     {
         current_time = (xTaskGetTickCount() - start_time);
@@ -386,6 +391,8 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    ezlopi_wifi_scanner_send_status("finished");
+    sg_scan_handle = NULL;
     vTaskDelete(NULL);
 }
 
@@ -399,6 +406,7 @@ void ezlopi_wifi_scan_stop()
         TRACE_E("Resetting WiFi scanner task.(handle: %p)", sg_scan_handle);
         vTaskDelete(sg_scan_handle);
         sg_scan_handle = NULL;
+        TRACE_E("Wifi scanner task deleted at: %p", sg_scan_handle);
     }
 
     TRACE_E("Deleting previous record.");
@@ -483,7 +491,7 @@ static void __event_wifi_scan_done(void* event_data)
                     }
                 }
 
-                ezlopi_network_update_wifi_scan_process(network_array);
+                ezlopi_network_update_wifi_scan_process(network_array, "process");
             }
 
             free(ap_record);
