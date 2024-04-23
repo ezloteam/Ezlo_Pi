@@ -1,5 +1,5 @@
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 #include <math.h>
 
 #include "ezlopi_core_timer.h"
@@ -205,7 +205,7 @@ static int __0041_notify(l_ezlopi_item_t* item)
             if (fabs((user_data->hum_val) - new_hum) > 0.5) // percent
             {
                 user_data->hum_val = new_hum;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
             ret = 1;
         }

@@ -5,7 +5,7 @@ file(GLOB_RECURSE src_files "*.c")
 set(ESP_IDF_COMPONENTS 
         esp_http_server 
         nvs_flash
-        json
+        cjext
         spiffs
 )
 set(EZLOPI_COMPONENTS 

@@ -8,6 +8,7 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_constants.h"
+#include "../../build/config/sdkconfig.h"
 
 #include "ezlopi_core_api.h"
 #include "ezlopi_core_http.h"
@@ -22,7 +23,8 @@
 
 #include "ezlopi_service_webprov.h"
 
-static char s_data_buffer[10 * 1024];
+
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
 
 static uint32_t message_counter = 0;
 static xTaskHandle _task_handle = NULL;
@@ -177,11 +179,11 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
         if (data_buffer && buffer_len)
         {
             TRACE_I("-----------------------------> buffer acquired!");
-            memset(s_data_buffer, 0, buffer_len);
+            memset(data_buffer, 0, buffer_len);
 
-            if (true == cJSON_PrintPreallocated(cj_data, s_data_buffer, buffer_len, false))
+            if (true == cJSON_PrintPreallocated(cj_data, data_buffer, buffer_len, false))
             {
-                ret = __send_str_data_to_nma_websocket(s_data_buffer);
+                ret = __send_str_data_to_nma_websocket(data_buffer);
             }
             else
             {
@@ -417,3 +419,5 @@ static uint8_t __config_update(void* arg)
 
     return ret;
 }
+
+#endif // CONFIG_EZPI_WEBSOCKET_CLIENT

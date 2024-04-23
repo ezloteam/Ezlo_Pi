@@ -361,15 +361,9 @@ int ezlopi_scene_then_reset_scene_latches(l_scenes_list_v2_t* curr_scene, void* 
 }
 int ezlopi_scene_then_reboot_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W(" reboot_hub ");
-    int ret = 0;
-    l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
-    if (curr_then && curr_scene)
-    {
-        TRACE_E("Rebooting ESP......................... ");
-        EZPI_CORE_reset_reboot();
-    }
-    return ret;
+    TRACE_E("Rebooting ESP......................... ");
+    EZPI_CORE_reset_reboot();
+    return 1;
 }
 int ezlopi_scene_then_reset_hub(l_scenes_list_v2_t* curr_scene, void* arg)
 {

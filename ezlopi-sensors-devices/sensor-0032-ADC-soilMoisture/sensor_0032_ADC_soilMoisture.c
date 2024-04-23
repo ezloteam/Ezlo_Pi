@@ -67,7 +67,7 @@ static int __notify(l_ezlopi_item_t* item)
         if (fabs(percentage - *soil_moisture_data) > 1.0)
         {
             *soil_moisture_data = percentage;
-            ezlopi_device_value_updated_from_device_v3(item);
+            ezlopi_device_value_updated_from_device_broadcast(item);
         }
     }
     return ret;

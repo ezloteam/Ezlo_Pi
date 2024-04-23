@@ -1,7 +1,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "lwip/ip_addr.h"
 #include "esp_event_base.h"
 #include "mbedtls/base64.h"
@@ -26,7 +26,6 @@
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))
-
 static s_gatt_service_t* g_provisioning_service;
 static s_linked_buffer_t* g_provisioning_linked_buffer = NULL;
 

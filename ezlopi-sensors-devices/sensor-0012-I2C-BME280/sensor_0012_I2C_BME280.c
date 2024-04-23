@@ -121,7 +121,7 @@ static int __notify(l_ezlopi_item_t* item)
                 sensor_params->temperature = temperature;
                 sensor_params->humidity = humidity;
                 sensor_params->pressure = pressure;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
                 update_cloud = false;
             }
         }

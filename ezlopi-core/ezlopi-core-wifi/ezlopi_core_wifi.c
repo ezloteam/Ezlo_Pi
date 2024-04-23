@@ -16,7 +16,7 @@
 #include "esp_event.h"
 #include "esp_event_base.h"
 #include "esp_log.h"
-#include "cJSON.h"
+#include "cjext.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -483,7 +483,7 @@ static void __event_wifi_scan_done(void* event_data)
                     }
                 }
 
-                ezlopi_network_update_wifi_scan_process(network_array);
+                ezlopi_core_device_value_update_wifi_scan_broadcast(network_array);
             }
 
             free(ap_record);

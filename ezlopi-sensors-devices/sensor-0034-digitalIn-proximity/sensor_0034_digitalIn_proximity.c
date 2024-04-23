@@ -160,7 +160,7 @@ static void proximity_sensor_value_updated_from_device(void* arg)
     l_ezlopi_item_t* item = (l_ezlopi_item_t*)arg;
     if (item)
     {
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
     }
 }
 

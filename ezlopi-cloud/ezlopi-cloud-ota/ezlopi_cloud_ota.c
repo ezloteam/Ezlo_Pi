@@ -1,6 +1,6 @@
 #include <string.h>
 #include <ctype.h>
-#include <cJSON.h>
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_util_version.h"
@@ -14,6 +14,8 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_core_factory_info.h"
 
+
+#if defined (CONFIG_EZPI_ENABLE_OTA)
 void firmware_update_start(cJSON* cj_request, cJSON* cj_response)
 {
     cJSON_AddNullToObject(cj_response, ezlopi_error_str);
@@ -126,3 +128,4 @@ cJSON* firmware_send_firmware_query_to_nma_server(uint32_t message_count)
 
     return cj_request;
 }
+#endif

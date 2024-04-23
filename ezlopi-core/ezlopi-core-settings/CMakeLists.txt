@@ -3,7 +3,7 @@
 file(GLOB_RECURSE config_src "./*.c*")
 
 set(ESP_IDF_COMPONENTS 
-        json 
+        cjext 
 )
 set(EZLOPI_CLOUD_COMPONENTS 
         ezlopi-cloud-constants

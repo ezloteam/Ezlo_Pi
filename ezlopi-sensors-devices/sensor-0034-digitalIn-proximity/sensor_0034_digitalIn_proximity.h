@@ -5,7 +5,7 @@
 #include "driver/gpio.h"
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_util_trace.h"
-#include "cJSON.h"
+#include "cjext.h"
 
 #include "ezlopi_core_actions.h"
 #include "ezlopi_core_devices.h"
@@ -17,6 +17,6 @@
 #include "ezlopi_cloud_item_name_str.h"
 #include "ezlopi_cloud_device_types_str.h"
 
-int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *args, void *user_arg);
+int sensor_0034_digitalIn_proximity(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* args, void* user_arg);
 
 #endif // _SENSOR_0034_DIGITALIN_PROXIMITY_H_

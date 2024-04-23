@@ -2,8 +2,7 @@ file(GLOB_RECURSE src_files "*.c*")
 
 # Define esp-components
 set(ESP_COMPONENTS
-       json
-       heap
+        cjext
 )
 
 # Define ezlopi-components

@@ -2,7 +2,7 @@
 #define __HUB_SCENES_LIST_H__
 
 #include <string.h>
-#include "cJSON.h"
+#include "cjext.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -14,7 +14,7 @@ extern "C"
     void scenes_get(cJSON* cj_request, cJSON* cj_response);
     void scenes_edit(cJSON* cj_request, cJSON* cj_response);
     void scenes_delete(cJSON* cj_request, cJSON* cj_response);
-    void scenes_status_get(cJSON* cj_request, cJSON* cj_response);
+    // void scenes_status_get(cJSON *cj_request, cJSON *cj_response);
     void scenes_blocks_list(cJSON* cj_request, cJSON* cj_response);
     void scenes_block_data_list(cJSON* cj_request, cJSON* cj_response);
     void scenes_run(cJSON* cj_request, cJSON* cj_response);

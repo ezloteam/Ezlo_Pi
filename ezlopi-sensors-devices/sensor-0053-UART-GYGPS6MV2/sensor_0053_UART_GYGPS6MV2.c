@@ -388,7 +388,7 @@ static int __0053_notify(l_ezlopi_item_t* item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_lat_angle_val) = lat_angle_val;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if ((sensor_0053_UART_gps6mv2_data->Longitude_item_id) == item->cloud_properties.item_id)
@@ -399,7 +399,7 @@ static int __0053_notify(l_ezlopi_item_t* item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_long_angle_val) = long_angle_val;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if ((sensor_0053_UART_gps6mv2_data->Fix_item_id) == item->cloud_properties.item_id)
@@ -414,7 +414,7 @@ static int __0053_notify(l_ezlopi_item_t* item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_GPS_FIX) = GPS_FIX;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             else if ((sensor_0053_UART_gps6mv2_data->Sea_level_item_id) == item->cloud_properties.item_id)
@@ -425,7 +425,7 @@ static int __0053_notify(l_ezlopi_item_t* item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_antenna_alti) = antenna_alti;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
 
@@ -437,7 +437,7 @@ static int __0053_notify(l_ezlopi_item_t* item)
                 {
                     (sensor_0053_UART_gps6mv2_data->prev_geoid) = geoid;
                     (sensor_0053_UART_gps6mv2_data->gps_message_guard) = false;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

@@ -6,7 +6,7 @@
 #include "ezlopi_core_ethernet.h"
 #include "ezlopi_util_trace.h"
 
-#include "cJSON.h"
+#include "cjext.h"
 #include "ezlopi_cloud_methods_str.h"
 #include "ezlopi_cloud_keywords.h"
 

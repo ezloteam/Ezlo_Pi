@@ -269,7 +269,7 @@ static int __0040_notify(l_ezlopi_item_t* item)
                     TRACE_S("Green :%d", user_data->green_mapped);
                     TRACE_S("Blue : %d", user_data->blue_mapped);
                     TRACE_S("---------------------------------------");
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

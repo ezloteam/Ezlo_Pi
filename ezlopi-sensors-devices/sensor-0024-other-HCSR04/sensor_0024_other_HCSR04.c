@@ -97,7 +97,7 @@ static int __notify(l_ezlopi_item_t* item)
     if (2 == ++count)
     {
         ezlopi_sensor_0024_other_HCSR04_get_from_sensor(item);
-        ezlopi_device_value_updated_from_device_v3(item);
+        ezlopi_device_value_updated_from_device_broadcast(item);
         count = 0;
     }
     return ret;

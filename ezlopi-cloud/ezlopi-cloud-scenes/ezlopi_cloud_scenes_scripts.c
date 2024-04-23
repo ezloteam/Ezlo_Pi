@@ -1,4 +1,4 @@
-#include "cJSON.h"
+#include "cjext.h"
 #include <stdlib.h>
 
 #include "ezlopi_cloud_scenes_scripts.h"

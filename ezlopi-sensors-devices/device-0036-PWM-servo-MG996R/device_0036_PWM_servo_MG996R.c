@@ -206,7 +206,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 }
 
 #if 0 // v2.x
-#include "cJSON.h"
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_cloud_items.h"

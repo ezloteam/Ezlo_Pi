@@ -374,7 +374,7 @@ static int __notify(l_ezlopi_item_t* item)
                     {
                         user_data->adc_x = ezlopi_analog_data.voltage;
                         // TRACE_S("X-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-                        ezlopi_device_value_updated_from_device_item_id_v3(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X]);
+                        ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_X]);
                     }
                 }
                 else if (user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y] == item->cloud_properties.item_id)
@@ -384,7 +384,7 @@ static int __notify(l_ezlopi_item_t* item)
                     {
                         user_data->adc_y = ezlopi_analog_data.voltage;
                         // TRACE_S("Y-axis value is %d and voltage is %d", ezlopi_analog_data.value, ezlopi_analog_data.voltage);
-                        ezlopi_device_value_updated_from_device_item_id_v3(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y]);
+                        ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_Y]);
                     }
                 }
             }
@@ -404,7 +404,7 @@ static void __joystick_intr_callback(void* arg)
         {
             item->interface.gpio.gpio_in.value = gpio_get_level(item->interface.gpio.gpio_in.gpio_num);
             item->interface.gpio.gpio_in.value = (false == item->interface.gpio.gpio_in.invert) ? (item->interface.gpio.gpio_in.value) : (!item->interface.gpio.gpio_in.value);
-            ezlopi_device_value_updated_from_device_item_id_v3(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH]);
+            ezlopi_device_value_updated_from_device_broadcast_by_item_id(user_data->sensor_0020_joystick_item_ids[JOYSTICK_ITEM_ID_SWITCH]);
         }
     }
 }

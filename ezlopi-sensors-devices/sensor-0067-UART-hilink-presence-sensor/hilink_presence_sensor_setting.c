@@ -531,7 +531,7 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
         if (setting_id == hilink_presence_sensor_setting_ids[0])
         {
             __setting_set_change_user_defined_template(true);
-            ezlopi_setting_value_updated_from_device_v3(hilink_presence_sensor_user_defined_setting);
+            ezlopi_core_device_value_updated_settings_broadcast(hilink_presence_sensor_user_defined_setting);
         }
         else
         {
@@ -540,7 +540,7 @@ static int __setting_set_change_setting_template(ld2410_template_t template, uin
             if (predef_value && (0 == strcmp(predef_value->setting_value, hilink_presence_sensor_setting_enum[9])))
             {
                 __setting_set_change_user_defined_template(true);
-                ezlopi_setting_value_updated_from_device_v3(hilink_presence_sensor_predefined_setting);
+                ezlopi_core_device_value_updated_settings_broadcast(hilink_presence_sensor_predefined_setting);
             }
             else
             {
@@ -735,7 +735,7 @@ static int __settings_set(void* arg, l_ezlopi_device_settings_v3_t* setting)
         ESP_ERROR_CHECK(__setting_set_radar_distance_sensitivity_setting(arg, setting));
     }
 
-    ezlopi_setting_value_updated_from_device_v3(setting);
+    ezlopi_core_device_value_updated_settings_broadcast(setting);
 
     return ret;
 }
@@ -870,7 +870,7 @@ static int __settings_reset(void* arg, l_ezlopi_device_settings_v3_t* setting)
         ESP_ERROR_CHECK(__setting_reset_radar_distance_sensitivity_setting(arg, setting));
     }
 
-    ezlopi_setting_value_updated_from_device_v3(setting);
+    ezlopi_core_device_value_updated_settings_broadcast(setting);
 
     return ret;
 }

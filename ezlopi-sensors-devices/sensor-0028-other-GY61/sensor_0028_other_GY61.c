@@ -288,7 +288,7 @@ static int __0028_notify(l_ezlopi_item_t* item)
                 if (fabs((user_data->x_data) - new_value) > 0.5)
                 {
                     user_data->x_data = new_value;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
@@ -297,7 +297,7 @@ static int __0028_notify(l_ezlopi_item_t* item)
                 if (fabs((user_data->y_data) - new_value) > 0.5)
                 {
                     user_data->y_data = new_value;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
@@ -306,7 +306,7 @@ static int __0028_notify(l_ezlopi_item_t* item)
                 if (fabs((user_data->z_data) - new_value) > 0.5)
                 {
                     user_data->z_data = new_value;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             ret = 1;

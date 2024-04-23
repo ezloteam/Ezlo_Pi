@@ -350,7 +350,7 @@ static int __0062_notify(l_ezlopi_item_t* item)
             if (curret_value != (char*)item->user_arg) // calls update only if there is change in state
             {
                 item->user_arg = (void*)curret_value;
-                ezlopi_device_value_updated_from_device_v3(item);
+                ezlopi_device_value_updated_from_device_broadcast(item);
             }
         }
         if (ezlopi_item_name_smoke_density == item->cloud_properties.item_name)
@@ -363,7 +363,7 @@ static int __0062_notify(l_ezlopi_item_t* item)
                 if (fabs((double)(MQ7_value->_CO_ppm) - new_value) > 0.0001)
                 {
                     MQ7_value->_CO_ppm = (float)new_value;
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

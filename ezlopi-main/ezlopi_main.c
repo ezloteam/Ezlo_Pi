@@ -15,9 +15,6 @@
 #include "ezlopi_service_ota.h"
 
 #include "ezlopi_service_ble.h"
-#if CONFIG_EZPI_SERV_BLE_EN == 1
-#endif
-
 #include "ezlopi_service_uart.h"
 #include "ezlopi_service_timer.h"
 #include "ezlopi_service_modes.h"
@@ -42,23 +39,39 @@ void app_main(void)
 
     ezlopi_init();
 
-    EZPI_SERV_uart_init();
+#if defined(CONFIG_EZPI_ENABLE_UART_PROVISIONING)
+    EZPI_SERVICE_uart_init();
+#endif
 
     timer_service_init();
 
-#if CONFIG_EZPI_SERV_BLE_EN == 1
+#if defined(CONFIG_EZLOPI_BLE_ENABLE)
     ezlopi_ble_service_init();
 #endif
 
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
-    ezlopi_service_ws_server_start();
-    ezlopi_service_web_provisioning_init();
+#endif
 
+    ezlpi_service_ws_server_dummy();
+
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)
+    ezlopi_service_ws_server_start();
+#endif
+
+#if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
+    ezlopi_service_web_provisioning_init();
+#endif
+
+#if defined(CONFIG_EZPI_ENABLE_OTA)
     ezlopi_service_ota_init();
-#if CONFIG_EZLPI_SERV_MODES_EN
+#endif
+
+#if CONFIG_EZLPI_SERV_ENABLE_MODES
     ezlopi_service_modes_init();
 #endif
-#if CONFIG_EZPI_SERV_MESHBOT_EN
+
+#if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
 #endif
 

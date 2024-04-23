@@ -1,5 +1,5 @@
 #include <time.h>
-#include <cJSON.h>
+#include "cjext.h"
 
 #include "ezlopi_util_trace.h"
 
@@ -10,6 +10,8 @@
 #include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
+
+#if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
 
 static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed);
 static void __cjson_add_mode_to_array(cJSON* cj_modes_arr, s_house_modes_t* mode);
@@ -476,6 +478,8 @@ static void __cjson_add_alarmed(cJSON* cj_alarmed, s_alarmed_t* alarmed)
         }
     }
 }
+
+#endif // CONFIG_EZLPI_SERV_ENABLE_MODES
 
 ///////////////////////////////
 // static

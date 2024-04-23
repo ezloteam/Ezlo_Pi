@@ -1,4 +1,4 @@
-// #include "cJSON.h"
+// #include "cjext.h"
 // #include "nvs.h"
 // #include "nvs_flash.h"
 #include <string.h>
@@ -20,6 +20,8 @@
 #include "ezlopi_core_factory_info.h"
 
 #include "ezlopi_service_ota.h"
+
+#if defined(CONFIG_EZPI_ENABLE_OTA)
 
 #define HASH_LEN 32
 
@@ -194,3 +196,4 @@ static esp_err_t _http_event_handler(esp_http_client_event_t* evt)
     }
     return ESP_OK;
 }
+#endif // CONFIG_EZPI_ENABLE_OTA

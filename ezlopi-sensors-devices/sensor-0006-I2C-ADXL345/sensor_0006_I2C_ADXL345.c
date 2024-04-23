@@ -271,7 +271,7 @@ static int __notify(l_ezlopi_item_t* item)
                 __adxl345_get_axis_value(item);
                 if (fabs((__prev[0] - user_data->acc_x) > 0.5))
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_acceleration_y_axis == item->cloud_properties.item_name)
@@ -279,7 +279,7 @@ static int __notify(l_ezlopi_item_t* item)
                 __prev[1] = user_data->acc_y;
                 if (fabs((__prev[1] - user_data->acc_x) > 0.5))
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
             if (ezlopi_item_name_acceleration_z_axis == item->cloud_properties.item_name)
@@ -287,7 +287,7 @@ static int __notify(l_ezlopi_item_t* item)
                 __prev[2] = user_data->acc_z;
                 if (fabs((__prev[2] - user_data->acc_x) > 0.5))
                 {
-                    ezlopi_device_value_updated_from_device_v3(item);
+                    ezlopi_device_value_updated_from_device_broadcast(item);
                 }
             }
         }

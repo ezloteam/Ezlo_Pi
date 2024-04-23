@@ -1,10 +1,11 @@
 file(GLOB_RECURSE files_src "./*.c*")
 
 set(EZLOPI_SERVICE_COMPONENTS 
-        ezlopi-service-webprov
-        ezlopi-core-factory-info
         ezlopi-core-nvs
         ezlopi-util-trace
+        ezlopi-service-webprov
+        ezlopi-service-ws-server
+        ezlopi-core-factory-info
 )
 
 idf_component_register(SRCS "ezlopi_core_reset.c" "${files_src}"
