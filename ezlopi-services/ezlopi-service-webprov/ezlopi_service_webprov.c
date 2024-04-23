@@ -145,6 +145,7 @@ static void __fetch_wss_endpoint(void* pv)
         free(ca_certificate);
         free(ssl_shared_key);
         free(ssl_private_key);
+        
         vTaskDelay(2000 / portTICK_RATE_MS);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
@@ -250,8 +251,7 @@ static void __config_check(void* pv)
         if (NULL != provisioning_server)
         {
             int prov_url_len = strlen(provisioning_server);
-
-            if (prov_url_len >= 5 && strcmp(&provisioning_server[prov_url_len - 5], ".com/") == 0)
+            if ((prov_url_len >= 5) && (0 == strcmp(&provisioning_server[prov_url_len - 5], ".com/")))
             {
                 provisioning_server[prov_url_len - 1] = '\0'; // Remove trailing "/"
             }
@@ -327,9 +327,10 @@ static void __config_check(void* pv)
         vTaskDelay(50000 / portTICK_RATE_MS);
     }
 
-    free(ca_certificate);
-    free(provision_token);
-    free(provisioning_server);
+    ezlopi_factory_info_v3_free(ca_certificate);
+    ezlopi_factory_info_v3_free(provision_token);
+    ezlopi_factory_info_v3_free(provisioning_server);
+
     vTaskDelete(NULL);
 }
 

@@ -702,6 +702,7 @@ static void ezlopi_service_uart_get_info()
             get_ezlopi_device_newtwork_info(cj_info);
 
             cJSON_AddItemToObject(cj_get_info, ezlopi_info_str, cj_info);
+            
             char* serial_data_json_string = cJSON_Print(cj_get_info);
             if (serial_data_json_string)
             {
