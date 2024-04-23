@@ -37,3 +37,4 @@ int ezlopi_scene_when_or(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_xor(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_function(l_scenes_list_v2_t *scene_node, void *arg);
 #endif // _EZLOPI_CORE_SCENES_WHEN_METHODS_H_
+    
