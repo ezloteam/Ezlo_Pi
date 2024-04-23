@@ -2,6 +2,7 @@
 
 #include "ezlopi_core_nvs.h"
 #include "ezlopi_core_http.h"
+#include "ezlopi_core_modes.h"
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_devices.h"
 #include "ezlopi_core_scenes_v2.h"
@@ -35,10 +36,6 @@ int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 {
                     cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
                     item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                    // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
-
-                    // cJSON_AddStringToObject(cj_params, ezlopi__id_str, curr_field->field_value.u_value.value_string);
-                    // item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                     // TRACE_D("item_id: %s", curr_field->field_value.u_value.value_string);
                 }
                 else if (0 == strncmp(curr_field->name, ezlopi_value_str, 5))
@@ -153,8 +150,56 @@ int ezlopi_scene_then_send_cloud_abstract_command(l_scenes_list_v2_t* curr_scene
 }
 int ezlopi_scene_then_switch_house_mode(l_scenes_list_v2_t* curr_scene, void* arg)
 {
-    TRACE_W("Warning: then-method not implemented!");
-    return 0;
+    TRACE_W(" switch_house_mode ");
+    int ret = 0;
+    if (curr_scene)
+    {
+        uint32_t house_mode_id = 0;
+        l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
+        if (curr_then)
+        {
+            l_fields_v2_t* curr_field = curr_then->fields;
+            while (curr_field)
+            {
+                if (0 == strncmp(curr_field->name, "houseMode", 10))
+                {
+                    if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID == curr_field->value_type)
+                    {
+                        if (NULL != curr_field->field_value.u_value.value_string)
+                        {
+                            house_mode_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        }
+                        else
+                        {
+                            house_mode_id = (uint32_t)curr_field->field_value.u_value.value_double;
+                        }
+                    }
+                }
+
+                curr_field = curr_field->next;
+            }
+
+            if (house_mode_id > 0)
+            {
+                // first get the current 
+                s_ezlopi_modes_t* curr_house_mode = ezlopi_core_modes_get_custom_modes();
+
+                // find and match the 'house_mode' you want to switch with.
+                s_house_modes_t* req_mode = ezlopi_core_modes_get_house_mode_by_id(house_mode_id);
+                TRACE_E("req-house-mode-id [%d] : curr->switch_to_mode_id[%d]",
+                    req_mode->_id,
+                    curr_house_mode->switch_to_mode_id);
+                if ((req_mode->_id != curr_house_mode->switch_to_mode_id))
+                {
+                    ezlopi_core_modes_api_switch_mode(req_mode);
+                    ret = 1;
+                }
+            }
+        }
+
+    }
+
+    return ret;
 }
 int ezlopi_scene_then_send_http_request(l_scenes_list_v2_t* curr_scene, void* arg)
 {
