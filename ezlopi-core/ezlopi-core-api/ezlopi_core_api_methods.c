@@ -103,5 +103,5 @@ bool ezlopi_core_elzlopi_methods_check_method_register(f_method_func_t method)
 
 void ezlopi_core_ezlopi_methods_reboot(cJSON* cj_request, cJSON* cj_response)
 {
-    EZPI_CORE_reboot();
+    EZPI_CORE_reset_reboot();
 }

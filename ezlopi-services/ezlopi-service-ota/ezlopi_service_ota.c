@@ -55,7 +55,7 @@ static void ota_service_process(void* pv)
             // uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();
             cJSON* cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
 
-            CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);
+            // CJSON_TRACE("----------------- broadcasting - cj_firmware_info_request", cj_firmware_info_request);
 
             if (0 == ezlopi_core_ezlopi_broadcast_add_to_queue(cj_firmware_info_request))
             {

@@ -1,4 +1,6 @@
 
+#ifdef CONFIG_EZPI_SERV_MDNS_EN
+
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -113,7 +115,7 @@ static void ezlopi_mdns_init_service_context()
     }
 
     // Add manufacturer service
-#if CONFIG_EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_manufacturer = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_manufacturer)
     {
@@ -130,10 +132,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_manufacturer);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_MANUFACTURER_SERVICE
+#endif // EZPI_SERV_MDNS_MANUFACTURER_SERVICE_EN
 
     // Add brand service
-#if CONFIG_EZPI_MDNS_ENABLE_BRAND_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_BRAND_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_brand = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_brand)
     {
@@ -150,10 +152,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_brand);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_BRAND_SERVICE
+#endif // EZPI_SERV_MDNS_BRAND_SERVICE_EN
 
     // Add model service
-#if CONFIG_EZPI_MDNS_ENABLE_MODEL_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_MODEL_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_model = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_model)
     {
@@ -170,10 +172,10 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_model);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_MODEL_SERVICE
+#endif // EZPI_SERV_MDNS_MODEL_SERVICE_EN
 
     // Add name service
-#if CONFIG_EZPI_MDNS_ENABLE_NAME_SERVICE == 1
+#ifdef EZPI_SERV_MDNS_NAME_SERVICE_EN
     l_ezlopi_mdns_context_t* ezlopi_mdns_service_cntx_name = (l_ezlopi_mdns_context_t*)malloc(sizeof(l_ezlopi_mdns_context_t));
     if (ezlopi_mdns_service_cntx_name)
     {
@@ -190,7 +192,7 @@ static void ezlopi_mdns_init_service_context()
             ezlopi_mdns_add_service_context(ezlopi_mdns_service_cntx_name);
         }
     }
-#endif // CONFIG_EZPI_MDNS_ENABLE_NAME_SERVICE
+#endif // EZPI_SERV_MDNS_NAME_SERVICE_EN
 
 }
 
@@ -285,3 +287,5 @@ static void __mdns_init(void* pv)
     vTaskDelete(NULL);
 
 }
+
+#endif // CONFIG_EZPI_SERV_MDNS_EN

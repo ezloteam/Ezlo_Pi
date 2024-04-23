@@ -152,6 +152,8 @@ extern "C"
 
     int ezlopi_factory_info_v3_scenes_factory_soft_reset(void);
 
+    int EZPI_CORE_factory_info_prov_init(void);
+
 #if (EZLOPI_DEVICE_TYPE_GENERIC == EZLOPI_DEVICE_TYPE)
 
 #elif (EZLOPI_DEVICE_TYPE_TEST_DEVICE == EZLOPI_DEVICE_TYPE)
@@ -174,13 +176,6 @@ extern "C"
                 \"op_inv\": false,\
                 \"val_ip\": false,\
                 \"val_op\": false\
-            },\
-            {\
-                \"dev_type\": 3,\
-                \"dev_name\": \"Water_leak\",\
-                \"id_room\": \"\",\
-                \"id_item\": 27,\
-                \"gpio\": 25\
             }\
         ], \
         \"dev_total\": 5}";

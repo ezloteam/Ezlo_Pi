@@ -303,7 +303,8 @@ int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag
                             if (cj_scene)
                             {
                                 cJSON* enable_item = cJSON_GetObjectItem(cj_scene, ezlopi_enabled_str);
-                                if (enable_item && cJSON_IsBool(enable_item))
+                                TRACE_S("prev_enable => [%s]", (enable_item->type == cJSON_True) ? "True" : "False");
+                                if ((enable_item && cJSON_IsBool(enable_item)) && (enable_item->type != ((enabled_flag) ? cJSON_True : cJSON_False)))
                                 {
                                     enable_item->type = (enabled_flag) ? cJSON_True : cJSON_False;
 
@@ -319,7 +320,7 @@ int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag
                                         curr_scene_head = curr_scene_head->next;
                                     }
 
-                                    CJSON_TRACE("cj_scene----2", cj_scene);
+                                    CJSON_TRACE("cj_scene----> 2. updated", cj_scene);
 
                                     if (1 == ezlopi_core_scene_edit_store_updated_to_nvs(cj_scene))
                                     {
@@ -333,7 +334,7 @@ int ezlopi_scenes_enable_disable_id_from_list_v2(uint32_t _id, bool enabled_flag
                                 }
                                 else
                                 {
-                                    TRACE_W("HERE-> enabled option invalid");
+                                    TRACE_W("Scene-Already [%s] or, invalid option ", (true == enabled_flag) ? "enabled" : "disabled");
                                 }
                                 cJSON_Delete(cj_scene);
                             }

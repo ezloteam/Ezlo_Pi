@@ -41,9 +41,6 @@ extern "C"
     uint32_t ezlopi_nvs_get_boot_count(void);
     void ezlopi_nvs_set_boot_count(uint32_t boot_count);
 
-    uint32_t ezlopi_nvs_get_provisioning_status(void);
-    void ezlopi_nvs_set_provisioning_status(void);
-
     void ezlopi_nvs_scenes_soft_reset(void);
     void ezlopi_nvs_scenes_factory_info_reset(void);
 
@@ -102,17 +99,17 @@ extern "C"
     bool EZPI_CORE_nvs_write_parity(uint32_t parity);
     uint8_t EZPI_CORE_nvs_read_parity(uint32_t* parity);
 
-    bool EZPI_CORE_nvs_write_start_bits(uint8_t start_bits);
-    uint8_t EZPI_CORE_nvs_read_start_bits(uint8_t* start_bits);
+    bool EZPI_CORE_nvs_write_start_bits(uint32_t start_bits);
+    uint8_t EZPI_CORE_nvs_read_start_bits(uint32_t* start_bits);
 
-    bool EZPI_CORE_nvs_write_stop_bits(uint8_t stop_bits);
-    uint8_t EZPI_CORE_nvs_read_stop_bits(uint8_t* stop_bits);
+    bool EZPI_CORE_nvs_write_stop_bits(uint32_t stop_bits);
+    uint8_t EZPI_CORE_nvs_read_stop_bits(uint32_t* stop_bits);
 
-    bool EZPI_CORE_nvs_write_frame_size(uint8_t frame_size);
-    uint8_t EZPI_CORE_nvs_read_frame_size(uint8_t* frame_size);
+    bool EZPI_CORE_nvs_write_frame_size(uint32_t frame_size);
+    uint8_t EZPI_CORE_nvs_read_frame_size(uint32_t* frame_size);
 
     bool EZPI_CORE_nvs_write_flow_control(uint32_t flow_control);
-    bool EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control);
+    uint8_t EZPI_CORE_nvs_read_flow_control(uint32_t* flow_control);
 
 #ifdef __cplusplus
 }

@@ -41,7 +41,7 @@ menu "EzloPi User Config"
         help 
             Run the device in test mode
     
-    config EZPI_UTIL_ENABLE_TRACE
+    config EZPI_UTIL_TRACE_EN
     bool "Enable trace component for logging"
     default y
     help
@@ -138,6 +138,7 @@ menu "EzloPi User Config"
         default n
         help 
             Enable mDNS service. mDNS broadcast informations of device.
+
 
     menu "EzloPi mDNS config"
         depends on EZPI_ENABLE_MDNS_SERVICE

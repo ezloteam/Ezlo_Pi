@@ -185,6 +185,10 @@ static int __send_cjson_data_to_nma_websocket(cJSON* cj_data)
             {
                 ret = __send_str_data_to_nma_websocket(data_buffer);
             }
+            else
+            {
+                TRACE_E("FAILED!");
+            }
 
             ezlopi_core_buffer_release();
             TRACE_I("-----------------------------> buffer released!");

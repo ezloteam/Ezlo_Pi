@@ -69,8 +69,8 @@ void ezlopi_ble_service_init(void)
     ezlopi_ble_start_secure_gatt_server();
 #else
     ezlopi_ble_start_secure_gatt_server_open_pairing();
-#endif
-#endif
+#endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PASSKEY
+#endif // 1 == CONFIG_EZLOPI_BLE_ENALBE_PAIRING
 }
 
 

@@ -3,7 +3,6 @@
 
 #include <string.h>
 
-#include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "EZLOPI_USER_CONFIG.h"
