@@ -398,7 +398,10 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
         {
             if (0 == strncmp(curr_field->name, ezlopi_houseMode_str, strlen(ezlopi_houseMode_str)))
             {
-                house_mode_id_array = curr_field;
+                if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY == curr_field->value_type)
+                {
+                    house_mode_id_array = curr_field;
+                }
             }
 
             curr_field = curr_field->next;
@@ -407,15 +410,18 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
         uint32_t idx = 0;
         cJSON* cj_house_mdoe_id = NULL;
 
-        while (NULL == (cj_house_mdoe_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
+        while (NULL != (cj_house_mdoe_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
         {
             if (cj_house_mdoe_id->valuestring)
             {
                 uint32_t house_mode_id = strtoul(cj_house_mdoe_id->valuestring, NULL, 16);
                 s_ezlopi_modes_t* modes = ezlopi_core_modes_get_custom_modes();
-                if ((modes->current_mode_id == house_mode_id) && ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id))
+                if ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id) /* first check if there is transition */
                 {
-                    ret = 1;
+                    if (modes->current_mode_id == house_mode_id)  /* if : new_state == desired */
+                    {
+                        ret = 1;
+                    }
                     house_mode_id_array->user_arg = (void*)house_mode_id;
                     TRACE_E("house-mode-changed-to: %d", house_mode_id);
                 }
@@ -428,8 +434,51 @@ int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t* scene_node, v
 
 int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node, void* arg)
 {
-    TRACE_W("Warning: when-method 'is_house_mode_changed_from' not implemented!");
-    return 0;
+    //TRACE_W(" isHouse_mode ");
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+
+    if (when_block)
+    {
+        l_fields_v2_t* house_mode_id_array = NULL;
+        l_fields_v2_t* curr_field = when_block->fields;
+
+        while (curr_field)
+        {
+            if (0 == strncmp(curr_field->name, ezlopi_houseMode_str, strlen(ezlopi_houseMode_str)))
+            {
+                if (EZLOPI_VALUE_TYPE_HOUSE_MODE_ID_ARRAY == curr_field->value_type)
+                {
+                    house_mode_id_array = curr_field;
+                }
+            }
+
+            curr_field = curr_field->next;
+        }
+
+        uint32_t idx = 0;
+        cJSON* cj_house_mode_id = NULL;
+
+        while (NULL != (cj_house_mode_id = cJSON_GetArrayItem(house_mode_id_array->field_value.u_value.cj_value, idx++)))
+        {
+            if (cj_house_mode_id->valuestring)
+            {
+                uint32_t house_mode_id = strtoul(cj_house_mode_id->valuestring, NULL, 16);
+                s_ezlopi_modes_t* modes = ezlopi_core_modes_get_custom_modes();
+                if ((uint32_t)house_mode_id_array->user_arg != modes->current_mode_id)  /* first check if there is transition */
+                {
+                    if ((uint32_t)house_mode_id_array->user_arg == house_mode_id)   /* if : old_state == desired */
+                    {
+                        ret = 1;
+                    }
+                    house_mode_id_array->user_arg = (void*)house_mode_id;
+                    TRACE_E("house-mode-changed-to: %d", house_mode_id);
+                }
+            }
+        }
+    }
+
+    return ret;
 }
 
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
