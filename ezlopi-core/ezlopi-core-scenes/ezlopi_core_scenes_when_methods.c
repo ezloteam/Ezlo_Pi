@@ -515,6 +515,29 @@ int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_
     return ret;
 }
 
+int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_node, void* arg)
+{
+    // TRACE_W(" is_House_Mode_Switch_to_Range ");
+    int ret = 0;
+    l_when_block_v2_t* when_block = (l_when_block_v2_t*)arg;
+
+    if (when_block && scene_node)
+    {
+        s_ezlopi_modes_t* curr_mode = ezlopi_core_modes_get_custom_modes();
+        if (curr_mode->alarmed.time_is_left_sec > 0)
+        {
+            TRACE_S(" Current HouseMode_phase has [%d]sec time before switch.(Duration confirmed) ", curr_mode->alarmed.time_is_left_sec);
+            ret = 1;
+        }
+        else
+        {
+            TRACE_E(" Current HouseMode_phase does not have duration ");
+        }
+    }
+
+    return ret;
+}
+
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg)
 {
     // TRACE_W(" isDevice_state. ");

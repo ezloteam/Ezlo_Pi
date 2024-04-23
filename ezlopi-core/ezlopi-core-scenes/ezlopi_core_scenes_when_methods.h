@@ -14,6 +14,7 @@ int ezlopi_scene_when_is_date_range(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_is_user_lock_operation(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_is_house_mode_changed_to(l_scenes_list_v2_t *scene_node, void *arg);
 int ezlopi_scene_when_is_house_mode_changed_from(l_scenes_list_v2_t* scene_node, void* arg);
+int ezlopi_scene_when_is_House_Mode_Switch_to_Range(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_when_is_House_Mode_Alarm_Phase_Range(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_when_is_device_state(l_scenes_list_v2_t* scene_node, void* arg);
 int ezlopi_scene_when_is_network_state(l_scenes_list_v2_t *scene_node, void *arg);
