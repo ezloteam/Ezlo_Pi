@@ -74,12 +74,13 @@ static void registration_process(void* pv)
 
         while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
         {
-            //     CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
             cJSON* cj_register_dup = cJSON_CreateObjectReference(cj_register->child);
             if (cj_register_dup)
             {
+                CJSON_TRACE("----------------- sent to broadcast - cj_register_dup", cj_register_dup);
                 if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_register_dup))
                 {
+                    TRACE_E("Error adding to broadcast queue!");
                     cJSON_Delete(cj_register_dup);
                 }
             }

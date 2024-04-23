@@ -83,19 +83,28 @@ static void __blinky(void* pv)
 {
 
     uint32_t count = 0;
+    uint32_t low_heap_start_time = xTaskGetTickCount();
 
     while (1)
     {
-        if (count++ > 1000)
-        {
-            count = 0;
+        uint32_t free_heap_kb = esp_get_free_heap_size() / 1024.0;
 
-            trace_wb("----------------------------------------------");
-            trace_wb("esp_get_free_heap_size - %f kB", esp_get_free_heap_size() / 1024.0);
-            trace_wb("esp_get_minimum_free_heap_size: %f kB", esp_get_minimum_free_heap_size() / 1024.0);
-            trace_wb("----------------------------------------------");
+        trace_wb("----------------------------------------------");
+        trace_wb("esp_get_free_heap_size - %.02f kB", free_heap_kb);
+        trace_wb("esp_get_minimum_free_heap_size: %.02f kB", esp_get_minimum_free_heap_size() / 1024.0);
+        trace_wb("----------------------------------------------");
+
+        if (free_heap_kb >= 10)
+        {
+            low_heap_start_time = xTaskGetTickCount();
+        }
+        else if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
+        {
+            TRACE_E("ERROR: low heap time-out detected!");
+            TRACE_W("Rebooting.....");
+            esp_restart();
         }
 
-        vTaskDelay(5 / portTICK_PERIOD_MS);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }

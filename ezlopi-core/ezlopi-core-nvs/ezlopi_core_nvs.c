@@ -474,7 +474,7 @@ uint8_t ezlopi_nvs_write_uint32(uint32_t i, const char* key_name)
         esp_err_t err = nvs_set_u32(ezlopi_nvs_handle, key_name, (uint32_t)i);
         if (ESP_OK != err)
         {
-            TRACE_W("(nvs_set_i32)-%s:: error: %s", key_name, esp_err_to_name(err));
+            TRACE_W("(nvs_set_u32)-%s:: error: %s", key_name, esp_err_to_name(err));
         }
         else
         {
@@ -502,12 +502,12 @@ uint8_t ezlopi_nvs_read_uint32(uint32_t* i, const char* key_name)
         esp_err_t err = nvs_get_u32(ezlopi_nvs_handle, key_name, (uint32_t*)i);
         if (ESP_OK == err)
         {
-            TRACE_D("(nvs_get_i32)-%s - NVS read success", key_name);
+            TRACE_D("(nvs_get_u32)-%s - NVS read success", key_name);
             ret = 1;
         }
         else
         {
-            TRACE_E("(nvs_get_i32)-%s - error: %s", key_name, esp_err_to_name(err));
+            TRACE_E("(nvs_get_u32)-%s - error: %s", key_name, esp_err_to_name(err));
         }
     }
     return ret;
