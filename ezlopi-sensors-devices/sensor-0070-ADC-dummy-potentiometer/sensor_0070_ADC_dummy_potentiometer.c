@@ -101,6 +101,8 @@ static int __0070_prepare(void* arg)
         if (NULL != user_data)
         {
             memset(user_data, 0, sizeof(s_dummy_potentiometer_t));
+            user_data->pot_val = 1;
+            snprintf(user_data->pot_status_str, sizeof(user_data->pot_status_str), "%s", "setup");
             l_ezlopi_device_t* dummy_potentiometer_device = ezlopi_device_add_device(cj_device, NULL);
             if (dummy_potentiometer_device)
             {
@@ -233,15 +235,15 @@ static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
                             user_data->pot_val = value_double;
                             if (user_data->pot_val > 70)
                             {
-                                snprintf(user_data->pot_status_str, 13, "%s", "high_volume");
+                                snprintf(user_data->pot_status_str, sizeof(user_data->pot_status_str), "%s", "high_volume");
                             }
                             else if (user_data->pot_val > 30)
                             {
-                                snprintf(user_data->pot_status_str, 12, "%s", "mid_volume");
+                                snprintf(user_data->pot_status_str, sizeof(user_data->pot_status_str), "%s", "mid_volume");
                             }
                             else
                             {
-                                snprintf(user_data->pot_status_str, 12, "%s", "low_volume");
+                                snprintf(user_data->pot_status_str, sizeof(user_data->pot_status_str), "%s", "low_volume");
                             }
                             TRACE_S("curr_pot_state: '%s' [%d]", user_data->pot_status_str, (int)user_data->pot_val);
                         }
@@ -250,6 +252,10 @@ static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
                         ret = 1;
                     }
                 }
+            }
+            else
+            {
+                TRACE_E("Here !!");
             }
         }
     }
@@ -267,9 +273,13 @@ static int __0070_get_cjson_value(l_ezlopi_item_t* item, void* arg)
             s_dummy_potentiometer_t* user_data = (s_dummy_potentiometer_t*)item->user_arg;
             if (user_data)
             {
-                cJSON_AddStringToObject(cj_result, ezlopi_value_str, user_data->pot_status_str);
-                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, user_data->pot_status_str);
+                cJSON_AddStringToObject(cj_result, ezlopi_value_str, (NULL != user_data->pot_status_str) ? user_data->pot_status_str : "low_volume");
+                cJSON_AddStringToObject(cj_result, ezlopi_valueFormatted_str, (NULL != user_data->pot_status_str) ? user_data->pot_status_str : "low_volume");
                 ret = 1;
+            }
+            else
+            {
+                TRACE_E("Here !!");
             }
         }
     }
@@ -278,9 +288,11 @@ static int __0070_get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
 static int __0070_notify(l_ezlopi_item_t* item)
 {
+    static uint8_t timing = 10;// 5sec
     int ret = 0;
-    if (item)
+    if (item && (0 == timing--))
     {
+        timing = 10;
         s_dummy_potentiometer_t* user_data = (s_dummy_potentiometer_t*)item->user_arg;
         if (user_data)
         {
@@ -293,19 +305,23 @@ static int __0070_notify(l_ezlopi_item_t* item)
                 user_data->pot_val = new_pot;
                 if (user_data->pot_val > 70)
                 {
-                    snprintf(user_data->pot_status_str, 13, "%s", "high_volume");
+                    snprintf(user_data->pot_status_str, sizeof(user_data->pot_status_str), "%s", "high_volume");
                 }
                 else if (user_data->pot_val > 30)
                 {
-                    snprintf(user_data->pot_status_str, 12, "%s", "mid_volume");
+                    snprintf(user_data->pot_status_str, sizeof(user_data->pot_status_str), "%s", "mid_volume");
                 }
                 else
                 {
-                    snprintf(user_data->pot_status_str, 12, "%s", "low_volume");
+                    snprintf(user_data->pot_status_str, sizeof(user_data->pot_status_str), "%s", "low_volume");
                 }
                 ezlopi_device_value_updated_from_device_v3(item);
             }
             ret = 1;
+        }
+        else
+        {
+            TRACE_E("Here!!");
         }
     }
     return ret;
