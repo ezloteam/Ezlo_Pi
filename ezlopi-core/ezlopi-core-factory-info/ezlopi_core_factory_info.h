@@ -170,6 +170,14 @@ extern "C"
                 \"gpio\": 18\
             },\
             {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"POT\",\
+                \"id_room\": \"\",\
+                \"id_item\": 70,\
+                \"gpio\": 5,\
+                \"resln_bit\": 3\
+            },\
+            {\
                 \"dev_type\": 10,\
                 \"dev_name\": \"Flame\",\
                 \"id_room\": \"\",\

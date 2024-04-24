@@ -80,12 +80,12 @@ static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_dev
     item->cloud_properties.item_name = ezlopi_item_name_sound_volume;
     item->cloud_properties.value_type = value_type_string;
     item->cloud_properties.show = true;
-    item->cloud_properties.scale = scales_milli_volt;
+    item->cloud_properties.scale = NULL;
 
     item->is_user_arg_unique = true;
     item->user_arg = user_data;
 
-    item->interface_type = EZLOPI_DEVICE_INTERFACE_MAX; // other
+    item->interface_type = EZLOPI_DEVICE_INTERFACE_ANALOG_INPUT; // other
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_gpio_str, item->interface.adc.gpio_num);
     item->interface.adc.resln_bit = 3;
 }
@@ -221,7 +221,7 @@ static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
                     {
                         TRACE_S("item_name: %s", item->cloud_properties.item_name);
                         TRACE_S("item_id: 0x%08x", item->cloud_properties.item_id);
-                        TRACE_S("prev_pot_state: '%s' [%d]", user_data->pot_status_str, user_data->pot_val);
+                        TRACE_S("prev_pot_state: '%s' [%d]", user_data->pot_status_str, (int)user_data->pot_val);
 
                         // if (value_str)
                         // {
@@ -243,7 +243,7 @@ static int __0070_set_value(l_ezlopi_item_t* item, void* arg)
                             {
                                 snprintf(user_data->pot_status_str, 12, "%s", "low_volume");
                             }
-                            TRACE_S("curr_pot_state: '%s' [%d]", user_data->pot_status_str, user_data->pot_val);
+                            TRACE_S("curr_pot_state: '%s' [%d]", user_data->pot_status_str, (int)user_data->pot_val);
                         }
 
                         ezlopi_device_value_updated_from_device_v3(item);
