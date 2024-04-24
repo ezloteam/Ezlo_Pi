@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -178,7 +179,9 @@ static int __0051_init(l_ezlopi_item_t* item)
                     { // calibrate if not done
                         if (false == MQ8_value->Calibration_complete_H2)
                         {
-                            xTaskCreate(__calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                            TaskHandle_t ezlopi_sensor_mq8_task_handle = NULL;
+                            xTaskCreate(__calibrate_MQ8_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ8_TASK_DEPTH, item, 1, &ezlopi_sensor_mq8_task_handle);
+                            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ8_TASK, &ezlopi_sensor_mq8_task_handle, EZLOPI_SENSOR_MQ8_TASK_DEPTH);
                         }
                         ret = 1;
                     }
@@ -191,14 +194,14 @@ static int __0051_init(l_ezlopi_item_t* item)
                     //     // ezlopi_device_free_device_by_item(item); // remove the item itself
                     // }
                 }
-            //     else
-            //    {
-            //        ret = -1;
-            //         TRACE_E("Deleting Item!!");
-            //        free(item->user_arg);
-            //        item->user_arg = NULL;
-            //         ezlopi_device_free_device_by_item(item); // remove the item itself
-            //    }
+                //     else
+                //    {
+                //        ret = -1;
+                //         TRACE_E("Deleting Item!!");
+                //        free(item->user_arg);
+                //        item->user_arg = NULL;
+                //         ezlopi_device_free_device_by_item(item); // remove the item itself
+                //    }
             }
             // else
             // {
@@ -505,5 +508,6 @@ static void __calibrate_MQ8_R0_resistance(void* params)
             MQ8_value->Calibration_complete_H2 = true;
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ8_TASK);
     vTaskDelete(NULL);
 }

@@ -9,6 +9,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_gpioisr.h"
 
@@ -31,8 +32,10 @@ void gpio_isr_service_init(void)
 {
     TRACE_S("Started gpio-isr service");
     gpio_evt_queue = xQueueCreate(20, sizeof(s_event_arg_t *));
-    xTaskCreate(gpio_isr_process_v3, "gpio_isr_process_v3", 2 * 2048, NULL, 3, NULL);
-    // xTaskCreate(gpio_isr_process, "digital-io-isr-service", 2 * 2048, NULL, 3, NULL);
+    TaskHandle_t ezlopi_service_gpio_isr_task_handle = NULL;
+    xTaskCreate(gpio_isr_process_v3, "gpio_isr_process_v3", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_GPIO_ISR_TASK, &ezlopi_service_gpio_isr_task_handle, EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH);
+    // xTaskCreate(gpio_isr_process, "digital-io-isr-service", EZLOPI_SERVICE_GPIO_ISR_TASK_DEPTH, NULL, 3, &ezlopi_service_gpio_isr_task_handle);
 }
 
 void gpio_isr_service_register_v3(l_ezlopi_item_t *item, f_interrupt_upcall_t __upcall, TickType_t debounce_ms)

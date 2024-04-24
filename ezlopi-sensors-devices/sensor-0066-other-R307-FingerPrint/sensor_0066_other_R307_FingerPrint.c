@@ -9,6 +9,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_uart.h"
 
@@ -299,7 +300,8 @@ static int __0066_init(l_ezlopi_item_t* item)
                                 if (NULL == (user_data->notifyHandler))
                                 {
                                     TRACE_I(" ---->>> Creating Fingerprint_activation Task <<<----");
-                                    xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", 2048 * 2, item, 1, &(user_data->notifyHandler));
+                                    xTaskCreate(__fingerprint_operation_task, "Fingerprint_activation", EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH, item, 1, &(user_data->notifyHandler));
+                                    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK, &user_data->notifyHandler, EZLOPI_SENSOR_R307_FINGER_PRINT_TASK_DEPTH);
                                 }
 
                                 const esp_timer_create_args_t esp_timer_create_args = {
@@ -739,5 +741,6 @@ static void __fingerprint_operation_task(void* params)
             }
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_R307_FINGER_PRINT_TASK);
     vTaskDelete(NULL);
 }

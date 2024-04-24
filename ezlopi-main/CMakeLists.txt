@@ -17,6 +17,7 @@ set(EZLOPI_COMPONENTS
 # Define core components
 set(EZLOPI_CORE_COMPONENTS 
         ezlopi-core-ezlopi
+        ezlopi-core-processes
 )
 
 # Define HAL components

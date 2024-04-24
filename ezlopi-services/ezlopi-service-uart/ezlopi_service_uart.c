@@ -25,6 +25,7 @@
 #include "ezlopi_core_reset.h"
 #include "ezlopi_core_net.h"
 #include "ezlopi_core_factory_info.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -259,6 +260,7 @@ static void ezlopi_service_uart_rx_task(void* arg)
     }
 
     free(data);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_UART_TASK);
     vTaskDelete(NULL);
 }
 
@@ -548,5 +550,7 @@ static void ezlopi_service_uart_read_config(void)
 void EZPI_SERVICE_uart_init(void)
 {
     serial_init();
-    xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", 1024 * 2, NULL, configMAX_PRIORITIES, NULL);
+    TaskHandle_t ezlopi_service_uart_task_handle = NULL;
+    xTaskCreate(ezlopi_service_uart_rx_task, "ezlopi_service_uart_rx_task", EZLOPI_SERVICE_UART_TASK_DEPTH, NULL, configMAX_PRIORITIES, &ezlopi_service_uart_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_UART_TASK, &ezlopi_service_uart_task_handle, EZLOPI_SERVICE_UART_TASK_DEPTH);
 }

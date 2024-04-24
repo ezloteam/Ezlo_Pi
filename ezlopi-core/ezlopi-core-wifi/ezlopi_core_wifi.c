@@ -29,6 +29,7 @@
 #include "ezlopi_core_wifi_err_reason.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_service_uart.h"
 
@@ -49,6 +50,7 @@ static volatile bool ezlopi_flag_wifi_status = false;
 static const char* wifi_scanner_task_name = "scanner_task";
 static uint16_t total_wifi_APs_available = 0;
 static wifi_ap_record_t* ap_record = NULL;
+static TaskHandle_t scan_handle = NULL;
 
 static ll_ezlopi_wifi_event_upcall_t* ezlopi_wifi_event_upcall_create(f_ezlopi_wifi_event_upcall upcall, void* arg);
 static void ezlopi_wifi_scanner_task(void* params);
@@ -421,6 +423,8 @@ static void ezlopi_wifi_scanner_task(void* params)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
+    scan_handle = NULL;
     vTaskDelete(NULL);
 }
 
@@ -428,10 +432,11 @@ void ezlopi_wifi_scan_stop()
 {
     TRACE_E("Stopping the scanning process.");
     esp_wifi_scan_stop();
-    TaskHandle_t scan_handle = xTaskGetHandle(wifi_scanner_task_name);
+    
     if (scan_handle)
     {
         TRACE_E("Resetting WiFi scanner task.(handle: %p)", scan_handle);
+        ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK);
         vTaskDelete(scan_handle);
     }
     TRACE_E("Deleting previous record.");
@@ -445,5 +450,6 @@ void ezlopi_wifi_scan_stop()
 void ezlopi_wifi_scan_start()
 {
     ezlopi_wifi_scan_stop();
-    xTaskCreate(ezlopi_wifi_scanner_task, wifi_scanner_task_name, 2 * 2048, NULL, 3, NULL);
+    xTaskCreate(ezlopi_wifi_scanner_task, wifi_scanner_task_name, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH, NULL, 3, &scan_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CORE_WIFI_SCANNER_TASK, &scan_handle, EZLOPI_CORE_WIFI_SCANNER_TASK_DEPTH);
 }

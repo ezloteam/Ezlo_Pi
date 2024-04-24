@@ -9,6 +9,8 @@
 
 #include "ezlopi_util_trace.h"
 
+#include "ezlopi_core_processes.h"
+
 #include "ezlopi_hal_uart.h"
 
 static void ezlopi_uart_channel_task(void *args);
@@ -59,7 +61,8 @@ s_ezlopi_uart_object_handle_t ezlopi_uart_init(uint32_t baudrate, uint32_t tx, u
         uart_object_handle->ezlopi_uart.enable = true;
         uart_object_handle->upcall = upcall;
 
-        xTaskCreate(ezlopi_uart_channel_task, "ezlopi_uart_channel_task", 2048 * 2, (void *)uart_object_handle, 13, &(uart_object_handle->taskHandle));
+        xTaskCreate(ezlopi_uart_channel_task, "EzpiUartChnTask", EZLOPI_HAL_UART_TASK_DEPTH, (void *)uart_object_handle, 13, &(uart_object_handle->taskHandle));
+        ezlopi_core_process_set_process_info(ENUM_EZLOPI_HAL_UART_TASK, &uart_object_handle->taskHandle, EZLOPI_HAL_UART_TASK_DEPTH);
     }
     else
     {

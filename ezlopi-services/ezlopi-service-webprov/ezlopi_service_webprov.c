@@ -13,6 +13,7 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_ezlopi_methods.h"
+#include "ezlopi_core_processes.h"
 #include "ezlopi_core_websocket_client.h"
 
 #include "ezlopi_service_webprov.h"
@@ -107,8 +108,11 @@ int ezlopi_service_web_provisioning_send_to_nma_websocket(cJSON* cjson_data, e_t
 
 void ezlopi_service_web_provisioning_init(void)
 {
-    xTaskCreate(__config_check, "web-provisioning config check", 4 * 2048, NULL, 5, NULL);
-    xTaskCreate(__fetch_wss_endpoint, "web-provisioning fetch wss endpoint", 3 * 2048, NULL, 5, &ezlopi_update_config_notifier);
+    TaskHandle_t ezlopi_service_web_prov_config_check_task_handle = NULL;
+    xTaskCreate(__config_check, "WebProvCfgChk", EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH, NULL, 5, &ezlopi_service_web_prov_config_check_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK, &ezlopi_service_web_prov_config_check_task_handle, EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK_DEPTH);
+    xTaskCreate(__fetch_wss_endpoint, "WebProvFetchWSS", EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH, NULL, 5, &ezlopi_update_config_notifier);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK, &ezlopi_update_config_notifier, EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK_DEPTH);
 }
 
 static uint8_t web_provisioning_config_update(void* arg)
@@ -390,6 +394,7 @@ static void __config_check(void* pv)
     free(ca_certificate);
     free(provision_token);
     free(provisioning_server);
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_CONFIG_CHECK_TASK);
     vTaskDelete(NULL);
 }
 
@@ -460,7 +465,7 @@ static void __fetch_wss_endpoint(void* pv)
         vTaskDelay(2000 / portTICK_RATE_MS);
         vTaskDelay(2000 / portTICK_RATE_MS);
     }
-
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SERVICE_WEB_PROV_FETCH_WSS_TASK);
     vTaskDelete(NULL);
 }
 

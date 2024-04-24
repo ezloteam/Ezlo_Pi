@@ -6,6 +6,7 @@
 #include "ezlopi_core_cjson_macros.h"
 #include "ezlopi_core_valueformatter.h"
 #include "ezlopi_core_device_value_updated.h"
+#include "ezlopi_core_processes.h"
 
 #include "ezlopi_hal_adc.h"
 
@@ -179,7 +180,9 @@ static int __0059_init(l_ezlopi_item_t* item)
                         // calibrate if not done
                         if (false == MQ6_value->Calibration_complete_LPG)
                         {
-                            xTaskCreate(__calibrate_MQ6_R0_resistance, "Task_to_calculate_R0_air", 2048, item, 1, NULL);
+                            TaskHandle_t ezlopi_sensor_mq6_task_handle = NULL;
+                            xTaskCreate(__calibrate_MQ6_R0_resistance, "Task_to_calculate_R0_air", EZLOPI_SENSOR_MQ6_TASK_DEPTH, item, 1, &ezlopi_sensor_mq6_task_handle);
+                            ezlopi_core_process_set_process_info(ENUM_EZLOPI_SENSOR_MQ6_TASK, &ezlopi_sensor_mq6_task_handle, EZLOPI_SENSOR_MQ6_TASK_DEPTH);
                         }
 
                         ret = 1;
@@ -504,5 +507,6 @@ static void __calibrate_MQ6_R0_resistance(void* params)
             MQ6_value->Calibration_complete_LPG = true;
         }
     }
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_SENSOR_MQ6_TASK);
     vTaskDelete(NULL);
 }

@@ -11,12 +11,15 @@
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_core_websocket_client.h"
 #include "ezlopi_core_event_group.h"
+#include "ezlopi_core_processes.h"
 
 static void registration_process(void* pv);
 
 void registration_init(void)
 {
-    xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
+    TaskHandle_t ezlopi_cloud_registration_process_task_handle = NULL;
+    xTaskCreate(registration_process, "registration_process", EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH, NULL, 2, &ezlopi_cloud_registration_process_task_handle);
+    ezlopi_core_process_set_process_info(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK, &ezlopi_cloud_registration_process_task_handle, EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK_DEPTH);
 }
 
 void register_repeat(cJSON* cj_request, cJSON* cj_response)
@@ -71,6 +74,6 @@ static void registration_process(void* pv)
 
         cJSON_Delete(cj_register);
     }
-
+    ezlopi_core_process_set_is_deleted(ENUM_EZLOPI_CLOUD_REGISTRATION_PROCESS_STACK);
     vTaskDelete(NULL);
 }
