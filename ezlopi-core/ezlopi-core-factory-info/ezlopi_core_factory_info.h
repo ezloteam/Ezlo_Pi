@@ -163,19 +163,19 @@ extern "C"
         \"dev_detail\":\
         [\
             {\
-                \"dev_type\": 1,\
-                \"dev_name\": \"LED\",\
+                \"dev_type\": 7,\
+                \"dev_name\": \"Temp Hum\",\
                 \"id_room\": \"\",\
-                \"id_item\": 1,\
-                \"gpio_in\": 0,\
-                \"gpio_out\": 5,\
-                \"pullup_ip\": false,\
-                \"pullup_op\": false,\
-                \"is_ip\": false,\
-                \"ip_inv\": false,\
-                \"op_inv\": false,\
-                \"val_ip\": false,\
-                \"val_op\": false\
+                \"id_item\": 16,\
+                \"gpio\": 18\
+            },\
+            {\
+                \"dev_type\": 3,\
+                \"dev_name\": \"POT\",\
+                \"id_room\": \"\",\
+                \"id_item\": 70,\
+                \"gpio\": 5,\
+                \"resln_bit\": 3\
             }\
         ], \
         \"dev_total\": 5}";
