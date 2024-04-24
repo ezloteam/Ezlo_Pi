@@ -5,6 +5,7 @@ CLOUD_METHOD("hub.item.value.set", items_set_value_v3, NULL)
 
 CLOUD_METHOD("hub.devices.list", devices_list_v3, NULL)
 CLOUD_METHOD("hub.device.name.set", device_name_set, device_updated)
+CLOUD_METHOD("hub.device.armed.set", device_armed_set, device_updated)
 
 #if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
 CLOUD_METHOD("hub.modes.get", ezlopi_cloud_modes_get, NULL)

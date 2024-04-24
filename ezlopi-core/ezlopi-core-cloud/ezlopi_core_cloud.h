@@ -52,6 +52,7 @@ typedef struct s_ezlopi_cloud_device
     const char* subcategory; // 'subcategory' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/subcategory_str.h
     const char* device_type; // 'type' -> https://api.ezlo.com/hub/devices_api/index.html, ezlopi-cloud/constants/device_types_str.h
     cJSON* info;             // info -> https://log.ezlo.com/new/hub/devices_api/
+    bool armed;                // 'armed' -> https://api.ezlo.com/hub/devices_api/index.html
 
 } s_ezlopi_cloud_device_t;
 

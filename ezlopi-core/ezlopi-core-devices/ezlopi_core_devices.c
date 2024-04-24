@@ -83,6 +83,19 @@ void ezlopi_device_name_set_by_device_id(uint32_t a_device_id, cJSON* cj_new_nam
     }
 }
 
+void ezlopi_device_set_reset_device_armed_status(uint32_t device_id, bool armed)
+{
+    if(device_id)
+    {
+        l_ezlopi_device_t* device_to_change = ezlopi_device_get_by_id(device_id);
+        if(device_to_change)
+        {
+            device_to_change->cloud_properties.armed = armed;
+            s_controller_information.armed = armed;
+        }
+    }
+}
+
 s_ezlopi_cloud_controller_t* ezlopi_device_get_controller_information(void)
 {
     return &s_controller_information;
@@ -794,7 +807,7 @@ cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t* device_pro
             cJSON_AddBoolToObject(cj_device, ezlopi_reachable_str, true);
             cJSON_AddBoolToObject(cj_device, ezlopi_persistent_str, true);
             cJSON_AddBoolToObject(cj_device, ezlopi_serviceNotification_str, false);
-            // cJSON_AddBoolToObject(cj_device, "armed", false);
+            cJSON_AddBoolToObject(cj_device, ezlopi_armed_str, device_prop->cloud_properties.armed);
             cJSON_AddStringToObject(cj_device, ezlopi_roomId_str, ezlopi__str);
             cJSON_AddStringToObject(cj_device, ezlopi_security_str, ezlopi_no_str);
             cJSON_AddBoolToObject(cj_device, ezlopi_ready_str, true);

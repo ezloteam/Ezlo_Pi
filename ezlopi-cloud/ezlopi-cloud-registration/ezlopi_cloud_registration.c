@@ -17,27 +17,27 @@
 
 #include "ezlopi_service_webprov.h"
 
-static void registration_process(void *pv);
+static void registration_process(void* pv);
 
 void registration_init(void)
 {
     xTaskCreate(registration_process, "registration_process", 2 * 2048, NULL, 2, NULL);
 }
 
-void register_repeat(cJSON *cj_request, cJSON *cj_response)
+void register_repeat(cJSON* cj_request, cJSON* cj_response)
 {
     registration_init();
 }
 
-void registered(cJSON *cj_request, cJSON *cj_response)
+void registered(cJSON* cj_request, cJSON* cj_response)
 {
     TRACE_S("Device registration successful.");
     ezlopi_event_group_set_event(EZLOPI_EVENT_NMA_REG);
 }
 
-static void registration_process(void *pv)
+static void registration_process(void* pv)
 {
-    cJSON *cj_register = cJSON_CreateObject();
+    cJSON* cj_register = cJSON_CreateObject();
     if (cj_register)
     {
         char mac_str[18];
@@ -45,12 +45,12 @@ static void registration_process(void *pv)
 
         esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
         snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
-                 mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+            mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
         cJSON_AddStringToObject(cj_register, "id", "__ID__");
         cJSON_AddStringToObject(cj_register, ezlopi_method_str, "register");
 
-        cJSON *cj_params = cJSON_AddObjectToObject(cj_register, ezlopi_params_str);
+        cJSON* cj_params = cJSON_AddObjectToObject(cj_register, ezlopi_params_str);
 
         if (cj_params)
         {
@@ -69,8 +69,8 @@ static void registration_process(void *pv)
 
         while (ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 5000, false) <= 0)
         {
-            //     CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
-            cJSON *cj_register_dup = cJSON_CreateObjectReference(cj_register->child);
+            // CJSON_TRACE("----------------- broadcasting - cj_register", cj_register);
+            cJSON* cj_register_dup = cJSON_CreateObjectReference(cj_register->child);
             if (cj_register_dup)
             {
                 if (!ezlopi_core_ezlopi_broadcast_add_to_queue(cj_register_dup))

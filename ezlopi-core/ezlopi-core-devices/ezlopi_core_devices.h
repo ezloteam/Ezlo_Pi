@@ -159,5 +159,6 @@ void ezlopi_device_factory_info_reset(void);
 cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t* device_prop);
 s_ezlopi_cloud_controller_t* ezlopi_device_get_controller_information(void);
 void ezlopi_device_name_set_by_device_id(uint32_t device_id, cJSON* cj_new_name);
+void ezlopi_device_set_reset_device_armed_status(uint32_t device_id, bool armed);
 
 #endif // EZLOPI_CORE_DEVICES_H

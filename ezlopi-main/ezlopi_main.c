@@ -49,7 +49,8 @@ void app_main(void)
     ezlopi_ble_service_init();
 #endif
 
-#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(EZPI_WEBSOCKET_CLIENT)
+    
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
 #endif
 
