@@ -9,6 +9,7 @@
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_scenes_scripts.h"
+#include "ezlopi_core_scenes_expressions.h"
 #include "ezlopi_core_scenes_then_methods.h"
 #include "ezlopi_core_scenes_status_changed.h"
 #include "ezlopi_service_meshbot.h"
@@ -553,9 +554,9 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
 
     if (curr_scene)
     {
-        int item_id = 0;       /* item or expression*/
-        int expression_id = 0; /* item or expression*/
+        int item_exp_id = 0;       /* item */
         const char* __id_string = NULL;
+        char *  expression_name = NULL; /* expression */
 
         l_action_block_v2_t* curr_then = (l_action_block_v2_t*)arg;
         if (curr_then)
@@ -567,24 +568,22 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                 {
                     if (EZLOPI_VALUE_TYPE_ITEM == curr_field->value_type)
                     {
-                        item_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
+                        item_exp_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
                         __id_string = curr_field->field_value.u_value.value_string;
                         TRACE_D("item_id: %s", __id_string);
                     }
                 }
                 else if (0 == strncmp(curr_field->name, ezlopi_expressions_str, 12))
                 {
-                    if (EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type)
+                    if ((EZLOPI_VALUE_TYPE_EXPRESSION == curr_field->value_type) && (NULL !=curr_field->field_value.u_value.value_string))
                     {
-                        expression_id = strtoul(curr_field->field_value.u_value.value_string, NULL, 16);
-                        __id_string = curr_field->field_value.u_value.value_string;
-                        TRACE_D("expression_id: %s", __id_string);
+                        expression_name =  curr_field->field_value.u_value.value_string;
                     }
                 }
                 curr_field = curr_field->next;
             }
 
-            if (item_id > 0)
+            if (item_exp_id > 0)
             {
                 uint8_t found_item = 0;
                 l_ezlopi_device_t* curr_device = ezlopi_device_get_head();
@@ -593,7 +592,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                     l_ezlopi_item_t* curr_item = curr_device->items;
                     while (curr_item)
                     {
-                        if (item_id == curr_item->cloud_properties.item_id &&
+                        if (item_exp_id == curr_item->cloud_properties.item_id &&
                             EZLOPI_DEVICE_INTERFACE_DIGITAL_OUTPUT == curr_item->interface_type)
                         {
                             cJSON* cj_tmp_value = cJSON_CreateObject();
@@ -635,6 +634,7 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                                             {
                                                 cJSON_AddNumberToObject(cj_result_value, ezlopi_value_str, 0);
                                             }
+
                                             curr_item->func(EZLOPI_ACTION_SET_VALUE, curr_item, cj_result_value, curr_item->user_arg);
                                         }
                                         else
@@ -660,10 +660,22 @@ int ezlopi_scene_then_toggle_value(l_scenes_list_v2_t* curr_scene, void* arg)
                     curr_device = curr_device->next;
                 }
             }
-            // else if (expression_id > 0)
-            // {
-            // #warning "need guidance"
-            // }
+            else if (NULL !=expression_name)
+            {
+                s_ezlopi_expressions_t* curr_exp = ezlopi_scenes_get_expression_node_by_name(expression_name);
+                if(curr_exp)
+                {
+                    if (EXPRESSION_VALUE_TYPE_NUMBER == curr_exp->exp_value.type)
+                    {
+                        curr_exp->exp_value.u_value.number_value = (0 == curr_exp->exp_value.u_value.number_value)?1:0; 
+                    }
+                    else if(EXPRESSION_VALUE_TYPE_BOOL)
+                    {
+                        curr_exp->exp_value.u_value.boolean_value = (false == curr_exp->exp_value.u_value.boolean_value)?true:false;
+                    }
+                }  
+                
+            }
         }
     }
 
