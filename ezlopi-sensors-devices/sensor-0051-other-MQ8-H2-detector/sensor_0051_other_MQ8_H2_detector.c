@@ -13,6 +13,8 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0051_other_MQ8_H2_detector.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 //*************************************************************************
 //                          Declaration
 //*************************************************************************

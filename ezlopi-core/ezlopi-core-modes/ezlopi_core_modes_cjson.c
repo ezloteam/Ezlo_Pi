@@ -10,6 +10,7 @@
 #include "ezlopi_core_cjson_macros.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_EZLPI_SERV_ENABLE_MODES)
 

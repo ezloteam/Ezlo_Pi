@@ -4,6 +4,7 @@
 
 #include "ezlopi_hal_pwm.h"
 #include "ezlopi_util_trace.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 struct s_ezlopi_pwm_object
 {
@@ -69,6 +70,7 @@ s_ezlopi_channel_speed_t *ezlopi_pwm_init(uint8_t pwm_gpio_num, uint8_t pwm_resl
         {
             TRACE_S("LEDC channel configured successfully.");
         }
+        
         ezlopi_channel_speed->channel = channel;
         ezlopi_channel_speed->speed_mode = ezlopi_pwm_channel_cfg.speed_mode;
     }

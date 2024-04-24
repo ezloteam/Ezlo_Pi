@@ -4,6 +4,7 @@
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_event_group.h"
 #include "ezlopi_core_scenes_when_methods_helper_functions.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------- ezlopi_scene_when_is_date ---------------------------------------------
 

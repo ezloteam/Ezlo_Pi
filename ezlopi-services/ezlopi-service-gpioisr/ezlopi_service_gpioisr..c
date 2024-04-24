@@ -11,6 +11,7 @@
 #include "ezlopi_core_device_value_updated.h"
 
 #include "ezlopi_service_gpioisr.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static QueueHandle_t gpio_evt_queue = NULL;
 static const uint32_t default_debounce_time = 1000;

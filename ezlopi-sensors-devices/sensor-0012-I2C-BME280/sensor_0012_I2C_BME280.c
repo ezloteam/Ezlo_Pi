@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0012_I2C_BME280.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_ezlopi_bmp280
 {

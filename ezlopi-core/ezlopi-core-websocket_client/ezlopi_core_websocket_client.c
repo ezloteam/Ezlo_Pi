@@ -15,6 +15,7 @@
 
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_websocket_client.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static esp_websocket_client_handle_t client = NULL;
 static void (*__msg_upcall)(const char*, uint32_t) = NULL;

@@ -3,6 +3,7 @@
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_scenes_v2.h"
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #define STR_SIZE(str) ((NULL != str) ? (strlen(str)) : 0)
 

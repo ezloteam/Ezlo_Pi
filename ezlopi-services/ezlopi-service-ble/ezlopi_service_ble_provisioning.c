@@ -23,6 +23,7 @@
 
 #include "ezlopi_service_ble_ble_auth.h"
 #include "ezlopi_service_ble.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #define CJ_GET_STRING(name) cJSON_GetStringValue(cJSON_GetObjectItem(root, name))
 #define CJ_GET_NUMBER(name) cJSON_GetNumberValue(cJSON_GetObjectItem(root, name))

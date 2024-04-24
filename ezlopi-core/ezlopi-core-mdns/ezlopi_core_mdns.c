@@ -16,6 +16,7 @@
 #include "ezlopi_cloud_keywords.h"
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_mdns.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 
 const char* ezlopi_mdns_instance_name = "EzloPi, an Open Source IoT Platform";

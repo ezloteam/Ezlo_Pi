@@ -1,6 +1,7 @@
 #include <string.h>
 #include "ezlopi_util_trace.h"
 #include "gyGPS6MV2.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //-------------------------------------------------------------------------
 // GPGGA MESSAGE PARSING FUNCTION

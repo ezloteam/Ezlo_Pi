@@ -35,6 +35,12 @@ menu "EzloPi User Config"
         
     endchoice
 
+    config EZPI_HEAP_ENABLE
+        bool "Enable ezlopi heap"
+        default n
+        help
+            Enables the allocation and free via ezlopi-util, helpful to track-down any memory leak in the stack
+
     config EZPI_DEV_TYPE_TEST
         bool "Run device in test mode"
         default n

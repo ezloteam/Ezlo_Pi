@@ -6,6 +6,7 @@
 #include "ezlopi_core_ble_profile.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static uint8_t adv_config_done = 0;
 #define ADV_CONFIG_FLAG (1 << 0)

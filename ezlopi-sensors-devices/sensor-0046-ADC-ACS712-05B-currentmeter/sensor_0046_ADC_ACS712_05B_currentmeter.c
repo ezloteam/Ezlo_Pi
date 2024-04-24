@@ -12,6 +12,8 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0046_ADC_ACS712_05B_currentmeter.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 typedef struct s_currentmeter
 {
     float amp_value;

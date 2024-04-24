@@ -13,6 +13,7 @@
 
 #include "ens160.h"
 #include "sensor_0068_ENS160_gas_sensor_settings.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static const char* nvs_key_ens160_gas_sensor_ambient_temperature_setting = "enstemp";
 static const char* nvs_key_ens160_gas_sensor_relative_humidity_setting = "enshmd";

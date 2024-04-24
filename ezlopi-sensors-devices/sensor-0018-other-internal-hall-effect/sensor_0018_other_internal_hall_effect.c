@@ -18,6 +18,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0018_other_internal_hall_effect.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 const char* hall_door_window_states[] = {
     "dw_is_opened",

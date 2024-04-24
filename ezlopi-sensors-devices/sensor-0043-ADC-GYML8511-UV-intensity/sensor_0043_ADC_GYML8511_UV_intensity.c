@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0043_ADC_GYML8511_UV_intensity.h"
+#include "EZLOPI_USER_CONFIG.h"
 //--------------------------------------------------------------------------------------------------------
 
 typedef struct s_gyml8511_data

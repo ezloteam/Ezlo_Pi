@@ -17,6 +17,7 @@
 #include "ezlopi_core_scenes_scripts_custom_libs_includes.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static l_ezlopi_scenes_script_t* script_head = NULL;
 

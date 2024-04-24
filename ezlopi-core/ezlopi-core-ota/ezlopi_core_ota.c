@@ -20,6 +20,7 @@
 #include "ezlopi_core_factory_info.h"
 
 #include "ezlopi_service_ota.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #if defined(CONFIG_EZPI_ENABLE_OTA)
 

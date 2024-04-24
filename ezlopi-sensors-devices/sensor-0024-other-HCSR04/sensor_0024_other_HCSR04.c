@@ -17,6 +17,7 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "sensor_0024_other_HCSR04.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 

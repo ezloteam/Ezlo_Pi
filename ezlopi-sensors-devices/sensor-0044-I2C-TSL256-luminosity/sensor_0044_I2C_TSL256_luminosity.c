@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0044_I2C_TSL256_luminosity.h"
+#include "EZLOPI_USER_CONFIG.h"
 //-----------------------------------------------------------------------
 
 static int __prepare(void* arg);

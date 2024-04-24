@@ -13,6 +13,7 @@
 
 #include "dht22.h"
 #include "sensor_0016_oneWire_DHT22.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_ezlopi_dht22_data
 {

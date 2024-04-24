@@ -13,6 +13,8 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0052_other_MQ135_NH3_detector.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 //*************************************************************************
 //                          Declaration
 //*************************************************************************

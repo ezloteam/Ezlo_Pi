@@ -37,6 +37,7 @@
 
 #include "ezlopi_core_timer.h"
 #include "ezlopi_core_event_queue.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_ezlopi_timer
 {
@@ -205,7 +206,7 @@ static void ezlopi_timer_init_timer_event(int timer_num, int time_ms, e_ezlopi_a
 {
     if (timer_num < MAX_TIMER)
     {
-        s_ezlopi_timer_t* timer_config = malloc(sizeof(s_ezlopi_timer_t));
+        s_ezlopi_timer_t* timer_config = malloc(sizeof(s_ezlopi_timer_t)); // can't be freed, used by timer-upcall to re-configure timer
 
         if (timer_config)
         {

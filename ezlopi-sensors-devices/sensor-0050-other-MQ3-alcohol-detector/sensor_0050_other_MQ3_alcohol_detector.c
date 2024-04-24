@@ -13,6 +13,8 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0050_other_MQ3_alcohol_detector.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 //*************************************************************************
 //                          Declaration
 //*************************************************************************

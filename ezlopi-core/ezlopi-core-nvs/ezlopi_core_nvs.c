@@ -6,8 +6,8 @@
 #include "freertos/task.h"
 
 #include "ezlopi_util_trace.h"
-
 #include "ezlopi_core_nvs.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static nvs_handle_t ezlopi_nvs_handle = 0;
 static const char* storage_name = "storage";

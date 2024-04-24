@@ -16,6 +16,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0040_other_TCS230.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __0040_prepare(void* arg);
 static int __0040_init(l_ezlopi_item_t* item);

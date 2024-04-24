@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0063_other_MQ9_LPG_flameable_detector.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //*************************************************************************
 //                          Declaration

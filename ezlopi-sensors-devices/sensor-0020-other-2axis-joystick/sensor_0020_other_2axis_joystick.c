@@ -17,6 +17,7 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "sensor_0020_other_2axis_joystick.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_joystick_data
 {

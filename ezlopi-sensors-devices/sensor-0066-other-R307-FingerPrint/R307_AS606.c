@@ -2,6 +2,7 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_hal_uart.h"
 #include "sensor_0066_other_R307_FingerPrint.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //----------------------------------------------------------------------------------------------------------------
 // !< Custom tx-packet >

@@ -11,6 +11,8 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0047_other_HX711_loadcell.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 /********************************************************************************/
 /*                    global defines                                            */
 /********************************************************************************/

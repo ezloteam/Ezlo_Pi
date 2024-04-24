@@ -15,6 +15,7 @@
 
 #include "sensor_0067_hilink_presence_sensor.h"
 #include "hilink_presence_sensor_setting.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static const char* hilink_presence_sensor_motion_direction_enum[] = {
     "unknown",

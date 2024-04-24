@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0021_UART_MB1013.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_mb1013_args
 {

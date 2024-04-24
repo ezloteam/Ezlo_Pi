@@ -11,6 +11,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0055_ADC_FlexResistor.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //--------------------------------------------------------------------------------------------------------
 static int __0055_prepare(void* arg);

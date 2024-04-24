@@ -18,6 +18,9 @@
 #include "ezlopi_service_gpioisr.h"
 
 #include "sensor_0066_other_R307_FingerPrint.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+
 //---------------------------------------------------------------------------------------------------------------
 static void IRAM_ATTR gpio_notify_isr(void* param)
 {

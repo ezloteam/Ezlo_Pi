@@ -13,6 +13,8 @@
 
 #include "hilink_presence_sensor_setting.h"
 #include "sensor_0067_hilink_presence_sensor.h"
+#include "EZLOPI_USER_CONFIG.h"
+
 
 static const char* nvs_key_hilink_presence_sensor_predefined_setting = "predef";
 static const char* nvs_key_hilink_presence_sensor_userdefined_setting = "userdef";

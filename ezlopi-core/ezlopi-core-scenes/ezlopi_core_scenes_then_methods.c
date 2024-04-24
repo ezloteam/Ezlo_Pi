@@ -14,6 +14,7 @@
 #include "ezlopi_core_scenes_then_methods_helper_func.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 int ezlopi_scene_then_set_item_value(l_scenes_list_v2_t* curr_scene, void* arg)
 {

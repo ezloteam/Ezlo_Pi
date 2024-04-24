@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0041_ADC_FC28_soilMoisture.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_fc28_data
 {

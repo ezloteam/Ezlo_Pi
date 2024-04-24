@@ -21,6 +21,7 @@
 
 #include "sensor_0068_ENS160_gas_sensor.h"
 #include "sensor_0068_ENS160_gas_sensor_settings.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 /*
 {\

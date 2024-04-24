@@ -19,6 +19,9 @@
 #include "color_codes.h"
 
 #include "device_0009_other_RMT_SK6812.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+
 typedef struct s_dimmer_args
 {
     led_strip_t sk6812_strip;

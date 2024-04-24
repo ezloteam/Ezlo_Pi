@@ -13,6 +13,9 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0017_ADC_potentiometer.h"
+#include "EZLOPI_USER_CONFIG.h"
+
+
 typedef struct s_potentiometer
 {
     float pot_val;

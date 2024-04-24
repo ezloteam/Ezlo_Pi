@@ -386,6 +386,15 @@ extern "C"
   CJSON_PUBLIC(int)
   cJSON_EstimatePrintLength(cJSON *item);
 
+
+
+CJSON_PUBLIC(cJSON*)
+cJSON_AddStringToObjectWithRef(cJSON* const object, const char* const name, const char* const string);
+CJSON_PUBLIC(cJSON*)
+cJSON_AddNumberToObjectWithRef(cJSON* const object, const char* const name, const double number);
+CJSON_PUBLIC(cJSON*)
+cJSON_AddObjectToObjectWithRef(cJSON* const object, const char* const name);
+
 #ifdef __cplusplus
 }
 #endif

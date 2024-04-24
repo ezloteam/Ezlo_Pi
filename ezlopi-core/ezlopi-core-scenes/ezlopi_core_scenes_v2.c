@@ -17,6 +17,7 @@
 
 #include "ezlopi_cloud_constants.h"
 #include "ezlopi_service_meshbot.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static l_scenes_list_v2_t* scenes_list_head_v2 = NULL;
 

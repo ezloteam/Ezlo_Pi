@@ -21,12 +21,13 @@
 #include "ezlopi_util_version.h"
 
 #include "ezlopi_core_nvs.h"
+#include "ezlopi_core_net.h"
 #include "ezlopi_core_wifi.h"
 #include "ezlopi_core_reset.h"
-#include "ezlopi_core_net.h"
+#include "ezlopi_core_buffer.h"
+#include "ezlopi_core_event_group.h"
 #include "ezlopi_core_factory_info.h"
 #include "ezlopi_core_cjson_macros.h"
-#include "ezlopi_core_event_group.h"
 
 #include "ezlopi_hal_system_info.h"
 
@@ -216,72 +217,115 @@ static void serial_init(void)
     uart_set_pin(UART_NUM_0, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
 
-static char* ezlopi_esp_reset_reason_str(esp_reset_reason_t reason)
+static const char* ezlopi_esp_reset_reason_str(esp_reset_reason_t reason)
 {
+    const char * ret = ezlopi__str;
+
     switch (reason)
     {
     case ESP_RST_UNKNOWN:
-        return "unknown";
-        break;
-    case ESP_RST_POWERON:
-        return "Power ON";
-        break;
-    case ESP_RST_EXT:
-        return "External pin";
-        break;
-    case ESP_RST_SW:
-        return "Software Reset via esp_restart";
-        break;
-    case ESP_RST_PANIC:
-        return "Software reset due to exception/panic";
-        break;
-    case ESP_RST_INT_WDT:
-        return "Interrupt watchdog";
-        break;
-    case ESP_RST_TASK_WDT:
-        return "Task watchdog";
-        break;
-    case ESP_RST_WDT:
-        return "Other watchdogs";
-        break;
-    case ESP_RST_DEEPSLEEP:
-        return "Reset after exiting deep sleep mode";
-        break;
-    case ESP_RST_BROWNOUT:
-        return "Brownout reset";
-        break;
-    case ESP_RST_SDIO:
-        return "Reset over SDIO";
-        break;
-    default:
-        return "unknown";
+    {
+        ret = "unknown";
         break;
     }
+    case ESP_RST_POWERON:
+    {
+        ret = "Power ON";
+        break;
+    }
+    case ESP_RST_EXT:
+    {
+        ret = "External pin";
+        break;
+    }
+    case ESP_RST_SW:
+    {
+        ret = "Software Reset via esp_restart";
+        break;
+    }
+    case ESP_RST_PANIC:
+    {
+        ret = "Software reset due to exception/panic";
+        break;
+    }
+    case ESP_RST_INT_WDT:
+    {
+        ret = "Interrupt watchdog";
+        break;
+    }
+    case ESP_RST_TASK_WDT:
+    {
+        ret = "Task watchdog";
+        break;
+    }
+    case ESP_RST_WDT:
+    {
+        ret = "Other watchdogs";
+        break;
+    }
+    case ESP_RST_DEEPSLEEP:
+    {
+        ret = "Reset after exiting deep sleep mode";
+        break;
+    }
+    case ESP_RST_BROWNOUT:
+    {
+        ret = "Brownout reset";
+        break;
+    }
+    case ESP_RST_SDIO:
+    {
+        ret = "Reset over SDIO";
+        break;
+    }
+    default:
+    {
+        ret = "unknown";
+        break;
+    }
+    }
+
+    return ret;
 }
 
-static char* ezlopi_chip_type_str(int chip_type)
+static const char* ezlopi_chip_type_str(int chip_type)
 {
+    const char * ret = ezlopi__str;
     switch (chip_type)
     {
     case CHIP_ESP32:
-        return "ESP32";
-        break;
-    case CHIP_ESP32S2:
-        return "ESP32-S2";
-        break;
-    case CHIP_ESP32S3:
-        return "ESP32-S3";
-        break;
-    case CHIP_ESP32C3:
-        return "ESP32-C3";
-        break;
-    case CHIP_ESP32H2:
-        return "ESP32-H2";
-        break;
-    default:
-        return "UNKNOWN";
+    {
+        ret = "ESP32";
         break;
     }
+    case CHIP_ESP32S2:
+    {
+        ret = "ESP32-S2";
+        break;
+    }
+    case CHIP_ESP32S3:
+    {
+        ret = "ESP32-S3";
+        break;
+    }
+    case CHIP_ESP32C3:
+    {
+        ret = "ESP32-C3";
+        break;
+    }
+    case CHIP_ESP32H2:
+    {
+        ret = "ESP32-H2";
+        break;
+    }
+    default:
+    {
+        ret = "UNKNOWN";
+        break;
+    }
+    }
+
+    return ret;
 }
 
 static int ezlopi_service_uart_execute_command_0(cJSON* root)
@@ -355,7 +399,7 @@ static int ezlopi_service_uart_read_uart_params(const cJSON* root)
 
 static int qt_serial_parse_rx_data(const char* data)
 {
-    cJSON* root = cJSON_Parse(data);
+    cJSON* root = cJSON_ParseWithRef(data);
 
     if (root)
     {
@@ -422,34 +466,43 @@ static void ezlopi_service_uart_rx_task(void* arg)
 {
     static const char* RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
-    uint8_t* data = (uint8_t*)malloc(RX_BUF_SIZE + 1);
-    memset(data, 0, RX_BUF_SIZE + 1);
-
+    
     while (1)
     {
-        int rxBytes = uart_read_bytes(UART_NUM_0, data, RX_BUF_SIZE, 1000 / portTICK_RATE_MS);
-
-        if (rxBytes > 0)
+        uint32_t buffer_len = 0;
+        char * buffer = ezlopi_core_buffer_acquire(&buffer_len, 5000);
+        if (buffer && buffer_len)
         {
-            data[rxBytes] = 0;
-            TRACE_I("%s", data);
-            qt_serial_parse_rx_data((const char*)data);
+            int rxBytes = uart_read_bytes(UART_NUM_0, buffer, buffer_len, 1000 / portTICK_RATE_MS);
+
+            if (rxBytes > 0)
+            {
+                buffer[rxBytes] = 0;
+                TRACE_I("%s", buffer);
+                qt_serial_parse_rx_data((const char*)buffer);
+            }
+
+            ezlopi_core_buffer_release();
+        }
+        else
+        {
+            TRACE_W("buffer acquiring failed!");
         }
     }
 
-    free(data);
     vTaskDelete(NULL);
 }
 
 static int get_ezlopi_firmware_info(cJSON* parent)
 {
     int ret = 0;
-    cJSON* cj_firmware_info = cJSON_AddObjectToObject(parent, "ezlopi_firmware");
+    static const char * _ezlopi_firmware_str = "ezlopi_firmware";
+    cJSON* cj_firmware_info = cJSON_AddObjectToObjectWithRef(parent, _ezlopi_firmware_str);
     if (cj_firmware_info)
     {
-        cJSON_AddStringToObject(cj_firmware_info, ezlopi_version_str, VERSION_STR);
-        cJSON_AddNumberToObject(cj_firmware_info, ezlopi_build_str, BUILD);
-        cJSON_AddNumberToObject(cj_firmware_info, ezlopi_build_date_str, BUILD_DATE);
+        cJSON_AddStringToObjectWithRef(cj_firmware_info, ezlopi_version_str, VERSION_STR);
+        cJSON_AddNumberToObjectWithRef(cj_firmware_info, ezlopi_build_str, BUILD);
+        cJSON_AddNumberToObjectWithRef(cj_firmware_info, ezlopi_build_date_str, BUILD_DATE);
         ret = 1;
     }
     return ret;

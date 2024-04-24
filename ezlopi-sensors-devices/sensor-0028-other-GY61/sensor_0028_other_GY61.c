@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0028_other_GY61.h"
+#include "EZLOPI_USER_CONFIG.h"
 //--------------------------------------------------------------------------------------------------------
 
 typedef struct s_gy61_data

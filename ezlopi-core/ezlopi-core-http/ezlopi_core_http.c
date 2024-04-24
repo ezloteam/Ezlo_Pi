@@ -16,6 +16,7 @@
 
 #include "ezlopi_core_http.h"
 #include "ezlopi_core_event_group.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 
 static void ezlopi_http_free_rx_data(s_rx_data_t* rx_data);

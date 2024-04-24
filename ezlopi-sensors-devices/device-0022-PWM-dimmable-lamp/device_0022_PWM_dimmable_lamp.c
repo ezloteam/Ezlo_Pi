@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "device_0022_PWM_dimmable_lamp.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_dimmable_bulb_properties
 {

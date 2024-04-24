@@ -14,6 +14,7 @@
 
 #include "gyGPS6MV2.h"
 #include "sensor_0053_UART_GYGPS6MV2.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------
 static int __0053_prepare(void* arg);

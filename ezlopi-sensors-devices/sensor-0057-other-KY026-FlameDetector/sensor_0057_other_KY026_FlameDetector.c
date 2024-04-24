@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0057_other_KY026_FlameDetector.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------------
 const char* ky206_sensor_heat_alarm_token[] = {

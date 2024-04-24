@@ -22,6 +22,7 @@
 #include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_service_webprov.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 
 #if defined(CONFIG_EZPI_WEBSOCKET_CLIENT)

@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0049_other_MQ2_LPG_detector.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //*************************************************************************
 //                          Declaration

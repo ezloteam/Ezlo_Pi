@@ -5,6 +5,7 @@
 
 #include "ezlopi_cloud_items.h"
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static l_ezlopi_device_t* l_device_head = NULL;
 static volatile uint32_t g_store_dev_config_with_id = 0;
@@ -588,56 +589,6 @@ static void ezlopi_device_parse_json_v3(cJSON* cjson_config)
             TRACE_I("---------------------------------------------");
         }
     }
-
-#if 0
-    ezlopi_device_print_controller_cloud_information_v3();
-
-    int device_count = 0;
-    l_ezlopi_device_t* tm_device_l_list = l_device_head;
-    while (tm_device_l_list)
-    {
-        TRACE_D("|~~~~~~~~~~~~~~~~ Device - %d ~~~~~~~~~~~~~~~~|", device_count + 1);
-        // TRACE_D("|- Device Pointer: %p", tm_device_l_list);
-        TRACE_D("|- Name: %.*s", 32, isprint(tm_device_l_list->cloud_properties.device_name[0]) ? tm_device_l_list->cloud_properties.device_name : ezlopi_null_str);
-        TRACE_D("|- Id: %08X", tm_device_l_list->cloud_properties.device_id);
-        TRACE_D("|- Parent Device ID: %08X", tm_device_l_list->cloud_properties.parent_device_id);
-        TRACE_D("|- Category: %s", tm_device_l_list->cloud_properties.category ? tm_device_l_list->cloud_properties.category : ezlopi_null_str);
-        TRACE_D("|- Sub-category: %s", tm_device_l_list->cloud_properties.subcategory ? tm_device_l_list->cloud_properties.subcategory : ezlopi_null_str);
-        TRACE_D("|- Device-type: %s", tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : ezlopi_null_str);
-
-        int item_count = 0;
-        l_ezlopi_item_t* tm_itme_l_list = tm_device_l_list->items;
-        while (tm_itme_l_list)
-        {
-            TRACE_D("|~~~|--------------- Item - %d ---------------|", item_count + 1);
-            TRACE_D("|~~~|- Id: %08X", tm_itme_l_list->cloud_properties.item_id);
-            TRACE_D("|~~~|- Category: %s", tm_itme_l_list->cloud_properties.item_name ? tm_itme_l_list->cloud_properties.item_name : ezlopi_null_str);
-            // TRACE_D("|~~~|- Value: %s", tm_itme_l_list->cloud_properties.value_type ? tm_itme_l_list->cloud_properties.value_type : "null");
-            // TRACE_D("|~~~|- Device-type: %.*s", 32, tm_device_l_list->cloud_properties.device_type ? tm_device_l_list->cloud_properties.device_type : "null");
-
-            TRACE_D("|~~~|- Interface-type: %d", tm_itme_l_list->interface_type);
-            ezlopi_device_print_interface_type(tm_itme_l_list);
-
-            tm_itme_l_list = tm_itme_l_list->next;
-            item_count++;
-        }
-
-        TRACE_D("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
-
-        tm_device_l_list = tm_device_l_list->next;
-        device_count++;
-    }
-#endif
-
-#if 0
-    l_ezlopi_configured_devices_t* current_head = ezlopi_devices_list_get_configured_items();
-    while (NULL != current_head)
-    {
-        ezlopi_device_print_properties(current_head->properties);
-        TRACE_I("Device name: %.*s", sizeof(current_head->properties->ezlopi_cloud.device_name), current_head->properties->ezlopi_cloud.device_name);
-        current_head = current_head->next;
-    }
-#endif
 }
 
 static void ezlopi_device_free_item(l_ezlopi_item_t* items)

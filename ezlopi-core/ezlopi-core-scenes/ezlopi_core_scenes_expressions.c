@@ -8,6 +8,7 @@
 #include "ezlopi_core_scenes_expressions.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static s_ezlopi_expressions_t* l_expressions_head = NULL;
 

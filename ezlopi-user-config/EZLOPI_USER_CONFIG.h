@@ -3,6 +3,7 @@
 
 #if 1
 #include "../build/config/sdkconfig.h"
+#include "ezlopi_util_heap.h"
 
 #if defined(CONFIG_EZPI_DISTRO_FULL_OPTION)
 #define CONFIG_EZPI_DISTRO_NAME "EZPI_DISTRO_FULL_OPTION"
@@ -25,6 +26,30 @@
 #else
 #define CONFIG_EZPI_DISTRO_NAME "EZLOPI_DISTRO_CUSTOM"
 #endif
+
+#if defined(CONFIG_EZPI_HEAP_ENABLE)
+#ifdef malloc
+#undef malloc
+#endif
+#define malloc(x) ezlopi_util_heap_malloc(x, __FILENAME__, __LINE__)
+
+#ifdef calloc
+#undef calloc
+#endif
+#define calloc(x, y) ezlopi_util_heap_calloc(x, y, __FILENAME__, __LINE__)
+
+#ifdef free
+#undef free
+#endif
+#define free(x) ezlopi_util_heap_free(x, __FILENAME__, __LINE__)
+
+#ifdef realloc
+#undef realloc
+#endif
+#define realloc(x, y) ezlopi_util_heap_realloc(x, y, __FILENAME__, __LINE__)
+
+#endif
+
 
 
 #define EZLOPI_SERIAL_API_VERSION "1.0.0"

@@ -31,6 +31,7 @@
 #include "ezlopi_core_device_value_updated.h"
 
 #include "ezlopi_service_uart.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 5
 

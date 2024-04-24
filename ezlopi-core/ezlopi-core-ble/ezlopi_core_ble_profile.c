@@ -6,6 +6,7 @@
 #include "ezlopi_core_ble_profile.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static s_gatt_service_t* gatt_head_service = NULL;
 

@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0042_ADC_shunt_voltmeter.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_voltmeter
 {

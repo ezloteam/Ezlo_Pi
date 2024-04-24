@@ -8,6 +8,7 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_hal_adc.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_ezlopi_analog_object
 {

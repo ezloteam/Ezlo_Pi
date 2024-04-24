@@ -15,6 +15,7 @@
 #include "freertos/task.h"
 
 #include "ens160.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static const char* TAG = "ENS160";
 

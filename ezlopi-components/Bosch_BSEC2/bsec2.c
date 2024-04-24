@@ -37,6 +37,7 @@
  */
 
 #include "bsec2.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 /* Stores the version of the BSEC algorithm */
 static bsec_version_t version;

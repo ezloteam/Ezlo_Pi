@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0062_other_MQ7_CO_detector.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //*************************************************************************
 //                          Declaration

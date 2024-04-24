@@ -24,6 +24,7 @@
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_broadcast.h"
 #include "ezlopi_service_led_indicator.h"
+#include "ezlopi_util_heap.h"
 
 #include "pt.h"
 
@@ -32,6 +33,7 @@ static void __blinky(void* pv);
 
 void app_main(void)
 {
+    #if 1
     ezlopi_service_led_indicator_init();
     gpio_install_isr_service(0);
 
@@ -40,7 +42,7 @@ void app_main(void)
     ezlopi_init();
 
 #if defined(CONFIG_EZPI_ENABLE_UART_PROVISIONING)
-    EZPI_SERVICE_uart_init();
+    // EZPI_SERVICE_uart_init();
 #endif
 
     timer_service_init();
@@ -49,7 +51,7 @@ void app_main(void)
     ezlopi_ble_service_init();
 #endif
 
-#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(EZPI_WEBSOCKET_CLIENT)
+#if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER) || defined(CONFIG_EZPI_WEBSOCKET_CLIENT)
     ezlopi_service_broadcast_init();
 #endif
 
@@ -74,37 +76,45 @@ void app_main(void)
 #if CONFIG_EZPI_SERV_ENABLE_MESHBOTS
     ezlopi_scenes_meshbot_init();
 #endif
-
+#endif
     xTaskCreate(__blinky, "__blinky", 2 * 2048, NULL, 0, NULL);
 }
 
 
 static void __blinky(void* pv)
 {
-
-    uint32_t count = 0;
     uint32_t low_heap_start_time = xTaskGetTickCount();
 
     while (1)
     {
-        uint32_t free_heap_kb = esp_get_free_heap_size() / 1024.0;
+        float free_heap_kb = esp_get_free_heap_size() / 1024.0;
 
         trace_wb("----------------------------------------------");
         trace_wb("esp_get_free_heap_size - %.02f kB", free_heap_kb);
         trace_wb("esp_get_minimum_free_heap_size: %.02f kB", esp_get_minimum_free_heap_size() / 1024.0);
         trace_wb("----------------------------------------------");
 
-        if (free_heap_kb >= 10)
+        ezlopi_util_heap_trace();
+        
+        if (free_heap_kb <= 10)
         {
-            low_heap_start_time = xTaskGetTickCount();
+            TRACE_W("CRITICAL-WARNING: low heap detected..");
+            ezlopi_util_heap_trace();
         }
         else if ((xTaskGetTickCount() - low_heap_start_time) > (15000 / portTICK_PERIOD_MS))
         {
-            TRACE_E("ERROR: low heap time-out detected!");
+            ezlopi_util_heap_trace();
+            vTaskDelay(2000 / portTICK_RATE_MS);
+            TRACE_E("CRITICAL-ERROR: low heap time-out detected!");
             TRACE_W("Rebooting.....");
             esp_restart();
         }
+        else
+        {
+            low_heap_start_time = xTaskGetTickCount();
+        }
 
+        ezlopi_util_heap_flush();
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }

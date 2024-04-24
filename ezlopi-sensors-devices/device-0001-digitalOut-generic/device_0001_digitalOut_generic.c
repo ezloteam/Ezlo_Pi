@@ -15,6 +15,7 @@
 
 #include "ezlopi_service_gpioisr.h"
 #include "device_0001_digitalOut_generic.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 // #define DEV_TEST_SETTINGS_EN
 

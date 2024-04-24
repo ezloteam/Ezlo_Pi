@@ -16,6 +16,7 @@
 
 #include "ALS_LTR303.h"
 #include "sensor_0008_I2C_LTR303ALS.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);

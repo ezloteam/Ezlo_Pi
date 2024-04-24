@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "device_0038_other_RGB.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_rgb_args
 {
@@ -214,10 +215,6 @@ static int __init(l_ezlopi_item_t* item)
 
                     rgb_args->RGB_LED_initialized = true;
                     ret = 1;
-                }
-                else
-                {
-                    ret = -1;
                 }
             }
             else

@@ -7,6 +7,7 @@
 #include "ezlopi_core_ezlopi_broadcast.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 // #include "ezlopi_service_webprov.h"
 

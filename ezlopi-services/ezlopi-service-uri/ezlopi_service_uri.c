@@ -10,6 +10,7 @@
 #include "dns_hijacking.h"
 
 #include "ezlopi_service_uri.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static const char* error_page_data = "\
     <!DOCTYPE html>\

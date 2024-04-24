@@ -35,6 +35,7 @@
 
 #include "ezlopi_service_ws_server.h"
 #include "ezlopi_service_ws_server_clients.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 
 // #if defined(CONFIG_EZPI_LOCAL_WEBSOCKET_SERVER)

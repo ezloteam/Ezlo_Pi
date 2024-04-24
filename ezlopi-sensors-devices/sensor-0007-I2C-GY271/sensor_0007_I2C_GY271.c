@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0007_I2C_GY271.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 static int __prepare(void* arg);

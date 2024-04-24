@@ -11,6 +11,7 @@
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
 #include "ezlopi_core_ezlopi_broadcast.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 // static uint32_t __message_count = 0;
 static l_broadcast_method_t* __method_head = NULL;
@@ -30,6 +31,10 @@ int ezlopi_core_ezlopi_broadcast_add_to_queue(cJSON* cj_data)
     if (cj_data && __broadcast_queue_func)
     {
         ret = __broadcast_queue_func(cj_data);
+    }
+    else
+    {
+        TRACE_E("cj_data: %p, __broadcast_queue_func: %p", cj_data, __broadcast_queue_func);
     }
     return ret;
 }

@@ -3,6 +3,7 @@
 #include "ezlopi_core_scenes_populate.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 void ezlopi_scenes_populate_scene(l_scenes_list_v2_t* new_scene, cJSON* cj_scene, uint32_t scene_id)
 {

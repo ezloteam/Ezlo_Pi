@@ -13,6 +13,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0029_I2C_GXHTC3.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);

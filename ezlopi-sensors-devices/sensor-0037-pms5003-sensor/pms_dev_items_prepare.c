@@ -10,6 +10,7 @@
 
 #include "pms5003.h"
 #include "sensor_0037_pms5003_sensor.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 // Device 0
 static int __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cJSON *cj_properties, uint32_t *parent_id, void *user_arg)

@@ -10,6 +10,7 @@
 #include "ezlopi_util_trace.h"
 
 #include "ezlopi_hal_uart.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static void ezlopi_uart_channel_task(void *args);
 static ezlo_uart_channel_t get_available_channel();

@@ -16,6 +16,7 @@
 #include "sensor_0069_ze08_ch02_gas_sensor.h"
 
 #include "ze08_ch2o.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg, void* user_arg);
 static int __init(l_ezlopi_item_t* item);

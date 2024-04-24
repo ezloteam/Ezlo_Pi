@@ -8,8 +8,9 @@
 
 #include "ezlopi_cloud_constants.h"
 
-#include "ezlopi_service_meshbot.h"
 #include "pt.h"
+#include "ezlopi_service_meshbot.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_thread_ctx
 {

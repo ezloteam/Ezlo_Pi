@@ -58,6 +58,7 @@
 
 #include "cjext.h"
 #include "ezlopi_util_trace.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 /* define our own boolean type */
 #ifdef true
@@ -166,25 +167,26 @@ typedef struct internal_hooks
     void* (CJSON_CDECL* reallocate)(void* pointer, size_t size);
 } internal_hooks;
 
-#if defined(_MSC_VER)
-/* work around MSVC error C2322: '...' address of dllimport '...' is not static */
-static void* CJSON_CDECL internal_malloc(size_t size)
-{
-    return malloc(size);
-}
-static void CJSON_CDECL internal_free(void* pointer)
-{
-    free(pointer);
-}
-static void* CJSON_CDECL internal_realloc(void* pointer, size_t size)
-{
-    return realloc(pointer, size);
-}
-#else
+// #if defined(_MSC_VER)
+// /* work around MSVC error C2322: '...' address of dllimport '...' is not static */
+// static void* CJSON_CDECL internal_malloc(size_t size)
+// {
+//     return malloc(size);
+// }
+// static void CJSON_CDECL internal_free(void* pointer)
+// {
+//     free(pointer);
+// }
+// static void* CJSON_CDECL internal_realloc(void* pointer, size_t size)
+// {
+//     return realloc(pointer, size);
+// }
+// #elif defined(CONFIG)
+// #else
 #define internal_malloc malloc
 #define internal_free free
 #define internal_realloc realloc
-#endif
+// #endif
 
 /* strlen of character literals resolved at compile time */
 #define static_strlen(string_literal) (sizeof(string_literal) - sizeof(""))
@@ -2558,6 +2560,7 @@ static cJSON_bool add_item_to_object(cJSON* const object, const char* const stri
     return add_item_to_array(object, item);
 }
 
+
 CJSON_PUBLIC(cJSON_bool)
 cJSON_AddItemToObject(cJSON* object, const char* string, cJSON* item)
 {
@@ -2658,11 +2661,38 @@ cJSON_AddNumberToObject(cJSON* const object, const char* const name, const doubl
     return NULL;
 }
 
+
+CJSON_PUBLIC(cJSON*)
+cJSON_AddNumberToObjectWithRef(cJSON* const object, const char* const name, const double number)
+{
+    cJSON* number_item = cJSON_CreateNumber(number);
+    if (add_item_to_object(object, name, number_item, &global_hooks, true))
+    {
+        return number_item;
+    }
+
+    cJSON_Delete(number_item);
+    return NULL;
+}
+
 CJSON_PUBLIC(cJSON*)
 cJSON_AddStringToObject(cJSON* const object, const char* const name, const char* const string)
 {
     cJSON* string_item = cJSON_CreateString(string);
     if (add_item_to_object(object, name, string_item, &global_hooks, false))
+    {
+        return string_item;
+    }
+
+    cJSON_Delete(string_item);
+    return NULL;
+}
+
+CJSON_PUBLIC(cJSON*)
+cJSON_AddStringToObjectWithRef(cJSON* const object, const char* const name, const char* const string)
+{
+    cJSON* string_item = cJSON_CreateStringReference(string);
+    if (add_item_to_object(object, name, string_item, &global_hooks, true))
     {
         return string_item;
     }
@@ -2689,6 +2719,19 @@ cJSON_AddObjectToObject(cJSON* const object, const char* const name)
 {
     cJSON* object_item = cJSON_CreateObject();
     if (add_item_to_object(object, name, object_item, &global_hooks, false))
+    {
+        return object_item;
+    }
+
+    cJSON_Delete(object_item);
+    return NULL;
+}
+
+CJSON_PUBLIC(cJSON*)
+cJSON_AddObjectToObjectWithRef(cJSON* const object, const char* const name)
+{
+    cJSON* object_item = cJSON_CreateObject();
+    if (add_item_to_object(object, name, object_item, &global_hooks, true))
     {
         return object_item;
     }
@@ -3028,7 +3071,8 @@ cJSON_CreateStringReference(const char* string)
     if (item != NULL)
     {
         item->type = cJSON_String | cJSON_IsReference;
-        item->valuestring = (char*)cast_away_const(string);
+        item->valuestring = string;
+        item->str_value_len = strlen(string);
     }
 
     return item;

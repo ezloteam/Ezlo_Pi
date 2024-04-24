@@ -14,6 +14,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0032_ADC_soilMoisture.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);

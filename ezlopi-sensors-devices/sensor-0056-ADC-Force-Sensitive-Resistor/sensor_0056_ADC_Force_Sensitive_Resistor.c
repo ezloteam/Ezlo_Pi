@@ -12,6 +12,7 @@
 #include "ezlopi_cloud_constants.h"
 
 #include "sensor_0056_ADC_Force_Sensitive_Resistor.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 //------------------------------------------------------------------------------------------------------------------------------
 static int __0056_prepare(void* arg);

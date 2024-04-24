@@ -13,6 +13,7 @@
 
 #include "dht11.h"
 #include "sensor_0015_oneWire_DHT11.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 typedef struct s_ezlopi_dht11_data
 {

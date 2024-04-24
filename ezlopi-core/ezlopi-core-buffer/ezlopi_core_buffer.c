@@ -4,6 +4,7 @@
 
 #include "ezlopi_util_trace.h"
 #include "ezlopi_core_buffer.h"
+#include "EZLOPI_USER_CONFIG.h"
 
 static char *__buffer = NULL;
 static uint32_t __buffer_len = 0;
@@ -98,7 +99,11 @@ char *ezlopi_core_buffer_acquire(uint32_t *len, uint32_t wait_to_acquired_ms)
     {
         if (pdTRUE == xSemaphoreTake(__buffer_lock, wait_to_acquired_ms / portTICK_RATE_MS))
         {
-            TRACE_I("acquired in: %d", xTaskGetTickCount() - start_time);
+            if (xTaskGetTickCount() - start_time)
+            {
+                TRACE_I("acquired in: %d", xTaskGetTickCount() - start_time);
+            }
+            
             ret = __buffer;
             *len = __buffer_len;
             __buffer_lock_state = EZ_BUFFER_STATE_BUSY;

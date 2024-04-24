@@ -12,6 +12,7 @@ set(EZLOPI_SDK_COMPONENTS
 # Define ezlopi-components
 set(EZLOPI_COMPONENTS
         pt
+        ezlopi-util-heap
         ezlopi-util-trace
 )
 
