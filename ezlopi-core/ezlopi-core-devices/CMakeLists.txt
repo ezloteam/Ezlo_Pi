@@ -85,6 +85,8 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         sensor-0067-UART-hilink-presence-sensor
         sensor-0068-I2C-ENS160-gas-sensor
         sensor-0069-UART-ze08-ch02-gas-sensor
+
+        sensor-0070-ADC-dummy-potentiometer
 )
 
 
